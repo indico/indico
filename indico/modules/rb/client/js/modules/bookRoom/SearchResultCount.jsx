@@ -23,6 +23,8 @@ import './BookRoom.module.scss';
 class SearchResultCount extends React.Component {
   static propTypes = {
     isSearching: PropTypes.bool.isRequired,
+    isSearchFailed: PropTypes.bool.isRequired,
+    searchFailedMessage: PropTypes.string,
     available: PropTypes.number,
     totalMatchingFilters: PropTypes.number,
     unbookable: PropTypes.number,
@@ -32,6 +34,7 @@ class SearchResultCount extends React.Component {
   };
 
   static defaultProps = {
+    searchFailedMessage: null,
     available: null,
     totalMatchingFilters: null,
     unbookable: null,
@@ -171,6 +174,11 @@ class SearchResultCount extends React.Component {
     );
   }
 
+  renderSearchFailed() {
+    const {searchFailedMessage} = this.props;
+    return <Message icon="times circle outline" error content={searchFailedMessage} />;
+  }
+
   renderNoRooms() {
     return (
       <Message
@@ -193,7 +201,7 @@ class SearchResultCount extends React.Component {
   }
 
   render() {
-    const {isSearching, available, totalMatchingFilters, unbookable} = this.props;
+    const {isSearching, isSearchFailed, available, totalMatchingFilters, unbookable} = this.props;
     const unavailable = totalMatchingFilters - available - unbookable;
     const style = {
       display: isSearching || totalMatchingFilters > 0 ? 'inline-flex' : 'none',
@@ -224,12 +232,14 @@ class SearchResultCount extends React.Component {
             )
           )}
         </Menu>
-        {!isSearching && (
+        {isSearchFailed ? (
+          this.renderSearchFailed()
+        ) : !isSearching ? (
           <>
             {totalMatchingFilters > 0 && available === 0 && this.renderNoMatching()}
             {totalMatchingFilters === 0 && this.renderNoRooms()}
           </>
-        )}
+        ) : null}
       </div>
     );
   }
@@ -238,6 +248,8 @@ class SearchResultCount extends React.Component {
 export default connect(
   state => ({
     isSearching: selectors.isSearching(state),
+    isSearchFailed: selectors.isSearchFailed(state),
+    searchFailedMessage: selectors.getSearchFailedMessage(state),
   }),
   dispatch => ({
     actions: bindActionCreators(

@@ -75,6 +75,7 @@ class BookingEdit extends React.Component {
       numberOfCandidates: null,
       willBookingSplit: false,
       calendars: null,
+      timelineError: null,
     };
   }
 
@@ -141,6 +142,10 @@ class BookingEdit extends React.Component {
     try {
       response = await indicoAxios.get(bookingEditTimelineURL({booking_id: id}), {params});
     } catch (error) {
+      if (_.get(error, 'response.status') === 418) {
+        this.setState({timelineError: error.response.data.message});
+        return;
+      }
       handleAxiosError(error);
       return;
     }
@@ -158,11 +163,12 @@ class BookingEdit extends React.Component {
       willBookingSplit: false,
     });
 
-    const {calendars, willBeSplit} = await this.fetchBookingTimelineInfo({
-      dates,
-      timeSlot,
-      recurrence,
-    });
+    const res = await this.fetchBookingTimelineInfo({dates, timeSlot, recurrence});
+    if (!res) {
+      // request failed
+      return;
+    }
+    const {calendars, willBeSplit} = res;
     const [currentBooking, newBooking] = calendars;
 
     this.setState({
@@ -188,6 +194,7 @@ class BookingEdit extends React.Component {
       numberOfConflicts,
       numberOfCandidates,
       isLoading,
+      timelineError,
     } = this.state;
     const conflictingBooking = numberOfConflicts > 0 && !skipConflicts;
     const submitBlocked =
@@ -216,7 +223,11 @@ class BookingEdit extends React.Component {
               />
             </Grid.Column>
             <Grid.Column stretched>
-              {!!calendars && (
+              {timelineError ? (
+                <div>
+                  <Message icon="times circle outline" error content={timelineError} />
+                </div>
+              ) : calendars ? (
                 <BookingEditCalendar
                   calendars={calendars}
                   booking={booking}
@@ -225,7 +236,7 @@ class BookingEdit extends React.Component {
                   willBookingSplit={willBookingSplit}
                   isLoading={isLoading}
                 />
-              )}
+              ) : null}
               {this.renderConflictsMessage()}
             </Grid.Column>
           </Grid>

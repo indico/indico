@@ -28,8 +28,10 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
+from indico.util.i18n import _
 from indico.util.iterables import group_list
 from indico.util.string import crc32
+from indico.web.util import ExpectedError
 
 
 ROOM_PHOTO_DIMENSIONS = (290, 170)
@@ -337,3 +339,15 @@ def get_prebooking_collisions(reservation):
     from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
     valid_occurrences = reservation.occurrences.filter(ReservationOccurrence.is_valid).all()
     return ReservationOccurrence.find_overlapping_with(reservation.room, valid_occurrences, reservation.id).all()
+
+
+def check_impossible_repetition(data):
+    from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+    try:
+        start_dt, end_dt = data['start_dt'], data['end_dt']
+        repetition = data['repeat_frequency'], data['repeat_interval']
+        recurrence_weekdays = data['recurrence_weekdays']
+    except KeyError:
+        return
+    if not any(ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition, recurrence_weekdays)):
+        raise ExpectedError(_('The selected date range does not contain any of the weekdays you selected.'))

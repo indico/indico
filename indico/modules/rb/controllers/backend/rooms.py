@@ -24,7 +24,7 @@ from indico.modules.rb.operations.blockings import filter_blocked_rooms, get_blo
 from indico.modules.rb.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb.operations.rooms import get_room_statistics, search_for_rooms
 from indico.modules.rb.schemas import room_attribute_values_schema, rooms_schema
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import check_impossible_repetition, rb_is_admin
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
@@ -59,6 +59,7 @@ class RHSearchRooms(RHRoomBookingBase):
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, args):
+        check_impossible_repetition(args)
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval',
                                                       'recurrence_weekdays'))
         only_unavailable = args.pop('unavailable')
