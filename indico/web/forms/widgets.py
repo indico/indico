@@ -5,10 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import itertools
 import re
 
-from flask import current_app
 from markupsafe import Markup
 from wtforms.widgets import CheckboxInput, HiddenInput
 
@@ -141,12 +139,6 @@ class TinyMCEWidget(JinjaWidget):
 
     def __init__(self, *, images=False, height=600):
         super().__init__('forms/tinymce_widget.html', images=images, height=height)
-
-    def __call__(self, field, **kwargs):
-        # Include our usual CSS as content CSS in the editor iframe
-        bundles = ('common.css', 'react.css', 'semantic-ui.css', 'jquery.css', 'main.css')
-        content_css = list(itertools.chain.from_iterable(current_app.manifest[x] for x in bundles))
-        return super().__call__(field, **kwargs, content_css=content_css)
 
 
 class SwitchWidget(JinjaWidget):

@@ -58,7 +58,10 @@
     {{ template_hook('html-head') }}
 </head>
 <body data-user-id="{{ session.user.id if session.user else 'null' }}"
-      data-debug="{{ config.DEBUG|tojson|forceescape }}">
+      data-debug="{{ config.DEBUG|tojson|forceescape }}"
+      {% if tinymce_content_css_urls is defined %}
+          data-tinymce-content-css="{{ tinymce_content_css_urls|tojson|forceescape }}"
+      {% endif %}>
     <ind-bypass-block-links></ind-bypass-block-links>
     {% block html_body %}
         {#-
