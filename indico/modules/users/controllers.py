@@ -233,8 +233,8 @@ class RHUserDataExportAPI(RHUserBase):
         'options': fields.List(fields.Enum(DataExportOptions), validate=validate.Length(min=1)),
     })
     def _process_POST(self, options):
-        from indico.modules.users.tasks import export_user_data_task
-        export_user_data_task.delay(self.user, options)
+        from indico.modules.users.tasks import export_user_data
+        export_user_data.delay(self.user, options)
         return {'state': DataExportRequestState.running.name}
 
 

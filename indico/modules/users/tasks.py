@@ -5,37 +5,19 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from contextlib import suppress
-from datetime import timedelta
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-from uuid import uuid4
-from zipfile import ZipFile
-
-import yaml
 from celery.schedules import crontab
 from sqlalchemy.orm.attributes import flag_modified
 
 from indico.core.celery import celery
-from indico.core.config import config
 from indico.core.db import db
-from indico.core.notifications import email_sender, make_email
-from indico.modules.attachments.models.attachments import AttachmentFile
-from indico.modules.events.abstracts.models.files import AbstractFile
-from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.registration.models.registrations import RegistrationData
-from indico.modules.files.models.files import File
 from indico.modules.users import logger
-from indico.modules.users.export import get_abstracts, get_attachments, get_editables, get_papers, get_registration_data
-from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
+from indico.modules.users.export import export_user_data as _export_user_data
+from indico.modules.users.export import get_old_requests
+from indico.modules.users.models.export import DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, User
 from indico.modules.users.util import get_gravatar_for_user, set_user_avatar
-from indico.util.date_time import now_utc
-from indico.util.fs import secure_filename
 from indico.util.iterables import committing_iterator
 from indico.util.string import crc32
-from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
 
 
 @celery.periodic_task(name='update_gravatars', run_every=crontab(minute='0', hour='0'))
@@ -65,212 +47,9 @@ def _do_update_gravatar(user):
     logger.info('Gravatar of user %s updated', user)
 
 
-def export_user_data(user, options):
-    """Generate a zip file with all user data and save it in user.data_export_request."""
-    export_request = user.data_export_request
-    if export_request and export_request.is_running:
-        return
-
-    if export_request:
-        export_request.delete()
-        db.session.commit()
-    export_request = DataExportRequest(user=user, selected_options=options, state=DataExportRequestState.running)
-    db.session.commit()
-
-    temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
-    try:
-        _export_user_data(export_request, temp_file)
-    except Exception:
-        logger.exception('Could not create a user data export %r', export_request)
-        export_request.fail()
-        db.session.commit()
-        notify_data_export_failure(export_request)
-    finally:
-        Path(temp_file.name).unlink(missing_ok=True)
-
-
-def _export_user_data(export_request, buffer):
-    generate_zip(export_request, buffer, config.MAX_DATA_EXPORT_SIZE * 1024**2)
-    buffer.seek(0)
-
-    file = File(filename='data-export.zip', content_type='application/zip')
-    try:
-        file.save(('user', export_request.user.id), buffer)
-        file.claim()
-        export_request.succeed(file)
-        db.session.commit()
-    except Exception as exc:
-        with suppress(Exception):
-            file.delete()
-        raise exc
-    else:
-        notify_data_export_success(export_request)
-
-
 @celery.task(name='export_user_data')
-def export_user_data_task(user, options):
-    export_user_data(user, options)
-
-
-def get_data(export_request):
-    from indico.modules.users.export_schemas import UserDataExportSchema
-
-    user = export_request.user
-    options = export_request.selected_options
-
-    options_map = {
-        DataExportOptions.contribs: ('contributions', 'subcontributions'),
-        DataExportOptions.abstracts_papers: ('abstracts', 'papers'),
-        DataExportOptions.misc: ('miscellaneous',),
-    }
-    fields = []
-    for opt in options:
-        fields += options_map.get(opt, (opt.name,))
-    return UserDataExportSchema(only=fields).dump(user)
-
-
-def convert_to_yaml(data):
-    """Convert to yaml with a nicer indentation style.
-
-    Normal output does not indent lists, e.g.:
-
-        key:
-        - 1
-        - 2
-
-    With this, the list is indented:
-
-        key:
-          - 1
-          - 2
-
-    See: https://github.com/yaml/pyyaml/issues/234
-    """
-    class Dumper(yaml.Dumper):
-        def increase_indent(self, flow=False, indentless=False):
-            return super().increase_indent(flow, indentless=False)
-
-    return yaml.dump(data, Dumper=Dumper, allow_unicode=True)
-
-
-def generate_zip(export_request, temp_file, max_size):
-    data = get_data(export_request)
-    with ZipFile(temp_file, 'w', allowZip64=True) as zip_file:
-        for key, subdata in data.items():
-            zip_file.writestr(f'{key}.yaml', convert_to_yaml(subdata))
-        size = 0
-        for file in collect_files(export_request):
-            size += getattr(file, 'file', file).size
-            if size <= max_size:
-                write_file(zip_file, file)
-            else:
-                export_request.max_size_exceeded = True
-                logger.warning('User data export exceeds size limit, exporting only partial data: %r',
-                               export_request)
-                break
-
-
-def collect_files(export_request):
-    user = export_request.user
-    options = export_request.selected_options
-
-    if DataExportOptions.attachments in options:
-        for attachment in get_attachments(user):
-            yield attachment.file
-
-    if DataExportOptions.abstracts_papers in options:
-        for abstract in get_abstracts(user):
-            yield from abstract.files
-
-        for paper in get_papers(user):
-            yield from paper.files
-
-    if DataExportOptions.editables in options:
-        for editable in get_editables(user):
-            yield from dedup_editable_files(editable)
-
-    if DataExportOptions.registrations in options:
-        yield from get_registration_data(user)
-
-
-def dedup_editable_files(editable):
-    """Return deduplicated editable files.
-
-    When a file is not changed between revisions, multiple revisions might refer to
-    the same physical file. We don't want to include duplicate files in the export.
-    """
-    files = {file.file_id: file for revision in editable.revisions for file in revision.files}
-    return files.values()
-
-
-def write_file(zip_file, file):
-    path = build_storage_path(file)
-    file = getattr(file, 'file', file)
-    with file.open() as f:
-        zip_file.writestr(path, f.read())
-
-
-def build_storage_path(file):
-    if isinstance(file, RegistrationData):
-        event = file.registration.event
-        prefix = 'registrations'
-        path = f'{event.id}_{event.title}'
-    elif isinstance(file, AttachmentFile):
-        prefix = 'attachments'
-        path = ''
-    elif isinstance(file, AbstractFile):
-        event = file.abstract.event
-        prefix = 'abstracts'
-        path = f'{event.id}_{event.title}/{file.abstract.id}_{file.abstract.title}'
-    elif isinstance(file, PaperFile):
-        event = file._contribution.event
-        prefix = 'papers'
-        path = f'{event.id}_{event.title}/{file._contribution.id}_{file.paper.title}'
-    else:
-        editable = file.revision.editable
-        event = editable.contribution.event
-        prefix = f'editables/{editable.type.name}'
-        path = f'{event.id}_{event.title}/{editable.id}_{editable.contribution.title}'
-
-    path = secure_path(path)
-    filename = build_filename(file)
-    return str(Path() / prefix / path / filename)
-
-
-def build_filename(file):
-    file = getattr(file, 'file', file)
-    if isinstance(file, RegistrationData):
-        id = f'{file.registration_id}_{file.field_data_id}'
-    else:
-        id = file.id
-
-    filename = secure_filename(Path(file.filename).stem, '')
-    return f'{id}_{filename}.{file.extension}'
-
-
-def secure_path(path):
-    parts = (secure_filename(p, uuid4()) for p in Path(path).parts)
-    return Path(*parts)
-
-
-@email_sender
-def notify_data_export_success(export_request):
-    """Send an email to the user when a data export is completed"""
-    with export_request.user.force_user_locale():
-        template = get_template_module('users/emails/data_export_success.txt',
-                                       user=export_request.user, link=export_request.url,
-                                       max_size_exceeded=export_request.max_size_exceeded)
-        return make_email({export_request.user.email}, template=template, html=False)
-
-
-@email_sender
-def notify_data_export_failure(export_request):
-    """Send an email to the user when a data export has failed"""
-    with export_request.user.force_user_locale():
-        user = export_request.user
-        template = get_template_module('users/emails/data_export_failure.txt', user=user,
-                                       link=url_for('users.user_data_export', user, _external=True))
-        return make_email({export_request.user.email}, template=template, html=False)
+def export_user_data(user, options):
+    _export_user_data(user, options)
 
 
 @celery.periodic_task(name='user_data_export_cleanup', run_every=crontab(hour='4', day_of_week='monday'))
@@ -283,7 +62,7 @@ def user_data_export_cleanup(days=30):
 
     :param days: minimum age of the data export to be marked for removal
     """
-    old_requests = _get_old_requests(days)
+    old_requests = get_old_requests(days)
 
     logger.info('Marking for deletion %d expired user data exports from the past %d days', len(old_requests), days)
     for request in old_requests:
@@ -291,10 +70,3 @@ def user_data_export_cleanup(days=30):
         if request.file:
             request.file.claimed = False
     db.session.commit()
-
-
-def _get_old_requests(days):
-    return (DataExportRequest.query
-            .filter(DataExportRequest.requested_dt < (now_utc() - timedelta(days=days)),
-                    DataExportRequest.state == DataExportRequestState.success)
-            .all())

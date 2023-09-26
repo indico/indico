@@ -27,8 +27,8 @@ def test_invalid_request():
 def test_user_data_request(mocker, dummy_user):
     from indico.modules.users.controllers import RHUserDataExportAPI
     from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
-    from indico.modules.users.tasks import export_user_data_task
-    task = mocker.patch.object(export_user_data_task, 'delay')
+    from indico.modules.users.tasks import export_user_data
+    task = mocker.patch.object(export_user_data, 'delay')
 
     rh = RHUserDataExportAPI()
     request.method = 'POST'

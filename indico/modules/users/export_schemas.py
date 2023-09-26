@@ -30,12 +30,11 @@ from indico.modules.events.static.models.static import StaticSite
 from indico.modules.events.surveys.schemas import SurveySubmissionSchema
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
-from indico.modules.users.export import (get_abstracts, get_attachments, get_contributions, get_editables, get_papers,
-                                         get_subcontributions)
+from indico.modules.users.export import (build_storage_path, get_abstracts, get_attachments, get_contributions,
+                                         get_editables, get_papers, get_subcontributions)
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest
 from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.modules.users.schemas import AffiliationSchema
-from indico.modules.users.tasks import build_storage_path
 from indico.util.marshmallow import NoneValueEnumField
 from indico.web.flask.util import url_for
 
