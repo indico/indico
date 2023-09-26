@@ -330,9 +330,11 @@ export default function SearchApp({category, eventId, isAdmin}) {
           sortOptions={options?.sortOptions || []}
           onSortChange={value => handleQuery(value, 'sort')}
         />
-        {!isAnyLoading && (
-          <ResultHeader query={q} hasResults={!!results.total} categoryTitle={category?.title} />
-        )}
+        <div aria-live="polite">
+          {!isAnyLoading && (
+            <ResultHeader query={q} hasResults={!!results.total} categoryTitle={category?.title} />
+          )}
+        </div>
         {q && (results.total !== 0 || isAnyLoading) && (
           <ResultList
             component={Component}

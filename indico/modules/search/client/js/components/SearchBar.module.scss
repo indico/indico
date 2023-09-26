@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/utilities' as *;
 
 .placeholder {
   font-size: 0.95em;
@@ -14,4 +15,8 @@
   .label {
     margin-right: 1em !important;
   }
+}
+
+.search-field > span {
+  @extend %visually-hidden;
 }

@@ -35,3 +35,7 @@
 :global(.ui.search > .results > .result.cursor-default) {
   cursor: default;
 }
+
+.search-field > span {
+  @extend %visually-hidden;
+}
