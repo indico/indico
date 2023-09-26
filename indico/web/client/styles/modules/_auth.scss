@@ -48,7 +48,10 @@
       }
 
       .footer {
-        width: fit-content;
+        width: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         margin: 0 auto;
         position: absolute;
         bottom: 0;
