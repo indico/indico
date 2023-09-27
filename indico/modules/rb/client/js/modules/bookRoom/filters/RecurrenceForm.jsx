@@ -119,11 +119,14 @@ export default class RecurrenceForm extends FilterFormComponent {
           </Form.Field>
         </Form.Group>
         <Form.Field styleName="weekday-recurrence-section" inline>
-          <label>{Translate.string('Recurring every')}</label>
+          <label styleName={type !== 'every' ? 'disabled' : ''}>
+            {Translate.string('Recurring every')}
+          </label>
           <WeekdayRecurrencePicker
             onChange={value => this.onWeekdaysChange(null, {value})}
             value={weekdays}
             disabled={type !== 'every'}
+            requireOneSelected
           />
         </Form.Field>
       </Form>

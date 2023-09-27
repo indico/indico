@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/palette';
+
 .recurrence-every:global(.fields.inline) {
   :global .ui.selection.dropdown {
     min-width: 100px;
@@ -18,4 +20,8 @@
 .weekday-recurrence-section {
   display: flex;
   align-items: center;
+
+  .disabled {
+    color: $hazy-gray !important;
+  }
 }
