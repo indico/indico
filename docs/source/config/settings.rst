@@ -311,7 +311,15 @@ Customization
 
 .. data:: LOGO_URL
 
-    The URL to a custom logo.  If unset, the default Indico logo is used.
+    The URL to a custom logo.  If unset, the default monochrome Indico logo is
+    used.
+
+    Default: ``None``
+
+.. data:: LOGIN_LOGO_URL
+
+    The URL to a custom logo used on the login page.  If unset, the default
+    Indico logo is used.
 
     Default: ``None``
 

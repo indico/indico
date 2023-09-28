@@ -33,6 +33,9 @@ Improvements
 - Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
 - Add accessible label to the main page link (:issue:`5934`, :pr:`5935`, thanks :user:`foxbunny`)
 - Add bypass block links (:issue:`5932`, :pr:`5939`, thanks :user:`foxbunny`)
+- Improve login page UI, allow overriding the logo URL (:data:`LOGIN_LOGO_URL` config option)
+  and using custom logos for auth providers (``logo_url`` in the auth provider settings)
+  (:pr:`5936`, thanks :user:`openprojects`)
 
 Bugfixes
 ^^^^^^^^
