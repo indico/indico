@@ -69,7 +69,7 @@
                     <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
                        class="i-button external-provider-{{ provider.name }}"
                        {% if provider_logo %}
-                           style="background-image: url('{{ provider_logo }}'); background-repeat: no-repeat;"
+                           style="background-image: url('{{ provider_logo }}'); background-repeat: no-repeat; background-size: contain;"
                        {% endif %}
                     >
                        {{- provider.title -}}
