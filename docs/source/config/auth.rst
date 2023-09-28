@@ -39,6 +39,8 @@ The following keys are available in the provider data:
   provider in case more than one such provider is used.  The login
   form of the default provider is displayed when opening the login
   page so it should be the provider that most people use.
+- ``logo_url`` -- If set, the referenced image will be used as the
+  background image of this provider's login button (on the login page).
 - Any provider-specific settings.
 
 
