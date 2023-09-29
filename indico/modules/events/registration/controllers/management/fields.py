@@ -11,8 +11,8 @@ from flask import jsonify, request, session
 from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
 from werkzeug.exceptions import BadRequest
 
+from indico.core import signals
 from indico.core.db import db
-from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
@@ -143,8 +143,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
-        if any(self.field.get_locked_reason(r) for r in self.regform.active_registrations):
-            raise UserValueError(_('Cannot delete a locked field.'))
+        signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
         update_regform_item_positions(self.regform)
         db.session.flush()

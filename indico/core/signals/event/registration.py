@@ -73,6 +73,11 @@ Called when a registration form is removed. The `sender` is the
 `RegistrationForm` object.
 ''')
 
+registration_form_field_deleted = _signals.signal('registration-form-field-deleted', '''
+Called when a registration form field is removed. The `sender` is the
+`RegistrationFormField` object.
+''')
+
 is_ticketing_handled = _signals.signal('is-ticketing-handled', '''
 Called when resolving whether Indico should send tickets with e-mails
 or it will be handled by other module. The `sender` is the
@@ -94,8 +99,7 @@ ticket for a registrant.
 
 is_field_data_locked = _signals.signal('is-field-data-locked', '''
 Called when resolving whether Indico should let a data value be modified
-in a registration, or let the corresponding field be deleted.
-The participant's `Registration` is passed as `registration`.
+in a registration. The participant's `Registration` is passed as `registration`.
 The `sender` is the `RegistrationFormItem` object.
 
 This signal returns a string containing the reason for the item being locked,
