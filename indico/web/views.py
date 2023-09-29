@@ -283,7 +283,7 @@ class WPBase(WPBundleMixin):
                                page_metadata=self.page_metadata,
                                page_title=' - '.join(str(x) for x in title_parts if x),
                                head_content=self._get_head_content(),
-                               body=body)
+                               body=body, wp_class=type(self))
 
 
 class WPNewBase(WPBundleMixin, WPJinjaMixin):
@@ -338,6 +338,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(str(x) for x in title_parts if x),
+                               wp_class=cls,
                                **params)
 
 
