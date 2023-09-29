@@ -50,6 +50,7 @@ Accessibility
 - Make search fields more accessible (:issue:`5948`, :pr:`5950`, thanks :user:`foxbunny`)
 - Make search result status messages more accessible (:issue:`5949`, :pr:`5950`,
   thanks :user:`foxbunny`)
+- Fix title area heading structure on pages extending the layout/base.html template (:issue:`5958`, :pr:`5959`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -46,33 +46,40 @@
 
     .title {
       display: flex;
-      align-items: flex-start;
-      padding-top: 0.4rem;
-      min-height: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin-bottom: 1em;
+      padding: 0.5em 3em;
+
       border-bottom: 1px solid $separator-color;
-      margin-bottom: 1rem;
 
       > .text {
         flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
 
         > .title-with-actions {
-          h2,
-          h3 {
-            display: inline;
-            margin-right: 0;
-          }
+          display: flex;
+          gap: 0.5em;
+          align-items: center;
+          justify-content: space-between;
 
-          .actions {
-            display: inline-block;
-            vertical-align: bottom;
+          h1 {
+            // FIXME: font attributes of headings should not be defined globally, fix in the base styles later
+            font-weight: normal;
           }
+        }
+
+        .subtitle-container {
+          // FIXME: compensating for tiny base text size.
+          font-size: 1.14em;
         }
       }
 
       > .actions {
-        flex-grow: 0;
-        flex-shrink: 0;
-        white-space: nowrap;
+        flex: none;
       }
     }
 
@@ -248,8 +255,4 @@
 
 .search-page {
   @include indico-page-standalone();
-
-  .title .text {
-    margin-left: 2%;
-  }
 }

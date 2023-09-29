@@ -14,9 +14,9 @@
                 <div class="title">
                     <div class="text">
                         <div class="title-with-actions">
-                            <h2>
+                            <h1>
                                 {%- block title %}{% endblock -%}
-                            </h2>
+                            </h1>
                             {%- if self.title_actions()|trim -%}
                                 <div class="actions">
                                     {% block title_actions %}{% endblock %}
@@ -25,7 +25,7 @@
                         </div>
                         <div class="subtitle-container">
                             {%- if self.subtitle()|trim -%}
-                                <h3>{% block subtitle %}{% endblock %}</h3>
+                                <div>{% block subtitle %}{% endblock %}</div>
                             {%- endif -%}
                         </div>
                     </div>
