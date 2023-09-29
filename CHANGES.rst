@@ -28,22 +28,28 @@ Improvements
 - Allow room managers to add internal notes to bookings (:issue:`5746`, :pr:`5791`)
 - Support generating tickets and badges for each of the registrant's accompanying
   persons (:pr:`5424`)
-- Include current language in page metadata (:pr:`5894`, thanks :user:`foxbunny`)
 - Add keyboard shortcut (CTRL-SHIFT-A) to toggle room booking admin override (:pr:`5909`)
-- Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
-- Add accessible label to the main page link (:issue:`5934`, :pr:`5935`, thanks :user:`foxbunny`)
-- Add bypass block links (:issue:`5932`, :pr:`5939`, thanks :user:`foxbunny`)
 - Improve login page UI, allow overriding the logo URL (:data:`LOGIN_LOGO_URL` config option)
   and using custom logos for auth providers (``logo_url`` in the auth provider settings)
   (:pr:`5936`, thanks :user:`openprojects`)
-- Make search fields more accessible (:issue:`5948`, :pr:`5950`, thanks :user:`foxbunny`)
-- Make search result status messages more accessible (:issue:`5949`, :pr:`5950`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
 
 - Prevent room booking sidebar menu from overlapping with the user dropdown menu
   (:pr:`5910`)
+
+Accessibility
+^^^^^^^^^^^^^
+
+- Include current language in page metadata (:pr:`5894`, thanks :user:`foxbunny`)
+- Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
+- Add accessible label to the main page link (:issue:`5934`, :pr:`5935`, thanks
+  :user:`foxbunny`)
+- Add bypass block links (:issue:`5932`, :pr:`5939`, thanks :user:`foxbunny`)
+- Make search fields more accessible (:issue:`5948`, :pr:`5950`, thanks :user:`foxbunny`)
+- Make search result status messages more accessible (:issue:`5949`, :pr:`5950`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
