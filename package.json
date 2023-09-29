@@ -10,6 +10,7 @@
     "@babel/runtime": "^7.18.3",
     "@ckeditor/ckeditor5-react": "^6.1.0",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
+    "@tinymce/tinymce-react": "^4.3.0",
     "ajv": "^8.11.0",
     "axios": "^1.4.0",
     "axios-hooks": "^4.0.0",

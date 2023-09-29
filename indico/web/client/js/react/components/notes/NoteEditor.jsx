@@ -22,7 +22,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {FinalMarkdownEditor} from '../MarkdownEditor';
-import {FinalTextEditor} from '../TextEditor';
+import {FinalTinyMCETextEditor} from '../TinyMCETextEditor';
 
 import 'react-markdown-editor-lite/lib/index.css';
 
@@ -188,7 +188,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
             <FinalMarkdownEditor name="source" imageUploadURL={imageUploadURL} height="70vh" />
           )}
           {renderMode === 'html' && (
-            <FinalTextEditor
+            <FinalTinyMCETextEditor
               name="source"
               loading={loading}
               value={currentInput}

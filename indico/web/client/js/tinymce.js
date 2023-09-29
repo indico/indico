@@ -60,7 +60,8 @@ export const getConfig = (
     showToolbar = true,
     contentCSS = [],
     height = 475,
-  } = {}
+  } = {},
+  {onChange = null} = {}
 ) => ({
   target: field,
   promotion: false,
@@ -170,31 +171,42 @@ export const getConfig = (
     args.content = sanitizeHtml(args.content);
   },
   setup: editor => {
-    // auto-save to hidden field on input
+    // auto-save to hidden field (or trigger change event) on input
     editor.on(
       'change input compositionend setcontent CommentChange',
-      _.debounce(() => {
-        editor.save();
-        editor.targetElm.dispatchEvent(new Event('change', {bubbles: true}));
-      }, 100)
+      _.debounce(
+        () => {
+          if (field) {
+            editor.save();
+            editor.targetElm.dispatchEvent(new Event('change', {bubbles: true}));
+          } else if (onChange) {
+            onChange(editor);
+          }
+        },
+        200,
+        // XXX if you touch this make sure it remains shorter than rollback in the react component
+        {maxWait: 1000}
+      )
     );
 
-    editor.on('init', () => {
-      // Re-position the dialog if we have one since the initial position is
-      // wrong due to the editor being loaded after the dialog has been opened.
-      const dialog = $(field.closest('.ui-dialog-content'));
-      if (dialog.length) {
-        dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
-      }
-      // Make sure the option dropdowns are displayed above the dialog.
-      const uiDialog = field.closest('.ui-dialog-content');
-      const exPopup = field.closest('.exclusivePopup');
-      if (uiDialog) {
-        uiDialog.style.overflow = 'inherit';
-      }
-      if (exPopup) {
-        exPopup.style.overflow = 'inherit';
-      }
-    });
+    if (field) {
+      editor.on('init', () => {
+        // Re-position the dialog if we have one since the initial position is
+        // wrong due to the editor being loaded after the dialog has been opened.
+        const dialog = $(field.closest('.ui-dialog-content'));
+        if (dialog.length) {
+          dialog.dialog('option', 'position', dialog.dialog('option', 'position'));
+        }
+        // Make sure the option dropdowns are displayed above the dialog.
+        const uiDialog = field.closest('.ui-dialog-content');
+        const exPopup = field.closest('.exclusivePopup');
+        if (uiDialog) {
+          uiDialog.style.overflow = 'inherit';
+        }
+        if (exPopup) {
+          exPopup.style.overflow = 'inherit';
+        }
+      });
+    }
   },
 });
