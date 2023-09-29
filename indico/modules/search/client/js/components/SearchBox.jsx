@@ -87,19 +87,22 @@ export default function SearchBox({onSearch, category, isAdmin}) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Search
-        input={{fluid: true}}
-        placeholder={Translate.string('Enter your search term')}
-        results={options}
-        value={keyword}
-        showNoResults={false}
-        open={!!keyword}
-        onResultSelect={handleResultSelect}
-        onSearchChange={handleSearchChange}
-        fluid
-        // only select the first result if there is more than 1 (means we are in a category)
-        selectFirstResult={options.length > 1}
-      />
+      <label styleName="search-field">
+        <Translate as="span">Search Indico</Translate>
+        <Search
+          input={{fluid: true}}
+          placeholder={Translate.string('Enter your search term')}
+          results={options}
+          value={keyword}
+          showNoResults={false}
+          open={!!keyword}
+          onResultSelect={handleResultSelect}
+          onSearchChange={handleSearchChange}
+          fluid
+          // only select the first result if there is more than 1 (means we are in a category)
+          selectFirstResult={options.length > 1}
+        />
+      </label>
     </Form>
   );
 }
