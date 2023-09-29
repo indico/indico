@@ -23,17 +23,22 @@ CHANGELOG_STUB = '''
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Nothing so far :(
 
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Nothing so far :)
+
+Accessibility
+^^^^^^^^^^^^^
+
+- Nothing so far
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- None so far
+- Nothing so far
 
 
 '''.lstrip()
@@ -62,6 +67,11 @@ Improvements
 
 Bugfixes
 ^^^^^^^^
+
+- Nothing so far
+
+Accessibility
+^^^^^^^^^^^^^
 
 - Nothing so far
 

@@ -18,6 +18,7 @@ EMOJIS = {
     'Internationalization': ':flags:',
     'Improvements': ':tada:',
     'Bugfixes': ':bug:',
+    'Accessibility': ':wheelchair:',
     'Internal Changes': ':wrench:',
 }
 
