@@ -602,3 +602,13 @@ class RegistrationPrivacyForm(IndicoForm):
         if fields:
             raise ValidationError(_('The retention period of the whole form cannot be lower than '
                                     'that of individual fields.'))
+
+
+class PublishReceiptForm(IndicoForm):
+    """Form to publish receipts for registrations"""
+
+    #publish = HiddenField()
+    #notify_user = BooleanField(_('Notify users'), [HiddenUnless('publish')], widget=SwitchWidget(),
+    #                           description=_('Whether users should be notified about the published receipt'))
+    notify_user = BooleanField(_('Notify users'), widget=SwitchWidget(),
+                               description=_('Whether users should be notified about the published receipt'))

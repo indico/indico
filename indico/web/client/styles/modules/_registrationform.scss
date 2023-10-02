@@ -579,6 +579,14 @@
     }
   }
 
+  tr.unpublished-receipt {
+    background-color: $pastel-gray;
+
+    .unpublished-receipt-warning {
+      color: $dark-gray;
+    }
+  }
+
   tr {
     td {
       .purged-field-warning {

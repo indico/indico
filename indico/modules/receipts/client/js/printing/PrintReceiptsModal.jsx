@@ -9,14 +9,15 @@ import allTemplatesURL from 'indico-url:receipts.all_templates';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Button, Checkbox, Form, Icon, Loader, Message, Modal} from 'semantic-ui-react';
+import {Accordion, Button, Checkbox, Form, Icon, Loader, Message, Modal} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import {printReceipt} from './print.jsx';
-import './PrintReceiptsModal.module.scss';
 import TemplateParameterEditor from './TemplateParameterEditor.jsx';
+
+import './PrintReceiptsModal.module.scss';
 
 /**
  * This modal presents the user with a structured interface to download, e-mail or publish
@@ -69,6 +70,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
             <Form.Dropdown
               loading={!ready}
               value={selectedTemplateId}
+              placeholder={Translate.string('Select a receipt template')}
               options={ready ? data.map(({id, title}) => ({key: id, text: title, value: id})) : []}
               onChange={(_, {value}) => {
                 console.log(value, data);
@@ -83,25 +85,33 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
               }}
               selection
             />
+            {!!selectedTemplate && selectedTemplate.customFields.length > 0 && (
+              <Accordion
+                defaultActiveIndex={0}
+                panels={[
+                  {
+                    key: 'template-params',
+                    title: Translate.string('Template Parameters'),
+                    content: {
+                      content: selectedTemplate ? (
+                        <TemplateParameterEditor
+                          customFields={selectedTemplate.customFields}
+                          values={customFieldValues}
+                          onChange={vals => {
+                            setCustomFieldValues(vals);
+                          }}
+                        />
+                      ) : (
+                        <Loader active />
+                      ),
+                    },
+                  },
+                ]}
+                styled
+                fluid
+              />
+            )}
           </section>
-          {!!selectedTemplate && (
-            <section styleName="custom-fields">
-              <h3>
-                <Translate>Template Parameters</Translate>
-              </h3>
-              {selectedTemplate ? (
-                <TemplateParameterEditor
-                  customFields={selectedTemplate.customFields}
-                  values={customFieldValues}
-                  onChange={vals => {
-                    setCustomFieldValues(vals);
-                  }}
-                />
-              ) : (
-                <Loader active />
-              )}
-            </section>
-          )}
           <section>
             <h2>
               <Translate>Action</Translate>

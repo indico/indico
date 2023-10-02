@@ -15,17 +15,18 @@ import templatePreviewURL from 'indico-url:receipts.template_preview';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Button, Confirm, Icon} from 'semantic-ui-react';
+import {Button, Confirm, Icon, Label} from 'semantic-ui-react';
 
 import {handleSubmitError} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {targetLocatorSchema, templateSchema} from './util';
+
 import './TemplateListPane.module.scss';
 
 function TemplateRow({
-  template: {id, title, owner},
+  template: {id, type, title, owner},
   dispatch,
   setConfirmPrompt,
   targetLocator,
@@ -51,12 +52,24 @@ function TemplateRow({
     }
   };
 
+  const typeLabel = {
+    receipt: {color: 'red', text: Translate.string('Receipt')},
+    certificate: {color: 'blue', text: Translate.string('Certificate')},
+  }[type];
+
   return (
     <tr>
       <td className="i-table id-column">
         <i className="icon-agreement" />
       </td>
-      <td>{title}</td>
+      <td>
+        {title}
+        {typeLabel && (
+          <Label size="small" style={{marginLeft: '1em'}} color={typeLabel.color} basic>
+            {typeLabel.text}
+          </Label>
+        )}
+      </td>
       <td className="text-superfluous">
         {!!inherited && (
           <Translate>

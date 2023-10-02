@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import printReceiptsURL from 'indico-url:receipts.print_receipts';
+import printReceiptsURL from 'indico-url:receipts.generate_receipts';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
@@ -50,7 +50,7 @@ function PrintingErrorsModal({onClose, errors, downloadData}) {
         <ButtonGroup>
           <Button
             onClick={() => {
-              downloadBlob(Translate.string('receipts.pdf'), downloadData);
+              //downloadBlob(Translate.string('receipts.pdf'), downloadData);
               setOpen(false);
               onClose();
             }}
@@ -132,7 +132,7 @@ export async function printReceipt(
           ));
         });
       } else {
-        downloadBlob(Translate.string('receipts.pdf'), downloadedData);
+        //downloadBlob(Translate.string('receipts.pdf'), downloadedData);
         return true;
       }
     } catch (error) {

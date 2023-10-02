@@ -104,6 +104,14 @@
                                                 {%- trans %}No{% endtrans -%}
                                             {% endif %}
                                         </td>
+                                    {% elif item.id == 'receipts_present' %}
+                                        <td class="i-table" data-text="{{ registration.receipt_files }}">
+                                            {% if registration.receipt_files %}
+                                                {%- trans %}Yes{% endtrans -%}
+                                            {% else %}
+                                                {%- trans %}No{% endtrans -%}
+                                            {% endif %}
+                                        </td>
                                     {% else %}
                                         <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>
                                     {% endif %}

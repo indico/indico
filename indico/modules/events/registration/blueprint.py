@@ -79,6 +79,12 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'manage_withdraw_registration', reglists.RHRegistrationManageWithdraw, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
                  'registration_check_in', reglists.RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>'
+                 '/<filename>', 'download_receipt', reglists.RHDownloadReceipt)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>'
+                 '/<filename>', 'publish_receipt', reglists.RHPublishReceipt, methods=('GET', 'POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>'
+                 '/<filename>', 'delete_receipt', reglists.RHDeleteReceipt, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  reglists.RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email-preview', 'email_registrants_preview',
@@ -198,6 +204,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', 
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  display.RHRegistrationFormDeclineInvitation, methods=('POST',))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', display.RHTicketDownload)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/receipts/<int:file_id>/<filename>', 'display_receipt_download',
+                 display.RHReceiptDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
                  display.RHRegistrationAvatar)
 

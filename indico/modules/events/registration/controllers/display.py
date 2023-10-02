@@ -19,7 +19,8 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
-from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
+from indico.modules.events.registration.controllers import (ReceiptActionsMixin, RegistrationEditMixin,
+                                                            RegistrationFormMixin)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -459,6 +460,29 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
     def _process(self):
         filename = secure_filename(f'{self.event.title}-Ticket.pdf', 'ticket.pdf')
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
+
+
+class RHReceiptDownload(ReceiptActionsMixin, RHRegistrationFormRegistrationBase):
+    """Download a previously generated receipt for a given registration."""
+    #TODO fix token not working
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.receipt_file.locator.registrant
+        }
+    }
+
+    def _process_args(self):
+        RHRegistrationFormRegistrationBase._process_args(self)
+        ReceiptActionsMixin._process_args(self)
+
+    def _check_access(self):
+        RHRegistrationFormRegistrationBase._check_access(self)
+        if not self.receipt_file.is_published:
+            raise Forbidden
+
+    def _process(self):
+        return self.receipt_file.file.send()
 
 
 class RHRegistrationAvatar(RHDisplayEventBase):

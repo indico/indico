@@ -9,8 +9,23 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.enum import RichIntEnum
+from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
+
+
+class ReceiptTemplateType(RichIntEnum):
+    __titles__ = [None, _('Receipt'), _('Certificate')]
+    __file_prefixes__ = ['document', 'receipt', 'certificate']
+    none = 0
+    receipt = 1
+    certificate = 2
+
+    @property
+    def file_prefix(self):
+        return self.__file_prefixes__[self]
 
 
 class ReceiptTemplate(db.Model):
@@ -21,6 +36,11 @@ class ReceiptTemplate(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+    type = db.Column(
+        PyIntEnum(ReceiptTemplateType),
+        nullable=False,
+        default=ReceiptTemplateType.none
     )
     title = db.Column(
         db.String,
@@ -69,6 +89,9 @@ class ReceiptTemplate(db.Model):
             lazy=True
         )
     )
+
+    # relationship backrefs:
+    # - receipt_files (ReceiptFile.template)
 
     @hybrid_property
     def owner(self):
