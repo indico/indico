@@ -16,7 +16,13 @@ import {Form as FinalForm} from 'react-final-form';
 import {Link} from 'react-router-dom';
 import {Button, Form, Message, Popup} from 'semantic-ui-react';
 
-import {FinalField, FinalInput, FinalSubmitButton, parsers} from 'indico/react/forms';
+import {
+  FinalDropdown,
+  FinalField,
+  FinalInput,
+  FinalSubmitButton,
+  parsers as p,
+} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
 import Nexus from 'indico/react/util/Nexus';
@@ -94,25 +100,41 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
   }, [currentFileExt]);
 
   const variablesLink = (
-    <VariablesPopup targetLocator={{...targetLocator, template_id: template.id}} />
+    <VariablesPopup
+      targetLocator={template.id ? {...targetLocator, template_id: template.id} : targetLocator}
+    />
   );
 
   return (
     <FinalForm
       onSubmit={onSubmit}
-      initialValues={{title: template?.title || null, ...codeValues}}
+      initialValues={{title: template?.title || null, type: template?.type, ...codeValues}}
       initialValuesEqual={_.isEqual}
     >
       {({handleSubmit, values}) => (
         <Form onSubmit={handleSubmit} subscription={{dirty: true}}>
-          <FinalInput
-            name="title"
-            label="Title"
-            component={Form.Input}
-            type="text"
-            required
-            rows={24}
-          />
+          <Form.Group widths="equal">
+            <FinalInput
+              name="title"
+              label={Translate.string('Title')}
+              component={Form.Input}
+              type="text"
+              required
+              rows={24}
+            />
+            <FinalDropdown
+              name="type"
+              label={Translate.string('Type')}
+              placeholder={Translate.string('Select a template type')}
+              options={[
+                {value: 'receipt', text: Translate.string('Receipt')},
+                {value: 'certificate', text: Translate.string('Certificate')},
+                {value: 'none', text: Translate.string('Other')},
+              ]}
+              required
+              selection
+            />
+          </Form.Group>
           <Message color="orange" size="small">
             <Translate>
               You can use variables in your template. See the{' '}
@@ -139,7 +161,7 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
               key={fileExt}
               name={fileExt}
               initialValue={template[fileExt]}
-              parse={parsers.nullIfEmpty}
+              parse={p.nullIfEmpty}
             >
               {({input, meta}) => (
                 <>

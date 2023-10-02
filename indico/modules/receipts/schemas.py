@@ -7,9 +7,10 @@
 
 import yaml
 from marshmallow import fields, validate
+from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
-from indico.modules.receipts.models.templates import ReceiptTemplate
+from indico.modules.receipts.models.templates import ReceiptTemplate, ReceiptTemplateType
 from indico.util.marshmallow import YAML, not_empty
 
 
@@ -35,7 +36,7 @@ class ReceiptTplMetadataSchema(mm.Schema):
 class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReceiptTemplate
-        fields = ('id', 'title', 'html', 'css', 'custom_fields', 'yaml', 'owner')
+        fields = ('id', 'type', 'title', 'html', 'css', 'custom_fields', 'yaml', 'owner')
 
     yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields})
                                         if tpl.custom_fields else None))
@@ -44,6 +45,7 @@ class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
 
 class ReceiptTemplateAPISchema(mm.Schema):
     title = fields.String(required=True, validate=validate.Length(3))
+    type = EnumField(ReceiptTemplateType, required=True)
     html = fields.String(required=True, validate=validate.Length(3))
     css = fields.String(load_default='')
     yaml = YAML(ReceiptTplMetadataSchema, load_default=None, allow_none=True)

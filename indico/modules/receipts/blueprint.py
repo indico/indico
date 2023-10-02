@@ -7,9 +7,9 @@
 
 from indico.modules.receipts.controllers import (RHAddTemplate, RHAllCategoryTemplates, RHAllEventTemplates,
                                                  RHCategoryTemplate, RHCloneTemplate, RHDeleteTemplate, RHEditTemplate,
-                                                 RHEventTemplate, RHGetDummyData, RHListCategoryTemplates,
-                                                 RHListEventTemplates, RHLivePreview, RHPreviewTemplate,
-                                                 RHPrintReceipts)
+                                                 RHEventTemplate, RHGenerateReceipts, RHGetDummyData,
+                                                 RHListCategoryTemplates, RHListEventTemplates, RHLivePreview,
+                                                 RHPreviewReceipts, RHPreviewTemplate)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -46,9 +46,11 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'template', _dispatch(RHEventTemplate, RHCategoryTemplate),
                      defaults={'object_type': object_type}, methods=('GET',))
-    _bp.add_url_rule(prefix + '/<int:template_id>/preview', 'template_preview', RHPreviewTemplate,
+    _bp.add_url_rule(prefix + '/<int:template_id>/preview-template', 'template_preview', RHPreviewTemplate,
                      defaults={'object_type': object_type}, methods=('GET',))
-    _bp.add_url_rule(prefix + '/<int:template_id>/print', 'print_receipts', RHPrintReceipts,
+    _bp.add_url_rule(prefix + '/<int:template_id>/preview', 'receipts_preview', RHPreviewReceipts,
+                     defaults={'object_type': object_type}, methods=('GET',))
+    _bp.add_url_rule(prefix + '/<int:template_id>/generate', 'generate_receipts', RHGenerateReceipts,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditTemplate,
                      defaults={'object_type': object_type}, methods=('PATCH',))

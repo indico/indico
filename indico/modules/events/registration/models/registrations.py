@@ -300,6 +300,7 @@ class Registration(db.Model):
     # relationship backrefs:
     # - invitation (RegistrationInvitation.registration)
     # - legacy_mapping (LegacyRegistrationMapping.registration)
+    # - receipt_files (ReceiptFile.registration)
     # - registration_form (RegistrationForm.registrations)
     # - transactions (PaymentTransaction.registration)
 
@@ -560,6 +561,10 @@ class Registration(db.Model):
                  .join(RegistrationFormFieldData)
                  .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons')))
         return list(itertools.chain.from_iterable(d.data for d in query.all() if not d.field_data.field.is_deleted))
+
+    @property
+    def published_receipts(self):
+        return [receipt for receipt in self.receipt_files if receipt.is_published]
 
     @classproperty
     @classmethod
