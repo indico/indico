@@ -44,6 +44,7 @@ import 'tinymce/plugins/table';
 
 import {indicoAxios, handleAxiosError} from './utils/axios';
 import {sanitizeHtml} from './utils/sanitize';
+import './prism';
 
 const extraContentCSS = `
 body {
