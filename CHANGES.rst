@@ -50,6 +50,7 @@ Accessibility
 - Make search fields more accessible (:issue:`5948`, :pr:`5950`, thanks :user:`foxbunny`)
 - Make search result status messages more accessible (:issue:`5949`, :pr:`5950`,
   thanks :user:`foxbunny`)
+- Make search results tabs accessible (:issues:`5964`, :pr:`5965`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

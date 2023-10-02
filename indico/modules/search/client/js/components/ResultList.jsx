@@ -29,7 +29,7 @@ export default function ResultList({
 
   return (
     <>
-      <Segment>
+      <Segment id="search-results" role="tabpanel">
         <List divided relaxed stylename="space">
           {loading ? (
             <Placeholder>

@@ -74,8 +74,27 @@ function SearchTypeMenuItem({index, active, title, total, loading, onClick}) {
   } else if (total !== -1) {
     indicator = ` (${total})`;
   }
+
+  let accessibleLabel = title;
+  if (loading) {
+    accessibleLabel = Translate.string('{title} (loading results)', {title});
+  } else if (!total) {
+    accessibleLabel = Translate.string('{title} (no results)', {title});
+  }
+
   return (
-    <Menu.Item index={index} active={active} onClick={onClick} disabled={loading || !total}>
+    <Menu.Item
+      as="button"
+      role="tab"
+      aria-controls="search-results"
+      aria-selected={active}
+      aria-disabled={loading || !total}
+      aria-label={accessibleLabel}
+      index={index}
+      active={active}
+      onClick={onClick}
+      disabled={loading || !total}
+    >
       {title}
       {indicator}
     </Menu.Item>
@@ -312,7 +331,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
             />
           </div>
         )}
-        <Menu pointing secondary styleName="menu">
+        <Menu role="tablist" pointing secondary styleName="menu">
           {searchMap.map(([label, _results], idx) => (
             <SearchTypeMenuItem
               key={label}
