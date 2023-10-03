@@ -11,9 +11,8 @@ import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {Form, Button, Message, Input, Popup, Icon} from 'semantic-ui-react';
 
-import {FinalEmailList} from 'indico/react/components';
+import {FinalEmailList, TinyMCETextEditor, FinalTinyMCETextEditor} from 'indico/react/components';
 import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
-import TinyMCETextEditor, {FinalTinyMCETextEditor} from 'indico/react/components/TinyMCETextEditor';
 import {FinalCheckbox, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
