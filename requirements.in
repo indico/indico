@@ -61,6 +61,7 @@ sqlalchemy<2  # major upgrade
 terminaltables
 translitcodec
 ua-parser
+urllib3<2  # not compatible with centos7 openssl + not yet compatible with botocore (s3 plugin)
 webargs
 werkzeug
 wtforms[email]

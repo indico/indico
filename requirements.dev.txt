@@ -144,6 +144,7 @@ pyflakes==3.0.1
     # via flake8
 pygments==2.15.1
     # via
+    #   -c requirements.txt
     #   -r requirements.dev.in
     #   sphinx
 pyproject-hooks==1.0.0
@@ -246,7 +247,7 @@ tomli==2.0.1
     #   pytest
 tornado==6.3.2
     # via livereload
-urllib3==1.26.15
+urllib3==1.26.17
     # via
     #   -c requirements.txt
     #   requests

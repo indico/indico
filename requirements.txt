@@ -348,8 +348,9 @@ tzdata==2023.3
     # via celery
 ua-parser==0.16.1
     # via -r requirements.in
-urllib3==1.26.15
+urllib3==1.26.17
     # via
+    #   -r requirements.in
     #   requests
     #   sentry-sdk
 vine==5.0.0
