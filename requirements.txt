@@ -41,7 +41,7 @@ blinker==1.6.2
     #   sentry-sdk
 cachelib==0.9.0
     # via flask-caching
-captcha==0.4
+captcha==0.5.0
     # via -r requirements.in
 celery==5.3.1
     # via
@@ -231,7 +231,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==9.5.0
+pillow==10.0.1
     # via
     #   -r requirements.in
     #   captcha
