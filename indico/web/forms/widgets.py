@@ -118,7 +118,7 @@ class TinyMCEWidget(JinjaWidget):
     :param html_embed: Whether to enable raw HTML embedding.
     :param height: The height of the editor.
 
-    If the form has a ``ckeditor_upload_url`` attribute and images are enabled,
+    If the form has a ``editor_upload_url`` attribute and images are enabled,
     the editor will allow pasting/selecting images and upload them using that URL.
     """
 

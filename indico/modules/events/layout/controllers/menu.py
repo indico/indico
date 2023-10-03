@@ -96,7 +96,7 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             form_cls = MenuLinkForm
         elif self.entry.is_page:
             form_cls = MenuPageForm
-            form_kwargs['ckeditor_upload_url'] = url_for('attachments.upload_ckeditor', self.event)
+            form_kwargs['editor_upload_url'] = url_for('attachments.upload_editor', self.event)
             defaults['html'] = self.entry.page.html
         else:
             form_cls = MenuBuiltinEntryForm
@@ -191,7 +191,7 @@ class RHMenuAddEntry(RHMenuBase):
             form_cls = MenuLinkForm
         elif entry_type == MenuEntryType.page.name:
             form_cls = MenuPageForm
-            form_kwargs['ckeditor_upload_url'] = url_for('attachments.upload_ckeditor', self.event)
+            form_kwargs['editor_upload_url'] = url_for('attachments.upload_editor', self.event)
         else:
             raise BadRequest
 

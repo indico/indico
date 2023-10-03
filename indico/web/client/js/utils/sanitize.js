@@ -10,7 +10,7 @@ import _sanitizeHtml from 'sanitize-html';
 /* eslint array-element-newline: off */
 
 // The following are whitelisted tags, attributes & CSS styles for
-// sanitizing HTML provided by the user, such as when pasting into ckeditor.
+// sanitizing HTML provided by the user, such as when pasting into the WYSIWYG editor.
 // It is the same configuration that is used by bleach on the server-side (except for the legacy attributes).
 // See 'indico/util/string.py'
 

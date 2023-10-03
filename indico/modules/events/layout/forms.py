@@ -199,8 +199,8 @@ class MenuLinkForm(MenuUserEntryFormBase):
 class MenuPageForm(MenuUserEntryFormBase):
     html = TextAreaField(_('Content'), [DataRequired()], widget=TinyMCEWidget(images=True))
 
-    def __init__(self, *args, ckeditor_upload_url, **kwargs):
-        self.ckeditor_upload_url = ckeditor_upload_url
+    def __init__(self, *args, editor_upload_url, **kwargs):
+        self.editor_upload_url = editor_upload_url
         super().__init__(*args, **kwargs)
 
 

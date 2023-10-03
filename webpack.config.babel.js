@@ -7,6 +7,7 @@
 
 import path from 'path';
 
+// eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import glob from 'glob';
 import {minify} from 'uglify-js';
@@ -75,7 +76,7 @@ entryPoints = Object.assign(entryPoints, getThemeEntryPoints(config, './themes/'
 export default env => {
   const currentEnv = (env ? env.NODE_ENV : null) || 'development';
 
-  // Minification of copied files (e.g. CKEditor and MathJax)
+  // Minification of copied files (e.g. MathJax)
   const transform =
     currentEnv === 'development'
       ? undefined

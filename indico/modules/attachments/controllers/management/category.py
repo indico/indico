@@ -8,7 +8,7 @@
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.attachments.controllers.management.base import (AddAttachmentCKEditorMixin, AddAttachmentFilesMixin,
+from indico.modules.attachments.controllers.management.base import (AddAttachmentEditorMixin, AddAttachmentFilesMixin,
                                                                     AddAttachmentLinkMixin, CreateFolderMixin,
                                                                     DeleteAttachmentMixin, DeleteFolderMixin,
                                                                     EditAttachmentMixin, EditFolderMixin,
@@ -36,7 +36,7 @@ class RHManageCategoryAttachments(ManageAttachmentsMixin, RHCategoryAttachmentMa
     wp = WPCategoryManagement
 
 
-class RHAddCategoryAttachmentCKEditor(AddAttachmentCKEditorMixin, RHCategoryAttachmentManagementBase):
+class RHAddCategoryAttachmentEditor(AddAttachmentEditorMixin, RHCategoryAttachmentManagementBase):
     pass
 
 

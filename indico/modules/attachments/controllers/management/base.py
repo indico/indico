@@ -76,8 +76,8 @@ class ManageAttachmentsMixin:
             return jsonify_template('attachments/attachments.html', **tpl_args)
 
 
-class AddAttachmentCKEditorMixin:
-    """Upload image attachment from CKEditor."""
+class AddAttachmentEditorMixin:
+    """Upload image attachment from editor."""
 
     @use_kwargs({'upload': fields.Field(required=True)}, location='files')
     def _process(self, upload):

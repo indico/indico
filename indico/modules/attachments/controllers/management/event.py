@@ -9,7 +9,7 @@ from flask import jsonify, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
-from indico.modules.attachments.controllers.management.base import (AddAttachmentCKEditorMixin, AddAttachmentFilesMixin,
+from indico.modules.attachments.controllers.management.base import (AddAttachmentEditorMixin, AddAttachmentFilesMixin,
                                                                     AddAttachmentLinkMixin, CreateFolderMixin,
                                                                     DeleteAttachmentMixin, DeleteFolderMixin,
                                                                     EditAttachmentMixin, EditFolderMixin,
@@ -56,7 +56,7 @@ class RHAttachmentManagementInfoColumn(RHEventAttachmentManagementBase):
         return jsonify(html=tpl.render_attachment_info(self.object))
 
 
-class RHAddEventAttachmentCKEditor(AddAttachmentCKEditorMixin, RHEventAttachmentManagementBase):
+class RHAddEventAttachmentEditor(AddAttachmentEditorMixin, RHEventAttachmentManagementBase):
     pass
 
 
