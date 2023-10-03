@@ -20,6 +20,8 @@ from indico.modules.core.plugins import CaptchaPluginMixin
 from indico.util.i18n import _
 from indico.web.forms.widgets import JinjaWidget
 
+from src.indico.util.signals import make_interceptable
+
 
 def _verify_captcha(user_answer):
     if plugin := get_captcha_plugin():
@@ -30,6 +32,7 @@ def _verify_captcha(user_answer):
         return bool(answer) and answer == user_answer.replace('1', '7')
 
 
+@make_interceptable
 def generate_captcha_challenge():
     """Generate 4-digit CAPTCHA as image and audio"""
     # we skip 1 since it's too similar to 7; when verifying we accept both digits
