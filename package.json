@@ -137,7 +137,7 @@
     "mini-css-extract-plugin": "^1.6.2",
     "node-glob": "^1.2.0",
     "path-browserify": "^1.0.1",
-    "postcss": "^8.4.14",
+    "postcss": "^8.4.31",
     "postcss-loader": "^7.0.0",
     "postcss-scss": "^4.0.4",
     "postcss-url": "^10.1.3",
