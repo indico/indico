@@ -90,7 +90,6 @@ export function EmailDialog({
       setPreview(undefined);
       return;
     }
-    body = body.getData ? body.getData() : body;
     const {data} = await indicoAxios.post(previewURL, {body, subject, ...previewContext});
     setPreview(data);
   };

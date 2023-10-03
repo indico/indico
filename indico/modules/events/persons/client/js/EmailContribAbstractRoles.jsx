@@ -27,7 +27,6 @@ export function EmailContribAbstractRoles({context, metadataURL, previewURL, sen
 
   const handleSubmit = async data => {
     const requestData = {...data, ...context};
-    requestData.body = requestData.body.getData ? requestData.body.getData() : requestData.body;
     let resp;
     try {
       resp = await indicoAxios.post(sendURL, requestData);

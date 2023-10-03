@@ -106,6 +106,9 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   }, [apiURL, getNoteURL]);
 
   const handleSubmit = async ({source}) => {
+    // getData is currently unused, keeping it around in case we need to enable lazyValue
+    // for the TinyMCE editor widget in case larger notes cause performance issues that
+    // can be resolved by only rendering them to an html string at submission time
     const currentValue = source.getData ? source.getData() : source;
     try {
       if (!currentValue) {

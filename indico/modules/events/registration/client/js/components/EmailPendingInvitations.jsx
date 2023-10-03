@@ -28,7 +28,6 @@ export default function EmailPendingInvitations({metadataURL, previewURL, sendUR
   } = data || {};
 
   const handleSubmit = async data => {
-    data.body = data.body.getData ? data.body.getData() : data.body;
     let resp;
     try {
       resp = await indicoAxios.post(sendURL, data);
