@@ -58,7 +58,7 @@ CLONE_REPEAT_CHOICES = (
 
 class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
-    description = TextAreaField(_('Description'), widget=TinyMCEWidget(images=True, height=250))
+    description = TextAreaField(_('Description'), widget=TinyMCEWidget(images=True, height=350))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
     def __init__(self, *args, event, **kwargs):
