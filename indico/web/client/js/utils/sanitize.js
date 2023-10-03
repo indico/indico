@@ -10,7 +10,7 @@ import _sanitizeHtml from 'sanitize-html';
 /* eslint array-element-newline: off */
 
 // The following are whitelisted tags, attributes & CSS styles for
-// sanitizing HTML provided by the user, such as when pasting into ckeditor.
+// sanitizing HTML provided by the user, such as when pasting into the WYSIWYG editor.
 // It is the same configuration that is used by bleach on the server-side (except for the legacy attributes).
 // See 'indico/util/string.py'
 
@@ -66,5 +66,14 @@ export function sanitizeHtml(dirty) {
     allowedTags: ALLOWED_TAGS,
     allowedAttributes: ALLOWED_ATTRIBUTES,
     allowedStyles,
+    allowedSchemesByTag: {
+      // blob and data are needed for TinyMCE image pasting:
+      // - blob is used when image uploading is enabled (uploading and replacing with a URL happens
+      //   at a later step)
+      // - data is used when it'd disabled: the editor will remove the pasted image and if data
+      //   urls weren't enabled, the pasted image would be sanitized to `<img />` which is broken
+      //   but no longer removed by the editor
+      img: ['http', 'https', 'blob', 'data'],
+    },
   });
 }

@@ -3,18 +3,16 @@
 
 {% block html %}
     <input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}">
-    <div id="{{ field.id }}-editor" style="margin-bottom: 10px;"></div>
 {% endblock %}
 
 
 {% block javascript %}
     <script>
-        setupCKEditorWidget({
+        setupTinyMCEWidget({
             fieldId: {{ field.id | tojson }},
             images: {{ images | tojson }},
-            imageUploadURL: {{ field.get_form().ckeditor_upload_url|default(none) | tojson }},
-            htmlEmbed: {{ html_embed | tojson }},
-            height: {{ height | tojson }}
+            imageUploadURL: {{ field.get_form().editor_upload_url|default(none) | tojson }},
+            height: {{ height | tojson }},
         });
     </script>
 {% endblock %}

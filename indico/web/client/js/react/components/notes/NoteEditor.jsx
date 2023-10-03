@@ -22,7 +22,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {FinalMarkdownEditor} from '../MarkdownEditor';
-import {FinalTextEditor} from '../TextEditor';
+import {FinalTinyMCETextEditor} from '../TinyMCETextEditor';
 
 import 'react-markdown-editor-lite/lib/index.css';
 
@@ -106,6 +106,9 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   }, [apiURL, getNoteURL]);
 
   const handleSubmit = async ({source}) => {
+    // getData is currently unused, keeping it around in case we need to enable lazyValue
+    // for the TinyMCE editor widget in case larger notes cause performance issues that
+    // can be resolved by only rendering them to an html string at submission time
     const currentValue = source.getData ? source.getData() : source;
     try {
       if (!currentValue) {
@@ -188,7 +191,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
             <FinalMarkdownEditor name="source" imageUploadURL={imageUploadURL} height="70vh" />
           )}
           {renderMode === 'html' && (
-            <FinalTextEditor
+            <FinalTinyMCETextEditor
               name="source"
               loading={loading}
               value={currentInput}

@@ -5,4 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'ckeditor';
+.tox .tox-textarea {
+  font-family: 'Liberation Mono', monospace !important;
+}
+
+.tox-tinymce {
+  // override text-input-base
+  padding: 0 !important;
+
+  &.tox-fullscreen {
+    border-radius: 0 !important;
+  }
+}

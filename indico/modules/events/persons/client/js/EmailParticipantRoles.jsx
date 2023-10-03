@@ -51,7 +51,6 @@ export function EmailParticipantRoles({
 
   const handleSubmit = async data => {
     const requestData = {...data, ...recipientData};
-    requestData.body = requestData.body.getData ? requestData.body.getData() : requestData.body;
     let resp;
     try {
       resp = await indicoAxios.post(emailSendURL({event_id: eventId}), requestData);

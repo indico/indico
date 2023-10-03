@@ -27,7 +27,7 @@ from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import IndicoButtonsBooleanField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
-from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 
 class ReferenceTypeForm(IndicoForm):
@@ -109,7 +109,7 @@ class LectureCreationForm(EventCreationFormBase):
     _advanced_field_order = ('description', 'theme')
     occurrences = OccurrencesField(_('Dates'), [DataRequired()])
     person_link_data = EventPersonLinkListField(_('Speakers'), event_type=EventType.lecture)
-    description = TextAreaField(_('Description'), widget=CKEditorWidget())
+    description = TextAreaField(_('Description'), widget=TinyMCEWidget())
     theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
 
 

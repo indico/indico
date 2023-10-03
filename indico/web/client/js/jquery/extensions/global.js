@@ -8,6 +8,7 @@
 // Global scripts that should be executed on all pages
 /* global showFormErrors:false */
 /* eslint-disable max-len */
+/* eslint-disable import/unambiguous */
 
 $(document).ready(function() {
   $('.main-breadcrumb a[href="#"]')
@@ -53,7 +54,9 @@ $(document).ready(function() {
         (!qtipHTML && !title) ||
         this.disabled ||
         $target.data('no-qtip') ||
-        ($target.closest('.ui:not(.ui-qtip)').length && !$target.hasClass('ui-qtip'))
+        ($target.closest('.ui:not(.ui-qtip)').length && !$target.hasClass('ui-qtip')) ||
+        $target.closest('.tox-tinymce').length ||
+        $target.closest('.tox').length
       ) {
         return;
       }

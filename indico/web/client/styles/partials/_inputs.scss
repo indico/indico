@@ -51,7 +51,8 @@
   > input[type='text'],
   > input[type='time'],
   > input[type='url'],
-  > input[type='week'] {
+  > input[type='week'],
+  > .tox-tinymce {
     @include text-input-base();
   }
 

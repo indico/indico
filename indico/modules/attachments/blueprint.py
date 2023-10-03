@@ -14,7 +14,7 @@ from indico.modules.attachments.controllers.display.event import (RHDownloadEven
                                                                   RHListEventAttachmentFolder,
                                                                   RHPackageEventAttachmentsDisplay)
 from indico.modules.attachments.controllers.event_package import RHPackageEventAttachmentsStatus
-from indico.modules.attachments.controllers.management.category import (RHAddCategoryAttachmentCKEditor,
+from indico.modules.attachments.controllers.management.category import (RHAddCategoryAttachmentEditor,
                                                                         RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
                                                                         RHCreateCategoryFolder,
@@ -22,7 +22,7 @@ from indico.modules.attachments.controllers.management.category import (RHAddCat
                                                                         RHDeleteCategoryFolder,
                                                                         RHEditCategoryAttachment, RHEditCategoryFolder,
                                                                         RHManageCategoryAttachments)
-from indico.modules.attachments.controllers.management.event import (RHAddEventAttachmentCKEditor,
+from indico.modules.attachments.controllers.management.event import (RHAddEventAttachmentEditor,
                                                                      RHAddEventAttachmentFiles,
                                                                      RHAddEventAttachmentLink,
                                                                      RHAttachmentManagementInfoColumn,
@@ -65,8 +65,8 @@ for object_type, prefixes in items:
         _bp.add_url_rule(prefix + '/attachments/info-column', 'management_info_column',
                          RHAttachmentManagementInfoColumn,
                          defaults={'object_type': object_type})
-        _bp.add_url_rule(prefix + '/attachments/add/ckeditor', 'upload_ckeditor',
-                         _dispatch(RHAddEventAttachmentCKEditor, RHAddCategoryAttachmentCKEditor),
+        _bp.add_url_rule(prefix + '/attachments/add/editor', 'upload_editor',
+                         _dispatch(RHAddEventAttachmentEditor, RHAddCategoryAttachmentEditor),
                          methods=('GET', 'POST'), defaults={'object_type': object_type})
         _bp.add_url_rule(prefix + '/attachments/add/files', 'upload',
                          _dispatch(RHAddEventAttachmentFiles, RHAddCategoryAttachmentFiles),

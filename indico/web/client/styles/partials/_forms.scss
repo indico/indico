@@ -249,7 +249,7 @@ form {
     }
   }
 
-  button,
+  button:not(.tox-tbtn),
   input[type='button'],
   input[type='submit'] {
     @include form-field-button();

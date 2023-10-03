@@ -73,7 +73,7 @@
                   data-icon
                   data-api-url="{{ url_for('event_notes.api', note) }}"
                   {% if note.event.can_manage_attachments(session.user) %}
-                      data-image-upload-url="{{ url_for('attachments.upload_ckeditor', note) }}"
+                      data-image-upload-url="{{ url_for('attachments.upload_editor', note) }}"
                   {% endif %}></span>
         {% endif %}
     </div>

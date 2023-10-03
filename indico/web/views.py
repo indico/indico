@@ -200,6 +200,12 @@ class WPBundleMixin:
             }
         }
 
+    @classproperty
+    @classmethod
+    def tinymce_content_css_urls(cls):
+        tinymce_css_bundles = ('common.css', 'react.css', 'semantic-ui.css', 'jquery.css', 'main.css')
+        return list(itertools.chain.from_iterable(current_app.manifest[x] for x in tinymce_css_bundles))
+
 
 class WPBase(WPBundleMixin):
     title = ''
@@ -278,6 +284,7 @@ class WPBase(WPBundleMixin):
         return render_template('indico_base.html',
                                css_files=css_files, js_files=js_files,
                                bundles=bundles, print_bundles=print_bundles,
+                               tinymce_content_css_urls=self.tinymce_content_css_urls,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_metadata=self.page_metadata,
@@ -335,6 +342,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                css_files=css_files, js_files=js_files,
                                page_metadata=cls.page_metadata,
                                bundles=bundles, print_bundles=print_bundles,
+                               tinymce_content_css_urls=cls.tinymce_content_css_urls,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(str(x) for x in title_parts if x),
