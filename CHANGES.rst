@@ -7,10 +7,11 @@ Version 3.2.8
 
 *Unreleased*
 
-Improvements
-^^^^^^^^^^^^
+Security fixes
+^^^^^^^^^^^^^^
 
-- None so far :(
+- Update `Pillow <https://pypi.org/project/Pillow/>`_ library due to
+  vulnerabilities in libwebp (:cve:`CVE-2023-4863`)
 
 Bugfixes
 ^^^^^^^^
@@ -21,11 +22,6 @@ Bugfixes
   set to a custom page (:pr:`5882`)
 - Show percentages for multi-choice survey answers based on number of answers instead of
   total number of choices selected (:pr:`5930`)
-
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- None so far
 
 
 Version 3.2.7
