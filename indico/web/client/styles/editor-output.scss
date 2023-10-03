@@ -5,21 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.ck {
-  height: auto;
-  width: auto;
-}
+// Neither ckeditor nor the markdown editor implement the styles shown in their
+// preview - they need to be manually implemented.
+// These styles apply to the generated output in conference & event description,
+// minutes and custom conference pages.
 
-.ck-source-editing-area {
-  height: 100%;
-}
-
-.ck-source-editing-area textarea {
-  height: 100% !important; /* overrides i-form auto height */
-}
-
-// Neither ckeditor nor the markdown editor implement the styles shown in their preview - they need to be manually implemented.
-// These styles apply to the generated output in conference & event description, minutes and custom conference pages.
+// XXX: even though we removed ckeditor those styles need to stay since e.g. the
+// classes are used in existing event notes; and generally the formatting is useful
 .editor-output {
   // Image positioning for ckeditor5
   // https://ckeditor.com/docs/ckeditor5/latest/features/images/images-styles.html

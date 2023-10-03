@@ -472,14 +472,6 @@ div.invalid {
   font-weight: bold;
 }
 
-/*
-    Used to display scroll bar in CKEditor properly.
-*/
-
-body.cke_show_borders {
-  height: auto;
-}
-
 .link {
   cursor: pointer;
   color: #045fb4;
