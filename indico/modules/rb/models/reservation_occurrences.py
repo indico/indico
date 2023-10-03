@@ -141,9 +141,9 @@ class ReservationOccurrence(db.Model):
         Map weekdays from the weekday recurrence picker to dateutil.rrule constants.
         """
 
-        # Return empty if no weekdays are provided; used after booking creation/viewing details
+        # Return none if no weekdays are provided
         if not weekdays:
-            return []
+            return None
 
         weekdays_map = {
             'mon': rrule.MO,

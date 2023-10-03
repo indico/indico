@@ -137,21 +137,21 @@ def test_iter_start_time_daily(interval, days_elapsed, expected_length):
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length', 'recurrence_weekdays'), (
-    (0, 0,  None, []),
-    (1, 0,  1, []),
-    (1, 7,  2, []),
-    (1, 21, 4, []),
-    (2, 7,  1, []),
-    (2, 14, 2, []),
-    (2, 42, 4, []),
-    (3, 14, 1, []),
-    (3, 21, 2, []),
-    (3, 63, 4, []),
-    (4, 0,  1, []),
-    (4, 27, 1, []),
-    (4, 28, 2, []),
-    (4, 83, 3, []),
-    (4, 84, 4, []),
+    (0, 0,  None, None),
+    (1, 0,  1, None),
+    (1, 7,  2, None),
+    (1, 21, 4, None),
+    (2, 7,  1, None),
+    (2, 14, 2, None),
+    (2, 42, 4, None),
+    (3, 14, 1, None),
+    (3, 21, 2, None),
+    (3, 63, 4, None),
+    (4, 0,  1, None),
+    (4, 27, 1, None),
+    (4, 28, 2, None),
+    (4, 83, 3, None),
+    (4, 84, 4, None),
 ))
 def test_iter_start_time_weekly(interval, days_elapsed, expected_length, recurrence_weekdays):
     assert days_elapsed >= 0
@@ -170,9 +170,9 @@ def test_iter_start_time_weekly(interval, days_elapsed, expected_length, recurre
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length', 'recurrence_weekdays'), (
-    (0, 0,  None, []),
-    (1, 0,  1, []),
-    (1, 40, 2, [])
+    (0, 0,  None, None),
+    (1, 0,  1, None),
+    (1, 40, 2, None)
 ))
 def test_iter_start_time_monthly(interval, days_elapsed, expected_length, recurrence_weekdays):
     assert days_elapsed >= 0
@@ -193,7 +193,7 @@ def test_iter_start_time_monthly(interval, days_elapsed, expected_length, recurr
 def test_iter_start_time_monthly_5th_monday_is_always_last():
     start_dt = date(2014, 9, 29) + relativedelta(hour=8)  # 5th monday of september
     end_dt = start_dt + relativedelta(days=100, hour=17)
-    params = {'start': start_dt, 'end': end_dt, 'repetition': (RepeatFrequency.MONTH, 1), 'recurrence_weekdays': []}
+    params = {'start': start_dt, 'end': end_dt, 'repetition': (RepeatFrequency.MONTH, 1), 'recurrence_weekdays': None}
     days = list(ReservationOccurrence.iter_start_time(**params))
     assert len(days) == 4
     assert days[1].date() == date(2014, 10, 27)  # 4th monday of october
