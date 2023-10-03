@@ -93,54 +93,38 @@ PrintingErrorsModal.propTypes = {
  * @param {number} eventId - Event ID
  * @param {number} templateId - Template ID
  * @param {Array.<String>} registrationIds - IDs of registrants to print
- * @param {String} action - action ("download" | "mail" | "publish")
- * @param {boolean} notifyEmail - whether to notify the user via e-mail (in case "publish" is chosen)
  * @param {Array.<Object>} customFields - custom field values to use in the template
  */
-export async function printReceipt(
-  eventId,
-  templateId,
-  registrationIds,
-  action,
-  notifyEmail,
-  customFields
-) {
-  if (action === 'download') {
-    try {
-      const data = {
-        custom_fields: customFields,
-        notify_emaik: notifyEmail,
-        registration_ids: registrationIds,
-      };
-      const {headers, data: downloadedData} = await indicoAxios.post(
-        printReceiptsURL(snakifyKeys({eventId, templateId})),
-        data,
-        {responseType: 'blob'}
-      );
-      const tplErrors = headers['x-indico-template-errors'];
-      if (tplErrors) {
-        await new Promise(resolve => {
-          injectModal(resolveModal => (
-            <PrintingErrorsModal
-              onClose={() => {
-                resolve();
-                resolveModal();
-              }}
-              errors={camelizeKeys(JSON.parse(tplErrors))}
-              downloadData={downloadedData}
-            />
-          ));
-        });
-      } else {
-        //downloadBlob(Translate.string('receipts.pdf'), downloadedData);
-        return true;
-      }
-    } catch (error) {
-      handleAxiosError(error);
+export async function printReceipt(eventId, templateId, registrationIds, customFields) {
+  try {
+    const data = {
+      custom_fields: customFields,
+      registration_ids: registrationIds,
+    };
+    const {headers, data: downloadedData} = await indicoAxios.post(
+      printReceiptsURL(snakifyKeys({eventId, templateId})),
+      data
+    );
+    const tplErrors = headers['x-indico-template-errors'];
+    if (tplErrors) {
+      await new Promise(resolve => {
+        injectModal(resolveModal => (
+          <PrintingErrorsModal
+            onClose={() => {
+              resolve();
+              resolveModal();
+            }}
+            errors={camelizeKeys(JSON.parse(tplErrors))}
+            downloadData={downloadedData}
+          />
+        ));
+      });
+    } else {
+      //downloadBlob(Translate.string('receipts.pdf'), downloadedData);
+      return downloadedData;
     }
-  } else {
-    // XXX: implement 'mail' and 'publish' actions
-    window.alert('Not implemented, sorry!');
+  } catch (error) {
+    handleAxiosError(error);
   }
 
   return false;

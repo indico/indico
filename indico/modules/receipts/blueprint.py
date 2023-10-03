@@ -49,7 +49,7 @@ for object_type in ('event', 'category'):
     _bp.add_url_rule(prefix + '/<int:template_id>/preview-template', 'template_preview', RHPreviewTemplate,
                      defaults={'object_type': object_type}, methods=('GET',))
     _bp.add_url_rule(prefix + '/<int:template_id>/preview', 'receipts_preview', RHPreviewReceipts,
-                     defaults={'object_type': object_type}, methods=('GET',))
+                     defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/generate', 'generate_receipts', RHGenerateReceipts,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditTemplate,

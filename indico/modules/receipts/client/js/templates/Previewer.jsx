@@ -17,7 +17,7 @@ import {makeAsyncDebounce} from 'indico/utils/debounce';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import './TemplatePane.module.scss';
+import './Previewer.module.scss';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
@@ -80,7 +80,19 @@ export default function Previewer({url, data}) {
             </ul>
           </Message>
         ))}
-      <div styleName={loading ? 'loading' : null}>
+      <div styleName={`previewer ${loading ? 'loading' : ''}`}>
+        {content && (
+          <Document
+            file={content}
+            loading={<Loader active />}
+            onLoadSuccess={({numPages: n}) => {
+              setNumPages(n);
+              setPageNumber(1);
+            }}
+          >
+            <Page pageNumber={pageNumber} />
+          </Document>
+        )}
         {numPages && (
           <Pagination
             disabled={numPages < 2}
@@ -96,16 +108,6 @@ export default function Previewer({url, data}) {
             styleName="pagination"
           />
         )}
-        <Document
-          file={content}
-          loading={<Loader active />}
-          onLoadSuccess={({numPages: n}) => {
-            setNumPages(n);
-            setPageNumber(1);
-          }}
-        >
-          <Page pageNumber={pageNumber} />
-        </Document>
       </div>
     </>
   );

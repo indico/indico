@@ -291,6 +291,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             Registration.id.in_(registration_ids), RegistrationForm.event == self.target
         ).join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
 
+        receipts = []
         g.template_stack = []
         for registration in registrations:
             g.template_stack.append(TemplateStackEntry(registration))
@@ -319,6 +320,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             )
             db.session.add(rf)
             db.session.commit()
+            receipts.append(rf.locator)
 
         undefineds = [
             {
@@ -333,7 +335,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             pass
         del g.template_stack
 
-        return '', 204
+        return jsonify(receipts=receipts)
 
 
 class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
