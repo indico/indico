@@ -31,7 +31,7 @@ def _category_sidemenu_items(sender, category, **kwargs):
 @signals.event.registrant_list_action_menu.connect
 def _get_action_menu_items(reg_form, **kwargs):
     yield ActionMenuEntry(
-        _('Print Receipts'),
+        _('Generate Documents'),
         'agreement',
         type='callback',
         callback='printReceipts',
