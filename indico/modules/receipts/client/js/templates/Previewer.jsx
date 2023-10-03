@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {pdfjs, Document, Page} from 'react-pdf';
@@ -13,6 +12,7 @@ import {Loader, Message, Pagination} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {makeAsyncDebounce} from 'indico/utils/debounce';
 
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -28,33 +28,7 @@ const MESSAGE_HEADERS = {
   jinja: Translate.string('Jinja Template'),
 };
 
-const debouncedRequest = _.throttle(
-  (setContent, setError, url, data) =>
-    (async () => {
-      try {
-        setError(null);
-        const {data: content} = await indicoAxios.post(url, data, {responseType: 'arraybuffer'});
-        setContent(content);
-      } catch (error) {
-        const {
-          response: {status, data},
-        } = error;
-        if (status === 422) {
-          const decoder = new TextDecoder('utf-8');
-          const json = JSON.parse(decoder.decode(data));
-          if (json.webargs_errors) {
-            setError(json.webargs_errors);
-          } else {
-            setError({jinja: [json.error.message]});
-          }
-        } else {
-          handleAxiosError(error);
-        }
-        return;
-      }
-    })(),
-  4000
-);
+const debounce = makeAsyncDebounce(250);
 
 export default function Previewer({url, data}) {
   const [content, setContent] = useState(null);
@@ -65,15 +39,32 @@ export default function Previewer({url, data}) {
 
   useEffect(() => {
     setLoading(true);
-    debouncedRequest(
-      c => {
+    (async () => {
+      try {
+        setError(null);
+        const {data: newContent} = await debounce(() =>
+          indicoAxios.post(url, data, {responseType: 'arraybuffer'})
+        );
         setLoading(false);
-        setContent(c);
-      },
-      setError,
-      url,
-      data
-    );
+        setContent(newContent);
+      } catch (e) {
+        const {
+          response: {status, data},
+        } = e;
+        if (status === 422) {
+          const decoder = new TextDecoder('utf-8');
+          const json = JSON.parse(decoder.decode(data));
+          if (json.webargs_errors) {
+            setError(json.webargs_errors);
+          } else {
+            setError({jinja: [json.error.message]});
+          }
+        } else {
+          handleAxiosError(e);
+        }
+        return;
+      }
+    })();
   }, [url, data]);
 
   return (
