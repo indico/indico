@@ -86,7 +86,7 @@ div.timetableContribution {
   opacity: 0.7 !important;
 }
 
-.key {
+.tt-key {
   display: inline;
   min-width: 1em;
   padding: 0.2em 0.3em;

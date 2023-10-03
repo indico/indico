@@ -418,7 +418,7 @@ type(
         indicatorDiv = $('<div class="bottomTip"/>')
           .html(
             $T(
-              '<span class="key light">Shift</span> is currently pressed. Changes will be applied to blocks after.'
+              '<kbd class="tt-key">Shift</kbd> is currently pressed. Changes will be applied to blocks after.'
             )
           )
           .appendTo('body');
