@@ -261,7 +261,7 @@ tornado==6.3.3
     # via livereload
 unbeheader==1.2.0
     # via -r requirements.dev.in
-urllib3==1.26.16
+urllib3==1.26.17
     # via
     #   -c requirements.txt
     #   requests

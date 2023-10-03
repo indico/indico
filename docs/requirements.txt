@@ -92,7 +92,7 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-urllib3==2.0.4
+urllib3==2.0.6
     # via requests
 werkzeug==2.3.6
     # via flask
