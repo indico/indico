@@ -8,3 +8,12 @@
 .tox .tox-textarea {
   font-family: 'Liberation Mono', monospace !important;
 }
+
+.tox-tinymce {
+  // override text-input-base
+  padding: 0 !important;
+
+  &.tox-fullscreen {
+    border-radius: 0 !important;
+  }
+}
