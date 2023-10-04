@@ -435,3 +435,8 @@ code.placeholder {
   font-style: normal;
   font-size: 0.9em;
 }
+
+// The .hidden style should not apply to some elements
+.ui.checkbox > input.hidden {
+  display: inline-block !important;
+}

@@ -54,6 +54,7 @@ export default function SearchBox({onSearch, category, isAdmin}) {
         <div styleName="option">
           <Label content={Translate.string('ADMIN')} size="small" color="red" />
           <Checkbox
+            id="checkbox-admin-search"
             styleName="checkbox-admin-search"
             label={Translate.string('Skip access checks')}
             checked={adminOverrideEnabled}

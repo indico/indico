@@ -52,6 +52,8 @@ Accessibility
   thanks :user:`foxbunny`)
 - Make search results tabs accessible (:issues:`5964`, :pr:`5965`, thanks :user:`foxbunny`)
 - Make timezone list accessible (:issue:`5908`, :pr:`5914`, thanks :user:`foxbunny`)
+- Make "Skip access checks" checkbox in search keyboard-accessible (:issue:`5952`, :pr:`5953`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

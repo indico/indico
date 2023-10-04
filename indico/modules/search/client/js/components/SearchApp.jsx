@@ -322,6 +322,7 @@ export default function SearchApp({category, eventId, isAdmin}) {
           <div styleName="admin-search-container">
             <Label content={Translate.string('ADMIN')} size="small" color="red" />
             <Checkbox
+              id="checkbox-admin-search"
               label={Translate.string('Skip access checks')}
               checked={adminOverrideEnabled}
               onChange={(__, {checked}) => {
