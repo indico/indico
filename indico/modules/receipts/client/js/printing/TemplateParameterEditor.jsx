@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form} from 'semantic-ui-react';
+import {Accordion, Form} from 'semantic-ui-react';
 
 /**
  * This component represents a custom field which can contain a "text" (str), "choice" or "yes/no" (boolean).
@@ -57,27 +57,46 @@ CustomField.defaultProps = {
   options: null,
 };
 
-export default function TemplateParameterEditor({customFields, values, onChange}) {
-  return customFields.map(({name, type, options}) => (
-    <CustomField
-      key={name}
-      type={type}
-      value={values[name]}
-      onChange={value => {
-        onChange({...values, [name]: value});
-      }}
-      name={name}
-      options={options}
+export default function TemplateParameterEditor({customFields, value, onChange, title}) {
+  if (customFields.length === 0 || Object.keys(value).length === 0) {
+    return null;
+  }
+  return (
+    <Accordion
+      defaultActiveIndex={0}
+      panels={[
+        {
+          key: 'template-params',
+          title,
+          content: {
+            content: customFields.map(({name, type, options}) => (
+              <CustomField
+                key={name}
+                type={type}
+                value={value[name]}
+                onChange={v => {
+                  onChange({...value, [name]: v});
+                }}
+                name={name}
+                options={options}
+              />
+            )),
+          },
+        },
+      ]}
+      styled
+      fluid
     />
-  ));
+  );
 }
 
 TemplateParameterEditor.propTypes = {
-  customFields: PropTypes.array,
-  values: PropTypes.object,
-  onChange: PropTypes.func,
+  customFields: PropTypes.array.isRequired,
+  value: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  title: PropTypes.string,
 };
 
 TemplateParameterEditor.defaultProps = {
-  customFields: [],
+  title: '',
 };

@@ -31,6 +31,7 @@ from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_in
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
 from indico.util.i18n import _
 from indico.util.marshmallow import YAML
+from indico.util.string import slugify
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
 
@@ -126,8 +127,9 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
 
 class AllTemplateMixin(ReceiptAreaMixin):
     def _process(self, **data):
-        inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
-        own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
+        schema = ReceiptTemplateDBSchema(only=('id', 'type', 'title', 'custom_fields'), many=True)
+        inherited_templates = schema.dump(get_inherited_templates(self.target))
+        own_templates = schema.dump(self.target.receipt_templates)
         return jsonify(inherited_templates + own_templates)
 
 
@@ -261,7 +263,6 @@ class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 event=self.target,
                 **get_useful_registration_data(registration.registration_form, registration)
             ))
-        #TODO add preview watermark
 
         response = send_file(
             'receipt.pdf', create_pdf(self.target, html_sources, self.template.css), 'application/pdf'
@@ -281,11 +282,14 @@ class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
 
 class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
     @use_kwargs({
-        'registration_ids': fields.List(fields.Integer()),
-        'notify_email': fields.Bool(load_default=True), # TODO move this to PublishReceipt
-        'custom_fields': fields.Dict(keys=fields.String)
+        'registration_ids': fields.List(fields.Integer(), required=True),
+        'custom_fields': fields.Dict(keys=fields.String, load_default={}),
+        'document_type': fields.String(load_default=''),
+        'filename': fields.String(required=True, validate=validate.Length(min=1, max=30)),
+        'publish': fields.Bool(load_default=False),
+        'notify_users': fields.Bool(load_default=False)
     })
-    def _process(self, registration_ids=None, notify_email=None, custom_fields=None):
+    def _process(self, registration_ids, custom_fields, document_type, filename, publish, notify_users):
         # fetch corresponding Registration objects, among those belonging to the event
         registrations = Registration.query.filter(
             Registration.id.in_(registration_ids), RegistrationForm.event == self.target
@@ -306,7 +310,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             n = ReceiptFile.query.filter(ReceiptFile.registration == registration,
                                          ReceiptFile.template.has(type=self.template.type)).count()
             f = File(
-                filename=f'{self.template.type.file_prefix}-{n + 1}.pdf',
+                filename=f'{slugify(filename, n + 1)}.pdf',
                 content_type='application/pdf',
                 meta={'event_id': self.target.id}
             )
@@ -316,11 +320,14 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 file=f,
                 registration=registration,
                 template=self.template,
-                template_params=custom_fields
+                template_params=custom_fields,
+                is_published=publish
             )
             db.session.add(rf)
             db.session.commit()
             receipts.append(rf.locator)
+            if publish and notify_users:
+                pass #TODO notify registrant
 
         undefineds = [
             {
@@ -330,12 +337,12 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             for entry in g.template_stack if entry.undefined
         ]
         if undefineds:
-            #TODO figure out what to do with errors. maybe log them somewhere?
-            #response.headers['X-Indico-Template-Errors'] = json.dumps(undefineds)
-            pass
+            errors = json.dumps(undefineds)  #TODO display errors in FE
+        else:
+            errors = []
         del g.template_stack
 
-        return jsonify(receipts=receipts)
+        return jsonify(receipts=receipts, errors=errors)
 
 
 class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):

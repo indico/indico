@@ -95,6 +95,7 @@ export function FinalModalForm({
   unloadPromptRouter,
   alignTop,
   submitLabel,
+  noSubmitButton,
   className,
   decorators,
   validate,
@@ -147,12 +148,14 @@ export function FinalModalForm({
           </Modal.Content>
           <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
             {_.isFunction(extraActions) ? extraActions(fprops) : extraActions}
-            <FinalSubmitButton
-              form={`final-modal-form-${id}`}
-              label={submitLabel || Translate.string('Submit')}
-              disabledUntilChange={disabledUntilChange}
-              disabledAfterSubmit={disabledAfterSubmit}
-            />
+            {!noSubmitButton && (
+              <FinalSubmitButton
+                form={`final-modal-form-${id}`}
+                label={submitLabel || Translate.string('Submit')}
+                disabledUntilChange={disabledUntilChange}
+                disabledAfterSubmit={disabledAfterSubmit}
+              />
+            )}
             <Form.Field disabled={fprops.submitting}>
               <Button onClick={onClose} disabled={fprops.submitting}>
                 {fprops.dirty && !(fprops.submitSucceeded && disabledAfterSubmit) ? (
@@ -219,6 +222,8 @@ FinalModalForm.propTypes = {
   alignTop: PropTypes.bool,
   /** A custom label for the submit button. */
   submitLabel: PropTypes.string,
+  /** Whether to render the form without a submit button. */
+  noSubmitButton: PropTypes.bool,
   /** Additional CSS classes to set on the SUI Form. */
   className: PropTypes.string,
   /**
@@ -250,6 +255,7 @@ FinalModalForm.defaultProps = {
   unloadPromptRouter: false,
   alignTop: false,
   submitLabel: null,
+  noSubmitButton: false,
   className: null,
   extraActions: null,
   style: null,

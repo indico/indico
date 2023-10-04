@@ -33,11 +33,18 @@ class ReceiptTplMetadataSchema(mm.Schema):
     custom_fields = fields.Nested(CustomFieldSchema(many=True))
 
 
+class ReceiptTemplateTypeSchema(mm.Schema):
+    title = fields.String()
+    name = fields.String()
+    file_prefix = fields.String()
+
+
 class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReceiptTemplate
         fields = ('id', 'type', 'title', 'html', 'css', 'custom_fields', 'yaml', 'owner')
 
+    type = fields.Nested(ReceiptTemplateTypeSchema)
     yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields})
                                         if tpl.custom_fields else None))
     owner = fields.Nested(OwnerDataSchema)
