@@ -12,3 +12,8 @@ select,
 isindex {
   font: inherit;
 }
+
+button:not(:disabled),
+label {
+  cursor: pointer;
+}
