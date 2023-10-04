@@ -185,6 +185,8 @@ def check_format_strings():
                            .format(item['orig'], item['trans'],
                                    list(item['orig_placeholders']), list(item['trans_placeholders'])))
             click.echo()
+    if all_valid:
+        click.secho('No issues found!', fg='green', bold=True)
     sys.exit(0 if all_valid else 1)
 
 
