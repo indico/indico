@@ -48,64 +48,76 @@
 
 
 {% macro _render_timezone_selector(timezone_data) %}
+    {% set active_tz_label = timezone_data.active_tz %}
     {% if timezone_data.disabled %}
-        <a class="i-button icon-time disabled">
-            {{- timezone_data.active_tz -}}
-        </a>
+        <span class="i-button icon-time disabled" aria-label="{% trans %}The active timezone is {{ active_tz_label }} and it cannot be changed{% endtrans %}">
+            {{- active_tz_label -}}
+        </span>
     {% else %}
-        <div id="tz-selector-widget" style="display: none;" class="tz-selector-widget settingsWidget">
-            <div style="line-height: 17px;">
-                <span class="settingsWidgetHeader">{% trans %}Choose Timezone{% endtrans %}</span><br>
-            </div>
-            <div class="settingsSeparator"></div>
-            <div class="tz-mode-container">
-                <div>
-                    <input type="radio" name="tz_mode" id="tz-mode-local" value="local"
-                           {{ 'checked' if timezone_data.tz_mode == 'local' }}>
-                    <label for="tz-mode-local">{% trans %}Use the event/category timezone{% endtrans %}</label>
+        {% set profile_timezone = session.user.settings.get('timezone') if session.user else '' %}
+        <article id="tz-selector-widget" style="display:none" aria-labelledby="tz-selector">
+            <div>
+                <h2 id="tz-selector">{% trans %}Choose timezone{% endtrans %}</h2>
+
+                <div id="tz-profile-setting">
+                    <span>{% trans %}Your profile timezone:{% endtrans %}</span>
+                    <span>{{ profile_timezone }}</span>
                 </div>
-                {% if session.user %}
-                    <div>
-                        <input type="radio" name="tz_mode" id="tz-mode-user" value="user"
-                               {{ 'checked' if timezone_data.tz_mode == 'user' }}>
-                        <label for="tz-mode-user">
-                            {% trans %}Your default timezone{% endtrans %}
-                            <em>({{ timezone_data.user_tz }})</em>
-                        </label>
-                    </div>
-                {% endif %}
-                <div>
-                    <input type="radio" name="tz_mode" id="tz-mode-custom" value="custom"
-                           {{ 'checked' if timezone_data.tz_mode == 'custom' }}>
-                    <label for="tz-mode-custom">{% trans %}Specify a timezone{% endtrans %}</label>
-                </div>
-            </div>
-            <select name="tz" class="tz-select" size="12" {{ 'disabled' if timezone_data.tz_mode != 'custom' }}>
-                {% for tz in timezone_data.timezones -%}
-                    <option value="{{ tz }}" {{ 'selected' if tz == session.tzinfo.zone }}>{{ tz }}</option>
-                {%- endfor %}
-            </select>
-            {% if session.user %}
-                <div class="tz-update-user-container">
-                    <input type="checkbox" name="update_user" id="tz-update-user" value="1">
-                    <label for="tz-update-user">
-                        {%- trans %}Remember these settings{% endtrans -%}
+
+                <form id="tz-mode-form" action="{{ url_for('core.change_tz') }}" method="post">
+                    <fieldset id="tz-modes">
+                        <legend>Use timezone based on:</legend>
+                        <input type="radio" name="tz_mode" id="tz-mode-local" value="local"
+                               {{ 'checked' if timezone_data.tz_mode == 'local' }}
+                               aria-label="{% trans %}Use the event/category timezone{% endtrans %}">
+                        <label for="tz-mode-local">{% trans %}Event/category{% endtrans %}</label>
+                        {% if session.user %}
+                            <input type="radio" name="tz_mode" id="tz-mode-user" value="user"
+                                   data-user-tz="{{ profile_timezone }}"
+                                   {{ 'checked' if timezone_data.tz_mode == 'user' }}
+                                   aria-label="{% trans %}Use the default timezone of your profile{% endtrans %}">
+                            <label for="tz-mode-user">
+                                {% trans %}Profile{% endtrans %}
+                            </label>
+                        {% endif %}
+                        <input type="radio" name="tz_mode" id="tz-mode-custom" value="custom"
+                               {{ 'checked' if timezone_data.tz_mode == 'custom' }}
+                               aria-label="{% trans %}Use a custom timezone{% endtrans %}">
+                        <label for="tz-mode-custom">{% trans %}Custom{% endtrans %}</label>
+                    </fieldset>
+                    <label id="tz-custom-field">
+                        <span>{% trans %}Select a custom timezone{% endtrans %}</span>
+                        <select name="tz" size="12">
+                            {% for tz in timezone_data.timezones -%}
+                                {% set is_profile_timezone = tz == profile_timezone %}
+                                <option value="{{ tz }}" {{ 'selected' if tz == session.tzinfo.zone }} {{ 'data-profile' if is_profile_timezone }}>
+                                    {% if is_profile_timezone -%}
+                                        {% trans %}{{ tz }} (your profile timezone){% endtrans %}
+                                    {%- else -%}
+                                        {{- tz -}}
+                                    {%- endif %}
+                                </option>
+                            {%- endfor %}
+                        </select>
                     </label>
-                </div>
-            {% endif %}
-            <div class="tz-save-container">
-                <button class="i-button highlight" type="button"
-                        data-href="{{ url_for('core.change_tz') }}"
-                        data-method="POST"
-                        data-params-selector="#tz-selector-widget input[name=tz_mode]:checked,
-                                              #tz-selector-widget select[name=tz]:not(:disabled),
-                                              #tz-update-user:checked"
-                        data-reload-after
-                        data-ajax>
-                    {% trans %}Save{% endtrans %}
-                </button>
+                    {% if session.user %}
+                        <label id="tz-remember-setting">
+                            <input type="checkbox" name="update_user" value="1">
+                            <span>{%- trans %}Remember these settings{% endtrans -%}</span>
+                        </label>
+                    {% endif %}
+                    <button data-href="{{ url_for('core.change_tz') }}"
+                            data-method="POST"
+                            data-params-selector="#tz-mode-form [name=tz_mode]:checked,
+                                                  #tz-mode-form [name=tz],
+                                                  #tz-mode-form [name=update_user]:checked"
+                            data-reload-after
+                            data-ajax>
+                        {% trans %}Save{% endtrans %}
+                    </button>
+                </form>
             </div>
-        </div>
+        </article>
 
         <button id="tz-selector-link" class="i-button icon-time arrow">{{ timezone_data.active_tz }}</button>
     {% endif %}

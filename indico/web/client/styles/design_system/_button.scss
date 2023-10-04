@@ -1,0 +1,82 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'layout';
+
+%button-base {
+  @extend %flex-inline-center;
+  gap: var(--control-internal-gap);
+  padding: var(--control-padding);
+
+  border: var(--control-border);
+  color: var(--control-text-color);
+  background: var(--control-clickable-surface-color);
+
+  &:focus,
+  &:hover {
+    background-color: var(--control-clickable-surface-focus-color);
+  }
+}
+
+%button-rounded {
+  border-radius: var(--control-border-radius);
+}
+
+%button-rounded-left {
+  border-top-left-radius: var(--control-border-radius);
+  border-bottom-left-radius: var(--control-border-radius);
+}
+
+%button-rounded-right {
+  border-top-right-radius: var(--control-border-radius);
+  border-bottom-right-radius: var(--control-border-radius);
+}
+
+%button-rounded-top {
+  border-top-left-radius: var(--control-border-radius);
+  border-top-right-radius: var(--control-border-radius);
+}
+
+%button-rounded-bottom {
+  border-bottom-left-radius: var(--control-border-radius);
+  border-bottom-right-radius: var(--control-border-radius);
+}
+
+%button-disabled-state {
+  background: var(--control-disabled-clickable-surface-color);
+  color: var(--control-disabled-text-color);
+  border-color: var(--control-disabled-border-color);
+}
+
+%button {
+  @extend %button-base;
+  @extend %button-rounded;
+
+  &:disabled {
+    @extend %button-disabled-state;
+  }
+}
+
+%button-alt-state {
+  background: var(--control-alt-clickable-surface-color);
+  color: var(--control-alt-text-color);
+  border-color: var(--control-alt-border-color);
+}
+
+%button-alt-hover-state {
+  background: var(--control-alt-clickable-surface-focus-color);
+}
+
+%button-main-action {
+  @extend %button;
+  @extend %button-alt-state;
+
+  &:focus-visible,
+  &:hover {
+    @extend %button-alt-hover-state;
+  }
+}

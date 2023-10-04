@@ -287,21 +287,6 @@ a.i-big-button {
   }
 }
 
-.i-button.signin {
-  display: block;
-  text-align: left;
-  margin-top: 5px;
-
-  .auth-id {
-    font-weight: bold;
-  }
-
-  .login-arrow {
-    float: right;
-    @include icon-before('icon-arrow-right-sparse');
-  }
-}
-
 .i-button.next {
   @include icon-after('icon-next');
   font-weight: bold;
@@ -355,7 +340,7 @@ button::-moz-focus-inner {
 }
 
 .i-button.right {
-  margin-left: 5px;
+  margin-right: 5px;
   margin-top: 5px;
 }
 

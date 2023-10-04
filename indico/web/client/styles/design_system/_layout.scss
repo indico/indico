@@ -1,0 +1,38 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@mixin flex-column {
+  --flex-gap: 0.5em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--flex-gap);
+}
+
+%flex-column {
+  @include flex-column();
+}
+
+@mixin flex-row {
+  --flex-gap: 0.5em;
+  display: flex;
+  align-items: center;
+  gap: var(--flex-gap);
+}
+
+%flex-row {
+  @include flex-row();
+}
+
+@mixin flex-inline-center {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+%flex-inline-center {
+  @include flex-inline-center();
+}

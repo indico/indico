@@ -1,0 +1,99 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'button';
+@use 'layout';
+@use 'form_controls';
+@use 'utils';
+@use 'partials/icons';
+
+%button-group-base {
+  // Recommended structure:
+  //
+  // FIELDSET
+  //   LEGEND
+  //   INPUT[type="radio"] LABEL
+  //   INPUT[type="radio"] LABEL
+
+  @extend %flex-row;
+  --flex-gap: 0;
+
+  legend {
+    @extend %form-label-block;
+  }
+
+  label {
+    @extend %button-base;
+    flex: 1;
+
+    &::before {
+      @extend %icon;
+      @extend %icon-checkmark;
+      visibility: hidden;
+    }
+
+    &::after {
+      // NB: fake icon to balance the layout
+      @extend %icon;
+      content: ' ';
+      width: 1ch;
+    }
+  }
+
+  :focus-visible + label {
+    @extend %default-focus-ring;
+    z-index: 1;
+  }
+
+  :checked + label {
+    @extend %button-alt-state;
+    cursor: default;
+
+    &::before {
+      visibility: visible;
+    }
+  }
+
+  :disabled + label {
+    @extend %button-disabled-state;
+  }
+}
+
+%button-group {
+  @extend %button-group-base;
+  align-items: center;
+
+  label:not(:last-child) {
+    margin-right: -1px;
+  }
+
+  label:first-of-type {
+    @extend %button-rounded-left;
+  }
+
+  label:last-of-type {
+    @extend %button-rounded-right;
+  }
+}
+
+%button-group-vertical {
+  @extend %button-group-base;
+  flex-direction: column;
+  align-items: stretch;
+
+  label {
+    justify-content: space-between;
+  }
+
+  label:first-of-type {
+    @extend %button-rounded-top;
+  }
+
+  label:last-of-type {
+    @extend %button-rounded-bottom;
+  }
+}

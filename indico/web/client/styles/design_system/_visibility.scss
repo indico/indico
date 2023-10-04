@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@forward 'widgets/occurrences';
-@forward 'widgets/permissions';
-@forward 'widgets/session-bar';
-@forward 'widgets/sortable_list';
-@forward 'widgets/tz_selector';
+%visually-hidden {
+  position: fixed;
+  right: 100vw;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+}

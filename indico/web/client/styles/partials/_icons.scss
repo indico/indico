@@ -37,7 +37,8 @@ you can use the generic selector below, but it's slower:
 [class*="icon-"] {
 */
 [class^='icon-']::before,
-[class*=' icon-']::before {
+[class*=' icon-']::before,
+%icon {
   font-family: 'icomoon-ultimate';
   font-style: normal;
   font-weight: normal;
@@ -569,6 +570,12 @@ i[class^='icon-']::before {
   content: '\e907';
 }
 /* End of icomoon's icon definitions */
+
+/* placeholder aliases */
+
+%icon-checkmark {
+  content: '\e372';
+}
 
 /* animated spinner icon */
 .icon-spinner::before {

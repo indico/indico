@@ -1,0 +1,69 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'utils';
+@use 'layout';
+@use 'partials/icons';
+
+%form-label {
+  @extend %reset-font-and-color;
+  font-weight: bold;
+}
+
+%form-label-block {
+  @extend %form-label;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+%select-list {
+  border: var(--control-border);
+  border-radius: var(--control-border-radius);
+
+  option:not(:checked):hover {
+    background: var(--control-clickable-surface-color);
+  }
+
+  option:checked {
+    background: var(--control-alt-clickable-surface-color);
+    color: var(--control-alt-text-color);
+  }
+}
+
+%checkbox {
+  @extend %flex-inline-center;
+  appearance: none;
+  width: 1.5em;
+  height: 1.5em;
+  background: var(--control-indented-bg-color);
+  border: var(--control-border);
+  border-radius: var(--control-border-radius);
+
+  &:checked {
+    background: var(--control-alt-clickable-surface-color);
+    color: var(--control-alt-text-color);
+  }
+
+  &:focus-visible:not(:checked) {
+    background: var(--control-clickable-surface-focus-color);
+  }
+
+  &:focus-visible:checked {
+    background: var(--control-alt-clickable-surface-focus-color);
+  }
+
+  &:disabled {
+    background: var(--control-disabled-indented-bg-color);
+    color: var(--control-disabled-text-color);
+    border-color: var(--control-disabled-border-color);
+  }
+
+  &:checked::before {
+    @extend %icon;
+    @extend %icon-checkmark;
+  }
+}

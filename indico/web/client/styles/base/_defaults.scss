@@ -19,6 +19,7 @@ $default-transition-delay: null;
 $default-border-color: $pastel-gray;
 $default-border-style: solid;
 $default-border-width: 1px;
+$default-border: $default-border-width $default-border-style $default-border-color;
 
 $color-variation: 15%;
 $light-color-variation: 5%;

@@ -5,8 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@forward 'widgets/occurrences';
-@forward 'widgets/permissions';
-@forward 'widgets/session-bar';
-@forward 'widgets/sortable_list';
-@forward 'widgets/tz_selector';
+%reset-font-and-color {
+  color: inherit;
+  font: inherit;
+}
+
+%default-focus-ring {
+  outline: medium solid Highlight;
+  outline: medium solid -webkit-focus-ring-color;
+}
