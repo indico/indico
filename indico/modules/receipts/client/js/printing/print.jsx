@@ -95,12 +95,10 @@ PrintingErrorsModal.propTypes = {
  * @param {Array.<String>} registrationIds - IDs of registrants to print
  * @param {Array.<Object>} customFields - custom field values to use in the template
  */
-export async function printReceipt(eventId, templateId, registrationIds, customFields) {
+export async function printReceipt(eventId, registrationIds, values) {
   try {
-    const data = {
-      custom_fields: customFields,
-      registration_ids: registrationIds,
-    };
+    const {template: templateId, ...data} = values;
+    data.registration_ids = registrationIds;
     const {headers, data: downloadedData} = await indicoAxios.post(
       printReceiptsURL(snakifyKeys({eventId, templateId})),
       data

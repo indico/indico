@@ -39,6 +39,11 @@ class ReceiptFile(db.Model):
         nullable=False,
         default={}
     )
+    type = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     is_published = db.Column(
         db.Boolean,
         nullable=False,
