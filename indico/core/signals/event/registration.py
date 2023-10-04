@@ -44,15 +44,6 @@ The `permanent` kwarg indicates whether the registration is being permanently de
 e.g. due to it exceeding its retention period.
 ''')
 
-registration_form_wtform_created = _signals.signal('registration_form_wtform_created', '''
-Called when a the wtform is created for rendering/processing a registration form.
-The sender is the `RegistrationForm` object. The generated WTForm class is
-passed in the `wtform_cls` kwarg and it may be modified. The `registration`
-kwarg contains a `Registration` object when called from registration edit
-endpoints. The `management` kwarg is set to `True` if the registration form is
-rendered/processed from the event management area.
-''')
-
 registration_form_created = _signals.signal('registration-form-created', '''
 Called when a new registration form is created. The `sender` is the
 `RegistrationForm` object.
