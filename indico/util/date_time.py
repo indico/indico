@@ -55,10 +55,10 @@ def now_utc(exact=True):
     :param exact: Set to ``False`` to set seconds/microseconds to 0.
     :return: A timezone-aware `datetime` object
     """
-    now = datetime.utcnow()
+    now = datetime.now(pytz.UTC)
     if not exact:
         now = now.replace(second=0, microsecond=0)
-    return pytz.utc.localize(now)
+    return now
 
 
 def as_utc(dt):

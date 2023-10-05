@@ -93,6 +93,7 @@ Internal Changes
   on ``selection.json`` (:pr:`5986`, thanks :user:`foxbunny`)
 - Pass form class arguments to ``core.add_form_fields`` signal handlers (:pr:`6020`, thanks
   :user:`vtran99`)
+- Support Python 3.12 (:pr:`5978`)
 
 
 ----

@@ -15,8 +15,8 @@ from indico.util.marshmallow import NaiveDateTime
 
 
 def test_NaiveDateTime_serialize():
-    now = datetime.now()
-    utc_now = pytz.utc.localize(datetime.utcnow())
+    utc_now = datetime.now(pytz.UTC)
+    now = utc_now.replace(tzinfo=None)
     obj = type('Test', (), {
         'naive': now,
         'aware': utc_now,
@@ -28,8 +28,8 @@ def test_NaiveDateTime_serialize():
 
 
 def test_NaiveDateTime_deserialize():
-    now = datetime.now()
-    utc_now = pytz.utc.localize(datetime.utcnow())
+    utc_now = datetime.now(pytz.UTC)
+    now = utc_now.replace(tzinfo=None)
     field = NaiveDateTime()
     assert field.deserialize(now.isoformat()) == now
     with pytest.raises(ValidationError):

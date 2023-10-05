@@ -4,6 +4,7 @@ env:
   PYTHON_VERSION_39: '3.9.18'
   PYTHON_VERSION_310: '3.10.13'
   PYTHON_VERSION_311: '3.11.5'
+  PYTHON_VERSION_312: '3.12.0'
 
 on:
   push:
@@ -24,9 +25,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: '3.9', python: '3.9', python_version_var: 'PYTHON_VERSION_39', tox: py39 }
-          - { name: '3.10', python: '3.10', python_version_var: 'PYTHON_VERSION_310', tox: py310 }
-          - { name: '3.11', python: '3.11', python_version_var: 'PYTHON_VERSION_311', tox: py311 }
+          - { name: '3.9', python: '3.9', python_version_var: 'PYTHON_VERSION_39' }
+          - { name: '3.10', python: '3.10', python_version_var: 'PYTHON_VERSION_310' }
+          - { name: '3.11', python: '3.11', python_version_var: 'PYTHON_VERSION_311' }
+          - { name: '3.12', python: '3.12', python_version_var: 'PYTHON_VERSION_312' }
 
     steps:
       - uses: actions/checkout@v4
@@ -102,7 +104,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION_311 }}
+          python-version: ${{ env.PYTHON_VERSION_312 }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -112,7 +114,7 @@ jobs:
       - name: Download environment
         uses: actions/download-artifact@v3
         with:
-          name: environment-3.11
+          name: environment-3.12
           path: /tmp
 
       - name: Restore environment
@@ -220,9 +222,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: '3.9', python: '3.9', python_version_var: 'PYTHON_VERSION_39', tox: py39 }
-          - { name: '3.10', python: '3.10', python_version_var: 'PYTHON_VERSION_310', tox: py310 }
-          - { name: '3.11', python: '3.11', python_version_var: 'PYTHON_VERSION_311', tox: py311 }
+          - { name: '3.9', python: '3.9', python_version_var: 'PYTHON_VERSION_39' }
+          - { name: '3.10', python: '3.10', python_version_var: 'PYTHON_VERSION_310' }
+          - { name: '3.11', python: '3.11', python_version_var: 'PYTHON_VERSION_311' }
+          - { name: '3.12', python: '3.12', python_version_var: 'PYTHON_VERSION_312' }
 
     services:
       postgres:
@@ -296,7 +299,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION_311 }}
+          python-version: ${{ env.PYTHON_VERSION_312 }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -306,7 +309,7 @@ jobs:
       - name: Download environment
         uses: actions/download-artifact@v3
         with:
-          name: environment-3.11
+          name: environment-3.12
           path: /tmp
 
       - name: Restore environment

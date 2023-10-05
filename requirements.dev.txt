@@ -80,7 +80,7 @@ flask-url-map-serializer==0.0.1
     # via -r requirements.dev.in
 freezegun==1.2.2
     # via -r requirements.dev.in
-greenlet==2.0.2
+greenlet==3.0.0
     # via
     #   -c requirements.txt
     #   sqlalchemy
