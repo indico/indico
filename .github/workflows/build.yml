@@ -9,13 +9,30 @@ on:
       - '!2.*'
       - '!3.0.*'
       - '!3.1.*'
+  pull_request:
+      branches:
+        - 'master'
+        - '*.x'
+        - '!1.*'
+        - '!2.*'
+        - '!3.0.*'
+        - '!3.1.*'
+      types:
+        - opened
+        - reopened
+        - synchronize
+        - labeled
 
 jobs:
   build:
     name: Build package 📦
     runs-on: ubuntu-22.04
+    if: github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'build-wheel')
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          # prefer head commit over merge commit in case of PRs
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       - uses: actions/setup-python@v4
         name: Set up Python 🐍
         with:
