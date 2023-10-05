@@ -13,6 +13,11 @@ Security fixes
 - Update `Pillow <https://pypi.org/project/Pillow/>`_ library due to
   vulnerabilities in libwebp (:cve:`CVE-2023-4863`)
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Italian
+
 Bugfixes
 ^^^^^^^^
 
