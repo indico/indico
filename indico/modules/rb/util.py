@@ -57,6 +57,14 @@ def rb_is_admin(user):
     return rb_settings.acls.contains_user('admin_principals', user)
 
 
+def rb_check_if_visible(user):
+    """Check if user should see links to the room booking."""
+    from indico.modules.rb import rb_settings
+    if not rb_settings.get('hide_module_if_unauthorized'):
+        return True
+    return rb_check_user_access(user)
+
+
 def build_rooms_spritesheet():
     from indico.modules.rb import rb_cache
     from indico.modules.rb.models.rooms import Room

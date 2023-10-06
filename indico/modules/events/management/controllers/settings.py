@@ -25,6 +25,7 @@ from indico.modules.events.util import should_show_draft_warning, track_location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_check_if_visible
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
@@ -49,8 +50,8 @@ class RHEventSettings(RHManageEventBase):
 
     def _process(self):
         show_booking_warning = False
-        if (config.ENABLE_ROOMBOOKING and not self.event.has_ended and self.event.room
-                and not self.event.room_reservation_links):
+        if (config.ENABLE_ROOMBOOKING and rb_check_if_visible(session.user)
+                and not self.event.has_ended and self.event.room and not self.event.room_reservation_links):
             # Check if any of the managers of the event already have a booking that overlaps with the event datetime
             manager_ids = [p.user.id for p in self.event.acl_entries if p.user]
             has_overlap = (ReservationOccurrence.query

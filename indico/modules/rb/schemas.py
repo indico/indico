@@ -485,6 +485,7 @@ class SettingsSchema(mm.Schema):
     admin_principals = PrincipalList(allow_groups=True)
     authorized_principals = PrincipalList(allow_groups=True)
     managers_edit_rooms = fields.Bool()
+    hide_module_if_unauthorized = fields.Bool()
     tileserver_url = fields.String(validate=validate.URL(schemes={'http', 'https'}), allow_none=True)
     booking_limit = fields.Int(validate=not_empty)
     notifications_enabled = fields.Bool()
