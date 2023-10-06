@@ -16,6 +16,8 @@ import * as SUIR from 'semantic-ui-react';
 
 import * as IndicoReactComponents from 'indico/react/components';
 import * as IndicoPrincipalsImperative from 'indico/react/components/principals/imperative';
+import * as IndicoSyncedInputs from 'indico/react/components/syncedInputs';
+import * as IndicoReactForm from 'indico/react/forms';
 import * as IndicoReactI18n from 'indico/react/i18n';
 import * as IndicoUtilsAxios from 'indico/utils/axios';
 import * as IndicoUtilsDate from 'indico/utils/date';
@@ -30,7 +32,9 @@ window._IndicoCoreRedux = Redux;
 window._IndicoCoreSUIR = SUIR;
 window._IndicoCoreReactFinalForm = ReactFinalForm;
 window._IndicoCoreFinalForm = FinalForm;
+window._IndicoSyncedInputs = IndicoSyncedInputs;
 window._IndicoReactComponents = IndicoReactComponents;
+window._IndicoReactForm = IndicoReactForm;
 window._IndicoReactI18n = IndicoReactI18n;
 window._IndicoUtilsAxios = IndicoUtilsAxios;
 window._IndicoUtilsDate = IndicoUtilsDate;
