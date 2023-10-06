@@ -286,9 +286,9 @@ def compile_catalog_react(directory=INDICO_DIR):
             json_file = os.path.join(translations_dir, locale, 'LC_MESSAGES', 'messages-react.json')
             if not os.path.exists(po_file):
                 continue
-            output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
+            output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
             json.loads(output)  # just to be sure the JSON is valid
-            with open(json_file, 'wb') as f:
+            with open(json_file, 'w') as f:
                 f.write(output)
     except subprocess.CalledProcessError as err:
         click.secho('Error: ' + err, fg='red', bold=True, err=True)
@@ -297,8 +297,7 @@ def compile_catalog_react(directory=INDICO_DIR):
 def extract_messages_react(directory=INDICO_DIR):
     """Extract messagges for react."""
     if directory is INDICO_DIR:
-        client_path = os.path.join('indico', 'web', 'client')
-        module_path = os.path.join('indico', 'modules')
+        paths = [os.path.join('indico', 'web', 'client'), os.path.join('indico', 'modules')]
     else:
         packages = [x for x in find_packages(directory) if '.' not in x]
         assert len(packages) == 1
@@ -306,8 +305,13 @@ def extract_messages_react(directory=INDICO_DIR):
         module_path = os.path.join(directory, packages[0], 'modules')
         if not os.path.exists(client_path) and not os.path.exists(module_path):
             return
+        paths = []
+        if os.path.exists(client_path):
+            paths.append(client_path)
+        if os.path.exists(module_path):
+            paths.append(module_path)
     with _chdir(INDICO_DIR):
-        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', client_path, module_path],
+        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract'] + paths,
                                          env=dict(os.environ, FORCE_COLOR='1'))
     with open(_get_react_messages_pot(directory), 'wb') as f:
         f.write(output)
@@ -448,7 +452,7 @@ def push():
     try:
         subprocess.run(['tx', 'push', '-s'], check=True)
     except subprocess.CalledProcessError:
-        click.secho('Error pushing to transifex ', fg='red', bold=True, err=True)
+        click.secho('Error pushing to transifex', fg='red', bold=True, err=True)
 
 
 @cli.command(short_help='Pull translated .po files from Transifex.')
@@ -462,20 +466,20 @@ def pull(languages):
     """
     if not languages:
         languages = [d for d in os.listdir(TRANSLATIONS_DIR) if os.path.isdir(os.path.join(TRANSLATIONS_DIR, d))]
+    language_renames = {'zh_Hans_CN': 'zh_CN.GB2312'}  # other lang codes requiring rename should be added here
+    language_codes = [language_renames.get(language, language) for language in languages]
     try:
-        for language in languages:
-            subprocess.run(['tx', 'pull', '-l', language, '-f'], check=True)
-            click.secho(f'Translations updated for {language}.', fg='green', bold=True)
+        subprocess.run(['tx', 'pull', '-l', ','.join(language_codes), '-f'], check=True)
+        click.secho('Translations updated.', fg='green', bold=True)
     except subprocess.CalledProcessError:
         click.secho('Error pulling from transifex', fg='red', bold=True, err=True)
-    finally:
-        language_renames = {'zh_CN.GB2312': 'zh_Hans_CN'}  # other lang codes requiring rename should be added here
-        languages = set(languages) & set(language_renames.keys())
+        sys.exit(1)
+    else:
+        languages = set(languages) & set(language_renames)
         for code in languages:
-            if os.path.exists(os.path.join(TRANSLATIONS_DIR, code)):
-                shutil.rmtree(os.path.join(TRANSLATIONS_DIR, language_renames[code]))
-                shutil.move(os.path.join(TRANSLATIONS_DIR, code),
-                            os.path.join(TRANSLATIONS_DIR, language_renames[code]))
+            shutil.rmtree(os.path.join(TRANSLATIONS_DIR, code))
+            shutil.move(os.path.join(TRANSLATIONS_DIR, language_renames[code]),
+                        os.path.join(TRANSLATIONS_DIR, code))
 
 
 def _check_format_strings(root_path='indico/translations'):
