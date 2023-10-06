@@ -102,7 +102,11 @@ class BookingBootstrapForm extends React.Component {
 
   componentDidUpdate() {
     const {recurrence} = this.state;
-    if (recurrence.type === 'every' && recurrence.weekdays.length === 0) {
+    if (
+      recurrence.type === 'every' &&
+      recurrence.interval === 'week' &&
+      recurrence.weekdays.length === 0
+    ) {
       this.preselectWeekday();
     } else {
       this.triggerChange();
@@ -158,9 +162,13 @@ class BookingBootstrapForm extends React.Component {
     const {
       recurrence: {type, number, weekdays},
     } = this.state;
+
+    // Clear weekdays if interval is changed to month
+    const updatedWeekdays = interval === 'month' ? [] : weekdays;
+
     this.setState(
       {
-        recurrence: {type, number, interval, weekdays},
+        recurrence: {type, number, interval, weekdays: updatedWeekdays},
       },
       () => {
         this.triggerChange();
@@ -234,18 +242,14 @@ class BookingBootstrapForm extends React.Component {
       .locale('en')
       .format('ddd')
       .toLocaleLowerCase();
+
     if (recurrence.weekdays.includes(weekdayToday)) {
       return;
     }
+
     const weekdays = [...recurrence.weekdays, weekdayToday];
-    this.setState(
-      {
-        recurrence: {...recurrence, weekdays},
-      },
-      () => {
-        this.triggerChange();
-      }
-    );
+    this.setState({recurrence: {...recurrence, weekdays}});
+    this.triggerChange();
   };
 
   render() {
@@ -368,7 +372,7 @@ class BookingBootstrapForm extends React.Component {
             />
           </Form.Group>
         )}
-        {type === 'every' && (
+        {type === 'every' && interval === 'week' && (
           <Form.Group inline style={{marginLeft: '1em', marginRight: '1em'}}>
             <label>{Translate.string('Recurring every')}</label>
             <WeekdayRecurrencePicker onChange={this.updateRecurrenceWeekdays} value={weekdays} />

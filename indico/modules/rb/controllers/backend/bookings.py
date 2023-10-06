@@ -307,16 +307,16 @@ class RHUpdateBooking(RHBookingBase):
     def _process(self, args):
         room = self.booking.room
 
-        # XXX this is a bit of an ugly hack: usually it's checked in the reservation create/update code
-        # whether internal notes are enabled and the user can touch them. but when splitting we need to
+        # XXX: This is a bit of an ugly hack: usually it's checked in the reservation create/update code
+        # whether internal notes are enabled and the user can touch them. But when splitting we need to
         # create a new booking and want to preserve internal notes regardless of whether the user who does
-        # the splitting is allowed to manage them or not. however, if the user does have access to internal
+        # the splitting is allowed to manage them or not. However, if the user does have access to internal
         # notes, we want to allow them to change it as well.
         if (
             not rb_settings.get('internal_notes_enabled') or
             not room.can_manage(session.user, allow_admin=args['admin_override_enabled'])
         ):
-            # remove the user-provided note (we fall back to the one from the xisting booking below)
+            # remove the user-provided note (we fall back to the one from the existing booking below)
             args.pop('internal_note', None)
 
         new_booking_data = {

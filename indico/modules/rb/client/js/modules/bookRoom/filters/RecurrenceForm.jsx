@@ -61,20 +61,25 @@ export default class RecurrenceForm extends FilterFormComponent {
   }
 
   preselectWeekdayToday() {
-    const {weekdays, type} = this.state;
+    const {weekdays, type, interval} = this.state;
     const today = moment()
       .locale('en')
       .format('ddd')
       .toLocaleLowerCase();
 
-    if (weekdays.length === 0 && type === 'every') {
-      // preselect today if no weekday is selected
+    if (interval !== 'week') {
+      // If the interval is not 'week', clear weekdays
+      if (weekdays.length > 0) {
+        this.props.setParentField('weekdays', []);
+      }
+    } else if (weekdays.length === 0 && type === 'every') {
+      // Preselect today if no weekday is selected
       this.setState({
         weekdays: [today],
       });
       this.props.setParentField('weekdays', [today]);
     } else if (weekdays.length > 0 && type !== 'every') {
-      // clear weekdays if type is not every
+      // Clear weekdays if type is not every
       this.props.setParentField('weekdays', []);
     }
   }
@@ -142,17 +147,19 @@ export default class RecurrenceForm extends FilterFormComponent {
             />
           </Form.Field>
         </Form.Group>
-        <Form.Field styleName="weekday-recurrence-section" inline>
-          <label styleName={type !== 'every' ? 'disabled' : ''}>
-            {Translate.string('Recurring every')}
-          </label>
-          <WeekdayRecurrencePicker
-            onChange={value => this.onWeekdaysChange(null, {value})}
-            value={weekdays}
-            disabled={type !== 'every'}
-            requireOneSelected
-          />
-        </Form.Field>
+        {type === 'every' && interval === 'week' && (
+          <Form.Field styleName="weekday-recurrence-section" inline>
+            <label styleName={type !== 'every' ? 'disabled' : ''}>
+              {Translate.string('Recurring every')}
+            </label>
+            <WeekdayRecurrencePicker
+              onChange={value => this.onWeekdaysChange(null, {value})}
+              value={weekdays}
+              disabled={type !== 'every'}
+              requireOneSelected
+            />
+          </Form.Field>
+        )}
       </Form>
     );
   }

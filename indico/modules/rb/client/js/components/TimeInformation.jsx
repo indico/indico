@@ -74,7 +74,7 @@ function TimeInformation({
           </div>
         </Segment>
         {timeInfo}
-        {recurrence.type === 'every' && recurrenceWeekdays && (
+        {recurrence.type === 'every' && recurrence.interval === 'week' && recurrenceWeekdays && (
           <Segment>
             <div>
               <div>

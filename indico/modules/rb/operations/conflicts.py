@@ -15,7 +15,8 @@ from sqlalchemy.orm import contains_eager
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import TempReservationConcurrentOccurrence, TempReservationOccurrence, rb_is_admin
+from indico.modules.rb.util import (TempReservationConcurrentOccurrence, TempReservationOccurrence,
+                                    check_empty_candidates, rb_is_admin)
 from indico.util.date_time import get_overlap
 from indico.util.iterables import group_list
 
@@ -30,6 +31,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
 
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
                                                      recurrence_weekdays)
+    check_empty_candidates(candidates)
+
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
              .filter(Reservation.room_id.in_(room_ids),

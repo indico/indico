@@ -9,7 +9,7 @@ from operator import itemgetter
 
 from babel.dates import get_timezone
 from flask import session
-from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
+from marshmallow import ValidationError, fields, post_dump, post_load, validate, validates, validates_schema
 from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
@@ -372,6 +372,13 @@ class CreateBookingSchema(mm.Schema):
     def validate_dts(self, data, **kwargs):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
+
+    @post_load
+    # XXX: Remove ``recurrence_weekdays`` for bookings that are being modified from weekly to monthly repetition.
+    def handle_monthly_repetition(self, data, **kwargs):
+        if data['repeat_frequency'] == RepeatFrequency.MONTH:
+            data['recurrence_weekdays'] = None
+        return data
 
 
 class RoomFeatureSchema(mm.SQLAlchemyAutoSchema):

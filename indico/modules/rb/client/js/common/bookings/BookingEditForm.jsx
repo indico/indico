@@ -90,6 +90,16 @@ class BookingEditForm extends React.Component {
     onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
   };
 
+  clearWeekdays = interval => {
+    const {
+      formProps: {
+        values: {recurrence},
+      },
+    } = this.props;
+    const updatedWeekdays = interval === 'month' ? [] : recurrence.weekdays;
+    return {...recurrence, weekdays: updatedWeekdays};
+  };
+
   isDateDisabled = dt => {
     const {
       booking: {startDt},
@@ -100,6 +110,25 @@ class BookingEditForm extends React.Component {
     }
 
     return !dt.isSameOrAfter(startDt, 'day');
+  };
+
+  preselectWeekdayToday = form => {
+    const {
+      formProps: {
+        values: {recurrence},
+      },
+    } = this.props;
+
+    const today = moment()
+      .format('ddd')
+      .toLowerCase();
+
+    if (recurrence.type === 'every' && recurrence.interval === 'week') {
+      if (recurrence.weekdays === null || recurrence.weekdays.length < 1) {
+        const newRecurrence = {...recurrence, weekdays: [today]};
+        form.change('recurrence.weekdays', newRecurrence.weekdays);
+      }
+    }
   };
 
   render() {
@@ -180,7 +209,7 @@ class BookingEditForm extends React.Component {
                   }
                 }}
               />
-              <Field name="recurrence.number" subscription={{value: true}}>
+              <Field name="recurrence.number" subscription={{}}>
                 {({input: {value: number}}) => (
                   <FinalDropdown
                     name="recurrence.interval"
@@ -198,8 +227,8 @@ class BookingEditForm extends React.Component {
                       },
                     ]}
                     onChange={newInterval => {
-                      const newRecurrence = {...recurrence, interval: newInterval};
-                      onBookingPeriodChange(dates, timeSlot, newRecurrence);
+                      onBookingPeriodChange(dates, timeSlot, this.clearWeekdays(newInterval));
+                      this.preselectWeekdayToday(form);
                     }}
                   />
                 )}
@@ -221,7 +250,7 @@ class BookingEditForm extends React.Component {
             <FinalDatePeriod
               name="dates"
               onChange={newDates => {
-                onBookingPeriodChange(newDates, timeSlot, recurrence);
+                onBookingPeriodChange(newDates, timeSlot, this.clearWeekdays(recurrence.interval));
               }}
               disabled={submitSucceeded || bookingFinished}
               disabledDateFields={bookingStarted ? START_DATE : null}
@@ -239,19 +268,21 @@ class BookingEditForm extends React.Component {
               disabled={submitSucceeded || bookingFinished}
             />
           )}
-          {recurrence.type === 'every' && (
-            <>
-              <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
-              <FinalWeekdayRecurrencePicker
-                name="recurrence.weekdays"
-                requireOneSelected
-                onChange={newWeekdays => {
-                  const newRecurrence = {...recurrence, weekdays: newWeekdays};
-                  onBookingPeriodChange(dates, timeSlot, newRecurrence);
-                }}
-              />
-            </>
-          )}
+          <div
+            style={
+              recurrence.type === 'every' && recurrence.interval === 'week' ? {} : {display: 'none'}
+            }
+          >
+            <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
+            <FinalWeekdayRecurrencePicker
+              name="recurrence.weekdays"
+              requireOneSelected
+              onChange={newWeekdays => {
+                const newRecurrence = {...recurrence, weekdays: newWeekdays};
+                onBookingPeriodChange(dates, timeSlot, newRecurrence);
+              }}
+            />
+          </div>
           {!room.canUserBook && room.canUserPrebook && isAccepted && (
             <FormSpy subscription={{dirtyFields: true, initialValues: true, values: true}}>
               {({dirtyFields, initialValues, values}) =>

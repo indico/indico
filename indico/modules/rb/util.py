@@ -342,7 +342,7 @@ def get_prebooking_collisions(reservation):
 
 
 def check_impossible_repetition(data):
-    """Check for broken repetition data
+    """Check for broken repetition data.
 
     This checks that a repetition using weekdays has a date range
     containing at least one of the specified weekdays.
@@ -355,4 +355,14 @@ def check_impossible_repetition(data):
     except KeyError:
         return
     if not any(ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition, recurrence_weekdays)):
+        raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
+
+
+def check_empty_candidates(candidates):
+    """Check for empty candidates.
+
+    This checks that a created time-series has at least one occurrence to filter by (similar to
+    :func:``check_impossible_repetition`` but without the need to pass all the data).
+    """
+    if not candidates:
         raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
