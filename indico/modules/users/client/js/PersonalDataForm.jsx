@@ -29,6 +29,7 @@ import {
 } from 'indico/react/forms';
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 function PersonalDataForm({
   userId,
@@ -149,6 +150,12 @@ function PersonalDataForm({
                 .
               </Translate>
             </SyncedFinalInput>
+            {renderPluginComponents('user-personal-data-form-inputs', {
+              userValues,
+              syncedValues,
+              lockedFields,
+              lockedFieldMessage,
+            })}
             <FinalSubmitButton label={Translate.string('Save changes')} className="submit-button" />
           </Form>
         )}
