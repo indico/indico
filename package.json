@@ -155,6 +155,7 @@
     "stylelint-config-recommended-scss": "^12.0.0",
     "stylelint-prettier": "^1.2.0",
     "stylelint-scss": "^5.0.1",
+    "stylelint-stylistic": "^0.4.3",
     "terser-webpack-plugin": "^5.3.3",
     "uglify-js": "^3.16.0",
     "webpack": "^5.73.0",

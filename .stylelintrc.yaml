@@ -2,6 +2,7 @@ extends:
   - stylelint-prettier/recommended
   - stylelint-config-recommended
   - stylelint-config-recommended-scss
+  - stylelint-stylistic/config
 
 ignoreFiles:
   - indico/web/static/dist/**/*.css
@@ -72,3 +73,13 @@ rules:
   scss/at-extend-no-missing-placeholder: null
   # prettier's formatting can violate this
   scss/operator-no-newline-after: null
+  # single quotes are clearly superior
+  stylistic/string-quotes: single
+
+  # these rule conflict with stylelint-prettier formatting
+  stylistic/indentation: null
+  stylistic/selector-descendant-combinator-no-non-space: null
+  stylistic/declaration-colon-newline-after: null
+  stylistic/selector-combinator-space-before: null
+  stylistic/block-closing-brace-newline-after: null
+  stylistic/value-list-comma-newline-after: null
