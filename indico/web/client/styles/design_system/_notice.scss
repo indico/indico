@@ -6,12 +6,11 @@
 // LICENSE file for more details.
 
 @use './variables';
-@use './button';
-@use './button_group';
-@use './form_controls';
-@use './layout';
-@use './link';
-@use './notice';
-@use './popup';
-@use './visibility';
-@use './utils';
+
+%notice {
+  padding: var(--container-padding);
+
+  background: var(--message-important-surface-color);
+  color: var(--message-important-text-color);
+  font-size: calc(var(--text-size-global-adjust) * var(--text-size-rel-l));
+}

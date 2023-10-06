@@ -430,7 +430,6 @@ div.main > .attachments-package {
   color: white;
   padding: 10px;
   z-index: 10;
-  box-sizing: border-box;
   align-items: center;
 
   .attachment-title {
@@ -502,7 +501,6 @@ div.main > .attachments-package {
           padding: 2vw;
           background-color: white;
           overflow: auto;
-          box-sizing: border-box;
         }
       }
     }

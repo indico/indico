@@ -16,7 +16,6 @@
   &::after {
     border-radius: 50%;
     @include border-all($width: 0.1em);
-    box-sizing: border-box;
     content: '';
     position: absolute;
     width: 100%;

@@ -47,7 +47,6 @@ form {
 
 .i-form {
   @include font-family-form();
-  box-sizing: border-box;
   max-width: 800px;
   display: block;
   font-size: 1em;

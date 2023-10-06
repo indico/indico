@@ -18,12 +18,12 @@
     text-align: left;
     padding: var(--container-narrow-padding);
     @extend %flex-column;
-    --flex-gap: 1em;
+    --flex-gap: var(--container-padding);
   }
 
   form {
     @extend %flex-column;
-    --flex-gap: 1em;
+    --flex-gap: var(--container-padding);
   }
 
   fieldset {

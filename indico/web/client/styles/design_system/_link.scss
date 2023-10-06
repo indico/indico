@@ -1,0 +1,29 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use './variables';
+
+%link {
+  color: var(--clickable-text-color);
+  text-decoration: none;
+
+  &:active {
+    color: var(--clickable-text-active-color);
+  }
+
+  &[aria-disabled='true'] {
+    color: var(--clickable-text-disabled-color);
+  }
+}
+
+%link-with-visited-state {
+  @extend %link;
+
+  &:visited {
+    color: var(--clickable-text-used-color);
+  }
+}

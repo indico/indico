@@ -14,7 +14,7 @@ import {Translate} from 'indico/react/i18n';
 import './SearchBox.module.scss';
 
 const renderResult = ({label}, keyword) => (
-  <div styleName="option">
+  <div styleName="search-type-option">
     <span>
       <Icon name="search" />
       {keyword}
@@ -51,7 +51,7 @@ export default function SearchBox({onSearch, category, isAdmin}) {
       onClick: () => {},
       // eslint-disable-next-line react/display-name
       renderer: () => (
-        <div styleName="option">
+        <div styleName="search-type-option">
           <Label content={Translate.string('ADMIN')} size="small" color="red" />
           <Checkbox
             id="checkbox-admin-search"

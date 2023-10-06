@@ -33,12 +33,6 @@
   flex-flow: row nowrap;
   line-height: initial;
 
-  &,
-  &::after,
-  &::before {
-    box-sizing: border-box;
-  }
-
   .icon {
     color: $gray;
     font-size: 2rem;

@@ -14,7 +14,6 @@ $i-button-spacing: 0.3rem;
   user-select: none;
   @include default-border-radius();
   @include border-all();
-  box-sizing: border-box;
   display: inline-block;
   cursor: pointer;
   color: $light-black;

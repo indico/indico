@@ -23,7 +23,6 @@
     @include border-vert();
     @include transition(background);
     @include transition(color);
-    box-sizing: border-box;
     border-top-left-radius: $default-border-radius;
     border-bottom-left-radius: $default-border-radius;
     user-select: none;

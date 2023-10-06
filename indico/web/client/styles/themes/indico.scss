@@ -64,7 +64,6 @@ body {
 .item-location {
   @include ellipsis();
 
-  box-sizing: border-box;
   border-radius: 0.2em;
   color: $tt-secondary-color;
   font-size: 1em;
@@ -321,7 +320,6 @@ ul.day-list {
       margin: 0.5rem 0.7em 0 0;
       min-width: 4em;
       text-align: right;
-      box-sizing: border-box;
       color: $dark-gray;
 
       &::before {

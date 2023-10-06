@@ -98,7 +98,6 @@
 
   li {
     display: table;
-    box-sizing: border-box;
     width: 100%;
     height: 3em;
     padding: 0.4em;
@@ -235,7 +234,6 @@
 
 .category-box {
   position: relative;
-  box-sizing: border-box;
   padding: 0.5rem !important;
 
   > div {

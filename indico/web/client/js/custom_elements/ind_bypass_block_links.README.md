@@ -1,11 +1,11 @@
-This element is used to create a set of bypass block [links][1] in the page. The
+This element is used to create a set of [bypass block links][1] in the page. The
 custom element is added to the base template, so there is no need to add it
 manually anywhere on the page.
 
 The bypass block links are created by marking elements on the page as a bypass
 block target. The target element is usually a heading. For an element to be a
 valid target, it must have the 'id' and 'data-bypass-target' attributes. The
-'data-bypass-target' should contain a text that will be used as the label for
+'data-bypass-target' should contain text that will be used as the label for
 the bypass block link.
 
 Example:
@@ -17,10 +17,10 @@ Example:
 ```
 
 Note that the bypass block link target does not need to be visible on the
-page. The utility placeholder selector can be used to hide it. For example:
+page. For example:
 
 ```scss
-@use "base/utilities";
+@use 'design_system';
 
 #category-list {
     @extend %visually-hidden;

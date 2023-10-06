@@ -222,7 +222,6 @@
     max-height: 12em;
     overflow: auto;
     min-width: 12em;
-    box-sizing: border-box;
 
     > li {
       @extend .flexrow;

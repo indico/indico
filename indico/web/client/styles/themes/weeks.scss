@@ -48,8 +48,6 @@
   width: 100%;
   padding: 0;
   list-style: none;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
 }
 
 .week-timetable > ul > li {
@@ -58,8 +56,6 @@
   display: inline-block;
   border: 1px #bbb solid;
   background: #fff;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
   border-radius: 0.2em;
   box-shadow: 1px 1px 1px #e1e1e1;
 }
@@ -81,7 +77,6 @@
   height: 18px;
   position: relative;
   border-top: solid 1px #f9f9f9;
-  box-sizing: border-box;
 }
 
 .week-timetable .row .title {
@@ -149,8 +144,6 @@
   position: absolute;
   padding-left: 40px;
   width: 100%;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
 }
 
 .week-timetable .row.has-session .main,
@@ -190,7 +183,6 @@
 .qtip-content {
   display: inline-block;
   padding: 10px;
-  box-sizing: border-box;
 
   span {
     line-height: 1.1em;

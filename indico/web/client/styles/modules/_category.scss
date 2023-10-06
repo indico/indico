@@ -7,6 +7,7 @@
 
 @use 'base' as *;
 @use 'partials/buttons' as *;
+@use 'design_system';
 
 .confirmation-dialog .body ul.categ-list {
   padding-left: 13px;
@@ -126,7 +127,6 @@
 }
 
 .category-sidebar {
-  box-sizing: border-box;
   background: #fafafa;
   background-image: linear-gradient(to bottom, #fafafa 95%, #fff 100%);
   border-left: 1px solid #f2f2f2;
