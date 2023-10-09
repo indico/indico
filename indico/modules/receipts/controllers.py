@@ -9,7 +9,7 @@ import re
 import typing as t
 from dataclasses import dataclass, field
 
-from flask import g, json, jsonify, request, session
+from flask import g, jsonify, request, session
 from marshmallow import fields, validate
 from werkzeug.exceptions import Forbidden
 
@@ -264,21 +264,8 @@ class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 event=self.target,
                 **get_useful_registration_data(registration.registration_form, registration)
             ))
-
-        response = send_file(
-            'receipt.pdf', create_pdf(self.target, html_sources, self.template.css), 'application/pdf'
-        )
-        undefineds = [
-            {
-                'registration': dict(entry.registration.get_personal_data(), id=entry.registration.id),
-                'undefineds': list(entry.undefined)
-            }
-            for entry in g.template_stack if entry.undefined
-        ]
-        if undefineds:
-            response.headers['X-Indico-Template-Errors'] = json.dumps(undefineds)
         del g.template_stack
-        return response
+        return send_file('receipts.pdf', create_pdf(self.target, html_sources, self.template.css), 'application/pdf')
 
 
 class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
@@ -287,26 +274,42 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
         'custom_fields': fields.Dict(keys=fields.String, load_default={}),
         'filename': fields.String(required=True, validate=not_empty),
         'publish': fields.Bool(load_default=False),
-        'notify_users': fields.Bool(load_default=False)
+        'notify_users': fields.Bool(load_default=False),
+        'force': fields.Bool(load_default=False)
     })
-    def _process(self, registration_ids, custom_fields, filename, publish, notify_users):
+    def _process(self, registration_ids, custom_fields, filename, publish, notify_users, force):
         # fetch corresponding Registration objects, among those belonging to the event
         registrations = Registration.query.filter(
             Registration.id.in_(registration_ids), RegistrationForm.event == self.target
         ).join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
 
-        receipts = []
-        g.template_stack = []
-        for registration in registrations:
+        def _compile_receipt_for_reg(registration):
             g.template_stack.append(TemplateStackEntry(registration))
-            html_source = compile_jinja_code(
+            return compile_jinja_code(
                 self.template.html,
                 use_stack=True,
                 custom_fields={f['name']: custom_fields.get(f['name']) for f in self.template.custom_fields},
                 event=self.target,
                 **get_useful_registration_data(registration.registration_form, registration)
             )
-            pdf_content = create_pdf(self.target, {html_source}, self.template.css)
+
+        g.template_stack = []
+        html_sources = {registration: _compile_receipt_for_reg(registration) for registration in registrations}
+
+        errors = [
+            {
+                'registration': dict(full_name=entry.registration.display_full_name, id=entry.registration.id),
+                'undefineds': list(entry.undefined)
+            }
+            for entry in g.template_stack if entry.undefined
+        ]
+        del g.template_stack
+        if errors and not force:
+            return jsonify(receipts=[], errors=errors)
+
+        receipts = []
+        for registration in registrations:
+            pdf_content = create_pdf(self.target, {html_sources[registration]}, self.template.css)
             n = ReceiptFile.query.filter(ReceiptFile.registration == registration).count()
             f = File(
                 filename=secure_filename(f'{slugify(filename, n + 1)}.pdf', f'document-{n + 1}.pdf'),
@@ -326,21 +329,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             db.session.commit()
             receipts.append(rf.locator)
             if publish and notify_users:
-                pass #TODO notify registrant
-
-        undefineds = [
-            {
-                'registration': dict(entry.registration.get_personal_data(), id=entry.registration.id),
-                'undefineds': list(entry.undefined)
-            }
-            for entry in g.template_stack if entry.undefined
-        ]
-        if undefineds:
-            errors = json.dumps(undefineds)  #TODO display errors in FE
-        else:
-            errors = []
-        del g.template_stack
-
+                pass  #TODO notify registrant
         return jsonify(receipts=receipts, errors=errors)
 
 

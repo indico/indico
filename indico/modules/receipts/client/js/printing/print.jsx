@@ -9,12 +9,11 @@ import printReceiptsURL from 'indico-url:receipts.generate_receipts';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Button, ButtonGroup, Icon, Label, Message, Modal} from 'semantic-ui-react';
+import {Button, ButtonGroup, Icon, Label, Message, Modal, Table} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {injectModal} from 'indico/react/util';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
-import {downloadBlob} from 'indico/utils/browser';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
 /**
@@ -22,7 +21,7 @@ import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
  * the templating process. The user may choose to download the result anyway (pre-downloaded by
  * the browser).
  */
-function PrintingErrorsModal({onClose, errors, downloadData}) {
+function PrintingErrorsModal({onRetry, onClose, errors}) {
   const [open, setOpen] = useState(true);
   return (
     <Modal open={open} onClose={onClose} closeIcon>
@@ -31,28 +30,40 @@ function PrintingErrorsModal({onClose, errors, downloadData}) {
       </Modal.Header>
       <Modal.Content>
         <Message error>
-          <Translate>
-            There were some templating errors while trying to generate your documents.
-          </Translate>
+          <Translate>There were some errors while trying to generate your documents.</Translate>
         </Message>
-        {errors.map(({registration, undefineds}) => (
-          <div key={registration.id}>
-            <Label>
-              {registration.firstName} {registration.lastName}
-            </Label>
-            {undefineds.map(name => (
-              <Label key={`${registration.id}-${name}`} color="red">
-                {name}
-              </Label>
+        <Table celled fixed>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>
+                <Translate>Registrant's name</Translate>
+              </Table.HeaderCell>
+              <Table.HeaderCell>
+                <Translate>Missing fields</Translate>
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {errors.map(({registration, undefineds}) => (
+              <Table.Row key={registration.id}>
+                <Table.Cell>{registration.fullName}</Table.Cell>
+                <Table.Cell>
+                  {undefineds.map(name => (
+                    <Label key={`${registration.id}-${name}`} color="red">
+                      {name}
+                    </Label>
+                  ))}
+                </Table.Cell>
+              </Table.Row>
             ))}
-          </div>
-        ))}
+          </Table.Body>
+        </Table>
       </Modal.Content>
       <Modal.Actions>
         <ButtonGroup>
           <Button
-            onClick={() => {
-              //downloadBlob(Translate.string('receipts.pdf'), downloadData);
+            onClick={async () => {
+              await onRetry();
               setOpen(false);
               onClose();
             }}
@@ -76,6 +87,7 @@ function PrintingErrorsModal({onClose, errors, downloadData}) {
 }
 
 PrintingErrorsModal.propTypes = {
+  onRetry: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   errors: PropTypes.arrayOf(
     PropTypes.shape({
@@ -86,42 +98,48 @@ PrintingErrorsModal.propTypes = {
       undefineds: PropTypes.arrayOf(PropTypes.string),
     })
   ).isRequired,
-  downloadData: PropTypes.instanceOf(Blob).isRequired,
 };
 
 /**
  * Handle the printing logic for a given template on a given event, based on previous user input.
  *
  * @param {number} eventId - Event ID
- * @param {number} templateId - Template ID
  * @param {Array.<String>} registrationIds - IDs of registrants to print
- * @param {Array.<Object>} customFields - custom field values to use in the template
+ * @param {Array.<Object>} values - custom field values to use in the template
  */
 export async function printReceipt(eventId, registrationIds, values) {
-  try {
+  const printReceiptsRequest = async (registrations, force) => {
     const {template: templateId, ...data} = values;
-    data.registration_ids = registrationIds;
-    const {data: downloadedData} = await indicoAxios.post(
-      printReceiptsURL(snakifyKeys({eventId, templateId})),
-      data
-    );
-    if (downloadedData.errors.length) {
+    data.registration_ids = registrations;
+    data.force = force;
+    const resp = await indicoAxios.post(printReceiptsURL(snakifyKeys({eventId, templateId})), data);
+    return resp.data;
+  };
+  try {
+    const data = await printReceiptsRequest(registrationIds, false);
+    let receipts = data.receipts;
+    if (data.errors.length) {
       await new Promise(resolve => {
         injectModal(resolveModal => (
           <PrintingErrorsModal
+            onRetry={async () => {
+              const retryData = await printReceiptsRequest(
+                [...new Set(data.errors.map(e => e.registration.id))],
+                true
+              );
+              receipts = [...receipts, ...retryData.receipts];
+              console.log('1.5', receipts);
+            }}
             onClose={() => {
               resolve();
               resolveModal();
             }}
-            errors={camelizeKeys(JSON.parse(downloadedData.errors))}
-            downloadData={downloadedData}
+            errors={camelizeKeys(data.errors)}
           />
         ));
       });
-    } else {
-      //downloadBlob(Translate.string('receipts.pdf'), downloadedData);
-      return downloadedData;
     }
+    return receipts;
   } catch (error) {
     handleAxiosError(error);
   }
