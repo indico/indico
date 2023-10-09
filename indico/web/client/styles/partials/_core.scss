@@ -9,7 +9,7 @@
 
 @use 'base' as *;
 
-.right {
+.right:not(.ui.labeled) {
   float: right;
   margin-left: auto;
 }

@@ -31,8 +31,6 @@ import Previewer from '../templates/Previewer.jsx';
 import {printReceipt} from './print.jsx';
 import TemplateParameterEditor from './TemplateParameterEditor.jsx';
 
-import './PrintReceiptsModal.module.scss';
-
 /**
  * This modal presents the user with a structured interface to download, e-mail or publish
  * receipts based on information from specific event registrations.
@@ -111,7 +109,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
       noSubmitButton
     >
       {fprops => (
-        <div styleName="modal-content">
+        <>
           <Message color="teal">
             <Icon name="print" size="big" />
             <PluralTranslate count={registrationIds.length}>
@@ -129,93 +127,89 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
           </Message>
           <Grid columns={2} divided>
             <Grid.Column>
-              <section>
-                <h2>
-                  <Translate>Document Template</Translate>
-                </h2>
-                <FinalDropdown
-                  name="template"
-                  loading={!ready}
-                  placeholder={Translate.string('Select a receipt template')}
-                  options={
-                    ready ? data.map(({id, title}) => ({key: id, text: title, value: id})) : []
+              <FinalDropdown
+                name="template"
+                loading={!ready}
+                label={Translate.string('Document Template')}
+                placeholder={Translate.string('Select a receipt template')}
+                options={
+                  ready ? data.map(({id, title}) => ({key: id, text: title, value: id})) : []
+                }
+                onChange={makeUpdateTemplateFields(fprops.form)}
+                required
+                selection
+              />
+              <Field name="template" subscription={{value: true}}>
+                {({input: {value: template}}) => (
+                  <FinalField
+                    name="custom_fields"
+                    component={TemplateParameterEditor}
+                    customFields={template ? getCustomFields(template) : []}
+                    title={Translate.string('Template Parameters')}
+                  />
+                )}
+              </Field>
+              <Field name="template" subscription={{value: true}}>
+                {({input: {value: template}}) => (
+                  <FinalInput
+                    name="filename"
+                    label={Translate.string('Filename')}
+                    type="text"
+                    componentLabel="-{n}.pdf"
+                    labelPosition="right"
+                    disabled={!template}
+                    format={formatters.slugify}
+                    formatOnBlur
+                    required
+                    fluid
+                  />
+                )}
+              </Field>
+              <FinalCheckbox
+                name="publish"
+                label={Translate.string('Publish document')}
+                description={Translate.string(
+                  'Make the resulting document(s) available on the registration page.'
+                )}
+                onChange={checked => {
+                  if (!checked) {
+                    fprops.form.change('notify_users', false);
                   }
-                  onChange={makeUpdateTemplateFields(fprops.form)}
-                  required
-                  selection
-                />
-                <Field name="template" subscription={{value: true}}>
-                  {({input: {value: template}}) => (
-                    <FinalField
-                      name="custom_fields"
-                      component={TemplateParameterEditor}
-                      customFields={template ? getCustomFields(template) : []}
-                      title={Translate.string('Template Parameters')}
-                    />
-                  )}
-                </Field>
-              </section>
-              <section>
-                <h2>
-                  <Translate>Generate</Translate>
-                </h2>
-                <Field name="template" subscription={{value: true}}>
-                  {({input: {value: template}}) => (
-                    <FinalInput
-                      name="filename"
-                      label={Translate.string('Filename')}
-                      type="text"
-                      componentLabel="-{n}.pdf"
-                      labelPosition="right"
-                      disabled={!template}
-                      format={formatters.slugify}
-                      formatOnBlur
-                      required
+                }}
+              />
+              <Field name="publish" subscription={{value: true}}>
+                {({input: {value: publish}}) => (
+                  <FinalCheckbox
+                    name="notify_users"
+                    disabled={!publish}
+                    label={Translate.string('Notify registrant(s) via e-mail')}
+                    description={Translate.string(
+                      'Send an e-mail to the registrant(s) informing them that the document is available.'
+                    )}
+                  />
+                )}
+              </Field>
+              <Form.Group style={{alignItems: 'center'}}>
+                <Field name="publish" subscription={{value: true}}>
+                  {({input: {value: publish}}) => (
+                    <FinalSubmitButton
+                      disabled={false || generating}
+                      loading={generating}
+                      label={
+                        receipts.length === 0
+                          ? publish
+                            ? Translate.string('Generate and Publish')
+                            : Translate.string('Generate')
+                          : Translate.string('Re-generate')
+                      }
+                      icon="sync"
+                      style={{width: '100%'}}
                       fluid
                     />
                   )}
                 </Field>
-                <FinalCheckbox
-                  name="publish"
-                  label={Translate.string('Publish document')}
-                  description={Translate.string(
-                    'The resulting receipt(s) will be available from the registration page. You can optionally notify the user about it.'
-                  )}
-                  onChange={checked => {
-                    if (!checked) {
-                      fprops.form.change('notify_users', false);
-                    }
-                  }}
-                />
-                <Field name="publish" subscription={{value: true}}>
-                  {({input: {value: publish}}) => (
-                    <FinalCheckbox
-                      name="notify_users"
-                      disabled={!publish}
-                      label={Translate.string('Notify registrant(s) via e-mail')}
-                    />
-                  )}
-                </Field>
-                <Form.Group style={{alignItems: 'center'}}>
-                  <Field name="publish" subscription={{value: true}}>
-                    {({input: {value: publish}}) => (
-                      <FinalSubmitButton
-                        disabled={false || generating}
-                        loading={generating}
-                        label={
-                          receipts.length === 0
-                            ? publish
-                              ? Translate.string('Generate and Publish')
-                              : Translate.string('Generate')
-                            : Translate.string('Re-generate')
-                        }
-                        icon="sync"
-                      />
-                    )}
-                  </Field>
-                  {receipts.length > 0 && <Icon name="check" color="green" size="large" />}
-                </Form.Group>
-              </section>
+                {receipts.length > 0 && <Icon name="check" color="green" size="large" />}
+              </Form.Group>
             </Grid.Column>
             <Grid.Column>
               <Field name="template" subscription={{value: true}}>
@@ -241,7 +235,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
               </Field>
             </Grid.Column>
           </Grid>
-        </div>
+        </>
       )}
     </FinalModalForm>
   );

@@ -31,7 +31,9 @@ function PrintingErrorsModal({onClose, errors, downloadData}) {
       </Modal.Header>
       <Modal.Content>
         <Message error>
-          <Translate>There were some templating errors trying to print your documents.</Translate>
+          <Translate>
+            There were some templating errors while trying to generate your documents.
+          </Translate>
         </Message>
         {errors.map(({registration, undefineds}) => (
           <div key={registration.id}>
@@ -56,8 +58,8 @@ function PrintingErrorsModal({onClose, errors, downloadData}) {
             }}
             primary
           >
-            <Icon name="download" />
-            <Translate>Download anyway</Translate>
+            <Icon name="sync" />
+            <Translate>Generate anyway</Translate>
           </Button>
           <Button
             onClick={() => {
@@ -99,12 +101,11 @@ export async function printReceipt(eventId, registrationIds, values) {
   try {
     const {template: templateId, ...data} = values;
     data.registration_ids = registrationIds;
-    const {headers, data: downloadedData} = await indicoAxios.post(
+    const {data: downloadedData} = await indicoAxios.post(
       printReceiptsURL(snakifyKeys({eventId, templateId})),
       data
     );
-    const tplErrors = headers['x-indico-template-errors'];
-    if (tplErrors) {
+    if (downloadedData.errors.length) {
       await new Promise(resolve => {
         injectModal(resolveModal => (
           <PrintingErrorsModal
@@ -112,7 +113,7 @@ export async function printReceipt(eventId, registrationIds, values) {
               resolve();
               resolveModal();
             }}
-            errors={camelizeKeys(JSON.parse(tplErrors))}
+            errors={camelizeKeys(JSON.parse(downloadedData.errors))}
             downloadData={downloadedData}
           />
         ));
