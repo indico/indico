@@ -7,13 +7,15 @@
 {%- endblock %}
 
 {% block body -%}
-{% trans %}Your Indico data export is ready for download.{% endtrans %}
-{% if max_size_exceeded %}
-    {% trans %}
-        Please note that some files were not exported due to exceeding the
-        maximum allowed size of the archive. Consider selecting less options.
-    {% endtrans %}
-{% endif %}
+    {%- filter dedent -%}
+        {% trans %}Your Indico data export is ready for download.{% endtrans %}
+        {%- if max_size_exceeded %}
+            {% trans %}
+                Please note that some files were not exported due to exceeding the
+                maximum allowed size of the archive. Consider selecting less options.
+            {% endtrans %}
+        {%- endif %}
 
-{% trans %}Download link:{% endtrans %} {{ link }}
+        {% trans %}Download link:{% endtrans %} {{ link }}
+    {%- endfilter -%}
 {%- endblock %}
