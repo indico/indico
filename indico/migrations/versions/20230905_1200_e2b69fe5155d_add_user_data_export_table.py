@@ -47,6 +47,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('requested_dt', UTCDateTime, nullable=False),
         sa.Column('selected_options', ARRAY(sa.Enum(_DataExportOptions, native_enum=False)), nullable=False),
+        sa.Column('include_files', sa.Boolean(), nullable=False),
         sa.Column('state', PyIntEnum(_DataExportRequestState), nullable=False),
         sa.Column('max_size_exceeded', sa.Boolean(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True),

@@ -26,7 +26,7 @@ class DataExportRequestState(RichIntEnum):
 
 class DataExportOptions(RichIntEnum):
     __titles__ = [None, L_('Personal data'), L_('Settings'), L_('Minutes & Contributions'), L_('Registrations'),
-                  L_('Room booking data'), L_('Abstracts & Papers'), L_('Survey submissions'),
+                  L_('Room booking'), L_('Abstracts & Papers'), L_('Survey submissions'),
                   L_('Attachments & Materials'), L_('Editables'), L_('Miscellaneous')]
     personal_data = 1
     settings = 2
@@ -75,6 +75,12 @@ class DataExportRequest(db.Model):
         ARRAY(sa.Enum(DataExportOptions, native_enum=False)),
         nullable=False,
         default=[],
+    )
+    #: Whether the files should be exported
+    include_files = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     # The request state
     state = db.Column(
