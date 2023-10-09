@@ -72,8 +72,8 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
         setGenerating(true);
         const result = await printReceipt(eventId, registrationIds, values);
         setGenerating(false);
-        if (result) {
-          setReceipts(result.receipts);
+        if (result && result.length > 0) {
+          setReceipts(result);
           setInitialValues(values);
         }
       }}
@@ -110,20 +110,31 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
     >
       {fprops => (
         <>
-          <Message color="teal">
+          <Message color={receipts.length === 0 ? 'teal' : 'green'}>
             <Icon name="print" size="big" />
-            <PluralTranslate count={registrationIds.length}>
-              <Singular>Generating document for a single registrant</Singular>
-              <Plural>
-                Printing documents for{' '}
-                <Param
-                  name="numberOfRegistrants"
-                  value={registrationIds.length}
-                  wrapper={<strong />}
-                />{' '}
-                registrants
-              </Plural>
-            </PluralTranslate>
+            {receipts.length === 0 ? (
+              <PluralTranslate count={registrationIds.length}>
+                <Singular>Generating document for a single registrant</Singular>
+                <Plural>
+                  Generating documents for{' '}
+                  <Param
+                    name="numberOfRegistrants"
+                    value={registrationIds.length}
+                    wrapper={<strong />}
+                  />{' '}
+                  registrants
+                </Plural>
+              </PluralTranslate>
+            ) : (
+              <PluralTranslate count={receipts.length}>
+                <Singular>Successfully generated document for a single registrant</Singular>
+                <Plural>
+                  Successfully generated{' '}
+                  <Param name="numberOfReceipts" value={receipts.length} wrapper={<strong />} />{' '}
+                  documents
+                </Plural>
+              </PluralTranslate>
+            )}
           </Message>
           <Grid columns={2} divided>
             <Grid.Column>
