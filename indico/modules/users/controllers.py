@@ -231,10 +231,11 @@ class RHUserDataExport(RHUserBase):
 class RHUserDataExportAPI(RHUserBase):
     @use_kwargs({
         'options': fields.List(fields.Enum(DataExportOptions), validate=validate.Length(min=1)),
+        'include_files': fields.Bool(required=True)
     })
-    def _process_POST(self, options):
+    def _process_POST(self, options, include_files):
         from indico.modules.users.tasks import export_user_data
-        export_user_data.delay(self.user, options)
+        export_user_data.delay(self.user, options, include_files)
         return {'state': DataExportRequestState.running.name}
 
 

@@ -48,8 +48,8 @@ def _do_update_gravatar(user):
 
 
 @celery.task(name='export_user_data')
-def export_user_data(user, options):
-    _export_user_data(user, options)
+def export_user_data(user, options, include_files):
+    _export_user_data(user, options, include_files)
 
 
 @celery.periodic_task(name='user_data_export_cleanup', run_every=crontab(hour='4', day_of_week='monday'))

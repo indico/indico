@@ -38,16 +38,16 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
 
-def export_user_data(user, options):
+def export_user_data(user, options, include_files):
     """Generate a zip file containing user data and files and save it in `user.data_export_request`."""
     export_request = user.data_export_request
     if export_request and export_request.is_running:
         return
 
     try:
-        export_request = initialize_new_request(user, options)
+        export_request = initialize_new_request(user, options, include_files)
         data = serialize_user_data(export_request)
-        files = get_user_files(export_request)
+        files = get_user_files(export_request) if include_files else []
         file, max_size_exceeded = generate_zip(user, data, files, config.MAX_DATA_EXPORT_SIZE * 1024**2)
     except Exception as e:
         logger.exception('Could not create a user data export %r: %r', export_request, e)
@@ -63,11 +63,12 @@ def export_user_data(user, options):
         notify_data_export_success(export_request)
 
 
-def initialize_new_request(user, options):
+def initialize_new_request(user, options, include_files):
     if user.data_export_request:
         user.data_export_request.delete()
         db.session.commit()
-    DataExportRequest(user=user, selected_options=options, state=DataExportRequestState.running)
+    DataExportRequest(user=user, selected_options=options, include_files=include_files,
+                      state=DataExportRequestState.running)
     db.session.commit()
     return user.data_export_request
 
