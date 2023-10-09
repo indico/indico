@@ -29,8 +29,9 @@ from indico.modules.receipts.schemas import (ReceiptTemplateAPISchema, ReceiptTe
 from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_inherited_templates,
                                           get_useful_registration_data)
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import YAML
+from indico.util.marshmallow import YAML, not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
@@ -127,7 +128,7 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
 
 class AllTemplateMixin(ReceiptAreaMixin):
     def _process(self, **data):
-        schema = ReceiptTemplateDBSchema(only=('id', 'type', 'title', 'custom_fields'), many=True)
+        schema = ReceiptTemplateDBSchema(only=('id', 'title', 'custom_fields', 'default_filename'), many=True)
         inherited_templates = schema.dump(get_inherited_templates(self.target))
         own_templates = schema.dump(self.target.receipt_templates)
         return jsonify(inherited_templates + own_templates)
@@ -145,11 +146,11 @@ class RHAddTemplate(ReceiptAreaRenderMixin, RHAdminBase):
     always_clonable = False
 
     @use_kwargs(ReceiptTemplateAPISchema)
-    def _process(self, title, type, html, css, yaml):
+    def _process(self, title, default_filename, html, css, yaml):
         if yaml is None:
             yaml = {'custom_fields': []}
-        template = ReceiptTemplate(type=type, title=title, html=html, css=css, custom_fields=yaml['custom_fields'],
-                                   **self.target_dict)
+        template = ReceiptTemplate(title=title, html=html, css=css, custom_fields=yaml['custom_fields'],
+                                   default_filename=default_filename, **self.target_dict)
         db.session.flush()
         return jsonify(ReceiptTemplateDBSchema().dump(template))
 
@@ -284,12 +285,11 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
     @use_kwargs({
         'registration_ids': fields.List(fields.Integer(), required=True),
         'custom_fields': fields.Dict(keys=fields.String, load_default={}),
-        'document_type': fields.String(load_default=''),
-        'filename': fields.String(required=True, validate=validate.Length(min=1, max=30)),
+        'filename': fields.String(required=True, validate=not_empty),
         'publish': fields.Bool(load_default=False),
         'notify_users': fields.Bool(load_default=False)
     })
-    def _process(self, registration_ids, custom_fields, document_type, filename, publish, notify_users):
+    def _process(self, registration_ids, custom_fields, filename, publish, notify_users):
         # fetch corresponding Registration objects, among those belonging to the event
         registrations = Registration.query.filter(
             Registration.id.in_(registration_ids), RegistrationForm.event == self.target
@@ -307,10 +307,9 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 **get_useful_registration_data(registration.registration_form, registration)
             )
             pdf_content = create_pdf(self.target, {html_source}, self.template.css)
-            n = ReceiptFile.query.filter(ReceiptFile.registration == registration,
-                                         ReceiptFile.template.has(type=self.template.type)).count()
+            n = ReceiptFile.query.filter(ReceiptFile.registration == registration).count()
             f = File(
-                filename=f'{slugify(filename, n + 1)}.pdf',
+                filename=secure_filename(f'{slugify(filename, n + 1)}.pdf', f'document-{n + 1}.pdf'),
                 content_type='application/pdf',
                 meta={'event_id': self.target.id}
             )
@@ -372,11 +371,11 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
         new_title = f'{base_title} ({max_index + 1})' if max_index else f'{base_title} (1)'
 
         new_tpl = ReceiptTemplate(
-            type=self.template.type,
             title=new_title,
             html=self.template.html,
             css=self.template.css,
             custom_fields=self.template.custom_fields,
+            default_filename=self.template.default_filename,
             **self.target_dict
         )
         db.session.add(new_tpl)

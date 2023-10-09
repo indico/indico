@@ -17,10 +17,10 @@ import {Link} from 'react-router-dom';
 import {Button, Form, Message, Popup} from 'semantic-ui-react';
 
 import {
-  FinalDropdown,
   FinalField,
   FinalInput,
   FinalSubmitButton,
+  formatters,
   parsers as p,
 } from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -108,7 +108,11 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
   return (
     <FinalForm
       onSubmit={onSubmit}
-      initialValues={{title: template?.title || null, type: template?.type, ...codeValues}}
+      initialValues={{
+        title: template?.title || null,
+        default_filename: template?.default_filename || '',
+        ...codeValues,
+      }}
       initialValuesEqual={_.isEqual}
     >
       {({handleSubmit, values}) => (
@@ -117,22 +121,18 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
             <FinalInput
               name="title"
               label={Translate.string('Title')}
-              component={Form.Input}
               type="text"
               required
               rows={24}
             />
-            <FinalDropdown
-              name="type"
-              label={Translate.string('Type')}
-              placeholder={Translate.string('Select a template type')}
-              options={[
-                {value: 'receipt', text: Translate.string('Receipt')},
-                {value: 'certificate', text: Translate.string('Certificate')},
-                {value: 'none', text: Translate.string('Other')},
-              ]}
-              required
-              selection
+            <FinalInput
+              name="default_filename"
+              label={Translate.string('Default filename')}
+              type="text"
+              componentLabel="-{n}.pdf"
+              labelPosition="right"
+              format={formatters.slugify}
+              formatOnBlur
             />
           </Form.Group>
           <Message color="orange" size="small">

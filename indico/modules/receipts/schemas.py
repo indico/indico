@@ -6,12 +6,12 @@
 # LICENSE file for more details.
 
 import yaml
-from marshmallow import fields, validate
-from marshmallow_enum import EnumField
+from marshmallow import fields, post_load, validate
 
 from indico.core.marshmallow import mm
-from indico.modules.receipts.models.templates import ReceiptTemplate, ReceiptTemplateType
+from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.util.marshmallow import YAML, not_empty
+from indico.util.string import slugify
 
 
 class OwnerDataSchema(mm.Schema):
@@ -42,9 +42,8 @@ class ReceiptTemplateTypeSchema(mm.Schema):
 class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReceiptTemplate
-        fields = ('id', 'type', 'title', 'html', 'css', 'custom_fields', 'yaml', 'owner')
+        fields = ('id', 'title', 'html', 'css', 'custom_fields', 'default_filename', 'yaml', 'owner')
 
-    type = fields.Nested(ReceiptTemplateTypeSchema)
     yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields})
                                         if tpl.custom_fields else None))
     owner = fields.Nested(OwnerDataSchema)
@@ -52,10 +51,15 @@ class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
 
 class ReceiptTemplateAPISchema(mm.Schema):
     title = fields.String(required=True, validate=validate.Length(3))
-    type = EnumField(ReceiptTemplateType, required=True)
+    default_filename = fields.String(load_default='')
     html = fields.String(required=True, validate=validate.Length(3))
     css = fields.String(load_default='')
     yaml = YAML(ReceiptTplMetadataSchema, load_default=None, allow_none=True)
+
+    @post_load
+    def ensure_filename_is_slug(self, data, **kwargs):
+        data['default_filename'] = slugify(data['default_filename'])
+        return data
 
 
 class PersonalDataFieldSchema(mm.Schema):

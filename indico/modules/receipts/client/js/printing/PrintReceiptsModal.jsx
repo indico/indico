@@ -45,7 +45,6 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
     document_type: 'none',
     filename: 'document',
   });
-  const [extraDocumentTypes, setExtraDocumentTypes] = useState([]);
 
   const {data, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
     trigger: eventId,
@@ -54,18 +53,14 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
   const ready = !loading && !!data;
 
   const makeUpdateTemplateFields = form => templateId => {
-    const {customFields, type} = data.find(t => t.id === templateId);
+    const {customFields, defaultFilename} = data.find(t => t.id === templateId);
     form.change(
       'custom_fields',
       customFields
         ? Object.assign({}, ...customFields.map(f => ({[f.name]: f.default || null})))
         : {}
     );
-    if (type.name !== 'none') {
-      setExtraDocumentTypes([{key: type.name, text: type.title, value: type.filePrefix}]);
-    }
-    form.change('document_type', type.filePrefix);
-    form.change('filename', type.filePrefix);
+    form.change('filename', defaultFilename);
   };
 
   const getCustomFields = templateId =>
@@ -166,43 +161,18 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                 </h2>
                 <Field name="template" subscription={{value: true}}>
                   {({input: {value: template}}) => (
-                    <Form.Group widths="equal">
-                      <FinalDropdown
-                        name="document_type"
-                        label={Translate.string('Document type')}
-                        options={[
-                          {key: 'none', text: Translate.string('Other'), value: 'document'},
-                          ...extraDocumentTypes,
-                        ]}
-                        onChange={value =>
-                          fprops.form.change('filename', formatters.slugify(value))
-                        }
-                        onAddItem={(_, {value}) => {
-                          setExtraDocumentTypes([
-                            ...extraDocumentTypes,
-                            {key: value, text: value, value},
-                          ]);
-                        }}
-                        disabled={!template}
-                        allowAdditions
-                        fluid
-                        required
-                        search
-                        selection
-                      />
-                      <FinalInput
-                        name="filename"
-                        label={Translate.string('Filename')}
-                        componentLabel="-{n}.pdf"
-                        labelPosition="right"
-                        maxLength={30}
-                        disabled={!template}
-                        format={formatters.slugify}
-                        formatOnBlur
-                        required
-                        fluid
-                      />
-                    </Form.Group>
+                    <FinalInput
+                      name="filename"
+                      label={Translate.string('Filename')}
+                      type="text"
+                      componentLabel="-{n}.pdf"
+                      labelPosition="right"
+                      disabled={!template}
+                      format={formatters.slugify}
+                      formatOnBlur
+                      required
+                      fluid
+                    />
                   )}
                 </Field>
                 <FinalCheckbox
