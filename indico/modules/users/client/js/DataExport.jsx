@@ -7,20 +7,19 @@
 
 import requestURL from 'indico-url:users.api_user_data_export';
 
-import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Form as FinalForm} from 'react-final-form';
-import {Button, Form, Icon, Label, List, Message, Table} from 'semantic-ui-react';
+import {Button, Icon, Label, Message, Table} from 'semantic-ui-react';
 
-import {FinalCheckbox, FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
+import {handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
+import DataExportForm from './DataExportForm';
 import './DataExport.module.scss';
 
 function DataExport({userId, request, exportOptions}) {
@@ -28,10 +27,14 @@ function DataExport({userId, request, exportOptions}) {
   const [state, setState] = useState(request.state);
 
   const onSubmit = async data => {
-    const selection = Object.keys(_.pickBy(data));
+    const {includeFiles, options} = data;
+    const selection = Object.keys(_.pickBy(options));
     let resp;
     try {
-      resp = await indicoAxios.post(requestURL(userIdArgs), {options: selection});
+      resp = await indicoAxios.post(requestURL(userIdArgs), {
+        include_files: includeFiles,
+        options: selection,
+      });
     } catch (e) {
       return handleSubmitError(e);
     }
@@ -47,22 +50,13 @@ function DataExport({userId, request, exportOptions}) {
           </div>
         </div>
         <div className="i-box-content ui">
-          <Translate as="p">
-            Here, you can request to export all data concerning you that is currently stored in
-            Indico.
-          </Translate>
-          <div styleName="divider" />
-          <div styleName="data-export-body">
-            {state === 'none' && (
-              <DataExportForm onSubmit={onSubmit} exportOptions={exportOptions} />
-            )}
-            {state === 'running' && <ExportRunning />}
-            {state === 'success' && (
-              <ExportSuccess request={request} exportOptions={exportOptions} setState={setState} />
-            )}
-            {state === 'failed' && <ExportFailed setState={setState} />}
-            {state === 'expired' && <ExportExpired setState={setState} />}
-          </div>
+          {state === 'none' && <DataExportForm onSubmit={onSubmit} exportOptions={exportOptions} />}
+          {state === 'running' && <ExportRunning />}
+          {state === 'success' && (
+            <ExportSuccess request={request} exportOptions={exportOptions} setState={setState} />
+          )}
+          {state === 'failed' && <ExportFailed setState={setState} />}
+          {state === 'expired' && <ExportExpired setState={setState} />}
         </div>
       </div>
     </div>
@@ -85,54 +79,12 @@ DataExport.defaultProps = {
   userId: null,
 };
 
-function DataExportForm({onSubmit, exportOptions}) {
-  return (
-    <FinalForm
-      onSubmit={onSubmit}
-      initialValues={{}}
-      initialValuesEqual={_.isEqual}
-      validate={values => {
-        if (!Object.values(values).some(v => v)) {
-          return {
-            [FORM_ERROR]: Translate.string('At least one option must be selected'),
-          };
-        }
-      }}
-    >
-      {fprops => (
-        <Form onSubmit={fprops.handleSubmit}>
-          <Translate as="p">Select what data you would like to export below:</Translate>
-          <List relaxed>
-            {exportOptions.map(([key, name]) => (
-              <List.Item key={key}>
-                <List.Content>
-                  <List.Header>
-                    <FinalCheckbox name={key} label={<label>{name}</label>} />
-                  </List.Header>
-                </List.Content>
-              </List.Item>
-            ))}
-          </List>
-          <div style={{textAlign: 'right'}}>
-            <FinalSubmitButton label={Translate.string('Export my data')} />
-          </div>
-        </Form>
-      )}
-    </FinalForm>
-  );
-}
-
-DataExportForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  exportOptions: PropTypes.array.isRequired,
-};
-
 function ExportRunning() {
   return (
     <div>
       <Message info>
         <Message.Header>
-          <Translate>
+          <Translate context="user data export">
             We are preparing your data. We will notify you via email when the export is finished
           </Translate>
         </Message.Header>
@@ -164,7 +116,7 @@ function ExportSuccess({request, exportOptions, setState}) {
         <InfoTable request={request} exportOptions={exportOptions} />
         <div style={{display: 'flex', justifyContent: 'flex-end', gap: '0.5em'}}>
           <Button onClick={() => setState('none')}>
-            <Translate>New export</Translate>
+            <Translate context="user data export">New export</Translate>
           </Button>
           <Button primary icon labelPosition="right" as="a" href={request.url}>
             <Translate>Download</Translate>
@@ -187,7 +139,7 @@ function ExportFailed({setState}) {
     <div>
       <Message negative>
         <Message.Header>
-          <Translate>Data export failed</Translate>
+          <Translate context="user data export">Data export failed</Translate>
         </Message.Header>
         <Translate as="p" context="user data export">
           You can request a new one
@@ -217,7 +169,7 @@ function ExportExpired({setState}) {
       </Message>
       <div style={{display: 'flex', justifyContent: 'flex-end'}}>
         <Button primary onClick={() => setState('none')} icon labelPosition="right">
-          <Translate>New export</Translate>
+          <Translate context="user data export">New export</Translate>
           <Icon name="zip" />
         </Button>
       </div>
@@ -238,11 +190,10 @@ function InfoTable({request, exportOptions}) {
             <Translate context="user data export request date">Requested on</Translate>
           </Table.HeaderCell>
           <Table.HeaderCell>
-            <Translate>Contents</Translate>
+            <Translate context="user data export">Contents</Translate>
           </Table.HeaderCell>
         </Table.Row>
       </Table.Header>
-
       <Table.Body>
         <Table.Row>
           <Table.Cell>{moment(request.requestedDt).format('L')}</Table.Cell>

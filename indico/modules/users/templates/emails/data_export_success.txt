@@ -7,14 +7,13 @@
 {%- endblock %}
 
 {% block body -%}
-{% trans %}Your Indico user data is ready for download.{% endtrans %}
+{% trans %}Your Indico data export is ready for download.{% endtrans %}
 {% if max_size_exceeded %}
     {% trans %}
         Please note that some files were not exported due to exceeding the
         maximum allowed size of the archive. Consider selecting less options.
     {% endtrans %}
 {% endif %}
-
 
 {% trans %}Download link:{% endtrans %} {{ link }}
 {%- endblock %}

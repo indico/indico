@@ -5,25 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-@use 'base/defaults' as *;
-@use 'base/borders' as *;
-
-.divider {
-  @include border-top();
-  margin-left: -10px;
-  margin-right: -10px;
-}
-
-.data-export-body {
-  margin-top: 10px;
-}
-
 :global(.ui.button.right.labeled) {
   // _core.scss sets float for '.right'
   float: unset;
 }
 
 :global(.ui.label).option-label {
-  margin: 2px;
+  margin: 0.2em;
 }
