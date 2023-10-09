@@ -5,46 +5,83 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/defaults' as *;
-@use 'base/palette' as *;
-
 body {
-  --color-text: #{$dark-black};
-  --color-accent: #{$dark-blue};
+  // Color palette
+  --text-color: #333;
+  --text-inverse-color: #fff;
+  --text-disabled-color: #999;
+  --surface-default: #e8e8e8;
+  --surface-highlight-color: #c4c4c4;
+  --surface-disabled-color: #f9f9f9;
+  --border-default-color: #5a5a5a;
+  --border-disabled-color: #c4c4c4;
+  --accent-color: #007cac;
+  --accent-highlight-color: #035e81;
+  --active-color: #db1a1a;
+  --visited-color: #8d14f0;
 
-  --control-border-color: #{$dark-gray};
-  --control-text-color: var(--color-text);
-  --control-clickable-surface-color: #{$pastel-gray};
-  --control-clickable-surface-focus-color: #{darken($pastel-gray, $color-variation)};
-  --control-alt-text-color: #{$white};
-  --control-alt-clickable-surface-color: #{$dark-blue};
-  --control-alt-clickable-surface-focus-color: #{darken($dark-blue, $color-variation)};
-  --control-alt-border-color: #{darken($dark-blue, $color-variation)};
-  --control-disabled-text-color: #{$dark-gray};
-  --control-disabled-clickable-surface-color: #{$light-gray};
-  --control-disabled-border-color: #{$pastel-gray};
-  --control-indented-bg-color: #{$light-gray};
-  --control-disabled-indented-bg-color: #{$light-gray};
-  --control-disabled-inset-indented-color: #{$dark-gray};
-
+  // Generic controls
+  --control-border-color: var(--border-default-color);
+  --control-text-color: var(--text-color);
+  --control-clickable-surface-color: var(--surface-default);
+  --control-clickable-surface-focus-color: var(--surface-highlight-color);
+  --control-clickable-border-color: var(--control-border-color);
+  --control-alt-text-color: var(--text-inverse-color);
+  --control-alt-clickable-surface-color: var(--accent-color);
+  --control-alt-clickable-surface-focus-color: var(--accent-highlight-color);
+  --control-alt-border-color: var(--accent-color);
+  --control-disabled-text-color: var(--text-disabled-color);
+  --control-disabled-clickable-surface-color: var(--surface-disabled-color);
+  --control-disabled-border-color: var(--surface-disabled-color);
+  --control-indented-bg-color: var(--surface-disabled-color);
+  --control-disabled-indented-bg-color: var(--text-disabled-color);
+  --control-disabled-inset-indented-color: var(--text-disabled-color);
   --control-border: 1px solid var(--control-border-color);
-  --control-border-radius: #{$default-border-radius};
+  --control-border-radius: 0.15em;
   --control-padding: 0.5em;
   --control-internal-gap: 0.2em;
 
+  // Clickable texts (e.g., link)
+  --clickable-text-color: var(--accent-color);
+  --clickable-text-active-color: var(--active-color);
+  --clickable-text-used-color: var(--visited-color);
+  --clickable-text-disabled-color: var(--text-disabled-color);
+
+  // Generic container
   --container-padding: 1em;
   --container-narrow-padding: 1em 0.5em;
   --container-element-spacing: 0.5em;
 
+  // Messages (banners, notifications, etc)
+  --message-important-surface-color: #fff9b8;
+  --message-important-text-color: var(--text-color);
+
+  // Text sizes (relative)
   --text-size-rel-s: 75%;
   --text-size-rel-n: 100%;
   --text-size-rel-l: 120%;
   --text-size-rel-xl: 150%;
   --text-size-rel-xxl: 200%;
 
+  // Text sizes (absolute)
   --text-size-abs-s: 0.875rem;
   --text-size-abs-n: 1rem;
   --text-size-abs-l: 1.2rem;
   --text-size-abs-xl: 1.5rem;
   --text-size-abs-xxl: 2rem;
+
+  // TODO: Compensates from base font size of 14px coming from SUI.
+  // This should be set to 1 once SUI is removed.
+  //
+  // How to use:
+  //
+  // In your container block, multiply the `font-size` with this value.
+  // For example:
+  //
+  //    .foo {
+  //      font-size: calc(var(--text-size-global-adjust) * var(--text-size-rel-n));
+  //    }
+  //
+  // You don't need to do this for descendants. Just once in the outermost container.
+  --text-size-global-adjust: 1.14;
 }

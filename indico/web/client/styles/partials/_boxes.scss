@@ -139,7 +139,6 @@ $i-box-padding: 10px;
   @include single-box-shadow();
   @include transition(padding-bottom);
 
-  box-sizing: border-box;
   background: white;
   color: $black;
 

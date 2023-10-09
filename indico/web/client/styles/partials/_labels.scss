@@ -15,7 +15,6 @@ $i-label-color: $light-black;
   @include default-border-radius();
   @include border-all($gray);
   user-select: none;
-  box-sizing: border-box;
   display: inline-flex;
   color: $i-label-color;
   outline: none;

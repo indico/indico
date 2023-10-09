@@ -100,7 +100,6 @@ tr.details-row {
 
 td.i-table,
 th.i-table {
-  box-sizing: border-box;
   @include ellipsis();
 
   padding: 5px 3px 5px 3px;
@@ -295,7 +294,6 @@ th {
       display: inline-block;
       float: left;
       padding: 0.4em;
-      box-sizing: border-box;
     }
 
     dt {

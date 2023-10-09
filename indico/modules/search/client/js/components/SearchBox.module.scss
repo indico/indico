@@ -7,8 +7,10 @@
 
 @use 'base/palette' as *;
 @use 'base/utilities' as *;
+@use 'design_system';
 
-.option {
+.search-type-option {
+  @extend %flex-row;
   display: flex;
   align-items: center;
   justify-content: space-between;

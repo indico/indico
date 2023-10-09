@@ -146,7 +146,7 @@ $display-preview-bg-color: white;
   max-width: 800px;
   position: relative;
   padding: 0.5em;
-  height: 2em;
+  height: 3em;
   margin: 0;
   background-color: $light-gray;
   display: flex;
@@ -164,7 +164,6 @@ $display-preview-bg-color: white;
 }
 
 .wmd-button-bar {
-  box-sizing: content-box;
   position: relative;
 
   .save-button {

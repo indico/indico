@@ -53,7 +53,6 @@
   .i-timeline-item-label {
     @include default-border-radius();
     @include border-all($color: transparent);
-    box-sizing: border-box;
     margin-right: 12px;
     outline: 2px solid white;
     flex-shrink: 0;
