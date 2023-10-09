@@ -57,7 +57,7 @@ def test_export_user_data_existing_request(mocker, db, dummy_user):
 
     DataExportRequest(user=dummy_user, selected_options=[], state=DataExportRequestState.running)
     db.session.flush()
-    export_user_data(dummy_user, options=[])
+    export_user_data(dummy_user, options=[], include_files=False)
     mock.assert_not_called()
 
 
@@ -70,7 +70,7 @@ def test_export_user_data_error(mocker, dummy_user):
         raise Exception('Mock exception')
     mocker.patch('indico.modules.users.export.generate_zip', raises)
 
-    export_user_data(dummy_user, options=[])
+    export_user_data(dummy_user, options=[], include_files=False)
     assert dummy_user.data_export_request.state == DataExportRequestState.failed
     failure.assert_called()
     success.assert_not_called()
@@ -83,7 +83,7 @@ def test_export_user_data(mocker, dummy_user, all_data_yamls):
     failure = mocker.patch('indico.modules.users.export.notify_data_export_failure')
 
     options = list(DataExportOptions)
-    export_user_data(dummy_user, options)
+    export_user_data(dummy_user, options, include_files=True)
 
     assert dummy_user.data_export_request.state == DataExportRequestState.success
     assert dummy_user.data_export_request.selected_options == options
@@ -105,6 +105,27 @@ def test_export_user_data(mocker, dummy_user, all_data_yamls):
         ]
 
 
+@pytest.mark.usefixtures('mock_io', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
+                         'dummy_editing_revision_file', 'dummy_reg_with_file_field')
+def test_export_user_data_no_files(mocker, dummy_user, all_data_yamls):
+    success = mocker.patch('indico.modules.users.export.notify_data_export_success')
+    failure = mocker.patch('indico.modules.users.export.notify_data_export_failure')
+
+    options = list(DataExportOptions)
+    export_user_data(dummy_user, options, include_files=False)
+
+    assert dummy_user.data_export_request.state == DataExportRequestState.success
+    assert dummy_user.data_export_request.selected_options == options
+    assert not dummy_user.data_export_request.max_size_exceeded
+    failure.assert_not_called()
+    success.assert_called_with(dummy_user.data_export_request)
+
+    file = File.query.filter(File.filename == 'data-export.zip').first()
+    with file.open() as f:
+        zip = ZipFile(f)
+        assert zip.namelist() == all_data_yamls
+
+
 @pytest.mark.usefixtures('dummy_attachment')
 def test_export_user_data_max_size_exceeded_1(mocker, dummy_user, all_data_yamls):
     class MockConfig:
@@ -119,7 +140,7 @@ def test_export_user_data_max_size_exceeded_1(mocker, dummy_user, all_data_yamls
     failure = mocker.patch('indico.modules.users.export.notify_data_export_failure')
 
     options = list(DataExportOptions)
-    export_user_data(dummy_user, options)
+    export_user_data(dummy_user, options, include_files=True)
 
     assert dummy_user.data_export_request.state == DataExportRequestState.success
     assert dummy_user.data_export_request.selected_options == options
@@ -147,7 +168,7 @@ def test_export_user_data_max_size_exceeded_2(mocker, dummy_user, dummy_attachme
     failure = mocker.patch('indico.modules.users.export.notify_data_export_failure')
 
     options = list(DataExportOptions)
-    export_user_data(dummy_user, options)
+    export_user_data(dummy_user, options, include_files=True)
 
     assert dummy_user.data_export_request.state == DataExportRequestState.success
     assert dummy_user.data_export_request.selected_options == options

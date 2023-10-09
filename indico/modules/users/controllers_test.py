@@ -32,7 +32,7 @@ def test_user_data_request(mocker, dummy_user):
 
     rh = RHUserDataExportAPI()
     request.method = 'POST'
-    request.form = MultiDict({'options': DataExportOptions.contribs.name})
+    request.form = MultiDict({'options': DataExportOptions.contribs.name, 'include_files': True})
     rh.user = dummy_user
 
     response = rh._process()
