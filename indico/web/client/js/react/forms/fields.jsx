@@ -596,6 +596,7 @@ export function FinalSubmitButton({
   circular,
   size,
   icon,
+  fluid,
   style,
   children,
 }) {
@@ -638,6 +639,7 @@ export function FinalSubmitButton({
             circular={circular}
             size={size}
             icon={icon}
+            fluid={fluid}
           />
         }
         position="bottom right"
@@ -661,6 +663,7 @@ FinalSubmitButton.propTypes = {
   onClick: PropTypes.func,
   circular: PropTypes.bool,
   icon: PropTypes.string,
+  fluid: PropTypes.bool,
   size: PropTypes.string,
   style: PropTypes.object,
   children: PropTypes.func,
@@ -677,6 +680,7 @@ FinalSubmitButton.defaultProps = {
   onClick: null,
   circular: false,
   icon: null,
+  fluid: false,
   size: null,
   style: null,
   children: null,
