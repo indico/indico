@@ -107,9 +107,11 @@ function AdditionalOptions() {
             <Toggle
               name="includeFiles"
               title={Translate.string('Include files')}
-              description={Translate.string(`If checked, for each selected option, a copy of all your uploaded files will be
-                included in the export. Note that depending on the number of files, this may significantly increase the
-                download size of the export`)}
+              description={Translate.string(
+                'If checked, for each selected option, a copy of all your uploaded files ' +
+                  'will be included in the export. Note that depending on the number of ' +
+                  'files, this may significantly increase the download size of the export'
+              )}
             />
           </List.Content>
         </List.Item>
