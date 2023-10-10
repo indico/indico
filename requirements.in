@@ -65,7 +65,7 @@ ua-parser
 urllib3<2  # not compatible with centos7 openssl + not yet compatible with botocore (s3 plugin)
 webargs
 werkzeug
-wtforms[email]
+wtforms[email]<3.1  # wtforms/wtforms-sqlalchemy#40 is not yet compatible
 wtforms-dateutil
 wtforms-sqlalchemy
 xlsxwriter

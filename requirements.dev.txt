@@ -8,9 +8,9 @@ aiosmtpd==1.4.4.post2
     # via pytest-localserver
 alabaster==0.7.13
     # via sphinx
-anyio==3.7.1
+anyio==4.0.0
     # via watchfiles
-async-timeout==4.0.2
+async-timeout==4.0.3
     # via
     #   -c requirements.txt
     #   redis
@@ -20,15 +20,15 @@ attrs==23.1.0
     # via
     #   -c requirements.txt
     #   aiosmtpd
-babel==2.12.1
+babel==2.13.1
     # via
     #   -c requirements.txt
     #   sphinx
-blinker==1.6.2
+blinker==1.7.0
     # via
     #   -c requirements.txt
     #   flask
-build==0.10.0
+build==1.0.3
     # via
     #   -r requirements.dev.in
     #   pip-tools
@@ -36,11 +36,11 @@ certifi==2023.7.22
     # via
     #   -c requirements.txt
     #   requests
-charset-normalizer==3.2.0
+charset-normalizer==3.3.2
     # via
     #   -c requirements.txt
     #   requests
-click==8.1.6
+click==8.1.7
     # via
     #   -c requirements.txt
     #   flask
@@ -54,15 +54,16 @@ colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.2.7
+coverage==7.3.2
     # via pytest-cov
 docutils==0.18.1
     # via
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
-exceptiongroup==1.1.2
+exceptiongroup==1.1.3
     # via
+    #   -c requirements.txt
     #   anyio
     #   pytest
 flake8==6.1.0
@@ -72,7 +73,7 @@ flake8==6.1.0
     #   pep8-naming
 flake8-quotes==3.3.2
     # via -r requirements.dev.in
-flask==2.3.2
+flask==3.0.0
     # via
     #   -c requirements.txt
     #   flask-url-map-serializer
@@ -80,7 +81,7 @@ flask-url-map-serializer==0.0.1
     # via -r requirements.dev.in
 freezegun==1.2.2
     # via -r requirements.dev.in
-greenlet==3.0.0
+greenlet==3.0.1
     # via
     #   -c requirements.txt
     #   sqlalchemy
@@ -94,6 +95,7 @@ imagesize==1.4.1
 importlib-metadata==6.8.0
     # via
     #   -c requirements.txt
+    #   build
     #   flask
     #   sphinx
 iniconfig==2.0.0
@@ -120,9 +122,9 @@ mccabe==0.7.0
     # via flake8
 migra==3.0.1663481299
     # via -r requirements.dev.in
-mirakuru==2.5.1
+mirakuru==2.5.2
     # via pytest-redis
-packaging==23.1
+packaging==23.2
     # via
     #   -c requirements.txt
     #   build
@@ -135,21 +137,21 @@ parso==0.8.3
     #   pyquotes
 pep8-naming==0.13.3
     # via -r requirements.dev.in
-pip-tools==7.1.0
+pip-tools==7.3.0
     # via -r requirements.dev.in
 plantweb==1.2.1
     # via -r requirements.dev.in
-pluggy==1.2.0
+pluggy==1.3.0
     # via pytest
-port-for==0.7.1
+port-for==0.7.2
     # via pytest-redis
-psutil==5.9.5
+psutil==5.9.6
     # via mirakuru
-pycodestyle==2.11.0
+pycodestyle==2.11.1
     # via flake8
 pyflakes==3.1.0
     # via flake8
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -c requirements.txt
     #   -r requirements.dev.in
@@ -158,7 +160,7 @@ pyproject-hooks==1.0.0
     # via build
 pyquotes==1.0.0
     # via -r requirements.dev.in
-pytest==7.4.0
+pytest==7.4.3
     # via
     #   -r requirements.dev.in
     #   pytest-cov
@@ -167,9 +169,9 @@ pytest==7.4.0
     #   pytest-snapshot
 pytest-cov==4.1.0
     # via -r requirements.dev.in
-pytest-localserver==0.8.0
+pytest-localserver==0.8.1
     # via -r requirements.dev.in
-pytest-mock==3.11.1
+pytest-mock==3.12.0
     # via -r requirements.dev.in
 pytest-redis==3.0.2
     # via -r requirements.dev.in
@@ -179,7 +181,7 @@ python-dateutil==2.8.2
     # via
     #   -c requirements.txt
     #   freezegun
-pyupgrade==3.10.1
+pyupgrade==3.15.0
     # via -r requirements.dev.in
 pywatchman==1.4.1 ; python_version < "3.10"
     # via -r requirements.dev.in
@@ -187,7 +189,7 @@ pyyaml==6.0.1
     # via
     #   -c requirements.txt
     #   unbeheader
-redis==4.6.0
+redis==5.0.1
     # via
     #   -c requirements.txt
     #   pytest-redis
@@ -210,24 +212,29 @@ sniffio==1.3.0
     # via anyio
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==6.2.1
+sphinx==7.2.6
     # via
     #   -r requirements.dev.in
     #   sphinx-autobuild
     #   sphinx-issues
     #   sphinx-rtd-theme
+    #   sphinxcontrib-applehelp
+    #   sphinxcontrib-devhelp
+    #   sphinxcontrib-htmlhelp
     #   sphinxcontrib-jquery
+    #   sphinxcontrib-qthelp
+    #   sphinxcontrib-serializinghtml
 sphinx-autobuild==2021.3.14
     # via -r requirements.dev.in
 sphinx-issues==3.0.1
     # via -r requirements.dev.in
-sphinx-rtd-theme==1.2.2
+sphinx-rtd-theme==1.3.0
     # via -r requirements.dev.in
-sphinxcontrib-applehelp==1.0.4
+sphinxcontrib-applehelp==1.0.7
     # via sphinx
-sphinxcontrib-devhelp==1.0.2
+sphinxcontrib-devhelp==1.0.5
     # via sphinx
-sphinxcontrib-htmlhelp==2.0.1
+sphinxcontrib-htmlhelp==2.0.4
     # via sphinx
 sphinxcontrib-jquery==4.1
     # via sphinx-rtd-theme
@@ -235,11 +242,11 @@ sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-mermaid==0.9.2
     # via -r requirements.dev.in
-sphinxcontrib-qthelp==1.0.3
+sphinxcontrib-qthelp==1.0.6
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.5
+sphinxcontrib-serializinghtml==1.1.9
     # via sphinx
-sqlalchemy==1.4.49
+sqlalchemy==1.4.50
     # via
     #   -c requirements.txt
     #   schemainspect
@@ -265,16 +272,16 @@ urllib3==1.26.18
     # via
     #   -c requirements.txt
     #   requests
-watchfiles==0.19.0
+watchfiles==0.21.0
     # via -r requirements.dev.in
-werkzeug==2.3.8
+werkzeug==3.0.1
     # via
     #   -c requirements.txt
     #   flask
     #   pytest-localserver
-wheel==0.41.0
+wheel==0.41.3
     # via pip-tools
-zipp==3.16.2
+zipp==3.17.0
     # via
     #   -c requirements.txt
     #   importlib-metadata
