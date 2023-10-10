@@ -13,7 +13,6 @@ from uuid import uuid4
 from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.globals import _cv_app
-from flask.helpers import locked_cached_property
 from flask.testing import FlaskClient
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
@@ -205,7 +204,7 @@ class IndicoBlueprint(Blueprint):
                 if event_id is not None:
                     require_feature(event_id, event_feature)
 
-    @locked_cached_property
+    @cached_property
     def jinja_loader(self):
         if self.template_folder is not None:
             return IndicoFileSystemLoader(os.path.join(self.root_path, self.template_folder),
