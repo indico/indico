@@ -2,6 +2,27 @@ Changelog
 =========
 
 
+Version 3.2.9
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- None so far :(
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- None so far
+
+
 Version 3.2.8
 -------------
 
