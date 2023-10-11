@@ -5,7 +5,7 @@ Changelog
 Version 3.2.8
 -------------
 
-*Unreleased*
+*Released on October 11, 2023*
 
 Security fixes
 ^^^^^^^^^^^^^^
