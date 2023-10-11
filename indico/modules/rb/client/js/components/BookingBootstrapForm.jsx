@@ -108,8 +108,6 @@ class BookingBootstrapForm extends React.Component {
       recurrence.weekdays.length === 0
     ) {
       this.preselectWeekday();
-    } else {
-      this.triggerChange();
     }
   }
 

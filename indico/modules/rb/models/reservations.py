@@ -363,8 +363,15 @@ class Reservation(db.Model):
         reservation.state = ReservationState.pending if prebook else ReservationState.accepted
         reservation.created_by_user = user
         reservation.create_occurrences(True, allow_admin=(not ignore_admin))
-        if not any(occ.is_valid for occ in reservation.occurrences):
+
+        first_occ = next((occ for occ in reservation.occurrences if occ.is_valid), None)
+        last_occ = next((occ for occ in reservation.occurrences.order_by(ReservationOccurrence.start_dt.desc())
+                         if occ.is_valid), None)
+        if not first_occ:
             raise NoReportError(_('Reservation has no valid occurrences'))
+        reservation.start_dt = first_occ.start_dt
+        reservation.end_dt = last_occ.end_dt
+
         db.session.flush()
         signals.rb.booking_created.send(reservation)
         notify_creation(reservation)
@@ -645,6 +652,9 @@ class Reservation(db.Model):
                 # If the internal notes are being updated then we don't bother updating the edit log with this
                 if field == 'internal_note':
                     continue
+                # Don't update the edit log if recurrence_weekdays is cleared
+                if field == 'recurrence_weekdays' and new is None:
+                    continue
                 # Record change for history entry
                 if field in date_time_fields:
                     # The date/time fields create separate entries for the date and time parts
@@ -672,7 +682,10 @@ class Reservation(db.Model):
             converter = change['converter']
             old = converter(change['old'])
             new = converter(change['new'])
-            if not old:
+            # XXX: Additional (ugly) check for None values - since we cast it to str first, we need to check for "None".
+            # This is to omit the 'empty' recurrence_weekdays field from the edit log when editing the booking from
+            # monthly to weekly repetition.
+            if not old or old == 'None':
                 log.append(f"The {field_title} was set to '{new}'")
             elif not new:
                 log.append(f'The {field_title} was cleared')

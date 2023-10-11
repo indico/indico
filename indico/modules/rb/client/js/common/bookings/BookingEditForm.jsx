@@ -88,6 +88,12 @@ class BookingEditForm extends React.Component {
     form.change('dates', filters.dates);
 
     onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
+
+    if (newType === 'every' && recurrence.interval === 'week') {
+      this.preselectWeekdayToday(form, true);
+    } else {
+      form.change('recurrence.weekdays', []);
+    }
   };
 
   clearWeekdays = interval => {
@@ -112,7 +118,7 @@ class BookingEditForm extends React.Component {
     return !dt.isSameOrAfter(startDt, 'day');
   };
 
-  preselectWeekdayToday = form => {
+  preselectWeekdayToday = (form, force = false) => {
     const {
       formProps: {
         values: {recurrence},
@@ -123,8 +129,8 @@ class BookingEditForm extends React.Component {
       .format('ddd')
       .toLowerCase();
 
-    if (recurrence.type === 'every' && recurrence.interval === 'week') {
-      if (recurrence.weekdays === null || recurrence.weekdays.length < 1) {
+    if ((recurrence.type === 'every' && recurrence.interval === 'week') || force) {
+      if (recurrence.weekdays === null || recurrence.weekdays.length === 0) {
         const newRecurrence = {...recurrence, weekdays: [today]};
         form.change('recurrence.weekdays', newRecurrence.weekdays);
       }

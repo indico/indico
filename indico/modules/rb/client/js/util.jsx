@@ -257,30 +257,37 @@ export function renderRecurrenceWeekdays(weekdays) {
     return null;
   }
 
-  if (weekdays.length === 1) {
+  const orderedWeekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+  // sort the weekdays based on their position in the orderedWeekdays array
+  const sortedWeekdays = weekdays.sort(
+    (a, b) => orderedWeekdays.indexOf(a) - orderedWeekdays.indexOf(b)
+  );
+
+  if (sortedWeekdays.length === 1) {
     return (
       <Translate>
-        Recurs every <Param name="weekday" value={weekdaysMap[weekdays[0]]} />
+        Recurs every <Param name="weekday" value={weekdaysMap[sortedWeekdays[0]]} />
       </Translate>
     );
   }
 
-  if (weekdays.length === 2) {
+  if (sortedWeekdays.length === 2) {
     return (
       <Translate>
-        Recurs every <Param name="weekdays_1" value={weekdaysMap[weekdays[0]]} /> and{' '}
-        <Param name="weekdays_2" value={weekdaysMap[weekdays[1]]} />
+        Recurs every <Param name="weekdays_1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
+        <Param name="weekdays_2" value={weekdaysMap[sortedWeekdays[1]]} />
       </Translate>
     );
   }
 
-  // join weekdays with commas and replace last comma with 'and'
+  // join weekdays with commas and replace the last comma with 'and'
   // (i.e. ['mon', 'wed', 'tue'] -> 'Monday, Tuesday and Wednesday')
-  const weekdaysString = weekdays
+  const weekdaysString = sortedWeekdays
     .slice(0, -1)
     .map(weekday => weekdaysMap[weekday])
     .join(', ');
-  const lastWeekday = weekdaysMap[weekdays[weekdays.length - 1]];
+  const lastWeekday = weekdaysMap[sortedWeekdays[sortedWeekdays.length - 1]];
 
   return (
     <Translate>
