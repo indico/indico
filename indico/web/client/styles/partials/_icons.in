@@ -1,0 +1,138 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+/*
+SUPER IMPORTNAT, DON'T SKIP
+
+_icons.in file is a template used to generate the _icons.scss file.
+Don't edit the _icons.scss file directly! Instead edit the _icons.in and
+run:
+
+python bin/maintenance/icons_generate.py
+*/
+
+// stylelint-disable rule-empty-line-before
+
+@use 'base/palette' as *;
+
+@font-face {
+  font-family: 'icomoon-ultimate';
+  src: url('static:fonts/icomoon/icomoon.svg#icomoon-ultimate') format('svg'),
+    url('static:fonts/icomoon/icomoon.woff') format('woff'),
+    url('static:fonts/icomoon/icomoon.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Use the following CSS code if you want to use data attributes for inserting your icons */
+[data-icon]::before {
+  font-family: 'icomoon-ultimate';
+  content: attr(data-icon);
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-"] {
+*/
+[class^='icon-']::before,
+[class*=' icon-']::before,
+%icon {
+  font-family: 'icomoon-ultimate';
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+i[class^='icon-']::before {
+  cursor: default;
+}
+
+.inactive[class^='icon-']::before,
+.inactive[class*=' icon-']::before {
+  opacity: 0.15;
+}
+
+/* How to add icons
+ *
+ *  1. Login into icomoon app https://icomoon.io/app/
+ *  2. Remove any existing project (Top-left hamburger icon, "Manage projects", "Remove" button)
+ *  3. Import "selection.json" from Indico repository (Top-left hamburger icon, "Import project",
+ *     choose 'indico/web/static/fonts/icomoon/selection.json'
+ *  4. Load the project (it should be named "Untitled Project")
+ *  5. Deselect all icons (Top-left hamburger icon, "Clear selection")
+ *  6. Add the IcoMoon Ultimate pack (Click on "Library" button then on "Add")
+ *  7. Search for the icon you want to add using the search box
+ *  8. Select the icons to add with the selection tool
+ *  9. Add the new icons to our set (Click the hamburger icon to the right of our set that
+ *     should be displayed as "icomoon" and select "Move selection here")
+ * 10. Clear the search box
+ * 11. Remove all icons sets except ours (Click the hamburger icon to the right of the set to remove
+ *     and choose "Remove set")
+ * 12. Reorder the icons in alphabetical order:
+ *      - Click the hamburger icon to the right of our project
+ *      - Choose "Select all".
+ *      - Click that hamburger icon again and choose "Rearrange icons".
+ *      - Choose "Order by name" and "Rearrange"
+ * 13. Click on the "Generate font" tab at the bottom of the screen
+ * 14. Click on "Download" at the bottom right of the screen
+ * 15. Copy files:
+ *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/web/static/fonts/icomoon/
+ *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
+ * 16. Run the update script: python bin/maintenance/icomoon_update.py
+ */
+
+/*-- ICONS --*/
+
+/* animated spinner icon */
+.icon-spinner::before {
+  content: '';
+  display: inline-block;
+  min-width: 1.2em;
+  min-height: 1.2em;
+  height: 100%;
+  background-image: url('static:images/loading.gif');
+  background-repeat: no-repeat;
+  background-size: 1.2em 1.2em;
+  vertical-align: middle !important;
+  opacity: 0.6; // full opacity is too dark compared to the text in a button
+}
+
+/* Custom "empty" icon to have a space equivalent to an icon */
+.icon-none::before {
+  content: '\2001';
+}
+
+.disabled .icon-spinner::before {
+  opacity: 0.4; // "disabled feel" for the bg image with the spinner
+}
+
+/* Customized icons for specific purposes */
+.icon-protection-public::before {
+  @extend %icon-unlocked;
+  color: $green;
+}
+
+.icon-protection-self::before {
+  @extend %icon-lock;
+  color: $red;
+}
+
+.icon-unlisted-event::before {
+  @extend %icon-eye-blocked;
+  color: $red;
+}

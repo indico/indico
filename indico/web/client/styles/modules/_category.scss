@@ -315,9 +315,9 @@ ul.category-list {
 
     &::before {
       @include transition(color);
+      @extend %icon-arrow-right-sparse;
       color: #ccc;
       float: right;
-      content: '\46';
       font-family: 'icomoon-ultimate';
       margin-right: 1em;
       margin-left: 1em;

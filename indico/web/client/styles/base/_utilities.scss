@@ -7,29 +7,18 @@
 
 @use 'partials/icons' as *;
 
-@mixin adjacent-icon {
-  font-family: 'icomoon-ultimate';
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  -webkit-font-smoothing: antialiased;
-}
-
 @mixin icon-after($icon-class) {
-  @extend .#{$icon-class}-after;
-
   &::after {
-    @include adjacent-icon();
+    @extend %icon;
+    @extend %#{$icon-class};
     margin-left: 0.2em;
   }
 }
 
 @mixin icon-before($icon-class) {
-  @extend .#{$icon-class};
-
   &::before {
-    @include adjacent-icon();
+    @extend %icon;
+    @extend %#{$icon-class};
   }
 }
 
