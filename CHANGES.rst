@@ -72,16 +72,42 @@ Internal Changes
 ----
 
 
-Version 3.2.8
+Version 3.2.9
 -------------
 
 *Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- None so far :(
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- None so far
+
+
+Version 3.2.8
+-------------
+
+*Released on October 11, 2023*
 
 Security fixes
 ^^^^^^^^^^^^^^
 
 - Update `Pillow <https://pypi.org/project/Pillow/>`_ library due to
   vulnerabilities in libwebp (:cve:`CVE-2023-4863`)
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Italian
 
 Bugfixes
 ^^^^^^^^
