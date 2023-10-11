@@ -1,10 +1,10 @@
 {
   "description": "Dummy attachment",
   "file": {
+    "_archive_path": "attachments/420_dummy_file.txt",
     "filename": "dummy_file.txt",
     "id": 420,
-    "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3",
-    "path": "attachments/420_dummy_file.txt"
+    "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3"
   },
   "folder": 420,
   "folder_id": 420,

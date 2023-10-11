@@ -118,11 +118,11 @@ class StaticSiteExportSchema(mm.SQLAlchemyAutoSchema):
 
 class RegistrationFileExportSchema(Schema):
     class Meta:
-        fields = ('registration_id', 'field_data_id', 'filename', 'md5', 'url', 'path')
+        fields = ('registration_id', 'field_data_id', 'filename', 'md5', 'url', '_archive_path')
 
     url = fields.Function(lambda data: url_for('event_registration.registration_file', data.locator.file,
                                                _external=True))
-    path = fields.Function(lambda file: build_storage_path(file))
+    _archive_path = fields.Function(lambda file: build_storage_path(file))
 
 
 class RegistrationDataExportSchema(Schema):
@@ -221,10 +221,10 @@ class ContributionExportSchema(mm.SQLAlchemyAutoSchema):
 class AbstractFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = AbstractFile
-        fields = ('id', 'filename', 'md5', 'url', 'path')
+        fields = ('id', 'filename', 'md5', 'url', '_archive_path')
 
     url = fields.Function(lambda f: url_for('abstracts.download_attachment', f, management=False, _external=True))
-    path = fields.Function(lambda file: build_storage_path(file))
+    _archive_path = fields.Function(lambda file: build_storage_path(file))
 
 
 class AbstractExportSchema(mm.SQLAlchemyAutoSchema):
@@ -244,7 +244,7 @@ class AbstractExportSchema(mm.SQLAlchemyAutoSchema):
 class PaperFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = PaperFile
-        fields = ('id', 'filename', 'md5', 'url', 'path')
+        fields = ('id', 'filename', 'md5', 'url', '_archive_path')
 
     url = fields.Function(lambda f: url_for('papers.download_file', f.paper.contribution, f, _external=True))
     path = fields.Function(lambda file: build_storage_path(file))
@@ -300,9 +300,9 @@ class MiscDataExportSchema(Schema):
 class AttachmentFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = AttachmentFile
-        fields = ('id', 'filename', 'md5', 'path')
+        fields = ('id', 'filename', 'md5', '_archive_path')
 
-    path = fields.Function(lambda file: build_storage_path(file))
+    _archive_path = fields.Function(lambda file: build_storage_path(file))
 
 
 class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
@@ -325,12 +325,12 @@ class AttachmentExportSchema(mm.SQLAlchemyAutoSchema):
 class EditableFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EditingRevisionFile
-        fields = ('filename', 'md5', 'signed_download_url', 'path')
+        fields = ('filename', 'md5', 'signed_download_url', '_archive_path')
 
     filename = fields.String(attribute='file.filename')
     md5 = fields.String(attribute='file.md5')
     signed_download_url = fields.String(attribute='file.signed_download_url')
-    path = fields.Function(lambda file: build_storage_path(file))
+    _archive_path = fields.Function(lambda file: build_storage_path(file))
 
 
 class EditingRevisionExportSchema(mm.SQLAlchemyAutoSchema):
@@ -410,3 +410,23 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     def _get_editables(self, user):
         editables = get_editables(user)
         return EditableExportSchema(many=True).dump(editables)
+
+    @post_dump
+    def _update_storage_paths(self, data, **kwargs):
+        include_files = self.context.get('include_files', False)
+        return update_storage_paths(data, include_files)
+
+
+def update_storage_paths(data, include_files):
+    """Recursively filter out or rename storage paths in the user schema."""
+    if isinstance(data, list):
+        return [update_storage_paths(item, include_files) for item in data]
+    elif isinstance(data, dict):
+        data = {key: update_storage_paths(value, include_files) for key, value in data.items()}
+        if '_archive_path' in data:
+            if include_files:
+                data['archive_path'] = data['_archive_path']
+            del data['_archive_path']
+        return data
+    else:
+        return data

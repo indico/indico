@@ -108,7 +108,7 @@ def serialize_user_data(export_request):
 
     user = export_request.user
     fields = options_to_fields(export_request.selected_options)
-    return UserDataExportSchema(only=fields).dump(user)
+    return UserDataExportSchema(only=fields, context={'include_files': export_request.include_files}).dump(user)
 
 
 def options_to_fields(options):

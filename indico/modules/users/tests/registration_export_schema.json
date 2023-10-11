@@ -13,10 +13,10 @@
       "data": "registration_upload.txt",
       "description": "",
       "file": {
+        "_archive_path": "registrations/0_dummy0/730_730_registration_upload.txt",
         "field_data_id": 730,
         "filename": "registration_upload.txt",
         "md5": "d659f3992a4861fbba98e728e8ab5d8e",
-        "path": "registrations/0_dummy0/730_730_registration_upload.txt",
         "registration_id": 730,
         "url": "http://localhost/event/0/manage/registration/420/registrations/730/file/730-registration_upload.txt"
       },

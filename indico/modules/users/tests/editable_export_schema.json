@@ -8,9 +8,9 @@
       "created_dt": "2022-05-22T12:00:00+00:00",
       "files": [
         {
+          "_archive_path": "editables/paper/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt",
           "filename": "dummy_file.txt",
-          "md5": "d659f3992a4861fbba98e728e8ab5d8e",
-          "path": "editables/paper/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt"
+          "md5": "d659f3992a4861fbba98e728e8ab5d8e"
         }
       ],
       "id": 420,

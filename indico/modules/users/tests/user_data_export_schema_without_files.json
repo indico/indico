@@ -6,7 +6,6 @@
       "event_url": "http://localhost/event/0/",
       "files": [
         {
-          "_archive_path": "abstracts/0_dummy0/420_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/420_dummy_abstract_file.txt",
           "filename": "dummy_abstract_file.txt",
           "id": 420,
           "md5": "d659f3992a4861fbba98e728e8ab5d8e",
@@ -25,7 +24,6 @@
     {
       "description": "Dummy attachment",
       "file": {
-        "_archive_path": "attachments/420_dummy_file.txt",
         "filename": "dummy_file.txt",
         "id": 420,
         "md5": "5eb63bbbe01eeed093cb22bb8f5acdc3"
@@ -72,7 +70,6 @@
           "created_dt": "2022-05-22T12:00:00+00:00",
           "files": [
             {
-              "_archive_path": "editables/paper/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt",
               "filename": "dummy_file.txt",
               "md5": "d659f3992a4861fbba98e728e8ab5d8e"
             }
@@ -177,7 +174,6 @@
           "data": "registration_upload.txt",
           "description": "",
           "file": {
-            "_archive_path": "registrations/0_dummy0/730_730_registration_upload.txt",
             "field_data_id": 730,
             "filename": "registration_upload.txt",
             "md5": "d659f3992a4861fbba98e728e8ab5d8e",

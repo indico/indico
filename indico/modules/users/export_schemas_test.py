@@ -203,10 +203,11 @@ def test_empty_user_data_export_schema(snapshot, dummy_user):
     _assert_json_snapshot(snapshot, data, 'empty_user_data_export_schema.json')
 
 
+@pytest.mark.parametrize('include_files', (False, True), ids=('without_files', 'with_files'))
 @pytest.mark.usefixtures('dummy_reservation', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
                          'dummy_reg_with_file_field', 'dummy_editing_revision_file')
-def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
-                                 dummy_subcontribution, dummy_event_person, dummy_room):
+def test_user_data_export_schema(request, snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
+                                 dummy_subcontribution, dummy_event_person, dummy_room, include_files):
     from indico.modules.users.export_schemas import UserDataExportSchema
 
     setup_settings(dummy_user.settings)
@@ -217,5 +218,6 @@ def test_user_data_export_schema(snapshot, db, dummy_user, dummy_category, dummy
     setup_misc_data(dummy_user, dummy_event)
     db.session.flush()
 
-    data = UserDataExportSchema().dump(dummy_user)
-    _assert_json_snapshot(snapshot, data, 'user_data_export_schema.json')
+    data = UserDataExportSchema(context={'include_files': include_files}).dump(dummy_user)
+    test_id = request.node.callspec.id
+    _assert_json_snapshot(snapshot, data, f'user_data_export_schema_{test_id}.json')
