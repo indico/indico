@@ -212,12 +212,17 @@
                        title="{% trans %}Generate a URL for the selected filters and columns.{% endtrans %}"></button>
                 </div>
                 <div class="group">
-                    <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                    <span class="i-button label icon-user" title="{% trans %}Total active registrations{% endtrans %}">
                         {{ regform.active_registration_count }}
                         {%- if regform.registration_limit %}
                             / {{ regform.registration_limit }}
                         {%- endif -%}
                     </span>
+                    {% if regform.existing_registrations_count > regform.active_registration_count -%}
+                        <span class="i-button label icon-user-block" title="{% trans %}Inactive registrations{% endtrans %}">
+                            {{ regform.existing_registrations_count - regform.active_registration_count }}
+                        </span>
+                    {%- endif %}
                 </div>
             </div>
         </div>

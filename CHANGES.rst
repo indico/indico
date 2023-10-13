@@ -32,6 +32,8 @@ Improvements
 - Improve login page UI, allow overriding the logo URL (:data:`LOGIN_LOGO_URL` config option)
   and using custom logos for auth providers (``logo_url`` in the auth provider settings)
   (:pr:`5936`, thanks :user:`openprojects`)
+- Show only active registration counts on the registration form management dashboard, and add
+  an inactive registration count to the registration list (:pr:`5990`)
 
 Bugfixes
 ^^^^^^^^

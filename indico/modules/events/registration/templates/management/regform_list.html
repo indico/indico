@@ -111,7 +111,7 @@
                                 {%- trans %}Registrations{% endtrans -%}
                                 {% block existing_count scoped %}
                                     <span class="badge">
-                                        {{- regform.existing_registrations_count -}}
+                                        {{- regform.active_registration_count -}}
                                         {% if regform.registration_limit %}
                                             / {{ regform.registration_limit }}
                                         {%- endif -%}
