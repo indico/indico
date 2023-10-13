@@ -89,7 +89,7 @@
                 <div class="group">
                     {% block registrations_count_label %}
                         <span class="i-button label icon-user" title="{% trans %}Total registrations{% endtrans %}">
-                            {{ regform.existing_registrations_count }}
+                            {{ regform.active_registration_count }}
                             {%- if regform.registration_limit %}
                                 / {{ regform.registration_limit }}
                             {%- endif -%}
