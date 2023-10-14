@@ -44,6 +44,8 @@ Improvements
 - Support sessions that expire at a certain date (specified by the used flask-multipass
   provider) regardless of activity when using an external login method (:pr:`5907`, thanks
   :user:`cbartz`)
+- Allow configuring future months threshold for categories (:issue:`2984`, :pr:`5928`, thanks
+  :user:`kewisch`)
 
 Bugfixes
 ^^^^^^^^

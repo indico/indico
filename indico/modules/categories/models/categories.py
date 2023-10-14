@@ -175,6 +175,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=False
     )
+    show_future_months = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
+    )
     is_flat_view_enabled = db.Column(
         db.Boolean,
         nullable=False,

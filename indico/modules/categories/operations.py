@@ -83,6 +83,7 @@ def _log_category_update(category, changes, extra_log_fields):
         'timezone': {'title': 'Timezone', 'type': 'string'},
         'suggestions_disabled': 'Disable suggestions',
         'is_flat_view_enabled': 'Allow flat view',
+        'show_future_months': 'Future months threshold',
         'event_message_mode': 'Event header message type',
         'event_message': 'Event header message',
         'notify_managers': 'Notify managers about event creation',
