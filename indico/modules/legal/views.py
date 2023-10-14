@@ -33,3 +33,11 @@ class WPDisplayPrivacyPolicy(WPLegalMixin, WPJinjaMixin, WPDecorated):
 
     def _get_body(self, params):
         return self._get_page_content(params)
+
+
+class WPDisplayAgreement(WPLegalMixin, WPJinjaMixin, WPDecorated):
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(_('Agreement'))
+
+    def _get_body(self, params):
+        return self._get_page_content(params)

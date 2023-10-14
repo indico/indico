@@ -5,13 +5,15 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 
 import dateutil.parser
 import pytz
+from babel.dates import get_timezone
 from sqlalchemy import inspect
 from werkzeug.utils import cached_property
 
+from indico.core.config import config
 from indico.core.db import db
 
 
@@ -48,6 +50,25 @@ class DatetimeConverter(SettingConverter):
     @staticmethod
     def to_python(value):
         return dateutil.parser.parse(value).astimezone(pytz.utc)
+
+
+class ServerDateConverter(SettingConverter):
+    """Convert an ISO 8601 date to/from a datetime in server timezone.
+
+    The datetime will be at midnight in the configured server timezone. The
+    python object going in should either be a date, or already have the correct
+    timezone.
+    """
+
+    @staticmethod
+    def from_python(value):
+        return value.strftime('%Y-%m-%d')
+
+    @staticmethod
+    def to_python(value):
+        dateval = date.fromisoformat(value)
+        server_tz = get_timezone(config.DEFAULT_TIMEZONE)
+        return datetime(year=dateval.year, month=dateval.month, day=dateval.day, tzinfo=server_tz)
 
 
 class TimedeltaConverter(SettingConverter):

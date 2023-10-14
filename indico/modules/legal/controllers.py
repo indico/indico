@@ -5,14 +5,16 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect
+from flask import redirect, request, session
 
 from indico.modules.admin import RHAdminBase
 from indico.modules.legal import legal_settings
-from indico.modules.legal.forms import LegalMessagesForm
-from indico.modules.legal.views import WPDisplayPrivacyPolicy, WPDisplayTOS, WPManageLegalMessages
+from indico.modules.legal.forms import AgreementForm, LegalMessagesForm
+from indico.modules.legal.views import WPDisplayAgreement, WPDisplayPrivacyPolicy, WPDisplayTOS, WPManageLegalMessages
+from indico.util.date_time import now_utc
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
+from indico.web.util import url_for_index
 
 
 class RHManageLegalMessages(RHAdminBase):
@@ -38,3 +40,31 @@ class RHDisplayPrivacyPolicy(RH):
         if url:
             return redirect(url)
         return WPDisplayPrivacyPolicy.render_template('privacy.html', content=legal_settings.get('privacy_policy'))
+
+
+class RHAcceptTerms(RH):
+    def _process(self):
+        terms_date = legal_settings.get('terms_effective_date')
+        user_accepted = (
+            session.user.accepted_tos_dt
+            and session.user.accepted_tos_dt >= terms_date
+        )
+        if not request.args.get('preview', False) and (
+            not legal_settings.get('terms_require_accept') or not terms_date or user_accepted
+        ):
+            return redirect(url_for_index())
+
+        form = AgreementForm()
+
+        if form.validate_on_submit():
+            if not request.args.get('preview', False) and form.data['accept_terms']:
+                session.user.accepted_tos_dt = now_utc()
+
+            returnpath = session.pop('legal_agreement_return_path', url_for_index())
+            return redirect(returnpath)
+
+        return WPDisplayAgreement.render_template(
+            'agreement.html',
+            form=form,
+            **legal_settings.get_all()
+        )

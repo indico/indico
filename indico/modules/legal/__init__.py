@@ -5,10 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import render_template, session
+from flask import redirect, render_template, request, session
 
 from indico.core import signals
 from indico.core.settings import SettingsProxy
+from indico.core.settings.converters import ServerDateConverter
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -29,7 +30,11 @@ legal_settings = SettingsProxy('legal', {
     'tos_url': '',
     'tos': '',
     'privacy_policy_url': '',
-    'privacy_policy': ''
+    'privacy_policy': '',
+    'terms_require_accept': False,
+    'terms_effective_date': None,
+}, converters={
+    'terms_effective_date': ServerDateConverter
 })
 
 
@@ -51,3 +56,48 @@ def _inject_privacy_footer(**kwargs):
     url = legal_settings.get('privacy_policy_url')
     if url or legal_settings.get('privacy_policy'):
         return render_template('legal/privacy_footer.html', url=url)
+
+
+@template_hook('global-announcement', markup=False)
+def _inject_announcement_header(**kwargs):
+    # Don't show if no user or not admin
+    if not session.user or not session.user.is_admin:
+        return
+
+    # Don't show the banner on the accept terms page
+    if request.endpoint == 'legal.accept_agreement':
+        return
+
+    # Don't show the banner if accepting terms is not required
+    terms_date = legal_settings.get('terms_effective_date')
+    if not legal_settings.get('terms_require_accept') or not terms_date:
+        return
+
+    # If you have accepted the most current terms, you are good
+    if session.user.accepted_tos_dt and session.user.accepted_tos_dt >= terms_date:
+        return
+
+    # Everyone else gets the warning
+    return 'warning', render_template('legal/admin_agreement_banner.html'), True
+
+
+def confirm_rh_terms_required():
+    terms_date = legal_settings.get('terms_effective_date')
+    if not legal_settings.get('terms_require_accept') or not terms_date:
+        return
+
+    # If you are not logged in or admin, we're not checking
+    if not session.user or session.user.is_admin:
+        return
+
+    # If you have accepted the most current terms, you are good
+    if session.user.accepted_tos_dt and session.user.accepted_tos_dt >= terms_date:
+        return
+
+    # Certain endpoints need to be passed through.
+    if request.blueprint and request.blueprint in ('assets', 'legal', 'auth', 'core'):
+        return
+
+    # Everything else gets redirected to the terms page
+    session['legal_agreement_return_path'] = request.path
+    return redirect(url_for('legal.accept_agreement'))

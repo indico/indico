@@ -85,6 +85,8 @@ Improvements
   ``indico.conf`` setting) (:pr:`6028`, thanks :user:`openprojects`)
 - Add option to exceptionally grant registration modification privileges to some registrants
   (:issue:`5264`, :pr:`6152`, thanks :user:`Thanhphan1147`)
+- Support for accepting terms on user registration (:issue:`5923`, :pr:`5925`, thanks
+  :user:`kewisch`)
 
 Bugfixes
 ^^^^^^^^

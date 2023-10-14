@@ -1,0 +1,54 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset %}
+
+{% block page_class %}fixed-width-standalone-text-page{% endblock %}
+
+{% block content %}
+{{ form_header(form) }}
+<p>
+    {% trans %}To continue using the platform, you must agree to the updated terms. Please take a moment to read the agreements before you continue.{% endtrans %}
+</p>
+{% if tos and not tos_url %}
+    {% call form_fieldset(_('Terms of Service')) %}
+        <div class="field policy">
+            {{ tos|sanitize_html }}
+        </div>
+    {% endcall %}
+{% endif %}
+{% if privacy_policy and not privacy_policy_url %}
+    {% call form_fieldset(_('Privacy Policy')) %}
+    <div class="field policy">
+        {{ privacy_policy|sanitize_html }}
+    </div>
+    {% endcall %}
+{% endif %}
+<p class="last-updated">
+    {% trans %}Last updated:{% endtrans %} {{ terms_effective_date|format_date(timezone=session.tzinfo) }}
+</p>
+
+{% call form_row(form.accept_terms, skip_label=True) %}
+    {% set tos_link_start = ('<a href="' ~ url_for('legal.display_tos') ~ '">')|safe if tos_url else "" %}
+    {% set pp_link_start = ('<a href="' ~ url_for('legal.display_privacy') ~ '">')|safe if privacy_policy_url else "" %}
+    {% set tos_link_end = '</a>'|safe if tos_url else "" %}
+    {% set pp_link_end = '</a>'|safe if privacy_policy_url else "" %}
+
+    {% if (tos or tos_url) and (privacy_policy or privacy_policy_url) %}
+        {% trans tos_link_start=tos_link_start, pp_link_start=pp_link_start, tos_link_end=tos_link_end, pp_link_end=pp_link_end %}
+            I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }} and
+            and {{ pp_link_start }}privacy policy{{ pp_link_end }}.
+        {% endtrans %}
+    {%- elif tos or tos_url %}
+        {% trans tos_link_start=tos_link_start, tos_link_end=tos_link_end %}
+            I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }}.
+        {% endtrans %}
+    {%- elif privacy_policy or privacy_policy_url %}
+        {% trans pp_link_start=pp_link_start, pp_link_end=pp_link_end %}
+            I have read, understood and accept the {{ pp_link_start }}privacy policy{{ pp_link_end }}.
+        {% endtrans %}
+    {%- endif -%}
+{% endcall %}
+
+{% call form_footer(form) %}
+    <input class="submit right i-button big highlight" type="submit" value="{% trans %}Confirm{% endtrans %}">
+{% endcall %}
+{% endblock %}
