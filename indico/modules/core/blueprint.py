@@ -7,7 +7,8 @@
 
 from indico.modules.core.controllers import (RHAPIGenerateCaptcha, RHChangeLanguage, RHChangeTimezone, RHConfig,
                                              RHContact, RHPrincipals, RHRenderMarkdown, RHReportErrorAPI,
-                                             RHResetSignatureTokens, RHSettings, RHSignURL, RHVersionCheck)
+                                             RHResetSignatureTokens, RHSettings, RHSesionExpiration, RHSignURL,
+                                             RHVersionCheck)
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -23,6 +24,7 @@ _bp.add_url_rule('/admin/', 'admin_dashboard', view_func=redirect_view('.setting
 # Global operations
 _bp.add_url_rule('/change-language', 'change_lang', RHChangeLanguage, methods=('POST',))
 _bp.add_url_rule('/change-timezone', 'change_tz', RHChangeTimezone, methods=('POST',))
+_bp.add_url_rule('/session-expiration', 'session_expiration', RHSesionExpiration)
 _bp.add_url_rule('/api/principals', 'principals', RHPrincipals, methods=('POST',))
 _bp.add_url_rule('/api/sign-url', 'sign_url', RHSignURL, methods=('POST',))
 _bp.add_url_rule('/api/reset-signature-tokens', 'reset_signature_tokens', RHResetSignatureTokens, methods=('POST',))

@@ -34,6 +34,7 @@ from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.schemas import AffiliationSchema
+from indico.util.date_time import server_to_utc
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalDict, validate_with_message
 from indico.util.string import render_markdown, sanitize_html
@@ -362,3 +363,10 @@ class RHRenderMarkdown(RH):
     def _process_POST(self, source):
         html = render_markdown(source, extensions=('nl2br',))
         return jsonify(html=html)
+
+
+class RHSesionExpiration(RH):
+    """Returns the session expiration time."""
+    def _process(self):
+        if session.get('_expires'):
+            return jsonify(session_expiration=str(server_to_utc(session['_expires'])))

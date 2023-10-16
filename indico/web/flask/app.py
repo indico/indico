@@ -234,6 +234,7 @@ def setup_jinja(app):
     app.add_template_filter(date_time_util.format_human_timedelta)
     app.add_template_filter(date_time_util.format_pretty_date)
     app.add_template_filter(date_time_util.format_pretty_datetime)
+    app.add_template_filter(date_time_util.server_to_utc)
     app.add_template_filter(lambda d: Markup(html_params(**d)), 'html_params')
     app.add_template_filter(underline)
     app.add_template_filter(markdown)

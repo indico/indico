@@ -229,6 +229,12 @@ class IndicoSessionInterface(SessionInterface):
             # session contents so we need to add a `Vary: Cookie`` header
             response.vary.add('Cookie')
 
+        _non_session_refreshing_endpoints = {
+            'core.session_expiration'
+        }
+        if request.endpoint in _non_session_refreshing_endpoints:
+            return
+
         if not refresh_sid and not session.modified and not self.should_refresh_session(app, session):
             # If the session has not been modified we only store if it needs to be refreshed
             return

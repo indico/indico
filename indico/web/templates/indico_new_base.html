@@ -2,6 +2,7 @@
 
 {% from 'announcement/display.html' import render_announcements %}
 {% from 'core/impersonation.html' import render_impersonation %}
+{% from 'core/session_expiration.html' import setup_session_expiration %}
 
 {% block extra_meta_tags %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,4 +26,7 @@
         {{ render_announcements() }}
     {% endblock %}
     {% block body %}{% endblock %}
+    {% block session_expiration %}
+        {{ setup_session_expiration() }}
+    {% endblock %}
 {% endblock %}
