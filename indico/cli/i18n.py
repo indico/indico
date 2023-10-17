@@ -261,7 +261,7 @@ def _common_translation_options(require_js=True, require_locale=False, plugins=F
         fn = click.option('--react', is_flag=True, help='i18n used in react code.')(fn)
         if require_js:
             fn = click.option('--javascript', is_flag=True, help='i18n used in javascript code.')(fn)
-        else:  # the only command that does not require js is compile_catalog which checks the string format at the end
+        else:  # the only command that does not require js is compile_catalog which checks the string format
             fn = click.option('--no-check', is_flag=True, required=False,
                               help='Skip running the string format validation.')(fn)
         if require_locale:
@@ -286,7 +286,8 @@ def compile_catalog_react(directory=INDICO_DIR):
             json_file = os.path.join(translations_dir, locale, 'LC_MESSAGES', 'messages-react.json')
             if not os.path.exists(po_file):
                 continue
-            output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
+            with _chdir(INDICO_DIR):
+                output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
             json.loads(output)  # just to be sure the JSON is valid
             with open(json_file, 'w') as f:
                 f.write(output)
@@ -416,33 +417,33 @@ def _command(**kwargs):
             _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir)
 
 
-def _make_command(group, cmd_name, babel_cmd, func, **kwargs):
+def _make_command(group, cmd_name, babel_cmd, **kwargs):
     cmd_group = group.command(cmd_name, short_help=f'Perform {babel_cmd} operation on {cmd_name}')
 
     @_common_translation_options(**kwargs)
     def wrapper(**kwargs):
-        func(babel_cmd=babel_cmd, **kwargs)
+        _command(babel_cmd=babel_cmd, **kwargs)
 
     return cmd_group(wrapper)
 
 
-_make_command(compile_catalog, 'indico', 'compile_catalog', _command, require_js=False)
-_make_command(extract_messages, 'indico', 'extract_messages', _command)
-_make_command(update_catalog, 'indico', 'update_catalog', _command)
-_make_command(init_catalog, 'indico', 'init_catalog', _command, require_locale=True)
+_make_command(compile_catalog, 'indico', 'compile_catalog', require_js=False)
+_make_command(extract_messages, 'indico', 'extract_messages')
+_make_command(update_catalog, 'indico', 'update_catalog')
+_make_command(init_catalog, 'indico', 'init_catalog', require_locale=True)
 
-_make_command(compile_catalog, 'plugins', 'compile_catalog', _command, require_js=False,
+_make_command(compile_catalog, 'plugins', 'compile_catalog', require_js=False,
               plugins=True)
-_make_command(extract_messages, 'plugins', 'extract_messages', _command, plugins=True)
-_make_command(update_catalog, 'plugins', 'update_catalog', _command, plugins=True)
-_make_command(init_catalog, 'plugins', 'init_catalog', _command, require_locale=True,
+_make_command(extract_messages, 'plugins', 'extract_messages', plugins=True)
+_make_command(update_catalog, 'plugins', 'update_catalog', plugins=True)
+_make_command(init_catalog, 'plugins', 'init_catalog', require_locale=True,
               plugins=True)
 
-_make_command(compile_catalog, 'all-plugins', 'compile_catalog', _command, require_js=False,
+_make_command(compile_catalog, 'all-plugins', 'compile_catalog', require_js=False,
               all_plugins=True)
-_make_command(extract_messages, 'all-plugins', 'extract_messages', _command, all_plugins=True)
-_make_command(update_catalog, 'all-plugins', 'update_catalog', _command, all_plugins=True)
-_make_command(init_catalog, 'all-plugins', 'init_catalog', _command, require_locale=True,
+_make_command(extract_messages, 'all-plugins', 'extract_messages', all_plugins=True)
+_make_command(update_catalog, 'all-plugins', 'update_catalog', all_plugins=True)
+_make_command(init_catalog, 'all-plugins', 'init_catalog', require_locale=True,
               all_plugins=True)
 
 
