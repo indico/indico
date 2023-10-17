@@ -41,6 +41,7 @@ Bugfixes
 
 - Prevent room booking sidebar menu from overlapping with the user dropdown menu
   (:pr:`5910`)
+- Allow cancelling pending bookings even if they have already "started" (:pr:`5995`)
 
 Accessibility
 ^^^^^^^^^^^^^

@@ -199,7 +199,7 @@ class ReservationOccurrence(db.Model):
         booked_or_owned_by_user = booking.is_owned_by(user) or booking.is_booked_for(user)
         if booking.is_rejected or booking.is_cancelled or booking.is_archived:
             return False
-        if booked_or_owned_by_user and self.is_within_cancel_grace_period:
+        if booked_or_owned_by_user and (booking.is_pending or self.is_within_cancel_grace_period):
             return True
         return allow_admin and rb_is_admin(user)
 

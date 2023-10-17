@@ -431,9 +431,13 @@ class Reservation(db.Model):
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Requiring new approval due to change']))
 
     def cancel(self, user, reason=None, silent=False):
+        if self.is_pending:
+            # if the booking is still pending, cancel all occurrences that are still valid
+            criteria = (ReservationOccurrence.is_valid,)
+        else:
+            criteria = (ReservationOccurrence.is_valid, ReservationOccurrence.is_within_cancel_grace_period)
         self.state = ReservationState.cancelled
         self.rejection_reason = reason or None
-        criteria = (ReservationOccurrence.is_valid, ReservationOccurrence.is_within_cancel_grace_period)
         self.occurrences.filter(*criteria).update({
             ReservationOccurrence.state: ReservationOccurrenceState.cancelled,
             ReservationOccurrence.rejection_reason: reason
@@ -478,7 +482,8 @@ class Reservation(db.Model):
             return False
         if self.is_rejected or self.is_cancelled or self.is_archived:
             return False
-        if not self.occurrences.filter(ReservationOccurrence.is_within_cancel_grace_period).has_rows():
+        if (not self.is_pending and
+                not self.occurrences.filter(ReservationOccurrence.is_within_cancel_grace_period).has_rows()):
             return False
 
         is_booked_or_owned_by_user = self.is_owned_by(user) or self.is_booked_for(user)
