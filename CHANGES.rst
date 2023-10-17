@@ -57,6 +57,8 @@ Accessibility
 - Make timezone list accessible (:issue:`5908`, :pr:`5914`, thanks :user:`foxbunny`)
 - Make "Skip access checks" checkbox in search keyboard-accessible (:issue:`5952`, :pr:`5953`,
   thanks :user:`foxbunny`)
+- Prevent icons from being announced to screen readers as random characters (:issue:`5985`,
+  :pr:`5986`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -70,6 +72,8 @@ Internal Changes
 - Add a new Indico design system (:pr:`5914`, thanks :user:`foxbunny`)
 - Add ``event.registration_form_field_deleted`` signal, allowing plugins to handle
   the removal of registration form fields (:pr:`5924`)
+- Add a tool ``bin/managemnent/icons_generate.py`` to generate CSS for icomoon icons based
+  on ``selection.json`` (:pr:`5986`, thanks :user:`foxbunny`)
 
 
 ----

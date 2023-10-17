@@ -134,6 +134,10 @@ jobs:
         if: success() || failure()
         run: python bin/maintenance/update_backrefs.py --ci
 
+      - name: Check icomoon css
+        if: success() || failure()
+        run: python bin/maintenance/generate_icons.py --ci
+
       - name: Check headers
         if: success() || failure()
         run: |
