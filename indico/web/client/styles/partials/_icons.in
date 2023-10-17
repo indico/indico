@@ -12,7 +12,7 @@ _icons.in file is a template used to generate the _icons.scss file.
 Don't edit the _icons.scss file directly! Instead edit the _icons.in and
 run:
 
-python bin/maintenance/icons_generate.py
+bin/maintenance/generate_icons.py
 */
 
 // stylelint-disable rule-empty-line-before
@@ -93,7 +93,7 @@ i[class^='icon-']::before {
  * 15. Copy files:
  *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/web/static/fonts/icomoon/
  *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
- * 16. Run the update script: python bin/maintenance/icomoon_update.py
+ * 16. Run the update script: `python bin/maintenance/generate_icons.py`
  */
 
 /*-- ICONS --*/
