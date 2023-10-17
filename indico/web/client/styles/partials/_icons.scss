@@ -6,13 +6,9 @@
 // LICENSE file for more details.
 
 /*
-SUPER IMPORTNAT, DON'T SKIP
-
-_icons.in file is a template used to generate the _icons.scss file.
-Don't edit the _icons.scss file directly! Instead edit the _icons.in and
-run:
-
-bin/maintenance/generate_icons.py
+Important: When adding new icons, read the guide below.
+Do not ediy any specific icons in here manually, the rules are generated
+using the `bin/maintenance/generate_icons.py` script.
 */
 
 // stylelint-disable rule-empty-line-before
@@ -93,9 +89,10 @@ i[class^='icon-']::before {
  * 15. Copy files:
  *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/web/static/fonts/icomoon/
  *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
- * 16. Run the update script: `python bin/maintenance/generate_icons.py`
+ * 16. Run the update script: `./bin/maintenance/generate_icons.py`
  */
 
+// BEGIN GENERATED ICON RULES
 .icon-agreement::before,
 %icon-agreement {
   content: '\e900';
@@ -728,6 +725,7 @@ i[class^='icon-']::before {
 %icon-wrench {
   content: '\e99b';
 }
+// END GENERATED ICON RULES
 
 /* animated spinner icon */
 .icon-spinner::before {
