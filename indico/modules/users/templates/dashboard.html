@@ -60,6 +60,14 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% if session.user.is_admin and user.created_dt %}
+                                <div class="ui small label">
+                                    {% trans %}Created on{% endtrans %}
+                                    <div class="detail">
+                                        {{ user.created_dt | format_datetime }}
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
                         {% if user.affiliation %}
                             <div>

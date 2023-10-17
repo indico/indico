@@ -24,13 +24,14 @@ from werkzeug.utils import cached_property
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
-from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
+from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _, force_locale
 from indico.util.locators import locator_property
@@ -299,6 +300,12 @@ class User(PersonMixin, db.Model):
         PyIntEnum(ProfilePictureSource),
         nullable=False,
         default=ProfilePictureSource.standard,
+    )
+    #: user account creation date
+    created_dt = db.Column(
+        UTCDateTime,
+        nullable=True,
+        default=now_utc
     )
 
     _primary_email = db.relationship(
