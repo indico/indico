@@ -92,8 +92,8 @@ class RHSearchRooms(RHRoomBookingBase):
             recurrence_weekdays = filters['recurrence_weekdays']
         except KeyError:
             return None
-        return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(
-            start_dt, end_dt, repetition, recurrence_weekdays)]
+        return [dt.date().isoformat()
+                for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition, recurrence_weekdays)]
 
     def _adjust_blockings(self, rooms, filters, availability, admin_override_enabled):
         if availability is None:
