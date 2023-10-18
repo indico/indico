@@ -34,7 +34,7 @@ from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
-from indico.modules.rb.util import (check_impossible_repetition, generate_spreadsheet_from_occurrences,
+from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, generate_spreadsheet_from_occurrences,
                                     get_linked_object, get_prebooking_collisions, group_by_occurrence_date,
                                     is_booking_start_within_grace_period, serialize_availability,
                                     serialize_booking_details, serialize_occurrences)
@@ -63,7 +63,7 @@ class RHTimeline(RHRoomBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
-        'recurrence_weekdays': fields.List(fields.Str(), load_default=None),
+        'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None),
         'skip_conflicts_with': fields.List(fields.Int(), load_default=None),
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
@@ -290,7 +290,7 @@ class RHBookingEditCalendars(RHBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
-        'recurrence_weekdays': fields.List(fields.Str(), load_default=None)
+        'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None)
     }, location='query')
     def _process(self, **kwargs):
         check_impossible_repetition(kwargs)
@@ -371,7 +371,7 @@ class RHMatchingEvents(RHRoomBookingBase):
         'end_dt': fields.DateTime(),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
-        'recurrence_weekdays': fields.List(fields.Str(), load_default=None)
+        'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None)
     }, location='query')
     def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays):
         events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays)

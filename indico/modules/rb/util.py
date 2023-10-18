@@ -34,6 +34,7 @@ from indico.util.string import crc32
 from indico.web.util import ExpectedError
 
 
+WEEKDAYS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
 ROOM_PHOTO_DIMENSIONS = (290, 170)
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
 TempReservationConcurrentOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservations'))

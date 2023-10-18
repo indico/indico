@@ -34,7 +34,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import WEEKDAYS, rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
@@ -356,8 +356,7 @@ class CreateBookingSchema(mm.Schema):
     end_dt = fields.DateTime(required=True)
     repeat_frequency = EnumField(RepeatFrequency, required=True)
     repeat_interval = fields.Int(load_default=0, validate=lambda x: x >= 0)
-    recurrence_weekdays = fields.List(fields.Str(
-        validate=validate.OneOf(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])))
+    recurrence_weekdays = fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)))
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
     booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
