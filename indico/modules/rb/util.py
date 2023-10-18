@@ -362,7 +362,7 @@ def check_empty_candidates(candidates):
     """Check for empty candidates.
 
     This checks that a created time-series has at least one occurrence to filter by (similar to
-    :func:``check_impossible_repetition`` but without the need to pass all the data).
+    :func:`check_impossible_repetition` but without the need to pass all the data).
     """
     if not candidates:
         raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
