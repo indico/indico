@@ -179,7 +179,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
 
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
     repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
-    recurrence_weekdays = filters.get('recurrence_weekdays', None)
+    recurrence_weekdays = filters.get('recurrence_weekdays')
 
     availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, recurrence_weekdays,
                                                   include_blockings=False, include_pre_bookings=False)]
