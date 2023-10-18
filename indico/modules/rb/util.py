@@ -58,7 +58,7 @@ def rb_is_admin(user):
 
 
 def rb_check_if_visible(user):
-    """Check if user should see links to the room booking."""
+    """Check if user should see links to the room booking system."""
     from indico.modules.rb import rb_settings
     if not rb_settings.get('hide_module_if_unauthorized'):
         return True

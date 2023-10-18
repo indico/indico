@@ -121,7 +121,7 @@ const SettingsPage = props => {
             />
             <FinalCheckbox
               name="hide_module_if_unauthorized"
-              label={Translate.string('Hide the Room Booking module from unauthorized users')}
+              label={Translate.string('Hide the Room Booking system from unauthorized users')}
               description={
                 <Translate>
                   If enabled, links to the Room Booking system will not be shown to users who do not
