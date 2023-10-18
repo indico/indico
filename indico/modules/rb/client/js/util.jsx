@@ -275,14 +275,13 @@ export function renderRecurrenceWeekdays(weekdays) {
   if (sortedWeekdays.length === 2) {
     return (
       <Translate>
-        Recurs every <Param name="weekdays_1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
-        <Param name="weekdays_2" value={weekdaysMap[sortedWeekdays[1]]} />
+        Recurs every <Param name="weekday1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
+        <Param name="weekday2" value={weekdaysMap[sortedWeekdays[1]]} />
       </Translate>
     );
   }
 
-  // join weekdays with commas and replace the last comma with 'and'
-  // (i.e. ['mon', 'wed', 'tue'] -> 'Monday, Tuesday and Wednesday')
+  // join all weekdays but the last one with commas
   const weekdaysString = sortedWeekdays
     .slice(0, -1)
     .map(weekday => weekdaysMap[weekday])
