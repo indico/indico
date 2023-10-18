@@ -137,9 +137,7 @@ class ReservationOccurrence(db.Model):
 
     @staticmethod
     def map_recurrence_weekdays_to_rrule(weekdays):
-        """
-        Map weekdays from the weekday recurrence picker to dateutil.rrule constants.
-        """
+        """Map weekdays from database to rrule weekdays."""
 
         # Return none if no weekdays are provided
         if not weekdays:
@@ -184,14 +182,8 @@ class ReservationOccurrence(db.Model):
             if position == 5:
                 # The fifth weekday of the month will always be the last one
                 position = -1
-
-            by_weekday = ReservationOccurrence.map_recurrence_weekdays_to_rrule(recurrence_weekdays)
-            # If no weekdays are provided (from the mapping), use the weekday from the start date
-            if not by_weekday:
-                by_weekday = start.weekday()
-
-            return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=by_weekday, bysetpos=position,
-                               interval=repeat_interval)
+            return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
+                               bysetpos=position, interval=repeat_interval)
 
         raise IndicoError(f'Unexpected frequency {repeat_frequency}')
 
