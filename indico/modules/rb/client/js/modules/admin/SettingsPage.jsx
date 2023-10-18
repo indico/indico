@@ -119,6 +119,16 @@ const SettingsPage = props => {
                 </Translate>
               }
             />
+            <FinalCheckbox
+              name="hide_module_if_unauthorized"
+              label={Translate.string('Hide the Room Booking system from unauthorized users')}
+              description={
+                <Translate>
+                  If enabled, links to the Room Booking system will not be shown to users who do not
+                  have access to it.
+                </Translate>
+              }
+            />
             <FinalInput
               name="tileserver_url"
               label={Translate.string('Tileserver URL')}

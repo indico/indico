@@ -7,77 +7,79 @@
 
 {% block content %}
     <div class="event-booking-page">
-        <div class="action-box event-bookings">
-            <div class="section">
-                <div class="text">
-                    <div class="label">
-                        {%- trans %}Event{% endtrans -%}
+        {% if is_rb_visible %}
+            <div class="action-box event-bookings">
+                <div class="section">
+                    <div class="text">
+                        <div class="label">
+                            {%- trans %}Event{% endtrans -%}
+                        </div>
+                        {{ event.title }}
                     </div>
-                    {{ event.title }}
+                    <div class="toolbar">
+                        {% set past_title = _('Event has already finished') %}
+                        {% if event_rb_params.type == 'mixed_times' %}
+                            <button type="button"
+                                    class="i-button highlight js-dropdown arrow"
+                                    title="{{ past_title if is_past_event }}"
+                                    data-toggle="dropdown"
+                                    {% if is_past_event %}disabled{% endif %}>
+                                {%- trans %}Book{% endtrans -%}
+                            </button>
+                            <ul class="i-dropdown">
+                                {% for day, day_params in event_rb_params.time_info %}
+                                    {% set params = dict(event_rb_params.params, **day_params) %}
+                                    <li>
+                                        <a href="{{ url_for('rb.roombooking', path='book', **params) }}" target="_blank">
+                                            {{ day | format_date(timezone=event.tz) }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <a href="{{ url_for('rb.roombooking', path='book', **event_rb_params.params) }}"
+                               target="_blank"
+                               class="i-button highlight {{ 'disabled' if is_past_event }}"
+                               title="{{ past_title if is_past_event }}">
+                                {%- trans %}Book{% endtrans -%}
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="toolbar">
-                    {% set past_title = _('Event has already finished') %}
-                    {% if event_rb_params.type == 'mixed_times' %}
-                        <button type="button"
-                                class="i-button highlight js-dropdown arrow"
-                                title="{{ past_title if is_past_event }}"
-                                data-toggle="dropdown"
-                                {% if is_past_event %}disabled{% endif %}>
-                            {%- trans %}Book{% endtrans -%}
-                        </button>
-                        <ul class="i-dropdown">
-                            {% for day, day_params in event_rb_params.time_info %}
-                                {% set params = dict(event_rb_params.params, **day_params) %}
-                                <li>
-                                    <a href="{{ url_for('rb.roombooking', path='book', **params) }}" target="_blank">
-                                        {{ day | format_date(timezone=event.tz) }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <a href="{{ url_for('rb.roombooking', path='book', **event_rb_params.params) }}"
-                           target="_blank"
-                           class="i-button highlight {{ 'disabled' if is_past_event }}"
-                           title="{{ past_title if is_past_event }}">
-                            {%- trans %}Book{% endtrans -%}
-                        </a>
-                    {% endif %}
-                </div>
+                {% if has_contribs %}
+                    <div class="section searchable-field" data-values="{{ contribs_data | tojson | forceescape }}">
+                        <div class="text">
+                            <div class="label">
+                                {%- trans %}Contribution{% endtrans -%}
+                            </div>
+                            {{ form_row(form.contribution, skip_label=true, hide_description=true,
+                                        widget_attrs={'data_link_type': 'contribution'}) }}
+                        </div>
+                        <div class="toolbar">
+                            <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
+                                {%- trans %}Book{% endtrans -%}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if has_session_blocks %}
+                    <div class="section searchable-field" data-values="{{ session_blocks_data | tojson | forceescape }}">
+                        <div class="text">
+                            <div class="label">
+                                {%- trans %}Session block{% endtrans -%}
+                            </div>
+                            {{ form_row(form.session_block, skip_label=true, hide_description=true,
+                                        widget_attrs={'data_link_type': 'sessionBlock'}) }}
+                        </div>
+                        <div class="toolbar">
+                            <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
+                                {%- trans %}Book{% endtrans -%}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-            {% if has_contribs %}
-                <div class="section searchable-field" data-values="{{ contribs_data | tojson | forceescape }}">
-                    <div class="text">
-                        <div class="label">
-                            {%- trans %}Contribution{% endtrans -%}
-                        </div>
-                        {{ form_row(form.contribution, skip_label=true, hide_description=true,
-                                    widget_attrs={'data_link_type': 'contribution'}) }}
-                    </div>
-                    <div class="toolbar">
-                        <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
-                            {%- trans %}Book{% endtrans -%}
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            {% if has_session_blocks %}
-                <div class="section searchable-field" data-values="{{ session_blocks_data | tojson | forceescape }}">
-                    <div class="text">
-                        <div class="label">
-                            {%- trans %}Session block{% endtrans -%}
-                        </div>
-                        {{ form_row(form.session_block, skip_label=true, hide_description=true,
-                                    widget_attrs={'data_link_type': 'sessionBlock'}) }}
-                    </div>
-                    <div class="toolbar">
-                        <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
-                            {%- trans %}Book{% endtrans -%}
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
+        {% endif %}
         {% if links %}
             <div>
                 <h3>Room bookings</h3>
@@ -128,13 +130,19 @@
                                         </span>
                                     {% endif %}
                                 </td>
-                                <td class="action-column">
-                                    {{ booking_details_link(reservation) }}
-                                </td>
+                                {% if is_rb_visible %}
+                                    <td class="action-column">
+                                        {{ booking_details_link(reservation) }}
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        {% else %}
+            <div class="text">
+                <h3>{%- trans %}There are no room bookings for this event yet.{% endtrans -%}</h3>
             </div>
         {% endif %}
     </div>

@@ -16,6 +16,7 @@ from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import ModelListConverter
 from indico.modules.categories.models.categories import Category
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_check_if_visible
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
@@ -27,6 +28,7 @@ rb_cache = make_scoped_cache('roombooking')
 
 rb_settings = SettingsProxy('roombooking', {
     'managers_edit_rooms': False,
+    'hide_module_if_unauthorized': False,
     'excluded_categories': [],
     'notification_before_days': 2,
     'notification_before_days_weekly': 5,
@@ -69,7 +71,7 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.menu.items.connect_via('top-menu')
 def _topmenu_items(sender, **kwargs):
-    if config.ENABLE_ROOMBOOKING:
+    if config.ENABLE_ROOMBOOKING and rb_check_if_visible(session.user):
         yield TopMenuItem('room_booking', _('Room booking'), url_for('rb.roombooking'), 80)
 
 
