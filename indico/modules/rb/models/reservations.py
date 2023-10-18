@@ -363,14 +363,13 @@ class Reservation(db.Model):
         reservation.state = ReservationState.pending if prebook else ReservationState.accepted
         reservation.created_by_user = user
         reservation.create_occurrences(True, allow_admin=(not ignore_admin))
-
-        first_occ = next((occ for occ in reservation.occurrences if occ.is_valid), None)
-        last_occ = next((occ for occ in reservation.occurrences.order_by(ReservationOccurrence.start_dt.desc())
-                         if occ.is_valid), None)
-        if not first_occ:
+        if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
-        reservation.start_dt = first_occ.start_dt
-        reservation.end_dt = last_occ.end_dt
+
+        # clamp reservation duration to actual occurrences
+        occurrences = reservation.occurrences.order_by(ReservationOccurrence.start_dt)
+        reservation.start_dt = occurrences[0].start_dt
+        reservation.end_dt = occurrences[-1].end_dt
 
         db.session.flush()
         signals.rb.booking_created.send(reservation)
