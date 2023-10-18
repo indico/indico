@@ -49,6 +49,7 @@ $rejection-fadeout-colors: $rejection-color, lighten($rejection-color, 30%);
 $other-booking-fadeout-colors: $other-booking-color, lighten($other-booking-color, 30%);
 
 $internal-notes-segment-color: #db9200;
+$filters-disabled-color: #d8d8d8;
 
 @mixin rb-splash-background {
   background-image: url('static:images/globe.png');
