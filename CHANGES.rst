@@ -37,6 +37,7 @@ Improvements
 - Store creation date of users and show it to admins (:pr:`5957`, thanks :user:`vasantvohra`)
 - Add option to hide links to Room Booking system for users who lack access (:pr:`5981`,
   thanks :user:`SegiNyn`)
+- Support weekly room bookings that take place on multiple weekdays (:pr:`5829`, :issue:`5806`)
 
 Bugfixes
 ^^^^^^^^
