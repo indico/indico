@@ -373,9 +373,15 @@ class CreateBookingSchema(mm.Schema):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
 
+    @validates('recurrence_weekdays')
+    def _check_weekdays_unique(self, weekdays, **kwargs):
+        if weekdays and len(weekdays) != len(set(weekdays)):
+            raise ValidationError('Duplicate weekdays')
+
     @post_load
-    # XXX: Remove ``recurrence_weekdays`` for bookings that are being modified from weekly to monthly repetition.
     def handle_monthly_repetition(self, data, **kwargs):
+        # Remove recurrence_weekdays for bookings that are being modified
+        # from weekly to monthly repetition.
         if data['repeat_frequency'] == RepeatFrequency.MONTH:
             data['recurrence_weekdays'] = None
         return data
