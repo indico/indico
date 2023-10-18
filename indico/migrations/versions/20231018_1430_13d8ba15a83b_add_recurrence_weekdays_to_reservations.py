@@ -1,4 +1,4 @@
-"""add recurrence_weekdays to reservations
+"""Add recurrence_weekdays to reservations
 
 Revision ID: 13d8ba15a83b
 Revises: d8562ad31e90
