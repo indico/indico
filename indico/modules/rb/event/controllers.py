@@ -21,7 +21,6 @@ from indico.modules.rb.util import get_booking_params_for_event, rb_check_if_vis
 from indico.modules.rb.views import WPEventBookingList
 from indico.util.date_time import format_datetime, now_utc
 from indico.util.i18n import _
-from indico.web.rh import RHProtected
 
 
 def _contrib_query(event):
@@ -42,15 +41,12 @@ def _session_block_query(event):
             .order_by(Session.friendly_id, Session.title, SessionBlock.title))
 
 
-class RHRoomBookingEventBase(RHManageEventBase, RHProtected):
+class RHEventBookingList(RHManageEventBase):
     def _check_access(self):
         RHManageEventBase._check_access(self)
         if not config.ENABLE_ROOMBOOKING:
             raise NotFound(_('The room booking module is not enabled.'))
-        RHProtected._check_access(self)
 
-
-class RHEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         form = BookingListForm(event=self.event)
         has_contribs = _contrib_query(self.event).has_rows()
