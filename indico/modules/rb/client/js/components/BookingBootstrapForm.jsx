@@ -372,7 +372,7 @@ class BookingBootstrapForm extends React.Component {
         )}
         {type === 'every' && interval === 'week' && (
           <Form.Group inline style={{marginLeft: '1em', marginRight: '1em'}}>
-            <label>{Translate.string('Recurring every')}</label>
+            <Translate as="label">Recurring every</Translate>
             <WeekdayRecurrencePicker onChange={this.updateRecurrenceWeekdays} value={weekdays} />
           </Form.Group>
         )}

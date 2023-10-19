@@ -149,8 +149,8 @@ export default class RecurrenceForm extends FilterFormComponent {
         </Form.Group>
         {type === 'every' && interval === 'week' && (
           <Form.Field styleName="weekday-recurrence-section" inline>
-            <label styleName={type !== 'every' ? 'disabled' : ''}>
-              {Translate.string('Recurring every')}
+            <label>
+              <Translate>Recurring every</Translate>
             </label>
             <WeekdayRecurrencePicker
               onChange={value => this.onWeekdaysChange(null, {value})}

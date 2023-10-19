@@ -129,11 +129,12 @@ class BookingEditForm extends React.Component {
       .format('ddd')
       .toLowerCase();
 
-    if ((recurrence.type === 'every' && recurrence.interval === 'week') || force) {
-      if (recurrence.weekdays === null || recurrence.weekdays.length === 0) {
-        const newRecurrence = {...recurrence, weekdays: [today]};
-        form.change('recurrence.weekdays', newRecurrence.weekdays);
-      }
+    if (
+      ((recurrence.type === 'every' && recurrence.interval === 'week') || force) &&
+      (recurrence.weekdays === null || recurrence.weekdays.length === 0)
+    ) {
+      const newRecurrence = {...recurrence, weekdays: [today]};
+      form.change('recurrence.weekdays', newRecurrence.weekdays);
     }
   };
 
