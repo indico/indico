@@ -203,8 +203,8 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
   }
 }
 
-export function getRecurrenceInfo(repetition, recurrenceWeekdays) {
-  const [repeatFrequency, repeatInterval] = repetition;
+export function getRecurrenceInfo(repetition) {
+  const [repeatFrequency, repeatInterval, recurrenceWeekdays] = repetition;
   let type = 'single';
   let number = '1';
   let interval = 'week';
@@ -220,7 +220,7 @@ export function getRecurrenceInfo(repetition, recurrenceWeekdays) {
     type = 'every';
     interval = 'month';
     number = repeatInterval;
-    weekdays = recurrenceWeekdays;
+    weekdays = recurrenceWeekdays; // TODO remove since we do not allow this anyway?!
   }
   return {type, number, interval, weekdays};
 }

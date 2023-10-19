@@ -55,6 +55,8 @@ def rb_check_user_access(user):
 def rb_is_admin(user):
     """Check if the user is a room booking admin."""
     from indico.modules.rb import rb_settings
+    if user is None:
+        return False
     if user.is_admin:
         return True
     return rb_settings.acls.contains_user('admin_principals', user)
@@ -351,11 +353,10 @@ def check_impossible_repetition(data):
     from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
     try:
         start_dt, end_dt = data['start_dt'], data['end_dt']
-        repetition = data['repeat_frequency'], data['repeat_interval']
-        recurrence_weekdays = data['recurrence_weekdays']
+        repetition = data['repeat_frequency'], data['repeat_interval'], data['recurrence_weekdays']
     except KeyError:
         return
-    if not any(ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition, recurrence_weekdays)):
+    if not any(ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)):
         raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
 
 

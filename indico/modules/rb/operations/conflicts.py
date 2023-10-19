@@ -29,8 +29,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     rooms_conflicting_candidates = defaultdict(set)
     skip_conflicts_with = skip_conflicts_with or []
 
-    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
-                                                     recurrence_weekdays)
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt,
+                                                     (repeat_frequency, repeat_interval, recurrence_weekdays))
     check_empty_candidates(candidates)
 
     room_ids = [room.id for room in rooms]

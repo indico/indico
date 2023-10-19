@@ -101,17 +101,9 @@ class BookingEdit extends React.Component {
   get initialFormValues() {
     const {
       user: sessionUser,
-      booking: {
-        repetition,
-        startDt,
-        endDt,
-        bookedForUser,
-        bookingReason,
-        internalNote,
-        recurrenceWeekdays,
-      },
+      booking: {repetition, startDt, endDt, bookedForUser, bookingReason, internalNote},
     } = this.props;
-    const recurrence = getRecurrenceInfo(repetition, recurrenceWeekdays);
+    const recurrence = getRecurrenceInfo(repetition);
     const isSingleBooking = recurrence.type === 'single';
     const dates = {
       startDate: serializeDate(startDt),

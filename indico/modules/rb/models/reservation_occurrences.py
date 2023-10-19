@@ -121,17 +121,16 @@ class ReservationOccurrence(db.Model):
 
     @classmethod
     def create_series_for_reservation(cls, reservation):
-        for o in cls.iter_create_occurrences(reservation.start_dt, reservation.end_dt, reservation.repetition,
-                                             reservation.recurrence_weekdays):
+        for o in cls.iter_create_occurrences(reservation.start_dt, reservation.end_dt, reservation.repetition):
             o.reservation = reservation
 
     @classmethod
-    def create_series(cls, start, end, repetition, recurrence_weekdays):
-        return list(cls.iter_create_occurrences(start, end, repetition, recurrence_weekdays))
+    def create_series(cls, start, end, repetition):
+        return list(cls.iter_create_occurrences(start, end, repetition))
 
     @classmethod
-    def iter_create_occurrences(cls, start, end, repetition, recurrence_weekdays):
-        for start in cls.iter_start_time(start, end, repetition, recurrence_weekdays):
+    def iter_create_occurrences(cls, start, end, repetition):
+        for start in cls.iter_start_time(start, end, repetition):
             end = datetime.combine(start.date(), end.time())
             yield ReservationOccurrence(start_dt=start, end_dt=end)
 
@@ -156,10 +155,10 @@ class ReservationOccurrence(db.Model):
         return [weekdays_map[day] for day in weekdays]
 
     @staticmethod
-    def iter_start_time(start, end, repetition, recurrence_weekdays):
+    def iter_start_time(start, end, repetition):
         from indico.modules.rb.models.reservations import RepeatFrequency
 
-        repeat_frequency, repeat_interval = repetition
+        repeat_frequency, repeat_interval, recurrence_weekdays = repetition
         if repeat_frequency == RepeatFrequency.NEVER:
             return [start]
 

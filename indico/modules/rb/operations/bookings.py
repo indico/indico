@@ -89,8 +89,8 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
     if only_accepted:
         query = query.filter(Reservation.is_accepted)
     if repeat_frequency != RepeatFrequency.NEVER:
-        candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
-                                                         recurrence_weekdays)
+        candidates = ReservationOccurrence.create_series(start_dt, end_dt,
+                                                         (repeat_frequency, repeat_interval, recurrence_weekdays))
         dates = [candidate.start_dt for candidate in candidates]
         query = query.filter(db.cast(ReservationOccurrence.start_dt, db.Date).in_(dates))
     if skip_booking_id is not None:
@@ -103,8 +103,8 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays,
                            skip_conflicts_with=None, admin_override_enabled=False, skip_past_conflicts=False):
     availability = {}
-    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
-                                                     recurrence_weekdays)
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt,
+                                                     (repeat_frequency, repeat_interval, recurrence_weekdays))
     date_range = sorted({cand.start_dt.date() for cand in candidates})
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
                                                  end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval,
@@ -454,8 +454,8 @@ def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval, rec
     This finds events that overlap with an occurrence of a booking
     with the given dates where the user is a manager.
     """
-    occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
-                                                      recurrence_weekdays)
+    occurrences = ReservationOccurrence.create_series(start_dt, end_dt,
+                                                      (repeat_frequency, repeat_interval, recurrence_weekdays))
     excluded_categories = rb_settings.get('excluded_categories')
     return (Event.query
             .filter(~Event.is_deleted,

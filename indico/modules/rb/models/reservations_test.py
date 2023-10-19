@@ -33,12 +33,13 @@ def overlapping_reservation(create_reservation):
 
 
 @pytest.mark.parametrize(('repetition', 'message'), (
-    ((RepeatFrequency.NEVER, 0), 'single booking'),
-    ((RepeatFrequency.DAY,   1), 'daily booking'),
-    ((RepeatFrequency.WEEK,  1), 'weekly'),
-    ((RepeatFrequency.WEEK,  2), 'every 2 weeks'),
-    ((RepeatFrequency.MONTH, 1), 'monthly'),
-    ((RepeatFrequency.MONTH, 2), 'every 2 months'),
+    ((RepeatFrequency.NEVER, 0, None), 'single booking'),
+    ((RepeatFrequency.DAY,   1, None), 'daily booking'),
+    ((RepeatFrequency.WEEK,  1, None), 'weekly'),
+    ((RepeatFrequency.WEEK,  2, None), 'every 2 weeks'),
+    ((RepeatFrequency.MONTH, 1, None), 'monthly'),
+    ((RepeatFrequency.MONTH, 2, None), 'every 2 months'),
+    # TODO: add cases with weekdays
 ))
 def test_repeat_mapping(repetition, message):
     assert RepeatMapping.get_message(*repetition) == message
@@ -118,7 +119,8 @@ def test_location_name(dummy_reservation, dummy_location):
 
 
 def test_repetition(dummy_reservation):
-    assert (dummy_reservation.repeat_frequency, dummy_reservation.repeat_interval) == dummy_reservation.repetition
+    assert (dummy_reservation.repeat_frequency, dummy_reservation.repeat_interval,
+            dummy_reservation.recurrence_weekdays) == dummy_reservation.repetition
 
 
 # ======================================================================================================================

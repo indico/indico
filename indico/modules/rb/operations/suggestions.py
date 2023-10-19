@@ -28,7 +28,6 @@ DURATION_FACTOR = 0.25
 def get_suggestions(filters, limit=None):
     blocked_rooms = get_blocked_rooms(filters['start_dt'], filters['end_dt'], [BlockedRoomState.accepted])
     rooms = [room for room in search_for_rooms(filters, availability=False) if room not in blocked_rooms]
-    recurrence_weekdays = filters.get('recurrence_weekdays')
     if filters['repeat_frequency'] == RepeatFrequency.NEVER:
         suggestions = sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                       limit=limit))
@@ -36,7 +35,8 @@ def get_suggestions(filters, limit=None):
         suggestions = sort_suggestions(get_recurring_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                          filters['repeat_frequency'],
                                                                          filters['repeat_interval'],
-                                                                         recurrence_weekdays, limit=limit))
+                                                                         filters.get('recurrence_weekdays'),
+                                                                         limit=limit))
     for entry in suggestions:
         entry['room_id'] = entry.pop('room').id
     return suggestions
@@ -86,8 +86,8 @@ def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency,
     data = []
     booking_days = end_dt - start_dt
     booking_length = booking_days.days + 1
-    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval),
-                                                     recurrence_weekdays)
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt,
+                                                     (repeat_frequency, repeat_interval, recurrence_weekdays))
     blocked_rooms = group_blocked_rooms(get_rooms_blockings(rooms, start_dt.date(), end_dt.date()))
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)

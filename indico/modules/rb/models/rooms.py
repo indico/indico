@@ -429,11 +429,11 @@ class Room(ProtectionManagersMixin, db.Model):
         return (dict(zip(keys, row if args else [row])) for row in query)
 
     @staticmethod
-    def filter_available(start_dt, end_dt, repetition, recurrence_weekdays, include_blockings=True,
+    def filter_available(start_dt, end_dt, repetition, include_blockings=True,
                          include_pre_bookings=True, include_pending_blockings=False):
         """Return a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences
-        dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition, recurrence_weekdays)
+        dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition)
         overlap_criteria = ReservationOccurrence.filter_overlap(dummy_occurrences)
         reservation_criteria = [Reservation.room_id == Room.id,
                                 ReservationOccurrence.is_valid,

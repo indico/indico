@@ -60,7 +60,7 @@ class RepeatMapping:
     }
 
     @classmethod
-    def get_message(cls, repeat_frequency, repeat_interval):
+    def get_message(cls, repeat_frequency, repeat_interval, recurrence_weekdays):
         # XXX: move this somewhere else
         # not translated since it's only used in log messages + emails now
         if repeat_frequency == RepeatFrequency.NEVER:
@@ -68,13 +68,16 @@ class RepeatMapping:
         elif repeat_frequency == RepeatFrequency.DAY:
             return 'daily booking'
         elif repeat_frequency == RepeatFrequency.WEEK:
+            # TODO: take recurrence_weekdays into account
             return 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
         elif repeat_frequency == RepeatFrequency.MONTH:
             return 'monthly' if repeat_interval == 1 else f'every {repeat_interval} months'
 
     @classmethod
-    def get_short_name(cls, repeat_frequency, repeat_interval):
+    def get_short_name(cls, repeat_frequency, repeat_interval, recurrence_weekdays):
         # for the API
+        if recurrence_weekdays:
+            return 'periodically'
         try:
             return cls.mapping[(repeat_frequency, repeat_interval)][2]
         except KeyError:
@@ -302,7 +305,7 @@ class Reservation(db.Model):
 
     @property
     def repetition(self):
-        return self.repeat_frequency, self.repeat_interval
+        return self.repeat_frequency, self.repeat_interval, self.recurrence_weekdays
 
     @property
     def linked_object(self):

@@ -88,12 +88,11 @@ class RHSearchRooms(RHRoomBookingBase):
     def _get_date_range(self, filters):
         try:
             start_dt, end_dt = filters['start_dt'], filters['end_dt']
-            repetition = filters['repeat_frequency'], filters['repeat_interval']
-            recurrence_weekdays = filters['recurrence_weekdays']
+            repetition = filters['repeat_frequency'], filters['repeat_interval'], filters['recurrence_weekdays']
         except KeyError:
             return None
         return [dt.date().isoformat()
-                for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition, recurrence_weekdays)]
+                for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
 
     def _adjust_blockings(self, rooms, filters, availability, admin_override_enabled):
         if availability is None:
