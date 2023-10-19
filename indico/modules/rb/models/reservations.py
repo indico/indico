@@ -125,7 +125,7 @@ class Reservation(db.Model):
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
                 db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
                 db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
-                db.CheckConstraint('recurrence_weekdays::text[]'
+                db.CheckConstraint('indico.array_is_unique(recurrence_weekdays) AND recurrence_weekdays::text[]'
                                    "<@ ARRAY['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']::text[]",
                                    'valid_recurrence_weekdays'),
                 {'schema': 'roombooking'})

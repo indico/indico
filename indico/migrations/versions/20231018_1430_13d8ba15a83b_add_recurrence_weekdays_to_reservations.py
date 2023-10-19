@@ -17,15 +17,28 @@ branch_labels = None
 depends_on = None
 
 
+SQL_FUNCTION_ARRAY_IS_UNIQUE = '''
+    CREATE FUNCTION indico.array_is_unique(value text[])
+        RETURNS boolean
+    AS $$
+        SELECT COALESCE(COUNT(DISTINCT a) = array_length(value, 1), true)
+        FROM unnest(value) a
+    $$
+    LANGUAGE SQL IMMUTABLE STRICT;
+'''
+
+
 def upgrade():
+    op.execute(SQL_FUNCTION_ARRAY_IS_UNIQUE)
     op.add_column('reservations', sa.Column('recurrence_weekdays', postgresql.ARRAY(sa.String()), nullable=True),
                   schema='roombooking')
     op.create_check_constraint(
         'valid_recurrence_weekdays', 'reservations',
-        "recurrence_weekdays::text[] <@ ARRAY['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']::text[]",
+        "indico.array_is_unique(recurrence_weekdays) AND recurrence_weekdays::text[] <@ ARRAY['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']::text[]",
         schema='roombooking'
     )
 
 
 def downgrade():
     op.drop_column('reservations', 'recurrence_weekdays', schema='roombooking')
+    op.execute('DROP FUNCTION indico.array_is_unique(value text[])')
