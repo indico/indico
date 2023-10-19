@@ -378,10 +378,9 @@ class CreateBookingSchema(mm.Schema):
             raise ValidationError('Duplicate weekdays')
 
     @post_load
-    def handle_monthly_repetition(self, data, **kwargs):
-        # Remove recurrence_weekdays for bookings that are being modified
-        # from weekly to monthly repetition.
-        if data['repeat_frequency'] == RepeatFrequency.MONTH:
+    def _weekdays_only_weekly(self, data, **kwargs):
+        # Make sure we do not set recurrence weekdays if the booking does not have weekly repetition
+        if data['repeat_frequency'] != RepeatFrequency.WEEK:
             data['recurrence_weekdays'] = None
         return data
 

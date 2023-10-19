@@ -131,6 +131,8 @@ class Reservation(db.Model):
                 db.CheckConstraint('indico.array_is_unique(recurrence_weekdays) AND recurrence_weekdays::text[]'
                                    "<@ ARRAY['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']::text[]",
                                    'valid_recurrence_weekdays'),
+                db.CheckConstraint(f'(recurrence_weekdays IS NULL) OR repeat_frequency = {RepeatFrequency.WEEK}',
+                                   'recurrence_weekdays_only_weekly'),
                 {'schema': 'roombooking'})
 
     id = db.Column(
@@ -165,7 +167,7 @@ class Reservation(db.Model):
     recurrence_weekdays = db.Column(
         ARRAY(db.String),
         nullable=True,
-        default=[]
+        default=None
     )  # mon, tue, wed, etc.
     booked_for_id = db.Column(
         db.Integer,

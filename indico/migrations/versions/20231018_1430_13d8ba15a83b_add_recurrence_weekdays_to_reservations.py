@@ -37,6 +37,10 @@ def upgrade():
         "indico.array_is_unique(recurrence_weekdays) AND recurrence_weekdays::text[] <@ ARRAY['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']::text[]",
         schema='roombooking'
     )
+    op.create_check_constraint(
+        'recurrence_weekdays_only_weekly', 'reservations', '(recurrence_weekdays IS NULL) OR repeat_frequency = 2',
+        schema='roombooking'
+    )
 
 
 def downgrade():
