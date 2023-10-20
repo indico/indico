@@ -68,8 +68,11 @@ class RepeatMapping:
         elif repeat_frequency == RepeatFrequency.DAY:
             return 'daily booking'
         elif repeat_frequency == RepeatFrequency.WEEK:
-            # TODO: take recurrence_weekdays into account
-            return 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
+            msg = 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
+            if recurrence_weekdays:
+                days = ', '.join(recurrence_weekdays)
+                msg += f' ({days})'
+            return msg
         elif repeat_frequency == RepeatFrequency.MONTH:
             return 'monthly' if repeat_interval == 1 else f'every {repeat_interval} months'
 
@@ -614,7 +617,7 @@ class Reservation(db.Model):
         # fields where date and time are compared separately
         date_time_fields = {'start_dt', 'end_dt'}
         # fields for the repetition
-        repetition_fields = {'repeat_frequency', 'repeat_interval'}
+        repetition_fields = {'repeat_frequency', 'repeat_interval', 'recurrence_weekdays'}
         # pretty names for logging
         field_names = {
             'start_dt/date': 'start date',
@@ -622,7 +625,6 @@ class Reservation(db.Model):
             'start_dt/time': 'start time',
             'end_dt/time': 'end time',
             'repetition': 'booking type',
-            'recurrence_weekdays': 'weekday',
             'booked_for_user': "'Booked for' user",
             'booking_reason': 'booking reason',
         }
@@ -656,9 +658,6 @@ class Reservation(db.Model):
                 # If the internal notes are being updated then we don't bother updating the edit log with this
                 if field == 'internal_note':
                     continue
-                # Don't update the edit log if recurrence_weekdays is cleared
-                if field == 'recurrence_weekdays' and new is None:
-                    continue
                 # Record change for history entry
                 if field in date_time_fields:
                     # The date/time fields create separate entries for the date and time parts
@@ -686,10 +685,7 @@ class Reservation(db.Model):
             converter = change['converter']
             old = converter(change['old'])
             new = converter(change['new'])
-            # XXX: Additional (ugly) check for None values - since we cast it to str first, we need to check for "None".
-            # This is to omit the 'empty' recurrence_weekdays field from the edit log when editing the booking from
-            # monthly to weekly repetition.
-            if not old or old == 'None':
+            if not old:
                 log.append(f"The {field_title} was set to '{new}'")
             elif not new:
                 log.append(f'The {field_title} was cleared')
