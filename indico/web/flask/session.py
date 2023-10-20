@@ -7,6 +7,7 @@
 
 import functools
 import pickle
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -23,6 +24,10 @@ from indico.modules.users import User
 from indico.util.date_time import get_display_tz
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
+
+RE_SKIP_REFRESH_SESSION_ENDPOINTS = re.compile(
+    r'core\.session_expiration|assets\.|plugin_.*\.static$'
+)
 
 
 @functools.cache
@@ -189,6 +194,8 @@ class IndicoSessionInterface(SessionInterface):
     def should_refresh_session(self, app, session):
         if session.new or '_expires' not in session:
             return False
+        if RE_SKIP_REFRESH_SESSION_ENDPOINTS.match(request.endpoint):
+            return False
         threshold = self.get_storage_lifetime(app, session) / 2
         return session['_expires'] - datetime.now() < threshold
 
@@ -228,12 +235,6 @@ class IndicoSessionInterface(SessionInterface):
             # if a non-empty session is accessed, the response almost certainly depends on
             # session contents so we need to add a `Vary: Cookie`` header
             response.vary.add('Cookie')
-
-        _non_session_refreshing_endpoints = {
-            'core.session_expiration'
-        }
-        if request.endpoint in _non_session_refreshing_endpoints:
-            return
 
         if not refresh_sid and not session.modified and not self.should_refresh_session(app, session):
             # If the session has not been modified we only store if it needs to be refreshed
