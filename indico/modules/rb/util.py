@@ -368,3 +368,9 @@ def check_empty_candidates(candidates):
     """
     if not candidates:
         raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
+
+
+def format_weekdays(weekdays):
+    """Format a list of weekdays into a nice readable string."""
+    assert weekdays
+    return ', '.join(x.capitalize() for x in sorted(weekdays, key=lambda x: WEEKDAYS.index(x)))

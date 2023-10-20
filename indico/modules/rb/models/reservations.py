@@ -30,7 +30,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
-from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
+from indico.modules.rb.util import format_weekdays, get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import _
@@ -70,8 +70,7 @@ class RepeatMapping:
         elif repeat_frequency == RepeatFrequency.WEEK:
             msg = 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
             if recurrence_weekdays:
-                days = ', '.join(recurrence_weekdays)
-                msg += f' ({days})'
+                msg += f' ({format_weekdays(recurrence_weekdays)})'
             return msg
         elif repeat_frequency == RepeatFrequency.MONTH:
             return 'monthly' if repeat_interval == 1 else f'every {repeat_interval} months'

@@ -39,7 +39,12 @@ def overlapping_reservation(create_reservation):
     ((RepeatFrequency.WEEK,  2, None), 'every 2 weeks'),
     ((RepeatFrequency.MONTH, 1, None), 'monthly'),
     ((RepeatFrequency.MONTH, 2, None), 'every 2 months'),
-    # TODO: add cases with weekdays
+    ((RepeatFrequency.WEEK, 1, ['mon']), 'weekly (Mon)'),
+    ((RepeatFrequency.WEEK, 1, ['mon', 'sun']), 'weekly (Mon, Sun)'),
+    ((RepeatFrequency.WEEK, 1, ['mon', 'sun', 'wed']), 'weekly (Mon, Wed, Sun)'),
+    ((RepeatFrequency.WEEK, 2, ['mon']), 'every 2 weeks (Mon)'),
+    ((RepeatFrequency.WEEK, 2, ['mon', 'sun']), 'every 2 weeks (Mon, Sun)'),
+    ((RepeatFrequency.WEEK, 2, ['mon', 'sun', 'wed']), 'every 2 weeks (Mon, Wed, Sun)'),
 ))
 def test_repeat_mapping(repetition, message):
     assert RepeatMapping.get_message(*repetition) == message
