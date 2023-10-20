@@ -149,13 +149,6 @@ class TimelineItem extends React.Component {
         return PluralTranslate.string('Recurs daily', 'Recurs every {count} days', repeatInterval, {
           count: repeatInterval,
         });
-      } else if (repeatFrequency === 'WEEK') {
-        return PluralTranslate.string(
-          'Recurs weekly',
-          'Recurs every {count} weeks',
-          repeatInterval,
-          {count: repeatInterval}
-        );
       } else if (repeatFrequency === 'MONTH') {
         return PluralTranslate.string(
           'Recurs monthly',
@@ -168,7 +161,7 @@ class TimelineItem extends React.Component {
       }
     }
 
-    const fmt = dayBased ? 'L' : 'L LT';
+    const fmt = 'L'; // only show the date as the time is already shown above in the occurrence
     const hasRecurringWeekdays =
       reservation && reservation.recurrenceWeekdays && reservation.recurrenceWeekdays.length > 0;
 
