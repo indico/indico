@@ -258,6 +258,17 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
             del data['internal_note']
         return data
 
+    @post_dump(pass_original=True)
+    def _add_missing_weekdays(self, data, booking, **kwargs):
+        if booking.repeat_frequency == RepeatFrequency.WEEK and booking.recurrence_weekdays is None:
+            # Weekly booking created before the recurrence weekdays have been implemented. In that case
+            # we need to get the weekdays from the start date of the booking so the JS code which expects
+            # them to be present (e.g. when editing a booking) works properly
+            weekdays = [WEEKDAYS[booking.start_dt.weekday()]]
+            data['recurrence_weekdays'] = weekdays
+            data['repetition'] = (*data['repetition'][:2], weekdays)
+        return data
+
 
 class BlockedRoomSchema(mm.SQLAlchemyAutoSchema):
     room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
