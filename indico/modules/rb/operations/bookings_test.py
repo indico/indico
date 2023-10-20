@@ -20,11 +20,10 @@ def test_bookings_are_split_on_time_changes(create_reservation):
 
     start_dt = datetime.today().replace(hour=8, minute=30) - timedelta(days=3)
     end_dt = datetime.today().replace(hour=17, minute=30) + timedelta(days=3)
-    recurrence_weekdays = ['mon', 'tue', 'wed', 'thu', 'fri']
     reservation = create_reservation(start_dt=start_dt,
                                      end_dt=end_dt,
                                      repeat_frequency=RepeatFrequency.DAY,
-                                     recurrence_weekdays=recurrence_weekdays)
+                                     recurrence_weekdays=None)
     new_booking_data = {
         'start_dt': start_dt, 'end_dt': end_dt,
         'repeat_frequency': reservation.repeat_frequency,
