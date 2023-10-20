@@ -18,6 +18,7 @@ import {Translate, Param, PluralTranslate} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
 
 import {openModal} from '../../actions';
+import {renderRecurrenceWeekdays} from '../../util';
 
 import './TimelineItem.module.scss';
 
@@ -168,6 +169,8 @@ class TimelineItem extends React.Component {
     }
 
     const fmt = dayBased ? 'L' : 'L LT';
+    const hasRecurringWeekdays =
+      reservation && reservation.recurrenceWeekdays && reservation.recurrenceWeekdays.length > 0;
 
     return dayBased && !message ? null : (
       <div styleName="popup-center">
@@ -178,7 +181,7 @@ class TimelineItem extends React.Component {
         )}
         <div>{message}</div>
         {reservation && reservation.isRepeating && !hideRecurringTooltip && (
-          <Message info>
+          <Message info style={{marginBottom: 0}} attached={hasRecurringWeekdays ? 'top' : null}>
             <Message.Content>
               <Message.Header>
                 <Translate>Recurring Booking</Translate>
@@ -194,6 +197,19 @@ class TimelineItem extends React.Component {
                 from <Param name="startTime" value={moment(reservation.startDt).format(fmt)} /> to{' '}
                 <Param name="endTime" value={moment(reservation.endDt).format(fmt)} />
               </Translate>
+            </Message.Content>
+          </Message>
+        )}
+
+        {hasRecurringWeekdays && !hideRecurringTooltip && (
+          <Message
+            color="violet"
+            size="small"
+            style={{marginTop: 0, padding: '0.5rem'}}
+            attached="bottom"
+          >
+            <Message.Content>
+              {renderRecurrenceWeekdays(reservation.recurrenceWeekdays)}
             </Message.Content>
           </Message>
         )}
