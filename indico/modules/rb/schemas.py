@@ -142,6 +142,13 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted', 'start_dt', 'end_dt',
                   'is_repeating', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays')
 
+    @post_dump(pass_original=True)
+    def _add_missing_weekdays(self, data, booking, **kwargs):
+        if booking.repeat_frequency == RepeatFrequency.WEEK and booking.recurrence_weekdays is None:
+            # Weekly booking created before the recurrence weekdays have been implemented
+            data['recurrence_weekdays'] = [WEEKDAYS[booking.start_dt.weekday()]]
+        return data
+
 
 class ReservationLinkedObjectDataSchema(mm.Schema):
     id = Number()
