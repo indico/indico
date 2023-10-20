@@ -64,13 +64,14 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Registration
         fields = ('id', 'regform_id', 'event_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
-                  'checkin_secret', 'is_paid', 'price', 'currency', 'tags', 'occupied_slots', 'registration_date',
-                  'registration_data')
+                  'checkin_secret', 'is_paid', 'price', 'currency', 'formatted_price', 'tags', 'occupied_slots',
+                  'registration_date', 'registration_data')
 
     regform_id = fields.Int(attribute='registration_form_id')
     full_name = fields.Str(attribute='display_full_name')
     state = fields.Enum(RegistrationState)
     checkin_secret = fields.UUID(attribute='ticket_uuid')
+    formatted_price = fields.Function(lambda reg: reg.render_price())
     tags = fields.Function(lambda reg: sorted(t.title for t in reg.tags))
     registration_date = fields.DateTime(attribute='submitted_dt')
     registration_data = fields.Method('_get_registration_data')
