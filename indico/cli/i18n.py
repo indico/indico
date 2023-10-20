@@ -304,13 +304,13 @@ def extract_messages_react(directory=INDICO_DIR):
         assert len(packages) == 1
         client_path = os.path.join(directory, packages[0], 'client')
         module_path = os.path.join(directory, packages[0], 'modules')
-        if not os.path.exists(client_path) and not os.path.exists(module_path):
-            return
         paths = []
         if os.path.exists(client_path):
             paths.append(client_path)
         if os.path.exists(module_path):
             paths.append(module_path)
+        if not paths:
+            return
     with _chdir(INDICO_DIR):
         output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract'] + paths,
                                          env=dict(os.environ, FORCE_COLOR='1'))
