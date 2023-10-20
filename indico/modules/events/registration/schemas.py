@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from operator import itemgetter
+
 from marshmallow.decorators import post_dump
 from marshmallow.fields import String
 from webargs import fields
@@ -117,7 +119,7 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
 
         # Sort sections and fields based on 'position'
         data = list(data.values())
-        data.sort(key=lambda s: s['position'])
+        data.sort(key=itemgetter('position'))
         for sections in data:
             sections['fields'].sort(key=lambda f: f['position'])
 
