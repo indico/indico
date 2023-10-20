@@ -64,7 +64,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Registration
         fields = ('id', 'regform_id', 'event_id', 'full_name', 'email', 'state', 'checked_in', 'checked_in_dt',
-                  'checkin_secret', 'tags', 'occupied_slots', 'registration_date', 'registration_data')
+                  'checkin_secret', 'is_paid', 'price', 'currency', 'tags', 'occupied_slots', 'registration_date',
+                  'registration_data')
 
     regform_id = fields.Int(attribute='registration_form_id')
     full_name = fields.Str(attribute='display_full_name')
