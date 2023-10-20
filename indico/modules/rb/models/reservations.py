@@ -721,6 +721,11 @@ class Reservation(db.Model):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True
 
+            # clamp the reservation duration to the actual occurrences when modifying the booking
+            occurrences = self.occurrences.order_by(ReservationOccurrence.start_dt)
+            self.start_dt = occurrences[0].start_dt
+            self.end_dt = occurrences[-1].end_dt
+
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))

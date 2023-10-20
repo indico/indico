@@ -149,6 +149,8 @@ class TimelineItem extends React.Component {
         return PluralTranslate.string('Recurs daily', 'Recurs every {count} days', repeatInterval, {
           count: repeatInterval,
         });
+      } else if (repeatFrequency === 'WEEK') {
+        return Translate.string('Recurs weekly');
       } else if (repeatFrequency === 'MONTH') {
         return PluralTranslate.string(
           'Recurs monthly',
@@ -161,7 +163,6 @@ class TimelineItem extends React.Component {
       }
     }
 
-    const fmt = 'L'; // only show the date as the time is already shown above in the occurrence
     const hasRecurringWeekdays =
       reservation && reservation.recurrenceWeekdays && reservation.recurrenceWeekdays.length > 0;
 
@@ -174,21 +175,24 @@ class TimelineItem extends React.Component {
         )}
         <div>{message}</div>
         {reservation && reservation.isRepeating && !hideRecurringTooltip && (
-          <Message info style={{marginBottom: 0}} attached={hasRecurringWeekdays ? 'top' : null}>
+          <Message
+            info
+            style={{marginBottom: 0, padding: '0.7rem'}}
+            attached={hasRecurringWeekdays ? 'top' : null}
+          >
             <Message.Content>
-              <Message.Header>
-                <Translate>Recurring Booking</Translate>
-              </Message.Header>
-              <Translate>
+              <Message.Header style={{fontSize: '1em'}}>
                 <Param
                   name="recurrenceFrequency"
                   value={mapRecurrenceTypeToInfo(
                     reservation.repeatFrequency,
                     reservation.repeatInterval
                   )}
-                />{' '}
-                from <Param name="startTime" value={moment(reservation.startDt).format(fmt)} /> to{' '}
-                <Param name="endTime" value={moment(reservation.endDt).format(fmt)} />
+                />
+              </Message.Header>
+              <Translate>
+                From <Param name="startTime" value={moment(reservation.startDt).format('L')} /> to{' '}
+                <Param name="endTime" value={moment(reservation.endDt).format('L')} />
               </Translate>
             </Message.Content>
           </Message>

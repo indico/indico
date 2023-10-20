@@ -267,7 +267,7 @@ export function renderRecurrenceWeekdays(weekdays) {
   if (sortedWeekdays.length === 1) {
     return (
       <Translate>
-        Recurs every <Param name="weekday" value={weekdaysMap[sortedWeekdays[0]]} />
+        Every <Param name="weekday" value={weekdaysMap[sortedWeekdays[0]]} />
       </Translate>
     );
   }
@@ -275,7 +275,7 @@ export function renderRecurrenceWeekdays(weekdays) {
   if (sortedWeekdays.length === 2) {
     return (
       <Translate>
-        Recurs every <Param name="weekday1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
+        Every <Param name="weekday1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
         <Param name="weekday2" value={weekdaysMap[sortedWeekdays[1]]} />
       </Translate>
     );
@@ -290,7 +290,7 @@ export function renderRecurrenceWeekdays(weekdays) {
 
   return (
     <Translate>
-      Recurs every <Param name="weekdays" value={weekdaysString} /> and{' '}
+      Every <Param name="weekdays" value={weekdaysString} /> and{' '}
       <Param name="last_weekday" value={lastWeekday} />
     </Translate>
   );
