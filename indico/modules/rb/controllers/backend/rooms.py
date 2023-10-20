@@ -60,8 +60,7 @@ class RHSearchRooms(RHRoomBookingBase):
     }, location='query')
     def _process(self, args):
         check_impossible_repetition(args)
-        filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval',
-                                                      'recurrence_weekdays'))
+        filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         only_unavailable = args.pop('unavailable')
         admin_override_enabled = args.pop('admin_override_enabled')
         if not filter_availability:
@@ -88,7 +87,7 @@ class RHSearchRooms(RHRoomBookingBase):
     def _get_date_range(self, filters):
         try:
             start_dt, end_dt = filters['start_dt'], filters['end_dt']
-            repetition = filters['repeat_frequency'], filters['repeat_interval'], filters['recurrence_weekdays']
+            repetition = filters['repeat_frequency'], filters['repeat_interval'], filters.get('recurrence_weekdays')
         except KeyError:
             return None
         return [dt.date().isoformat()
