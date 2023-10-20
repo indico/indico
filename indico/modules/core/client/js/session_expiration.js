@@ -57,6 +57,7 @@ export default function SessionExpirationManager() {
       dispatch({type: 'SESSION_EXPIRED'});
       clearInterval(countdownInterval.current);
     } else if (counter >= 120 && opened.current) {
+      opened.current = false;
       dispatch({type: 'SESSION_ACTIVE'});
       clearInterval(countdownInterval.current);
     }
