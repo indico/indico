@@ -13,6 +13,7 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from indico.core import signals
 from indico.modules.events import Event
 from indico.modules.events.controllers.base import RHProtectedEventBase
+from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
@@ -103,11 +104,15 @@ class RHAPIRegistration(RHAPIRegFormBase):
         from indico.modules.events.registration.schemas import CheckinRegistrationSchema
         return jsonify(CheckinRegistrationSchema().dump(self.registration))
 
-    @use_kwargs({'checked_in': fields.Bool(required=True)})
-    def _process_PATCH(self, checked_in):
+    @use_kwargs({'checked_in': fields.Bool(), 'paid': fields.Bool()})
+    def _process_PATCH(self, checked_in=None, paid=None):
         from indico.modules.events.registration.schemas import CheckinRegistrationSchema
-        self.registration.checked_in = checked_in
-        signals.event.registration_checkin_updated.send(self.registration)
+
+        if checked_in is not None:
+            self.registration.checked_in = checked_in
+            signals.event.registration_checkin_updated.send(self.registration)
+        if paid is not None and paid != self.registration.is_paid and self.registration.price:
+            toggle_registration_payment(self.registration, paid=paid)
         return jsonify(CheckinRegistrationSchema().dump(self.registration))
 
 
