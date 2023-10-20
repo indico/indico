@@ -220,7 +220,6 @@ export function getRecurrenceInfo(repetition) {
     type = 'every';
     interval = 'month';
     number = repeatInterval;
-    weekdays = recurrenceWeekdays; // TODO remove since we do not allow this anyway?!
   }
   return {type, number, interval, weekdays};
 }
