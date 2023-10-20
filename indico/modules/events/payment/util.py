@@ -7,10 +7,12 @@
 
 import re
 
+from flask import session
+
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.events.payment import PaymentPluginMixin
-from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionAction, TransactionStatus
 from indico.modules.events.registration.notifications import notify_registration_state_update
 
 
@@ -53,3 +55,20 @@ def register_transaction(registration, amount, currency, action, provider=None, 
             registration.update_state(paid=False)
             notify_registration_state_update(registration)
         return new_transaction
+
+
+def toggle_registration_payment(registration, paid):
+    """Toggle registration payment.
+
+    :param registration: the `Registration` to be modified
+    :param paid: `True` if the registration should be set as paid, `False` otherwise
+    """
+    currency = registration.currency if paid else registration.transaction.currency
+    amount = registration.price if paid else registration.transaction.amount
+    action = TransactionAction.complete if paid else TransactionAction.cancel
+    register_transaction(registration=registration,
+                         amount=amount,
+                         currency=currency,
+                         action=action,
+                         data={'changed_by_name': session.user.full_name,
+                               'changed_by_id': session.user.id})

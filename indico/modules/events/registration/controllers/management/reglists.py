@@ -28,8 +28,7 @@ from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_badge_format, get_inherited_templates
 from indico.modules.events import EventLogRealm
-from indico.modules.events.payment.models.transactions import TransactionAction
-from indico.modules.events.payment.util import register_transaction
+from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
@@ -600,15 +599,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
     def _process(self):
         pay = request.form.get('pay') == '1'
         if pay != self.registration.is_paid:
-            currency = self.registration.currency if pay else self.registration.transaction.currency
-            amount = self.registration.price if pay else self.registration.transaction.amount
-            action = TransactionAction.complete if pay else TransactionAction.cancel
-            register_transaction(registration=self.registration,
-                                 amount=amount,
-                                 currency=currency,
-                                 action=action,
-                                 data={'changed_by_name': session.user.full_name,
-                                       'changed_by_id': session.user.id})
+            toggle_registration_payment(self.registration, paid=pay)
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
