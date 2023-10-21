@@ -47,3 +47,8 @@ export const recurrenceIntervalSerializer = {
     }
   },
 };
+
+export const recurrenceWeekdaysSerializer = {
+  onlyIf: data => data.recurrence && data.recurrence.type === 'every' && data.recurrence.weekdays,
+  serializer: ({recurrence: {weekdays}}) => weekdays,
+};

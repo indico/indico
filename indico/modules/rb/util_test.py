@@ -12,8 +12,8 @@ import pytz
 
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservations import ReservationState
-from indico.modules.rb.util import (get_booking_params_for_event, get_prebooking_collisions, rb_check_user_access,
-                                    rb_is_admin)
+from indico.modules.rb.util import (format_weekdays, get_booking_params_for_event, get_prebooking_collisions,
+                                    rb_check_user_access, rb_is_admin)
 from indico.testing.util import bool_matrix
 
 
@@ -145,3 +145,15 @@ def test_get_prebooking_collisions(create_reservation, dummy_user, freeze_time):
 
     collisions = get_prebooking_collisions(res1)
     assert collisions == [res2.occurrences.one()]
+
+
+@pytest.mark.parametrize(('weekdays', 'expected'), (
+    (['mon'], 'Mon'),
+    (['mon', 'tue'], 'Mon, Tue'),
+    (['mon', 'tue', 'wed'], 'Mon, Tue, Wed'),
+    (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], 'Mon, Tue, Wed, Thu, Fri, Sat, Sun'),
+    (['tue', 'sat', 'wed'], 'Tue, Wed, Sat'),
+    (['tue', 'sat', 'fri', 'wed', 'mon', 'sun', 'thu'], 'Mon, Tue, Wed, Thu, Fri, Sat, Sun'),
+))
+def test_format_weekdays(weekdays, expected):
+    assert format_weekdays(weekdays) == expected

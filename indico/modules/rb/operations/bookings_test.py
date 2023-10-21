@@ -20,9 +20,16 @@ def test_bookings_are_split_on_time_changes(create_reservation):
 
     start_dt = datetime.today().replace(hour=8, minute=30) - timedelta(days=3)
     end_dt = datetime.today().replace(hour=17, minute=30) + timedelta(days=3)
-    reservation = create_reservation(start_dt=start_dt, end_dt=end_dt, repeat_frequency=RepeatFrequency.DAY)
-    new_booking_data = {'start_dt': start_dt, 'end_dt': end_dt, 'repeat_frequency': reservation.repeat_frequency,
-                        'repeat_interval': reservation.repeat_interval}
+    reservation = create_reservation(start_dt=start_dt,
+                                     end_dt=end_dt,
+                                     repeat_frequency=RepeatFrequency.DAY,
+                                     recurrence_weekdays=None)
+    new_booking_data = {
+        'start_dt': start_dt, 'end_dt': end_dt,
+        'repeat_frequency': reservation.repeat_frequency,
+        'repeat_interval': reservation.repeat_interval,
+        'recurrence_weekdays': reservation.recurrence_weekdays
+    }
 
     assert not should_split_booking(reservation, new_booking_data)
     assert not should_split_booking(reservation, dict(new_booking_data, end_dt=end_dt + timedelta(days=5)))

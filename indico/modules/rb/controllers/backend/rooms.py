@@ -24,7 +24,7 @@ from indico.modules.rb.operations.blockings import filter_blocked_rooms, get_blo
 from indico.modules.rb.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb.operations.rooms import get_room_statistics, search_for_rooms
 from indico.modules.rb.schemas import room_attribute_values_schema, rooms_schema
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import check_impossible_repetition, rb_is_admin
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
@@ -59,6 +59,7 @@ class RHSearchRooms(RHRoomBookingBase):
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
     def _process(self, args):
+        check_impossible_repetition(args)
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         only_unavailable = args.pop('unavailable')
         admin_override_enabled = args.pop('admin_override_enabled')
@@ -86,10 +87,11 @@ class RHSearchRooms(RHRoomBookingBase):
     def _get_date_range(self, filters):
         try:
             start_dt, end_dt = filters['start_dt'], filters['end_dt']
-            repetition = filters['repeat_frequency'], filters['repeat_interval']
+            repetition = filters['repeat_frequency'], filters['repeat_interval'], filters.get('recurrence_weekdays')
         except KeyError:
             return None
-        return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
+        return [dt.date().isoformat()
+                for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
 
     def _adjust_blockings(self, rooms, filters, availability, admin_override_enabled):
         if availability is None:

@@ -27,7 +27,7 @@
                     {%- endtrans %}
                 {%- else -%}
                     {% trans room=reservation.room.full_name, name=reservation.booked_for_name, map=RepeatMapping.get_message(reservation.repeat_frequency,
-                             reservation.repeat_interval), from=reservation.start_dt|format_skeleton('EEEEddMMyyyy'), to=reservation.end_dt|format_skeleton('EEEEddMMyyyy'),
+                             reservation.repeat_interval, reservation.recurrence_weekdays), from=reservation.start_dt|format_skeleton('EEEEddMMyyyy'), to=reservation.end_dt|format_skeleton('EEEEddMMyyyy'),
                              start=reservation.start_dt|format_time(), end=reservation.end_dt|format_time(), linebreak='\n' -%}
                         The conference room {{ room }}{{ linebreak }}
                         has been pre-booked for {{ name }}{{ linebreak }}
@@ -44,7 +44,7 @@
                     {%- endtrans %}
                 {%- else -%}
                     {% trans room=reservation.room.full_name, name=reservation.booked_for_name, map=RepeatMapping.get_message(reservation.repeat_frequency,
-                             reservation.repeat_interval), from=reservation.start_dt|format_skeleton('EEEEddMMyyyy'), to=reservation.end_dt|format_skeleton('EEEEddMMyyyy'),
+                             reservation.repeat_interval, reservation.recurrence_weekdays), from=reservation.start_dt|format_skeleton('EEEEddMMyyyy'), to=reservation.end_dt|format_skeleton('EEEEddMMyyyy'),
                              start=reservation.start_dt|format_time(), end=reservation.end_dt|format_time(), linebreak='\n' -%}
                         The conference room {{ room }}{{ linebreak }}
                         has been booked for {{ name }}{{ linebreak }}

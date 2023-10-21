@@ -9,6 +9,7 @@ import {
   filterDTHandler,
   recurrenceIntervalSerializer,
   recurrenceFrequencySerializer,
+  recurrenceWeekdaysSerializer,
 } from '../../serializers';
 
 export const ajax = {
@@ -16,6 +17,7 @@ export const ajax = {
   end_dt: filterDTHandler('end'),
   repeat_frequency: recurrenceFrequencySerializer,
   repeat_interval: recurrenceIntervalSerializer,
+  recurrence_weekdays: recurrenceWeekdaysSerializer,
   reason: ({reason}) => reason,
   user: {
     onlyIf: ({usage}) => usage === 'someone',

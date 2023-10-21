@@ -9,6 +9,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from sqlalchemy import Date, Time
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -29,7 +30,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
-from indico.modules.rb.util import get_prebooking_collisions, rb_is_admin
+from indico.modules.rb.util import format_weekdays, get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import _
@@ -59,7 +60,7 @@ class RepeatMapping:
     }
 
     @classmethod
-    def get_message(cls, repeat_frequency, repeat_interval):
+    def get_message(cls, repeat_frequency, repeat_interval, recurrence_weekdays):
         # XXX: move this somewhere else
         # not translated since it's only used in log messages + emails now
         if repeat_frequency == RepeatFrequency.NEVER:
@@ -67,13 +68,18 @@ class RepeatMapping:
         elif repeat_frequency == RepeatFrequency.DAY:
             return 'daily booking'
         elif repeat_frequency == RepeatFrequency.WEEK:
-            return 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
+            msg = 'weekly' if repeat_interval == 1 else f'every {repeat_interval} weeks'
+            if recurrence_weekdays:
+                msg += f' ({format_weekdays(recurrence_weekdays)})'
+            return msg
         elif repeat_frequency == RepeatFrequency.MONTH:
             return 'monthly' if repeat_interval == 1 else f'every {repeat_interval} months'
 
     @classmethod
-    def get_short_name(cls, repeat_frequency, repeat_interval):
+    def get_short_name(cls, repeat_frequency, repeat_interval, recurrence_weekdays):
         # for the API
+        if recurrence_weekdays:
+            return 'periodically'
         try:
             return cls.mapping[(repeat_frequency, repeat_interval)][2]
         except KeyError:
@@ -124,6 +130,11 @@ class Reservation(db.Model):
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
                 db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
                 db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
+                db.CheckConstraint('indico.array_is_unique(recurrence_weekdays) AND recurrence_weekdays::text[]'
+                                   "<@ ARRAY['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']::text[]",
+                                   'valid_recurrence_weekdays'),
+                db.CheckConstraint(f'(recurrence_weekdays IS NULL) OR repeat_frequency = {RepeatFrequency.WEEK}',
+                                   'recurrence_weekdays_only_weekly'),
                 {'schema': 'roombooking'})
 
     id = db.Column(
@@ -155,6 +166,11 @@ class Reservation(db.Model):
         nullable=False,
         default=0
     )  # 1, 2, 3, etc.
+    recurrence_weekdays = db.Column(
+        ARRAY(db.String),
+        nullable=True,
+        default=None
+    )  # mon, tue, wed, etc.
     booked_for_id = db.Column(
         db.Integer,
         db.ForeignKey('users.users.id'),
@@ -293,7 +309,7 @@ class Reservation(db.Model):
 
     @property
     def repetition(self):
-        return self.repeat_frequency, self.repeat_interval
+        return self.repeat_frequency, self.repeat_interval, self.recurrence_weekdays
 
     @property
     def linked_object(self):
@@ -325,7 +341,8 @@ class Reservation(db.Model):
         """
         from indico.modules.rb import rb_settings
 
-        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason'}
+        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id',
+                           'booking_reason', 'recurrence_weekdays'}
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
@@ -355,6 +372,12 @@ class Reservation(db.Model):
         reservation.create_occurrences(True, allow_admin=(not ignore_admin))
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
+
+        # clamp reservation duration to actual occurrences
+        occurrences = reservation.occurrences.order_by(ReservationOccurrence.start_dt)
+        reservation.start_dt = occurrences[0].start_dt
+        reservation.end_dt = occurrences[-1].end_dt
+
         db.session.flush()
         signals.rb.booking_created.send(reservation)
         notify_creation(reservation)
@@ -586,14 +609,14 @@ class Reservation(db.Model):
         """
         from indico.modules.rb import rb_settings
 
-        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
-                           'booking_reason'}
+        populate_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays',
+                           'booked_for_user', 'booking_reason'}
         # fields affecting occurrences
-        occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
+        occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays'}
         # fields where date and time are compared separately
         date_time_fields = {'start_dt', 'end_dt'}
         # fields for the repetition
-        repetition_fields = {'repeat_frequency', 'repeat_interval'}
+        repetition_fields = {'repeat_frequency', 'repeat_interval', 'recurrence_weekdays'}
         # pretty names for logging
         field_names = {
             'start_dt/date': 'start date',
@@ -692,6 +715,11 @@ class Reservation(db.Model):
                                                                     for occ in old_occurrences.values()):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True
+
+            # clamp the reservation duration to the actual occurrences when modifying the booking
+            occurrences = self.occurrences.order_by(ReservationOccurrence.start_dt)
+            self.start_dt = occurrences[0].start_dt
+            self.end_dt = occurrences[-1].end_dt
 
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):

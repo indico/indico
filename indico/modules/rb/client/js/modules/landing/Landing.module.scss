@@ -79,6 +79,7 @@
   .landing-page-card:global(.ui.card) {
     transition: max-height 0.25s ease-out;
     margin: 10vh auto auto auto;
+    width: unset;
 
     @media (max-width: $tablet-width) {
       width: 100%;

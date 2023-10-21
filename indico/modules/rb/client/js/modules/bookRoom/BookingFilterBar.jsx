@@ -38,6 +38,7 @@ class BookingFilterBar extends React.Component {
         number: PropTypes.number,
         type: PropTypes.string,
         interval: PropTypes.string,
+        weekdays: PropTypes.arrayOf(PropTypes.string),
       }).isRequired,
       dates: PropTypes.shape({
         startDate: PropTypes.string,
@@ -84,14 +85,15 @@ class BookingFilterBar extends React.Component {
               form={(fieldValues, setParentField) => (
                 <RecurrenceForm setParentField={setParentField} {...fieldValues} />
               )}
-              setGlobalState={({type, number, interval}) => {
-                setFilterParameter('recurrence', {type, number, interval});
+              setGlobalState={({type, number, interval, weekdays}) => {
+                setFilterParameter('recurrence', {type, number, interval, weekdays});
               }}
               initialValues={recurrence}
               defaults={{
                 type: 'single',
                 number: 1,
                 interval: 'week',
+                weekdays: [],
               }}
               renderValue={renderRecurrence}
             />

@@ -135,11 +135,30 @@ class ReservationOccurrence(db.Model):
             yield ReservationOccurrence(start_dt=start, end_dt=end)
 
     @staticmethod
+    def map_recurrence_weekdays_to_rrule(weekdays):
+        """Map weekdays from database to rrule weekdays."""
+
+        # Return none if no weekdays are provided
+        if not weekdays:
+            return None
+
+        weekdays_map = {
+            'mon': rrule.MO,
+            'tue': rrule.TU,
+            'wed': rrule.WE,
+            'thu': rrule.TH,
+            'fri': rrule.FR,
+            'sat': rrule.SA,
+            'sun': rrule.SU
+        }
+
+        return [weekdays_map[day] for day in weekdays]
+
+    @staticmethod
     def iter_start_time(start, end, repetition):
         from indico.modules.rb.models.reservations import RepeatFrequency
 
-        repeat_frequency, repeat_interval = repetition
-
+        repeat_frequency, repeat_interval, recurrence_weekdays = repetition
         if repeat_frequency == RepeatFrequency.NEVER:
             return [start]
 
@@ -151,7 +170,9 @@ class ReservationOccurrence(db.Model):
         elif repeat_frequency == RepeatFrequency.WEEK:
             if repeat_interval <= 0:
                 raise IndicoError('Unsupported interval')
-            return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
+            return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end,
+                               interval=repeat_interval,
+                               byweekday=ReservationOccurrence.map_recurrence_weekdays_to_rrule(recurrence_weekdays))
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:

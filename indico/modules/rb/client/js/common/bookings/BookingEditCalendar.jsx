@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -21,6 +22,7 @@ import OccurrencesCounter from './OccurrencesCounter';
 import * as bookingsSelectors from './selectors';
 
 import './BookingEditCalendar.module.scss';
+import '../../components/WeekdayInformation.module.scss';
 
 class BookingEditCalendar extends React.Component {
   static propTypes = {
@@ -72,7 +74,11 @@ class BookingEditCalendar extends React.Component {
         nonbookablePeriods: data.nonbookablePeriods[day] || [],
         unbookableHours: data.unbookableHours || [],
       },
-      label: serializeDate(day, 'L'),
+      label: (
+        <>
+          <span styleName="weekday">{moment(day).format('ddd')}</span> {serializeDate(day, 'L')}
+        </>
+      ),
       key: day,
       room,
     });

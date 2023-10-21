@@ -22,8 +22,15 @@ import UnavailableRoomsModal from './UnavailableRoomsModal';
 const BookingDataProvider = connect(state => ({
   bookRoomFilters: bookRoomSelectors.getFilters(state),
 }))(
-  ({bookRoomFilters: {dates, timeSlot, recurrence}, bookingData: {isPrebooking}, ...restProps}) => (
-    <BookRoomModal {...restProps} bookingData={{dates, timeSlot, recurrence, isPrebooking}} />
+  ({
+    bookRoomFilters: {dates, timeSlot, recurrence, weekdays},
+    bookingData: {isPrebooking},
+    ...restProps
+  }) => (
+    <BookRoomModal
+      {...restProps}
+      bookingData={{dates, timeSlot, recurrence, weekdays, isPrebooking}}
+    />
   )
 );
 

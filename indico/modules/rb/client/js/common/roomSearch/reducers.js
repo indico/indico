@@ -92,6 +92,8 @@ export function roomSearchReducerFactory(namespace, extra = {}) {
         switch (action.type) {
           case actions.SEARCH_RESULTS_RECEIVED:
             return camelizeKeys(action.data);
+          case actions.SEARCH_ROOMS_ERROR:
+            return initialSearchResultsState;
           case adminActions.ROOM_DELETED:
             return initialSearchResultsState;
           case bookRoomActions.CREATE_BOOKING_SUCCESS: {

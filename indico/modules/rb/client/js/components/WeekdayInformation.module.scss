@@ -7,17 +7,13 @@
 
 @import 'rb:styles/palette';
 
-.recurrence-every:global(.fields.inline) {
-  :global .ui.selection.dropdown {
-    min-width: 100px;
-  }
-
-  :global .field .ui.input input {
-    width: 80px;
-  }
+// Shown on the side of the timeline calendar
+.weekday {
+  color: $dark-gray;
 }
 
-.weekday-recurrence-section {
-  display: flex;
-  align-items: center;
+// Shown on the booking details modal
+.booking-times-weekday {
+  color: $dark-gray;
+  font-weight: bold;
 }

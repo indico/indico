@@ -34,9 +34,10 @@ from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
-from indico.modules.rb.util import (generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
-                                    group_by_occurrence_date, is_booking_start_within_grace_period,
-                                    serialize_availability, serialize_booking_details, serialize_occurrences)
+from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, generate_spreadsheet_from_occurrences,
+                                    get_linked_object, get_prebooking_collisions, group_by_occurrence_date,
+                                    is_booking_start_within_grace_period, serialize_availability,
+                                    serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -62,6 +63,7 @@ class RHTimeline(RHRoomBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
+        'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None),
         'skip_conflicts_with': fields.List(fields.Int(), load_default=None),
         'admin_override_enabled': fields.Bool(load_default=False)
     }, location='query')
@@ -288,8 +290,10 @@ class RHBookingEditCalendars(RHBookingBase):
         'end_dt': fields.DateTime(required=True),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
+        'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None)
     }, location='query')
     def _process(self, **kwargs):
+        check_impossible_repetition(kwargs)
         return jsonify(get_booking_edit_calendar_data(self.booking, kwargs))
 
 
@@ -303,16 +307,16 @@ class RHUpdateBooking(RHBookingBase):
     def _process(self, args):
         room = self.booking.room
 
-        # XXX this is a bit of an ugly hack: usually it's checked in the reservation create/update code
-        # whether internal notes are enabled and the user can touch them. but when splitting we need to
+        # XXX: This is a bit of an ugly hack: usually it's checked in the reservation create/update code
+        # whether internal notes are enabled and the user can touch them. But when splitting we need to
         # create a new booking and want to preserve internal notes regardless of whether the user who does
-        # the splitting is allowed to manage them or not. however, if the user does have access to internal
+        # the splitting is allowed to manage them or not. However, if the user does have access to internal
         # notes, we want to allow them to change it as well.
         if (
             not rb_settings.get('internal_notes_enabled') or
             not room.can_manage(session.user, allow_admin=args['admin_override_enabled'])
         ):
-            # remove the user-provided note (we fall back to the one from the xisting booking below)
+            # remove the user-provided note (we fall back to the one from the existing booking below)
             args.pop('internal_note', None)
 
         new_booking_data = {
@@ -323,6 +327,7 @@ class RHUpdateBooking(RHBookingBase):
             'end_dt': args['end_dt'],
             'repeat_frequency': args['repeat_frequency'],
             'repeat_interval': args['repeat_interval'],
+            'recurrence_weekdays': args['recurrence_weekdays'],
         }
 
         additional_booking_attrs = {}
@@ -366,9 +371,10 @@ class RHMatchingEvents(RHRoomBookingBase):
         'end_dt': fields.DateTime(),
         'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
+        'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None)
     }, location='query')
-    def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
-        events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
+    def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays):
+        events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval, recurrence_weekdays)
         return jsonify(reservation_user_event_schema.dump(events))
 
 

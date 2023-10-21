@@ -178,9 +178,10 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
         return query
 
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
-    repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
-    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=False,
-                                                  include_pre_bookings=False)]
+    repeatability = (filters['repeat_frequency'], filters['repeat_interval'], filters.get('recurrence_weekdays'))
+
+    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability,
+                                                  include_blockings=False, include_pre_bookings=False)]
     if not (allow_admin and rb_is_admin(session.user)):
         selected_period_days = (filters['end_dt'] - filters['start_dt']).days
         booking_limit_days = db.func.coalesce(Room.booking_limit_days, rb_settings.get('booking_limit'))

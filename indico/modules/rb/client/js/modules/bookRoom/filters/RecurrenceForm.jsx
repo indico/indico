@@ -5,10 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Form, Input, Radio, Select} from 'semantic-ui-react';
 
+import {WeekdayRecurrencePicker} from 'indico/modules/rb/components/WeekdayRecurrencePicker';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 
 import {FilterFormComponent} from '../../../common/filters';
@@ -20,6 +22,7 @@ export default class RecurrenceForm extends FilterFormComponent {
     type: PropTypes.string,
     interval: PropTypes.string,
     number: PropTypes.number,
+    weekdays: PropTypes.arrayOf(PropTypes.string),
     ...FilterFormComponent.propTypes,
   };
 
@@ -27,7 +30,12 @@ export default class RecurrenceForm extends FilterFormComponent {
     type: null,
     interval: null,
     number: null,
+    weekdays: [],
   };
+
+  componentDidUpdate() {
+    this.preselectWeekdayToday();
+  }
 
   constructor(props) {
     super(props);
@@ -37,6 +45,7 @@ export default class RecurrenceForm extends FilterFormComponent {
     this.onTypeChange = this.stateChanger('type');
     this.onNumberChange = this.stateChanger('number', num => Math.abs(parseInt(num, 10)));
     this.onIntervalChange = this.stateChanger('interval');
+    this.onWeekdaysChange = this.stateChanger('weekdays');
   }
 
   stateChanger(param, sanitizer = v => v) {
@@ -51,8 +60,32 @@ export default class RecurrenceForm extends FilterFormComponent {
     };
   }
 
+  preselectWeekdayToday() {
+    const {weekdays, type, interval} = this.state;
+    const today = moment()
+      .locale('en')
+      .format('ddd')
+      .toLocaleLowerCase();
+
+    if (interval !== 'week') {
+      // If the interval is not 'week', clear weekdays
+      if (weekdays.length > 0) {
+        this.props.setParentField('weekdays', []);
+      }
+    } else if (weekdays.length === 0 && type === 'every') {
+      // Preselect today if no weekday is selected
+      this.setState({
+        weekdays: [today],
+      });
+      this.props.setParentField('weekdays', [today]);
+    } else if (weekdays.length > 0 && type !== 'every') {
+      // Clear weekdays if type is not every
+      this.props.setParentField('weekdays', []);
+    }
+  }
+
   render() {
-    const {type, interval, number} = this.state;
+    const {type, interval, number, weekdays} = this.state;
     const intervalOptions = [
       {
         value: 'week',
@@ -84,7 +117,7 @@ export default class RecurrenceForm extends FilterFormComponent {
             onChange={this.onTypeChange}
           />
         </Form.Field>
-        <Form.Group inline styleName="recurrence-every" style={{marginBottom: 0}}>
+        <Form.Group inline styleName="recurrence-every" style={{marginBottom: '1em'}}>
           <Form.Field>
             <Radio
               value="every"
@@ -114,6 +147,19 @@ export default class RecurrenceForm extends FilterFormComponent {
             />
           </Form.Field>
         </Form.Group>
+        {type === 'every' && interval === 'week' && (
+          <Form.Field styleName="weekday-recurrence-section" inline>
+            <label>
+              <Translate>Recurring every</Translate>
+            </label>
+            <WeekdayRecurrencePicker
+              onChange={value => this.onWeekdaysChange(null, {value})}
+              value={weekdays}
+              disabled={type !== 'every'}
+              requireOneSelected
+            />
+          </Form.Field>
+        )}
       </Form>
     );
   }

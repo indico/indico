@@ -9,7 +9,7 @@ from operator import itemgetter
 
 from babel.dates import get_timezone
 from flask import session
-from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
+from marshmallow import ValidationError, fields, post_dump, post_load, validate, validates, validates_schema
 from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
@@ -34,7 +34,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb.util import WEEKDAYS, rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
@@ -140,7 +140,14 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Reservation
         fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted', 'start_dt', 'end_dt',
-                  'is_repeating', 'repeat_frequency', 'repeat_interval')
+                  'is_repeating', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays')
+
+    @post_dump(pass_original=True)
+    def _add_missing_weekdays(self, data, booking, **kwargs):
+        if booking.repeat_frequency == RepeatFrequency.WEEK and booking.recurrence_weekdays is None:
+            # Weekly booking created before the recurrence weekdays have been implemented
+            data['recurrence_weekdays'] = [WEEKDAYS[booking.start_dt.weekday()]]
+        return data
 
 
 class ReservationLinkedObjectDataSchema(mm.Schema):
@@ -241,7 +248,8 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note')
+                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note',
+                  'recurrence_weekdays')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -255,6 +263,17 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     def _hide_sensitive_data(self, data, booking, **kwargs):
         if not booking.room.can_manage(session.user):
             del data['internal_note']
+        return data
+
+    @post_dump(pass_original=True)
+    def _add_missing_weekdays(self, data, booking, **kwargs):
+        if booking.repeat_frequency == RepeatFrequency.WEEK and booking.recurrence_weekdays is None:
+            # Weekly booking created before the recurrence weekdays have been implemented. In that case
+            # we need to get the weekdays from the start date of the booking so the JS code which expects
+            # them to be present (e.g. when editing a booking) works properly
+            weekdays = [WEEKDAYS[booking.start_dt.weekday()]]
+            data['recurrence_weekdays'] = weekdays
+            data['repetition'] = (*data['repetition'][:2], weekdays)
         return data
 
 
@@ -355,6 +374,7 @@ class CreateBookingSchema(mm.Schema):
     end_dt = fields.DateTime(required=True)
     repeat_frequency = EnumField(RepeatFrequency, required=True)
     repeat_interval = fields.Int(load_default=0, validate=lambda x: x >= 0)
+    recurrence_weekdays = fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)))
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
     booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
@@ -369,6 +389,18 @@ class CreateBookingSchema(mm.Schema):
     def validate_dts(self, data, **kwargs):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
+
+    @validates('recurrence_weekdays')
+    def _check_weekdays_unique(self, weekdays, **kwargs):
+        if weekdays and len(weekdays) != len(set(weekdays)):
+            raise ValidationError('Duplicate weekdays')
+
+    @post_load
+    def _weekdays_only_weekly(self, data, **kwargs):
+        # Make sure we do not set recurrence weekdays if the booking does not have weekly repetition
+        if data['repeat_frequency'] != RepeatFrequency.WEEK:
+            data['recurrence_weekdays'] = None
+        return data
 
 
 class RoomFeatureSchema(mm.SQLAlchemyAutoSchema):

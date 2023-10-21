@@ -204,22 +204,24 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
 }
 
 export function getRecurrenceInfo(repetition) {
-  const [repeatFrequency, repeatInterval] = repetition;
+  const [repeatFrequency, repeatInterval, recurrenceWeekdays] = repetition;
   let type = 'single';
   let number = '1';
   let interval = 'week';
+  let weekdays = [];
   if (repeatFrequency === 1) {
     type = 'daily';
   } else if (repeatFrequency === 2) {
     type = 'every';
     interval = 'week';
     number = repeatInterval;
+    weekdays = recurrenceWeekdays;
   } else if (repeatFrequency === 3) {
     type = 'every';
     interval = 'month';
     number = repeatInterval;
   }
-  return {type, number, interval};
+  return {type, number, interval, weekdays};
 }
 
 export function serializeRecurrenceInfo({type, number, interval}) {
@@ -232,6 +234,65 @@ export function serializeRecurrenceInfo({type, number, interval}) {
   } else if (interval === 'month') {
     return ['MONTH', number];
   }
+}
+
+/**
+ * Renders the array of recurrence weekdays into a nicely formatted string
+ * @param {array} weekdays Array of weekdays
+ * @returns {string} Formatted string of weekdays
+ */
+export function renderRecurrenceWeekdays(weekdays) {
+  const weekdaysMap = {
+    mon: moment.weekdays(1),
+    tue: moment.weekdays(2),
+    wed: moment.weekdays(3),
+    thu: moment.weekdays(4),
+    fri: moment.weekdays(5),
+    sat: moment.weekdays(6),
+    sun: moment.weekdays(0),
+  };
+
+  if (weekdays.length === 0) {
+    return null;
+  }
+
+  const orderedWeekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+  // sort the weekdays based on their position in the orderedWeekdays array
+  const sortedWeekdays = weekdays.sort(
+    (a, b) => orderedWeekdays.indexOf(a) - orderedWeekdays.indexOf(b)
+  );
+
+  if (sortedWeekdays.length === 1) {
+    return (
+      <Translate>
+        Every <Param name="weekday" value={weekdaysMap[sortedWeekdays[0]]} />
+      </Translate>
+    );
+  }
+
+  if (sortedWeekdays.length === 2) {
+    return (
+      <Translate>
+        Every <Param name="weekday1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
+        <Param name="weekday2" value={weekdaysMap[sortedWeekdays[1]]} />
+      </Translate>
+    );
+  }
+
+  // join all weekdays but the last one with commas
+  const weekdaysString = sortedWeekdays
+    .slice(0, -1)
+    .map(weekday => weekdaysMap[weekday])
+    .join(', ');
+  const lastWeekday = weekdaysMap[sortedWeekdays[sortedWeekdays.length - 1]];
+
+  return (
+    <Translate>
+      Every <Param name="weekdays" value={weekdaysString} /> and{' '}
+      <Param name="last_weekday" value={lastWeekday} />
+    </Translate>
+  );
 }
 
 const _legendLabels = {

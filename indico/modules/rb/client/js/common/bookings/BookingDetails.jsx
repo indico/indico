@@ -51,6 +51,7 @@ import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
 
 import './BookingDetails.module.scss';
+import '../../components/WeekdayInformation.module.scss';
 
 class BookingDetails extends React.Component {
   static propTypes = {
@@ -862,6 +863,7 @@ class BookingDetails extends React.Component {
         isLinkedToObject,
         link,
         externalDetailsURL,
+        recurrenceWeekdays,
       },
     } = this.props;
     const dates = {startDate: startDt, endDate: endDt};
@@ -908,6 +910,7 @@ class BookingDetails extends React.Component {
                   timeSlot={times}
                   onClickOccurrences={this.showOccurrences}
                   occurrenceCount={occurrenceCount}
+                  recurrenceWeekdays={recurrenceWeekdays}
                 />
               </Grid.Column>
               <Grid.Column>

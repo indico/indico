@@ -28,10 +28,13 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
+from indico.util.i18n import _
 from indico.util.iterables import group_list
 from indico.util.string import crc32
+from indico.web.util import ExpectedError
 
 
+WEEKDAYS = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
 ROOM_PHOTO_DIMENSIONS = (290, 170)
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
 TempReservationConcurrentOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservations'))
@@ -52,6 +55,8 @@ def rb_check_user_access(user):
 def rb_is_admin(user):
     """Check if the user is a room booking admin."""
     from indico.modules.rb import rb_settings
+    if user is None:
+        return False
     if user.is_admin:
         return True
     return rb_settings.acls.contains_user('admin_principals', user)
@@ -337,3 +342,35 @@ def get_prebooking_collisions(reservation):
     from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
     valid_occurrences = reservation.occurrences.filter(ReservationOccurrence.is_valid).all()
     return ReservationOccurrence.find_overlapping_with(reservation.room, valid_occurrences, reservation.id).all()
+
+
+def check_impossible_repetition(data):
+    """Check for broken repetition data.
+
+    This checks that a repetition using weekdays has a date range
+    containing at least one of the specified weekdays.
+    """
+    from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+    try:
+        start_dt, end_dt = data['start_dt'], data['end_dt']
+        repetition = data['repeat_frequency'], data['repeat_interval'], data['recurrence_weekdays']
+    except KeyError:
+        return
+    if not any(ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)):
+        raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
+
+
+def check_empty_candidates(candidates):
+    """Check for empty candidates.
+
+    This checks that a created time-series has at least one occurrence to filter by (similar to
+    :func:`check_impossible_repetition` but without the need to pass all the data).
+    """
+    if not candidates:
+        raise ExpectedError(_('The chosen date range does not include any of the weekdays you specified.'))
+
+
+def format_weekdays(weekdays):
+    """Format a list of weekdays into a nice readable string."""
+    assert weekdays
+    return ', '.join(x.capitalize() for x in sorted(weekdays, key=lambda x: WEEKDAYS.index(x)))

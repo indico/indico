@@ -7,6 +7,7 @@
 
 import bookingEditTimelineURL from 'indico-url:rb.booking_edit_calendars';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
@@ -74,6 +75,7 @@ class BookingEdit extends React.Component {
       numberOfCandidates: null,
       willBookingSplit: false,
       calendars: null,
+      timelineError: null,
     };
   }
 
@@ -132,6 +134,10 @@ class BookingEdit extends React.Component {
     try {
       response = await indicoAxios.get(bookingEditTimelineURL({booking_id: id}), {params});
     } catch (error) {
+      if (_.get(error, 'response.status') === 418) {
+        this.setState({timelineError: error.response.data.message});
+        return;
+      }
       handleAxiosError(error);
       return;
     }
@@ -149,11 +155,14 @@ class BookingEdit extends React.Component {
       willBookingSplit: false,
     });
 
-    const {calendars, willBeSplit} = await this.fetchBookingTimelineInfo({
-      dates,
-      timeSlot,
-      recurrence,
-    });
+    const res = await this.fetchBookingTimelineInfo({dates, timeSlot, recurrence});
+    if (!res) {
+      // request failed - stop here as the backend will have raised an error
+      return;
+    }
+    // otherwise, clear the error (for when the request succeeds after a previous failure)
+    this.setState({timelineError: null});
+    const {calendars, willBeSplit} = res;
     const [currentBooking, newBooking] = calendars;
 
     this.setState({
@@ -179,6 +188,7 @@ class BookingEdit extends React.Component {
       numberOfConflicts,
       numberOfCandidates,
       isLoading,
+      timelineError,
     } = this.state;
     const conflictingBooking = numberOfConflicts > 0 && !skipConflicts;
     const submitBlocked =
@@ -207,7 +217,11 @@ class BookingEdit extends React.Component {
               />
             </Grid.Column>
             <Grid.Column stretched>
-              {!!calendars && (
+              {timelineError ? (
+                <div>
+                  <Message icon="times circle outline" error content={timelineError} />
+                </div>
+              ) : calendars ? (
                 <BookingEditCalendar
                   calendars={calendars}
                   booking={booking}
@@ -216,7 +230,7 @@ class BookingEdit extends React.Component {
                   willBookingSplit={willBookingSplit}
                   isLoading={isLoading}
                 />
-              )}
+              ) : null}
               {this.renderConflictsMessage()}
             </Grid.Column>
           </Grid>
@@ -306,6 +320,7 @@ class BookingEdit extends React.Component {
       end_dt: `${endDate ? endDate : startDate} ${endTime}`,
       repeat_frequency: repeatFrequency,
       repeat_interval: repeatInterval,
+      recurrence_weekdays: recurrence.weekdays,
       room_id: roomId,
       user,
       reason,
@@ -329,6 +344,7 @@ class BookingEdit extends React.Component {
         onSubmit={this.updateBooking}
         render={this.renderBookingEditModal}
         initialValues={this.initialFormValues}
+        initialValuesEqual={_.isEqual}
         subscription={{
           submitting: true,
           submitSucceeded: true,

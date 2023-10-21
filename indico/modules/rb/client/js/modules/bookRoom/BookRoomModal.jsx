@@ -576,6 +576,7 @@ class BookRoomModal extends React.Component {
                 recurrence={recurrence}
                 onClickOccurrences={this.showConflicts}
                 occurrenceCount={occurrenceCount}
+                recurrenceWeekdays={recurrence.weekdays}
               />
             </Grid.Column>
             <Grid.Column width={8}>
@@ -743,7 +744,7 @@ export default connect(
         createBooking: (data, props) => {
           const {reason, internalNote, usage, user, linkType, linkId, linkBack} = data;
           const {
-            bookingData: {recurrence, dates, timeSlot, isPrebooking},
+            bookingData: {recurrence, dates, recurrenceWeekdays, timeSlot, isPrebooking},
             room,
             isAdminOverrideEnabled,
           } = props;
@@ -754,6 +755,7 @@ export default connect(
               usage,
               user,
               recurrence,
+              recurrenceWeekdays,
               dates,
               timeSlot,
               room,
