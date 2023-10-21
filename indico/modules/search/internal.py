@@ -8,6 +8,7 @@
 import itertools
 
 from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload, selectinload, subqueryload, undefer
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
@@ -182,7 +183,13 @@ class InternalSearch(IndicoSearchProvider):
         return res, pagenav
 
     def search_categories(self, q, user, page, category_id, admin_override_enabled):
-        query = Category.query if not category_id else Category.get(category_id).deep_children_query
+        if not category_id:
+            query = Category.query
+        else:
+            category = Category.get(category_id)
+            if category is None:
+                raise BadRequest('Invalid category')
+            query = category.deep_children_query
 
         query = (query
                  .filter(Category.title_matches(q),
