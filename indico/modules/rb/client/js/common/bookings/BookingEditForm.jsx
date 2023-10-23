@@ -12,7 +12,7 @@ import {START_DATE} from 'react-dates/constants';
 import {Field, FormSpy} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
-import {Form, Message, Segment} from 'semantic-ui-react';
+import {Form, Message, Segment, Icon} from 'semantic-ui-react';
 
 import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
 import {
@@ -156,12 +156,21 @@ class BookingEditForm extends React.Component {
     const today = moment();
     const bookingStarted = today.isAfter(startDt, 'day');
     const bookingFinished = today.isAfter(endDt, 'day');
+    const recurringBookingInProgress = recurrence.type === 'every' && bookingStarted;
 
     // all but one option are hidden
     const showRecurrenceOptions =
       ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
     return (
       <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
+        {recurringBookingInProgress && (
+          <Message icon styleName="recurring-booking-warning">
+            <Icon name="dont" />
+            <Translate>
+              You can't change the booking's recurrence interval once it has begun.
+            </Translate>
+          </Message>
+        )}
         <Segment>
           {showRecurrenceOptions && (
             <Form.Group inline>
@@ -220,7 +229,7 @@ class BookingEditForm extends React.Component {
                 {({input: {value: number}}) => (
                   <FinalDropdown
                     name="recurrence.interval"
-                    disabled={submitSucceeded}
+                    disabled={submitSucceeded || recurringBookingInProgress}
                     selection
                     required
                     options={[
@@ -280,7 +289,9 @@ class BookingEditForm extends React.Component {
               recurrence.type === 'every' && recurrence.interval === 'week' ? {} : {display: 'none'}
             }
           >
-            <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
+            <div styleName="recurring-every-label">
+              <Translate>Recurring every</Translate>
+            </div>
             <FinalWeekdayRecurrencePicker
               name="recurrence.weekdays"
               requireOneSelected
