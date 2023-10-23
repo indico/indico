@@ -91,6 +91,7 @@ export function FinalModalForm({
   extraActions,
   disabledUntilChange,
   disabledAfterSubmit,
+  keepDirtyOnReinitialize,
   unloadPrompt,
   unloadPromptRouter,
   alignTop,
@@ -119,6 +120,7 @@ export function FinalModalForm({
       initialValuesEqual={initialValuesEqual}
       decorators={decorators}
       validate={validate}
+      keepDirtyOnReinitialize={keepDirtyOnReinitialize}
     >
       {fprops => (
         <Modal
@@ -208,6 +210,8 @@ FinalModalForm.propTypes = {
   disabledUntilChange: PropTypes.bool,
   /** Whether to disable the submit button after the form is successfully submitted once. */
   disabledAfterSubmit: PropTypes.bool,
+  /** Whether to keep the form dirty after reinitializing it. */
+  keepDirtyOnReinitialize: PropTypes.bool,
   /**
    * Whether to ask the user to confirm when unloading the page or closing the dialog using
    * anything but the explicit cancel button.
@@ -251,6 +255,7 @@ FinalModalForm.defaultProps = {
   scrolling: false,
   disabledUntilChange: true,
   disabledAfterSubmit: false,
+  keepDirtyOnReinitialize: false,
   unloadPrompt: false,
   unloadPromptRouter: false,
   alignTop: false,

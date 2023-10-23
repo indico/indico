@@ -6,12 +6,13 @@
 // LICENSE file for more details.
 
 import allTemplatesURL from 'indico-url:receipts.all_templates';
+import exportReceiptsURL from 'indico-url:receipts.receipts_export';
 import previewReceiptsURL from 'indico-url:receipts.receipts_preview';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Field} from 'react-final-form';
-import {Button, Form, Grid, Header, Icon, Message, Popup, Segment} from 'semantic-ui-react';
+import {Field, FormSpy} from 'react-final-form';
+import {Button, Dropdown, Form, Grid, Header, Icon, Message, Segment} from 'semantic-ui-react';
 
 import {
   formatters,
@@ -24,6 +25,8 @@ import {
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {downloadBlob} from 'indico/utils/browser';
 import {snakifyKeys} from 'indico/utils/case';
 
 import Previewer from '../templates/Previewer.jsx';
@@ -31,88 +34,103 @@ import Previewer from '../templates/Previewer.jsx';
 import {printReceipt} from './print.jsx';
 import TemplateParameterEditor from './TemplateParameterEditor.jsx';
 
+const makeSubmitLabel = ({publish, notify_users: notifyUsers}) => {
+  if (publish) {
+    return notifyUsers
+      ? Translate.string('Publish and send to registrant(s)')
+      : Translate.string('Save and publish to registration(s)');
+  }
+  return notifyUsers
+    ? Translate.string('Save and send to registrant(s)')
+    : Translate.string('Save to registration(s)');
+};
+
+const downloadOptions = [
+  {
+    key: 'pdf',
+    value: 'pdf',
+    text: Translate.string('as a single PDF document'),
+  },
+  {
+    key: 'zip',
+    value: 'zip',
+    text: Translate.string('as a ZIP archive'),
+  },
+];
+
+const archiveFilename = {
+  pdf: 'documents.pdf',
+  zip: 'documents.zip',
+};
+
 /**
  * This modal presents the user with a structured interface to download, e-mail or publish
  * receipts based on information from specific event registrations.
  */
 export default function PrintReceiptsModal({onClose, registrationIds, eventId}) {
-  const [generating, setGenerating] = useState(false);
-  const [receipts, setReceipts] = useState([]);
-  const [initialValues, setInitialValues] = useState({
-    custom_fields: {},
-    document_type: 'none',
-    filename: 'document',
-  });
+  const [receiptIds, setReceiptIds] = useState([]);
+  const [downloading, setDownloading] = useState(false);
 
-  const {data, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
+  const {data: templateList, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
     trigger: eventId,
     camelize: true,
   });
-  const ready = !loading && !!data;
+  const ready = !loading && !!templateList;
 
   const makeUpdateTemplateFields = form => templateId => {
-    const {customFields, defaultFilename} = data.find(t => t.id === templateId);
+    const {customFields, defaultFilename, title} = templateList.find(t => t.id === templateId);
     form.change(
       'custom_fields',
       customFields
         ? Object.assign({}, ...customFields.map(f => ({[f.name]: f.default || null})))
         : {}
     );
-    form.change('filename', defaultFilename);
+    form.change('filename', defaultFilename || formatters.slugify(title));
+  };
+
+  const downloadReceipts = async format => {
+    setDownloading(true);
+    try {
+      const {data: downloadedData} = await indicoAxios.post(
+        exportReceiptsURL(snakifyKeys({eventId, format})),
+        snakifyKeys({receiptIds}),
+        {responseType: 'blob'}
+      );
+      downloadBlob(archiveFilename[format], downloadedData);
+    } catch (error) {
+      handleAxiosError(error);
+    }
+    setDownloading(false);
   };
 
   const getCustomFields = templateId =>
-    ready && data.find(tpl => tpl.id === templateId)?.customFields;
+    ready && templateList.find(tpl => tpl.id === templateId)?.customFields;
 
   return (
     <FinalModalForm
       id="print-receipts"
       size="large"
       onSubmit={async values => {
-        setGenerating(true);
         const result = await printReceipt(eventId, registrationIds, values);
-        setGenerating(false);
         if (result && result.length > 0) {
-          setReceipts(result);
-          setInitialValues(values);
+          setReceiptIds(result);
         }
       }}
-      initialValues={initialValues}
+      initialValues={{
+        custom_fields: {},
+        document_type: 'none',
+        filename: 'document',
+      }}
       onClose={onClose}
       header={Translate.string('Generate Documents')}
-      extraActions={
-        <Button.Group style={{fontSize: 'inherit'}} primary>
-          {[
-            {
-              icon: 'download',
-              action: 'download',
-              label: Translate.string('Download'),
-              text: Translate.string('The document(s) will be downloaded immediately'),
-            },
-            {
-              icon: 'mail',
-              action: 'mail',
-              label: Translate.string('E-mail'),
-              text: Translate.string(
-                'The document(s) will be e-mailed to the corresponding registrants'
-              ),
-            },
-          ].map(({icon, action, label, text}) => (
-            <Popup
-              key={action}
-              content={text}
-              trigger={<Button disabled={receipts.length === 0} icon={icon} content={label} />}
-            />
-          ))}
-        </Button.Group>
-      }
+      keepDirtyOnReinitialize
       noSubmitButton
     >
       {fprops => (
         <>
-          <Message color={receipts.length === 0 ? 'teal' : 'green'}>
+          <Message color={receiptIds.length === 0 ? 'teal' : 'green'}>
             <Icon name="print" size="big" />
-            {receipts.length === 0 ? (
+            {receiptIds.length === 0 ? (
               <PluralTranslate count={registrationIds.length}>
                 <Singular>Generating document for a single registrant</Singular>
                 <Plural>
@@ -126,11 +144,11 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                 </Plural>
               </PluralTranslate>
             ) : (
-              <PluralTranslate count={receipts.length}>
+              <PluralTranslate count={receiptIds.length}>
                 <Singular>Successfully generated document for a single registrant</Singular>
                 <Plural>
                   Successfully generated{' '}
-                  <Param name="numberOfReceipts" value={receipts.length} wrapper={<strong />} />{' '}
+                  <Param name="numberOfReceipts" value={receiptIds.length} wrapper={<strong />} />{' '}
                   documents
                 </Plural>
               </PluralTranslate>
@@ -142,11 +160,14 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                 name="template"
                 loading={!ready}
                 label={Translate.string('Document Template')}
-                placeholder={Translate.string('Select a receipt template')}
+                placeholder={Translate.string('Select a document template')}
                 options={
-                  ready ? data.map(({id, title}) => ({key: id, text: title, value: id})) : []
+                  ready
+                    ? templateList.map(({id, title}) => ({key: id, text: title, value: id}))
+                    : []
                 }
                 onChange={makeUpdateTemplateFields(fprops.form)}
+                disabled={receiptIds.length > 0}
                 required
                 selection
               />
@@ -157,6 +178,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                     component={TemplateParameterEditor}
                     customFields={template ? getCustomFields(template) : []}
                     title={Translate.string('Template Parameters')}
+                    disabled={receiptIds.length > 0}
                   />
                 )}
               </Field>
@@ -168,8 +190,8 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                     type="text"
                     componentLabel="-{n}.pdf"
                     labelPosition="right"
-                    disabled={!template}
-                    format={formatters.slugify}
+                    disabled={!template || receiptIds.length > 0}
+                    format={v => formatters.slugify(v).replace(/\.pdf$/, '')}
                     formatOnBlur
                     required
                     fluid
@@ -182,44 +204,63 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                 description={Translate.string(
                   'Make the resulting document(s) available on the registration page.'
                 )}
-                onChange={checked => {
-                  if (!checked) {
-                    fprops.form.change('notify_users', false);
-                  }
-                }}
+                disabled={receiptIds.length > 0}
               />
               <Field name="publish" subscription={{value: true}}>
                 {({input: {value: publish}}) => (
                   <FinalCheckbox
                     name="notify_users"
-                    disabled={!publish}
                     label={Translate.string('Notify registrant(s) via e-mail')}
-                    description={Translate.string(
-                      'Send an e-mail to the registrant(s) informing them that the document is available.'
-                    )}
+                    description={
+                      publish
+                        ? Translate.string(
+                            'Send an e-mail to the registrant(s) informing them that the document is available.'
+                          )
+                        : Translate.string(
+                            'Send an e-mail to the registrant(s) with the document attached.'
+                          )
+                    }
+                    disabled={receiptIds.length > 0}
                   />
                 )}
               </Field>
               <Form.Group style={{alignItems: 'center'}}>
-                <Field name="publish" subscription={{value: true}}>
-                  {({input: {value: publish}}) => (
+                <FormSpy subscription={{values: true}}>
+                  {({values}) => (
                     <FinalSubmitButton
-                      disabled={false || generating}
-                      loading={generating}
-                      label={
-                        receipts.length === 0
-                          ? publish
-                            ? Translate.string('Generate and Publish')
-                            : Translate.string('Generate')
-                          : Translate.string('Re-generate')
-                      }
-                      icon="sync"
+                      label={makeSubmitLabel(values)}
+                      icon={values.notify_users ? 'send' : 'save'}
                       style={{width: '100%'}}
+                      disabledAfterSubmit
                       fluid
                     />
                   )}
-                </Field>
-                {receipts.length > 0 && <Icon name="check" color="green" size="large" />}
+                </FormSpy>
+                {receiptIds.length > 0 && (
+                  <>
+                    <Icon name="check" color="green" size="large" />
+                    <Dropdown
+                      options={downloadOptions}
+                      scrolling
+                      icon={null}
+                      value={null}
+                      selectOnBlur={false}
+                      selectOnNavigation={false}
+                      onChange={(_, {value}) => downloadReceipts(value)}
+                      trigger={
+                        <Button
+                          icon
+                          style={{whiteSpace: 'nowrap', marginLeft: '1em'}}
+                          type="button"
+                          loading={downloading}
+                        >
+                          <Icon name="download" /> <Translate>Download</Translate>{' '}
+                          <Icon name="caret down" />
+                        </Button>
+                      }
+                    />
+                  </>
+                )}
               </Form.Group>
             </Grid.Column>
             <Grid.Column>

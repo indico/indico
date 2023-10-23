@@ -1,7 +1,7 @@
 """Add receipt data structures
 
 Revision ID: 252d61f890a0
-Revises: 0c44046dc1be
+Revises: 31b699664893
 Create Date: 2021-10-01 15:30:14.789502
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '252d61f890a0'
-down_revision = '0c44046dc1be'
+down_revision = '31b699664893'
 branch_labels = None
 depends_on = None
 
@@ -50,6 +50,5 @@ def upgrade():
 
 
 def downgrade():
-    return
     op.drop_table('receipt_files', schema='event_registration')
     op.drop_table('receipt_templates', schema='indico')

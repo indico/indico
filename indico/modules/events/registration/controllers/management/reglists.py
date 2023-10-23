@@ -837,9 +837,8 @@ class RHDeleteReceipt(RHManageReceiptsBase):
     def _process(self):
         self.receipt_file.is_deleted = True
         db.session.flush()
-        logger.info('Receipt/certificate file %s deleted by %s', self.receipt_file, session.user)
-        receipt_type = self.receipt_file.template.type.title or 'Document'
+        logger.info('Document file %s deleted by %s', self.receipt_file, session.user)
         self.registration.log(EventLogRealm.management, LogKind.negative, 'Receipts',
-                              f'{receipt_type} "{self.receipt_file.file.filename}" deleted', session.user)
+                              f'Document "{self.receipt_file.file.filename}" deleted', session.user)
         flash(_("Document '{}' successfully deleted").format(self.receipt_file.file.filename), 'success')
         return jsonify_data(html=self._render_receipts_list())

@@ -5,12 +5,16 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import os
 import re
 import typing as t
 from dataclasses import dataclass, field
+from datetime import datetime
+from io import BytesIO
 
 from flask import g, jsonify, request, session
 from marshmallow import fields, validate
+from pypdf import PdfWriter
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -21,6 +25,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.files.models.files import File
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
@@ -31,7 +36,7 @@ from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_in
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import YAML, not_empty
+from indico.util.marshmallow import YAML, ModelList, not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
@@ -305,14 +310,21 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
         ]
         del g.template_stack
         if errors and not force:
-            return jsonify(receipts=[], errors=errors)
+            return jsonify(receipt_ids=[], errors=errors)
 
-        receipts = []
+        receipt_ids = []
         for registration in registrations:
             pdf_content = create_pdf(self.target, {html_sources[registration]}, self.template.css)
-            n = ReceiptFile.query.filter(ReceiptFile.registration == registration).count()
+            timestamp = datetime.now().strftime('%Y%m%d-%H%M')
+            full_filename = f'{slugify(filename, timestamp)}'
+            n = (ReceiptFile.query
+                 .join(File)
+                 .filter(ReceiptFile.registration == registration, File.filename.like(f'{full_filename}%.pdf'))
+                 .count())
+            if n > 0:
+                full_filename = f'{full_filename}-{n}'
             f = File(
-                filename=secure_filename(f'{slugify(filename, n + 1)}.pdf', f'document-{n + 1}.pdf'),
+                filename=secure_filename(f'{full_filename}.pdf', f'document-{timestamp}.pdf'),
                 content_type='application/pdf',
                 meta={'event_id': self.target.id}
             )
@@ -327,10 +339,10 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             )
             db.session.add(rf)
             db.session.commit()
-            receipts.append(rf.locator)
-            if publish and notify_users:
+            receipt_ids.append(rf.file_id)
+            if notify_users:
                 pass  #TODO notify registrant
-        return jsonify(receipts=receipts, errors=errors)
+        return jsonify(receipt_ids=receipt_ids, errors=errors)
 
 
 class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
@@ -370,3 +382,33 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
         db.session.add(new_tpl)
         db.session.flush()
         return jsonify(ReceiptTemplateDBSchema().dump(new_tpl))
+
+
+class RHExportReceipts(RHManageEventBase, ZipGeneratorMixin):
+    """Export an archive of multiple receipts."""
+
+    def _prepare_folder_structure(self, file):
+        registration = file.receipt_file.registration
+        registrant_name = f'{registration.get_full_name()}_{registration.friendly_id}'
+        file_name = secure_filename(f'{file.id}_{registrant_name}_{file.filename}', f'{file.id}_document')
+        return os.path.join(*self._adjust_path_length([file_name]))
+
+    def _iter_items(self, receipts):
+        for receipt in receipts:
+            yield receipt.file
+
+    @use_kwargs({
+        'receipts': ModelList(ReceiptFile, filter_deleted=True, data_key='receipt_ids', required=True,
+                              validate=not_empty)
+    })
+    def _process(self, receipts):
+        if request.view_args['format'] == 'zip':
+            return self._generate_zip_file(receipts)
+        output = PdfWriter()
+        for receipt in receipts:
+            with receipt.file.open() as fd:
+                output.append(fd)
+        outputbuf = BytesIO()
+        output.write(outputbuf)
+        outputbuf.seek(0)
+        return send_file('documents.pdf', outputbuf, 'application/pdf')

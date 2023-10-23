@@ -54,9 +54,10 @@ class ReceiptFile(db.Model):
         'File',
         lazy=False,
         backref=db.backref(
-            'receipt_files',
+            'receipt_file',
             cascade='all, delete-orphan',
-            lazy=True
+            lazy=True,
+            uselist=False
         )
     )
     registration = db.relationship(
