@@ -5,12 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import autoLinkerRulesUrl from 'indico-url:events.autolinker_rules';
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import MdEditor from 'react-markdown-editor-lite';
+import {Loader} from 'semantic-ui-react';
 
 import {formatters, FinalField} from 'indico/react/forms';
-import {Markdown} from 'indico/react/util';
+import {useIndicoAxios} from 'indico/react/hooks';
+import {AutoLinkerPlugin, Markdown} from 'indico/react/util';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './MarkdownEditor.module.scss';
@@ -35,6 +39,10 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
     'tab-insert',
   ];
 
+  const {data, loading: isLoadingRules} = useIndicoAxios(autoLinkerRulesUrl(), {
+    camelize: true,
+  });
+
   const onImageUpload = async file => {
     const bodyFormData = new FormData();
     bodyFormData.append('upload', file);
@@ -54,10 +62,16 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
     }
   };
 
-  return (
+  return isLoadingRules ? (
+    <Loader />
+  ) : (
     <div styleName="markdown-editor" onDragOver={handleDragOver}>
       <MdEditor
-        renderHTML={text => <Markdown>{text.replace(/\n/gi, '  \n')}</Markdown>}
+        renderHTML={text => (
+          <Markdown remarkPlugins={[[AutoLinkerPlugin, {rules: data.rules}]]}>
+            {text.replace(/\n/gi, '  \n')}
+          </Markdown>
+        )}
         canView={{menu: true, md: true, html: false, fullScreen: false, hideMenu: false}}
         plugins={plugins.filter(p => imageUploadURL || p !== 'image')}
         style={{height}}

@@ -87,6 +87,7 @@ def render_event_footer(event, dark=False):
 
 class WPEventAdmin(WPAdmin):
     template_prefix = 'events/'
+    bundles = ('module_events.admin.js', 'module_events.admin.css')
 
 
 class WPEventBase(WPDecorated):

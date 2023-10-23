@@ -13,15 +13,19 @@ import binascii
 import os
 import re
 import string
+import typing as t
 import unicodedata
+from collections import OrderedDict
 from email.utils import escapesre, specialsre
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
 from uuid import uuid4
+from xml.etree.ElementTree import Element
 
 import bleach
 import email_validator
+import html5lib
 import markdown
 import translitcodec
 from bleach.css_sanitizer import CSSSanitizer
@@ -30,6 +34,95 @@ from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
 from sqlalchemy import ForeignKeyConstraint, inspect
+
+
+class AutoLinkExtension(markdown.extensions.Extension):
+    def __init__(self, rules: list[list], **kwargs):
+        self.rules = rules
+        super().__init__(**kwargs)
+
+    # flake8: noqa: N802
+    def extendMarkdown(self, md: markdown.Markdown):
+        for n, rule in enumerate(self.rules):
+            md.inlinePatterns.register(AutoLinkInlineProcessor(rule['regex'], md, rule['url']), f'linker_{n}', 50)
+
+
+class AutoLinkInlineProcessor(markdown.inlinepatterns.InlineProcessor):
+
+    # exclude subsitution within links (nesting)
+    ANCESTOR_EXCLUDES = ('a',)
+
+    def __init__(self, pattern: str, md: markdown.Markdown, url: str):
+        self.url = url
+        super().__init__(pattern, md)
+
+    # flake8: noqa: N802
+    def handleMatch(self, m: re.Match, data: str):
+        el = Element('a')
+        # if a match is empty, just ignore it silently
+        values = (('' if val is None else val) for val in m.groups())
+        el.set('href', self.url.format(m.group(0), *values))
+        el.text = m.group(0)
+        return el, m.start(0), m.end(0)
+
+
+class HTMLLinker:
+    """An HTML parser which applies autolinker rules."""
+
+    def __init__(self, rules: list[list]):
+        self.rules = rules
+
+    def _walk(self, tree_gen: t.Iterator[dict]):
+        can_parse = True
+        for item in tree_gen:
+            # we will ignore stuff inside links, to avoid nesting
+            if item['type'] in {'StartTag', 'EndTag'} and item['name'] in {'html', 'head', 'body'}:
+                pass
+            elif item['type'] == 'StartTag' and item['name'] == 'a':
+                can_parse = False
+                yield item
+            elif item['type'] == 'EndTag' and item['name'] == 'a':
+                can_parse = True
+                yield item
+            elif item['type'] == 'Characters' and can_parse:
+                text = item['data']
+
+                # "tokenize" text
+                tokens = []
+                last_idx = 0
+                for m in re.finditer(r'|'.join(f"(?:{r['regex']})" for r in self.rules), text):
+                    if m.span()[0] > last_idx:
+                        tokens.append(text[last_idx:m.span()[0]])
+                    tokens.append(m.group(0))
+                    last_idx = m.span()[1]
+                if text[last_idx:]:
+                    tokens.append(text[last_idx:])
+
+                # process each token
+                for token in tokens:
+                    for rule in self.rules:
+                        m = re.match(rule['regex'], token)
+                        if m:
+                            # if a match is empty, just ignore it silently
+                            values = (('' if val is None else val) for val in m.groups())
+                            # enclose text in a link
+                            yield {
+                                'type': 'StartTag',
+                                'name': 'a',
+                                'data': OrderedDict([((None, 'href'), rule['url'].format(m.group(0), *values))])
+                            }
+                            yield {'type': 'Characters', 'data': token}
+                            yield {'type': 'EndTag', 'name': 'a'}
+                            break
+                    else:
+                        yield {'type': 'Characters', 'data': token}
+            else:
+                yield item
+
+    def process(self, html):
+        walker = html5lib.getTreeWalker('etree')
+        serializer = html5lib.serializer.HTMLSerializer(omit_optional_tags=False)
+        return serializer.render(self._walk(walker(html5lib.parse(html))))
 
 
 # basic list of tags, used for markdown content
@@ -522,10 +615,11 @@ class RichMarkup(Markup):
     it in a jinja template.
     """
 
-    __slots__ = ('_preformatted',)
+    __slots__ = ('_preformatted', '_linker')
 
-    def __new__(cls, content='', preformatted=None):
+    def __new__(cls, content: str = '', preformatted: t.Optional[bool] = None, linker: t.Optional[t.Callable] = None):
         obj = Markup.__new__(cls, content)
+        obj._linker = linker
         if preformatted is None:
             tmp = content.lower()
             obj._preformatted = not any(tag in tmp for tag in ('<p>', '<p ', '<br', '<li>'))
@@ -537,6 +631,8 @@ class RichMarkup(Markup):
         # XXX: ensure we have no harmful HTML - there are certain malicious values that
         # are not caught by the legacy sanitizer that runs at submission time
         string = RichMarkup(sanitize_html(str(self)), preformatted=self._preformatted)
+        if self._linker:
+            string = self._linker(string)
         if string._preformatted:
             return f'<div class="preformatted">{string}</div>'
         else:

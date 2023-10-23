@@ -42,6 +42,7 @@
     "lodash": "^4.17.21",
     "mathjax": "^3.2.2",
     "mathjax-full": "^3.2.2",
+    "mdast-util-find-and-replace": "^3.0.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.34",
     "nanoid": "^4.0.2",

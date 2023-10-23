@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import flash, redirect, request
+from webargs import fields
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
@@ -14,9 +15,11 @@ from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
                                               delete_reference_type, update_event_label, update_reference_type)
-from indico.modules.events.settings import unlisted_events_settings
+from indico.modules.events.schemas import AutoLinkerRuleSchema
+from indico.modules.events.settings import autolinker_settings, unlisted_events_settings
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -149,3 +152,20 @@ class RHUnlistedEvents(RHAdminBase):
             flash(_('Settings have been saved'), 'success')
             return redirect(url_for('events.unlisted_events'))
         return WPEventAdmin.render_template('admin/unlisted_events.html', 'unlisted_events', form=form)
+
+
+class RHAutoLinker(RHAdminBase):
+    """Manage patterns which are automatically linked in notes."""
+
+    def _process(self):
+        return WPEventAdmin.render_template('admin/autolinker.html')
+
+
+class RHAutoLinkerConfig(RHAdminBase):
+    """Update configuration of auto-linker"""
+
+    @use_kwargs({
+        'rules': fields.Nested(AutoLinkerRuleSchema(many=True))
+    })
+    def _process(self, rules):
+        autolinker_settings.set('rules', rules)
