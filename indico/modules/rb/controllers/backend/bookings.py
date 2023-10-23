@@ -34,10 +34,10 @@ from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
-from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, generate_spreadsheet_from_occurrences,
-                                    get_linked_object, get_prebooking_collisions, group_by_occurrence_date,
-                                    is_booking_start_within_grace_period, serialize_availability,
-                                    serialize_booking_details, serialize_occurrences)
+from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
+                                    generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
+                                    group_by_occurrence_date, is_booking_start_within_grace_period,
+                                    serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -294,6 +294,7 @@ class RHBookingEditCalendars(RHBookingBase):
     }, location='query')
     def _process(self, **kwargs):
         check_impossible_repetition(kwargs)
+        check_repeat_frequency(self.booking.repeat_frequency, kwargs['repeat_frequency'])
         return jsonify(get_booking_edit_calendar_data(self.booking, kwargs))
 
 
@@ -329,6 +330,8 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_interval': args['repeat_interval'],
             'recurrence_weekdays': args['recurrence_weekdays'],
         }
+
+        check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):

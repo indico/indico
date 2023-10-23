@@ -157,6 +157,7 @@ class BookingEditForm extends React.Component {
     const bookingStarted = today.isAfter(startDt, 'day');
     const bookingFinished = today.isAfter(endDt, 'day');
     const recurringBookingInProgress = recurrence.type === 'every' && bookingStarted;
+    // TODO: Grab the repeat freq. of the booking itself (via this.props.bookings + a interval mapping? etc.) as this won't really work...
 
     // all but one option are hidden
     const showRecurrenceOptions =
