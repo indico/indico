@@ -33,7 +33,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
-from indico.modules.events.registration.controllers import ReceiptActionsMixin, RegistrationEditMixin
+from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
@@ -51,6 +51,7 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -783,7 +784,7 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
         return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.regform.id)
 
 
-class RHManageReceiptsBase(ReceiptActionsMixin, RHManageRegistrationBase):
+class RHManageReceiptBase(RHManageRegistrationBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.receipt_file
@@ -792,21 +793,24 @@ class RHManageReceiptsBase(ReceiptActionsMixin, RHManageRegistrationBase):
 
     def _process_args(self):
         RHManageRegistrationBase._process_args(self)
-        ReceiptActionsMixin._process_args(self)
+        self.receipt_file = (ReceiptFile.query
+                             .with_parent(self.registration)
+                             .filter_by(file_id=request.view_args['file_id'])
+                             .first_or_404())
 
     def _render_receipts_list(self):
         tpl_summary = get_template_module('events/registration/display/_registration_summary_blocks.html')
         return tpl_summary.render_receipts_list(self.registration, from_management=True)
 
 
-class RHDownloadReceipt(RHManageReceiptsBase):
+class RHDownloadReceipt(RHManageReceiptBase):
     """Download a receipt file from a registration."""
 
     def _process(self):
         return self.receipt_file.file.send()
 
 
-class RHPublishReceipt(RHManageReceiptsBase):
+class RHPublishReceipt(RHManageReceiptBase):
     """Publish or unpublish a receipt from a registration."""
 
     @use_kwargs({
@@ -831,7 +835,7 @@ class RHPublishReceipt(RHManageReceiptsBase):
                             disabled_until_change=False)
 
 
-class RHDeleteReceipt(RHManageReceiptsBase):
+class RHDeleteReceipt(RHManageReceiptBase):
     """Delete a receipt from a registration."""
 
     def _process(self):

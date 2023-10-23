@@ -152,7 +152,7 @@
                         <tr class="{{ 'unpublished-receipt' if not receipt.is_published }}">
                             <th class="regform-done-caption">{{ receipt.template.type.title if receipt.template.type else '' }}</th>
                             <td class="regform-done-data">
-                                <a href="{{ url_for('.download_receipt', receipt) if from_management else url_for('.display_receipt_download', receipt.locator.registrant) }}">
+                                <a href="{{ url_for('.download_receipt', receipt) if from_management else receipt.file.signed_download_url }}">
                                     {{ filename }}
                                 </a>
                                 {% if not receipt.is_published -%}
