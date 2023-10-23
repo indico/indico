@@ -117,7 +117,7 @@ export async function printReceipt(eventId, registrationIds, values) {
   };
   try {
     const data = await printReceiptsRequest(registrationIds, false);
-    let receipts = data.receipts;
+    let receiptIds = data.receipt_ids;
     if (data.errors.length) {
       await new Promise(resolve => {
         injectModal(resolveModal => (
@@ -127,8 +127,8 @@ export async function printReceipt(eventId, registrationIds, values) {
                 [...new Set(data.errors.map(e => e.registration.id))],
                 true
               );
-              receipts = [...receipts, ...retryData.receipts];
-              console.log('1.5', receipts);
+              receiptIds = [...receiptIds, ...retryData.receipt_ids];
+              console.log('1.5', receiptIds);
             }}
             onClose={() => {
               resolve();
@@ -139,7 +139,7 @@ export async function printReceipt(eventId, registrationIds, values) {
         ));
       });
     }
-    return receipts;
+    return receiptIds;
   } catch (error) {
     handleAxiosError(error);
   }

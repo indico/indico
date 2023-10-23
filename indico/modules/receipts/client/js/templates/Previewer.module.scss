@@ -10,6 +10,7 @@
   flex-direction: column;
   align-items: center;
   min-height: 55em;
+  overflow: hidden;
 
   &.loading {
     opacity: 0.5;
