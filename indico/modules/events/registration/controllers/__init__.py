@@ -13,7 +13,6 @@ from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (get_flat_section_submission_data, get_form_registration_data,
                                                      make_registration_schema, modify_registration)
-from indico.modules.receipts.models.files import ReceiptFile
 from indico.web.args import parser
 
 
@@ -80,11 +79,3 @@ class RegistrationEditMixin:
                                                paid=self.registration.is_paid,
                                                registration_data=registration_data,
                                                file_data=self._get_file_data())
-
-
-class ReceiptActionsMixin:
-    def _process_args(self):
-        self.receipt_file = (ReceiptFile.query
-                             .with_parent(self.registration)
-                             .filter_by(file_id=request.view_args['file_id'])
-                             .first_or_404())

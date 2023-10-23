@@ -88,12 +88,6 @@ class ReceiptFile(db.Model):
         return dict(self.registration.locator, file_id=self.file_id,
                     filename=secure_filename(self.file.filename, f'file-{self.file_id}'))
 
-    @locator.registrant
-    def locator(self):
-        """A locator suitable for 'display' pages."""
-        return dict(self.registration.locator.registrant, file_id=self.file_id,
-                    filename=secure_filename(self.file.filename, f'file-{self.file_id}'))
-
     @property
     def download_url(self):
         return url_for('receipts.download_file', self)
