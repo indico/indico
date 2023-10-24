@@ -158,11 +158,11 @@ class RHAutoLinker(RHAdminBase):
     """Manage patterns which are automatically linked in notes."""
 
     def _process(self):
-        return WPEventAdmin.render_template('admin/autolinker.html')
+        return WPEventAdmin.render_template('admin/autolinker.html', 'autolinker')
 
 
 class RHAutoLinkerConfig(RHAdminBase):
-    """Update configuration of auto-linker"""
+    """Update configuration of the auto-linker."""
 
     @use_kwargs({
         'rules': fields.Nested(AutoLinkerRuleSchema(many=True))

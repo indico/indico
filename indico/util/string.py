@@ -41,14 +41,12 @@ class AutoLinkExtension(markdown.extensions.Extension):
         self.rules = rules
         super().__init__(**kwargs)
 
-    # flake8: noqa: N802
-    def extendMarkdown(self, md: markdown.Markdown):
+    def extendMarkdown(self, md: markdown.Markdown):  # noqa: N802
         for n, rule in enumerate(self.rules):
             md.inlinePatterns.register(AutoLinkInlineProcessor(rule['regex'], md, rule['url']), f'linker_{n}', 50)
 
 
 class AutoLinkInlineProcessor(markdown.inlinepatterns.InlineProcessor):
-
     # exclude subsitution within links (nesting)
     ANCESTOR_EXCLUDES = ('a',)
 
@@ -56,8 +54,7 @@ class AutoLinkInlineProcessor(markdown.inlinepatterns.InlineProcessor):
         self.url = url
         super().__init__(pattern, md)
 
-    # flake8: noqa: N802
-    def handleMatch(self, m: re.Match, data: str):
+    def handleMatch(self, m: re.Match, data: str):  # noqa: N802
         el = Element('a')
         # if a match is empty, just ignore it silently
         values = (('' if val is None else val) for val in m.groups())
@@ -617,9 +614,8 @@ class RichMarkup(Markup):
 
     __slots__ = ('_preformatted', '_linker')
 
-    def __new__(cls, content: str = '', preformatted: t.Optional[bool] = None, linker: t.Optional[t.Callable] = None):
+    def __new__(cls, content: str = '', preformatted: t.Optional[bool] = None):
         obj = Markup.__new__(cls, content)
-        obj._linker = linker
         if preformatted is None:
             tmp = content.lower()
             obj._preformatted = not any(tag in tmp for tag in ('<p>', '<p ', '<br', '<li>'))
@@ -631,8 +627,6 @@ class RichMarkup(Markup):
         # XXX: ensure we have no harmful HTML - there are certain malicious values that
         # are not caught by the legacy sanitizer that runs at submission time
         string = RichMarkup(sanitize_html(str(self)), preformatted=self._preformatted)
-        if self._linker:
-            string = self._linker(string)
         if string._preformatted:
             return f'<div class="preformatted">{string}</div>'
         else:

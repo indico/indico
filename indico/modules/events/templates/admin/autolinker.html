@@ -27,16 +27,15 @@
         <div class="content">
             <div class="header">{% trans %}Example{% endtrans %}</div>
             <code>
-                gh:([\d\w\-_\.]+)/([\d\w\-_\.]+):(\d+) → https://github.com/{1}/{2}/issues/{3}
+                \bgh:([\d\w\-_\.]+)/([\d\w\-_\.]+)#(\d+)\b → https://github.com/{1}/{2}/issues/{3}
             </code>
         </div>
     </div>
 {% endblock %}
 
 {%- block content %}
-    <div id="autolinker-widget"></div>
-    <div id="autolinker-test"></div>
+    <div id="autolinker-root"></div>
     <script>
-        setupAutoLinkerConfig('autolinker-widget', 'autolinker-test');
+        setupAutoLinkerConfig('autolinker-root');
     </script>
 {%- endblock -%}

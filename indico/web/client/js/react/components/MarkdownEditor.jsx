@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import autoLinkerRulesUrl from 'indico-url:events.autolinker_rules';
+import autoLinkerRulesURL from 'indico-url:events.autolinker_rules';
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -39,7 +39,7 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
     'tab-insert',
   ];
 
-  const {data, loading: isLoadingRules} = useIndicoAxios(autoLinkerRulesUrl(), {
+  const {data, loading: isLoadingRules} = useIndicoAxios(autoLinkerRulesURL(), {
     camelize: true,
   });
 
@@ -68,7 +68,7 @@ export default function MarkdownEditor({height, imageUploadURL, ...rest}) {
     <div styleName="markdown-editor" onDragOver={handleDragOver}>
       <MdEditor
         renderHTML={text => (
-          <Markdown remarkPlugins={[[AutoLinkerPlugin, {rules: data.rules}]]}>
+          <Markdown targetBlank remarkPlugins={[[AutoLinkerPlugin, {rules: data.rules}]]}>
             {text.replace(/\n/gi, '  \n')}
           </Markdown>
         )}

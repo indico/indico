@@ -24,27 +24,24 @@ class ValidRegExField(fields.String):
             raise ValidationError(_('Empty regex'))
         try:
             return re.compile(value).pattern
-        except ValueError as exc:
-            raise ValidationError(str(exc))
+        except re.error as exc:
+            raise ValidationError(_('Invalid regex: {}').format(exc))
 
 
 class AutoLinkerRuleSchema(mm.Schema):
     """A regex -> url with placeholders mapping rule."""
 
     regex = ValidRegExField()
-    url = fields.String(validate=not_empty)
+    url = fields.URL(validate=not_empty)
 
     @validates_schema(skip_on_field_errors=True)
     def _check_url_is_well_formed(self, data, **kwargs):
         regex = data['regex']
-        if not regex:
-            raise ValidationError(_('No regex provided'))
-
         # if de-serialization worked OK, this shouldn't fail
         compiled_regex = re.compile(regex)
 
         # check that there is at least one group
-        if compiled_regex.groups == 0:
+        if not compiled_regex.groups:
             raise ValidationError(_('The regex needs to have at least one group'))
 
         # check if all groups are used

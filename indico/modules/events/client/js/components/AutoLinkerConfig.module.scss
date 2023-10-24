@@ -10,3 +10,11 @@
 .list-segment :global(.ui.list) {
   @include font-family-monospace();
 }
+
+:global(.ui.form) .rule-editor-row:global(.fields) {
+  margin-right: 0;
+
+  :global(.ui.input) > input {
+    @include font-family-monospace();
+  }
+}

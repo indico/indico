@@ -103,7 +103,7 @@ class RHDisplayPrivacyPolicy(RHEventBase):
 
 
 class RHAutoLinkerRules(RHProtected):
-    """Get auto-linker configuration"""
+    """Get auto-linker configuration."""
 
     def _process(self):
         return jsonify(autolinker_settings.get_all())
