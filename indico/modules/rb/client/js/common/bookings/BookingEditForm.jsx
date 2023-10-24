@@ -30,7 +30,7 @@ import {serializeDate} from 'indico/utils/date';
 
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
 import {FinalWeekdayRecurrencePicker} from '../../components/WeekdayRecurrencePicker';
-import {sanitizeRecurrence} from '../../util';
+import {sanitizeRecurrence, getRecurrenceInfo} from '../../util';
 import {selectors as userSelectors} from '../user';
 
 import './BookingEditForm.module.scss';
@@ -141,7 +141,7 @@ class BookingEditForm extends React.Component {
   render() {
     const {
       user: sessionUser,
-      booking: {bookedForUser, startDt, endDt, room, isAccepted},
+      booking: {bookedForUser, startDt, endDt, room, isAccepted, repetition},
       onBookingPeriodChange,
       formProps,
       hideOptions,
@@ -156,8 +156,7 @@ class BookingEditForm extends React.Component {
     const today = moment();
     const bookingStarted = today.isAfter(startDt, 'day');
     const bookingFinished = today.isAfter(endDt, 'day');
-    const recurringBookingInProgress = recurrence.type === 'every' && bookingStarted;
-    // TODO: Grab the repeat freq. of the booking itself (via this.props.bookings + a interval mapping? etc.) as this won't really work...
+    const recurringBookingInProgress = getRecurrenceInfo(repetition).type === 'every';
 
     // all but one option are hidden
     const showRecurrenceOptions =
@@ -167,9 +166,7 @@ class BookingEditForm extends React.Component {
         {recurringBookingInProgress && (
           <Message icon styleName="recurring-booking-warning">
             <Icon name="dont" />
-            <Translate>
-              You can't change the booking's recurrence interval once it has begun.
-            </Translate>
+            <Translate>You cannot modify the repeat frequency of an existing booking.</Translate>
           </Message>
         )}
         <Segment>
