@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from datetime import datetime
-from operator import itemgetter
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 
@@ -19,7 +18,7 @@ from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
 from indico.util.marshmallow import LowercaseString, UUIDString
-from indico.util.string import validate_email
+from indico.util.string import remove_accents, str_to_ascii, validate_email
 
 
 # we use a special UUID that's never generated as a valid uuid4 to indicate that the
@@ -318,7 +317,7 @@ class CountryField(RegistrationFormFieldBase):
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
         choices = sorted(({'caption': v, 'countryKey': k} for k, v in get_countries().items()),
-                         key=itemgetter('caption'))
+                         key=lambda x: str_to_ascii(remove_accents(x['caption'])))
         return {'choices': choices}
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
