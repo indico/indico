@@ -263,34 +263,14 @@ export function renderRecurrenceWeekdays(weekdays) {
     (a, b) => orderedWeekdays.indexOf(a) - orderedWeekdays.indexOf(b)
   );
 
-  if (sortedWeekdays.length === 1) {
-    return (
-      <Translate>
-        Every <Param name="weekday" value={weekdaysMap[sortedWeekdays[0]]} />
-      </Translate>
-    );
-  }
-
-  if (sortedWeekdays.length === 2) {
-    return (
-      <Translate>
-        Every <Param name="weekday1" value={weekdaysMap[sortedWeekdays[0]]} /> and{' '}
-        <Param name="weekday2" value={weekdaysMap[sortedWeekdays[1]]} />
-      </Translate>
-    );
-  }
-
-  // join all weekdays but the last one with commas
-  const weekdaysString = sortedWeekdays
-    .slice(0, -1)
-    .map(weekday => weekdaysMap[weekday])
-    .join(', ');
-  const lastWeekday = weekdaysMap[sortedWeekdays[sortedWeekdays.length - 1]];
+  const formattedWeekdays = new Intl.ListFormat(moment.locale(), {
+    style: 'long',
+    type: 'conjunction',
+  }).format(sortedWeekdays.map(weekday => weekdaysMap[weekday]));
 
   return (
     <Translate>
-      Every <Param name="weekdays" value={weekdaysString} /> and{' '}
-      <Param name="last_weekday" value={lastWeekday} />
+      Every <Param name="weekdays" value={formattedWeekdays} />
     </Translate>
   );
 }
