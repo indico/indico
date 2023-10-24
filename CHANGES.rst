@@ -43,6 +43,7 @@ Improvements
 - Support sessions that expire at a certain date (specified by the used flask-multipass
   provider) regardless of activity when using an external login method (:pr:`5907`, thanks
   :user:`cbartz`)
+- Improve i18n support for ``renderRecurrenceWeekdays()`` using ``Intl.ListFormat`` (:pr:`6000`)
 
 Bugfixes
 ^^^^^^^^

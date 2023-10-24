@@ -252,7 +252,12 @@ export function renderRecurrenceWeekdays(weekdays) {
     sun: moment.weekdays(0),
   };
 
-  if (weekdays.length === 0) {
+  if (weekdays === null || weekdays.length === 0) {
+    return null;
+  }
+
+  // handle unknown/bad weekdays
+  if (weekdays.some(weekday => !Object.keys(weekdaysMap).includes(weekday))) {
     return null;
   }
 
@@ -268,11 +273,7 @@ export function renderRecurrenceWeekdays(weekdays) {
     type: 'conjunction',
   }).format(sortedWeekdays.map(weekday => weekdaysMap[weekday]));
 
-  return (
-    <Translate>
-      Every <Param name="weekdays" value={formattedWeekdays} />
-    </Translate>
-  );
+  return formattedWeekdays;
 }
 
 const _legendLabels = {
