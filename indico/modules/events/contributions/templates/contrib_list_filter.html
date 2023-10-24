@@ -52,11 +52,13 @@
     </div>
 </div>
 <form class="list-filter" method="POST">
-    <h3>{% trans %}Available filtering options{% endtrans %}</h3>
-    <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.items() %}
-            {{ _render_column_selector(item_id, item) }}
-        {% endfor %}
+    <div class="list-filter-content">
+        <h3>{% trans %}Available filtering options{% endtrans %}</h3>
+        <div class="flexrow f-wrap">
+            {% for item_id, item in static_items.items() %}
+                {{ _render_column_selector(item_id, item) }}
+            {% endfor %}
+        </div>
     </div>
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change

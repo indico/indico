@@ -126,8 +126,12 @@
 }
 
 .list-filter {
-  padding-bottom: 14em;
   position: relative;
+
+  .list-filter-content {
+    max-height: 65vh;
+    overflow-y: auto;
+  }
 
   .list-column {
     @extend .flexrow;
@@ -237,9 +241,9 @@
   }
 
   > .bottom-buttons {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+    display: flex;
+    justify-content: end;
+    padding-top: 15px;
   }
 }
 

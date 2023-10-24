@@ -76,37 +76,38 @@
     </div>
 </div>
 <form class="list-filter" method="POST">
-    <input id="visible-items" type="hidden" name="visible_items"
-           value="{{ visible_items | tojson | forceescape }}">
-    <h3>{% trans %}General abstract info{% endtrans %}</h3>
-    <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.items() %}
-            {% set filter_choices = item.get('filter_choices') %}
-            {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
-        {% endfor %}
-    </div>
-
-    {% if contrib_fields %}
-        <h3>{% trans %}Abstract fields{% endtrans %}</h3>
+    <div class="list-filter-content">
+        <input id="visible-items" type="hidden" name="visible_items"
+               value="{{ visible_items | tojson | forceescape }}">
+        <h3>{% trans %}General abstract info{% endtrans %}</h3>
         <div class="flexrow f-wrap">
-            {% for field in contrib_fields %}
-                {{ _render_column_selector(field.id, field, field.filter_choices) }}
+            {% for item_id, item in static_items.items() %}
+                {% set filter_choices = item.get('filter_choices') %}
+                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
             {% endfor %}
         </div>
-    {% endif %}
 
-    {% if extra_filters %}
-        <h3>{% trans %}Extra filters{% endtrans %}</h3>
-        <div class="i-form horizontal">
-            {% for item_id, item in extra_filters.items() %}
-                {% set name = 'field_{}'.format(item_id) %}
-                {% if item.type == 'bool' %}
-                    {{ _render_boolean_filter(id=item_id, name=name, label=item.title) }}
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
+        {% if contrib_fields %}
+            <h3>{% trans %}Abstract fields{% endtrans %}</h3>
+            <div class="flexrow f-wrap">
+                {% for field in contrib_fields %}
+                    {{ _render_column_selector(field.id, field, field.filter_choices) }}
+                {% endfor %}
+            </div>
+        {% endif %}
 
+        {% if extra_filters %}
+            <h3>{% trans %}Extra filters{% endtrans %}</h3>
+            <div class="i-form horizontal">
+                {% for item_id, item in extra_filters.items() %}
+                    {% set name = 'field_{}'.format(item_id) %}
+                    {% if item.type == 'bool' %}
+                        {{ _render_boolean_filter(id=item_id, name=name, label=item.title) }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
                value="{% trans %}Apply{% endtrans %}">
