@@ -44,6 +44,8 @@ Improvements
   provider) regardless of activity when using an external login method (:pr:`5907`, thanks
   :user:`cbartz`)
 - Improve i18n support for ``renderRecurrenceWeekdays()`` using ``Intl.ListFormat`` (:pr:`6000`)
+- Support weekly room bookings that take place on multiple weekdays (:pr:`5829`,
+  :pr:`6000`, :issue:`5806`)
 
 Bugfixes
 ^^^^^^^^

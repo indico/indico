@@ -79,12 +79,10 @@ function TimeInformation({
             <div>
               <div>
                 <Icon name="sync alternate" />
-                <strong>
-                  <Translate>
-                    Every{' '}
-                    <Param name="weekdays" value={renderRecurrenceWeekdays(recurrenceWeekdays)} />
-                  </Translate>
-                </strong>
+                <Translate as="strong">
+                  Every{' '}
+                  <Param name="weekdays" value={renderRecurrenceWeekdays(recurrenceWeekdays)} />
+                </Translate>
               </div>
             </div>
           </Segment>

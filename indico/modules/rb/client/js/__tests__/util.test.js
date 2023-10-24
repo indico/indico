@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
+
 import {renderRecurrenceWeekdays} from '../util';
 
 describe('renderRecurrenceWeekdays', () => {
@@ -59,4 +61,34 @@ describe('renderRecurrenceWeekdays', () => {
     const expected = 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, and Sunday';
     expect(renderRecurrenceWeekdays(weekdays)).toBe(expected);
   });
+});
+
+describe('renderLocalizedRecurrenceWeekdays', () => {
+  const unorderedWeekdays = ['wed', 'mon', 'fri', 'tue', 'sun', 'thu', 'sat'];
+  const cases = [
+    ['de', 'Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag'],
+    ['fr', 'lundi, mardi, mercredi, jeudi, vendredi, samedi et dimanche'],
+    [
+      'pt-br',
+      'segunda-feira, terça-feira, quarta-feira, quinta-feira, sexta-feira, sábado e domingo',
+    ],
+    ['es', 'lunes, martes, miércoles, jueves, viernes, sábado y domingo'],
+    ['it', 'lunedì, martedì, mercoledì, giovedì, venerdì, sabato e domenica'],
+    ['tr', 'Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi ve Pazar'],
+    ['pl', 'poniedziałek, wtorek, środa, czwartek, piątek, sobota i niedziela'],
+    ['mn', 'Даваа, Мягмар, Лхагва, Пүрэв, Баасан, Бямба, Ням'],
+    ['uk', 'понеділок, вівторок, середа, четвер, п’ятниця, субота і неділя'],
+    ['zh-cn', '星期一、星期二、星期三、星期四、星期五、星期六和星期日'],
+  ];
+
+  test.each(cases)(
+    'should localize all weekdays in non-sequential order in %s',
+    (locale, expected) => {
+      const oldLocale = moment.locale();
+      moment.locale(locale);
+      const formatted = renderRecurrenceWeekdays(unorderedWeekdays);
+      expect(formatted).toBe(expected);
+      moment.locale(oldLocale);
+    }
+  );
 });
