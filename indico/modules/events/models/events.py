@@ -726,9 +726,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Check whether the user can lock/unlock the event."""
         return user and (user.is_admin or user == self.creator or (self.category and self.category.can_manage(user)))
 
-    def can_display(self, user):
+    def can_display(self, user, *, allow_admin=True):
         """Check whether the user can display the event in the category."""
-        return self.visibility != 0 or self.can_manage(user)
+        return self.visibility != 0 or self.can_manage(user, allow_admin=allow_admin)
 
     @materialize_iterable()
     def get_manage_button_options(self, *, note_may_exist=False):
