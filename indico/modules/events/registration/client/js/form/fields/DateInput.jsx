@@ -224,7 +224,7 @@ export function DateSettings(props) {
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
   return (
-    <div>
+    <>
       <Form.Group widths="equal">
         <FinalDropdown
           name="dateFormat"
@@ -249,7 +249,7 @@ export function DateSettings(props) {
           )}
         </Field>
       </Form.Group>
-      {renderPluginComponents('date-input-settings', {...props})}
-    </div>
+      {renderPluginComponents('regform-date-input-settings', {...props})}
+    </>
   );
 }
