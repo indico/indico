@@ -28,6 +28,7 @@ import {selectors as userSelectors} from '../user';
 import * as bookingsActions from './actions';
 import BookingEditCalendar from './BookingEditCalendar';
 import BookingEditForm from './BookingEditForm';
+import {DummyTimeline} from './DummyTimeline';
 import * as bookingsSelectors from './selectors';
 
 import './BookingEdit.module.scss';
@@ -218,9 +219,12 @@ class BookingEdit extends React.Component {
             </Grid.Column>
             <Grid.Column stretched>
               {timelineError ? (
-                <div>
-                  <Message icon="times circle outline" error content={timelineError} />
-                </div>
+                <>
+                  <div>
+                    <Message icon="times circle outline" error content={timelineError} />
+                  </div>
+                  <DummyTimeline rows={10} />
+                </>
               ) : calendars ? (
                 <BookingEditCalendar
                   calendars={calendars}
