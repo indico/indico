@@ -16,6 +16,7 @@ import {SingleDatePicker} from 'indico/react/components';
 import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import '../../../styles/regform.module.scss';
 
@@ -199,7 +200,7 @@ export const dateSettingsInitialData = {
   timeFormat: null,
 };
 
-export function DateSettings() {
+export function DateSettings(props) {
   const dateOptions = [
     '%d/%m/%Y',
     '%d.%m.%Y',
@@ -223,29 +224,32 @@ export function DateSettings() {
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
   return (
-    <Form.Group widths="equal">
-      <FinalDropdown
-        name="dateFormat"
-        label={Translate.string('Date format')}
-        options={dateOptions}
-        required
-        selection
-        fluid
-      />
-      <Field name="dateFormat" subscription={{value: true}}>
-        {({input: {value: dateFormat}}) => (
-          <FinalDropdown
-            name="timeFormat"
-            label={Translate.string('Time format')}
-            options={timeOptions}
-            placeholder={Translate.string('None')}
-            disabled={!dateFormat.includes('%d')}
-            parse={p.nullIfEmpty}
-            selection
-            fluid
-          />
-        )}
-      </Field>
-    </Form.Group>
+    <div>
+      <Form.Group widths="equal">
+        <FinalDropdown
+          name="dateFormat"
+          label={Translate.string('Date format')}
+          options={dateOptions}
+          required
+          selection
+          fluid
+        />
+        <Field name="dateFormat" subscription={{value: true}}>
+          {({input: {value: dateFormat}}) => (
+            <FinalDropdown
+              name="timeFormat"
+              label={Translate.string('Time format')}
+              options={timeOptions}
+              placeholder={Translate.string('None')}
+              disabled={!dateFormat.includes('%d')}
+              parse={p.nullIfEmpty}
+              selection
+              fluid
+            />
+          )}
+        </Field>
+      </Form.Group>
+      {renderPluginComponents('date-input-settings', {...props})}
+    </div>
   );
 }
