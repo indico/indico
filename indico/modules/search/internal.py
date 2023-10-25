@@ -143,7 +143,8 @@ class InternalSearch(IndicoSearchProvider):
                                     admin_override_enabled=admin_override_enabled)
         else:
             raise Exception(f'Unexpected object: {obj}')
-        if isinstance(obj, Event) and not obj.can_display(user):
+
+        if isinstance(obj, Event) and not obj.can_display(user, allow_admin=admin_override_enabled):
             return False
 
         return (protection_mode == ProtectionMode.public or
