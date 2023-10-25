@@ -25,6 +25,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.notifications import notify_registration_receipt_created
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.files.models.files import File
 from indico.modules.receipts.models.files import ReceiptFile
@@ -330,18 +331,17 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             )
             context = ('event', self.target.id, 'registration', registration.id, 'receipts')
             f.save(context, pdf_content)
-            rf = ReceiptFile(
+            receipt = ReceiptFile(
                 file=f,
                 registration=registration,
                 template=self.template,
                 template_params=custom_fields,
                 is_published=publish
             )
-            db.session.add(rf)
+            db.session.add(receipt)
             db.session.commit()
-            receipt_ids.append(rf.file_id)
-            if notify_users:
-                pass  #TODO notify registrant
+            receipt_ids.append(receipt.file_id)
+            notify_registration_receipt_created(registration, receipt, notify_user=notify_users)
         return jsonify(receipt_ids=receipt_ids, errors=errors)
 
 

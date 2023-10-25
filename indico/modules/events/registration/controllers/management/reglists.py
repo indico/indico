@@ -41,7 +41,8 @@ from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateM
                                                       RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
-from indico.modules.events.registration.notifications import notify_registration_state_update
+from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
+                                                              notify_registration_state_update)
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
                                                      generate_spreadsheet_from_registrations,
@@ -822,14 +823,17 @@ class RHPublishReceipt(RHManageReceiptBase):
         if not publish and request.method == 'POST':
             self.receipt_file.is_published = False
             flash(_("Document '{}' successfully unpublished").format(self.receipt_file.file.filename), 'success')
+            logger.info('Docunent %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
+                        self.registration, session.user)
             return jsonify_data(html=self._render_receipts_list())
         form = PublishReceiptForm()
         if form.validate_on_submit():
             self.receipt_file.is_published = True
-            if publish and form.data.get('notify_user'):
-                # TODO send email
-                pass
             flash(_("Document '{}' successfully published").format(self.receipt_file.file.filename), 'success')
+            logger.info('Docunent %r from registration %r was published by %r', self.receipt_file.file.filename,
+                        self.registration, session.user)
+            notify_registration_receipt_created(self.registration, self.receipt_file,
+                                                notify_user=form.data.get('notify_user'))
             return jsonify_data(html=self._render_receipts_list())
         return jsonify_form(form, submit=_('Publish'), back=_('Cancel'), footer_align_right=True,
                             disabled_until_change=False)

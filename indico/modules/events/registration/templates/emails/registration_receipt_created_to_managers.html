@@ -1,0 +1,27 @@
+{% extends 'events/registration/emails/registration_creation_to_managers.html' %}
+
+{% block subject_message -%}
+    {% if receipt.is_published -%}
+        {% trans title=event.title %}Document published for registration in {{ title }}{% endtrans %}
+    {%- else -%}
+        {% trans title=event.title %}Document created for registration in {{ title }}{% endtrans %}
+    {%- endif %}
+{%- endblock %}
+
+{% block registration_header_text %}
+    {% if receipt.is_published -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The following document has been published for the event {{ strong }}{{ title }}{{ endstrong }} under the registration for {{ strong }}{{ name }}{{ endstrong }}:
+        {%- endtrans %}
+    {%- else -%}
+        {% trans title=event.title, name=registration.full_name, strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            The following document has been created for the event {{ strong }}{{ title }}{{ endstrong }} under the registration for {{ strong }}{{ name }}{{ endstrong }}:
+        {%- endtrans %}
+    {%- endif %}
+    <ul>
+        <li>
+            <a href="{{ url_for('event_registration.download_receipt', receipt, _external=true) }}">{{ receipt.file.filename }}</a>
+        </li>
+    </ul>
+    {{ render_text_manage() }}
+{% endblock %}

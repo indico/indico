@@ -1,0 +1,25 @@
+{% extends 'events/registration/emails/registration_creation_to_registrant.html' %}
+{% block registration_body %}{% endblock %}
+
+{% block subject_message -%}
+    {% trans title=event.title %}New document available for {{ title }}{% endtrans %}
+{%- endblock %}
+
+{% block registration_header_text -%}
+    {% if receipt.is_published -%}
+        {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+            A document regarding your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            has been made available to you:
+        {%- endtrans %}
+        <ul>
+            <li>
+                <a href="{{ receipt.file.signed_download_url }}">{{ receipt.file.filename }}</a>
+            </li>
+        </ul>
+    {%- else -%}
+        {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+            A document regarding your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            has been made available to you and sent to you as an attachment.
+        {%- endtrans %}
+    {%- endif %}
+{%- endblock %}

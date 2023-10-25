@@ -30,7 +30,7 @@ def notify_invitation(invitation, email_subject, email_body, from_address):
 
 @make_interceptable
 def _notify_registration(registration, template_name, *, to_managers=False, attach_rejection_reason=False,
-                         diff=None, old_price=None, allow_session_locale=False):
+                         diff=None, old_price=None, receipt=None, allow_session_locale=False):
     from indico.modules.events.registration.util import get_ticket_attachments
     attachments = []
     regform = registration.registration_form
@@ -39,12 +39,15 @@ def _notify_registration(registration, template_name, *, to_managers=False, atta
             regform.tickets_enabled and
             regform.ticket_on_email and
             not any(tickets_handled) and
-            registration.state == RegistrationState.complete):
+            registration.state == RegistrationState.complete and
+            receipt is None):
         attachments += get_ticket_attachments(registration)
     if not to_managers and registration.registration_form.attach_ical:
         event_ical = event_to_ical(registration.event, method='REQUEST', skip_access_check=True,
                                    organizer=(core_settings.get('site_title'), config.NO_REPLY_EMAIL))
         attachments.append(MIMECalendar('event.ics', event_ical))
+    if not to_managers and receipt is not None and not receipt.is_published:
+        attachments.append(receipt.file.as_attachment())
     to_list = (
         registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     )
@@ -52,7 +55,8 @@ def _notify_registration(registration, template_name, *, to_managers=False, atta
     with registration.event.force_event_locale(registration.user if not to_managers else None,
                                                allow_session=allow_session_locale):
         tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
-                                  attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price)
+                                  attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price,
+                                  receipt=receipt)
         mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
     user = session.user if session else None
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
@@ -85,3 +89,11 @@ def notify_registration_state_update(registration, *, attach_rejection_reason=Fa
                          attach_rejection_reason=attach_rejection_reason, allow_session_locale=(not from_management))
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)
+
+
+def notify_registration_receipt_created(registration, receipt, notify_user=True):
+    if notify_user:
+        _notify_registration(registration, 'registration_receipt_created_to_registrant.html', receipt=receipt)
+    if registration.registration_form.manager_notifications_enabled:
+        _notify_registration(registration, 'registration_receipt_created_to_managers.html', to_managers=True,
+                             receipt=receipt)
