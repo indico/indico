@@ -25,6 +25,7 @@ from indico.util.date_time import get_display_tz
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
 
+
 RE_SKIP_REFRESH_SESSION_ENDPOINTS = re.compile(
     r'core\.session_expiration|assets\.|plugin_.*\.static$'
 )
