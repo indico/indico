@@ -223,31 +223,29 @@ export function DateSettings() {
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
   return (
-    <>
-      <Form.Group widths="equal">
-        <FinalDropdown
-          name="dateFormat"
-          label={Translate.string('Date format')}
-          options={dateOptions}
-          required
-          selection
-          fluid
-        />
-        <Field name="dateFormat" subscription={{value: true}}>
-          {({input: {value: dateFormat}}) => (
-            <FinalDropdown
-              name="timeFormat"
-              label={Translate.string('Time format')}
-              options={timeOptions}
-              placeholder={Translate.string('None')}
-              disabled={!dateFormat.includes('%d')}
-              parse={p.nullIfEmpty}
-              selection
-              fluid
-            />
-          )}
-        </Field>
-      </Form.Group>
-    </>
+    <Form.Group widths="equal">
+      <FinalDropdown
+        name="dateFormat"
+        label={Translate.string('Date format')}
+        options={dateOptions}
+        required
+        selection
+        fluid
+      />
+      <Field name="dateFormat" subscription={{value: true}}>
+        {({input: {value: dateFormat}}) => (
+          <FinalDropdown
+            name="timeFormat"
+            label={Translate.string('Time format')}
+            options={timeOptions}
+            placeholder={Translate.string('None')}
+            disabled={!dateFormat.includes('%d')}
+            parse={p.nullIfEmpty}
+            selection
+            fluid
+          />
+        )}
+      </Field>
+    </Form.Group>
   );
 }
