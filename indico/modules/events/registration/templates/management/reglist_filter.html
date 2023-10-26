@@ -78,34 +78,35 @@
     </div>
 </div>
 <form class="list-filter" method="POST">
-    <input id="visible-items" type="hidden" name="visible_items"
-           value="{{ visible_items | tojson | forceescape }}">
-    <h3>{% trans %}General registration info{% endtrans %}</h3>
-    <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.items() %}
-            {% set filter_choices = item.get('filter_choices') %}
-            {% set filter_only = item.get('filter_only', false) %}
-            {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, filter_only=filter_only) }}
-        {% endfor %}
-    </div>
-
-    {% for section in regform.sections if section.is_visible and section.active_fields %}
-        {{ _render_regform_item_col_selector(section) }}
-    {% endfor %}
-
-    {% set disabled_sections = regform.disabled_sections|selectattr('active_fields')|list %}
-    {% if disabled_sections %}
-        <h1 class="disabled-caption">
-            {%- trans %}Disabled sections{% endtrans -%}
-            <a class="button icon-next js-toggle-disabled" title="Click to show/hide disabled sections"></a>
-        </h1>
-        <div class="disabled-sections">
-            {% for section in disabled_sections %}
-                {{ _render_regform_item_col_selector(section) }}
+    <div class="list-filter-content">
+        <input id="visible-items" type="hidden" name="visible_items"
+               value="{{ visible_items | tojson | forceescape }}">
+        <h3>{% trans %}General registration info{% endtrans %}</h3>
+        <div class="flexrow f-wrap">
+            {% for item_id, item in static_items.items() %}
+                {% set filter_choices = item.get('filter_choices') %}
+                {% set filter_only = item.get('filter_only', false) %}
+                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, filter_only=filter_only) }}
             {% endfor %}
         </div>
-    {% endif %}
 
+        {% for section in regform.sections if section.is_visible and section.active_fields %}
+            {{ _render_regform_item_col_selector(section) }}
+        {% endfor %}
+
+        {% set disabled_sections = regform.disabled_sections|selectattr('active_fields')|list %}
+        {% if disabled_sections %}
+            <h1 class="disabled-caption">
+                {%- trans %}Disabled sections{% endtrans -%}
+                <a class="button icon-next js-toggle-disabled" title="Click to show/hide disabled sections"></a>
+            </h1>
+            <div class="disabled-sections">
+                {% for section in disabled_sections %}
+                    {{ _render_regform_item_col_selector(section) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
                value="{% trans %}Apply{% endtrans %}">

@@ -64,16 +64,17 @@
     </div>
 </div>
 <form class="list-filter" method="POST">
-    <input id="visible-items" type="hidden" name="visible_items"
-           value="{{ visible_items | tojson | forceescape }}">
-    <h3>{% trans %}General paper assignment info{% endtrans %}</h3>
-    <div class="flexrow f-wrap">
-        {% for item_id, item in static_items.items() %}
-            {% set filter_choices = item.get('filter_choices') %}
-            {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
-        {% endfor %}
+    <div class="list-filter-content">
+        <input id="visible-items" type="hidden" name="visible_items"
+               value="{{ visible_items | tojson | forceescape }}">
+        <h3>{% trans %}General paper assignment info{% endtrans %}</h3>
+        <div class="flexrow f-wrap">
+            {% for item_id, item in static_items.items() %}
+                {% set filter_choices = item.get('filter_choices') %}
+                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
+            {% endfor %}
+        </div>
     </div>
-
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
                value="{% trans %}Apply{% endtrans %}">
