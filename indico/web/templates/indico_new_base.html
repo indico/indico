@@ -26,7 +26,5 @@
         {{ render_announcements() }}
     {% endblock %}
     {% block body %}{% endblock %}
-    {% block session_expiration %}
-        {{ setup_session_expiration() }}
-    {% endblock %}
+    {{ setup_session_expiration() }}
 {% endblock %}

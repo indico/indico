@@ -366,7 +366,11 @@ class RHRenderMarkdown(RH):
 
 
 class RHSessionExpiration(RH):
-    """Returns the session expiration time."""
+    """Return the session expiration time."""
+
     def _process(self):
-        if session.get('_expires'):
-            return jsonify(session_expiration=str(server_to_utc(session['_expires'])))
+        try:
+            expiry = str(server_to_utc(session['_expires']))
+        except KeyError:
+            expiry = None
+        return jsonify(session_expiration=expiry)

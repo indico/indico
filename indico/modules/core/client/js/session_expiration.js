@@ -71,9 +71,7 @@ export default function SessionExpirationManager() {
     } catch (e) {
       return handleAxiosError(e);
     }
-    if (response) {
-      return response.data.session_expiration;
-    }
+    return response.data.session_expiration;
   };
 
   const checkTimeToExpire = useCallback(async () => {
@@ -123,7 +121,7 @@ export default function SessionExpirationManager() {
         <center className="ui large header">{count}</center>
       </RequestConfirm>
       <RequestConfirm
-        header={Translate.string('This Session has expired')}
+        header={Translate.string('This session has expired')}
         confirmText={Translate.string('Ok')}
         cancelText={Translate.string('Cancel')}
         onClose={() => dispatch({type: 'DEFAULT'})}
