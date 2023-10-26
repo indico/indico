@@ -365,7 +365,7 @@ class RHRenderMarkdown(RH):
         return jsonify(html=html)
 
 
-class RHSesionExpiration(RH):
+class RHSessionExpiration(RH):
     """Returns the session expiration time."""
     def _process(self):
         if session.get('_expires'):
