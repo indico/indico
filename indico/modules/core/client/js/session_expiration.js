@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import loginUrl from 'indico-url:auth.login';
-import sessionExpirationUrl from 'indico-url:core.session_expiration';
+import loginURL from 'indico-url:auth.login';
+import sessionExpirationURL from 'indico-url:core.session_expiration';
 
 import moment from 'moment';
 import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react';
@@ -67,7 +67,7 @@ export default function SessionExpirationManager() {
   const getSessionExpirationTime = async () => {
     let response;
     try {
-      response = await indicoAxios.get(sessionExpirationUrl());
+      response = await indicoAxios.get(sessionExpirationURL());
     } catch (e) {
       return handleAxiosError(e);
     }
@@ -102,7 +102,7 @@ export default function SessionExpirationManager() {
 
   const refreshSession = () => {
     const hash = location.hash;
-    location.href = loginUrl({next: location.href + hash});
+    location.href = loginURL({next: location.href + hash});
     return true;
   };
 
