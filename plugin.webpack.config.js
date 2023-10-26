@@ -60,6 +60,7 @@ module.exports = env => {
       'indico/react/components/syncedInputs': '_IndicoSyncedInputs',
       'indico/react/forms': '_IndicoReactForm',
       'indico/react/i18n': '_IndicoReactI18n',
+      'indico/react/util': '_IndicoReactUtil',
       'indico/utils/axios': '_IndicoUtilsAxios',
       'indico/utils/date': '_IndicoUtilsDate',
       'indico/utils/plugins': '_IndicoUtilsPlugins',
