@@ -16,7 +16,6 @@ import {SingleDatePicker} from 'indico/react/components';
 import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
-import {renderPluginComponents} from 'indico/utils/plugins';
 
 import '../../../styles/regform.module.scss';
 
@@ -200,7 +199,7 @@ export const dateSettingsInitialData = {
   timeFormat: null,
 };
 
-export function DateSettings(props) {
+export function DateSettings() {
   const dateOptions = [
     '%d/%m/%Y',
     '%d.%m.%Y',
@@ -249,7 +248,6 @@ export function DateSettings(props) {
           )}
         </Field>
       </Form.Group>
-      {renderPluginComponents('regform-date-input-settings', {...props})}
     </>
   );
 }

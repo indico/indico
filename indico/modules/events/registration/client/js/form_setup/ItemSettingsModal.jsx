@@ -22,6 +22,7 @@ import {
 } from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {getFieldRegistry} from '../form/fields/registry';
 import {getStaticData, getItemById} from '../form/selectors';
@@ -146,6 +147,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
             />
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
+          {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
             <>
               <FinalInput
