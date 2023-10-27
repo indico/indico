@@ -102,4 +102,12 @@
   .rb-pusher:global(.pusher) {
     min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
   }
+
+  .rb-pusher:global(.pusher::after) {
+    backdrop-filter: blur(0.5rem);
+  }
+}
+
+:global(.modals.ui.dimmer) {
+  backdrop-filter: blur(0.5rem);
 }
