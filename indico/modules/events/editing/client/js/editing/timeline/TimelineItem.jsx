@@ -21,6 +21,7 @@ import ChangesConfirmation from './ChangesConfirmation';
 import CustomActions from './CustomActions';
 import FileDisplay from './FileDisplay';
 import ResetReview from './ResetReview';
+import ReviewComment from './ReviewComment';
 import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
@@ -109,9 +110,9 @@ export default function TimelineItem({block, index}) {
                   </Message>
                 )}
                 {block.commentHtml && (
-                  <div
-                    className="markdown-text"
-                    dangerouslySetInnerHTML={{__html: block.commentHtml}}
+                  <ReviewComment
+                    block={block}
+                    canEdit={isLastValidBlock && canUndoLastValidBlock}
                   />
                 )}
                 {block.commentHtml && !!(block.files.length || block.tags.length) && <Divider />}
