@@ -163,8 +163,8 @@ class BookingEditForm extends React.Component {
       ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
     return (
       <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
-        {recurringBookingInProgress && (
-          <Message icon styleName="recurring-booking-warning">
+        {recurringBookingInProgress && recurrence.type === 'every' && (
+          <Message icon styleName="repeat-frequency-disabled-notice">
             <Icon name="dont" />
             <Translate>You cannot modify the repeat frequency of an existing booking.</Translate>
           </Message>
