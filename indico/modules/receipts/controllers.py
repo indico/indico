@@ -46,10 +46,16 @@ from indico.web.flask.util import send_file
 TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
 
 
-def generate_dummy_data(event: Event, custom_fields: dict):
+def _get_default_value(field):
+    if field['type'] == 'dropdown' and 'default' in field['attributes']:
+        return field['attributes']['options'][field['attributes']['default']]
+    return field['attributes']['value'] if 'value' in field['attributes'] else None
+
+
+def _generate_dummy_data(event: Event, custom_fields: dict):
     """Generate some dummy data to be used as an example."""
     return {
-        'custom_fields': {f['name']: f.get('default') for f in (custom_fields)},
+        'custom_fields': {f['name']: _get_default_value(f) for f in (custom_fields)},
         'event': event,
         'personal_data': {
             'title': 'Dr',
@@ -214,7 +220,7 @@ class RHGetDummyData(ReceiptAreaMixin, RHAdminBase):
             custom_fields = template.custom_fields
         else:
             custom_fields = {}
-        return jsonify(TemplateDataSchema().dump(generate_dummy_data(self.target, custom_fields)))
+        return jsonify(TemplateDataSchema().dump(_generate_dummy_data(self.target, custom_fields)))
 
 
 class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
@@ -222,7 +228,7 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
         # Just some dummy data to test the template
         html = compile_jinja_code(
             self.template.html,
-            **generate_dummy_data(self.target, self.template.custom_fields)
+            **_generate_dummy_data(self.target, self.template.custom_fields)
         )
         f = create_pdf(self.target, {html}, self.template.css)
 
@@ -243,7 +249,7 @@ class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
         compiled_html = compile_jinja_code(
             html,
             use_stack=True,
-            **generate_dummy_data(self.target, yaml.get('custom_fields', []) if yaml else [])
+            **_generate_dummy_data(self.target, yaml.get('custom_fields', []) if yaml else [])
         )
         return send_file('receipt.pdf', create_pdf(self.target, {compiled_html}, css), 'application/pdf')
 

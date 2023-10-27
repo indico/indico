@@ -607,8 +607,5 @@ class RegistrationPrivacyForm(IndicoForm):
 class PublishReceiptForm(IndicoForm):
     """Form to publish receipts for registrations"""
 
-    #publish = HiddenField()
-    #notify_user = BooleanField(_('Notify users'), [HiddenUnless('publish')], widget=SwitchWidget(),
-    #                           description=_('Whether users should be notified about the published receipt'))
     notify_user = BooleanField(_('Notify users'), widget=SwitchWidget(),
                                description=_('Whether users should be notified about the published receipt'))

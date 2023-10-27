@@ -45,6 +45,9 @@ const makeSubmitLabel = ({publish, notify_users: notifyUsers}) => {
     : Translate.string('Save to registration(s)');
 };
 
+const getDefaultValue = f =>
+  f.type === 'dropdown' ? f.attributes.options[f.attributes.default] : f.attributes.value;
+
 const downloadOptions = [
   {
     key: 'pdf',
@@ -82,7 +85,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
     form.change(
       'custom_fields',
       customFields
-        ? Object.assign({}, ...customFields.map(f => ({[f.name]: f.default || null})))
+        ? Object.assign({}, ...customFields.map(f => ({[f.name]: getDefaultValue(f)})))
         : {}
     );
     form.change('filename', defaultFilename || formatters.slugify(title));
