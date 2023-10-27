@@ -12,31 +12,31 @@ import {Accordion, Form} from 'semantic-ui-react';
 /**
  * This component represents a custom field which can contain a "text" (str), "choice" or "yes/no" (boolean).
  */
-function CustomField({name, value, type, options, onChange}) {
-  if (type === 'str') {
+function CustomField({name, value, type, attributes, onChange}) {
+  if (type === 'input') {
     return (
       <Form.Input
-        label={name}
+        label={attributes.label}
         name={name}
         value={value}
         onChange={(_, {value: v}) => onChange(v)}
       />
     );
-  } else if (type === 'choice') {
+  } else if (type === 'dropdown') {
     return (
       <Form.Dropdown
-        label={name}
+        label={attributes.label}
         name={name}
-        options={options.map(option => ({value: option, key: option, text: option}))}
+        options={attributes.options.map(o => ({value: o, key: o, text: o}))}
         value={value}
         selection
         onChange={(_, {value: v}) => onChange(v)}
       />
     );
-  } else {
+  } else if (type === 'checkbox') {
     return (
       <Form.Checkbox
-        label={name}
+        label={attributes.label}
         name={name}
         onChange={(_, {checked}) => onChange(checked)}
         checked={value}
@@ -47,14 +47,14 @@ function CustomField({name, value, type, options, onChange}) {
 
 CustomField.propTypes = {
   name: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number]),
   type: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(PropTypes.string),
+  attributes: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
 CustomField.defaultProps = {
-  options: null,
+  value: null,
 };
 
 export default function TemplateParameterEditor({customFields, value, onChange, title}) {
@@ -69,7 +69,7 @@ export default function TemplateParameterEditor({customFields, value, onChange, 
           key: 'template-params',
           title,
           content: {
-            content: customFields.map(({name, type, options}) => (
+            content: customFields.map(({name, type, attributes}) => (
               <CustomField
                 key={name}
                 type={type}
@@ -78,7 +78,7 @@ export default function TemplateParameterEditor({customFields, value, onChange, 
                   onChange({...value, [name]: v});
                 }}
                 name={name}
-                options={options}
+                attributes={attributes}
               />
             )),
           },

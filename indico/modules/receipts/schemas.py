@@ -6,7 +6,8 @@
 # LICENSE file for more details.
 
 import yaml
-from marshmallow import fields, post_load, validate
+from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
+from marshmallow_oneofschema import OneOfSchema
 
 from indico.core.marshmallow import mm
 from indico.modules.receipts.models.templates import ReceiptTemplate
@@ -20,13 +21,45 @@ class OwnerDataSchema(mm.Schema):
     locator = fields.Dict()
 
 
+class _CheckboxAttributesSchema(mm.Schema):
+    value = fields.Bool()
+    label = fields.String(required=True)
+
+
+class _DropdownAttributesSchema(mm.Schema):
+    label = fields.String(required=True)
+    options = fields.List(fields.String())
+    default = fields.Int(validate=validate.Range(0))
+
+    @validates_schema(skip_on_field_errors=True)
+    def _validate_default(self, data, **kwargs):
+        if 'default' in data and data['default'] >= len(data['options']):
+            raise ValidationError('The provided value is out of range')
+
+
+class _InputAttributesSchema(mm.Schema):
+    value = fields.String()
+    label = fields.String(required=True)
+
+
+class CustomFieldAttributesSchema(OneOfSchema):
+    type_schemas = {
+        'checkbox': _CheckboxAttributesSchema,
+        'dropdown': _DropdownAttributesSchema,
+        'input': _InputAttributesSchema
+    }
+
+
 class CustomFieldSchema(mm.Schema):
     name = fields.String(required=True, validate=not_empty)
-    type = fields.String(required=True, validate=validate.OneOf(['str', 'bool', 'choice']))
-    options = fields.List(fields.String())
+    type = fields.String(required=True)
+    attributes = fields.Nested(CustomFieldAttributesSchema, required=True)
 
-    class Meta:
-        additional = ('default',)
+    @pre_load
+    def _add_attributes_type(self, data, **kwargs):
+        data = data.copy()
+        data['attributes']['type'] = data['type']
+        return data
 
 
 class ReceiptTplMetadataSchema(mm.Schema):
