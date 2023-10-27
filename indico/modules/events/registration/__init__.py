@@ -15,6 +15,7 @@ from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.models.events import EventType
+from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.logging import connect_log_signals
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
@@ -240,3 +241,17 @@ class RegistrationPermission(ManagementPermission):
     friendly_name = _('Registration')
     description = _('Grants management access to the registration form.')
     user_selectable = True
+
+
+@signals.event.updated.connect
+def _patch_google_wallet_class(sender, obj=None, **kwargs):
+    if sender.has_google_wallet_tickets:
+        gwm = GoogleWalletManager(sender)
+        if gwm.credentials:
+            ticket_class = gwm.create_class_template(gwm.settings['google_wallet_issuer_id'],
+                                                     f'TicketClass-{sender.id}')
+            try:
+                gwm.patch_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{sender.id}', ticket_class)
+            except Exception as e:
+                from indico.core.logger import Logger  # Locally imported to avoid circular import issues.
+                Logger.get('events.registration').warning('Cannot update Google Wallet link: %s', str(e))

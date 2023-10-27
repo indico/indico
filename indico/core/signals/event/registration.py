@@ -129,3 +129,8 @@ Called when composing the list of menu items to be displayed under the "Actions"
 at the top of the list of registrants/participants. The `sender` is the corresponding
 registration form.
 ''')
+
+google_wallet_object_template_created = _signals.signal('google-wallet-object-created', '''
+Called when a new Google Wallet object has been created. The `sender` is the `Registration` object.
+The `data` kwarg contains the dictionary template used to create the object.
+''')

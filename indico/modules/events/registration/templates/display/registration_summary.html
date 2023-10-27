@@ -85,6 +85,11 @@
             {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and
                   registration.registration_form.ticket_on_summary_page and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
                 <div class="group">
+                    {% if registration.registration_form.ticket_google_wallet_enabled %}
+                        <a href="{{ url_for('.ticket_google_wallet', registration.locator.registrant) }}" class="i-button accept icon-ticket">
+                            {% trans %}Save to Google Wallet{% endtrans %}
+                        </a>
+                    {% endif %}
                     <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}
                     </a>

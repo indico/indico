@@ -24,6 +24,7 @@ flask-sqlalchemy
 flask-webpackext
 flask-wtf
 flask
+google-auth
 html2text
 icalendar
 indico-fonts

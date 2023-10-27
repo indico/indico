@@ -214,6 +214,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline
 _bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', display.RHTicketDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/receipts/<int:file_id>/<filename>', 'receipt_download_display',
                  display.RHReceiptDownload)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket_google_wallet', 'ticket_google_wallet',
+                 display.RHTicketGoogleWallet)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
                  display.RHRegistrationAvatar)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/picture/<int:field_data_id>/<filename>',

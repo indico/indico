@@ -114,3 +114,8 @@ The `event` object is the sender.
 The signal should return a bool to determine if the Participant list menu
 should be displayed on the Event page.
 ''')
+
+google_wallet_class_template_created = _signals.signal('google-wallet-class-created', '''
+Called when a new Google Wallet class has been created. The `sender` is the `Event` object.
+The `data` kwarg contains the dictionary template used to create the class.
+''')

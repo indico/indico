@@ -1144,6 +1144,20 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         with force_locale(locale):
             yield
 
+    @property
+    def has_google_wallet_tickets(self):
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        google_wallet_enabled = (RegistrationForm.query.with_parent(self)
+                                 .filter(RegistrationForm.ticket_google_wallet_enabled).has_rows())
+        if google_wallet_enabled:
+            from indico.modules.events.registration.models.registrations import Registration, RegistrationState
+            has_registrations = (Registration.query.with_parent(self)
+                                 .filter(Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                                         ~Registration.is_deleted)).has_rows()
+            if has_registrations:
+                return True
+        return False
+
 
 Event.register_location_events()
 Event.register_protection_events()

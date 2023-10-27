@@ -26,6 +26,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
+from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
@@ -465,6 +466,17 @@ class Registration(db.Model):
     def is_ticket_blocked(self):
         """Check whether the ticket is blocked by a plugin."""
         return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))
+
+    @property
+    def ticket_google_wallet_url(self):
+        """Return link to Google Wallet ticket display."""
+        gwm = GoogleWalletManager(self.event, registration=self)
+        if not gwm.credentials:
+            return None
+        ticket_class = gwm.create_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{self.event_id}')
+        ticket_obj = gwm.create_object(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{self.event_id}',
+                                       f'Ticket-{self.event_id}-{self.registration_form_id}-{self.id}')
+        return gwm.get_link(ticket_class, ticket_obj)
 
     @property
     def is_paid(self):

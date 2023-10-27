@@ -101,16 +101,30 @@ class RHManageCategoryContent(RHManageCategoryBase):
 
 
 class RHManageCategorySettings(RHManageCategoryBase):
+
     def _process(self):
-        defaults = FormDefaults(self.category,
-                                meeting_theme=self.category.default_event_themes['meeting'],
-                                lecture_theme=self.category.default_event_themes['lecture'])
+        additional_keys = ('google_wallet_application_credentials', 'google_wallet_issuer_name',
+                           'google_wallet_issuer_id')
+        kwargs = {
+            'meeting_theme': self.category.default_event_themes['meeting'],
+            'lecture_theme': self.category.default_event_themes['lecture'],
+            'google_wallet_enabled': self.category.google_wallet_settings}
+        if self.category.google_wallet_settings:
+            kwargs.update({key: self.category.google_wallet_settings[key] for key in additional_keys})
+        defaults = FormDefaults(self.category, **kwargs)
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
         logo_form = CategoryLogoForm(obj=self.category)
 
         if form.validate_on_submit():
-            update_category(self.category, form.data, skip={'meeting_theme', 'lecture_theme'})
+            new_dict = form.data
+            new_dict.setdefault('google_wallet_settings', {})
+            for key in additional_keys:
+                new_dict['google_wallet_settings'][key] = new_dict.pop(key, {})
+            if not new_dict.pop('google_wallet_enabled'):
+                new_dict['google_wallet_settings'] = {}
+            update_category(self.category, new_dict, skip={'meeting_theme', 'lecture_theme'},
+                            _extra_log_fields={'google_wallet_settings': 'Google Wallet configuration settings'})
             self.category.default_event_themes = {
                 'meeting': form.meeting_theme.data,
                 'lecture': form.lecture_theme.data

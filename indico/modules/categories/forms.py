@@ -8,7 +8,7 @@
 from functools import partial
 
 from flask import request
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
@@ -27,13 +27,15 @@ from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFi
                                      IndicoMarkdownField, IndicoProtectionField, IndicoSinglePalettePickerField,
                                      IndicoTimezoneSelectField, MultipleItemsField)
 from indico.web.forms.fields.principals import PermissionsField
+from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
 
 class CategorySettingsForm(IndicoForm):
     BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
                     'suggestions_disabled', 'is_flat_view_enabled', 'show_future_months',
-                    'event_creation_notification_emails', 'notify_managers')
+                    'event_creation_notification_emails', 'notify_managers', 'google_wallet_enabled',
+                    'google_wallet_application_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
@@ -65,6 +67,23 @@ class CategorySettingsForm(IndicoForm):
     notify_managers = BooleanField(_('Notify managers'), widget=SwitchWidget(),
                                    description=_('Whether to send email notifications to all managers of this category '
                                                  'when an event is created inside it or in any of its subcategories.'))
+    google_wallet_enabled = BooleanField(_('Google Wallet'), widget=SwitchWidget(),
+                                         description=_('Add Google Wallet configuration.'))
+    google_wallet_application_credentials = TextAreaField(_('Google Wallet application credentials'),
+                                                          [DataRequired(),
+                                                           HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                                          description=_('Json content generated from Google Wallet '
+                                                                        'console.'))
+    google_wallet_issuer_name = StringField(_('Google Wallet Issuer Name'),
+                                            [DataRequired(),
+                                             HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                            description=_('Issuer name that will appear in the Google Wallet ticket '
+                                                          'top header.'))
+    google_wallet_issuer_id = StringField(_('Google Wallet Issuer ID'),
+                                          [DataRequired(),
+                                           HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                          description=_('Issuer ID assigned in the Google Wallet console.'))
+
     event_creation_notification_emails = EmailListField(_('Notification E-mails'),
                                                         description=_('List of emails that will receive a notification '
                                                                       'every time a new event is created inside the '

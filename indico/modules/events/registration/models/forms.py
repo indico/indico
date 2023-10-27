@@ -230,6 +230,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether to enable Google Wallet integration
+    ticket_google_wallet_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     #: Whether to send tickets by e-mail
     ticket_on_email = db.Column(
         db.Boolean,

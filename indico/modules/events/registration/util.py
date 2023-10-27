@@ -965,3 +965,22 @@ def close_registration(regform):
     regform.end_dt = now_utc()
     if not regform.has_started:
         regform.start_dt = regform.end_dt
+
+
+def get_persons(registrations, include_accompanying_persons=False):
+    persons = []
+    for registration in registrations:
+        persons.append({
+            'id': registration.id,
+            'first_name': registration.first_name,
+            'last_name': registration.last_name,
+            'registration': registration,
+            'is_accompanying': False,
+        })
+        if include_accompanying_persons:
+            persons.extend({'id': person['id'],
+                            'first_name': person['firstName'],
+                            'last_name': person['lastName'],
+                            'registration': registration,
+                            'is_accompanying': True} for person in registration.accompanying_persons)
+    return persons

@@ -24,6 +24,7 @@ from indico.modules.designer import PageLayout, PageOrientation, PageSize, Templ
 from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
+from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItem
@@ -307,6 +308,9 @@ class EmailRegistrantsForm(IndicoForm):
 class TicketsForm(IndicoForm):
     tickets_enabled = BooleanField(_('Enable Tickets'), widget=SwitchWidget(),
                                    description=_('Create tickets for registrations using this registration form.'))
+    ticket_google_wallet_enabled = BooleanField(_('Enable Google Wallet'), [HiddenUnless('tickets_enabled',
+                                                                                         preserve_data=True)],
+                                                widget=SwitchWidget(), description=_('Add Google Wallet integration.'))
     ticket_on_email = BooleanField(_('Send with an e-mail'), [HiddenUnless('tickets_enabled',
                                                                            preserve_data=True)],
                                    widget=SwitchWidget(),
@@ -333,15 +337,19 @@ class TicketsForm(IndicoForm):
                                                             Optional()], coerce=int)
 
     def __init__(self, *args, **kwargs):
-        event = kwargs.pop('event')
+        self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        default_tpl = get_default_ticket_on_category(event.category)
-        all_templates = set(event.designer_templates) | get_inherited_templates(event)
+        default_tpl = get_default_ticket_on_category(self.event.category)
+        all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
                            if tpl.type == TemplateType.badge and tpl != default_tpl]
         # Show the default template first
         badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
         self.ticket_template_id.choices = badge_templates
+
+    def validate_ticket_google_wallet_enabled(self, field):
+        if field.data and not GoogleWalletManager.get_google_wallet_settings(self.event.category):
+            raise ValidationError(_('Missing Google Wallet configuration at Category level.'))
 
 
 class ParticipantsDisplayForm(IndicoForm):
