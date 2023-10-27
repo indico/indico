@@ -84,7 +84,7 @@ class RegistrationListGenerator(ListGeneratorBase):
                 'filter_only': True
             },
             'receipts_present': {
-                'title': _('Has receipts'),
+                'title': _('Has documents'),
                 'filter_choices': {
                     '0': _('No'),
                     '1': _('Yes')
