@@ -8,7 +8,7 @@
 import functools
 import pickle
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import yaml
@@ -136,6 +136,22 @@ class IndicoSession(BaseSession):
         """
         return get_display_tz(as_timezone=True)
 
+    @property
+    def hard_expiry(self):
+        """The datetime a session definitely expires at."""
+        return self.get('_hard_expiry')
+
+    @hard_expiry.setter
+    def hard_expiry(self, dt: datetime):
+        """Set the datetime a session definitely expires at.
+
+        The datetime is expected to be tz-aware, otherwise a ValueError
+        will be raised
+        """
+        if dt.tzinfo is None:
+            raise ValueError(f'hard_expiry datetime "{dt}" must be tz-aware')
+        self['_hard_expiry'] = dt
+
 
 class IndicoSessionInterface(SessionInterface):
     pickle_based = True
@@ -156,10 +172,19 @@ class IndicoSessionInterface(SessionInterface):
         # Permanent sessions are stored for exactly the same duration as the session id cookie.
         # "Temporary" session are stored for a period that is not too short/long as some people
         # close their browser very rarely and thus shouldn't be logged out that often.
+        # Beyond that, we also consider an optional hard expiry set on the session, in which case the
+        # minimum of the lifetime determined by the hard expiry and the permanent/temporary
+        # session lifetime is used.
+
         if session.permanent:
-            return app.permanent_session_lifetime
+            session_lifetime = app.permanent_session_lifetime
         else:
-            return self.temporary_session_lifetime
+            session_lifetime = self.temporary_session_lifetime
+
+        if session.hard_expiry:
+            return min(session_lifetime, session.hard_expiry - datetime.now(timezone.utc))
+
+        return session_lifetime
 
     def should_refresh_session(self, app, session):
         if session.new or '_expires' not in session:
@@ -208,14 +233,17 @@ class IndicoSessionInterface(SessionInterface):
             # If the session has not been modified we only store if it needs to be refreshed
             return
 
-        if config.SESSION_LIFETIME > 0:
+        if config.SESSION_LIFETIME > 0 or session.hard_expiry:
             # Setting session.permanent marks the session as modified so we only set it when we
             # are saving the session anyway!
             session.permanent = True
 
         storage_ttl = self.get_storage_lifetime(app, session)
-        cookie_lifetime = self.get_expiration_time(app, session)
-        session['_expires'] = datetime.now() + storage_ttl
+        if session.hard_expiry:
+            cookie_lifetime = session.hard_expiry
+        else:
+            cookie_lifetime = self.get_expiration_time(app, session)
+            session['_expires'] = datetime.now() + storage_ttl
 
         if refresh_sid:
             self.storage.delete(session.sid)
