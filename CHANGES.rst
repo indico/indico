@@ -37,15 +37,13 @@ Improvements
 - Store creation date of users and show it to admins (:pr:`5957`, thanks :user:`vasantvohra`)
 - Add option to hide links to Room Booking system for users who lack access (:pr:`5981`,
   thanks :user:`SegiNyn`)
-- Support weekly room bookings that take place on multiple weekdays (:pr:`5829`, :issue:`5806`)
+- Support weekly room bookings that take place on multiple weekdays (:pr:`5829`, :pr:`6000`,
+  :issue:`5806`)
 - Hide events marked as invisible from builtin search results unless the user is a manager
   (:pr:`5947`, thanks :user:`openprojects`)
 - Support sessions that expire at a certain date (specified by the used flask-multipass
   provider) regardless of activity when using an external login method (:pr:`5907`, thanks
   :user:`cbartz`)
-- Improve i18n support for ``renderRecurrenceWeekdays()`` using ``Intl.ListFormat`` (:pr:`6000`)
-- Support weekly room bookings that take place on multiple weekdays (:pr:`5829`,
-  :pr:`6000`, :issue:`5806`)
 
 Bugfixes
 ^^^^^^^^
