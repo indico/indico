@@ -67,6 +67,8 @@ describe('renderLocalizedRecurrenceWeekdays', () => {
   const unorderedWeekdays = ['wed', 'mon', 'fri', 'tue', 'sun', 'thu', 'sat'];
   const cases = [
     ['de', 'Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag und Sonntag'],
+    ['en-gb', 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday and Sunday'],
+    ['en-us', 'Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, and Sunday'],
     ['fr', 'lundi, mardi, mercredi, jeudi, vendredi, samedi et dimanche'],
     [
       'pt-br',
