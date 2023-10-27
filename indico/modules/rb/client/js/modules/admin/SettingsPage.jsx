@@ -288,7 +288,10 @@ const SettingsPage = props => {
                 </Translate>
               }
             />
-            <FinalSubmitButton label={Translate.string('Save')} />
+            <FinalSubmitButton
+              label={Translate.string('Save')}
+              style={{marginBottom: '0.875rem'}}
+            />
           </Form>
         )}
       </FinalForm>
