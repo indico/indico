@@ -823,14 +823,14 @@ class RHPublishReceipt(RHManageReceiptBase):
         if not publish and request.method == 'POST':
             self.receipt_file.is_published = False
             flash(_("Document '{}' successfully unpublished").format(self.receipt_file.file.filename), 'success')
-            logger.info('Docunent %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
+            logger.info('Document %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
                         self.registration, session.user)
             return jsonify_data(html=self._render_receipts_list())
         form = PublishReceiptForm()
         if form.validate_on_submit():
             self.receipt_file.is_published = True
             flash(_("Document '{}' successfully published").format(self.receipt_file.file.filename), 'success')
-            logger.info('Docunent %r from registration %r was published by %r', self.receipt_file.file.filename,
+            logger.info('Document %r from registration %r was published by %r', self.receipt_file.file.filename,
                         self.registration, session.user)
             notify_registration_receipt_created(self.registration, self.receipt_file,
                                                 notify_user=form.data.get('notify_user'))

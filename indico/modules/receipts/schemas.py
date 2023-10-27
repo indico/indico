@@ -118,7 +118,7 @@ class FormFieldsSchema(mm.Schema):
 class TemplateDataSchema(mm.Schema):
     custom_fields = fields.Dict(keys=fields.String, values=fields.String)
     personal_data = fields.Nested(PersonalDataFieldSchema)
-    _fields = fields.List(fields.Nested(FormFieldsSchema), data_key='fields')
+    _fields = fields.List(fields.Nested(FormFieldsSchema), attribute='fields', data_key='fields')
     base_price = fields.Number()
     total_price = fields.Number()
     currency = fields.String()
