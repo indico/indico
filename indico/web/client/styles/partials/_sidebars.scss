@@ -60,6 +60,7 @@
     .title-wrapper {
       @include icon-before('icon-arrow-down');
       display: flex;
+      align-items: center;
       cursor: pointer;
 
       &::before {
