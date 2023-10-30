@@ -10,6 +10,7 @@
 @use 'partials/boxes' as *;
 @use 'partials/header_menu_trigger';
 @use 'partials/header_layout';
+@use 'widgets/favorite_button';
 @use 'design_system';
 
 #flashed-messages {
@@ -73,7 +74,11 @@
 
   .button-bar {
     @extend %page-header-branding;
+    @extend %text-size-reset;
     align-items: stretch;
+    color: var(--text-inverse-secondary-color);
+    align-self: stretch;
+    z-index: 1;
 
     .i-button {
       @include i-button-states($black, transparent, transparent, $gray, white, false);
@@ -82,6 +87,10 @@
       padding: 0 0.8em;
       margin: 0;
       border: none;
+
+      &::before {
+        font-size: inherit;
+      }
     }
 
     .separator {
@@ -118,6 +127,25 @@
       @include border-bottom($black);
       height: auto;
       margin: 0 1em;
+    }
+
+    #favorite-link ind-with-tooltip {
+      height: 100%;
+    }
+
+    #favorite-link button {
+      @extend %button-clear;
+      @extend %favorite-button;
+      @extend %text-size-reset;
+      @include i-button-states($black, transparent, transparent, $gray, white, false);
+
+      --favorite-icon-active-color: inherit;
+      height: 100%;
+      padding: 0 0.8em;
+
+      &:not(:hover, :focus) {
+        background: transparent !important;
+      }
     }
   }
 

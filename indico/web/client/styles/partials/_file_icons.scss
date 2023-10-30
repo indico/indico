@@ -1,0 +1,88 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'icons';
+@use 'design_system/variables';
+
+@mixin file-icon($operator, $type, $icon, $color: null) {
+  &[data-content-type#{$operator}'#{$type}']::before {
+    @extend %icon-#{$icon};
+
+    @if $color {
+      --icon-color: #{$color};
+    }
+  }
+}
+
+@mixin file-icon-is($type, $icon, $color: null) {
+  @include file-icon('=', $type, $icon, $color);
+}
+
+@mixin file-icon-startswith($type, $icon, $color: null) {
+  @include file-icon('^=', $type, $icon, $color);
+}
+
+@mixin file-icon-endswith($type, $icon, $color: null) {
+  @include file-icon('$=', $type, $icon, $color);
+}
+
+%file-icon {
+  --icon-color: inherit;
+
+  // Default icon
+  &::before {
+    @extend %icon;
+    @extend %icon-link;
+    color: var(--icon-color);
+  }
+
+  // Partial matches first
+  @include file-icon-endswith('+json', 'file-css');
+  @include file-icon-endswith('+xml', 'file-xml');
+  @include file-icon-startswith('application/vnd.oasis.opendocument.', 'file-openoffice');
+  @include file-icon-startswith('image/', 'file-image');
+  @include file-icon-startswith('audio/', 'file-music');
+  @include file-icon-startswith('text/', 'file-text');
+  @include file-icon-startswith('video/', 'file-video');
+
+  // Concrete match
+  @include file-icon-is('application/json', 'file-css');
+  @include file-icon-is('application/pdf', 'file-pdf', var(--text-red-color));
+  @include file-icon-is('application/vnd.ms-excel', 'file-excel', var(--text-green-color));
+  @include file-icon-is(
+    'application/vnd.ms-powerpoint',
+    'file-presentation',
+    var(--text-orange-color)
+  );
+  @include file-icon-is(
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'file-presentation',
+    var(--text-orange-color)
+  );
+  @include file-icon-is(
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'file-word',
+    var(--text-blue-color)
+  );
+  @include file-icon-is('application/x-7z-compressed', 'file-zip');
+  @include file-icon-is('application/x-ace-compressed', 'file-zip');
+  @include file-icon-is('application/x-bzip', 'file-zip');
+  @include file-icon-is('application/x-bzip2', 'file-zip');
+  @include file-icon-is('application/x-rar-compressed', 'file-zip');
+  @include file-icon-is('application/x-tar', 'file-zip');
+  @include file-icon-is('application/xml', 'file-xml');
+  @include file-icon-is('application/zip', 'file-zip');
+  @include file-icon-is('text/calendar', 'calendar');
+  @include file-icon-is('text/css', 'file-css');
+  @include file-icon-is('text/csv', 'file-spreadsheet', var(--text-green-color));
+  @include file-icon-is('text/tsv', 'file-spreadsheet', var(--text-green-color));
+  @include file-icon-is('text/html', 'file-xml');
+  @include file-icon-is('text/n3', 'file-xml');
+  @include file-icon-is('text/sgml', 'file-xml');
+  @include file-icon-is('text/tab-separated-values', 'file-spreadsheet', var(--text-green-color));
+  @include file-icon-is('text/xml', 'file-xml');
+}

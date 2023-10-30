@@ -37,7 +37,7 @@
     _close_all: function(effect) {
       var self = this;
 
-      this.element.find('a, button').each(function() {
+      this.element.find(`a, button, ${this.options.selector}`).each(function() {
         self._close($(this), effect);
       });
     },

@@ -13,8 +13,9 @@ body {
   --text-disabled-color: #999;
   --text-secondary-color: #6e6e6e;
   --background-base: #fff;
+  --text-inverse-secondary-color: #bbb;
   --background-secondary: #f7f7f7;
-  --surface-default: #e8e8e8;
+  --surface-default: #e0e1e2;
   --surface-inverse-color: #555;
   --surface-accent-color: var(--accent-color);
   --surface-accent-secondary-color: #cee8f5;
@@ -53,15 +54,16 @@ body {
   --text-orange-color: #b73701;
 
   // Generic controls
-  --control-border-color: var(--border-default-color);
-  --control-text-color: var(--text-color);
+  --control-text-color: #4f4f4f;
+  --control-border-color: #bdbdbd;
+  --control-border: 1px solid var(--control-border-color);
   --control-clickable-surface-color: var(--surface-default);
   --control-clickable-surface-focus-color: var(--surface-highlight-color);
-  --control-clickable-border-color: var(--control-border-color);
+  --control-clickable-border-color: var(--control-clickable-surface-color);
   --control-alt-text-color: var(--text-inverse-color);
   --control-alt-clickable-surface-color: var(--accent-color);
   --control-alt-clickable-surface-focus-color: var(--accent-highlight-color);
-  --control-alt-border-color: var(--accent-border-color);
+  --control-alt-border-color: var(--control-alt-clickable-surface-color);
   --control-disabled-text-color: var(--text-disabled-color);
   --control-disabled-clickable-surface-color: var(--surface-disabled-color);
   --control-disabled-border-color: var(--surface-disabled-color);
@@ -150,4 +152,8 @@ body {
   --subgroup-highlight-border-color: var(--accent-highlight-color);
   --subgroup-highlight-surface-color: #def0f7;
   --subgroup-highlight-text-color: inherit;
+
+  // Fonts
+  --base-font: 'Liberation Sans', sans-serif;
+  --control-font: Muli, sans-serif;
 }

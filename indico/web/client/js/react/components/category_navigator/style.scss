@@ -95,7 +95,7 @@
   }
 
   ind-with-toggletip button {
-    @extend %button-icon-only;
+    @extend %button-icon-only-clear;
 
     display: flex;
     align-items: center;
@@ -259,7 +259,7 @@
   }
 
   .category-search-field button:not([hidden]) {
-    @extend %button-icon-only;
+    @extend %button-icon-only-clear;
 
     position: absolute;
     right: 0;

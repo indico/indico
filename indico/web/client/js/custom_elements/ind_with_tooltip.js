@@ -45,6 +45,10 @@ customElements.define(
         this.show();
         this.addEventListener('focusout', this.hide);
       });
+
+      this.addEventListener('click', () => {
+        this.hide();
+      });
     }
   }
 );

@@ -1,89 +1,179 @@
-{% from 'attachments/_attachments.html' import render_attachments as _render_attachments %}
+{% macro _render_attachment_file(attachment) %}
+    {% set previewable = (attachment.file.is_previewable and not g.static_site) or false %}
+    {% set visible_link = attachment.type.name == 'link' and (not attachment.is_protected or attachment.can_access(session.user)) %}
+    <li>
+        <ind-attachment>
+            <a data-content-type="{{ attachment.file.content_type }}"
+               href="{{ attachment.link_url if visible_link else attachment.download_url }}"
+               target="_blank"
+               rel="noreferrer"
+               data-filename="{{ attachment.title }}"
+               {% if attachment.is_self_protected %}data-protected{% endif %}
+            >
+                <span>
+                    {{ attachment.title }}
+                    {% if attachment.is_self_protected %}
+                        <span class="protected">({% trans %}protected{% endtrans %})</span>
+                    {% endif %}
+                </span>
+            </a>
+        </ind-attachment>
+    </li>
+{% endmacro %}
+
+{% macro _render_attachment_folder(attachment) %}
+    {% set folder_name = attachment.title %}
+    <li>
+        <details open>
+            <summary aria-label="folder {{ attachment.title }}">
+                {{ attachment.title }}
+            </summary>
+            <ul>
+                {% for child in attachment.attachments %}
+                    {{ _render_attachment_file(child) }}
+                {% endfor %}
+            </ul>
+        </details>
+    </li>
+{% endmacro %}
 
 {% macro render_attachments(category) %}
     {%- set can_manage = category.can_manage(session.user) -%}
     {%- if category.attachment_count or can_manage %}
-        <div class="title">
-            <h2 class="icon-attachment">{% trans %}Materials{% endtrans %}</h2>
-            {% if can_manage %}
-                <div class="actions">
-                    <button class="i-button text-color subtle icon-edit js-manage-attachments"
-                            title="{% trans %}Manage materials{% endtrans %}"
-                            data-title="{% trans title=category.title %}Manage category materials{% endtrans %}"
-                            data-locator="{{ category.locator|tojson|forceescape }}"
-                            data-attachment-editor
-                            data-reload-on-change></button>
+        <section id="material-list" aria-labelledby="materials">
+            <header>
+                <h2 id="materials">{% trans %}Materials{% endtrans %}</h2>
+                {% if can_manage %}
+                    <div class="actions">
+                        <button class="i-button text-color subtle icon-edit js-manage-attachments"
+                                title="{% trans %}Manage materials{% endtrans %}"
+                                data-title="{% trans title=category.title %}Manage category materials{% endtrans %}"
+                                data-locator="{{ category.locator|tojson|forceescape }}"
+                                data-attachment-editor
+                                data-reload-on-change></button>
+                    </div>
+                {% endif %}
+            </header>
+            <ul>
+                {% set attachments = category.attached_items %}
+                {% if attachments %}
+                    {% for attachment in attachments.files %} {{ _render_attachment_file(attachment) }}{% endfor %}
+                    {% for attachment in attachments.folders %}{{ _render_attachment_folder(attachment) }}{% endfor %}
+                {% else %}
+                    <p class="empty-list-notice">{% trans %}There are no materials yet.{% endtrans %}</p>
+                {% endif %}
+            </ul>
+        </section>
+
+        <ind-attachment-preview-modal>
+            <dialog aria-labelled-by="attachment-preview">
+                <div>
+                    <div class="titlebar">
+                        {# XXX: The heading is a placeholder that will be filled in from JavaScript #}
+                        <h2 id="attachment-preview">{% trans %}Material preview{% endtrans %}</h2>
+                        <button value="close"><span>{% trans %}Close{% endtrans %}</span></button>
+                    </div>
+                    <article class="content"></article>
+                    <div class="button-bar">
+                        <a download>{% trans %}Download{% endtrans %}</a>
+                        <button value="close">{% trans %}Close{% endtrans %}</button>
+                    </div>
                 </div>
-            {% endif %}
-        </div>
-        {{ _render_attachments(category.attached_items, linked_object=category, management=false) }}
+            </dialog>
+            <template data-type="image">
+                <img alt="{% trans %}preview of an image attachment{% endtrans %}">
+            </template>
+            <template data-type="audio">
+                <audio controls><source></audio>
+            </template>
+            <template data-type="video">
+                <video controls><source></video>
+            </template>
+            <template data-type="text">
+                <div>
+                    <span hidden>{% trans %}Loading...{% endtrans %}</span>
+                    <span hidden aria-live="polite">{% trans %}Attachment preview could not be loaded{% endtrans %}</span>
+                    <pre hidden></pre>
+                </div>
+            </template>
+            <template data-type="invalid">
+                <p>{% trans %}Preview is not available for this attachment.{% endtrans %}</p>
+            </template>
+        </ind-attachment-preview-modal>
     {% endif -%}
 {% endmacro %}
 
 {% macro render_managers(managers) %}
     {%- if managers %}
-        <div class="title">
-            <h2 class="icon-medal">{% trans %}Managers{% endtrans %}</h2>
-        </div>
-        <ul id="manager-list">
-            {% for manager in managers %}
-                <li class="{{ 'icon-user' if manager.principal_type.name in ('user', 'email') else 'icon-users' }}">
-                    {{ manager.name }}
-                </li>
-            {% endfor %}
-        </ul>
+        <section id="manager-list" aria-labelledby="managers">
+            <header>
+                <h2 id="managers">{% trans %}Managers{% endtrans %}</h2>
+            </header>
+            <ul>
+                {% for manager in managers %}
+                    <li class="{{ 'user' if manager.principal_type.name in ('user', 'email') else 'group' }}">
+                        {{ manager.name }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
     {% endif -%}
 {% endmacro %}
 
 {% macro render_news(news_list, tzinfo) %}
     {%- if news_list %}
-        <div class="title">
-            <h2 class="icon-bullhorn">{% trans %}News{% endtrans %}</h2>
-            <a href="{{ url_for('news.display') }}" class="more-icon">{% trans %}more...{% endtrans %}</a>
-        </div>
-        <ul class="main-page-list">
-            {% for news in news_list %}
-                <li>
-                    <a class="title" href="{{ news.url }}">
-                        {{ news.title }}
-                    </a>
-                    <span class="timing">
-                        {% trans date=news.created_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                            Posted {{ date }}
-                        {%- endtrans %}
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
+        <section id="latest-news" aria-labelledby="news">
+            <header>
+                <h2 id="news">{% trans %}News{% endtrans %}</h2>
+            </header>
+            <ul>
+                {% for news in news_list %}
+                    <li>
+                        <a href="{{ news.url }}">
+                            {{ news.title }}
+                        </a>
+                        <div>
+                            {% trans date=news.created_dt|format_pretty_date(tzinfo=tzinfo) -%}
+                                Posted {{ date }}
+                            {%- endtrans %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div>
+                <a href="{{ url_for('news.display') }}" class="more-news">{% trans %}All news...{% endtrans %}</a>
+            </div>
+        </section>
     {% endif -%}
 {% endmacro %}
 
 {% macro render_upcoming_events(upcoming_events, tzinfo, happening_now) %}
     {%- if upcoming_events %}
-        <div class="title">
-            <h2 class="icon-alarm">{% trans %}Upcoming events{% endtrans %}</h2>
-        </div>
-        <ul class="main-page-list">
-            {% for event in upcoming_events %}
-                <li>
-                    {% block upcoming_title scoped %}
-                        <a href="{{ event.url }}" class="title" title="{{ event.title|striptags }}" >
-                            {{ event.title|striptags }}
-                        </a>
-                    {% endblock %}
-                    <span class="timing">
-                        {% if happening_now(event) %}
-                            {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                                ongoing until {{ time }}
-                            {%- endtrans %}
-                        {% else %}
-                            {% trans time=event.start_dt|format_pretty_date(tzinfo=tzinfo) -%}
-                                starts {{ time }}
-                            {%- endtrans %}
-                        {% endif %}
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
+        <section id="upcoming-event-list" aria-labelledby="upcoming-events">
+            <header>
+                <h2 id="upcoming-events">{% trans %}Upcoming events{% endtrans %}</h2>
+            </header>
+            <ul>
+                {% for event in upcoming_events %}
+                    <li>
+                        {% block upcoming_title scoped %}
+                            <a href="{{ event.url }}">{{ event.title|striptags }}</a>
+                        {% endblock %}
+                        <div>
+                            {% if happening_now(event) %}
+                                {% trans time=event.end_dt|format_pretty_date(tzinfo=tzinfo) -%}
+                                    ongoing until {{ time }}
+                                {%- endtrans %}
+                            {% else %}
+                                {% trans time=event.start_dt|format_pretty_date(tzinfo=tzinfo) -%}
+                                    starts {{ time }}
+                                {%- endtrans %}
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        </section>
     {% endif -%}
 {% endmacro %}

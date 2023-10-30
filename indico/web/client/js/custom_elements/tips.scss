@@ -9,10 +9,10 @@
 
 ind-with-tooltip,
 ind-with-toggletip {
+  // XXX: The following variables are set using JavaScript:
   --tooltip-surface-color: #333;
   --tooltip-text-color: #fff;
 
-  // XXX: The following variables are set using JavaScript:
   --top: 0;
   --left: 0;
   --right: auto;
@@ -33,6 +33,7 @@ ind-with-toggletip {
     max-width: min(calc(100vw - 1em), 40ch);
     gap: var(--content-gap-within-inline);
     padding: var(--container-padding);
+    width: max-content;
 
     cursor: default;
     color: var(--tooltip-text-color);
@@ -41,6 +42,7 @@ ind-with-toggletip {
     border-width: 0.5em 0;
 
     // Reset the default text appearance
+    font-family: var(--base-font);
     font-style: normal;
     font-weight: normal;
     font-size: 1rem; // FIXME: this needs the base font size to be addressed!

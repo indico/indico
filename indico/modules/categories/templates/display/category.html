@@ -5,7 +5,7 @@
 {% from 'message_box.html' import message_box %}
 
 {% block content %}
-    <div class="category-info flexrow">
+    <div id="category-info">
         {% if category.has_logo %}
             <div class="category-logo">
                 <img src="{{ category.logo_url }}" alt="">

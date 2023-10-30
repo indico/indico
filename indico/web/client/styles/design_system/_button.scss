@@ -14,19 +14,22 @@
 }
 
 %button-base {
-  --button-border-color: var(--control-border-color);
+  --button-border-color: var(--control-clickable-border-color);
   --button-text-color: var(--control-text-color);
   --button-surface-color: var(--control-clickable-surface-color);
   --button-surface-hover-color: var(--control-clickable-surface-focus-color);
+  --button-padding: var(--control-padding);
 
   @extend %flex-inline-center;
   gap: var(--control-internal-gap);
-  padding: var(--control-padding);
+  padding: var(--button-padding);
 
   border: var(--control-border-width) solid var(--button-border-color);
   color: var(--button-text-color);
   background: var(--button-surface-color);
   line-height: 1.1;
+  font-family: var(--control-font);
+  font-weight: bold;
 
   &:focus,
   &:hover {
@@ -75,6 +78,10 @@
   border-color: var(--button-disabled-border-color);
 }
 
+%button-even-padding {
+  padding: var(--control-padding-short);
+}
+
 %button {
   @extend %button-base;
   @extend %button-rounded;
@@ -103,7 +110,7 @@
   color: inherit;
 }
 
-%button-icon-only {
+%button-icon-only-clear {
   @extend %button-clear;
   @extend %flex-inline-center;
   padding: 0;

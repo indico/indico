@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {domReady} from 'indico/utils/domstate';
+import {domReady, getViewportGeometry} from 'indico/utils/domstate';
 import './tips.scss';
 
 let viewportWidth = document.documentElement.clientWidth;
@@ -21,8 +21,7 @@ function updateClientGeometry() {
 }
 
 function positionVertically(referenceRect, tooltipRect) {
-  const vw = viewportWidth;
-  const vh = viewportHeight;
+  const {vw, vh} = getViewportGeometry();
   let top = 'auto';
   let bottom = 'auto';
   const refCenter = `${referenceRect.left + referenceRect.width / 2}px`;
@@ -53,8 +52,7 @@ function positionVertically(referenceRect, tooltipRect) {
 }
 
 function positionHorizontally(referenceRect, tooltipRect) {
-  const vw = viewportWidth;
-  const vh = viewportHeight;
+  const {vw, vh} = getViewportGeometry();
   let left = 'auto';
   let right = 'auto';
   const refCenter = `${referenceRect.top + referenceRect.height / 2}px`;
@@ -125,7 +123,7 @@ export class TipBase extends HTMLElement {
   }
 
   getTipCSS() {
-    const referenceRect = this.getBoundingClientRect();
+    const referenceRect = this.firstElementChild.getBoundingClientRect();
     const tooltipRect = this.$tip.getBoundingClientRect();
 
     if (this.orientation === 'horizontal') {

@@ -18,6 +18,6 @@ domReady.then(() => {
       innerHTML: `<div data-tip-content>${template.innerHTML}</div>`,
     });
     target.replaceWith(tooltip);
-    tooltip.append(target);
+    tooltip.prepend(target);
   });
 });

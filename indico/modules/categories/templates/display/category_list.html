@@ -1,20 +1,27 @@
 {% macro category_list(parent_category) %}
     {% if parent_category.children %}
-        {% set category_title = parent_category.title %}
-        <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
-            {%- trans %}Categories in {{ category_title }}{% endtrans -%}
-        </h2>
-        <ul class="category-list" data-subcat-info-url="{{ url_for('.subcat_info', parent_category) }}">
-            {% for category in parent_category.children %}
-                <li>
-                    <span class="protection {{ 'icon-shield' if category.is_self_protected }}"></span>
-                    <span class="number-events" id="category-event-count-{{ category.id }}"></span>
-                    <a href="{{ url_for('.display', category) }}" class="name">{{ category.title }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-        <script>
-            setupCategoryDisplaySubcatList();
-        </script>
+        <ind-category-list subcat-info-url="{{ url_for('.subcat_info', parent_category) }}">
+            {% set category_title = parent_category.title %}
+            <h2 id="category-list" data-bypass-target="{% trans %}Skip to category list{% endtrans %}">
+                {%- trans %}Categories in {{ category_title }}{% endtrans -%}
+            </h2>
+            <ul class="category-list">
+                {% for category in parent_category.children %}
+                    <li id="category-{{ category.id }}">
+                        <a href="{{ url_for('.display', category) }}" class="name">
+                            {% if category.is_self_protected %}
+                                <span class="protected" aria-hidden="true"></span>
+                                <span class="protected-label">{% trans %}Protected category{% endtrans %}</span>
+                            {% else %}
+                                <span class="not-protected" aria-hidden="true"></span>
+                            {% endif %}
+                            <span class="title-text">{{ category.title }}</span>
+                            <span class="separator">,</span>
+                            <span class="event-count"></span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </ind-category-list>
     {% endif %}
 {% endmacro %}

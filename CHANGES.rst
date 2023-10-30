@@ -325,6 +325,7 @@ Improvements
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
 - Convert the session bar into a pull-down menu (:issue:`5966`, :pr:`6048`, thanks :user:`foxbunny`)
+- New attachment preview dialog with support for video and audio files (:pr:`5945`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -349,6 +350,7 @@ Bugfixes
 - Fail with a nicer error message when trying to upload a non-UTF8 CSV file (:issue:`6085`,
   :pr:`6259`)
 - Do not include unnecessary user data in JSON exports (:pr:`6260`)
+- Fix the category page focus order (:issue:`5943`, :pr:`5945`, thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -375,6 +377,8 @@ Accessibility
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
 - Convert category navigator to react and improve its accessibility (:issue:`5917`, :pr:`5931`,
   thanks :user:`foxbunny`)
+- Improve category page sidebar, category list, and event list color constrast (:pr:`5945`, thanks :user:`foxbunny`)
+- Improve category page keyboard navigation (:pr:`5945`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

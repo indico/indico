@@ -30,6 +30,7 @@ using the `bin/maintenance/generate_icons.py` script.
   content: attr(data-icon);
   font-weight: normal;
   font-variant: normal;
+  font-size: max(1rem, 100%); // FIXME: it should be 0.875rem, but we need to fix font sizes first
   text-transform: none;
   line-height: 1;
   -webkit-font-smoothing: antialiased;
@@ -45,13 +46,20 @@ you can use the generic selector below, but it's slower:
 [class^='icon-']::before,
 [class*=' icon-']::before,
 %icon {
+  --icon-line-height: 1.1;
+  --icon-size: max(1rem, 100%); // FIXME: it should be 0.875rem, but we need to fix font sizes first
+
+  flex: none;
+
   font-family: 'icomoon-ultimate';
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
   text-transform: none;
-  line-height: 1;
   -webkit-font-smoothing: antialiased;
+
+  font-size: var(--icon-size);
+  line-height: var(--icon-line-height);
 }
 
 i[class^='icon-']::before {
@@ -736,7 +744,8 @@ i[class^='icon-']::before {
 // END GENERATED ICON RULES
 
 /* animated spinner icon */
-.icon-spinner::before {
+.icon-spinner::before,
+%icon-spinner {
   content: '';
   display: inline-block;
   min-width: 1.2em;
@@ -755,7 +764,8 @@ i[class^='icon-']::before {
 }
 
 /* Custom "empty" icon to have a space equivalent to an icon */
-.icon-none::before {
+.icon-none::before,
+%icon-none {
   content: '\2001';
 }
 

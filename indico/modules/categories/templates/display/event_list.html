@@ -1,50 +1,8 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro _hidden_events_block(class, category, events_by_month, format_event_date, is_recent, happening_now,
-                             before=none, after=none, message_first=true) %}
-    {% set message=caller() %}
-    {% macro render_message() %}
-        {% call message_box('info', icon=false) %}
-            <div class="content smaller">
-                <span class="js-show-message">
-                    {{ message }}
-                    <a class="js-toggle-list" href="#">{% trans %}Show{% endtrans %}</a>
-                    <span class="icon-spinner js-spinner"></span>
-                </span>
-                <span class="js-hide-message">
-                    {{ message }}
-                    <a class="js-toggle-list" href="#">{% trans %}Hide{% endtrans %}</a>
-                </span>
-            </div>
-        {% endcall %}
-    {% endmacro %}
-
-    {% macro render_list() %}
-        <div class="events"
-             data-event-list-url="{{ url_for('.event_list', category) }}"
-             {% if after %}data-event-list-after="{{ after }}"{% endif %}
-             {% if before %}data-event-list-before="{{ before }}"{% endif %}>
-            {%- if events_by_month -%}
-                {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
-            {%- endif -%}
-        </div>
-    {% endmacro %}
-
-    <div class="{{ class }}">
-        {% if message_first %}
-            {{ render_message() }}
-            {{ render_list() }}
-        {% else %}
-            {{ render_list() }}
-            {{ render_message() }}
-        {% endif %}
-    </div>
-{% endmacro %}
-
 {% macro event_list(events_by_month, format_event_date, is_recent, happening_now, category, future_event_count,
-                    past_event_count, future_threshold, past_threshold, future_events_by_month=[],
-                    past_events_by_month=[], show_future_events=false, show_past_events=false,
-                    has_hidden_events=false, is_flat=false, request_params={}) %}
+                    past_event_count, future_threshold, past_threshold, show_future_events=false,
+                    show_past_events=false, has_hidden_events=false, is_flat=false, request_params={}) %}
     {#- request_params parameter provided for template extensions -#}
     {% if has_hidden_events %}
         {% call message_box('highlight', icon=true) %}
@@ -56,93 +14,138 @@
         {% endcall %}
     {% endif %}
 
-    <div class="event-list"
-         data-show-future-events-url="{{ url_for('.show_future_events', category) }}"
-         data-show-past-events-url="{{ url_for('.show_past_events', category) }}">
-        {% if future_event_count %}
-            {% call _hidden_events_block('future-events', category, future_events_by_month, format_event_date,
-                                        is_recent, happening_now, after=future_threshold) %}
-                {% trans count=future_event_count -%}
-                    There is one event in the future.
-                {%- pluralize -%}
-                    There are {{ count }} events in the future.
-                {%- endtrans %}
-            {% endcall %}
-        {% endif %}
-        <div>
+    <ind-event-list
+        show-future-events="{{ show_future_events|tojson }}"
+        is-flat="{{ is_flat|tojson }}"
+    >
+        <section id="event-list" aria-labelledby="events-by-month">
+            <h2 id="events-by-month"
+                data-bypass-target="{% trans %}Skip to event list{% endtrans %}">{% trans %}Events by month{% endtrans %}</h2>{% if future_event_count %}
+                <ind-hidden-event-trigger list-name="future"
+                                          url="{{ url_for('.show_future_events', category) }}"
+                                          shown="{{ show_future_events|tojson }}"
+                >
+                    <button value="show">
+                        {%- trans count=future_event_count -%}
+                            Show {{ future_event_count }} future event
+                        {%- pluralize -%}
+                            Show {{ future_event_count }} future events
+                        {%- endtrans -%}
+                    </button>
+                    <button value="hide">{% trans %}Hide future events{% endtrans %}</button>
+                    <p aria-live="polite"
+                       data-loading-message="{% trans %}Loading future events{% endtrans %}"
+                       data-error-message="{% trans %}Future events could not be loaded due to an error.{% endtrans %}"
+                       data-loaded-message="{% trans count=future_event_count %}Showing {{ future_event_count }} future event.{% pluralize %}Showing {{ future_event_count }} events.{% endtrans %}"
+                    ></p>
+                    <ind-hidden-event-list list-name="future"
+                                           url="{{ url_for('.event_list', category) }}"
+                                           after="{{ future_threshold }}"
+                                           flat="{{ is_flat|tojson }}"
+                                           extra-params="{{ request_params|tojson }}"
+                                           hidden
+                    ></ind-hidden-event-list>
+                </ind-hidden-event-trigger>
+            {% endif %}
             {{ event_list_block(events_by_month, format_event_date, is_recent, happening_now) }}
-        </div>
-        {% if past_event_count %}
-            {% call _hidden_events_block('past-events', category, past_events_by_month, format_event_date, is_recent,
-                                        happening_now, before=past_threshold, message_first=false) %}
-                {% trans count=past_event_count -%}
-                    There is one event in the past.
-                {%- pluralize -%}
-                    There are {{ count }} events in the past.
-                {%- endtrans %}
-            {% endcall %}
-        {% endif %}
-    </div>
-    <script>
-        setupCategoryDisplayEventList({{ (show_future_events and not future_events_by_month) | tojson }},
-                                      {{ (show_past_events and not past_events_by_month) | tojson }},
-                                      {{ is_flat | tojson }},
-                                      {{ request_params | tojson }});
-    </script>
+            {% if past_event_count %}
+                <ind-hidden-event-trigger list-name="past"
+                                          url="{{ url_for('.show_past_events', category) }}"
+                                          shown="{{ show_past_events|tojson }}"
+                >
+                    {# XXX: The 'show' button is above the list because of the focus order. #}
+                    <button value="show">
+                        {%- trans count=past_event_count -%}
+                            Show {{ past_event_count }} past event
+                            {%- pluralize -%}
+                            Show {{ past_event_count }} past events
+                        {%- endtrans -%}
+                    </button>
+                    <ind-hidden-event-list list-name="past"
+                                           url="{{ url_for('.event_list', category) }}"
+                                           before="{{ past_threshold }}"
+                                           flat="{{ is_flat|tojson }}"
+                                           extra-params="{{ request_params|tojson }}"
+                                           hidden
+                    ></ind-hidden-event-list>
+                    <button value="hide" hidden>{% trans %}Hide past events{% endtrans %}</button>
+                    <p aria-live="polite"
+                       data-loading-message="{% trans %}Loading past events.{% endtrans %}"
+                       data-error-message="{% trans %}Past events could not be loaded due to an error.{% endtrans %}"
+                       data-loaded-message="{% trans count=past_event_count %}Showing {{ past_event_count }} past event.{% pluralize %}Showing {{ past_event_count }} events.{% endtrans %}"
+                    ></p>
+                </ind-hidden-event-trigger>
+            {% endif %}
+        </section>
+    </ind-event-list>
 {% endmacro %}
 
 {% macro event_list_block(events_by_month, format_event_date, is_recent, happening_now) %}
     {% for month in events_by_month %}
-        <h4 class="{% if month.is_current %}current-month{% endif %}">
-            <span>{{ month.name }}</span>
-        </h4>
-        <ul>
-            {% for event in month.events %}
-                {% set is_lecture = (event.type == 'lecture') %}
-                <li>
-                    <span class="event-icons">
-                        <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}" title="{% trans %}Export{% endtrans %}"></a>
-                        {% if session.user and event in session.user.favorite_events %}
-                            <i class="icon-star" title="{% trans %}You have favorited this event.{% endtrans %}"></i>
-                        {% endif %}
-                    </span>
-                    <span class="list-name">
-                        <span class="date {% if happening_now(event) %}today{% endif %}">
-                            {{ format_event_date(event) }}
-                        </span>
+        <section aria-labelledby="month-events-{{ month.iso_date }}">
+            <h3 id="month-events-{{ month.iso_date }}" class="{% if month.is_current %}current-month{% endif %}">
+                <time datetime="{{ month.iso_date }}">{{ month.name }}</time>
+            </h3>
+            <ul>
+                {% for event in month.events %}
+                    {% set is_lecture = (event.type == 'lecture') %}
+                    {% set event_title = event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) %}
+                    {% set is_favorite = session.user and event in session.user.favorite_events %}
+                    <li>
+                        <div class="event-date">
+                            <ind-with-tooltip>
+                                <a class="download-event" href="{{ url_for('events.export_event_ical', event) }}"
+                                   download>
+                                    <span data-tip-content>{% trans %}Download event details for
+                                        {{ event_title }}{% endtrans %}</span>
+                                </a>
+                            </ind-with-tooltip>
+                            <span class="date {% if happening_now(event) %}ongoing{% endif %}">
+                                {{ format_event_date(event) }}
+                            </span>
+                        </div>
                         <div class="event-title">
                             <a href="{{ event.url }}">
-                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
+                                {{ event_title | striptags }}
                             </a>
-                            <span class="protected">
-                                {% if event.visibility == 0 %}
-                                    <span class="ui label mini grey"
-                                          title="{% trans %}This event is hidden.{% endtrans %}">
-                                        {%- trans %}hidden{% endtrans -%}
-                                    </span>
-                                {% endif %}
-                                {% if event.is_self_protected %}
-                                    <span class="icon-shield" data-type="restricted" title="{% trans %}Protected{% endtrans %}"></span>
-                                {% endif %}
-
-                                {% if is_recent(event.created_dt) %}
-                                    <span class="ui label mini blue"
-                                          title="{% trans %}This event is new.{% endtrans %}">
-                                        {%- trans %}new{% endtrans -%}
-                                    </span>
-                                {% endif %}
-                                {{ template_hook('event-status-labels', event=event) }}
-                            </span>
-                            {% if event.label %}
-                                <span class="ui label basic mini {{ event.label.color }}"
-                                      title="{{ event.label_message }}">
-                                    {{- event.label.title -}}
+                            {% if is_favorite %}
+                                <span class="favorite-event">
+                                    <span>{% trans %}Favorite event{% endtrans %}</span>
+                                </span>
+                            {% endif %}
+                            {% if event.is_self_protected %}
+                                <span class="protected" data-type="restricted">
+                                    <span>{% trans %}Protected{% endtrans %}</span>
                                 </span>
                             {% endif %}
                         </div>
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
+                        <span class="event-labels">
+                            {% if event.visibility == 0 %}
+                                <span class="hidden-event-label">{% trans %}hidden{% endtrans %}</span>
+                            {% endif %}
+                            {% if is_recent(event.created_dt) %}
+                                <span class="new-event-label">{% trans %}new{% endtrans %}</span>
+                            {% endif %}
+                            {{ template_hook('event-status-labels', event=event) }}
+                            {% if event.label %}
+                                <span class="custom-event-label" data-color="{{ event.label.color }}">
+                                    <span>{{- event.label.title -}}</span>
+                                    {% if event.label_message %}
+                                        <ind-with-toggletip>
+                                            <button>
+                                                <span>{% trans %}More information{% endtrans %}</span>
+                                            </button>
+                                            <span data-tip-content aria-live="polite">
+                                                {{ event.label_message }}
+                                            </span>
+                                        </ind-with-toggletip>
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
     {% endfor %}
 {% endmacro %}
