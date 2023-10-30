@@ -41,7 +41,7 @@ jobs:
           cache-dependency-path: |
             requirements.txt
             requirements.dev.txt
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         name: Setup Node
         with:
           node-version: 18.x
