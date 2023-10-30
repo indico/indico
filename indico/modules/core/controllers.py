@@ -365,7 +365,7 @@ class RHRenderMarkdown(RH):
         return jsonify(html=html)
 
 
-class RHSessionExpiration(RH):
+class SessionExpirationMixin:
     """Return the session expiration time."""
 
     def _process(self):
@@ -374,3 +374,11 @@ class RHSessionExpiration(RH):
         except KeyError:
             expiry = None
         return jsonify(session_expiration=expiry)
+
+
+class RHSessionExpiration(SessionExpirationMixin, RH):
+    """Return the session expiration time without refreshing the session."""
+
+
+class RHSessionRefresh(SessionExpirationMixin, RH):
+    """Return the sesssion expiration time and refresh the current session."""
