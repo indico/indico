@@ -8,28 +8,33 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
+import {useDispatch} from 'react-redux';
 import {Button, Form} from 'semantic-ui-react';
 
 import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {RevisionType} from '../../models';
+import {RevisionTypeStates} from '../../models';
 
+import {modifyReviewComment} from './actions';
 import {blockPropTypes} from './util';
 
 import './ReviewComment.module.scss';
 
 export default function ReviewComment({block, canEdit}) {
   const [editFormOpen, setEditFormOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSubmit = async formData => {
-    console.log(formData, block);
-    // TODO
+    const rv = await dispatch(modifyReviewComment(block, formData));
+    if (rv.error) {
+      return rv.error;
+    }
     setEditFormOpen(false);
   };
 
   return (
-    <div styleName="revision-comment">
+    <div styleName="review-comment">
       {editFormOpen ? (
         <div className="f-self-stretch">
           <FinalForm
@@ -43,7 +48,7 @@ export default function ReviewComment({block, canEdit}) {
                   name="text"
                   placeholder={Translate.string('Leave a comment...')}
                   autoFocus
-                  required={block.type.name !== RevisionType.acceptance}
+                  required={RevisionTypeStates[block.type.name] !== 'accepted'}
                   hideValidationError
                 />
                 <Form.Group styleName="submit-buttons" inline>

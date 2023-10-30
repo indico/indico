@@ -49,6 +49,12 @@ export function confirmEditableChanges(revision, formData) {
   );
 }
 
+export function modifyReviewComment(revision, formData) {
+  return submitFormAction(() => indicoAxios.patch(revision.reviewURL, formData), null, () =>
+    loadTimeline()
+  );
+}
+
 export function createRevisionComment(url, formData) {
   return submitFormAction(() => indicoAxios.post(url, formData), null, () => loadTimeline());
 }

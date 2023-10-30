@@ -113,23 +113,6 @@ export const hasPublishableFiles = createSelector(
   }
 );
 
-export const getLastRevertableRevisionId = createSelector(
-  getValidRevisions,
-  revisions => {
-    if (!revisions || !revisions.length) {
-      return null;
-    }
-    const latestRevision = revisions[revisions.length - 1];
-    if (
-      latestRevision.isUndone ||
-      [RevisionType.new, RevisionType.ready_for_review].includes(latestRevision.type.name)
-    ) {
-      return null;
-    }
-    return latestRevision.id;
-  }
-);
-
 export const canPerformSubmitterActions = createSelector(
   getDetails,
   details => details && details.canPerformSubmitterActions
@@ -156,9 +139,12 @@ export const canJudgeLastRevision = createSelector(
   (lastRevision, allowed) => lastRevision.type.name === RevisionType.ready_for_review && allowed
 );
 
-export const canUndoLastValidBlock = createSelector(
-  getValidTimelineBlocks,
-  getLastRevertableRevisionId,
-  (blocks, lastRevertableRevisionId) =>
-    blocks.length >= 2 && blocks[blocks.length - 1].id === lastRevertableRevisionId
+export const canEditLastRevision = createSelector(
+  getLastRevision,
+  canPerformEditorActions,
+  (latestRevision, allowed) =>
+    allowed &&
+    latestRevision &&
+    !latestRevision.isUndone &&
+    ![RevisionType.new, RevisionType.ready_for_review].includes(latestRevision.type.name)
 );

@@ -196,7 +196,7 @@ def create_submitter_revision(prev_revision, user, files):
     return new_revision
 
 
-def _ensure_revision_is_undoable(revision):
+def _ensure_revision_can_be_updated(revision):
     if (revision != revision.editable.latest_revision or
             revision.type in (RevisionType.new, RevisionType.ready_for_review)):
         raise InvalidEditableState
@@ -204,7 +204,7 @@ def _ensure_revision_is_undoable(revision):
 
 @no_autoflush
 def undo_review(revision):
-    _ensure_revision_is_undoable(revision)
+    _ensure_revision_can_be_updated(revision)
     revision.editable.published_revision = None
     db.session.flush()
     revision.is_undone = True
@@ -213,8 +213,17 @@ def undo_review(revision):
 
 
 @no_autoflush
+def update_review_comment(revision, text):
+    _ensure_revision_can_be_updated(revision)
+    revision.comment = text
+    revision.modified_dt = now_utc()
+    db.session.flush()
+    logger.info('Review comment on revision %r updated by %r', revision, revision.editable.editor)
+
+
+@no_autoflush
 def reset_editable(revision):
-    _ensure_revision_is_undoable(revision)
+    _ensure_revision_can_be_updated(revision)
     if revision.editable.state != EditableState.accepted:
         return
     revision.editable.published_revision = None
