@@ -12,7 +12,7 @@ import {START_DATE} from 'react-dates/constants';
 import {Field, FormSpy} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
-import {Form, Message, Segment} from 'semantic-ui-react';
+import {Form, Message, Segment, Icon} from 'semantic-ui-react';
 
 import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
 import {
@@ -30,7 +30,7 @@ import {serializeDate} from 'indico/utils/date';
 
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
 import {FinalWeekdayRecurrencePicker} from '../../components/WeekdayRecurrencePicker';
-import {sanitizeRecurrence} from '../../util';
+import {sanitizeRecurrence, getRecurrenceInfo} from '../../util';
 import {selectors as userSelectors} from '../user';
 
 import './BookingEditForm.module.scss';
@@ -141,7 +141,7 @@ class BookingEditForm extends React.Component {
   render() {
     const {
       user: sessionUser,
-      booking: {bookedForUser, startDt, endDt, room, isAccepted},
+      booking: {bookedForUser, startDt, endDt, room, isAccepted, repetition},
       onBookingPeriodChange,
       formProps,
       hideOptions,
@@ -156,12 +156,19 @@ class BookingEditForm extends React.Component {
     const today = moment();
     const bookingStarted = today.isAfter(startDt, 'day');
     const bookingFinished = today.isAfter(endDt, 'day');
+    const recurringBookingInProgress = getRecurrenceInfo(repetition).type === 'every';
 
     // all but one option are hidden
     const showRecurrenceOptions =
       ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
     return (
       <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
+        {recurringBookingInProgress && recurrence.type === 'every' && (
+          <Message icon styleName="repeat-frequency-disabled-notice">
+            <Icon name="dont" />
+            <Translate>You cannot modify the repeat frequency of an existing booking.</Translate>
+          </Message>
+        )}
         <Segment>
           {showRecurrenceOptions && (
             <Form.Group inline>
@@ -220,7 +227,7 @@ class BookingEditForm extends React.Component {
                 {({input: {value: number}}) => (
                   <FinalDropdown
                     name="recurrence.interval"
-                    disabled={submitSucceeded}
+                    disabled={submitSucceeded || recurringBookingInProgress}
                     selection
                     required
                     options={[
@@ -280,7 +287,9 @@ class BookingEditForm extends React.Component {
               recurrence.type === 'every' && recurrence.interval === 'week' ? {} : {display: 'none'}
             }
           >
-            <div styleName="recurring-every-label">{Translate.string('Recurring every')}</div>
+            <div styleName="recurring-every-label">
+              <Translate>Recurring every</Translate>
+            </div>
             <FinalWeekdayRecurrencePicker
               name="recurrence.weekdays"
               requireOneSelected
