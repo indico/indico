@@ -32,8 +32,8 @@ from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
 class CategorySettingsForm(IndicoForm):
     BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
-                    'suggestions_disabled', 'is_flat_view_enabled', 'event_creation_notification_emails',
-                    'notify_managers')
+                    'suggestions_disabled', 'is_flat_view_enabled', 'show_future_months',
+                    'event_creation_notification_emails', 'notify_managers')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
@@ -52,6 +52,11 @@ class CategorySettingsForm(IndicoForm):
                                         description=_('Allow users to view all the events descending from this '
                                                       'category in one single page. This is not recommended on large '
                                                       'categories with thousands of events.'))
+    show_future_months = IntegerField(_('Future months threshold'), [NumberRange(min=0)],
+                                      description=_('Events past the threshold will be hidden by default to avoid '
+                                                    'clutter, the user can click to expand them. If no events are '
+                                                    'found within this threshold, it is extended to show the first '
+                                                    'month with events.'))
     event_message_mode = IndicoEnumSelectField(_('Message Type'), enum=EventMessageMode,
                                                default=EventMessageMode.disabled,
                                                description=_('This message will show up at the top of every event page '

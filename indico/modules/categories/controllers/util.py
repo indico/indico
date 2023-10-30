@@ -87,8 +87,9 @@ def get_category_view_params(category, now, is_flat=False):
 
     # Current events, which are always shown by default are events of this month and of the previous month.
     # If there are no events in this range, it will include the last and next month containing events.
+
     past_threshold = now - relativedelta(months=1, day=1, hour=0, minute=0)
-    future_threshold = now + relativedelta(months=1, day=1, hour=0, minute=0)
+    future_threshold = now + relativedelta(months=category.show_future_months+1, day=1, hour=0, minute=0)
 
     hidden_event_ids = {e.id for e in category.get_hidden_events(user=session.user)} if not is_flat else set()
     event_query_filter = get_event_query_filter(category, is_flat=is_flat, hidden_event_ids=hidden_event_ids)
