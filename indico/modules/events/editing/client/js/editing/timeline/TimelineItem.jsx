@@ -21,6 +21,7 @@ import ChangesConfirmation from './ChangesConfirmation';
 import CustomActions from './CustomActions';
 import FileDisplay from './FileDisplay';
 import ResetReview from './ResetReview';
+import ReviewComment from './ReviewComment';
 import ReviewForm from './ReviewForm';
 import RevisionLog from './RevisionLog';
 import * as selectors from './selectors';
@@ -31,18 +32,18 @@ import '../../../styles/timeline.module.scss';
 import './TimelineItem.module.scss';
 
 export default function TimelineItem({block, index}) {
-  const {createdDt, isUndone} = block;
+  const {createdDt, modifiedDt, isUndone} = block;
   const lastTimelineBlock = useSelector(selectors.getLastTimelineBlock);
   const lastValidTimelineBlock = useSelector(selectors.getLastValidTimelineBlock);
   const lastTimelineBlockWithFiles = useSelector(selectors.getLastTimelineBlockWithFiles);
-  const lastRevertableRevisionId = useSelector(selectors.getLastRevertableRevisionId);
   const needsSubmitterConfirmation = useSelector(selectors.needsSubmitterConfirmation);
   const canPerformSubmitterActions = useSelector(selectors.canPerformSubmitterActions);
-  const canUndoLastValidBlock = useSelector(selectors.canUndoLastValidBlock);
+  const canEditLastRevision = useSelector(selectors.canEditLastRevision);
   const {canComment} = useSelector(selectors.getDetails);
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastTimelineBlock.id === block.id;
   const isLastValidBlock = lastValidTimelineBlock.id === block.id;
+  const canEdit = isLastValidBlock && canEditLastRevision;
   const hasContent =
     block.commentHtml ||
     !!block.files.length ||
@@ -80,15 +81,23 @@ export default function TimelineItem({block, index}) {
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
                   {serializeDate(createdDt, 'LLL')}
                 </time>{' '}
+                {modifiedDt && (
+                  <time
+                    dateTime={serializeDate(modifiedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}
+                    title={serializeDate(modifiedDt, 'LLL')}
+                  >
+                    <span className="review-comment-edited">
+                      <Translate>edited</Translate>
+                    </span>
+                  </time>
+                )}{' '}
                 {isUndone && (
                   <Translate as="span" styleName="undone-indicator">
                     Retracted
                   </Translate>
                 )}
               </div>
-              {visible && isLastValidBlock && canUndoLastValidBlock && (
-                <ResetReview revisionId={lastRevertableRevisionId} />
-              )}
+              {visible && canEdit && <ResetReview reviewURL={block.reviewURL} />}
               {!isAlwaysVisible && (hasContent || !!block.items.length) && (
                 <a
                   className="i-link"
@@ -108,12 +117,7 @@ export default function TimelineItem({block, index}) {
                     <Translate>This revision has been retracted by the editor.</Translate>
                   </Message>
                 )}
-                {block.commentHtml && (
-                  <div
-                    className="markdown-text"
-                    dangerouslySetInnerHTML={{__html: block.commentHtml}}
-                  />
-                )}
+                {block.commentHtml && <ReviewComment block={block} canEdit={canEdit} />}
                 {block.commentHtml && !!(block.files.length || block.tags.length) && <Divider />}
                 <FileDisplay
                   fileTypes={fileTypes}

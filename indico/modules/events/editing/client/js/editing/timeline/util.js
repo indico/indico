@@ -147,6 +147,7 @@ export const blockPropTypes = {
   id: PropTypes.number.isRequired,
   user: PropTypes.shape(userPropTypes).isRequired,
   createdDt: PropTypes.string.isRequired,
+  modifiedDt: PropTypes.string,
   type: PropTypes.shape(typePropTypes).isRequired,
   isUndone: PropTypes.bool,
   isEditorRevision: PropTypes.bool,

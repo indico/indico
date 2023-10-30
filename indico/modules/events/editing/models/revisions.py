@@ -86,6 +86,10 @@ class EditingRevision(RenderModeMixin, db.Model):
         nullable=False,
         default=now_utc
     )
+    modified_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
     type = db.Column(
         PyIntEnum(RevisionType),
         nullable=False,

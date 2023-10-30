@@ -5,42 +5,24 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import resetReviewsURL from 'indico-url:event_editing.api_undo_review';
-
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {Icon, Popup} from 'semantic-ui-react';
 
 import {RequestConfirm} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 import {resetReviews} from './actions';
-import * as selectors from './selectors';
 
-export default function ResetReview({revisionId}) {
-  const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
-  const allowed = useSelector(selectors.canPerformEditorActions);
+export default function ResetReview({reviewURL}) {
   const [submitting, setSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
 
-  if (!allowed) {
-    return null;
-  }
-
   const resetRevisions = async () => {
     setSubmitting(true);
-    await dispatch(
-      resetReviews(
-        resetReviewsURL({
-          event_id: eventId,
-          contrib_id: contributionId,
-          type: editableType,
-          revision_id: revisionId,
-        })
-      )
-    );
+    await dispatch(resetReviews(reviewURL));
     setSubmitting(false);
   };
 
@@ -74,5 +56,5 @@ export default function ResetReview({revisionId}) {
 }
 
 ResetReview.propTypes = {
-  revisionId: PropTypes.number.isRequired,
+  reviewURL: PropTypes.string.isRequired,
 };

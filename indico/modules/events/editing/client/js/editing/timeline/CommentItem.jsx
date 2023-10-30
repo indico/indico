@@ -64,17 +64,16 @@ export default function Comment({
               )}
               <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>
                 {serializeDate(createdDt, 'LLL')}
-              </time>
+              </time>{' '}
               {modifiedDt && (
-                <span
-                  className="review-comment-edited"
-                  title={Translate.string('On {modificationDate}', {
-                    modificationDate: serializeDate(modifiedDt, 'LLL'),
-                  })}
+                <time
+                  dateTime={serializeDate(modifiedDt, moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}
+                  title={serializeDate(modifiedDt, 'LLL')}
                 >
-                  {' '}
-                  · <Translate>edited</Translate>
-                </span>
+                  <span className="review-comment-edited">
+                    <Translate>edited</Translate>
+                  </span>
+                </time>
               )}
             </div>
             {canModify && lastRevision.id === revisionId && (

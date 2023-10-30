@@ -119,15 +119,13 @@ _bp.add_url_rule(contrib_api_prefix + '/upload', 'api_upload', timeline.RHEditin
 _bp.add_url_rule(contrib_api_prefix + '/add-paper-file', 'api_add_contribution_file',
                  timeline.RHEditingUploadContributionFile, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/review', 'api_review_editable',
-                 timeline.RHReviewEditable, methods=('POST',))
+                 timeline.RHReviewEditable, methods=('POST', 'PATCH', 'DELETE'))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/confirm', 'api_confirm_changes',
                  timeline.RHConfirmEditableChanges, methods=('POST',),)
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/replace', 'api_replace_revision',
                  timeline.RHReplaceRevision, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/new', 'api_create_submitter_revision',
                  timeline.RHCreateSubmitterRevision, methods=('POST',),)
-_bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/review', 'api_undo_review',
-                 timeline.RHUndoReview, methods=('DELETE',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/reset', 'api_reset_editable',
                  timeline.RHResetEditable, methods=('POST',))
 _bp.add_url_rule(contrib_api_prefix + '/<int:revision_id>/comments/', 'api_create_revision_comment',
