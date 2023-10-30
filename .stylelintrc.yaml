@@ -42,7 +42,9 @@ rules:
     - except: [first-nested]
       ignore: [after-comment]
 
-  value-keyword-case: lower
+  value-keyword-case:
+    - lower
+    - ignoreProperties: ["/^--/"]
 
   scss/at-import-partial-extension: never
   scss/at-function-pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$

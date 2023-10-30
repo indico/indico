@@ -52,7 +52,7 @@
   }
 
   .titlebar button[value='close'] {
-    @extend %button-icon-only;
+    @extend %button-icon-only-clear;
     padding: 0.2em;
     border-radius: 50%;
     font-size: var(--text-size-rel-l);

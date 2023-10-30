@@ -8,7 +8,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {IButton, ICSCalendarLink} from 'indico/react/components';
+import {ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
       endpoint="categories.export_ical"
       params={{category_id: categoryId}}
       renderButton={classes => (
-        <IButton icon="calendar" title={Translate.string('Export')} classes={classes} />
+        <ind-with-tooltip>
+          <button
+            type="button"
+            // FIXME: Temp hack until we have a dropdown in the DS
+            className={Object.entries(classes)
+              .filter(pair => pair[1])
+              .map(([k]) => k)
+              .join(' ')}
+          >
+            <Translate as="span" data-tip-content>
+              Export
+            </Translate>
+          </button>
+        </ind-with-tooltip>
       )}
       options={[{key: 'category', text: Translate.string('Category'), extraParams: {}}]}
     />,

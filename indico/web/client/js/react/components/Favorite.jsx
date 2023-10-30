@@ -11,9 +11,7 @@ import eventFavoriteURL from 'indico-url:users.user_favorites_event_api';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
-import {IButton} from 'indico/react/components';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import Palette from 'indico/utils/palette';
 
 export default function Favorite({type, id, favorited, setFavText, deleteFavText}) {
   const [fav, setFav] = useState(favorited);
@@ -50,22 +48,18 @@ export default function Favorite({type, id, favorited, setFavText, deleteFavText
     }
   };
 
-  return fav ? (
-    <IButton
-      icon="star"
-      classes={type === 'event' ? {'height-full': true, 'text-color': true, 'subtle': true} : {}}
-      style={type === 'event' ? {color: Palette.indicoBlue} : {}}
-      highlight
-      title={deleteFavText}
-      onClick={() => deleteFavorite(id)}
-    />
-  ) : (
-    <IButton
-      icon="star-empty"
-      classes={type === 'event' ? {'height-full': true, 'text-color': true, 'subtle': true} : {}}
-      title={setFavText}
-      onClick={() => putFavorite(id)}
-    />
+  return (
+    <ind-with-tooltip>
+      {fav ? (
+        <button onClick={() => deleteFavorite(id)} data-favorited={fav} type="button">
+          <span data-tip-content>{deleteFavText}</span>
+        </button>
+      ) : (
+        <button onClick={() => putFavorite(id)} data-favorited={fav} type="button">
+          <span data-tip-content>{setFavText}</span>
+        </button>
+      )}
+    </ind-with-tooltip>
   );
 }
 

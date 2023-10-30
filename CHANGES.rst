@@ -95,6 +95,7 @@ Improvements
 - Add possibility to link room reservations to multiple events, session blocks and contributions
   (:issue:`6113`, :pr:`6114`, thanks :user:`omegak, unconventionaldotdev`)
 - Convert the session bar into a pull-down menu (:issue:`5966`, :pr:`6048`, thanks :user:`foxbunny`)
+- New attachment preview dialog with support for video and audio files (:pr:`5945`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -113,6 +114,7 @@ Bugfixes
 - Populate fields such as first and last name from the multipass login provider (e.g. LDAP) during
   sign-up regardless of synchronization settings (:pr:`6182`)
 - Hide redundant affiliations tooltip on the Participant Roles list (:pr:`6201`)
+- Fix the category page focus order (:issue:`5943`, :pr:`5945`, thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -139,6 +141,8 @@ Accessibility
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
 - Convert category navigator to react and improve its accessibility (:issue:`5917`, :pr:`5931`,
   thanks :user:`foxbunny`)
+- Improve category page sidebar, category list, and event list color constrast (:pr:`5945`, thanks :user:`foxbunny`)
+- Improve category page keyboard navigation (:pr:`5945`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

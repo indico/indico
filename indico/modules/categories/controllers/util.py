@@ -26,7 +26,9 @@ from indico.web.flask.util import url_for
 def group_by_month(events, now, tzinfo):
     def _format_tuple(x):
         (year, month), events = x
-        return {'name': format_skeleton(date(year, month, 1), 'MMMMyyyy'),
+        start_date = date(year, month, 1)
+        return {'name': format_skeleton(start_date, 'MMMMyyyy'),
+                'iso_date': start_date.isoformat(),
                 'events': list(events),
                 'is_current': year == now.year and month == now.month}
 

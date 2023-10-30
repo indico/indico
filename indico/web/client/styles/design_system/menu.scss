@@ -1,0 +1,48 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+@use './variables';
+
+%dropdown-menu {
+  list-style: none;
+  min-width: 100%;
+  width: max-content;
+}
+
+%dropdown-menu-item {
+  --menu-surface-color: var(--surface-inverse-color);
+  --menu-surface-hover-color: var(--surface-highlight-inverse-color);
+  --menu-text-color: var(--text-inverse-color);
+
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--control-internal-gap);
+  padding: var(--control-padding);
+  width: 100%;
+  background: var(--menu-surface-color);
+
+  color: var(--menu-text-color);
+
+  &:is(:hover, :focus-visible) {
+    background: var(--menu-surface-hover-color);
+    z-index: 1; // XXX: make focus outline show correctly
+  }
+}
+
+%dropdown-menu-trigger {
+  &::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    display: block; // XXX: Required for transform to work
+  }
+
+  &[aria-expanded='true']::after {
+    transform: rotateX(-180deg);
+  }
+}
