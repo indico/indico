@@ -380,8 +380,8 @@ def check_repeat_frequency(old_frequency, new_frequency):
     """Prevent changing the repeat frequency of an existing booking."""
     from indico.modules.rb.models.reservations import RepeatFrequency
 
-    if ((old_frequency == RepeatFrequency.WEEK and
-            new_frequency == RepeatFrequency.MONTH) or
-            (old_frequency == RepeatFrequency.MONTH and
-                new_frequency == RepeatFrequency.WEEK)):
+    if (
+        (old_frequency == RepeatFrequency.WEEK and new_frequency == RepeatFrequency.MONTH) or
+        (old_frequency == RepeatFrequency.MONTH and new_frequency == RepeatFrequency.WEEK)
+    ):
         raise ExpectedError(_('You cannot modify the repeat frequency of an existing booking.'))
