@@ -104,7 +104,8 @@ def _get_plugin_options(cmd_name, plugin_dir):
             'mapping_file': 'babel.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel.cfg')) else '../babel.cfg'
         },
         'compile_catalog': {
-            'directory': _get_translations_dir(plugin_dir)
+            'directory': _get_translations_dir(plugin_dir),
+            'use_fuzzy': True,
         },
         'update_catalog': {
             'input_file': _get_messages_pot(plugin_dir),
