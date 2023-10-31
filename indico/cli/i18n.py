@@ -150,24 +150,26 @@ def _chdir(path):
         os.chdir(cwd)
 
 
-def _validate_plugin_dir(plugin_dir):
-    if not os.path.exists(os.path.join(plugin_dir, 'setup.py')):
-        raise click.BadParameter(f'no setup.py found in {plugin_dir}.')
-    if not list(Path(plugin_dir).glob('*/translations')):
-        raise click.BadParameter(f'no translations folder found in {plugin_dir}.')
+def _validate_plugin_dir(check_tx=False):
 
+    def _validate_dir(ctx, param, plugin_dir):
+        if check_tx:
+            if not os.path.exists(os.path.join(plugin_dir, '.tx', 'config')):
+                raise click.BadParameter(f'no transifex configuration found in {plugin_dir}.')
+        if not os.path.exists(os.path.join(plugin_dir, 'setup.py')):
+            raise click.BadParameter(f'no setup.py found in {plugin_dir}.')
+        if not list(Path(plugin_dir).glob('*/translations')):
+            raise click.BadParameter(f'no translations folder found in {plugin_dir}.')
+        return plugin_dir
 
-def _validate_plugin_dirs(ctx, param, values):
-    for value in values:
-        _validate_plugin_dir(value)
-    return values
+    return _validate_dir
 
 
 def _validate_all_plugins_dir(ctx, param, value):
     plugin_dirs = []
     for plugin_dir in os.listdir(value):
         try:
-            _validate_plugin_dir(os.path.join(value, plugin_dir))
+            _validate_plugin_dir()(None, None, os.path.join(value, plugin_dir))
         except click.BadParameter:
             continue
         plugin_dirs.append(os.path.join(value, plugin_dir))
@@ -250,13 +252,13 @@ def _run_command(cmd_name, extra=None):
     options = DEFAULT_OPTIONS.get(cmd_name, {})
     if extra:
         options.update(extra)
-    if plugin_dir := options.get('plugin_dir', None):
+    if plugin_dir := options.get('plugin_dir'):
         options.update(_get_plugin_options(cmd_name, plugin_dir))
     cmd = wrap_distutils_command(cmd_class, plugin_dir=plugin_dir)
     cmd(**options)
 
 
-def _common_translation_options(require_js=True, require_locale=False, plugins=False, all_plugins=False):
+def _common_translation_options(require_js=True, require_locale=False, plugin=False, all_plugins=False):
     def decorator(fn):
         fn = click.option('--python', is_flag=True, help='i18n used in python and Jinja code.')(fn)
         fn = click.option('--react', is_flag=True, help='i18n used in react code.')(fn)
@@ -267,12 +269,11 @@ def _common_translation_options(require_js=True, require_locale=False, plugins=F
                               help='Skip running the string format validation.')(fn)
         if require_locale:
             fn = click.option('--locale', required=True)(fn)
-        if plugins:
-            fn = click.argument('plugin_dirs', required=True, type=click.Path(exists=True, file_okay=False,
-                                                                              resolve_path=True),
-                                nargs=-1, callback=_validate_plugin_dirs)(fn)
+        if plugin:
+            fn = click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                                callback=_validate_plugin_dir())(fn)
         elif all_plugins:
-            fn = click.argument('plugin_dirs', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+            fn = click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                                 callback=_validate_all_plugins_dir)(fn)
         return fn
     return decorator
@@ -403,7 +404,8 @@ def _command(**kwargs):
     javascript = kwargs.get('javascript')
     react = kwargs.get('react')
     locale = kwargs.get('locale')
-    plugin_dirs = kwargs.get('plugin_dirs')
+    plugin_dir = kwargs.get('plugin_dir')
+    plugins_dir = kwargs.get('plugins_dir')
     no_check = kwargs.get('no_check', True)
 
     if not (python or react or javascript):
@@ -411,11 +413,13 @@ def _command(**kwargs):
         if babel_cmd == 'compile_catalog':
             javascript = False
 
-    if not plugin_dirs:
-        _indico_command(babel_cmd, python, javascript, react, locale, no_check)
-    else:
-        for plugin_dir in plugin_dirs:
+    if plugin_dir:
+        _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir)
+    elif plugins_dir:
+        for plugin_dir in plugins_dir:
             _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir)
+    else:
+        _indico_command(babel_cmd, python, javascript, react, locale, no_check)
 
 
 def _make_command(group, cmd_name, babel_cmd, **kwargs):
@@ -433,12 +437,12 @@ _make_command(extract_messages, 'indico', 'extract_messages')
 _make_command(update_catalog, 'indico', 'update_catalog')
 _make_command(init_catalog, 'indico', 'init_catalog', require_locale=True)
 
-_make_command(compile_catalog, 'plugins', 'compile_catalog', require_js=False,
-              plugins=True)
-_make_command(extract_messages, 'plugins', 'extract_messages', plugins=True)
-_make_command(update_catalog, 'plugins', 'update_catalog', plugins=True)
-_make_command(init_catalog, 'plugins', 'init_catalog', require_locale=True,
-              plugins=True)
+_make_command(compile_catalog, 'plugin', 'compile_catalog', require_js=False,
+              plugin=True)
+_make_command(extract_messages, 'plugin', 'extract_messages', plugin=True)
+_make_command(update_catalog, 'plugin', 'update_catalog', plugin=True)
+_make_command(init_catalog, 'plugin', 'init_catalog', require_locale=True,
+              plugin=True)
 
 _make_command(compile_catalog, 'all-plugins', 'compile_catalog', require_js=False,
               all_plugins=True)
@@ -448,26 +452,58 @@ _make_command(init_catalog, 'all-plugins', 'init_catalog', require_locale=True,
               all_plugins=True)
 
 
-@cli.command(short_help='Push .pot files to Transifex.')
+@cli.group('push', short_help='Push .pot files to transifex for indico and indico plugins.')
 def push():
-    """Push .pot files to Transifex."""
+    """Push .pot files to transifex for indico and indico plugins."""
+
+
+def _push():
+    """Push .pot files to transifex."""
     try:
         subprocess.run(['tx', 'push', '-s'], check=True)
     except subprocess.CalledProcessError:
         click.secho('Error pushing to transifex', fg='red', bold=True, err=True)
 
 
-@cli.command(short_help='Pull translated .po files from Transifex.')
-@click.argument('languages', nargs=-1, required=False)
-def pull(languages):
-    """Pull translations from Transifex.
+@push.command('indico', short_help='Push .pot files to Transifex for indico.')
+def push_indico():
+    """Push .pot files to Transifex for indico."""
+    _push()
+
+
+@push.command('plugin', short_help='Push .pot files to Transifex for a plugin.')
+@click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                callback=_validate_plugin_dir(check_tx=True))
+def push_plugin(plugin_dir):
+    """Push .pot files to transifex for a plugin."""
+    with _chdir(plugin_dir):
+        _push()
+
+
+@push.command('all-plugins', short_help='Push .pot files to Transifex for multiple plugins.')
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+def push_all_plugins(plugins_dir):
+    """Push .pot files to transifex for multiple plugins in a directory."""
+    with _chdir(plugins_dir):
+        _push()
+
+
+@cli.group('pull', short_help='Pull translated .po files from Transifex indico and indico plugins.')
+def pull():
+    """Pull translated .po files from Transifex for indico and indico plugins."""
+
+
+def _pull(languages, translations_dir=TRANSLATIONS_DIR):
+    """Pull translated .po files from Transifex.
 
     Pulls only the language codes specified in `languages` if present.
     If no `languages`, it pulls all the languages currently available in the translations folder.
     To pull a new language available on Transifex, simply pass the new language code in the argument.
     """
     if not languages:
-        languages = [d for d in os.listdir(TRANSLATIONS_DIR) if os.path.isdir(os.path.join(TRANSLATIONS_DIR, d))]
+        languages = [d for d in os.listdir(translations_dir) if os.path.isdir(os.path.join(translations_dir, d))]
+        if 'en_US' in languages:
+            languages.remove('en_US')
     language_renames = {'zh_Hans_CN': 'zh_CN.GB2312'}  # other lang codes requiring rename should be added here
     language_codes = [language_renames.get(language, language) for language in languages]
     try:
@@ -477,11 +513,63 @@ def pull(languages):
         click.secho('Error pulling from transifex', fg='red', bold=True, err=True)
         sys.exit(1)
     else:
-        languages = set(languages) & set(language_renames)
-        for code in languages:
-            shutil.rmtree(os.path.join(TRANSLATIONS_DIR, code))
-            shutil.move(os.path.join(TRANSLATIONS_DIR, language_renames[code]),
-                        os.path.join(TRANSLATIONS_DIR, code))
+        for code in set(languages) & set(language_renames):
+            if os.path.exists(os.path.join(translations_dir, code)):
+                shutil.rmtree(os.path.join(translations_dir, code))
+            shutil.move(os.path.join(translations_dir, language_renames[code]),
+                        os.path.join(translations_dir, code))
+
+
+@pull.command('indico', short_help='Pull translated .po files from Transifex for indico.')
+@click.argument('languages', nargs=-1, required=False)
+def pull_indico(languages):
+    """Pull translated .po files from Transifex for indico.
+
+    Pulls only the language codes specified in `languages` if present.
+    If no `languages`, it pulls all the languages currently available in the translations folder.
+    To pull a new language available on Transifex, simply pass the new language code in the argument.
+    """
+    _pull(languages)
+
+
+@pull.command('plugin', short_help='Pull translated .po files from Transifex for a plugin.')
+@click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                callback=_validate_plugin_dir(check_tx=True))
+@click.argument('languages', nargs=-1, required=False)
+def pull_plugin(plugin_dir, languages):
+    """Pull translated .po files from Transifex for a plugin."""
+    with _chdir(plugin_dir):
+        _pull(languages, _get_translations_dir(plugin_dir))
+
+
+@pull.command('all-plugins', short_help='Pull translated .po files from Transifex for multiple plugins.')
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.argument('languages', nargs=-1, required=False)
+def pull_all_plugins(plugins_dir, languages):
+    """Pull translated .po files from Transifex for multiple plugins."""
+    with _chdir(plugins_dir):
+        plugin_dirs = _validate_all_plugins_dir(None, None, plugins_dir)
+        if 'en_US' in languages:
+            languages.remove('en_US')
+        language_renames = {'zh_Hans_CN': 'zh_CN.GB2312'}  # other lang codes requiring rename should be added here
+        language_codes = [language_renames.get(language, language) for language in languages]
+        try:
+            if languages:
+                subprocess.run(['tx', 'pull', '-l', ','.join(language_codes), '-f'], check=True)
+            else:
+                subprocess.run(['tx', 'pull', '-f'], check=True)
+            click.secho('Translations updated.', fg='green', bold=True)
+        except subprocess.CalledProcessError:
+            click.secho('Error pulling from transifex', fg='red', bold=True, err=True)
+            sys.exit(1)
+        else:
+            for code in set(languages) & set(language_renames):
+                for plugin_dir in plugin_dirs:
+                    translations_dir = _get_translations_dir(plugin_dir)
+                    if os.path.exists(os.path.join(translations_dir, code)):
+                        shutil.rmtree(os.path.join(translations_dir, code))
+                    shutil.move(os.path.join(translations_dir, language_renames[code]),
+                                os.path.join(translations_dir, code))
 
 
 def _check_format_strings(root_path='indico/translations'):
