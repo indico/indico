@@ -120,10 +120,9 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
             section['fields'].append(field_data)
 
         # Sort sections and fields based on 'position'
-        data = list(data.values())
-        data.sort(key=itemgetter('position'))
+        data = sorted(data.values(), key=itemgetter('position'))
         for sections in data:
-            sections['fields'].sort(key=lambda f: f['position'])
+            sections['fields'].sort(key=itemgetter('position'))
 
         # Remove the 'position' key
         for section in data:
