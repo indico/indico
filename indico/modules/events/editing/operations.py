@@ -27,13 +27,15 @@ from indico.modules.events.editing.notifications import (notify_comment, notify_
 from indico.modules.events.editing.schemas import (EditableDumpSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction)
 from indico.modules.logs import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, orig_string
 from indico.web.flask.util import send_file
 
 
-FILE_TYPE_ATTRS = ('name', 'extensions', 'allow_multiple_files', 'required', 'publishable', 'filename_template')
+FILE_TYPE_ATTRS = {'name': 'Name', 'extensions': 'Extensions', 'allow_multiple_files': 'Multiple files',
+                   'required': 'File required', 'publishable': 'Publishable', 'filename_template': 'Filename template'}
 
 
 class InvalidEditableState(BadRequest):
@@ -85,8 +87,8 @@ def create_new_editable(contrib, type_, submitter, files, type=RevisionType.read
 
 
 def delete_editable(editable, *, soft=True):
-    log_msg = f'"{editable.contribution.title}" ({orig_string(editable.type.title)}) deleted'
-    editable.log(EventLogRealm.management, LogKind.negative, 'Editing', log_msg, session.user)
+    log_msg = f'{editable.log_title} deleted'
+    editable.log(EventLogRealm.reviewing, LogKind.negative, 'Editing', log_msg, session.user)
     db.session.expire(editable)
     if soft:
         editable.is_deleted = True
@@ -202,37 +204,61 @@ def _ensure_revision_can_be_updated(revision):
         raise InvalidEditableState
 
 
+def _log_remove_review(editable, log_msg, old_state, was_published):
+    log_fields = {'state': 'Editable State', 'published': 'Published'}
+    changes = {}
+    if old_state != editable.state:
+        changes['state'] = (orig_string(old_state.title), orig_string(editable.state.title))
+    if was_published:
+        changes['published'] = (True, editable.published_revision is not None)
+    editable.log(EventLogRealm.reviewing, LogKind.negative, 'Editing', log_msg,
+                 session.user, data={'Changes': make_diff_log(changes, log_fields)})
+
+
 @no_autoflush
 def undo_review(revision):
     _ensure_revision_can_be_updated(revision)
-    revision.editable.published_revision = None
+    editable = revision.editable
+    old_state = editable.state
+    was_published = editable.published_revision is not None
+    editable.published_revision = None
     db.session.flush()
     revision.is_undone = True
     db.session.flush()
-    logger.info('Revision %r review undone by %r', revision.editable.editor)
+    logger.info('Revision %r review undone by %r', revision, session.user)
+    _log_remove_review(editable, f'Review on {editable.log_title} removed', old_state, was_published)
 
 
 @no_autoflush
 def update_review_comment(revision, text):
     _ensure_revision_can_be_updated(revision)
+    changes = {'comment': (revision.comment, text)}
+    log_fields = {'comment': 'Comment'}
     revision.comment = text
     revision.modified_dt = now_utc()
     db.session.flush()
-    logger.info('Review comment on revision %r updated by %r', revision, revision.editable.editor)
+    logger.info('Review comment on revision %r updated by %r', revision, session.user)
+    revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
+                          f'Review comment on {revision.editable.log_title} updated',
+                          session.user, data={'Changes': make_diff_log(changes, log_fields)})
 
 
 @no_autoflush
 def reset_editable(revision):
     _ensure_revision_can_be_updated(revision)
-    if revision.editable.state != EditableState.accepted:
+    editable = revision.editable
+    old_state = editable.state
+    if old_state != EditableState.accepted:
         return
-    revision.editable.published_revision = None
+    was_published = editable.published_revision is not None
+    editable.published_revision = None
     db.session.flush()
     revision.is_undone = True
-    new_revision = EditingRevision(user=revision.editable.editor, type=RevisionType.reset)
-    revision.editable.revisions.append(new_revision)
+    new_revision = EditingRevision(user=editable.editor, type=RevisionType.reset)
+    editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r review reset', revision)
+    _log_remove_review(editable, f'State of {editable.log_title} reset', old_state, was_published)
 
 
 @no_autoflush
@@ -248,10 +274,14 @@ def create_revision_comment(revision, user, text, internal=False):
 @no_autoflush
 def update_revision_comment(comment, updates):
     ensure_latest_revision(comment.revision)
-    comment.populate_from_dict(updates)
+    changes = comment.populate_from_dict(updates)
     comment.modified_dt = now_utc()
     db.session.flush()
     logger.info('Comment on revision %r updated: %r', comment.revision, comment)
+    log_fields = {'text': 'Text', 'internal': 'Restricted to editors'}
+    comment.revision.editable.log(EventLogRealm.reviewing, LogKind.change, 'Editing',
+                                  f'Comment on {comment.revision.editable.log_title} updated',
+                                  session.user, data={'Changes': make_diff_log(changes, log_fields)})
 
 
 @no_autoflush
@@ -260,29 +290,32 @@ def delete_revision_comment(comment):
     comment.is_deleted = True
     db.session.flush()
     logger.info('Comment on revision %r deleted: %r', comment.revision, comment)
+    comment.revision.editable.log(EventLogRealm.reviewing, LogKind.negative, 'Editing',
+                                  f'Comment on {comment.revision.editable.log_title} deleted',
+                                  session.user)
 
 
 def create_new_tag(event, code, title, color, system=False):
     tag = EditingTag(code=code, title=title, color=color, system=system, event=event)
     db.session.flush()
     logger.info('Tag %r created by %r', tag, session.user)
+    tag.log(EventLogRealm.management, LogKind.positive, 'Editing', f'Tag {tag.verbose_title} created', session.user)
     return tag
 
 
-def update_tag(tag, code=None, title=None, color=None):
-    if code:
-        tag.code = code
-    if title:
-        tag.title = title
-    if color:
-        tag.color = color
+def update_tag(tag, updates):
+    changes = tag.populate_from_dict({k: v for k, v in updates.items() if v is not None})
     db.session.flush()
     logger.info('Tag %r updated by %r', tag, session.user)
+    log_fields = {'code': 'Code', 'title': 'Title', 'color': 'Color'}
+    tag.log(EventLogRealm.management, LogKind.change, 'Editing', f'Tag {tag.verbose_title} updated', session.user,
+            data={'Changes': make_diff_log(changes, log_fields)})
 
 
 def delete_tag(tag):
     logger.info('Tag %r deleted by %r', tag, session.user)
     db.session.delete(tag)
+    tag.log(EventLogRealm.management, LogKind.negative, 'Editing', f'Tag {tag.verbose_title} deleted', session.user)
 
 
 def create_new_file_type(event, editable_type, **data):
@@ -290,17 +323,23 @@ def create_new_file_type(event, editable_type, **data):
     file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
     db.session.flush()
     logger.info('File type %r for %s created by %r', file_type, editable_type.name, session.user)
+    file_type.log(EventLogRealm.management, LogKind.positive, 'Editing', f'File type {file_type.name} created',
+                  session.user)
     return file_type
 
 
 def update_file_type(file_type, **data):
-    file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
+    changes = file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS.keys())
     db.session.flush()
     logger.info('File type %r updated by %r', file_type, session.user)
+    file_type.log(EventLogRealm.management, LogKind.change, 'Editing', f'File type {file_type.name} updated',
+                  session.user, data={'Changes': make_diff_log(changes, FILE_TYPE_ATTRS)})
 
 
 def delete_file_type(file_type):
     logger.info('File type %r deleted by %r', file_type, session.user)
+    file_type.log(EventLogRealm.management, LogKind.negative, 'Editing', f'File type {file_type.name} deleted',
+                  session.user)
     db.session.delete(file_type)
 
 
@@ -333,9 +372,7 @@ def assign_editor(editable, editor):
     }
     if old_editor:
         log_data['Previous editor'] = old_editor.full_name
-    log_msg = '"{}" ({}) assigned to {}'.format(editable.contribution.title,
-                                                orig_string(editable.type.title),
-                                                editor.full_name)
+    log_msg = f'{editable.log_title} assigned to {editor.full_name}'
     editable.log(EventLogRealm.management, LogKind.positive, 'Editing', log_msg, session.user, data=log_data)
     db.session.flush()
 
@@ -349,9 +386,7 @@ def unassign_editor(editable):
         'Editable type': orig_string(editable.type.title),
         'Editable': editable.contribution.title
     }
-    log_msg = '"{}" ({}) unassigned from {}'.format(editable.contribution.title,
-                                                    orig_string(editable.type.title),
-                                                    editor.full_name)
+    log_msg = f'{editable.log_title} unassigned from {editor.full_name}'
     editable.log(EventLogRealm.management, LogKind.negative, 'Editing', log_msg, session.user, data=log_data)
     db.session.flush()
 
