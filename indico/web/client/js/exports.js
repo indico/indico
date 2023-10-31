@@ -11,6 +11,8 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as ReactFinalForm from 'react-final-form';
 import * as ReactRedux from 'react-redux';
+import * as ReactRouter from 'react-router';
+import * as ReactRouterDom from 'react-router-dom';
 import * as Redux from 'redux';
 import * as SUIR from 'semantic-ui-react';
 
@@ -29,6 +31,8 @@ window._IndicoCoreReact = React;
 window._IndicoCoreReactDom = ReactDom;
 window._IndicoCorePropTypes = PropTypes;
 window._IndicoCoreReactRedux = ReactRedux;
+window._IndicoCoreReactRouter = ReactRouter;
+window._IndicoCoreReactRouterDom = ReactRouterDom;
 window._IndicoCoreRedux = Redux;
 window._IndicoCoreSUIR = SUIR;
 window._IndicoCoreReactFinalForm = ReactFinalForm;

@@ -52,6 +52,8 @@ module.exports = env => {
       'react': '_IndicoCoreReact',
       'react-dom': '_IndicoCoreReactDom',
       'react-redux': '_IndicoCoreReactRedux',
+      'react-router': '_IndicoCoreReactRouter',
+      'react-router-dom': '_IndicoCoreReactRouterDom',
       'prop-types': '_IndicoCorePropTypes',
       'redux': '_IndicoCoreRedux',
       'semantic-ui-react': '_IndicoCoreSUIR',
