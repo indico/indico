@@ -267,7 +267,7 @@ pynpm==0.1.2
     # via
     #   flask-webpackext
     #   pywebpack
-pypdf==3.14.0
+pypdf==3.17.0
     # via -r requirements.in
 pypng==0.20220715.0
     # via qrcode
