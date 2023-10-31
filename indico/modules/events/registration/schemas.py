@@ -87,21 +87,23 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
         form_data = get_flat_section_submission_data(regform, registration=registration, management=True)
         reg_data = get_form_registration_data(regform, registration, management=True)
         filenames = self._get_filenames(registration)
+        sections = sorted(list(form_data['sections'].values()), key=itemgetter('position'))
+        fields = sorted(list(form_data['items'].values()), key=itemgetter('position'))
         data = {}
 
-        for section_id, section in form_data['sections'].items():
-            data[section_id] = {
-                'id': section_id,
+        for section in sections:
+            data[section['id']] = {
+                'id': section['id'],
                 'position': section['position'],
                 'title': section['title'],
                 'description': section['description'],
                 'fields': []
             }
 
-        for field_id, field in form_data['items'].items():
+        for field in fields:
             section = data[field['sectionId']]
             field_data = {
-                'id': field_id,
+                'id': field['id'],
                 'position': field['position'],
                 'title': field['title'],
                 'description': field['description'],
@@ -115,18 +117,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 field_data['choices'] = field['choices']
             # File field stores the uuid as data which is not helpful.
             # We want to show the filename instead.
-            if field_id in filenames:
-                field_data['data'] = filenames[field_id]
+            if field['id'] in filenames:
+                field_data['data'] = filenames[field['id']]
             section['fields'].append(field_data)
 
-        # Sort sections and fields based on 'position'
-        data = sorted(data.values(), key=itemgetter('position'))
-        for sections in data:
-            sections['fields'].sort(key=itemgetter('position'))
-
-        # Remove the 'position' key
-        for section in data:
-            del section['position']
-            for field in section['fields']:
-                del field['position']
-        return data
+        return list(data.values())
