@@ -107,7 +107,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Fix meeting timetable not showing custom locations when all top-level timetable
+  entries are session blocks inheriting the custom location from its session (:pr:`6014`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

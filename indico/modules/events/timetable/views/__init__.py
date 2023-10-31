@@ -99,7 +99,14 @@ def inject_meeting_body(event, **kwargs):
             entries.append(entry)
         elif entry.object.can_access(session.user):
             entries.append(entry)
-        if not entry.object.inherit_location:
+        if (
+            # the object itself does not inherit
+            not entry.object.inherit_location or
+            # the object is a session block and inherits from a session with a custom location
+            (entry.type == TimetableEntryType.SESSION_BLOCK and
+                entry.object.inherit_location and
+                not entry.object.session.inherit_location)
+        ):
             show_siblings_location = True
         show_children_location[entry.id] = not all(child.object.inherit_location for child in entry.children)
 
