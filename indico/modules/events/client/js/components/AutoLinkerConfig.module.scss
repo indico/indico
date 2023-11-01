@@ -1,0 +1,20 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/typography' as *;
+
+.list-segment :global(.ui.list) {
+  @include font-family-monospace();
+}
+
+:global(.ui.form) .rule-editor-row:global(.fields) {
+  margin-right: 0;
+
+  :global(.ui.input) > input {
+    @include font-family-monospace();
+  }
+}

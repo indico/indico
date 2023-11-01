@@ -16,11 +16,12 @@ from indico.modules.events.ical import CalendarScope, event_to_ical, events_to_i
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
+from indico.modules.events.settings import autolinker_settings
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplay, WPConferencePrivacyDisplay, WPSimpleEventDisplay
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
-from indico.web.rh import allow_signed_url
+from indico.web.rh import RHProtected, allow_signed_url
 
 
 @allow_signed_url
@@ -99,3 +100,10 @@ class RHDisplayPrivacyPolicy(RHEventBase):
             self.event,
             privacy_info=privacy_settings.get_all(self.event)
         )
+
+
+class RHAutoLinkerRules(RHProtected):
+    """Get auto-linker configuration."""
+
+    def _process(self):
+        return jsonify(autolinker_settings.get_all())

@@ -12,3 +12,4 @@ export {default as IndicoPropTypes} from './propTypes';
 export {default as Markdown} from './Markdown';
 export {default as ConditionalRoute} from './ConditionalRoute';
 export {default as Responsive, useResponsive} from './Responsive';
+export {default as AutoLinkerPlugin} from './autolinker';

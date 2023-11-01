@@ -268,3 +268,7 @@ unlisted_events_settings = SettingsProxy('unlisted_events', {
 }, acls={
     'authorized_creators'
 })
+
+autolinker_settings = SettingsProxy('autolinker', {
+    'rules': []
+})

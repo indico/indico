@@ -1,0 +1,41 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'events/admin/_event_label_list.html' import render_event_label_list %}
+
+{% block title %}
+    {% trans %}Auto-linked Patterns{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    <div class="ui icon purple message">
+        <i class="lab icon"></i>
+        <div class="content">
+            <div class="header">{% trans %}Experimental feature{% endtrans %}</div>
+            <p>
+                {% trans -%}
+                    Make sure you understand what you're doing or your notes may end up broken!
+                {%- endtrans %}
+            </p>
+        </div>
+    </div>
+    <p>
+        {% trans -%}
+            Here you can define text patterns which are automatically linked e.g. to ticketing or code
+            repository systems, from within your notes.
+        {%- endtrans %}
+    </p>
+    <div class="ui icon message">
+        <div class="content">
+            <div class="header">{% trans %}Example{% endtrans %}</div>
+            <code>
+                \bgh:([\d\w\-_\.]+)/([\d\w\-_\.]+)#(\d+)\b → https://github.com/{1}/{2}/issues/{3}
+            </code>
+        </div>
+    </div>
+{% endblock %}
+
+{%- block content %}
+    <div id="autolinker-root"></div>
+    <script>
+        setupAutoLinkerConfig('autolinker-root');
+    </script>
+{%- endblock -%}

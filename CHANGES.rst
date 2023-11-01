@@ -47,6 +47,7 @@ Improvements
 - Allow configuring future months threshold for categories (:issue:`2984`, :pr:`5928`, thanks
   :user:`kewisch`)
 - Allow editors to edit their review comments on editables (:pr:`6008`)
+- Auto-linking of patterns in minutes (e.g. issue trackers, Github repos...) (:pr:`5998`)
 
 Bugfixes
 ^^^^^^^^

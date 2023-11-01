@@ -5,12 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.events.controllers.admin import (RHCreateEventLabel, RHCreateReferenceType, RHDeleteEventLabel,
-                                                     RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
-                                                     RHEventLabels, RHReferenceTypes, RHUnlistedEvents)
+from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerConfig, RHCreateEventLabel,
+                                                     RHCreateReferenceType, RHDeleteEventLabel, RHDeleteReferenceType,
+                                                     RHEditEventLabel, RHEditReferenceType, RHEventLabels,
+                                                     RHReferenceTypes, RHUnlistedEvents)
 from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
-from indico.modules.events.controllers.display import RHDisplayPrivacyPolicy, RHEventAccessKey, RHExportEventICAL
+from indico.modules.events.controllers.display import (RHAutoLinkerRules, RHDisplayPrivacyPolicy, RHEventAccessKey,
+                                                       RHExportEventICAL)
 from indico.modules.events.controllers.entry import event_or_shorturl
 from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -25,6 +27,8 @@ _bp.add_url_rule('/admin/external-id-types/create', 'create_reference_type', RHC
 _bp.add_url_rule('/admin/event-labels/', 'event_labels', RHEventLabels, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/event-labels/create', 'create_event_label', RHCreateEventLabel, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/unlisted-events/', 'unlisted_events', RHUnlistedEvents, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/autolinker/', 'autolinker_admin', RHAutoLinker)
+_bp.add_url_rule('/admin/autolinker/config', 'autolinker_config', RHAutoLinkerConfig, methods=('POST',))
 
 # Single reference type
 _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>/edit', 'update_reference_type', RHEditReferenceType,
@@ -38,6 +42,10 @@ _bp.add_url_rule('/admin/event-labels/<int:event_label_id>/edit', 'update_event_
 _bp.add_url_rule('/admin/event-labels/<int:event_label_id>', 'delete_event_label', RHDeleteEventLabel,
                  methods=('DELETE',))
 
+# Auto-linker rules
+_bp.add_url_rule('/api/autolinker-rules', 'autolinker_rules', RHAutoLinkerRules)
+
+# Event ICS/iCal
 _bp.add_url_rule('/event/<int:event_id>/event.ics', 'export_event_ical', RHExportEventICAL)
 
 # Creation

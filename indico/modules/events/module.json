@@ -2,6 +2,7 @@
   "name": "events",
   "produceBundle": false,
   "partials": {
+    "admin": "./admin",
     "cloning": "./cloning",
     "creation": "./creation",
     "display": "./display",
