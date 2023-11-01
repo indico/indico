@@ -60,7 +60,7 @@ You can also consult the official
 
 Navigate to ``~/dev/indico/src`` (assuming you used the standard locations from the dev setup guide).
 
-Run ``indico i18n pull <language_code>``.
+Run ``indico i18n pull indico <language_code>``.
 Languages codes can be obtained `here <https://www.transifex.com/indico/>`_.
 
 For example, Chinese (China) is ``zh_CN.GB2312``.
