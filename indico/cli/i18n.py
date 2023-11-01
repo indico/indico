@@ -269,6 +269,8 @@ def _common_translation_options(require_js=True, require_locale=False, plugin=Fa
                               help='Skip running the string format validation.')(fn)
         if require_locale:
             fn = click.option('--locale', required=True)(fn)
+        elif require_locale is not None:
+            fn = click.option('--locale', required=False)(fn)
         if plugin:
             fn = click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                                 callback=_validate_plugin_dir())(fn)
@@ -279,13 +281,14 @@ def _common_translation_options(require_js=True, require_locale=False, plugin=Fa
     return decorator
 
 
-def compile_catalog_react(directory=INDICO_DIR):
+def compile_catalog_react(directory=INDICO_DIR, locale=''):
     """Compile react catalogs."""
     translations_dir = _get_translations_dir(directory)
+    locales = [locale] if locale else os.listdir(translations_dir)
     try:
-        for locale in os.listdir(translations_dir):
-            po_file = os.path.join(translations_dir, locale, 'LC_MESSAGES', 'messages-react.po')
-            json_file = os.path.join(translations_dir, locale, 'LC_MESSAGES', 'messages-react.json')
+        for loc in locales:
+            po_file = os.path.join(translations_dir, loc, 'LC_MESSAGES', 'messages-react.po')
+            json_file = os.path.join(translations_dir, loc, 'LC_MESSAGES', 'messages-react.json')
             if not os.path.exists(po_file):
                 continue
             with _chdir(INDICO_DIR):
@@ -359,7 +362,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
             _run_command(f'{babel_cmd}_js', extra=extra)
         if react:
             if babel_cmd == 'compile_catalog':
-                compile_catalog_react()
+                compile_catalog_react(locale=extra.get('locale'))
             elif babel_cmd == 'extract_messages':
                 extract_messages_react()
             else:
@@ -389,7 +392,7 @@ def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plug
                 _run_command(f'{babel_cmd}_js', extra=extra)
             if react:
                 if babel_cmd == 'compile_catalog':
-                    compile_catalog_react(plugin_dir)
+                    compile_catalog_react(plugin_dir, locale=extra.get('locale'))
                 elif babel_cmd == 'extract_messages':
                     extract_messages_react(plugin_dir)
                 else:
@@ -433,20 +436,21 @@ def _make_command(group, cmd_name, babel_cmd, **kwargs):
 
 
 _make_command(compile_catalog, 'indico', 'compile_catalog', require_js=False)
-_make_command(extract_messages, 'indico', 'extract_messages')
+_make_command(extract_messages, 'indico', 'extract_messages', require_locale=None)
 _make_command(update_catalog, 'indico', 'update_catalog')
 _make_command(init_catalog, 'indico', 'init_catalog', require_locale=True)
 
 _make_command(compile_catalog, 'plugin', 'compile_catalog', require_js=False,
               plugin=True)
-_make_command(extract_messages, 'plugin', 'extract_messages', plugin=True)
+_make_command(extract_messages, 'plugin', 'extract_messages', plugin=True, require_locale=None)
 _make_command(update_catalog, 'plugin', 'update_catalog', plugin=True)
 _make_command(init_catalog, 'plugin', 'init_catalog', require_locale=True,
               plugin=True)
 
 _make_command(compile_catalog, 'all-plugins', 'compile_catalog', require_js=False,
               all_plugins=True)
-_make_command(extract_messages, 'all-plugins', 'extract_messages', all_plugins=True)
+_make_command(extract_messages, 'all-plugins', 'extract_messages', all_plugins=True,
+              require_locale=None)
 _make_command(update_catalog, 'all-plugins', 'update_catalog', all_plugins=True)
 _make_command(init_catalog, 'all-plugins', 'init_catalog', require_locale=True,
               all_plugins=True)
