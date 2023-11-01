@@ -182,7 +182,7 @@ export function PictureArea({
               <Translate>There were some problems with the picture</Translate>
             </Message.Header>
             {fileRejections.map(({file, errors}) => (
-              <Message.List key={file.size}>
+              <Message.List key={file.path}>
                 {errors.map(e => (
                   <Message.Item key={e.code}>
                     {file.name}:- {e.message}
@@ -192,9 +192,7 @@ export function PictureArea({
             ))}
             {customFileRejections && (
               <Message.List>
-                <Message.Item key={customFileRejections.code}>
-                  {customFileRejections.message}
-                </Message.Item>
+                <Message.Item>{customFileRejections.message}</Message.Item>
               </Message.List>
             )}
           </Message>

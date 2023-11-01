@@ -133,6 +133,7 @@ const PictureManager = ({
   };
 
   const onCameraMediaError = mediaErr => {
+    console.log(mediaErr);
     setIsCameraAllowed(false);
     dispatch({type: 'RESET'});
   };
@@ -338,7 +339,7 @@ const PictureManager = ({
         'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (.jpg, .png, .gif).',
         {minPictureSize}
       )
-    : Translate.string('Allowed file types: .jpg, .png, .gif.');
+    : Translate.string('Allowed file types: .jpg, .png, .gif');
   return (
     <PictureArea
       dropzone={dropzone}

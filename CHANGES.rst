@@ -65,6 +65,7 @@ Improvements
   restricted (:pr:`6094`)
 - Improve editing notifications emails (:issue:`6027`, :pr:`6042`)
 - Add support for Picture fields in registration forms (:pr:`5922` :user:`SegiNyn`)
+- Add support for Picture fields in registration forms (:pr:`5922`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

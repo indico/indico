@@ -20,7 +20,7 @@ def _get_fields(sender, **kwargs):
     from .accompanying import AccompanyingPersonsField
     from .choices import AccommodationField, MultiChoiceField, SingleChoiceField
     from .simple import (BooleanField, CheckboxField, CountryField, DateField, EmailField, FileField, NumberField,
-                         PhoneField, TextAreaField, TextField, PictureField)
+                         PhoneField, PictureField, TextAreaField, TextField)
     yield AccommodationField
     yield MultiChoiceField
     yield SingleChoiceField

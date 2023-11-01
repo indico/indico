@@ -36,7 +36,7 @@ export function PictureWebcam({
       >
         <div styleName="picture-inner-div">
           <Header as="h3" icon textAlign="center" color="grey">
-            Camera
+            <Translate>Camera</Translate>
           </Header>
           <Webcam
             ref={cameraRef}
@@ -56,8 +56,8 @@ export function PictureWebcam({
             name="arrow left"
             color="grey"
             size="large"
-            onClick={e => {
-              e.stopPropagation();
+            onClick={evt => {
+              evt.stopPropagation();
               backAction();
             }}
           />

@@ -10,18 +10,18 @@ import React from 'react';
 import Cropper from 'react-cropper';
 import {Header, Icon, Button} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
+
 import 'cropperjs/dist/cropper.css';
 import './Picture.module.scss';
 
 export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize}) {
-  let size = Math.max(minCropSize, 500);
-  size += 200;
-
+  const size = Math.max(minCropSize, 500) + 200;
   return (
     <div styleName="picture-outer-div">
       <div styleName="picture-inner-div cropper-inner-div" style={{width: size}}>
         <Header as="h3" color="grey">
-          Crop
+          <Translate>Crop</Translate>
         </Header>
         <Cropper
           ref={cropperRef}
@@ -42,8 +42,8 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
           name="arrow left"
           color="grey"
           size="large"
-          onClick={e => {
-            e.stopPropagation();
+          onClick={evt => {
+            evt.stopPropagation();
             backAction();
           }}
         />
@@ -53,18 +53,18 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
             icon
             float="left"
             color="blue"
-            onClick={e => {
-              e.stopPropagation();
+            onClick={evt => {
+              evt.stopPropagation();
               if (cropperRef.current.cropper) {
                 cropperRef.current.cropper.rotate(90);
               }
             }}
           >
-            Rotate
+            <Translate>Rotate</Translate>
             <Icon name="sync" />
           </Button>
           <Button float="left" styleName="cropper-action-btn" icon color="blue" onClick={onCrop}>
-            Done
+            <Translate>Done</Translate>
             <Icon name="check" />
           </Button>
         </Button.Group>

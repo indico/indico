@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 from datetime import datetime
-from PIL import Image
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
+from PIL import Image
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
