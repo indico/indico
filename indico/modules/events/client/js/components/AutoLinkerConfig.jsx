@@ -78,10 +78,10 @@ export default function AutoLinkerConfig({rules, onChange}) {
   const onRemove = async n => {
     try {
       const newRules = [...rules];
-      newRules.splice(n, 1);
+      const [oldRule] = newRules.splice(n, 1);
       await indicoAxios.post(autoLinkerConfigUrl(), {rules: newRules});
       onChange(newRules);
-      setNewRule({regex: '', url: ''});
+      setNewRule(oldRule);
     } catch (e) {
       handleAxiosError(e);
     }
