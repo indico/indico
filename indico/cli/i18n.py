@@ -511,10 +511,12 @@ def push_plugin(plugin_dir):
 
 
 @push.command('all-plugins', short_help='Push .pot files to Transifex for multiple plugins.')
-@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                callback=_validate_all_plugins_dir)
 def push_all_plugins(plugins_dir):
     """Push .pot files to transifex for multiple plugins in a directory."""
-    with _chdir(plugins_dir):
+    parent_directory = Path(plugins_dir[0]).parent.absolute()
+    with _chdir(parent_directory):
         _push()
 
 
@@ -573,12 +575,13 @@ def pull_plugin(plugin_dir, languages):
 
 
 @pull.command('all-plugins', short_help='Pull translated .po files from Transifex for multiple plugins.')
-@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                callback=_validate_all_plugins_dir)
 @click.argument('languages', nargs=-1, required=False)
 def pull_all_plugins(plugins_dir, languages):
     """Pull translated .po files from Transifex for multiple plugins."""
-    with _chdir(plugins_dir):
-        plugin_dirs = _validate_all_plugins_dir(None, None, plugins_dir)
+    parent_directory = Path(plugins_dir[0]).parent.absolute()
+    with _chdir(parent_directory):
         if 'en_US' in languages:
             languages.remove('en_US')
         language_renames = {'zh_Hans_CN': 'zh_CN.GB2312'}  # other lang codes requiring rename should be added here
@@ -594,7 +597,7 @@ def pull_all_plugins(plugins_dir, languages):
             sys.exit(1)
         else:
             for code in set(languages) & set(language_renames):
-                for plugin_dir in plugin_dirs:
+                for plugin_dir in plugins_dir:
                     translations_dir = _get_translations_dir(plugin_dir)
                     if os.path.exists(os.path.join(translations_dir, code)):
                         shutil.rmtree(os.path.join(translations_dir, code))
