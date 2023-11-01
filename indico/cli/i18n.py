@@ -323,6 +323,26 @@ def extract_messages_react(directory=INDICO_DIR):
         f.write(output)
 
 
+def remove_empty_pot_files(translations_dir, python=False, javascript=False, react=False):
+    """Remove empty .pot files with no msgid strings after extraction."""
+    def _message_id_count(file_name):
+        count = 0
+        with open(os.path.join(translations_dir, file_name), encoding='utf-8') as f:
+            data = f.read()
+            count = data.count('msgid')
+        return count
+    if python:
+        if _message_id_count('messages.pot') == 1:
+            os.remove(os.path.join(translations_dir, 'messages.pot'))
+    if javascript:
+        if _message_id_count('messages-js.pot') == 1:
+            os.remove(os.path.join(translations_dir, 'messages-js.pot'))
+    if react:
+        if (os.path.exists(os.path.join(translations_dir, 'messages-react.pot'))
+           and _message_id_count('messages-react.pot') == 1):
+            os.remove(os.path.join(translations_dir, 'messages-react.pot'))
+
+
 @cli.group('compile', short_help='Catalog compilation command for indico and indico plugins.')
 def compile_catalog():
     """Catalog compilation command for indico and indico plugins."""
@@ -369,6 +389,8 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
                 _run_command(f'{babel_cmd}_react', extra=extra)
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
+    if babel_cmd == 'extract_messages':
+        remove_empty_pot_files(TRANSLATIONS_DIR, python=python, javascript=javascript, react=react)
 
 
 def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
@@ -399,6 +421,9 @@ def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plug
                     _run_command(f'{babel_cmd}_react', extra=extra)
         except Exception as err:
             click.secho(f'Error running {babel_cmd} for {plugin_dir} - {err}', fg='red', bold=True, err=True)
+        if babel_cmd == 'extract_messages':
+            remove_empty_pot_files(_get_translations_dir(plugin_dir), python=python, javascript=javascript,
+                                   react=react)
 
 
 def _command(**kwargs):
