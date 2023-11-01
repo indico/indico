@@ -273,7 +273,9 @@ class BookingBootstrapForm extends React.Component {
     );
     const recurrenceOptions = [
       {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
-      {text: PluralTranslate.string('Month', 'Months', number), value: 'month'},
+      ...(hideOptions.recurringMonthly
+        ? []
+        : [{text: PluralTranslate.string('Month', 'Months', number), value: 'month'}]),
     ];
     // all but one option are hidden
     const showRecurrenceOptions =
@@ -331,6 +333,7 @@ class BookingBootstrapForm extends React.Component {
             <Select
               value={interval}
               options={recurrenceOptions}
+              disabled={hideOptions.recurringMonthly}
               onChange={(event, data) => this.updateInterval(data.value)}
             />
           </Form.Group>
