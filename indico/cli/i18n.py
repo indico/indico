@@ -301,7 +301,7 @@ def compile_catalog_react(directory=INDICO_DIR, locale=''):
 
 
 def extract_messages_react(directory=INDICO_DIR):
-    """Extract messagges for react."""
+    """Extract messages for react."""
     if directory is INDICO_DIR:
         paths = [os.path.join('indico', 'web', 'client'), os.path.join('indico', 'modules')]
     else:
@@ -325,6 +325,7 @@ def extract_messages_react(directory=INDICO_DIR):
 
 def remove_empty_pot_files(translations_dir, python=False, javascript=False, react=False):
     """Remove empty .pot files with no msgid strings after extraction."""
+
     def _message_id_count(file_name):
         count = 0
         with open(os.path.join(translations_dir, file_name), encoding='utf-8') as f:
