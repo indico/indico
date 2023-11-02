@@ -271,12 +271,14 @@ class BookingBootstrapForm extends React.Component {
       isAdminOverrideEnabled,
       bookingGracePeriod
     );
-    const recurrenceOptions = [
-      {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
-      ...(hideOptions.recurringMonthly
-        ? []
-        : [{text: PluralTranslate.string('Month', 'Months', number), value: 'month'}]),
-    ];
+    const recurrenceOptions = hideOptions.recurringOptions
+      ? []
+      : [
+          {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
+          ...(hideOptions.recurringMonthly
+            ? []
+            : [{text: PluralTranslate.string('Month', 'Months', number), value: 'month'}]),
+        ];
     // all but one option are hidden
     const showRecurrenceOptions =
       ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
@@ -330,12 +332,17 @@ class BookingBootstrapForm extends React.Component {
               step="1"
               onChange={(event, data) => this.updateNumber(data.value)}
             />
-            <Select
-              value={interval}
-              options={recurrenceOptions}
-              disabled={hideOptions.recurringMonthly}
-              onChange={(event, data) => this.updateInterval(data.value)}
-            />
+            {!hideOptions.recurringOptions && (
+              <Select
+                value={interval}
+                options={recurrenceOptions}
+                disabled={hideOptions.recurringOptions}
+                onChange={(event, data) => this.updateInterval(data.value)}
+              />
+            )}
+            {hideOptions.recurringOptions && (
+              <label>{PluralTranslate.string('Week', 'Weeks', number)}</label>
+            )}
           </Form.Group>
         )}
         {['every', 'daily'].includes(type) && (

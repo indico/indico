@@ -165,7 +165,7 @@ class BookingEditForm extends React.Component {
       <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
         {recurringBookingInProgress &&
           recurrence.type === 'every' &&
-          !hideOptions.recurringMonthly && (
+          !hideOptions.recurringOptions && (
             <Message icon styleName="repeat-frequency-disabled-notice">
               <Icon name="dont" />
               <Translate>You cannot modify the repeat frequency of an existing booking.</Translate>
@@ -225,30 +225,34 @@ class BookingEditForm extends React.Component {
                   }
                 }}
               />
-              <Field name="recurrence.number" subscription={{}}>
-                {({input: {value: number}}) => (
-                  <FinalDropdown
-                    name="recurrence.interval"
-                    disabled={submitSucceeded || recurringBookingInProgress}
-                    selection
-                    required
-                    options={[
-                      {
-                        value: 'week',
-                        text: PluralTranslate.string('Week', 'Weeks', number || 0),
-                      },
-                      {
-                        value: 'month',
-                        text: PluralTranslate.string('Month', 'Months', number || 0),
-                      },
-                    ]}
-                    onChange={newInterval => {
-                      onBookingPeriodChange(dates, timeSlot, this.clearWeekdays(newInterval));
-                      this.preselectWeekdayToday(form);
-                    }}
-                  />
-                )}
-              </Field>
+              {hideOptions.recurringOptions ? (
+                <label>{PluralTranslate.string('Week', 'Weeks', recurrence.number || 0)}</label>
+              ) : (
+                <Field name="recurrence.number" subscription={{}}>
+                  {({input: {value: number}}) => (
+                    <FinalDropdown
+                      name="recurrence.interval"
+                      disabled={submitSucceeded || recurringBookingInProgress}
+                      selection
+                      required
+                      options={[
+                        {
+                          value: 'week',
+                          text: PluralTranslate.string('Week', 'Weeks', number || 0),
+                        },
+                        {
+                          value: 'month',
+                          text: PluralTranslate.string('Month', 'Months', number || 0),
+                        },
+                      ]}
+                      onChange={newInterval => {
+                        onBookingPeriodChange(dates, timeSlot, this.clearWeekdays(newInterval));
+                        this.preselectWeekdayToday(form);
+                      }}
+                    />
+                  )}
+                </Field>
+              )}
             </Form.Group>
           )}
           {recurrence.type === 'single' ? (
