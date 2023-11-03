@@ -90,6 +90,8 @@ Internal Changes
   the removal of registration form fields (:pr:`5924`)
 - Add a tool ``bin/managemnent/icons_generate.py`` to generate CSS for icomoon icons based
   on ``selection.json`` (:pr:`5986`, thanks :user:`foxbunny`)
+- Pass form class arguments to ``core.add_form_fields`` signal handlers (:pr:`6020`, thanks
+  :user:`vtran99`)
 
 
 ----
