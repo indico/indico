@@ -129,7 +129,7 @@ is available from github (slightly outdated and we should eventually move it to 
 It describes the interface between translating and programming and some conventions to be followed.
 Everyone involved in translating or programming Indico should have read it before starting the work.
 
-Whenever translaters spot difficult code (forgotten pluralization, typos), they
+Whenever translators spot difficult code (forgotten pluralization, typos), they
 should do their best to avoid double (or rather: multiple) work to their fellow translators.
 What is a problem for their translation, usually will be a problem for all translations.
 Don't hesitate to open an issue or pull request on `GitHub <https://github.com/indico/indico>`_.
