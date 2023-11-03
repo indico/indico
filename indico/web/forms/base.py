@@ -52,7 +52,7 @@ class IndicoFormMeta(FormMeta):
         # if the signal receiver didn't specify a sender.
         if kwargs.pop('__extended', False):
             return super().__call__(*args, **kwargs)
-        extra_fields = values_from_signal(signals.core.add_form_fields.send(cls))
+        extra_fields = values_from_signal(signals.core.add_form_fields.send(cls, form_args=args, form_kwargs=kwargs))
         # If there are no extra fields, we don't need any custom logic
         # and simply create an instance of the original form.
         if not extra_fields:
