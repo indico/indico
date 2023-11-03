@@ -1111,8 +1111,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         name, territory, ambiguous = locales.get(self.default_locale, ('', '', False))
         return f'{name} ({territory})' if territory else name
 
-    def get_forced_event_locale(self, user=None, *, allow_session=False):
+    def get_forced_event_locale(self, user=None, *, allow_session=False, always=False):
         if not self.enforce_locale or not (locale := self.default_locale):
+            if always:
+                # if we always want to set a locale (typically for sending emails), use the default locale
+                # either of the event or the instance
+                return self.default_locale or config.DEFAULT_LOCALE
             return None
         if user:
             locale = user.settings.get('lang')
@@ -1124,7 +1128,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @contextmanager
     def force_event_locale(self, user=None, *, allow_session=False):
-        locale = self.get_forced_event_locale(user, allow_session=allow_session)
+        always = user is None and not allow_session
+        locale = self.get_forced_event_locale(user, allow_session=allow_session, always=always)
         if not locale:
             yield
             return
