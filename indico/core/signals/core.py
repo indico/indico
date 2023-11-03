@@ -40,7 +40,9 @@ Expected to return one or more Storage subclasses.
 
 add_form_fields = _signals.signal('add-form-fields', '''
 Lets you add extra fields to a form.  The *sender* is the form class
-and should always be specified when subscribing to this signal.
+and should always be specified when subscribing to this signal. Any
+arguments passed while instantiating the form are being passed in
+`form_args` and `form_kwargs`.
 
 The signal handler should return one or more ``'name', Field`` tuples.
 Each field will be added to the form as ``ext__<name>`` and is
