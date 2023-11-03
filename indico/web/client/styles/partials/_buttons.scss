@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'icons';
 
 $i-button-background-color: darken($light-gray, 5%);
 $i-button-spacing: 0.3rem;

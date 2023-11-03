@@ -36,6 +36,9 @@
 
   &:active {
     @extend %button-pressed-state;
+    --button-text-color: var(--button-text-color);
+    --button-surface-color: var(--control-clickable-surface-focus-color);
+    color: var(--button-text-color);
   }
 }
 
@@ -107,5 +110,30 @@
 
   span {
     @extend %visually-hidden;
+  }
+}
+
+%button-clear {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+}
+
+%button-icon-only {
+  @extend %button-clear;
+  @extend %flex-inline-center;
+  padding: 0;
+}
+
+%button-surfaceless {
+  @extend %button;
+  --button-surface-color: transparent;
+  --button-border-color: transparent;
+
+  &:hover,
+  &:focus-visible {
+    --button-surface-color: transparent;
+    --button-border-color: var(--control-border-color);
   }
 }

@@ -9,10 +9,10 @@
 
 ind-with-tooltip,
 ind-with-toggletip {
+  // XXX: The following variables are set using JavaScript:
   --tooltip-surface-color: #333;
   --tooltip-text-color: #fff;
 
-  // XXX: The following variables are set using JavaScript:
   --top: 0;
   --left: 0;
   --right: auto;

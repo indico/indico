@@ -55,3 +55,15 @@ a.discreet-link {
   margin-left: 0.5em;
   color: $gray !important;
 }
+
+%link-as-button {
+  color: var(--button-text-color-default);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--button-text-color-default);
+  }
+}
