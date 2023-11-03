@@ -275,9 +275,7 @@ class BookingBootstrapForm extends React.Component {
       ? []
       : [
           {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
-          ...(hideOptions.recurringMonthly
-            ? []
-            : [{text: PluralTranslate.string('Month', 'Months', number), value: 'month'}]),
+          {text: PluralTranslate.string('Month', 'Months', number), value: 'month'},
         ];
     // all but one option are hidden
     const showRecurrenceOptions =
