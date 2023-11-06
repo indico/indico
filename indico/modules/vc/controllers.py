@@ -326,7 +326,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .options((lazyload(r) for r in inspect(VCRoom).relationships.keys()),
                           joinedload('events').joinedload('event').joinedload('acl_entries'))
                  .group_by(VCRoom.id)
-                 .order_by(db.desc('event_count'))
+                 .order_by(func.lower(VCRoom.name) != self.query.lower(), db.desc('event_count'))
                  .limit(10))
 
         return ((room, count) for room, count in query if room.plugin.can_manage_vc_room(session.user, room))
