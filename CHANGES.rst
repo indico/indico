@@ -17,6 +17,8 @@ Bugfixes
 
 - Fix meeting timetable not showing custom locations when all top-level timetable
   entries are session blocks inheriting the custom location from its session (:pr:`6014`)
+- Always show exact matches when searching for existing videoconference rooms to attach to an
+  event (:pr:`6022`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
