@@ -265,6 +265,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.ForeignKey('indico.files.id'),
         nullable=True
     )
+    #: The protection setting for speaker submitions
+    speakers_can_submit = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
 
     #: The last user-friendly registration ID
     _last_friendly_registration_id = db.deferred(db.Column(
@@ -287,7 +293,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         nullable=False,
         default=0
     ))
-
     #: The category containing the event
     category = db.relationship(
         'Category',
