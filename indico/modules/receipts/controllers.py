@@ -209,19 +209,6 @@ class RHAllCategoryTemplates(AllTemplateMixin, RHManageCategoryBase):
     pass
 
 
-class RHGetDummyData(ReceiptAreaMixin, RHAdminBase):
-    @use_kwargs({
-        'template_id': fields.Integer(load_default=None)
-    }, location='query')
-    def _process(self, template_id):
-        if template_id:
-            template = ReceiptTemplate.get_or_404(template_id)
-            custom_fields = template.custom_fields
-        else:
-            custom_fields = {}
-        return jsonify(TemplateDataSchema().dump(_generate_dummy_data(self.target, custom_fields)))
-
-
 class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
     def _process(self):
         # Just some dummy data to test the template
@@ -245,12 +232,15 @@ class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
     def _process(self, html, css, yaml):
         g.template_stack = [TemplateStackEntry(None)]
         # Just some dummy data to test the template
+        dummy_data = _generate_dummy_data(self.target, yaml.get('custom_fields', []) if yaml else [])
         compiled_html = compile_jinja_code(
             html,
             use_stack=True,
-            **_generate_dummy_data(self.target, yaml.get('custom_fields', []) if yaml else [])
+            **dummy_data
         )
-        return send_file('receipt.pdf', create_pdf(self.target, {compiled_html}, css), 'application/pdf')
+        response = send_file('receipt.pdf', create_pdf(self.target, {compiled_html}, css), 'application/pdf')
+        response.headers['X-Indico-Dummy-Data'] = TemplateDataSchema().dumps(dummy_data)
+        return response
 
 
 class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):

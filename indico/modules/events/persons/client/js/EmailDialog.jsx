@@ -155,7 +155,7 @@ export function EmailDialog({
         />
         {placeholders.length > 0 && (
           <Form.Field>
-            <PlaceholderInfo placeholders={placeholders} />
+            <PlaceholderInfo placeholders={placeholders} defaultOpen />
           </Form.Field>
         )}
         {recipientsField || <RecipientsField recipients={recipients} />}

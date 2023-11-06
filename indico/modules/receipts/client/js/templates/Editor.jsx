@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import dummyDataURL from 'indico-url:receipts.dummy_data';
 import templateListURL from 'indico-url:receipts.template_list';
 
 import MonacoEditor from '@monaco-editor/react';
@@ -14,7 +13,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Link} from 'react-router-dom';
-import {Button, Form, Message, Popup} from 'semantic-ui-react';
+import {Button, Form, Message} from 'semantic-ui-react';
 
 import {
   FinalField,
@@ -23,12 +22,12 @@ import {
   formatters,
   parsers as p,
 } from 'indico/react/forms';
-import {useIndicoAxios} from 'indico/react/hooks';
-import {Param, Translate} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 import Nexus from 'indico/react/util/Nexus';
 
-import './Editor.module.scss';
 import {targetLocatorSchema, templateSchema} from './util';
+
+import './Editor.module.scss';
 
 const FILES = {
   html: {
@@ -45,51 +44,6 @@ const FILES = {
   },
 };
 
-function FieldMap({fields}) {
-  return Object.entries(fields).map(([k, v]) => (
-    <div key={k} styleName="var-entry">
-      <span styleName="key">{k}</span>:{' '}
-      {_.isObject(v) ? (
-        <div styleName="nested-value" style={{marginLeft: '1em'}}>
-          <FieldMap fields={v} />
-        </div>
-      ) : (
-        <span styleName="value">{JSON.stringify(v)}</span>
-      )}
-    </div>
-  ));
-}
-
-FieldMap.propTypes = {
-  fields: PropTypes.object,
-};
-
-function VariablesPopup({targetLocator, children}) {
-  const {data} = useIndicoAxios({
-    url: dummyDataURL(targetLocator),
-  });
-
-  return data && children ? (
-    <Popup trigger={<a>{children}</a>} on="click">
-      <Popup.Header>
-        <Translate>Template Variables</Translate>
-      </Popup.Header>
-      <Popup.Content>
-        <FieldMap fields={data} />
-      </Popup.Content>
-    </Popup>
-  ) : null;
-}
-
-VariablesPopup.propTypes = {
-  targetLocator: targetLocatorSchema.isRequired,
-  children: PropTypes.node,
-};
-
-VariablesPopup.defaultProps = {
-  children: null,
-};
-
 export default function Editor({template, onChange, onSubmit, editorHeight, targetLocator}) {
   const [currentFileExt, setFileExt] = useState('html');
   const codeValues = _.pick(template, ['html', 'css', 'yaml']);
@@ -98,12 +52,6 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
   useEffect(() => {
     editorRef.current?.focus();
   }, [currentFileExt]);
-
-  const variablesLink = (
-    <VariablesPopup
-      targetLocator={template.id ? {...targetLocator, template_id: template.id} : targetLocator}
-    />
-  );
 
   return (
     <FinalForm
@@ -135,15 +83,6 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
               formatOnBlur
             />
           </Form.Group>
-          <Message color="orange" size="small">
-            <Translate>
-              You can use variables in your template. See the{' '}
-              <Param name="link" wrapper={variablesLink}>
-                full list here
-              </Param>
-              .
-            </Translate>
-          </Message>
           <Button.Group attached="top">
             {['html', 'css', 'yaml'].map(format => (
               <Button
