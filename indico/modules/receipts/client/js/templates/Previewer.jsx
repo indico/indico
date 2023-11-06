@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {pdfjs, Document, Page} from 'react-pdf';
 import {Loader, Message, Pagination} from 'semantic-ui-react';
 
+import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
@@ -28,6 +30,22 @@ const MESSAGE_HEADERS = {
   jinja: Translate.string('Jinja Template'),
 };
 
+const processPlaceholders = placeholderData =>
+  Object.entries(placeholderData).map(([name, value]) =>
+    _.isObject(value)
+      ? {
+          name: _.isArray(value) ? `${name}.0` : name,
+          parametrized: true,
+          params: Object.entries(_.isArray(value) ? value[0] : value).map(
+            ([param, paramValue]) => ({
+              param,
+              description: JSON.stringify(paramValue),
+            })
+          ),
+        }
+      : {name, description: JSON.stringify(value)}
+  );
+
 const debounce = makeAsyncDebounce(250);
 
 export default function Previewer({url, data}) {
@@ -35,6 +53,7 @@ export default function Previewer({url, data}) {
   const [loading, setLoading] = useState(false);
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [placeholders, setPlaceholders] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -42,9 +61,13 @@ export default function Previewer({url, data}) {
     (async () => {
       try {
         setError(null);
-        const {data: newContent} = await debounce(() =>
+        const {data: newContent, headers} = await debounce(() =>
           indicoAxios.post(url, data, {responseType: 'arraybuffer'})
         );
+        const dummyData = headers['x-indico-dummy-data'];
+        if (dummyData) {
+          setPlaceholders(processPlaceholders(JSON.parse(dummyData)));
+        }
         setLoading(false);
         setContent(newContent);
       } catch (e) {
@@ -69,6 +92,7 @@ export default function Previewer({url, data}) {
 
   return (
     <>
+      {placeholders && <PlaceholderInfo placeholders={placeholders} jinja />}
       {error &&
         Object.entries(error).map(([entry, errs]) => (
           <Message key={entry} error visible={!!error}>

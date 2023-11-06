@@ -7,7 +7,7 @@
 
 from indico.modules.receipts.controllers import (RHAddTemplate, RHAllCategoryTemplates, RHAllEventTemplates,
                                                  RHCategoryTemplate, RHCloneTemplate, RHDeleteTemplate, RHEditTemplate,
-                                                 RHEventTemplate, RHExportReceipts, RHGenerateReceipts, RHGetDummyData,
+                                                 RHEventTemplate, RHExportReceipts, RHGenerateReceipts,
                                                  RHListCategoryTemplates, RHListEventTemplates, RHLivePreview,
                                                  RHPreviewReceipts, RHPreviewTemplate)
 from indico.util.caching import memoize
@@ -39,15 +39,13 @@ for object_type in ('event', 'category'):
     _bp.add_url_rule(prefix + '/add', 'add_template', RHAddTemplate,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/add', 'add_template_page', _dispatch(RHEventTemplate, RHCategoryTemplate),
-                     defaults={'object_type': object_type}, methods=('GET',))
-    _bp.add_url_rule(prefix + '/preview/dummy-data', 'dummy_data', RHGetDummyData,
-                     defaults={'object_type': object_type}, methods=('GET',))
+                     defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/live-preview', 'template_live_preview', RHLivePreview,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'template', _dispatch(RHEventTemplate, RHCategoryTemplate),
-                     defaults={'object_type': object_type}, methods=('GET',))
+                     defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/<int:template_id>/preview-template', 'template_preview', RHPreviewTemplate,
-                     defaults={'object_type': object_type}, methods=('GET',))
+                     defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/<int:template_id>/preview', 'receipts_preview', RHPreviewReceipts,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/generate', 'generate_receipts', RHGenerateReceipts,
@@ -59,7 +57,7 @@ for object_type in ('event', 'category'):
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template', RHCloneTemplate,
                      defaults={'object_type': object_type}, methods=('POST',))
     _bp.add_url_rule(prefix + '/templates', 'all_templates', _dispatch(RHAllEventTemplates, RHAllCategoryTemplates),
-                     defaults={'object_type': object_type}, methods=('GET',))
+                     defaults={'object_type': object_type})
 
 _bp.add_url_rule('/event/<int:event_id>/manage/receipts/export/receipts.<any(pdf,zip):format>',
                  'receipts_export', RHExportReceipts, methods=('POST',))

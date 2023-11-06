@@ -29,26 +29,3 @@
     height: auto !important;
   }
 }
-
-.var-entry {
-  padding-bottom: 0.5em;
-
-  .key {
-    background-color: $blue;
-    color: $white;
-    padding: 0.2em;
-    border-radius: 0.2em;
-  }
-
-  .nested-value {
-    padding-top: 0.4em;
-    font-size: 0.9em;
-  }
-
-  .value {
-    background-color: $gray;
-    color: $white;
-    padding: 0.2em;
-    border-radius: 0.2em;
-  }
-}

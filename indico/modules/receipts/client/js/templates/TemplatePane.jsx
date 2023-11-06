@@ -24,7 +24,6 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
     title: template.title,
     ..._.pick(template, ['html', 'css', 'yaml']),
   });
-  const previewUrl = templateLivePreviewURL(targetLocator);
 
   return (
     <>
@@ -42,7 +41,7 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
           </Grid.Column>
           <Grid.Column>
             {data.html && data.html.length >= 3 ? (
-              <Previewer url={previewUrl} data={data} />
+              <Previewer url={templateLivePreviewURL(targetLocator)} data={data} />
             ) : (
               <Segment placeholder>
                 <Header icon>
