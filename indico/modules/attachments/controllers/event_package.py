@@ -34,13 +34,12 @@ from indico.web.util import jsonify_data
 
 
 def _get_start_dt(obj):
-    # TODO: adapt to new models (needs extra properties to use event TZ)
     if isinstance(obj, Contribution):
         return obj.timetable_entry.start_dt if obj.timetable_entry else None
     elif isinstance(obj, SubContribution):
         return obj.timetable_entry.start_dt if obj.timetable_entry else None
     elif isinstance(obj, Session):
-        return None
+        return obj.start_dt  # start_dt of the first block
     return obj.start_dt
 
 
