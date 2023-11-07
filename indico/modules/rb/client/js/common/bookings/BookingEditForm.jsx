@@ -138,6 +138,22 @@ class BookingEditForm extends React.Component {
     }
   };
 
+  getRecurrenceLabel = number => {
+    const {hideOptions} = this.props;
+
+    if (hideOptions.recurringWeekly && hideOptions.recurringMonthly) {
+      return null;
+    }
+
+    if (hideOptions.recurringWeekly) {
+      return [{text: PluralTranslate.string('Month', 'Months', number || 0), value: 'month'}];
+    }
+
+    if (hideOptions.recurringMonthly) {
+      return [{text: PluralTranslate.string('Week', 'Weeks', number || 0), value: 'week'}];
+    }
+  };
+
   render() {
     const {
       user: sessionUser,
@@ -157,20 +173,20 @@ class BookingEditForm extends React.Component {
     const bookingStarted = today.isAfter(startDt, 'day');
     const bookingFinished = today.isAfter(endDt, 'day');
     const recurringBookingInProgress = getRecurrenceInfo(repetition).type === 'every';
+    const recurrenceHidden = hideOptions.recurringWeekly && hideOptions.recurringMonthly;
 
     // all but one option are hidden
     const showRecurrenceOptions =
       ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
+    const hideMessage = hideOptions.recurringWeekly || hideOptions.recurringMonthly;
     return (
       <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
-        {recurringBookingInProgress &&
-          recurrence.type === 'every' &&
-          !hideOptions.recurringOptions && (
-            <Message icon styleName="repeat-frequency-disabled-notice">
-              <Icon name="dont" />
-              <Translate>You cannot modify the repeat frequency of an existing booking.</Translate>
-            </Message>
-          )}
+        {!hideMessage && recurringBookingInProgress && recurrence.type === 'every' && (
+          <Message icon styleName="repeat-frequency-disabled-notice">
+            <Icon name="dont" />
+            <Translate>You cannot modify the repeat frequency of an existing booking.</Translate>
+          </Message>
+        )}
         <Segment>
           {showRecurrenceOptions && (
             <Form.Group inline>
@@ -192,7 +208,7 @@ class BookingEditForm extends React.Component {
                   onClick={() => this.recurrenceTypeChanged('daily')}
                 />
               )}
-              {!hideOptions.recurring && (
+              {!recurrenceHidden && (
                 <FinalRadio
                   name="recurrence.type"
                   label={Translate.string('Recurring booking')}
@@ -225,8 +241,8 @@ class BookingEditForm extends React.Component {
                   }
                 }}
               />
-              {hideOptions.recurringOptions ? (
-                <label>{PluralTranslate.string('Week', 'Weeks', recurrence.number || 0)}</label>
+              {hideOptions.recurringWeekly || hideOptions.recurringMonthly ? (
+                <label>{this.getRecurrenceLabel(recurrence.number).map(x => x.text)}</label>
               ) : (
                 <Field name="recurrence.number" subscription={{}}>
                   {({input: {value: number}}) => (
