@@ -53,7 +53,7 @@ class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'event_id', 'title', 'introduction', 'start_dt', 'end_dt',
                   'is_open', 'registration_count', 'checked_in_count')
 
-    is_open = fields.Bool(attribute='is_open')
+    is_open = fields.Bool()
     registration_count = fields.Int(attribute='existing_registrations_count')
     checked_in_count = fields.Int(attribute='checked_in_registrations_count')
 
