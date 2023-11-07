@@ -107,9 +107,9 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 'position': field['position'],
                 'title': field['title'],
                 'description': field['description'],
-                'inputType': field['inputType'],
+                'input_type': field['inputType'],
                 'data': reg_data[field['htmlName']],
-                'defaultValue': field['defaultValue'],
+                'default_value': field['defaultValue'],
             }
             if 'price' in field:
                 field_data['price'] = field['price']
