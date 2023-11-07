@@ -38,7 +38,7 @@ class RHAPIEvent(RHAPICheckinBase):
 
     def _process(self):
         from indico.modules.events.registration.schemas import CheckinEventSchema
-        return jsonify(CheckinEventSchema().dump(self.event))
+        return CheckinEventSchema().jsonify(self.event)
 
 
 class RHAPIRegForms(RHAPIEvent):
@@ -50,7 +50,7 @@ class RHAPIRegForms(RHAPIEvent):
                     .with_parent(self.event)
                     .options(undefer('existing_registrations_count'), undefer('checked_in_registrations_count'))
                     .all())
-        return jsonify(CheckinRegFormSchema(many=True).dump(regforms))
+        return CheckinRegFormSchema(many=True).jsonify(regforms)
 
 
 class RHAPIRegFormBase(RHAPICheckinBase):
@@ -69,7 +69,7 @@ class RHAPIRegForm(RHAPIRegFormBase):
 
     def _process(self):
         from indico.modules.events.registration.schemas import CheckinRegFormSchema
-        return jsonify(CheckinRegFormSchema().dump(self.regform))
+        return CheckinRegFormSchema().jsonify(self.regform)
 
 
 class RHAPIRegistrations(RHAPIRegFormBase):
@@ -80,7 +80,7 @@ class RHAPIRegistrations(RHAPIRegFormBase):
         registrations = (Registration.query.with_parent(self.regform)
                          .filter(~Registration.is_deleted)
                          .all())
-        return jsonify(CheckinRegistrationSchema(many=True).dump(registrations))
+        return CheckinRegistrationSchema(many=True).jsonify(registrations)
 
 
 class RHAPIRegistration(RHAPIRegFormBase):
@@ -102,7 +102,7 @@ class RHAPIRegistration(RHAPIRegFormBase):
 
     def _process_GET(self):
         from indico.modules.events.registration.schemas import CheckinRegistrationSchema
-        return jsonify(CheckinRegistrationSchema().dump(self.registration))
+        return CheckinRegistrationSchema().jsonify(self.registration)
 
     @use_kwargs({'checked_in': fields.Bool(), 'paid': fields.Bool()})
     def _process_PATCH(self, checked_in=None, paid=None):
@@ -113,7 +113,7 @@ class RHAPIRegistration(RHAPIRegFormBase):
             signals.event.registration_checkin_updated.send(self.registration)
         if paid is not None and paid != self.registration.is_paid and self.registration.price:
             toggle_registration_payment(self.registration, paid=paid)
-        return jsonify(CheckinRegistrationSchema().dump(self.registration))
+        return CheckinRegistrationSchema().jsonify(self.registration)
 
 
 @oauth_scope('registrants')
