@@ -10,7 +10,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.modules.attachments.settings import attachments_settings
 from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
-from indico.modules.events.contributions import contribution_settings, subcontribution_settings
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
@@ -174,10 +174,7 @@ class EventProtectionCloner(EventCloner):
         })
 
     def _clone_subcontrib_settings(self, new_event):
-        subcontribution_settings_data = subcontribution_settings.get_all(self.old_event)
-        subcontribution_settings.set_multi(new_event, {
-            'speakers_can_submit': subcontribution_settings_data['speakers_can_submit'],
-        })
+        new_event.speakers_can_submit = self.old_event.speakers_can_submit
 
     def _clone_attachment_settings(self, new_event):
         attachment_settings_data = attachments_settings.get_all(self.old_event)

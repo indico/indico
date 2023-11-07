@@ -265,7 +265,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.ForeignKey('indico.files.id'),
         nullable=True
     )
-    #: The protection setting for speaker submitions
+    #: The protection setting for speaker submissions
     speakers_can_submit = db.Column(
         db.Boolean,
         nullable=False,
@@ -293,6 +293,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         nullable=False,
         default=0
     ))
+
     #: The category containing the event
     category = db.relationship(
         'Category',

@@ -76,8 +76,7 @@ def can_manage_attachments(obj, user, allow_admin=True):
     if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit', allow_admin=allow_admin):
         return True
     if isinstance(obj, db.m.SubContribution):
-        from indico.modules.events.contributions import subcontribution_settings
-        speakers_can_submit = subcontribution_settings.get(obj.contribution.event, 'speakers_can_submit')
+        speakers_can_submit = obj.contribution.event.speakers_can_submit
         if speakers_can_submit and any(speaker.person.user == user for speaker in obj.speakers):
             return True
         return can_manage_attachments(obj.contribution, user, allow_admin=allow_admin)

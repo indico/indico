@@ -49,6 +49,8 @@ Improvements
 - Allow editors to edit their review comments on editables (:pr:`6008`)
 - Auto-linking of patterns in minutes (e.g. issue trackers, Github repos...) (:pr:`5998`)
 - Log editor actions in the Editing module (:pr:`6015`)
+- New events subcontribution setting of speakers can submit set as true as a default
+  (:issue:`5905`, :pr:`6025`)
 
 Bugfixes
 ^^^^^^^^
