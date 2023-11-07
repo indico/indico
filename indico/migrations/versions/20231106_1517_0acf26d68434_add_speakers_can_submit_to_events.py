@@ -17,33 +17,29 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('events', sa.Column('speakers_can_submit', sa.Boolean(), nullable=False,
-                  server_default='false'), schema='events')
+    op.add_column('events', sa.Column('speakers_can_submit', sa.Boolean(), nullable=False, server_default='false'),
+                  schema='events')
+    op.alter_column('events', 'speakers_can_submit', server_default=None, schema='events')
     op.execute('''
         UPDATE events.events ev
         SET speakers_can_submit = true
         FROM events.settings es
         WHERE
-        ev.id = es.event_id AND
-        es.module = 'subcontributions' AND
-        es.name = 'speakers_can_submit' AND
-        es.value::bool;
+            ev.id = es.event_id AND
+            es.module = 'subcontributions' AND
+            es.name = 'speakers_can_submit' AND
+            es.value = 'true'::jsonb
     ''')
     op.execute('''
-        DELETE FROM events.settings es
-        WHERE
-        es.module = 'subcontributions' AND
-        es.name = 'speakers_can_submit';
+        DELETE FROM events.settings es WHERE es.module = 'subcontributions' AND es.name = 'speakers_can_submit';
     ''')
-    op.alter_column('events', sa.Column('speakers_can_submit', server_default='true'), schema='events')
 
 
 def downgrade():
     conn = op.get_bind()
     conn.execute('''
         INSERT INTO events.settings(module, name, event_id, value)
-        SELECT 'subcontributions', 'speakers_can_submit', id, 'true'::jsonb FROM events.events ev
-        WHERE
-        ev.speakers_can_submit;
+        SELECT 'subcontributions', 'speakers_can_submit', id, 'true'::jsonb
+        FROM events.events ev WHERE ev.speakers_can_submit;
     ''')
     op.drop_column('events', 'speakers_can_submit', schema='events')

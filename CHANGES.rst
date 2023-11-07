@@ -50,6 +50,7 @@ Improvements
 - Auto-linking of patterns in minutes (e.g. issue trackers, Github repos...) (:pr:`5998`)
 - Log editor actions in the Editing module (:pr:`6015`)
 - New events subcontribution setting of speakers can submit set as true as a default
+- Grant subcontribution speakers submission privileges by default in newly created events
   (:issue:`5905`, :pr:`6025`)
 
 Bugfixes
