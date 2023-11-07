@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import jsonify, request, session
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload, selectinload, undefer
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -79,8 +79,11 @@ class RHAPIRegistrations(RHAPIRegFormBase):
         from indico.modules.events.registration.schemas import CheckinRegistrationSchema
         registrations = (Registration.query.with_parent(self.regform)
                          .filter(~Registration.is_deleted)
+                         .options(selectinload('data').joinedload('field_data'),
+                                  selectinload('tags'),
+                                  undefer('occupied_slots'))
                          .all())
-        return CheckinRegistrationSchema(many=True).jsonify(registrations)
+        return CheckinRegistrationSchema(many=True, exclude=('registration_data',)).jsonify(registrations)
 
 
 class RHAPIRegistration(RHAPIRegFormBase):
