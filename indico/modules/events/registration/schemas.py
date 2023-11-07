@@ -87,8 +87,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
         form_data = get_flat_section_submission_data(regform, registration=registration, management=True)
         reg_data = get_form_registration_data(regform, registration, management=True)
         filenames = self._get_filenames(registration)
-        sections = sorted(list(form_data['sections'].values()), key=itemgetter('position'))
-        fields = sorted(list(form_data['items'].values()), key=itemgetter('position'))
+        sections = sorted(form_data['sections'].values(), key=itemgetter('position'))
+        fields = sorted(form_data['items'].values(), key=itemgetter('position'))
         data = {}
 
         for section in sections:
