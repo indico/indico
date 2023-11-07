@@ -48,7 +48,7 @@ class RHAPIRegForms(RHAPIEvent):
         from indico.modules.events.registration.schemas import CheckinRegFormSchema
         regforms = (RegistrationForm.query
                     .with_parent(self.event)
-                    .options(undefer('checked_in_registrations_count'))
+                    .options(undefer('existing_registrations_count'), undefer('checked_in_registrations_count'))
                     .all())
         return jsonify(CheckinRegFormSchema(many=True).dump(regforms))
 
