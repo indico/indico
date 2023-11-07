@@ -155,6 +155,7 @@ class EventProtectionCloner(EventCloner):
         new_event.access_key = self.old_event.access_key
         new_event.own_no_access_contact = self.old_event.own_no_access_contact
         new_event.public_regform_access = self.old_event.public_regform_access
+        new_event.speakers_can_submit = self.old_event.speakers_can_submit
 
     def _clone_visibility(self, new_event):
         new_event.visibility = self.old_event.visibility if new_event.category == self.old_event.category else None
@@ -172,9 +173,6 @@ class EventProtectionCloner(EventCloner):
             'submitters_can_edit': contribution_settings_data['submitters_can_edit'],
             'submitters_can_edit_custom': contribution_settings_data['submitters_can_edit_custom']
         })
-
-    def _clone_subcontrib_settings(self, new_event):
-        new_event.speakers_can_submit = self.old_event.speakers_can_submit
 
     def _clone_attachment_settings(self, new_event):
         attachment_settings_data = attachments_settings.get_all(self.old_event)
