@@ -336,12 +336,16 @@ class VCRoomEventAssociation(db.Model):
                                           vc_room, self.event, self.link_object)
             vc_room.events.remove(self)
         db.session.flush()
-        if vc_room.plugin and not vc_room.events:
-            Logger.get('modules.vc').info(f'Deleting videoconference {vc_room}')
-            if vc_room.status != VCRoomStatus.deleted:
-                vc_room.plugin.delete_room(vc_room, self.event)
-                notify_deleted(vc_room.plugin, vc_room, self, self.event, user)
-            db.session.delete(vc_room)
+        if vc_room.plugin:
+            if vc_room.events:
+                # just detached
+                vc_room.plugin.detach_room(self, vc_room, self.event)
+            else:
+                Logger.get('modules.vc').info(f'Deleting videoconference {vc_room}')
+                if vc_room.status != VCRoomStatus.deleted:
+                    vc_room.plugin.delete_room(vc_room, self.event)
+                    notify_deleted(vc_room.plugin, vc_room, self, self.event, user)
+                db.session.delete(vc_room)
 
 
 VCRoomEventAssociation.register_link_events()

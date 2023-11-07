@@ -12,9 +12,10 @@ from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.models.events import Event
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.forms import VCPluginSettingsFormBase
-from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
@@ -201,8 +202,14 @@ class VCPluginMixin:
         if vc_room.data is None:
             vc_room.data = {}
 
-    def create_room(self, vc_room, event):
+    def create_room(self, vc_room: VCRoom, event: Event):
         raise NotImplementedError('Plugin must implement create_room()')
+
+    def delete_room(self, vc_room: VCRoom, event: Event):
+        raise NotImplementedError('Plugin must implement delete_room()')
+
+    def detach_room(self, event_vc_room: VCRoomEventAssociation, vc_room: VCRoom, event: Event):
+        pass
 
     def clone_room(self, old_event_vc_room, link_object):
         """Clone the room, returning a new :class:`VCRoomEventAssociation`.
