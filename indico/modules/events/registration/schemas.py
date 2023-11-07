@@ -41,8 +41,6 @@ class RegistrationTagSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
-# Schemas for the Check-in app API
-
 class CheckinEventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
