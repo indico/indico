@@ -457,6 +457,13 @@ class RegistrationForm(db.Model):
                 .all())
 
     @property
+    def checked_in_registrations(self):
+        return (Registration.query.with_parent(self)
+                .filter(Registration.checked_in)
+                .options(subqueryload('data'))
+                .all())
+
+    @property
     def needs_publish_consent(self):
         return (self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or
                 self.publish_registrations_public == PublishRegistrationsMode.show_with_consent)
@@ -538,3 +545,11 @@ def _mappers_configured():
              .correlate_except(Registration)
              .scalar_subquery())
     RegistrationForm.existing_registrations_count = column_property(query, deferred=True)
+
+    query = (select([db.func.coalesce(db.func.sum(Registration.occupied_slots), 0)])
+             .where(db.and_(Registration.registration_form_id == RegistrationForm.id,
+                            ~Registration.is_deleted,
+                            Registration.checked_in))
+             .correlate_except(Registration)
+             .scalar_subquery())
+    RegistrationForm.checked_in_registrations_count = column_property(query, deferred=True)

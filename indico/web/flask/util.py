@@ -15,6 +15,7 @@ from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for
 from flask.helpers import get_root_path
+from flask_cors import cross_origin
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
 
@@ -83,6 +84,11 @@ def make_view_func(obj):
 
         wrapper.__name__ = obj.__name__
         wrapper.__doc__ = obj.__doc__
+
+        if (cors_config := getattr(obj, '_CORS', None)) is not None:
+            # apply CORS options from `@cors` decorator
+            wrapper = cross_origin(**cors_config)(wrapper)
+
         return wrapper
     elif callable(obj):
         # Normal function

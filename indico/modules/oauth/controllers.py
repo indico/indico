@@ -30,10 +30,11 @@ from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.rh import RH, RHProtected
+from indico.web.rh import RH, RHProtected, cors
 from indico.web.util import jsonify_data, jsonify_form
 
 
+@cors
 class RHOAuthMetadata(RH):
     """Return RFC8414 Authorization Server Metadata."""
 
@@ -98,13 +99,12 @@ class RHOAuthAuthorize(RHProtected):
                                new_scopes=[_f for _f in [SCOPES.get(s) for s in new_scopes] if _f])
 
 
+@cors
 class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
     def _process(self):
         resp = auth_server.create_token_response()
-        resp.headers['Access-Control-Allow-Methods'] = 'POST'
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
 
 

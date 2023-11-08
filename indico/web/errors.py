@@ -9,7 +9,8 @@ import traceback
 from uuid import uuid4
 
 import sentry_sdk
-from flask import g, jsonify, render_template, request, session
+from flask import after_this_request, current_app, g, jsonify, render_template, request, session
+from flask_cors.core import get_cors_options, set_cors_headers
 from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
 from werkzeug.exceptions import Forbidden, HTTPException
@@ -24,6 +25,7 @@ error_cache = make_scoped_cache('errors')
 
 
 def render_error(exc, title, message, code, standalone=False):
+    _handle_error_cors()
     _save_error(exc, title, message)
     if _need_json_response():
         return _jsonify_error(exc, title, message, code)
@@ -44,6 +46,19 @@ def render_error(exc, title, message, code, standalone=False):
 
 def load_error_data(uuid):
     return error_cache.get(uuid)
+
+
+def _handle_error_cors():
+    """Set CORS on error response based on RH's CORS settings."""
+    if not hasattr(g, 'rh') or (cors_config := getattr(g.rh, '_CORS', None)) is None:
+        return
+
+    cors_options = get_cors_options(current_app, cors_config)
+
+    @after_this_request
+    def set_error_cors(resp):
+        set_cors_headers(resp, cors_options)
+        return resp
 
 
 def _save_error(exc, title, message):

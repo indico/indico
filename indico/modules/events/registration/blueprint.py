@@ -201,15 +201,26 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar'
 
 
 # API
-_bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
-                 api.RHAPIRegistrant, methods=('GET', 'PATCH'))
-_bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
-                 api.RHAPIRegistrants)
 _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api.RHAPIRegistrationForms)
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registration_tags_assign',
                  tags.RHAPIRegistrationTagsAssign, methods=('POST',))
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',
                  privacy.RHAPIRegistrationChangeConsent, methods=('POST',))
+
+
+# Check-in app API
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/', 'api_checkin_event', api.RHAPIEvent)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/', 'api_checkin_regforms', api.RHAPIRegForms)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/', 'api_checkin_regform', api.RHAPIRegForm)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/',
+                 'api_checkin_registrations', api.RHAPIRegistrations)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/<int:registration_id>',
+                 'api_checkin_registration', api.RHAPIRegistration, methods=('GET', 'PATCH'))
+
+# Deprecated Check-in app API
+_bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
+                 api.RHAPIRegistrant, methods=('GET', 'PATCH'))
+_bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants', api.RHAPIRegistrants)
 
 # Participants
 _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<int:event_id>',
