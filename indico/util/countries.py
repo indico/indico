@@ -11,6 +11,7 @@ from werkzeug.datastructures import ImmutableDict
 from indico.core.config import config
 from indico.util.caching import memoize
 from indico.util.i18n import get_current_locale
+from indico.util.string import remove_accents, str_to_ascii
 
 
 def get_countries(locale=None):
@@ -24,7 +25,7 @@ def _get_countries(locale):
     _countries = {country.alpha_2: getattr(country, 'common_name', country.name) for country in pycountry.countries}
     _countries = {code: locale.territories.get(code, name) for code, name in _countries.items()}
     _countries.update(config.CUSTOM_COUNTRIES)
-    return ImmutableDict(_countries)
+    return ImmutableDict(sorted(_countries.items(), key=lambda item: str_to_ascii(remove_accents(item[1]))))
 
 
 def get_country(code, locale=None):
