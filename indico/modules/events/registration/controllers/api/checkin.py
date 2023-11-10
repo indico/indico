@@ -15,6 +15,8 @@ from indico.modules.events.controllers.base import RHProtectedEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
+                                                        CheckinRegistrationSchema)
 from indico.web.args import use_kwargs
 from indico.web.rh import cors, json_errors, oauth_scope
 
@@ -35,7 +37,6 @@ class RHAPIEvent(RHAPICheckinBase):
             raise Forbidden()
 
     def _process(self):
-        from indico.modules.events.registration.schemas import CheckinEventSchema
         return CheckinEventSchema().jsonify(self.event)
 
 
@@ -43,7 +44,6 @@ class RHAPIRegForms(RHAPIEvent):
     """Manage registration forms."""
 
     def _process(self):
-        from indico.modules.events.registration.schemas import CheckinRegFormSchema
         regforms = (RegistrationForm.query
                     .with_parent(self.event)
                     .options(undefer('existing_registrations_count'), undefer('checked_in_registrations_count'))
@@ -66,7 +66,6 @@ class RHAPIRegForm(RHAPIRegFormBase):
     """Manage a single registration form."""
 
     def _process(self):
-        from indico.modules.events.registration.schemas import CheckinRegFormSchema
         return CheckinRegFormSchema().jsonify(self.regform)
 
 
@@ -74,7 +73,6 @@ class RHAPIRegistrations(RHAPIRegFormBase):
     """Manage registrations."""
 
     def _process(self):
-        from indico.modules.events.registration.schemas import CheckinRegistrationSchema
         registrations = (Registration.query.with_parent(self.regform)
                          .filter(~Registration.is_deleted)
                          .options(selectinload('data').joinedload('field_data'),
@@ -102,13 +100,10 @@ class RHAPIRegistration(RHAPIRegFormBase):
                              .first_or_404())
 
     def _process_GET(self):
-        from indico.modules.events.registration.schemas import CheckinRegistrationSchema
         return CheckinRegistrationSchema().jsonify(self.registration)
 
     @use_kwargs({'checked_in': fields.Bool(), 'paid': fields.Bool()})
     def _process_PATCH(self, checked_in=None, paid=None):
-        from indico.modules.events.registration.schemas import CheckinRegistrationSchema
-
         if checked_in is not None:
             self.registration.checked_in = checked_in
             signals.event.registration_checkin_updated.send(self.registration)
