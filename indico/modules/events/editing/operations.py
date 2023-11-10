@@ -34,8 +34,14 @@ from indico.util.i18n import _, orig_string
 from indico.web.flask.util import send_file
 
 
-FILE_TYPE_ATTRS = {'name': 'Name', 'extensions': 'Extensions', 'allow_multiple_files': 'Multiple files',
-                   'required': 'File required', 'publishable': 'Publishable', 'filename_template': 'Filename template'}
+FILE_TYPE_ATTRS = {
+    'name': {'title': 'Name', 'type': 'string'},
+    'extensions': 'Extensions',
+    'allow_multiple_files': 'Multiple files',
+    'required': 'File required',
+    'publishable': 'Publishable',
+    'filename_template': {'title': 'Filename template', 'type': 'string'},
+}
 
 
 class InvalidEditableState(BadRequest):
@@ -104,7 +110,7 @@ def _log_review(editable, kind, log_msg, old_state=None, was_published=None):
     log_fields = {'state': 'Editable State', 'published': 'Published'}
     changes = {}
     if old_state is not None and old_state != editable.state:
-        changes['state'] = (orig_string(old_state.title), orig_string(editable.state.title))
+        changes['state'] = (old_state, editable.state)
     if was_published is not None and was_published != (editable.published_revision is not None):
         changes['published'] = (was_published, editable.published_revision is not None)
     editable.log(EventLogRealm.reviewing, kind, 'Editing', log_msg,
@@ -325,7 +331,11 @@ def update_tag(tag, updates):
     changes = tag.populate_from_dict({k: v for k, v in updates.items() if v is not None})
     db.session.flush()
     logger.info('Tag %r updated by %r', tag, session.user)
-    log_fields = {'code': 'Code', 'title': 'Title', 'color': 'Color'}
+    log_fields = {
+        'code': {'title': 'Code', 'type': 'string'},
+        'title': {'title': 'Title', 'type': 'string'},
+        'color': {'title': 'Color', 'type': 'string'},
+    }
     tag.log(EventLogRealm.management, LogKind.change, 'Editing', f'Tag {tag.verbose_title} updated', session.user,
             data={'Changes': make_diff_log(changes, log_fields)})
 
