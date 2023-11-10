@@ -19,7 +19,7 @@ from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger
 from indico.modules.auth.util import redirect_to_login
 from indico.util.i18n import _
-from indico.web.errors import render_error
+from indico.web.errors import _need_json_response, render_error
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.util import ExpectedError
 
@@ -31,7 +31,7 @@ errors_bp = IndicoBlueprint('errors', __name__)
 def handle_forbidden(exc):
     if exc.response:
         return exc
-    if (session.user is None and not request.is_xhr and not request.is_json and request.blueprint != 'auth' and
+    if (session.user is None and not _need_json_response() and request.blueprint != 'auth' and
             not g.get('get_request_user_failed')):
         return redirect_to_login(reason=_('Please log in to access this page.'))
     return render_error(exc, _('Access Denied'), get_error_description(exc), exc.code)
