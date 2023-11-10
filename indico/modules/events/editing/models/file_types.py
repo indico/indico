@@ -86,6 +86,10 @@ class EditingFileType(db.Model):
     # - files (EditingRevisionFile.file_type)
     # - review_conditions (EditingReviewCondition.file_types)
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the file type."""
+        return self.event.log(*args, meta={'editing_file_type_id': self.id}, **kwargs)
+
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
                            publishable=False, filename_template=None, _text=self.name)

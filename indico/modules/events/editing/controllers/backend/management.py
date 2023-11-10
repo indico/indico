@@ -61,7 +61,7 @@ class RHEditTag(RHEditingManagementBase):
     def _process_PATCH(self, data):
         if self.tag.system and not self.is_service_call:
             raise Forbidden
-        update_tag(self.tag, **data)
+        update_tag(self.tag, data)
         return EditingTagSchema().jsonify(self.tag)
 
     def _process_DELETE(self):
