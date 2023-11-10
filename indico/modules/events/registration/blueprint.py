@@ -211,14 +211,14 @@ _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_reg
 
 
 # Check-in app API
-_bp.add_url_rule('!/api/checkin/event/<int:event_id>/', 'api_checkin_event', api_checkin.RHAPIEvent)
-_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/', 'api_checkin_regforms', api_checkin.RHAPIRegForms)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/', 'api_checkin_event', api_checkin.RHCheckinAPIEventDetails)
+_bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/', 'api_checkin_regforms', api_checkin.RHCheckinAPIRegForms)
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/', 'api_checkin_regform',
-                 api_checkin.RHAPIRegForm)
+                 api_checkin.RHCheckinAPIRegFormDetails)
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/',
-                 'api_checkin_registrations', api_checkin.RHAPIRegistrations)
+                 'api_checkin_registrations', api_checkin.RHCheckinAPIRegistrations)
 _bp.add_url_rule('!/api/checkin/event/<int:event_id>/forms/<int:reg_form_id>/registrations/<int:registration_id>',
-                 'api_checkin_registration', api_checkin.RHAPIRegistration, methods=('GET', 'PATCH'))
+                 'api_checkin_registration', api_checkin.RHCheckinAPIRegistration, methods=('GET', 'PATCH'))
 
 # Deprecated Check-in app API
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',

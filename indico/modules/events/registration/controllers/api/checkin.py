@@ -23,21 +23,21 @@ from indico.web.rh import cors, json_errors, oauth_scope
 @json_errors
 @cors
 @oauth_scope('registrants')
-class RHAPICheckinBase(RHManageEventBase):
+class RHCheckinAPIBase(RHManageEventBase):
     """Base class for the Check-in API."""
 
     PERMISSION = 'registration'
 
 
-class RHAPIEvent(RHAPICheckinBase):
-    """Manage a single event."""
+class RHCheckinAPIEventDetails(RHCheckinAPIBase):
+    """Get details about an event."""
 
     def _process(self):
         return CheckinEventSchema().jsonify(self.event)
 
 
-class RHAPIRegForms(RHAPICheckinBase):
-    """Manage registration forms."""
+class RHCheckinAPIRegForms(RHCheckinAPIBase):
+    """Get details about the registrations forms in an event."""
 
     def _process(self):
         regforms = (RegistrationForm.query
@@ -47,26 +47,26 @@ class RHAPIRegForms(RHAPICheckinBase):
         return CheckinRegFormSchema(many=True).jsonify(regforms)
 
 
-class RHAPIRegFormBase(RHAPICheckinBase):
-    """Base class for registration forms management."""
+class RHCheckinAPIRegFormBase(RHCheckinAPIBase):
+    """Base class for Check-in API endpoints for a specific regform."""
 
     def _process_args(self):
-        RHAPICheckinBase._process_args(self)
+        RHCheckinAPIBase._process_args(self)
         self.regform = (RegistrationForm.query
                         .with_parent(self.event)
                         .filter_by(id=request.view_args['reg_form_id'])
                         .first_or_404())
 
 
-class RHAPIRegForm(RHAPIRegFormBase):
-    """Manage a single registration form."""
+class RHCheckinAPIRegFormDetails(RHCheckinAPIRegFormBase):
+    """Get details about a specific registration form."""
 
     def _process(self):
         return CheckinRegFormSchema().jsonify(self.regform)
 
 
-class RHAPIRegistrations(RHAPIRegFormBase):
-    """Manage registrations."""
+class RHCheckinAPIRegistrations(RHCheckinAPIRegFormBase):
+    """Get details about all the registrations in a registration form."""
 
     def _process(self):
         registrations = (Registration.query.with_parent(self.regform)
@@ -78,8 +78,8 @@ class RHAPIRegistrations(RHAPIRegFormBase):
         return CheckinRegistrationSchema(many=True, exclude=('registration_data',)).jsonify(registrations)
 
 
-class RHAPIRegistration(RHAPIRegFormBase):
-    """Manage a single registration."""
+class RHCheckinAPIRegistration(RHCheckinAPIRegFormBase):
+    """Get full details for a specific registration or update it."""
 
     normalize_url_spec = {
         'locators': {
@@ -88,7 +88,7 @@ class RHAPIRegistration(RHAPIRegFormBase):
     }
 
     def _process_args(self):
-        RHAPIRegFormBase._process_args(self)
+        RHCheckinAPIRegFormBase._process_args(self)
         registration_id = request.view_args['registration_id']
         self.registration = (Registration.query
                              .with_parent(self.regform)
