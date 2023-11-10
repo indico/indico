@@ -5,13 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request, session
+from flask import request
 from sqlalchemy.orm import selectinload, undefer
 from webargs import fields
-from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
-from indico.modules.events.controllers.base import RHProtectedEventBase
+from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
@@ -24,23 +23,20 @@ from indico.web.rh import cors, json_errors, oauth_scope
 @json_errors
 @cors
 @oauth_scope('registrants')
-class RHAPICheckinBase(RHProtectedEventBase):
+class RHAPICheckinBase(RHManageEventBase):
     """Base class for the Check-in API."""
+
+    PERMISSION = 'registration'
 
 
 class RHAPIEvent(RHAPICheckinBase):
     """Manage a single event."""
 
-    def _check_access(self):
-        RHAPICheckinBase._check_access(self)
-        if not self.event.can_manage(session.user, permission='registration'):
-            raise Forbidden()
-
     def _process(self):
         return CheckinEventSchema().jsonify(self.event)
 
 
-class RHAPIRegForms(RHAPIEvent):
+class RHAPIRegForms(RHAPICheckinBase):
     """Manage registration forms."""
 
     def _process(self):
