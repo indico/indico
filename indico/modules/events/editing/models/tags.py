@@ -68,7 +68,7 @@ class EditingTag(db.Model):
 
     def log(self, *args, **kwargs):
         """Log with prefilled metadata for the tag."""
-        return self.event.log(*args, meta={'tag_id': self.id}, **kwargs)
+        return self.event.log(*args, meta={'editing_tag_id': self.id}, **kwargs)
 
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', system=False, _text=self.title)

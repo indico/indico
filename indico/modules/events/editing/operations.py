@@ -332,8 +332,8 @@ def update_tag(tag, updates):
 
 def delete_tag(tag):
     logger.info('Tag %r deleted by %r', tag, session.user)
-    db.session.delete(tag)
     tag.log(EventLogRealm.management, LogKind.negative, 'Editing', f'Tag {tag.verbose_title} deleted', session.user)
+    db.session.delete(tag)
 
 
 def create_new_file_type(event, editable_type, **data):
@@ -347,7 +347,7 @@ def create_new_file_type(event, editable_type, **data):
 
 
 def update_file_type(file_type, **data):
-    changes = file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS.keys())
+    changes = file_type.populate_from_dict(data, keys=FILE_TYPE_ATTRS)
     db.session.flush()
     logger.info('File type %r updated by %r', file_type, session.user)
     file_type.log(EventLogRealm.management, LogKind.change, 'Editing', f'File type {file_type.name} updated',
