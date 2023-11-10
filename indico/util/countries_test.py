@@ -7,7 +7,7 @@
 
 import pytest
 
-from indico.util.countries import get_countries, get_country
+from indico.util.countries import _get_countries, _get_country, get_countries, get_country
 
 
 class MockConfig:
@@ -15,6 +15,17 @@ class MockConfig:
         'XK': 'Kosovo',  # does not exist
         'TW': 'Taiwan, China',  # different name
     }
+
+
+@pytest.fixture(autouse=True)
+def _clear_country_cache():
+    # those utils are memoized and other test code may call them before/after the tests
+    # in here and we need to use our custom mocked data instead of old cached data
+    _get_country.cache_clear()
+    _get_countries.cache_clear()
+    yield
+    _get_country.cache_clear()
+    _get_countries.cache_clear()
 
 
 @pytest.mark.parametrize('country', list(MockConfig.CUSTOM_COUNTRIES))
@@ -25,6 +36,6 @@ def test_get_countries(mocker, country):
 
 
 @pytest.mark.parametrize('country', list(MockConfig.CUSTOM_COUNTRIES))
-def test_get_county(mocker, country):
+def test_get_country(mocker, country):
     mocker.patch('indico.util.countries.config', MockConfig())
     assert get_country(country) == MockConfig.CUSTOM_COUNTRIES[country]
