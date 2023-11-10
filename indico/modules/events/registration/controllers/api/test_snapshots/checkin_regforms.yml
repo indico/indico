@@ -1,0 +1,9 @@
+- checked_in_count: 1
+  end_dt: <timestamp>
+  event_id: <id>
+  id: <id>
+  introduction: ''
+  is_open: false
+  registration_count: 1
+  start_dt: <timestamp>
+  title: Registration Form
