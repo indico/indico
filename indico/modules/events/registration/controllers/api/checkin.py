@@ -42,6 +42,7 @@ class RHCheckinAPIRegForms(RHCheckinAPIBase):
     def _process(self):
         regforms = (RegistrationForm.query
                     .with_parent(self.event)
+                    .filter(~RegistrationForm.is_deleted)
                     .options(undefer('existing_registrations_count'), undefer('checked_in_registrations_count'))
                     .all())
         return CheckinRegFormSchema(many=True).jsonify(regforms)
@@ -54,7 +55,7 @@ class RHCheckinAPIRegFormBase(RHCheckinAPIBase):
         RHCheckinAPIBase._process_args(self)
         self.regform = (RegistrationForm.query
                         .with_parent(self.event)
-                        .filter_by(id=request.view_args['reg_form_id'])
+                        .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
                         .first_or_404())
 
 
