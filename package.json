@@ -11,7 +11,7 @@
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
     "@tinymce/tinymce-react": "^4.3.0",
     "ajv": "^8.11.0",
-    "axios": "^1.4.0",
+    "axios": "^1.6.0",
     "axios-hooks": "^4.0.0",
     "chartist": "^1.3.0",
     "clipboard": "^2.0.11",
