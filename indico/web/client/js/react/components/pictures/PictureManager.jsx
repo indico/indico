@@ -272,7 +272,7 @@ const PictureManager = ({
   const dropzone = useDropzone({
     onDropAccepted,
     disabled: disabled || (isUploading || failed || isCapturing || isEditing),
-    accept: ['.png', '.jpg', '.gif'],
+    accept: ['.png', '.jpg', '.gif', '.webp'],
     multiple: false,
     noClick: true,
     noKeyboard: true,
@@ -336,7 +336,7 @@ const PictureManager = ({
   };
   const descriptionText = minPictureSize
     ? Translate.string(
-        'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (.jpg, .png, .gif).',
+        'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (.jpg, .png, .gif, .webp)',
         {minPictureSize}
       )
     : Translate.string('Allowed file types: .jpg, .png, .gif');

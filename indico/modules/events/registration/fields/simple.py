@@ -399,11 +399,15 @@ class PictureField(FileField):
 
     def get_validators(self, existing_registration):
         def _picture_size_and_type(value):
-            min_picture_size = self.form_item.data.get('min_picture_size') or None
+            if not value:
+                return
             file = File.query.filter(File.uuid == value, ~File.claimed).first() if value else None
-            if file and file.content_type not in ('image/png', 'image/jpg', 'image/gif'):
-                raise ValidationError(_('This field can accept only .jpg, .png and .gif picture formats.'))
-            if file and min_picture_size:
+            if not file:
+                raise ValidationError('Invalid file')
+            if file.content_type not in ('image/png', 'image/jpg', 'image/gif', 'image/webp'):
+                raise ValidationError(_('This field can accept only .jpg, .png, .gif and .webp picture formats.'))
+            min_picture_size = self.form_item.data.get('min_picture_size')
+            if min_picture_size:
                 with Image.open(file.open()) as picture:
                     if min(picture.size) < min_picture_size:
                         raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
