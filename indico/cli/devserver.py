@@ -19,9 +19,10 @@ from werkzeug.serving import WSGIRequestHandler, run_simple
 
 
 def run_cmd(info, **kwargs):
-    if kwargs['reloader_type'] == 'watchfiles':
+    if kwargs.pop('reloader_type') == 'watchfiles':
         run_watchfiles()
         return
+
     run_server(info, **kwargs)
 
 
@@ -30,7 +31,7 @@ def run_watchfiles():
     Watchfiles().run()
 
 
-def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader_type):
+def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from):
     if port is None:
         port = 8443 if ssl else 8000
 
@@ -85,7 +86,7 @@ def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enab
 
     app = _make_wsgi_app(info, url, evalex_whitelist, proxy)
     run_simple(host, port, app,
-               reloader_type=reloader_type, use_reloader=(reloader_type != 'none'),
+               reloader_type='none', use_reloader=False,
                use_debugger=False, use_evalex=False, threaded=True, ssl_context=ssl_ctx,
                extra_files=extra_files, request_handler=QuietWSGIRequestHandler if quiet else None)
 
