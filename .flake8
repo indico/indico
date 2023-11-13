@@ -55,6 +55,14 @@ per-file-ignores =
     indico/util/decorators.py:N801
     # vendored code - don't care about naming in there
     indico/vendor/*.py:N
+    # Q000 is too strict on f-strings on python 3.12 - TODO remove once fixed upstream or when moving to ruff
+    indico/cli/python_upgrader.py:Q000
+    indico/cli/user.py:Q000
+    indico/modules/admin/notices.py:Q000
+    indico/modules/events/management/controllers/program_codes.py:Q000
+    indico/modules/users/controllers.py:Q000
+    indico/util/fs_test.py:Q000
+
 
 classmethod_decorators =
     classmethod
