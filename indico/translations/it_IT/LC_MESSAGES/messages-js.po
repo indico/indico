@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
+# Alessio Cosenza, 2023
 # Andrea Lenarduzzi <andreaussi@yahoo.it>, 2019
 # francesca.m <francesca.m.martelli@gmail.com>, 2014
 # michele michelotto <michelotto@pd.infn.it>, 2018-2019,2022
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Pierpaolo Gallo, 2023\n"
+"Last-Translator: Alessio Cosenza, 2023\n"
 "Language-Team: Italian (Italy) (http://app.transifex.com/indico/indico/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -90,7 +91,7 @@ msgstr "L'ordine della categoria è stato ripristinato"
 
 #: indico/modules/categories/client/js/management.js:61
 msgid "The category list has been sorted."
-msgstr "La lista della categoria è stata ordinata."
+msgstr "La lista delle categorie è stata ordinata."
 
 #: indico/modules/categories/client/js/management.js:184
 msgid "Delete category"

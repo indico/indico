@@ -6,6 +6,7 @@
 # francesca.m <francesca.m.martelli@gmail.com>, 2014
 # Giorgio Bartoccioni, 2023
 # michele michelotto <michelotto@pd.infn.it>, 2018
+# Pedro Ferreira <pedro.ferreira@cern.ch>, 2023
 # Pierpaolo Gallo, 2023
 # Segreteria AIUM <segreteria@aium.it>, 2023
 # Xhulja Oboni, 2023
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-07-20 15:21+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: Segreteria AIUM <segreteria@aium.it>, 2023\n"
+"Last-Translator: Pierpaolo Gallo, 2023\n"
 "Language-Team: Italian (Italy) (http://app.transifex.com/indico/indico/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1038,7 +1039,7 @@ msgid ""
 "HMAC signature) and you can (and should!) create one token for each "
 "script/application where you need to access the Indico API. To reduce the "
 "risk from a leaked token they also let you specify more fine-grained scopes."
-msgstr "Creare %(link_start)stoken API%(link_end)s: utilizzano un metodo di autenticazione più standard (autenticazione con token Bearer invece che con firma HMAC) e potete (e dovreste!) creare un token per ogni script/applicazione in cui dovete accedere all'API di Indico. Per ridurre il rischio di una fuga di token, consentono anche di specificare ambiti di applicazione più precisi."
+msgstr "Creare %(link_start)stoken API%(link_end)s: i token API utilizzano un metodo di autenticazione più standard (autenticazione con token Bearer invece che con firma HMAC). Puoi (dovresti!) creare un token per ogni script/applicazione in cui devi accedere all'API di Indico. In questo modo potrai specificare degli ambiti (scope) di applicazione più precisi, riducendo così il rischio di fuga di dati."
 
 #: indico/modules/api/templates/user_profile.html:39
 msgid "API Key"
@@ -1140,7 +1141,7 @@ msgid ""
 "a secret key that is unique per Indico user. If one of your links is "
 "compromised, you should click this button. All other links will be "
 "invalidated."
-msgstr "I link univoci basati su token sono URL segreti che Indico utilizza per consentire di recuperare facilmente i dati all'interno di altre applicazioni (ad esempio, i pianificatori di calendario tramite iCalendar). Sono generati attraverso una firma digitale basata su una chiave segreta che è unica per ogni utente di Indico. Se uno dei vostri link è compromesso, dovrete fare clic su questo pulsante. Tutti gli altri collegamenti saranno invalidati."
+msgstr "I link univoci basati su token sono URL segreti che Indico utilizza per consentire di recuperare facilmente i dati all'interno di altre applicazioni (ad esempio, i pianificatori di calendario tramite iCalendar). Sono generati attraverso una firma digitale basata su una chiave segreta che è unica per ogni utente di Indico. Se uno dei tuoi link è compromesso, dovrai fare clic su questo pulsante. Tutti gli altri collegamenti saranno invalidati."
 
 #: indico/modules/api/templates/user_profile.html:185
 msgid "Unblock API key"
@@ -1819,7 +1820,7 @@ msgstr "La richiesta di registrazione è stata ricevuta. Riceverai un'e-mail qua
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
-msgstr "Il vostro profilo Indico è stato registrato con successo. Controllate <a href=\"{url}\">il vostro profilo</a> per ulteriori dettagli e impostazioni."
+msgstr "Il tuo profilo Indico è stato registrato con successo. Controlla <a href=\"{url}\">il tuo profilo</a> per ulteriori dettagli e impostazioni."
 
 #: indico/modules/auth/controllers.py:358
 msgid "Local account added successfully"
@@ -2983,7 +2984,7 @@ msgid_plural ""
 "There are %(count)s event move requests %(link_start)spending "
 "moderation%(link_end)s."
 msgstr[0] "C'è %(count)s richiesta di spostamento di eventi %(link_start)s in attesa di valutazione %(link_end)s."
-msgstr[1] "Ci sono%(count)s richieste di spostamento di eventi %(link_start)s in attesa di valutazione %(link_end)s."
+msgstr[1] "Ci sono %(count)s richieste di spostamento di eventi %(link_start)s in attesa di valutazione %(link_end)s."
 msgstr[2] "Ci sono %(count)s richieste di spostamento di eventi %(link_start)s in attesa di valutazione %(link_end)s."
 
 #: indico/modules/categories/templates/display/category.html:40
@@ -3438,7 +3439,7 @@ msgid ""
 "By registering your Indico server with the community hub, you will receive "
 "news on the latest releases as well as important security advisories. The "
 "data in the form below will be sent to the community hub."
-msgstr "Registrando il vostro server Indico presso il Community Hub, riceverete notizie sulle ultime release e importanti avvisi di sicurezza. I dati riportati nel modulo sottostante saranno inviati al Community Hub."
+msgstr "Registrando il tuo server Indico presso il Community Hub, riceverai notizie sulle ultime release e importanti avvisi di sicurezza. I dati riportati nel modulo sottostante saranno inviati al Community Hub."
 
 #: indico/modules/cephalopod/templates/cephalopod.html:17
 msgid ""
@@ -4004,9 +4005,9 @@ msgid_plural ""
 "This template is used as the back side of %(link_start)s%(tpls_count)s "
 "templates%(link_end)s. The back side of those templates <strong>will be "
 "removed</strong> if the dimensions of this template change."
-msgstr[0] "Questo template è utilizzato come lato posteriore di %(link_start)sun altro template%(link_end)s. <strong>Il lato posteriore di queol template verrà rimosso</strong> se le dimensioni di questo template dovessero cambiare."
-msgstr[1] "Questo template è utilizzato come lato posteriore di %(link_start)s%(tpls_count)stemplate%(link_end)s. 1Il lato posteriore di questi template verrà rimosso1 se le dimensioni di questo template dovessero cambiare."
-msgstr[2] "Questo template è utilizzato come retro di %(link_start)s%(tpls_count)stemplate%(link_end)s. <strong>Il retro di questi template verrà rimosso</strong> se le dimensioni di questo template dovessero cambiare."
+msgstr[0] "Questo template è utilizzato come retro di %(link_start)s un altro template%(link_end)s. <strong>Il retro di quel template verrà rimosso</strong> se le dimensioni di questo template dovessero cambiare."
+msgstr[1] "Questo template è utilizzato come retro di %(link_start)s%(tpls_count)stemplate%(link_end)s. <strong>Il retro di quei template verrà rimosso</strong> se le dimensioni di questo template dovessero cambiare."
+msgstr[2] "Questo template è utilizzato come retro di %(link_start)s%(tpls_count)stemplate%(link_end)s. <strong>Il retro di quei template verrà rimosso</strong> se le dimensioni di questo template dovessero cambiare."
 
 #: indico/modules/designer/templates/template.html:54
 #, python-format
@@ -4386,7 +4387,7 @@ msgstr "Non ci sono relatori"
 
 #: indico/modules/events/fields.py:233
 msgid "Person with email '{}' is duplicated"
-msgstr "La persona con email '{}' è copiato"
+msgstr "La persona con email '{}' è già esistente (duplicato)"
 
 #: indico/modules/events/fields.py:246
 msgid "Category default"
@@ -4639,7 +4640,7 @@ msgstr "Concede i diritti di revisione degli abstract di un evento."
 #: indico/modules/events/abstracts/__init__.py:184
 #: indico/modules/events/papers/__init__.py:149
 msgid "Reviewing Area"
-msgstr "Sezione di revisione"
+msgstr "Area di revisione"
 
 #: indico/modules/events/abstracts/clone.py:20
 msgid "Call for Abstracts (settings, email templates, review questions)"
@@ -5774,7 +5775,7 @@ msgstr "Integrato"
 
 #: indico/modules/events/abstracts/models/abstracts.py:35
 msgid "Duplicate"
-msgstr "Duplicare"
+msgstr "Duplicato"
 
 #: indico/modules/events/abstracts/models/abstracts.py:49
 msgid "Awaiting Review"
@@ -6077,7 +6078,7 @@ msgstr "Per maggiori dettagli, visita la pagina del tuo abstract:"
 #: indico/modules/events/abstracts/templates/emails/default_submit_notification.txt:10
 #, python-format
 msgid "Kind regards,%(linebreak)s The organizers of {event_title}"
-msgstr "Cordiali saluti%(linebreak)sGli organizzatori di {event_title}"
+msgstr "Cordiali saluti, %(linebreak)sGli organizzatori di {event_title}"
 
 #: indico/modules/events/abstracts/templates/emails/default_invite_notification.txt:4
 msgid "Invitation to submit an abstract"
@@ -6866,7 +6867,7 @@ msgid ""
 "The abstract was accepted as <span class=\"abstract-contribution-"
 "type\">%(type)s</span> for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
-msgstr "L'abstract è stato accettato come <span class=\"abstract-contribution-type\">%(type)s</span>per la track%(track)s e un %(link_start)scontributo%(link_end)s è stato inserito nell'evento."
+msgstr "L'abstract è stato accettato come <span class=\"abstract-contribution-type\">%(type)s</span>per la track%(track)s  e un %(link_start)scontributo%(link_end)s è stato inserito nell'evento."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:238
 #, python-format
@@ -6881,7 +6882,7 @@ msgstr "L'abstract è stato accettato come <span class=\"abstract-contribution-t
 msgid ""
 "The abstract was accepted for track %(track)s and a "
 "%(link_start)scontribution%(link_end)s was created in the event."
-msgstr "L'abstract è stato accettato per la track%(track)s e un %(link_start)scontributo%(link_end)s è stato inserito nell'evento."
+msgstr "L'abstract è stato accettato per la track %(track)s e un %(link_start)scontributo%(link_end)s è stato inserito nell'evento."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:250
 #, python-format
@@ -6934,7 +6935,7 @@ msgstr "Ulteriori informazioni"
 msgid ""
 "<strong>%(name)s</strong> submitted this <span class=\"abstract-"
 "contribution-type\">%(type)s</span>"
-msgstr "<strong>%(name)s</strong>inviato questo<span class=\"abstract-contribution-type\">%(type)s</span>"
+msgstr "<strong>%(name)s</strong> ha presentato questo <span class=\"abstract-contribution-type\">%(type)s</span>"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:429
 #, python-format
@@ -6942,35 +6943,35 @@ msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s as <span class=\"abstract-contribution-"
 "type\">%(type)s</span>."
-msgstr "<strong>%(name)s</strong> ha inviato questo abstract e al termine della procedura è stato accetato per la track%(track)scome <span class=\"abstract-contribution-type\">%(type)s</span>."
+msgstr "<strong>%(name)s</strong> ha presentato questo abstract e al termine della procedura è stato accettato per la track%(track)s come <span class=\"abstract-contribution-type\">%(type)s</span>."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted as <span class=\"abstract-contribution-type\">%(type)s</span>."
-msgstr "<strong>%(name)s</strong>inviato questo abstract ed è stato finalmente accettato come<span class=\"abstract-contribution-type\">%(type)s</span>"
+msgstr "<strong>%(name)s</strong> ha presentato questo abstract e al termine della procedur è stato accettato come <span class=\"abstract-contribution-type\">%(type)s</span>"
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:443
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s."
-msgstr "<strong>%(name)s</strong> ha inviato questo abstract e al termine della procedura è stato accettato per la track%(track)s."
+msgstr "<strong>%(name)s</strong> ha presentato questo abstract e al termine della procedura è stato accettato per la track %(track)s."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:449
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted."
-msgstr "<strong>%(name)s</strong>ha inviato questo abstract e alla fine è stato accettato."
+msgstr "<strong>%(name)s</strong> ha presentato questo abstract e alla fine è stato accettato."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:463
 #, python-format
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was merged into "
 "another."
-msgstr "<strong>%(name)s</strong>ha inviato questo abstract, ma è stato fuso in un altro."
+msgstr "<strong>%(name)s</strong> ha inviato questo abstract, ma è stato fuso in un altro."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:469
 #: indico/modules/events/abstracts/templates/reviewing/public.html:480
@@ -6983,7 +6984,7 @@ msgstr "<a href=\"%(url)s\">Vai all'abstract</a>"
 msgid ""
 "<strong>%(name)s</strong> submitted this abstract but it was marked as "
 "duplicate of another."
-msgstr "<strong>%(name)s</strong>ha inviato questo abstract , ma è stato segnato come duplicato di un altro."
+msgstr "<strong>%(name)s</strong> ha inviato questo abstract , ma è stato segnato come duplicato di un altro."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:486
 #, python-format
@@ -7038,12 +7039,12 @@ msgstr "Questo abstract è stato segnato come duplicato"
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:13
 #, python-format
 msgid "Proposed to %(action)saccept%(endaction)s as %(type)s"
-msgstr "Proposto a %(action)s accettare  %(endaction)scome%(type)s"
+msgstr "Proposto a %(action)s accettare  %(endaction)s come %(type)s"
 
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:17
 #, python-format
 msgid "Proposed to %(action)saccept%(endaction)s"
-msgstr "Proposto di %(action)saccettare%(endaction)s"
+msgstr "Proposto di %(action)s accettare %(endaction)s"
 
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:22
 #, python-format
@@ -7366,7 +7367,7 @@ msgstr "Accordi firmati"
 #: indico/modules/events/agreements/templates/agreement_type_details.html:255
 #, python-format
 msgid "Rejection reason: %(reason)s"
-msgstr "Motivo di rifiuto%(reason)s"
+msgstr "Motivo del rifiuto %(reason)s"
 
 #: indico/modules/events/agreements/templates/agreement_type_details.html:275
 msgid "Download scanned agreement form"
@@ -8023,7 +8024,7 @@ msgstr "Gestire sottocontributi"
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:175
 #, python-format
 msgid "Subcontributions of contribution #%(id)s"
-msgstr "Sottocontributi di contributo%(id)s"
+msgstr "Sottocontributi di contributo %(id)s"
 
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:194
 #: indico/modules/events/papers/templates/_paper_list.html:139
@@ -8538,7 +8539,7 @@ msgstr "Non è possibile disconnettere l'evento dal servizio: {}"
 
 #: indico/modules/events/editing/controllers/backend/timeline.py:71
 msgid "No such file was found within the paper"
-msgstr "Non è stato trovato alcun file di questo tipo all'interno del articolo"
+msgstr "Non è stato trovato alcun file di questo tipo all'interno dell'articolo"
 
 #: indico/modules/events/editing/controllers/backend/timeline.py:102
 msgid "You cannot perform this action on this revision"
@@ -8623,11 +8624,11 @@ msgstr "Valutazione del nuovo editor"
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt:7
 #, python-format
 msgid "%(name)s has left a judgment to an editable you are submitter of."
-msgstr "%(name)s ha lasciato una valutazione per il testo di cui risulti proponente."
+msgstr "%(name)s ha inserito una valutazione per il testo di cui risulti proponente."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt:9
 msgid "Someone has left a judgment to an editable you are submitter of."
-msgstr "Qualcuno ha lasciato una valutazione per il testo di cui risulti proponente."
+msgstr "Qualcuno ha inserito una valutazione per il testo di cui risulti proponente."
 
 #: indico/modules/events/editing/templates/emails/submitter_confirmation_notification.txt:3
 msgid "Submitter confirmed changes"
@@ -8636,7 +8637,7 @@ msgstr "Modifiche confermate dal proponente"
 #: indico/modules/events/editing/templates/emails/submitter_confirmation_notification.txt:6
 #, python-format
 msgid "Your revision changes have been confirmed by %(name)s."
-msgstr "Le modifiche alla revisione sono state confermate da%(name)s"
+msgstr "Le modifiche alla revisione sono state confermate da %(name)s"
 
 #: indico/modules/events/editing/templates/emails/submitter_rejection_notification.txt:3
 msgid "Submitter rejected changes"
@@ -9814,7 +9815,7 @@ msgstr "Inviare e-mail"
 msgid ""
 "Created by %(name)s (%(email)s) from event on "
 "%(link_start)s%(date)s%(link_end)s"
-msgstr "Creato da%(name)s(%(email)s) dall'evento in%(link_start)s%(date)s%(link_end)s"
+msgstr "Creato da %(name)s (%(email)s) dall'evento in %(link_start)s%(date)s%(link_end)s"
 
 #: indico/modules/events/management/templates/_management_frame.html:20
 #, python-format
@@ -10022,7 +10023,7 @@ msgstr "Dove devono essere posizionati gli eventi?"
 msgid ""
 "%(lastday)s<strong>All cloned events will occur on the last day of the "
 "month.</strong>%(endlastday)s %(link)sWhen?%(endlink)s"
-msgstr "%(lastday)s<strong>Tutti gli eventi clonati si svolgeranno l'ultimo giorno del mese.</strong>%(endlastday)s%(link)sQuando?%(endlink)s"
+msgstr "%(lastday)s<strong>Tutti gli eventi clonati si svolgeranno l'ultimo giorno del mese.</strong>%(endlastday)s %(link)sQuando?%(endlink)s"
 
 #: indico/modules/events/management/templates/clone_event.html:110
 #: indico/modules/events/management/templates/import_event.html:70
@@ -10040,7 +10041,7 @@ msgid ""
 "Please note that if you delete the event you will lose all the information "
 "contained in it, %(strong)sincluding %(num_bookings)s Room "
 "Booking(s)%(endstrong)s linked to it. This operation is irreversible!"
-msgstr "Si prega di notare che se si elimina l'evento si perderanno tutte le informazioni in esso contenute, %(strong)s comprese%(num_bookings)sPrenotazione(i) della stanza%(endstrong)sad essa collegata. Questa operazione è irreversibile!"
+msgstr "Si prega di notare che se si elimina l'evento si perderanno tutte le informazioni in esso contenute, %(strong)s comprese %(num_bookings)sPrenotazione(i) della stanza%(endstrong)s ad essa collegata. Questa operazione è irreversibile!"
 
 #: indico/modules/events/management/templates/delete_event.html:12
 msgid ""
@@ -10053,7 +10054,7 @@ msgstr "Si prega di notare che se si elimina l'evento si perderanno tutte le inf
 msgid ""
 "You are about to <strong>delete</strong> the whole event "
 "<strong>%(event_title)s (%(event_date)s)</strong>"
-msgstr "State per <strong> cancellare </strong>l'intero evento<strong>%(event_title)s(%(event_date)s)</strong>"
+msgstr "State per <strong>cancellare</strong>l'intero evento<strong>%(event_title)s (%(event_date)s)</strong>"
 
 #: indico/modules/events/management/templates/delete_events.html:3
 msgid "Delete events"
@@ -10065,7 +10066,7 @@ msgid ""
 "Please note that if you delete the events you will lose all the information "
 "contained in them, %(strong)sincluding %(num_bookings)s Room "
 "Booking(s)%(endstrong)s. This operation is irreversible!"
-msgstr "Si prega di notare che se si eliminano gli eventi si perderanno tutte le informazioni in essi contenute, %(strong)s comprese%(num_bookings)sprenotazione(i) della stanza %(endstrong)s. Questa operazione è irreversibile!"
+msgstr "Si prega di notare che se si eliminano gli eventi si perderanno tutte le informazioni in essi contenute, %(strong)scomprese%(num_bookings)s prenotazione(i) della stanza%(endstrong)s. Questa operazione è irreversibile!"
 
 #: indico/modules/events/management/templates/delete_events.html:13
 msgid ""
@@ -10079,9 +10080,9 @@ msgid "You are about to <strong>delete</strong> the following event:"
 msgid_plural ""
 "You are about to <strong>delete</strong> the following "
 "<strong>%(count)s</strong> events:"
-msgstr[0] "State per <strong> cancellare </strong> il seguente evento:"
-msgstr[1] "State per <strong> cancellare </strong> i seguenti <strong>%(count)s</strong> eventi: "
-msgstr[2] "State per <strong> cancellare </strong> i seguenti <strong>%(count)s</strong> eventi:"
+msgstr[0] "Stai per <strong>cancellare</strong> il seguente evento:"
+msgstr[1] "Stai per <strong>cancellare</strong> i seguenti <strong>%(count)s</strong> eventi: "
+msgstr[2] "Stai per <strong>cancellare</strong> i seguenti <strong>%(count)s</strong> eventi:"
 
 #: indico/modules/events/management/templates/event_contact_info.html:6
 msgid "Contact/Support"
@@ -10141,7 +10142,7 @@ msgstr "Si prega di notare che se si blocca questo evento, non sarà più possib
 
 #: indico/modules/events/management/templates/lock_event.html:12
 msgid "You are about to lock this event!"
-msgstr "State per bloccare questo evento!"
+msgstr "Stai per bloccare questo evento!"
 
 #: indico/modules/events/management/templates/non_inheriting_objects.html:3
 msgid ""
@@ -10807,7 +10808,7 @@ msgid ""
 "Paper judges use this area to judge papers assigned to them.<br> As a "
 "manager you can see all papers in the %(link_start)smanagement "
 "area%(link_end)s."
-msgstr "I giudici dei articoli utilizzano quest'area per giudicare i articoli a loro assegnati. <br>Come manager potete vedere tutti i articoli nell'%(link_start)sarea di gestione%(link_end)s."
+msgstr "I giudici degli articoli utilizzano quest'area per giudicare gli articoli loro assegnati. <br>Come manager puoi vedere tutti gli articoli nell'%(link_start)sarea di gestione%(link_end)s."
 
 #: indico/modules/events/papers/templates/display/judging_area.html:35
 msgid "Judging deadline"
@@ -10829,7 +10830,7 @@ msgstr "L'area di revisione mostra i articoli per i quali siete revisore."
 msgid ""
 "Paper reviewers use this area to review papers assigned to them.<br> As a "
 "judge/manager there is nothing for you to do here."
-msgstr "I revisori dei articoli utilizzano quest'area per rivedere i articoli loro assegnati. Come giudice/manager non c'è niente che tu possa fare qui."
+msgstr "I revisori degli articoli utilizzano quest'area per rivedere gli articoli loro assegnati. Come giudice/manager non c'è niente che tu possa fare qui."
 
 #: indico/modules/events/papers/templates/display/reviewing_area.html:33
 msgid "Reviewing deadlines"
@@ -10859,20 +10860,20 @@ msgstr "Non ci sono più paper da sottoporre a revisione."
 
 #: indico/modules/events/papers/templates/display/reviewing_area.html:81
 msgid "Reviewed papers"
-msgstr "Contributi con revisione"
+msgstr "Articoli con revisione"
 
 #: indico/modules/events/papers/templates/display/reviewing_area.html:99
 msgid "You haven't reviewed any papers yet."
-msgstr "Non hai ancora fatto la revisione di alcun contributi."
+msgstr "Non hai ancora fatto la revisione di alcun articolo."
 
 #: indico/modules/events/papers/templates/display/select_contribution.html:6
 msgid "Select a contribution for which you wish to submit a paper."
-msgstr "Seleziona un tema per il quale desideri presentare un paper."
+msgstr "Seleziona un tema per il quale desideri presentare un articolo."
 
 #: indico/modules/events/papers/templates/emails/added_to_reviewing_team.html:3
 #: indico/modules/events/papers/templates/emails/added_to_reviewing_team.html:5
 msgid "Added in paper reviewing team"
-msgstr "Aggiunto al team di revisione dei contributi"
+msgstr "Aggiunto al team di revisione degli articoli"
 
 #: indico/modules/events/papers/templates/emails/added_to_reviewing_team.html:10
 #, python-format
@@ -10880,7 +10881,7 @@ msgid ""
 "You have been chosen as a %(strong)s%(title)s%(endstrong)s for the "
 "conference %(strong)s%(event_title)s%(endstrong)s in order to help with the "
 "paper reviewing process."
-msgstr "Sei stato scelto come %(strong)s%(title)s%(endstrong)s per la conferenza %(strong)s%(event_title)s%(endstrong)s per aiutare nel processo di revisione dei contributi."
+msgstr "Sei stato scelto come %(strong)s%(title)s%(endstrong)s per la conferenza %(strong)s%(event_title)s%(endstrong)s per aiutare nel processo di revisione degli articoli."
 
 #: indico/modules/events/papers/templates/emails/added_to_reviewing_team.html:15
 msgid ""
@@ -10892,12 +10893,12 @@ msgstr "Una volta che ci saranno alcuni articoli da giudicare, potrai farlo nell
 msgid ""
 "Once there are some papers for you to review, you will be able to do so in "
 "the reviewing area page:"
-msgstr "Una volta che ci saranno alcuni documenti da rivedere, potrai farlo nella pagina dell'area di revisione."
+msgstr "Una volta che ci saranno alcuni articoli da rivedere, potrai farlo nella pagina dell'area di revisione."
 
 #: indico/modules/events/papers/templates/emails/comment.html:3
 #: indico/modules/events/papers/templates/emails/comment.html:5
 msgid "New paper comment"
-msgstr "Aggiungi commento al contributi"
+msgstr "Aggiungi commento all'articolo"
 
 #: indico/modules/events/papers/templates/emails/comment.html:10
 #, python-format
@@ -10907,23 +10908,23 @@ msgstr "Gentile %(receiver)s,"
 #: indico/modules/events/papers/templates/emails/comment.html:11
 #, python-format
 msgid "%(name)s commented on the paper %(strong)s%(title)s%(endstrong)s:"
-msgstr "%(name)s ha commentato il articolo %(strong)s%(title)s%(endstrong)s :"
+msgstr "%(name)s ha commentato l'articolo %(strong)s%(title)s%(endstrong)s:"
 
 #: indico/modules/events/papers/templates/emails/comment.html:20
 msgid "You can reply to this comment from within the paper page:"
-msgstr "È possibile rispondere a questo commento all'interno della pagina del articolo:"
+msgstr "È possibile rispondere a questo commento all'interno della pagina dell'articolo:"
 
 #: indico/modules/events/papers/templates/emails/judgment_reset_to_author.html:3
 #: indico/modules/events/papers/templates/emails/judgment_reset_to_author.html:5
 msgid "Paper assessment withdrawn"
-msgstr "Assessment del contributo ritirato"
+msgstr "Assessment dell'articolo ritirato"
 
 #: indico/modules/events/papers/templates/emails/judgment_reset_to_author.html:11
 #, python-format
 msgid ""
 "Your paper %(strong)s%(title)s%(endstrong)s has been put back to review, "
 "after the assessment has been withdrawn."
-msgstr "Il tuo contributo %(strong)s%(title)s%(endstrong)s è stato rinviato dopo che la valutazione è stata ritirata."
+msgstr "Il tuo articolo %(strong)s%(title)s%(endstrong)s è stato rinviato dopo che la valutazione è stata ritirata."
 
 #: indico/modules/events/papers/templates/emails/judgment_reset_to_author.html:14
 #: indico/modules/events/papers/templates/emails/judgment_to_author.html:46
@@ -10940,7 +10941,7 @@ msgstr "Assessment del contributo"
 msgid ""
 "Your paper %(strong)s%(title)s%(endstrong)s has been "
 "%(strong)saccepted%(endstrong)s!"
-msgstr "Il tuo contributo %(strong)s%(title)s%(endstrong)s è stato %(strong)saccettato%(endstrong)s!\""
+msgstr "Il tuo articolo %(strong)s%(title)s%(endstrong)s è stato %(strong)saccettato%(endstrong)s!\""
 
 #: indico/modules/events/papers/templates/emails/judgment_to_author.html:15
 #: indico/modules/events/papers/templates/emails/judgment_to_author.html:20
@@ -10952,14 +10953,14 @@ msgstr "Non sono richieste ulteriori azioni."
 msgid ""
 "Your paper %(strong)s%(title)s%(endstrong)s has been "
 "%(strong)srejected%(endstrong)s."
-msgstr "Il vostro articolo%(strong)s%(title)s%(endstrong)s è stato%(strong)s rifiutato%(endstrong)s."
+msgstr "Il tuo articolo %(strong)s%(title)s%(endstrong)s è stato %(strong)srifiutato%(endstrong)s."
 
 #: indico/modules/events/papers/templates/emails/judgment_to_author.html:22
 #, python-format
 msgid ""
 "A judge has requested some %(strong)schanges%(endstrong)s to your paper "
 "%(strong)s%(title)s%(endstrong)s."
-msgstr "Un giudice ha richiesto alcune %(strong)smodifiche%(endstrong)s al vostro articolo%(strong)s%(title)s%(endstrong)s."
+msgstr "Un giudice ha richiesto alcune %(strong)smodifiche%(endstrong)s al tuo articolo %(strong)s%(title)s%(endstrong)s."
 
 #: indico/modules/events/papers/templates/emails/judgment_to_author.html:32
 #: indico/modules/events/papers/templates/emails/review_submission_to_judge.html:37
@@ -11010,7 +11011,7 @@ msgstr "Non sei più un %(strong)s%(role_title)s%(endstrong)s del contributo %(s
 msgid ""
 "You have been assigned as a %(strong)s%(role_title)s%(endstrong)s to the "
 "following papers:"
-msgstr "Sei stato assegnato come %(strong)s%(role_title)s%(endstrong)s dei seguenti contributi:"
+msgstr "Sei stato assegnato come %(strong)s%(role_title)s%(endstrong)s dei seguenti articoli:"
 
 #: indico/modules/events/papers/templates/emails/paper_assignment.html:45
 #, python-format
@@ -11100,7 +11101,7 @@ msgstr "Contributo sottoposto a revisione"
 msgid ""
 "A reviewer just left a review on the paper "
 "%(strong)s\"%(title)s\"%(endstrong)s."
-msgstr "Un revisore ha appena lasciato una revisione per il contributo %(strong)s\"%(title)s\"%(endstrong)s."
+msgstr "Un revisore ha appena inserito una revisione per il contributo %(strong)s\"%(title)s\"%(endstrong)s."
 
 #: indico/modules/events/papers/templates/emails/review_submission_to_judge.html:14
 #: indico/modules/events/papers/templates/emails/revision_submission_to_judge.html:4
@@ -11329,7 +11330,7 @@ msgstr "Inviare e-mail ai revisori degli articoli e ai giudici"
 
 #: indico/modules/events/papers/templates/management/overview.html:192
 msgid "Manage paper reviewing managers, reviewers and judges"
-msgstr "Gestire i manager della revisione dei articoli, i revisori e i giudici"
+msgstr "Gestisci i manager della revisione degli articoli, i revisori e i giudici"
 
 #: indico/modules/events/papers/templates/management/overview.html:194
 msgid "Teams"
@@ -11970,9 +11971,9 @@ msgstr "Elenco partecipanti"
 #: indico/modules/events/registration/__init__.py:161
 msgid "A registration has been linked to your account."
 msgid_plural "{n} registrations have been linked to your account."
-msgstr[0] "Una iscrizione è stata associata al vostro account."
-msgstr[1] "{n} iscrizioni sono stati associati al vostro account."
-msgstr[2] "{n} iscrizioni sono stati associati al vostro account."
+msgstr[0] "Un'iscrizione è stata associata al tuo account."
+msgstr[1] "{n} iscrizioni sono stati associate al tuo account."
+msgstr[2] "{n} iscrizioni sono stati associate al tuo account."
 
 #: indico/modules/events/registration/__init__.py:231
 msgid ""
@@ -12632,7 +12633,7 @@ msgstr "Riga {}: esiste già un invito per questo utente"
 
 #: indico/modules/events/registration/controllers/display.py:253
 msgid "Your invitation code is not valid."
-msgstr "Il vostro codice di invito non è valido."
+msgstr "Il tuo codice di invito non è valido."
 
 #: indico/modules/events/registration/controllers/display.py:257
 msgid "This invitation does not exist or has been withdrawn."
@@ -13268,7 +13269,7 @@ msgstr "La partecipazione a questo evento è moderata"
 
 #: indico/modules/events/registration/templates/display/regform_display.html:119
 msgid "The organizers will have to approve your application."
-msgstr "Gli organizzatori dovranno approvare la vostra applicazione."
+msgstr "Gli organizzatori dovranno approvare la tua candiatura."
 
 #: indico/modules/events/registration/templates/display/regform_list.html:10
 msgid "Available forms"
@@ -13319,7 +13320,7 @@ msgstr "Contatta l'amministratore dell'evento se cambi idea"
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:31
 msgid "Your registration is awaiting approval"
-msgstr "La vostra iscrizione è in attesa di approvazione "
+msgstr "La tua iscrizione è in attesa di approvazione "
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:34
 msgid "An event manager will manually validate it."
@@ -13331,7 +13332,7 @@ msgstr "L'iscrizione è in attesa di pagamento"
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:43
 msgid "Awaiting your payment."
-msgstr "In attesa del vostro pagamento."
+msgstr "In attesa del tuo pagamento."
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:45
 msgid "Awaiting payment confirmation."
@@ -13382,7 +13383,7 @@ msgid ""
 "I have read and accepted the %(link_start)sterms and conditions%(link_end)s "
 "and understand that by confirming this order I will be entering into a "
 "binding transaction."
-msgstr "Ho letto e accettato i%(link_start)s termini e le condizioni %(link_end)se sono consapevole che, confermando l'ordine, effettuerò una transazione vincolante. "
+msgstr "Ho letto e accettato i %(link_start)stermini e le condizioni%(link_end)s e sono consapevole che, confermando l'ordine, effettuerò una transazione vincolante. "
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:141
 msgid ""
@@ -13446,7 +13447,7 @@ msgstr "Gentile organizzatore,"
 msgid ""
 "There is a new registration for the event %(strong)s%(title)s%(endstrong)s "
 "under %(strong)s%(name)s%(endstrong)s."
-msgstr "C'è una nuova iscrizione per l'evento %(strong)s%(title)s%(endstrong)ssotto%(strong)s%(name)s%(endstrong)s."
+msgstr "C'è una nuova iscrizione per l'evento %(strong)s%(title)s%(endstrong)s sotto%(strong)s%(name)s%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:26
 msgid "To manage this registration form follow this link:"
@@ -13472,7 +13473,7 @@ msgstr "Si prega di notare che è in attesa di approvazione manuale da parte di 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:49
 #, python-format
 msgid "You can manage this registration %(link)shere%(endlink)s."
-msgstr "Potete gestire questo iscrizione%(link)squi%(endlink)s"
+msgstr "Puoi gestire questa iscrizione %(link)squi%(endlink)s"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:5
 #, python-format
@@ -13484,7 +13485,7 @@ msgstr "Registrazione per %(title)s"
 msgid ""
 "Thank you! Your registration for the event %(strong)s%(title)s%(endstrong)s "
 "%(at_time)s has been received."
-msgstr "Grazie! La tua registrazione all'evento %(strong)s%(title)s%(endstrong)s%(at_time)s è stata ricevuta."
+msgstr "Grazie! La tua registrazione all'evento %(strong)s%(title)s%(endstrong)s %(at_time)s è stata ricevuta."
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:32
 msgid "To manage your registration follow this link:"
@@ -13492,7 +13493,7 @@ msgstr "Per gestire la tua registrazione clicca sul link:"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:34
 msgid "Manage my registration"
-msgstr "Gestisci la registrazione"
+msgstr "Gestisci l'iscrizione"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:62
 msgid "Please note that this event requires manual approval."
@@ -13507,7 +13508,7 @@ msgstr "Riceverai una notifica quando il processo di registrazione sarà complet
 msgid ""
 "Please proceed to the checkout %(link)shere%(endlink)s in order to complete "
 "it."
-msgstr "Si prega di procedere al checkout%(link)squi%(endlink)s per completarlo."
+msgstr "Si prega di procedere al checkout %(link)squi%(endlink)s per completarlo."
 
 #: indico/modules/events/registration/templates/emails/registration_modification_to_managers.html:5
 #, python-format
@@ -13581,70 +13582,70 @@ msgstr "Iscrizione non pagata per %(title)s"
 msgid ""
 "The registration for the event %(strong)s%(title)s%(endstrong)s under "
 "%(strong)s%(name)s%(endstrong)s is now %(strong)scomplete%(endstrong)s."
-msgstr "L'iscrizione per l'evento %(strong)s%(title)s%(endstrong)ssotto%(strong)s%(name)s%(endstrong)sè ora %(strong)scompleto%(endstrong)s"
+msgstr "L'iscrizione per l'evento %(strong)s%(title)s%(endstrong)s sotto%(strong)s%(name)s%(endstrong)s al momento è %(strong)scompletata%(endstrong)s"
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:25
 #, python-format
 msgid ""
 "The registration for the event %(strong)s%(title)s%(endstrong)s under "
 "%(strong)s%(name)s%(endstrong)s is now %(strong)spending%(endstrong)s."
-msgstr "L'iscrizione per l'evento %(strong)s%(title)s%(endstrong)ssotto %(strong)s%(name)s%(endstrong)sè ora %(strong)sin sospeso%(endstrong)s."
+msgstr "L'iscrizione per l'evento %(strong)s%(title)s%(endstrong)s sotto %(strong)s%(name)s%(endstrong)s al momento è %(strong)sin sospeso%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:30
 #, python-format
 msgid ""
 "The registration for the event %(strong)s%(title)s%(endstrong)s under "
 "%(strong)s%(name)s%(endstrong)s is now %(strong)srejected%(endstrong)s."
-msgstr "L'iscrizione per l'evento%(strong)s%(title)s%(endstrong)ssotto%(strong)s%(name)s%(endstrong)sè ora %(strong)srifiutato%(endstrong)s."
+msgstr "L'iscrizione per l'evento%(strong)s%(title)s%(endstrong)s sotto%(strong)s%(name)s%(endstrong)s al momento è %(strong)srifiutata%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:35
 #, python-format
 msgid ""
 "The registration for the event %(strong)s%(title)s%(endstrong)s under "
 "%(strong)s%(name)s%(endstrong)s is now %(strong)swithdrawn%(endstrong)s."
-msgstr "L'iscrizione per l'evento%(strong)s%(title)s%(endstrong)ssotto%(strong)s%(name)s%(endstrong)sè ora %(strong)sritirato%(endstrong)s."
+msgstr "L'iscrizione per l'evento%(strong)s%(title)s%(endstrong)s sotto%(strong)s%(name)s%(endstrong)sal momento è %(strong)sritirata%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_managers.html:40
 #, python-format
 msgid ""
 "The registration for the event %(strong)s%(title)s%(endstrong)s under "
 "%(strong)s%(name)s%(endstrong)s is now %(strong)sunpaid%(endstrong)s."
-msgstr "L'iscrizione per l'evento%(strong)s%(title)s%(endstrong)ssotto%(strong)s%(name)s%(endstrong)sè ora %(strong)snon pagato%(endstrong)s."
+msgstr "L'iscrizione per l'evento%(strong)s%(title)s%(endstrong)s sotto%(strong)s%(name)s%(endstrong)sal momento è %(strong)snon pagata%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:20
 #, python-format
 msgid ""
 "Your registration for the event %(strong)s%(title)s%(endstrong)s %(at_time)s"
 " is now %(strong)scomplete%(endstrong)s."
-msgstr "La vostra iscrizione all'evento%(strong)s%(title)s%(endstrong)s%(at_time)sè ora %(strong)scompleta%(endstrong)s."
+msgstr "La tua iscrizione all'evento %(strong)s%(title)s%(endstrong)s %(at_time)s al momento è %(strong)scompletata%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:25
 #, python-format
 msgid ""
 "Your registration for the event %(strong)s%(title)s%(endstrong)s %(at_time)s"
 " is now %(strong)spending%(endstrong)s."
-msgstr "La vostra iscrizione all'evento%(strong)s%(title)s%(endstrong)s%(at_time)sè ora %(strong)sin sospeso%(endstrong)s."
+msgstr "La tua iscrizione all'evento %(strong)s%(title)s%(endstrong)s %(at_time)s al momento è %(strong)sin sospeso%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:30
 #, python-format
 msgid ""
 "Your registration for the event %(strong)s%(title)s%(endstrong)s %(at_time)s"
 " is now %(strong)srejected%(endstrong)s."
-msgstr "La vostra iscrizione all'evento%(strong)s%(title)s%(endstrong)s%(at_time)sè ora%(strong)srifiutato%(endstrong)s."
+msgstr "La tua iscrizione all'evento %(strong)s%(title)s%(endstrong)s %(at_time)s al momento è %(strong)srifiutata%(endstrong)s."
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:35
 #, python-format
 msgid ""
 "Your registration for the event %(strong)s%(title)s%(endstrong)s %(at_time)s"
 " is now %(strong)swithdrawn%(endstrong)s."
-msgstr "La tua registrazione per l'evento %(strong)s%(title)s%(endstrong)s%(at_time)sè stata %(strong)sannullata%(endstrong)s"
+msgstr "La tua registrazione per l'evento %(strong)s%(title)s%(endstrong)s %(at_time)s al momento è %(strong)sannullata%(endstrong)s"
 
 #: indico/modules/events/registration/templates/emails/registration_state_update_to_registrant.html:40
 #, python-format
 msgid ""
 "Your registration for the event %(strong)s%(title)s%(endstrong)s %(at_time)s"
 " is now %(strong)sunpaid%(endstrong)s."
-msgstr "La vostra iscrizione all'evento%(strong)s%(title)s%(endstrong)s%(at_time)sè ora%(strong)snon pagato%(endstrong)s."
+msgstr "La tua iscrizione all'evento %(strong)s%(title)s%(endstrong)s %(at_time)s al momento è %(strong)snon pagata%(endstrong)s."
 
 #: indico/modules/events/registration/templates/management/_invitation_list.html:6
 msgid "Pending invitations"
@@ -13902,9 +13903,9 @@ msgid "Tickets are currently not available for the selected registration."
 msgid_plural ""
 "Tickets are currently not available for %(count)s out of the %(total)s "
 "selected registrations."
-msgstr[0] "I biglietti non sono attualmente disponibili per l'iscrizione selezionato."
-msgstr[1] "I biglietti non sono attualmente disponibili per %(count)s delle%(total)s iscrizioni selezionate."
-msgstr[2] "I biglietti non sono attualmente disponibili per %(count)s delle %(total)s iscrizioni selezionate."
+msgstr[0] "Al momento non sono disponibili i biglietti per l'iscrizione selezionata."
+msgstr[1] "Al momento non sono disponibili i biglietti per %(count)s delle %(total)s iscrizioni selezionate."
+msgstr[2] "Al momento non sono disponibili i biglietti per %(count)s delle %(total)s iscrizioni selezionate."
 
 #: indico/modules/events/registration/templates/management/email.html:21
 #: indico/modules/events/reminders/templates/edit_reminder.html:26
@@ -13981,9 +13982,9 @@ msgid ""
 msgid_plural ""
 "Registrations will be permanently deleted %(count)s weeks after the event "
 "ended (on %(date)s)."
-msgstr[0] "Le registrazioni saranno cancellate definitivamente %(count)ssettimana dopo la terminazione dell'evento (in %(date)s)."
-msgstr[1] "Le registrazioni saranno cancellate definitivamente %(count)ssettimane dopo la terminazione dell'evento (in%(date)s)."
-msgstr[2] "Le registrazioni saranno cancellate definitivamente %(count)s settimane dopo la terminazione dell'evento ( in %(date)s)."
+msgstr[0] "Le registrazioni saranno cancellate definitivamente %(count)s settimana dopo il termine dell'evento (in %(date)s)."
+msgstr[1] "Le registrazioni saranno cancellate definitivamente %(count)s settimane dopo il termine dell'evento (in%(date)s)."
+msgstr[2] "Le registrazioni saranno cancellate definitivamente %(count)s settimane dopo il termine dell'evento ( in %(date)s)."
 
 #: indico/modules/events/registration/templates/management/regform.html:36
 msgid "Edit settings for this form."
@@ -14019,7 +14020,7 @@ msgstr "Inviti"
 
 #: indico/modules/events/registration/templates/management/regform.html:119
 msgid "Manage invitations to register for your event."
-msgstr "Gestire gli inviti a iscriversi al vostro evento."
+msgstr "Gestisci gli inviti a iscriversi al tuo evento."
 
 #: indico/modules/events/registration/templates/management/regform.html:134
 msgid "Tickets"
@@ -14149,7 +14150,7 @@ msgstr "Invitare persone"
 
 #: indico/modules/events/registration/templates/management/regform_invitations.html:24
 msgid "Invite people to register for your event."
-msgstr "Invitare persone a iscriversi al vostro evento."
+msgstr "Invita persone a iscriversi al tuo evento."
 
 #: indico/modules/events/registration/templates/management/regform_invitations.html:30
 msgid "Invite"
@@ -14627,7 +14628,7 @@ msgstr "Promemoria inviati"
 #: indico/modules/events/reminders/templates/emails/_agenda.txt:3
 #, python-format
 msgid "Agenda for %(title)s"
-msgstr "Agenda per%(title)s"
+msgstr "Agenda per %(title)s"
 
 #: indico/modules/events/reminders/templates/emails/_agenda.txt:6
 msgid "There are no events scheduled."
@@ -14660,7 +14661,7 @@ msgstr "È possibile accedere all'intero evento qui:"
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt:79
 #, python-format
 msgid "room %(r)s"
-msgstr "stanza%(r)s"
+msgstr "stanza %(r)s"
 
 #: indico/modules/events/reminders/templates/emails/event_reminder.txt:86
 msgid "Address:"
@@ -14711,7 +14712,7 @@ msgstr "Si è verificato un problema nel ritiro della richiesta ({0}). Si prega 
 
 #: indico/modules/events/requests/controllers.py:192
 msgid "You have withdrawn your request ({0})"
-msgstr "Avete ritirato la vostra richiesta ({0})"
+msgstr "Avete ritirato la tua richiesta ({0})"
 
 #: indico/modules/events/requests/templates/event_request_details.html:10
 msgid "Send request"
@@ -14745,7 +14746,7 @@ msgstr "La richiesta è stata rifiutata. Si prega di controllare il motivo del r
 msgid ""
 "You have withdrawn your request. If you need this service, please resubmit "
 "your request."
-msgstr "Avete ritirato la vostra richiesta. Se avete bisogno di questo servizio, siete pregati di inoltrare nuovamente la richiesta."
+msgstr "Hai ritirato la tua richiesta. Se hai bisogno di questo servizio, inoltra nuovamente la richiesta."
 
 #: indico/modules/events/requests/templates/emails/base_to_request_managers.txt:50
 #: indico/modules/events/requests/templates/event_request_details.html:68
@@ -14798,7 +14799,7 @@ msgstr "Richiesta accettata"
 #: indico/modules/events/requests/templates/emails/accepted_to_event_managers.txt:8
 #, python-format
 msgid "The %(title)s request for your event has been accepted."
-msgstr "La %(title)srichiesta per il vostro evento è stata accettata."
+msgstr "La %(title)srichiesta per il tuo evento è stata accettata."
 
 #: indico/modules/events/requests/templates/emails/accepted_to_request_managers.txt:4
 msgid "Accepted service request"
@@ -14866,12 +14867,12 @@ msgstr "Richiesta modificata"
 #: indico/modules/events/requests/templates/emails/new_modified_to_event_managers.txt:9
 #, python-format
 msgid "A %(title)s request for your event has been sent."
-msgstr "Una %(title)srichiesta per il vostro evento è stata inviata."
+msgstr "Una %(title)srichiesta per il tuo evento è stata inviata."
 
 #: indico/modules/events/requests/templates/emails/new_modified_to_event_managers.txt:11
 #, python-format
 msgid "A %(title)s request for your event has been modified."
-msgstr "Una %(title)srichiesta per il vostro evento è stata modificata."
+msgstr "Una %(title)srichiesta per il tuo evento è stata modificata."
 
 #: indico/modules/events/requests/templates/emails/new_modified_to_request_managers.txt:5
 msgid "New service request"
@@ -14916,7 +14917,7 @@ msgstr "Annullamento richiesto"
 #: indico/modules/events/requests/templates/emails/withdrawn_to_event_managers.txt:8
 #, python-format
 msgid "The %(title)s request for your event has been withdrawn."
-msgstr "La %(title)srichiesta per il vostro evento è stata ritirata."
+msgstr "La %(title)srichiesta per il tuo evento è stata ritirata."
 
 #: indico/modules/events/requests/templates/emails/withdrawn_to_request_managers.txt:4
 msgid "Withdrawn service request"
@@ -15657,7 +15658,7 @@ msgstr "Le tue risposte saranno inviate in forma anonima."
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:57
 msgid "Your answers will be associated with your account."
-msgstr "Le risposte saranno associate al vostro account."
+msgstr "Le risposte saranno associate al tuo account."
 
 #: indico/modules/events/surveys/templates/emails/new_submission_email.txt:5
 #, python-format
@@ -15788,7 +15789,7 @@ msgstr "Il questionario è privato"
 msgid ""
 "The survey is accessible only by people with this "
 "%(link_start)slink%(link_end)s"
-msgstr "Il sondaggio è accessibile solo alle persone con questo%(link_start)s link%(link_end)s"
+msgstr "Il sondaggio è accessibile solo alle persone con questo %(link_start)slink%(link_end)s"
 
 #: indico/modules/events/surveys/templates/management/survey.html:29
 msgid "Send survey links"
@@ -16226,7 +16227,7 @@ msgstr "Modifica %(name)sil tipo di ID esterno"
 #: indico/modules/events/templates/admin/_reference_type_list.html:27
 #, python-format
 msgid "Delete external ID type %(name)s?"
-msgstr "Cancellare il tipo di ID esterno%(name)s?"
+msgstr "Cancellare il tipo di ID esterno %(name)s?"
 
 #: indico/modules/events/templates/admin/_reference_type_list.html:28
 #, python-format
@@ -16282,7 +16283,7 @@ msgstr "Inserirlo di seguito."
 #: indico/modules/events/templates/display/access_key.html:15
 #, python-format
 msgid "Please %(link_start)slog in%(link_end)s or enter the key below."
-msgstr "Per cortesia%(link_start)s effettuare il login%(link_end)s o inserisci la chiave qui sotto. "
+msgstr "%(link_start)sEffettuare il login%(link_end)s o inserire la chiave di seguito. "
 
 #: indico/modules/events/templates/display/access_key.html:26
 #: indico/web/templates/error.html:19
@@ -16376,7 +16377,7 @@ msgstr "Editore di materiali"
 #: indico/modules/events/templates/display/common/_manage_button.html:52
 #, python-format
 msgid "Edit session block '%(title)s'"
-msgstr "Modifica blocco di sessione '%(title)s'"
+msgstr "Modifica blocco di sessione  '%(title)s'"
 
 #: indico/modules/events/templates/display/common/_manage_button.html:57
 #: indico/modules/events/timetable/templates/balloons/block.html:27
@@ -16407,7 +16408,7 @@ msgstr "Informazioni sulla privacy dell'evento"
 #: indico/modules/events/templates/display/conference/_util.html:9
 #, python-format
 msgid "%(start)s to %(end)s"
-msgstr "%(start)sa%(end)s"
+msgstr "%(start)s a %(end)s"
 
 #: indico/modules/events/templates/display/conference/base.html:37
 #, python-format
@@ -16569,7 +16570,7 @@ msgstr "Crea nuova conferenza"
 #: indico/modules/events/templates/management/_lists.html:3
 #, python-format
 msgid "%(displayed_num)s out of %(total_num)s displayed"
-msgstr "%(displayed_num)ssu%(total_num)svisualizzate"
+msgstr "%(displayed_num)s su %(total_num)s visualizzate"
 
 #: indico/modules/events/templates/management/_lists.html:11
 #, python-format
@@ -16583,7 +16584,7 @@ msgstr "Revisioni"
 #: indico/modules/events/templates/reviews/_common.html:8
 #, python-format
 msgid "On %(dt)s by %(name)s"
-msgstr "Il%(dt)sda%(name)s"
+msgstr "Il %(dt)s da %(name)s"
 
 #: indico/modules/events/templates/reviews/_common.html:9
 #: indico/modules/events/templates/reviews/_common.html:13
@@ -16604,7 +16605,7 @@ msgstr "Istruzioni per la valutazione"
 msgid ""
 "Please don't forget to read the %(link)sjudgment instructions%(endlink)s "
 "before taking your decision."
-msgstr "Si prega di non dimenticare di leggere%(link)s le istruzioni per il giudizio%(endlink)s prima di prendere una decisione."
+msgstr "Leggi le %(link)sistruzioni per il giudizio%(endlink)s prima di prendere una decisione."
 
 #: indico/modules/events/templates/reviews/_common.html:129
 msgid "Opening day"
@@ -16636,7 +16637,7 @@ msgstr "Istruzioni per la revisione"
 msgid ""
 "Please don't forget to read the %(link)sreviewing instructions%(endlink)s "
 "before submitting a review."
-msgstr "Si prega di non dimenticare di leggere%(link)s le istruzioni per la revisione%(endlink)s prima di inviare una revisione."
+msgstr "Leggi le %(link)sistruzioni per la revisione%(endlink)s prima di inviare una revisione."
 
 #: indico/modules/events/templates/reviews/forms.html:36
 #, python-format
@@ -16927,7 +16928,7 @@ msgstr "Blocco"
 #: indico/modules/events/timetable/templates/balloons/block.html:28
 #, python-format
 msgid "Edit session block %(title)s"
-msgstr "Modifica blocco di sessione%(title)s"
+msgstr "Modifica blocco di sessione %(title)s"
 
 #: indico/modules/events/timetable/templates/balloons/block.html:30
 msgid "Delete session block"
@@ -16936,12 +16937,12 @@ msgstr "Cancellare blocco di sessione"
 #: indico/modules/events/timetable/templates/balloons/block.html:31
 #, python-format
 msgid "Delete session block %(title)s?"
-msgstr "Cancellare blocco di sessione%(title)s?"
+msgstr "Cancellare blocco di sessione %(title)s?"
 
 #: indico/modules/events/timetable/templates/balloons/block.html:32
 #, python-format
 msgid "Are you sure you want to delete the session block %(title)s?"
-msgstr "Siete sicuri di voler cancellare il blocco di sessione%(title)s?"
+msgstr "Sei sicuro di voler cancellare il blocco di sessione %(title)s?"
 
 #: indico/modules/events/timetable/templates/balloons/block.html:58
 msgid "View session details"
@@ -17467,7 +17468,7 @@ msgstr[2] "Stai per <strong>cancellare</strong>il gruppo di rete <strong>%(name)
 msgid ""
 "You are about to <strong>delete</strong> the network group "
 "<strong>%(name)s</strong>."
-msgstr "State per <strong>cancellare</strong> il gruppo di rete <strong>%(name)s</strong>."
+msgstr "Stai per <strong>cancellare</strong> il gruppo di rete <strong>%(name)s</strong>."
 
 #: indico/modules/networks/templates/networks.html:14
 #, python-format
@@ -17763,7 +17764,7 @@ msgstr "Applicazioni autorizzate"
 #: indico/modules/oauth/templates/user_apps.html:12
 msgid ""
 "This is the list of applications you authorized to access your Indico data."
-msgstr "Questo è l'elenco delle applicazioni che avete autorizzato ad accedere ai vostri dati Indico."
+msgstr "Questo è l'elenco delle applicazioni che hai autorizzato ad accedere ai tuoi dati Indico."
 
 #: indico/modules/oauth/templates/user_apps.html:16
 msgid "No third party applications have been authorized."
@@ -17784,7 +17785,7 @@ msgstr "Ultimo utilizzo:"
 msgid ""
 "%(app_name)s will no longer have access to your Indico data. Are you sure "
 "you want to revoke its access?"
-msgstr "%(app_name)snon avrà più accesso ai vostri dati Indico. Siete sicuri di voler revocare il suo accesso?"
+msgstr "%(app_name)snon avrà più accesso ai tuoi dati Indico. Sei sicuro di voler revocare il tuo accesso?"
 
 #: indico/modules/oauth/templates/user_apps.html:41
 msgid "Revoke"
@@ -17816,7 +17817,7 @@ msgstr "Modifica il token '%(token_name)s'"
 #: indico/modules/oauth/templates/user_tokens.html:75
 #, python-format
 msgid "Last used from %(ip)s Total uses: %(count)s"
-msgstr "Ultimo utilizzo da%(ip)s Totale degli utilizzi%(count)s"
+msgstr "Ultimo utilizzo da %(ip)s Totale degli utilizzi%(count)s"
 
 #: indico/modules/oauth/templates/user_tokens.html:89
 msgid "Regenerate token"
@@ -18088,11 +18089,11 @@ msgstr "Blocco della stanza RIFIUTATO"
 
 #: indico/modules/rb/templates/emails/blockings/state_email_to_user.txt:16
 msgid "Your room blocking request has been ACCEPTED by a room manager."
-msgstr "La vostra richiesta di blocco della stanza è stata ACCETTATA da un manager della stanza."
+msgstr "La tua richiesta di blocco della stanza è stata ACCETTATA da un manager della stanza."
 
 #: indico/modules/rb/templates/emails/blockings/state_email_to_user.txt:18
 msgid "Your room blocking request has been REJECTED by a room manager."
-msgstr "La vostra richiesta di blocco della stanza è stata RIFIUTATA da un manager della stanza."
+msgstr "La tua richiesta di blocco della stanza è stata RIFIUTATA da un manager della stanza."
 
 #: indico/modules/rb/templates/emails/blockings/state_email_to_user.txt:24
 msgid "Action: ACCEPTED"
@@ -18104,7 +18105,7 @@ msgstr "Azione: RIFIUTATO"
 
 #: indico/modules/rb/templates/emails/blockings/state_email_to_user.txt:31
 msgid "You can view the details of your blocking here:"
-msgstr "È possibile visualizzare i dettagli del vostro blocco qui:"
+msgstr "È possibile visualizzare i dettagli del tuo blocco qui:"
 
 #: indico/modules/rb/templates/emails/reservations/base_email_to_manager.txt:10
 msgid "You can check the details of the booking here:"
@@ -18116,7 +18117,7 @@ msgstr "Dettagli della prenotazione:"
 
 #: indico/modules/rb/templates/emails/reservations/base_email_to_user.txt:13
 msgid "Remember you can always check your bookings here:"
-msgstr "Ricordate che potete sempre controllare le vostre prenotazioni qui:"
+msgstr "Ricorda che potrai sempre controllare le tue prenotazioni qui:"
 
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_manager.txt:3
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_user.txt:3
@@ -18131,7 +18132,7 @@ msgstr "Una prenotazione nella stanza '%(room)s' è stata CANCELLATA  dall'utent
 
 #: indico/modules/rb/templates/emails/reservations/cancellation_email_to_user.txt:8
 msgid "You have CANCELLED your booking:"
-msgstr "Avete CANCELLATO la vostra prenotazione:"
+msgstr "Avete CANCELLATO la tua prenotazione:"
 
 #: indico/modules/rb/templates/emails/reservations/change_state_email_to_manager.txt:3
 #: indico/modules/rb/templates/emails/reservations/change_state_email_to_user.txt:3
@@ -18160,7 +18161,7 @@ msgstr "[%(room)s] Prenotazione confermata (%(start)s)"
 #, python-format
 msgid ""
 "A booking in your room '%(room)s' has been CONFIRMED by a room manager."
-msgstr "Una prenotazione nella vostra camera '%(room)s' è stata CONFERMATA da un manager di stanza. "
+msgstr "Una prenotazione nella tua camera '%(room)s' è stata CONFERMATA da un manager di stanza. "
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_manager.txt:13
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt:15
@@ -18169,7 +18170,7 @@ msgstr "Il seguente messaggio è stato fornito dal manager della stanza: "
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt:10
 msgid "Your booking has been ACCEPTED."
-msgstr "La vostra prenotazione è stata ACCETTATA."
+msgstr "La tua prenotazione è stata ACCETTATA."
 
 #: indico/modules/rb/templates/emails/reservations/confirmation_email_to_user.txt:11
 msgid "This is the final confirmation."
@@ -18187,7 +18188,7 @@ msgstr "[%(room)s] Nuova prenotazione (%(start)s)"
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_manager.txt:19
 msgid "There is a new pre-booking for your room."
-msgstr "C'è una nuova prenotazione anticipata per la vostra stanza."
+msgstr "C'è una nuova prenotazione anticipata per la tua stanza."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_manager.txt:21
 msgid "There is a new booking for your room."
@@ -18203,7 +18204,7 @@ msgstr "[%(room)s] Prenotazione anticipata in attesa di accettazione (%(start)s)
 msgid ""
 "The conference room %(room)s%(linebreak)s has been pre-booked for "
 "%(name)s%(linebreak)s on %(date)s from %(from)s to %(to)s."
-msgstr "La sala conferenze %(room)s%(linebreak)sè stata prenotata in anticipo per %(name)s%(linebreak)s il%(date)sdalle%(from)salle%(to)s."
+msgstr "La sala conferenze %(room)s%(linebreak)s è stata prenotata in anticipo per %(name)s%(linebreak)s il %(date)s dalle %(from)s alle %(to)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt:29
 #, python-format
@@ -18211,14 +18212,14 @@ msgid ""
 "The conference room %(room)s%(linebreak)s has been pre-booked for "
 "%(name)s%(linebreak)s %(map)s from %(from)s to %(to)s between %(start)s and "
 "%(end)s."
-msgstr "La sala conferenza %(room)s%(linebreak)sè stata prenotata in anticipo per %(name)s%(linebreak)s%(map)sdalle%(from)salle%(to)stra%(start)se%(end)s."
+msgstr "La sala conferenza %(room)s%(linebreak)sè stata prenotata in anticipo per %(name)s%(linebreak)s %(map)s dalle %(from)s alle %(to)s tra %(start)s e %(end)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt:39
 #, python-format
 msgid ""
 "The conference room %(room)s%(linebreak)s has been booked for "
 "%(name)s%(linebreak)s on %(date)s from %(from)s to %(to)s."
-msgstr "La sala conferenza%(room)s%(linebreak)s è stata prenotata per%(name)s%(linebreak)s il %(date)s da%(from)sa%(to)s.  "
+msgstr "La sala conferenza%(room)s%(linebreak)s è stata prenotata per %(name)s%(linebreak)s il %(date)s da %(from)s a %(to)s.  "
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt:46
 #, python-format
@@ -18226,14 +18227,14 @@ msgid ""
 "The conference room %(room)s%(linebreak)s has been booked for "
 "%(name)s%(linebreak)s %(map)s from %(from)s to %(to)s between %(start)s and "
 "%(end)s."
-msgstr "La sala conferenza %(room)s%(linebreak)sè stata prenotata per%(name)s%(linebreak)s%(map)s da%(from)sa%(to)stra le%(start)se le%(end)s."
+msgstr "La sala conferenza %(room)s%(linebreak)s è stata prenotata per %(name)s%(linebreak)s %(map)s da %(from)s a %(to)s tra le  %(start)s e le %(end)s."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt:59
 #, python-format
 msgid ""
 "(Note that there are %(excluded)s excluded days. For further info, check "
 "your reservation.)"
-msgstr "(Si noti che ci sono %(excluded)sgiorni esclusi. Per ulteriori informazioni, controllare la vostra prenotazione)."
+msgstr "(NB Ci sono %(excluded)s giorni esclusi. Per ulteriori informazioni, controlla la tua prenotazione)."
 
 #: indico/modules/rb/templates/emails/reservations/creation_email_to_user.txt:64
 msgid ""
@@ -18257,7 +18258,7 @@ msgid ""
 "Your pre-booking is NOT YET ACCEPTED by a room manager. Please be aware that"
 " pre-bookings are subject to acceptance or rejection. Expect an e-mail with "
 "acceptance/rejection information."
-msgstr "La vostra prenotazione anticipata non è ancora stata accettata da un manager di stanza. Si prega di notare che le prenotazioni anticipate sono soggette ad accettazione o rifiuto. Aspettatevi un'e-mail con le informazioni sull'accettazione/rifiuto. "
+msgstr "La tua prenotazione anticipata non è ancora stata accettata da un manager di stanza. Si prega di notare che le prenotazioni anticipate sono soggette ad accettazione o rifiuto. Attendi un'e-mail con le informazioni sull'accettazione/rifiuto. "
 
 #: indico/modules/rb/templates/emails/reservations/modification_email_to_manager.txt:3
 #: indico/modules/rb/templates/emails/reservations/modification_email_to_user.txt:3
@@ -18284,12 +18285,12 @@ msgstr "[%(room)s] Prenotazione cancellata (%(start)s) ( SINGOLA OCCORRENZA)"
 msgid ""
 "The date %(date)s from a booking that concerns one of your rooms has been "
 "CANCELLED by the user."
-msgstr "La data %(date)s da una prenotazione che riguarda una delle vostre camere è stata CANCELLATA dall'utente."
+msgstr "La data %(date)s da una prenotazione che riguarda una delle tue camere è stata CANCELLATA dall'utente."
 
 #: indico/modules/rb/templates/emails/reservations/occurrence_cancellation_email_to_user.txt:9
 #, python-format
 msgid "You have CANCELLED an occurrence of your booking on %(date)s."
-msgstr "Avete CANCELLATO un occorrenza della vostra prenotazione su%(date)s."
+msgstr "Hai CANCELLATO un'occorrenza della tua prenotazione il %(date)s."
 
 #: indico/modules/rb/templates/emails/reservations/occurrence_rejection_email_to_manager.txt:3
 #: indico/modules/rb/templates/emails/reservations/occurrence_rejection_email_to_user.txt:3
@@ -18339,19 +18340,19 @@ msgstr "Come trovare una chiave:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/finishing_bookings.html:6
 msgid "One of your bookings will come to an end soon"
-msgstr "Una delle vostre prenotazioni terminerà presto."
+msgstr "Una delle tue prenotazioni terminerà presto."
 
 #: indico/modules/rb/templates/emails/reservations/reminders/finishing_bookings.html:8
 msgid "Some of your bookings will come to an end soon"
-msgstr "Alcune delle vostre prenotazioni termineranno presto."
+msgstr "Alcune delle tue prenotazioni termineranno presto."
 
 #: indico/modules/rb/templates/emails/reservations/reminders/finishing_bookings.html:16
 msgid "There is a booking under your name that will soon come to an end:"
-msgstr "C'è una prenotazione a vostro nome che presto terminerà:"
+msgstr "C'è una prenotazione a tuo nome che presto terminerà:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/finishing_bookings.html:18
 msgid "There are bookings under your name that will soon come to an end:"
-msgstr "Ci sono prenotazioni a vostro nome che presto termineranno:"
+msgstr "Ci sono prenotazioni a tuo nome che presto termineranno:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/finishing_bookings.html:39
 msgid "Reason of the booking:"
@@ -18363,11 +18364,11 @@ msgstr "Promemoria per la prenotazione"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html:10
 msgid "This is a reminder about a booking under your name:"
-msgstr "Questo è un promemoria su una prenotazione a vostro nome:"
+msgstr "Questo è un promemoria su una prenotazione a tuo nome:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html:12
 msgid "This is a reminder about bookings under your name:"
-msgstr "Questo è un promemoria sulle prenotazioni a vostro nome:"
+msgstr "Questo è un promemoria sulle prenotazioni a tuo nome:"
 
 #: indico/modules/rb/templates/emails/reservations/reminders/upcoming_occurrence.html:37
 #, python-format
@@ -18381,7 +18382,7 @@ msgstr "Se non avete bisogno di utilizzare la camera, siete pregati %(link)s di 
 msgid ""
 "If you do not need to use the room, please %(link)scancel the occurrence in "
 "Indico%(endlink)s."
-msgstr "Se non avete bisogno di utilizzare la stanza, siete pregati%(link)s di cancellare l'occorrenza a Indico%(endlink)s."
+msgstr "Se non avete bisogno di utilizzare la stanza, siete pregati %(link)s di cancellare l'occorrenza a Indico%(endlink)s."
 
 #: indico/modules/search/templates/category_search.html:6
 #, python-format
@@ -18437,7 +18438,7 @@ msgstr "Questo utente è segnato come in in sospeso, cioè è stato collegato a 
 
 #: indico/modules/users/controllers.py:237
 msgid "Your personal data was successfully updated."
-msgstr "I vostri dati personali sono stati aggiornati con successo."
+msgstr "I tuoi dati personali sono stati aggiornati con successo."
 
 #: indico/modules/users/controllers.py:318
 msgid "You cannot upload this file as profile picture."
@@ -18465,7 +18466,7 @@ msgstr "Questo token è per un altro account di Indico. Accedi con l'account cor
 
 #: indico/modules/users/controllers.py:502
 msgid "This email address is already attached to your account."
-msgstr "Questo indirizzo email è già allegato al vostro account."
+msgstr "Questo indirizzo email è già allegato al tuo account."
 
 #: indico/modules/users/controllers.py:504
 msgid "This email address is already in use by another account."
@@ -18896,7 +18897,7 @@ msgstr "Ultimo accesso"
 
 #: indico/modules/users/templates/dashboard.html:87
 msgid "Your unlisted events"
-msgstr "I vostri eventi non elencati"
+msgstr "I tuoi eventi non elencati"
 
 #: indico/modules/users/templates/dashboard.html:111
 msgid "Your events at hand"
@@ -18924,7 +18925,7 @@ msgstr "Potresti essere interessato alle seguenti categorie..."
 
 #: indico/modules/users/templates/dashboard.html:158
 msgid "Your categories"
-msgstr "Le vostre categorie"
+msgstr "Le tue categorie"
 
 #: indico/modules/users/templates/dashboard.html:163
 #: indico/modules/users/templates/dashboard.html:179
@@ -18943,7 +18944,7 @@ msgstr "Non sta succedendo nulla nelle tue categorie"
 msgid ""
 "Your <strong>primary email</strong> will be used for account-related "
 "notifications (e.g. registration emails and billing information)."
-msgstr "Il vostro <strong>email principale</strong> sarà utilizzato per le notifiche relative all'account (ad esempio, e-mail di iscrizione e informazioni di fatturazione)."
+msgstr "La tua <strong>email principale</strong> sarà utilizzata per le notifiche relative all'account (ad esempio, e-mail di iscrizione e informazioni di fatturazione)."
 
 #: indico/modules/users/templates/emails.html:21
 msgid "Primary"
@@ -19079,11 +19080,11 @@ msgstr "Gestire le richieste in sospeso:"
 
 #: indico/modules/users/templates/emails/registration_request_accepted.txt:3
 msgid "Your Indico profile has been created"
-msgstr "Il vostro profilo Indico è stato creato"
+msgstr "Il tuo profilo Indico è stato creato"
 
 #: indico/modules/users/templates/emails/registration_request_accepted.txt:11
 msgid "Your request to create an Indico profile has been approved."
-msgstr "La vostra richiesta di creare un profilo Indico è stata approvata."
+msgstr "La tua richiesta di creare un profilo Indico è stata approvata."
 
 #: indico/modules/users/templates/emails/registration_request_accepted.txt:12
 msgid "You may now log in to your new account:"
@@ -19107,7 +19108,7 @@ msgstr "Purtroppo la sua richiesta di creare un profilo Indico è stata negata."
 msgid ""
 "You recently added the e-mail address %(mail)s to your Indico account. "
 "Please click the following link to confirm this action."
-msgstr "Avete recentemente aggiunto l'indirizzo email %(mail)sal vostro account Indico. Cliccare sul seguente link per confermare l'operazione."
+msgstr "Hai recentemente aggiunto l'indirizzo email %(mail)s al tuo account Indico. Clicca sul seguente link per confermare l'operazione."
 
 #: indico/modules/vc/clone.py:36
 msgid "The target event already has a videoconference"
@@ -19348,7 +19349,7 @@ msgstr "Allega"
 #: indico/modules/vc/templates/manage_event_select.html:14
 #, python-format
 msgid "%(action)s %(plugin_name)s room"
-msgstr "%(action)s%(plugin_name)sstanza"
+msgstr "%(action)s %(plugin_name)s stanza"
 
 #: indico/modules/vc/templates/vc_room_list.html:20
 msgid "Videoconferences"
@@ -19679,22 +19680,22 @@ msgstr "Selezionare più volte"
 #, python-format
 msgid "Please select at least %(min)d option."
 msgid_plural "Please select at least %(min)d options."
-msgstr[0] "Per cortesia selezionare almeno%(min)d opzione."
-msgstr[1] "Per cortesia selezionare almeno %(min)dopzioni."
-msgstr[2] "Per cortesia selezionare almeno %(min)dopzioni."
+msgstr[0] "Selezionare almeno %(min)d opzione."
+msgstr[1] "Selezionare almeno %(min)d opzioni."
+msgstr[2] "Selezionare almeno %(min)d opzioni."
 
 #: indico/web/fields/choices.py:136
 #, python-format
 msgid "Please select no more than %(max)d option."
 msgid_plural "Please select no more than %(max)d options."
-msgstr[0] "Per cortesia selezionare non più di %(max)dopzione."
-msgstr[1] "Per cortesia selezionare non più di %(max)dopzioni."
-msgstr[2] "Per cortesia selezionare non più di %(max)d opzioni."
+msgstr[0] "Selezionare non più di %(max)d opzione."
+msgstr[1] "Selezionare non più di %(max)d opzioni."
+msgstr[2] "Selezionare non più di %(max)d opzioni."
 
 #: indico/web/fields/choices.py:139
 #, python-format
 msgid "Please select between %(min)d and %(max)d options."
-msgstr "Per cortesia selezionare tra %(min)de %(max)d  opzioni."
+msgstr "Selezionare tra %(min)d e %(max)d opzioni."
 
 #: indico/web/fields/simple.py:20
 msgid "Multiline"
@@ -19944,7 +19945,7 @@ msgstr "Questo oggetto è accessibile <strong>solo</strong> agli <strong>utenti 
 msgid ""
 "This object is not publicly accessible since "
 "<strong>%(parent_title)s</strong> (%(parent_type)s) is protected."
-msgstr "Questo oggetto non è accessibile al pubblico poiché<strong>%(parent_title)s</strong>(%(parent_type)s) è protetto."
+msgstr "Questo oggetto non è accessibile al pubblico poiché <strong>%(parent_title)s</strong> (%(parent_type)s) è protetto."
 
 #: indico/web/templates/_protection_messages.html:56
 #, python-format
@@ -19988,9 +19989,9 @@ msgid ""
 msgid_plural ""
 "The information on this page is restricted for display on the %(networks)s "
 "networks only."
-msgstr[0] "L'informazione in questa pagina è limitato alla visualizzazione solo sulla %(networks)s rete."
-msgstr[1] "L'informazione in questa pagina è limitato alla visualizzazione solo sulle%(networks)s reti."
-msgstr[2] "L'informazione in questa pagina è limitato alla visualizzazione solo sulle%(networks)s reti."
+msgstr[0] "La visualizzazione delle informazioni contenute in questa pagina è limitata alla rete %(networks)s."
+msgstr[1] "La visualizzazione delle informazioni contenute in questa pagina è limitata alle reti %(networks)s."
+msgstr[2] "La visualizzazione delle informazioni contenute in questa pagina è limitata alle reti %(networks)s."
 
 #: indico/web/templates/_session_bar.html:20
 msgid ""
@@ -20020,7 +20021,7 @@ msgstr "Utilizzare il fuso orario dell'evento/categoria"
 
 #: indico/web/templates/_session_bar.html:72
 msgid "Your default timezone"
-msgstr "Il vostro fuso orario predefinito"
+msgstr "Il tuo fuso orario predefinito"
 
 #: indico/web/templates/_session_bar.html:80
 msgid "Specify a timezone"
@@ -20241,13 +20242,13 @@ msgstr "Non sei autorizzato a prenotare questa sala."
 #: indico/web/templates/forms/markdown_widget.html:28
 #, python-format
 msgid "You can use %(markdown)s and %(latex)s math formulae."
-msgstr "È possibile utilizzare %(markdown)s e%(latex)s formule matematiche."
+msgstr "È possibile utilizzare formule matematiche %(markdown)s e %(latex)s."
 
 #: indico/web/templates/forms/markdown_widget.html:33
 #: indico/web/templates/forms/markdown_widget.html:67
 #, python-format
 msgid "You can use %(markdown)s."
-msgstr "Si può usare%(markdown)s."
+msgstr "Si può usare %(markdown)s."
 
 #: indico/web/templates/forms/markdown_widget.html:42
 #, python-format
@@ -20255,19 +20256,19 @@ msgid ""
 "Markdown is a lightweight markup language that makes it easier to write rich"
 " text content. Check the %(link_start)slanguage reference%(link_end)s for "
 "more information."
-msgstr "Markdown è un linguaggio di markup leggero che semplifica la scrittura di contenuti testuali ricchi. Controlla il%(link_start)s riferimento della lingua %(link_end)sper maggiori informazioni."
+msgstr "Markdown è un linguaggio di markup leggero che semplifica la scrittura di contenuti testuali ricchi. Controlla la %(link_start)sdocumentazione%(link_end)s per maggiori informazioni."
 
 #: indico/web/templates/forms/markdown_widget.html:51
 #, python-format
 msgid ""
 "You may write formulae using %(link_start)sLaTeX%(link_end)s (math mode "
 "only) by surrounding them in <code>$...$</code>."
-msgstr "È possibile scrivere formule utilizzando%(link_start)sLaTeX%(link_end)s (solo in modo matematico) circolandoli con<code>$...$</code>.,"
+msgstr "È possibile scrivere formule utilizzando %(link_start)sLaTeX%(link_end)s (solo in modo matematico) circolandoli con <code>$...$</code>.,"
 
 #: indico/web/templates/forms/markdown_widget.html:62
 #, python-format
 msgid "You can use %(markdown)s and %(latex)s formulae."
-msgstr "È possibile utilizzare%(markdown)se%(latex)sformule."
+msgstr "È possibile utilizzare formule %(markdown)s e %(latex)s."
 
 #: indico/web/templates/forms/multiple_items_widget.html:19
 msgid "Action"
@@ -20315,7 +20316,7 @@ msgstr "Generare il link iCalendar"
 #: indico/web/templates/overview/base.html:45
 #, python-format
 msgid "Your %(link_start)scalendar link%(link_end)s has been generated."
-msgstr "Il vostro%(link_start)s link al calendario%(link_end)s è stato generato."
+msgstr "Il tuo %(link_start)slink al calendario%(link_end)s è stato generato."
 
 #: indico/web/templates/overview/base.html:66
 msgid "No results found"
