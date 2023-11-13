@@ -37,7 +37,7 @@ def register_transaction(registration, amount, currency, action, provider=None, 
     :param currency: the currency used for the transaction
     :param action: the `TransactionAction` of the transaction
     :param provider: the payment method name of the transaction,
-                     or '_manual' if no payment method has been used
+                     or ``None`` if no payment method has been used
     :param data: arbitrary JSON-serializable data specific to the
                  transaction's provider
     """
@@ -48,8 +48,8 @@ def register_transaction(registration, amount, currency, action, provider=None, 
         db.session.flush()
         if new_transaction.status == TransactionStatus.successful:
             registration.update_state(paid=True)
-            notify_registration_state_update(registration)
+            notify_registration_state_update(registration, from_management=(provider is None))
         elif new_transaction.status == TransactionStatus.cancelled:
             registration.update_state(paid=False)
-            notify_registration_state_update(registration)
+            notify_registration_state_update(registration, from_management=(provider is None))
         return new_transaction

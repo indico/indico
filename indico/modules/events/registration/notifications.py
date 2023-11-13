@@ -29,8 +29,8 @@ def notify_invitation(invitation, email_subject, email_body, from_address):
 
 
 @make_interceptable
-def _notify_registration(registration, template_name, to_managers=False, attach_rejection_reason=False,
-                         diff=None, old_price=None):
+def _notify_registration(registration, template_name, *, to_managers=False, attach_rejection_reason=False,
+                         diff=None, old_price=None, allow_session_locale=False):
     from indico.modules.events.registration.util import get_ticket_attachments
     attachments = []
     regform = registration.registration_form
@@ -49,7 +49,8 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
         registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     )
     from_address = registration.registration_form.notification_sender_address if not to_managers else None
-    with registration.event.force_event_locale(registration.user if not to_managers else None):
+    with registration.event.force_event_locale(registration.user if not to_managers else None,
+                                               allow_session=allow_session_locale):
         tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
                                   attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price)
         mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
@@ -61,24 +62,26 @@ def _notify_registration(registration, template_name, to_managers=False, attach_
                log_metadata={'registration_id': registration.id})
 
 
-def notify_registration_creation(registration, notify_user=True):
+def notify_registration_creation(registration, *, from_management=False, notify_user=True):
     if notify_user:
-        _notify_registration(registration, 'registration_creation_to_registrant.html')
+        _notify_registration(registration, 'registration_creation_to_registrant.html',
+                             allow_session_locale=(not from_management))
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_creation_to_managers.html', to_managers=True)
 
 
-def notify_registration_modification(registration, notify_user=True, diff=None, old_price=None):
+def notify_registration_modification(registration, *, from_management=False, notify_user=True, diff=None,
+                                     old_price=None):
     if notify_user:
         _notify_registration(registration, 'registration_modification_to_registrant.html',
-                             diff=diff, old_price=old_price)
+                             diff=diff, old_price=old_price, allow_session_locale=(not from_management))
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_modification_to_managers.html', to_managers=True,
                              diff=diff, old_price=old_price)
 
 
-def notify_registration_state_update(registration, attach_rejection_reason=False):
+def notify_registration_state_update(registration, *, attach_rejection_reason=False, from_management=False):
     _notify_registration(registration, 'registration_state_update_to_registrant.html',
-                         attach_rejection_reason=attach_rejection_reason)
+                         attach_rejection_reason=attach_rejection_reason, allow_session_locale=(not from_management))
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)
