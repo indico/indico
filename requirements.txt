@@ -380,7 +380,7 @@ webencodings==0.5.1
     #   bleach
     #   html5lib
     #   tinycss2
-werkzeug==2.3.6
+werkzeug==2.3.8
     # via
     #   -r requirements.in
     #   flask

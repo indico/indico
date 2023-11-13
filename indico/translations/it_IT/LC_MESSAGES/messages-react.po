@@ -598,7 +598,7 @@ msgstr "Limita la visibilità di questo commento agli altri editor"
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:59
 #: indico/modules/events/papers/client/js/components/RevisionComment.jsx:55
 msgid "{userName} left a comment"
-msgstr "{userName} ha lasciato un commento"
+msgstr "{userName} ha inserito un commento"
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:66
 msgid "Visible only to editors"
@@ -1999,7 +1999,7 @@ msgstr "Il contributo deve essere rivisto."
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:68
 msgid "{reviewerName} left a review"
-msgstr "{reviewerName} ha lasciato una revisione"
+msgstr "{reviewerName} ha inserito una revisione"
 
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx:114
 msgid "Proposed to {actionName}accept{/actionName}"
@@ -2082,11 +2082,11 @@ msgstr "Non registrato"
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx:87
 msgid "This person submitted an abstract"
-msgstr "Questa persona ha inviato un abstract"
+msgstr "Questa persona ha presentato un abstract"
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx:88
 msgid "This person hasn't submitted any abstracts"
-msgstr "Questa persona non ha inviato alcun abstract"
+msgstr "Questa persona non ha presentato alcun abstract"
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx:115
 #: indico/modules/events/persons/client/js/AuthorsListButton.jsx:31

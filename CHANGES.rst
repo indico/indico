@@ -103,6 +103,12 @@ Version 3.2.9
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Update `Werkzeug <https://pypi.org/project/Werkzeug/>`_ library due to a
+  DoS vulnerability while parsing certain file uploads (:cve:`CVE-2023-46136`)
+
 Improvements
 ^^^^^^^^^^^^
 
