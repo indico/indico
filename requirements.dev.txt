@@ -253,7 +253,7 @@ urllib3==1.26.17
     #   requests
 watchfiles==0.19.0
     # via -r requirements.dev.in
-werkzeug==2.3.4
+werkzeug==2.3.8
     # via
     #   -c requirements.txt
     #   flask
