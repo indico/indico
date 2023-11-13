@@ -9,6 +9,7 @@ from datetime import date, datetime, time, timedelta
 
 import pytest
 import pytz
+from flask import session
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.events import Event
@@ -155,4 +156,23 @@ def test_force_event_locale(dummy_event, dummy_user, supported_locales, default_
     # Test without a user
     assert dummy_event.get_forced_event_locale() == (default_locale if enforce else None)
     with dummy_event.force_event_locale():
-        assert str(get_current_locale()) == (default_locale if enforce else 'en_GB')
+        assert str(get_current_locale()) == default_locale
+
+
+@pytest.mark.usefixtures('request_context')
+def test_force_event_locale_fallback(dummy_event):
+    session.lang = 'de_DE'
+    # no locale set
+    with dummy_event.force_event_locale():
+        assert str(get_current_locale()) == 'en_GB'
+    # no locale set, but session allowed
+    with dummy_event.force_event_locale(allow_session=True):
+        assert str(get_current_locale()) == 'de_DE'
+    # event locale set (but not globally enforced)
+    dummy_event.default_locale = 'fr_FR'
+    with dummy_event.force_event_locale():
+        assert str(get_current_locale()) == 'fr_FR'
+    # event locale set (but not globally enforced, and session allowed)
+    dummy_event.default_locale = 'fr_FR'
+    with dummy_event.force_event_locale(allow_session=True):
+        assert str(get_current_locale()) == 'de_DE'

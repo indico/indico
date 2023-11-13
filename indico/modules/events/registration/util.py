@@ -413,7 +413,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
     signals.event.registration_created.send(registration, management=management, data=data)
-    notify_registration_creation(registration, notify_user)
+    notify_registration_creation(registration, notify_user=notify_user, from_management=management)
     logger.info('New registration %s by %s', registration, user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      LogKind.positive, 'Registration',
@@ -482,7 +482,8 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
     new_data = snapshot_registration_data(registration)
     diff = diff_registration_data(old_data, new_data)
-    notify_registration_modification(registration, notify_user, diff=diff, old_price=old_price)
+    notify_registration_modification(registration, notify_user=notify_user, diff=diff, old_price=old_price,
+                                     from_management=management)
     logger.info('Registration %s modified by %s', registration, session.user)
     registration.log(EventLogRealm.management if management else EventLogRealm.participants,
                      LogKind.change, 'Registration',

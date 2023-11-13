@@ -122,6 +122,8 @@ Bugfixes
 - Always show exact matches when searching for existing videoconference rooms to attach to an
   event (:pr:`6022`)
 - Include materials linked to sessions in the material package (:pr:`6024`)
+- Use the correct locale when sending sending email notifications to others in an event
+  (:issue:`5987`, :pr:`6021`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

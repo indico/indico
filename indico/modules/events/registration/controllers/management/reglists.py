@@ -612,7 +612,8 @@ def _modify_registration_status(registration, approve, rejection_reason='', atta
         registration.rejection_reason = rejection_reason
         registration.update_state(rejected=True)
     db.session.flush()
-    notify_registration_state_update(registration, attach_rejection_reason)
+    notify_registration_state_update(registration, attach_rejection_reason=attach_rejection_reason,
+                                     from_management=True)
     status = 'approved' if approve else 'rejected'
     logger.info('Registration %s was %s by %s', registration, status, session.user)
 
@@ -652,7 +653,7 @@ class RHRegistrationReset(RHManageRegistrationBase):
             self.registration.update_state(rejected=False)
         elif self.registration.state == RegistrationState.withdrawn:
             self.registration.update_state(withdrawn=False)
-            notify_registration_state_update(self.registration)
+            notify_registration_state_update(self.registration, from_management=True)
         else:
             raise BadRequest(_('The registration cannot be reset in its current state.'))
         self.registration.checked_in = False
@@ -693,7 +694,7 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
         self.registration.update_state(withdrawn=True)
         flash(_('The registration has been withdrawn.'), 'success')
         logger.info('Registration %r was withdrawn by %r', self.registration, session.user)
-        notify_registration_state_update(self.registration)
+        notify_registration_state_update(self.registration, from_management=True)
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
