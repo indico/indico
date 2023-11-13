@@ -18,7 +18,6 @@ pytest-snapshot
 pytest
 pyquotes
 pyupgrade
-pywatchman; python_version < '3.10'  # not compatible with python 3.10 - https://github.com/facebook/watchman/issues/970
 sphinx-autobuild
 sphinx-issues
 sphinx-rtd-theme

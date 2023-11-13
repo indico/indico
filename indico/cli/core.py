@@ -84,20 +84,13 @@ def maint():
 
 
 @cli.command(context_settings={'ignore_unknown_options': True, 'allow_extra_args': True}, add_help_option=False)
-@click.option('--watchman', is_flag=True, help='Run celery inside watchman auto-reloader')
 @click.option('--watchfiles', is_flag=True, help='Run celery inside watchfiles auto-reloader')
 @click.pass_context
-def celery(ctx, watchman=False, watchfiles=False):
+def celery(ctx, watchfiles=False):
     """Manage the Celery task daemon."""
     from indico.core.celery.cli import celery_cmd
 
-    if watchman and watchfiles:
-        raise click.UsageError('--watchman and --watchfiles are mutually exclusive')
-    elif watchman:
-        from .devserver import run_watchman
-        run_watchman()
-        return
-    elif watchfiles:
+    if watchfiles:
         from .devserver import run_watchfiles
         run_watchfiles()
         return
@@ -151,7 +144,7 @@ def cleanup(temp, cache, verbose, dry_run, min_age):
               help='Restrict the debugger shell to the given ips (can be used multiple times)')
 @click.option('--proxy', is_flag=True, help='Use the ip and protocol provided by the proxy.')
 @click.option('--reloader', 'reloader_type',
-              type=click.Choice(['auto', 'none', 'stat', 'watchdog', 'watchman', 'watchfiles']),
+              type=click.Choice(['auto', 'none', 'stat', 'watchdog', 'watchfiles']),
               default='watchfiles', help='The type of auto-reloader to use.')
 @pass_script_info
 def run(info, **kwargs):

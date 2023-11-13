@@ -18,32 +18,11 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.serving import WSGIRequestHandler, run_simple
 
 
-try:
-    import pywatchman
-except ImportError:
-    pywatchman = None
-
-
 def run_cmd(info, **kwargs):
-    if kwargs['reloader_type'] == 'watchman':
-        if pywatchman is None:
-            print('watchman is not available - you need to `pip install pywatchman`')
-            return
-        run_watchman()
-        return
-    elif kwargs['reloader_type'] == 'watchfiles':
+    if kwargs['reloader_type'] == 'watchfiles':
         run_watchfiles()
         return
     run_server(info, **kwargs)
-
-
-def run_watchman():
-    from .watchman import Watchman
-    try:
-        Watchman().run()
-    except pywatchman.WatchmanError as exc:
-        from indico.util.console import cformat
-        print(cformat('%{red!}watchman error: {}').format(exc))
 
 
 def run_watchfiles():
@@ -151,7 +130,7 @@ def _make_indico_dispatcher(wsgi_app, path):
 
 
 # Taken from Flask - it was removed, but we want to keep the initial-lazy-loading
-# behavior to ensure fast startup e.g. after a watchman reload
+# behavior to ensure fast startup e.g. after a reload from a file change watcher
 class DispatchingApp:
     """
     Special application that dispatches to a Flask application which
