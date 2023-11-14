@@ -39,6 +39,7 @@ type(
         success: function(data) {
           if (data) {
             self.timetable._updateDay(data.update);
+            handleFlashes(data);
           }
         },
       });
