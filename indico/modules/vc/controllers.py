@@ -58,14 +58,14 @@ def process_vc_room_association(plugin: IndicoPlugin, event: Event, vc_room: VCR
             existing = {x.vc_room for x in q}
 
     if event_vc_room.link_type != VCRoomLinkType.event and existing:
-        db.session.rollback()
         flash(_("There is already a videoconference attached to '{link_object_title}'.").format(
             link_object_title=resolve_title(event_vc_room.link_object)), 'error')
+        db.session.rollback()
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
-        db.session.rollback()
         flash(_('This {plugin_name} room is already attached to the event.').format(plugin_name=plugin.friendly_name),
               'error')
+        db.session.rollback()
         return None
     else:
         return event_vc_room
