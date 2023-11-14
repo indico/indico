@@ -18,6 +18,7 @@ pytest-snapshot
 pytest
 pyquotes
 pyupgrade
+ruff
 sphinx-autobuild
 sphinx-issues
 sphinx-rtd-theme

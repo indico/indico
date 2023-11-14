@@ -1,0 +1,177 @@
+target-version = 'py39'
+line-length = 120
+preview = true
+dummy-variable-rgx = '^(_{2,}|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$' # a single `_` is already used for i18n
+
+extend-exclude = ['.*/', 'docs', 'htmlcov', '*.egg-info', 'indico.conf']
+
+select = [
+    'E',      # pycodestyle
+    'F',      # pyflakes
+    'N',      # pep8-naming
+    'Q',      # flake8-quotes
+    'RUF',    # ruff
+    'UP',     # pyupgrade
+    'D',      # pydocstyle
+    'S',      # flake8-bandit
+    'C4',     # flake8-comprehensions
+    'INT',    # flake8-gettext
+    'LOG',    # flake8-logging
+    'G',      # flake8-logging-format
+    'B',      # flake8-bugbear
+    'A001',   # flake8-builtins
+    'COM',    # flake8-commas
+    'T10',    # flake8-debugger
+    'EXE',    # flake8-executable
+    'ISC',    # flake8-implicit-str-concat
+    'PIE',    # flake8-pie
+    'PT',     # flake8-pytest-style
+    'RSE',    # flake8-raise
+    'RET504', # flake8-return
+    'SIM',    # flake8-simplify
+    'TID',    # flake8-tidy-imports
+    'PGH',    # pygrep-hooks
+    'PL',     # pylint
+    'TRY',    # tryceratops
+    'PERF',   # perflint
+    'FURB',   # refurb
+    # 'ERA',  # eradicate -- too many FPs for now, see https://github.com/astral-sh/ruff/issues/6100
+]
+ignore = [
+    'E226',    # allow omitting whitespace around arithmetic operators
+    'E731',    # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
+    'N818',    # not all our exceptions are errors
+    'RUF012',  # ultra-noisy and dicts in classvars are very common
+    'RUF015',  # not always more readable, and we don't do it for huge lists
+    'D205',    # too many docstrings which have no summary line
+    'D301',    # https://github.com/astral-sh/ruff/issues/8696
+    'D1',      # we have way too many missing docstrings :(
+    'D401',    # too noisy (but maybe useful to go through at some point)
+    'D412',    # we do not use section, and in click docstrings those blank lines are useful
+    'S101',    # we use asserts outside tests, and do not run python with `-O` (also see B011)
+    'S113',    # enforcing timeouts would likely require config in some places - maybe later
+    'S311',    # false positives, it does not care about the context
+    'S324',    # all our md5/sha1 usages are for non-security purposes
+    'S603',    # useless, triggers on *all* subprocess calls: https://github.com/astral-sh/ruff/issues/4045
+    'S607',    # we trust the PATH to be sane
+    'B011',    # we don't run python with `-O` (also see S101)
+    'B904',    # very similar to TRY200 ("possibly useful but too noisy")
+    'COM812',  # trailing commas on multiline lists are nice, but we have 2.5k violations
+    'PIE807',  # `lambda: []` is much clearer for `load_default` in schemas
+    'PT004',   # pretty weird + not a pytest convention: https://github.com/astral-sh/ruff/issues/8796
+    'PT005',   # ^ likewise
+    'PT011',   # very noisy
+    'PT015',   # nice for tests but not so nice elsewhere
+    'PT018',   # ^ likewise
+    'SIM102',  # sometimes nested ifs are more readable
+    'SIM103',  # sometimes this is more readable (especially when checking multiple conditions)
+    'SIM105',  # try-except-pass is faster and people are used to it
+    'SIM108',  # noisy ternary
+    'SIM114',  # sometimes separate ifs are more readable (especially if they just return a bool)
+    'SIM117',  # nested context managers may be more readable
+    'SIM300',  # https://github.com/astral-sh/ruff/issues/6956
+    'PLC0415', # local imports are there for a reason
+    'PLR09',   # too-many-<whatever> is just noisy
+    'PLR0913', # very noisy
+    'PLR2004', # extremely noisy and generally annoying
+    'PLR6201', # sets are faster (by a factor of 10!) but it's noisy and we're in nanoseconds territory
+    'PLR6301', # extremely noisy and generally annoying
+    'PLW0108', # a lambda often makes it more clear what you actually want
+    'PLW1510', # we often do not care about the status code of commands
+    'PLW1514', # we expect UTF8 environments everywhere
+    'PLW1641', # false positives with SA comparator classes
+    'PLW2901', # noisy and reassigning to the loop var is usually intentional
+    'PLW3201', # TODO remove after updating to ruff>=1.0.7
+    'TRY002',  # super noisy, and those exceptions are pretty exceptional anyway
+    'TRY003',  # super noisy and also useless w/ werkzeugs http exceptions
+    'TRY200',  # possibly useful but too noisy (also see B904)
+    'TRY300',  # kind of strange in many cases
+    'TRY301',  # sometimes doing that is actually useful
+    'TRY400',  # not all exceptions need exception logging
+    'PERF203', # noisy, false positives, and not applicable for 3.11+
+    'FURB113', # less readable
+    'FURB140', # less readable and actually slower in 3.12+
+]
+
+extend-safe-fixes = [
+    'RUF005',  # we typically don't deal with objects overriding `__add__` ir `__radd__`
+    'C4',      # they seem pretty safe
+    'UP008',   # ^ likewise
+    'D200',    # ^ likewise
+    'D400',    # ^ likewise
+    'PT014',   # duplicate test case parametrizations are never intentional
+    'RSE102',  # we do not use `raise func()` (with `func` returning the exception instance)
+    'RET504',  # looks pretty safe
+    'SIM110',  # ^ likewise
+    'PERF102', # ^ likewise
+]
+
+[format]
+quote-style = 'single'
+
+[flake8-builtins]
+builtins-ignorelist = ['id', 'format', 'input', 'type', 'credits']
+
+[flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+parametrize-names-type = 'tuple'
+parametrize-values-type = 'tuple'
+parametrize-values-row-type = 'tuple'
+
+[flake8-quotes]
+inline-quotes = 'single'
+multiline-quotes = 'single'
+docstring-quotes = 'double'
+avoid-escape = true
+
+[pep8-naming]
+ignore-names = [
+    '_process_GET',
+    '_process_POST',
+    '_process_PATCH',
+    '_process_PUT',
+    '_process_DELETE',
+]
+classmethod-decorators = [
+    'classmethod',
+    'declared_attr',
+    'strict_classproperty',
+    'expression',
+    'comparator',
+]
+
+[pydocstyle]
+convention = 'pep257'
+
+[pylint]
+# TODO enable after updating to ruff>=1.0.7
+# allow-dunder-method-names = ['__table_args__', '__tablename__', '__clause_element__']
+
+[per-file-ignores]
+# signals use wildcard imports to expose everything in `indico.core.signals`
+'indico/core/signals/event/__init__.py' = ['E402', 'F403', 'F401']
+'indico/core/signals/__init__.py' = ['F403', 'F401']
+# allow long lines in migrations (only do that for raw SQL please)
+'indico/migrations/versions/*.py' = ['E501', 'D400']
+# allow stuff that's useful in tests
+'indico/*_test.py' = ['E221', 'E241', 'E272', 'N802', 'S105', 'S106', 'PLC1901']
+# sphinx config has many commented-out variables with no space after `#`
+'docs/source/conf.py' = ['E265']
+# legacy code with camelCase
+'indico/web/http_api/*.py' = ['N802', 'N803', 'N806']
+'indico/modules/events/api.py' = ['N802', 'N803', 'N806']
+'indico/modules/events/agreements/api.py' = ['N802']
+'indico/modules/events/notes/api.py' = ['N802']
+'indico/modules/rb/api.py' = ['N802']
+'indico/modules/attachments/api/hooks.py' = ['N802']
+'indico/modules/users/api.py' = ['N802']
+# the config class has some properties that are basically constants
+'indico/core/config.py' = ['N802']
+# custom sqlalchemy constructs commonly use lowercase class names
+'indico/core/db/sqlalchemy/custom/*.py' = ['N801']
+'indico/util/decorators.py' = ['N801']
+# latex generation is much more readable without curly braces used for formatting
+'indico/util/mdx_latex.py' = ['UP031']
+# vendored code - don't care about most stuff in there
+'indico/vendor/*.py' = ['N', 'F841', 'UP', 'D', 'PIE', 'TID252', 'TRY']

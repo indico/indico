@@ -100,6 +100,7 @@ Internal Changes
 - Remove watchman reloader support, use watchfiles instead (:pr:`5978`)
 - Improve ``indico i18n`` CLI to support plugin-related i18n operations (:issue:`5906`, :pr:`5961`,
   thanks :user:`SegiNyn`)
+- Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
 
 
 ----

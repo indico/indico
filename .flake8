@@ -60,6 +60,8 @@ per-file-ignores =
     indico/cli/user.py:Q000
     indico/modules/admin/notices.py:Q000
     indico/modules/events/management/controllers/program_codes.py:Q000
+    indico/modules/events/payment/forms.py:Q000
+    indico/modules/events/registration/forms.py:Q000
     indico/modules/users/controllers.py:Q000
     indico/util/fs_test.py:Q000
 
