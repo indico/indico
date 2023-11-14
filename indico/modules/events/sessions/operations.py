@@ -37,8 +37,7 @@ def create_session_block(session_, data):
     block.populate_from_dict(data)
     db.session.flush()
     session_.event.log(EventLogRealm.management, LogKind.positive, 'Sessions',
-                       'Session block "{}" for session "{}" has been created'
-                       .format(block.title, session_.title), session.user,
+                       f'Session block "{block.title}" for session "{session_.title}" has been created', session.user,
                        meta={'session_block_id': block.id})
     logger.info('Session block %s created by %s', block, session.user)
     return block

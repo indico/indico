@@ -47,4 +47,4 @@ class InvitationLinkPlaceholder(Placeholder):
     @classmethod
     def render(cls, invitation, **kwargs):
         url = url_for('.display_regform', invitation.locator.uuid, _external=True)
-        return Markup('<a href="{0}">{0}</a>'.format(url))
+        return Markup(f'<a href="{url}">{url}</a>')

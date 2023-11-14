@@ -630,9 +630,8 @@ def _mapper_configured():
     def _set_timetable_entry(target, value, *unused):
         if value is None:
             target.session_block = None
-        else:
-            if target.session is not None:
-                target.session_block = value.parent.session_block
+        elif target.session is not None:
+            target.session_block = value.parent.session_block
 
     @listens_for(Contribution.duration, 'set')
     def _set_duration(target, value, oldvalue, *unused):
@@ -645,12 +644,12 @@ def _mapper_configured():
 
 @listens_for(Contribution.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = '''
+    sql = f'''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE OF event_id, session_id, session_block_id, duration
-        ON {}
+        ON {target.fullname}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('contribution');
-    '''.format(target.fullname)
+    '''
     DDL(sql).execute(conn)

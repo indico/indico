@@ -120,4 +120,4 @@ def test_update_registration(dummy_event, dummy_regform, dummy_reg, auth_headers
     resp = test_client.patch(url, json={'paid': False}, headers=auth_headers)
     assert not dummy_reg.is_paid
     assert not resp.json['is_paid']
-    assert not resp.json['state'] == 'unpaid'
+    assert resp.json['state'] != 'unpaid'

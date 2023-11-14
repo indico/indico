@@ -77,15 +77,15 @@ def main():
                       help='Port to listen on')
     parser.add_option('-d', '--debug', action='store_true', dest='debug', help='Debug mode')
     parser.add_option('--force-evalex', action='store_true', dest='evalex',
-                      help='Enable evalex (remote code execution) even when listening on a host' +
-                           ' that is not localhost - use with care!')
+                      help='Enable evalex (remote code execution) even when listening on a host '
+                           'that is not localhost - use with care!')
     parser.add_option('-I', '--allow-ip', dest='allowed_ips', action='append',
                       help='Only allow the given IP to access the script. Can be used multiple times.')
     parser.add_option('-i', '--indico', dest='indico_url', default='https://indico.cern.ch',
                       help='The base URL of your indico installation')
     parser.add_option('-a', '--apikey', dest='api_key', help='The API key to use')
     parser.add_option('-s', '--secretkey', dest='secret_key', help='The secret key to use')
-    options, args = parser.parse_args()
+    options = parser.parse_args()[0]
 
     use_evalex = options.debug
     if options.host not in ('::1', '127.0.0.1'):

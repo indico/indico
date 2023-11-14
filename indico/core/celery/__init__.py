@@ -48,7 +48,7 @@ def _load_default_modules(app, **kwargs):
 
 @import_modules.connect
 def _import_modules(*args, **kwargs):
-    import indico.core.emails  # noqa: F401
+    import indico.core.emails  # noqa: F401,RUF100
     import indico.util.tasks  # noqa: F401
     signals.core.import_tasks.send()
 

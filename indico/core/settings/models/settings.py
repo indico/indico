@@ -25,7 +25,7 @@ class Setting(JSONSettingsBase, CoreSettingsMixin, db.Model):
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
-        return db.UniqueConstraint('module', 'name'),
+        return (db.UniqueConstraint('module', 'name'),)
 
     @declared_attr
     def __table_args__(cls):

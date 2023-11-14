@@ -425,7 +425,7 @@ class Room(ProtectionManagersMixin, db.Model):
         if order:  # pragma: no cover
             query = query.order_by(*order)
 
-        keys = ('room',) + tuple(args)
+        keys = ('room', *args)
         return (dict(zip(keys, row if args else [row])) for row in query)
 
     @staticmethod
@@ -526,10 +526,10 @@ class Room(ProtectionManagersMixin, db.Model):
 
         criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
         for group in user.local_groups:
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
+            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,  # noqa: PERF401
                                     RoomPrincipal.local_group_id == group.id))
         for group in user.iter_all_multipass_groups():
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
+            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,  # noqa: PERF401
                                     RoomPrincipal.multipass_group_provider == group.provider.name,
                                     db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
 

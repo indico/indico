@@ -128,8 +128,7 @@ class VCRoom(db.Model):
 
 class VCRoomEventAssociation(db.Model):
     __tablename__ = 'vc_room_events'
-    __table_args__ = tuple(_make_checks()) + (db.Index(None, 'data', postgresql_using='gin'),
-                                              {'schema': 'events'})
+    __table_args__ = (*_make_checks(), db.Index(None, 'data', postgresql_using='gin'), {'schema': 'events'})
 
     #: Association ID
     id = db.Column(

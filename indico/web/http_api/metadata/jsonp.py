@@ -14,6 +14,6 @@ class JSONPSerializer(JSONSerializer):
     _mime = 'application/javascript'
 
     def _execute(self, results):
-        return '// fetched from Indico\n%s(%s);' % \
-               (self._query_params.get('jsonp', 'read'),
-                super()._execute(results))
+        func = self._query_params.get('jsonp', 'read')
+        res = super()._execute(results)
+        return f'// fetched from Indico\n{func}({res});'

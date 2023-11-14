@@ -18,8 +18,7 @@ def create_person():
     """Return a callable which lets you create AgreementPersonInfo."""
 
     def _create_person(name, email, data=None):
-        person = AgreementPersonInfo(name=name, email=email, data=data)
-        return person
+        return AgreementPersonInfo(name=name, email=email, data=data)
 
     return _create_person
 

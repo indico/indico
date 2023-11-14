@@ -53,7 +53,7 @@ def main(ci):
             source = [line.rstrip('\n') for line in f]
         new_source = []
         in_class = in_backrefs = backrefs_written = False
-        for i, line in enumerate(source):
+        for line in source:
             if in_backrefs:
                 if not backrefs_written:
                     _write_backrefs(rels, new_source)
@@ -68,9 +68,8 @@ def main(ci):
                 elif line and not line.startswith(' ' * 4):
                     # end of the indented class block
                     in_class = False
-            else:
-                if line.startswith(f'class {cls.__name__}('):
-                    in_class = True
+            elif line.startswith(f'class {cls.__name__}('):
+                in_class = True
             new_source.append(line)
         if in_backrefs and not backrefs_written:
             _write_backrefs(rels, new_source)

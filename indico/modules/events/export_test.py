@@ -5,11 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import os
 import tarfile
 import uuid
 from datetime import datetime, timedelta
 from io import BytesIO
+from pathlib import Path
 
 import pytest
 import yaml
@@ -59,8 +59,7 @@ def test_event_export(db, dummy_event, monkeypatch):
     export_event(dummy_event, f)
     f.seek(0)
 
-    with open(os.path.join(os.path.dirname(__file__), 'export_test_1.yaml')) as ref_file:
-        data_yaml_content = ref_file.read()
+    data_yaml_content = (Path(__file__).parent / 'export_test_1.yaml').read_text()
 
     # check composition of tarfile and data.yaml content
     with tarfile.open(fileobj=f) as tarf:
@@ -112,9 +111,7 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
 
 @pytest.mark.usefixtures('static_indico_version')
 def test_event_import(db, dummy_user):
-    with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml')) as ref_file:
-        data_yaml_content = ref_file.read()
-
+    data_yaml_content = (Path(__file__).parent / 'export_test_2.yaml').read_text()
     data_yaml = BytesIO(data_yaml_content.encode())
     tar_buffer = BytesIO()
 

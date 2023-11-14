@@ -308,10 +308,7 @@ class TimetableEntry(db.Model):
 
     def is_parallel(self, in_session=False):
         siblings = self.siblings if not in_session else self.session_siblings
-        for sibling in siblings:
-            if overlaps((self.start_dt, self.end_dt), (sibling.start_dt, sibling.end_dt)):
-                return True
-        return False
+        return any(overlaps((self.start_dt, self.end_dt), (sibling.start_dt, sibling.end_dt)) for sibling in siblings)
 
     def move(self, start_dt):
         """Move the entry to start at a different time.
@@ -339,14 +336,14 @@ class TimetableEntry(db.Model):
 
 @listens_for(TimetableEntry.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = '''
+    sql = f'''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE
-        ON {}
+        ON {target.fullname}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('timetable_entry');
-    '''.format(target.fullname)
+    '''
     DDL(sql).execute(conn)
 
 

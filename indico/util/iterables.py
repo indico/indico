@@ -10,7 +10,7 @@ from itertools import groupby, islice
 
 
 def group_list(data, key=None, sort_by=None, sort_reverse=False):
-    return {group: sorted(list(items), key=sort_by, reverse=sort_reverse)
+    return {group: sorted(items, key=sort_by, reverse=sort_reverse)
             for group, items in groupby(sorted(data, key=key), key=key)}
 
 

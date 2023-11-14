@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# ruff: noqa: E501
+
 import pytest
 from markdown import Markdown
 
@@ -25,7 +27,7 @@ def test_escape_math():
     assert latex_escape(r'$\\\extranaughty$') == r'\protect $\\\\extranaughty$'
 
 
-@pytest.mark.parametrize(('input', 'expected'), [
+@pytest.mark.parametrize(('input', 'expected'), (
     ('\nplain text\n', 'plain text'),
     ('plain text with reserved characters &^{}', r'plain text with reserved characters \&\^{}\{\}'),
     ('**bold text**', r'\textbf{bold text}'),
@@ -39,7 +41,7 @@ def test_escape_math():
     ('\tCode sample with reserved chars &{}', '\\begin{verbatim}\nCode sample with reserved chars \\&\\{\\}\n\\end{verbatim}'),
     ('## Plain Heading ##', r'\subsection{Plain Heading}'),
     ('## Heading with reserved chars &{} ##', r'\subsection{Heading with reserved chars \&\{\}}'),
-])
+))
 def test_convert_markdown_to_latex(input, expected):
     md = Markdown(safe_mode='remove')
     _latex_md = LaTeXExtension(configs={'apply_br': True})

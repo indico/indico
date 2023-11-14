@@ -106,7 +106,7 @@ def test_sha256token_check(password):
 def test_bcryptpassword_fail_bytes():
     pw = BCryptPassword(md5('foo'))
     with pytest.raises(TypeError) as exc_info:
-        pw == b'foo'
+        pw == b'foo'  # noqa: B015
     assert str(exc_info.value) == "password must be str, not <class 'bytes'>"
 
 

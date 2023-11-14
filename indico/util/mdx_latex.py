@@ -148,8 +148,7 @@ def unescape_html_entities(text):
     out = text.replace('&amp;', '&')
     out = out.replace('&lt;', '<')
     out = out.replace('&gt;', '>')
-    out = out.replace('&quot;', '"')
-    return out
+    return out.replace('&quot;', '"')
 
 
 def latex_escape(text, ignore_math=True, ignore_braces=False):
@@ -179,7 +178,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     def substitute(x):
         return chars[x.group()]
 
-    math_placeholder = f'[*LaTeXmath-{str(uuid.uuid4())}*]'
+    math_placeholder = f'[*LaTeXmath-{uuid.uuid4()!s}*]'
 
     def math_replace(m):
         math_segments.append(m.group(0))
@@ -189,7 +188,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
         # Extract math-mode segments and replace with placeholder
         text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
 
-    pattern = re.compile('|'.join(re.escape(k) for k in chars.keys()))
+    pattern = re.compile('|'.join(re.escape(k) for k in chars))
     res = pattern.sub(substitute, text)
 
     if ignore_math:
@@ -216,16 +215,13 @@ def escape_latex_entities(text):
     out = start_double_quote_re.sub(r'\g<1>``', out)
     out = end_double_quote_re.sub(r"''\g<1>", out)
 
-    out = latex_escape(out)
-
-    return out
+    return latex_escape(out)
 
 
 def unescape_latex_entities(text):
     """Limit ourselves as this is only used for maths stuff."""
     out = text
-    out = out.replace('\\&', '&')
-    return out
+    return out.replace('\\&', '&')
 
 
 def latex_render_error(message):
@@ -265,7 +261,7 @@ def latex_render_image(src, alt, tmpdir, strict=False):
             raise ImageURLException(f'URL scheme not supported: {src}')
         else:
             try:
-                resp = requests.get(src, verify=False, timeout=5)
+                resp = requests.get(src, verify=False, timeout=5)  # noqa: S501
             except InvalidURL:
                 raise ImageURLException(f"Cannot understand URL '{src}'")
             except (requests.Timeout, ConnectionError):
@@ -464,7 +460,7 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         def repl_1(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
             tmp = text.strip()
-            if tmp.startswith('\\[') or tmp.startswith('\\begin'):
+            if tmp.startswith(('\\[', '\\begin')):
                 return text
             else:
                 return '\\[%s\\]\n' % text
@@ -478,7 +474,7 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         out = pat.sub(repl_1, instr)
         # Jones, $x=3$, is ...
         pat3 = re.compile(r'\$([^$]+)\$(\s|$)')
-        out = pat3.sub(repl_2, out)
+        return pat3.sub(repl_2, out)
         # # $100 million
         # pat2 = re.compile('([^\$])\$([^\$])')
         # out = pat2.sub('\g<1>\\$\g<2>', out)
@@ -486,7 +482,6 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         # out = out.replace('\\lt', '<')
         # out = out.replace(' * ', ' \\cdot ')
         # out = out.replace('\\del', '\\partial')
-        return out
 
 
 # ========================== LINKS =================================

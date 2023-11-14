@@ -39,14 +39,13 @@ def build_default_email_template(event, tpl_type):
     provided by the user.
     """
     email = get_template_module(f'events/abstracts/emails/default_{tpl_type}_notification.txt')
-    tpl = AbstractEmailTemplate(body=email.get_body(),
-                                extra_cc_emails=[],
-                                reply_to_address='',
-                                subject=email.get_subject(),
-                                include_authors=True,
-                                include_submitter=True,
-                                include_coauthors=True)
-    return tpl
+    return AbstractEmailTemplate(body=email.get_body(),
+                                 extra_cc_emails=[],
+                                 reply_to_address='',
+                                 subject=email.get_subject(),
+                                 include_authors=True,
+                                 include_submitter=True,
+                                 include_coauthors=True)
 
 
 def _names_with_emails(person_links):
@@ -197,7 +196,7 @@ def create_mock_abstract(event):
                         judgment_comment='Vague but interesting!',
                         merged_into=target_abstract)
 
-    return abstract
+    return abstract  # noqa: RET504
 
 
 def make_abstract_form(event, user, notification_option=False, management=False, invited=False):
@@ -228,7 +227,7 @@ def make_abstract_form(event, user, notification_option=False, management=False,
         mixins.append(SendNotificationsMixin)
     if invited:
         mixins.append(InvitedAbstractMixin)
-    form_class = type('_AbstractForm', tuple(mixins) + (AbstractForm,), {})
+    form_class = type('_AbstractForm', (*mixins, AbstractForm), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:

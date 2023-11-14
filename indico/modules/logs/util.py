@@ -79,7 +79,7 @@ def make_diff_log(changes, fields):
         else:
             type_ = 'text'
             change = list(map(str, map(orig_string, change)))
-        data[title] = list(change) + [type_]
+        data[title] = [*change, type_]
     return data
 
 

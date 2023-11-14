@@ -154,8 +154,8 @@ def test_title(db):
     ('',       '')
 ))
 def test_no_names(db, first_name, last_name):
+    db.session.add(User(first_name=first_name, last_name=last_name))
     with pytest.raises(IntegrityError):
-        db.session.add(User(first_name=first_name, last_name=last_name))
         db.session.flush()
 
 

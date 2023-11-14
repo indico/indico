@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# ruff: noqa: PGH001
+
 import os
 import posixpath
 import re
@@ -99,7 +101,7 @@ def _exec_custom(code, **extra):
     """Execute a custom code snippet and return all non-underscored values."""
     globals_ = _make_globals(**extra)
     locals_ = {}
-    exec(code, globals_, locals_)
+    exec(code, globals_, locals_)  # noqa: S102
     return {str(k): v for k, v in locals_.items() if k[0] != '_'}
 
 
@@ -109,7 +111,7 @@ def _resolve_col(col):
     :param col: A string containing a Python expression, a model
                 attribute or a Column instance.
     """
-    attr = eval(col, _make_globals()) if isinstance(col, str) else col
+    attr = eval(col, _make_globals()) if isinstance(col, str) else col  # noqa: S307
     if isinstance(attr, db.Column):
         return attr
     assert len(attr.prop.columns) == 1
@@ -333,14 +335,14 @@ class EventExporter:
             # This is mainly needed for self-referential FKs and CHECK
             # constraints that require certain objects to be exported before
             # the ones referencing them
-            order = eval(spec['order'], _make_globals())
+            order = eval(spec['order'], _make_globals())  # noqa: S307
             if not isinstance(order, tuple):
                 order = (order,)
             query = query.order_by(*order)
         query = query.order_by(*table.primary_key.columns)
         cascaded = []
         for row in query:
-            if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row)):
+            if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row)):  # noqa: S307
                 continue
             rowdict = row._asdict()
             pk = tuple(v for k, v in rowdict.items() if table.c[k].primary_key)
@@ -458,9 +460,10 @@ class EventImporter:
         if missing:
             click.secho('The following users from the import data could not be mapped to existing users:', fg='yellow')
             table_data = [['First Name', 'Last Name', 'Email', 'Affiliation']]
-            for userdata in sorted(missing.values(), key=itemgetter('first_name', 'last_name', 'email')):
-                table_data.append([userdata['first_name'], userdata['last_name'], userdata['email'],
-                                   userdata['affiliation']])
+            table_data.extend(
+                [userdata['first_name'], userdata['last_name'], userdata['email'], userdata['affiliation']]
+                for userdata in sorted(missing.values(), key=itemgetter('first_name', 'last_name', 'email'))
+            )
             table = AsciiTable(table_data)
             click.echo(table.table)
             if self.create_users is None:
@@ -512,8 +515,10 @@ class EventImporter:
             click.secho('The following affiliations from the import data could not be mapped to existing ones:',
                         fg='yellow')
             table_data = [['Name', 'City', 'Country']]
-            for affildata in sorted(missing.values(), key=itemgetter('name', 'city', 'country_code')):
-                table_data.append([affildata['name'], affildata['city'], affildata['country_code']])
+            table_data.extend(
+                [affildata['name'], affildata['city'], affildata['country_code']]
+                for affildata in sorted(missing.values(), key=itemgetter('name', 'city', 'country_code'))
+            )
             table = AsciiTable(table_data)
             click.echo(table.table)
             if self.create_affiliations is None:
@@ -590,7 +595,8 @@ class EventImporter:
             ContributionPrincipal.replace_email_with_user(user, 'contribution')
 
         # event persons
-        query = EventPerson.query.with_parent(event).filter(EventPerson.user_id.is_(None), EventPerson.email != '')
+        query = EventPerson.query.with_parent(event).filter(EventPerson.user_id.is_(None),
+                                                            EventPerson.email != '')  # noqa: PLC1901
         for person in query:
             person.user = get_user_by_email(person.email)
 
@@ -640,8 +646,7 @@ class EventImporter:
         # and the orignal models' logic to construct paths
         path_segments = ['event', strict_str(self.event_id), 'imported']
         filename = f'{id_}-{filename}'
-        path = posixpath.join(*(path_segments + [filename]))
-        return path
+        return posixpath.join(*path_segments, filename)
 
     def _process_file(self, id_, data):
         storage_backend = config.ATTACHMENT_STORAGE
@@ -690,7 +695,7 @@ class EventImporter:
             if col in import_custom:
                 # custom python code to process the imported value
                 def _resolve_id_ref(value):
-                    return self._convert_value(colspec, value)
+                    return self._convert_value(colspec, value)  # noqa: B023
                 rv = _exec_custom(import_custom[col], VALUE=value, RESOLVE_ID_REF=_resolve_id_ref)
                 assert list(rv.keys()) == [col]
                 insert_values[col] = rv[col]
@@ -707,8 +712,8 @@ class EventImporter:
                 else:
                     missing_user_exec.add(exc.run)
             except MissingUserCascaded:
-                click.secho('! Skipping row in {} as parent row was skipped due to a missing user'
-                            .format(table.fullname), fg='yellow')
+                click.secho(f'! Skipping row in {table.fullname} as parent row was skipped due to a missing user',
+                            fg='yellow')
                 missing_user_skip = True
         if missing_user_skip:
             # skipped row due to a missing user? mark it as skipped so

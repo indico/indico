@@ -39,7 +39,7 @@ def send_email_task(task, email, log_entry=None):
     try:
         do_send_email(email, log_entry, _from_task=True)
     except Exception as exc:
-        delay = (DELAYS + [0])[task.request.retries] if not config.DEBUG else 1
+        delay = ([*DELAYS, 0])[task.request.retries] if not config.DEBUG else 1
         try:
             task.retry(countdown=delay, max_retries=(MAX_TRIES - 1))
         except MaxRetriesExceededError:
@@ -132,7 +132,7 @@ def resend_failed_email(path):
     """Try re-sending an email that previously failed."""
     from indico.modules.logs import EventLogEntry
     with open(path, 'rb') as f:
-        email, log_entry_id = pickle.load(f)
+        email, log_entry_id = pickle.load(f)  # noqa: S301
     log_entry = EventLogEntry.get(log_entry_id) if log_entry_id is not None else None
     do_send_email(email, log_entry)
     db.session.commit()

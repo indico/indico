@@ -95,12 +95,12 @@ def _set_duration(target, value, oldvalue, *unused):
 
 @listens_for(Break.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = '''
+    sql = f'''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER INSERT OR UPDATE OF duration
-        ON {}
+        ON {target.fullname}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('break');
-    '''.format(target.fullname)
+    '''
     DDL(sql).execute(conn)

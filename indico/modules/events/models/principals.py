@@ -31,7 +31,7 @@ class EventPrincipal(PrincipalPermissionsMixin, db.Model):
             PrincipalType.local_group, PrincipalType.multipass_group, permissions
         )
         group_perm_constraint = db.CheckConstraint(condition, 'disallow_group_editor_permissions')
-        return (group_perm_constraint,) + auto_table_args(cls, schema='events')
+        return (group_perm_constraint, *auto_table_args(cls, schema='events'))
 
     #: The ID of the acl entry
     id = db.Column(

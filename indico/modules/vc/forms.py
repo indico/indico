@@ -94,8 +94,8 @@ class VCRoomLinkFormBase(IndicoForm):
         block_choices = [(block.id, '{} ({})'.format(block.full_title,
                                                      format_datetime(block.start_dt, timezone=self.event.tzinfo)))
                          for block in sorted(blocks, key=attrgetter('full_title', 'start_dt'))]
-        self.contribution.choices = [('', _('Please select a contribution'))] + contrib_choices
-        self.block.choices = [('', _('Please select a session block'))] + block_choices
+        self.contribution.choices = [('', _('Please select a contribution')), *contrib_choices]
+        self.block.choices = [('', _('Please select a session block')), *block_choices]
 
 
 class VCRoomAttachFormBase(VCRoomLinkFormBase):

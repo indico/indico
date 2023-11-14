@@ -50,7 +50,7 @@ class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
     @strict_classproperty
     @staticmethod
     def __auto_table_args():
-        return db.UniqueConstraint('event_id', 'module', 'name'),
+        return (db.UniqueConstraint('event_id', 'module', 'name'),)
 
     @declared_attr
     def __table_args__(cls):

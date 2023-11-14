@@ -232,10 +232,9 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
         query = (query.outerjoin(favorite_user_table, db.and_(favorite_user_table.c.user_id == session.user.id,
                                                               favorite_user_table.c.target_id == User.id))
                  .order_by(nullslast(favorite_user_table.c.user_id)))
-    query = query.order_by(db.func.lower(db.func.indico.indico_unaccent(User.first_name)),
-                           db.func.lower(db.func.indico.indico_unaccent(User.last_name)),
-                           User.id)
-    return query
+    return query.order_by(db.func.lower(db.func.indico.indico_unaccent(User.first_name)),
+                          db.func.lower(db.func.indico.indico_unaccent(User.last_name)),
+                          User.id)
 
 
 def _deduplicate_identities(identities):

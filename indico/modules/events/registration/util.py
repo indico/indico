@@ -270,38 +270,40 @@ def check_registration_email(regform, email, registration=None, management=False
         return sorted(extra_checks, key=lambda x: ['error', 'warning', 'ok'].index(x['status']))[0]
     if registration is not None:
         if email_registration and email_registration != registration:
-            return dict(status='error', conflict='email-already-registered')
+            return {'status': 'error', 'conflict': 'email-already-registered'}
         elif user_registration and user_registration != registration:
-            return dict(status='error', conflict='user-already-registered')
+            return {'status': 'error', 'conflict': 'user-already-registered'}
         elif user and registration.user and registration.user != user:
-            return dict(status='warning' if management else 'error', conflict='email-other-user', user=user.full_name)
+            return {'status': 'warning' if management else 'error', 'conflict': 'email-other-user',
+                    'user': user.full_name}
         elif not user and registration.user:
-            return dict(status='warning' if management else 'error', conflict='email-no-user',
-                        user=registration.user.full_name)
+            return {'status': 'warning' if management else 'error', 'conflict': 'email-no-user',
+                    'user': registration.user.full_name}
         elif user:
-            return dict(status='ok', user=user.full_name, self=(not management and user == session.user),
-                        same=(user == registration.user))
+            return {'status': 'ok', 'user': user.full_name, 'self': (not management and user == session.user),
+                    'same': user == registration.user}
         email_err = validate_email_verbose(email)
         if email_err:
-            return dict(status='error', conflict='email-invalid', email_error=email_err)
+            return {'status': 'error', 'conflict': 'email-invalid', 'email_error': email_err}
         if regform.require_user and (management or email != registration.email):
-            return dict(status='warning' if management else 'error', conflict='no-user')
+            return {'status': 'warning' if management else 'error', 'conflict': 'no-user'}
         else:
-            return dict(status='ok', user=None)
+            return {'status': 'ok', 'user': None}
     else:
         if email_registration:
-            return dict(status='error', conflict='email-already-registered')
+            return {'status': 'error', 'conflict': 'email-already-registered'}
         elif user_registration:
-            return dict(status='error', conflict='user-already-registered')
+            return {'status': 'error', 'conflict': 'user-already-registered'}
         elif user:
-            return dict(status='ok', user=user.full_name, self=(not management and user == session.user), same=False)
+            return {'status': 'ok', 'user': user.full_name, 'self': not management and user == session.user,
+                    'same': False}
         email_err = validate_email_verbose(email)
         if email_err:
-            return dict(status='error', conflict='email-invalid', email_error=email_err)
+            return {'status': 'error', 'conflict': 'email-invalid', 'email_error': email_err}
         if regform.require_user:
-            return dict(status='warning' if management else 'error', conflict='no-user')
+            return {'status': 'warning' if management else 'error', 'conflict': 'no-user'}
         else:
-            return dict(status='ok', user=None)
+            return {'status': 'ok', 'user': None}
 
 
 class RegistrationSchemaBase(IndicoSchema):
@@ -395,8 +397,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
         value = data.get(form_item.html_field_name, default) if can_modify else default
         data_entry = RegistrationData()
         registration.data.append(data_entry)
-        for attr, value in form_item.field_impl.process_form_data(registration, value).items():
-            setattr(data_entry, attr, value)
+        for attr, field_value in form_item.field_impl.process_form_data(registration, value).items():
+            setattr(data_entry, attr, field_value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
     if invitation is None:

@@ -65,20 +65,18 @@ class SessionListToPDF(PDFBase):
         text_style.spaceAfter = 0
         text_style.firstLineIndent = 0
 
-        rows = []
-        row_values = []
-        for col in [_('ID'), _('Type'), _('Title'), _('Code'), _('Description')]:
-            row_values.append(Paragraph(f'<b>{col}</b>', text_style))
-        rows.append(row_values)
-
-        for sess in self.sessions:
-            rows.append([
-                Paragraph(sess.friendly_id, text_style),
-                Paragraph(sess.type.name if sess.type else '', text_style),
-                Paragraph(sess.title, text_style),
-                Paragraph(sess.code, text_style),
-                Paragraph(sess.description, text_style)
-            ])
+        headers = [
+            Paragraph(f'<b>{col}</b>', text_style)
+            for col in (_('ID'), _('Type'), _('Title'), _('Code'), _('Description'))
+        ]
+        rows = [headers]
+        rows.extend([
+            Paragraph(sess.friendly_id, text_style),
+            Paragraph(sess.type.name if sess.type else '', text_style),
+            Paragraph(sess.title, text_style),
+            Paragraph(sess.code, text_style),
+            Paragraph(sess.description, text_style)
+        ] for sess in self.sessions)
 
         col_widths = (None,) * 5
         table_style = TableStyle([

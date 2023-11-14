@@ -761,8 +761,8 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
-        registrant_name = secure_filename('{}_{}'.format(registration.get_full_name(),
-                                          str(registration.friendly_id)), registration.friendly_id)
+        registrant_name = secure_filename(f'{registration.get_full_name()}_{registration.friendly_id!s}',
+                                          registration.friendly_id)
         file_name = secure_filename('{}_{}_{}'.format(attachment.field_data.field.title, attachment.field_data.field_id,
                                                       attachment.filename), attachment.filename)
         return os.path.join(*self._adjust_path_length([regform_title, registrant_name, file_name]))

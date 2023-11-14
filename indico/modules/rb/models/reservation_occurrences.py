@@ -130,9 +130,9 @@ class ReservationOccurrence(db.Model):
 
     @classmethod
     def iter_create_occurrences(cls, start, end, repetition):
-        for start in cls.iter_start_time(start, end, repetition):
-            end = datetime.combine(start.date(), end.time())
-            yield ReservationOccurrence(start_dt=start, end_dt=end)
+        for occ_start in cls.iter_start_time(start, end, repetition):
+            end = datetime.combine(occ_start.date(), end.time())
+            yield ReservationOccurrence(start_dt=occ_start, end_dt=end)
 
     @staticmethod
     def map_recurrence_weekdays_to_rrule(weekdays):

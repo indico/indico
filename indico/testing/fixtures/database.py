@@ -122,7 +122,6 @@ def db(database, monkeypatch):
 
 
 @pytest.fixture
-@pytest.mark.usefixtures('db')
 def count_queries():
     """Provide a query counter.
 

@@ -49,7 +49,7 @@ def test_locator_property():
     assert get_locator(t.locator) == {'foo': 'bar'}
     assert get_locator(t.locator.fancy) == {'foo': 'bar', 'awesome': 'magic'}
     with pytest.raises(AttributeError):
-        t.locator.invalid
+        t.locator.invalid  # noqa: B018
 
 
 def test_locator_property_lazy():
@@ -68,7 +68,7 @@ def test_locator_property_lazy():
     # creating the object or accessing the locator itself doesn't
     # call the underlying function
     t = _Test()
-    t.locator
+    t.locator  # noqa: B018
     assert not accessed
 
     # accessing the locator in any way that needs to access its data
@@ -79,7 +79,7 @@ def test_locator_property_lazy():
     # accessing a special locator only triggers that locator's accessor
     # but not the one of the default locator
     accessed = []
-    t.locator.fancy
+    t.locator.fancy  # noqa: B018
     assert accessed == ['fancy']
 
 

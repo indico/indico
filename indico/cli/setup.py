@@ -384,8 +384,7 @@ class SetupWizard:
         # There is no harm in having the virtualenv somewhere else but it
         # is cleaner to keep everything within the root path
         if not sys.prefix.startswith(self.root_path + '/'):
-            _warn('It is recommended to have the virtualenv inside the root directory, e.g. {}/.venv'
-                  .format(self.root_path))
+            _warn(f'It is recommended to have the virtualenv inside the root directory, e.g. {self.root_path}/.venv')
             _warn(f'The virtualenv is currently located in {sys.prefix}')
             _prompt_abort()
         self.data_root_path = os.path.join(self.root_path, 'data') if dev else self.root_path
@@ -393,8 +392,9 @@ class SetupWizard:
     def _check_configured(self):
         # Bail out early if indico is already configured
         if os.path.exists(self.config_path):
-            _error('Config file already exists. If you really want to run this wizard again, delete {}'.format(
-                self.config_path))
+            _error(
+                f'Config file already exists. If you really want to run this wizard again, delete {self.config_path}'
+            )
             raise click.Abort
 
     def _check_directories(self, dev=False):
@@ -527,7 +527,7 @@ class SetupWizard:
             for host, port in candidates:
                 try:
                     SMTP(host, port, timeout=3).close()
-                except Exception:
+                except Exception:  # noqa: S112
                     continue
                 return host, port
             return '', ''
@@ -575,12 +575,13 @@ class SetupWizard:
         def _get_system_timezone():
             candidates = []
             # Get a timezone name directly
-            if os.path.isfile('/etc/timezone'):
-                with open('/etc/timezone') as f:
-                    candidates.append(f.read().strip())
+            etc_timezone = Path('/etc/timezone')
+            if etc_timezone.is_file():
+                candidates.append(etc_timezone.read_text().strip())
             # Get the timezone from the symlink
-            if os.path.islink('/etc/localtime'):
-                candidates.append(re.sub(r'.*/usr/share/zoneinfo/', '', os.readlink('/etc/localtime')))
+            etc_localtime = Path('/etc/localtime')
+            if etc_localtime.is_symlink():
+                candidates.append(re.sub(r'.*/usr/share/zoneinfo/', '', etc_localtime.readlink()))
             # We do not try to find a matching zoneinfo based on a checksum
             # as e.g. https://stackoverflow.com/a/12523283/298479 suggests
             # since this is ambiguous and we rather have the user type their
@@ -630,8 +631,7 @@ class SetupWizard:
             'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache')),
             'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
             'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
-            'STORAGE_BACKENDS = {!r}'.format({k: v
-                                              for k, v in storage_backends.items()}),
+            f'STORAGE_BACKENDS = {storage_backends!r}',
             "ATTACHMENT_STORAGE = 'default'",
             '',
             '# Email settings',

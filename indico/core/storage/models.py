@@ -198,7 +198,9 @@ class StoredFileMixin:
 
         :param data: bytes or a file-like object
         """
-        assert self.storage_backend is None and self.storage_file_id is None and self.size is None
+        assert self.storage_backend is None
+        assert self.storage_file_id is None
+        assert self.size is None
         if self.version_of:
             assert getattr(self, self.version_of) is not None
         self.storage_backend, path = self._build_storage_path()

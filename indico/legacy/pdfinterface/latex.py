@@ -67,7 +67,7 @@ class PDFLaTeXBase:
 
         buf = BytesIO()
         with ZipFile(buf, 'w', allowZip64=True) as zip_handler:
-            for dirpath, dirnames, files in os.walk(self.source_dir, followlinks=True):
+            for dirpath, _dirnames, files in os.walk(self.source_dir, followlinks=True):
                 for f in files:
                     if f.startswith('.') or f.endswith(('.py', '.pyc', '.pyo')):
                         continue
@@ -165,7 +165,7 @@ class LatexRunner:
     def _render_template(self, template_name, kwargs):
         template_dir = os.path.join(get_root_path('indico'), 'legacy/pdfinterface/latex_templates')
         env = Environment(loader=FileSystemLoader(template_dir),
-                          autoescape=False,
+                          autoescape=False,  # noqa: S701
                           trim_blocks=True,
                           keep_trailing_newline=True,
                           auto_reload=config.DEBUG,
@@ -205,7 +205,7 @@ class LatexRunner:
             raise RuntimeError('LaTeX is not enabled')
         source_filename, target_filename = self.prepare(template_name, **kwargs)
         log_filename = os.path.join(self.source_dir, 'output.log')
-        log_file = open(log_filename, 'a+')
+        log_file = open(log_filename, 'a+')  # noqa: SIM115
         try:
             self.run_latex(source_filename, log_file)
             if self.has_toc:
@@ -221,7 +221,7 @@ class LatexRunner:
 
 
 def extract_affiliations(contrib):
-    affiliations = dict()
+    affiliations = {}
 
     def enumerate_affil(person_links):
         auth_list = []

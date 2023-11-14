@@ -35,8 +35,4 @@ class BlockingPrincipal(PrincipalMixin, db.Model):
     # - blocking (Blocking._allowed)
 
     def __repr__(self):
-        return '<BlockingPrincipal({}, {}, {})>'.format(
-            self.id,
-            self.blocking_id,
-            self.principal
-        )
+        return f'<BlockingPrincipal({self.id}, {self.blocking_id}, {self.principal})>'

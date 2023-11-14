@@ -39,7 +39,7 @@ class AdminSettingsForm(IndicoForm):
         self._set_currencies()
 
     def _set_currencies(self):
-        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
+        currencies = [(c['code'], f'{c["code"]} ({c["name"]})') for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
     def validate_currency(self, field):

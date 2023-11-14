@@ -31,10 +31,10 @@ class UsedIf:
         if self.condition in (True, False):
             if not self.condition:
                 field.errors[:] = []
-                raise StopValidation()
+                raise StopValidation
         elif not self.condition(form, field):
             field.errors[:] = []
-            raise StopValidation()
+            raise StopValidation
 
 
 class HiddenUnless:
@@ -71,7 +71,7 @@ class HiddenUnless:
                 # Clear existing data (just in case) and use the existing data for the field
                 field.data = None
                 field.process_data(field.object_data)
-            raise StopValidation()
+            raise StopValidation
 
 
 class Exclusive:

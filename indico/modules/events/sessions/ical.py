@@ -22,7 +22,7 @@ from indico.web.flask.util import url_for
 def generate_session_component(
     session: Session,
     related_to_uid: t.Optional[str] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[tuple[str, str]] = None
 ):
     """Generate an Event iCalendar component from an Indico Session."""
     uid = f'indico-session-{session.id}@{urlsplit(config.BASE_URL).hostname}'
@@ -38,7 +38,7 @@ def generate_session_component(
 def generate_session_block_component(
     block: SessionBlock,
     related_to_uid: t.Optional[str] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[tuple[str, str]] = None
 ):
     """Generate an Event iCalendar component for a session block in an Indico Session."""
     uid = f'indico-session-block-{block.id}@{urlsplit(config.BASE_URL).hostname}'
@@ -57,7 +57,7 @@ def session_to_ical(
     session: Session,
     user: t.Optional[User] = None,
     detailed: bool = False,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[tuple[str, str]] = None
 ):
     """Serialize a session into an iCal.
 

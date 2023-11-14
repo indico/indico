@@ -26,7 +26,7 @@ class EditingFilesField(Dict):
 
         keys_field = ModelField(EditingFileType, get_query=lambda m: self.editing_file_types_query)
         values_field = FilesField(required=True, allow_claimed=allow_claimed_files)
-        validators = kwargs.pop('validate', []) + [self.validate_files]
+        validators = [*kwargs.pop('validate', []), self.validate_files]
         super().__init__(keys=keys_field, values=values_field, validate=validators, **kwargs)
 
     def validate_files(self, value):

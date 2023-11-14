@@ -16,7 +16,6 @@ from indico.modules.events.payment.util import register_transaction
 @pytest.mark.parametrize(('new', 'status'), (
     (False, None),
     (True,  TransactionStatus.successful),
-    (True,  TransactionStatus.successful),
     (True,  TransactionStatus.pending)
 ))
 def test_register_transaction(mocker, new, status):

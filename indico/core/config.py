@@ -149,8 +149,7 @@ def _parse_config(path):
     globals_ = {'timedelta': timedelta, 'crontab': crontab}
     locals_ = {}
     with codecs.open(path, encoding='utf-8') as config_file:
-        # XXX: unicode_literals is inherited from this file
-        exec(compile(config_file.read(), path, 'exec'), globals_, locals_)
+        exec(compile(config_file.read(), path, 'exec'), globals_, locals_)  # noqa: S102
     return {str(k if k.isupper() else _convert_key(k)): v
             for k, v in locals_.items()
             if k[0] != '_'}

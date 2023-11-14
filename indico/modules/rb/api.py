@@ -143,7 +143,7 @@ class ReservationHook(RoomBookingHookBase):
         if not locations:
             return
 
-        for room_id, reservation in _export_reservations(self, False, True):
+        for _room_id, reservation in _export_reservations(self, False, True):
             yield reservation
 
 

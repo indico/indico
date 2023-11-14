@@ -297,7 +297,7 @@ class MultiChoiceField(ChoiceBaseField):
                 raise ValidationError(ngettext('At most {max_choices} option can be selected',
                                                'At most {max_choices} options can be selected', max_choices)
                                       .format(max_choices=max_choices))
-        return [_check_max_choices] + super().get_validators(existing_registration)
+        return [_check_max_choices, *super().get_validators(existing_registration)]
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         # always store no-option as empty dict
@@ -507,7 +507,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             item['price'] = float(item['price']) if item.get('price') else 0
             item['places_limit'] = int(item['places_limit']) if item.get('places_limit') else 0
             captions[item['id']] = item.pop('caption')
-        for key in {'arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'}:
+        for key in ('arrival_date_from', 'arrival_date_to', 'departure_date_from', 'departure_date_to'):
             unversioned_data[key] = _to_machine_date(unversioned_data[key])
         versioned_data['choices'] = items
         unversioned_data['captions'] = captions

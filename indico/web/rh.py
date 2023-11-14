@@ -323,8 +323,7 @@ class RHSimple(RH):
         self.func = func
 
     def _process(self):
-        rv = self.func()
-        return rv
+        return self.func()
 
     @classmethod
     def wrap_function(cls, func, *, disable_csrf_check=False):

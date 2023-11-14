@@ -39,8 +39,7 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
             preview_content = previewer.generate_content(self.attachment)
             return jsonify_template('attachments/preview.html', attachment=self.attachment,
                                     preview_content=preview_content)
+        elif self.attachment.type == AttachmentType.link:
+            return redirect(self.attachment.link_url)
         else:
-            if self.attachment.type == AttachmentType.link:
-                return redirect(self.attachment.link_url)
-            else:
-                return self.attachment.file.send(inline=not force_download)
+            return self.attachment.file.send(inline=not force_download)

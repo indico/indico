@@ -28,7 +28,7 @@ class vRecur(ical.vRecur):  # noqa: N801
             if key == 'FREQ':
                 continue
             typ = self.types[key]
-            if not type(vals) in ical.prop.SequenceTypes:
+            if type(vals) not in ical.prop.SequenceTypes:
                 vals = [vals]
             vals = ','.join(typ(val).ical() for val in vals)
             result.append(f'{key}={vals}')

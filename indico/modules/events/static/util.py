@@ -45,7 +45,7 @@ def rewrite_static_url(path):
 
 def _create_data_uri(url, filename):
     """Create a data url that contains the file in question."""
-    response = requests.get(url, verify=False)
+    response = requests.get(url, verify=False)  # noqa: S501
     if response.status_code != 200:
         # couldn't access the file
         return url
@@ -60,7 +60,7 @@ def _rewrite_event_asset_url(event, url):
 
     Only assets contained within the event will be taken into account
     """
-    scheme, netloc, path, qs, anchor = urlsplit(url)
+    scheme, netloc, path, qs, _anchor = urlsplit(url)
     netloc = netloc or current_app.config['SERVER_NAME']
     scheme = scheme or 'https'
 
@@ -83,7 +83,7 @@ def _rewrite_event_asset_url(event, url):
 
 def _remove_anchor(url):
     """Remove the anchor from a URL."""
-    scheme, netloc, path, qs, anchor = urlsplit(url)
+    scheme, netloc, path, qs, _anchor = urlsplit(url)
     return urlunsplit((scheme, netloc, path, qs, ''))
 
 

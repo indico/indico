@@ -33,7 +33,6 @@ from indico.util.mimetypes import icon_from_mimetype
     ('application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'icon-file-word'),
     ('application/vnd.openxmlformats-officedocument.wordprocessingml.template', 'default_icon'),
     ('application/vnd.oasis.opendocument.chart', 'icon-file-openoffice'),
-    ('application/vnd.oasis.opendocument.chart', 'icon-file-openoffice'),
     ('application/vnd.oasis.opendocument.chart-template', 'icon-file-openoffice'),
     ('application/vnd.oasis.opendocument.database', 'icon-file-openoffice'),
     ('application/vnd.oasis.opendocument.formula', 'icon-file-openoffice'),

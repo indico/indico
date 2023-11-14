@@ -235,8 +235,7 @@ class EventNoteRevision(db.Model):
     def __repr__(self):
         render_mode = self.render_mode.name if self.render_mode is not None else None
         source = text_to_repr(self.source, html=True)
-        return '<EventNoteRevision({}, {}, {}, {}): "{}">'.format(self.id, self.note_id, render_mode, self.created_dt,
-                                                                  source)
+        return f'<EventNoteRevision({self.id}, {self.note_id}, {render_mode}, {self.created_dt}): "{source}">'
 
 
 @listens_for(EventNote.current_revision, 'set')

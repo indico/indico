@@ -115,8 +115,8 @@ class EmailRolesSendMixin:
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=email, bcc_list=bcc, from_address=from_address, template=tpl, html=True)
-            send_email(email, self.event, self.log_module, log_metadata=log_metadata)
+                email_data = make_email(to_list=email, bcc_list=bcc, from_address=from_address, template=tpl, html=True)
+            send_email(email_data, self.event, self.log_module, log_metadata=log_metadata)
             count += 1
         if not count:
             raise ExpectedError(_('There are no people matching your selected recipient roles.'))

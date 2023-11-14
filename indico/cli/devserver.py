@@ -67,7 +67,7 @@ def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enab
         print(f' * Serving Indico on {url}')
         if evalex_whitelist:
             print(f' * Werkzeug debugger console on {url}/console')
-            if evalex_whitelist is True:  # noqa
+            if evalex_whitelist is True:
                 print(' * Werkzeug debugger console is available to all clients!')
 
     try:
@@ -205,7 +205,7 @@ class DebuggedIndico(DebuggedApplication):
     def evalex(self):
         if not self._evalex_whitelist:
             return False
-        elif self._evalex_whitelist is True:  # noqa
+        elif self._evalex_whitelist is True:
             return True
         else:
             return self._request_ip in self._evalex_whitelist

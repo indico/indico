@@ -51,7 +51,7 @@ def upgrade():
 
     # Migrate reservations.event_id to new reservation_links and set
     # reservations.link_id based on the id of the newly created row.
-    op.execute('''
+    op.execute(f'''
         WITH reserv_data AS (
             SELECT nextval(pg_get_serial_sequence('roombooking.reservation_links', 'id')) AS new_link_id,
             id AS reserv_id, event_id
@@ -59,7 +59,7 @@ def upgrade():
             WHERE event_id IS NOT NULL
         ), link_ids_data AS (
             INSERT INTO roombooking.reservation_links (id, event_id, linked_event_id, link_type)
-            SELECT new_link_id, event_id, event_id, {}
+            SELECT new_link_id, event_id, event_id, {LinkType.event.value}
             FROM reserv_data
             RETURNING id AS link_id
         )
@@ -67,7 +67,7 @@ def upgrade():
         SET link_id = link_ids_data.link_id
         FROM link_ids_data, reserv_data
         WHERE id = reserv_data.reserv_id and link_ids_data.link_id = reserv_data.new_link_id;
-    '''.format(LinkType.event.value))
+    ''')  # noqa: S608
 
     op.drop_column('reservations', 'event_id', schema='roombooking')
 

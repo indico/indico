@@ -196,7 +196,7 @@ def get_placeholders(context, **kwargs):
 
 
 def get_sorted_placeholders(context, **kwargs):
-    return sorted(list(get_placeholders(context, **kwargs).values()), key=attrgetter('name'))
+    return sorted(get_placeholders(context, **kwargs).values(), key=attrgetter('name'))
 
 
 def replace_placeholders(context, text, escape_html=True, **kwargs):

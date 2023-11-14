@@ -106,7 +106,7 @@ class RegistrationListGenerator(ListGeneratorBase):
                                                          personal_data_type=PersonalDataType[item_id]).one()
             result.append({'id': field.id, 'caption': field.title})
         for item_id in [x for x in self.static_items if x in ids]:
-            result.append({'id': item_id, 'caption': self.static_items[item_id]['title']})
+            result.append({'id': item_id, 'caption': self.static_items[item_id]['title']})  # noqa: PERF401
         return result
 
     def _column_ids_to_db(self, ids):

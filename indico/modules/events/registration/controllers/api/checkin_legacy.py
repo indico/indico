@@ -25,7 +25,7 @@ class RHAPIRegistrant(RH):
 
     def _check_access(self):
         if not self.event.can_manage(session.user, permission='registration'):
-            raise Forbidden()
+            raise Forbidden
 
     def _process_args(self):
         self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
@@ -64,7 +64,7 @@ class RHAPIRegistrants(RH):
 
     def _check_access(self):
         if not self.event.can_manage(session.user, permission='registration'):
-            raise Forbidden()
+            raise Forbidden
 
     def _process_args(self):
         self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()

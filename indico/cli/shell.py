@@ -67,8 +67,8 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
             return '.'.join(segments[:-1] if len(segments) > 1 else segments)
 
     items = [(_get_module(obj), get_name(obj), obj) for obj in objects]
-    for module, items in itertools.groupby(sorted(items, key=itemgetter(0, 1)), key=itemgetter(0)):
-        names, elements = list(zip(*((x[1], x[2]) for x in items)))
+    for module, mod_items in itertools.groupby(sorted(items, key=itemgetter(0, 1)), key=itemgetter(0)):
+        names, elements = list(zip(*((x[1], x[2]) for x in mod_items)))
         _add_to_context_multi(namespace, info, elements, names, doc=module, color=color)
 
 
@@ -97,7 +97,7 @@ def _make_shell_context():
              if not task.name.startswith('celery.')]
     add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
     # Plugins
-    plugins = [type(plugin) for plugin in sorted(list(plugin_engine.get_active_plugins().values()),
+    plugins = [type(plugin) for plugin in sorted(plugin_engine.get_active_plugins().values(),
                                                  key=attrgetter('name'))]
     if plugins:
         info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
@@ -129,7 +129,7 @@ def shell_cmd(verbose, with_req_context):
     context, info = _make_shell_context()
     banner = cformat('%{yellow!}Indico v{} is ready for your commands').format(indico.__version__)
     if verbose:
-        banner = '\n'.join(info + ['', banner])
+        banner = '\n'.join([*info, '', banner])
     ctx = current_app.make_shell_context()
     ctx.update(context)
     stack = ExitStack()

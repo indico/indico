@@ -84,7 +84,7 @@ def generate_csv(headers, rows, *, include_header=True):
         header_positions = {name: i for i, name in enumerate(headers)}
         assert all(len(row) == len(headers) for row in rows)
         for row in rows:
-            row = sorted(list(row.items()), key=lambda x: header_positions[x[0]])
+            row = sorted(row.items(), key=lambda x: header_positions[x[0]])
             writer.writerow([_prepare_csv_data(v) for k, v in row])
     buf.seek(0)
     return buf
@@ -114,7 +114,7 @@ def generate_xlsx(headers, rows, tz=None):
     buf = BytesIO()
     header_positions = {name: i for i, name in enumerate(headers)}
     # convert row dicts to lists
-    rows = [[x[1] for x in sorted(list(row.items()), key=lambda x: header_positions[x[0]])] for row in rows]
+    rows = [[x[1] for x in sorted(row.items(), key=lambda x: header_positions[x[0]])] for row in rows]
     assert all(len(row) == len(headers) for row in rows)
     with Workbook(buf, workbook_options) as workbook:
         bold = workbook.add_format({'bold': True})

@@ -189,7 +189,7 @@ class _MultipassGroupProxy(GroupProxy):
         try:
             return multipass.get_group(self.provider, self.name)
         except MultipassException as e:
-            warn(f'Could not retrieve group {self.provider}:{self.name}: {e}')
+            warn(f'Could not retrieve group {self.provider}:{self.name}: {e}', stacklevel=3)
             return None
 
     @cached_property
@@ -223,7 +223,7 @@ class _MultipassGroupProxy(GroupProxy):
         if rv is not None:
             return rv
         elif self.group is None:
-            warn(f'Tried to check if {user} is in invalid group {self}')
+            warn(f'Tried to check if {user} is in invalid group {self}', stacklevel=2)
             rv = False
         else:
             rv = any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
@@ -235,7 +235,7 @@ class _MultipassGroupProxy(GroupProxy):
     def get_members(self):
         from indico.modules.users.models.users import User
         if self.group is None:
-            warn(f'Tried to get members for invalid group {self}')
+            warn(f'Tried to get members for invalid group {self}', stacklevel=2)
             return set()
         # We actually care about Users, not identities here!
         emails = set()

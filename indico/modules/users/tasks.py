@@ -25,15 +25,19 @@ def update_gravatars(user=None):
         users = [user]
     else:
         users = User.query.filter(~User.is_deleted, User.picture_source == ProfilePictureSource.gravatar).all()
-    for user in committing_iterator(users):
-        gravatar, lastmod = get_gravatar_for_user(user, identicon=False, lastmod=user.picture_metadata['lastmod'])
-        if gravatar is None:
-            logger.debug('Gravatar for %r did not change (not modified)', user)
-            continue
-        if crc32(gravatar) == user.picture_metadata['hash']:
-            logger.debug('Gravatar for %r did not change (same hash)', user)
-            user.picture_metadata['lastmod'] = lastmod
-            flag_modified(user, 'picture_metadata')
-            continue
-        set_user_avatar(user, gravatar, 'gravatar', lastmod)
-        logger.info('Gravatar of user %s updated', user)
+    for u in committing_iterator(users):
+        _do_update_gravatar(u)
+
+
+def _do_update_gravatar(user):
+    gravatar, lastmod = get_gravatar_for_user(user, identicon=False, lastmod=user.picture_metadata['lastmod'])
+    if gravatar is None:
+        logger.debug('Gravatar for %r did not change (not modified)', user)
+        return
+    if crc32(gravatar) == user.picture_metadata['hash']:
+        logger.debug('Gravatar for %r did not change (same hash)', user)
+        user.picture_metadata['lastmod'] = lastmod
+        flag_modified(user, 'picture_metadata')
+        return
+    set_user_avatar(user, gravatar, 'gravatar', lastmod)
+    logger.info('Gravatar of user %s updated', user)

@@ -35,7 +35,7 @@ def upgrade():
             UPDATE users.settings
             SET value = '{json.dumps(name)}'
             WHERE module = 'users' AND name = 'name_format' AND value = '{value}'
-        ''')
+        ''')  # noqa: S608
 
 
 def downgrade():
@@ -44,4 +44,4 @@ def downgrade():
             UPDATE users.settings
             SET value = '{json.dumps(value)}'
             WHERE module = 'users' AND name = 'name_format' AND value = '{json.dumps(name)}'
-        ''')
+        ''')  # noqa: S608

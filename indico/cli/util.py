@@ -39,7 +39,7 @@ class IndicoFlaskGroup(FlaskGroup):
 
     def _load_plugin_commands(self):
         # We don't care about `flask.commands` but indico plugin commands instead
-        # This actually shouldn't be called sinde we override all the methods
+        # This actually shouldn't be called since we override all the methods
         # calling it...
         assert False
 

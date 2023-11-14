@@ -27,7 +27,7 @@ SPECIAL_FILTERS = {
 
 def make_query(model):
     return (model.query
-            .filter(model.md5 == '', model.storage_file_id.isnot(None))
+            .filter(model.md5 == '', model.storage_file_id.isnot(None))  # noqa: PLC1901
             .filter_by(**SPECIAL_FILTERS.get(model, {}))
             .options(lazyload('*'), load_only('storage_backend', 'storage_file_id', 'md5')))
 
@@ -53,7 +53,7 @@ def main():
               for model, total in models.items()}
     max_length = max(len(x) for x in labels.values())
     labels = {model: label.ljust(max_length) for model, label in labels.items()}
-    for model, total in sorted(list(models.items()), key=itemgetter(1)):
+    for model, total in sorted(models.items(), key=itemgetter(1)):
         with click.progressbar(query_chunked(model, 100), length=total, label=labels[model],
                                show_percent=True, show_pos=True) as objects:
             for obj in objects:

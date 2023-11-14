@@ -86,7 +86,7 @@ def find_latest_entry_end_dt(obj, day=None):
             raise ValueError('Day specified for session block.')
         entries = obj.timetable_entry.children
     else:
-        raise ValueError(f'Invalid object type {type(obj)}')
+        raise TypeError(f'Invalid object type {type(obj)}')
     return max(entries, key=attrgetter('end_dt')).end_dt if entries else None
 
 
@@ -117,7 +117,7 @@ def find_next_start_dt(duration, obj, day=None, force=False):
         earliest_dt = obj.timetable_entry.start_dt
         latest_dt = obj.timetable_entry.end_dt
     else:
-        raise ValueError(f'Invalid object type {type(obj)}')
+        raise TypeError(f'Invalid object type {type(obj)}')
     max_duration = latest_dt - earliest_dt
     if duration > max_duration:
         return earliest_dt if force else None

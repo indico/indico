@@ -65,7 +65,7 @@ class File(StoredFileMixin, db.Model):
         path_segments = list(map(strict_str, self.__context))
         self.assign_id()
         filename = '{}-{}'.format(self.id, secure_filename(self.filename, 'file'))
-        path = posixpath.join(*(path_segments + [filename]))
+        path = posixpath.join(*path_segments, filename)
         return config.ATTACHMENT_STORAGE, path
 
     def save(self, context, data):

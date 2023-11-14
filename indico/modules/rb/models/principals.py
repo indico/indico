@@ -29,7 +29,7 @@ class RoomPrincipal(PrincipalPermissionsMixin, db.Model):
     def __auto_table_args():
         # Since all rooms are visible to anyone who can access room booking,
         # we do not use the read_access permission.
-        return db.CheckConstraint('NOT read_access', 'no_read_access'),
+        return (db.CheckConstraint('NOT read_access', 'no_read_access'),)
 
     id = db.Column(
         db.Integer,

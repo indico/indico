@@ -196,11 +196,7 @@ def service_handle_review_editable(editable, user, action, parent_revision, revi
 
 
 def service_handle_delete_editable(editable):
-    path = '/event/{}/editable/{}/{}'.format(
-        _get_event_identifier(editable.event),
-        editable.type.name,
-        editable.contribution_id
-    )
+    path = f'/event/{_get_event_identifier(editable.event)}/editable/{editable.type.name}/{editable.contribution_id}'
     try:
         resp = requests.delete(_build_url(editable.event, path), headers=_get_headers(editable.event))
         resp.raise_for_status()

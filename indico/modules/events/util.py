@@ -291,7 +291,8 @@ class ListGeneratorBase:
         elif separator_type == 'static':
             static_item_ids = [item_id for item_id in item_ids if item_id in self.static_items]
             return static_item_ids, [item_id for item_id in item_ids if item_id not in static_item_ids]
-        return item_ids,
+        else:
+            raise ValueError('Invalid separator_type')
 
     def _build_query(self):
         """Return the query of the list's entries.
@@ -614,8 +615,8 @@ def serialize_person_for_json_ld(person):
 
 def get_field_values(form_data):
     """Split the form fields between custom and static."""
-    fields = {x: form_data[x] for x in form_data.keys() if not x.startswith('custom_')}
-    custom_fields = {x: form_data[x] for x in form_data.keys() if x.startswith('custom_')}
+    fields = {x: form_data[x] for x in form_data if not x.startswith('custom_')}
+    custom_fields = {x: form_data[x] for x in form_data if x.startswith('custom_')}
     return fields, custom_fields
 
 
@@ -641,11 +642,9 @@ def check_permissions(event, field, allow_networks=False):
                                               allow_networks=allow_networks,
                                               event_id=event.id)
         if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
-            msg = _('IP networks cannot have management permissions: {}').format(principal.name)
-            return msg
+            return _('IP networks cannot have management permissions: {}').format(principal.name)
         if isinstance(principal, RegistrationForm) and set(permissions) - {READ_ACCESS_PERMISSION}:
-            msg = _('Registrants cannot have management permissions: {}').format(principal.name)
-            return msg
+            return _('Registrants cannot have management permissions: {}').format(principal.name)
         if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
             # when full access permission is set, discard rest of permissions
             permissions[:] = [FULL_ACCESS_PERMISSION]

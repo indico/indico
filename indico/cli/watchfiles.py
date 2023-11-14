@@ -91,7 +91,7 @@ class Watchfiles:
             self._print_changes(changes)
             self._restart()
 
-    @functools.cache
+    @functools.cache  # noqa: B019
     def _get_root(self, path):
         return next((p for p in self._paths if path.is_relative_to(p)), None)
 

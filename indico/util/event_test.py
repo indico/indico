@@ -22,7 +22,6 @@ from indico.util.event import truncate_path
     (['aaa', 'bbb', 'ccc', 'ddd', 'eee'],        14, False, ('aaa', ['ccc', 'ddd'], 'eee', True)),
     (['aaaaaaaa', 'bbb', 'ccc'],                 10, False, (None, ['bbb'], 'ccc', True)),
     (['aaaaaaaa', 'bbb', 'ccc', 'ddd'],          10, False, (None, ['bbb', 'ccc'], 'ddd', True)),
-    ([],                                         10, False, (None, None, None, False)),
     (['aaa'],                                     5, True,  (None, None, 'aaa', False)),
     (['aaaaaa'],                                  5, True,  (None, None, 'aaaaaa', False)),
     (['aaa', 'bbb'],                             10, True,  ('aaa', None, 'bbb', False)),

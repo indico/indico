@@ -175,7 +175,7 @@ class PaperReviewDumpSchema(PaperReviewSchema):
 
 class PaperRevisionDumpSchema(PaperRevisionSchema):
     class Meta(PaperRevisionSchema.Meta):
-        fields = PaperRevisionSchema.Meta.fields + ('reviews',)
+        fields = (*PaperRevisionSchema.Meta.fields, 'reviews')
         exclude = ('reviewer_data',)
 
     reviews = List(Nested(PaperReviewDumpSchema))

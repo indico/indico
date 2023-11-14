@@ -55,8 +55,7 @@ def log_registration_updated(registration, previous_state, **kwargs):
         kind = LogKind.negative
     else:
         state_title = orig_string(registration.state.title).lower()
-        log_text = 'Registration for "{{}}" has been changed from {} to {}'.format(previous_state_title.lower(),
-                                                                                   state_title)
+        log_text = f'Registration for "{{}}" has been changed from {previous_state_title.lower()} to {state_title}'
         kind = LogKind.change
     registration.log(EventLogRealm.participants, kind, 'Registration', log_text.format(registration.full_name),
                      session.user, data=data)

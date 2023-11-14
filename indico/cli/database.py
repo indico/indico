@@ -51,9 +51,9 @@ def prepare(force=False):
 
 def _stamp(plugin=None, revision=None):
     table = 'alembic_version' if not plugin else f'alembic_version_plugin_{plugin}'
-    db.session.execute(f'DELETE FROM {table}')
+    db.session.execute(f'DELETE FROM {table}')  # noqa: S608
     if revision:
-        db.session.execute(f'INSERT INTO {table} VALUES (:revision)', {'revision': revision})
+        db.session.execute(f'INSERT INTO {table} VALUES (:revision)', {'revision': revision})  # noqa: S608
 
 
 @cli.command()
@@ -77,7 +77,7 @@ def reset_alembic():
         print('2) You have already executed the script')
         print('3) You did not fully upgrade to the latest 1.9.11 revision before upgrading to 2.x')
         print('In case of (3), you need to install v1.9.11 and then upgrade the database before updating Indico back '
-              'to {}'.format(indico.__version__))
+              f'to {indico.__version__}')
         sys.exit(1)
     plugins = sorted(x[23:] for x in tables if x.startswith('alembic_version_plugin_'))
     print('Resetting core alembic state...')

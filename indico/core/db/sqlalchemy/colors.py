@@ -42,7 +42,7 @@ class ColorTuple(namedtuple('ColorTuple', ('text', 'background'))):
                 raise ValueError('Colors must only use hex digits')
         return super().__new__(cls, *colors)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return all(self)
 
     @property

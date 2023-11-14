@@ -262,7 +262,8 @@ class EventProtectionForm(IndicoForm):
     own_no_access_contact = StringField(_('No access contact'),
                                         description=_('Contact information shown when someone lacks access to the '
                                                       'event'))
-    visibility = SelectField(_('Visibility'), [Optional()], coerce=lambda x: None if x == '' else int(x),
+    visibility = SelectField(_('Visibility'),
+                             [Optional()], coerce=lambda x: None if x == '' else int(x),  # noqa: PLC1901
                              description=_('''From which point in the category tree this event will be visible from '''
                                            '''(number of categories upwards). Applies to "Today's events", '''
                                            '''Calendar. If the event is moved, this number will be preserved. '''
@@ -499,7 +500,7 @@ class EventLanguagesForm(IndicoForm):
         locales = [(code, f'{name} ({territory})' if territory else name)
                    for code, (name, territory, __) in get_all_locales().items()]
         locales.sort(key=itemgetter(1))
-        self.default_locale.choices = [('', _('No default language'))] + locales
+        self.default_locale.choices = [('', _('No default language')), *locales]
         self.supported_locales.choices = locales
 
     def post_validate(self):

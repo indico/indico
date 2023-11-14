@@ -23,7 +23,7 @@ def upgrade():
         sa.Column('room_id', sa.Integer(), nullable=False, index=True),
         sa.ForeignKeyConstraint(['room_id'], ['roombooking.rooms.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.PrimaryKeyConstraint('user_id', 'room_id',),
+        sa.PrimaryKeyConstraint('user_id', 'room_id'),
         schema='roombooking'
     )
 

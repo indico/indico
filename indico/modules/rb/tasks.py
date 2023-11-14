@@ -36,7 +36,7 @@ def _make_occurrence_date_filter(date_column, default_values, room_columns, valu
     return days_until == notification_before_days
 
 
-def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):
+def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):  # noqa: B006
     if not _defaults or not _overrides:
         _defaults.update({RepeatFrequency.WEEK: rb_settings.get('notification_before_days_weekly'),
                           RepeatFrequency.MONTH: rb_settings.get('notification_before_days_monthly'),

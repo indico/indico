@@ -92,7 +92,7 @@ def generate(output):
         elif language in moment:
             table[locale] = language
 
-    unmatched_locales = sorted(list(set(moment) - set(table.values())))
+    unmatched_locales = sorted(set(moment) - set(table.values()))
     click.secho('Locales generated.', fg='green', bold=True)
     click.secho('Unmatched moment locales:', fg='yellow')
     click.echo(json.dumps(unmatched_locales, indent=2))

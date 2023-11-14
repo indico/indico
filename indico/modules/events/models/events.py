@@ -841,7 +841,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         query = SessionBlock.query.filter(SessionBlock.id == id_,
                                           SessionBlock.session.has(event=self, is_deleted=False))
         if scheduled_only:
-            query.filter(SessionBlock.timetable_entry != None)  # noqa
+            query.filter(SessionBlock.timetable_entry != None)  # noqa: E711
         return query.first()
 
     def get_allowed_sender_emails(self, *, include_current_user=True, include_creator=True, include_managers=True,
@@ -896,7 +896,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                   for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None
-        return dict(sorted(list(emails.items()), key=lambda x: (x[0] != own_email, x[1].lower())))
+        return dict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
 
     @memoize_request
     def has_feature(self, feature):
@@ -1055,7 +1055,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.events.sessions.models.blocks import SessionBlock
         return (SessionBlock.query
                 .filter(SessionBlock.session.has(event=self, is_deleted=False),
-                        SessionBlock.timetable_entry != None)  # noqa
+                        SessionBlock.timetable_entry != None)  # noqa: E711
                 .count())
 
     def __repr__(self):
@@ -1114,7 +1114,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def default_language(self):
         locales = get_all_locales()
-        name, territory, ambiguous = locales.get(self.default_locale, ('', '', False))
+        name, territory, _ambiguous = locales.get(self.default_locale, ('', '', False))
         return f'{name} ({territory})' if territory else name
 
     def get_forced_event_locale(self, user=None, *, allow_session=False, always=False):
@@ -1216,25 +1216,25 @@ def _set_label(target, value, oldvalue, *unused):
 
 @listens_for(Event.__table__, 'after_create')
 def _add_timetable_consistency_trigger(target, conn, **kw):
-    sql = '''
+    sql = f'''
         CREATE CONSTRAINT TRIGGER consistent_timetable
         AFTER UPDATE OF start_dt, end_dt
-        ON {table}
+        ON {target.fullname}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE events.check_timetable_consistency('event');
-    '''.format(table=target.fullname)
+    '''
     DDL(sql).execute(conn)
 
 
 @listens_for(Event.__table__, 'after_create')
 def _add_deletion_consistency_trigger(target, conn, **kw):
-    sql = '''
+    sql = f'''
         CREATE CONSTRAINT TRIGGER consistent_deleted
         AFTER INSERT OR UPDATE OF category_id, is_deleted
-        ON {table}
+        ON {target.fullname}
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
         EXECUTE PROCEDURE categories.check_consistency_deleted();
-    '''.format(table=target.fullname)
+    '''
     DDL(sql).execute(conn)

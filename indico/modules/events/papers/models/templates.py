@@ -63,5 +63,5 @@ class PaperTemplate(StoredFileMixin, db.Model):
         self.assign_id()
         path_segments = ['event', strict_str(self.event.id), 'paper_templates']
         filename = '{}_{}'.format(self.id, secure_filename(self.filename, 'file'))
-        path = posixpath.join(*(path_segments + [filename]))
+        path = posixpath.join(*path_segments, filename)
         return config.ATTACHMENT_STORAGE, path

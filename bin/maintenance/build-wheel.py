@@ -82,7 +82,7 @@ def clean_build_dirs():
 def compile_catalogs():
     path = None
     # find ./xxx/translations/ with at least one subdir
-    for root, dirs, files in os.walk('.'):
+    for root, dirs, _files in os.walk('.'):
         segments = root.split(os.sep)
         if segments[-1] == 'translations' and len(segments) == 3 and dirs:
             path = root
@@ -113,10 +113,10 @@ def build_wheel(target_dir):
 
 
 def git_is_clean_indico():
-    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*',))})
-    cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
-            ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel,
-            ['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel]
+    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*'))})
+    cmds = [['git', 'diff', '--stat', '--color=always', *toplevel],
+            ['git', 'diff', '--stat', '--color=always', '--staged', *toplevel],
+            ['git', 'clean', '-dn', '-e', '__pycache__', *toplevel]]
     for cmd in cmds:
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
@@ -148,7 +148,7 @@ def _get_ignored_package_files_indico():
     files = set(_get_included_files(('indico', 'indico.*')))
     output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'],
                                      text=True)
-    ignored = {line for line in output.splitlines()}
+    ignored = set(output.splitlines())
     dist_path = 'indico/web/static/dist/'
     i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/(?:messages\.mo|messages-react\.json)')
     return {path for path in ignored & files if not path.startswith(dist_path) and not i18n_re.match(path)}
@@ -162,13 +162,13 @@ def package_is_clean_indico():
 
 
 def git_is_clean_plugin():
-    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*',))})
-    cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
-            ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel]
+    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*'))})
+    cmds = [['git', 'diff', '--stat', '--color=always', *toplevel],
+            ['git', 'diff', '--stat', '--color=always', '--staged', *toplevel]]
     if toplevel:
         # only check for ignored files if we have packages. for single-module
         # plugins we don't have any package data to include anyway...
-        cmds.append(['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel)
+        cmds.append(['git', 'clean', '-dn', '-e', '__pycache__', *toplevel])
     for cmd in cmds:
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
@@ -176,7 +176,7 @@ def git_is_clean_plugin():
     if not toplevel:
         # If we have just a single pyfile we don't need to check for ignored files
         return True, None
-    rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard'] + toplevel,
+    rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', *toplevel],
                                  stderr=subprocess.STDOUT, text=True)
     garbage_re = re.compile(r'(\.(py[co]|mo)$)|(/__pycache__/)|(^({})/static/dist/)'.format('|'.join(toplevel)))
     garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]

@@ -69,15 +69,15 @@ def check_person_link_email(event, email):
     event_person_schema = EventPersonSchema(exclude=['address', 'phone'])
 
     if user and person:
-        return dict(status='warning', conflict='user-and-person-already-exists',
-                    event_person=event_person_schema.dump(person),
-                    user=user_schema.dump(user))
+        return {'status': 'warning', 'conflict': 'user-and-person-already-exists',
+                'event_person': event_person_schema.dump(person), 'user': user_schema.dump(user)}
     if person:
-        return dict(status='warning', conflict='person-already-exists', event_person=event_person_schema.dump(person))
+        return {'status': 'warning', 'conflict': 'person-already-exists',
+                'event_person': event_person_schema.dump(person)}
     elif user:
-        return dict(status='warning', conflict='user-already-exists', user=user_schema.dump(user))
+        return {'status': 'warning', 'conflict': 'user-already-exists', 'user': user_schema.dump(user)}
     if email_err := validate_email_verbose(email):
-        return dict(status=('error' if email_err != 'undeliverable' else 'warning'), conflict='email-invalid',
-                    email_error=email_err)
+        return {'status': 'error' if email_err != 'undeliverable' else 'warning', 'conflict': 'email-invalid',
+                'email_error': email_err}
     else:
-        return dict(status='ok')
+        return {'status': 'ok'}

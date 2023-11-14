@@ -405,7 +405,7 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
     def _process_PUT(self):
         if self.category not in self.user.favorite_categories:
             if not self.category.can_access(self.user):
-                raise Forbidden()
+                raise Forbidden
             self.user.favorite_categories.add(self.category)
             if self.suggestion:
                 self.user.suggested_categories.remove(self.suggestion)
@@ -438,7 +438,7 @@ class RHUserFavoritesEventAPI(RHUserBase):
     def _process_PUT(self):
         if self.event not in self.user.favorite_events:
             if not self.event.can_access(self.user):
-                raise Forbidden()
+                raise Forbidden
             self.user.favorite_events.add(self.event)
             signals.users.favorite_event_added.send(self.user, event=self.event)
         return jsonify(success=True)
@@ -748,8 +748,8 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
     """Accept a registration request."""
 
     def _process(self):
-        user, identity = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
-                                       self.request.identity_data, self.request.settings)
+        user = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
+                             self.request.identity_data, self.request.settings)[0]
         with user.force_user_locale():
             tpl = get_template_module('users/emails/registration_request_accepted.txt', user=user)
             email = make_email(self.request.email, template=tpl)

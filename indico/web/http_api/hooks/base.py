@@ -111,12 +111,12 @@ class HTTPAPIHook:
             self._tz = pytz.timezone(tzName)
         except pytz.UnknownTimeZoneError as exc:
             raise HTTPAPIError(f"Bad timezone: '{exc}'", 400)
-        max = self.MAX_RECORDS.get(self._detail, 1000)
+        max_records = self.MAX_RECORDS.get(self._detail, 1000)
         self._userLimit = get_query_parameter(self._queryParams, ['n', 'limit'], 0, integer=True)
-        if self._userLimit > max:
+        if self._userLimit > max_records:
             raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s'" %
-                               (max, self._detail), 400)
-        self._limit = self._userLimit if self._userLimit > 0 else max
+                               (max_records, self._detail), 400)
+        self._limit = self._userLimit if self._userLimit > 0 else max_records
 
         fromDT = get_query_parameter(self._queryParams, ['f', 'from'])
         toDT = get_query_parameter(self._queryParams, ['t', 'to'])
@@ -149,7 +149,7 @@ class HTTPAPIHook:
             res = func(user)
             if isinstance(res, GeneratorType):
                 for obj in res:
-                    resultList.append(obj)
+                    resultList.append(obj)  # noqa: PERF402
             else:
                 resultList = res
         except LimitExceededException:
@@ -238,7 +238,7 @@ class DataFetcher:
             if not allowNegativeOffset and mod == -1:
                 raise ArgumentParseError('End date cannot be a negative offset')
 
-            atoms = list(0 if a is None else int(a) * mod for a in m.groups()[1:])
+            atoms = [0 if a is None else int(a) * mod for a in m.groups()[1:]]
             if atoms[1] > 23 or atoms[2] > 59:
                 raise ArgumentParseError('Invalid time!')
             return ('ctx', timedelta(days=atoms[0], hours=atoms[1], minutes=atoms[2]))

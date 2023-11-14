@@ -190,7 +190,7 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
 
     def _get_agreements(self):
         agreements = self.event.agreements.filter(Agreement.pending,
-                                                  Agreement.person_email != None,  # noqa
+                                                  Agreement.person_email.isnot(None),
                                                   Agreement.type == self.definition.name).all()
         return [a for a in agreements if not a.is_orphan()]
 

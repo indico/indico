@@ -76,7 +76,7 @@ class RHManageCategoryContent(RHManageCategoryBase):
         children_strategy = joinedload('children')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')
-        return children_strategy,
+        return (children_strategy,)
 
     def _process(self):
         page = request.args.get('page', '1')

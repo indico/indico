@@ -228,7 +228,7 @@ class FileSystemStorage(Storage):
 
     def open(self, file_id):
         try:
-            return open(self._resolve_path(file_id), 'rb')
+            return open(self._resolve_path(file_id), 'rb')  # noqa: SIM115
         except Exception as e:
             raise StorageError(f'Could not open "{file_id}": {e}') from e
 

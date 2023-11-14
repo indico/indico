@@ -25,7 +25,7 @@ def test_seems_html():
 
 
 def test_make_unique_token(monkeypatch):
-    monkeypatch.setattr('indico.util.string.uuid4', lambda _counter=count(): str(next(_counter)))
+    monkeypatch.setattr('indico.util.string.uuid4', lambda _counter=count(): str(next(_counter)))  # noqa: B008
     tokens = {'1', '3'}
 
     def _get_token():

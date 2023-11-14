@@ -102,16 +102,11 @@ class AttachmentFile(StoredFileMixin, db.Model):
         self.attachment.assign_id()
         self.assign_id()
         filename = '{}-{}-{}'.format(self.attachment.id, self.id, secure_filename(self.filename, 'file'))
-        path = posixpath.join(*(path_segments + [filename]))
+        path = posixpath.join(*path_segments, filename)
         return config.ATTACHMENT_STORAGE, path
 
     def __repr__(self):
-        return '<AttachmentFile({}, {}, {}, {})>'.format(
-            self.id,
-            self.attachment_id,
-            self.filename,
-            self.content_type
-        )
+        return f'<AttachmentFile({self.id}, {self.attachment_id}, {self.filename}, {self.content_type})>'
 
 
 class Attachment(SearchableTitleMixin, ProtectionMixin, VersionedResourceMixin, db.Model):

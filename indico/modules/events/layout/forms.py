@@ -105,7 +105,7 @@ class ConferenceLayoutForm(LoggedLayoutForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        self.timetable_theme.choices = [('', _('Default'))] + _get_timetable_theme_choices(self.event)
+        self.timetable_theme.choices = [('', _('Default')), *_get_timetable_theme_choices(self.event)]
         self.theme.choices = _get_conference_theme_choices()
 
     def validate_use_custom_css(self, field):

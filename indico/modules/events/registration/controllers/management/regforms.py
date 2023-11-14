@@ -88,8 +88,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
                 continue
             sorted_forms.append(regform)
             del available_forms[form_id]
-        for form_id, regform in available_forms.items():
-            sorted_forms.append(regform)
+        sorted_forms.extend(available_forms.values())
 
         merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
         return WPManageRegistration.render_template('management/regform_display.html', self.event,

@@ -125,7 +125,7 @@ class EventProtectionCloner(EventCloner):
     def get_conflicts(self, target_event):
         conflicts = []
 
-        if target_event.access_key != '':
+        if target_event.access_key:
             conflicts.append(_('The target event already has an access key'))
 
         entries = list(target_event.acl_entries)

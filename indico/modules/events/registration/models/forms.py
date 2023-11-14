@@ -465,8 +465,10 @@ class RegistrationForm(db.Model):
 
     @property
     def needs_publish_consent(self):
-        return (self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or
-                self.publish_registrations_public == PublishRegistrationsMode.show_with_consent)
+        return (
+            self.publish_registrations_participants == PublishRegistrationsMode.show_with_consent or  # noqa: PLR1714
+            self.publish_registrations_public == PublishRegistrationsMode.show_with_consent
+        )
 
     @hybrid_method
     def is_participant_list_visible(self, is_participant):

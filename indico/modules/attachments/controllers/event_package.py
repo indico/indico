@@ -161,7 +161,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
                 else:
                     time = format_time(start_date, format='HHmm', timezone=self.event.timezone)
                     paths.append(secure_filename(f'{time}_{obj.title}', ''))
-            else:
+            else:  # noqa: PLR5501
                 if isinstance(obj, SubContribution):
                     paths.append(secure_filename(f'{obj.position}_{obj.title}', str(obj.id)))
                 else:

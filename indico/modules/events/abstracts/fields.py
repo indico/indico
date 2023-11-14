@@ -176,7 +176,7 @@ class AbstractField(QuerySelectField):
 
     def _get_object_list(self):
         return [(key, abstract)
-                for key, abstract in super(AbstractField, self)._get_object_list()
+                for key, abstract in super()._get_object_list()
                 if abstract.can_access(session.user)]
 
     def _value(self):

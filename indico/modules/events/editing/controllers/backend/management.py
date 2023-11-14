@@ -281,10 +281,18 @@ class RHEmailNotSubmittedEditablesPreview(EmailRolesPreviewMixin, RHEditableType
     object_context = 'contributions'
 
     def get_placeholder_kwargs(self):
-        query = Contribution.query.with_parent(self.event).filter(
-            ~Contribution.editables.any(Editable.type == self.editable_type)
+        query = (
+            Contribution.query
+            .with_parent(self.event)
+            .filter(~Contribution.editables.any(Editable.type == self.editable_type))
         )
-        if contribution := query.join(ContributionPersonLink).join(EventPerson).filter(EventPerson.email != '').first():
+        contrib_with_email_query = (
+            query
+            .join(ContributionPersonLink)
+            .join(EventPerson)
+            .filter(EventPerson.email != '')  # noqa: PLC1901
+        )
+        if contribution := contrib_with_email_query.first():
             person = next(p for p in contribution.person_links if p.email)
         else:
             contribution = query.first()

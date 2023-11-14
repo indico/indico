@@ -143,11 +143,13 @@ class FieldStats:
         """
         choices = defaultdict(dict)
         data = defaultdict(list)
-        regitems = sorted(self._regitems, key=self._build_key)
-        for k, regitems in groupby((regitem for regitem in regitems if regitem.price), key=self._build_key):
-            choices['billed'][k] = self._build_regitems_data(k, list(regitems))
-        for k, regitems in groupby((regitem for regitem in regitems if not regitem.price), key=self._build_key):
-            choices['not_billed'][k] = self._build_regitems_data(k, list(regitems))
+        all_items = sorted(self._regitems, key=self._build_key)
+        items_with_price = [regitem for regitem in all_items if regitem.price]
+        items_without_price = [regitem for regitem in all_items if not regitem.price]
+        for k, items in groupby(items_with_price, key=self._build_key):
+            choices['billed'][k] = self._build_regitems_data(k, list(items))
+        for k, items in groupby(items_without_price, key=self._build_key):
+            choices['not_billed'][k] = self._build_regitems_data(k, list(items))
         for item in self._choices.values():
             key = 'billed' if item['price'] else 'not_billed'
             choices[key].setdefault(self._build_key(item), self._build_choice_data(item))
@@ -164,7 +166,7 @@ class FieldStats:
         """
         table = defaultdict(list)
         table['head'] = self._get_table_head()
-        for (name, id), data_items in sorted(self._data.items()):
+        for (name, _id), data_items in sorted(self._data.items()):
             total_regs = sum(detail.regs for detail in data_items)
             table['rows'].append(('single-row' if len(data_items) == 1 else 'header-row',
                                  self._get_main_row_cells(data_items, name, total_regs) +
@@ -215,7 +217,7 @@ class FieldStats:
                     Cell(type='currency', data=0, classes=['unpaid-amount', 'stick-right']),
                     Cell(type='currency', data=0)]
         progress = [[detail.paid / detail.regs, detail.unpaid / detail.regs],
-                    '{0.paid} / {0.regs}'.format(detail)] if detail.regs else None
+                    f'{detail.paid} / {detail.regs}'] if detail.regs else None
         return [Cell(type='currency', data=float(detail.price)),
                 Cell(type='progress-stacked', data=progress, classes=['paid-unpaid-progress']),
                 Cell(type='currency', data=detail.paid_amount, classes=['paid-amount', 'stick-left']),
@@ -343,7 +345,7 @@ class AccommodationStats(FieldStats, StatsBase):
         if not details.capacity:
             return [Cell()]
         return [Cell(type='progress',
-                     data=(details.regs / details.capacity, '{0.regs} / {0.capacity}'.format(details)))]
+                     data=(details.regs / details.capacity, f'{details.regs} / {details.capacity}'))]
 
     def _build_key(self, obj):
         choice_id = obj.data['choice'] if isinstance(obj, RegistrationData) else obj['id']
@@ -352,7 +354,7 @@ class AccommodationStats(FieldStats, StatsBase):
         return choice_caption, choice_id, choice_price
 
     def _build_regitems_data(self, key, regitems):
-        name, id, price = key
+        price = key[2]
         choices = lambda r: {choice['id']: choice for choice in r.field_data.versioned_data['choices']}
         data = {'regs': len(regitems),
                 'capacity': next((choices(regitem)[regitem.data['choice']]['places_limit'] for regitem in regitems), 0),
@@ -394,9 +396,10 @@ class AccommodationStats(FieldStats, StatsBase):
         return [
             Cell(type='str', data=' ' + choice_caption, classes=['cancelled-item'] if cancelled else []),
             Cell(type='progress', data=((total_regs / len(active_registrations),
-                                         f'{total_regs} / {len(active_registrations)}')
-                                        if active_registrations else None))
-        ] + self._get_occupancy(data_items)
+                                         f'{total_regs} / {len(active_registrations)}') if active_registrations
+                                        else None)),
+            *self._get_occupancy(data_items)
+        ]
 
     def _get_sub_row_cells(self, data_item, total_regs):
         return [
@@ -404,4 +407,5 @@ class AccommodationStats(FieldStats, StatsBase):
             Cell(type='progress', data=((data_item.regs / total_regs,
                                         f'{data_item.regs} / {total_regs}')
                                         if total_regs else None)),
-        ] + self._get_occupancy_details(data_item)
+            *self._get_occupancy_details(data_item)
+        ]

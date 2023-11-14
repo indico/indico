@@ -197,7 +197,7 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
     def data(self):
         """Extend form.data with generated data from properties."""
         data = {k: v
-                for k, v in super(IndicoForm, self).data.items()
+                for k, v in super().data.items()
                 if k != self.meta.csrf_field_name and not k.startswith('ext__')}
         data.update(self.generated_data)
         return data

@@ -54,7 +54,7 @@ def test_full_name(create_room, building, floor, number, verbose_name, expected_
     assert room.full_name == expected_name
 
 
-@pytest.mark.parametrize(('name',), (
+@pytest.mark.parametrize('name', (
     (None,),
     ('1/2-3',),
     ('Test',)

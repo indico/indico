@@ -22,11 +22,11 @@ from indico.core.oauth.models.tokens import OAuthToken
 # The maximum number of tokens to keep for any given app/user and scope combination
 MAX_TOKENS_PER_SCOPE = 50
 # The prefix for OAuth tokens
-TOKEN_PREFIX_OAUTH = 'indo_'
+TOKEN_PREFIX_OAUTH = 'indo_'  # noqa: S105
 # The prefix for personal tokens
-TOKEN_PREFIX_PERSONAL = 'indp_'
+TOKEN_PREFIX_PERSONAL = 'indp_'  # noqa: S105
 # The prefix for service tokens (not handled by this module)
-TOKEN_PREFIX_SERVICE = 'inds_'
+TOKEN_PREFIX_SERVICE = 'inds_'  # noqa: S105
 
 
 def query_token(token_string, allow_personal=False):

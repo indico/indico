@@ -49,11 +49,11 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     qparams = parse_qs(query)
     sorted_params = []
 
-    for key, values in sorted(list(qparams.items()), key=lambda x: x[0].lower()):
+    for key, values in sorted(qparams.items(), key=lambda x: x[0].lower()):
         key = key.lower()
         if key not in remove:
             for v in sorted(values):
-                sorted_params.append((key, v))
+                sorted_params.append((key, v))  # noqa: PERF401
 
     if separate:
         return path, sorted_params and urlencode(sorted_params)
@@ -114,7 +114,7 @@ def handler(prefix, path):
         queryParams = {key: values[0] for key, values in queryParams}
     else:
         # Parse the actual query string
-        queryParams = {key: value for key, value in request.args.items()}
+        queryParams = dict(request.args.items())
         query = request.query_string.decode()
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)

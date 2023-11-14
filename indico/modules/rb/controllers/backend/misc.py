@@ -99,12 +99,12 @@ class RHStats(RHRoomBookingBase):
                                                    'start_dt', today_dt,
                                                    'end_dt', today_dt + timedelta(days=1)))
                           .count())
-        return dict(
-            active_rooms=Room.query.filter_by(is_deleted=False).count(),
-            buildings=Room.query.distinct(Room.building).filter_by(is_deleted=False).count(),
-            pending_bookings=Reservation.query.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
-            bookings_today=bookings_today
-        )
+        return {
+            'active_rooms': Room.query.filter_by(is_deleted=False).count(),
+            'buildings': Room.query.distinct(Room.building).filter_by(is_deleted=False).count(),
+            'pending_bookings': Reservation.query.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
+            'bookings_today': bookings_today
+        }
 
 
 class RHMapAreas(RHRoomBookingBase):

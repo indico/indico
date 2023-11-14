@@ -196,8 +196,8 @@ def serialize_booking_details(booking):
     attributes = reservation_details_schema.dump(booking)
     date_range, occurrences = get_booking_occurrences(booking)
     booking_details = dict(attributes)
-    occurrences_by_type = dict(bookings={}, cancellations={}, rejections={}, other={}, blockings={},
-                               unbookable_hours={}, nonbookable_periods={}, overridable_blockings={})
+    occurrences_by_type = {'bookings': {}, 'cancellations': {}, 'rejections': {}, 'other': {}, 'blockings': {},
+                           'unbookable_hours': {}, 'nonbookable_periods': {}, 'overridable_blockings': {}}
     booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = [dt.isoformat() for dt in date_range]
     for dt, [occ] in occurrences.items():

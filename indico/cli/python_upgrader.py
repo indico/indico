@@ -64,7 +64,7 @@ class PythonUpgrader:
                 sys.exit(1)
             print(f'Not executed via pyenv (probably inside virtualenv); re-executing with {pyenv_shim}')
             os.environ['_PYTHON_UPGRADER_REEXEC'] = '1'
-            os.execl(pyenv_shim, pyenv_shim, *sys.argv)
+            os.execl(pyenv_shim, pyenv_shim, *sys.argv)  # noqa: S606
 
         pyenv_global_python_version = Path('~/.pyenv/version').expanduser().read_text().strip()
         pyenv_local_python_version = subprocess.run(['pyenv', 'version-name'], capture_output=True,
@@ -100,7 +100,7 @@ class PythonUpgrader:
         for line in file.read_text().splitlines():
             if '=' not in line:
                 continue
-            key, _, value = line.partition('=')
+            key, __, value = line.partition('=')
             key = key.strip().lower()
             value = value.strip()
             data[key] = value

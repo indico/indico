@@ -191,7 +191,7 @@ class IndicoLocale(Locale):
     @cached_property
     def time_formats(self):
         formats = super().time_formats
-        for k, v in formats.items():
+        for v in formats.values():
             v.format = v.format.replace(':%(ss)s', '')
         return formats
 

@@ -38,7 +38,7 @@ def _get_indico_version(ctx, param, value):
 
 @click.group(cls=IndicoFlaskGroup)
 @click.option('--version', '-v', expose_value=False, callback=_get_indico_version, is_flag=True, is_eager=True,
-              help='Show the flask version',)
+              help='Show the flask version')
 def cli():
     """
     This script lets you control various aspects of Indico from the

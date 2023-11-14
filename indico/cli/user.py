@@ -91,8 +91,8 @@ def search(substring, include_deleted, include_pending, include_blocked, include
                                       _safe_lower(x.data['email'])))
     if users:
         table_data = [['ID', 'First Name', 'Last Name', 'Email', 'Affiliation']]
-        for user in users:
-            table_data.append([str(user.id), user.first_name, user.last_name, user.email, user.affiliation])
+        table_data.extend([str(user.id), user.first_name, user.last_name, user.email, user.affiliation]
+                          for user in users)
         table = AsciiTable(table_data, cformat('%{white!}Users%{reset}'))
         table.justify_columns[0] = 'right'
         print(table.table)
@@ -269,7 +269,7 @@ def token_list(user_id, verbose):
 def _show_available_scopes(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    table_data = [['Name', 'Description']] + sorted(SCOPES.items())
+    table_data = [['Name', 'Description'], *sorted(SCOPES.items())]
     click.echo(AsciiTable(table_data, cformat('%{white!}Available scopes%{reset}')).table)
     ctx.exit()
 

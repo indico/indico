@@ -51,7 +51,7 @@ class RepeatFrequency(IndicoIntEnum):
 
 class RepeatMapping:
     mapping = {
-        (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),  # noqa: E241
+        (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),  # noqa: E241, E272
         (RepeatFrequency.DAY,   1): ('Repeat daily',                  0,    'daily'),  # noqa: E241
         (RepeatFrequency.WEEK,  1): ('Repeat once a week',            1,    'weekly'),  # noqa: E241
         (RepeatFrequency.WEEK,  2): ('Repeat once every two weeks',   2,    'everyTwoWeeks'),  # noqa: E241
@@ -543,7 +543,7 @@ class Reservation(db.Model):
                 for nbd in nonbookable_periods:
                     if nbd.overlaps(occurrence.start_dt, occurrence.end_dt):
                         if not skip_conflicts:
-                            raise ConflictingOccurrences()
+                            raise ConflictingOccurrences
                         occurrence.cancel(user, 'Skipped due to nonbookable date', silent=True, propagate=False)
                         break
 
@@ -566,7 +566,7 @@ class Reservation(db.Model):
                 continue
             if conflicts['confirmed']:
                 if not skip_conflicts:
-                    raise ConflictingOccurrences()
+                    raise ConflictingOccurrences
                 # Cancel OUR occurrence
                 msg = 'Skipped due to collision with {} reservation(s)'
                 occurrence.cancel(user, msg.format(len(conflicts['confirmed'])), silent=True, propagate=False)
@@ -587,7 +587,7 @@ class Reservation(db.Model):
         if not valid_occurrences:
             raise NoReportError(_('Reservation has no valid occurrences'))
         colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
-        conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
+        conflicts = defaultdict(lambda: {'confirmed': [], 'pending': []})
         for occurrence in valid_occurrences:
             for colliding in colliding_occurrences:
                 if occurrence.overlaps(colliding):

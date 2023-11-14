@@ -175,8 +175,7 @@ class Agreement(db.Model):
 
     def __repr__(self):
         state = self.state.name if self.state is not None else None
-        return '<Agreement({}, {}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.identifier,
-                                                            self.person_email, state)
+        return f'<Agreement({self.id}, {self.event_id}, {self.type}, {self.identifier}, {self.person_email}, {state})>'
 
     @staticmethod
     def create_from_data(event, type_, person):

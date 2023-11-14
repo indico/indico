@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 import sys
-import typing as t
 from contextlib import contextmanager
 from functools import partial
 from threading import get_ident
@@ -47,10 +46,10 @@ def handle_sqlalchemy_database_error():
                                that enforce consistenct
     :raise DatabaseError: any other database error is simply re-raised
     """
-    exc_class, exc, tb = sys.exc_info()
+    exc = sys.exc_info()[1]
     if exc.orig.pgcode is None or not exc.orig.pgcode.startswith('INDX'):
         # not an indico exception
-        raise
+        raise  # noqa: PLE0704
     msg = exc.orig.diag.message_primary
     if exc.orig.diag.message_detail:
         msg += f': {exc.orig.diag.message_detail}'
@@ -66,7 +65,7 @@ def _after_commit(*args, **kwargs):
 
 
 class IndicoSQLAlchemy(SQLAlchemy):
-    Model: t.Type[IndicoModel]
+    Model: type[IndicoModel]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

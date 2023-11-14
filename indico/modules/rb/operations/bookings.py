@@ -125,7 +125,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         nonbookable_periods, unbookable_hours, skip_conflicts_with,
         allow_admin=admin_override_enabled, skip_past_conflicts=skip_past_conflicts
     )
-    dates = list(candidate.start_dt.date() for candidate in candidates)
+    dates = [candidate.start_dt.date() for candidate in candidates]
     for room in rooms:
         room_occurrences = occurrences.get(room.id, [])
         room_conflicting_candidates = conflicting_candidates.get(room.id, [])
@@ -330,8 +330,8 @@ def create_booking_for_event(room_id, event):
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)
         booking_reason = f"Event '{event.title}'"
-        data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
-                    repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
+        data = {'start_dt': start_dt, 'end_dt': end_dt, 'booked_for_user': event.creator,
+                'booking_reason': booking_reason, 'repeat_frequency': RepeatFrequency.NEVER, 'event_id': event.id}
         booking = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
         booking.linked_object = event
         return booking
@@ -353,7 +353,7 @@ def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
                        db.func.indico.natsort(Room.full_name))
              .limit(limit))
 
-    bookings, total = with_total_rows(query)
+    total = with_total_rows(query)[1]
     rows_left = total - limit if total > limit else total
     return group_by_occurrence_date(query, sort_by=lambda obj: (obj.start_dt, obj.reservation_id)), rows_left
 

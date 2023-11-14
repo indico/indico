@@ -85,7 +85,7 @@ class IndicoSearchProvider:
 
         :return: a dict with the `ResultSchema` structure
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_placeholders(self):
         """

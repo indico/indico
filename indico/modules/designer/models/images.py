@@ -57,13 +57,8 @@ class DesignerImageFile(StoredFileMixin, db.Model):
         path_segments = ['designer_templates', strict_str(self.template.id), 'images']
         self.assign_id()
         filename = f'{self.id}-{self.filename}'
-        path = posixpath.join(*(path_segments + [filename]))
+        path = posixpath.join(*path_segments, filename)
         return config.ATTACHMENT_STORAGE, path
 
     def __repr__(self):
-        return '<DesignerImageFile({}, {}, {}, {})>'.format(
-            self.id,
-            self.template_id,
-            self.filename,
-            self.content_type
-        )
+        return f'<DesignerImageFile({self.id}, {self.template_id}, {self.filename}, {self.content_type})>'

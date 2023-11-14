@@ -95,7 +95,7 @@ class StaticSite(StoredFileMixin, db.Model):
         path_segments = ['event', strict_str(self.event.id), 'static']
         self.assign_id()
         filename = f'{self.id}-{self.filename}'
-        path = posixpath.join(*(path_segments + [filename]))
+        path = posixpath.join(*path_segments, filename)
         return config.STATIC_SITE_STORAGE, path
 
     def __repr__(self):

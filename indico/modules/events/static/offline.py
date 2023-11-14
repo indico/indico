@@ -10,6 +10,7 @@ import itertools
 import os
 import posixpath
 import re
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
@@ -136,10 +137,10 @@ class StaticEventCreator:
         # assets
         css_files = {url for url in used_assets if re.match(r'static/dist/.*\.css$', url)}
         for file_path in css_files:
-            with open(os.path.join(self._web_dir, file_path)) as f:
-                rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
-                used_assets |= used_urls
-                self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+            css_data = Path(self._web_dir, file_path).read_text()
+            rewritten_css, used_urls, __ = rewrite_css_urls(self.event, css_data)
+            used_assets |= used_urls
+            self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
         for file_path in used_assets - css_files:
             if not re.match('^static/(images|fonts|dist)/(?!js/ckeditor/)', file_path):
                 continue
@@ -151,10 +152,10 @@ class StaticEventCreator:
         for file_path in css_files:
             plugin_name, path = re.match(r'static/plugins/([^/]+)/(.+.css)', file_path).groups()
             plugin = plugin_engine.get_plugin(plugin_name)
-            with open(os.path.join(plugin.root_path, 'static', path)) as f:
-                rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
-                used_assets |= used_urls
-                self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+            css_data = Path(plugin.root_path, 'static', path).read_text()
+            rewritten_css, used_urls, __ = rewrite_css_urls(self.event, css_data)
+            used_assets |= used_urls
+            self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
         for file_path in used_assets - css_files:
             match = re.match(r'static/plugins/([^/]+)/(.+)', file_path)
             if not match:
@@ -171,10 +172,10 @@ class StaticEventCreator:
     def _copy_customization_files(self, used_assets):
         css_files = {url for url in used_assets if re.match(r'static/custom/.*\.css$', url)}
         for file_path in css_files:
-            with open(os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))) as f:
-                rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
-                used_assets |= used_urls
-                self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+            css_data = Path(os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))).read_text()
+            rewritten_css, used_urls, __ = rewrite_css_urls(self.event, css_data)
+            used_assets |= used_urls
+            self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
         for file_path in used_assets - css_files:
             if not file_path.startswith('static/custom/'):
                 continue
@@ -216,7 +217,7 @@ class StaticEventCreator:
         self._zip_file.write(src, dest)
 
     def _copy_folder(self, dest, src):
-        for root, subfolders, files in os.walk(src):
+        for root, _dirs, files in os.walk(src):
             dst_dirpath = os.path.join(dest, os.path.relpath(root, src))
             for filename in files:
                 src_filepath = os.path.join(src, root, filename)

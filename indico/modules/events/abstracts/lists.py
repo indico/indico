@@ -185,7 +185,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
                                        .where(Abstract.submitted_for_tracks.prop.primaryjoin))
                 criteria.append(submitted_for_count > 1)
             if extra_filters.get('comments'):
-                criteria.append(Abstract.submission_comment != '')
+                criteria.append(Abstract.submission_comment != '')  # noqa: PLC1901
         return query.filter(db.and_(*criteria))
 
     def get_list_kwargs(self):

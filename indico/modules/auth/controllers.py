@@ -389,7 +389,7 @@ class RHRemoveAccount(RHUserBase):
         RHUserBase._process_args(self)
         self.identity = Identity.get_or_404(request.view_args['identity'])
         if self.identity.user != self.user:
-            raise NotFound()
+            raise NotFound
 
     def _process(self):
         if session.get('login_identity') == self.identity.id:
@@ -401,8 +401,8 @@ class RHRemoveAccount(RHUserBase):
             provider_title = multipass.identity_providers[self.identity.provider].title
         except KeyError:
             provider_title = self.identity.provider.title()
-        flash(_('{provider} ({identifier}) successfully removed from your accounts'
-              .format(provider=provider_title, identifier=self.identity.identifier)), 'success')
+        flash(_('{provider} ({identifier}) successfully removed from your accounts')
+              .format(provider=provider_title, identifier=self.identity.identifier), 'success')
         return redirect(url_for('.accounts'))
 
 

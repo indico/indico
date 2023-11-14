@@ -63,9 +63,9 @@ def test_values_from_signal_multi_value_types():
 
 def test_values_from_signal_return_plugins():
     vals = ('a', 'b', 'c')
-    signal_response = _make_signal_response(vals) + [(MagicMock(indico_plugin='foo'), 'd')]
-    assert values_from_signal(signal_response, return_plugins=True) == set(list(zip([None] * 3, vals)) + [('foo', 'd')])
-    assert values_from_signal(signal_response) == set(vals + ('d',))
+    signal_response = [*_make_signal_response(vals), (MagicMock(indico_plugin='foo'), 'd')]
+    assert values_from_signal(signal_response, return_plugins=True) == {*zip([None] * 3, vals), ('foo', 'd')}
+    assert values_from_signal(signal_response) == {*vals, 'd'}
 
 
 @pytest.mark.parametrize('name_attr', ('name', 'foobar'))
@@ -196,7 +196,7 @@ def test_interceptable_override_none():
     with signals.plugin.interceptable_function.connected_to(lambda *a, **kw: None, interceptable_sender(foo)):
         # simply returning None won't work
         assert foo() == 'nope'
-    with signals.plugin.interceptable_function.connected_to(lambda *a, RETURN_NONE, **kw: RETURN_NONE,
+    with signals.plugin.interceptable_function.connected_to(lambda *a, RETURN_NONE, **kw: RETURN_NONE,  # noqa: N803
                                                             interceptable_sender(foo)):
         assert foo() is None
 

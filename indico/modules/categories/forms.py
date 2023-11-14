@@ -94,7 +94,8 @@ class CategoryProtectionForm(IndicoForm):
     own_no_access_contact = StringField(_('No access contact'),
                                         description=_('Contact information shown when someone lacks access to the '
                                                       'category'))
-    visibility = SelectField(_('Event visibility'), [Optional()], coerce=lambda x: None if x == '' else int(x),
+    visibility = SelectField(_('Event visibility'),
+                             [Optional()], coerce=lambda x: None if x == '' else int(x),  # noqa: PLC1901
                              description=_('''From which point in the category tree contents will be visible from '''
                                            '''(number of categories upwards). Applies to "Today's events" and '''
                                            '''Calendar. If the category is moved, this number will be preserved.'''))

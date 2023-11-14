@@ -70,7 +70,7 @@ class RHSearchRooms(RHRoomBookingBase):
         else:
             availability = not only_unavailable
         search_query = search_for_rooms(args, allow_admin=admin_override_enabled, availability=availability)
-        rooms = [(id_, room_name) for id_, room_name, in search_query.with_entities(Room.id, Room.full_name)]
+        rooms = list(search_query.with_entities(Room.id, Room.full_name))
 
         # We can't filter by blocking's acl in the search_query, so we need to adjust the results
         rooms = self._adjust_blockings(rooms, args, availability, admin_override_enabled)

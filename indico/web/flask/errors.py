@@ -71,7 +71,7 @@ def handle_unprocessableentity(exc):
 @errors_bp.app_errorhandler(BadRequestKeyError)
 def handle_badrequestkeyerror(exc):
     if current_app.debug:
-        raise
+        raise  # noqa: PLE0704
     msg = _('Required argument missing: {}').format(str(exc))
     return render_error(exc, exc.name, msg, exc.code)
 
@@ -111,7 +111,7 @@ def handle_exception(exc, message=None):
     if not current_app.debug or request.is_xhr or request.is_json:
         sentry_sdk.capture_exception(exc)
         if message is None:
-            message = f'{type(exc).__name__}: {str(exc)}'
+            message = f'{type(exc).__name__}: {exc!s}'
         if os.environ.get('INDICO_DEV_SERVER') == '1':
             # If we are in the dev server, we always want to see a traceback on the
             # console, even if this was an API request.
@@ -120,4 +120,4 @@ def handle_exception(exc, message=None):
     # Let the exception propagate to middleware / the webserver.
     # This triggers the Flask debugger in development and sentry
     # logging (if enabled) (via got_request_exception).
-    raise
+    raise  # noqa: PLE0704

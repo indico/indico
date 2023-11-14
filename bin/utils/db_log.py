@@ -40,7 +40,7 @@ class LogRecordStreamHandler(StreamRequestHandler):
             chunk = self.connection.recv(size)
             while len(chunk) < size:
                 chunk = chunk + self.connection.recv(size - len(chunk))
-            obj = pickle.loads(chunk)
+            obj = pickle.loads(chunk)  # noqa: S301
             self.handle_log(obj)
 
     def _check_ignored_sources(self, source):
@@ -135,7 +135,7 @@ class LogRecordSocketReceiver(ThreadingTCPServer):
 
 
 def terminal_size():
-    h, w, hp, wp = struct.unpack(b'HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack(b'HHHH', 0, 0, 0, 0)))
+    h, w, _hp, _wp = struct.unpack(b'HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack(b'HHHH', 0, 0, 0, 0)))
     return w, h
 
 

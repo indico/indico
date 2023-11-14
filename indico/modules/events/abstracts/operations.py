@@ -153,7 +153,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
             'convert': lambda change: [t.name if t else None for t in change]
         }
     }
-    for field_name, change in changes.items():
+    for field_name in changes:
         # we skip skip None -> '' changes (editing an abstract that
         # did not have a value for a new field yet without filling
         # it out)
@@ -276,8 +276,8 @@ def _merge_person_links(target_abstract, source_abstract):
             else:
                 link.display_order = 0
             new_links.add(link)
-            for column_name in {'_title', '_affiliation', '_affiliation_id', '_address', '_phone', '_first_name',
-                                '_last_name'}:
+            for column_name in ('_title', '_affiliation', '_affiliation_id', '_address', '_phone', '_first_name',
+                                '_last_name'):
                 setattr(link, column_name, getattr(source_link, column_name))
 
     # Add new links in order

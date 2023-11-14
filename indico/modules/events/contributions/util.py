@@ -163,14 +163,11 @@ def generate_spreadsheet_from_contributions(contributions):
         if has_board_number:
             contrib_data['Board number'] = c.board_number
 
-        attachments = []
         attached_items = get_attached_items(c)
-        for attachment in attached_items.get('files', []):
-            attachments.append(attachment.absolute_download_url)
-
-        for folder in attached_items.get('folders', []):
-            for attachment in folder.attachments:
-                attachments.append(attachment.absolute_download_url)
+        attachments = [att.absolute_download_url for att in attached_items.get('files', [])]
+        attachments.extend(attachment.absolute_download_url
+                           for folder in attached_items.get('folders', [])
+                           for attachment in folder.attachments)
 
         if attachments:
             contrib_data['Materials'] = ', '.join(attachments)

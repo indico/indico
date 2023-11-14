@@ -86,7 +86,7 @@ class RHDisplayEventBase(RHProtectedEventBase):
         return WPAccessKey.render_template('display/access_key.html', event=self.event)
 
     def _show_registration_form(self):
-        displayed_regforms, user_registrations = get_event_regforms_registrations(self.event, session.user)
+        displayed_regforms = get_event_regforms_registrations(self.event, session.user)[0]
         if displayed_regforms and all(r.require_login for r in displayed_regforms) and not session.user:
             # force the user to log in first. like this they will go back to the page they tried to
             # originally access in case they are already registered for the event

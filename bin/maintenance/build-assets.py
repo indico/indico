@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
+from pathlib import Path
 
 import click
 import yaml
@@ -40,8 +41,7 @@ def step(message, *args):
 
 
 def _get_webpack_build_config(url_root='/'):
-    with open('indico/modules/events/themes.yaml') as f:
-        themes = yaml.safe_load(f.read())
+    themes = yaml.safe_load(Path('indico/modules/events/themes.yaml').read_text())
     root_path = os.path.abspath('indico')
     return {
         'build': {
@@ -82,8 +82,7 @@ def _get_plugin_build_deps(plugin_dir):
 
 def _parse_plugin_theme_yaml(plugin_yaml):
     # This is very similar to what ThemeSettingsProxy does
-    with open('indico/modules/events/themes.yaml') as f:
-        core_data = f.read()
+    core_data = Path('indico/modules/events/themes.yaml').read_text()
     core_data = re.sub(r'^(\S+:)$', r'__core_\1', core_data, flags=re.MULTILINE)
     settings = {k: v
                 for k, v in yaml.safe_load(core_data + '\n' + plugin_yaml).items()
@@ -99,8 +98,8 @@ def _get_plugin_themes(plugin_dir):
         theme_file = bundle_config['indicoTheme']
     except KeyError:
         return {}
-    with open(os.path.join(plugin_dir, theme_file)) as f:
-        return _parse_plugin_theme_yaml(f.read())
+    data = Path(plugin_dir, theme_file).read_text()
+    return _parse_plugin_theme_yaml(data)
 
 
 def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
@@ -175,10 +174,10 @@ def build_indico(dev, clean, watch, url_root):
         _clean(webpack_build_config)
     force_url_map = ['--force'] if clean or not dev else []
     url_map_path = webpack_build_config['build']['urlMapPath']
-    subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path] + force_url_map)
+    subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path, *force_url_map])
     args = _get_webpack_args(dev, watch)
     try:
-        subprocess.check_call(['npx', 'webpack'] + args)
+        subprocess.check_call(['npx', 'webpack', *args])
     except subprocess.CalledProcessError:
         fail('running webpack failed')
     finally:
@@ -232,8 +231,8 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
     dump_plugin_args = ['--plugin', webpack_build_config['plugin']]
     for name in _get_plugin_build_deps(plugin_dir):
         dump_plugin_args += ['--plugin', name]
-    subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py',
-                           '--output', url_map_path] + dump_plugin_args + force_url_map)
+    subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path,
+                           *dump_plugin_args, *force_url_map])
     webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'
@@ -248,7 +247,7 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
     os.environ['NODE_PATH'] = os.path.abspath('node_modules')
     os.environ['INDICO_PLUGIN_ROOT'] = plugin_dir
     try:
-        subprocess.check_call(['npx', 'webpack'] + args)
+        subprocess.check_call(['npx', 'webpack', *args])
     except subprocess.CalledProcessError:
         fail('running webpack failed')
     finally:

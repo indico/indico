@@ -87,7 +87,6 @@ def test_reservation_confirmation_emails_plaintext(snapshot, snapshot_name, crea
     ('creation_email_to_user.txt', '_repeat', None, RepeatFrequency.DAY),
     ('creation_email_to_user.txt', '_repeat_excluded_1', 1, RepeatFrequency.DAY),
     ('creation_email_to_user.txt', '_repeat_excluded_2', 2, RepeatFrequency.DAY),
-    ('creation_email_to_manager.txt', '', None, RepeatFrequency.NEVER),
     ('creation_email_to_manager.txt', '_pre', None, RepeatFrequency.NEVER),
     ('creation_email_to_user.txt', '_pre', None, RepeatFrequency.NEVER),
     ('creation_email_to_user.txt', '_repeat_pre', None, RepeatFrequency.DAY),

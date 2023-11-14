@@ -68,7 +68,7 @@ class EventPersonSchema(mm.SQLAlchemyAutoSchema):
         model = EventPerson
         public_fields = ('id', 'identifier', 'title', 'email', 'affiliation', 'affiliation_link', 'affiliation_id',
                          'affiliation_meta', 'name', 'first_name', 'last_name', 'user_identifier')
-        fields = public_fields + ('phone', 'address')
+        fields = (*public_fields, 'phone', 'address')
 
     type = fields.Constant('EventPerson')
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')

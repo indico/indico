@@ -67,7 +67,7 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
     active_tz = _get_timezone_display(local_tz, session.timezone, force_local_tz)
     timezones = common_timezones
     if active_tz not in common_timezones_set:
-        timezones = list(common_timezones) + [active_tz]
+        timezones = [*common_timezones, active_tz]
     timezone_data = {
         'disabled': force_local_tz,
         'user_tz': user_tz,
@@ -161,7 +161,7 @@ class WPJinjaMixin:
 
 class WPBundleMixin:
     bundles = ('exports.js', 'common-runtime.js')
-    print_bundles = tuple()
+    print_bundles = ()
 
     @classproperty
     @classmethod
@@ -228,10 +228,9 @@ class WPBase(WPBundleMixin):
     @classproperty
     @classmethod
     def bundles(cls):
-        _bundles = ('common.css', 'common.js', 'react.css', 'react.js', 'semantic-ui.js', 'semantic-ui.css',
-                    'jquery.css', 'jquery.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
-                    'module_attachments.js', 'outdatedbrowser.js', 'outdatedbrowser.css')
-        return _bundles
+        return ('common.css', 'common.js', 'react.css', 'react.js', 'semantic-ui.js', 'semantic-ui.css',
+                'jquery.css', 'jquery.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
+                'module_attachments.js', 'outdatedbrowser.js', 'outdatedbrowser.css')
 
     def _get_head_content(self):
         """Return _additional_ content between <head></head> tags.
@@ -296,7 +295,7 @@ class WPBase(WPBundleMixin):
 class WPNewBase(WPBundleMixin, WPJinjaMixin):
     title = ''
     bundles = ('outdatedbrowser.js', 'outdatedbrowser.css')
-    print_bundles = tuple()
+    print_bundles = ()
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False

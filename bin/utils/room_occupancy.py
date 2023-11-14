@@ -29,10 +29,10 @@ def _main(location):
 
     print('Month\tYear\tPublic?\tRoom')
     for room in rooms:
-        print('{2:.2f}%\t{3:.2f}%\t{1}\t{0}'.format(room.full_name,
-                                                    'Y' if room.is_public else 'N',
-                                                    calculate_rooms_occupancy([room], past_month, yesterday) * 100,
-                                                    calculate_rooms_occupancy([room], past_year, yesterday) * 100))
+        print('{:.2f}%\t{:.2f}%\t{}\t{}'.format(calculate_rooms_occupancy([room], past_month, yesterday) * 100,
+                                                calculate_rooms_occupancy([room], past_year, yesterday) * 100,
+                                                'Y' if room.is_public else 'N',
+                                                room.full_name))
 
 
 @click.command()

@@ -91,11 +91,11 @@ def delete_all_tables(db):
         conn.execute(DropTable(table))
     for schema in all_schema_tables:
         if schema != 'public':
-            row = conn.execute('''
+            row = conn.execute(f'''
                 SELECT 'DROP FUNCTION ' || ns.nspname || '.' || proname || '(' || oidvectortypes(proargtypes) || ')'
                 FROM pg_proc INNER JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
-                WHERE ns.nspname = '{}'  order by proname;
-            '''.format(schema))
+                WHERE ns.nspname = '{schema}' order by proname;
+            ''')  # noqa: S608
             for stmt, in row:
                 conn.execute(stmt)
             conn.execute(DropSchema(schema))

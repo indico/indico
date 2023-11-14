@@ -87,7 +87,7 @@ class RHTimeline(RHRoomBookingBase):
             availability = serialized[self.room.id]
         else:
             # keep order of original room id list
-            availability = sorted(list(serialized.items()), key=lambda x: room_ids.index(x[0]))
+            availability = sorted(serialized.items(), key=lambda x: room_ids.index(x[0]))
         return jsonify(availability=availability, date_range=date_range)
 
 

@@ -6,4 +6,4 @@
 # LICENSE file for more details.
 
 from .core import db  # noqa: F401
-from .custom import *  # noqa: F401,F403
+from .custom import *  # noqa: F401,F403,RUF100

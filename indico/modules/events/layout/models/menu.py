@@ -163,13 +163,7 @@ class MenuEntryMixin:
         return dict(self.event_ref.locator, menu_entry_id=self.id)
 
     def __repr__(self):
-        return '<{}({}, {}, {}, position={})>'.format(
-            type(self).__name__,
-            self.id,
-            self.title,
-            self.name,
-            self.position,
-        )
+        return f'<{type(self).__name__}({self.id}, {self.title}, {self.name}, position={self.position})>'
 
 
 class TransientMenuEntry(MenuEntryMixin):
@@ -221,16 +215,15 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
             .format(type=MenuEntryType),
             'valid_name'),
         db.CheckConstraint(
-            '(type = {type.user_link.value}) = (link_url IS NOT NULL)'
-            .format(type=MenuEntryType),
+            f'(type = {MenuEntryType.user_link.value}) = (link_url IS NOT NULL)',
             'valid_link_url'),
         db.CheckConstraint(
-            '(type = {type.page.value} AND page_id IS NOT NULL) OR'
-            ' (type != {type.page.value} AND page_id IS NULL)'.format(type=MenuEntryType),
+            f'(type = {MenuEntryType.page.value} AND page_id IS NOT NULL) OR'
+            f' (type != {MenuEntryType.page.value} AND page_id IS NULL)',
             'valid_page_id'),
         db.CheckConstraint(
-            '(type = {type.plugin_link.value} AND plugin IS NOT NULL) OR'
-            ' (type != {type.plugin_link.value} AND plugin IS NULL)'.format(type=MenuEntryType),
+            f'(type = {MenuEntryType.plugin_link.value} AND plugin IS NOT NULL) OR'
+            f' (type != {MenuEntryType.plugin_link.value} AND plugin IS NULL)',
             'valid_plugin'),
         db.CheckConstraint(
             '(type = {type.separator.value} AND title IS NULL) OR'

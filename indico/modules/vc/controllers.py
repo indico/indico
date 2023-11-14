@@ -323,7 +323,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .join(VCRoomEventAssociation)
                  # Plugins might add eager-loaded extensions to the table - since we cannot group by them
                  # we need to make sure everything is lazy-loaded here.
-                 .options((lazyload(r) for r in inspect(VCRoom).relationships.keys()),
+                 .options((lazyload(r) for r in inspect(VCRoom).relationships.keys()),  # noqa: SIM118
                           joinedload('events').joinedload('event').joinedload('acl_entries'))
                  .group_by(VCRoom.id)
                  .order_by(func.lower(VCRoom.name) != self.query.lower(), db.desc('event_count'))

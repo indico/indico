@@ -209,9 +209,9 @@ class SerializerBase:
             'emailHash': md5(convener.person.email.encode()).hexdigest() if convener.person.email else None
         }
         if can_manage:
-            data['address'] = convener.address,
-            data['phone'] = convener.phone,
-            data['email'] = convener.person.email,
+            data['address'] = convener.address
+            data['phone'] = convener.phone
+            data['email'] = convener.person.email
         return data
 
     def _serialize_session(self, session_, can_manage=False):
@@ -402,7 +402,7 @@ class SerializerBase:
 
     def _serialize_subcontribution(self, subcontrib):
         can_manage = self.user is not None and subcontrib.contribution.can_manage(self.user)
-        data = {
+        return {
             '_type': 'SubContribution',
             '_fossil': 'subContributionMetadata',
             'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
@@ -419,7 +419,6 @@ class SerializerBase:
             'references': [self.serialize_reference(x) for x in subcontrib.references],
             'code': subcontrib.code,
         }
-        return data
 
 
 class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):

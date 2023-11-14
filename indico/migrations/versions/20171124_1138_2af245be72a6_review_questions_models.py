@@ -34,18 +34,19 @@ def upgrade():
         op.add_column(questions_table, sa.Column('description', sa.Text(), nullable=False, server_default=''),
                       schema=schema)
         op.alter_column(questions_table, 'description', server_default=None, schema=schema)
-        op.execute('ALTER TABLE {}.{} ALTER COLUMN "value" TYPE JSON USING to_json(value)'.format(schema,
-                                                                                                  ratings_table))
+        op.execute(f'ALTER TABLE {schema}.{ratings_table} ALTER COLUMN "value" TYPE JSON USING to_json(value)')
 
 
 def downgrade():
     for schema, ratings_table, questions_table in tables:
         op.alter_column(questions_table, 'title', new_column_name='text', schema=schema)
-        op.execute('DELETE FROM {0}.{1} WHERE question_id IN(SELECT id FROM {0}.{2} '
-                   "WHERE field_type != 'rating' OR NOT is_required)".format(schema, ratings_table, questions_table))
-        op.execute(f"DELETE FROM {schema}.{questions_table} WHERE field_type != 'rating'")
-        op.execute('ALTER TABLE {}.{} ALTER COLUMN "value" TYPE INT USING value::TEXT::INT'.format(schema,
-                                                                                                   ratings_table))
+        op.execute(f'''
+            DELETE FROM {schema}.{ratings_table} WHERE question_id IN (
+                SELECT id FROM {schema}.{questions_table} WHERE field_type != 'rating' OR NOT is_required
+            )
+        ''')  # noqa: S608
+        op.execute(f"DELETE FROM {schema}.{questions_table} WHERE field_type != 'rating'")  # noqa: S608
+        op.execute(f'ALTER TABLE {schema}.{ratings_table} ALTER COLUMN "value" TYPE INT USING value::TEXT::INT')
 
         op.drop_column(questions_table, 'field_type', schema=schema)
         op.drop_column(questions_table, 'is_required', schema=schema)

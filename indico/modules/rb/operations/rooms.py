@@ -53,11 +53,11 @@ def _query_managed_rooms(user):
                         RoomPrincipal.user_id == user.id,
                         RoomPrincipal.has_management_permission())]
     for group in user.local_groups:
-        criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
+        criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,  # noqa: PERF401
                                 RoomPrincipal.local_group_id == group.id,
                                 RoomPrincipal.has_management_permission()))
     for group in user.iter_all_multipass_groups():
-        criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
+        criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,  # noqa: PERF401
                                 RoomPrincipal.multipass_group_provider == group.provider.name,
                                 db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
                                 RoomPrincipal.has_management_permission()))

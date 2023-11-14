@@ -303,8 +303,8 @@ def create_comment(paper, text, visibility, user):
     comment = PaperReviewComment(user=user, text=text, visibility=visibility)
     paper.last_revision.comments.append(comment)
     db.session.flush()
-    recipients = {x for x in paper.contribution.paper_judges}
-    if visibility == PaperCommentVisibility.contributors or visibility == PaperCommentVisibility.reviewers:
+    recipients = set(paper.contribution.paper_judges)
+    if visibility in {PaperCommentVisibility.contributors, PaperCommentVisibility.reviewers}:
         recipients |= paper.contribution.paper_layout_reviewers if paper.cfp.layout_reviewing_enabled else set()
         recipients |= paper.contribution.paper_content_reviewers if paper.cfp.content_reviewing_enabled else set()
     if visibility == PaperCommentVisibility.contributors:

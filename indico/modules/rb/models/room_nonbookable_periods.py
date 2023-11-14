@@ -35,11 +35,7 @@ class NonBookablePeriod(db.Model):
     # - room (Room.nonbookable_periods)
 
     def __repr__(self):
-        return '<NonBookablePeriod({}, {}, {})>'.format(
-            self.room_id,
-            self.start_dt,
-            self.end_dt
-        )
+        return f'<NonBookablePeriod({self.room_id}, {self.start_dt}, {self.end_dt})>'
 
     @hybrid_method
     def overlaps(self, st, et):

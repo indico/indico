@@ -7,6 +7,7 @@
 
 import os
 from io import BytesIO
+from pathlib import Path
 
 import pytest
 
@@ -145,8 +146,7 @@ def test_fs_get_local_path(fs_storage):
     f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
     with fs_storage.get_local_path(f) as path:
         assert path == fs_storage._resolve_path(f)
-        with open(path, 'rb') as fd:
-            assert fd.read() == b'hello world'
+        assert Path(path).read_bytes() == b'hello world'
     # fs storage returns the real path so it should still exist afterwards
     assert os.path.exists(path)
 
@@ -159,6 +159,5 @@ def test_storage_get_local_path(fs_storage):
     storage = CustomStorage(fs_storage.path)
     f, __ = storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
     with storage.get_local_path(f) as path:
-        with open(path, 'rb') as fd:
-            assert fd.read() == b'hello world'
+        assert Path(path).read_bytes() == b'hello world'
     assert not os.path.exists(path)

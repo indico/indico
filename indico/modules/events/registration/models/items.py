@@ -160,21 +160,18 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint('(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)'
                            .format(t=RegistrationFormItemType),
                            name='top_level_sections'),
-        db.CheckConstraint('(type != {type}) = (personal_data_type IS NULL)'
-                           .format(type=RegistrationFormItemType.field_pd),
+        db.CheckConstraint(f'(type != {RegistrationFormItemType.field_pd}) = (personal_data_type IS NULL)',
                            name='pd_field_type'),
         db.CheckConstraint('NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))'
                            .format(t=RegistrationFormItemType),
                            name='pd_not_deleted'),
         db.CheckConstraint(f'is_enabled OR type != {RegistrationFormItemType.section_pd}',
                            name='pd_section_enabled'),
-        db.CheckConstraint('is_enabled OR type != {type} OR personal_data_type NOT IN '
-                           '({pt.email}, {pt.first_name}, {pt.last_name})'
-                           .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
+        db.CheckConstraint(f'is_enabled OR type != {RegistrationFormItemType.field_pd} OR personal_data_type NOT IN '
+                           f'({PersonalDataType.email}, {PersonalDataType.first_name}, {PersonalDataType.last_name})',
                            name='pd_field_enabled'),
-        db.CheckConstraint('is_required OR type != {type} OR personal_data_type NOT IN '
-                           '({pt.email}, {pt.first_name}, {pt.last_name})'
-                           .format(type=RegistrationFormItemType.field_pd, pt=PersonalDataType),
+        db.CheckConstraint(f'is_required OR type != {RegistrationFormItemType.field_pd} OR personal_data_type NOT IN '
+                           f'({PersonalDataType.email}, {PersonalDataType.first_name}, {PersonalDataType.last_name})',
                            name='pd_field_required'),
         db.CheckConstraint('current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})'
                            .format(t=RegistrationFormItemType),
@@ -337,7 +334,7 @@ class RegistrationFormItem(db.Model):
     @property
     def view_data(self):
         """Return object with data that Angular can understand."""
-        return dict(id=self.id, description=self.description, position=self.position)
+        return {'id': self.id, 'description': self.description, 'position': self.position}
 
     @property
     def is_active(self):
@@ -379,7 +376,7 @@ class RegistrationFormItem(db.Model):
                    .filter(~sections.is_deleted)
                    .filter(sections.is_enabled)
                    .exists())
-        return cls.is_enabled & ~cls.is_deleted & ((cls.parent_id == None) | query)  # noqa
+        return cls.is_enabled & ~cls.is_deleted & (cls.parent_id.is_(None) | query)
 
     def get_locked_reason(self, registration):
         """Get the reason for the field being locked."""
@@ -420,12 +417,11 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @property
     def own_data(self):
-        field_data = dict(super().view_data,
-                          enabled=self.is_enabled,
-                          title=self.title,
-                          is_manager_only=self.is_manager_only,
-                          is_personal_data=False)
-        return field_data
+        return dict(super().view_data,
+                    enabled=self.is_enabled,
+                    title=self.title,
+                    is_manager_only=self.is_manager_only,
+                    is_personal_data=False)
 
     @property
     def view_data(self):

@@ -10,6 +10,7 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 import click
 from babel.dates import format_date
@@ -74,26 +75,24 @@ def _bump_version(version):
 
 
 def _get_current_version():
-    with open('indico/__init__.py') as f:
-        content = f.read()
+    content = Path('indico/__init__.py').read_text()
     match = re.search(r"^__version__ = '([^']+)'$", content, re.MULTILINE)
     return match.group(1)
 
 
 def _set_version(version, dry_run=False):
     step('Setting version to {}', version, dry_run=dry_run)
-    with open('indico/__init__.py') as f:
-        orig = content = f.read()
+    init_py = Path('indico/__init__.py')
+    orig = content = init_py.read_text()
     content = re.sub(r"^__version__ = '([^']+)'$", f"__version__ = '{version}'", content, flags=re.MULTILINE)
     assert content != orig
     if not dry_run:
-        with open('indico/__init__.py', 'w') as f:
-            f.write(content)
+        init_py.write_text(content)
 
 
 def _set_changelog_date(new_version, dry_run=False):
-    with open('CHANGES.rst') as f:
-        orig = content = f.read()
+    changes_rst = Path('CHANGES.rst')
+    orig = content = changes_rst.read_text()
     version_line = f'Version {new_version}'
     underline = '-' * len(version_line)
     unreleased = re.escape('Unreleased')
@@ -106,8 +105,7 @@ def _set_changelog_date(new_version, dry_run=False):
     if content == orig:
         fail('Could not update changelog - is there an entry for {}?', new_version)
     if not dry_run:
-        with open('CHANGES.rst', 'w') as f:
-            f.write(content)
+        changes_rst.write_text(content)
 
 
 def _canonicalize_version(new_version):
@@ -152,7 +150,7 @@ def _git_commit(message, files, dry_run=False):
     step("Committing '{}'", message, dry_run=dry_run)
     if dry_run:
         return
-    subprocess.check_call(['git', 'add'] + files)
+    subprocess.check_call(['git', 'add', *files])
     subprocess.check_call(['git', 'commit', '--no-verify', '--message', message])
 
 
@@ -162,7 +160,7 @@ def _git_tag(version, message, sign, dry_run):
     if dry_run:
         return
     sign_args = ['--sign'] if sign else []
-    subprocess.check_call(['git', 'tag', '--message', message, tag_name] + sign_args)
+    subprocess.check_call(['git', 'tag', '--message', message, tag_name, *sign_args])
 
 
 def _build_wheel(no_assets, dry_run):
@@ -170,12 +168,12 @@ def _build_wheel(no_assets, dry_run):
     if dry_run:
         return
     args = ['--no-assets'] if no_assets else []
-    subprocess.check_call(['./bin/maintenance/build-wheel.py', 'indico'] + args)
+    subprocess.check_call(['./bin/maintenance/build-wheel.py', 'indico', *args])
 
 
 def _create_changelog_stub(released_version, next_version, *, dry_run=False):
-    with open('CHANGES.rst') as f:
-        content = f.read()
+    changes_rst = Path('CHANGES.rst')
+    content = changes_rst.read_text()
     released_version_line = f'Version {released_version}'
     version_line = f'Version {next_version}'
     underline = '-' * len(version_line)
@@ -187,8 +185,7 @@ def _create_changelog_stub(released_version, next_version, *, dry_run=False):
     content = content[:pos] + stub + content[pos:]
     step('Creating changelog stub for {}', next_version, dry_run=dry_run)
     if not dry_run:
-        with open('CHANGES.rst', 'w') as f:
-            f.write(content)
+        changes_rst.write_text(content)
 
 
 @click.command()

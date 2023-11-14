@@ -26,7 +26,7 @@ class PaperRatingReviewingQuestionConfigForm(FieldConfigForm):
 class AbstractRatingReviewingQuestion(BaseField):
     name = 'rating'
     friendly_name = _('Rating')
-    common_settings = BaseField.common_settings + ('no_score',)
+    common_settings = (*BaseField.common_settings, 'no_score')
     config_form_base = AbstractRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
     required_validator = InputRequired

@@ -95,9 +95,7 @@ class LegacyAttachmentFolderMapping(_LegacyLinkMixin, db.Model):
     )
 
     def __repr__(self):
-        return '<LegacyAttachmentFolderMapping({}, material_id={}, {})>'.format(
-            self.folder, self.material_id, self.link_repr
-        )
+        return f'<LegacyAttachmentFolderMapping({self.folder}, material_id={self.material_id}, {self.link_repr})>'
 
 
 class LegacyAttachmentMapping(_LegacyLinkMixin, db.Model):

@@ -37,11 +37,11 @@ def discover_blueprints():
     """
     package_root = get_root_path('indico')
     modules = set()
-    for root, dirs, files in os.walk(package_root):
+    for root, _dirs, files in os.walk(package_root):
         for name in files:
             if not name.endswith('.py') or name.endswith('_test.py'):
                 continue
-            segments = ['indico'] + os.path.relpath(root, package_root).replace(os.sep, '.').split('.') + [name[:-3]]
+            segments = ['indico', *os.path.relpath(root, package_root).replace(os.sep, '.').split('.'), name[:-3]]
             if segments[-1] == 'blueprint':
                 modules.add('.'.join(segments))
             elif 'blueprints' in segments[:-1]:

@@ -66,7 +66,7 @@ def _flat_map(func, list_):
 
 
 class RHCategoryIcon(RHDisplayCategoryBase):
-    _category_query_options = undefer('icon'),
+    _category_query_options = (undefer('icon'),)
 
     def _check_access(self):
         # Category icons are always public
@@ -81,7 +81,7 @@ class RHCategoryIcon(RHDisplayCategoryBase):
 
 
 class RHCategoryLogo(RHDisplayCategoryBase):
-    _category_query_options = undefer('logo'),
+    _category_query_options = (undefer('logo'),)
 
     def _process(self):
         if not self.category.has_logo:
@@ -468,9 +468,10 @@ class RHCategoryOverview(RHDisplayCategoryBase):
             days = self._get_calendar_days()
             template = 'display/overview/month.html'
 
-        events_by_day = []
-        for day in days:
-            events_by_day.append((day, self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events)))
+        events_by_day = [
+            (day, self._pop_head_while(lambda x: x.start_dt.date() <= day.date(), events))  # noqa: B023
+            for day in days
+        ]
 
         # Check whether all weekends are empty
         hide_weekend = (not any(map(itemgetter(1), events_by_day[5::7])) and

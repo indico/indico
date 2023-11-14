@@ -73,7 +73,7 @@ class SettingsBase:
             return g.global_settings_cache[key], True
         except AttributeError:
             # no cache at all
-            g.global_settings_cache = cache = dict()
+            g.global_settings_cache = cache = {}
             cache[key] = rv = defaultdict(dict)
             return rv, False
         except KeyError:
@@ -153,7 +153,7 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     @strict_classproperty
     @classmethod
     def unique_columns(cls):
-        return ('module', 'name') + cls.extra_key_cols
+        return ('module', 'name', *cls.extra_key_cols)
 
     @classmethod
     def get_all_acls(cls, module, **kwargs):
@@ -199,7 +199,7 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     def merge_users(cls, module, target, source):
         settings = [(setting.module, setting.name, {x: getattr(setting, x) for x in cls.extra_key_cols})
                     for setting in cls.query.filter_by(module=module, type=PrincipalType.user, user=source)]
-        for module, name, extra in settings:
-            cls.remove_principal(module, name, source, **extra)
-            cls.add_principal(module, name, target, **extra)
+        for mod, name, extra in settings:
+            cls.remove_principal(mod, name, source, **extra)
+            cls.add_principal(mod, name, target, **extra)
         db.session.flush()

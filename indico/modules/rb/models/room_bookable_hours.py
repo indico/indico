@@ -35,11 +35,7 @@ class BookableHours(db.Model):
     # - room (Room.bookable_hours)
 
     def __repr__(self):
-        return '<BookableHours({}, {}, {})>'.format(
-            self.room_id,
-            self.start_time,
-            self.end_time
-        )
+        return f'<BookableHours({self.room_id}, {self.start_time}, {self.end_time})>'
 
     def fits_period(self, st, et):
         st = _tuplify(st, False)

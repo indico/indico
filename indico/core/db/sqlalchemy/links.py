@@ -214,7 +214,7 @@ class LinkMixin:
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=(cls.unique_links != True),  # noqa
+                    uselist=(cls.unique_links != True),  # noqa: E712
                     lazy=cls.link_backref_lazy
                 )
             )
@@ -241,7 +241,7 @@ class LinkMixin:
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=(cls.unique_links != True),  # noqa
+                    uselist=(cls.unique_links != True),  # noqa: E712
                     lazy=cls.link_backref_lazy
                 )
             )
@@ -255,7 +255,7 @@ class LinkMixin:
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=(cls.unique_links != True),  # noqa
+                    uselist=(cls.unique_links != True),  # noqa: E712
                     lazy=cls.link_backref_lazy
                 )
             )
@@ -269,7 +269,7 @@ class LinkMixin:
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=(cls.unique_links != True),  # noqa
+                    uselist=(cls.unique_links != True),  # noqa: E712
                     lazy=cls.link_backref_lazy
                 )
             )
@@ -283,7 +283,7 @@ class LinkMixin:
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=(cls.unique_links != True),  # noqa
+                    uselist=(cls.unique_links != True),  # noqa: E712
                     lazy=cls.link_backref_lazy
                 )
             )
@@ -297,7 +297,7 @@ class LinkMixin:
                 backref=db.backref(
                     cls.link_backref_name,
                     cascade='all, delete-orphan',
-                    uselist=(cls.unique_links != True),  # noqa
+                    uselist=(cls.unique_links != True),  # noqa: E712
                     lazy=cls.link_backref_lazy
                 )
             )
@@ -398,4 +398,4 @@ class LinkedObjectComparator(Comparator):
             return db.and_(self.cls.link_type == LinkType.subcontribution,
                            self.cls.subcontribution_id == other.id)
         else:
-            raise ValueError(f'Unexpected object type {type(other)}: {other}')
+            raise TypeError(f'Unexpected object type {type(other)}: {other}')

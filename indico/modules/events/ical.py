@@ -50,7 +50,7 @@ def generate_basic_component(
     url: t.Optional[str] = None,
     title: t.Optional[str] = None,
     description: t.Optional[str] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[tuple[str, str]] = None
 ):
     """Generate an iCalendar component with basic common properties.
 
@@ -119,7 +119,7 @@ def generate_basic_component(
 def generate_event_component(
     event: Event,
     user: t.Optional[User] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None,
+    organizer: t.Optional[tuple[str, str]] = None,
     skip_access_check: t.Optional[bool] = False,
 ):
     """Generate an event icalendar component from an Indico event."""
@@ -166,7 +166,7 @@ def event_to_ical(
     *,
     skip_access_check: bool = False,
     method: t.Optional[str] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[tuple[str, str]] = None
 ):
     """Serialize an event into an ical.
 
@@ -188,7 +188,7 @@ def events_to_ical(
     *,
     skip_access_check: bool = False,
     method: t.Optional[str] = None,
-    organizer: t.Optional[t.Tuple[str, str]] = None
+    organizer: t.Optional[tuple[str, str]] = None
 ):
     """Serialize multiple events into an ical.
 

@@ -55,7 +55,7 @@ def check_permissions(type_):
     permissions = get_available_permissions(type_)
     if not all(x.islower() for x in permissions):
         raise RuntimeError('Management permissions must be all-lowercase')
-    if len(list(x for x in permissions.values() if x.default)) > 1:
+    if sum(1 for x in permissions.values() if x.default) > 1:
         raise RuntimeError('Only one permission can be the default')
 
 

@@ -91,7 +91,7 @@ class CategoryRole(db.Model):
 
     @property
     def css(self):
-        return 'color: #{0} !important; border-color: #{0} !important'.format(self.color)
+        return f'color: #{self.color} !important; border-color: #{self.color} !important'
 
     @property
     def style(self):

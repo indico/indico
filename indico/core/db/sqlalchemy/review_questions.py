@@ -111,7 +111,7 @@ class ReviewQuestionMixin:
             lazy=True,
             backref=db.backref(
                 cls.event_backref_name,
-                primaryjoin='({0}.event_id == Event.id) & ~{0}.is_deleted'.format(cls.__name__),
+                primaryjoin=f'({cls.__name__}.event_id == Event.id) & ~{cls.__name__}.is_deleted',
                 order_by=cls.position,
                 cascade='all, delete-orphan',
                 lazy=True

@@ -97,7 +97,7 @@ class IndicoModel(Model):
     query_class = IndicoBaseQuery
 
     @classmethod
-    def get(cls: t.Type[_ModelT], oid, is_deleted=None) -> _ModelT:
+    def get(cls: type[_ModelT], oid, is_deleted=None) -> _ModelT:
         """Get an object based on its primary key.
 
         :param oid: The primary key of the object
@@ -127,7 +127,7 @@ class IndicoModel(Model):
         """
         obj = cls.get(oid, is_deleted=is_deleted)
         if obj is None:
-            raise NoResultFound()
+            raise NoResultFound
         return obj
 
     @classmethod
@@ -254,7 +254,7 @@ def import_all_models(package_name='indico'):
     if not package_root:
         return
     modules = []
-    for root, dirs, files in os.walk(package_root):
+    for root, _dirs, files in os.walk(package_root):
         if os.path.basename(root) == 'models':
             package = os.path.relpath(root, package_root).replace(os.sep, '.')
             modules += [f'{package_name}.{package}.{name[:-3]}'
@@ -350,10 +350,10 @@ def auto_table_args(cls, **extra_kwargs):
             else:
                 posargs.extend(value)
         else:  # pragma: no cover
-            raise ValueError(f'Unexpected tableargs: {value}')
+            raise TypeError(f'Unexpected tableargs: {value}')
     kwargs.update(extra_kwargs)
     if posargs and kwargs:
-        return tuple(posargs) + (kwargs,)
+        return (*posargs, kwargs)
     elif kwargs:
         return kwargs
     else:

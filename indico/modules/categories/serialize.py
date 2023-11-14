@@ -52,7 +52,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     events = list(it)
     # make sure the parent categories are in sqlalchemy's identity cache.
     # this avoids query spam from `protection_parent` lookups
-    _parent_categs = (Category._get_chain_query(Category.id.in_({e.category_id for e in events}))  # noqa: F841
+    _parent_categs = (Category._get_chain_query(Category.id.in_({e.category_id for e in events}))  # noqa: F841,RUF100
                       .options(load_only('id', 'parent_id', 'protection_mode'),
                                joinedload('acl_entries'))
                       .all())

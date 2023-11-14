@@ -5,6 +5,8 @@ Revises: a59688f9ba40
 Create Date: 2023-08-07 09:44:11.504348
 """
 
+# ruff: noqa: S608
+
 import sqlalchemy as sa
 from alembic import context, op
 

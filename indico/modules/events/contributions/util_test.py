@@ -71,7 +71,7 @@ def test_import_contributions_changes(db, dummy_event, dummy_user):
                       b'2017-11-27T08:10:00,10,Second contribution,John,Doe,ACME Inc.,jdoe@example.test',
                       b'2017-11-27T11:30,60,Third contribution,Guinea Albert,Pig,,1337@example.test'])
 
-    contributions, changes = import_contributions_from_csv(dummy_event, BytesIO(csv))
+    changes = import_contributions_from_csv(dummy_event, BytesIO(csv))[1]
     new_end_dt = as_utc(datetime(2017, 11, 27, 12, 30, 0))
     assert dummy_event.end_dt == new_end_dt
     assert changes == {
@@ -88,7 +88,7 @@ def test_import_contributions_changes(db, dummy_event, dummy_user):
                       b'2017-11-27T08:10:00,10,Second contribution,John,Doe,ACME Inc.,jdoe@example.test',
                       b'2017-11-28T11:30,60,Third contribution,Guinea Albert,Pig,,1337@example.test'])
 
-    contributions, changes = import_contributions_from_csv(dummy_event, BytesIO(csv))
+    changes = import_contributions_from_csv(dummy_event, BytesIO(csv))[1]
     new_start_dt = as_utc(datetime(2017, 11, 26, 8, 0, 0))
     new_end_dt = as_utc(datetime(2017, 11, 28, 12, 30, 0))
     assert dummy_event.start_dt == new_start_dt

@@ -105,13 +105,11 @@ class StaticListLink(db.Model):
         static_list_link = event.static_list_links.filter_by(type=type_, data=data).first()
         if static_list_link is None:
             static_list_link = cls(event=event, type=type_, data=data)
+        elif static_list_link.last_used_dt is not None:
+            # bump timestamp in case we start expiring old links in the future
+            static_list_link.last_used_dt = now_utc()
         else:
-            # bump timestamp in case we start expiring old links
-            # in the future
-            if static_list_link.last_used_dt is not None:
-                static_list_link.last_used_dt = now_utc()
-            else:
-                static_list_link.created_dt = now_utc()
+            static_list_link.created_dt = now_utc()
         db.session.flush()
         return static_list_link
 

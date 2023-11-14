@@ -9,5 +9,5 @@ class ArgumentParseError(Exception):
     pass
 
 
-class LimitExceededException(Exception):  # noqa: N818
+class LimitExceededException(Exception):
     pass

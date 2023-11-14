@@ -96,15 +96,15 @@ def bool_matrix(template, mask=None, expect=None):
     if expect is None:
         pass
     elif expect == 'any_dynamic':
-        iterable = (x + (any(y for i, y in enumerate(x) if template[i] is None),) for x in iterable)
+        iterable = ((*x, any(y for i, y in enumerate(x) if template[i] is None)) for x in iterable)
     elif expect == 'all_dynamic':
-        iterable = (x + (all(y for i, y in enumerate(x) if template[i] is None),) for x in iterable)
+        iterable = ((*x, all(y for i, y in enumerate(x) if template[i] is None)) for x in iterable)
     elif callable(expect):
-        iterable = (x + (expect(x),) for x in iterable)
+        iterable = ((*x, expect(x)) for x in iterable)
     elif isinstance(expect, (tuple, list)):
-        iterable = (x + (x == expect,) for x in iterable)
+        iterable = ((*x, x == expect) for x in iterable)
     else:
-        iterable = (x + (expect,) for x in iterable)
+        iterable = ((*x, expect) for x in iterable)
     matrix = tuple(iterable)
     if not matrix:
         raise ValueError('empty matrix')

@@ -19,7 +19,7 @@ def test_set_enum():
 
     Setting.set_multi('foo', {'foo': Useless.thing})
     Setting.set('foo', 'bar', Useless.thing)
-    for key in {'foo', 'bar'}:
+    for key in ('foo', 'bar'):
         value = Setting.get('foo', key)
         assert value == Useless.thing
         assert value == Useless.thing.value

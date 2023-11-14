@@ -104,8 +104,7 @@ class RHOAuthToken(RH):
     CSRF_ENABLED = False
 
     def _process(self):
-        resp = auth_server.create_token_response()
-        return resp
+        return auth_server.create_token_response()
 
 
 class RHOAuthIntrospect(RH):

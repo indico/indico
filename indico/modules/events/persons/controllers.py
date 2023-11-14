@@ -79,8 +79,7 @@ class RHPersonsBase(RHManageEventBase):
                                selected=person_link.contribution.friendly_id)}
 
     def generate_subcontributions_data(self, person_link):
-        return {'title': '{} ({})'.format(person_link.subcontribution.contribution.title,
-                                          person_link.subcontribution.title),
+        return {'title': f'{person_link.subcontribution.contribution.title} ({person_link.subcontribution.title})',
                 'url': url_for('contributions.manage_contributions', self.event,
                                selected=person_link.subcontribution.contribution.friendly_id)}
 

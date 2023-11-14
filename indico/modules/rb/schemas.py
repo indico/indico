@@ -80,12 +80,10 @@ class RoomUpdateSchema(RoomSchema):
     protection_mode = EnumField(ProtectionMode)
 
     class Meta(RoomSchema.Meta):
-        fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
-                                           'notification_before_days_monthly', 'notifications_enabled',
-                                           'end_notification_daily', 'end_notification_weekly',
-                                           'end_notification_monthly', 'end_notifications_enabled',
-                                           'verbose_name', 'site', 'notification_emails', 'booking_limit_days',
-                                           'acl_entries', 'protection_mode')
+        fields = (*RoomSchema.Meta.fields, 'notification_before_days', 'notification_before_days_weekly', 'owner',
+                  'notification_before_days_monthly', 'notifications_enabled', 'end_notification_daily',
+                  'end_notification_weekly', 'end_notification_monthly', 'end_notifications_enabled', 'verbose_name',
+                  'site', 'notification_emails', 'booking_limit_days', 'acl_entries', 'protection_mode')
 
 
 class RoomUpdateArgsSchema(mm.Schema):
@@ -187,7 +185,7 @@ class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
     permissions = Method('_get_permissions')
 
     class Meta:
-        fields = ReservationOccurrenceSchema.Meta.fields + ('permissions',)
+        fields = (*ReservationOccurrenceSchema.Meta.fields, 'permissions')
 
     def _get_permissions(self, occurrence):
         methods = ('can_cancel', 'can_reject')
@@ -202,7 +200,7 @@ class ReservationConcurrentOccurrenceSchema(ReservationOccurrenceSchema):
     reservations = Nested(ReservationSchema, many=True)
 
     class Meta:
-        fields = ReservationOccurrenceSchema.Meta.fields + ('reservations',)
+        fields = (*ReservationOccurrenceSchema.Meta.fields, 'reservations')
         exclude = ('reservation',)
 
 
@@ -362,7 +360,7 @@ class RBUserSchema(UserSchema):
     is_rb_admin = mm.Function(lambda user: rb_is_admin(user))
 
     class Meta:
-        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'is_admin', 'is_rb_admin', 'identifier', 'full_name')
+        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'is_admin', 'is_rb_admin', 'identifier', 'full_name')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb.operations.rooms import has_managed_rooms

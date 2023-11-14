@@ -678,7 +678,7 @@ class RHManageContributionFields(RHManageContributionsBase):
 
     def _process(self):
         custom_fields = self.event.contribution_fields.order_by(ContributionField.position).all()
-        custom_field_types = sorted(list(get_contrib_field_types().values()), key=attrgetter('friendly_name'))
+        custom_field_types = sorted(get_contrib_field_types().values(), key=attrgetter('friendly_name'))
         return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event,
                                 custom_fields=custom_fields, custom_field_types=custom_field_types)
 
@@ -700,7 +700,7 @@ class RHSortContributionFields(RHManageContributionsBase):
         for index, field_id in enumerate(field_ids, 0):
             field_by_id[field_id].position = index
             del field_by_id[field_id]
-        for index, field in enumerate(sorted(list(field_by_id.values()), key=attrgetter('position')), len(field_ids)):
+        for index, field in enumerate(sorted(field_by_id.values(), key=attrgetter('position')), len(field_ids)):
             field.position = index
         db.session.flush()
         self.event.log(EventLogRealm.management, LogKind.change, 'Contributions',

@@ -45,9 +45,9 @@ class AbstractState(RichIntEnum):
 
 
 class AbstractPublicState(RichIntEnum):
-    __titles__ = {i: title for i, title in enumerate(AbstractState.__titles__[2:], 2)}
+    __titles__ = dict(enumerate(AbstractState.__titles__[2:], 2))
     __titles__.update({-1: _('Awaiting Review'), -2: _('Under Review')})
-    __css_classes__ = {i: css_class for i, css_class in enumerate(AbstractState.__css_classes__[2:], 2)}
+    __css_classes__ = dict(enumerate(AbstractState.__css_classes__[2:], 2))
     __css_classes__.update({-1: '', -2: 'highlight'})
     # regular states (must match AbstractState!)
     withdrawn = 2
@@ -85,17 +85,13 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     __tablename__ = 'abstracts'
     __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
                                   postgresql_where=db.text('NOT is_deleted')),
-                         db.CheckConstraint('(state = {}) OR (accepted_track_id IS NULL)'
-                                            .format(AbstractState.accepted),
+                         db.CheckConstraint(f'(state = {AbstractState.accepted}) OR (accepted_track_id IS NULL)',
                                             name='accepted_track_id_only_accepted'),
-                         db.CheckConstraint('(state = {}) OR (accepted_contrib_type_id IS NULL)'
-                                            .format(AbstractState.accepted),
+                         db.CheckConstraint(f'(state = {AbstractState.accepted}) OR (accepted_contrib_type_id IS NULL)',
                                             name='accepted_contrib_type_id_only_accepted'),
-                         db.CheckConstraint('(state = {}) = (merged_into_id IS NOT NULL)'
-                                            .format(AbstractState.merged),
+                         db.CheckConstraint(f'(state = {AbstractState.merged}) = (merged_into_id IS NOT NULL)',
                                             name='merged_into_id_only_merged'),
-                         db.CheckConstraint('(state = {}) = (duplicate_of_id IS NOT NULL)'
-                                            .format(AbstractState.duplicate),
+                         db.CheckConstraint(f'(state = {AbstractState.duplicate}) = (duplicate_of_id IS NOT NULL)',
                                             name='duplicate_of_id_only_duplicate'),
                          db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judge_id IS NOT NULL)'
                                             .format(AbstractState.accepted, AbstractState.rejected,

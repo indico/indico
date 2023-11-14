@@ -54,7 +54,7 @@ def attachment_access_test_env(request_context, dummy_user, dummy_event, dummy_s
                 rh._check_access()
             assert exc_info.type is expected_exc
 
-    yield type('AttachmentAccessTestEnv', (object,), {
+    return type('AttachmentAccessTestEnv', (object,), {
         'event': dummy_event,
         'session': dummy_session,
         'standalone_contrib': standalone_contrib,

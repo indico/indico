@@ -21,24 +21,21 @@ from indico.util.date_time import now_utc
 
 def _query_contributions_with_user_as_reviewer(event, user):
     query = Contribution.query.with_parent(event)
-    query = query.filter(db.or_(Contribution.paper_content_reviewers.any(User.id == user.id),
-                                Contribution.paper_layout_reviewers.any(User.id == user.id)),
-                         Contribution._paper_revisions.any())
-    return query
+    return query.filter(db.or_(Contribution.paper_content_reviewers.any(User.id == user.id),
+                               Contribution.paper_layout_reviewers.any(User.id == user.id)),
+                        Contribution._paper_revisions.any())
 
 
 def get_user_reviewed_contributions(event, user):
     """Get the list of contributions where user already reviewed paper."""
     contribs = _query_contributions_with_user_as_reviewer(event, user).all()
-    contribs = [contrib for contrib in contribs if contrib.paper.last_revision.has_user_reviewed(user)]
-    return contribs
+    return [contrib for contrib in contribs if contrib.paper.last_revision.has_user_reviewed(user)]
 
 
 def get_user_contributions_to_review(event, user):
     """Get the list of contributions where user has paper to review."""
     contribs = _query_contributions_with_user_as_reviewer(event, user).all()
-    contribs = [contrib for contrib in contribs if not contrib.paper.last_revision.has_user_reviewed(user)]
-    return contribs
+    return [contrib for contrib in contribs if not contrib.paper.last_revision.has_user_reviewed(user)]
 
 
 def get_events_with_paper_roles(user, dt=None):
@@ -80,7 +77,7 @@ def has_contributions_with_user_paper_submission_rights(event, user):
 
 
 def get_user_submittable_contributions(event, user):
-    criteria = [Contribution._paper_last_revision == None,  # noqa
+    criteria = [Contribution._paper_last_revision == None,  # noqa: E711
                 Contribution._paper_last_revision.has(PaperRevision.state == PaperRevisionState.to_be_corrected)]
     return (_query_contributions_with_user_paper_submission_rights(event, user)
             .filter(db.or_(*criteria))

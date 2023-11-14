@@ -64,7 +64,7 @@ def get_not_deletable_templates(obj):
     """Get all non-deletable templates for an event/category."""
     not_deletable_criteria = [
         DesignerTemplate.is_system_template,
-        DesignerTemplate.backside_template_of != None,  # noqa
+        DesignerTemplate.backside_template_of != None,  # noqa: E711
         DesignerTemplate.ticket_for_regforms.any(RegistrationForm.event.has(Event.ends_after(now_utc())))
     ]
     return set(DesignerTemplate.query.filter(DesignerTemplate.owner == obj, db.or_(*not_deletable_criteria)))

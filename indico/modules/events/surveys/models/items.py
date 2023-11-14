@@ -38,29 +38,29 @@ class SurveyItemType(IndicoIntEnum):
 
 class SurveyItem(DescriptionMixin, db.Model):
     __tablename__ = 'items'
-    __table_args__ = (db.CheckConstraint('type != {type} OR ('
+    __table_args__ = (db.CheckConstraint(f'type != {SurveyItemType.question} OR ('
                                          'title IS NOT NULL AND '
                                          'is_required IS NOT NULL AND '
                                          'field_type IS NOT NULL AND '
                                          'parent_id IS NOT NULL AND '
-                                         'display_as_section IS NULL)'
-                                         .format(type=SurveyItemType.question), 'valid_question'),
-                      db.CheckConstraint('type != {type} OR ('
+                                         'display_as_section IS NULL)',
+                                         'valid_question'),
+                      db.CheckConstraint(f'type != {SurveyItemType.section} OR ('
                                          'title IS NOT NULL AND '
                                          'is_required IS NULL AND '
                                          'field_type IS NULL AND '
-                                         "field_data::text = '{{}}' AND "
+                                         "field_data::text = '{}' AND "
                                          'parent_id IS NULL AND '
-                                         'display_as_section IS NOT NULL)'
-                                         .format(type=SurveyItemType.section), 'valid_section'),
-                      db.CheckConstraint('type != {type} OR ('
+                                         'display_as_section IS NOT NULL)',
+                                         'valid_section'),
+                      db.CheckConstraint(f'type != {SurveyItemType.text} OR ('
                                          'title IS NULL AND '
                                          'is_required IS NULL AND '
                                          'field_type IS NULL AND '
-                                         "field_data::text = '{{}}' AND "
+                                         "field_data::text = '{}' AND "
                                          'parent_id IS NOT NULL AND '
-                                         'display_as_section IS NULL)'
-                                         .format(type=SurveyItemType.text), 'valid_text'),
+                                         'display_as_section IS NULL)',
+                                         'valid_text'),
                       {'schema': 'event_surveys'})
     __mapper_args__ = {
         'polymorphic_on': 'type',

@@ -120,7 +120,7 @@ class RegistrationFormEditForm(IndicoForm):
                                                          'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
 
     def _set_currencies(self):
-        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
+        currencies = [(c['code'], f'{c["code"]} ({c["name"]})') for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
 
@@ -208,7 +208,7 @@ class InvitationFormBase(IndicoForm):
 
 
 class InvitationFormNew(InvitationFormBase):
-    _invitation_fields = ('first_name', 'last_name', 'email', 'affiliation') + InvitationFormBase._invitation_fields
+    _invitation_fields = ('first_name', 'last_name', 'email', 'affiliation', *InvitationFormBase._invitation_fields)
     first_name = StringField(_('First name'), [DataRequired()],
                              description=_('The first name of the user you are inviting.'))
     last_name = StringField(_('Last name'), [DataRequired()],
@@ -233,7 +233,7 @@ class InvitationFormNew(InvitationFormBase):
 
 
 class InvitationFormExisting(InvitationFormBase):
-    _invitation_fields = ('users_field',) + InvitationFormBase._invitation_fields
+    _invitation_fields = ('users_field', *InvitationFormBase._invitation_fields)
     users_field = PrincipalListField(_('Users'), [DataRequired()], allow_external_users=True,
                                      description=_('Select the users to invite.'))
 
@@ -260,7 +260,7 @@ class InvitationFormExisting(InvitationFormBase):
 
 
 class ImportInvitationsForm(InvitationFormBase):
-    _invitation_fields = ('source_file', 'skip_existing') + InvitationFormBase._invitation_fields
+    _invitation_fields = ('source_file', 'skip_existing', *InvitationFormBase._invitation_fields)
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
                             accepted_file_types='.csv')
     skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,

@@ -263,7 +263,7 @@ class CustomizationLoader(BaseLoader):
         # This is almost exactly what PluginPrefixLoader.load() does, but we have
         # to replicate it here since we need to handle `~` and use our custom
         # `get_source` to get the overridden template
-        plugin_name, tpl_name = name.split(':', 1)
+        plugin_name = name.split(':', 1)[0]
         if plugin_name[0] == '~':
             plugin_name = plugin_name[1:]
         plugin = get_state(current_app).plugin_engine.get_plugin(plugin_name)

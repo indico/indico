@@ -207,7 +207,7 @@ def _get_messages_react_pot(path):
 def find_indico_packages(path, prefix=''):
     yield prefix
     prefix = prefix + '.'
-    for _, name, ispkg in walk_packages(path, prefix):
+    for __, name, ispkg in walk_packages(path, prefix):
         if ispkg:
             yield name
 
@@ -317,7 +317,7 @@ def extract_messages_react(directory=INDICO_DIR):
         if not paths:
             return
     with _chdir(INDICO_DIR):
-        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract'] + paths,
+        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', *paths],
                                          env=dict(os.environ, FORCE_COLOR='1'))
     with open(_get_messages_react_pot(directory), 'wb') as f:
         f.write(output)
@@ -606,7 +606,7 @@ def pull_all_plugins(plugins_dir, languages):
 
 def _check_format_strings(root_path='indico/translations'):
     paths = set()
-    for root, dirs, files in os.walk(root_path):
+    for root, _dirs, files in os.walk(root_path):
         for file in files:
             if file.endswith('.po'):
                 paths.add(os.path.join(root, file))

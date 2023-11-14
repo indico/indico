@@ -265,7 +265,7 @@ class TimetableSerializer:
         elif entry.type == TimetableEntryType.BREAK:
             return f'b{entry.id}'
         else:
-            raise ValueError()
+            raise ValueError
 
     def _get_entry_date_dt(self, dt, tzinfo):
         return {'date': dt.astimezone(tzinfo).strftime('%Y-%m-%d'),
