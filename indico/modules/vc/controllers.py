@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import typing as t
 from collections import defaultdict
 from operator import itemgetter
 
@@ -15,8 +16,10 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.core.plugins import IndicoPlugin
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.models.events import Event
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.forms import VCRoomListFilterForm
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
@@ -32,7 +35,9 @@ from indico.web.rh import RHProtected
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
-def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
+def process_vc_room_association(plugin: IndicoPlugin, event: Event, vc_room: VCRoom, form,
+                                event_vc_room: t.Optional[VCRoomEventAssociation] = None,
+                                allow_same_room: bool = False):
     # disable autoflush, so that the new event_vc_room does not influence the result
     with db.session.no_autoflush:
         if event_vc_room is None:

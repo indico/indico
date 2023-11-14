@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import re
+import typing as t
 
 from flask import render_template
 from flask_pluginengine import render_plugin_template
@@ -18,22 +19,22 @@ from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
-from indico.web.forms.base import FormDefaults
+from indico.web.forms.base import FormDefaults, IndicoForm
 
 
 PREFIX_RE = re.compile('^vc_')
 
 
 class VCPluginMixin:
-    settings_form = VCPluginSettingsFormBase
-    default_settings = {'notification_emails': []}
-    acl_settings = {'acl', 'managers'}
+    settings_form: IndicoForm = VCPluginSettingsFormBase
+    default_settings: dict[str, t.Any] = {'notification_emails': []}
+    acl_settings: set = {'acl', 'managers'}
     #: the :class:`IndicoForm` to use for the videoconference room form
-    vc_room_form = None
+    vc_room_form: t.Optional[IndicoForm] = None
     #: the :class:`IndicoForm` to use for the videoconference room attach form
-    vc_room_attach_form = None
+    vc_room_attach_form: t.Optional[IndicoForm] = None
     #: the readable name of the VC plugin
-    friendly_name = None
+    friendly_name: t.Optional[str] = None
 
     def init(self):
         super().init()
