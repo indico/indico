@@ -18,7 +18,6 @@ import indico.modules.attachments.api.hooks  # noqa: F401
 import indico.modules.events.agreements.api  # noqa: F401
 import indico.modules.events.api  # noqa: F401
 import indico.modules.events.notes.api  # noqa: F401
-import indico.modules.events.registration.api  # noqa: F401
 import indico.modules.rb.api  # noqa: F401
 import indico.modules.users.api  # noqa: F401
 import indico.web.http_api.hooks.file  # noqa: F401

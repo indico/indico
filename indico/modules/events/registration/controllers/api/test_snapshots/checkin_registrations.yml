@@ -1,0 +1,16 @@
+- checked_in: true
+  checked_in_dt: <timestamp>
+  checkin_secret: <uuid>
+  currency: USD
+  email: 1337@example.test
+  event_id: <id>
+  formatted_price: US$0.00
+  full_name: Guinea Pig
+  id: <id>
+  is_paid: false
+  occupied_slots: 1
+  price: 0
+  regform_id: <id>
+  registration_date: <timestamp>
+  state: complete
+  tags: []

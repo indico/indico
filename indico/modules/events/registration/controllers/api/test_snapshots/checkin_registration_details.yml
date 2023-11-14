@@ -1,0 +1,621 @@
+checked_in: true
+checked_in_dt: <timestamp>
+checkin_secret: <uuid>
+currency: USD
+email: 1337@example.test
+event_id: <id>
+formatted_price: US$0.00
+full_name: Guinea Pig
+id: <id>
+is_paid: false
+occupied_slots: 1
+price: 0
+regform_id: <id>
+registration_data:
+- description: ''
+  fields:
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: text
+    position: 1
+    title: First Name
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: text
+    position: 2
+    title: Last Name
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: email
+    position: 3
+    title: Email Address
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: text
+    position: 4
+    title: Affiliation
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: textarea
+    position: 1000
+    title: Address
+  - choices:
+    - caption: Afghanistan
+      countryKey: AF
+    - caption: "\xC5land Islands"
+      countryKey: AX
+    - caption: Albania
+      countryKey: AL
+    - caption: Algeria
+      countryKey: DZ
+    - caption: American Samoa
+      countryKey: AS
+    - caption: Andorra
+      countryKey: AD
+    - caption: Angola
+      countryKey: AO
+    - caption: Anguilla
+      countryKey: AI
+    - caption: Antarctica
+      countryKey: AQ
+    - caption: Antigua & Barbuda
+      countryKey: AG
+    - caption: Argentina
+      countryKey: AR
+    - caption: Armenia
+      countryKey: AM
+    - caption: Aruba
+      countryKey: AW
+    - caption: Australia
+      countryKey: AU
+    - caption: Austria
+      countryKey: AT
+    - caption: Azerbaijan
+      countryKey: AZ
+    - caption: Bahamas
+      countryKey: BS
+    - caption: Bahrain
+      countryKey: BH
+    - caption: Bangladesh
+      countryKey: BD
+    - caption: Barbados
+      countryKey: BB
+    - caption: Belarus
+      countryKey: BY
+    - caption: Belgium
+      countryKey: BE
+    - caption: Belize
+      countryKey: BZ
+    - caption: Benin
+      countryKey: BJ
+    - caption: Bermuda
+      countryKey: BM
+    - caption: Bhutan
+      countryKey: BT
+    - caption: Bolivia
+      countryKey: BO
+    - caption: Bosnia & Herzegovina
+      countryKey: BA
+    - caption: Botswana
+      countryKey: BW
+    - caption: Bouvet Island
+      countryKey: BV
+    - caption: Brazil
+      countryKey: BR
+    - caption: British Indian Ocean Territory
+      countryKey: IO
+    - caption: British Virgin Islands
+      countryKey: VG
+    - caption: Brunei
+      countryKey: BN
+    - caption: Bulgaria
+      countryKey: BG
+    - caption: Burkina Faso
+      countryKey: BF
+    - caption: Burundi
+      countryKey: BI
+    - caption: Cambodia
+      countryKey: KH
+    - caption: Cameroon
+      countryKey: CM
+    - caption: Canada
+      countryKey: CA
+    - caption: Cape Verde
+      countryKey: CV
+    - caption: Caribbean Netherlands
+      countryKey: BQ
+    - caption: Cayman Islands
+      countryKey: KY
+    - caption: Central African Republic
+      countryKey: CF
+    - caption: Chad
+      countryKey: TD
+    - caption: Chile
+      countryKey: CL
+    - caption: China
+      countryKey: CN
+    - caption: Christmas Island
+      countryKey: CX
+    - caption: Cocos (Keeling) Islands
+      countryKey: CC
+    - caption: Colombia
+      countryKey: CO
+    - caption: Comoros
+      countryKey: KM
+    - caption: Congo - Brazzaville
+      countryKey: CG
+    - caption: Congo - Kinshasa
+      countryKey: CD
+    - caption: Cook Islands
+      countryKey: CK
+    - caption: Costa Rica
+      countryKey: CR
+    - caption: "C\xF4te d\u2019Ivoire"
+      countryKey: CI
+    - caption: Croatia
+      countryKey: HR
+    - caption: Cuba
+      countryKey: CU
+    - caption: "Cura\xE7ao"
+      countryKey: CW
+    - caption: Cyprus
+      countryKey: CY
+    - caption: Czechia
+      countryKey: CZ
+    - caption: Denmark
+      countryKey: DK
+    - caption: Djibouti
+      countryKey: DJ
+    - caption: Dominica
+      countryKey: DM
+    - caption: Dominican Republic
+      countryKey: DO
+    - caption: Ecuador
+      countryKey: EC
+    - caption: Egypt
+      countryKey: EG
+    - caption: El Salvador
+      countryKey: SV
+    - caption: Equatorial Guinea
+      countryKey: GQ
+    - caption: Eritrea
+      countryKey: ER
+    - caption: Estonia
+      countryKey: EE
+    - caption: Eswatini
+      countryKey: SZ
+    - caption: Ethiopia
+      countryKey: ET
+    - caption: Falkland Islands
+      countryKey: FK
+    - caption: Faroe Islands
+      countryKey: FO
+    - caption: Fiji
+      countryKey: FJ
+    - caption: Finland
+      countryKey: FI
+    - caption: France
+      countryKey: FR
+    - caption: French Guiana
+      countryKey: GF
+    - caption: French Polynesia
+      countryKey: PF
+    - caption: French Southern Territories
+      countryKey: TF
+    - caption: Gabon
+      countryKey: GA
+    - caption: Gambia
+      countryKey: GM
+    - caption: Georgia
+      countryKey: GE
+    - caption: Germany
+      countryKey: DE
+    - caption: Ghana
+      countryKey: GH
+    - caption: Gibraltar
+      countryKey: GI
+    - caption: Greece
+      countryKey: GR
+    - caption: Greenland
+      countryKey: GL
+    - caption: Grenada
+      countryKey: GD
+    - caption: Guadeloupe
+      countryKey: GP
+    - caption: Guam
+      countryKey: GU
+    - caption: Guatemala
+      countryKey: GT
+    - caption: Guernsey
+      countryKey: GG
+    - caption: Guinea
+      countryKey: GN
+    - caption: Guinea-Bissau
+      countryKey: GW
+    - caption: Guyana
+      countryKey: GY
+    - caption: Haiti
+      countryKey: HT
+    - caption: Heard & McDonald Islands
+      countryKey: HM
+    - caption: Honduras
+      countryKey: HN
+    - caption: Hong Kong SAR China
+      countryKey: HK
+    - caption: Hungary
+      countryKey: HU
+    - caption: Iceland
+      countryKey: IS
+    - caption: India
+      countryKey: IN
+    - caption: Indonesia
+      countryKey: ID
+    - caption: Iran
+      countryKey: IR
+    - caption: Iraq
+      countryKey: IQ
+    - caption: Ireland
+      countryKey: IE
+    - caption: Isle of Man
+      countryKey: IM
+    - caption: Israel
+      countryKey: IL
+    - caption: Italy
+      countryKey: IT
+    - caption: Jamaica
+      countryKey: JM
+    - caption: Japan
+      countryKey: JP
+    - caption: Jersey
+      countryKey: JE
+    - caption: Jordan
+      countryKey: JO
+    - caption: Kazakhstan
+      countryKey: KZ
+    - caption: Kenya
+      countryKey: KE
+    - caption: Kiribati
+      countryKey: KI
+    - caption: Kuwait
+      countryKey: KW
+    - caption: Kyrgyzstan
+      countryKey: KG
+    - caption: Laos
+      countryKey: LA
+    - caption: Latvia
+      countryKey: LV
+    - caption: Lebanon
+      countryKey: LB
+    - caption: Lesotho
+      countryKey: LS
+    - caption: Liberia
+      countryKey: LR
+    - caption: Libya
+      countryKey: LY
+    - caption: Liechtenstein
+      countryKey: LI
+    - caption: Lithuania
+      countryKey: LT
+    - caption: Luxembourg
+      countryKey: LU
+    - caption: Macao SAR China
+      countryKey: MO
+    - caption: Madagascar
+      countryKey: MG
+    - caption: Malawi
+      countryKey: MW
+    - caption: Malaysia
+      countryKey: MY
+    - caption: Maldives
+      countryKey: MV
+    - caption: Mali
+      countryKey: ML
+    - caption: Malta
+      countryKey: MT
+    - caption: Marshall Islands
+      countryKey: MH
+    - caption: Martinique
+      countryKey: MQ
+    - caption: Mauritania
+      countryKey: MR
+    - caption: Mauritius
+      countryKey: MU
+    - caption: Mayotte
+      countryKey: YT
+    - caption: Mexico
+      countryKey: MX
+    - caption: Micronesia
+      countryKey: FM
+    - caption: Moldova
+      countryKey: MD
+    - caption: Monaco
+      countryKey: MC
+    - caption: Mongolia
+      countryKey: MN
+    - caption: Montenegro
+      countryKey: ME
+    - caption: Montserrat
+      countryKey: MS
+    - caption: Morocco
+      countryKey: MA
+    - caption: Mozambique
+      countryKey: MZ
+    - caption: Myanmar (Burma)
+      countryKey: MM
+    - caption: Namibia
+      countryKey: NA
+    - caption: Nauru
+      countryKey: NR
+    - caption: Nepal
+      countryKey: NP
+    - caption: Netherlands
+      countryKey: NL
+    - caption: New Caledonia
+      countryKey: NC
+    - caption: New Zealand
+      countryKey: NZ
+    - caption: Nicaragua
+      countryKey: NI
+    - caption: Niger
+      countryKey: NE
+    - caption: Nigeria
+      countryKey: NG
+    - caption: Niue
+      countryKey: NU
+    - caption: Norfolk Island
+      countryKey: NF
+    - caption: North Korea
+      countryKey: KP
+    - caption: North Macedonia
+      countryKey: MK
+    - caption: Northern Mariana Islands
+      countryKey: MP
+    - caption: Norway
+      countryKey: 'NO'
+    - caption: Oman
+      countryKey: OM
+    - caption: Pakistan
+      countryKey: PK
+    - caption: Palau
+      countryKey: PW
+    - caption: Palestinian Territories
+      countryKey: PS
+    - caption: Panama
+      countryKey: PA
+    - caption: Papua New Guinea
+      countryKey: PG
+    - caption: Paraguay
+      countryKey: PY
+    - caption: Peru
+      countryKey: PE
+    - caption: Philippines
+      countryKey: PH
+    - caption: Pitcairn Islands
+      countryKey: PN
+    - caption: Poland
+      countryKey: PL
+    - caption: Portugal
+      countryKey: PT
+    - caption: Puerto Rico
+      countryKey: PR
+    - caption: Qatar
+      countryKey: QA
+    - caption: "R\xE9union"
+      countryKey: RE
+    - caption: Romania
+      countryKey: RO
+    - caption: Russia
+      countryKey: RU
+    - caption: Rwanda
+      countryKey: RW
+    - caption: Samoa
+      countryKey: WS
+    - caption: San Marino
+      countryKey: SM
+    - caption: "S\xE3o Tom\xE9 & Pr\xEDncipe"
+      countryKey: ST
+    - caption: Saudi Arabia
+      countryKey: SA
+    - caption: Senegal
+      countryKey: SN
+    - caption: Serbia
+      countryKey: RS
+    - caption: Seychelles
+      countryKey: SC
+    - caption: Sierra Leone
+      countryKey: SL
+    - caption: Singapore
+      countryKey: SG
+    - caption: Sint Maarten
+      countryKey: SX
+    - caption: Slovakia
+      countryKey: SK
+    - caption: Slovenia
+      countryKey: SI
+    - caption: Solomon Islands
+      countryKey: SB
+    - caption: Somalia
+      countryKey: SO
+    - caption: South Africa
+      countryKey: ZA
+    - caption: South Georgia & South Sandwich Islands
+      countryKey: GS
+    - caption: South Korea
+      countryKey: KR
+    - caption: South Sudan
+      countryKey: SS
+    - caption: Spain
+      countryKey: ES
+    - caption: Sri Lanka
+      countryKey: LK
+    - caption: "St Barth\xE9lemy"
+      countryKey: BL
+    - caption: St Helena
+      countryKey: SH
+    - caption: St Kitts & Nevis
+      countryKey: KN
+    - caption: St Lucia
+      countryKey: LC
+    - caption: St Martin
+      countryKey: MF
+    - caption: St Pierre & Miquelon
+      countryKey: PM
+    - caption: St Vincent & the Grenadines
+      countryKey: VC
+    - caption: Sudan
+      countryKey: SD
+    - caption: Suriname
+      countryKey: SR
+    - caption: Svalbard & Jan Mayen
+      countryKey: SJ
+    - caption: Sweden
+      countryKey: SE
+    - caption: Switzerland
+      countryKey: CH
+    - caption: Syria
+      countryKey: SY
+    - caption: Taiwan
+      countryKey: TW
+    - caption: Tajikistan
+      countryKey: TJ
+    - caption: Tanzania
+      countryKey: TZ
+    - caption: Thailand
+      countryKey: TH
+    - caption: Timor-Leste
+      countryKey: TL
+    - caption: Togo
+      countryKey: TG
+    - caption: Tokelau
+      countryKey: TK
+    - caption: Tonga
+      countryKey: TO
+    - caption: Trinidad & Tobago
+      countryKey: TT
+    - caption: Tunisia
+      countryKey: TN
+    - caption: Turkey
+      countryKey: TR
+    - caption: Turkmenistan
+      countryKey: TM
+    - caption: Turks & Caicos Islands
+      countryKey: TC
+    - caption: Tuvalu
+      countryKey: TV
+    - caption: US Outlying Islands
+      countryKey: UM
+    - caption: US Virgin Islands
+      countryKey: VI
+    - caption: Uganda
+      countryKey: UG
+    - caption: Ukraine
+      countryKey: UA
+    - caption: United Arab Emirates
+      countryKey: AE
+    - caption: United Kingdom
+      countryKey: GB
+    - caption: United States
+      countryKey: US
+    - caption: Uruguay
+      countryKey: UY
+    - caption: Uzbekistan
+      countryKey: UZ
+    - caption: Vanuatu
+      countryKey: VU
+    - caption: Vatican City
+      countryKey: VA
+    - caption: Venezuela
+      countryKey: VE
+    - caption: Vietnam
+      countryKey: VN
+    - caption: Wallis & Futuna
+      countryKey: WF
+    - caption: Western Sahara
+      countryKey: EH
+    - caption: Yemen
+      countryKey: YE
+    - caption: Zambia
+      countryKey: ZM
+    - caption: Zimbabwe
+      countryKey: ZW
+    data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: country
+    position: 1001
+    title: Country
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: phone
+    position: 1002
+    title: Phone Number
+  - data: ''
+    default_value: ''
+    description: ''
+    id: <id>
+    input_type: text
+    position: 1003
+    title: Position
+  - choices:
+    - caption: Mr
+      id: <id>
+      isEnabled: true
+      maxExtraSlots: 0
+      placesLimit: 0
+      price: 0
+    - caption: Ms
+      id: <id>
+      isEnabled: true
+      maxExtraSlots: 0
+      placesLimit: 0
+      price: 0
+    - caption: Mrs
+      id: <id>
+      isEnabled: true
+      maxExtraSlots: 0
+      placesLimit: 0
+      price: 0
+    - caption: Dr
+      id: <id>
+      isEnabled: true
+      maxExtraSlots: 0
+      placesLimit: 0
+      price: 0
+    - caption: Prof.
+      id: <id>
+      isEnabled: true
+      maxExtraSlots: 0
+      placesLimit: 0
+      price: 0
+    - caption: Mx
+      id: <id>
+      isEnabled: true
+      maxExtraSlots: 0
+      placesLimit: 0
+      price: 0
+    data: {}
+    default_value: {}
+    description: ''
+    id: <id>
+    input_type: single_choice
+    position: 1004
+    title: Title
+  id: <id>
+  position: 1
+  title: Personal Data
+registration_date: <timestamp>
+state: complete
+tags: []
