@@ -66,6 +66,8 @@ in the `changes` kwarg.
 
 session_updated = _signals.signal('session-updated', '''
 Called when a session is updated. The *sender* is the session.
+A dict containing ``old, new`` tuples for all changed values is passed
+in the ``changes`` kwarg.
 ''')
 
 session_deleted = _signals.signal('session-deleted', '''
@@ -74,6 +76,8 @@ Called when a session is deleted. The *sender* is the session.
 
 session_block_updated = _signals.signal('session-block-updated', '''
 Called when a session block is updated. The *sender* is the session block.
+A dict containing ``old, new`` tuples for all changed values is passed
+in the ``changes`` kwarg.
 ''')
 
 session_block_deleted = _signals.signal('session-block-deleted', '''
