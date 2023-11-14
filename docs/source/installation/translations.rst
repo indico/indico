@@ -78,8 +78,7 @@ this could to lead to errors when Indico tries to use the translated string.
 6. Compile translations and run Indico
 --------------------------------------
 
-Run the command ``indico i18n compile indico``
-and:
+Run the command ``indico i18n compile indico`` and:
 
 - :ref:`launch Indico <run-dev>`, or
 - :ref:`build <building>` and :ref:`deploy your own version of Indico <install-prod>`,

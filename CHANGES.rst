@@ -98,7 +98,8 @@ Internal Changes
   :user:`vtran99`)
 - Support Python 3.12 (:pr:`5978`)
 - Remove watchman reloader support, use watchfiles instead (:pr:`5978`)
-- Improve i18n cli and add new i18n cli for plugins(:issue:`5906`, :pr:`5961`, thanks :user:`SegiNyn`)
+- Improve ``indico i18n`` CLI to support plugin-related i18n operations (:issue:`5906`, :pr:`5961`,
+  thanks :user:`SegiNyn`)
 
 
 ----

@@ -114,27 +114,27 @@ def _get_plugin_options(cmd_name, plugin_dir):
 
         # JavaScript
         'init_catalog_js': {
-            'input_file': _get_js_messages_pot(plugin_dir),
+            'input_file': _get_messages_js_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
         'extract_messages_js': {
             'keywords': '$t gettext ngettext:1,2 pgettext:1c,2 npgettext:1c,2,3',
-            'output_file': _get_js_messages_pot(plugin_dir),
+            'output_file': _get_messages_js_pot(plugin_dir),
             'mapping_file': 'babel-js.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel-js.cfg'))
                             else '../babel-js.cfg'
         },
         'update_catalog_js': {
-            'input_file': _get_js_messages_pot(plugin_dir),
+            'input_file': _get_messages_js_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
 
         # JavaScript / React
         'init_catalog_react': {
-            'input_file': _get_react_messages_pot(plugin_dir),
+            'input_file': _get_messages_react_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
         'update_catalog_react': {
-            'input_file': _get_react_messages_pot(plugin_dir),
+            'input_file': _get_messages_react_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
     }[cmd_name]
@@ -151,7 +151,6 @@ def _chdir(path):
 
 
 def _validate_plugin_dir(check_tx=False):
-
     def _validate_dir(ctx, param, plugin_dir):
         if check_tx:
             if not os.path.exists(os.path.join(plugin_dir, '.tx', 'config')):
@@ -196,11 +195,11 @@ def _get_messages_pot(path):
     return _get_messages(path, 'messages.pot')
 
 
-def _get_js_messages_pot(path):
+def _get_messages_js_pot(path):
     return _get_messages(path, 'messages-js.pot')
 
 
-def _get_react_messages_pot(path):
+def _get_messages_react_pot(path):
     return _get_messages(path, 'messages-react.pot')
 
 
@@ -319,29 +318,29 @@ def extract_messages_react(directory=INDICO_DIR):
     with _chdir(INDICO_DIR):
         output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract'] + paths,
                                          env=dict(os.environ, FORCE_COLOR='1'))
-    with open(_get_react_messages_pot(directory), 'wb') as f:
+    with open(_get_messages_react_pot(directory), 'wb') as f:
         f.write(output)
 
 
-def remove_empty_pot_files(translations_dir, python=False, javascript=False, react=False):
-    """Remove empty .pot files with no msgid strings after extraction."""
+def po_file_empty(path):
+    if not os.path.exists(path):
+        return False
+    with open(path, 'rb') as f:
+        po_data = read_po(f)
+    return not po_data
 
-    def _message_id_count(file_name):
-        count = 0
-        with open(os.path.join(translations_dir, file_name), encoding='utf-8') as f:
-            data = f.read()
-            count = data.count('msgid')
-        return count
+
+def remove_empty_pot_files(path, python=False, javascript=False, react=False):
+    """Remove empty .pot files with no msgid strings after extraction."""
     if python:
-        if _message_id_count('messages.pot') == 1:
-            os.remove(os.path.join(translations_dir, 'messages.pot'))
+        if po_file_empty(_get_messages_pot(path)):
+            os.remove(_get_messages_pot(path))
     if javascript:
-        if _message_id_count('messages-js.pot') == 1:
-            os.remove(os.path.join(translations_dir, 'messages-js.pot'))
+        if po_file_empty(_get_messages_js_pot(path)):
+            os.remove(_get_messages_js_pot(path))
     if react:
-        if (os.path.exists(os.path.join(translations_dir, 'messages-react.pot'))
-           and _message_id_count('messages-react.pot') == 1):
-            os.remove(os.path.join(translations_dir, 'messages-react.pot'))
+        if po_file_empty(_get_messages_react_pot(path)):
+            os.remove(_get_messages_react_pot(path))
 
 
 @cli.group('compile', short_help='Catalog compilation command for indico and indico plugins.')
@@ -391,7 +390,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'extract_messages':
-        remove_empty_pot_files(TRANSLATIONS_DIR, python=python, javascript=javascript, react=react)
+        remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
 
 
 def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
@@ -423,8 +422,7 @@ def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plug
         except Exception as err:
             click.secho(f'Error running {babel_cmd} for {plugin_dir} - {err}', fg='red', bold=True, err=True)
         if babel_cmd == 'extract_messages':
-            remove_empty_pot_files(_get_translations_dir(plugin_dir), python=python, javascript=javascript,
-                                   react=react)
+            remove_empty_pot_files(plugin_dir, python=python, javascript=javascript, react=react)
 
 
 def _command(**kwargs):
