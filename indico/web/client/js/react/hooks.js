@@ -252,6 +252,31 @@ export function useTimeout(callback, delay) {
 }
 
 /**
+ * React hook to use `setInterval` inside a react component.
+ *
+ * @param {Function} callback - the function to run at the end
+ * @param {Number} delay - the duration of the timeout (`null` to disable)
+ *
+ * Based on https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+ */
+export function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the actual interval
+  useEffect(() => {
+    if (delay !== null) {
+      const id = setInterval(() => savedCallback.current(), delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
+/**
  * React hook that parses the query string into an object.
  *
  * Provides an array [query, setQuery] similar to useState and allows adding/updating a parameter or

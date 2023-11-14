@@ -7,5 +7,5 @@
 
 import './impersonation';
 import './session_bar';
-import './session_expiration';
+import './session_expiry';
 import './top_bars';

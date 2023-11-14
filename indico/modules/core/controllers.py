@@ -365,7 +365,7 @@ class RHRenderMarkdown(RH):
         return jsonify(html=html)
 
 
-class SessionExpirationMixin:
+class SessionExpiryMixin:
     """Return the session expiration time."""
 
     def _process(self):
@@ -373,10 +373,10 @@ class SessionExpirationMixin:
             expiry = str(server_to_utc(session['_expires']))
         except KeyError:
             expiry = None
-        return jsonify(session_expiration=expiry)
+        return jsonify(session_expiry=expiry)
 
 
-class RHSessionExpiration(SessionExpirationMixin, RH):
+class RHSessionExpiry(SessionExpiryMixin, RH):
     """Return the session expiration time without refreshing the session.
 
     The logic that prevents this endpoint from refreshing the session is
@@ -384,7 +384,7 @@ class RHSessionExpiration(SessionExpirationMixin, RH):
     """
 
 
-class RHSessionRefresh(SessionExpirationMixin, RH):
+class RHSessionRefresh(SessionExpiryMixin, RH):
     """Return the sesssion expiration time and refresh the current session.
 
     Refreshing the session is the standard behavior of almost any endpoint.
