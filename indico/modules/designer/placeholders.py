@@ -28,7 +28,7 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder', 'FixedTextPlaceholder',
-           'FixedImagePlaceholder')
+           'FixedImagePlaceholder', 'RegistrationAccompanyingPersonsCountPlaceholder')
 
 
 GROUP_TITLES = {
@@ -274,6 +274,15 @@ class RegistrationPricePlaceholder(RegistrationPlaceholder):
     def render(cls, registration):
         # XXX: Use event locale once we have such a setting
         return format_currency(registration.price, registration.currency, locale='en_GB')
+
+
+class RegistrationAccompanyingPersonsCountPlaceholder(RegistrationPlaceholder):
+    name = 'num_accompanying_persons'
+    description = _('Number of Accompanying persons')
+
+    @classmethod
+    def render(cls, registration):
+        return str(registration.num_accompanying_persons)
 
 
 class RegistrationFriendlyIDPlaceholder(RegistrationPlaceholder):
