@@ -377,8 +377,15 @@ class SessionExpirationMixin:
 
 
 class RHSessionExpiration(SessionExpirationMixin, RH):
-    """Return the session expiration time without refreshing the session."""
+    """Return the session expiration time without refreshing the session.
+
+    The logic that prevents this endpoint from refreshing the session is
+    implemented in ``indico.web.flask.session``.
+    """
 
 
 class RHSessionRefresh(SessionExpirationMixin, RH):
-    """Return the sesssion expiration time and refresh the current session."""
+    """Return the sesssion expiration time and refresh the current session.
+
+    Refreshing the session is the standard behavior of almost any endpoint.
+    """

@@ -1,5 +1,3 @@
-{% from 'core/session_expiration.html' import setup_session_expiration %}
-
 <div class="footer {{ 'dark' if dark|default(false) }}">
     {% block footer -%}
         {%- set indico -%}
@@ -42,7 +40,6 @@
                 {% endblock %}
             </div>
         </div>
-        {{ setup_session_expiration() }}
     {% endblock %}
 </div>
 

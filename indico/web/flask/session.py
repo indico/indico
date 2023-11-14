@@ -26,9 +26,7 @@ from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
 
 
-RE_SKIP_REFRESH_SESSION_ENDPOINTS = re.compile(
-    r'core\.session_expiration|assets\.|plugin_.*\.static$'
-)
+RE_SKIP_REFRESH_SESSION_FOR_ASSETS_ENDPOINTS = re.compile(r'assets\.|plugin_.*\.static$')
 
 
 @functools.cache
@@ -195,7 +193,8 @@ class IndicoSessionInterface(SessionInterface):
     def should_refresh_session(self, app, session):
         if session.new or '_expires' not in session:
             return False
-        if RE_SKIP_REFRESH_SESSION_ENDPOINTS.match(request.endpoint):
+        if (request.endpoint == 'core.session_expiration' or
+                RE_SKIP_REFRESH_SESSION_FOR_ASSETS_ENDPOINTS.match(request.endpoint)):
             return False
         threshold = self.get_storage_lifetime(app, session) / 2
         return session['_expires'] - datetime.now() < threshold
