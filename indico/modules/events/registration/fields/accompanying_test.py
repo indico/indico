@@ -221,22 +221,27 @@ def test_registration_count_multiple_fields(dummy_regform, create_accompanying_p
 
     _assert_registration_count(dummy_regform, 0)
     reg_1 = create_registration(1)
+    assert reg_1.num_accompanying_persons == 0
     _assert_occupied_slots(reg_1, 1)
     _assert_registration_count(dummy_regform, 1)
 
     create_accompanying_persons_field(0, False, registration=reg_1, num_persons=1)
+    assert reg_1.num_accompanying_persons == 1
     _assert_occupied_slots(reg_1, 1)
     _assert_registration_count(dummy_regform, 1)
 
     create_accompanying_persons_field(0, True, registration=reg_1, num_persons=1)
+    assert reg_1.num_accompanying_persons == 2
     _assert_occupied_slots(reg_1, 2)
     _assert_registration_count(dummy_regform, 2)
 
     create_accompanying_persons_field(0, True, registration=reg_1, num_persons=2)
+    assert reg_1.num_accompanying_persons == 4
     _assert_occupied_slots(reg_1, 4)
     _assert_registration_count(dummy_regform, 4)
 
     reg_2 = create_registration(2)
+    assert reg_2.num_accompanying_persons == 0
     _assert_occupied_slots(reg_2, 1)
     _assert_registration_count(dummy_regform, 5)
 
