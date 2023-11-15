@@ -58,6 +58,7 @@ Bugfixes
 - Allow cancelling pending bookings even if they have already "started" (:pr:`5995`)
 - Disallow switching the repeat frequency of an existing room booking from weekly to monthly
   or vice versa (:pr:`5999`)
+- Ignore deleted fields when computing the number of occupied slots for a registration (:pr:`6035`)
 
 Accessibility
 ^^^^^^^^^^^^^
