@@ -141,7 +141,6 @@ class RegistrationFormFieldBase:
         :param billable_items_locked: Whether modifications to any
                                       billable item should be ignored.
         """
-
         if old_data is not None and not self.has_data_changed(value, old_data):
             return {}
         else:

@@ -42,6 +42,7 @@ class LogKind(IndicoIntEnum):
 
 class LogEntryBase(db.Model):
     """Base model for log entries."""
+
     __abstract__ = True
     __tablename__ = 'logs'
 

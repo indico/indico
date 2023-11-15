@@ -17,7 +17,6 @@ def disallow_emails(monkeypatch):
     Return a set where you can add `(host, port)` combinations that
     should be exempt from the SMTP restriction.
     """
-
     orig_connect = SMTP.connect
     allowed = set()
 

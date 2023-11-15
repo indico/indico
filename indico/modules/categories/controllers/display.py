@@ -267,7 +267,7 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
 
 
 class RHDisplayCategory(RHDisplayCategoryEventsBase):
-    """Show the contents of a category (events/subcategories)"""
+    """Show the contents of a category (events/subcategories)."""
 
     def _process(self):
         params = get_category_view_params(self.category, self.now, is_flat=self.is_flat)
@@ -326,9 +326,7 @@ class RHEventList(RHDisplayCategoryEventsBase):
 
 
 class RHShowEventsInCategoryBase(RHDisplayCategoryBase):
-    """
-    Set whether the events in a category are automatically displayed or not.
-    """
+    """Set whether the events in a category are automatically displayed or not."""
 
     session_field = ''
 
@@ -348,17 +346,13 @@ class RHShowEventsInCategoryBase(RHDisplayCategoryBase):
 
 
 class RHShowFutureEventsInCategory(RHShowEventsInCategoryBase):
-    """
-    Set whether the past events in a category are automatically displayed or not.
-    """
+    """Set whether the past events in a category are automatically displayed or not."""
 
     session_field = 'fetch_future_events_in'
 
 
 class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
-    """
-    Set whether the past events in a category are automatically displayed or not.
-    """
+    """Set whether the past events in a category are automatically displayed or not."""
 
     session_field = 'fetch_past_events_in'
 

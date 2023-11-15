@@ -193,6 +193,7 @@ class _CelerySAWrapper:
     through the Celery serializer and then fetching the actual objects
     again when executing the task.
     """
+
     __slots__ = ('identity_key',)
 
     def __init__(self, obj):

@@ -88,7 +88,6 @@ def _handle_legacy_ids(app, **kwargs):
     or losing relevant information (0123 and 123 may be different
     events).
     """
-
     # Endpoints which need to deal with non-standard event "ids" because they might be shorturls.
     # Those endpoints handle legacy event ids on their own so we ignore them here.
     _non_standard_id_endpoints = {

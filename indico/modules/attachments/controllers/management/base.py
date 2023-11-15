@@ -63,6 +63,7 @@ def _get_folders_protection_info(linked_object):
 
 class ManageAttachmentsMixin:
     """Show the attachment management page."""
+
     wp = None
 
     def _process(self):

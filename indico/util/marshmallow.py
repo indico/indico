@@ -51,7 +51,6 @@ def not_empty(value):
 
     Any falsy value is considered empty.
     """
-
     if not value:
         raise ValidationError(_('This field cannot be empty.'))
 
@@ -75,7 +74,6 @@ def validate_placeholders(format_string, valid_placeholders, required_placeholde
 
 def file_extension(*exts):
     """Validator which checks the file extension."""
-
     exts = frozenset('.' + ext.lstrip('.') for ext in exts)
 
     def validate(file):

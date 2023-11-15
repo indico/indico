@@ -402,7 +402,6 @@ def override_attr(attr_name, parent_name, *, fget=None, check_attr_name=None, ow
     :param own_attr_name: The name of the attribute on the object that has this property; by default
                           this is ``_<attr_name>``.
     """
-
     if own_attr_name is None:
         own_attr_name = '_' + attr_name
 

@@ -36,18 +36,16 @@ class LinkedObjectField(Field):
 
 
 class ContributionField(LinkedObjectField):
-    """
-    A field with dynamic fetching to select a contribution that has no reservation yet.
-    """
+    """A field with dynamic fetching to select a contribution that has no reservation yet."""
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter contribution title or #id'))
         super().__init__(*args, **kwargs)
 
 
 class SessionBlockField(LinkedObjectField):
-    """
-    A field with dynamic fetching to select a session block that has no reservation yet.
-    """
+    """A field with dynamic fetching to select a session block that has no reservation yet."""
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title'))
         super().__init__(*args, **kwargs)

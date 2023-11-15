@@ -28,6 +28,7 @@ from indico.util.string import format_repr
 
 class EventReminder(db.Model):
     """Email reminders for events."""
+
     __tablename__ = 'reminders'
     __table_args__ = (db.Index(None, 'scheduled_dt', postgresql_where=db.text('not is_sent')),
                       {'schema': 'events'})

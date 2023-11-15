@@ -5,9 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-"""
-Image processing functions
-"""
+"""Image processing functions."""
 
 
 def square(image):

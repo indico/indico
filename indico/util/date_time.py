@@ -304,7 +304,6 @@ def format_pretty_datetime(dt, locale=None, tzinfo=None):
     :param locale: the locale to use for formatting
     :param tzinfo: the timezone to use
     """
-
     return _format_pretty_datetime(dt, locale, tzinfo, {
         'last_day': _("'Yesterday' 'at' {time_fmt}"),
         'same_day': _("'Today' 'at' {time_fmt}"),

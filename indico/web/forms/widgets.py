@@ -60,7 +60,7 @@ class HiddenCheckbox(CheckboxInput, HiddenInput):
 
 
 class JinjaWidget:
-    """Render a field using a custom Jinja template
+    """Render a field using a custom Jinja template.
 
     :param template: The template to render
     :param plugin: The plugin or plugin name containing the template
@@ -269,7 +269,7 @@ class ColorPickerWidget(JinjaWidget):
 
 
 class PrefixedTextWidget(JinjaWidget):
-    """Render a TextInput with a prefix"""
+    """Render a TextInput with a prefix."""
 
     def __init__(self, prefix=None, show_field=True):
         super().__init__('forms/prefixed_text_widget.html', single_line=True, single_kwargs=True,

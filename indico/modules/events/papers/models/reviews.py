@@ -53,6 +53,7 @@ class PaperJudgmentProxy:
 
 class PaperCommentVisibility(RichIntEnum):
     """Most to least restrictive visibility for paper comments."""
+
     __titles__ = [None,
                   _('Visible only to judges'),
                   _('Visible to reviewers and judges'),

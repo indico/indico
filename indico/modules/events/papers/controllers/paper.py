@@ -104,9 +104,7 @@ class RHPapersActionBase(RHPapersListBase):
 
 
 class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
-    """
-    Generate a ZIP file with paper files for a given list of contributions.
-    """
+    """Generate a ZIP file with paper files for a given list of contributions."""
 
     ALLOW_LOCKED = True
 

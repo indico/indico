@@ -102,7 +102,7 @@ class RoleSchema(mm.Schema):
 
 
 class RolesAPIMixin:
-    """JSON API for roles"""
+    """JSON API for roles."""
 
     def _process(self):
         return RoleSchema(many=True).jsonify(self.roles)

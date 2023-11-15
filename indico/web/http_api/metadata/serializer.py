@@ -30,7 +30,6 @@ class Serializer:
     @classmethod
     def create(cls, dformat, query_params=None, **kwargs):
         """A serializer factory."""
-
         query_params = query_params or {}
 
         serializer = cls.registry.get(dformat)

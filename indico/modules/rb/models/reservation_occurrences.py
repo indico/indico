@@ -137,7 +137,6 @@ class ReservationOccurrence(db.Model):
     @staticmethod
     def map_recurrence_weekdays_to_rrule(weekdays):
         """Map weekdays from database to rrule weekdays."""
-
         # Return none if no weekdays are provided
         if not weekdays:
             return None

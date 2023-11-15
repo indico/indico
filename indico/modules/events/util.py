@@ -703,7 +703,6 @@ class ZipGeneratorMixin:
         :param name_suffix: The suffix to the zip file name
         :param return_file: Return the temp file instead of a response
         """
-
         temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()

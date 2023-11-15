@@ -59,7 +59,6 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     :param static_item_ids: The abstract properties to be used as columns
     :param dynamic_items: Contribution fields as extra columns
     """
-
     field_names = ['Id', 'Title']
     static_item_mapping = {
         'state': ('State', lambda x: x.state.title),

@@ -26,6 +26,7 @@ from indico.web.util import get_request_user
 
 class _DataWrapper:
     """Wrapper for the return value of generated_data properties."""
+
     def __init__(self, data):
         self.data = data
 
@@ -173,7 +174,7 @@ class IndicoForm(FlaskForm, metaclass=IndicoFormMeta):
 
     @property
     def error_list(self):
-        """A list containing all errors, prefixed with the field's label.'"""
+        """A list containing all errors, prefixed with the field's label."""
         all_errors = []
         for field_name, errors in self.errors.items():
             for error in errors:

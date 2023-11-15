@@ -96,6 +96,7 @@ class TemplateDesignerMixin:
 
     It resolves the target object type from the blueprint URL.
     """
+
     @property
     def object_type(self):
         """Figure out whether we're targetting an event or category, based on URL info."""
@@ -115,6 +116,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
 
     The target category/event will be the owner of that template.
     """
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.template
@@ -149,9 +151,7 @@ class BacksideTemplateProtectionMixin:
 
 
 class TargetFromURLMixin(TemplateDesignerMixin):
-    """
-    Mixin that takes the target event/category from the URL that is passed.
-    """
+    """Mixin that takes the target event/category from the URL that is passed."""
 
     @property
     def target_dict(self):

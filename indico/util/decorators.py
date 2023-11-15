@@ -19,6 +19,7 @@ class strict_classproperty(classproperty):
     itself, so it's really just to stop people from accessing
     the property in an inappropriate way.
     """
+
     def __get__(self, obj, type=None):
         if obj is not None:
             raise AttributeError(f'Attribute is not available on instances of {type.__name__}')

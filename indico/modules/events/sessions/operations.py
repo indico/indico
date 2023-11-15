@@ -19,9 +19,7 @@ from indico.util.i18n import orig_string
 
 
 def create_session(event, data):
-    """
-    Create a new session with the information passed in the `data` argument.
-    """
+    """Create a new session with the information passed in the `data` argument."""
     event_session = Session(event=event)
     event_session.populate_from_dict(data)
     db.session.flush()

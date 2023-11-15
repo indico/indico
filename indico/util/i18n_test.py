@@ -55,7 +55,7 @@ DICTIONARIES = {
 class MockTranslations(Translations):
     """
     Mock `Translations` class - returns a mock dictionary
-    based on the selected locale
+    based on the selected locale.
     """
 
     def __init__(self):

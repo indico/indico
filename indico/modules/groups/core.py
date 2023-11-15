@@ -134,7 +134,7 @@ class _LocalGroupProxy(GroupProxy):
 
     @cached_property
     def group(self):
-        """The underlying :class:`.LocalGroup`"""
+        """The underlying :class:`.LocalGroup`."""
         if not config.LOCAL_GROUPS:
             # pretend local groups do not exist if they are disabled
             # this way they'll be rejected in acl fields

@@ -39,7 +39,7 @@ class EventACLProxy(ACLProxyBase):
 
     @event_or_id
     def get(self, event, name):
-        """Retrieves an ACL setting
+        """Retrieve an ACL setting.
 
         :param event: Event (or its ID)
         :param name: Setting name

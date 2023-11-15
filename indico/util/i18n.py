@@ -75,8 +75,7 @@ def _gettext(tr, message):
 
 
 def _pgettext(tr, context, message):
-    """pgettext variant of _gettext."""
-
+    # pgettext variant of _gettext
     translation = tr.pgettext(context, message)
     if message != translation:
         return translation
@@ -111,10 +110,9 @@ def orig_string(lazy_string):
 def smart_func(func_name, plugin_name=None):
     def _wrap(*args, **kwargs):
         """
-        Returns either a translated string or a lazy-translatable object,
-        depending on whether there is a session language or not (respectively)
+        Return either a translated string or a lazy-translatable object,
+        depending on whether there is a session language or not (respectively).
         """
-
         if has_request_context() or func_name != 'gettext':
             # straight translation
             return _indico_gettext(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
@@ -129,30 +127,22 @@ def smart_func(func_name, plugin_name=None):
 
 
 def make_bound_gettext(plugin_name):
-    """
-    Create a smart gettext callable bound to the domain of the specified plugin.
-    """
+    """Create a smart gettext callable bound to the domain of the specified plugin."""
     return smart_func('gettext', plugin_name=plugin_name)
 
 
 def make_bound_ngettext(plugin_name):
-    """
-    Create a smart ngettext callable bound to the domain of the specified plugin.
-    """
+    """Create a smart ngettext callable bound to the domain of the specified plugin."""
     return smart_func('ngettext', plugin_name=plugin_name)
 
 
 def make_bound_pgettext(plugin_name):
-    """
-    Create a smart pgettext callable bound to the domain of the specified plugin.
-    """
+    """Create a smart pgettext callable bound to the domain of the specified plugin."""
     return smart_func('pgettext', plugin_name=plugin_name)
 
 
 def make_bound_npgettext(plugin_name):
-    """
-    Create a smart npgettext callable bound to the domain of the specified plugin.
-    """
+    """Create a smart npgettext callable bound to the domain of the specified plugin."""
     return smart_func('npgettext', plugin_name=plugin_name)
 
 
@@ -282,9 +272,7 @@ def _get_current_locale(locale):
 
 
 def get_all_locales():
-    """
-    List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``.
-    """
+    """List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``."""
     if not has_app_context():
         return {}
     else:

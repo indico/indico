@@ -131,6 +131,7 @@ class RHOAuthAdmin(RHAdminBase):
 
 class RHOAuthAdminApplicationBase(RHAdminBase):
     """Base class for single OAuth application RHs."""
+
     def _process_args(self):
         self.application = OAuthApplication.get_or_404(request.view_args['id'])
 
@@ -236,7 +237,7 @@ class RHOAuthUserAppRevoke(RHUserBase):
 
 
 class RHPersonalTokensUserBase(RHUserBase):
-    """Base class for personal token management"""
+    """Base class for personal token management."""
 
     allow_system_user = True
 

@@ -96,6 +96,7 @@ class MenuEntryData:
     :param url_kwargs: dict -- Additional data passed to ``url_for``
         when building the url the menu item points to.
     """
+
     plugin = None
 
     def __init__(self, title, name, endpoint=None, position=-1, is_enabled=True, visible=None, parent=None,

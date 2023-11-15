@@ -75,7 +75,6 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         Return the contribution fields ordered by their position in
         the abstract form.
         """
-
         if not item_ids or not self.show_contribution_fields:
             return []
         return (ContributionField.query
@@ -253,9 +252,7 @@ class AbstractListGeneratorManagement(AbstractListGeneratorBase):
 
 
 class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
-    """
-    Listing and filtering actions in the abstract list in the display view.
-    """
+    """Listing and filtering actions in the abstract list in the display view."""
 
     list_link_type = 'abstract_display'
     endpoint = '.display_reviewable_track_abstracts'

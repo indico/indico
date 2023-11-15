@@ -31,7 +31,7 @@ def _verify_captcha(user_answer):
 
 
 def generate_captcha_challenge():
-    """Generate 4-digit CAPTCHA as image and audio"""
+    """Generate 4-digit CAPTCHA as image and audio."""
     # we skip 1 since it's too similar to 7; when verifying we accept both digits
     answer = ''.join(random.choices('023456789', k=4))
     image = ImageCaptcha().generate(answer).read()

@@ -30,7 +30,6 @@ def postgresql():
     If the environment variable `INDICO_TEST_DATABASE_URI` is set, this fixture
     will do nothing and simply return the connection string from that variable
     """
-
     # Use existing database
     if 'INDICO_TEST_DATABASE_URI' in os.environ:
         yield os.environ['INDICO_TEST_DATABASE_URI']

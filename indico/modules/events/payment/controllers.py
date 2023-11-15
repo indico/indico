@@ -39,6 +39,7 @@ class RHPaymentAdminSettings(RHAdminBase):
 
 class RHPaymentAdminPluginSettings(RHPluginDetails):
     """Payment plugin settings in server admin area."""
+
     back_button_endpoint = 'payment.admin_settings'
 
 
@@ -50,6 +51,7 @@ class RHPaymentManagementBase(RHManageEventBase):
 
 class RHPaymentBase(RHRegistrationFormRegistrationBase):
     """Base RH for non-management payment pages."""
+
     EVENT_FEATURE = 'payment'
 
 

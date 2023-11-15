@@ -26,6 +26,7 @@ class RequestState(RichIntEnum):
 
 class Request(db.Model):
     """Event-related requests, e.g. for a webcast."""
+
     __tablename__ = 'requests'
     __table_args__ = {'schema': 'events'}
 

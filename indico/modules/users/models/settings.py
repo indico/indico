@@ -15,6 +15,7 @@ from indico.core.settings.util import get_all_settings, get_setting
 
 class UserSetting(JSONSettingsBase, db.Model):
     """User-specific settings."""
+
     __table_args__ = (db.Index(None, 'user_id', 'module', 'name'),
                       db.Index(None, 'user_id', 'module'),
                       db.UniqueConstraint('user_id', 'module', 'name'),

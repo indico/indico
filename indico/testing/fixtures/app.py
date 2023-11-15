@@ -17,7 +17,6 @@ from indico.web.flask.wrappers import IndicoFlask
 @pytest.fixture(scope='session')
 def app(request):
     """Create the flask app."""
-
     redis_cache_url = os.environ.get('INDICO_TEST_REDIS_CACHE_URL')
     if not redis_cache_url:
         redis_proc = request.getfixturevalue('redis_proc')

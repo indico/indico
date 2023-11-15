@@ -640,9 +640,7 @@ class User(PersonMixin, db.Model):
 
     @property
     def can_get_all_multipass_groups(self):
-        """
-        Check whether it is possible to get all multipass groups the user is in.
-        """
+        """Check whether it is possible to get all multipass groups the user is in."""
         return all(multipass.identity_providers[x.provider].supports_get_identity_groups
                    for x in self.identities
                    if x.provider != 'indico' and x.provider in multipass.identity_providers)

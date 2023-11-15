@@ -261,7 +261,7 @@ class IndicoPlugin(Plugin):
 
 
 def plugin_url_rule_to_js(endpoint):
-    """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint"""
+    """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint."""
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
         endpoint = f'plugin_{endpoint}'
     return url_rule_to_js(endpoint)
@@ -275,7 +275,7 @@ def url_for_plugin(endpoint, *targets, **values):
 
 
 def get_plugin_template_module(template_name, **context):
-    """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates"""
+    """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates."""
     template_name = f'{current_plugin.name}:{template_name}'
     return get_template_module(template_name, **context)
 

@@ -18,6 +18,7 @@ from speaklater import _LazyString
 
 class IndicoJSONEncoder(simplejson.JSONEncoder):
     """Custom JSON encoder that supports more types."""
+
     def __init__(self, *args, **kwargs):
         if kwargs.get('separators') is None:
             kwargs['separators'] = (',', ':')

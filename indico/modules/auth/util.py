@@ -126,7 +126,7 @@ def url_for_logout(next_url=None):
 
 
 def url_for_register(next_url=None, email=None):
-    """Returns the URL to register
+    """Returns the URL to register.
 
     :param next_url: The URL to redirect to afterwards.
     :param email: A pre-validated email address to use when creating

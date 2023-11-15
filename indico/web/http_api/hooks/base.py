@@ -5,9 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-"""
-Base export interface
-"""
+"""Base export interface."""
 
 import re
 from datetime import datetime, time, timedelta
@@ -34,8 +32,10 @@ from indico.web.http_api.util import get_query_parameter
 
 
 class HTTPAPIHook:
-    """This class is the hook between the query (path+params) and the generator of the results (fossil).
-       It is also in charge of checking the parameters and the access rights.
+    """Base class for implementing legacy HTTP-API endpoins.
+
+    This class is the hook between the query (path+params) and the generator of the results (fossil).
+    It is also in charge of checking the parameters and the access rights.
     """
 
     HOOK_LIST = []
@@ -78,7 +78,8 @@ class HTTPAPIHook:
     def register(cls):
         """Register a hook.
 
-        To use it, simply decorate the hook class with this method."""
+        To use it, simply decorate the hook class with this method.
+        """
         assert cls.RE is not None
         HTTPAPIHook.HOOK_LIST.append(cls)
         return cls
@@ -213,7 +214,8 @@ class DataFetcher:
 
     @classmethod
     def _parseDateTime(cls, dateTime, allowNegativeOffset):
-        """
+        """Parse a date/time string.
+
         Accepted formats:
          * ISO 8601 subset - YYYY-MM-DD[THH:MM]
          * 'today', 'yesterday', 'tomorrow' and 'now'
@@ -222,7 +224,6 @@ class DataFetcher:
          'ctx' means that the date will change according to its function
          ('from' or 'to')
         """
-
         # if it's a an "alias", return immediately
         now = now_utc()
         if dateTime in cls._deltas:

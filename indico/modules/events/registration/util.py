@@ -136,7 +136,7 @@ def get_title_uuid(regform, title):
 
 
 def get_country_field(regform):
-    """Get the country personal-data field of a regform"""
+    """Get the country personal-data field of a regform."""
     return next((x
                  for x in regform.active_fields
                  if (x.type == RegistrationFormItemType.field_pd and

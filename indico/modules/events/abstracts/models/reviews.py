@@ -201,6 +201,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
 class AbstractCommentVisibility(RichIntEnum):
     """Most to least restrictive visibility for abstract comments."""
+
     __titles__ = [None,
                   _('Visible only to judges'),
                   _('Visible to conveners and judges'),

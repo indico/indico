@@ -318,6 +318,7 @@ class RHSimple(RH):
 
     :param func: A function returning HTML
     """
+
     def __init__(self, func):
         RH.__init__(self)
         self.func = func
@@ -327,7 +328,7 @@ class RHSimple(RH):
 
     @classmethod
     def wrap_function(cls, func, *, disable_csrf_check=False):
-        """Decorates a function to run within the RH's framework"""
+        """Decorate a function to run within the RH's framework."""
         @wraps(func)
         def wrapper(*args, **kwargs):
             rh = cls(partial(func, *args, **kwargs))

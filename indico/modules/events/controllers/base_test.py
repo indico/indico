@@ -41,9 +41,7 @@ def test_event_protected_access(db, create_user, create_event):
 
 @pytest.mark.usefixtures('request_context')
 def test_event_key_access(create_user, create_event):
-    """
-    Ensure the event doesn't reject the user if an access key is required.
-    """
+    """Ensure the event doesn't reject the user if an access key is required."""
     rh = RHDisplayEventBase()
     rh.event = create_event(2, protection_mode=ProtectionMode.protected, access_key='abc')
     with pytest.raises(AccessKeyRequired):

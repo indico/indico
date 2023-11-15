@@ -130,25 +130,24 @@ def find_next_start_dt(duration, obj, day=None, force=False):
 
 def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz=utc, from_categ=None, grouped=True,
                            includible=lambda item: True):
-    """Retrieve time blocks that fall within a specific time interval
-       for a given set of categories.
+    """Retrieve time blocks that fall within a specific time interval for a given set of categories.
 
-       :param categ_ids: iterable containing list of category IDs
-       :param start_dt: start of search interval (``datetime``, expected
-                        to be in display timezone)
-       :param end_dt: end of search interval (``datetime`` in expected
-                      to be in display timezone)
-       :param detail_level: the level of detail of information
-                            (``event|session|contribution``)
-       :param tz: the ``timezone`` information should be displayed in
-       :param from_categ: ``Category`` that will be taken into account to calculate
-                          visibility
-       :param grouped: Whether to group results by start date
-       :param includible: a callable, to allow further arbitrary custom filtering (maybe from 3rd
-                          party plugins) on whether to include (returns True) or not (returns False)
-                          each ``detail`` item. Default always returns True.
-       :returns: a dictionary containing timetable information in a
-                 structured way. See source code for examples.
+    :param categ_ids: iterable containing list of category IDs
+    :param start_dt: start of search interval (``datetime``, expected
+                     to be in display timezone)
+    :param end_dt: end of search interval (``datetime`` in expected
+                   to be in display timezone)
+    :param detail_level: the level of detail of information
+                         (``event|session|contribution``)
+    :param tz: the ``timezone`` information should be displayed in
+    :param from_categ: ``Category`` that will be taken into account to calculate
+                       visibility
+    :param grouped: Whether to group results by start date
+    :param includible: a callable, to allow further arbitrary custom filtering (maybe from 3rd
+                       party plugins) on whether to include (returns True) or not (returns False)
+                       each ``detail`` item. Default always returns True.
+    :returns: a dictionary containing timetable information in a
+              structured way. See source code for examples.
     """
     day_start = start_dt.astimezone(utc)
     day_end = end_dt.astimezone(utc)

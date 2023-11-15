@@ -237,7 +237,6 @@ def upgrade_python(check, no_pyenv_update, local, force_version, venv):
     Be careful when using `--force-version` with a custom version; you may end up
     using an unsupported version where this command will no longer work.
     """
-
     if not check and not no_pyenv_update:
         click.echo('updating pyenv')
         proc = subprocess.run(['pyenv', 'update'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

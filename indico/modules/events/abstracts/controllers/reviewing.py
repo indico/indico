@@ -34,9 +34,7 @@ from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
-    """
-    AJAX endpoint that lists all abstracts in the event (dict representation).
-    """
+    """AJAX endpoint that lists all abstracts in the event (dict representation)."""
 
     ALLOW_LOCKED = True
 

@@ -165,7 +165,6 @@ class SerializerBase:
 
     def _serialize_person(self, person, person_type, can_manage=False):
         """Serialize an event associated person."""
-
         if person:
             data = {
                 '_type': person_type,
@@ -764,7 +763,6 @@ class SessionFetcher(SessionContribFetcher, SerializerBase):
 
     def _build_sessions_api_data(self, sessions):
         """Return an aggregated list of session blocks given the sessions."""
-
         session_blocks = []
         for session_ in sessions:
             can_manage = self.user is not None and session_.can_manage(self.user)

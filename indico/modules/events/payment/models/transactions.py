@@ -130,6 +130,7 @@ class TransactionStatusTransition:
 
 class PaymentTransaction(db.Model):
     """Payment transactions."""
+
     __tablename__ = 'payment_transactions'
     __table_args__ = (db.CheckConstraint('amount > 0', 'positive_amount'),
                       {'schema': 'events'})

@@ -57,7 +57,7 @@ def _render_session_list(event):
 
 
 class RHSessionsList(RHManageSessionsBase):
-    """Display list of all sessions within the event,"""
+    """Display list of all sessions within the event."""
 
     def _process(self):
         selected_entry = request.args.get('selected')

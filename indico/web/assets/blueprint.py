@@ -87,7 +87,6 @@ def i18n_locale_react(locale_name):
 
 def _get_i18n_locale(locale_name, react=False):
     """Retrieve a locale in a Jed-compatible format."""
-
     # Ensure we have a valid locale. en_GB is our source locale and thus always considered
     # valid, even if it doesn't exist (dev setup where the user did not compile any locales)
     # since otherwise we'd have no valid locales at all and get a redirect loop

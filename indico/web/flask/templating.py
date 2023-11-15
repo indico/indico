@@ -130,7 +130,8 @@ def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''
 def get_template_module(template_name_or_list, **context):
     """Return the python module of a template.
 
-    This allows you to call e.g. macros inside it from Python code."""
+    This allows you to call e.g. macros inside it from Python code.
+    """
     current_app.update_template_context(context)
     tpl = current_app.jinja_env.get_or_select_template(template_name_or_list)
     return tpl.make_module(context)

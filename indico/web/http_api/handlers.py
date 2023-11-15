@@ -5,9 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-"""
-HTTP API - Handlers
-"""
+"""HTTP API - Handlers."""
 
 import hashlib
 import hmac

@@ -340,6 +340,7 @@ class TicketsForm(IndicoForm):
 
 class ParticipantsDisplayForm(IndicoForm):
     """Form to customize the display of the participant list."""
+
     json = JSONField()
 
     def __init__(self, *args, **kwargs):
@@ -372,6 +373,7 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
     Form to customize the columns for a particular registration form
     on the participant list.
     """
+
     json = JSONField()
 
     def validate_json(self, field):
@@ -391,9 +393,7 @@ class ParticipantsDisplayFormColumnsForm(IndicoForm):
 
 
 class RegistrationManagersForm(IndicoForm):
-    """
-    Form to manage users with privileges to modify registration-related items.
-    """
+    """Form to manage users with privileges to modify registration-related items."""
 
     managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_event_roles=True,
                                   allow_category_roles=True, allow_emails=True, allow_external_users=True,
@@ -406,9 +406,7 @@ class RegistrationManagersForm(IndicoForm):
 
 
 class CreateMultipleRegistrationsForm(IndicoForm):
-    """
-    Form to create multiple registrations of Indico users at the same time.
-    """
+    """Form to create multiple registrations of Indico users at the same time."""
 
     user_principals = PrincipalListField(_('Indico users'), [DataRequired()], allow_external_users=True)
     notify_users = BooleanField(_('Send e-mail notifications'),
@@ -532,7 +530,7 @@ class RegistrationTagsAssignForm(IndicoForm):
 
 
 class RegistrationPrivacyForm(IndicoForm):
-    """Form to set the privacy settings of a registration form"""
+    """Form to set the privacy settings of a registration form."""
 
     visibility = IndicoParticipantVisibilityField(_('Participant list visibility'),
                                                   description=_('Specify under which conditions the participant list '

@@ -44,9 +44,7 @@ class RHManageEventBase(RHEventBase, ManageEventMixin):
 
 
 class RHContributionPersonListMixin:
-    """
-    List of persons somehow related to contributions (co-authors, speakers...).
-    """
+    """List of persons somehow related to contributions (co-authors, speakers...)."""
 
     @property
     def _membership_filter(self):

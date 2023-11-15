@@ -279,7 +279,6 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
              for external users not yet in Indico and :class:`.User`
              objects for existing users.
     """
-
     criteria = {key: value.strip() for key, value in criteria.items() if value.strip()}
 
     if not criteria:
@@ -354,7 +353,6 @@ def merge_users(source, target, force=False):
     :param source: source user (will be set as deleted)
     :param target: target user (final)
     """
-
     if source.is_deleted and not force:
         raise ValueError(f'Source user {source} has been deleted. Merge aborted.')
 

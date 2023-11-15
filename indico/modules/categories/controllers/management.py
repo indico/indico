@@ -363,7 +363,7 @@ class RHDeleteSubcategories(RHManageCategoryBase):
 
 
 class RHMoveSubcategories(RHMoveCategoryBase):
-    """Bulk-move subcategories"""
+    """Bulk-move subcategories."""
 
     def _process_args(self):
         RHMoveCategoryBase._process_args(self)

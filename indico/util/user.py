@@ -10,7 +10,7 @@ from indico.core.db.sqlalchemy.principals import EmailPrincipal
 
 
 def iter_acl(acl):
-    """Iterates over an ACL in the most efficient order.
+    """Iterate over an ACL in the most efficient order.
 
     This first yields users/emails, then ip networks, then local
     groups, and eventually multipass groups as a remote group check

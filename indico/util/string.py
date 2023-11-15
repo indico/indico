@@ -5,9 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-"""
-String manipulation functions
-"""
+"""String manipulation functions."""
 
 import binascii
 import os
@@ -197,7 +195,6 @@ def slugify(*args, **kwargs):
     :param maxlen: Maximum slug length
     :param fallback: Fallback in case of an empty slug
     """
-
     lower = kwargs.get('lower', True)
     maxlen = kwargs.get('maxlen')
     fallback = kwargs.get('fallback', '')
@@ -351,7 +348,6 @@ def strip_control_chars(text):
 
 def html_color_to_rgb(hexcolor):
     """Convert #RRGGBB to an (R, G, B) tuple."""
-
     if not hexcolor.startswith('#'):
         raise ValueError(f"Invalid color string '{hexcolor}' (should start with '#')")
 
@@ -591,7 +587,7 @@ def sanitize_html(string):
 
 
 def html_to_plaintext(string):
-    """Convert HTML to plaintext.
+    r"""Convert HTML to plaintext.
 
     :param string: The HTML source string
 
@@ -658,11 +654,11 @@ def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mod
                               get_value=attrgetter('_description')):
     """Check if the object in question is using an HTML description and convert it.
 
-       The description will be automatically converted to Markdown and a warning will
-       be shown next to the field.
+    The description will be automatically converted to Markdown and a warning will
+    be shown next to the field.
 
-       :param field: the WTForms field to be checked
-       :param obj: the object whose render mode/description will be checked
+    :param field: the WTForms field to be checked
+    :param obj: the object whose render mode/description will be checked
     """
     from indico.core.db.sqlalchemy.descriptions import RenderMode
     from indico.util.i18n import _

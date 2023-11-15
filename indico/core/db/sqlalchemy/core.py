@@ -28,6 +28,7 @@ from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
 
 class ConstraintViolated(Exception):
     """Indicate that a constraint trigger was violated."""
+
     def __init__(self, message, orig):
         super().__init__(message)
         self.orig = orig

@@ -46,9 +46,7 @@ class RegistrationFormItemType(IndicoIntEnum):
 
 # We are not using a RichIntEnum since one of the instances is named "title".
 class PersonalDataType(IndicoIntEnum):
-    """
-    Description of the personal data items that exist on every registration form.
-    """
+    """Description of the personal data items that exist on every registration form."""
 
     __titles__ = [None, 'Email Address', 'First Name', 'Last Name', 'Affiliation', 'Title', 'Address',
                   'Phone Number', 'Country', 'Position']

@@ -121,6 +121,7 @@ class ExpectedError(ImATeapot):
     :param message: A short message describing the error
     :param data: Any additional data to return
     """
+
     def __init__(self, message, **data):
         super().__init__(message or 'Something went wrong')
         self.data = dict(data, message=message)
@@ -383,7 +384,6 @@ def get_request_user():
     - an OAuth token
     - a signature for a persistent url
     """
-
     if g.get('get_request_user_failed'):
         # If getting the current user failed, we abort early in case something
         # tries again since that code may be in logging or error handling, and

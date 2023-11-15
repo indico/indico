@@ -221,11 +221,13 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
 
 class RHRegistrationFormToggleTextState(RHRegistrationFormToggleFieldState):
     """Enable/Disable a static text field."""
+
     field_class = RegistrationFormText
 
 
 class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
     """Remove/Modify a static text field."""
+
     field_class = RegistrationFormText
 
     def _process_PATCH(self):
@@ -246,6 +248,7 @@ class RHRegistrationFormModifyText(RHRegistrationFormModifyField):
 
 class RHRegistrationFormMoveText(RHRegistrationFormMoveField):
     """Change position of a static text field within the section."""
+
     field_class = RegistrationFormText
 
 

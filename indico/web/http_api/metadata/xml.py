@@ -23,9 +23,7 @@ def _deserialize_date(date_dict):
 
 
 class XMLSerializer(Serializer):
-    """
-    Receive a fossil (or a collection of them) and converts them to XML.
-    """
+    """Receive a fossil (or a collection of them) and converts them to XML."""
 
     _mime = 'text/xml'
 

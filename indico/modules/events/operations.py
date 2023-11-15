@@ -212,7 +212,6 @@ def clone_into_event(source_event, target_event, cloners):
     :param target_event: The `Event` to clone data into;
     :param cloners: A set containing the names of all enabled cloners.
     """
-
     # Run the modular cloning system
     g.importing_event = True
     used_cloners = EventCloner.run_cloners(source_event, target_event, cloners, event_exists=True)

@@ -128,7 +128,6 @@ def generate_spreadsheet_from_contributions(contributions):
     Return a tuple consisting of spreadsheet columns and respective
     contribution values.
     """
-
     has_board_number = any(c.board_number for c in contributions)
     has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters',

@@ -342,7 +342,7 @@ class RHCreateRevisionComment(RHContributionEditableRevisionBase):
 
 
 class RHEditRevisionComment(RHContributionEditableRevisionBase):
-    """Edit/delete revision comment"""
+    """Edit/delete revision comment."""
 
     normalize_url_spec = {
         'locators': {

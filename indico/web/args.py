@@ -27,9 +27,7 @@ def _strip_whitespace(value):
 
 
 class IndicoFlaskParser(FlaskParser):
-    """
-    A custom webargs flask parser that strips surrounding whitespace.
-    """
+    """A custom webargs flask parser that strips surrounding whitespace."""
 
     DEFAULT_LOCATION = 'json_or_form'
 
@@ -115,7 +113,6 @@ def use_rh_args(schema_cls, **kwargs):
     :param kwargs: Any keyword arguments that are supported by ``use_args`` or the
                    Schema constructor.
     """
-
     schema_kwargs, default_context, webargs_kwargs = _split_kwargs(kwargs)
     webargs_kwargs.setdefault('unknown', EXCLUDE)
 

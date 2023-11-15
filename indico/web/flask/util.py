@@ -131,7 +131,7 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
 
 
 def url_for(endpoint, *targets, **values):
-    """Wrapper for Flask's url_for() function.
+    """Wrapper for Flask's ``url_for`` function.
 
     The `target` argument allows you to pass some object having a `locator` property returning a dict.
 
@@ -142,7 +142,6 @@ def url_for(endpoint, *targets, **values):
     _scheme: a string specifying the desired URL scheme (only with _external) - use _secure if possible!
     _anchor: if provided this is added as #anchor to the URL.
     """
-
     if targets:
         locator = {}
         for target in targets:
@@ -188,7 +187,6 @@ def url_rule_to_js(endpoint):
     ``params`` is is an object containing the arguments and ``fragment``
     a string containing the ``#anchor`` if needed.
     """
-
     if endpoint[0] == '.':
         endpoint = request.blueprint + endpoint
 
@@ -258,7 +256,6 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     `safe` adds some basic security features such a adding a content-security-policy and forcing inline=False for
     text/html mimetypes
     """
-
     name = re.sub(r'\s+', ' ', name).strip()  # get rid of crap like linebreaks
     assert '/' in mimetype
     if inline is None:

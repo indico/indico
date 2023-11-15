@@ -78,6 +78,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     Note that the ACL is currently only used for managers but not for
     view access!
     """
+
     __tablename__ = 'events'
     disallowed_protection_modes = frozenset()
     inheriting_have_acl = True

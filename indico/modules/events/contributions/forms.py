@@ -233,7 +233,8 @@ class ContributionTypeForm(IndicoForm):
 
 
 class ContributionExportTeXForm(IndicoForm):
-    """Form for TeX-based export selection"""
+    """Form for TeX-based export selection."""
+
     format = SelectField(_('Format'), default='PDF')
     sort_by = IndicoEnumSelectField(_('Sort by'), enum=BOASortField, default=BOASortField.abstract_title,
                                     sorted=True)

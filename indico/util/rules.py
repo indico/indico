@@ -66,7 +66,7 @@ class Condition:
 
     @classmethod
     def check(cls, values, **kwargs):
-        """Check whether the condition is matched
+        """Check whether the condition is matched.
 
         Subclasses are encouraged to explicitly specify the arguments
         they expect instead of using ``**kwargs``.
