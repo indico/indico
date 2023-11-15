@@ -1,4 +1,4 @@
-"""Add speakers_can_submit to events table
+"""Add subcontrib_speakers_can_submit to events table
 
 Revision ID: 0acf26d68434
 Revises: 31b699664893
@@ -17,12 +17,12 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('events', sa.Column('speakers_can_submit', sa.Boolean(), nullable=False, server_default='false'),
+    op.add_column('events', sa.Column('subcontrib_speakers_can_submit', sa.Boolean(), nullable=False, server_default='false'),
                   schema='events')
-    op.alter_column('events', 'speakers_can_submit', server_default=None, schema='events')
+    op.alter_column('events', 'subcontrib_speakers_can_submit', server_default=None, schema='events')
     op.execute('''
         UPDATE events.events ev
-        SET speakers_can_submit = true
+        SET subcontrib_speakers_can_submit = true
         FROM events.settings es
         WHERE
             ev.id = es.event_id AND
@@ -40,6 +40,6 @@ def downgrade():
     conn.execute('''
         INSERT INTO events.settings(module, name, event_id, value)
         SELECT 'subcontributions', 'speakers_can_submit', id, 'true'::jsonb
-        FROM events.events ev WHERE ev.speakers_can_submit;
+        FROM events.events ev WHERE ev.subcontrib_speakers_can_submit;
     ''')
-    op.drop_column('events', 'speakers_can_submit', schema='events')
+    op.drop_column('events', 'subcontrib_speakers_can_submit', schema='events')

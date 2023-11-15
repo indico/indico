@@ -81,8 +81,8 @@ def can_edit_note(obj, user):
     if isinstance(obj, db.m.Contribution) and obj.can_manage(user, 'submit'):
         return True
     if isinstance(obj, db.m.SubContribution):
-        speakers_can_submit = obj.contribution.event.speakers_can_submit
-        if speakers_can_submit and any(speaker.person.user == user for speaker in obj.speakers):
+        subcontrib_speakers_can_submit = obj.contribution.event.subcontrib_speakers_can_submit
+        if subcontrib_speakers_can_submit and any(speaker.person.user == user for speaker in obj.speakers):
             return True
         return can_edit_note(obj.contribution, user)
     return False

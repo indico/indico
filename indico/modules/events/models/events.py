@@ -266,7 +266,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         nullable=True
     )
     #: The protection setting for speaker submissions
-    speakers_can_submit = db.Column(
+    subcontrib_speakers_can_submit = db.Column(
         db.Boolean,
         nullable=False,
         default=True

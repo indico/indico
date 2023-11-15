@@ -141,7 +141,6 @@ class EventProtectionCloner(EventCloner):
             self._clone_protection(new_event)
             self._clone_session_coordinator_privs(new_event)
             self._clone_contrib_settings(new_event)
-            self._clone_subcontrib_settings(new_event)
             self._clone_attachment_settings(new_event)
             self._clone_acl(new_event, event_exists)
             self._clone_visibility(new_event)
@@ -155,7 +154,7 @@ class EventProtectionCloner(EventCloner):
         new_event.access_key = self.old_event.access_key
         new_event.own_no_access_contact = self.old_event.own_no_access_contact
         new_event.public_regform_access = self.old_event.public_regform_access
-        new_event.speakers_can_submit = self.old_event.speakers_can_submit
+        new_event.subcontrib_speakers_can_submit = self.old_event.subcontrib_speakers_can_submit
 
     def _clone_visibility(self, new_event):
         new_event.visibility = self.old_event.visibility if new_event.category == self.old_event.category else None
