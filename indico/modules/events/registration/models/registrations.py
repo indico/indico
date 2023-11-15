@@ -863,6 +863,7 @@ def _mapper_configured():
                             (RegistrationData.field_data_id == RegistrationFormFieldData.id),
                             (RegistrationFormFieldData.field_id == RegistrationFormItem.id),
                             (RegistrationFormItem.input_type == 'accompanying_persons'),
+                            (~RegistrationFormItem.is_deleted),
                             db.cast(RegistrationFormItem.data['persons_count_against_limit'].astext, db.Boolean)))
              .correlate_except(RegistrationData)
              .scalar_subquery())
