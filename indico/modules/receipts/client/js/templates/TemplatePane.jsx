@@ -28,7 +28,7 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
 
   return (
     <>
-      <ManagementPageSubTitle title={Translate.string('Add Receipt / Certificate template')} />
+      <ManagementPageSubTitle title={Translate.string('Add document template')} />
       <Grid columns={2} divided>
         <Grid.Row>
           <Grid.Column>
