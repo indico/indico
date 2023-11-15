@@ -17,14 +17,14 @@ from indico.web.menu import SideMenuItem
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _event_sidemenu_items(sender, event, **kwargs):
     if session.user.is_admin:
-        return SideMenuItem('receipts', _('Receipt Templates'), url_for('receipts.template_list', event),
+        return SideMenuItem('receipts', _('Document Templates'), url_for('receipts.template_list', event),
                             section='customization')
 
 
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _category_sidemenu_items(sender, category, **kwargs):
     if session.user.is_admin:
-        return SideMenuItem('receipts', _('Receipt Templates'), url_for('receipts.template_list', category),
+        return SideMenuItem('receipts', _('Document Templates'), url_for('receipts.template_list', category),
                             icon='agreement')
 
 
