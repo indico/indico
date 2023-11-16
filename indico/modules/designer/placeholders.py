@@ -15,6 +15,7 @@ from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime, format_interval
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
+from indico.util.string import format_full_name
 
 
 __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'RegistrationFullNamePlaceholder',
