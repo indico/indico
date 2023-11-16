@@ -16,7 +16,7 @@ Security fixes
 Improvements
 ^^^^^^^^^^^^
 
-- None so far :(
+- Add placeholders for accompanying persons to the badge/ticket designer (:pr:`6033`)
 
 Bugfixes
 ^^^^^^^^
