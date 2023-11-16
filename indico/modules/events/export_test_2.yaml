@@ -36,6 +36,7 @@ objects:
     - '2017-08-24T10:00:00+00:00'
     stylesheet: null
     stylesheet_metadata: null
+    subcontrib_speakers_can_submit: true
     timezone: UTC
     title: dummy#0
     type: !!python/object/apply:indico.modules.events.models.events.EventType

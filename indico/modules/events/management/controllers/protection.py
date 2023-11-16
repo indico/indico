@@ -18,7 +18,6 @@ from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.categories.util import serialize_category_role
 from indico.modules.core.controllers import PrincipalsMixin
 from indico.modules.events import Event
-from indico.modules.events.contributions import subcontribution_settings
 from indico.modules.events.controllers.base import RHAuthenticatedEventBase
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
@@ -86,12 +85,12 @@ class RHEventProtection(RHManageEventBase):
             data = {'protection_mode': form.protection_mode.data,
                     'own_no_access_contact': form.own_no_access_contact.data,
                     'access_key': form.access_key.data,
-                    'public_regform_access': form.public_regform_access.data}
+                    'public_regform_access': form.public_regform_access.data,
+                    'subcontrib_speakers_can_submit': form.subcontrib_speakers.data}
             if form.visibility:
                 data['visibility'] = form.visibility.data
             update_event_protection(self.event, data)
             self._update_session_coordinator_privs(form)
-            self._update_subcontrib_settings(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event))
         return WPEventProtection.render_template('event_protection.html', self.event, 'protection', form=form)
@@ -105,7 +104,7 @@ class RHEventProtection(RHManageEventBase):
         permissions = [[serialize_principal(p.principal), list(get_principal_permissions(p, Event))]
                        for p in self.event.acl_entries]
         permissions = [item for item in permissions if item[1]]
-        subcontrib_speakers = subcontribution_settings.get(self.event, 'speakers_can_submit')
+        subcontrib_speakers = self.event.subcontrib_speakers_can_submit
 
         return dict({'protection_mode': self.event.protection_mode, 'registration_managers': registration_managers,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
@@ -118,9 +117,6 @@ class RHEventProtection(RHManageEventBase):
     def _update_session_coordinator_privs(self, form):
         data = {field: getattr(form, field).data for field in form.priv_fields}
         update_session_coordinator_privs(self.event, data)
-
-    def _update_subcontrib_settings(self, form):
-        subcontribution_settings.set(self.event, 'speakers_can_submit', form.subcontrib_speakers.data)
 
 
 class RHPermissionsDialog(RH):

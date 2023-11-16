@@ -136,7 +136,3 @@ contribution_settings = EventSettingsProxy('contributions', {
 }, converters={
     'default_duration': TimedeltaConverter
 })
-
-subcontribution_settings = EventSettingsProxy('subcontributions', {
-    'speakers_can_submit': False,  # Speakers can edit minutes and upload attachments
-})

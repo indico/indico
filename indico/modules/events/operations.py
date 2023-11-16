@@ -294,6 +294,7 @@ def update_event_protection(event, data, *, _extra_log_fields=None):
                       'visibility': {'title': 'Visibility', 'type': 'string',
                                      'convert': lambda changes: [format_visibility(event, x) for x in changes]},
                       'public_regform_access': 'Public registration form access',
+                      'subcontrib_speakers_can_submit': 'Subcontribution speakers submission privileges',
                       **(_extra_log_fields or {})}
         event.log(EventLogRealm.management, LogKind.change, 'Event', 'Protection updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
