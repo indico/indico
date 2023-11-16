@@ -291,10 +291,9 @@ class AccompanyinPersonsPlaceholderBase(RegistrationPlaceholder):
 
     @classmethod
     def render(cls, registration):
-        if persons := registration.accompanying_persons:
-            names = [format_full_name(p['firstName'], p['lastName'], **cls.name_options) for p in persons]
-            return ', '.join(names)
-        return ''
+        names = [format_full_name(p['firstName'], p['lastName'], **cls.name_options)
+                 for p in registration.accompanying_persons]
+        return ', '.join(names)
 
 
 class RegistrationAccompanyingPersonsPlaceholder(AccompanyinPersonsPlaceholderBase):
