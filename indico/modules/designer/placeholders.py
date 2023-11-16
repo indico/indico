@@ -279,7 +279,7 @@ class RegistrationPricePlaceholder(RegistrationPlaceholder):
 
 class RegistrationAccompanyingPersonsCountPlaceholder(RegistrationPlaceholder):
     name = 'num_accompanying_persons'
-    description = _('Number of Accompanying persons')
+    description = _('Number of accompanying persons')
 
     @classmethod
     def render(cls, registration):
