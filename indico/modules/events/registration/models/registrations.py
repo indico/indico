@@ -868,3 +868,13 @@ def _mapper_configured():
              .correlate_except(RegistrationData)
              .scalar_subquery())
     Registration.occupied_slots = column_property(query, deferred=True)
+
+    query = (select([db.func.coalesce(db.func.sum(db.func.jsonb_array_length(RegistrationData.data)), 0)])
+             .where(db.and_(RegistrationData.registration_id == Registration.id,
+                            RegistrationData.field_data_id == RegistrationFormFieldData.id,
+                            RegistrationFormFieldData.field_id == RegistrationFormItem.id,
+                            RegistrationFormItem.input_type == 'accompanying_persons',
+                            ~RegistrationFormItem.is_deleted))
+             .correlate_except(RegistrationData)
+             .scalar_subquery())
+    Registration.num_accompanying_persons = column_property(query, deferred=True)

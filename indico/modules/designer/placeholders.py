@@ -29,7 +29,8 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder', 'FixedTextPlaceholder',
-           'FixedImagePlaceholder')
+           'FixedImagePlaceholder', 'RegistrationAccompanyingPersonsCountPlaceholder',
+           'RegistrationAccompanyingPersonsPlaceholder', 'RegistrationAccompanyingPersonsAbbrevPlaceholder')
 
 
 GROUP_TITLES = {
@@ -288,6 +289,37 @@ class RegistrationPricePlaceholder(RegistrationPlaceholder):
     def render(cls, registration):
         # XXX: Use event locale once we have such a setting
         return format_currency(registration.price, registration.currency, locale='en_GB')
+
+
+class RegistrationAccompanyingPersonsCountPlaceholder(RegistrationPlaceholder):
+    name = 'num_accompanying_persons'
+    description = _('Number of accompanying persons')
+
+    @classmethod
+    def render(cls, registration):
+        return str(registration.num_accompanying_persons)
+
+
+class AccompanyinPersonsPlaceholderBase(RegistrationPlaceholder):
+    name_options = None
+
+    @classmethod
+    def render(cls, registration):
+        names = [format_full_name(p['firstName'], p['lastName'], **cls.name_options)
+                 for p in registration.accompanying_persons]
+        return ', '.join(names)
+
+
+class RegistrationAccompanyingPersonsPlaceholder(AccompanyinPersonsPlaceholderBase):
+    name = 'accompanying_persons'
+    description = _('Accompanying persons')
+    name_options = {'abbrev_first_name': False, 'last_name_first': False}
+
+
+class RegistrationAccompanyingPersonsAbbrevPlaceholder(AccompanyinPersonsPlaceholderBase):
+    name = 'accompanying_persons_abbrev'
+    description = _('Accompanying persons (abbrev.)')
+    name_options = {'last_name_first': False}
 
 
 class RegistrationFriendlyIDPlaceholder(RegistrationPlaceholder):
