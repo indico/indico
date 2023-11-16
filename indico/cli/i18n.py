@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import errno
 import json
 import os
 import re
@@ -323,24 +324,24 @@ def extract_messages_react(directory=INDICO_DIR):
 
 
 def po_file_empty(path):
-    if not os.path.exists(path):
-        return False
-    with open(path, 'rb') as f:
-        po_data = read_po(f)
+    try:
+        with open(path, 'rb') as f:
+            po_data = read_po(f)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            return False
+        raise
     return not po_data
 
 
 def remove_empty_pot_files(path, python=False, javascript=False, react=False):
     """Remove empty .pot files with no msgid strings after extraction."""
-    if python:
-        if po_file_empty(_get_messages_pot(path)):
-            os.remove(_get_messages_pot(path))
-    if javascript:
-        if po_file_empty(_get_messages_js_pot(path)):
-            os.remove(_get_messages_js_pot(path))
-    if react:
-        if po_file_empty(_get_messages_react_pot(path)):
-            os.remove(_get_messages_react_pot(path))
+    if python and po_file_empty(_get_messages_pot(path)):
+        os.remove(_get_messages_pot(path))
+    if javascript and po_file_empty(_get_messages_js_pot(path)):
+        os.remove(_get_messages_js_pot(path))
+    if react and po_file_empty(_get_messages_react_pot(path)):
+        os.remove(_get_messages_react_pot(path))
 
 
 @cli.group('compile', short_help='Catalog compilation command for indico and indico plugins.')
