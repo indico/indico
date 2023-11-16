@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('events', sa.Column('subcontrib_speakers_can_submit', sa.Boolean(), nullable=False, server_default='false'),
-                  schema='events')
+    op.add_column('events', sa.Column('subcontrib_speakers_can_submit', sa.Boolean(), nullable=False,
+                                      server_default='false'), schema='events')
     op.alter_column('events', 'subcontrib_speakers_can_submit', server_default=None, schema='events')
     op.execute('''
         UPDATE events.events ev
@@ -31,15 +31,15 @@ def upgrade():
             es.value = 'true'::jsonb
     ''')
     op.execute('''
-        DELETE FROM events.settings es WHERE es.module = 'subcontributions' AND es.name = 'speakers_can_submit';
+        DELETE FROM events.settings WHERE module = 'subcontributions' AND name = 'speakers_can_submit'
     ''')
 
 
 def downgrade():
     conn = op.get_bind()
     conn.execute('''
-        INSERT INTO events.settings(module, name, event_id, value)
+        INSERT INTO events.settings (module, name, event_id, value)
         SELECT 'subcontributions', 'speakers_can_submit', id, 'true'::jsonb
-        FROM events.events ev WHERE ev.subcontrib_speakers_can_submit;
+        FROM events.events WHERE subcontrib_speakers_can_submit
     ''')
     op.drop_column('events', 'subcontrib_speakers_can_submit', schema='events')
