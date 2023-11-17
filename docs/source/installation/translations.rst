@@ -60,7 +60,7 @@ You can also consult the official
 
 Navigate to ``~/dev/indico/src`` (assuming you used the standard locations from the dev setup guide).
 
-Run ``tx pull -f -l <language_code>``.
+Run ``indico i18n pull indico <language_code>``.
 Languages codes can be obtained `here <https://www.transifex.com/indico/>`_.
 
 For example, Chinese (China) is ``zh_CN.GB2312``.
@@ -78,9 +78,7 @@ this could to lead to errors when Indico tries to use the translated string.
 6. Compile translations and run Indico
 --------------------------------------
 
-Run the commands ``indico i18n compile-catalog``
-and ``indico i18n compile-catalog-react``
-and:
+Run the command ``indico i18n compile indico`` and:
 
 - :ref:`launch Indico <run-dev>`, or
 - :ref:`build <building>` and :ref:`deploy your own version of Indico <install-prod>`,

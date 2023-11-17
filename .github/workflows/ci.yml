@@ -160,13 +160,13 @@ jobs:
 
       - name: Try extracting i18n strings (Python)
         if: success() || failure()
-        run: indico i18n extract-messages
+        run: indico i18n extract indico --python
 
       - name: Try extracting i18n strings (JS)
         if: success() || failure()
         run: |
           echo "::add-matcher::.github/matchers/react-jsx-i18n-problem-matcher.json"
-          FORCE_COLOR=1 npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ > /dev/null
+          FORCE_COLOR=1 indico i18n extract indico --react
           echo "::remove-matcher owner=react-jsx-i18n::"
 
       - name: Check i18n format strings
