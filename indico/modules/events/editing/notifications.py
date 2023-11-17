@@ -22,6 +22,7 @@ def notify_comment(comment):
     """Notify about a new comments on a revision."""
     revision = comment.revision
     editable = revision.editable
+    contribution = editable.contribution
     editor = editable.editor
     submitter = next((r.user for r in editable.revisions[::-1] if r.is_submitter_revision), None)
     author = comment.user
@@ -46,7 +47,10 @@ def notify_comment(comment):
             tpl = get_template_module('events/editing/emails/comment_notification.txt',
                                       author_name=author_name,
                                       timeline_url=editable.external_timeline_url,
-                                      recipient_name=recipient.first_name)
+                                      recipient_name=recipient.first_name,
+                                      contribution_id=contribution.id,
+                                      programme_code=contribution.code,
+                                      text=comment.text)
             email = make_email(recipient.email, template=tpl)
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
