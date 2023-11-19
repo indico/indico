@@ -140,10 +140,7 @@ class IndicoCelery(Celery):
                     flush_email_queue()
                     return rv
 
-        # TODO revert this workaround once https://github.com/celery/kombu/issues/1804 is solved
-        # this is just here to avoid the error at import time
-        # self.Task = IndicoTask
-        self.__dict__['Task'] = IndicoTask
+        self.Task = IndicoTask
 
 
 class IndicoCeleryLogging(Logging):
