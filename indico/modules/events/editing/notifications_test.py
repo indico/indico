@@ -24,12 +24,11 @@ def test_confirmation_email_plaintext(snapshot):
                      timeline_url='http://localhost/timeline-url')
 
 
-def test_comment_email_plaintext(snapshot):
+def test_comment_email_plaintext(snapshot, dummy_contribution):
     _assert_snapshot(snapshot, 'comment_notification.txt',
                      recipient_name='John Doe',
                      author_name='Jane Doe',
-                     contribution_title='Introduction',
-                     program_code='',
+                     contribution=dummy_contribution,
                      text='The review is passed',
                      timeline_url='http://localhost/timeline-url')
 
