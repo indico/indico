@@ -257,9 +257,10 @@ def delete(user_id):
     try:
         db.session.delete(user)
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
         click.secho('Failed to delete user', fg='red')
+        click.echo(e)
     else:
         click.secho('Successfully deleted user', fg='green')
 
