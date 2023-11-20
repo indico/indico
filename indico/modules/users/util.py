@@ -31,12 +31,6 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
-from indico.modules.events.models.principals import EventPrincipal
-from indico.modules.events.models.settings import EventSettingPrincipal
-from indico.modules.events.sessions.models.principals import SessionPrincipal
-from indico.modules.events.tracks.models.principals import TrackPrincipal
-from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
@@ -431,6 +425,13 @@ def merge_users(source, target, force=False):
 
 
 def anonymize_user(user):
+    from indico.modules.events.models.principals import EventPrincipal
+    from indico.modules.events.models.settings import EventSettingPrincipal
+    from indico.modules.events.sessions.models.principals import SessionPrincipal
+    from indico.modules.events.tracks.models.principals import TrackPrincipal
+    from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+    from indico.modules.rb.models.principals import RoomPrincipal
+
     user.first_name = '<anonymous>'
     user.last_name = '<anonymous>'
     user.title = UserTitle.none
