@@ -28,6 +28,9 @@ def test_comment_email_plaintext(snapshot):
     _assert_snapshot(snapshot, 'comment_notification.txt',
                      recipient_name='John Doe',
                      author_name='Jane Doe',
+                     contribution_title='Introduction',
+                     program_code='',
+                     text='The review is passed',
                      timeline_url='http://localhost/timeline-url')
 
 

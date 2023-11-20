@@ -48,8 +48,8 @@ def notify_comment(comment):
                                       author_name=author_name,
                                       timeline_url=editable.external_timeline_url,
                                       recipient_name=recipient.first_name,
-                                      contribution_id=contribution.id,
-                                      programme_code=contribution.code,
+                                      contribution_title=contribution.title,
+                                      program_code=contribution.code,
                                       text=comment.text)
             email = make_email(recipient.email, template=tpl)
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})

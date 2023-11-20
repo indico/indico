@@ -1,6 +1,8 @@
 Dear John Doe,
 
-Jane Doe has posted a new comment.
+Jane Doe has posted a new comment on  (Introduction):
+
+    The review is passed
 
 You can view details on the following URL:
 http://localhost/timeline-url
