@@ -12,6 +12,7 @@
 @use 'base/animation' as *;
 @use 'base/typography' as *;
 @use 'partials/boxes' as *;
+@use 'partials/icons' as *;
 @use 'modules/contributions/display' as *;
 
 $editor-preview-bg-color: $light-gray;
@@ -111,51 +112,51 @@ $editor-preview-bg-color: $light-gray;
 }
 
 [id^='wmd-bold-button'] span::before {
-  content: '\e454';
+  @extend %icon-bold;
 }
 
 [id^='wmd-italic-button'] span::before {
-  content: '\e456';
+  @extend %icon-italic;
 }
 
 [id^='wmd-link-button'] span::before {
-  content: '\e2cd';
+  @extend %icon-link;
 }
 
 [id^='wmd-quote-button'] span::before {
-  content: '\e16d';
+  @extend %icon-bubble-quote;
 }
 
 [id^='wmd-code-button'] span::before {
-  content: '\e480';
+  @extend %icon-code;
 }
 
 [id^='wmd-image-button'] span::before {
-  content: '\31';
+  @extend %icon-image;
 }
 
 [id^='wmd-olist-button'] span::before {
-  content: '\e29c';
+  @extend %icon-numbered-list;
 }
 
 [id^='wmd-ulist-button'] span::before {
-  content: '\e299';
+  @extend %icon-list;
 }
 
 [id^='wmd-heading-button'] span::before {
-  content: '\2a';
+  @extend %icon-type;
 }
 
 [id^='wmd-hr-button'] span::before {
-  content: '\e463';
+  @extend %icon-pagebreak;
 }
 
 [id^='wmd-undo-button'] span::before {
-  content: '\27';
+  @extend %icon-undo;
 }
 
 [id^='wmd-redo-button'] span::before {
-  content: '\e14c';
+  @extend %icon-redo;
 }
 
 .wmd-prompt-background {
