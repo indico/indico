@@ -1,28 +1,39 @@
 {% from 'events/management/_create_event_button.html' import create_event_link %}
 {% from 'announcement/display.html' import render_announcements %}
 {% from 'core/impersonation.html' import render_impersonation %}
+{% from '_user_icon.html' import render_user_icon %}
 
 {{ render_impersonation(legacy=true) }}
 {{ render_announcements(legacy=true) }}
 
-<div class="page-header clearfix">
-    <div class="flexrow f-j-space-between f-a-start">
-        {% block logo %}
-            {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.svg') -%}
-            <a id="header-logo"
-               href="{{ url_for_index() }}"
-               aria-label="{% trans %}Indico main page{% endtrans %}"
-               aria-current="{{ url_for_index() == request.path }}"
-            >
-                <img class="header-logo" src="{{ logo_url }}" alt="{% trans %}Indico logo{% endtrans %}">
-            </a>
-        {% endblock %}
-
-        <div class="flexcol">
-            {{ render_session_bar(protected_object=protected_object, local_tz=local_tz, force_local_tz=force_local_tz,
-                                  force_locale=force_locale, force_locale_alts=force_locale_alts) }}
-            {{ template_hook('page-header', category=category) }}
+<header id="page-header">
+    <div class="page-banner">
+        <div class="page-branding">
+            {% block logo %}
+                {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.svg') -%}
+                <a id="header-logo"
+                   href="{{ url_for_index() }}"
+                   aria-label="{% trans %}Indico main page{% endtrans %}"
+                   aria-current="{{ url_for_index() == request.path }}"
+                >
+                    <img class="header-logo" src="{{ logo_url }}" alt="{% trans %}Indico logo{% endtrans %}">
+                </a>
+            {% endblock %}
         </div>
+
+        <div class="header-controls">
+            {{ render_protection_indicator(protected_object) }}
+            {{ render_user_icon() }}
+            <ind-toggle-trigger>
+                <button class="header-menu-trigger" aria-controls="session-menu">
+                    <span>{% trans %}Menu{% endtrans %}</span>
+                </button>
+            </ind-toggle-trigger>
+        </div>
+    </div>
+    <div class="page-menu">
+        {{ render_session_menu(protected_object=protected_object, local_tz=local_tz, force_local_tz=force_local_tz, force_locale=force_locale, force_locale_alts=force_locale_alts) }}
+        {{ template_hook('page-header', category=category) }}
     </div>
 
     <div id="global-menu" class="global-menu toolbar">
@@ -53,9 +64,16 @@
                     {% endif %}
                 {% endfor %}
             </menu>
+            {% set active_tz = get_active_tz(local_tz) %}
+            <div id="page-timezone"
+                 aria-label="{% trans %}Times on this page are shown in the {{ active_tz }} timezone{% endtrans %}"
+                 data-locked="{{ force_local_tz | tojson }}"
+            >
+                {{ active_tz }}
+            </div>
         {% endblock %}
     </div>
-</div>
+</header>
 
 <template data-tooltip-for="create-lecture">
     <p>

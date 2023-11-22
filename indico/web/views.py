@@ -11,22 +11,23 @@ from urllib.parse import urlparse
 
 from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
-from pytz import common_timezones, common_timezones_set
 
 from indico.core import signals
 from indico.core.config import config
 from indico.modules.core.settings import core_settings
-from indico.modules.legal import legal_settings
 from indico.util.decorators import classproperty
-from indico.util.i18n import _, get_all_locales
+from indico.util.i18n import _
+from indico.util.locales import LocaleChoice
+from indico.util.protection_info import ProtectionInfo
 from indico.util.signals import values_from_signal
+from indico.util.timezones import TzChoice
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import build_menu_structure
 from indico.web.util import jsonify_template
 
 
-def _get_timezone_display(local_tz, timezone, force=False):
+def _get_timezone_label(local_tz, timezone, force=False):
     if force and local_tz:
         return local_tz
     elif timezone == 'LOCAL':
@@ -43,45 +44,44 @@ def render_header(category=None, protected_object=None, local_tz=None, force_loc
                            protected_object=protected_object,
                            local_tz=local_tz,
                            force_local_tz=force_local_tz,
-                           force_locale=None)
+                           force_locale=None,
+                           force_locale_alts=[])
 
 
-def render_session_bar(protected_object=None, local_tz=None, force_local_tz=False, force_locale=None,
-                       force_locale_alts=None):
-    protection_disclaimers = {
-        'network': legal_settings.get('network_protected_disclaimer'),
-        'restricted': legal_settings.get('restricted_disclaimer')
-    }
-    default_tz = config.DEFAULT_TIMEZONE
+def render_protection_indicator(protected_object=None):
+    page_protection = ProtectionInfo(protected_object)
+    tpl = get_template_module('_protection_indicator.html')
+    rv = tpl.render_indicator(protection_data=page_protection)
+    return Markup(rv)
+
+
+def render_session_menu(protected_object=None, local_tz=None, force_local_tz=False, force_locale=None,
+                        force_locale_alts=None):
+    page_protection = ProtectionInfo(protected_object)
+
+    tz_choice = TzChoice(
+        page_local_tz=local_tz,
+        page_forces_tz=force_local_tz,
+    )
+
+    user_locale = session.lang
+    user_forces_own_locale = False
+
     if session.user:
-        user_tz = session.user.settings.get('timezone', default_tz)
-        if session.timezone == 'LOCAL':
-            tz_mode = 'local'
-        elif session.timezone == user_tz:
-            tz_mode = 'user'
-        else:
-            tz_mode = 'custom'
-    else:
-        user_tz = None
-        tz_mode = 'local' if session.timezone == 'LOCAL' else 'custom'
-    active_tz = _get_timezone_display(local_tz, session.timezone, force_local_tz)
-    timezones = common_timezones
-    if active_tz not in common_timezones_set:
-        timezones = [*common_timezones, active_tz]
-    timezone_data = {
-        'disabled': force_local_tz,
-        'user_tz': user_tz,
-        'active_tz': active_tz,
-        'tz_mode': tz_mode,
-        'timezones': timezones,
-    }
-    tpl = get_template_module('_session_bar.html')
-    rv = tpl.render_session_bar(protected_object=protected_object,
-                                protection_disclaimers=protection_disclaimers,
-                                timezone_data=timezone_data,
-                                languages=get_all_locales(),
-                                force_locale=force_locale,
-                                force_locale_alts=force_locale_alts)
+        user_locale = session.user.settings.get('lang')
+        user_forces_own_locale = session.user.settings.get('force_language')
+
+    locale_choice = LocaleChoice(
+        forced_context_locale=force_locale,
+        additional_context_locales=force_locale_alts,
+        user_locale=user_locale,
+        user_forces_own_locale=user_forces_own_locale
+    )
+
+    tpl = get_template_module('_session_menu.html')
+    rv = tpl.render_session_menu(protection_data=page_protection,
+                                 timezone_data=tz_choice,
+                                 locale_data=locale_choice)
     return Markup(rv)
 
 

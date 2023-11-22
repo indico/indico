@@ -1,0 +1,38 @@
+{% macro render_indicator(protection_data) %}
+    {% if session.user %}
+        <ind-with-toggletip>
+            <button id="protection-indicator" data-level="{{ protection_data.protection_level }}">
+                <span>
+                    {% if protection_data.protection_level == 'public' %}
+                        {% trans %}public{% endtrans %}
+                    {% elif protection_data.protection_level == 'network' %}
+                        {% trans %}network{% endtrans %}
+                    {% else %}
+                        {% trans %}protected{% endtrans %}
+                    {% endif %}
+                </span>
+                <span>{% trans %}Get page access information{% endtrans %}</span>
+            </button>
+            <div data-tip-content>
+                <p>
+                    {% if protection_data.protection_level == 'public' %}
+                        {% trans %}The information on this page is visible to anyone{% endtrans %}
+                    {% elif protection_data.protection_level == 'network' %}
+                        {% trans count=protection_data.networks_with_access|length, networks=protection_data.networks_with_access|join('/') %}
+                            The information on this page is restricted for display on the {{ networks }} network only.
+                            {% pluralize %}
+                            The information on this page is restricted for display on the {{ networks }} networks only.
+                        {% endtrans %}
+                    {% elif protection_data.protection_level == 'restricted' %}
+                        {% trans %}
+                            The information on this page is restricted for display to named individuals or specific groups.
+                        {% endtrans %}
+                    {% endif %}
+                </p>
+                {% if protection_data.disclaimer %}
+                    {{ protection_data.disclaimer|sanitize_html|trim }}
+                {% endif %}
+            </div>
+        </ind-with-toggletip>
+    {% endif %}
+{% endmacro %}

@@ -133,18 +133,10 @@
   });
 
   $.extend($.ui, {
-    sticky: function(arg1, arg2) {
-      if (arg2 !== undefined) {
-        var className = arg1,
-          options = arg2;
-      } else {
-        if (typeof arg1 == 'string') {
-          var className = arg1,
-            options = {};
-        } else {
-          var className = null,
-            options = arg1;
-        }
+    sticky: function(className, options = {}) {
+      if (arguments.length == 1 && typeof className == 'object') {
+        options = className;
+        className = null;
       }
 
       var scrolling = {};

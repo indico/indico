@@ -33,8 +33,14 @@ menu {
   margin: 0;
 }
 
+legend,
+dialog {
+  padding: 0;
+}
+
+dialog,
 fieldset {
-  border: none;
+  border: 0;
 }
 
 button:not(:disabled),

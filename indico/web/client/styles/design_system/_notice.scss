@@ -8,9 +8,11 @@
 @use './variables';
 
 %notice {
+  --notice-text-size: var(--text-size-rel-l);
+
   padding: var(--container-padding);
 
   background: var(--message-important-surface-color);
   color: var(--message-important-text-color);
-  font-size: calc(var(--text-size-global-adjust) * var(--text-size-rel-l));
+  font-size: var(--notice-text-size);
 }

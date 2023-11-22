@@ -73,6 +73,7 @@ Improvements
   (:issue:`6105, 6106, 6128`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`)
 - Add week and day views in the category calendar and improve navigation controls
   (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`).
+- Convert the session bar into a pull-down menu (:issue:`5966`, :pr:`6048`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -135,6 +136,8 @@ Internal Changes
 - Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
+- Add ``<ind-toggle-trigger>`` custom elements for controls that toggle the visibility of another
+  element (:pr:`6098`, thanks :user:`foxbunny`)
 
 
 ----

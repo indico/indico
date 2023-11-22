@@ -43,9 +43,12 @@
 
 %link-button {
   @extend %link;
+  display: inline-block;
+  padding: 0;
+
+  text-align: left;
   font: inherit;
   background: transparent;
-  padding: 0;
   border: 0;
 
   &:disabled {

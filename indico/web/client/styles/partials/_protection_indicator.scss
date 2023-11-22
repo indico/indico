@@ -1,0 +1,70 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+@use 'design_system';
+
+#protection-indicator {
+  @extend %flex-row;
+  --flex-gap: 0;
+  --flex-wrap: nowrap;
+  flex: none;
+  padding: 0;
+
+  font-size: var(--text-size-rel-s);
+  border-radius: 1.4em;
+  overflow: hidden;
+
+  &::before {
+    @extend %icon;
+    padding: 0.2em 0.5em;
+  }
+
+  &[data-level='public'] {
+    color: var(--safe-text-color);
+    background: var(--safe-surface-color);
+    border: 1px solid var(--safe-alt-surface-color);
+
+    &::before {
+      @extend %icon-earth;
+      background: var(--safe-alt-surface-color);
+    }
+  }
+
+  &[data-level='network'] {
+    color: var(--restricted-text-color);
+    background: var(--restricted-surface-color);
+    border: 1px solid var(--restricted-alt-surface-color);
+
+    &::before {
+      @extend %icon-lan;
+      background: var(--restricted-alt-surface-color);
+    }
+  }
+
+  &[data-level='restricted'] {
+    color: var(--protected-text-color);
+    background: var(--protected-surface-color);
+    border: 1px solid var(--protected-alt-surface-color);
+
+    &::before {
+      @extend %icon-shield;
+      background: var(--protected-alt-surface-color);
+    }
+  }
+
+  span:first-of-type {
+    position: relative;
+    top: 0.05em; // XXX: compesate for all-caps missing descenders
+    text-transform: uppercase;
+    padding: 0.2em 0.5em;
+  }
+
+  span:last-of-type {
+    @extend %visually-hidden;
+  }
+}

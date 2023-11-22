@@ -21,14 +21,16 @@ ind-with-toggletip {
   --arrow-borders: transparent;
 
   [data-tip-content] {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: var(--top);
     left: var(--left);
     right: var(--right);
     bottom: var(--bottom);
     max-width: min(calc(100vw - 1em), 40ch);
-    padding: 0.5em;
+    gap: var(--content-gap-within-inline);
+    padding: var(--container-padding);
 
     cursor: default;
     color: var(--tooltip-text-color);
@@ -40,7 +42,7 @@ ind-with-toggletip {
     font-style: normal;
     font-weight: normal;
     font-size: 1rem; // FIXME: this needs the base font size to be addressed!
-    text-align: center;
+    text-align: left;
     text-transform: none;
     letter-spacing: 0;
   }
