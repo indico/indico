@@ -6,6 +6,7 @@
 
 PYUPGRADE_CMD='pyupgrade --py39-plus --keep-percent-format'
 FLAKE8_CMD='flake8'
+RUFF_CMD='ruff check'
 ESLINT_CMD='npx eslint'
 STYLELINT_CMD='npx stylelint'
 
@@ -60,12 +61,19 @@ if [[ ${#FILES[@]} -ne 0 ]]; then
 fi
 
 
-# flake8, pyupgrade
+# flake8, ruff, pyupgrade
 _get_files '*.py'
 if [[ ${#FILES[@]} -ne 0 ]]; then
     if ! RESULT=$($FLAKE8_CMD "${FILES[@]}"); then
         STATUS=1
-        echo "${RED}There are python issues in your code:${RESET}"
+        echo "${RED}There are flake8 python issues in your code:${RESET}"
+        echo "$RESULT"
+        echo
+    fi
+
+    if ! RESULT=$(CLICOLOR_FORCE=1 $RUFF_CMD "${FILES[@]}"); then
+        STATUS=1
+        echo "${RED}There are ruff python issues in your code:${RESET}"
         echo "$RESULT"
         echo
     fi
