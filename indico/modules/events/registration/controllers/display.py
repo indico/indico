@@ -31,7 +31,7 @@ from indico.modules.events.registration.util import (check_registration_email, c
                                                      get_initial_form_values, get_user_data, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
-                                                      WPDisplayRegistrationParticipantList)
+                                                      WPDisplayRegistrationParticipantList, WPManageRegistration)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
@@ -136,6 +136,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     """List of all public registrations."""
 
     view_class = WPDisplayRegistrationParticipantList
+    preview = False
 
     @staticmethod
     def _is_checkin_visible(reg):
@@ -263,10 +264,22 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
+            preview=self.preview,
             tables=tables,
             published=bool(regforms),
             num_participants=num_participants
         )
+
+
+class RHParticipantListPreview(RHParticipantList):
+
+    view_class = WPManageRegistration
+    preview = True
+
+    def _check_access(self):
+        RHParticipantList._check_access(self)
+        if not self.event.can_manage(session.user, permission='registration', allow_admin=True):
+            raise Forbidden(_('You are not allowed to access this page.'))
 
 
 class InvitationMixin:

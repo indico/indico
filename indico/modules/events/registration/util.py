@@ -617,6 +617,11 @@ def count_hidden_registrations(event, is_participant):
     return query.count()
 
 
+@make_interceptable
+def can_preview_participant_list(event, user, allow_admin=False):
+    return event.can_manage(user, permission='registration', allow_admin=allow_admin)
+
+
 def get_events_registered(user, dt=None):
     """Get the IDs of events where the user is registered.
 

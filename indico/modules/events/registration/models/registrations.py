@@ -37,7 +37,7 @@ from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
-from indico.util.signals import values_from_signal
+from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.string import format_full_name, format_repr, strict_str
 from indico.web.flask.util import url_for
 
@@ -337,6 +337,7 @@ class Registration(db.Model):
                 r.user = target
 
     @hybrid_method
+    @make_interceptable
     def is_publishable(self, is_participant):
         if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False

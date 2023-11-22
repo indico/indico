@@ -1,8 +1,18 @@
-{% if event.type == 'conference' %}
-    {% extends 'events/registration/display/_event_registration_base.html' %}
-{% else %}
-    {% extends 'events/registration/display/_meeting_registration_base.html' %}
-{% endif %}
+{%  if preview %}
+    {% extends 'events/management/base.html' %}
+    {% from '_switch.html' import switch %}
+    {% from 'message_box.html' import message_box %}
+    {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
+    {% from '_sortable_list.html' import sortable_list, sortable_lists %}
+    {% from 'events/management/_registrations_visibility_list.html' import render_registrations_visibility_labels, render_registrations_visibility_list %}
+    {%  set page_title = 'Participant List Preview' %}
+{%  else %}
+    {% if event.type == 'conference' %}
+        {% extends 'events/registration/display/_event_registration_base.html' %}
+    {% else %}
+        {% extends 'events/registration/display/_meeting_registration_base.html' %}
+    {% endif %}
+{%  endif %}
 
 {% from 'message_box.html' import message_box %}
 
