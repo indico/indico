@@ -11,7 +11,7 @@ import typing as t
 from collections import defaultdict
 from datetime import datetime
 from io import BytesIO
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 
 import requests
 from flask import render_template, session
@@ -152,6 +152,10 @@ def get_linked_events(user, dt, limit=None, load_also=()):
     if not links:
         return {}
 
+    # Find events (past and future) which are closest to the current time
+    time_delta = now_utc(False) - Event.start_dt
+    absolute_time_delta = db.func.abs(db.func.extract('epoch', time_delta))
+
     query = (Event.query
              .filter(~Event.is_deleted,
                      Event.id.in_(links))
@@ -160,10 +164,13 @@ def get_linked_events(user, dt, limit=None, load_also=()):
                       load_only('id', 'category_id', 'title', 'start_dt', 'end_dt',
                                 'series_id', 'series_pos', 'series_count', 'label_id', 'label_message',
                                 *load_also))
-             .order_by(Event.start_dt, Event.id))
+             .order_by(absolute_time_delta, Event.id))
     if limit is not None:
         query = query.limit(limit)
-    return {event: links[event.id] for event in query}
+
+    # Sort by 'start_dt' so that past events appear at the top and future events at the bottom
+    events = sorted(query, key=attrgetter('start_dt'))
+    return {event: links[event.id] for event in events}
 
 
 def get_unlisted_events(user):
