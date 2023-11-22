@@ -51,6 +51,8 @@ Improvements
 - Log editor actions in the Editing module (:pr:`6015`)
 - Grant subcontribution speakers submission privileges by default in newly created events
   (:issue:`5905`, :pr:`6025`)
+- Stop overwhelmingly showing past events in the 'Events at hand' section in the user dashboard
+  (:pr:`6049`)
 
 Bugfixes
 ^^^^^^^^
