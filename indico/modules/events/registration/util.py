@@ -49,7 +49,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
-from indico.util.signals import values_from_signal
+from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 
@@ -613,6 +613,11 @@ def count_hidden_registrations(event, is_participant):
              .join(Registration.registration_form))
 
     return query.count()
+
+
+@make_interceptable
+def can_preview_participant_list(event, user, allow_admin=False):
+    return event.can_manage(user, permission='registration', allow_admin=allow_admin)
 
 
 def get_events_registered(user, dt=None):

@@ -27,6 +27,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
+from indico.util.signals import make_interceptable
 from indico.util.string import format_repr
 
 
@@ -472,6 +473,7 @@ class RegistrationForm(db.Model):
         )
 
     @hybrid_method
+    @make_interceptable
     def is_participant_list_visible(self, is_participant):
         if self.is_deleted:
             return False
