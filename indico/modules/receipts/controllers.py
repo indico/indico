@@ -216,9 +216,8 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
             self.template.html,
             **_generate_dummy_data(self.target, self.template.custom_fields)
         )
-        f = create_pdf(self.target, {html}, self.template.css)
-
-        return send_file('receipt.pdf', f, 'application/pdf')
+        pdf_data = create_pdf(self.target, [html], self.template.css)
+        return send_file('receipt.pdf', pdf_data, 'application/pdf')
 
 
 class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
@@ -238,7 +237,7 @@ class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
             use_stack=True,
             **dummy_data
         )
-        response = send_file('receipt.pdf', create_pdf(self.target, {compiled_html}, css), 'application/pdf')
+        response = send_file('receipt.pdf', create_pdf(self.target, [compiled_html], css), 'application/pdf')
         response.headers['X-Indico-Dummy-Data'] = TemplateDataSchema().dumps(dummy_data)
         return response
 
@@ -310,9 +309,9 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
 
         receipt_ids = []
         for registration in registrations:
-            pdf_content = create_pdf(self.target, {html_sources[registration]}, self.template.css)
+            pdf_content = create_pdf(self.target, [html_sources[registration]], self.template.css)
             timestamp = datetime.now().strftime('%Y%m%d-%H%M')
-            full_filename = f'{slugify(filename, timestamp)}'
+            full_filename = slugify(filename, timestamp)
             n = (ReceiptFile.query
                  .join(File)
                  .filter(ReceiptFile.registration == registration, File.filename.like(f'{full_filename}%.pdf'))
