@@ -31,6 +31,7 @@ Bugfixes
 - Fix the author/speaker selector (e.g. for abstracts) breaking when submitting the form and
   getting a validation error (:issue:`6043`, :pr:`6053`)
 - Do not cancel past linked room bookings when deleting an event (:issue:`6032`, :pr:`6051`)
+- Fix contribution list filters being obscured by the action dialog (:pr:`6055`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
