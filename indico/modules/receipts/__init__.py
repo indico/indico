@@ -25,7 +25,7 @@ def _event_sidemenu_items(sender, event, **kwargs):
 def _category_sidemenu_items(sender, category, **kwargs):
     if session.user.is_admin:
         return SideMenuItem('receipts', _('Document Templates'), url_for('receipts.template_list', category),
-                            icon='agreement')
+                            icon='agreement', weight=20)
 
 
 @signals.event.registrant_list_action_menu.connect
