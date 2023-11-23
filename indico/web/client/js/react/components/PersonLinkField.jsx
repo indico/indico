@@ -450,6 +450,7 @@ export function WTFPersonLinkField({
     const picked = value.map(p =>
       _.pick(p, [
         'title',
+        'name',
         'firstName',
         'lastName',
         'affiliation',
@@ -462,6 +463,7 @@ export function WTFPersonLinkField({
         'identifier',
         'type',
         'personId',
+        'avatarURL',
       ])
     );
     inputField.value = JSON.stringify(
