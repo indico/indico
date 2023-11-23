@@ -66,6 +66,14 @@
     const visibleItems = $('#visible-items');
     const hasColumnSelector = !!$('#visible-items').length;
 
+    // The form dialog has a combination of overflow: hidden and auto.
+    // Since the list filter is much larger when expanded, most of its
+    // options would not be visible without changing the overflow property to visible.
+    const popup = $(`.list-filter`).closest('.exclusivePopup');
+    const dialog = popup.parent();
+    popup.css('overflow', 'visible');
+    dialog.css('overflow', 'visible');
+
     $('.list-filter .filter').each(function() {
       const $filter = $(this).parent();
       const isOnlyFilter = !!$filter.find('[data-only-filter]').length;
