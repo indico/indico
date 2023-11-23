@@ -89,7 +89,7 @@ class TemplateStackEntry:
 
 
 class ReceiptAreaMixin:
-    """Basic class for all receitp template mixins.
+    """Basic class for all receipt template mixins.
 
     It resolves the target object type from the blueprint URL.
     """
