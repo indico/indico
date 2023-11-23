@@ -7,7 +7,6 @@
 
 import os
 import re
-import typing as t
 from dataclasses import dataclass, field
 from datetime import datetime
 from io import BytesIO
@@ -49,13 +48,13 @@ TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
 def _get_default_value(field):
     if field['type'] == 'dropdown' and 'default' in field['attributes']:
         return field['attributes']['options'][field['attributes']['default']]
-    return field['attributes']['value'] if 'value' in field['attributes'] else None
+    return field['attributes'].get('value')
 
 
 def _generate_dummy_data(event: Event, custom_fields: dict):
     """Generate some dummy data to be used as an example."""
     return {
-        'custom_fields': {f['name']: _get_default_value(f) for f in (custom_fields)},
+        'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
         'event': event,
         'personal_data': {
             'title': 'Dr',
@@ -86,7 +85,7 @@ def _generate_dummy_data(event: Event, custom_fields: dict):
 @dataclass
 class TemplateStackEntry:
     registration: Registration
-    undefined: t.Set[str] = field(default_factory=set)
+    undefined: set[str] = field(default_factory=set)
 
 
 class ReceiptAreaMixin:
@@ -310,7 +309,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
 
         errors = [
             {
-                'registration': dict(full_name=entry.registration.display_full_name, id=entry.registration.id),
+                'registration': {'full_name': entry.registration.display_full_name, 'id': entry.registration.id},
                 'undefineds': list(entry.undefined)
             }
             for entry in g.template_stack if entry.undefined
