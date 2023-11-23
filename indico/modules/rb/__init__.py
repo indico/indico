@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime
+
 from flask import session
 
 from indico.core import signals
@@ -102,7 +104,8 @@ def _event_deleted(event, user, **kwargs):
                          .filter(~Reservation.is_rejected, ~Reservation.is_cancelled)
                          .all())
     for link in reservation_links:
-        link.reservation.cancel(user or session.user, 'Associated event was deleted')
+        if link.reservation.end_dt >= datetime.now():
+            link.reservation.cancel(user or session.user, 'Associated event was deleted')
 
 
 class BookPermission(ManagementPermission):
