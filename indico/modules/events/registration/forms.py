@@ -605,7 +605,7 @@ class RegistrationPrivacyForm(IndicoForm):
 
 
 class PublishReceiptForm(IndicoForm):
-    """Form to publish receipts for registrations"""
+    """Form to publish receipts for registrations."""
 
     notify_user = BooleanField(_('Notify users'), widget=SwitchWidget(),
                                description=_('Whether users should be notified about the published receipt'))

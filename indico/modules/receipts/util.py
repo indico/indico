@@ -90,7 +90,7 @@ def sandboxed_url_fetcher(event: Event, **kwargs) -> t.Callable[[str], dict]:
     return _fetcher
 
 
-def create_pdf(event: Event, html_sources: t.List[str], css: str) -> BytesIO:
+def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     """Create a PDF based on the given HTML sources.
 
     :param event: The `Event` the PDF relates to
