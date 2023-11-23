@@ -15,4 +15,8 @@ that version.
 
 ## Reporting a Vulnerability
 
-Please email indico-team@cern.ch to report security vulnerabilities privately.
+Please report it privately using GitHub's ["Report a Vulnerability"][gh-vuln] option.
+In case you do not have a GitHub account, you can also email email indico-team@cern.ch.
+
+
+[gh-vuln]: https://github.com/indico/indico/security/advisories/new
