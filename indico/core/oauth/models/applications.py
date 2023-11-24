@@ -32,7 +32,10 @@ class SystemAppType(IndicoIntEnum):
         checkin: {'is_trusted': True,
                   'name': 'Checkin App',
                   'description': 'The checkin app for mobile devices allows scanning ticket QR codes and '
-                                 'checking-in event participants.'},
+                                 'checking-in event participants.',
+                  'redirect_uris': ['https://checkin.getindico.io/',  # new Check-in app
+                                    'http://localhost']},  # old Check-in app
+                                                           # TODO: remove together with the deprecated check-in API
     }
 
     @property
