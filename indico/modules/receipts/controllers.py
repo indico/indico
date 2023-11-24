@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import base64
 import os
 import re
 from dataclasses import dataclass, field
@@ -238,9 +239,11 @@ class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
             use_stack=True,
             **dummy_data
         )
-        response = send_file('receipt.pdf', create_pdf(self.target, [compiled_html], css), 'application/pdf')
-        response.headers['X-Indico-Dummy-Data'] = TemplateDataSchema().dumps(dummy_data)
-        return response
+        pdf_data = create_pdf(self.target, [compiled_html], css)
+        return jsonify({
+            'pdf': base64.b64encode(pdf_data.getvalue()),
+            'data': TemplateDataSchema().dump(dummy_data)
+        })
 
 
 class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
