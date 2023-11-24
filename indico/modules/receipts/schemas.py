@@ -58,7 +58,8 @@ class CustomFieldSchema(mm.Schema):
     @pre_load
     def _add_attributes_type(self, data, **kwargs):
         data = data.copy()
-        data['attributes']['type'] = data['type']
+        if 'attributes' in data:
+            data['attributes']['type'] = data['type']
         return data
 
 
