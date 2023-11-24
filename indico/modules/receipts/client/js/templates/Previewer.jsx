@@ -61,26 +61,23 @@ export default function Previewer({url, data}) {
     (async () => {
       try {
         setError(null);
-        const {data: newContent, headers} = await debounce(() =>
-          indicoAxios.post(url, data, {responseType: 'arraybuffer'})
-        );
-        const dummyData = headers['x-indico-dummy-data'];
+        const {data: previewData} = await debounce(() => indicoAxios.post(url, data));
+        const dummyData = previewData.data;
+        const newContent = Uint8Array.from(atob(previewData.pdf), c => c.charCodeAt(0)).buffer;
         if (dummyData) {
-          setPlaceholders(processPlaceholders(JSON.parse(dummyData)));
+          setPlaceholders(processPlaceholders(dummyData));
         }
         setLoading(false);
         setContent(newContent);
       } catch (e) {
         const {
-          response: {status, data},
+          response: {status, data: respData},
         } = e;
         if (status === 422) {
-          const decoder = new TextDecoder('utf-8');
-          const json = JSON.parse(decoder.decode(data));
-          if (json.webargs_errors) {
-            setError(json.webargs_errors);
+          if (respData.webargs_errors) {
+            setError(respData.webargs_errors);
           } else {
-            setError({jinja: [json.error.message]});
+            setError({jinja: [respData.error.message]});
           }
         } else {
           handleAxiosError(e);
