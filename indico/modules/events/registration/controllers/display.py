@@ -27,7 +27,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
-                                                     get_initial_form_values, get_user_data, make_registration_schema)
+                                                     get_initial_form_values, get_ticket_template, get_user_data,
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -454,7 +455,8 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         if (not self.regform.ticket_on_event_page and not self.regform.ticket_on_summary_page
                 and not self.regform.event.can_manage(session.user, 'registration')):
             raise Forbidden
-        if self.registration.is_ticket_blocked:
+        ticket_template = get_ticket_template(self.regform)
+        if ticket_template.is_ticket and self.registration.is_ticket_blocked:
             raise Forbidden
 
     def _process(self):
