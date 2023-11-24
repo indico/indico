@@ -788,7 +788,7 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
 class RHManageReceiptBase(RHManageRegistrationBase):
     normalize_url_spec = {
         'locators': {
-            lambda self: self.receipt_file
+            lambda self: self.receipt_file.locator.filename
         }
     }
 
@@ -811,21 +811,20 @@ class RHDownloadReceipt(RHManageReceiptBase):
         return self.receipt_file.file.send()
 
 
-class RHPublishReceipt(RHManageReceiptBase):
-    """Publish or unpublish a receipt from a registration."""
+class RHPublishReceiptBase(RHManageReceiptBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.receipt_file
+        }
+    }
 
-    @use_kwargs({
-        'publish': fields.Bool(required=True)
-    }, location='query')
-    def _process(self, publish):
-        if self.receipt_file.is_published == publish:
+
+class RHPublishReceipt(RHPublishReceiptBase):
+    """Publish a receipt to a registration."""
+
+    def _process(self):
+        if self.receipt_file.is_published:
             return jsonify_data()
-        if not publish and request.method == 'POST':
-            self.receipt_file.is_published = False
-            flash(_("Document '{}' successfully unpublished").format(self.receipt_file.file.filename), 'success')
-            logger.info('Document %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
-                        self.registration, session.user)
-            return jsonify_data(html=self._render_receipts_list())
         form = PublishReceiptForm()
         if form.validate_on_submit():
             self.receipt_file.is_published = True
@@ -837,6 +836,19 @@ class RHPublishReceipt(RHManageReceiptBase):
             return jsonify_data(html=self._render_receipts_list())
         return jsonify_form(form, submit=_('Publish'), back=_('Cancel'), footer_align_right=True,
                             disabled_until_change=False)
+
+
+class RHUnpublishReceipt(RHPublishReceiptBase):
+    """Unpublish a receipt from a registration."""
+
+    def _process(self):
+        if not self.receipt_file.is_published:
+            return jsonify_data()
+        self.receipt_file.is_published = False
+        flash(_("Document '{}' successfully unpublished").format(self.receipt_file.file.filename), 'success')
+        logger.info('Document %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
+                    self.registration, session.user)
+        return jsonify_data(html=self._render_receipts_list())
 
 
 class RHDeleteReceipt(RHManageReceiptBase):

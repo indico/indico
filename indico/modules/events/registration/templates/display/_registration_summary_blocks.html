@@ -152,7 +152,7 @@
                         <tr class="{{ 'unpublished-receipt' if not receipt.is_published }}">
                             <th class="regform-done-caption">{{ receipt.template.type.title if receipt.template.type else '' }}</th>
                             <td class="regform-done-data">
-                                <a href="{{ url_for('.download_receipt', receipt) if from_management else receipt.file.signed_download_url }}">
+                                <a href="{{ url_for('.download_receipt', receipt.locator.filename) if from_management else receipt.file.signed_download_url }}">
                                     {{ filename }}
                                 </a>
                                 {% if not receipt.is_published -%}
@@ -166,7 +166,7 @@
                                             <a href="#" class="icon-eye-blocked"
                                                title="{% trans %}Unpublish document{% endtrans %}"
                                                data-title="{% trans name=receipt.file.filename %}Unpublish '{{ name }}' to the registrant{% endtrans %}"
-                                               data-href="{{ url_for('.publish_receipt', receipt, publish=false) }}"
+                                               data-href="{{ url_for('.unpublish_receipt', receipt) }}"
                                                data-method="POST"
                                                data-update="#receipts-list"
                                                data-confirm="{% trans name=filename %}Are you sure you want to unpublish the document '{{ name }}' to the registrant?{% endtrans %}"></a>
@@ -174,8 +174,7 @@
                                             <a href="#" class="icon-eye js-dialog-action"
                                                title="{% trans %}Publish document{% endtrans %}"
                                                data-title="{% trans name=receipt.file.filename %}Publish '{{ name }}' to the registrant{% endtrans %}"
-                                               data-href="{{ url_for('.publish_receipt', receipt, publish=true) }}"
-                                               data-method="POST"
+                                               data-href="{{ url_for('.publish_receipt', receipt) }}"
                                                data-update="#receipts-list"
                                                data-ajax-dialog></a>
                                         {% endif %}
@@ -185,7 +184,7 @@
                                            data-confirm="{% trans name=filename %}Are you sure you want to completely delete the document '{{ name }}'?{% endtrans %}"
                                            data-update="#receipts-list"
                                            data-method="DELETE"
-                                           data-href="{{ url_for('.delete_receipt', receipt) }}"></a>
+                                           data-href="{{ url_for('.delete_receipt', receipt.locator.filename) }}"></a>
                                     </div>
                                 </td>
                             {% endif %}

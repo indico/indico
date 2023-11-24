@@ -83,8 +83,11 @@ _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/<filename>',
     'download_receipt', reglists.RHDownloadReceipt)
 _bp.add_url_rule(
-    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/<filename>',
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/publish',
     'publish_receipt', reglists.RHPublishReceipt, methods=('GET', 'POST'))
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/unpublish',
+    'unpublish_receipt', reglists.RHUnpublishReceipt, methods=('POST',))
 _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/<filename>',
     'delete_receipt', reglists.RHDeleteReceipt, methods=('DELETE',))

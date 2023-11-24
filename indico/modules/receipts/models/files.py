@@ -85,8 +85,11 @@ class ReceiptFile(db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.registration.locator, file_id=self.file_id,
-                    filename=secure_filename(self.file.filename, f'file-{self.file_id}'))
+        return {**self.registration.locator, 'file_id': self.file_id}
+
+    @locator.filename
+    def locator(self):
+        return {**self.locator, 'filename': secure_filename(self.file.filename, f'file-{self.file_id}.pdf')}
 
     @property
     def download_url(self):
