@@ -43,16 +43,18 @@
 {%- endblock %}
 
 {% block content -%}
-    <section>
-        <div class="header">
-            <div class="header-row">
-                <h3>{% trans %}Description{% endtrans %}</h3>
+    {% if subcontrib.description %}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}Description{% endtrans %}</h3>
+                </div>
             </div>
-        </div>
-        <div class="description js-mathjax">
-            {{ render_description(subcontrib) }}
-        </div>
-    </section>
+            <div class="description js-mathjax">
+                {{ render_description(subcontrib) }}
+            </div>
+        </section>
+    {% endif %}
     {{ render_speakers(subcontrib) }}
     {{ render_attachments(subcontrib) }}
 
