@@ -110,6 +110,7 @@ class PersonalDataFieldSchema(mm.Schema):
 
 class FormFieldsSchema(mm.Schema):
     title = fields.String()
+    section_title = fields.String()
     value = fields.Boolean()
     field_data = fields.Dict()
     actual_price = fields.Number()
