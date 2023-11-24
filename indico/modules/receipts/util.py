@@ -7,6 +7,7 @@
 
 import typing as t
 from io import BytesIO
+from operator import attrgetter
 
 from flask import g
 from jinja2 import Undefined
@@ -117,7 +118,7 @@ def get_useful_registration_data(reg_form: RegistrationForm, registration: Regis
     :return: a `dict` containing useful fields for templating
     """
     fields = []
-    for field in reg_form.active_fields:
+    for field in sorted(reg_form.active_fields, key=attrgetter('parent.position', 'position')):
         field_data = field.current_data.versioned_data
         data = registration.data_by_field.get(field.id)
         value = data.data if data else None
