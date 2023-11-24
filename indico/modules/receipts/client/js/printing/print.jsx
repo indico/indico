@@ -128,7 +128,6 @@ export async function printReceipt(eventId, registrationIds, values) {
                 true
               );
               receiptIds = [...receiptIds, ...retryData.receipt_ids];
-              console.log('1.5', receiptIds);
             }}
             onClose={() => {
               resolve();
