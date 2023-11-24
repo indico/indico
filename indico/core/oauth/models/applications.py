@@ -24,7 +24,6 @@ class SystemAppType(IndicoIntEnum):
 
     __enforced_data__ = {
         checkin: {'allowed_scopes': {'registrants'},
-                  'redirect_uris': ['http://localhost'],
                   'allow_pkce_flow': True,
                   'is_enabled': True},
     }
