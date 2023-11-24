@@ -20,7 +20,7 @@
     {%- endif %}
     <ul>
         <li>
-            <a href="{{ url_for('event_registration.download_receipt', receipt, _external=true) }}">{{ receipt.file.filename }}</a>
+            <a href="{{ url_for('event_registration.download_receipt.locator.filename', receipt, _external=true) }}">{{ receipt.file.filename }}</a>
         </li>
     </ul>
     {{ render_text_manage() }}
