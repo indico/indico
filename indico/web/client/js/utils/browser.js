@@ -14,11 +14,11 @@
 export function downloadBlob(fileName, data) {
   const blob = new Blob([data]);
   const link = document.createElement('a');
-  const url = window.URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
   link.href = url;
   link.download = fileName;
   document.body.append(link);
   link.click();
   link.remove();
-  window.URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url);
 }
