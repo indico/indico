@@ -7,8 +7,10 @@
 
 import templateListURL from 'indico-url:receipts.template_list';
 
-import MonacoEditor from '@monaco-editor/react';
+import MonacoEditor, {loader} from '@monaco-editor/react';
 import _ from 'lodash';
+// weird import needed because of https://github.com/microsoft/monaco-editor/issues/2874
+import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
@@ -29,6 +31,12 @@ import {targetLocatorSchema, templateSchema} from './util';
 
 import './Editor.module.scss';
 
+// load monaco editor locally instead of from a CDN
+loader.config({monaco: monacoEditor});
+
+// Note: if you ever end up adding more file types, or refactoring this into something more
+// generic to use the editor elsewhere, you also need to update the webpack config since it
+// is configured to only include a subset of languages (search for `MonacoEditorWebpackPlugin`)
 const FILES = {
   html: {
     syntax: 'html',
