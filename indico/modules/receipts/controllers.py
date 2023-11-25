@@ -118,7 +118,7 @@ class ReceiptAreaMixin:
 
 class ReceiptTemplateMixin(ReceiptAreaMixin):
     def _process_args(self):
-        self.template = ReceiptTemplate.get_or_404(request.view_args['template_id'])
+        self.template = ReceiptTemplate.get_or_404(request.view_args['template_id'], is_deleted=False)
 
 
 class ReceiptAreaRenderMixin(ReceiptAreaMixin):
@@ -190,7 +190,7 @@ class RHCategoryTemplate(DisplayTemplateMixin, RHManageCategoryBase):
 
 class RHDeleteTemplate(ReceiptTemplateMixin, RHAdminBase):
     def _process(self):
-        db.session.delete(self.template)
+        self.template.is_deleted = True
 
 
 class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):

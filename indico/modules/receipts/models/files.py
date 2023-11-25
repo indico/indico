@@ -74,7 +74,6 @@ class ReceiptFile(db.Model):
         lazy=True,
         backref=db.backref(
             'receipt_files',
-            cascade='all, delete-orphan',
             lazy=True
         )
     )
