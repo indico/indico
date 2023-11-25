@@ -832,7 +832,10 @@ class RHPublishReceipt(RHPublishReceiptBase):
             logger.info('Document %r from registration %r was published by %r', self.receipt_file.file.filename,
                         self.registration, session.user)
             notify_registration_receipt_created(self.registration, self.receipt_file,
-                                                notify_user=form.data.get('notify_user'))
+                                                notify_user=form.notify_user.data)
+            self.registration.log(EventLogRealm.management, LogKind.change, 'Documents',
+                                  f'Document "{self.receipt_file.file.filename}" published', session.user,
+                                  data={'Notified': form.notify_user.data})
             return jsonify_data(html=self._render_receipts_list())
         return jsonify_form(form, submit=_('Publish'), back=_('Cancel'), footer_align_right=True,
                             disabled_until_change=False)
@@ -848,6 +851,8 @@ class RHUnpublishReceipt(RHPublishReceiptBase):
         flash(_("Document '{}' successfully unpublished").format(self.receipt_file.file.filename), 'success')
         logger.info('Document %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
                     self.registration, session.user)
+        self.registration.log(EventLogRealm.management, LogKind.change, 'Documents',
+                              f'Document "{self.receipt_file.file.filename}" unpublished', session.user)
         return jsonify_data(html=self._render_receipts_list())
 
 
@@ -858,7 +863,7 @@ class RHDeleteReceipt(RHManageReceiptBase):
         self.receipt_file.is_deleted = True
         db.session.flush()
         logger.info('Document file %s deleted by %s', self.receipt_file, session.user)
-        self.registration.log(EventLogRealm.management, LogKind.negative, 'Receipts',
+        self.registration.log(EventLogRealm.management, LogKind.negative, 'Documents',
                               f'Document "{self.receipt_file.file.filename}" deleted', session.user)
         flash(_("Document '{}' successfully deleted").format(self.receipt_file.file.filename), 'success')
         return jsonify_data(html=self._render_receipts_list())

@@ -28,7 +28,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_receipt_created
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.files.models.files import File
-from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import (ReceiptTemplateAPISchema, ReceiptTemplateDBSchema,
@@ -345,6 +345,10 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             db.session.commit()
             receipt_ids.append(receipt.file_id)
             notify_registration_receipt_created(registration, receipt, notify_user=notify_users)
+            registration.log(EventLogRealm.management, LogKind.positive, 'Documents',
+                             f'Document "{f.filename}" generated', session.user,
+                             data={'Published': publish, 'Notified': notify_users})
+
         return jsonify(receipt_ids=receipt_ids, errors=errors)
 
 
