@@ -55,6 +55,11 @@ class ReceiptTemplate(db.Model):
         nullable=False,
         default=''
     )
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     category = db.relationship(
         'Category',
@@ -62,7 +67,7 @@ class ReceiptTemplate(db.Model):
         foreign_keys=category_id,
         backref=db.backref(
             'receipt_templates',
-            cascade='all, delete-orphan',
+            primaryjoin='(ReceiptTemplate.category_id == Category.id) & ~ReceiptTemplate.is_deleted',
             lazy=True
         )
     )
@@ -71,7 +76,7 @@ class ReceiptTemplate(db.Model):
         lazy=True,
         backref=db.backref(
             'receipt_templates',
-            cascade='all, delete-orphan',
+            primaryjoin='(ReceiptTemplate.event_id == Event.id) & ~ReceiptTemplate.is_deleted',
             lazy=True
         )
     )

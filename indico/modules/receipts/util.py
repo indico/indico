@@ -51,7 +51,8 @@ class SilentUndefined(Undefined):
 def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
     """Get all templates usable by an event/category."""
     category = obj.category if isinstance(obj, Event) else obj
-    return set(ReceiptTemplate.query.filter(ReceiptTemplate.category_id.in_(categ['id'] for categ in category.chain)))
+    return set(ReceiptTemplate.query.filter(~ReceiptTemplate.is_deleted,
+                                            ReceiptTemplate.category_id.in_(categ['id'] for categ in category.chain)))
 
 
 def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
