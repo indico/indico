@@ -19,7 +19,7 @@ import Editor from './Editor';
 import Previewer from './Previewer';
 import {targetLocatorSchema, templateSchema} from './util';
 
-export default function TemplatePane({template, onSubmit, targetLocator, editorHeight}) {
+export default function TemplatePane({template, onSubmit, targetLocator, editorHeight, add}) {
   const [data, setData] = useState({
     title: template.title,
     ..._.pick(template, ['html', 'css', 'yaml']),
@@ -27,7 +27,13 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
 
   return (
     <>
-      <ManagementPageSubTitle title={Translate.string('Add document template')} />
+      <ManagementPageSubTitle
+        title={
+          add
+            ? Translate.string('Add document template')
+            : Translate.string('Edit document template')
+        }
+      />
       <Grid columns={2} divided>
         <Grid.Row>
           <Grid.Column>
@@ -62,9 +68,11 @@ TemplatePane.propTypes = {
   template: templateSchema,
   targetLocator: targetLocatorSchema.isRequired,
   editorHeight: PropTypes.number,
+  add: PropTypes.bool,
 };
 
 TemplatePane.defaultProps = {
   template: {},
   editorHeight: 800,
+  add: false,
 };

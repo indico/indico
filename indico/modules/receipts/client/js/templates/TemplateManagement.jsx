@@ -114,7 +114,7 @@ function NewTemplatePane({dispatch, targetLocator}) {
     }
   };
 
-  return <TemplatePane onSubmit={createTemplate} targetLocator={targetLocator} />;
+  return <TemplatePane onSubmit={createTemplate} targetLocator={targetLocator} add />;
 }
 
 NewTemplatePane.propTypes = {
