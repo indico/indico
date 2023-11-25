@@ -11,6 +11,7 @@ import path from 'path';
 
 import autoprefixer from 'autoprefixer';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import MonacoEditorWebpackPlugin from 'monaco-editor-webpack-plugin';
 import postcssURL from 'postcss-url';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
@@ -302,6 +303,10 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       new webpack.ProvidePlugin({
         process: 'process/browser.js',
       }),
+      new MonacoEditorWebpackPlugin({
+        filename: 'js/monaco.[name].worker.js',
+        languages: ['html', 'yaml', 'css'],
+      }),
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],
@@ -359,6 +364,12 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
               semanticui: {
                 test: /node_modules\/(semantic-ui|indico-sui-theme)/,
                 name: 'semantic-ui',
+                chunks: 'initial',
+                priority: 10,
+              },
+              monaco: {
+                test: /node_modules\/monaco-editor\//,
+                name: 'monaco',
                 chunks: 'initial',
                 priority: 10,
               },
