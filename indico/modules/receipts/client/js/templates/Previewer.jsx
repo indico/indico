@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
-import {pdfjs, Document, Page} from 'react-pdf';
+import {Document, Page} from 'react-pdf';
 import {Loader, Message, Pagination} from 'semantic-ui-react';
 
 import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
@@ -20,8 +20,6 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import './Previewer.module.scss';
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const MESSAGE_HEADERS = {
   yaml: Translate.string('YAML Metadata'),
@@ -48,7 +46,26 @@ const processPlaceholders = placeholderData =>
 
 const debounce = makeAsyncDebounce(250);
 
-export default function Previewer({url, data}) {
+export default function Previewer(props) {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      // this is a very large module, so we lazy-load it only when we actually want to use
+      // the previewer.
+      await import('pdfjs-dist/webpack');
+      setLoading(false);
+    })();
+  }, []);
+
+  return loading ? <Loader active /> : <PreviewerDisplay {...props} />;
+}
+
+Previewer.propTypes = {
+  url: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
+};
+
+function PreviewerDisplay({url, data}) {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -134,12 +151,4 @@ export default function Previewer({url, data}) {
   );
 }
 
-Previewer.propTypes = {
-  url: PropTypes.string.isRequired,
-  data: PropTypes.shape({
-    title: PropTypes.string,
-    html: PropTypes.string,
-    css: PropTypes.string,
-    yaml: PropTypes.string,
-  }).isRequired,
-};
+PreviewerDisplay.propTypes = Previewer.propTypes;
