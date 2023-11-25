@@ -15,7 +15,7 @@ Major Features
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- New locale: English (Canada) (:pr:`6063`, thanks :user:`omegak`)
 
 Improvements
 ^^^^^^^^^^^^
