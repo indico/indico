@@ -269,7 +269,8 @@ class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 **get_useful_registration_data(registration.registration_form, registration)
             ))
         del g.template_stack
-        return send_file('receipts.pdf', create_pdf(self.target, html_sources, self.template.css), 'application/pdf')
+        pdf_data = create_pdf(self.target, html_sources, self.template.css)
+        return jsonify({'pdf': base64.b64encode(pdf_data.getvalue())})
 
 
 class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
