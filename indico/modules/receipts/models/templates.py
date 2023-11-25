@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
+from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
@@ -95,6 +96,14 @@ class ReceiptTemplate(db.Model):
     @locator_property
     def locator(self):
         return dict(self.owner.locator, template_id=self.id)
+
+    @property
+    def log_realm(self):
+        return EventLogRealm.management if self.event else CategoryLogRealm.category
+
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the receipt template."""
+        return self.owner.log(*args, meta={'receipt_template_id': self.id}, **kwargs)
 
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'category_id', _text=self.title)

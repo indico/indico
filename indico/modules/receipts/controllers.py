@@ -28,6 +28,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_receipt_created
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.files.models.files import File
+from indico.modules.logs.models.entries import LogKind
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import (ReceiptTemplateAPISchema, ReceiptTemplateDBSchema,
@@ -191,6 +192,8 @@ class RHCategoryTemplate(DisplayTemplateMixin, RHManageCategoryBase):
 class RHDeleteTemplate(ReceiptTemplateMixin, RHAdminBase):
     def _process(self):
         self.template.is_deleted = True
+        self.template.log(self.template.log_realm, LogKind.negative, 'Templates',
+                          f'Document template "{self.template.title}" deleted', user=session.user)
 
 
 class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
@@ -199,8 +202,9 @@ class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
         yaml = data.pop('yaml', None)
         for key, value in data.items():
             setattr(self.template, key, value)
-
         self.template.custom_fields = yaml['custom_fields'] if yaml else []
+        self.template.log(self.template.log_realm, LogKind.change, 'Templates',
+                          f'Document template "{self.template.title}" updated', user=session.user)
 
 
 class RHAllEventTemplates(AllTemplateMixin, RHManageEventBase):
@@ -380,6 +384,8 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
         )
         db.session.add(new_tpl)
         db.session.flush()
+        new_tpl.log(new_tpl.log_realm, LogKind.positive, 'Templates', f'Document template "{new_tpl.title}" created',
+                    user=session.user, data={'Cloned from': self.template.title})
         return jsonify(ReceiptTemplateDBSchema().dump(new_tpl))
 
 
