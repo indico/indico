@@ -40,7 +40,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import YAML, ModelList, not_empty
 from indico.util.string import slugify
-from indico.web.args import use_kwargs
+from indico.web.args import use_args, use_kwargs
 from indico.web.flask.util import send_file
 
 
@@ -141,7 +141,7 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
 
 
 class AllTemplateMixin(ReceiptAreaMixin):
-    def _process(self, **data):
+    def _process(self):
         schema = ReceiptTemplateDBSchema(only=('id', 'title', 'custom_fields', 'default_filename'), many=True)
         inherited_templates = schema.dump(get_inherited_templates(self.target))
         own_templates = schema.dump(self.target.receipt_templates)
@@ -197,8 +197,8 @@ class RHDeleteTemplate(ReceiptTemplateMixin, RHAdminBase):
 
 
 class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
-    @use_kwargs(ReceiptTemplateAPISchema)
-    def _process(self, **data):
+    @use_args(ReceiptTemplateAPISchema)
+    def _process(self, data):
         yaml = data.pop('yaml', None)
         for key, value in data.items():
             setattr(self.template, key, value)
@@ -349,7 +349,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
 
 
 class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
-    def _process(self, **data):
+    def _process(self):
         base_title = self.template.title
         max_index = 0
 
