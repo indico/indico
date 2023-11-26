@@ -22,6 +22,15 @@ function CustomField({name, value, type, attributes, onChange}) {
         onChange={(_, {value: v}) => onChange(v)}
       />
     );
+  } else if (type === 'textarea') {
+    return (
+      <Form.TextArea
+        label={attributes.label}
+        name={name}
+        value={value}
+        onChange={(_, {value: v}) => onChange(v)}
+      />
+    );
   } else if (type === 'dropdown') {
     return (
       <Form.Dropdown
