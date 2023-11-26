@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
-import {Document, Page} from 'react-pdf';
+import {pdfjs, Document, Page} from 'react-pdf';
 import {Loader, Message, Pagination} from 'semantic-ui-react';
 
 import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
@@ -20,6 +20,8 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import './Previewer.module.scss';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `/dist/js/pdf.worker.min.js`;
 
 const MESSAGE_HEADERS = {
   yaml: Translate.string('YAML Metadata'),
@@ -52,7 +54,10 @@ export default function Previewer(props) {
     (async () => {
       // this is a very large module, so we lazy-load it only when we actually want to use
       // the previewer.
-      await import('pdfjs-dist/webpack');
+      // await import('pdfjs-dist/webpack');
+      // XXX for some reason loading it like this causes randomly failing renders (with no error)
+      // which I think is caused by worker reuse (with the URL set above, it appears to be a new
+      // worker for each re-render of the PDF)
       setLoading(false);
     })();
   }, []);
