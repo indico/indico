@@ -12,12 +12,12 @@ from indico.web.flask.util import url_for
 
 class WPEventReceiptTemplates(WPEventManagement):
     template_prefix = 'receipts/'
-    bundles = ('monaco.js', 'monaco.css', 'module_receipts.js', 'module_receipts.css')
+    bundles = ('monaco.js', 'monaco.css', 'module_receipts.admin.js', 'module_receipts.admin.css')
 
 
 class WPCategoryReceiptTemplates(WPCategoryManagement):
     template_prefix = 'receipts/'
-    bundles = ('monaco.js', 'monaco.css', 'module_receipts.js', 'module_receipts.css')
+    bundles = ('monaco.js', 'monaco.css', 'module_receipts.admin.js', 'module_receipts.admin.css')
 
     def _get_parent_category_breadcrumb_url(self, category, management=False):
         if not management:
