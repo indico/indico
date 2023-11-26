@@ -45,8 +45,15 @@ const makeSubmitLabel = ({publish, notify_users: notifyUsers}) => {
     : Translate.string('Save to registration(s)');
 };
 
-const getDefaultValue = f =>
-  f.type === 'dropdown' ? f.attributes.options[f.attributes.default] : f.attributes.value;
+const getDefaultValue = f => {
+  if (f.type === 'dropdown') {
+    return f.attributes.options[f.attributes.default];
+  } else if (f.type === 'checkbox') {
+    return f.attributes.value || false;
+  } else {
+    return f.attributes.value || '';
+  }
+};
 
 const downloadOptions = [
   {
