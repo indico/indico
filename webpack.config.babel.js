@@ -139,7 +139,13 @@ export default env => {
       new CopyWebpackPlugin({
         // mathjax requests some assets dynamically after it has been loaded,
         // so we copy everything to the dist folder.
-        patterns: [{from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}],
+        patterns: [
+          {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
+          {
+            from: path.resolve(modulesDir, 'pdfjs-dist/build/pdf.worker.min.js'),
+            to: 'js/pdf.worker.min.js',
+          },
+        ],
       }),
       new webpack.ProvidePlugin({
         _: ['underscore', 'default'],
