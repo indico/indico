@@ -5,9 +5,4 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-
-:global(.ui.form) .buttons:global(.fields) {
-  justify-content: flex-end;
-  margin-top: 1em;
-}
+import './templates';

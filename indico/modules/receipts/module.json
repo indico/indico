@@ -1,3 +1,6 @@
 {
-    "name": "receipts"
+    "name": "receipts",
+    "partials": {
+      "admin": "./admin.js"
+    }
 }

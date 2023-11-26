@@ -11,8 +11,6 @@ import {injectModal} from 'indico/react/util';
 
 import PrintReceiptsModal from './printing/PrintReceiptsModal';
 
-import './templates';
-
 window.printReceipts = function({registration_id: registrationIds, event_id: eventId}) {
   injectModal(resolve => (
     <PrintReceiptsModal onClose={resolve} registrationIds={registrationIds} eventId={eventId} />
