@@ -19,7 +19,7 @@ from indico.util.string import slugify
 
 class OwnerDataSchema(mm.Schema):
     title = fields.String()
-    id = fields.Integer()
+    id = fields.Int()
     locator = fields.Dict()
 
 
@@ -31,7 +31,7 @@ class _CheckboxAttributesSchema(mm.Schema):
 class _DropdownAttributesSchema(mm.Schema):
     label = fields.String(required=True)
     options = fields.List(fields.String())
-    default = fields.Int(validate=validate.Range(0))
+    default = fields.Int(validate=validate.Range(0), strict=True)
 
     @validates_schema(skip_on_field_errors=True)
     def _validate_default(self, data, **kwargs):
