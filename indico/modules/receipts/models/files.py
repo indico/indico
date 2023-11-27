@@ -11,6 +11,7 @@ from indico.core.db import db
 from indico.util.fs import secure_filename
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
+from indico.web.flask.util import url_for
 
 
 class ReceiptFile(db.Model):
@@ -88,3 +89,19 @@ class ReceiptFile(db.Model):
     @locator.filename
     def locator(self):
         return {**self.locator, 'filename': secure_filename(self.file.filename, f'file-{self.file_id}.pdf')}
+
+    @locator.registrant
+    def locator(self):
+        return {
+            **self.registration.locator.registrant,
+            'file_id': self.file_id,
+            'filename': secure_filename(self.file.filename, f'file-{self.file_id}.pdf'),
+        }
+
+    @property
+    def registrant_download_url(self):
+        return url_for('event_registration.receipt_download_display', self.locator.registrant)
+
+    @property
+    def external_registrant_download_url(self):
+        return url_for('event_registration.receipt_download_display', self.locator.registrant, _external=True)

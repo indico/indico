@@ -50,6 +50,9 @@ class RH:
     #: `locators` is a set of callables returning objects with locators.
     #: `preserved_args` is a set of view arg names which will always
     #: be copied from the current request if present.
+    #: `copy_query_args` specified arguments that are in the query string
+    #: but may be provided by one of the locators and thus need to be taken
+    #: from the query string when checking if a redirect is needed.
     #: The callables are always invoked with a single `self` argument
     #: containing the RH instance.
     #: `endpoint` may be used to specify the endpoint used to build
@@ -70,6 +73,7 @@ class RH:
         'args': {},
         'locators': set(),
         'preserved_args': set(),
+        'copy_query_args': set(),
         'endpoint': None
     }
 
@@ -125,6 +129,7 @@ class RH:
             'args': self.normalize_url_spec.get('args', {}),
             'locators': self.normalize_url_spec.get('locators', set()),
             'preserved_args': self.normalize_url_spec.get('preserved_args', set()),
+            'copy_query_args': self.normalize_url_spec.get('copy_query_args', set()),
             'endpoint': self.normalize_url_spec.get('endpoint', None)
         }
         # Initialize the new view args with preserved arguments (since those would be lost otherwise)
@@ -159,6 +164,8 @@ class RH:
             return str(v) if isinstance(v, int) else v
 
         provided = {k: _convert(v) for k, v in request.view_args.items() if k not in defaults}
+        if spec['copy_query_args']:
+            provided.update((k, _convert(v)) for k, v in request.args.items() if k in spec['copy_query_args'])
         new_view_args = {k: _convert(v) for k, v in new_view_args.items() if v is not None}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
