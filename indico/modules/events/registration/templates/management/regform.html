@@ -140,7 +140,7 @@
                     <div class="group">
                         <a id="checkin-app-link" class="icon-link"
                            style="margin-right:1em;{{ 'display: none;' if not regform.tickets_enabled }}"
-                           href="https://checkin.getindico.io"
+                           href="{{ indico_config.CHECKIN_APP_URL }}"
                            target="_blank"
                            rel="noopener noreferrer"
                            title="{% trans %}Use the app to manage the check-in status of the participants{% endtrans %}">
