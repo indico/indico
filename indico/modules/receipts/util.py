@@ -74,7 +74,7 @@ def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
             **fields,
             now_utc=now_utc
         )
-    except (TemplateSyntaxError, SecurityError, LookupError) as e:
+    except (TemplateSyntaxError, TemplateRuntimeError, SecurityError, LookupError) as e:
         raise UnprocessableEntity(e)
 
 
