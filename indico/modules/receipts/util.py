@@ -10,7 +10,7 @@ from io import BytesIO
 from operator import attrgetter
 
 from flask import g
-from jinja2 import Undefined
+from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 from weasyprint import CSS, HTML, default_url_fetcher
@@ -63,7 +63,8 @@ def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplat
 def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
-        env = SandboxedEnvironment(undefined=SilentUndefined) if use_stack else SandboxedEnvironment()
+        undefined_config = {'undefined': SilentUndefined} if use_stack else {}
+        env = SandboxedEnvironment(**undefined_config, autoescape=True)
         env.filters.update({
             'format_date': format_date,
             'format_datetime': format_datetime,
