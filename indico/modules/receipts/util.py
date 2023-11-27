@@ -127,6 +127,7 @@ def get_useful_registration_data(reg_form: RegistrationForm, registration: Regis
         fields.append({
             'title': field.title,
             'section_title': field.parent.title,
+            'input_type': field.input_type,
             'value': value,
             'field_data': field_data,
             'actual_price': data.price if data else None

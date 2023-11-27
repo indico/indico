@@ -74,6 +74,7 @@ def _generate_dummy_data(event: Event, custom_fields: dict):
         'fields': [{
             'title': _('Social Dinner'),
             'section_title': _('Extras'),
+            'input_type': 'checkbox',
             'value': True,
             'field_data': {
                 'price': 50
