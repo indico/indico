@@ -50,7 +50,9 @@ TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
 def _get_default_value(field):
     if field['type'] == 'dropdown' and 'default' in field['attributes']:
         return field['attributes']['options'][field['attributes']['default']]
-    return field['attributes'].get('value')
+    elif field['type'] == 'checkbox':
+        return field['attributes'].get('value', False)
+    return field['attributes'].get('value', '')
 
 
 def _generate_dummy_data(event: Event, custom_fields: dict):
