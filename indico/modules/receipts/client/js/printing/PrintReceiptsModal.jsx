@@ -275,25 +275,25 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
             </Grid.Column>
             <Grid.Column>
               <Field name="template" subscription={{value: true}}>
-                {({input: {value: templateId}}) =>
-                  templateId ? (
-                    <Field name="custom_fields" subscription={{value: true}}>
-                      {({input: {value: customFields}}) => (
+                {({input: {value: templateId}}) => (
+                  <Field name="custom_fields" subscription={{value: true}}>
+                    {({input: {value: customFields}}) =>
+                      templateId ? (
                         <Previewer
                           url={previewReceiptsURL(snakifyKeys({eventId, templateId}))}
                           data={snakifyKeys({customFields, registrationIds})}
                         />
-                      )}
-                    </Field>
-                  ) : (
-                    <Segment placeholder>
-                      <Header icon>
-                        <Icon name="eye" />
-                        <Translate>Please select a template to preview it...</Translate>
-                      </Header>
-                    </Segment>
-                  )
-                }
+                      ) : (
+                        <Segment placeholder>
+                          <Header icon>
+                            <Icon name="eye" />
+                            <Translate>Please select a template to preview it...</Translate>
+                          </Header>
+                        </Segment>
+                      )
+                    }
+                  </Field>
+                )}
               </Field>
             </Grid.Column>
           </Grid>
