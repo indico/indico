@@ -68,6 +68,7 @@ Bugfixes
 - Ignore deleted fields when computing the number of occupied slots for a registration (:pr:`6035`)
 - Show the description of a subcontribution in conference events (:issue:`5946`, :pr:`6056`)
 - Only allow blocking templates containing a QR code via `is_ticket_blocked` (:pr:`6062`)
+- Only block templates containing a QR code via ``is_ticket_blocked`` (:pr:`6062`)
 
 Accessibility
 ^^^^^^^^^^^^^
