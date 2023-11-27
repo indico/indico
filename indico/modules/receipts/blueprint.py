@@ -5,11 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.receipts.controllers import (RHAddTemplate, RHAllCategoryTemplates, RHAllEventTemplates,
-                                                 RHCategoryTemplate, RHCloneTemplate, RHDeleteTemplate, RHEditTemplate,
-                                                 RHEventTemplate, RHExportReceipts, RHGenerateReceipts,
-                                                 RHListCategoryTemplates, RHListEventTemplates, RHLivePreview,
-                                                 RHPreviewReceipts, RHPreviewTemplate)
+from indico.modules.receipts.controllers import (RHAddTemplate, RHAllEventTemplates, RHCategoryTemplate,
+                                                 RHCloneTemplate, RHDeleteTemplate, RHEditTemplate, RHEventTemplate,
+                                                 RHExportReceipts, RHGenerateReceipts, RHListCategoryTemplates,
+                                                 RHListEventTemplates, RHLivePreview, RHPreviewReceipts,
+                                                 RHPreviewTemplate)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -56,8 +56,7 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template', RHCloneTemplate,
                      defaults={'object_type': object_type}, methods=('POST',))
-    _bp.add_url_rule(prefix + '/templates', 'all_templates', _dispatch(RHAllEventTemplates, RHAllCategoryTemplates),
-                     defaults={'object_type': object_type})
 
+_bp.add_url_rule('/event/<int:event_id>/manage/receipts/templates', 'all_templates', RHAllEventTemplates)
 _bp.add_url_rule('/event/<int:event_id>/manage/receipts/export/receipts.<any(pdf,zip):format>',
                  'receipts_export', RHExportReceipts, methods=('POST',))

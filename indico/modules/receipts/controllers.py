@@ -23,6 +23,7 @@ from indico.modules.categories.controllers.management import RHManageCategoryBas
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import Event
+from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_receipt_created
@@ -120,6 +121,21 @@ class ReceiptAreaMixin:
             raise Forbidden
 
 
+class EventReceiptTemplateMixin:
+    """Mixin to require event management permissions for a receipt template."""
+
+    def _process_args(self):
+        self.template = ReceiptTemplate.get_or_404(request.view_args['template_id'], is_deleted=False)
+
+    def _check_access(self):
+        # Check that template belongs to this event or a category that is a parent
+        if self.template.owner == self.event:
+            return
+        valid_category_ids = self.event.category_chain or [Category.get_root().id]
+        if self.template.owner.id not in valid_category_ids:
+            raise Forbidden
+
+
 class ReceiptTemplateMixin(ReceiptAreaMixin):
     def _process_args(self):
         self.template = ReceiptTemplate.get_or_404(request.view_args['template_id'], is_deleted=False)
@@ -143,11 +159,11 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
         )
 
 
-class AllTemplateMixin(ReceiptAreaMixin):
+class RHAllEventTemplates(RHManageRegFormsBase):
     def _process(self):
         schema = ReceiptTemplateDBSchema(only=('id', 'title', 'custom_fields', 'default_filename'), many=True)
-        inherited_templates = schema.dump(get_inherited_templates(self.target))
-        own_templates = schema.dump(self.target.receipt_templates)
+        inherited_templates = schema.dump(get_inherited_templates(self.event))
+        own_templates = schema.dump(self.event.receipt_templates)
         return jsonify(inherited_templates + own_templates)
 
 
@@ -210,14 +226,6 @@ class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
                           f'Document template "{self.template.title}" updated', user=session.user)
 
 
-class RHAllEventTemplates(AllTemplateMixin, RHManageEventBase):
-    pass
-
-
-class RHAllCategoryTemplates(AllTemplateMixin, RHManageCategoryBase):
-    pass
-
-
 class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
     def _process(self):
         # Just some dummy data to test the template
@@ -253,16 +261,25 @@ class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
         })
 
 
-class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
+class RHPreviewReceipts(EventReceiptTemplateMixin, RHManageRegFormsBase):
+    def _process_args(self):
+        RHManageRegFormsBase._process_args(self)
+        EventReceiptTemplateMixin._process_args(self)
+
+    def _check_access(self):
+        RHManageRegFormsBase._check_access(self)
+        EventReceiptTemplateMixin._check_access(self)
+
     @use_kwargs({
         'registration_ids': fields.List(fields.Integer()),
         'custom_fields': fields.Dict(keys=fields.String)
     })
     def _process(self, registration_ids=None, custom_fields=None):
-        # fetch corresponding Registration objects, among those belonging to the event
-        registrations = Registration.query.filter(
-            Registration.id.in_(registration_ids), RegistrationForm.event == self.target
-        ).join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+        registrations = (Registration.query
+                         .filter(Registration.id.in_(registration_ids),
+                                 RegistrationForm.event == self.event)
+                         .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+                         .all())
 
         g.template_stack = []
         html_sources = []
@@ -272,15 +289,23 @@ class RHPreviewReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 self.template.html,
                 use_stack=True,
                 custom_fields={f['name']: custom_fields.get(f['name']) for f in self.template.custom_fields},
-                event=self.target,
+                event=self.event,
                 **get_useful_registration_data(registration.registration_form, registration)
             ))
         del g.template_stack
-        pdf_data = create_pdf(self.target, html_sources, self.template.css)
+        pdf_data = create_pdf(self.event, html_sources, self.template.css)
         return jsonify({'pdf': base64.b64encode(pdf_data.getvalue())})
 
 
-class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
+class RHGenerateReceipts(EventReceiptTemplateMixin, RHManageRegFormsBase):
+    def _process_args(self):
+        RHManageRegFormsBase._process_args(self)
+        EventReceiptTemplateMixin._process_args(self)
+
+    def _check_access(self):
+        RHManageRegFormsBase._check_access(self)
+        EventReceiptTemplateMixin._check_access(self)
+
     @use_kwargs({
         'registration_ids': fields.List(fields.Integer(), required=True),
         'custom_fields': fields.Dict(keys=fields.String, load_default={}),
@@ -290,10 +315,11 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
         'force': fields.Bool(load_default=False)
     })
     def _process(self, registration_ids, custom_fields, filename, publish, notify_users, force):
-        # fetch corresponding Registration objects, among those belonging to the event
-        registrations = Registration.query.filter(
-            Registration.id.in_(registration_ids), RegistrationForm.event == self.target
-        ).join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+        registrations = (Registration.query
+                         .filter(Registration.id.in_(registration_ids),
+                                 RegistrationForm.event == self.event)
+                         .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+                         .all())
 
         def _compile_receipt_for_reg(registration):
             g.template_stack.append(TemplateStackEntry(registration))
@@ -301,7 +327,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
                 self.template.html,
                 use_stack=True,
                 custom_fields={f['name']: custom_fields.get(f['name']) for f in self.template.custom_fields},
-                event=self.target,
+                event=self.event,
                 **get_useful_registration_data(registration.registration_form, registration)
             )
 
@@ -321,7 +347,7 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
 
         receipt_ids = []
         for registration in registrations:
-            pdf_content = create_pdf(self.target, [html_sources[registration]], self.template.css)
+            pdf_content = create_pdf(self.event, [html_sources[registration]], self.template.css)
             timestamp = datetime.now().strftime('%Y%m%d-%H%M')
             full_filename = slugify(filename, timestamp)
             n = (ReceiptFile.query
@@ -333,9 +359,9 @@ class RHGenerateReceipts(ReceiptTemplateMixin, RHManageEventBase):
             f = File(
                 filename=secure_filename(f'{full_filename}.pdf', f'document-{timestamp}.pdf'),
                 content_type='application/pdf',
-                meta={'event_id': self.target.id}
+                meta={'event_id': self.event.id}
             )
-            context = ('event', self.target.id, 'registration', registration.id, 'receipts')
+            context = ('event', self.event.id, 'registration', registration.id, 'receipts')
             f.save(context, pdf_content)
             receipt = ReceiptFile(
                 file=f,
@@ -396,7 +422,7 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
         return jsonify(ReceiptTemplateDBSchema().dump(new_tpl))
 
 
-class RHExportReceipts(RHManageEventBase, ZipGeneratorMixin):
+class RHExportReceipts(RHManageRegFormsBase, ZipGeneratorMixin):
     """Export an archive of multiple receipts."""
 
     def _prepare_folder_structure(self, file):
