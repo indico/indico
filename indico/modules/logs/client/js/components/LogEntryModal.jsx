@@ -122,7 +122,7 @@ export default class LogEntryModal extends React.Component {
         <Slot name="footer">
           <div className="group flexrow f-j-space-between">
             <IButton
-              title="Previous"
+              title={Translate.string('Previous')}
               icon="prev"
               onClick={this.prevEntry}
               disabled={this._isFirstEntry()}
@@ -134,7 +134,7 @@ export default class LogEntryModal extends React.Component {
               <Translate>Related entries</Translate>
             </IButton>
             <IButton
-              title="Next"
+              title={Translate.string('Next')}
               classes={{next: true}}
               highlight
               onClick={this.nextEntry}
