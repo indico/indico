@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from copy import deepcopy
+
 import yaml
 from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
 from marshmallow_oneofschema import OneOfSchema
@@ -63,7 +65,8 @@ class CustomFieldSchema(mm.Schema):
 
     @pre_load
     def _add_attributes_type(self, data, **kwargs):
-        data = data.copy()
+        # OneOfSchema requires the type to be in the attributes
+        data = deepcopy(data)
         if 'attributes' in data and 'type' in data:
             data['attributes']['type'] = data['type']
         return data
@@ -84,7 +87,7 @@ class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
         model = ReceiptTemplate
         fields = ('id', 'title', 'html', 'css', 'custom_fields', 'default_filename', 'yaml', 'owner')
 
-    yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields})
+    yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields}, sort_keys=False)
                                         if tpl.custom_fields else None))
     owner = fields.Nested(OwnerDataSchema)
 
