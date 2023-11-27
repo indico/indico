@@ -6,8 +6,12 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Portal} from 'semantic-ui-react';
+
+function rectsEqual(a, b) {
+  return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+}
 
 /**
  * HOC to make out-of-tree components look like they are placed exactly over another
@@ -20,10 +24,14 @@ import {Portal} from 'semantic-ui-react';
  */
 export default function Nexus({children, target, overrides, open}) {
   const [style, setStyle] = useState(null);
+  const lastRect = useRef(null);
+  const nodeRef = useRef(null);
   const placeholderCallback = useCallback(
     node => {
+      nodeRef.current = node;
       if (node && open) {
         const rect = node.getBoundingClientRect();
+        lastRect.current = rect;
         setStyle({
           position: 'absolute',
           left: rect.x + window.scrollX,
@@ -36,6 +44,19 @@ export default function Nexus({children, target, overrides, open}) {
     },
     [overrides, open]
   );
+
+  useEffect(() => {
+    if (!nodeRef.current || !open) {
+      return;
+    }
+    const timer = setInterval(() => {
+      const newRect = nodeRef.current.getBoundingClientRect();
+      if (lastRect.current && !rectsEqual(newRect, lastRect.current)) {
+        placeholderCallback(nodeRef.current);
+      }
+    }, 100);
+    return () => clearInterval(timer);
+  }, [nodeRef, placeholderCallback, open]);
 
   return (
     <>
