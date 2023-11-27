@@ -79,7 +79,7 @@
     <td class="i-table">
         {% if person.invited_dt %}
             <span class="i-label icon-mail"
-                  title="This person has been invited to create an Indico account">
+                  title="{% trans %}This person has been invited to create an Indico account{% endtrans %}">
                 {{ person.invited_dt | format_date(timezone=person_data.person.event.tzinfo) }}
             </span>
         {% endif %}

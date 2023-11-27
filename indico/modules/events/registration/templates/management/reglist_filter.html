@@ -98,7 +98,8 @@
         {% if disabled_sections %}
             <h1 class="disabled-caption">
                 {%- trans %}Disabled sections{% endtrans -%}
-                <a class="button icon-next js-toggle-disabled" title="Click to show/hide disabled sections"></a>
+                <a class="button icon-next js-toggle-disabled"
+                   title="{% trans %}Click to show/hide disabled sections{% endtrans %}"></a>
             </h1>
             <div class="disabled-sections">
                 {% for section in disabled_sections %}
