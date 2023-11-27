@@ -569,9 +569,13 @@ def get_registrations_with_tickets(user, event):
                      ~Registration.is_deleted)
              .join(Registration.registration_form))
 
+    cached_templates = {}
+
     def _is_ticket_blocked(registration):
-        ticket_template = get_ticket_template(registration.registration_form)
-        return ticket_template.is_ticket and registration.is_ticket_blocked
+        regform = registration.registration_form
+        if regform.id not in cached_templates:
+            cached_templates[regform.id] = get_ticket_template(regform)
+        return cached_templates[regform.id].is_ticket and registration.is_ticket_blocked
 
     return [r for r in query if not _is_ticket_blocked(r)]
 
