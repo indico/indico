@@ -559,7 +559,6 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
 
 
 def get_registrations_with_tickets(user, event):
-    from indico.modules.events.registration.util import get_ticket_template
     query = (Registration.query.with_parent(event)
              .filter(Registration.user == user,
                      Registration.state == RegistrationState.complete,
@@ -574,7 +573,7 @@ def get_registrations_with_tickets(user, event):
     def _is_ticket_blocked(registration):
         regform = registration.registration_form
         if regform.id not in cached_templates:
-            cached_templates[regform.id] = get_ticket_template(regform)
+            cached_templates[regform.id] = regform.get_ticket_template()
         return cached_templates[regform.id].is_ticket and registration.is_ticket_blocked
 
     return [r for r in query if not _is_ticket_blocked(r)]
@@ -764,7 +763,7 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
 
 def generate_ticket(registration):
     from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
-    template = get_ticket_template(registration.registration_form)
+    template = registration.registration_form.get_ticket_template()
     registrations = [registration]
     signals.event.designer.print_badge_template.send(template, regform=registration.registration_form,
                                                      registrations=registrations)
@@ -772,12 +771,6 @@ def generate_ticket(registration):
     pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, registrations,
                     registration.registration_form.tickets_for_accompanying_persons)
     return pdf.get_pdf()
-
-
-def get_ticket_template(regform):
-    """Get the ticket template for a regform."""
-    from indico.modules.designer.util import get_default_ticket_on_category
-    return regform.ticket_template or get_default_ticket_on_category(regform.event.category)
 
 
 def get_ticket_attachments(registration):

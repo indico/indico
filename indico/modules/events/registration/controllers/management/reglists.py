@@ -51,9 +51,8 @@ from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
-                                                     get_ticket_attachments, get_ticket_template, get_title_uuid,
-                                                     get_user_data, import_registrations_from_csv,
-                                                     make_registration_schema)
+                                                     get_ticket_attachments, get_title_uuid, get_user_data,
+                                                     import_registrations_from_csv, make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
@@ -286,7 +285,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                 template = get_template_module('events/registration/emails/custom_email.html',
                                                email_subject=email_subject, email_body=email_body)
                 bcc = [session.user.email] if form.copy_for_sender.data else []
-                ticket_template = get_ticket_template(self.regform)
+                ticket_template = self.regform.get_ticket_template()
                 is_ticket_blocked = ticket_template.is_ticket and registration.is_ticket_blocked
                 attach_ticket = (
                     'attach_ticket' in form and form.attach_ticket.data and not is_ticket_blocked
@@ -316,7 +315,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                            '{num} emails were sent.', num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
 
-        ticket_template = get_ticket_template(self.regform)
+        ticket_template = self.regform.get_ticket_template()
         registrations_without_ticket = [r for r in self.registrations if (ticket_template.is_ticket and
                                                                           r.is_ticket_blocked)]
         return jsonify_template('events/registration/management/email.html', form=form, regform=self.regform,
