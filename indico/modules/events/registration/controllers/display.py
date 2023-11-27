@@ -32,6 +32,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -488,3 +489,24 @@ class RHRegistrationAvatar(RHDisplayEventBase):
         if self.registration.user:
             return send_avatar(self.registration.user)
         return send_default_avatar(self.registration.full_name)
+
+
+class RHReceiptDownload(RHRegistrationFormRegistrationBase):
+    """Download a receipt file from a registration."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.receipt_file.locator.registrant
+        },
+        'copy_query_args': {'token'},
+    }
+
+    def _process_args(self):
+        RHRegistrationFormRegistrationBase._process_args(self)
+        self.receipt_file = (ReceiptFile.query
+                             .with_parent(self.registration)
+                             .filter_by(file_id=request.view_args['file_id'])
+                             .first_or_404())
+
+    def _process(self):
+        return self.receipt_file.file.send()
