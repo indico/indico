@@ -147,6 +147,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
       header={Translate.string('Generate Documents')}
       keepDirtyOnReinitialize
       noSubmitButton
+      disabledAfterSubmit
     >
       {fprops => (
         <>
