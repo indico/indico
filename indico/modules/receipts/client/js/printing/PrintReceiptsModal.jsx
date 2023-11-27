@@ -34,15 +34,27 @@ import Previewer from '../templates/Previewer.jsx';
 import {printReceipt} from './print.jsx';
 import TemplateParameterEditor from './TemplateParameterEditor.jsx';
 
-const makeSubmitLabel = ({publish, notify_users: notifyUsers}) => {
+const makeSubmitLabel = ({publish, notify_users: notifyUsers}, numRegistrants) => {
   if (publish) {
     return notifyUsers
-      ? Translate.string('Publish and send to registrant(s)')
-      : Translate.string('Save and publish to registration(s)');
+      ? PluralTranslate.string(
+          'Publish and send to registrant',
+          'Publish and send to registrants',
+          numRegistrants
+        )
+      : PluralTranslate.string(
+          'Save and publish to registration',
+          'Save and publish to registrations',
+          numRegistrants
+        );
   }
   return notifyUsers
-    ? Translate.string('Save and send to registrant(s)')
-    : Translate.string('Save to registration(s)');
+    ? PluralTranslate.string(
+        'Save and send to registrant',
+        'Save and send to registrants',
+        numRegistrants
+      )
+    : PluralTranslate.string('Save to registration', 'Save to registrations', numRegistrants);
 };
 
 const getDefaultValue = f => {
@@ -211,8 +223,10 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
               <FinalCheckbox
                 name="publish"
                 label={Translate.string('Publish document')}
-                description={Translate.string(
-                  'Make the resulting document(s) available on the registration page.'
+                description={PluralTranslate.string(
+                  'Make the resulting document available on the registration page.',
+                  'Make the resulting documents available on the registration pages.',
+                  registrationIds.length
                 )}
                 disabled={receiptIds.length > 0}
               />
@@ -220,14 +234,22 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                 {({input: {value: publish}}) => (
                   <FinalCheckbox
                     name="notify_users"
-                    label={Translate.string('Notify registrant(s) via e-mail')}
+                    label={PluralTranslate.string(
+                      'Notify registrants via e-mail',
+                      'Notify registrants via e-mail',
+                      registrationIds.length
+                    )}
                     description={
                       publish
-                        ? Translate.string(
-                            'Send an e-mail to the registrant(s) informing them that the document is available.'
+                        ? PluralTranslate.string(
+                            'Send an e-mail to the registrant informing them that the document is available.',
+                            'Send an e-mail to the registrants informing them that the document is available.',
+                            registrationIds.length
                           )
-                        : Translate.string(
-                            'Send an e-mail to the registrant(s) with the document attached.'
+                        : PluralTranslate.string(
+                            'Send an e-mail to the registrant with the document attached.',
+                            'Send an e-mail to the registrants with the document attached.',
+                            registrationIds.length
                           )
                     }
                     disabled={receiptIds.length > 0}
@@ -238,7 +260,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                 <FormSpy subscription={{values: true}}>
                   {({values}) => (
                     <FinalSubmitButton
-                      label={makeSubmitLabel(values)}
+                      label={makeSubmitLabel(values, registrationIds.length)}
                       icon={values.notify_users ? 'send' : 'save'}
                       style={{width: '100%'}}
                       disabledAfterSubmit
