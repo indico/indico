@@ -133,9 +133,15 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
       id="print-receipts"
       size="large"
       onSubmit={async values => {
-        const result = await printReceipt(eventId, registrationIds, values);
-        if (result && result.length > 0) {
-          setReceiptIds(result);
+        const {receiptIds: printedReceiptIds, error} = await printReceipt(
+          eventId,
+          registrationIds,
+          values
+        );
+        if (error) {
+          return error;
+        } else if (printedReceiptIds.length > 0) {
+          setReceiptIds(printedReceiptIds);
         }
       }}
       initialValues={{

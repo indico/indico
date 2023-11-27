@@ -15,6 +15,7 @@ from io import BytesIO
 from flask import g, jsonify, request, session
 from marshmallow import fields, validate
 from pypdf import PdfWriter
+from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -261,34 +262,45 @@ class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
         })
 
 
-class RHPreviewReceipts(EventReceiptTemplateMixin, RHManageRegFormsBase):
-    def _process_args(self):
+class RenderReceiptsBase(EventReceiptTemplateMixin, RHManageRegFormsBase):
+    @use_kwargs({
+        'registration_ids': fields.List(fields.Integer(), required=True),
+        'custom_fields': fields.Dict(keys=fields.String, load_default=lambda: {}),
+    })
+    def _process_args(self, registration_ids, custom_fields):
         RHManageRegFormsBase._process_args(self)
         EventReceiptTemplateMixin._process_args(self)
+        self.registrations = (Registration.query
+                              .filter(Registration.id.in_(registration_ids),
+                                      RegistrationForm.event == self.event)
+                              .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+                              .all())
+        self.custom_fields_raw = custom_fields
 
     def _check_access(self):
         RHManageRegFormsBase._check_access(self)
         EventReceiptTemplateMixin._check_access(self)
 
-    @use_kwargs({
-        'registration_ids': fields.List(fields.Integer()),
-        'custom_fields': fields.Dict(keys=fields.String)
-    })
-    def _process(self, registration_ids=None, custom_fields=None):
-        registrations = (Registration.query
-                         .filter(Registration.id.in_(registration_ids),
-                                 RegistrationForm.event == self.event)
-                         .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
-                         .all())
+    def _get_custom_fields(self):
+        custom_fields = {f['name']: self.custom_fields_raw.get(f['name']) for f in self.template.custom_fields}
+        missing = [f['attributes']['label'] for f in self.template.custom_fields
+                   if not custom_fields[f['name']] and f.get('validations', {}).get('required')]
+        if missing:
+            abort(422, messages={'custom_fields': [_('Required fields missing: {}').format(', '.join(missing))]})
+        return custom_fields
 
+
+class RHPreviewReceipts(RenderReceiptsBase):
+    def _process(self):
+        custom_fields = self._get_custom_fields()
         g.template_stack = []
         html_sources = []
-        for registration in registrations:
+        for registration in self.registrations:
             g.template_stack.append(TemplateStackEntry(registration))
             html_sources.append(compile_jinja_code(
                 self.template.html,
                 use_stack=True,
-                custom_fields={f['name']: custom_fields.get(f['name']) for f in self.template.custom_fields},
+                custom_fields=custom_fields,
                 event=self.event,
                 **get_useful_registration_data(registration.registration_form, registration)
             ))
@@ -297,42 +309,28 @@ class RHPreviewReceipts(EventReceiptTemplateMixin, RHManageRegFormsBase):
         return jsonify({'pdf': base64.b64encode(pdf_data.getvalue())})
 
 
-class RHGenerateReceipts(EventReceiptTemplateMixin, RHManageRegFormsBase):
-    def _process_args(self):
-        RHManageRegFormsBase._process_args(self)
-        EventReceiptTemplateMixin._process_args(self)
-
-    def _check_access(self):
-        RHManageRegFormsBase._check_access(self)
-        EventReceiptTemplateMixin._check_access(self)
-
+class RHGenerateReceipts(RenderReceiptsBase):
     @use_kwargs({
-        'registration_ids': fields.List(fields.Integer(), required=True),
-        'custom_fields': fields.Dict(keys=fields.String, load_default={}),
         'filename': fields.String(required=True, validate=not_empty),
         'publish': fields.Bool(load_default=False),
         'notify_users': fields.Bool(load_default=False),
         'force': fields.Bool(load_default=False)
     })
-    def _process(self, registration_ids, custom_fields, filename, publish, notify_users, force):
-        registrations = (Registration.query
-                         .filter(Registration.id.in_(registration_ids),
-                                 RegistrationForm.event == self.event)
-                         .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
-                         .all())
+    def _process(self, filename, publish, notify_users, force):
+        custom_fields = self._get_custom_fields()
 
         def _compile_receipt_for_reg(registration):
             g.template_stack.append(TemplateStackEntry(registration))
             return compile_jinja_code(
                 self.template.html,
                 use_stack=True,
-                custom_fields={f['name']: custom_fields.get(f['name']) for f in self.template.custom_fields},
+                custom_fields=custom_fields,
                 event=self.event,
                 **get_useful_registration_data(registration.registration_form, registration)
             )
 
         g.template_stack = []
-        html_sources = {registration: _compile_receipt_for_reg(registration) for registration in registrations}
+        html_sources = {registration: _compile_receipt_for_reg(registration) for registration in self.registrations}
 
         errors = [
             {
@@ -346,7 +344,7 @@ class RHGenerateReceipts(EventReceiptTemplateMixin, RHManageRegFormsBase):
             return jsonify(receipt_ids=[], errors=errors)
 
         receipt_ids = []
-        for registration in registrations:
+        for registration in self.registrations:
             pdf_content = create_pdf(self.event, [html_sources[registration]], self.template.css)
             timestamp = datetime.now().strftime('%Y%m%d-%H%M')
             full_filename = slugify(filename, timestamp)

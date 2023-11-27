@@ -58,10 +58,15 @@ class CustomFieldAttributesSchema(OneOfSchema):
     }
 
 
+class CustomFieldValidationsSchema(mm.Schema):
+    required = fields.Bool()
+
+
 class CustomFieldSchema(mm.Schema):
     name = fields.String(required=True, validate=not_empty)
     type = fields.String(required=True)
     attributes = fields.Nested(CustomFieldAttributesSchema, required=True)
+    validations = fields.Nested(CustomFieldValidationsSchema)
 
     @pre_load
     def _add_attributes_type(self, data, **kwargs):

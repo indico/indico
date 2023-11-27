@@ -11,9 +11,10 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Button, ButtonGroup, Icon, Label, Message, Modal, Table} from 'semantic-ui-react';
 
+import {handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {injectModal} from 'indico/react/util';
-import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
 /**
@@ -138,10 +139,8 @@ export async function printReceipt(eventId, registrationIds, values) {
         ));
       });
     }
-    return receiptIds;
+    return {receiptIds, error: null};
   } catch (error) {
-    handleAxiosError(error);
+    return {receiptIds: null, error: handleSubmitError(error)};
   }
-
-  return false;
 }

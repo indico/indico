@@ -28,6 +28,7 @@ const MESSAGE_HEADERS = {
   html: Translate.string('HTML Code'),
   css: Translate.string('CSS Stylesheet'),
   jinja: Translate.string('Jinja Template'),
+  custom_fields: Translate.string('Template Parameters'),
 };
 
 const processPlaceholders = placeholderData =>
@@ -82,7 +83,6 @@ function PreviewerDisplay({url, data}) {
     setLoading(true);
     (async () => {
       try {
-        setError(null);
         const {data: previewData} = await debounce(() => indicoAxios.post(url, data));
         const dummyData = previewData.data;
         const newContent = Uint8Array.from(atob(previewData.pdf), c => c.charCodeAt(0)).buffer;
@@ -91,6 +91,7 @@ function PreviewerDisplay({url, data}) {
         }
         setLoading(false);
         setContent(newContent);
+        setError(null);
       } catch (e) {
         const {
           response: {status, data: respData},
@@ -104,7 +105,6 @@ function PreviewerDisplay({url, data}) {
         } else {
           handleAxiosError(e);
         }
-        return;
       }
     })();
   }, [url, data]);
