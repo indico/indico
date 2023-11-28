@@ -149,7 +149,6 @@ class RHCategoryTemplatesManagement(TemplateListMixin, RHManageCategoryBase):
 
 
 class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
-    always_clonable = False
 
     @use_kwargs(ReceiptTemplateAPISchema)
     def _process(self, title, default_filename, html, css, yaml):
@@ -191,7 +190,6 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
 
 class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
-    DENY_FRAMES = False
 
     @use_kwargs({
         'html': fields.String(required=True, validate=validate.Length(3)),
