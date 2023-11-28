@@ -408,7 +408,7 @@ class PictureField(FileField):
                 raise ValidationError(_('This field can accept only .jpg, .png, .gif and .webp picture formats.'))
             min_picture_size = self.form_item.data.get('min_picture_size')
             if min_picture_size:
-                with Image.open(file.open()) as picture:
+                with file.open() as f, Image.open(f) as picture:
                     if min(picture.size) < min_picture_size:
                         raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
                                               .format(min_picture_size))
