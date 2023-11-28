@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.modules.admin.views import WPAdmin
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events.management.views import WPEventManagement
 from indico.web.flask.util import url_for
@@ -25,3 +26,7 @@ class WPCategoryReceiptTemplates(WPCategoryManagement):
         # we don't want template-specific urls since those may be tied
         # to the previous category
         return url_for('receipts.template_list', category)
+
+
+class WPReceiptsAdmin(WPAdmin):
+    template_prefix = 'receipts/'

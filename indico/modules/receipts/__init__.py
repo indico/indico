@@ -9,21 +9,29 @@ from flask import session
 
 from indico.core import signals
 from indico.modules.events.registration.util import ActionMenuEntry
+from indico.modules.receipts.util import can_user_manage_receipt_templates
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
+@signals.menu.items.connect_via('admin-sidemenu')
+def _admin_sidemenu_items(sender, **kwargs):
+    if session.user.is_admin:
+        yield SideMenuItem('receipts', _('Document Templates'), url_for('receipts.admin_settings'),
+                           section='customization')
+
+
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _event_sidemenu_items(sender, event, **kwargs):
-    if session.user.is_admin:
+    if can_user_manage_receipt_templates(session.user):
         return SideMenuItem('receipts', _('Document Templates'), url_for('receipts.template_list', event),
                             section='customization')
 
 
 @signals.menu.items.connect_via('category-management-sidemenu')
 def _category_sidemenu_items(sender, category, **kwargs):
-    if session.user.is_admin:
+    if can_user_manage_receipt_templates(session.user):
         return SideMenuItem('receipts', _('Document Templates'), url_for('receipts.template_list', category),
                             icon='agreement', weight=20)
 

@@ -7,9 +7,9 @@
 
 from indico.modules.receipts.controllers import (RHAddTemplate, RHAllEventTemplates, RHCategoryTemplate,
                                                  RHCloneTemplate, RHDeleteTemplate, RHEditTemplate, RHEventTemplate,
-                                                 RHExportReceipts, RHGenerateReceipts, RHListCategoryTemplates,
-                                                 RHListEventTemplates, RHLivePreview, RHPreviewReceipts,
-                                                 RHPreviewTemplate)
+                                                 RHExportReceipts, RHGenerateReceipts, RHGlobalReceiptsSettings,
+                                                 RHListCategoryTemplates, RHListEventTemplates, RHLivePreview,
+                                                 RHPreviewReceipts, RHPreviewTemplate)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -27,6 +27,8 @@ def _dispatch(event_rh, category_rh):
 
 
 _bp = IndicoBlueprint('receipts', __name__, template_folder='templates', virtual_template_folder='receipts')
+
+_bp.add_url_rule('/admin/receipts/', 'admin_settings', RHGlobalReceiptsSettings, methods=('GET', 'POST'))
 
 for object_type in ('event', 'category'):
     if object_type == 'category':

@@ -1,0 +1,39 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {% trans %}Document Templates{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    <p>
+        {% trans %}
+            Document Templates allow event organizers to generate receipts, certificates of attendance and similar PDF
+            documents for event participants.
+        {% endtrans %}
+    </p>
+
+    <div class="ui icon red message">
+        <i class="bomb icon"></i>
+        <div class="content">
+            <div class="header">{% trans %}Danger zone{% endtrans %}</div>
+            <p>
+                {% trans -%}
+                    Creating templates requires knowledge in Jinja, HTML and CSS. It may also be possible to cause high
+                    resource usage on the Indico server (causing a Denial of Service) with poorly (or maliciously)
+                    crafted templates.
+                {%- endtrans %}
+            </p>
+            <p>
+                {% trans -%}
+                    For this reason, template management access is restricted to Indico administrators.
+                    If needed, you can grant access to additional (trustworthy) users.
+                {%- endtrans %}
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, back_button=false) }}
+{% endblock %}

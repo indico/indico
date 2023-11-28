@@ -12,7 +12,7 @@ import re
 from datetime import datetime
 from io import BytesIO
 
-from flask import g, jsonify, request, session
+from flask import flash, g, jsonify, redirect, request, session
 from marshmallow import fields, validate
 from pypdf import PdfWriter
 from webargs.flaskparser import abort
@@ -28,23 +28,26 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_receipt_created
-from indico.modules.events.util import ZipGeneratorMixin
+from indico.modules.events.util import ZipGeneratorMixin, check_event_locked
 from indico.modules.files.models.files import File
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
+from indico.modules.receipts.forms import ReceiptsSettingsForm
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import (ReceiptTemplateAPISchema, ReceiptTemplateDBSchema,
                                              ReceiptTplMetadataSchema, TemplateDataSchema)
-from indico.modules.receipts.settings import receipt_defaults
-from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_inherited_templates,
-                                          get_useful_registration_data)
-from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
+from indico.modules.receipts.settings import receipt_defaults, receipts_settings
+from indico.modules.receipts.util import (can_user_manage_receipt_templates, compile_jinja_code, create_pdf,
+                                          get_inherited_templates, get_useful_registration_data)
+from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates, WPReceiptsAdmin
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import YAML, ModelList, not_empty
 from indico.util.string import slugify
 from indico.web.args import use_args, use_kwargs
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
+from indico.web.forms.base import FormDefaults
+from indico.web.rh import RHProtected
 
 
 TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
@@ -119,8 +122,14 @@ class ReceiptAreaMixin:
         return Event.get_or_404(event_id) if self.object_type == 'event' else Category.get_or_404(categ_id)
 
     def _check_access(self):
-        if not session.user or not session.user.is_admin:
+        # General access check to manage receipt templates (admin or on explicit ACL)
+        if not can_user_manage_receipt_templates(session.user):
             raise Forbidden
+        # Event/category-level access check (important if user is not an admin)
+        if not self.target.can_manage(session.user):
+            raise Forbidden
+        elif isinstance(self.target, Event):
+            check_event_locked(self, self.target)
 
 
 class EventReceiptTemplateMixin:
@@ -142,6 +151,15 @@ class ReceiptTemplateMixin(ReceiptAreaMixin):
     def _process_args(self):
         self.template = ReceiptTemplate.get_or_404(request.view_args['template_id'], is_deleted=False)
 
+    def _check_access(self):
+        ReceiptAreaMixin._check_access(self)
+        # Check that template belongs to this event or a category that is a parent
+        if self.template.owner == self.target:
+            return
+        valid_category_ids = self.target.category_chain or [Category.get_root().id]
+        if self.template.owner.id not in valid_category_ids:
+            raise Forbidden
+
 
 class ReceiptAreaRenderMixin(ReceiptAreaMixin):
     def _render_template(self, tpl_name, **kwargs):
@@ -159,6 +177,10 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
             own_templates=own_templates,
             target_locator=self.target.locator
         )
+
+
+class RHReceiptTemplatesManagementBase(RHProtected):
+    DENY_FRAMES = True
 
 
 class RHAllEventTemplates(RHManageRegFormsBase):
@@ -196,7 +218,7 @@ class RHListCategoryTemplates(TemplateListMixin, RHManageCategoryBase):
     pass
 
 
-class RHAddTemplate(ReceiptAreaRenderMixin, RHAdminBase):
+class RHAddTemplate(ReceiptAreaRenderMixin, RHReceiptTemplatesManagementBase):
     always_clonable = False
 
     @use_kwargs(ReceiptTemplateAPISchema)
@@ -229,14 +251,14 @@ class RHCategoryTemplate(DisplayTemplateMixin, RHManageCategoryBase):
     pass
 
 
-class RHDeleteTemplate(ReceiptTemplateMixin, RHAdminBase):
+class RHDeleteTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
     def _process(self):
         self.template.is_deleted = True
         self.template.log(self.template.log_realm, LogKind.negative, 'Templates',
                           f'Document template "{self.template.title}" deleted', user=session.user)
 
 
-class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
+class RHEditTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
     @use_args(ReceiptTemplateAPISchema)
     def _process(self, data):
         yaml = data.pop('yaml', None)
@@ -247,7 +269,7 @@ class RHEditTemplate(ReceiptTemplateMixin, RHAdminBase):
                           f'Document template "{self.template.title}" updated', user=session.user)
 
 
-class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
+class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
     def _process(self):
         # Just some dummy data to test the template
         html = compile_jinja_code(
@@ -258,7 +280,7 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHAdminBase):
         return send_file('receipt.pdf', pdf_data, 'application/pdf')
 
 
-class RHLivePreview(ReceiptAreaMixin, RHAdminBase):
+class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
     DENY_FRAMES = False
 
     @use_kwargs({
@@ -404,7 +426,7 @@ class RHGenerateReceipts(RenderReceiptsBase):
         return jsonify(receipt_ids=receipt_ids, errors=errors)
 
 
-class RHCloneTemplate(ReceiptTemplateMixin, RHAdminBase):
+class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
     def _process(self):
         base_title = self.template.title
         max_index = 0
@@ -473,3 +495,15 @@ class RHExportReceipts(RHManageRegFormsBase, ZipGeneratorMixin):
         output.write(outputbuf)
         outputbuf.seek(0)
         return send_file('documents.pdf', outputbuf, 'application/pdf')
+
+
+class RHGlobalReceiptsSettings(RHAdminBase):
+    """Manage global settings for the receipts module in the server admin area."""
+
+    def _process(self):
+        form = ReceiptsSettingsForm(obj=FormDefaults(**receipts_settings.get_all()))
+        if form.validate_on_submit():
+            receipts_settings.set_multi(form.data)
+            flash(_('Settings have been saved'), 'success')
+            return redirect(url_for('.admin_settings'))
+        return WPReceiptsAdmin.render_template('admin_settings.html', 'receipts', form=form)

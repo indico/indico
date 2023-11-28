@@ -8,6 +8,7 @@
 import typing as t
 from io import BytesIO
 from operator import attrgetter
+from urllib.parse import urlparse
 
 from flask import g
 from jinja2 import TemplateRuntimeError, Undefined
@@ -16,13 +17,18 @@ from jinja2.sandbox import SandboxedEnvironment
 from weasyprint import CSS, HTML, default_url_fetcher
 from werkzeug.exceptions import UnprocessableEntity
 
+from indico.core.config import config
+from indico.core.logger import Logger
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.templates import ReceiptTemplate
+from indico.modules.receipts.settings import receipts_settings
 from indico.util.date_time import format_date, format_datetime, format_time, now_utc
 
+
+logger = Logger.get('receipts')
 
 DEFAULT_CSS = '''
 .error {
@@ -38,6 +44,14 @@ DEFAULT_CSS = '''
     margin: 0.1em;
 }
 '''
+
+
+def can_user_manage_receipt_templates(user):
+    if not user:
+        return False
+    if user.is_admin:
+        return True
+    return receipts_settings.acls.contains_user('authorized_users', user)
 
 
 class SilentUndefined(Undefined):
@@ -78,18 +92,32 @@ def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
         raise UnprocessableEntity(e)
 
 
-def sandboxed_url_fetcher(event: Event, **kwargs) -> t.Callable[[str], dict]:
+def sandboxed_url_fetcher(event: Event, allow_event_logo: bool = False) -> t.Callable[[str], dict]:
     """Fetch also "event-local" URLs.
 
     More info on fetchers: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#url-fetchers
     """
+    allow_external_urls = receipts_settings.get('allow_external_urls')
+
     def _fetcher(url: str) -> dict:
-        if url == 'event://logo':
+        if allow_event_logo and url == 'event://logo':
             return {
                 'mime_type': event.logo_metadata['content_type'],
                 'string': event.logo
             }
+
+        # Make sure people don't do anything funny...
+        url_data = urlparse(url)
+        if url_data.scheme not in {'http', 'https'}:
+            if url_data.scheme == 'file':
+                logger.warning('Attempted to use local file URL %s in a document template', url)
+            raise ValueError('Invalid URL scheme')
+
+        if not allow_external_urls and not url.startswith(config.BASE_URL):
+            raise ValueError('External URLs not allowed')
+
         return default_url_fetcher(url)
+
     return _fetcher
 
 
@@ -101,9 +129,11 @@ def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     :param css: CSS stylesheet to include
     :return: a the rendered PDF blob
     """
-    css = CSS(string=f'{css}{DEFAULT_CSS}')
+    css_url_fetcher = sandboxed_url_fetcher(event)
+    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_logo=True)
+    css = CSS(string=f'{css}{DEFAULT_CSS}', url_fetcher=css_url_fetcher)
     documents = [
-        HTML(string=source, url_fetcher=sandboxed_url_fetcher(event)).render(stylesheets=(css,))
+        HTML(string=source, url_fetcher=html_url_fetcher).render(stylesheets=(css,))
         for source in html_sources
     ]
     all_pages = [p for doc in documents for p in doc.pages]
