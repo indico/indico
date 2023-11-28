@@ -33,7 +33,7 @@ from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code
                                           get_useful_registration_data)
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelList, not_empty
+from indico.util.marshmallow import not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
@@ -223,14 +223,20 @@ class RHExportReceipts(ZipGeneratorMixin, RHManageRegFormsBase):
             yield receipt.file
 
     @use_kwargs({
-        'receipts': ModelList(ReceiptFile, filter_deleted=True, data_key='receipt_ids', required=True,
-                              validate=not_empty)
+        'receipt_ids': fields.List(fields.Integer(), required=True, validate=not_empty),
     })
-    def _process(self, receipts):
+    def _process_args(self, receipt_ids):
+        RHManageRegFormsBase._process_args(self)
+        self.receipts = (ReceiptFile.query
+                         .filter(ReceiptFile.file_id.in_(receipt_ids),
+                                 ReceiptFile.registration.has(event=self.event))
+                         .all())
+
+    def _process(self):
         if request.view_args['format'] == 'zip':
-            return self._generate_zip_file(receipts)
+            return self._generate_zip_file(self.receipts)
         output = PdfWriter()
-        for receipt in receipts:
+        for receipt in self.receipts:
             with receipt.file.open() as fd:
                 output.append(fd)
         outputbuf = BytesIO()
