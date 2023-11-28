@@ -148,6 +148,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
         custom_fields: {},
         document_type: 'none',
         filename: 'document',
+        save_config: true,
       }}
       onClose={onClose}
       header={Translate.string('Generate Documents')}
@@ -227,6 +228,15 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                   />
                 )}
               </Field>
+              <FinalCheckbox
+                name="save_config"
+                label={Translate.string('Remember settings')}
+                description={Translate.string(
+                  'Prefill template parameters (if present) and filename when generating more ' +
+                    'documents for the same template in this event.'
+                )}
+                disabled={receiptIds.length > 0}
+              />
               <FinalCheckbox
                 name="publish"
                 label={Translate.string('Publish document')}

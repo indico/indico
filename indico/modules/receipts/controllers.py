@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 import base64
+import dataclasses
 import os
 import re
-from dataclasses import dataclass, field
 from datetime import datetime
 from io import BytesIO
 
@@ -35,6 +35,7 @@ from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import (ReceiptTemplateAPISchema, ReceiptTemplateDBSchema,
                                              ReceiptTplMetadataSchema, TemplateDataSchema)
+from indico.modules.receipts.settings import receipt_defaults
 from indico.modules.receipts.util import (compile_jinja_code, create_pdf, get_inherited_templates,
                                           get_useful_registration_data)
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
@@ -90,10 +91,10 @@ def _generate_dummy_data(event: Event, custom_fields: dict):
     }
 
 
-@dataclass
+@dataclasses.dataclass
 class TemplateStackEntry:
     registration: Registration
-    undefined: set[str] = field(default_factory=set)
+    undefined: set[str] = dataclasses.field(default_factory=set)
 
 
 class ReceiptAreaMixin:
@@ -161,11 +162,30 @@ class TemplateListMixin(ReceiptAreaRenderMixin):
 
 
 class RHAllEventTemplates(RHManageRegFormsBase):
+    def _apply_event_defaults(self, tpl, defaults):
+        for field in tpl['custom_fields']:
+            if (default := defaults.get(field['name'])) is None:
+                continue
+            if field['type'] == 'dropdown':
+                try:
+                    idx = field['attributes']['options'].index(default)
+                except IndexError:
+                    continue
+                field['attributes']['default'] = idx
+            else:
+                field['attributes']['value'] = default
+
     def _process(self):
         schema = ReceiptTemplateDBSchema(only=('id', 'title', 'custom_fields', 'default_filename'), many=True)
         inherited_templates = schema.dump(get_inherited_templates(self.event))
         own_templates = schema.dump(self.event.receipt_templates)
-        return jsonify(inherited_templates + own_templates)
+        templates = inherited_templates + own_templates
+        for tpl in templates:
+            if defaults := receipt_defaults.get(self.event, f"custom_fields:{tpl['id']}"):
+                self._apply_event_defaults(tpl, defaults)
+            if filename := receipt_defaults.get(self.event, f"filename:{tpl['id']}"):
+                tpl['default_filename'] = filename
+        return jsonify(templates)
 
 
 class RHListEventTemplates(TemplateListMixin, RHManageEventBase):
@@ -311,12 +331,13 @@ class RHPreviewReceipts(RenderReceiptsBase):
 
 class RHGenerateReceipts(RenderReceiptsBase):
     @use_kwargs({
+        'save_config': fields.Bool(load_default=False),
         'filename': fields.String(required=True, validate=not_empty),
         'publish': fields.Bool(load_default=False),
         'notify_users': fields.Bool(load_default=False),
         'force': fields.Bool(load_default=False)
     })
-    def _process(self, filename, publish, notify_users, force):
+    def _process(self, save_config, filename, publish, notify_users, force):
         custom_fields = self._get_custom_fields()
 
         def _compile_receipt_for_reg(registration):
@@ -375,7 +396,11 @@ class RHGenerateReceipts(RenderReceiptsBase):
             registration.log(EventLogRealm.management, LogKind.positive, 'Documents',
                              f'Document "{f.filename}" generated', session.user,
                              data={'Published': publish, 'Notified': notify_users})
-
+        if save_config:
+            receipt_defaults.set_multi(self.event, {
+                f'custom_fields:{self.template.id}': self.custom_fields_raw,
+                f'filename:{self.template.id}': filename,
+            })
         return jsonify(receipt_ids=receipt_ids, errors=errors)
 
 
