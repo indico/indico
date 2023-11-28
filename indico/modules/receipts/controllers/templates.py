@@ -122,18 +122,14 @@ class ReceiptTemplateMixin(ReceiptAreaMixin):
             raise Forbidden
 
 
-class ReceiptAreaRenderMixin(ReceiptAreaMixin):
-    def _render_template(self, tpl_name, **kwargs):
-        view_class = WPEventReceiptTemplates if self.object_type == 'event' else WPCategoryReceiptTemplates
-        return view_class.render_template(tpl_name, self.target, 'receipts', target=self.target, **kwargs)
-
-
-class TemplateListMixin(ReceiptAreaRenderMixin):
+class TemplateListMixin(ReceiptAreaMixin):
     def _process(self):
         inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
         own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
-        return self._render_template(
-            'list.html',
+        view_class = WPEventReceiptTemplates if self.object_type == 'event' else WPCategoryReceiptTemplates
+        return view_class.render_template(
+            'list.html', self.target, 'receipts',
+            target=self.target,
             inherited_templates=inherited_templates,
             own_templates=own_templates,
             target_locator=self.target.locator
@@ -152,7 +148,7 @@ class RHCategoryTemplatesManagement(TemplateListMixin, RHManageCategoryBase):
     pass
 
 
-class RHAddTemplate(ReceiptAreaRenderMixin, RHReceiptTemplatesManagementBase):
+class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
     always_clonable = False
 
     @use_kwargs(ReceiptTemplateAPISchema)
