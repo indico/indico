@@ -306,15 +306,12 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
 
     found_emails = {}
     found_identities = {}
-    found_anonymized = set()  # Anonymized users (via `indico user anonymize ...`) have no emails nor identities
     system_user = set()
     for user in query:
         for identity in user.identities:
             found_identities[(identity.provider, identity.identifier)] = user
         for email in user.all_emails:
             found_emails[email] = user
-        if user.is_deleted and not user.all_emails and not user.identities:
-            found_anonymized.add(user)
         if user.is_system and not user.all_emails and allow_system_user:
             system_user = {user}
 
@@ -328,7 +325,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, incl
                 found_emails[ident.data['email'].lower()] = ident
                 found_identities[(ident.provider, ident.identifier)] = ident
 
-    return set(found_emails.values()) | found_anonymized | system_user
+    return set(found_emails.values()) | system_user
 
 
 def get_user_by_email(email, create_pending=False):
@@ -448,6 +445,8 @@ def anonymize_user(user):
     user.identities = set()
     # TODO: check what breaks when we delete all emails
     UserEmail.query.filter(UserEmail.user == user).delete()
+    email = UserEmail(user=user, email=f'indico-{user.id}@indico.invalid')
+    db.session.add(email)
 
     principals = [
         EventPrincipal, CategoryPrincipal, AttachmentPrincipal, AttachmentFolderPrincipal,

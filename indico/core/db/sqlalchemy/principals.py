@@ -431,12 +431,12 @@ class PrincipalMixin:
         For anything group-like it is the primary email address of each group member
         who has an Indico account.
         """
-        if self.type == PrincipalType.user and not self.user.is_system and not self.user.is_deleted:
+        if self.type == PrincipalType.user and not self.user.is_system:
             return {self.user.email}
         elif self.type in (PrincipalType.local_group, PrincipalType.multipass_group):
-            return {x.email for x in self.principal.get_members() if not x.is_system and not self.user.is_deleted}
+            return {x.email for x in self.principal.get_members() if not x.is_system}
         elif self.type in (PrincipalType.event_role, PrincipalType.category_role):
-            return {x.email for x in self.principal.members if not x.is_system and not self.user.is_deleted}
+            return {x.email for x in self.principal.members if not x.is_system}
         return set()
 
     def get_users(self):
