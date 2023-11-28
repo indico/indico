@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import dataclasses
 import typing as t
 from io import BytesIO
 from operator import attrgetter
@@ -52,6 +53,12 @@ def can_user_manage_receipt_templates(user):
     if user.is_admin:
         return True
     return receipts_settings.acls.contains_user('authorized_users', user)
+
+
+@dataclasses.dataclass
+class TemplateStackEntry:
+    registration: Registration
+    undefined: set[str] = dataclasses.field(default_factory=set)
 
 
 class SilentUndefined(Undefined):
