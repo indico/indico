@@ -106,8 +106,8 @@
                                         </td>
                                     {% elif item.id == 'receipts_present' %}
                                         <td class="i-table">
-                                            {% if registration.receipt_files %}
-                                                {%- trans %}Yes{% endtrans -%}
+                                            {% if registration.num_receipt_files %}
+                                                {%- trans %}Yes{% endtrans %} ({{ registration.num_receipt_files }})
                                             {% else %}
                                                 {%- trans %}No{% endtrans -%}
                                             {% endif %}

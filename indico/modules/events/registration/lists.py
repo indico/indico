@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import request
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -156,7 +156,8 @@ class RegistrationListGenerator(ListGeneratorBase):
                 .with_parent(self.regform)
                 .filter(~Registration.is_deleted)
                 .options(joinedload('data').joinedload('field_data').joinedload('field'),
-                         joinedload('tags'))
+                         joinedload('tags'),
+                         undefer('num_receipt_files'))
                 .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
 
     def _filter_list_entries(self, query, filters):
