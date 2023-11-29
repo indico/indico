@@ -22,5 +22,5 @@ export const templateSchema = PropTypes.shape({
     id: PropTypes.number,
     title: PropTypes.string,
     locator: PropTypes.object,
-  }).isRequired,
+  }),
 });

@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from sqlalchemy.dialects.postgresql import JSONB
+import yaml
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
@@ -45,11 +45,13 @@ class ReceiptTemplate(db.Model):
     )
     css = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default='',
     )
-    custom_fields = db.Column(
-        JSONB,
-        nullable=False
+    yaml = db.Column(
+        db.String,
+        nullable=False,
+        default='',
     )
     default_filename = db.Column(
         db.String,
@@ -92,6 +94,11 @@ class ReceiptTemplate(db.Model):
     @owner.comparator
     def owner(cls):
         return _OwnerComparator(cls)
+
+    @property
+    def custom_fields(self):
+        data = yaml.safe_load(self.yaml) or {}
+        return data.get('custom_fields', [])
 
     @locator_property
     def locator(self):

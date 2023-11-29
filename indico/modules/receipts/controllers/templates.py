@@ -153,9 +153,7 @@ class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
 
     @use_kwargs(ReceiptTemplateAPISchema)
     def _process(self, title, default_filename, html, css, yaml):
-        if yaml is None:
-            yaml = {'custom_fields': []}
-        template = ReceiptTemplate(title=title, html=html, css=css, custom_fields=yaml['custom_fields'],
+        template = ReceiptTemplate(title=title, html=html, css=css, yaml=yaml,
                                    default_filename=default_filename, **self.target_dict)
         db.session.flush()
         return jsonify(ReceiptTemplateDBSchema().dump(template))
@@ -175,10 +173,7 @@ class RHEditTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
     @use_args(ReceiptTemplateAPISchema)
     def _process(self, data):
-        yaml = data.pop('yaml', None)
-        for key, value in data.items():
-            setattr(self.template, key, value)
-        self.template.custom_fields = yaml['custom_fields'] if yaml else []
+        self.template.populate_from_dict(data)
         self.template.log(self.template.log_realm, LogKind.change, 'Templates',
                           f'Document template "{self.template.title}" updated', user=session.user)
 
@@ -201,13 +196,13 @@ class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
 
     @use_kwargs({
         'html': fields.String(required=True, validate=validate.Length(3)),
-        'css': fields.String(load_default=''),
-        'yaml': YAML(ReceiptTplMetadataSchema, load_default=None, allow_none=True),
+        'css': fields.String(required=True),
+        'yaml': YAML(ReceiptTplMetadataSchema, required=True),
     })
     def _process(self, html, css, yaml):
         g.template_stack = [TemplateStackEntry(None)]
         # Just some dummy data to test the template
-        dummy_data = _generate_dummy_data(self.target, yaml.get('custom_fields', []) if yaml else [])
+        dummy_data = _generate_dummy_data(self.target, yaml.get('custom_fields', []))
         compiled_html = compile_jinja_code(
             html,
             use_stack=True,
@@ -252,7 +247,7 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
             title=new_title,
             html=self.template.html,
             css=self.template.css,
-            custom_fields=self.template.custom_fields,
+            yaml=self.template.yaml,
             default_filename=self.template.default_filename,
             **self.target_dict
         )

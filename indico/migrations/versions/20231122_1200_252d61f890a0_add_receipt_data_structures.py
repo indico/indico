@@ -26,7 +26,7 @@ def upgrade():
         sa.Column('category_id', sa.Integer(), nullable=True, index=True),
         sa.Column('html', sa.String(), nullable=False),
         sa.Column('css', sa.String(), nullable=False),
-        sa.Column('custom_fields', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column('yaml', sa.String(), nullable=False),
         sa.Column('default_filename', sa.String(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.CheckConstraint('(event_id IS NULL) != (category_id IS NULL)', name='event_xor_category_id_null'),

@@ -528,25 +528,38 @@ class SortedList(fields.List):
 
 
 class YAML(I18nAwareField):
-    """Marshmallow field for well-formed YAML data."""
+    """Marshmallow field for well-formed YAML data.
+
+    :param schema: A marshmallow schema to validate against
+    :param keep_text: Whether to transform the YAML to a Python object
+                      (and vice versa) or keep it as a YAML string.
+    """
 
     default_error_messages = {
+        'invalid_type': _('Data must be a string'),
         'invalid_yaml': _('YAML syntax is invalid'),
+        'invalid_toplevel_type': _('The top-level YAML entity must be a mapping'),
         'invalid_metadata': _('The metadata contained within the YAML code is invalid: {error}')
     }
 
-    def __init__(self, schema: Schema, **kwargs):
+    def __init__(self, schema: Schema, *, keep_text: bool = False, **kwargs):
         self.schema = schema
+        self.keep_text = keep_text
         super().__init__(**kwargs)
 
     def _serialize(self, value, attr, obj, **kwargs):
-        return yaml.safe_dump(value)
+        return value if self.keep_text else yaml.safe_dump(value)
 
     def _deserialize(self, value, attr, data, **kwargs):
+        if not isinstance(value, str):
+            raise self.make_error('invalid_type')
         try:
-            data = yaml.safe_load(value)
+            # we allow empty yaml data (the schema can deal with it)
+            data = yaml.safe_load(value if value.strip() else '{}')
+            if not isinstance(data, dict):
+                raise self.make_error('invalid_toplevel_type')
             if error := self.schema().validate(data):
                 raise self.make_error('invalid_metadata', error=error)
-            return data
+            return value if self.keep_text else data
         except yaml.YAMLError:
             raise self.make_error('invalid_yaml')

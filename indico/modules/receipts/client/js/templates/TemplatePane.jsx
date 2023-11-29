@@ -72,7 +72,7 @@ TemplatePane.propTypes = {
 };
 
 TemplatePane.defaultProps = {
-  template: {},
+  template: {html: '', css: '', yaml: ''},
   editorHeight: 800,
   add: false,
 };

@@ -23,7 +23,6 @@ import {
   FinalSubmitButton,
   FinalUnloadPrompt,
   formatters,
-  parsers as p,
 } from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import Nexus from 'indico/react/util/Nexus';
@@ -121,7 +120,7 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
               key={fileExt}
               name={fileExt}
               initialValue={template[fileExt]}
-              parse={p.nullIfEmpty}
+              parse={v => v}
             >
               {({input, meta}) => (
                 <>

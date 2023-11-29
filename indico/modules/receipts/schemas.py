@@ -7,7 +7,6 @@
 
 from copy import deepcopy
 
-import yaml
 from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
 from marshmallow_oneofschema import OneOfSchema
 
@@ -78,7 +77,7 @@ class CustomFieldSchema(mm.Schema):
 
 
 class ReceiptTplMetadataSchema(mm.Schema):
-    custom_fields = fields.Nested(CustomFieldSchema(many=True))
+    custom_fields = fields.List(fields.Nested(CustomFieldSchema), load_default=lambda: [])
 
 
 class ReceiptTemplateTypeSchema(mm.Schema):
@@ -92,17 +91,16 @@ class ReceiptTemplateDBSchema(mm.SQLAlchemyAutoSchema):
         model = ReceiptTemplate
         fields = ('id', 'title', 'html', 'css', 'custom_fields', 'default_filename', 'yaml', 'owner')
 
-    yaml = fields.Function(lambda tpl: (yaml.safe_dump({'custom_fields': tpl.custom_fields}, sort_keys=False)
-                                        if tpl.custom_fields else None))
     owner = fields.Nested(OwnerDataSchema)
+    custom_fields = fields.List(fields.Dict())
 
 
 class ReceiptTemplateAPISchema(mm.Schema):
     title = fields.String(required=True, validate=validate.Length(3))
     default_filename = fields.String(load_default='')
     html = fields.String(required=True, validate=validate.Length(3))
-    css = fields.String(load_default='')
-    yaml = YAML(ReceiptTplMetadataSchema, load_default=None, allow_none=True)
+    css = fields.String(required=True)
+    yaml = YAML(ReceiptTplMetadataSchema, keep_text=True, required=True, allow_none=True)
 
     @post_load
     def ensure_filename_is_slug(self, data, **kwargs):

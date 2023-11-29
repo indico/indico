@@ -21,14 +21,14 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 @pytest.fixture
 def dummy_event_template(db, dummy_event):
-    tpl = ReceiptTemplate(title='Dummy', event=dummy_event, html='Test', css='', custom_fields={})
+    tpl = ReceiptTemplate(title='Dummy', event=dummy_event, html='Test')
     db.session.flush()
     return tpl
 
 
 @pytest.fixture
 def dummy_category_template(db, dummy_category):
-    tpl = ReceiptTemplate(title='Dummy', category=dummy_category, html='Test', css='', custom_fields={})
+    tpl = ReceiptTemplate(title='Dummy', category=dummy_category, html='Test')
     db.session.flush()
     return tpl
 

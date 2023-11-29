@@ -59,7 +59,7 @@ class RHAllEventTemplates(RHManageRegFormsBase):
         schema = ReceiptTemplateDBSchema(only=('id', 'title', 'custom_fields', 'default_filename'), many=True)
         inherited_templates = schema.dump(get_inherited_templates(self.event))
         own_templates = schema.dump(self.event.receipt_templates)
-        templates = inherited_templates + own_templates
+        templates = sorted(inherited_templates + own_templates, key=lambda x: x['title'].lower())
         for tpl in templates:
             if defaults := receipt_defaults.get(self.event, f"custom_fields:{tpl['id']}"):
                 self._apply_event_defaults(tpl, defaults)
