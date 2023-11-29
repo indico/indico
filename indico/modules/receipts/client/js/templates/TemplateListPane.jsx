@@ -88,7 +88,10 @@ function TemplateRow({
             <Icon name="eye" color="blue" title={Translate.string('Preview template')} />
           </a>
           {!inherited && (
-            <Link to={templateURL({template_id: id, ...targetLocator})}>
+            <Link
+              to={templateURL({template_id: id, ...targetLocator})}
+              onClick={evt => evt.target.dispatchEvent(new Event('indico:closeAutoTooltip'))}
+            >
               <Icon name="edit" color="blue" title={Translate.string('Edit template')} />
             </Link>
           )}
@@ -103,15 +106,16 @@ function TemplateRow({
               name="trash"
               color="red"
               title={Translate.string('Delete template')}
-              onClick={() =>
+              onClick={evt => {
+                evt.target.dispatchEvent(new Event('indico:closeAutoTooltip'));
                 setConfirmPrompt({
                   header: title,
                   content: Translate.string('Would you like to delete this template?'),
                   confirmButton: Translate.string('Yes'),
                   cancelButton: Translate.string('No'),
                   onConfirm: () => deleteTemplate(id),
-                })
-              }
+                });
+              }}
             />
           )}
         </div>
