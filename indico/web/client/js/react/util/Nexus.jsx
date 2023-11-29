@@ -50,6 +50,9 @@ export default function Nexus({children, target, overrides, open}) {
       return;
     }
     const timer = setInterval(() => {
+      if (!nodeRef.current) {
+        return;
+      }
       const newRect = nodeRef.current.getBoundingClientRect();
       if (lastRect.current && !rectsEqual(newRect, lastRect.current)) {
         placeholderCallback(nodeRef.current);
