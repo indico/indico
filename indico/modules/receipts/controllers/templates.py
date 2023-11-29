@@ -19,6 +19,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import Event
 from indico.modules.events.util import check_event_locked
 from indico.modules.logs.models.entries import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import (ReceiptTemplateAPISchema, ReceiptTemplateDBSchema,
                                              ReceiptTplMetadataSchema, TemplateDataSchema)
@@ -156,6 +157,9 @@ class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
         template = ReceiptTemplate(title=title, html=html, css=css, yaml=yaml,
                                    default_filename=default_filename, **self.target_dict)
         db.session.flush()
+        template.log(template.log_realm, LogKind.positive, 'Templates',
+                     f'Document template "{template.title}" created',
+                     user=session.user, data={'HTML': html, 'CSS': css, 'YAML': yaml})
         return jsonify(ReceiptTemplateDBSchema().dump(template))
 
 
@@ -173,9 +177,17 @@ class RHEditTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
     @use_args(ReceiptTemplateAPISchema)
     def _process(self, data):
-        self.template.populate_from_dict(data)
-        self.template.log(self.template.log_realm, LogKind.change, 'Templates',
-                          f'Document template "{self.template.title}" updated', user=session.user)
+        if changes := self.template.populate_from_dict(data):
+            log_fields = {
+                'title': {'title': 'Title', 'type': 'string'},
+                'default_filename': {'title': 'Default filename', 'type': 'string'},
+                'html': 'HTML',
+                'css': 'CSS',
+                'yaml': 'YAML',
+            }
+            self.template.log(self.template.log_realm, LogKind.change, 'Templates',
+                              f'Document template "{self.template.title}" updated', user=session.user,
+                              data={'Changes': make_diff_log(changes, log_fields)})
 
 
 class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
