@@ -13,7 +13,7 @@ import _ from 'lodash';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
-import {Form as FinalForm} from 'react-final-form';
+import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {Link} from 'react-router-dom';
 import {Button, Form, Message} from 'semantic-ui-react';
 
@@ -21,6 +21,7 @@ import {
   FinalField,
   FinalInput,
   FinalSubmitButton,
+  FinalUnloadPrompt,
   formatters,
   parsers as p,
 } from 'indico/react/forms';
@@ -73,6 +74,18 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
     >
       {({handleSubmit, values}) => (
         <Form onSubmit={handleSubmit} subscription={{dirty: true}}>
+          <FormSpy subscription={{dirtyFieldsSinceLastSubmit: true}}>
+            {/*
+               The form stays dirty when we submit for creation so we need to disable the unload
+               prompt if there were no chances since submitting it. For editing we just use the
+               standard behavior since the dirty flag is properly cleared.
+            */}
+            {({dirtyFieldsSinceLastSubmit}) =>
+              (!!template.owner || Object.values(dirtyFieldsSinceLastSubmit).some(x => x)) && (
+                <FinalUnloadPrompt router />
+              )
+            }
+          </FormSpy>
           <Form.Group widths="equal">
             <FinalInput
               name="title"
