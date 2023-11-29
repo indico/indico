@@ -788,7 +788,7 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
 class RHManageReceiptBase(RHManageRegistrationBase):
     normalize_url_spec = {
         'locators': {
-            lambda self: self.receipt_file.locator.filename
+            lambda self: self.receipt_file
         }
     }
 
@@ -807,19 +807,17 @@ class RHManageReceiptBase(RHManageRegistrationBase):
 class RHDownloadReceipt(RHManageReceiptBase):
     """Download a receipt file from a registration."""
 
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.receipt_file.locator.filename
+        }
+    }
+
     def _process(self):
         return self.receipt_file.file.send()
 
 
-class RHPublishReceiptBase(RHManageReceiptBase):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.receipt_file
-        }
-    }
-
-
-class RHPublishReceipt(RHPublishReceiptBase):
+class RHPublishReceipt(RHManageReceiptBase):
     """Publish a receipt to a registration."""
 
     def _process(self):
@@ -841,7 +839,7 @@ class RHPublishReceipt(RHPublishReceiptBase):
                             disabled_until_change=False)
 
 
-class RHUnpublishReceipt(RHPublishReceiptBase):
+class RHUnpublishReceipt(RHManageReceiptBase):
     """Unpublish a receipt from a registration."""
 
     def _process(self):

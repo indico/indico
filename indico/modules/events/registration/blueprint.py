@@ -89,7 +89,7 @@ _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/unpublish',
     'unpublish_receipt', reglists.RHUnpublishReceipt, methods=('POST',))
 _bp.add_url_rule(
-    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/<filename>',
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/',
     'delete_receipt', reglists.RHDeleteReceipt, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  reglists.RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
