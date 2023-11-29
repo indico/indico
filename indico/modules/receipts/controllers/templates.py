@@ -141,14 +141,15 @@ class RHReceiptTemplatesManagementBase(RHProtected):
 
 
 class RHEventTemplatesManagement(TemplateListMixin, RHManageEventBase):
-    pass
+    """Display the template management page for an event."""
 
 
 class RHCategoryTemplatesManagement(TemplateListMixin, RHManageCategoryBase):
-    pass
+    """Display the template management page for a category."""
 
 
 class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
+    """Add a new template."""
 
     @use_kwargs(ReceiptTemplateAPISchema)
     def _process(self, title, default_filename, html, css, yaml):
@@ -161,6 +162,8 @@ class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
 
 
 class RHDeleteTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
+    """Delete a template."""
+
     def _process(self):
         self.template.is_deleted = True
         self.template.log(self.template.log_realm, LogKind.negative, 'Templates',
@@ -168,6 +171,8 @@ class RHDeleteTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
 
 class RHEditTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
+    """Update a template."""
+
     @use_args(ReceiptTemplateAPISchema)
     def _process(self, data):
         yaml = data.pop('yaml', None)
@@ -179,6 +184,8 @@ class RHEditTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
 
 class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
+    """Preview a template with dummy data."""
+
     def _process(self):
         # Just some dummy data to test the template
         html = compile_jinja_code(
@@ -190,6 +197,7 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
 
 class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
+    """Preview a template while editing it."""
 
     @use_kwargs({
         'html': fields.String(required=True, validate=validate.Length(3)),
@@ -213,6 +221,8 @@ class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
 
 
 class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
+    """Clone a template into the current target location."""
+
     def _process(self):
         base_title = self.template.title
         max_index = 0
