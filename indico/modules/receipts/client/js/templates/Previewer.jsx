@@ -21,7 +21,7 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import './Previewer.module.scss';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `/dist/js/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `/dist/js/pdf.worker-${pdfjs.version}.min.js`;
 
 const MESSAGE_HEADERS = {
   yaml: Translate.string('YAML Metadata'),

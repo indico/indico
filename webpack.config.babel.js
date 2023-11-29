@@ -10,6 +10,7 @@ import path from 'path';
 // eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import glob from 'glob';
+import {pdfjs} from 'react-pdf';
 import {minify} from 'uglify-js';
 import webpack from 'webpack';
 import {customizeArray, mergeWithCustomize} from 'webpack-merge';
@@ -143,7 +144,7 @@ export default env => {
           {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
           {
             from: path.resolve(modulesDir, 'pdfjs-dist/build/pdf.worker.min.js'),
-            to: 'js/pdf.worker.min.js',
+            to: `js/pdf.worker-${pdfjs.version}.min.js`,
           },
         ],
       }),
