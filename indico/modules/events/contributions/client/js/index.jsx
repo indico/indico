@@ -426,14 +426,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   global.setupDraftModeWarning = function setupDraftModeWarning() {
     const warning = document.querySelector('#draft-mode-warning');
-    const button = document.querySelector('#draft-mode-warning-button');
-    if (warning && button) {
+    const buttonContainer = document.querySelector('#draft-mode-warning-button-container');
+    if (warning && buttonContainer) {
       ReactDOM.render(
         <PublicationButton
-          eventId={button.dataset.eventId}
+          eventId={buttonContainer.dataset.eventId}
           onSuccess={() => warning.classList.add('hidden')}
         />,
-        button
+        buttonContainer
       );
     }
   };
