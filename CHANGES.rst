@@ -65,6 +65,7 @@ Bugfixes
 - Disallow switching the repeat frequency of an existing room booking from weekly to monthly
   or vice versa (:pr:`5999`)
 - Ignore deleted fields when computing the number of occupied slots for a registration (:pr:`6035`)
+- Show the description of a subcontribution in conference events (:issue:`5946`, :pr:`6056`)
 
 Accessibility
 ^^^^^^^^^^^^^
