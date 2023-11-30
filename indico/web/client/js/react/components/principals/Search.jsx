@@ -173,6 +173,7 @@ const searchFactory = config => {
     onAdd,
     onRemove,
     existsInEvent,
+    external,
     avatarURL,
   }) => {
     const avatar = avatarURL ? (
@@ -194,6 +195,14 @@ const searchFactory = config => {
                 <Popup
                   content={Translate.string('Person exists in event')}
                   trigger={<Icon name="ticket" styleName="event-person" corner="top right" />}
+                  offset={[-15, 0]}
+                  position="top left"
+                />
+              )}
+              {external && (
+                <Popup
+                  content={Translate.string('Person does not have an Indico account yet')}
+                  trigger={<Icon name="external" styleName="event-person" corner="top right" />}
                   offset={[-15, 0]}
                   position="top left"
                 />
@@ -247,6 +256,7 @@ const searchFactory = config => {
                 onAdd={() => onAdd(r)}
                 onRemove={() => onRemove(r)}
                 existsInEvent={r.existsInEvent}
+                external={r.type === 'user' && r.userId === null}
                 avatarURL={r.avatarURL}
               />
             ))}

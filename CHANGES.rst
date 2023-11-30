@@ -55,6 +55,7 @@ Improvements
   (:pr:`6049`)
 - Add document templates to generate PDF receipts, certificates, and similar documents for
   event participants (:pr:`5123`)
+- Show which persons are external in the user search dialog (:pr:`6074`)
 
 Bugfixes
 ^^^^^^^^
