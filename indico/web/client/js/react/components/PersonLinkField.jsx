@@ -366,7 +366,7 @@ function PersonLinkField({
             triggerFactory={props => (
               <Button type="button" {...props}>
                 <Icon name="search" />
-                <Translate>Add from Search</Translate>
+                <Translate>Add from search</Translate>
               </Button>
             )}
             withExternalUsers
