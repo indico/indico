@@ -13,6 +13,7 @@ import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from copy import deepcopy
+from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from urllib.parse import urlsplit
@@ -694,6 +695,9 @@ class ZipGeneratorMixin:
     def _iter_items(self, files_holder):
         yield from files_holder
 
+    def _get_item_path(self, item):
+        return item.get_local_path()
+
     def _generate_zip_file(self, files_holder, name_prefix='material', name_suffix=None, return_file=False):
         """Generate a zip file containing the files passed.
 
@@ -709,8 +713,11 @@ class ZipGeneratorMixin:
             for item in self._iter_items(files_holder):
                 name = self._prepare_folder_structure(item)
                 self.used_filenames.add(name)
-                with item.get_local_path() as filepath:
-                    zip_handler.write(filepath, name)
+                with self._get_item_path(item) as filepath:
+                    if isinstance(filepath, BytesIO):
+                        zip_handler.writestr(name, filepath.getvalue())
+                    else:
+                        zip_handler.write(filepath, name)
 
         zip_file_name = f'{name_prefix}-{name_suffix}.zip' if name_suffix else f'{name_prefix}.zip'
         chmod_umask(temp_file.name)

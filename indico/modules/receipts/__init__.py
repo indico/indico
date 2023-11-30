@@ -37,12 +37,30 @@ def _category_sidemenu_items(sender, category, **kwargs):
 
 
 @signals.event.registrant_list_action_menu.connect
-def _get_action_menu_items(reg_form, **kwargs):
+def _get_action_menu_items(regform, **kwargs):
+    # TODO: only show this if document templates are available
     yield ActionMenuEntry(
         _('Generate Documents'),
         'agreement',
         type='callback',
         callback='printReceipts',
-        params={'event_id': reg_form.event_id},
+        params={'event_id': regform.event_id},
         weight=70
+    )
+    # TODO: only show this if document templates are available or some registrations have documents
+    yield ActionMenuEntry(
+        _('Download Documents (Single PDF)'),
+        'agreement',
+        type='href-custom',
+        url=url_for('.registrations_receipts_export', regform, combined=1),
+        extra_classes='js-submit-list-form regform-download-documents',
+        weight=69,  # 😏 (pure coincidence, really!) i needed "right after 'generate'" which happened to be 70
+    )
+    yield ActionMenuEntry(
+        _('Download Documents (Separate PDFs)'),
+        'agreement',
+        type='href-custom',
+        url=url_for('.registrations_receipts_export', regform),
+        extra_classes='js-submit-list-form regform-download-documents',
+        weight=68,
     )

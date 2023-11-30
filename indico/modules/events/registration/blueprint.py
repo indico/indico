@@ -113,6 +113,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in'
                  reglists.RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments', 'registrations_attachments_export',
                  reglists.RHRegistrationsExportAttachments, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/receipts', 'registrations_receipts_export',
+                 reglists.RHRegistrationsExportReceipts, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/config', 'registrations_config_badges',
                  reglists.RHRegistrationsConfigBadges, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/config', 'registrations_config_tickets',

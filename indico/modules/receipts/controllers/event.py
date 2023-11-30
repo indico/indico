@@ -213,9 +213,9 @@ class RHExportReceipts(ZipGeneratorMixin, RHManageRegFormsBase):
     """Export an archive of multiple receipts."""
 
     def _prepare_folder_structure(self, file):
-        registration = file.receipt_file.registration
-        registrant_name = f'{registration.get_full_name()}_{registration.friendly_id}'
-        file_name = secure_filename(f'{file.id}_{registrant_name}_{file.filename}', f'{file.id}_document.pdf')
+        reg = file.receipt_file.registration
+        registrant_name = f'{reg.get_full_name()}_{reg.friendly_id}'
+        file_name = secure_filename(f'{registrant_name}_{file.id}_{file.filename}', f'{file.id}_document.pdf')
         return os.path.join(*self._adjust_path_length([file_name]))
 
     def _iter_items(self, receipts):

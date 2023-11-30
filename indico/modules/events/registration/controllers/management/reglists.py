@@ -5,13 +5,17 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import dataclasses
 import itertools
 import os
 import uuid
+from collections import defaultdict
+from contextlib import contextmanager
 from io import BytesIO
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, render_template, request, session
+from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -757,7 +761,7 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
-class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):
+class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportBase):
     """Export registration attachments in a zip file."""
 
     def _prepare_folder_structure(self, attachment):
@@ -783,6 +787,89 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
             if attachments_for_registration:
                 attachments[registration.id] = attachments_for_registration
         return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.regform.id)
+
+
+@dataclasses.dataclass
+class _FileWrapper:
+    content: BytesIO
+    filename: str
+
+
+# TODO: Try to merge this with RHExportReceipts (and maybe use a nice react dialog
+# to choose what to export). This would allow to get rid of all the ugly hacks to
+# merge the PDFs and then feed them to the with the ZIP generator.
+# It would also allow users to actually choose receipts from which template they
+# want to export instead of always exporting everything, and maybe even an option
+# to filter based on the 'published' flag.
+class RHRegistrationsExportReceipts(ZipGeneratorMixin, RHRegistrationsActionBase):
+    """Export registration receipts in a zip file."""
+
+    ALLOW_LOCKED = True
+
+    def _prepare_folder_structure(self, data):
+        if isinstance(data, _FileWrapper):
+            return os.path.join(*self._adjust_path_length([data.filename]))
+        else:
+            template_prefixes, file = data
+            reg = file.receipt_file.registration
+            registrant_name = f'{reg.get_full_name()}_{reg.friendly_id}'
+            file_name = secure_filename(f'{registrant_name}_{file.id}_{file.filename}', f'{file.id}_document.pdf')
+            return os.path.join(*self._adjust_path_length([*template_prefixes, file_name]))
+
+    def _iter_items(self, receipts_by_template):
+        for template, receipts in receipts_by_template.items():
+            if not self.combined:
+                for receipt in receipts:
+                    yield [f'{template.title}-{template.id}'], receipt.file
+                continue
+            output = PdfWriter()
+            for receipt in receipts:
+                with receipt.file.open() as fd:
+                    output.append(fd)
+            outputbuf = BytesIO()
+            output.write(outputbuf)
+            outputbuf.seek(0)
+            yield _FileWrapper(outputbuf, f'{template.title}-{template.id}.pdf')
+
+    @contextmanager
+    def _get_item_path(self, item):
+        if isinstance(item, _FileWrapper):
+            yield item.content
+            return
+
+        with item[1].get_local_path() as path:
+            yield path
+
+    @use_kwargs({
+        'combined': fields.Bool(load_default=False),
+    }, location='query')
+    def _process_args(self, combined):
+        RHRegistrationsExportBase._process_args(self)
+        self.combined = combined
+        receipts = (ReceiptFile.query
+                    .filter(~ReceiptFile.is_deleted,
+                            ReceiptFile.registration_id.in_(r.id for r in self.registrations))
+                    .order_by(ReceiptFile.template_id,
+                              ReceiptFile.registration_id,
+                              ReceiptFile.file_id)
+                    .all())
+        self.receipts_by_template = defaultdict(list)
+        for receipt in receipts:
+            self.receipts_by_template[receipt.template].append(receipt)
+
+    def _process(self):
+        if self.combined and len(self.receipts_by_template) == 1:
+            receipts = next(iter(self.receipts_by_template.values()))
+            output = PdfWriter()
+            for receipt in receipts:
+                with receipt.file.open() as fd:
+                    output.append(fd)
+            outputbuf = BytesIO()
+            output.write(outputbuf)
+            outputbuf.seek(0)
+            return send_file('documents.pdf', outputbuf, 'application/pdf')
+
+        return self._generate_zip_file(self.receipts_by_template, 'documents')
 
 
 class RHManageReceiptBase(RHManageRegistrationBase):
