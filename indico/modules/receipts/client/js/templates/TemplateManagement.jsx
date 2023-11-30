@@ -114,7 +114,12 @@ function NewTemplatePane({dispatch, targetLocator}) {
     }
   };
 
-  return <TemplatePane onSubmit={createTemplate} targetLocator={targetLocator} add />;
+  return (
+    <>
+      <ManagementPageBackButton url={templateListURL(targetLocator)} />
+      <TemplatePane onSubmit={createTemplate} targetLocator={targetLocator} add />
+    </>
+  );
 }
 
 NewTemplatePane.propTypes = {
