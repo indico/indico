@@ -229,7 +229,8 @@ class RHExportReceipts(ZipGeneratorMixin, RHManageRegFormsBase):
         RHManageRegFormsBase._process_args(self)
         self.receipts = (ReceiptFile.query
                          .filter(ReceiptFile.file_id.in_(receipt_ids),
-                                 ReceiptFile.registration.has(event=self.event))
+                                 ReceiptFile.registration.has(event=self.event),
+                                 ~ReceiptFile.is_deleted)
                          .all())
 
     def _process(self):
