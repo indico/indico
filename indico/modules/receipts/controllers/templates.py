@@ -118,7 +118,8 @@ class ReceiptTemplateMixin(ReceiptAreaMixin):
         # Check that template belongs to this event or a category that is a parent
         if self.template.owner == self.target:
             return
-        valid_category_ids = self.target.category_chain or [Category.get_root().id]
+        category_chain = self.target.chain_ids if isinstance(self.target, Category) else self.target.category_chain
+        valid_category_ids = category_chain or [Category.get_root().id]
         if self.template.owner.id not in valid_category_ids:
             raise Forbidden
 
