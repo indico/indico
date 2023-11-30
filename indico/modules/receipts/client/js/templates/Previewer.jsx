@@ -49,29 +49,7 @@ const processPlaceholders = placeholderData =>
 
 const debounce = makeAsyncDebounce(250);
 
-export default function Previewer(props) {
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    (async () => {
-      // this is a very large module, so we lazy-load it only when we actually want to use
-      // the previewer.
-      // await import('pdfjs-dist/webpack');
-      // XXX for some reason loading it like this causes randomly failing renders (with no error)
-      // which I think is caused by worker reuse (with the URL set above, it appears to be a new
-      // worker for each re-render of the PDF)
-      setLoading(false);
-    })();
-  }, []);
-
-  return loading ? <Loader active /> : <PreviewerDisplay {...props} />;
-}
-
-Previewer.propTypes = {
-  url: PropTypes.string.isRequired,
-  data: PropTypes.object.isRequired,
-};
-
-function PreviewerDisplay({url, data}) {
+export default function Previewer({url, data}) {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -156,4 +134,7 @@ function PreviewerDisplay({url, data}) {
   );
 }
 
-PreviewerDisplay.propTypes = Previewer.propTypes;
+Previewer.propTypes = {
+  url: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
+};
