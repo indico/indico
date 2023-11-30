@@ -26,6 +26,7 @@ from indico.util.packaging import package_is_editable
 from indico.util.string import crc32, snakify
 
 
+# Note: Whenever you add/change something here, you MUST update the docs (settings.rst) as well
 DEFAULTS = {
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},

@@ -359,6 +359,20 @@ Customization
 
     Default: ``{}``
 
+.. data:: CHECKIN_APP_URL
+
+    The URL of the mobile checkin app. The app is purely client-side and only
+    communicates with your Indico instance, so even when using the default app
+    (which is hosted in CERN's datacenter in Switzerland) no data about your
+    events or participants is sent to CERN, the Indico dev team or anyone else.
+    If you wish to use a custom app nonetheless, you can find its
+    `source code on GitHub <https://github.com/indico/indico-checkin-pwa/>`_ and
+    deploy it wherever you want. Note that you need to add the URL of the app
+    to the *"Allowed authorization callback URLs"* of the OAuth app named
+    "Checkin App" in the Indico admin area.
+
+    Default: ``'https://checkin.getindico.io'``
+
 
 Database
 --------
