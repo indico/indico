@@ -49,7 +49,7 @@ const judgmentOptions = [
   },
   {
     value: EditingReviewAction.update,
-    text: Translate.string('Make changes'),
+    text: Translate.string('Request approval'),
     color: 'yellow',
     class: 'needs-submitter-confirmation',
   },
