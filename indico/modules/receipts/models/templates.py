@@ -113,7 +113,7 @@ class ReceiptTemplate(db.Model):
         return self.owner.log(*args, meta={'receipt_template_id': self.id}, **kwargs)
 
     def __repr__(self):
-        return format_repr(self, 'id', 'event_id', 'category_id', _text=self.title)
+        return format_repr(self, 'id', 'event_id', 'category_id', is_deleted=False, _text=self.title)
 
 
 class _OwnerComparator(Comparator):

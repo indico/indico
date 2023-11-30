@@ -80,7 +80,7 @@ class ReceiptFile(db.Model):
     )
 
     def __repr__(self):
-        return format_repr(self, 'file_id', 'registration_id', 'template_id')
+        return format_repr(self, 'file_id', 'registration_id', 'template_id', is_deleted=False)
 
     @locator_property
     def locator(self):
