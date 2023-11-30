@@ -9,7 +9,7 @@ from flask import session
 
 from indico.core import signals
 from indico.modules.events.registration.util import ActionMenuEntry
-from indico.modules.receipts.util import can_user_manage_receipt_templates
+from indico.modules.receipts.util import can_user_manage_receipt_templates, has_any_receipts, has_any_templates
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -38,29 +38,32 @@ def _category_sidemenu_items(sender, category, **kwargs):
 
 @signals.event.registrant_list_action_menu.connect
 def _get_action_menu_items(regform, **kwargs):
-    # TODO: only show this if document templates are available
-    yield ActionMenuEntry(
-        _('Generate Documents'),
-        'agreement',
-        type='callback',
-        callback='printReceipts',
-        params={'event_id': regform.event_id},
-        weight=70
-    )
-    # TODO: only show this if document templates are available or some registrations have documents
-    yield ActionMenuEntry(
-        _('Download Documents (Single PDF)'),
-        'agreement',
-        type='href-custom',
-        url=url_for('.registrations_receipts_export', regform, combined=1),
-        extra_classes='js-submit-list-form regform-download-documents',
-        weight=69,  # 😏 (pure coincidence, really!) i needed "right after 'generate'" which happened to be 70
-    )
-    yield ActionMenuEntry(
-        _('Download Documents (Separate PDFs)'),
-        'agreement',
-        type='href-custom',
-        url=url_for('.registrations_receipts_export', regform),
-        extra_classes='js-submit-list-form regform-download-documents',
-        weight=68,
-    )
+    has_templates = has_any_templates(regform.event)
+    if has_templates:
+        yield ActionMenuEntry(
+            _('Generate Documents'),
+            'agreement',
+            type='callback',
+            callback='printReceipts',
+            params={'event_id': regform.event_id},
+            weight=70
+        )
+    # show download options even if there are no files, because the disabled option indicates
+    # to event organizers that the possibility to bulk-download them exists
+    if has_templates or has_any_receipts(regform):
+        yield ActionMenuEntry(
+            _('Download Documents (Single PDF)'),
+            'agreement',
+            type='href-custom',
+            url=url_for('.registrations_receipts_export', regform, combined=1),
+            extra_classes='js-submit-list-form regform-download-documents',
+            weight=69,  # 😏 (pure coincidence, really!) i needed "right after 'generate'" which happened to be 70
+        )
+        yield ActionMenuEntry(
+            _('Download Documents (Separate PDFs)'),
+            'agreement',
+            type='href-custom',
+            url=url_for('.registrations_receipts_export', regform),
+            extra_classes='js-submit-list-form regform-download-documents',
+            weight=68,
+        )

@@ -15,6 +15,7 @@ from flask import g
 from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
+from sqlalchemy.sql import or_
 from weasyprint import CSS, HTML, default_url_fetcher
 from werkzeug.exceptions import UnprocessableEntity
 
@@ -24,6 +25,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
 from indico.util.date_time import format_date, format_datetime, format_time, now_utc
@@ -74,6 +76,23 @@ def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
     category = obj.category if isinstance(obj, Event) else obj
     return set(ReceiptTemplate.query.filter(~ReceiptTemplate.is_deleted,
                                             ReceiptTemplate.category_id.in_(categ['id'] for categ in category.chain)))
+
+
+def has_any_templates(event: Event) -> bool:
+    """Check if any receipt templates are available for the event."""
+    return (ReceiptTemplate.query
+            .filter(~ReceiptTemplate.is_deleted,
+                    or_(ReceiptTemplate.category_id.in_(categ['id'] for categ in event.category.chain),
+                        ReceiptTemplate.event == event))
+            .has_rows())
+
+
+def has_any_receipts(regform: RegistrationForm) -> bool:
+    """Check if any receipts have been generated available for the regform."""
+    return (ReceiptFile.query
+            .filter(ReceiptFile.registration.has(is_deleted=False, registration_form=regform),
+                    ~ReceiptFile.is_deleted)
+            .has_rows())
 
 
 def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
