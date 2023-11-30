@@ -40,6 +40,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
+from indico.util.signals import make_interceptable
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_kwargs, use_rh_args
@@ -180,12 +181,7 @@ class RHCreateBooking(RHRoomBookingBase):
             raise ExpectedError(msg)
 
         try:
-            resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
-                                                ignore_admin=(not admin_override))
-            with track_location_changes():
-                if args.get('link_type') is not None and args.get('link_id') is not None:
-                    self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
-                db.session.flush()
+            resv = self.create_reservation(args, ignore_admin=not admin_override)
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(str(e))
@@ -196,6 +192,23 @@ class RHCreateBooking(RHRoomBookingBase):
         else:
             data = {'bookings': serialized_occurrences}
         return jsonify(room_id=self.room.id, booking=reservation_details_schema.dump(resv), calendar_data=data)
+
+    @make_interceptable
+    def create_reservation(self, args, ignore_admin: bool) -> 'Reservation':
+        """Create a Reservation from the given data."""
+        resv = Reservation.create_from_data(
+            self.room,
+            args,
+            session.user,
+            prebook=self.prebook,
+            ignore_admin=ignore_admin,
+        )
+
+        with track_location_changes():
+            if args.get('link_type') is not None and args.get('link_id') is not None:
+                self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
+            db.session.flush()
+        return resv
 
 
 class RHRoomSuggestions(RHRoomBookingBase):

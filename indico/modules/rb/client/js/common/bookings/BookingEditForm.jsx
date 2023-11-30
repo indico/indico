@@ -27,6 +27,7 @@ import {
 import {FavoritesProvider} from 'indico/react/hooks';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {selectors as configSelectors} from '../../common/config';
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
@@ -384,6 +385,7 @@ class BookingEditForm extends React.Component {
             disabled={submitSucceeded}
           />
         </Segment>
+        {renderPluginComponents('rb-form-extra_fields', {})}
 
         {room.canUserViewInternalNotes && (
           <Segment inverted styleName="internal-notes-segment">

@@ -28,6 +28,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid, serializeTime} from 'indico/utils/date';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {openModal} from '../../actions';
 import {BookingObjectLink} from '../../common/bookings';
@@ -625,6 +626,7 @@ class BookRoomModal extends React.Component {
                     required={requireReason}
                   />
                 </Segment>
+                {renderPluginComponents('rb-form-extra_fields', {})}
                 {!link &&
                   !fprops.submitSucceeded &&
                   this.renderRelatedEventsDropdown(
