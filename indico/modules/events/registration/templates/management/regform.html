@@ -138,6 +138,14 @@
 
                 <div class="toolbar">
                     <div class="group">
+                        <a id="checkin-app-link" class="icon-link"
+                           style="margin-right:1em;{{ 'display: none;' if not regform.tickets_enabled }}"
+                           href="{{ indico_config.CHECKIN_APP_URL }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           title="{% trans %}Use the app to manage the check-in status of the participants{% endtrans %}">
+                            {% trans %}Open the Check-in App{% endtrans %}
+                        </a>
                         <button id="qr-code" class="i-button icon-qrcode"
                            style="{{ 'display: none;' if not regform.tickets_enabled }}"
                            data-href="{{ url_for('.tickets_qrcode', regform) }}"
@@ -167,7 +175,8 @@
     <script>
         (function() {
             'use strict';
-            var qrCodeButton = $('#qr-code');
+            const qrCodeButton = $('#qr-code');
+            const checkinAppLink = $('#checkin-app-link');
             qrCodeButton.qbubble({
                 content: {
                     text: function() {
@@ -184,6 +193,7 @@
             $('#qr-code-config').on('ajaxDialog:closed', function(evt, data) {
                 if (data) {
                     qrCodeButton.toggle(data.tickets_enabled);
+                    checkinAppLink.toggle(data.tickets_enabled);
                 }
             });
         })();

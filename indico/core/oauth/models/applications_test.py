@@ -36,7 +36,7 @@ def test_reset_client_secret(dummy_application):
     (['https://test.com'],                          'https://test.com',       True),
     (['https://test.com'],                          'http://test.com',        False),
     (['https://test.com'],                          'https://scam.com',       False),
-    (['https://test.com/'],                         'https://test.com',       False),
+    (['https://test.com/'],                         'https://test.com',       True),
     (['https://test.com/'],                         'https://test.com/',      True),
     (['https://test.com/'],                         'https://test.com/?id=1', True),
     (['https://test.com/a'],                        'https://test.com/a/b',   True),

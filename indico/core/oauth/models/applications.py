@@ -24,7 +24,6 @@ class SystemAppType(IndicoIntEnum):
 
     __enforced_data__ = {
         checkin: {'allowed_scopes': {'registrants'},
-                  'redirect_uris': ['http://localhost'],
                   'allow_pkce_flow': True,
                   'is_enabled': True},
     }
@@ -33,7 +32,10 @@ class SystemAppType(IndicoIntEnum):
         checkin: {'is_trusted': True,
                   'name': 'Checkin App',
                   'description': 'The checkin app for mobile devices allows scanning ticket QR codes and '
-                                 'checking-in event participants.'},
+                                 'checking-in event participants.',
+                  'redirect_uris': ['https://checkin.getindico.io/',  # new Check-in app
+                                    'http://localhost']},  # old Check-in app
+                                                           # TODO: remove together with the deprecated check-in API
     }
 
     @property
@@ -165,7 +167,7 @@ class OAuthApplication(ClientMixin, db.Model):
         uri_data = urlsplit(redirect_uri)
         for valid_uri_data in map(urlsplit, self.redirect_uris):
             if (uri_data.scheme == valid_uri_data.scheme and uri_data.netloc == valid_uri_data.netloc and
-                    uri_data.path.startswith(valid_uri_data.path)):
+                    uri_data.path.rstrip('/').startswith(valid_uri_data.path.rstrip('/'))):
                 return True
         return False
 

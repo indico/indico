@@ -59,6 +59,16 @@
                         It cannot be deleted and certain attributes cannot be changed.
                     {%- endtrans -%}
                 {%- endcall %}
+
+                {% if application.system_app_type.name == 'checkin' and not application.check_redirect_uri(indico_config.CHECKIN_APP_URL) %}
+                    {% call message_box('warning') -%}
+                        {%- trans setting_name='CHECKIN_APP_URL', app_url=indico_config.CHECKIN_APP_URL -%}
+                            The <code>{{ setting_name }}</code> in your <code>indico.conf</code> file is set to
+                            <code>{{ app_url }}</code>, but this URL is not in the list of allowed URLs below. This is
+                            almost certainly an error and you should add it to the list or the check-in app will not work.
+                        {%- endtrans -%}
+                    {%- endcall %}
+                {% endif %}
             {% endif %}
 
             <dl class="i-data-list dt-select-disabled">

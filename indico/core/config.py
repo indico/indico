@@ -26,6 +26,7 @@ from indico.util.packaging import package_is_editable
 from indico.util.string import crc32, snakify
 
 
+# Note: Whenever you add/change something here, you MUST update the docs (settings.rst) as well
 DEFAULTS = {
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
@@ -35,6 +36,7 @@ DEFAULTS = {
     'CELERY_BROKER': None,
     'CELERY_CONFIG': {},
     'CELERY_RESULT_BACKEND': None,
+    'CHECKIN_APP_URL': 'https://checkin.getindico.io',
     'COMMUNITY_HUB_URL': 'https://hub.getindico.io',
     'CUSTOMIZATION_DEBUG': False,
     'CUSTOMIZATION_DIR': None,
