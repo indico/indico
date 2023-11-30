@@ -166,7 +166,7 @@ export default function ReceiptTemplateManagement({initialState, targetLocator})
           <Route
             exact
             path={routerPathFromFlask(templateListURL, targetIdParams)}
-            component={() => (
+            render={() => (
               <TemplateListPane dispatch={dispatch} targetLocator={targetLocator} {...state} />
             )}
           />

@@ -15,11 +15,11 @@ import templatePreviewURL from 'indico-url:receipts.template_preview';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Button, Confirm, Icon, Label} from 'semantic-ui-react';
+import {Button, Icon, Label} from 'semantic-ui-react';
 
-import {handleSubmitError} from 'indico/react/forms';
+import {RequestConfirmDelete} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 import {targetLocatorSchema, templateSchema} from './util';
 
@@ -28,7 +28,7 @@ import './TemplateListPane.module.scss';
 function TemplateRow({
   template: {id, type, title, owner},
   dispatch,
-  setConfirmPrompt,
+  setDeletePrompt,
   targetLocator,
   inherited,
 }) {
@@ -37,7 +37,8 @@ function TemplateRow({
       await indicoAxios.delete(deleteTemplateURL({template_id: id, ...targetLocator}));
       dispatch({type: 'DELETE_TEMPLATE', id});
     } catch (err) {
-      return handleSubmitError(err);
+      handleAxiosError(err);
+      return true;
     }
   };
 
@@ -48,7 +49,7 @@ function TemplateRow({
       );
       dispatch({type: 'ADD_TEMPLATE', template: clonedTemplate});
     } catch (err) {
-      return handleSubmitError(err);
+      handleAxiosError(err);
     }
   };
 
@@ -71,7 +72,7 @@ function TemplateRow({
         )}
       </td>
       <td className="text-superfluous">
-        {!!inherited && (
+        {inherited && (
           <Translate>
             from category{' '}
             <Param
@@ -101,19 +102,16 @@ function TemplateRow({
             title={Translate.string('Clone template')}
             onClick={() => cloneTemplate(id)}
           />
-          {!inherited && (
+          {!inherited && setDeletePrompt && (
             <Icon
               name="trash"
               color="red"
               title={Translate.string('Delete template')}
               onClick={evt => {
                 evt.target.dispatchEvent(new Event('indico:closeAutoTooltip'));
-                setConfirmPrompt({
-                  header: title,
-                  content: Translate.string('Would you like to delete this template?'),
-                  confirmButton: Translate.string('Yes'),
-                  cancelButton: Translate.string('No'),
-                  onConfirm: () => deleteTemplate(id),
+                setDeletePrompt({
+                  title,
+                  func: () => deleteTemplate(id),
                 });
               }}
             />
@@ -127,13 +125,14 @@ function TemplateRow({
 TemplateRow.propTypes = {
   template: templateSchema.isRequired,
   dispatch: PropTypes.func.isRequired,
-  setConfirmPrompt: PropTypes.func.isRequired,
+  setDeletePrompt: PropTypes.func,
   targetLocator: targetLocatorSchema.isRequired,
   inherited: PropTypes.bool,
 };
 
 TemplateRow.defaultProps = {
   inherited: false,
+  setDeletePrompt: null,
 };
 
 export default function TemplateListPane({
@@ -142,20 +141,19 @@ export default function TemplateListPane({
   targetLocator,
   dispatch,
 }) {
-  const [confirmPrompt, setConfirmPrompt] = useState(null);
+  const [deletePrompt, setDeletePrompt] = useState(null);
   return (
     <>
-      {confirmPrompt !== null && (
-        <Confirm
-          open
-          content={confirmPrompt.content}
-          header={confirmPrompt.header}
-          confirmButton={confirmPrompt.confirmButton}
-          cancelButton={confirmPrompt.cancelButton}
-          onConfirm={confirmPrompt.onConfirm}
-          onCancel={() => setConfirmPrompt(null)}
-        />
-      )}
+      <RequestConfirmDelete
+        onClose={() => setDeletePrompt(null)}
+        requestFunc={deletePrompt?.func || (() => null)}
+        open={deletePrompt !== null}
+      >
+        <Translate>
+          Are you sure you want to delete the template{' '}
+          <Param name="template" value={deletePrompt?.title} wrapper={<strong />} />?
+        </Translate>
+      </RequestConfirmDelete>
       {!!inheritedTemplates.length && (
         <section>
           <h3>
@@ -168,7 +166,6 @@ export default function TemplateListPane({
                   key={tpl.id}
                   template={tpl}
                   dispatch={dispatch}
-                  setConfirmPrompt={setConfirmPrompt}
                   targetLocator={targetLocator}
                   inherited
                 />
@@ -201,7 +198,7 @@ export default function TemplateListPane({
                   key={tpl.id}
                   template={tpl}
                   dispatch={dispatch}
-                  setConfirmPrompt={setConfirmPrompt}
+                  setDeletePrompt={setDeletePrompt}
                   targetLocator={targetLocator}
                 />
               ))}
