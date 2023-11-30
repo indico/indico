@@ -53,6 +53,7 @@ class File(StoredFileMixin, db.Model):
     # relationship backrefs:
     # - custom_boa_of (Event.custom_boa)
     # - editing_revision_files (EditingRevisionFile.file)
+    # - receipt_file (ReceiptFile.file)
 
     def claim(self):
         """Mark the file as claimed by some object it's linked to.
@@ -77,6 +78,11 @@ class File(StoredFileMixin, db.Model):
     def signed_download_url(self):
         return url_for('files.download_file', uuid=self.uuid,
                        token=secure_serializer.dumps(self.uuid.hex, salt='file-download'), _external=True)
+
+    def as_attachment(self):
+        """Return the file as an attachment in the format expected by the util `make_email`."""
+        with self.open() as f:
+            return secure_filename(self.filename, 'file'), f.read(), self.content_type
 
     def __repr__(self):
         return format_repr(self, 'id', 'uuid', 'content_type', _text=self.filename)

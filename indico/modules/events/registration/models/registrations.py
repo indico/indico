@@ -300,6 +300,7 @@ class Registration(db.Model):
     # relationship backrefs:
     # - invitation (RegistrationInvitation.registration)
     # - legacy_mapping (LegacyRegistrationMapping.registration)
+    # - receipt_files (ReceiptFile.registration)
     # - registration_form (RegistrationForm.registrations)
     # - transactions (PaymentTransaction.registration)
 
@@ -560,6 +561,10 @@ class Registration(db.Model):
                  .join(RegistrationFormFieldData)
                  .filter(RegistrationFormFieldData.field.has(input_type='accompanying_persons')))
         return list(itertools.chain.from_iterable(d.data for d in query.all() if not d.field_data.field.is_deleted))
+
+    @property
+    def published_receipts(self):
+        return [receipt for receipt in self.receipt_files if receipt.is_published]
 
     @classproperty
     @classmethod
@@ -843,6 +848,7 @@ class RegistrationData(StoredFileMixin, db.Model):
 def _mapper_configured():
     from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
     from indico.modules.events.registration.models.items import RegistrationFormItem
+    from indico.modules.receipts.models.files import ReceiptFile
 
     @listens_for(Registration.registration_form, 'set')
     def _set_event_id(target, value, *unused):
@@ -879,3 +885,10 @@ def _mapper_configured():
              .correlate_except(RegistrationData)
              .scalar_subquery())
     Registration.num_accompanying_persons = column_property(query, deferred=True)
+
+    query = (select([db.func.coalesce(db.func.count(ReceiptFile.file_id), 0)])
+             .where(db.and_(ReceiptFile.registration_id == Registration.id,
+                            ~ReceiptFile.is_deleted))
+             .correlate_except(ReceiptFile)
+             .scalar_subquery())
+    Registration.num_receipt_files = column_property(query, deferred=True)

@@ -170,6 +170,12 @@
       max-width: 1000px !important;
     }
   }
+
+  &.ultra-wide {
+    .page-content {
+      max-width: 1600px !important;
+    }
+  }
 }
 
 .fixed-width-standalone-page {

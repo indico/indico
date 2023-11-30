@@ -26,6 +26,14 @@ import {$T} from 'indico/utils/i18n';
           );
         })
         .trigger('change');
+      $('table.i-table input.select-row')
+        .on('change', function() {
+          $('.regform-download-documents').toggleClass(
+            'disabled',
+            !$('.list input:checkbox:checked[data-has-documents=true]').length
+          );
+        })
+        .trigger('change');
     }
 
     $('body').on('click', '#preview-email', function() {
@@ -121,5 +129,7 @@ import {$T} from 'indico/utils/i18n';
         }
       },
     });
+
+    handleRegListRowSelection();
   };
 })(window);

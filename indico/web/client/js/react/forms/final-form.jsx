@@ -91,10 +91,12 @@ export function FinalModalForm({
   extraActions,
   disabledUntilChange,
   disabledAfterSubmit,
+  keepDirtyOnReinitialize,
   unloadPrompt,
   unloadPromptRouter,
   alignTop,
   submitLabel,
+  noSubmitButton,
   className,
   decorators,
   validate,
@@ -118,6 +120,7 @@ export function FinalModalForm({
       initialValuesEqual={initialValuesEqual}
       decorators={decorators}
       validate={validate}
+      keepDirtyOnReinitialize={keepDirtyOnReinitialize}
     >
       {fprops => (
         <Modal
@@ -147,12 +150,14 @@ export function FinalModalForm({
           </Modal.Content>
           <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
             {_.isFunction(extraActions) ? extraActions(fprops) : extraActions}
-            <FinalSubmitButton
-              form={`final-modal-form-${id}`}
-              label={submitLabel || Translate.string('Submit')}
-              disabledUntilChange={disabledUntilChange}
-              disabledAfterSubmit={disabledAfterSubmit}
-            />
+            {!noSubmitButton && (
+              <FinalSubmitButton
+                form={`final-modal-form-${id}`}
+                label={submitLabel || Translate.string('Submit')}
+                disabledUntilChange={disabledUntilChange}
+                disabledAfterSubmit={disabledAfterSubmit}
+              />
+            )}
             <Form.Field disabled={fprops.submitting}>
               <Button onClick={onClose} disabled={fprops.submitting}>
                 {fprops.dirty && !(fprops.submitSucceeded && disabledAfterSubmit) ? (
@@ -205,6 +210,8 @@ FinalModalForm.propTypes = {
   disabledUntilChange: PropTypes.bool,
   /** Whether to disable the submit button after the form is successfully submitted once. */
   disabledAfterSubmit: PropTypes.bool,
+  /** Whether to keep the form dirty after reinitializing it. */
+  keepDirtyOnReinitialize: PropTypes.bool,
   /**
    * Whether to ask the user to confirm when unloading the page or closing the dialog using
    * anything but the explicit cancel button.
@@ -219,6 +226,8 @@ FinalModalForm.propTypes = {
   alignTop: PropTypes.bool,
   /** A custom label for the submit button. */
   submitLabel: PropTypes.string,
+  /** Whether to render the form without a submit button. */
+  noSubmitButton: PropTypes.bool,
   /** Additional CSS classes to set on the SUI Form. */
   className: PropTypes.string,
   /**
@@ -246,10 +255,12 @@ FinalModalForm.defaultProps = {
   scrolling: false,
   disabledUntilChange: true,
   disabledAfterSubmit: false,
+  keepDirtyOnReinitialize: false,
   unloadPrompt: false,
   unloadPromptRouter: false,
   alignTop: false,
   submitLabel: null,
+  noSubmitButton: false,
   className: null,
   extraActions: null,
   style: null,

@@ -53,6 +53,8 @@ Improvements
   (:issue:`5905`, :pr:`6025`)
 - Stop overwhelmingly showing past events in the 'Events at hand' section in the user dashboard
   (:pr:`6049`)
+- Add document templates to generate PDF receipts, certificates, and similar documents for
+  event participants (:pr:`5123`)
 
 Bugfixes
 ^^^^^^^^

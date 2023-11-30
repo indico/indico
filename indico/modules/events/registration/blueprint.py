@@ -79,6 +79,18 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'manage_withdraw_registration', reglists.RHRegistrationManageWithdraw, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
                  'registration_check_in', reglists.RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/<filename>',
+    'download_receipt', reglists.RHDownloadReceipt)
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/publish',
+    'publish_receipt', reglists.RHPublishReceipt, methods=('GET', 'POST'))
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/unpublish',
+    'unpublish_receipt', reglists.RHUnpublishReceipt, methods=('POST',))
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/',
+    'delete_receipt', reglists.RHDeleteReceipt, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
                  reglists.RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email-preview', 'email_registrants_preview',
@@ -101,6 +113,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in'
                  reglists.RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments', 'registrations_attachments_export',
                  reglists.RHRegistrationsExportAttachments, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/receipts', 'registrations_receipts_export',
+                 reglists.RHRegistrationsExportReceipts, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/config', 'registrations_config_badges',
                  reglists.RHRegistrationsConfigBadges, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/config', 'registrations_config_tickets',
@@ -198,6 +212,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', 
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  display.RHRegistrationFormDeclineInvitation, methods=('POST',))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', display.RHTicketDownload)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/receipts/<int:file_id>/<filename>', 'receipt_download_display',
+                 display.RHReceiptDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
                  display.RHRegistrationAvatar)
 

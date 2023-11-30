@@ -5,13 +5,17 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import dataclasses
 import itertools
 import os
 import uuid
+from collections import defaultdict
+from contextlib import contextmanager
 from io import BytesIO
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, render_template, request, session
+from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -37,11 +41,12 @@ from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
-                                                      EmailRegistrantsForm, ImportRegistrationsForm,
+                                                      EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
                                                       RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
-from indico.modules.events.registration.notifications import notify_registration_state_update
+from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
+                                                              notify_registration_state_update)
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
                                                      generate_spreadsheet_from_registrations,
@@ -51,6 +56,7 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -755,7 +761,7 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
-class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMixin):
+class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportBase):
     """Export registration attachments in a zip file."""
 
     def _prepare_folder_structure(self, attachment):
@@ -781,3 +787,168 @@ class RHRegistrationsExportAttachments(RHRegistrationsExportBase, ZipGeneratorMi
             if attachments_for_registration:
                 attachments[registration.id] = attachments_for_registration
         return self._generate_zip_file(attachments, name_prefix='attachments', name_suffix=self.regform.id)
+
+
+@dataclasses.dataclass
+class _FileWrapper:
+    content: BytesIO
+    filename: str
+
+
+# TODO: Try to merge this with RHExportReceipts (and maybe use a nice react dialog
+# to choose what to export). This would allow to get rid of all the ugly hacks to
+# merge the PDFs and then feed them to the with the ZIP generator.
+# It would also allow users to actually choose receipts from which template they
+# want to export instead of always exporting everything, and maybe even an option
+# to filter based on the 'published' flag.
+class RHRegistrationsExportReceipts(ZipGeneratorMixin, RHRegistrationsActionBase):
+    """Export registration receipts in a zip file."""
+
+    ALLOW_LOCKED = True
+
+    def _prepare_folder_structure(self, data):
+        if isinstance(data, _FileWrapper):
+            return os.path.join(*self._adjust_path_length([data.filename]))
+        else:
+            template_prefixes, file = data
+            reg = file.receipt_file.registration
+            registrant_name = f'{reg.get_full_name()}_{reg.friendly_id}'
+            file_name = secure_filename(f'{registrant_name}_{file.id}_{file.filename}', f'{file.id}_document.pdf')
+            return os.path.join(*self._adjust_path_length([*template_prefixes, file_name]))
+
+    def _iter_items(self, receipts_by_template):
+        for template, receipts in receipts_by_template.items():
+            if not self.combined:
+                for receipt in receipts:
+                    yield [f'{template.title}-{template.id}'], receipt.file
+                continue
+            output = PdfWriter()
+            for receipt in receipts:
+                with receipt.file.open() as fd:
+                    output.append(fd)
+            outputbuf = BytesIO()
+            output.write(outputbuf)
+            outputbuf.seek(0)
+            yield _FileWrapper(outputbuf, f'{template.title}-{template.id}.pdf')
+
+    @contextmanager
+    def _get_item_path(self, item):
+        if isinstance(item, _FileWrapper):
+            yield item.content
+            return
+
+        with item[1].get_local_path() as path:
+            yield path
+
+    @use_kwargs({
+        'combined': fields.Bool(load_default=False),
+    }, location='query')
+    def _process_args(self, combined):
+        RHRegistrationsExportBase._process_args(self)
+        self.combined = combined
+        receipts = (ReceiptFile.query
+                    .filter(~ReceiptFile.is_deleted,
+                            ReceiptFile.registration_id.in_(r.id for r in self.registrations))
+                    .order_by(ReceiptFile.template_id,
+                              ReceiptFile.registration_id,
+                              ReceiptFile.file_id)
+                    .all())
+        self.receipts_by_template = defaultdict(list)
+        for receipt in receipts:
+            self.receipts_by_template[receipt.template].append(receipt)
+
+    def _process(self):
+        if self.combined and len(self.receipts_by_template) == 1:
+            receipts = next(iter(self.receipts_by_template.values()))
+            output = PdfWriter()
+            for receipt in receipts:
+                with receipt.file.open() as fd:
+                    output.append(fd)
+            outputbuf = BytesIO()
+            output.write(outputbuf)
+            outputbuf.seek(0)
+            return send_file('documents.pdf', outputbuf, 'application/pdf')
+
+        return self._generate_zip_file(self.receipts_by_template, 'documents')
+
+
+class RHManageReceiptBase(RHManageRegistrationBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.receipt_file
+        }
+    }
+
+    def _process_args(self):
+        RHManageRegistrationBase._process_args(self)
+        self.receipt_file = (ReceiptFile.query
+                             .with_parent(self.registration)
+                             .filter_by(file_id=request.view_args['file_id'])
+                             .first_or_404())
+
+    def _render_receipts_list(self):
+        tpl_summary = get_template_module('events/registration/display/_registration_summary_blocks.html')
+        return tpl_summary.render_receipts_list(self.registration, from_management=True)
+
+
+class RHDownloadReceipt(RHManageReceiptBase):
+    """Download a receipt file from a registration."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.receipt_file.locator.filename
+        }
+    }
+
+    def _process(self):
+        return self.receipt_file.file.send()
+
+
+class RHPublishReceipt(RHManageReceiptBase):
+    """Publish a receipt to a registration."""
+
+    def _process(self):
+        if self.receipt_file.is_published:
+            return jsonify_data()
+        form = PublishReceiptForm()
+        if form.validate_on_submit():
+            self.receipt_file.is_published = True
+            flash(_("Document '{}' successfully published").format(self.receipt_file.file.filename), 'success')
+            logger.info('Document %r from registration %r was published by %r', self.receipt_file.file.filename,
+                        self.registration, session.user)
+            notify_registration_receipt_created(self.registration, self.receipt_file,
+                                                notify_user=form.notify_user.data)
+            self.registration.log(EventLogRealm.management, LogKind.change, 'Documents',
+                                  f'Document "{self.receipt_file.file.filename}" published', session.user,
+                                  data={'Notified': form.notify_user.data})
+            return jsonify_data(html=self._render_receipts_list())
+        return jsonify_form(form, submit=_('Publish'), back=_('Cancel'), footer_align_right=True,
+                            disabled_until_change=False)
+
+
+class RHUnpublishReceipt(RHManageReceiptBase):
+    """Unpublish a receipt from a registration."""
+
+    def _process(self):
+        if not self.receipt_file.is_published:
+            return jsonify_data()
+        self.receipt_file.is_published = False
+        flash(_("Document '{}' successfully unpublished").format(self.receipt_file.file.filename), 'success')
+        logger.info('Document %r from registration %r was unpublished by %r', self.receipt_file.file.filename,
+                    self.registration, session.user)
+        self.registration.log(EventLogRealm.management, LogKind.change, 'Documents',
+                              f'Document "{self.receipt_file.file.filename}" unpublished', session.user)
+        return jsonify_data(html=self._render_receipts_list())
+
+
+class RHDeleteReceipt(RHManageReceiptBase):
+    """Delete a receipt from a registration."""
+
+    def _process(self):
+        self.receipt_file.is_deleted = True
+        db.session.flush()
+        logger.info('Document file %s deleted by %s', self.receipt_file, session.user)
+        self.registration.log(EventLogRealm.management, LogKind.negative, 'Documents',
+                              f'Document "{self.receipt_file.file.filename}" deleted', session.user)
+        flash(_("Document '{}' successfully deleted").format(self.receipt_file.file.filename), 'success')
+        return jsonify_data(html=self._render_receipts_list())

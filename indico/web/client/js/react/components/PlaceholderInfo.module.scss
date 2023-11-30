@@ -6,19 +6,33 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'base/borders' as *;
 
 .placeholder-info {
   margin: 0;
   padding: 0;
   list-style: none;
 
+  li:not(:last-child) {
+    margin-bottom: 0.3em;
+  }
+
   code {
+    @include default-border-radius();
     font-style: normal;
     font-size: 0.9em;
+    border: 1px solid $pastel-gray;
+    background: $light-gray;
+    padding: 0.1em;
+  }
+
+  .description {
+    user-select: none;
   }
 
   .required {
     font-style: italic;
     margin-left: 0.2em;
+    user-select: none;
   }
 }

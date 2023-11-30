@@ -238,6 +238,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - legacy_mapping (LegacyCategoryMapping.category)
     # - log_entries (CategoryLogEntry.event)
     # - parent (Category.children)
+    # - receipt_templates (ReceiptTemplate.category)
     # - roles (CategoryRole.category)
     # - settings (CategorySetting.category)
     # - suggestions (SuggestedCategory.category)

@@ -12,6 +12,7 @@ from flask_webpackext.ext import _FlaskWebpackExtState
 
 from indico.web.flask.app import make_app
 from indico.web.flask.wrappers import IndicoFlask
+from indico.web.rh import RH
 
 
 @pytest.fixture(scope='session')
@@ -71,3 +72,9 @@ def test_client(make_test_client):
     """Create a flask test client."""
     with make_test_client() as c:
         yield c
+
+
+@pytest.fixture
+def no_csrf_check(mocker):
+    """Disable the request-level CSRF check."""
+    mocker.patch.object(RH, '_check_csrf')

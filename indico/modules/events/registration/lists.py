@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import request
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from indico.core.db import db
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -83,6 +83,13 @@ class RegistrationListGenerator(ListGeneratorBase):
                 'filter_choices': registration_tag_choices,
                 'filter_only': True
             },
+            'receipts_present': {
+                'title': _('Has documents'),
+                'filter_choices': {
+                    '0': _('No'),
+                    '1': _('Yes')
+                }
+            },
         }
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
                                'phone', 'country')
@@ -149,7 +156,8 @@ class RegistrationListGenerator(ListGeneratorBase):
                 .with_parent(self.regform)
                 .filter(~Registration.is_deleted)
                 .options(joinedload('data').joinedload('field_data').joinedload('field'),
-                         joinedload('tags'))
+                         joinedload('tags'),
+                         undefer('num_receipt_files'))
                 .order_by(db.func.lower(Registration.last_name), db.func.lower(Registration.first_name)))
 
     def _filter_list_entries(self, query, filters):
@@ -193,6 +201,12 @@ class RegistrationListGenerator(ListGeneratorBase):
         if 'tags_absent' in filters['items']:
             tag_ids = [int(tag_id) for tag_id in filters['items']['tags_absent']]
             items_criteria.append(~Registration.tags.any(RegistrationTag.id.in_(tag_ids)))
+
+        if 'receipts_present' in filters['items']:
+            receipts_present_values = filters['items']['receipts_present']
+            # If both values 'true' and 'false' are selected, there's no point in filtering
+            if len(receipts_present_values) == 1:
+                items_criteria.append(Registration.receipt_files.any() == bool(int(receipts_present_values[0])))
 
         if field_filters:
             subquery = (RegistrationData.query
