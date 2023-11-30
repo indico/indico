@@ -4,7 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
+import typing
 import uuid
 from datetime import date, datetime, time
 
@@ -181,10 +181,16 @@ class RHCreateBooking(RHRoomBookingBase):
             raise ExpectedError(msg)
 
         try:
-            resv = self.create_reservation(args, ignore_admin=not admin_override)
+            resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
+                                                ignore_admin=(not admin_override))
+            with track_location_changes():
+                if args.get('link_type') is not None and args.get('link_id') is not None:
+                    self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
+                db.session.flush()
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(str(e))
+        self.after_create(args, reservation=resv)
 
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
@@ -193,22 +199,15 @@ class RHCreateBooking(RHRoomBookingBase):
             data = {'bookings': serialized_occurrences}
         return jsonify(room_id=self.room.id, booking=reservation_details_schema.dump(resv), calendar_data=data)
 
+    @staticmethod
     @make_interceptable
-    def create_reservation(self, args, ignore_admin: bool) -> 'Reservation':
-        """Create a Reservation from the given data."""
-        resv = Reservation.create_from_data(
-            self.room,
-            args,
-            session.user,
-            prebook=self.prebook,
-            ignore_admin=ignore_admin,
-        )
-
-        with track_location_changes():
-            if args.get('link_type') is not None and args.get('link_id') is not None:
-                self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
-            db.session.flush()
-        return resv
+    def after_create(args: dict[str, typing.Any], reservation: 'Reservation') -> None:
+        """
+        Hook called after a reservation is created.
+        :param args: The data from the request that was used to create the Reservation
+        :param reservation: The Reservation object that was created
+        """
+        pass
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
@@ -356,6 +355,7 @@ class RHUpdateBooking(RHBookingBase):
 
         check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 
+        new_booking: typing.Optional['Reservation'] = None
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)
@@ -368,10 +368,27 @@ class RHUpdateBooking(RHBookingBase):
             additional_booking_attrs['new_booking_id'] = new_booking.id
 
         db.session.flush()
+        self.after_update(args, reservation=self.booking, new_split_reservation=new_booking)
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
         return jsonify(booking=(serialize_booking_details(self.booking) | additional_booking_attrs),
                        room_calendar=list(serialize_availability(calendar).values()))
+
+    @staticmethod
+    @make_interceptable
+    def after_update(
+            args: dict[str, typing.Any],
+            reservation: 'Reservation',
+            new_split_reservation: typing.Optional['Reservation'] = None,
+            **kwargs,
+    ) -> None:
+        """Hook called after a reservation is updated.
+
+        :param args: The data from the request that was used to update the Reservation
+        :param reservation: The Reservation object that was updated
+        :param new_split_reservation: The new Reservation that was created by splitting the original one
+        """
+        pass
 
 
 class RHMyUpcomingBookings(RHRoomBookingBase):
