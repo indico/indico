@@ -167,7 +167,7 @@ class OAuthApplication(ClientMixin, db.Model):
         uri_data = urlsplit(redirect_uri)
         for valid_uri_data in map(urlsplit, self.redirect_uris):
             if (uri_data.scheme == valid_uri_data.scheme and uri_data.netloc == valid_uri_data.netloc and
-                    uri_data.path.startswith(valid_uri_data.path)):
+                    uri_data.path.rstrip('/').startswith(valid_uri_data.path.rstrip('/'))):
                 return True
         return False
 
