@@ -131,10 +131,10 @@ export default function ReceiptTemplateManagement({initialState, targetLocator})
   const [state, dispatch] = useReducer(reducer, initialState);
   const targetIdParams = Object.keys(targetLocator);
 
-  // hide success messages after 5 seconds
+  // hide success messages after 2.5 seconds
   useEffect(() => {
     if (state.message) {
-      setTimeout(() => dispatch({type: 'RESET_MESSAGE'}), 5000);
+      setTimeout(() => dispatch({type: 'RESET_MESSAGE'}), 2500);
     }
   }, [state.message]);
 

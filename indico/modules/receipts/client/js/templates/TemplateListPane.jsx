@@ -101,7 +101,10 @@ function TemplateRow({
             name="clone"
             color="blue"
             title={Translate.string('Clone template')}
-            onClick={() => cloneTemplate(id)}
+            onClick={evt => {
+              evt.target.dispatchEvent(new Event('indico:closeAutoTooltip'));
+              cloneTemplate(id);
+            }}
           />
           {!inherited && setDeletePrompt && (
             <Icon
