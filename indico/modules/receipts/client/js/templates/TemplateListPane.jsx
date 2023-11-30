@@ -12,6 +12,7 @@ import templateURL from 'indico-url:receipts.template';
 import templateListURL from 'indico-url:receipts.template_list';
 import templatePreviewURL from 'indico-url:receipts.template_preview';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
@@ -161,7 +162,7 @@ export default function TemplateListPane({
           </h3>
           <table className="i-table-widget">
             <tbody>
-              {inheritedTemplates.map(tpl => (
+              {_.sortBy(inheritedTemplates, 'title').map(tpl => (
                 <TemplateRow
                   key={tpl.id}
                   template={tpl}
@@ -193,7 +194,7 @@ export default function TemplateListPane({
         {ownTemplates.length ? (
           <table className="i-table-widget">
             <tbody>
-              {ownTemplates.map(tpl => (
+              {_.sortBy(ownTemplates, 'title').map(tpl => (
                 <TemplateRow
                   key={tpl.id}
                   template={tpl}
