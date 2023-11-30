@@ -201,7 +201,7 @@ const searchFactory = config => {
               )}
               {external && (
                 <Popup
-                  content={Translate.string('Person does not yet have an Indico account')}
+                  content={Translate.string('Person does not have an Indico account yet')}
                   trigger={<Icon name="external" styleName="event-person" corner="top right" />}
                   offset={[-15, 0]}
                   position="top left"
