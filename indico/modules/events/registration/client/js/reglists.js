@@ -129,5 +129,7 @@ import {$T} from 'indico/utils/i18n';
         }
       },
     });
+
+    handleRegListRowSelection();
   };
 })(window);
