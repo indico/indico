@@ -315,9 +315,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                            '{num} emails were sent.', num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
 
-        ticket_template = self.regform.get_ticket_template()
-        registrations_without_ticket = [r for r in self.registrations if (ticket_template.is_ticket and
-                                                                          r.is_ticket_blocked)]
+        template_is_ticket = self.regform.get_ticket_template()        .is_ticket
+        registrations_without_ticket = [r for r in self.registrations if template_is_ticket and r.is_ticket_blocked]
         return jsonify_template('events/registration/management/email.html', form=form, regform=self.regform,
                                 all_registrations_count=len(self.registrations),
                                 registrations_without_ticket_count=len(registrations_without_ticket))
@@ -600,8 +599,8 @@ class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
         return str(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
 
     def _filter_registrations(self, registrations):
-        template = DesignerTemplate.get_or_404(self.template_id)
-        return [r for r in registrations if not template.is_ticket or not r.is_ticket_blocked]
+        template_is_ticket = DesignerTemplate.get_or_404(self.template_id).is_ticket
+        return [r for r in registrations if not template_is_ticket or not r.is_ticket_blocked]
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):
