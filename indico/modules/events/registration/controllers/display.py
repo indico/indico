@@ -454,7 +454,8 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         if (not self.regform.ticket_on_event_page and not self.regform.ticket_on_summary_page
                 and not self.regform.event.can_manage(session.user, 'registration')):
             raise Forbidden
-        if self.registration.is_ticket_blocked:
+        ticket_template = self.regform.get_ticket_template()
+        if ticket_template.is_ticket and self.registration.is_ticket_blocked:
             raise Forbidden
 
     def _process(self):

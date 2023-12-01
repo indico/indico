@@ -567,7 +567,16 @@ def get_registrations_with_tickets(user, event):
                      ~RegistrationForm.is_deleted,
                      ~Registration.is_deleted)
              .join(Registration.registration_form))
-    return [r for r in query if not r.is_ticket_blocked]
+
+    cached_templates = {}
+
+    def _is_ticket_blocked(registration):
+        regform = registration.registration_form
+        if regform not in cached_templates:
+            cached_templates[regform] = regform.get_ticket_template()
+        return cached_templates[regform].is_ticket and registration.is_ticket_blocked
+
+    return [r for r in query if not _is_ticket_blocked(r)]
 
 
 def get_published_registrations(event, is_participant):
@@ -753,10 +762,8 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
 
 
 def generate_ticket(registration):
-    from indico.modules.designer.util import get_default_ticket_on_category
     from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
-    template = (registration.registration_form.ticket_template or
-                get_default_ticket_on_category(registration.event.category))
+    template = registration.registration_form.get_ticket_template()
     registrations = [registration]
     signals.event.designer.print_badge_template.send(template, regform=registration.registration_form,
                                                      registrations=registrations)

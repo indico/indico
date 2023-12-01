@@ -285,8 +285,10 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                 template = get_template_module('events/registration/emails/custom_email.html',
                                                email_subject=email_subject, email_body=email_body)
                 bcc = [session.user.email] if form.copy_for_sender.data else []
+                ticket_template = self.regform.get_ticket_template()
+                is_ticket_blocked = ticket_template.is_ticket and registration.is_ticket_blocked
                 attach_ticket = (
-                    'attach_ticket' in form and form.attach_ticket.data and not registration.is_ticket_blocked
+                    'attach_ticket' in form and form.attach_ticket.data and not is_ticket_blocked
                 )
                 attachments = get_ticket_attachments(registration) if attach_ticket else None
                 email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
@@ -313,7 +315,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                            '{num} emails were sent.', num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
 
-        registrations_without_ticket = [r for r in self.registrations if r.is_ticket_blocked]
+        template_is_ticket = self.regform.get_ticket_template().is_ticket
+        registrations_without_ticket = [r for r in self.registrations if template_is_ticket and r.is_ticket_blocked]
         return jsonify_template('events/registration/management/email.html', form=form, regform=self.regform,
                                 all_registrations_count=len(self.registrations),
                                 registrations_without_ticket_count=len(registrations_without_ticket))
@@ -596,7 +599,8 @@ class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
         return str(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
 
     def _filter_registrations(self, registrations):
-        return [r for r in registrations if not r.is_ticket_blocked]
+        template_is_ticket = DesignerTemplate.get_or_404(self.template_id).is_ticket
+        return [r for r in registrations if not template_is_ticket or not r.is_ticket_blocked]
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):

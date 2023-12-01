@@ -519,6 +519,11 @@ class RegistrationForm(db.Model):
         if email:
             return Registration.query.with_parent(self).filter_by(email=email).filter(~Registration.is_deleted).first()
 
+    def get_ticket_template(self):
+        """Get the current ticket template or, if not set, the default category one."""
+        from indico.modules.designer.util import get_default_ticket_on_category
+        return self.ticket_template or get_default_ticket_on_category(self.event.category)
+
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
 
