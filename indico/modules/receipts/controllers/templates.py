@@ -89,6 +89,7 @@ def _generate_dummy_data(custom_fields: dict):
             'section_title': _('Extras'),
             'input_type': 'checkbox',
             'value': True,
+            'friendly_value': 'Yes',
             'field_data': {
                 'price': 50
             },

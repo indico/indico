@@ -194,6 +194,7 @@ def get_useful_registration_data(reg_form: RegistrationForm, registration: Regis
             'section_title': field.parent.title,
             'input_type': field.input_type,
             'value': value,
+            'friendly_value': data.get_friendly_data(for_humans=True),
             'field_data': field_data,
             'actual_price': data.price if data else None
         })

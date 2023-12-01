@@ -128,6 +128,7 @@ class FormFieldsSchema(mm.Schema):
     section_title = fields.String()
     value = fields.Boolean()
     field_data = fields.Dict()
+    friendly_value = fields.Raw()
     actual_price = fields.Number()
 
 
