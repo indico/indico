@@ -18,6 +18,7 @@ from jinja2.sandbox import SandboxedEnvironment
 from markupsafe import Markup
 from sqlalchemy.sql import or_
 from weasyprint import CSS, HTML, default_url_fetcher
+from webargs.flaskparser import abort
 from werkzeug.exceptions import UnprocessableEntity
 
 from indico.core.config import config
@@ -30,6 +31,7 @@ from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
 from indico.util.date_time import format_date, format_datetime, format_time, now_utc
+from indico.util.i18n import _
 
 
 logger = Logger.get('receipts')
@@ -159,7 +161,12 @@ def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     """
     css_url_fetcher = sandboxed_url_fetcher(event)
     html_url_fetcher = sandboxed_url_fetcher(event, allow_event_logo=True)
-    css = CSS(string=f'{css}{DEFAULT_CSS}', url_fetcher=css_url_fetcher)
+    try:
+        css = CSS(string=f'{css}{DEFAULT_CSS}', url_fetcher=css_url_fetcher)
+    except IndexError:
+        # error happens when parsing `flex: ;` in the stylesheet
+        # https://github.com/Kozea/WeasyPrint/issues/2012
+        abort(422, messages={'css': [_('Could not parse stylesheet')]})
     documents = [
         HTML(string=source, url_fetcher=html_url_fetcher).render(stylesheets=(css,))
         for source in html_sources
