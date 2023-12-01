@@ -137,3 +137,5 @@ class TemplateDataSchema(mm.Schema):
     total_price = fields.Number()
     currency = fields.String()
     formatted_price = fields.String()
+    registration_global_id = fields.Int()
+    registration_friendly_id = fields.Int()

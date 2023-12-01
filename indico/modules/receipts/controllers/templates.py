@@ -49,6 +49,8 @@ def _generate_dummy_data(event: Event, custom_fields: dict):
     return {
         'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
         'event': event,
+        'registration_global_id': 123456,
+        'registration_friendly_id': 42,
         'personal_data': {
             'title': 'Dr',
             'first_name': 'John',
