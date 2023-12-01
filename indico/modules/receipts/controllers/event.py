@@ -125,6 +125,7 @@ class RHPreviewReceipts(RenderReceiptsBase):
                 use_stack=True,
                 custom_fields=custom_fields,
                 event=self.event,
+                registration=registration,
                 **get_useful_registration_data(registration.registration_form, registration)
             ))
         del g.template_stack
@@ -152,6 +153,7 @@ class RHGenerateReceipts(RenderReceiptsBase):
                 use_stack=True,
                 custom_fields=custom_fields,
                 event=self.event,
+                registration=registration,
                 **get_useful_registration_data(registration.registration_form, registration)
             )
 

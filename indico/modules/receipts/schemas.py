@@ -12,6 +12,7 @@ from marshmallow_oneofschema import OneOfSchema
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.events import Event
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.util.marshmallow import YAML, not_empty
 from indico.util.string import slugify
@@ -140,14 +141,19 @@ class EventDataSchema(mm.SQLAlchemyAutoSchema):
     type = fields.String(attribute='_type.name')
 
 
+class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Registration
+        fields = ('id', 'friendly_id', 'submitted_dt')
+
+
 class TemplateDataSchema(mm.Schema):
     custom_fields = fields.Dict(keys=fields.String)
     personal_data = fields.Nested(PersonalDataFieldSchema)
     event = fields.Nested(EventDataSchema)
+    registration = fields.Nested(RegistrationDataSchema)
     _fields = fields.List(fields.Nested(FormFieldsSchema), attribute='fields', data_key='fields')
     base_price = fields.Number()
     total_price = fields.Number()
     currency = fields.String()
     formatted_price = fields.String()
-    registration_global_id = fields.Int()
-    registration_friendly_id = fields.Int()

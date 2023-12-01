@@ -192,8 +192,6 @@ def get_useful_registration_data(reg_form: RegistrationForm, registration: Regis
         })
 
     return {
-        'registration_global_id': registration.id,
-        'registration_friendly_id': registration.friendly_id,
         'personal_data': registration.get_personal_data(),
         'fields': fields,
         'base_price': registration.base_price,

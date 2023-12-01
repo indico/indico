@@ -66,6 +66,11 @@ def _generate_dummy_data(custom_fields: dict):
     return {
         'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
         'event': fake_event,
+        'registration': {
+            'id': 123456,
+            'friendly_id': 42,
+            'submitted_dt': datetime(2023, 12, 8, 12, 37, tzinfo=utc)
+        },
         'registration_global_id': 123456,
         'registration_friendly_id': 42,
         'personal_data': {
