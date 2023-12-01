@@ -7,16 +7,19 @@
 
 import base64
 import re
+from datetime import datetime
 
 from flask import g, jsonify, request, session
 from marshmallow import fields, validate
+from pytz import utc
 from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.models.events import Event
+from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.util import check_event_locked
 from indico.modules.logs.models.entries import LogKind
 from indico.modules.logs.util import make_diff_log
@@ -44,11 +47,25 @@ def _get_default_value(field):
     return field['attributes'].get('value', '')
 
 
-def _generate_dummy_data(event: Event, custom_fields: dict):
+def _generate_dummy_data(custom_fields: dict):
     """Generate some dummy data to be used as an example."""
+    fake_event = Event(
+        id=42,
+        category=Category.get_root(),
+        _type=EventType.conference,
+        title='How to build a Stargate',
+        own_venue_name='University Campus',
+        own_room_name='Main Auditorium',
+        own_address='Science Road 1\nCH-1234 Switzerland',
+        start_dt=datetime(2023, 12, 24, 16, tzinfo=utc),
+        end_dt=datetime(2023, 12, 24, 20, tzinfo=utc),
+        timezone=config.DEFAULT_TIMEZONE,
+    )
+    db.session.expunge(fake_event)  # setting a category adds it to the SA session
+    assert fake_event not in db.session
     return {
         'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
-        'event': event,
+        'event': fake_event,
         'registration_global_id': 123456,
         'registration_friendly_id': 42,
         'personal_data': {
@@ -200,7 +217,7 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
         # Just some dummy data to test the template
         html = compile_jinja_code(
             self.template.html,
-            **_generate_dummy_data(self.target, self.template.custom_fields)
+            **_generate_dummy_data(self.template.custom_fields)
         )
         pdf_data = create_pdf(self.target, [html], self.template.css)
         return send_file('receipt.pdf', pdf_data, 'application/pdf')
@@ -217,7 +234,7 @@ class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
     def _process(self, html, css, yaml):
         g.template_stack = [TemplateStackEntry(None)]
         # Just some dummy data to test the template
-        dummy_data = _generate_dummy_data(self.target, yaml.get('custom_fields', []))
+        dummy_data = _generate_dummy_data(yaml.get('custom_fields', []))
         compiled_html = compile_jinja_code(
             html,
             use_stack=True,

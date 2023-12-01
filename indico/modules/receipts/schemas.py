@@ -11,6 +11,7 @@ from marshmallow import ValidationError, fields, post_load, pre_load, validate, 
 from marshmallow_oneofschema import OneOfSchema
 
 from indico.core.marshmallow import mm
+from indico.modules.events.models.events import Event
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.util.marshmallow import YAML, not_empty
 from indico.util.string import slugify
@@ -129,9 +130,20 @@ class FormFieldsSchema(mm.Schema):
     actual_price = fields.Number()
 
 
+class EventDataSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Event
+        fields = ('id', 'category_chain', 'title', 'start_dt', 'end_dt', 'timezone', 'venue_name', 'room_name',
+                  'address', 'type')
+
+    category_chain = fields.List(fields.String(), attribute='category.chain_titles')
+    type = fields.String(attribute='_type.name')
+
+
 class TemplateDataSchema(mm.Schema):
     custom_fields = fields.Dict(keys=fields.String)
     personal_data = fields.Nested(PersonalDataFieldSchema)
+    event = fields.Nested(EventDataSchema)
     _fields = fields.List(fields.Nested(FormFieldsSchema), attribute='fields', data_key='fields')
     base_price = fields.Number()
     total_price = fields.Number()
