@@ -315,7 +315,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                            '{num} emails were sent.', num_emails_sent).format(num=num_emails_sent), 'success')
             return jsonify_data()
 
-        template_is_ticket = self.regform.get_ticket_template()        .is_ticket
+        template_is_ticket = self.regform.get_ticket_template().is_ticket
         registrations_without_ticket = [r for r in self.registrations if template_is_ticket and r.is_ticket_blocked]
         return jsonify_template('events/registration/management/email.html', form=form, regform=self.regform,
                                 all_registrations_count=len(self.registrations),
