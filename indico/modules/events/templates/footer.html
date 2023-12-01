@@ -5,7 +5,7 @@
 
     {% if show_social %}
         <div class="social-share">
-            <h3>{% trans %}Share this page{% endtrans %}</h3>
+            <h2>{% trans %}Share this page{% endtrans %}</h2>
             <h4>{% trans %}Direct link{% endtrans %}</h4>
             <a href="{{ url }}"
                class="js-copy-to-clipboard"
@@ -16,26 +16,8 @@
             </a>
             <div>
                 <h4>{% trans %}Social networks{% endtrans %}</h4>
-                <div>
-                    <span id="fb-loading">{% trans %}Loading...{% endtrans %}</span>
-                    <div id="fb-like" class="fb-like"
-                         data-href="{{ url }}"
-                         data-size="small"
-                         data-width="100"
-                         data-layout="standard"
-                         data-colorscheme="{{ 'dark' if dark else 'light' }}"
-                         data-action="like"
-                         data-show-faces="false"
-                         data-share="true"></div>
-                </div>
                 <div class="social-site">
-                    <div class="g-plusone"
-                         data-annotation="inline"
-                         data-width="220"
-                         data-href="{{ url }}"></div>
-                </div>
-                <div class="social-site">
-                    <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal">
+                    <a href="https://twitter.com/intent/tweet?text={{ url }}" class="twitter-share-button">
                         {%- trans %}Tweet{% endtrans -%}
                     </a>
                 </div>
@@ -48,13 +30,18 @@
                     <img src="{{ url_for('assets.image', filename='google_calendar.gif') }}" alt="" border="0">
                 </a>
             </div>
+            <div class="social-site">
+                <a href="https://outlook.office.com/calendar/deeplink/compose?{{ outlook_calendar_params|urlencode }}" target="_blank">
+                    <img src="{{ url_for('assets.image', filename='outlook_calendar.png') }}" alt="" border="0">
+                </a>
+            </div>
         </div>
 
         <div class="social-button-container f-j-end"
              data-url="{{ url }}"
              data-dark-theme="{{ dark|tojson|forceescape }}"
              data-social-settings="{{ social_settings|tojson|forceescape }}">
-            <img src="{{ indico_config.IMAGES_BASE_URL }}/social.png"
+            <img src="{{ indico_config.IMAGES_BASE_URL }}/social-share.svg"
                  class="social-button"
                  alt="{% trans %}Social Networks{% endtrans %}"
                  title="{% trans %}Social Networks{% endtrans %}">

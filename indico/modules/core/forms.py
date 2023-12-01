@@ -10,7 +10,6 @@ from wtforms.validators import DataRequired
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.validators import IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -22,7 +21,6 @@ class SettingsForm(IndicoForm):
 
     # Social settings
     social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
-    social_facebook_app_id = StringField('Facebook App ID', [IndicoRegexp(r'^\d*$')])
 
     @property
     def _fieldsets(self):

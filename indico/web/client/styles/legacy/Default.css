@@ -478,8 +478,13 @@ div.invalid {
 }
 
 .social_share_tooltip {
-  max-width: 420px;
+  max-width: 350px;
   color: #fff;
+}
+
+.social_share_tooltip h2 {
+  color: #fff;
+  margin-bottom: 5px;
 }
 
 .social_share_tooltip.qtip-dark h3 {
@@ -493,6 +498,7 @@ div.invalid {
 }
 
 .social_share_tooltip.qtip-dark h4 {
+  margin-top: 0;
   margin-bottom: 5px;
   color: #aaa;
 }
@@ -530,12 +536,6 @@ div.invalid {
 .social_share_tooltip .social_site img {
   display: inline-block;
   vertical-align: middle;
-}
-
-#fb-like {
-  height: 25px;
-  overflow: hidden;
-  visibility: hidden;
 }
 
 .social_share_tooltip .social_site {
