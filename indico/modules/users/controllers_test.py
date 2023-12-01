@@ -13,7 +13,7 @@ from werkzeug.exceptions import UnprocessableEntity
 
 @pytest.mark.usefixtures('request_context')
 def test_invalid_request():
-    """Test data export request with invalid options"""
+    """Test data export request with invalid options."""
     from indico.modules.users.controllers import RHUserDataExportAPI
     rh = RHUserDataExportAPI()
     request.method = 'POST'

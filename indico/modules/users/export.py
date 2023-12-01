@@ -202,9 +202,7 @@ def get_papers(user):
 
 
 def get_editables(user):
-    """
-    Get all editables where the user is either linked to the parent contribution or has submitted an editing revision.
-    """
+    """Get all editables where the user is linked to the parent contribution or has submitted an editing revision."""
     return (Editable.query
             .join(Contribution, Contribution.id == Editable.contribution_id)
             .outerjoin(ContributionPersonLink, ContributionPersonLink.contribution_id == Contribution.id)

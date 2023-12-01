@@ -52,7 +52,7 @@ class PersonalTokenExportSchema(mm.SQLAlchemyAutoSchema):
         model = PersonalToken
         fields = ('name', 'revoked_dt', 'created_dt', 'last_used_dt', 'last_used_ip', 'use_count', 'scopes')
 
-    scopes = fields.Function(lambda token: sorted(list(token.scopes)))
+    scopes = fields.Function(lambda token: sorted(token.scopes))
 
 
 class APIKeyExportSchema(mm.SQLAlchemyAutoSchema):
@@ -146,7 +146,7 @@ class RegistrationDataExportSchema(Schema):
 
     @post_dump(pass_original=True)
     def _add_file(self, data, original, **kwargs):
-        """For file fields, export also the file metadata"""
+        """For file fields, export also the file metadata."""
         if original.filename:
             file_data = RegistrationFileExportSchema().dump(original)
             return data | {'file': file_data}

@@ -34,7 +34,7 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
 @pytest.fixture
 def mock_io(mocker):
     class MockNamedTemporaryFile(BytesIO):
-        name = '/tmp/somefile'
+        name = '/tmp/somefile'  # noqa: S108
 
         def __init__(self, *args, **kwargs):
             super().__init__()
@@ -93,8 +93,8 @@ def test_export_user_data(mocker, dummy_user, all_data_yamls):
 
     file = File.query.filter(File.filename == 'data-export.zip').first()
     with file.open() as f:
-        zip = ZipFile(f)
-        assert zip.namelist() == [
+        zip_file = ZipFile(f)
+        assert zip_file.namelist() == [
             *all_data_yamls,
             'attachments/420_dummy_file.txt',
             ('abstracts/0_dummy0/420_Broken_Symmetry_and_the_Mass_of_Gauge_Vector_Mesons/'
@@ -122,8 +122,8 @@ def test_export_user_data_no_files(mocker, dummy_user, all_data_yamls):
 
     file = File.query.filter(File.filename == 'data-export.zip').first()
     with file.open() as f:
-        zip = ZipFile(f)
-        assert zip.namelist() == all_data_yamls
+        zip_file = ZipFile(f)
+        assert zip_file.namelist() == all_data_yamls
 
 
 @pytest.mark.usefixtures('dummy_attachment')
@@ -150,8 +150,8 @@ def test_export_user_data_max_size_exceeded_1(mocker, dummy_user, all_data_yamls
 
     file = File.query.filter(File.filename == 'data-export.zip').first()
     with file.open() as f:
-        zip = ZipFile(f)
-        assert zip.namelist() == all_data_yamls
+        zip_file = ZipFile(f)
+        assert zip_file.namelist() == all_data_yamls
 
 
 @pytest.mark.usefixtures('dummy_abstract_file')
@@ -178,8 +178,8 @@ def test_export_user_data_max_size_exceeded_2(mocker, dummy_user, dummy_attachme
 
     file = File.query.filter(File.filename == 'data-export.zip').first()
     with file.open() as f:
-        zip = ZipFile(f)
-        assert zip.namelist() == [*all_data_yamls, 'attachments/420_dummy_file.txt']
+        zip_file = ZipFile(f)
+        assert zip_file.namelist() == [*all_data_yamls, 'attachments/420_dummy_file.txt']
 
 
 def test_serialize_user_data(dummy_user):
