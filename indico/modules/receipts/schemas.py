@@ -71,7 +71,7 @@ class CustomFieldSchema(mm.Schema):
     def _add_attributes_type(self, data, **kwargs):
         # OneOfSchema requires the type to be in the attributes
         data = deepcopy(data)
-        if 'attributes' in data and 'type' in data:
+        if 'attributes' in data and isinstance(data['attributes'], dict) and 'type' in data:
             data['attributes']['type'] = data['type']
         return data
 
