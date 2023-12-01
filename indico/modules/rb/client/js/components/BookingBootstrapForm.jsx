@@ -111,6 +111,23 @@ class BookingBootstrapForm extends React.Component {
     }
   }
 
+  updateIntervalOptions = () => {
+    const {hideOptions} = this.props;
+    const {recurrence} = this.state;
+
+    if (!hideOptions.recurringWeekly && !hideOptions.recurringMonthly) {
+      return null;
+    }
+
+    if (hideOptions.recurringWeekly && recurrence.interval !== 'month') {
+      this.updateInterval('month');
+    }
+
+    if (hideOptions.recurringMonthly && recurrence.interval !== 'week') {
+      this.updateInterval('week');
+    }
+  };
+
   triggerChange() {
     const {onChange} = this.props;
     onChange(this.serializedState);
@@ -250,6 +267,28 @@ class BookingBootstrapForm extends React.Component {
     this.triggerChange();
   };
 
+  getRecurrenceOptions = () => {
+    const {hideOptions} = this.props;
+    const {recurrence} = this.state;
+
+    if (hideOptions.recurringWeekly && hideOptions.recurringMonthly) {
+      return null;
+    }
+
+    if (hideOptions.recurringWeekly) {
+      return [{text: PluralTranslate.string('Month', 'Months', recurrence.number), value: 'month'}];
+    }
+
+    if (hideOptions.recurringMonthly) {
+      return [{text: PluralTranslate.string('Week', 'Weeks', recurrence.number), value: 'week'}];
+    }
+
+    return [
+      {text: PluralTranslate.string('Week', 'Weeks', recurrence.number), value: 'week'},
+      {text: PluralTranslate.string('Month', 'Months', recurrence.number), value: 'month'},
+    ];
+  };
+
   render() {
     const {
       timeSlot: {startTime, endTime},
@@ -271,10 +310,6 @@ class BookingBootstrapForm extends React.Component {
       isAdminOverrideEnabled,
       bookingGracePeriod
     );
-    const recurrenceOptions = [
-      {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
-      {text: PluralTranslate.string('Month', 'Months', number), value: 'month'},
-    ];
     // all but one option are hidden
     const showRecurrenceOptions =
       ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
@@ -283,6 +318,7 @@ class BookingBootstrapForm extends React.Component {
       isAdminOverrideEnabled,
       bookingGracePeriod
     );
+    const recurrenceHidden = hideOptions.recurringWeekly && hideOptions.recurringMonthly;
 
     return (
       <Form>
@@ -306,7 +342,7 @@ class BookingBootstrapForm extends React.Component {
                 onChange={(e, {value}) => this.updateBookingType(value)}
               />
             )}
-            {!hideOptions.recurring && (
+            {!recurrenceHidden && (
               <Form.Radio
                 label={Translate.string('Recurring booking')}
                 name="type"
@@ -328,11 +364,17 @@ class BookingBootstrapForm extends React.Component {
               step="1"
               onChange={(event, data) => this.updateNumber(data.value)}
             />
-            <Select
-              value={interval}
-              options={recurrenceOptions}
-              onChange={(event, data) => this.updateInterval(data.value)}
-            />
+            {hideOptions.recurringWeekly || hideOptions.recurringMonthly ? (
+              <label>{this.getRecurrenceOptions().map(x => x.text)}</label>
+            ) : (
+              <Select
+                value={interval}
+                options={this.getRecurrenceOptions()}
+                disabled={recurrenceHidden}
+                onChange={(event, data) => this.updateInterval(data.value)}
+              />
+            )}
+            {this.updateIntervalOptions()}
           </Form.Group>
         )}
         {['every', 'daily'].includes(type) && (
