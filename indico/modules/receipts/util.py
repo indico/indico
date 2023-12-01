@@ -15,6 +15,7 @@ from flask import g
 from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
+from markupsafe import Markup
 from sqlalchemy.sql import or_
 from weasyprint import CSS, HTML, default_url_fetcher
 from werkzeug.exceptions import UnprocessableEntity
@@ -68,7 +69,8 @@ class SilentUndefined(Undefined):
 
     def _fail_with_undefined_error(self, *args, **kwargs):
         g.template_stack[-1].undefined.add(self._undefined_name)
-        return f'<span class="error">Undefined: <span class="var-name">{self._undefined_name}</span></span>'
+        return (Markup('<span class="error">Undefined: <span class="var-name">{}</span></span>')
+                .format(self._undefined_name))
 
 
 def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
