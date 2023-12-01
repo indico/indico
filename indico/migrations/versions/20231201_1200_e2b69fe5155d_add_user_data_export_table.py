@@ -1,7 +1,7 @@
 """Add data_export_requests table
 
 Revision ID: e2b69fe5155d
-Revises: 0acf26d68434
+Revises: fb0ca1440185
 Create Date: 2023-05-08 15:37:24.134940
 """
 
@@ -36,7 +36,7 @@ class _DataExportOptions(IndicoIntEnum):
 
 # revision identifiers, used by Alembic.
 revision = 'e2b69fe5155d'
-down_revision = '0acf26d68434'
+down_revision = 'fb0ca1440185'
 branch_labels = None
 depends_on = None
 
