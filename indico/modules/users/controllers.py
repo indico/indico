@@ -330,7 +330,7 @@ class RHProfilePictureDisplay(RH):
     """Display the user's profile picture."""
 
     def _process_args(self):
-        self.user = User.get_or_404(request.view_args['user_id'], is_deleted=False)
+        self.user = User.get_or_404(request.view_args['user_id'])
 
     def _process(self):
         return send_avatar(self.user)

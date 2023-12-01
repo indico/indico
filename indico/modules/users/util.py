@@ -31,6 +31,7 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
+from indico.modules.events.editing.models.editable import Editable
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
@@ -443,9 +444,14 @@ def anonymize_user(user):
     user.favorite_events = set()
     user.favorite_categories = set()
     user.identities = set()
+
     # TODO: check what breaks when we delete all emails
     UserEmail.query.filter(UserEmail.user == user).delete()
-    email = UserEmail(user=user, email=f'indico-{user.id}@indico.invalid')
+    email = UserEmail(user_id=user.id, email=f'indico-{user.id}@indico.invalid')
+    editables = Editable.query.filter(Editable.editor == user)
+    for editable in editables:
+        editable.editor = None
+        db.session.add(editable)
     db.session.add(email)
 
     principals = [
