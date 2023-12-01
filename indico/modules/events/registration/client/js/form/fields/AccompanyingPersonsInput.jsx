@@ -92,6 +92,7 @@ function calculatePlaces(availablePlaces, maxPersons, personsInCurrentField, ite
 }
 
 function AccompanyingPersonsComponent({
+  id,
   value,
   disabled,
   onChange,
@@ -128,12 +129,12 @@ function AccompanyingPersonsComponent({
     setOperation({type: 'ADD', person: null});
   };
 
-  const handleAccompanyingPersonEdit = id => {
-    setOperation({type: 'EDIT', person: value.find(p => p.id === id)});
+  const handleAccompanyingPersonEdit = personId => {
+    setOperation({type: 'EDIT', person: value.find(p => p.id === personId)});
   };
 
-  const handleAccompanyingPersonRemove = id => {
-    onChange(changeReducer({type: 'REMOVE', id}));
+  const handleAccompanyingPersonRemove = personId => {
+    onChange(changeReducer({type: 'REMOVE', id: personId}));
   };
 
   const handleModalClose = () => {
@@ -174,6 +175,7 @@ function AccompanyingPersonsComponent({
           type="button"
           onClick={handleAccompanyingPersonAdd}
           disabled={disabled || placesLimit - placesUsed === 0}
+          aria-describedby={id ? `${id}-placeslimit` : ''}
         >
           <Translate>Add accompanying person</Translate>
         </Button>
@@ -183,7 +185,7 @@ function AccompanyingPersonsComponent({
           </Label>
         )}
         {placesLimit !== Infinity && (
-          <div styleName="places-left">
+          <div id={`${id}-placeslimit`} styleName="places-left">
             <PlacesLeft placesLimit={placesLimit} placesUsed={placesUsed} isEnabled={!disabled} />
           </div>
         )}
@@ -208,6 +210,7 @@ function AccompanyingPersonsComponent({
 }
 
 AccompanyingPersonsComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -230,6 +233,7 @@ AccompanyingPersonsComponent.defaultProps = {
 };
 
 export default function AccompanyingPersonsInput({
+  htmlId,
   htmlName,
   disabled,
   price,
@@ -238,6 +242,7 @@ export default function AccompanyingPersonsInput({
 }) {
   return (
     <FinalField
+      id={htmlId}
       name={htmlName}
       component={AccompanyingPersonsComponent}
       disabled={disabled}
@@ -249,6 +254,7 @@ export default function AccompanyingPersonsInput({
 }
 
 AccompanyingPersonsInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   price: PropTypes.number,

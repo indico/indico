@@ -51,9 +51,10 @@ CountryInputComponent.propTypes = {
   clearable: PropTypes.bool.isRequired,
 };
 
-export default function CountryInput({htmlName, disabled, isRequired, choices}) {
+export default function CountryInput({htmlId, htmlName, disabled, isRequired, choices}) {
   return (
     <FinalField
+      id={htmlId}
       name={htmlName}
       component={CountryInputComponent}
       required={isRequired}
@@ -66,6 +67,7 @@ export default function CountryInput({htmlName, disabled, isRequired, choices}) 
 }
 
 CountryInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

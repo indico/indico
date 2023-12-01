@@ -26,6 +26,7 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function MultiChoiceInputComponent({
+  id,
   existingValue,
   value,
   onChange,
@@ -71,13 +72,14 @@ function MultiChoiceInputComponent({
   const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
 
   return (
-    <table styleName="choice-table">
+    <table styleName="choice-table" role="presentation">
       <tbody>
-        {choices.map(choice => {
+        {choices.map((choice, index) => {
           return (
             <tr key={choice.id} styleName="row">
               <td>
                 <Checkbox
+                  id={id ? `${id}-${index}` : ''}
                   styleName="checkbox"
                   style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                   value={choice.id}
@@ -167,6 +169,7 @@ function MultiChoiceInputComponent({
 }
 
 MultiChoiceInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
@@ -180,6 +183,7 @@ MultiChoiceInputComponent.propTypes = {
 
 export default function MultiChoiceInput({
   id,
+  htmlId,
   htmlName,
   disabled,
   isRequired,
@@ -191,6 +195,7 @@ export default function MultiChoiceInput({
   const existingValue = useSelector(state => getFieldValue(state, id)) || {};
   return (
     <FinalField
+      id={htmlId}
       name={htmlName}
       component={MultiChoiceInputComponent}
       required={isRequired}
@@ -216,6 +221,7 @@ export default function MultiChoiceInput({
 
 MultiChoiceInput.propTypes = {
   id: PropTypes.number.isRequired,
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

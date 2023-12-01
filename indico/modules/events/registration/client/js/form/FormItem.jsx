@@ -107,6 +107,21 @@ export default function FormItem({
 
   const showAsRequired = meta.alwaysRequired || isRequired;
   const inputRequired = !isManagement && showAsRequired;
+  const htmlId = `input-${inputProps.id}`;
+
+  const fieldControls = (
+    <>
+      {retentionPeriodIcon}
+      <InputComponent
+        isRequired={inputRequired}
+        disabled={disabled}
+        isPurged={showPurged}
+        htmlId={htmlId}
+        {...inputProps}
+      />
+    </>
+  );
+
   return (
     <div
       styleName={`form-item ${toClasses({
@@ -130,14 +145,24 @@ export default function FormItem({
             />
           ) : (
             <Form.Field required={showAsRequired} styleName="field">
-              <label style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>{title}</label>
-              {retentionPeriodIcon}
-              <InputComponent
-                isRequired={inputRequired}
-                disabled={disabled}
-                isPurged={showPurged}
-                {...inputProps}
-              />
+              {meta.renderAsFieldset ? (
+                <fieldset>
+                  <legend style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>
+                    {title}
+                  </legend>
+                  {fieldControls}
+                </fieldset>
+              ) : (
+                <>
+                  <label
+                    htmlFor={htmlId}
+                    style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}
+                  >
+                    {title}
+                  </label>
+                  {fieldControls}
+                </>
+              )}
             </Form.Field>
           )
         ) : (

@@ -94,6 +94,7 @@ BooleanInputComponent.defaultProps = {
 
 export default function BooleanInput({
   id,
+  htmlId,
   htmlName,
   disabled,
   isRequired,
@@ -110,7 +111,7 @@ export default function BooleanInput({
 
   return (
     <FinalField
-      id={id}
+      id={htmlId || id}
       name={htmlName}
       component={BooleanInputComponent}
       required={isRequired ? 'no-validator' : isRequired}
@@ -127,6 +128,7 @@ export default function BooleanInput({
 
 BooleanInput.propTypes = {
   id: PropTypes.number.isRequired,
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
