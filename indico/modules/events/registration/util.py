@@ -572,9 +572,9 @@ def get_registrations_with_tickets(user, event):
 
     def _is_ticket_blocked(registration):
         regform = registration.registration_form
-        if regform.id not in cached_templates:
-            cached_templates[regform.id] = regform.get_ticket_template()
-        return cached_templates[regform.id].is_ticket and registration.is_ticket_blocked
+        if regform not in cached_templates:
+            cached_templates[regform] = regform.get_ticket_template()
+        return cached_templates[regform].is_ticket and registration.is_ticket_blocked
 
     return [r for r in query if not _is_ticket_blocked(r)]
 
