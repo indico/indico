@@ -233,6 +233,7 @@
         "id": 420,
         "is_accepted": true,
         "is_repeating": false,
+        "recurrence_weekdays": null,
         "repeat_frequency": "NEVER",
         "repeat_interval": 0,
         "room_id": 420,

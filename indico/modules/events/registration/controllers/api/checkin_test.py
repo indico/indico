@@ -14,7 +14,7 @@ import yaml
 from indico.modules.events.features.util import set_feature_enabled
 
 
-pytest_plugins = ('indico.modules.events.registration.testing.fixtures', 'indico.core.oauth.testing.fixtures')
+pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 @pytest.fixture(autouse=True)
