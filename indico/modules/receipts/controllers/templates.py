@@ -77,7 +77,7 @@ def _generate_dummy_data(custom_fields: dict):
             'title': 'Dr',
             'first_name': 'John',
             'last_name': 'Doe',
-            'affiliation': 'Atlantis Institute  ',
+            'affiliation': 'Atlantis Institute',
             'position': 'Unicorn Specialist',
             'address': '123 Route des Licornes',
             'country': 'France',
