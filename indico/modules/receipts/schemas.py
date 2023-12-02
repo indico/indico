@@ -126,6 +126,7 @@ class PersonalDataFieldSchema(mm.Schema):
 class FormFieldsSchema(mm.Schema):
     title = fields.String()
     section_title = fields.String()
+    input_type = fields.String()
     value = fields.Boolean()
     field_data = fields.Dict()
     friendly_value = fields.Raw()
