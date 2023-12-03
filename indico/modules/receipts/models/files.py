@@ -24,8 +24,7 @@ class ReceiptFile(db.Model):
         primary_key=True
     )
     registration_id = db.Column(
-        db.Integer,
-        db.ForeignKey('event_registration.registrations.id'),
+        db.ForeignKey('event_registration.registrations.id', ondelete='CASCADE'),
         index=True,
         nullable=False
     )
@@ -67,6 +66,7 @@ class ReceiptFile(db.Model):
             'receipt_files',
             primaryjoin='(ReceiptFile.registration_id == Registration.id) & ~ReceiptFile.is_deleted',
             cascade='all, delete-orphan',
+            passive_deletes=True,
             lazy=True
         )
     )

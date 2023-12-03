@@ -18,6 +18,7 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.util import close_registration
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.util.date_time import now_utc
 from indico.util.string import snakify_keys
 
@@ -87,6 +88,10 @@ def delete_registrations():
         for data in reg.data:
             if data.field_data.field.field_impl.is_file_field:
                 _delete_file(data)
+        # We need to query all receipts, even those that are soft-deleted
+        for receipt in ReceiptFile.query.filter_by(registration=reg):
+            # Unclaimed files are cleaned up periodically
+            receipt.file.claimed = False
         db.session.delete(reg)
 
     for regform in regforms:

@@ -1,0 +1,341 @@
+event:
+  address: 'Somewhere
+
+    Where you do not belong'
+  category_chain:
+  - Home
+  - Space Stuff
+  - Top Secret
+  end_dt: '2023-12-24T19:00:00+00:00'
+  id: 6666
+  room_name: Secret Lecture Hall
+  start_dt: '2023-12-24T15:00:00+00:00'
+  timezone: Europe/Zurich
+  title: How to build a Stargate
+  type: conference
+  venue_name: Area 51
+registration:
+  base_price: 75.0
+  currency: CHF
+  field_data:
+  - actual_price: 0
+    config:
+      captions:
+        15272d02-c01a-4f54-9918-57765125b9f6: Ms
+        7e8d2703-c290-4826-8dc9-a2bd5a19388a: Mrs
+        9c44fc7b-ae60-404a-a35c-efa43c68ac18: Mr
+        a825a410-4d28-447c-b124-9236914a6490: Dr
+        c8cc2dbf-b738-4bfe-92cc-bc5da1050f1b: Prof.
+        f3310cd7-a25a-45d9-8c49-af29cc3d3ad3: Mx
+      choices:
+      - id: 9c44fc7b-ae60-404a-a35c-efa43c68ac18
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 0
+      - id: 15272d02-c01a-4f54-9918-57765125b9f6
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 0
+      - id: 7e8d2703-c290-4826-8dc9-a2bd5a19388a
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 0
+      - id: a825a410-4d28-447c-b124-9236914a6490
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 0
+      - id: c8cc2dbf-b738-4bfe-92cc-bc5da1050f1b
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 0
+      - id: f3310cd7-a25a-45d9-8c49-af29cc3d3ad3
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 0
+      default_item: null
+      item_type: dropdown
+      with_extra_slots: false
+    friendly_value: Dr
+    input_type: single_choice
+    raw_value:
+      a825a410-4d28-447c-b124-9236914a6490: 1
+    section_title: Personal Data
+    title: Title
+  - actual_price: 0
+    config: {}
+    friendly_value: Jack
+    input_type: text
+    raw_value: Jack
+    section_title: Personal Data
+    title: First Name
+  - actual_price: 0
+    config: {}
+    friendly_value: O'Neill
+    input_type: text
+    raw_value: O'Neill
+    section_title: Personal Data
+    title: Last Name
+  - actual_price: 0
+    config: {}
+    friendly_value: myemail@example.ch
+    input_type: email
+    raw_value: myemail@example.ch
+    section_title: Personal Data
+    title: Email Address
+  - actual_price: 0
+    config: {}
+    friendly_value: AF
+    input_type: text
+    raw_value: AF
+    section_title: Personal Data
+    title: Affiliation
+  - actual_price: 0
+    config: {}
+    friendly_value: Colonel
+    input_type: text
+    raw_value: Colonel
+    section_title: Personal Data
+    title: Position
+  - actual_price: 0
+    config: {}
+    friendly_value: 'Wormhole Road 1
+
+      00000 Space'
+    input_type: textarea
+    raw_value: 'Wormhole Road 1
+
+      00000 Space'
+    section_title: Personal Data
+    title: Address
+  - actual_price: 0
+    config: {}
+    friendly_value: United States
+    input_type: country
+    raw_value: US
+    section_title: Personal Data
+    title: Country
+  - actual_price: 0
+    config: {}
+    friendly_value: '+123456789'
+    input_type: phone
+    raw_value: '+123456789'
+    section_title: Personal Data
+    title: Phone Number
+  - actual_price: 0
+    config:
+      max_length: 0
+      min_length: 0
+    friendly_value: General Hammond
+    input_type: text
+    raw_value: General Hammond
+    section_title: Details
+    title: Name of your supervisor
+  - actual_price: 0
+    config:
+      number_of_rows: null
+    friendly_value: 'Going to space.
+
+      And planets.
+
+      Everything else is secret!'
+    input_type: textarea
+    raw_value: 'Going to space.
+
+      And planets.
+
+      Everything else is secret!'
+    section_title: Details
+    title: Your background
+  - actual_price: 30.0
+    config:
+      max_value: 0
+      min_value: 0
+      price: 5.0
+    friendly_value: '6'
+    input_type: number
+    raw_value: 6
+    section_title: Details
+    title: How much do you want to donate?
+  - actual_price: 1337.0
+    config:
+      places_limit: 0
+      price: 1337.0
+    friendly_value: 'Yes'
+    input_type: checkbox
+    raw_value: true
+    section_title: Details
+    title: Special VIP
+  - actual_price: 0
+    config:
+      date_format: '%d.%m.%Y'
+    friendly_value: 01.01.2037
+    input_type: date
+    raw_value: '2037-01-01T00:00:00'
+    section_title: Details
+    title: Start date
+  - actual_price: 0
+    config:
+      default_value: ''
+      places_limit: 0
+      price: 69.0
+    friendly_value: 'No'
+    input_type: bool
+    raw_value: false
+    section_title: Details
+    title: Almost-VIP
+  - actual_price: 0
+    config: {}
+    friendly_value: cat1.png
+    input_type: file
+    raw_value: null
+    section_title: Details
+    title: Upload your CV
+  - actual_price: 1000.0
+    config:
+      captions:
+        04f62ad8-9a74-417a-a885-3221b561986f: Zero-Point-Module
+        85a28f9d-bf43-4816-b31a-fd91966e2647: Batteries
+        eda9dd84-aa10-481d-b48a-cd2e0f783fee: Naquadah
+      choices:
+      - extra_slots_pay: false
+        id: 04f62ad8-9a74-417a-a885-3221b561986f
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 1000.0
+      - extra_slots_pay: false
+        id: eda9dd84-aa10-481d-b48a-cd2e0f783fee
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 250.0
+      - extra_slots_pay: false
+        id: 85a28f9d-bf43-4816-b31a-fd91966e2647
+        is_enabled: true
+        max_extra_slots: 0
+        places_limit: 0
+        price: 6.0
+      default_item: null
+      item_type: dropdown
+      with_extra_slots: false
+    friendly_value: Zero-Point-Module
+    input_type: single_choice
+    raw_value:
+      04f62ad8-9a74-417a-a885-3221b561986f: 1
+    section_title: Details
+    title: Preferred Energy Source
+  - actual_price: 70.0
+    config:
+      captions:
+        7f53ead9-96ba-4562-9317-7a3f92932d75: Dinner
+        a314369c-7de5-4f3c-870e-72f6e73d2d1e: Lunch
+        c33f3d52-f441-47e0-869e-fe0564b46d9d: Breakfast
+      choices:
+      - extra_slots_pay: false
+        id: c33f3d52-f441-47e0-869e-fe0564b46d9d
+        is_enabled: true
+        max_extra_slots: 2
+        places_limit: 0
+        price: 10.0
+      - extra_slots_pay: true
+        id: a314369c-7de5-4f3c-870e-72f6e73d2d1e
+        is_enabled: true
+        max_extra_slots: 1
+        places_limit: 0
+        price: 20.0
+      - extra_slots_pay: true
+        id: 7f53ead9-96ba-4562-9317-7a3f92932d75
+        is_enabled: true
+        max_extra_slots: 1
+        places_limit: 0
+        price: 30.0
+      max_choices: null
+      with_extra_slots: true
+    friendly_value: Breakfast (+2), Dinner (+1)
+    input_type: multi_choice
+    raw_value:
+      7f53ead9-96ba-4562-9317-7a3f92932d75: 2
+      c33f3d52-f441-47e0-869e-fe0564b46d9d: 3
+    section_title: Details
+    title: Food
+  - actual_price: 1332.0
+    config:
+      arrival_date_from: '2023-12-22'
+      arrival_date_to: '2023-12-24'
+      captions:
+        72098712-8cc2-483b-af31-f298bcbf364b: On the ground
+        86c711a0-c377-4079-8616-3e450f255d1b: Just here for the day
+        dc988736-e4a3-4845-9acc-f7a6d218c1d1: Stargate Command
+      choices:
+      - id: 86c711a0-c377-4079-8616-3e450f255d1b
+        is_enabled: true
+        is_no_accommodation: true
+        places_limit: 0
+        price: 0
+      - id: dc988736-e4a3-4845-9acc-f7a6d218c1d1
+        is_enabled: true
+        is_no_accommodation: false
+        places_limit: 10
+        price: 333.0
+      - id: 72098712-8cc2-483b-af31-f298bcbf364b
+        is_enabled: true
+        is_no_accommodation: false
+        places_limit: 0
+        price: 0
+      departure_date_from: '2023-12-25'
+      departure_date_to: '2023-12-27'
+    friendly_value: Stargate Command
+    input_type: accommodation
+    raw_value:
+      arrival_date: '2023-12-22'
+      choice: dc988736-e4a3-4845-9acc-f7a6d218c1d1
+      departure_date: '2023-12-26'
+      is_no_accommodation: false
+    section_title: Details
+    title: Accommodation
+  - actual_price: 175.0
+    config:
+      max_persons: 1
+      persons_count_against_limit: true
+      price: 175.0
+    friendly_value: Sam Carter
+    input_type: accompanying_persons
+    raw_value:
+    - firstName: Sam
+      id: e6e5df0a-c325-4e6e-91f0-31ef580d5054
+      lastName: Carter
+    section_title: Details
+    title: Bring your friend
+  formatted_price: CHF4,019.00
+  friendly_id: 42
+  id: 313337
+  personal_data:
+    address: 'Wormhole Road 1
+
+      00000 Space'
+    affiliation: AF
+    country: United States
+    email: myemail@example.ch
+    first_name: Jack
+    last_name: O'Neill
+    phone: '+123456789'
+    position: Colonel
+    title: Dr
+  state: complete
+  submitted_dt: '2023-12-03T15:05:20.260373+00:00'
+  total_price: 4019.0
+  transaction:
+    amount: 4019.0
+    currency: CHF
+    data:
+      changed_by_id: 23
+      changed_by_name: George Hammond
+    provider: _manual
+    status: successful
+    timestamp: '2023-12-03T18:04:28.799161+00:00'

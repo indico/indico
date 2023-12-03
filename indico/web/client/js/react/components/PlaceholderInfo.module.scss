@@ -7,6 +7,7 @@
 
 @use 'base/palette' as *;
 @use 'base/borders' as *;
+@use 'base/typography' as *;
 
 .placeholder-info {
   margin: 0;
@@ -26,8 +27,17 @@
     padding: 0.1em;
   }
 
-  .description {
+  &:not(.jinja) .description {
     user-select: none;
+  }
+
+  .description :global(div.highlight) {
+    @include font-family-monospace();
+    display: inline;
+
+    pre {
+      display: inline;
+    }
   }
 
   .required {

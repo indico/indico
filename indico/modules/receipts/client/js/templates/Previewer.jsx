@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {pdfjs, Document, Page} from 'react-pdf';
@@ -32,20 +31,10 @@ const MESSAGE_HEADERS = {
 };
 
 const processPlaceholders = placeholderData =>
-  Object.entries(placeholderData).map(([name, value]) =>
-    _.isObject(value)
-      ? {
-          name: _.isArray(value) ? `${name}.0` : name,
-          parametrized: true,
-          params: Object.entries(_.isArray(value) ? value[0] : value).map(
-            ([param, paramValue]) => ({
-              param,
-              description: JSON.stringify(paramValue),
-            })
-          ),
-        }
-      : {name, description: JSON.stringify(value)}
-  );
+  placeholderData.map(([name, value]) => ({
+    name,
+    description: value,
+  }));
 
 const debounce = makeAsyncDebounce(250);
 
@@ -56,6 +45,7 @@ export default function Previewer({url, data}) {
   const [pageNumber, setPageNumber] = useState(1);
   const [placeholders, setPlaceholders] = useState(null);
   const [error, setError] = useState(null);
+  const [limited, setLimited] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -66,6 +56,9 @@ export default function Previewer({url, data}) {
         const newContent = Uint8Array.from(atob(previewData.pdf), c => c.charCodeAt(0)).buffer;
         if (dummyData) {
           setPlaceholders(processPlaceholders(dummyData));
+        }
+        if (previewData.limited !== undefined) {
+          setLimited(previewData.limited);
         }
         setLoading(false);
         setContent(newContent);
@@ -89,7 +82,7 @@ export default function Previewer({url, data}) {
 
   return (
     <>
-      {placeholders && <PlaceholderInfo placeholders={placeholders} jinja />}
+      {placeholders && <PlaceholderInfo placeholders={placeholders} jinja htmlDescription />}
       {error &&
         Object.entries(error).map(([entry, errs]) => (
           <Message key={entry} error visible={!!error}>
@@ -128,6 +121,13 @@ export default function Previewer({url, data}) {
             secondary
             styleName="pagination"
           />
+        )}
+        {limited && (
+          <Message warning visible>
+            <Translate>
+              The preview is limited to a few registrations for performance reasons.
+            </Translate>
+          </Message>
         )}
       </div>
     </>
