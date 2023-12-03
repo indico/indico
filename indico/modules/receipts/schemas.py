@@ -15,6 +15,7 @@ from speaklater import is_lazy_string
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.events import Event
+from indico.modules.events.payment.models.transactions import PaymentTransaction
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.util.marshmallow import YAML, not_empty
@@ -140,18 +141,30 @@ class EventDataSchema(mm.SQLAlchemyAutoSchema):
     type = fields.String(load_only=True)
 
 
+class TransactionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = PaymentTransaction
+        fields = ('status', '_status', 'amount', 'currency', 'provider', 'timestamp', 'data')
+
+    amount = fields.Number(required=True)
+    _status = fields.String(attribute='status.name', data_key='status', dump_only=True)
+    status = fields.String(load_only=True)
+
+
 class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Registration
         fields = ('id', 'friendly_id', 'submitted_dt', 'base_price', 'total_price', 'currency', 'formatted_price',
-                  'field_data', 'personal_data')
+                  'state', 'field_data', 'personal_data', 'transaction')
 
     base_price = fields.Number(required=True)
     total_price = fields.Number(required=True)
     currency = fields.String(required=True)
     formatted_price = fields.String(required=True)
+    state = fields.String(required=True)
     field_data = fields.Method('_dump_field_data', '_load_field_data', required=True)
     personal_data = fields.Nested(PersonalDataSchema, required=True)
+    transaction = fields.Nested(TransactionSchema, required=True, allow_none=True)
 
     def get_attribute(self, obj: t.Union[Registration, dict], attr: str, default: t.Any):
         # Unfortunately marshmallow has no nice way to specify that a value is coming from a method
@@ -166,6 +179,8 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
             return obj.price
         elif attr == 'formatted_price':
             return obj.render_price()
+        elif attr == 'state':
+            return obj.state.name
 
         return super().get_attribute(obj, attr, default)
 

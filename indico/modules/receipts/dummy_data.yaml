@@ -327,5 +327,15 @@ registration:
     phone: '+123456789'
     position: Colonel
     title: Dr
+  state: complete
   submitted_dt: '2023-12-03T15:05:20.260373+00:00'
   total_price: 4019.0
+  transaction:
+    amount: 4019.0
+    currency: CHF
+    data:
+      changed_by_id: 23
+      changed_by_name: George Hammond
+    provider: _manual
+    status: successful
+    timestamp: '2023-12-03T18:04:28.799161+00:00'
