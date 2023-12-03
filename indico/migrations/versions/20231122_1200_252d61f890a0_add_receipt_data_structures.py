@@ -43,7 +43,7 @@ def upgrade():
         sa.Column('is_published', sa.Boolean(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['file_id'], ['indico.files.id']),
-        sa.ForeignKeyConstraint(['registration_id'], ['event_registration.registrations.id']),
+        sa.ForeignKeyConstraint(['registration_id'], ['event_registration.registrations.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['template_id'], ['indico.receipt_templates.id']),
         sa.PrimaryKeyConstraint('file_id'),
         schema='event_registration'
