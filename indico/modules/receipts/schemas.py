@@ -189,11 +189,13 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
             # Dummy preview data loaded from YAML
             return registration['field_data']
         regform = registration.registration_form
+        data_by_field = registration.data_by_field
         fields = []
         for field in sorted(regform.active_fields, key=attrgetter('parent.position', 'position')):
-            config = field.versioned_data | field.data
-            data = registration.data_by_field.get(field.id)  # XXX: skip missing ones altogether?
-            value = data.data if data else None
+            try:
+                data = data_by_field[field.id]
+            except KeyError:
+                continue
             friendly_value = data.get_friendly_data(for_humans=True)
             if is_lazy_string(friendly_value):
                 friendly_value = str(friendly_value)
@@ -201,10 +203,10 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
                 'title': field.title,
                 'section_title': field.parent.title,
                 'input_type': field.input_type,
-                'raw_value': value,
+                'raw_value': data.data,
                 'friendly_value': friendly_value,
-                'config': config,
-                'actual_price': data.price if data else None
+                'config': field.versioned_data | field.data,
+                'actual_price': data.price
             })
         return fields
 
