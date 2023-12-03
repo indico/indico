@@ -186,7 +186,7 @@ def get_useful_registration_data(reg_form: RegistrationForm, registration: Regis
     """
     fields = []
     for field in sorted(reg_form.active_fields, key=attrgetter('parent.position', 'position')):
-        field_data = field.current_data.versioned_data
+        field_data = field.versioned_data | field.data
         data = registration.data_by_field.get(field.id)
         value = data.data if data else None
         fields.append({
