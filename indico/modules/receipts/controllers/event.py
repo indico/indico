@@ -118,13 +118,16 @@ class RHPreviewReceipts(RenderReceiptsBase):
         custom_fields = self._get_custom_fields()
         g.template_stack = []
         html_sources = []
-        for registration in self.registrations:
+        for registration in self.registrations[:5]:
             g.template_stack.append(TemplateStackEntry(registration))
             safe_ctx = get_safe_template_context(self.event, registration, custom_fields)
             html_sources.append(compile_jinja_code(self.template.html, safe_ctx, use_stack=True))
         del g.template_stack
         pdf_data = create_pdf(self.event, html_sources, self.template.css)
-        return jsonify({'pdf': base64.b64encode(pdf_data.getvalue())})
+        return jsonify({
+            'pdf': base64.b64encode(pdf_data.getvalue()),
+            'limited': len(html_sources) < len(self.registrations)
+        })
 
 
 class RHGenerateReceipts(RenderReceiptsBase):

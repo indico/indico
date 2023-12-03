@@ -45,6 +45,7 @@ export default function Previewer({url, data}) {
   const [pageNumber, setPageNumber] = useState(1);
   const [placeholders, setPlaceholders] = useState(null);
   const [error, setError] = useState(null);
+  const [limited, setLimited] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -55,6 +56,9 @@ export default function Previewer({url, data}) {
         const newContent = Uint8Array.from(atob(previewData.pdf), c => c.charCodeAt(0)).buffer;
         if (dummyData) {
           setPlaceholders(processPlaceholders(dummyData));
+        }
+        if (previewData.limited !== undefined) {
+          setLimited(previewData.limited);
         }
         setLoading(false);
         setContent(newContent);
@@ -117,6 +121,13 @@ export default function Previewer({url, data}) {
             secondary
             styleName="pagination"
           />
+        )}
+        {limited && (
+          <Message warning visible>
+            <Translate>
+              The preview is limited to a few registrations for performance reasons.
+            </Translate>
+          </Message>
         )}
       </div>
     </>
