@@ -7,15 +7,20 @@
 
 import dataclasses
 import typing as t
+from datetime import datetime
 from io import BytesIO
-from operator import attrgetter
+from pathlib import Path
 from urllib.parse import urlparse
 
-from flask import g
+import yaml
+from flask import current_app, g
 from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 from markupsafe import Markup
+from pygments import highlight
+from pygments.formatters.html import HtmlFormatter
+from pygments.lexers.python import PythonLexer
 from sqlalchemy.sql import or_
 from weasyprint import CSS, HTML, default_url_fetcher
 from webargs.flaskparser import abort
@@ -32,6 +37,7 @@ from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
 from indico.util.date_time import format_date, format_datetime, format_time, now_utc
 from indico.util.i18n import _
+from indico.util.iterables import materialize_iterable
 
 
 logger = Logger.get('receipts')
@@ -74,6 +80,13 @@ class SilentUndefined(Undefined):
         return (Markup('<span class="error">Undefined: <span class="var-name">{}</span></span>')
                 .format(self._undefined_name))
 
+    # StrictUndefined behavior but with our custom failure method
+    __iter__ = __str__ = __len__ = _fail_with_undefined_error
+    __eq__ = __ne__ = __bool__ = __hash__ = _fail_with_undefined_error
+    __contains__ = _fail_with_undefined_error
+    # Make sure markupsafe doesn't escape our Markup object
+    __html__ = _fail_with_undefined_error
+
 
 def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
     """Get all templates usable by an event/category."""
@@ -104,7 +117,7 @@ def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplat
     return get_all_templates(obj) - set(obj.receipt_templates)
 
 
-def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
+def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = False) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
         undefined_config = {'undefined': SilentUndefined} if use_stack else {}
@@ -115,7 +128,7 @@ def compile_jinja_code(code: str, use_stack: bool = False, **fields) -> str:
             'format_time': format_time,
         })
         return env.from_string(code).render(
-            **fields,
+            **template_context,
             now_utc=now_utc
         )
     except (TemplateSyntaxError, TemplateRuntimeError, SecurityError, LookupError, TypeError, ValueError) as e:
@@ -178,32 +191,82 @@ def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     return f
 
 
-def get_useful_registration_data(reg_form: RegistrationForm, registration: Registration):
-    """Collect a series of useful data about a registration and make it available as a dict.
+def get_safe_template_context(event: Event, registration: Registration, custom_fields: dict) -> dict:
+    """Get a safe version of the data needed to render a document template.
 
-    :param registration: a `Registration` object
-    :return: a `dict` containing useful fields for templating
+    This uses just primitive Python types (and datetime objects) and, in particular,
+    avoids passing any database objects which would make it trivial to make changes
+    to the database when simply rendering a template.
     """
-    fields = []
-    for field in sorted(reg_form.active_fields, key=attrgetter('parent.position', 'position')):
-        field_data = field.versioned_data | field.data
-        data = registration.data_by_field.get(field.id)
-        value = data.data if data else None
-        fields.append({
-            'title': field.title,
-            'section_title': field.parent.title,
-            'input_type': field.input_type,
-            'value': value,
-            'friendly_value': data.get_friendly_data(for_humans=True),
-            'field_data': field_data,
-            'actual_price': data.price if data else None
-        })
+    from indico.modules.receipts.schemas import TemplateDataSchema
+    tds = TemplateDataSchema()
+    dumped = tds.dump({
+        'event': event,
+        'registration': registration,
+        'custom_fields': custom_fields,
+    })
+    # This round-trip through marshmallow loads it back to a plain dict while converting
+    # e.g. date strings back to actual datetime objects
+    return tds.load(dumped)
 
-    return {
-        'personal_data': registration.get_personal_data(),
-        'fields': fields,
-        'base_price': registration.base_price,
-        'total_price': registration.price,
-        'currency': reg_form.currency,
-        'formatted_price': registration.render_price()
-    }
+
+def _get_default_value(field):
+    if field['type'] == 'dropdown' and 'default' in field['attributes']:
+        return field['attributes']['options'][field['attributes']['default']]
+    elif field['type'] == 'checkbox':
+        return field['attributes'].get('value', False)
+    return field['attributes'].get('value', '')
+
+
+def get_dummy_preview_data(custom_fields: dict) -> dict:
+    """Get dummy preview data for rendering a document template.
+
+    Most document templates are written inthe context of a category, so it is not
+    possible to use real event/registration data for previewing it. This function
+    serializes dummy data that can be used instead.
+    """
+    from indico.modules.receipts.schemas import TemplateDataSchema
+    dummy_file = Path(current_app.root_path) / 'modules' / 'receipts' / 'dummy_data.yaml'
+    dummy_data = yaml.safe_load(dummy_file.read_text())
+    return TemplateDataSchema().load({
+        **dummy_data,
+        'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
+    })
+
+
+def _render_placeholder_value(value):
+    if isinstance(value, datetime):
+        return f'<{value}> (Python datetime object)'
+    return highlight(repr(value), PythonLexer(), HtmlFormatter(noclasses=True))
+
+
+@materialize_iterable()
+def _get_preview_placeholders(value: t.Any, _name: str = ''):
+    if isinstance(value, dict):
+        for k, v in value.items():
+            prefix = f'{_name}.' if _name else ''
+            if prefix.startswith('registration.field_data[') and k in ('config', 'raw_value'):
+                # don't descend into config and raw value of a field
+                yield f'{prefix}{k}', _render_placeholder_value(v)
+            else:
+                yield from _get_preview_placeholders(v, f'{prefix}{k}')
+    elif isinstance(value, list):
+        if _name == 'registration.field_data':
+            # separate placeholders for each field
+            for i, v in enumerate(value):
+                yield from _get_preview_placeholders(v, f'{_name}[{i}]')
+        else:
+            yield _name, _render_placeholder_value(value)
+    else:
+        yield _name, _render_placeholder_value(value)
+
+
+def get_preview_placeholders(value):
+    """Get a flat list of placeholders from the template context."""
+    placeholders = _get_preview_placeholders(value)
+    placeholders.sort(key=lambda x: (
+        not x[0].startswith('custom_fields.'),
+        not x[0].startswith('event.'),
+        x[0].startswith('registration.field_data['),
+    ))
+    return placeholders

@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {pdfjs, Document, Page} from 'react-pdf';
@@ -32,20 +31,10 @@ const MESSAGE_HEADERS = {
 };
 
 const processPlaceholders = placeholderData =>
-  Object.entries(placeholderData).map(([name, value]) =>
-    _.isObject(value)
-      ? {
-          name: _.isArray(value) ? `${name}.0` : name,
-          parametrized: true,
-          params: Object.entries(_.isArray(value) ? value[0] : value).map(
-            ([param, paramValue]) => ({
-              param,
-              description: JSON.stringify(paramValue),
-            })
-          ),
-        }
-      : {name, description: JSON.stringify(value)}
-  );
+  placeholderData.map(([name, value]) => ({
+    name,
+    description: value,
+  }));
 
 const debounce = makeAsyncDebounce(250);
 
@@ -89,7 +78,7 @@ export default function Previewer({url, data}) {
 
   return (
     <>
-      {placeholders && <PlaceholderInfo placeholders={placeholders} jinja />}
+      {placeholders && <PlaceholderInfo placeholders={placeholders} jinja htmlDescription />}
       {error &&
         Object.entries(error).map(([entry, errs]) => (
           <Message key={entry} error visible={!!error}>

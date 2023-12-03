@@ -30,7 +30,7 @@ from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import ReceiptTemplateDBSchema
 from indico.modules.receipts.settings import receipt_defaults
 from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code, create_pdf, get_inherited_templates,
-                                          get_useful_registration_data)
+                                          get_safe_template_context)
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
@@ -120,14 +120,8 @@ class RHPreviewReceipts(RenderReceiptsBase):
         html_sources = []
         for registration in self.registrations:
             g.template_stack.append(TemplateStackEntry(registration))
-            html_sources.append(compile_jinja_code(
-                self.template.html,
-                use_stack=True,
-                custom_fields=custom_fields,
-                event=self.event,
-                registration=registration,
-                **get_useful_registration_data(registration.registration_form, registration)
-            ))
+            safe_ctx = get_safe_template_context(self.event, registration, custom_fields)
+            html_sources.append(compile_jinja_code(self.template.html, safe_ctx, use_stack=True))
         del g.template_stack
         pdf_data = create_pdf(self.event, html_sources, self.template.css)
         return jsonify({'pdf': base64.b64encode(pdf_data.getvalue())})
@@ -148,14 +142,8 @@ class RHGenerateReceipts(RenderReceiptsBase):
 
         def _compile_receipt_for_reg(registration):
             g.template_stack.append(TemplateStackEntry(registration))
-            return compile_jinja_code(
-                self.template.html,
-                use_stack=True,
-                custom_fields=custom_fields,
-                event=self.event,
-                registration=registration,
-                **get_useful_registration_data(registration.registration_form, registration)
-            )
+            safe_ctx = get_safe_template_context(self.event, registration, custom_fields)
+            return compile_jinja_code(self.template.html, safe_ctx, use_stack=True)
 
         g.template_stack = []
         html_sources = {registration: _compile_receipt_for_reg(registration) for registration in self.registrations}

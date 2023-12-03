@@ -604,7 +604,10 @@ class Registration(db.Model):
         return personal_data
 
     def _render_price(self, price):
-        return format_currency(price, self.currency, locale=session.lang or 'en_GB')
+        locale = 'en_GB'
+        if has_request_context():
+            locale = session.lang or 'en_GB'
+        return format_currency(price, self.currency, locale=locale)
 
     def render_price(self):
         return self._render_price(self.price)

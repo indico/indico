@@ -27,11 +27,14 @@ const placeholderShape = {
   ),
 };
 
-function SinglePlaceholderInfo({name, description, required, jinja}) {
+function SinglePlaceholderInfo({name, description, required, jinja, htmlDescription}) {
   return (
     <li>
       <code>{jinja ? `{{ ${name} }}` : `{${name}}`}</code>
-      <span styleName="description"> – {description}</span>
+      <span styleName="description">
+        {' '}
+        – {htmlDescription ? <span dangerouslySetInnerHTML={{__html: description}} /> : description}
+      </span>
       {required && (
         <span styleName="required">
           (<Translate>required</Translate>)
@@ -46,13 +49,14 @@ SinglePlaceholderInfo.propTypes = {
   required: PropTypes.bool,
   description: PropTypes.node.isRequired,
   jinja: PropTypes.bool.isRequired,
+  htmlDescription: PropTypes.bool.isRequired,
 };
 
 SinglePlaceholderInfo.defaultProps = {
   required: false,
 };
 
-function ParametrizedPlaceholderInfo({name, required, params, jinja}) {
+function ParametrizedPlaceholderInfo({name, required, params, jinja, htmlDescription}) {
   const paramName = param => (jinja ? `${name}.${param}` : `${name}:${param}`);
   return params.map(({param, description}) => (
     <SinglePlaceholderInfo
@@ -61,6 +65,7 @@ function ParametrizedPlaceholderInfo({name, required, params, jinja}) {
       required={required}
       description={description}
       jinja={jinja}
+      htmlDescription={htmlDescription}
     />
   ));
 }
@@ -68,20 +73,31 @@ function ParametrizedPlaceholderInfo({name, required, params, jinja}) {
 ParametrizedPlaceholderInfo.propTypes = {
   ...placeholderShape,
   jinja: PropTypes.bool.isRequired,
+  htmlDescription: PropTypes.bool.isRequired,
 };
 
-function PlaceholderInfoBox({placeholders, jinja}) {
+function PlaceholderInfoBox({placeholders, jinja, htmlDescription}) {
   return (
-    <ul styleName="placeholder-info">
+    <ul styleName={`placeholder-info ${jinja ? 'jinja' : ''}`}>
       {placeholders
         .filter(p => p.description)
         .map(placeholder => (
-          <SinglePlaceholderInfo key={placeholder.name} {...placeholder} jinja={jinja} />
+          <SinglePlaceholderInfo
+            key={placeholder.name}
+            {...placeholder}
+            jinja={jinja}
+            htmlDescription={htmlDescription}
+          />
         ))}
       {placeholders
         .filter(p => p.parametrized)
         .map(placeholder => (
-          <ParametrizedPlaceholderInfo key={placeholder.name} {...placeholder} jinja={jinja} />
+          <ParametrizedPlaceholderInfo
+            key={placeholder.name}
+            {...placeholder}
+            jinja={jinja}
+            htmlDescription={htmlDescription}
+          />
         ))}
     </ul>
   );
@@ -90,9 +106,10 @@ function PlaceholderInfoBox({placeholders, jinja}) {
 PlaceholderInfoBox.propTypes = {
   placeholders: PropTypes.arrayOf(PropTypes.shape(placeholderShape)).isRequired,
   jinja: PropTypes.bool.isRequired,
+  htmlDescription: PropTypes.bool.isRequired,
 };
 
-export default function PlaceholderInfo({placeholders, defaultOpen, jinja}) {
+export default function PlaceholderInfo({placeholders, defaultOpen, jinja, htmlDescription}) {
   const simplePlaceholders = placeholders.filter(p => !p.advanced);
   const advancedPlaceholders = placeholders.filter(p => p.advanced);
 
@@ -101,7 +118,13 @@ export default function PlaceholderInfo({placeholders, defaultOpen, jinja}) {
       key: 'simple',
       title: Translate.string('Available placeholders'),
       content: {
-        content: <PlaceholderInfoBox placeholders={simplePlaceholders} jinja={jinja} />,
+        content: (
+          <PlaceholderInfoBox
+            placeholders={simplePlaceholders}
+            jinja={jinja}
+            htmlDescription={htmlDescription}
+          />
+        ),
       },
     },
   ];
@@ -110,7 +133,13 @@ export default function PlaceholderInfo({placeholders, defaultOpen, jinja}) {
       key: 'advanced',
       title: Translate.string('Advanced placeholders'),
       content: {
-        content: <PlaceholderInfoBox placeholders={advancedPlaceholders} jinja={jinja} />,
+        content: (
+          <PlaceholderInfoBox
+            placeholders={advancedPlaceholders}
+            jinja={jinja}
+            htmlDescription={htmlDescription}
+          />
+        ),
       },
     });
   }
@@ -130,9 +159,11 @@ PlaceholderInfo.propTypes = {
   placeholders: PropTypes.arrayOf(PropTypes.shape(placeholderShape)).isRequired,
   defaultOpen: PropTypes.bool,
   jinja: PropTypes.bool,
+  htmlDescription: PropTypes.bool,
 };
 
 PlaceholderInfo.defaultProps = {
   defaultOpen: false,
   jinja: false,
+  htmlDescription: false,
 };

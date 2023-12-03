@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import typing as t
 from copy import deepcopy
+from operator import attrgetter
 
 from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
 from marshmallow_oneofschema import OneOfSchema
+from speaklater import is_lazy_string
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.events import Event
@@ -110,52 +113,91 @@ class ReceiptTemplateAPISchema(mm.Schema):
         return data
 
 
-class PersonalDataFieldSchema(mm.Schema):
-    title = fields.String()
-    first_name = fields.String()
-    last_name = fields.String()
-    email = fields.Email()
-    affiliation = fields.String()
-    position = fields.String()
-    address = fields.String()
-    country = fields.String()
-    phone = fields.String()
-    price = fields.Number()
-
-
-class FormFieldsSchema(mm.Schema):
-    title = fields.String()
-    section_title = fields.String()
-    input_type = fields.String()
-    value = fields.Boolean()
-    field_data = fields.Dict()
-    friendly_value = fields.Raw()
-    actual_price = fields.Number()
+class PersonalDataSchema(mm.Schema):
+    first_name = fields.String(required=True)
+    last_name = fields.String(required=True)
+    email = fields.Email(required=True)
+    title = fields.String(load_default='')
+    affiliation = fields.String(load_default='')
+    position = fields.String(load_default='')
+    address = fields.String(load_default='')
+    country = fields.String(load_default='')
+    phone = fields.String(load_default='')
 
 
 class EventDataSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('id', 'category_chain', 'title', 'start_dt', 'end_dt', 'timezone', 'venue_name', 'room_name',
-                  'address', 'type')
+        fields = ('id', '_category_chain', 'title', 'start_dt', 'end_dt', 'timezone', 'venue_name', 'room_name',
+                  'address', '_type', 'category_chain', 'type')
 
-    category_chain = fields.List(fields.String(), attribute='category.chain_titles')
-    type = fields.String(attribute='_type.name')
+    # dump from nested data
+    _category_chain = fields.List(fields.String(), attribute='category.chain_titles', data_key='category_chain',
+                                  dump_only=True)
+    _type = fields.String(attribute='_type.name', data_key='type', dump_only=True)
+    # load into flat data
+    category_chain = fields.List(fields.String(), load_only=True)
+    type = fields.String(load_only=True)
 
 
 class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Registration
-        fields = ('id', 'friendly_id', 'submitted_dt')
+        fields = ('id', 'friendly_id', 'submitted_dt', 'base_price', 'total_price', 'currency', 'formatted_price',
+                  'field_data', 'personal_data')
+
+    base_price = fields.Number(required=True)
+    total_price = fields.Number(required=True)
+    currency = fields.String(required=True)
+    formatted_price = fields.String(required=True)
+    field_data = fields.Method('_dump_field_data', '_load_field_data', required=True)
+    personal_data = fields.Nested(PersonalDataSchema, required=True)
+
+    def get_attribute(self, obj: t.Union[Registration, dict], attr: str, default: t.Any):
+        # Unfortunately marshmallow has no nice way to specify that a value is coming from a method
+        # on the object, so we have to hack into the attribute lookup logic for this purpose...
+        if isinstance(obj, dict):
+            # Dummy preview data loaded from YAML - no magic needed
+            return super().get_attribute(obj, attr, default)
+
+        if attr == 'personal_data':
+            return obj.get_personal_data()
+        elif attr == 'total_price':
+            return obj.price
+        elif attr == 'formatted_price':
+            return obj.render_price()
+
+        return super().get_attribute(obj, attr, default)
+
+    def _dump_field_data(self, registration: t.Union[Registration, dict]):
+        if isinstance(registration, dict):
+            # Dummy preview data loaded from YAML
+            return registration['field_data']
+        regform = registration.registration_form
+        fields = []
+        for field in sorted(regform.active_fields, key=attrgetter('parent.position', 'position')):
+            config = field.versioned_data | field.data
+            data = registration.data_by_field.get(field.id)  # XXX: skip missing ones altogether?
+            value = data.data if data else None
+            friendly_value = data.get_friendly_data(for_humans=True)
+            if is_lazy_string(friendly_value):
+                friendly_value = str(friendly_value)
+            fields.append({
+                'title': field.title,
+                'section_title': field.parent.title,
+                'input_type': field.input_type,
+                'raw_value': value,
+                'friendly_value': friendly_value,
+                'config': config,
+                'actual_price': data.price if data else None
+            })
+        return fields
+
+    def _load_field_data(self, value):
+        return value
 
 
 class TemplateDataSchema(mm.Schema):
-    custom_fields = fields.Dict(keys=fields.String)
-    personal_data = fields.Nested(PersonalDataFieldSchema)
-    event = fields.Nested(EventDataSchema)
-    registration = fields.Nested(RegistrationDataSchema)
-    _fields = fields.List(fields.Nested(FormFieldsSchema), attribute='fields', data_key='fields')
-    base_price = fields.Number()
-    total_price = fields.Number()
-    currency = fields.String()
-    formatted_price = fields.String()
+    custom_fields = fields.Dict(keys=fields.String, required=True)
+    event = fields.Nested(EventDataSchema, required=True)
+    registration = fields.Nested(RegistrationDataSchema, required=True)
