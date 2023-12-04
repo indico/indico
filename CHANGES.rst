@@ -86,6 +86,8 @@ Accessibility
   thanks :user:`foxbunny`)
 - Prevent icons from being announced to screen readers as random characters (:issue:`5985`,
   :pr:`5986`, thanks :user:`foxbunny`)
+- Add proper labels to the captcha play and reload buttons (:issue:`6064`, :pr:`6080`,
+  :thanks:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
