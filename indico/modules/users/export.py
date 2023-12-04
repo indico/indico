@@ -6,13 +6,13 @@
 # LICENSE file for more details.
 
 from datetime import timedelta
-from pathlib import Path
+from pathlib import Path, PurePath
 from tempfile import NamedTemporaryFile
 from uuid import uuid4
 from zipfile import ZipFile
 
 import yaml
-from sqlalchemy.orm import joinedload, subqueryload
+from sqlalchemy.orm import joinedload, selectinload, subqueryload
 
 from indico.core.config import config
 from indico.core.db import db
@@ -175,7 +175,16 @@ def get_registration_files(user):
 
 def get_attachments(user):
     """Get all attachments uploaded by the user."""
-    return Attachment.query.filter(Attachment.user == user, Attachment.type == AttachmentType.file).all()
+    folder_strategy = joinedload('folder')
+    folder_strategy.joinedload('event').load_only('id')
+    folder_strategy.joinedload('contribution').load_only('id', 'event_id')
+    folder_strategy.joinedload('subcontribution').load_only('id', 'contribution_id')
+    folder_strategy.joinedload('session').load_only('id', 'event_id')
+    folder_strategy.joinedload('category').load_only('id')
+    return (Attachment.query
+            .options(folder_strategy)
+            .filter(Attachment.user == user, Attachment.type == AttachmentType.file)
+            .all())
 
 
 def get_note_revisions(user):
@@ -219,9 +228,20 @@ def get_subcontributions(user):
             .all())
 
 
+def get_survey_submissions(user):
+    """Get all survey submissions linked to the user."""
+    return (user.survey_submissions
+            .options(joinedload('survey'),
+                     joinedload('answers').joinedload('question'))
+            .all())
+
+
 def get_abstracts(user):
     """Get all abstracts where the user is either the submitter or is linked to the abstract."""
-    return (Abstract.query.options(joinedload('person_links'))
+    return (Abstract.query
+            .options(joinedload('person_links'),
+                     joinedload('event').load_only('id'),
+                     selectinload('files'))
             .filter(db.or_(Abstract.submitter == user,
                            Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
             .all())
@@ -239,12 +259,22 @@ def get_papers(user):
 
 def get_editables(user):
     """Get all editables where the user is linked to the parent contribution or has submitted an editing revision."""
+    query = (db.session.query(Editable.id)
+             .join(Contribution, Contribution.id == Editable.contribution_id)
+             .outerjoin(ContributionPersonLink, ContributionPersonLink.contribution_id == Contribution.id)
+             .outerjoin(EditingRevision, EditingRevision.editable_id == Editable.id)
+             .filter(db.or_(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
+                            EditingRevision.user == user))
+             .all())
+    editable_ids = {eid for eid, in query}
+    revisions_strategy = joinedload('revisions')
+    # revisions_strategy.selectinload('comments').joinedload('user')
+    revision_file_strategy = revisions_strategy.selectinload('files')
+    revision_file_strategy.joinedload('file')
+    revision_file_strategy.selectinload('file_type')
     return (Editable.query
-            .join(Contribution, Contribution.id == Editable.contribution_id)
-            .outerjoin(ContributionPersonLink, ContributionPersonLink.contribution_id == Contribution.id)
-            .outerjoin(EditingRevision, EditingRevision.editable_id == Editable.id)
-            .filter(db.or_(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
-                           EditingRevision.user == user))
+            .options(revisions_strategy)
+            .filter(Editable.id.in_(editable_ids))
             .all())
 
 
@@ -297,8 +327,9 @@ def build_filename(file):
     else:
         id = file.id
 
-    filename = secure_filename(Path(file.filename).stem, '')
-    return f'{id}_{filename}.{file.extension}'
+    filename_data = PurePath(file.filename)
+    filename = secure_filename(filename_data.stem, '')
+    return f'{id}_{filename}{filename_data.suffix}'
 
 
 def secure_path(path):

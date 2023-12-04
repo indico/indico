@@ -33,7 +33,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
 from indico.modules.users.export import (build_storage_path, get_abstracts, get_attachments, get_contributions,
                                          get_editables, get_note_revisions, get_papers, get_registrations,
-                                         get_subcontributions)
+                                         get_subcontributions, get_survey_submissions)
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest
 from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.modules.users.schemas import AffiliationSchema
@@ -386,7 +386,7 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     subcontributions = fields.Method('_get_subcontributions')
     registrations = fields.Method('_get_registrations')
     room_booking = fields.Function(lambda user: RoomBookingExportSchema().dump(user))
-    survey_submissions = fields.List(fields.Nested(SurveySubmissionSchema))
+    survey_submissions = fields.Method('_get_survey_submissions')
     abstracts = fields.Method('_get_abstracts')
     papers = fields.Method('_get_papers')
     attachments = fields.Method('_get_attachments')
@@ -413,6 +413,10 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     def _get_abstracts(self, user):
         abstracts = get_abstracts(user)
         return AbstractExportSchema(many=True).dump(abstracts)
+
+    def _get_survey_submissions(self, user):
+        survey_submissions = get_survey_submissions(user)
+        return SurveySubmissionSchema(many=True).dump(survey_submissions)
 
     def _get_papers(self, user):
         papers = get_papers(user)
