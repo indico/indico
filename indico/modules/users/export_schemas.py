@@ -169,7 +169,7 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
     fields = fields.Method('_serialize_data')
 
     def _serialize_data(self, registration):
-        registration_data = [data for data in registration.data if not data.field_data.field.is_manager_only]
+        registration_data = [data for data in registration.data if not data.field_data.field.parent.is_manager_only]
         return RegistrationDataExportSchema(many=True).dump(registration_data)
 
 
