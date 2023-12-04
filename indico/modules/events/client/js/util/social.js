@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 (function() {
-
   $(document).ready(function() {
     const container = $('.social-button-container');
     if (!container.length) {
@@ -41,9 +40,6 @@
         },
       },
       events: {
-        render() {
-          $.getScript('//platform.twitter.com/widgets.js');
-        },
         hide() {
           $('.social-button-container').css('opacity', '');
         },

@@ -828,3 +828,34 @@ ul.material_list ul li {
   vertical-align: -12%;
   font-size: 15px;
 }
+
+.twitter-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  padding: 3px 10px 3px 10px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.twitter-btn-blue {
+  background-color: #1d9bf0;
+  color: #fff;
+}
+
+.twitter-btn-blue:hover {
+  background-color: #0a72ae;
+}
+
+.twitter-btn-icon {
+  display: inline;
+  height: 1rem;
+  width: 1rem;
+  pointer-events: none;
+}
+
+.twitter-btn-text {
+  font-size: 1rem;
+  font-weight: 500;
+  padding-left: 5px;
+}

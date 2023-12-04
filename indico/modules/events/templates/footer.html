@@ -17,8 +17,15 @@
             <div>
                 <h4>{% trans %}Social networks{% endtrans %}</h4>
                 <div class="social-site">
-                    <a href="https://twitter.com/intent/tweet?text={{ url }}" class="twitter-share-button">
-                        {%- trans %}Tweet{% endtrans -%}
+                    <a href="https://twitter.com/intent/tweet?text={{ event.title }} ({{ event.start_dt | format_datetime(format='d MMMM YYYY') }}) · Indico {{ url }}" target="_blank">
+                        <button class="twitter-btn twitter-btn-blue">
+                            <i class="twitter-btn-icon">
+                                <img src="{{ url_for('assets.image', filename='twitter-bird.svg') }}" alt="" border="0">
+                            </i>
+                            <span class=twitter-btn-text>
+                              {% trans %}Tweet{% endtrans %}
+                            </span>
+                        </button>
                     </a>
                 </div>
             </div>
