@@ -217,12 +217,27 @@ def assert_json_snapshot(snapshot, obj, snapshot_filename):
     snapshot.assert_match(json.dumps(obj, indent=2, sort_keys=True), snapshot_filename)
 
 
-def assert_yaml_snapshot(snapshot, obj, snapshot_filename):
+def assert_yaml_snapshot(snapshot, obj, snapshot_filename, *, strip_dynamic_data=False):
     """Assert that a yaml object matches a snapshot.
 
     :param snapshot: The pytest snapshot fixture
     :param obj: The yaml object to compare
     :param snapshot_filename: The filename for the snapshot
+    :param strip_dynamic_data: Whether to replace likely-dynamic data like IDs and
+                               dates with placeholders
     """
+    dumped = yaml.dump(obj)
+    if strip_dynamic_data:
+        dumped = remove_dynamic_data(dumped)
     __tracebackhide__ = True
-    snapshot.assert_match(yaml.dump(obj), snapshot_filename)
+    snapshot.assert_match(dumped, snapshot_filename)
+
+
+def remove_dynamic_data(yaml_string):
+    """Remove data that appears dynamic (IDs, dates) from a YAML string."""
+    yaml_string = re.sub(r'(?<=_date: ).+$', '<timestamp>', yaml_string, flags=re.MULTILINE)
+    yaml_string = re.sub(r'(?<=_dt: ).+$', '<timestamp>', yaml_string, flags=re.MULTILINE)
+    yaml_string = re.sub(r'(?<=: )[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', '<uuid>',
+                         yaml_string, flags=re.MULTILINE)
+    yaml_string = re.sub(r'(?<=_id: ).+$', '<id>', yaml_string, flags=re.MULTILINE)
+    return re.sub(r'(?<=\bid: ).+$', '<id>', yaml_string, flags=re.MULTILINE)
