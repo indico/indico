@@ -3,18 +3,18 @@ affiliation_link:
   city: ''
   country_code: ''
   country_name: ''
-  id: 1
+  id: <id>
   name: CERN
   postcode: ''
   street: ''
 avatar_url: /user/1337/picture-default
 email: 1337@example.test
 favorite_categories:
-- id: 42
+- id: <id>
   title: dummy
   url: http://localhost/category/42/
 favorite_events:
-- id: 0
+- id: <id>
   title: dummy#0
   url: http://localhost/event/0/
 first_name: Guinea

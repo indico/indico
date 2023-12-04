@@ -29,7 +29,7 @@ SNAPSHOT_DIR = Path(__file__).parent / 'tests'
 def _assert_yaml_snapshot(snapshot, data, name):
     __tracebackhide__ = True
     snapshot.snapshot_dir = SNAPSHOT_DIR
-    assert_yaml_snapshot(snapshot, data, name)
+    assert_yaml_snapshot(snapshot, data, name, strip_dynamic_data=True)
 
 
 @pytest.fixture(autouse=True)

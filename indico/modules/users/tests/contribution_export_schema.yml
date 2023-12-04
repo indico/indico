@@ -1,17 +1,17 @@
 address: ''
 description: ''
 duration: 20
-end_dt: null
-event_id: 0
+end_dt: <timestamp>
+event_id: <id>
 event_url: http://localhost/event/0/
-id: 420
+id: <id>
 is_author: false
 is_deleted: false
 is_speaker: true
 keywords: []
 minutes: <p><strong>Contrib Test</strong></p>
 room_name: ''
-start_dt: null
+start_dt: <timestamp>
 title: Dummy Contribution
 url: http://localhost/event/0/contributions/420/
 venue_name: ''

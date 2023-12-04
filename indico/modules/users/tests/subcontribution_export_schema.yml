@@ -1,8 +1,8 @@
-contribution_id: 420
+contribution_id: <id>
 description: ''
 duration: 10
 event_url: http://localhost/event/0/
-id: 420
+id: <id>
 is_deleted: false
 minutes: <p><strong>SubContrib Test</strong></p>
 room_name: ''

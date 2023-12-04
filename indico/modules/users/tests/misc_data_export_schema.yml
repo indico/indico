@@ -1,6 +1,6 @@
 api_key: null
 created_events:
-- id: 0
+- id: <id>
   title: dummy#0
   url: http://localhost/event/0/
 identities:
@@ -9,7 +9,7 @@ identities:
     - bar
     - baz
   identifier: guinea_pig
-  last_login_dt: null
+  last_login_dt: <timestamp>
   last_login_ip: null
   provider: ldap
 oauth_applications:
@@ -21,19 +21,19 @@ oauth_applications:
   - read:user
 old_api_keys: []
 personal_tokens:
-- created_dt: '2022-05-22T12:00:00+00:00'
-  last_used_dt: null
+- created_dt: <timestamp>
+  last_used_dt: <timestamp>
   last_used_ip: null
   name: dummy
-  revoked_dt: null
+  revoked_dt: <timestamp>
   scopes:
   - read:legacy_api
   - read:user
   use_count: 0
 static_sites:
-- event_id: 0
+- event_id: <id>
   event_url: http://localhost/event/0/
-  id: 1
-  requested_dt: '2022-05-22T12:00:00+00:00'
+  id: <id>
+  requested_dt: <timestamp>
   state: pending
   url: http://localhost/event/0/manage/offline-copy/1.zip

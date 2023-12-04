@@ -1,10 +1,10 @@
 checked_in: false
-checked_in_dt: null
+checked_in_dt: <timestamp>
 consent_to_publish: nobody
 created_by_manager: false
 currency: USD
 email: 1337@example.test
-event_id: 0
+event_id: <id>
 event_title: dummy#0
 event_url: http://localhost/event/0/
 fields:
@@ -12,18 +12,18 @@ fields:
   description: ''
   file:
     _archive_path: registrations/0_dummy0/730_730_registration_upload.txt
-    field_data_id: 730
+    field_data_id: <id>
     filename: registration_upload.txt
     md5: d659f3992a4861fbba98e728e8ab5d8e
-    registration_id: 730
+    registration_id: <id>
     url: http://localhost/event/0/manage/registration/420/registrations/730/file/730-registration_upload.txt
   title: File field
 first_name: Guinea
-id: 730
+id: <id>
 is_deleted: false
 last_name: Pig
 price: '0'
 rejection_reason: ''
 state: complete
-submitted_dt: '2022-05-22T12:00:00+00:00'
+submitted_dt: <timestamp>
 url: http://localhost/event/0/manage/registration/420/registrations/730/
