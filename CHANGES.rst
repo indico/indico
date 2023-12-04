@@ -57,8 +57,9 @@ Improvements
   event participants (:pr:`5123`, :pr:`6078`)
 - Show which persons are external in the user search dialog (:pr:`6074`)
 - Add feature for users to export all data linked to them (:pr:`5757`)
-- Support adding events to Outlook calendar, remove Facebook and Google+ sharing options
-  (:issue:`6075`, :pr:`6077`)
+- Add Outlook online calendar button to share widget (:issue:`6075`, :pr:`6077`)
+- Remove Facebook and Google+ share widgets and make Twitter share button privacy-friendly
+  (:pr:`6077`)
 
 Bugfixes
 ^^^^^^^^
