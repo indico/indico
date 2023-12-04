@@ -22,6 +22,7 @@ from indico.util.string import truncate
 logger = Logger.get('emails')
 
 
+# XXX: Please don't use this in new code. Call `send_email()` directly.
 def email_sender(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):

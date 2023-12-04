@@ -16,7 +16,7 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.notifications import email_sender, make_email
+from indico.core.notifications import make_email, send_email
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.files import AbstractFile
@@ -300,21 +300,19 @@ def get_old_requests(days):
             .all())
 
 
-@email_sender
 def notify_data_export_success(export_request):
     """Send an email to a user when a data export has finished."""
     with export_request.user.force_user_locale():
         template = get_template_module('users/emails/data_export_success.txt',
                                        user=export_request.user, link=export_request.url,
                                        max_size_exceeded=export_request.max_size_exceeded)
-        return make_email({export_request.user.email}, template=template, html=False)
+        send_email(make_email({export_request.user.email}, template=template, html=False))
 
 
-@email_sender
 def notify_data_export_failure(export_request):
     """Send an email to a user when a data export has failed."""
     with export_request.user.force_user_locale():
         user = export_request.user
         template = get_template_module('users/emails/data_export_failure.txt', user=user,
                                        link=url_for('users.user_data_export', user, _external=True))
-        return make_email({export_request.user.email}, template=template, html=False)
+        send_email(make_email({export_request.user.email}, template=template, html=False))
