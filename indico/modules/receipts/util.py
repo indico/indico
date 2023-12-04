@@ -97,9 +97,10 @@ def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
 
 def has_any_templates(event: Event) -> bool:
     """Check if any receipt templates are available for the event."""
+    event_category = event.category or Category.get_root()
     return (ReceiptTemplate.query
             .filter(~ReceiptTemplate.is_deleted,
-                    or_(ReceiptTemplate.category_id.in_(categ['id'] for categ in event.category.chain),
+                    or_(ReceiptTemplate.category_id.in_(categ['id'] for categ in event_category.chain),
                         ReceiptTemplate.event == event))
             .has_rows())
 
