@@ -14,6 +14,7 @@ from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
 from indico.util.string import format_repr
+from indico.web.flask.util import url_for
 
 
 class DataExportRequestState(RichIntEnum):
@@ -119,8 +120,8 @@ class DataExportRequest(db.Model):
 
     @property
     def url(self):
-        if f := self.file:
-            return f.signed_download_url
+        if self.file:
+            return url_for('users.user_data_export_download')
 
     @property
     def is_running(self):

@@ -218,6 +218,8 @@ class RHPersonalData(RHUserBase):
 
 
 class RHUserDataExport(RHUserBase):
+    """Frontend page for user data exports."""
+
     def _process(self):
         if req := self.user.data_export_request:
             data = DataExportRequestSchema().dump(req)
@@ -228,7 +230,19 @@ class RHUserDataExport(RHUserBase):
                                                 export_request=data, export_options=export_options)
 
 
+class RHUserDataExportDownload(RHUserBase):
+    """Download the exported user data archive."""
+
+    def _process(self):
+        if not self.user.data_export_request or not self.user.data_export_request.file:
+            raise NotFound
+        logger.info('User data export for %r downloaded by %r', self.user, session.user)
+        return self.user.data_export_request.file.send()
+
+
 class RHUserDataExportAPI(RHUserBase):
+    """API to trigger user data exports."""
+
     @use_kwargs({
         'options': fields.List(fields.Enum(DataExportOptions), validate=validate.Length(min=1)),
         'include_files': fields.Bool(required=True)
@@ -236,6 +250,8 @@ class RHUserDataExportAPI(RHUserBase):
     def _process_POST(self, options, include_files):
         from indico.modules.users.tasks import export_user_data
         export_user_data.delay(self.user, options, include_files)
+        logger.info('User data export for %r triggered by %r [%s, files=%r]',
+                    self.user, session.user, ', '.join(x.name for x in options), include_files)
         return {'state': DataExportRequestState.running.name}
 
 

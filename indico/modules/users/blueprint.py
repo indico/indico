@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
+from flask import has_request_context, request
 
 from indico.modules.users.api import RHUserAPI
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHExportDashboardICS,
@@ -13,13 +13,13 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHProfilePictureDisplay, RHProfilePicturePage, RHProfilePicturePreview,
                                               RHRegistrationRequestList, RHRejectRegistrationRequest,
                                               RHSaveProfilePicture, RHSearchAffiliations, RHUserBlock, RHUserDashboard,
-                                              RHUserDataExport, RHUserDataExportAPI, RHUserEmails, RHUserEmailsDelete,
-                                              RHUserEmailsSetPrimary, RHUserEmailsVerify, RHUserFavorites,
-                                              RHUserFavoritesAPI, RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI,
-                                              RHUserPreferences, RHUserPreferencesMarkdownAPI, RHUsersAdmin,
-                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
-                                              RHUsersAdminSettings, RHUserSearch, RHUserSearchInfo,
-                                              RHUserSuggestionsRemove)
+                                              RHUserDataExport, RHUserDataExportAPI, RHUserDataExportDownload,
+                                              RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
+                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
+                                              RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI, RHUserPreferences,
+                                              RHUserPreferencesMarkdownAPI, RHUsersAdmin, RHUsersAdminCreate,
+                                              RHUsersAdminMerge, RHUsersAdminMergeCheck, RHUsersAdminSettings,
+                                              RHUserSearch, RHUserSearchInfo, RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -75,6 +75,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
     _bp.add_url_rule('/blocked', 'user_block', RHUserBlock, methods=('PUT', 'DELETE'))
     _bp.add_url_rule('/data-export', 'user_data_export', RHUserDataExport)
+    _bp.add_url_rule('/data-export.zip', 'user_data_export_download', RHUserDataExportDownload)
     _bp.add_url_rule('/api/data-export', 'api_user_data_export', RHUserDataExportAPI, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
@@ -101,5 +102,5 @@ def _add_user_id(endpoint, values):
     Note that this needs to be replicated in other blueprints when they add
     stuff to the user pages using the `user_sidemenu` signal.
     """
-    if endpoint.startswith('users.user_') and 'user_id' not in values:
+    if endpoint.startswith('users.user_') and 'user_id' not in values and has_request_context():
         values['user_id'] = request.view_args.get('user_id')

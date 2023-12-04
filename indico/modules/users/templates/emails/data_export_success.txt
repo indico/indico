@@ -16,6 +16,7 @@
             {% endtrans %}
         {%- endif %}
 
-        {% trans %}Download link:{% endtrans %} {{ link }}
+        {% trans %}You can download it on the following page:{% endtrans %}
+        {{ link }}
     {%- endfilter -%}
 {%- endblock %}

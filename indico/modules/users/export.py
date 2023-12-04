@@ -303,8 +303,8 @@ def get_old_requests(days):
 def notify_data_export_success(export_request):
     """Send an email to a user when a data export has finished."""
     with export_request.user.force_user_locale():
-        template = get_template_module('users/emails/data_export_success.txt',
-                                       user=export_request.user, link=export_request.url,
+        template = get_template_module('users/emails/data_export_success.txt', user=export_request.user,
+                                       link=url_for('users.user_data_export', _external=True),
                                        max_size_exceeded=export_request.max_size_exceeded)
         send_email(make_email({export_request.user.email}, template=template, html=False))
 
@@ -312,7 +312,6 @@ def notify_data_export_success(export_request):
 def notify_data_export_failure(export_request):
     """Send an email to a user when a data export has failed."""
     with export_request.user.force_user_locale():
-        user = export_request.user
-        template = get_template_module('users/emails/data_export_failure.txt', user=user,
-                                       link=url_for('users.user_data_export', user, _external=True))
+        template = get_template_module('users/emails/data_export_failure.txt', user=export_request.user,
+                                       link=url_for('users.user_data_export', _external=True))
         send_email(make_email({export_request.user.email}, template=template, html=False))

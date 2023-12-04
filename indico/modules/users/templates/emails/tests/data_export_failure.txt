@@ -1,8 +1,9 @@
 Dear Guinea,
 
-We weren't able to process your data export request.
+We weren't able to process your data export request due to an error.
 
-You may try again at the following link: attachment.zip
+You may try again at the following link:
+http://localhost/user/data-export
 
 --
 Indico :: Email Notifier

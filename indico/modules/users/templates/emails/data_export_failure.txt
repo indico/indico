@@ -7,7 +7,8 @@
 {%- endblock %}
 
 {% block body -%}
-{% trans %}We weren't able to process your data export request.{% endtrans %}
+{% trans %}We weren't able to process your data export request due to an error.{% endtrans %}
 
-{% trans %}You may try again at the following link: {{ link }}{% endtrans %}
+{% trans %}You may try again at the following link:{% endtrans %}
+{{ link }}
 {%- endblock %}

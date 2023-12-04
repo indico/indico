@@ -2,7 +2,8 @@ Dear Guinea,
 
 Your Indico data export is ready for download.
 
-Download link: attachment.zip
+You can download it on the following page:
+http://localhost/user/data-export
 
 --
 Indico :: Email Notifier
