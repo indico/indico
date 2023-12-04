@@ -477,11 +477,11 @@ div.invalid {
   color: #045fb4;
 }
 
-.qtip-blue .direct-link {
+.social_share_tooltip.qtip-blue .direct-link {
   color: #124ea8 !important;
 }
 
-.qtip-dark .direct-link {
+.social_share_tooltip.qtip-dark .direct-link {
   color: #87b7ff !important;
 }
 
