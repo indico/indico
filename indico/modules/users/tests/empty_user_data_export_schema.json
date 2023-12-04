@@ -33,7 +33,8 @@
   "room_booking": {
     "favorite_rooms": [],
     "owned_rooms": [],
-    "reservations": []
+    "reservations": [],
+    "reservations_booked_for": []
   },
   "settings": {
     "add_ical_alerts": false,

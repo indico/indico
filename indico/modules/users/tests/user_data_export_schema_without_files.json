@@ -235,6 +235,21 @@
         "room_id": 420,
         "start_dt": "2022-05-22T08:30:00"
       }
+    ],
+    "reservations_booked_for": [
+      {
+        "booked_for_name": "Guinea Pig",
+        "booking_reason": "Testing",
+        "end_dt": "2022-05-22T17:30:00",
+        "id": 420,
+        "is_accepted": true,
+        "is_repeating": false,
+        "recurrence_weekdays": null,
+        "repeat_frequency": "NEVER",
+        "repeat_interval": 0,
+        "room_id": 420,
+        "start_dt": "2022-05-22T08:30:00"
+      }
     ]
   },
   "settings": {

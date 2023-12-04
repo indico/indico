@@ -285,6 +285,7 @@ class RoomBookingExportSchema(Schema):
     favorite_rooms = fields.List(fields.Nested(RoomExportSchema))
     owned_rooms = fields.List(fields.Nested(RoomExportSchema))
     reservations = fields.List(fields.Nested(ReservationSchema))
+    reservations_booked_for = fields.List(fields.Nested(ReservationSchema))
 
 
 class MiscDataExportSchema(Schema):
