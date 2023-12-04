@@ -141,6 +141,7 @@ export default function FormItem({
               disabled={disabled}
               isPurged={showPurged}
               retentionPeriodIcon={retentionPeriodIcon}
+              htmlId={htmlId}
               {...inputProps}
             />
           ) : (
