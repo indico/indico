@@ -477,13 +477,26 @@ div.invalid {
   color: #045fb4;
 }
 
+.qtip-blue .direct-link {
+  color: #124ea8 !important;
+}
+
+.qtip-dark .direct-link {
+  color: #87b7ff !important;
+}
+
 .social_share_tooltip {
   max-width: 350px;
   color: #fff;
 }
 
-.social_share_tooltip h2 {
+.social_share_tooltip.qtip-dark h2 {
   color: #fff;
+  margin-bottom: 5px;
+}
+
+.social_share_tooltip.qtip-blue h2 {
+  color: #1f8dd1;
   margin-bottom: 5px;
 }
 
@@ -498,13 +511,12 @@ div.invalid {
 }
 
 .social_share_tooltip.qtip-dark h4 {
-  margin-top: 0;
-  margin-bottom: 5px;
-  color: #aaa;
+  margin: 5px 0;
+  color: #cdcdcd;
 }
 
 .social_share_tooltip.qtip-blue h4 {
-  margin-bottom: 5px;
+  margin: 5px 0;
   color: #1f8dd1;
 }
 

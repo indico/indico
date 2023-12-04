@@ -8,7 +8,7 @@
             <h2>{% trans %}Share this page{% endtrans %}</h2>
             <h4>{% trans %}Direct link{% endtrans %}</h4>
             <a href="{{ url }}"
-               class="js-copy-to-clipboard"
+               class="js-copy-to-clipboard direct-link"
                title="{% trans %}Copy link to clipboard{% endtrans %}"
                data-clipboard-text="{{ url }}"
                data-clipboard-action="copy">
@@ -36,8 +36,6 @@
                 <a href="https://www.google.com/calendar/event?{{ google_calendar_params|urlencode }}" target="_blank">
                     <img src="{{ url_for('assets.image', filename='google_calendar.gif') }}" alt="" border="0">
                 </a>
-            </div>
-            <div class="social-site">
                 <a href="https://outlook.office.com/calendar/deeplink/compose?{{ outlook_calendar_params|urlencode }}" target="_blank">
                     <img src="{{ url_for('assets.image', filename='outlook_calendar.png') }}" alt="" border="0">
                 </a>
