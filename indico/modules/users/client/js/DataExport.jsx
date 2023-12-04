@@ -85,7 +85,8 @@ function ExportRunning() {
       <Message info>
         <Message.Header>
           <Translate context="user data export">
-            We are preparing your data. We will notify you via email when the export is finished
+            Your data is being prepared. We will notify you by email once it is available for
+            download.
           </Translate>
         </Message.Header>
       </Message>
