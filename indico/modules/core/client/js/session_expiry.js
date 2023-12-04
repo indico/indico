@@ -49,6 +49,7 @@ function SessionExpiryCountdown({callback}) {
   useInterval(callback, 1000);
   return null;
 }
+
 function SessionExpiryCountdownBody({count, sessionExpiryActions, inProgress}) {
   return (
     <>
@@ -112,12 +113,12 @@ SessionExpiredBody.propTypes = {
   inProgress: PropTypes.bool.isRequired,
 };
 
-export default function SessionExpiryManager({sessionExpiry: sessionExpiryProp, hardExpiry}) {
+export default function SessionExpiryManager({initialExpiry, hardExpiry}) {
   const [inProgress, setInProgress] = useState(false);
   const [state, dispatch] = useReducer(sessionExpiryReducer, {
     operation: 'active',
     count: 120,
-    sessionExpiry: sessionExpiryProp,
+    sessionExpiry: initialExpiry,
   });
   const sessionTimeout = useRef();
   const opened = useRef(false);
@@ -244,7 +245,7 @@ export default function SessionExpiryManager({sessionExpiry: sessionExpiryProp, 
 }
 
 SessionExpiryManager.propTypes = {
-  sessionExpiry: PropTypes.string.isRequired,
+  initialExpiry: PropTypes.string.isRequired,
   hardExpiry: PropTypes.bool.isRequired,
 };
 
@@ -254,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sessionExpiry = root.dataset.sessionExpiry;
     const hardExpiry = root.dataset.hardExpiry !== undefined;
     ReactDOM.render(
-      <SessionExpiryManager sessionExpiry={sessionExpiry} hardExpiry={hardExpiry} />,
+      <SessionExpiryManager initialExpiry={sessionExpiry} hardExpiry={hardExpiry} />,
       root
     );
   }
