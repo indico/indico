@@ -139,7 +139,7 @@
     }
 
     .log-entry-details {
-      @extend .text-superfluous;
+      @include text-superfluous();
 
       display: flex;
       flex: 0.65;
