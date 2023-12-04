@@ -258,7 +258,7 @@ class WPBase(WPBundleMixin):
 
     def display(self, **params):
         from indico.modules.admin import RHAdminBase
-        from indico.modules.core.settings import core_settings, social_settings
+        from indico.modules.core.settings import core_settings
 
         title_parts = [*self._extra_title_parts, self.title]
         if self.MANAGEMENT:
@@ -285,7 +285,6 @@ class WPBase(WPBundleMixin):
                                bundles=bundles, print_bundles=print_bundles,
                                tinymce_content_css_urls=self.tinymce_content_css_urls,
                                site_name=core_settings.get('site_title'),
-                               social=social_settings.get_all(),
                                page_metadata=self.page_metadata,
                                page_title=' - '.join(str(x) for x in title_parts if x),
                                head_content=self._get_head_content(),
@@ -316,7 +315,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
     @classmethod
     def display(cls, template_name, **params):
         from indico.modules.admin import RHAdminBase
-        from indico.modules.core.settings import core_settings, social_settings
+        from indico.modules.core.settings import core_settings
 
         title_parts = [cls.title]
         if cls.MANAGEMENT:
@@ -343,7 +342,6 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
                                bundles=bundles, print_bundles=print_bundles,
                                tinymce_content_css_urls=cls.tinymce_content_css_urls,
                                site_name=core_settings.get('site_title'),
-                               social=social_settings.get_all(),
                                page_title=' - '.join(str(x) for x in title_parts if x),
                                wp_class=cls,
                                **params)

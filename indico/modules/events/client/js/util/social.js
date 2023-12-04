@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
+
 (function() {
   $(document).ready(function() {
     const container = $('.social-button-container');

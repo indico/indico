@@ -84,12 +84,10 @@ def render_event_footer(event, dark=False):
         'rru': 'addevent'
     }
 
-    social_settings_data = social_settings.get_all()
-    show_social = social_settings_data['enabled'] and layout_settings.get(event, 'show_social_badges')
+    show_social = social_settings.get('enabled') and layout_settings.get(event, 'show_social_badges')
     return render_template('events/footer.html',
                            event=event,
                            dark=dark,
-                           social_settings=social_settings_data,
                            show_social=show_social,
                            google_calendar_params=google_calendar_params,
                            outlook_calendar_params=outlook_calendar_params)
