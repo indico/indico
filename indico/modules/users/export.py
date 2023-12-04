@@ -12,7 +12,7 @@ from uuid import uuid4
 from zipfile import ZipFile
 
 import yaml
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.config import config
 from indico.core.db import db
@@ -153,6 +153,15 @@ def get_user_files(export_request):
 
     if DataExportOptions.registrations in options:
         yield from get_registration_files(user)
+
+
+def get_registrations(user):
+    """Get all registrations linked to the user."""
+    return (user.registrations
+            .options(subqueryload('data').joinedload('field_data').joinedload('field').joinedload('parent'),
+                     joinedload('registration_form').load_only('id', 'event_id'),
+                     joinedload('event').load_only('id', 'title'))
+            .all())
 
 
 def get_registration_files(user):
