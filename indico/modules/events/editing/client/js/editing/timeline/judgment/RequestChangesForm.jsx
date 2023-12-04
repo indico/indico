@@ -75,7 +75,7 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
           <Form.Field>
             <Checkbox
               toggle
-              label={Translate.string('Make changes to the submission')}
+              label={Translate.string('Upload files')}
               checked={uploadChanges}
               onChange={(__, {checked}) => setUploadChanges(checked)}
             />
