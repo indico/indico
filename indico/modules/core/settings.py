@@ -16,5 +16,4 @@ core_settings = SettingsProxy('core', {
 
 social_settings = SettingsProxy('social', {
     'enabled': False,
-    'facebook_app_id': ''
 })

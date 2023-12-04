@@ -5,21 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global FB */
+/* eslint-disable import/unambiguous */
 
 (function() {
-  function injectFacebook(appId) {
-    $.getScript('//connect.facebook.net/en_US/all.js#xfbml=1', function() {
-      FB.init({appId, status: true, cookie: false, xfbml: true});
-      FB.Event.subscribe('xfbml.render', function() {
-        // when the "Like" button gets rendered, replace the "loading" message
-        $('#fb-loading').hide();
-        $('#fb-like').css('visibility', 'visible');
-      });
-      FB.XFBML.parse();
-    });
-  }
-
   $(document).ready(function() {
     const container = $('.social-button-container');
     if (!container.length) {
@@ -29,7 +17,7 @@
     const dark = container.data('dark-theme');
     $('.social-button').qtip({
       style: {
-        width: '420px',
+        width: '350px',
         classes: `qtip-rounded qtip-shadow social_share_tooltip ${
           dark ? 'qtip-dark' : 'qtip-blue'
         }`,
@@ -54,11 +42,6 @@
         },
       },
       events: {
-        render() {
-          injectFacebook($('.social-button-container').data('social-settings').facebook_app_id);
-          $.getScript('//apis.google.com/js/plusone.js');
-          $.getScript('//platform.twitter.com/widgets.js');
-        },
         hide() {
           $('.social-button-container').css('opacity', '');
         },

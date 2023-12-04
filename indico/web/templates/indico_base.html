@@ -17,9 +17,6 @@
 
     {% include 'meta.html' %}
 
-    {% if social.facebook_app_id -%}
-        <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
-    {% endif %}
     {% block extra_meta_tags %}
     {% endblock %}
 

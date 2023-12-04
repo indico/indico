@@ -74,15 +74,23 @@ def render_event_footer(event, dark=False):
         'trp': False,
         'sprop': [event.external_url, 'name:indico']
     }
+    outlook_calendar_params = {
+        'body': description,
+        'subject': event.title,
+        'location': location,
+        'startdt': event.start_dt.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'enddt': event.end_dt.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'path': '/calendar/action/compose',
+        'rru': 'addevent'
+    }
 
-    social_settings_data = social_settings.get_all()
-    show_social = social_settings_data['enabled'] and layout_settings.get(event, 'show_social_badges')
+    show_social = social_settings.get('enabled') and layout_settings.get(event, 'show_social_badges')
     return render_template('events/footer.html',
                            event=event,
                            dark=dark,
-                           social_settings=social_settings_data,
                            show_social=show_social,
-                           google_calendar_params=google_calendar_params)
+                           google_calendar_params=google_calendar_params,
+                           outlook_calendar_params=outlook_calendar_params)
 
 
 class WPEventAdmin(WPAdmin):
