@@ -119,6 +119,7 @@ const fieldRegistry = {
     settingsComponent: BooleanSettings,
     hasPrice: true,
     icon: 'switchon',
+    renderAsFieldset: true,
   },
   phone: {
     title: Translate.string('Phone'),

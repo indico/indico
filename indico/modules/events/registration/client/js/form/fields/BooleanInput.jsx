@@ -22,7 +22,6 @@ import '../../../styles/regform.module.scss';
 
 function BooleanInputComponent({
   id,
-  htmlId,
   value,
   onChange,
   disabled,
@@ -48,7 +47,6 @@ function BooleanInputComponent({
       <Button.Group>
         <Button
           type="button"
-          id={htmlId}
           active={!isPurged && value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
           onClick={makeOnClick(true)}
@@ -80,7 +78,6 @@ function BooleanInputComponent({
 
 BooleanInputComponent.propTypes = {
   id: PropTypes.number.isRequired,
-  htmlId: PropTypes.string.isRequired,
   value: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -97,7 +94,6 @@ BooleanInputComponent.defaultProps = {
 
 export default function BooleanInput({
   id,
-  htmlId,
   htmlName,
   disabled,
   isRequired,
@@ -115,7 +111,6 @@ export default function BooleanInput({
   return (
     <FinalField
       id={id}
-      htmlId={htmlId}
       name={htmlName}
       component={BooleanInputComponent}
       required={isRequired ? 'no-validator' : isRequired}
@@ -132,7 +127,6 @@ export default function BooleanInput({
 
 BooleanInput.propTypes = {
   id: PropTypes.number.isRequired,
-  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
