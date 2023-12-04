@@ -13,6 +13,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
+from indico.util.string import format_repr
 
 
 class DataExportRequestState(RichIntEnum):
@@ -143,4 +144,4 @@ class DataExportRequest(db.Model):
         db.session.delete(self)
 
     def __repr__(self):
-        return f'<DataExportRequest({self.id}, {self.user_id}, {self.state}, {self.file})>'
+        return format_repr(self, 'id', 'user_id', 'state', 'file')
