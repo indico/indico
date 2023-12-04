@@ -20,7 +20,8 @@ class SettingsForm(IndicoForm):
                                          description=_('The organization that runs this Indico site.'))
 
     # Social settings
-    social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
+    social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
+                                  description=_('Show a share widget in the footer of event pages.'))
 
     @property
     def _fieldsets(self):
