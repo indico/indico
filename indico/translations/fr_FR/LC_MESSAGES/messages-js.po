@@ -14,14 +14,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-12-01 00:52+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2023\n"
 "Language-Team: French (France) (http://app.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.13.1\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -50,22 +50,18 @@ msgstr "Gérer les documents"
 msgid "Building package"
 msgstr "Fichier ZIP en cours de création"
 
-#: indico/modules/categories/client/js/calendar.js:24
+#: indico/modules/categories/client/js/calendar.js:41
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: indico/modules/categories/client/js/calendar.js:50
-msgid "Events happening on {0}"
-msgstr "Événements ayant lieu le {0}"
-
-#: indico/modules/categories/client/js/calendar.js:62
+#: indico/modules/categories/client/js/calendar.js:53
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] "{0} événement de longue durée pas montré"
 msgstr[1] "{0} événements de longue durée ne sont pas montrés"
 msgstr[2] "{0} événements de longue durée ne sont pas montrés"
 
-#: indico/modules/categories/client/js/calendar.js:72
+#: indico/modules/categories/client/js/calendar.js:63
 msgid "Long lasting events"
 msgstr "Événements de longue durée"
 
@@ -343,11 +339,11 @@ msgstr "Annulation en cours de la dernière opération..."
 msgid "Terms and Conditions"
 msgstr "Conditions générales"
 
-#: indico/modules/events/registration/client/js/reglists.js:35
+#: indico/modules/events/registration/client/js/reglists.js:43
 msgid "Email Preview"
 msgstr "Aperçu du courriel"
 
-#: indico/modules/events/registration/client/js/reglists.js:52
+#: indico/modules/events/registration/client/js/reglists.js:60
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "Voulez-vous vraiment supprimer l'inscription sélectionnée?"
@@ -385,15 +381,15 @@ msgstr "Copié dans le presse-papier"
 msgid "Press {0} to copy"
 msgstr "Appuyer sur {0} pour copier"
 
-#: indico/web/client/js/jquery/extensions/global.js:256
+#: indico/web/client/js/jquery/extensions/global.js:259
 msgid "Create new lecture"
 msgstr "Créer une nouvelle présentation"
 
-#: indico/web/client/js/jquery/extensions/global.js:257
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new meeting"
 msgstr "Créer une nouvelle réunion"
 
-#: indico/web/client/js/jquery/extensions/global.js:258
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new conference"
 msgstr "Créer une nouvelle conférence"
 
@@ -419,12 +415,12 @@ msgstr "Fermer "
 msgid "You have unsaved changes that will be lost."
 msgstr "Vous avez des modifications non enregistrées qui seront perdues."
 
-#: indico/web/client/js/jquery/utils/declarative.js:256
+#: indico/web/client/js/jquery/utils/declarative.js:265
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "Confirmer l'action"
 
-#: indico/web/client/js/jquery/utils/declarative.js:366
+#: indico/web/client/js/jquery/utils/declarative.js:375
 msgid "Direct link to this item"
 msgstr "Lien direct vers cet élément"
 
@@ -1025,9 +1021,9 @@ msgstr "déplacer pour redimensionner"
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
 msgid ""
-"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
-" applied to blocks after."
-msgstr "<span class=\"key light\">Shift</span> est enfoncée. Les changements seront appliqués à toutes les entrées suivantes."
+"<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
+"applied to blocks after."
+msgstr "<kbd class=\"tt-key\">Shift</kbd> est actuellement enfoncée. Les changements seront appliqués aux blocs suivants."
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
 msgid "Drop to move block inside session"
