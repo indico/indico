@@ -57,7 +57,7 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
         return self._get_page_content(params)
 
     def _get_breadcrumbs(self):
-        return render_breadcrumbs(event=self.event, management=True)
+        return render_breadcrumbs(event=self.event, management=self.MANAGEMENT)
 
 
 class WPEventSettings(WPEventManagement):
