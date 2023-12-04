@@ -836,15 +836,12 @@ ul.material_list ul li {
   padding: 3px 10px 3px 10px;
   display: inline-flex;
   align-items: center;
-}
-
-.twitter-btn-blue {
   background-color: #1d9bf0;
   color: #fff;
 }
 
-.twitter-btn-blue:hover {
-  background-color: #0a72ae;
+.twitter-btn:hover {
+  background-color: #0c7abf;
 }
 
 .twitter-btn-icon {
@@ -855,7 +852,7 @@ ul.material_list ul li {
 }
 
 .twitter-btn-text {
-  font-size: 1rem;
+  font-size: 13px;
   font-weight: 500;
   padding-left: 5px;
 }
