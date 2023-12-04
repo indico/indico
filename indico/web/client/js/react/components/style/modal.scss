@@ -41,7 +41,7 @@ $modal-footer-height: 60px;
       background-color: $light-gray;
       border-bottom: 1px solid darken($light-gray, 5%);
       padding: 1em;
-      height: $modal-header-height;
+      height: auto;
       width: 100%;
 
       a.icon-cross {
