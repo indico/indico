@@ -17,13 +17,14 @@ import {getCurrency} from '../../form/selectors';
 
 import '../../../styles/regform.module.scss';
 
-function NumberInputComponent({value, onChange, disabled, price, minValue, maxValue}) {
+function NumberInputComponent({id, value, onChange, disabled, price, minValue, maxValue}) {
   const currency = useSelector(getCurrency);
   const total = (value * price).toFixed(2);
 
   return (
     <div styleName="number-field">
       <input
+        id={id}
         type="number"
         value={value !== null ? value : ''}
         min={minValue}
@@ -41,6 +42,7 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
 }
 
 NumberInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
