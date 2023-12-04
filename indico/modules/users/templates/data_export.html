@@ -2,7 +2,7 @@
 
 {% block user_content %}
     <div id="data-export-container"></div>
-    
+
     <script>
         setupDataExport(
             {{ (user.id if user != session.user else none) | tojson }},
