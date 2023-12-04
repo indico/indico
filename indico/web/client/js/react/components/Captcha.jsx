@@ -86,11 +86,13 @@ function IndicoCaptcha({name, wtf}) {
       content={playing ? Translate.string('Pause') : Translate.string('Play')}
       trigger={
         <Button
+          styleName="captcha-control"
           icon
           type="button"
           disabled={loading || error || !audio || submitting}
           onClick={toggleAudio}
         >
+          <Translate as="span">Hear the characters</Translate>
           <Icon name={playing ? 'stop' : 'play'} />
         </Button>
       }
@@ -102,6 +104,7 @@ function IndicoCaptcha({name, wtf}) {
       content={Translate.string('Refresh CAPTCHA')}
       trigger={
         <Button
+          styleName="captcha-control"
           icon
           type="button"
           loading={loading}
@@ -113,6 +116,7 @@ function IndicoCaptcha({name, wtf}) {
             fetchCaptcha();
           }}
         >
+          <Translate as="span">Try different characters</Translate>
           <Icon name="redo" />
         </Button>
       }
@@ -149,16 +153,16 @@ function IndicoCaptcha({name, wtf}) {
           {/* SUI's .error classes only work when there is a parent with .ui.form class.
               Using <Form /> would cause a DOM nesting warning since there is already a plain <form>
               wrapping the whole regform */}
-          <div style={{marginTop: 20}} className="ui form">
+          <div styleName="captcha-form" className="ui form">
             <Form.Field>
-              <label>
-                <Translate>Answer</Translate>
+              <label styleName="captcha-answer">
+                <Translate as="span">Answer</Translate>
+                {wtf ? (
+                  <Input name={name} required style={{maxWidth: 200}} />
+                ) : (
+                  <FinalInput name={name} required style={{maxWidth: 200}} />
+                )}
               </label>
-              {wtf ? (
-                <Input name={name} required style={{maxWidth: 200}} />
-              ) : (
-                <FinalInput name={name} required style={{maxWidth: 200}} />
-              )}
             </Form.Field>
           </div>
         </>

@@ -5,11 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+
 .captcha {
   display: flex;
   align-items: center;
   margin-top: 2em;
   gap: 2em;
+}
+
+.captcha-form {
+  margin-top: 2em;
 }
 
 .error {
@@ -20,4 +26,13 @@
   :global(.ui.error.message) {
     margin-bottom: 0;
   }
+}
+
+.captcha-control > span:first-child {
+  @extend %visually-hidden;
+}
+
+:global(.ui.form .field) > .captcha-answer {
+  // XXX: Override semantic UI
+  @extend %flex-column;
 }
