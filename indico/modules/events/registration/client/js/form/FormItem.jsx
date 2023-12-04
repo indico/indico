@@ -109,18 +109,19 @@ export default function FormItem({
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.id}`;
 
-  const fieldControls = (
-    <>
-      {retentionPeriodIcon}
-      <InputComponent
-        isRequired={inputRequired}
-        disabled={disabled}
-        isPurged={showPurged}
-        htmlId={htmlId}
-        {...inputProps}
-      />
-    </>
-  );
+  const fieldControls =
+    InputComponent && !meta.customFormItem ? (
+      <>
+        {retentionPeriodIcon}
+        <InputComponent
+          isRequired={inputRequired}
+          disabled={disabled}
+          isPurged={showPurged}
+          htmlId={htmlId}
+          {...inputProps}
+        />
+      </>
+    ) : null;
 
   return (
     <div
