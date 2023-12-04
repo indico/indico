@@ -4,7 +4,6 @@ duration: 10
 event_url: http://localhost/event/0/
 id: <id>
 is_deleted: false
-minutes: <p><strong>SubContrib Test</strong></p>
 room_name: ''
 title: Dummy SubContribution
 url: http://localhost/event/0/contributions/420/subcontributions/420

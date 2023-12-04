@@ -20,7 +20,8 @@ import './DataExportForm.module.scss';
 const descriptions = {
   personal_data: Translate.string('Basic information about your account'),
   settings: Translate.string('Your global Indico settings'),
-  contribs: Translate.string('Data about your minutes and contributions'),
+  contribs: Translate.string('Data about your contributions in events'),
+  note_revisions: Translate.string('Data about minutes you wrote in events'),
   registrations: Translate.string('Data you submitted when registering for events'),
   room_booking: Translate.string('Your rooms and reservations'),
   abstracts_papers: Translate.string('Data about your abstract and paper submissions'),

@@ -64,7 +64,8 @@ class IndicoIntEnum(_IndicoEnumMixin, int, ReprEnum):
 
 
 class IndicoStrEnum(_IndicoEnumMixin, str, ReprEnum):
-    pass
+    def _generate_next_value_(name, start, count, last_values):  # noqa: N805
+        return name.lower()
 
 
 class RichEnum(_RichEnumMixin, IndicoEnum):
@@ -76,4 +77,5 @@ class RichIntEnum(_IndicoEnumMixin, _RichEnumMixin, int, ReprEnum):
 
 
 class RichStrEnum(_IndicoEnumMixin, _RichEnumMixin, str, ReprEnum):
-    pass
+    def _generate_next_value_(name, start, count, last_values):  # noqa: N805
+        return name.lower()

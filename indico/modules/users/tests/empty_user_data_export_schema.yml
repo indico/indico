@@ -10,6 +10,7 @@ miscellaneous:
   old_api_keys: []
   personal_tokens: []
   static_sites: []
+note_revisions: []
 papers: []
 personal_data:
   affiliation: ''

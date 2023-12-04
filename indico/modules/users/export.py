@@ -26,6 +26,7 @@ from indico.modules.events.contributions.models.persons import ContributionPerso
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revisions import EditingRevision
+from indico.modules.events.notes.models.notes import EventNoteRevision
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
@@ -168,18 +169,44 @@ def get_attachments(user):
     return Attachment.query.filter(Attachment.user == user, Attachment.type == AttachmentType.file).all()
 
 
+def get_note_revisions(user):
+    """Get all note revisions created by the user."""
+    return EventNoteRevision.query.options(joinedload('note')).filter(EventNoteRevision.user == user).all()
+
+
 def get_contributions(user):
     """Get all contributions linked to the user (author, speaker or submitter)."""
-    return (Contribution.query.options(joinedload('person_links'))
-            .filter(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)))
+    query = (db.session.query(Contribution.id)
+             .filter(Contribution.person_links.any(ContributionPersonLink.person.has(user=user)))
+             .all())
+    contribution_ids = {cid for cid, in query}
+    return (Contribution.query
+            .options(joinedload('person_links'),
+                     joinedload('note').load_only('id'),
+                     joinedload('timetable_entry').load_only('start_dt'),
+                     joinedload('session'),
+                     joinedload('session_block'),
+                     joinedload('event'))
+            .filter(Contribution.id.in_(contribution_ids))
             .all())
 
 
 def get_subcontributions(user):
     """Get all subcontributions linked to the user (speaker)."""
+    query = (db.session.query(SubContribution.id)
+             .filter(SubContribution.person_links.any(SubContributionPersonLink.person.has(user=user)))
+             .all())
+    subcontribution_ids = {scid for scid, in query}
+    contribution_strategy = joinedload('contribution')
+    contribution_strategy.joinedload('timetable_entry').load_only('start_dt')
+    contribution_strategy.joinedload('event')
+    contribution_strategy.joinedload('session_block')
+    contribution_strategy.joinedload('session')
     return (SubContribution.query
-            .options(joinedload('person_links'))
-            .filter(SubContribution.person_links.any(SubContributionPersonLink.person.has(user=user)))
+            .options(joinedload('person_links'),
+                     joinedload('note').load_only('id'),
+                     contribution_strategy)
+            .filter(SubContribution.id.in_(subcontribution_ids))
             .all())
 
 

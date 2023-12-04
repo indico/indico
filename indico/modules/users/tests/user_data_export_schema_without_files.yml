@@ -31,7 +31,7 @@ contributions:
 - address: ''
   description: ''
   duration: 20
-  end_dt: <timestamp>
+  end_dt: null
   event_id: <id>
   event_url: http://localhost/event/0/
   id: <id>
@@ -39,9 +39,9 @@ contributions:
   is_deleted: false
   is_speaker: true
   keywords: []
-  minutes: <p><strong>Contrib Test</strong></p>
+  note_id: <id>
   room_name: ''
-  start_dt: <timestamp>
+  start_dt: null
   title: Dummy Contribution
   url: http://localhost/event/0/contributions/420/
   venue_name: ''
@@ -76,6 +76,35 @@ miscellaneous:
     requested_dt: <timestamp>
     state: pending
     url: http://localhost/event/0/manage/offline-copy/2.zip
+note_revisions:
+- created_dt: <timestamp>
+  id: <id>
+  note:
+    contribution_id: <id>
+    current_revision_id: <id>
+    event_id: <id>
+    id: <id>
+    is_deleted: false
+    link_type: contribution
+    linked_event_id: null
+    session_id: null
+    subcontribution_id: null
+  render_mode: markdown
+  source: '**Contrib Test**'
+- created_dt: <timestamp>
+  id: <id>
+  note:
+    contribution_id: null
+    current_revision_id: <id>
+    event_id: <id>
+    id: <id>
+    is_deleted: false
+    link_type: subcontribution
+    linked_event_id: null
+    session_id: null
+    subcontribution_id: <id>
+  render_mode: markdown
+  source: '**SubContrib Test**'
 papers:
 - event_url: http://localhost/event/0/
   files:
@@ -116,7 +145,7 @@ personal_data:
   title: null
 registrations:
 - checked_in: false
-  checked_in_dt: <timestamp>
+  checked_in_dt: null
   consent_to_publish: nobody
   created_by_manager: false
   currency: USD
@@ -209,7 +238,6 @@ subcontributions:
   event_url: http://localhost/event/0/
   id: <id>
   is_deleted: false
-  minutes: <p><strong>SubContrib Test</strong></p>
   room_name: ''
   title: Dummy SubContribution
   url: http://localhost/event/0/contributions/420/subcontributions/420

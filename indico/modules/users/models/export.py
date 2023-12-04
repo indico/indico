@@ -5,13 +5,15 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from enum import auto
+
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
-from indico.util.enum import RichIntEnum
+from indico.util.enum import RichIntEnum, RichStrEnum
 from indico.util.i18n import L_
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
@@ -26,20 +28,31 @@ class DataExportRequestState(RichIntEnum):
     expired = 4  # The associated file has been deleted
 
 
-class DataExportOptions(RichIntEnum):
-    __titles__ = [None, L_('Personal data'), L_('Settings'), L_('Minutes & Contributions'), L_('Registrations'),
-                  L_('Room booking'), L_('Abstracts & Papers'), L_('Survey submissions'),
-                  L_('Attachments & Materials'), L_('Editables'), L_('Miscellaneous')]
-    personal_data = 1
-    settings = 2
-    contribs = 3
-    registrations = 4
-    room_booking = 5
-    abstracts_papers = 6
-    survey_submissions = 7
-    attachments = 8
-    editables = 9
-    misc = 10
+class DataExportOptions(RichStrEnum):
+    __titles__ = {
+        'personal_data': L_('Personal data'),
+        'settings': L_('Settings'),
+        'contribs': L_('Contributions'),
+        'note_revisions': L_('Minutes'),
+        'registrations': L_('Registrations'),
+        'room_booking': L_('Room booking'),
+        'abstracts_papers': L_('Abstracts & Papers'),
+        'survey_submissions': L_('Survey submissions'),
+        'attachments': L_('Attachments & Materials'),
+        'editables': L_('Editables'),
+        'misc': L_('Miscellaneous'),
+    }
+    personal_data = auto()
+    settings = auto()
+    contribs = auto()
+    note_revisions = auto()
+    registrations = auto()
+    room_booking = auto()
+    abstracts_papers = auto()
+    survey_submissions = auto()
+    attachments = auto()
+    editables = auto()
+    misc = auto()
 
 
 class DataExportRequest(db.Model):

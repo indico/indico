@@ -194,7 +194,7 @@ def test_serialize_user_data(dummy_user):
     data = serialize_user_data(request)
     assert set(data.keys()) == {'personal_data', 'settings', 'contributions', 'subcontributions', 'registrations',
                                 'room_booking', 'survey_submissions', 'abstracts', 'papers', 'miscellaneous',
-                                'editables', 'attachments'}
+                                'editables', 'attachments', 'note_revisions'}
 
 
 @pytest.mark.usefixtures('dummy_reg_with_file_field')

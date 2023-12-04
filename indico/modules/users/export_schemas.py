@@ -23,6 +23,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
+from indico.modules.events.notes.models.notes import EventNote, EventNoteRevision
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.papers import PaperRevisionState
 from indico.modules.events.registration.models.registrations import Registration
@@ -31,7 +32,7 @@ from indico.modules.events.surveys.schemas import SurveySubmissionSchema
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
 from indico.modules.users.export import (build_storage_path, get_abstracts, get_attachments, get_contributions,
-                                         get_editables, get_papers, get_subcontributions)
+                                         get_editables, get_note_revisions, get_papers, get_subcontributions)
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest
 from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.modules.users.schemas import AffiliationSchema
@@ -177,18 +178,13 @@ class SubContributionExportSchema(mm.SQLAlchemyAutoSchema):
         model = SubContribution
         fields = ('id', 'contribution_id', 'subcontribution_id', 'title', 'description',
                   'url', 'event_url', 'duration', 'venue_name', 'room_name',
-                  'minutes', 'is_deleted')
+                  'is_deleted')
 
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
-    minutes = fields.Method('_get_minutes')
     url = fields.Function(lambda subcontrib: url_for('contributions.display_subcontribution', subcontrib,
                                                      _external=True))
     event_url = fields.Function(lambda subcontrib: url_for('events.display', subcontrib.contribution.event,
                                                            _external=True))
-
-    def _get_minutes(self, subcontrib):
-        if note := subcontrib.note:
-            return note.current_revision.html
 
 
 class ContributionExportSchema(mm.SQLAlchemyAutoSchema):
@@ -196,14 +192,14 @@ class ContributionExportSchema(mm.SQLAlchemyAutoSchema):
         model = Contribution
         fields = ('id', 'contribution_type', 'event_id', 'event_title', 'title', 'description',
                   'url', 'event_url', 'start_dt', 'end_dt', 'duration', 'venue_name', 'room_name', 'address',
-                  'minutes', 'keywords', 'is_deleted', 'is_author', 'is_speaker')
+                  'keywords', 'is_deleted', 'is_author', 'is_speaker', 'note_id')
 
     duration = fields.TimeDelta(precision=fields.TimeDelta.MINUTES)
     url = fields.Function(lambda contrib: url_for('contributions.display_contribution', contrib, _external=True))
     event_url = fields.Function(lambda contrib: url_for('events.display', contrib.event, _external=True))
     is_author = fields.Method('_is_author')
     is_speaker = fields.Method('_is_speaker')
-    minutes = fields.Method('_get_minutes')
+    note_id = fields.Integer(attribute='note.id')
 
     def _is_author(self, contrib):
         user = self.context['user']
@@ -212,10 +208,6 @@ class ContributionExportSchema(mm.SQLAlchemyAutoSchema):
     def _is_speaker(self, contrib):
         user = self.context['user']
         return any(link.is_speaker for link in contrib.person_links if link.person.user == user)
-
-    def _get_minutes(self, contrib):
-        if note := contrib.note:
-            return note.current_revision.html
 
 
 class AbstractFileExportSchema(mm.SQLAlchemyAutoSchema):
@@ -355,6 +347,21 @@ class EditableExportSchema(mm.SQLAlchemyAutoSchema):
     revisions = fields.List(fields.Nested(EditingRevisionExportSchema))
 
 
+class LinkedNoteExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventNote
+        fields = ('id', 'is_deleted', 'current_revision_id', 'link_type', 'event_id', 'linked_event_id',
+                  'contribution_id', 'subcontribution_id', 'session_id')
+
+
+class EventNoteRevisionExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventNoteRevision
+        fields = ('id', 'source', 'render_mode', 'created_dt', 'note')
+
+    note = fields.Nested(LinkedNoteExportSchema)
+
+
 class SettingsExportSchema(Schema):
     class Meta:
         fields = ('add_ical_alerts', 'add_ical_alerts_mins', 'force_language', 'force_timezone',
@@ -369,7 +376,8 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('personal_data', 'settings', 'contributions', 'subcontributions', 'registrations', 'room_booking',
-                  'survey_submissions', 'abstracts', 'papers', 'miscellaneous', 'editables', 'attachments')
+                  'survey_submissions', 'abstracts', 'papers', 'miscellaneous', 'editables', 'attachments',
+                  'note_revisions')
 
     personal_data = fields.Function(lambda user: PersonalDataExportSchema().dump(user))
     settings = fields.Method('_get_settings')
@@ -382,6 +390,7 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     papers = fields.Method('_get_papers')
     attachments = fields.Method('_get_attachments')
     editables = fields.Method('_get_editables')
+    note_revisions = fields.Method('_get_note_revisions')
     miscellaneous = fields.Function(lambda user: MiscDataExportSchema().dump(user))
 
     def _get_settings(self, user):
@@ -411,6 +420,10 @@ class UserDataExportSchema(mm.SQLAlchemyAutoSchema):
     def _get_editables(self, user):
         editables = get_editables(user)
         return EditableExportSchema(many=True).dump(editables)
+
+    def _get_note_revisions(self, user):
+        note_revisions = get_note_revisions(user)
+        return EventNoteRevisionExportSchema(many=True).dump(note_revisions)
 
     @post_dump
     def _update_storage_paths(self, data, **kwargs):

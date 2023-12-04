@@ -9,7 +9,7 @@ identities:
     - bar
     - baz
   identifier: guinea_pig
-  last_login_dt: <timestamp>
+  last_login_dt: null
   last_login_ip: null
   provider: ldap
 oauth_applications:
@@ -22,10 +22,10 @@ oauth_applications:
 old_api_keys: []
 personal_tokens:
 - created_dt: <timestamp>
-  last_used_dt: <timestamp>
+  last_used_dt: null
   last_used_ip: null
   name: dummy
-  revoked_dt: <timestamp>
+  revoked_dt: null
   scopes:
   - read:legacy_api
   - read:user

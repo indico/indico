@@ -235,9 +235,9 @@ def assert_yaml_snapshot(snapshot, obj, snapshot_filename, *, strip_dynamic_data
 
 def remove_dynamic_data(yaml_string):
     """Remove data that appears dynamic (IDs, dates) from a YAML string."""
-    yaml_string = re.sub(r'(?<=_date: ).+$', '<timestamp>', yaml_string, flags=re.MULTILINE)
-    yaml_string = re.sub(r'(?<=_dt: ).+$', '<timestamp>', yaml_string, flags=re.MULTILINE)
+    yaml_string = re.sub(r'(?<=_date: )(?!null$).+$', '<timestamp>', yaml_string, flags=re.MULTILINE)
+    yaml_string = re.sub(r'(?<=_dt: )(?!null$).+$', '<timestamp>', yaml_string, flags=re.MULTILINE)
     yaml_string = re.sub(r'(?<=: )[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', '<uuid>',
                          yaml_string, flags=re.MULTILINE)
-    yaml_string = re.sub(r'(?<=_id: ).+$', '<id>', yaml_string, flags=re.MULTILINE)
-    return re.sub(r'(?<=\bid: ).+$', '<id>', yaml_string, flags=re.MULTILINE)
+    yaml_string = re.sub(r'(?<=_id: )(?!null$).+$', '<id>', yaml_string, flags=re.MULTILINE)
+    return re.sub(r'(?<=\bid: )(?!null$).+$', '<id>', yaml_string, flags=re.MULTILINE)
