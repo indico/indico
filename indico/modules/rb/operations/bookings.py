@@ -494,7 +494,11 @@ def get_booking_edit_calendar_data(booking, booking_changes):
             rejected_dates = []
             new_date_range, data = get_rooms_availability([room], skip_conflicts_with=[booking.id], **booking_changes)
         else:
-            new_booking_start_dt = datetime.combine(future_occurrences[0].start_dt.date(),
+            try:
+                next_start_date = future_occurrences[0].start_dt.date()
+            except IndexError:
+                next_start_date = date.today()
+            new_booking_start_dt = datetime.combine(next_start_date,
                                                     booking_changes['start_dt'].time())
             availability_filters = dict(booking_changes, start_dt=new_booking_start_dt)
             new_date_range, data = get_rooms_availability([room], skip_conflicts_with=[booking.id],
