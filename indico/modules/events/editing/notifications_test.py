@@ -17,11 +17,13 @@ def _assert_snapshot(snapshot, template_name, **context):
     snapshot.assert_match(template.get_body(), template_name)
 
 
-def test_confirmation_email_plaintext(snapshot):
+def test_confirmation_email_plaintext(snapshot, dummy_contribution):
     _assert_snapshot(snapshot, 'submitter_confirmation_notification.txt',
                      recipient_name='John Doe',
                      submitter_name='Jane Doe',
-                     timeline_url='http://localhost/timeline-url')
+                     timeline_url='http://localhost/timeline-url',
+                     contribution=dummy_contribution,
+                     text='Great last changes')
 
 
 def test_comment_email_plaintext(snapshot, dummy_contribution):
@@ -33,22 +35,28 @@ def test_comment_email_plaintext(snapshot, dummy_contribution):
                      timeline_url='http://localhost/timeline-url')
 
 
-def test_upload_email_plaintext(snapshot):
+def test_upload_email_plaintext(snapshot, dummy_contribution):
     _assert_snapshot(snapshot, 'submitter_upload_notification.txt',
                      recipient_name='John Doe',
                      submitter_name='Jane Doe',
-                     timeline_url='http://localhost/timeline-url')
+                     timeline_url='http://localhost/timeline-url',
+                     contribution=dummy_contribution)
 
 
-def test_rejection_email_plaintext(snapshot):
+def test_rejection_email_plaintext(snapshot, dummy_contribution):
     _assert_snapshot(snapshot, 'submitter_rejection_notification.txt',
                      recipient_name='John Doe',
                      submitter_name='Jane Doe',
-                     timeline_url='http://localhost/timeline-url')
+                     timeline_url='http://localhost/timeline-url',
+                     contribution=dummy_contribution,
+                     text='Revert last changes')
 
 
-def test_judgment_email_plaintext(snapshot):
+def test_judgment_email_plaintext(snapshot, dummy_contribution):
     _assert_snapshot(snapshot, 'editor_judgment_notification.txt',
                      recipient_name='John Doe',
                      editor_name='Jane Doe',
-                     timeline_url='http://localhost/timeline-url')
+                     timeline_url='http://localhost/timeline-url',
+                     contribution=dummy_contribution,
+                     revision_type=3,
+                     text='Added 2 slides to the presentation')

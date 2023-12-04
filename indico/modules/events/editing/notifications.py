@@ -53,16 +53,18 @@ def notify_comment(comment):
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
-def notify_editor_judgment(revision, editor):
+def notify_editor_judgment(revision, submitter, revision_type):
     """Notify the submitter about a judgment made by an editor."""
-    submitter = revision.user
     editable = revision.editable
-    editor_name = editor.first_name if editable.can_see_editor_names(submitter) else None
+    editor_name = revision.user.first_name if editable.can_see_editor_names(submitter) else None
     with submitter.force_user_locale():
         tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
                                   editor_name=editor_name,
                                   timeline_url=editable.external_timeline_url,
-                                  recipient_name=submitter.first_name)
+                                  recipient_name=submitter.first_name,
+                                  contribution=editable.contribution,
+                                  revision_type=revision_type,
+                                  text=revision.comment)
         email = make_email(submitter.email, template=tpl)
     send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
@@ -78,7 +80,8 @@ def notify_submitter_upload(revision):
         tpl = get_template_module('events/editing/emails/submitter_upload_notification.txt',
                                   submitter_name=submitter.first_name,
                                   timeline_url=editable.external_timeline_url,
-                                  recipient_name=editor.first_name)
+                                  recipient_name=editor.first_name,
+                                  contribution=editable.contribution)
         email = make_email(editor.email, template=tpl)
     send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
@@ -99,6 +102,8 @@ def notify_submitter_confirmation(revision, submitter, action):
             tpl = get_template_module(template_path,
                                       submitter_name=submitter.first_name,
                                       timeline_url=revision.editable.external_timeline_url,
-                                      recipient_name=recipient.first_name)
+                                      recipient_name=recipient.first_name,
+                                      contribution=editable.contribution,
+                                      text=revision.comment)
             email = make_email(recipient.email, template=tpl)
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})

@@ -1,7 +1,14 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% block subject -%}{% trans %}Submitter confirmed changes{% endtrans %}{%- endblock %}
+{% set title=contribution.verbose_title %}
+
+{% block subject -%}{% trans %}Submitter confirmed changes for contribution {{ title }}{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
-{% trans name=submitter_name %}Your revision changes have been confirmed by {{ name }}.{% endtrans %}
+{% trans name=submitter_name %}Your revision changes have been confirmed by {{ name }} on contribution {{ title }}.{% endtrans %}
+{% if text -%}
+    {% trans linebreak='\n' -%}
+        {{ linebreak }}{{ text }}
+    {%- endtrans %}
+{%- endif %}
 {% endblock %}

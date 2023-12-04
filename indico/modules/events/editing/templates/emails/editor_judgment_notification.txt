@@ -1,11 +1,16 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% block subject -%}{% trans %}New editor judgment{% endtrans %}{%- endblock %}
+{% set title=contribution.verbose_title %}
+{% set revision_type = {3: "made changes to", 6: "requested changes to", 7: "accepted", 8: "rejected"}[revision_type] | default("left a judgment to") -%}
+
+{% block subject -%}{% trans %}New editor judgment for contribution {{ title }}{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
 {% if editor_name -%}
-    {% trans name=editor_name %}{{ name }} has left a judgment to an editable you are submitter of.{% endtrans %}
+    {% trans name=editor_name %}{{ name }} has {{ revision_type }} an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
 {%- else -%}
-    {% trans %}Someone has left a judgment to an editable you are submitter of.{% endtrans %}
+    {% trans %}Someone has left a { revision_type } an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
 {%- endif %}
+
+{{ text }}
 {% endblock %}

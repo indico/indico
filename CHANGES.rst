@@ -64,6 +64,7 @@ Improvements
 - Add option to allow people to register using an invitation link even if the event is
   restricted (:pr:`6094`)
 - Include comment and contribution title on timeline notifications to editors/authors
+- Improve timeline notifications to editors/authors
   (:issue:`6027`, :pr:`6042`)
 
 Bugfixes

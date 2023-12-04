@@ -1,6 +1,8 @@
 Dear John Doe,
 
-Jane Doe has left a judgment to an editable you are submitter of.
+Jane Doe has made changes to an editable you are submitter of, on contribution #1 (Dummy Contribution).
+
+Added 2 slides to the presentation
 
 You can view details on the following URL:
 http://localhost/timeline-url
