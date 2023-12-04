@@ -126,12 +126,12 @@
     }
   ],
   "personal_data": {
-    "affiliation": {
+    "affiliation": "CERN",
+    "affiliation_link": {
       "city": "",
       "country_code": "",
       "country_name": "",
       "id": 3,
-      "meta": {},
       "name": "CERN",
       "postcode": "",
       "street": ""

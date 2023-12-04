@@ -269,12 +269,12 @@ class PersonalDataExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'full_name', 'title', 'email', 'secondary_emails',
-                  'affiliation', 'phone', 'avatar_url', 'picture_metadata', 'picture_source',
+                  'affiliation', 'affiliation_link', 'phone', 'avatar_url', 'picture_metadata', 'picture_source',
                   'favorite_events', 'favorite_categories')
 
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
     secondary_emails = fields.Function(lambda user: list(user.secondary_emails))
-    affiliation = fields.Nested(AffiliationSchema, attribute='affiliation_link')
+    affiliation_link = fields.Nested(AffiliationSchema, exclude=('meta',))
     favorite_events = fields.List(fields.Nested(EventExportSchema))
     favorite_categories = fields.List(fields.Nested(CategoryExportSchema))
 

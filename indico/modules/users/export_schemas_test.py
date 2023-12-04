@@ -74,6 +74,7 @@ def test_settings_export_schema(snapshot, dummy_user):
 
 def setup_personal_data(dummy_user, dummy_event, dummy_category):
     dummy_user.affiliation_link = Affiliation(name='CERN')
+    dummy_user.affiliation = dummy_user.affiliation_link.name
     dummy_user.favorite_events.add(dummy_event)
     dummy_user.favorite_categories.add(dummy_category)
 
