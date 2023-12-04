@@ -62,7 +62,8 @@ Available keys:
 - alwaysRequired: optional; always display the field as required
 - hasPrice: optional; show price field if the whole field can have a price attached
 - noRetentionPeriod: optional; hide the retention period setting
-- renderAsFieldset: optional; whether the field should be rendered in a fieldset; applies to fields that use multiple controls, like radios, checkboxes, multi-button controls
+- renderAsFieldset: optional; whether the field should be rendered in a fieldset; applies
+  to fields that use multiple controls, like radios, checkboxes, multi-button controls
 */
 
 const fieldRegistry = {
