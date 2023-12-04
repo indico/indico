@@ -17,7 +17,7 @@ from indico.modules.events.static.models.static import StaticSite
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
 from indico.modules.users.models.users import NameFormat
-from indico.testing.util import assert_json_snapshot
+from indico.testing.util import assert_yaml_snapshot
 
 
 pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
@@ -26,10 +26,10 @@ pytest_plugins = ('indico.modules.events.registration.testing.fixtures',
 SNAPSHOT_DIR = Path(__file__).parent / 'tests'
 
 
-def _assert_json_snapshot(snapshot, data, name):
+def _assert_yaml_snapshot(snapshot, data, name):
     __tracebackhide__ = True
     snapshot.snapshot_dir = SNAPSHOT_DIR
-    assert_json_snapshot(snapshot, data, name)
+    assert_yaml_snapshot(snapshot, data, name)
 
 
 @pytest.fixture(autouse=True)
@@ -69,7 +69,7 @@ def test_settings_export_schema(snapshot, dummy_user):
 
     setup_settings(dummy_user.settings)
     data = SettingsExportSchema().dump(dummy_user.settings.get_all())
-    _assert_json_snapshot(snapshot, data, 'settings_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'settings_export_schema.yml')
 
 
 def setup_personal_data(dummy_user, dummy_event, dummy_category):
@@ -86,7 +86,7 @@ def test_personal_data_export_schema(snapshot, db, dummy_event, dummy_category, 
     db.session.flush()
 
     data = PersonalDataExportSchema().dump(dummy_user)
-    _assert_json_snapshot(snapshot, data, 'personal_data_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'personal_data_export_schema.yml')
 
 
 def setup_contributions(db, user, contribution, event_person):
@@ -105,7 +105,7 @@ def test_contribution_export_schema(snapshot, db, dummy_user, dummy_contribution
     db.session.flush()
 
     data = ContributionExportSchema(context={'user': dummy_user}).dump(dummy_contribution)
-    _assert_json_snapshot(snapshot, data, 'contribution_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'contribution_export_schema.yml')
 
 
 def setup_subcontributions(db, user, subcontribution, event_person):
@@ -124,14 +124,14 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
     db.session.flush()
 
     data = SubContributionExportSchema(context={'user': dummy_user}).dump(dummy_subcontribution)
-    _assert_json_snapshot(snapshot, data, 'subcontribution_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'subcontribution_export_schema.yml')
 
 
 def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
     from indico.modules.users.export_schemas import RegistrationExportSchema
 
     data = RegistrationExportSchema().dump(dummy_reg_with_file_field)
-    _assert_json_snapshot(snapshot, data, 'registration_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'registration_export_schema.yml')
 
 
 def setup_room_booking(user, room):
@@ -147,7 +147,7 @@ def test_room_booking_export_schema(snapshot, db, dummy_user, dummy_room):
     db.session.flush()
 
     data = RoomBookingExportSchema().dump(dummy_user)
-    _assert_json_snapshot(snapshot, data, 'room_booking_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'room_booking_export_schema.yml')
 
 
 @pytest.mark.usefixtures('dummy_abstract_file')
@@ -155,7 +155,7 @@ def test_abstract_export_schema(snapshot, dummy_abstract):
     from indico.modules.users.export_schemas import AbstractExportSchema
 
     data = AbstractExportSchema().dump(dummy_abstract)
-    _assert_json_snapshot(snapshot, data, 'abstract_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'abstract_export_schema.yml')
 
 
 @pytest.mark.usefixtures('dummy_paper_file')
@@ -163,14 +163,14 @@ def test_paper_export_schema(snapshot, dummy_paper):
     from indico.modules.users.export_schemas import PaperExportSchema
 
     data = PaperExportSchema().dump(dummy_paper)
-    _assert_json_snapshot(snapshot, data, 'paper_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'paper_export_schema.yml')
 
 
 def test_attachment_export_schema(snapshot, dummy_attachment):
     from indico.modules.users.export_schemas import AttachmentExportSchema
 
     data = AttachmentExportSchema().dump(dummy_attachment)
-    _assert_json_snapshot(snapshot, data, 'attachment_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'attachment_export_schema.yml')
 
 
 @pytest.mark.usefixtures('dummy_editing_revision_file')
@@ -178,7 +178,7 @@ def test_editable_export_schema(snapshot, dummy_editable):
     from indico.modules.users.export_schemas import EditableExportSchema
 
     data = EditableExportSchema().dump(dummy_editable)
-    _assert_json_snapshot(snapshot, data, 'editable_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'editable_export_schema.yml')
 
 
 def setup_misc_data(user, event):
@@ -194,14 +194,14 @@ def test_misc_data_export_schema(snapshot, db, dummy_user, dummy_event):
     db.session.flush()
 
     data = MiscDataExportSchema().dump(dummy_user)
-    _assert_json_snapshot(snapshot, data, 'misc_data_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'misc_data_export_schema.yml')
 
 
 def test_empty_user_data_export_schema(snapshot, dummy_user):
     from indico.modules.users.export_schemas import UserDataExportSchema
 
     data = UserDataExportSchema().dump(dummy_user)
-    _assert_json_snapshot(snapshot, data, 'empty_user_data_export_schema.json')
+    _assert_yaml_snapshot(snapshot, data, 'empty_user_data_export_schema.yml')
 
 
 @pytest.mark.parametrize('include_files', (False, True), ids=('without_files', 'with_files'))
@@ -221,4 +221,4 @@ def test_user_data_export_schema(request, snapshot, db, dummy_user, dummy_catego
 
     data = UserDataExportSchema(context={'include_files': include_files}).dump(dummy_user)
     test_id = request.node.callspec.id
-    _assert_json_snapshot(snapshot, data, f'user_data_export_schema_{test_id}.json')
+    _assert_yaml_snapshot(snapshot, data, f'user_data_export_schema_{test_id}.yml')

@@ -1,0 +1,27 @@
+affiliation: CERN
+affiliation_link:
+  city: ''
+  country_code: ''
+  country_name: ''
+  id: 1
+  name: CERN
+  postcode: ''
+  street: ''
+avatar_url: /user/1337/picture-default
+email: 1337@example.test
+favorite_categories:
+- id: 42
+  title: dummy
+  url: http://localhost/category/42/
+favorite_events:
+- id: 0
+  title: dummy#0
+  url: http://localhost/event/0/
+first_name: Guinea
+full_name: Guinea Pig
+last_name: Pig
+phone: ''
+picture_metadata: null
+picture_source: standard
+secondary_emails: []
+title: null

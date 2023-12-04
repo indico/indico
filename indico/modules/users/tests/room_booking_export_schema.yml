@@ -1,0 +1,44 @@
+favorite_rooms:
+- building: '1'
+  floor: '2'
+  id: 420
+  location_name: Test
+  map_url: null
+  name: 1/2-3
+  number: '3'
+  site: ''
+  verbose_name: null
+owned_rooms:
+- building: '1'
+  floor: '2'
+  id: 420
+  location_name: Test
+  map_url: null
+  name: 1/2-3
+  number: '3'
+  site: ''
+  verbose_name: null
+reservations:
+- booked_for_name: Guinea Pig
+  booking_reason: Testing
+  end_dt: '2022-05-22T17:30:00'
+  id: 420
+  is_accepted: true
+  is_repeating: false
+  recurrence_weekdays: null
+  repeat_frequency: NEVER
+  repeat_interval: 0
+  room_id: 420
+  start_dt: '2022-05-22T08:30:00'
+reservations_booked_for:
+- booked_for_name: Guinea Pig
+  booking_reason: Testing
+  end_dt: '2022-05-22T17:30:00'
+  id: 420
+  is_accepted: true
+  is_repeating: false
+  recurrence_weekdays: null
+  repeat_frequency: NEVER
+  repeat_interval: 0
+  room_id: 420
+  start_dt: '2022-05-22T08:30:00'

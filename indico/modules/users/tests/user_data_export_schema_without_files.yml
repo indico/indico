@@ -1,0 +1,217 @@
+abstracts:
+- description: ''
+  event_id: 0
+  event_url: http://localhost/event/0/
+  files:
+  - filename: dummy_abstract_file.txt
+    id: 420
+    md5: d659f3992a4861fbba98e728e8ab5d8e
+    url: http://localhost/event/-314/abstracts/1234/attachments/420/dummy_abstract_file.txt
+  id: 420
+  state: submitted
+  submission_comment: ''
+  submitted_dt: '2022-05-22T12:00:00+00:00'
+  title: Broken Symmetry and the Mass of Gauge Vector Mesons
+  url: http://localhost/event/-314/abstracts/1234/
+attachments:
+- description: Dummy attachment
+  file:
+    filename: dummy_file.txt
+    id: 420
+    md5: 5eb63bbbe01eeed093cb22bb8f5acdc3
+  folder: 420
+  folder_id: 420
+  id: 420
+  link_url: null
+  modified_dt: '2022-05-22T12:00:00+00:00'
+  title: dummy_attachment
+  type: file
+  url: http://localhost/event/0/attachments/420/420/dummy_file.txt
+contributions:
+- address: ''
+  description: ''
+  duration: 20
+  end_dt: null
+  event_id: 0
+  event_url: http://localhost/event/0/
+  id: 420
+  is_author: false
+  is_deleted: false
+  is_speaker: true
+  keywords: []
+  minutes: <p><strong>Contrib Test</strong></p>
+  room_name: ''
+  start_dt: null
+  title: Dummy Contribution
+  url: http://localhost/event/0/contributions/420/
+  venue_name: ''
+editables:
+- contribution_id: 420
+  contribution_title: Dummy Contribution
+  id: 420
+  revisions:
+  - comment: ''
+    created_dt: '2022-05-22T12:00:00+00:00'
+    files:
+    - filename: dummy_file.txt
+      md5: d659f3992a4861fbba98e728e8ab5d8e
+    id: 420
+    is_undone: false
+    type: acceptance
+  type: paper
+miscellaneous:
+  api_key: null
+  created_events:
+  - id: 0
+    title: dummy#0
+    url: http://localhost/event/0/
+  identities: []
+  oauth_applications: []
+  old_api_keys: []
+  personal_tokens: []
+  static_sites:
+  - event_id: 0
+    event_url: http://localhost/event/0/
+    id: 2
+    requested_dt: '2022-05-22T12:00:00+00:00'
+    state: pending
+    url: http://localhost/event/0/manage/offline-copy/2.zip
+papers:
+- event_url: http://localhost/event/0/
+  files:
+  - filename: dummy_file.txt
+    id: 420
+    md5: d659f3992a4861fbba98e728e8ab5d8e
+    url: http://localhost/event/0/papers/420/files/420-dummy_file.txt
+  submitted_dt: '2022-05-22T12:00:00+00:00'
+  title: Dummy Contribution
+  url: http://localhost/event/0/papers/420/
+personal_data:
+  affiliation: CERN
+  affiliation_link:
+    city: ''
+    country_code: ''
+    country_name: ''
+    id: 2
+    name: CERN
+    postcode: ''
+    street: ''
+  avatar_url: /user/1337/picture-default
+  email: 1337@example.test
+  favorite_categories:
+  - id: 42
+    title: dummy
+    url: http://localhost/category/42/
+  favorite_events:
+  - id: 0
+    title: dummy#0
+    url: http://localhost/event/0/
+  first_name: Guinea
+  full_name: Guinea Pig
+  last_name: Pig
+  phone: ''
+  picture_metadata: null
+  picture_source: standard
+  secondary_emails: []
+  title: null
+registrations:
+- checked_in: false
+  checked_in_dt: null
+  consent_to_publish: nobody
+  created_by_manager: false
+  currency: USD
+  email: 1337@example.test
+  event_id: 0
+  event_title: dummy#0
+  event_url: http://localhost/event/0/
+  fields:
+  - data: registration_upload.txt
+    description: ''
+    file:
+      field_data_id: 730
+      filename: registration_upload.txt
+      md5: d659f3992a4861fbba98e728e8ab5d8e
+      registration_id: 730
+      url: http://localhost/event/0/manage/registration/420/registrations/730/file/730-registration_upload.txt
+    title: File field
+  first_name: Guinea
+  id: 730
+  is_deleted: false
+  last_name: Pig
+  price: '0'
+  rejection_reason: ''
+  state: complete
+  submitted_dt: '2022-05-22T12:00:00+00:00'
+  url: http://localhost/event/0/manage/registration/420/registrations/730/
+room_booking:
+  favorite_rooms:
+  - building: '1'
+    floor: '2'
+    id: 420
+    location_name: Test
+    map_url: null
+    name: 1/2-3
+    number: '3'
+    site: ''
+    verbose_name: null
+  owned_rooms:
+  - building: '1'
+    floor: '2'
+    id: 420
+    location_name: Test
+    map_url: null
+    name: 1/2-3
+    number: '3'
+    site: ''
+    verbose_name: null
+  reservations:
+  - booked_for_name: Guinea Pig
+    booking_reason: Testing
+    end_dt: '2022-05-22T17:30:00'
+    id: 420
+    is_accepted: true
+    is_repeating: false
+    recurrence_weekdays: null
+    repeat_frequency: NEVER
+    repeat_interval: 0
+    room_id: 420
+    start_dt: '2022-05-22T08:30:00'
+  reservations_booked_for:
+  - booked_for_name: Guinea Pig
+    booking_reason: Testing
+    end_dt: '2022-05-22T17:30:00'
+    id: 420
+    is_accepted: true
+    is_repeating: false
+    recurrence_weekdays: null
+    repeat_frequency: NEVER
+    repeat_interval: 0
+    room_id: 420
+    start_dt: '2022-05-22T08:30:00'
+settings:
+  add_ical_alerts: false
+  add_ical_alerts_mins: 5
+  force_language: false
+  force_timezone: false
+  lang: en_US
+  name_format: first_last_upper
+  show_future_events: false
+  show_past_events: false
+  suggest_categories: false
+  synced_fields: null
+  timezone: Europe/Paris
+  use_markdown_for_minutes: false
+  use_previewer_pdf: false
+subcontributions:
+- contribution_id: 420
+  description: ''
+  duration: 10
+  event_url: http://localhost/event/0/
+  id: 420
+  is_deleted: false
+  minutes: <p><strong>SubContrib Test</strong></p>
+  room_name: ''
+  title: Dummy SubContribution
+  url: http://localhost/event/0/contributions/420/subcontributions/420
+  venue_name: ''
+survey_submissions: []

@@ -13,6 +13,8 @@ from email import message_from_string
 from email.policy import SMTPUTF8
 from itertools import product
 
+import yaml
+
 
 def bool_matrix(template, mask=None, expect=None):
     """Create a boolean matrix suitable for parametrized tests.
@@ -213,3 +215,14 @@ def assert_json_snapshot(snapshot, obj, snapshot_filename):
     """
     __tracebackhide__ = True
     snapshot.assert_match(json.dumps(obj, indent=2, sort_keys=True), snapshot_filename)
+
+
+def assert_yaml_snapshot(snapshot, obj, snapshot_filename):
+    """Assert that a yaml object matches a snapshot.
+
+    :param snapshot: The pytest snapshot fixture
+    :param obj: The yaml object to compare
+    :param snapshot_filename: The filename for the snapshot
+    """
+    __tracebackhide__ = True
+    snapshot.assert_match(yaml.dump(obj), snapshot_filename)
