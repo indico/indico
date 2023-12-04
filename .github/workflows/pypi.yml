@@ -88,12 +88,12 @@ jobs:
       - uses: actions/download-artifact@v3
       # Try uploading to Test PyPI first, in case something fails.
       - name: Publish to Test PyPI 🧪
-        uses: pypa/gh-action-pypi-publish@v1.8.10
+        uses: pypa/gh-action-pypi-publish@v1.8.11
         with:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: indico-wheel/
       - name: Publish to PyPI 🚀
-        uses: pypa/gh-action-pypi-publish@v1.8.10
+        uses: pypa/gh-action-pypi-publish@v1.8.11
         with:
           packages-dir: indico-wheel/
       - name: Publish GitHub release 🐙
