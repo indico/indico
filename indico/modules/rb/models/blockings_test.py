@@ -13,9 +13,6 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.testing.util import bool_matrix
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 @pytest.mark.parametrize(('check_date', 'expected'), (
     ('2014-12-04', False),
     ('2014-12-05', True),

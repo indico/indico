@@ -1,0 +1,13 @@
+{% extends 'users/base.html' %}
+
+{% block user_content %}
+    <div id="data-export-container"></div>
+
+    <script>
+        setupDataExport(
+            {{ (user.id if user != session.user else none) | tojson }},
+            {{ export_request | tojson }},
+            {{ export_options | tojson }},
+        )
+    </script>
+{% endblock %}

@@ -36,10 +36,12 @@ from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
+from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
                                         SearchForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
@@ -47,8 +49,8 @@ from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
                                        merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
-from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserFavorites, WPUserPersonalData, WPUserProfilePic,
-                                        WPUsersAdmin)
+from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
+                                        WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -213,6 +215,44 @@ class RHPersonalData(RHUserBase):
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations)
+
+
+class RHUserDataExport(RHUserBase):
+    """Frontend page for user data exports."""
+
+    def _process(self):
+        if req := self.user.data_export_request:
+            data = DataExportRequestSchema().dump(req)
+        else:
+            data = {'state': DataExportRequestState.none.name}
+        export_options = [(opt.name, str(opt.title)) for opt in DataExportOptions]
+        return WPUserDataExport.render_template('data_export.html', 'data_export', user=self.user,
+                                                export_request=data, export_options=export_options)
+
+
+class RHUserDataExportDownload(RHUserBase):
+    """Download the exported user data archive."""
+
+    def _process(self):
+        if not self.user.data_export_request or not self.user.data_export_request.file:
+            raise NotFound
+        logger.info('User data export for %r downloaded by %r', self.user, session.user)
+        return self.user.data_export_request.file.send()
+
+
+class RHUserDataExportAPI(RHUserBase):
+    """API to trigger user data exports."""
+
+    @use_kwargs({
+        'options': fields.List(fields.Enum(DataExportOptions), validate=validate.Length(min=1)),
+        'include_files': fields.Bool(required=True)
+    })
+    def _process_POST(self, options, include_files):
+        from indico.modules.users.tasks import export_user_data
+        export_user_data.delay(self.user, options, include_files)
+        logger.info('User data export for %r triggered by %r [%s, files=%r]',
+                    self.user, session.user, ', '.join(x.name for x in options), include_files)
+        return {'state': DataExportRequestState.running.name}
 
 
 class RHPersonalDataUpdate(RHUserBase):

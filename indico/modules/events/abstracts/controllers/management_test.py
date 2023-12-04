@@ -14,9 +14,6 @@ from indico.modules.events.abstracts.settings import abstracts_reviewing_setting
 from indico.modules.events.tracks import Track
 
 
-pytest_plugins = 'indico.modules.events.abstracts.testing.fixtures'
-
-
 @pytest.mark.parametrize(('value', 'scale_min', 'scale_max', 'expected'), (
     (5, 1, 3, 3),
     (5, 0, 10, 10),

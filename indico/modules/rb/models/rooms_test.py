@@ -22,7 +22,6 @@ from indico.testing.util import bool_matrix
 from indico.util.date_time import get_day_end, get_day_start
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
 _notset = object()
 
 

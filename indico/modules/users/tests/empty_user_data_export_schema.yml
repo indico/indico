@@ -1,0 +1,51 @@
+abstracts: []
+attachments: []
+contributions: []
+editables: []
+miscellaneous:
+  api_key: null
+  created_events: []
+  identities: []
+  oauth_applications: []
+  old_api_keys: []
+  personal_tokens: []
+  static_sites: []
+note_revisions: []
+papers: []
+personal_data:
+  affiliation: ''
+  affiliation_link: null
+  avatar_url: /user/1337/picture-default
+  email: 1337@example.test
+  favorite_categories: []
+  favorite_events: []
+  first_name: Guinea
+  full_name: Guinea Pig
+  last_name: Pig
+  phone: ''
+  picture_metadata: null
+  picture_source: standard
+  secondary_emails: []
+  title: null
+registrations: []
+room_booking:
+  favorite_rooms: []
+  owned_rooms: []
+  reservations: []
+  reservations_booked_for: []
+settings:
+  add_ical_alerts: false
+  add_ical_alerts_mins: 5
+  force_language: false
+  force_timezone: false
+  lang: null
+  name_format: first_last
+  show_future_events: false
+  show_past_events: false
+  suggest_categories: false
+  synced_fields: null
+  timezone: null
+  use_markdown_for_minutes: false
+  use_previewer_pdf: true
+subcontributions: []
+survey_submissions: []

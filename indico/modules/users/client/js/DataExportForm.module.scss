@@ -1,0 +1,32 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+.form-description {
+  padding-bottom: 1em;
+}
+
+.submit {
+  @extend %flex-row;
+  justify-content: flex-end;
+}
+
+.toggle {
+  @extend %flex-column;
+  --flex-gap: 0.5em;
+  padding: 0.5em 0;
+
+  .description {
+    margin-left: 1.8em;
+    max-width: 60%;
+  }
+}
+
+:global(.ui.form) .toggle > :global(.field) {
+  margin-bottom: 0;
+}

@@ -9,7 +9,11 @@ from celery.schedules import crontab
 from sqlalchemy.orm.attributes import flag_modified
 
 from indico.core.celery import celery
+from indico.core.db import db
 from indico.modules.users import logger
+from indico.modules.users.export import export_user_data as _export_user_data
+from indico.modules.users.export import get_old_requests
+from indico.modules.users.models.export import DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, User
 from indico.modules.users.util import get_gravatar_for_user, set_user_avatar
 from indico.util.iterables import committing_iterator
@@ -41,3 +45,28 @@ def _do_update_gravatar(user):
         return
     set_user_avatar(user, gravatar, 'gravatar', lastmod)
     logger.info('Gravatar of user %s updated', user)
+
+
+@celery.task(name='export_user_data')
+def export_user_data(user, options, include_files):
+    _export_user_data(user, options, include_files)
+
+
+@celery.periodic_task(name='user_data_export_cleanup', run_every=crontab(hour='4', day_of_week='monday'))
+def user_data_export_cleanup(days=30):
+    """Clean up old user data exports.
+
+    Files belonging to old data exports are marked for deletion
+    by setting `claimed=False`. The files will then be automatically
+    deleted by the daily `delete_unclaimed_files` task.
+
+    :param days: minimum age of the data export to be marked for removal
+    """
+    old_requests = get_old_requests(days)
+
+    logger.info('Marking for deletion %d expired user data exports from the past %d days', len(old_requests), days)
+    for request in old_requests:
+        request.state = DataExportRequestState.expired
+        if request.file:
+            request.file.claimed = False
+    db.session.commit()

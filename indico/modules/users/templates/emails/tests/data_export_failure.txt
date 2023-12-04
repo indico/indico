@@ -1,0 +1,10 @@
+Dear Guinea,
+
+We weren't able to process your data export request due to an error.
+
+You may try again at the following link:
+http://localhost/user/data-export
+
+--
+Indico :: Email Notifier
+http://localhost/

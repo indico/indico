@@ -5,16 +5,16 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import re
 from pathlib import Path
 
 import pytest
 import yaml
 
 from indico.modules.events.features.util import set_feature_enabled
+from indico.testing.util import remove_dynamic_data
 
 
-pytest_plugins = ('indico.modules.events.registration.testing.fixtures', 'indico.core.oauth.testing.fixtures')
+pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 @pytest.fixture(autouse=True)
@@ -33,12 +33,7 @@ def _assert_successful_request(snapshot, resp, name):
     snapshot.snapshot_dir = Path(__file__).parent / 'test_snapshots'
     assert resp.status_code == 200
     dumped = yaml.dump(resp.json)
-    dumped = re.sub(r'(?<=_date: ).+$', '<timestamp>', dumped, flags=re.MULTILINE)
-    dumped = re.sub(r'(?<=_dt: ).+$', '<timestamp>', dumped, flags=re.MULTILINE)
-    dumped = re.sub(r'(?<=: )[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', '<uuid>',
-                    dumped, flags=re.MULTILINE)
-    dumped = re.sub(r'(?<=_id: ).+$', '<id>', dumped, flags=re.MULTILINE)
-    dumped = re.sub(r'(?<=\bid: ).+$', '<id>', dumped, flags=re.MULTILINE)
+    dumped = remove_dynamic_data(dumped)
     __tracebackhide__ = True
     snapshot.assert_match(dumped, f'{name}.yml')
 

@@ -746,6 +746,17 @@ Storage
 
     Default: ``None``
 
+.. data:: MAX_DATA_EXPORT_SIZE
+
+    The maximum file size (in MB) for files added to the user data export archive.
+    Note that this limit does not apply to the YAML metadata files which are
+    always generated and typically do not exceed a few megabytes. However,
+    any additional files such as attachments, papers, etc., that the user might
+    have and that do not fit within the limit are not included in the exported
+    archive. The default size is 10 GB.
+
+    Default: ``10 * 1024``
+
 
 System
 ------

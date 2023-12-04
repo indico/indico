@@ -1,0 +1,13 @@
+add_ical_alerts: false
+add_ical_alerts_mins: 5
+force_language: false
+force_timezone: false
+lang: en_US
+name_format: first_last_upper
+show_future_events: false
+show_past_events: false
+suggest_categories: false
+synced_fields: null
+timezone: Europe/Paris
+use_markdown_for_minutes: false
+use_previewer_pdf: false

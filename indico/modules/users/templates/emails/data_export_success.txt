@@ -1,0 +1,22 @@
+{% extends 'emails/base_i18n.txt' %}
+
+{% block subject %}{% trans %}Indico data ready for download{% endtrans %}{% endblock %}
+
+{% block header_recipient -%}
+    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        {% trans %}Your Indico data export is ready for download.{% endtrans %}
+        {%- if max_size_exceeded %}
+            {% trans %}
+                Please note that some files were not exported due to exceeding the
+                maximum allowed size of the archive. Consider selecting less options.
+            {% endtrans %}
+        {%- endif %}
+
+        {% trans %}You can download it on the following page:{% endtrans %}
+        {{ link }}
+    {%- endfilter -%}
+{%- endblock %}

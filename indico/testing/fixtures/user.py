@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import pytest
+from werkzeug.datastructures import MultiDict
 
 from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
@@ -66,9 +67,16 @@ def dummy_group(create_group):
 @pytest.fixture
 def create_identity(db):
     """Return a callable which lets you create dummy identities."""
-    def _create_identity(user, provider, identifier):
-        identity = Identity(user=user, provider=provider, identifier=identifier)
+    def _create_identity(user, provider, identifier, **kwargs):
+        identity = Identity(user=user, provider=provider, identifier=identifier, **kwargs)
         db.session.flush()
         return identity
 
     return _create_identity
+
+
+@pytest.fixture
+def dummy_identity(dummy_user, create_identity):
+    """Create a dummy identity."""
+    data = MultiDict([('foo', 'bar'), ('foo', 'baz')])
+    return create_identity(dummy_user, provider='ldap', identifier='guinea_pig', data=data)

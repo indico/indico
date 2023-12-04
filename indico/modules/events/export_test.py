@@ -14,7 +14,6 @@ from pathlib import Path
 import pytest
 import yaml
 
-from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.export import export_event, import_event
@@ -67,17 +66,11 @@ def test_event_export(db, dummy_event, monkeypatch):
         assert tarf.extractfile('data.yaml').read().decode() == data_yaml_content
 
 
-@pytest.mark.usefixtures('reproducible_uuids')
-def test_event_attachment_export(db, dummy_event, dummy_attachment):
+@pytest.mark.usefixtures('reproducible_uuids', 'dummy_attachment')
+def test_event_attachment_export(db, dummy_event):
     s = Session(event=dummy_event, title='sd', is_deleted=True)
     Contribution(event=dummy_event, title='c1', duration=timedelta(minutes=30))
     Contribution(event=dummy_event, title='c2', session=s, duration=timedelta(minutes=30), is_deleted=True)
-
-    dummy_attachment.folder.event = dummy_event
-    dummy_attachment.folder.linked_event = dummy_event
-    dummy_attachment.folder.link_type = LinkType.event
-
-    dummy_attachment.file.save(BytesIO(b'hello world'))
     db.session.flush()
 
     f = BytesIO()

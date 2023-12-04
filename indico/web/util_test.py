@@ -19,9 +19,6 @@ from indico.web.util import (_check_request_user, _lookup_request_user, _request
                              get_request_user, is_legacy_signed_url_valid, signed_url_for_user, verify_signed_user_url)
 
 
-pytest_plugins = 'indico.core.oauth.testing.fixtures'
-
-
 @pytest.mark.parametrize(('url', 'valid'), (
     ('/user/70/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', True),
     ('/user/71/dashboard/?token=6bO-FgjAvYPiZ8Uft5_DmOC4Oow', False),

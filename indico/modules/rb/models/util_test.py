@@ -14,9 +14,6 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import bool_matrix
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 @pytest.mark.parametrize(
     ('not_repeating', 'only_one_valid', 'propagate', 'proxied'),
     bool_matrix('..0', expect=False) +

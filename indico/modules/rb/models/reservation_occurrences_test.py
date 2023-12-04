@@ -16,9 +16,6 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import extract_emails
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 @pytest.fixture
 def creation_params():
     return {'start': date.today() + relativedelta(hour=8),

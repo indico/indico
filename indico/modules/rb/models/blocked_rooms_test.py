@@ -14,9 +14,6 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import bool_matrix, extract_emails
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 @pytest.mark.parametrize('state', BlockedRoom.State)
 def test_state_name(state):
     assert BlockedRoom(state=state).state_name == state.title

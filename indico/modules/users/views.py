@@ -64,6 +64,10 @@ class WPUserFavorites(WPUser):
     bundles = ('module_users.favorites.js', 'module_users.favorites.css')
 
 
+class WPUserDataExport(WPUser):
+    bundles = ('module_users.data_export.js', 'module_users.data_export.css')
+
+
 class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
     bundles = ('module_users.js',)

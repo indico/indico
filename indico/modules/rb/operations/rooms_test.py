@@ -13,9 +13,6 @@ from indico.modules.rb.operations.rooms import get_managed_room_ids, search_for_
 from indico.modules.users import User
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 @pytest.mark.parametrize('bulk_possible', (True, False))
 def test_managed_rooms(monkeypatch, bulk_possible, create_user, create_room):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)

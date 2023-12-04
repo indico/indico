@@ -1,0 +1,14 @@
+{% extends 'emails/base_i18n.txt' %}
+
+{% block subject %}{% trans %}Indico data export failed{% endtrans %}{% endblock %}
+
+{% block header_recipient -%}
+    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+{% trans %}We weren't able to process your data export request due to an error.{% endtrans %}
+
+{% trans %}You may try again at the following link:{% endtrans %}
+{{ link }}
+{%- endblock %}

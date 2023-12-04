@@ -25,9 +25,6 @@ from indico.modules.users.util import merge_users
 from indico.web.flask.util import url_for
 
 
-pytest_plugins = 'indico.core.oauth.testing.fixtures'
-
-
 class MockSession:
     def __init__(self, client):
         self.client = client

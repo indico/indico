@@ -15,9 +15,6 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, Reservation, ReservationState
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
 @pytest.fixture
 def overlapping_reservation(create_reservation):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=2),

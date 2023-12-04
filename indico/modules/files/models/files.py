@@ -52,6 +52,7 @@ class File(StoredFileMixin, db.Model):
 
     # relationship backrefs:
     # - custom_boa_of (Event.custom_boa)
+    # - data_export_of (DataExportRequest.file)
     # - editing_revision_files (EditingRevisionFile.file)
     # - receipt_file (ReceiptFile.file)
 

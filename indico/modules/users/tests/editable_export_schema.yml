@@ -1,0 +1,14 @@
+contribution_id: <id>
+contribution_title: Dummy Contribution
+id: <id>
+revisions:
+- comment: ''
+  created_dt: <timestamp>
+  files:
+  - _archive_path: editables/paper/0_dummy0/420_Dummy_Contribution/420_dummy_file.txt
+    filename: dummy_file.txt
+    md5: d659f3992a4861fbba98e728e8ab5d8e
+  id: <id>
+  is_undone: false
+  type: acceptance
+type: paper

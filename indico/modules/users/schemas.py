@@ -9,7 +9,7 @@ from marshmallow import fields, post_dump, post_load, validate
 from marshmallow.fields import List, String
 
 from indico.core.marshmallow import mm
-from indico.modules.categories import Category
+from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
