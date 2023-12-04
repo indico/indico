@@ -388,4 +388,7 @@ class RHSessionRefresh(SessionExpiryMixin, RH):
     """Return the sesssion expiration time and refresh the current session.
 
     Refreshing the session is the standard behavior of almost any endpoint.
+
+    The logic that forces this endpoint to always refresh the session is
+    implemented in ``indico.web.flask.session``.
     """

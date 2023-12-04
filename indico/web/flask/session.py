@@ -196,6 +196,8 @@ class IndicoSessionInterface(SessionInterface):
         if (request.endpoint == 'core.session_expiry' or
                 RE_SKIP_REFRESH_SESSION_FOR_ASSETS_ENDPOINTS.match(request.endpoint)):
             return False
+        if request.endpoint == 'core.session_refresh':
+            return True
         threshold = self.get_storage_lifetime(app, session) / 2
         return session['_expires'] - datetime.now() < threshold
 
