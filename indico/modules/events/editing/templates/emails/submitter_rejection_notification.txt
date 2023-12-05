@@ -8,6 +8,7 @@
 {% trans name=submitter_name %}Your revision changes have been rejected by {{ name }} on contribution {{ title }}.{% endtrans %}
 {% if text -%}
     {% trans linebreak='\n' -%}
+        {{ linebreak }}{{ submitter_name }} also left a comment:
         {{ linebreak }}{{ text }}
     {%- endtrans %}
 {%- endif %}

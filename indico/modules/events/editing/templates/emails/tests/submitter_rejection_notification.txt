@@ -2,6 +2,7 @@ Dear John Doe,
 
 Your revision changes have been rejected by Jane Doe on contribution #1 (Dummy Contribution).
 
+Jane Doe also left a comment: 
 Revert last changes
 
 You can view details on the following URL:

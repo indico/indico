@@ -1,16 +1,26 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
 {% set title=contribution.verbose_title %}
-{% set revision_type = {3: "made changes to", 6: "requested changes to", 7: "accepted", 8: "rejected"}[revision_type] | default("left a judgment to") -%}
-
+{% set name=editor_name if editor_name else 'Someone' %}
 {% block subject -%}{% trans %}New editor judgment for contribution {{ title }}{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
-{% if editor_name -%}
-    {% trans name=editor_name %}{{ name }} has {{ revision_type }} an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
-{%- else -%}
-    {% trans %}Someone has left a { revision_type } an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
-{%- endif %}
+{% if action == 'accept' -%}
+    {% trans %}{{ name }} has accepted an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
+{%- elif action == 'reject' -%}
+    {% trans %}{{ name }} has rejected an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
+{%- elif action == 'update' -%}
+    {% trans %}{{ name }} has made changes to an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
+{%- elif action == 'update_accept' -%}
+    {% trans %}{{ name }} has changed and accepted an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
+{%- elif action == 'request_update' -%}
+    {% trans %}{{ name }} has requested changes to an editable you are submitter of, on contribution {{ title }}.{% endtrans %}
+{%- endif -%}
 
-{{ text }}
-{% endblock %}
+{%- if text %}
+    {% trans linebreak='\n' %}
+        {{ linebreak }}{{ name }} also left a comment:
+        {{ linebreak }}{{ text }}
+    {% endtrans %}
+{% endif %}
+{%- endblock %}

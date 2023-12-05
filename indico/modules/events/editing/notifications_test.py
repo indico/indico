@@ -58,5 +58,5 @@ def test_judgment_email_plaintext(snapshot, dummy_contribution):
                      editor_name='Jane Doe',
                      timeline_url='http://localhost/timeline-url',
                      contribution=dummy_contribution,
-                     revision_type=3,
+                     action='update',
                      text='Added 2 slides to the presentation')

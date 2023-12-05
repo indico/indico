@@ -158,7 +158,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                        tags=tags)
         revision.editable.revisions.append(new_revision)
     db.session.flush()
-    notify_editor_judgment(new_revision, revision.user, revision_type)
+    notify_editor_judgment(new_revision, revision.user, action)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
     _log_review(revision.editable, LogKind.positive, f'Revision for {revision.editable.log_title} reviewed',
                 old_state=old_state)

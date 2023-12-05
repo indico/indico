@@ -53,7 +53,7 @@ def notify_comment(comment):
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
-def notify_editor_judgment(revision, submitter, revision_type):
+def notify_editor_judgment(revision, submitter, action):
     """Notify the submitter about a judgment made by an editor."""
     editable = revision.editable
     editor_name = revision.user.first_name if editable.can_see_editor_names(submitter) else None
@@ -63,7 +63,7 @@ def notify_editor_judgment(revision, submitter, revision_type):
                                   timeline_url=editable.external_timeline_url,
                                   recipient_name=submitter.first_name,
                                   contribution=editable.contribution,
-                                  revision_type=revision_type,
+                                  action=action.value,
                                   text=revision.comment)
         email = make_email(submitter.email, template=tpl)
     send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
