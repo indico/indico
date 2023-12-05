@@ -27,6 +27,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
+from indico.util.string import format_repr
 
 
 class ModificationMode(RichIntEnum):
@@ -485,7 +486,7 @@ class RegistrationForm(db.Model):
         return ~cls.is_deleted & (cls.publish_registrations_public != PublishRegistrationsMode.hide_all)
 
     def __repr__(self):
-        return f'<RegistrationForm({self.id}, {self.event_id}, {self.title})>'
+        return format_repr(self, 'id', 'event_id', is_deleted=False, _text=self.title)
 
     def is_modification_allowed(self, registration):
         """Check whether a registration may be modified."""
