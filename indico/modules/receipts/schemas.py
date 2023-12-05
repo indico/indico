@@ -138,7 +138,7 @@ class EventDataSchema(mm.SQLAlchemyAutoSchema):
     _type = fields.String(attribute='_type.name', data_key='type', dump_only=True)
     _url = fields.String(attribute='short_external_url', data_key='url', dump_only=True)
     # load into flat data
-    category_chain = fields.List(fields.String(), load_only=True)
+    category_chain = fields.List(fields.String(), load_only=True, load_default=lambda: [])
     type = fields.String(load_only=True, required=True)
     url = fields.String(load_only=True, required=True)
 

@@ -18,6 +18,7 @@ from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 from markupsafe import Markup
+from marshmallow import ValidationError
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.python import PythonLexer
@@ -90,7 +91,7 @@ class SilentUndefined(Undefined):
 
 def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
     """Get all templates usable by an event/category."""
-    category = obj.category if isinstance(obj, Event) else obj
+    category = (obj.category or Category.get_root()) if isinstance(obj, Event) else obj
     return set(ReceiptTemplate.query.filter(~ReceiptTemplate.is_deleted,
                                             ReceiptTemplate.category_id.in_(categ['id'] for categ in category.chain)))
 
@@ -201,14 +202,19 @@ def get_safe_template_context(event: Event, registration: Registration, custom_f
     """
     from indico.modules.receipts.schemas import TemplateDataSchema
     tds = TemplateDataSchema()
-    dumped = tds.dump({
-        'event': event,
-        'registration': registration,
-        'custom_fields': custom_fields,
-    })
-    # This round-trip through marshmallow loads it back to a plain dict while converting
-    # e.g. date strings back to actual datetime objects
-    return tds.load(dumped)
+    try:
+        dumped = tds.dump({
+            'event': event,
+            'registration': registration,
+            'custom_fields': custom_fields,
+        })
+        # This round-trip through marshmallow loads it back to a plain dict while converting
+        # e.g. date strings back to actual datetime objects
+        return tds.load(dumped)
+    except ValidationError as exc:
+        # This should never happen outside develop, but if it does we get a proper error instead of
+        # breaking the frontend with an unexpected validation error payload.
+        raise RuntimeError(f'Could not load template preview data: {exc}') from exc
 
 
 def _get_default_value(field):
@@ -229,10 +235,16 @@ def get_dummy_preview_data(custom_fields: dict) -> dict:
     from indico.modules.receipts.schemas import TemplateDataSchema
     dummy_file = Path(current_app.root_path) / 'modules' / 'receipts' / 'dummy_data.yaml'
     dummy_data = yaml.safe_load(dummy_file.read_text())
-    return TemplateDataSchema().load({
-        **dummy_data,
-        'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
-    })
+    try:
+        return TemplateDataSchema().load({
+            **dummy_data,
+            'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
+        })
+    except ValidationError as exc:
+        # This is a bug that generally happens only during development, but having the
+        # validation error propagate to the frontend makes it harder to notice and realize
+        # that's actually wrong (usually a missing update to dummy_data.yaml)
+        raise RuntimeError(f'Could not load template preview data: {exc}') from exc
 
 
 def _render_placeholder_value(value):
