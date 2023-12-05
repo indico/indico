@@ -618,7 +618,7 @@ def count_hidden_registrations(event, is_participant):
 
 
 @make_interceptable
-def can_preview_participant_list(event, user, allow_admin=False):
+def can_preview_participant_list(event, user, allow_admin=True):
     return event.can_manage(user, permission='registration', allow_admin=allow_admin)
 
 

@@ -10,7 +10,7 @@ from datetime import timedelta
 from operator import attrgetter
 
 import pytz
-from flask import has_request_context, render_template, request, session
+from flask import has_request_context, render_template, session
 from markupsafe import Markup
 from sqlalchemy import DDL, and_, or_, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
@@ -1075,12 +1075,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration, RegistrationState
-
-        # Check preview participant list as participant
-        if request.endpoint == 'event_registration.manage_participantlist_preview':
-            from indico.modules.events.registration.util import can_preview_participant_list
-            return can_preview_participant_list(self, user)
-
         if user is None:
             return False
         return (Registration.query.with_parent(self)
