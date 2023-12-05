@@ -130,15 +130,17 @@ class EventDataSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
         fields = ('id', '_category_chain', 'title', 'start_dt', 'end_dt', 'timezone', 'venue_name', 'room_name',
-                  'address', '_type', 'category_chain', 'type')
+                  'address', '_type', 'category_chain', 'type', '_url', 'url')
 
     # dump from nested data
     _category_chain = fields.List(fields.String(), attribute='category.chain_titles', data_key='category_chain',
                                   dump_only=True)
     _type = fields.String(attribute='_type.name', data_key='type', dump_only=True)
+    _url = fields.String(attribute='short_external_url', data_key='url', dump_only=True)
     # load into flat data
     category_chain = fields.List(fields.String(), load_only=True)
-    type = fields.String(load_only=True)
+    type = fields.String(load_only=True, required=True)
+    url = fields.String(load_only=True, required=True)
 
 
 class TransactionSchema(mm.SQLAlchemyAutoSchema):

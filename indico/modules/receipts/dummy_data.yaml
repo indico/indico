@@ -13,6 +13,7 @@ event:
   timezone: Europe/Zurich
   title: How to build a Stargate
   type: conference
+  url: https://indico.example.com/e/6666
   venue_name: Area 51
 registration:
   base_price: 75.0
