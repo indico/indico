@@ -13,7 +13,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import yaml
-from flask import current_app, g
+from babel.numbers import format_currency
+from flask import current_app, g, session
 from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
@@ -119,6 +120,12 @@ def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplat
     return get_all_templates(obj) - set(obj.receipt_templates)
 
 
+def _format_currency(amount, currency, locale=None):
+    # XXX same logic as in render_price - should probably use the event language in both places!
+    locale = session.lang or 'en_GB'
+    return format_currency(amount, currency, locale=locale)
+
+
 def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = False) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
@@ -128,6 +135,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_date': format_date,
             'format_datetime': format_datetime,
             'format_time': format_time,
+            'format_currency': _format_currency,
         })
         return env.from_string(code).render(
             **template_context,
