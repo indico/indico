@@ -25,7 +25,8 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
-from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
+from indico.modules.events.registration.util import (can_preview_participant_list, check_registration_email,
+                                                     create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
@@ -121,11 +122,14 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     view_class = WPDisplayRegistrationParticipantList
     preview = False
 
+    def is_participant(self, user):
+        return self.event.is_user_registered(user)
+
     @staticmethod
     def _is_checkin_visible(reg):
         return reg.registration_form.publish_checkin_enabled and reg.checked_in
 
-    def _merged_participant_list_table(self):
+    def _merged_participant_list_table(self, is_participant):
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
             columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
@@ -150,7 +154,6 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
                  .signal_query('merged-participant-list-publishable-registrations', event=self.event))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
                                                      for reg in query if reg.is_publishable(is_participant)),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
@@ -159,7 +162,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
                 'num_participants': query.count()}
 
-    def _participant_list_table(self, regform):
+    def _participant_list_table(self, regform, is_participant):
         def _process_registration(reg, column_ids, active_fields):
             data_by_field = reg.data_by_field
 
@@ -197,7 +200,6 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in query
                          if reg.is_publishable(is_participant)]
         return {'headers': headers,
@@ -207,14 +209,15 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'num_participants': query.count()}
 
     def _process(self):
+        is_participant = self.is_participant(session.user)
         regforms = (RegistrationForm.query.with_parent(self.event)
-                    .filter(RegistrationForm.is_participant_list_visible(self.event.is_user_registered(session.user)),
+                    .filter(RegistrationForm.is_participant_list_visible(is_participant),
                             ~RegistrationForm.participant_list_disabled)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
-            tables = [self._merged_participant_list_table()]
+            tables = [self._merged_participant_list_table(is_participant)]
         else:
             tables = []
             regforms_dict = {regform.id: regform for regform in regforms}
@@ -225,9 +228,10 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     # The settings might reference forms that are not available
                     # anymore (publishing was disabled, etc.)
                     continue
-                tables.append(self._participant_list_table(regform))
+                tables.append(self._participant_list_table(regform, is_participant))
             # There might be forms that have not been sorted by the user yet
-            tables.extend(map(self._participant_list_table, regforms_dict.values()))
+            tables.extend(map(self._participant_list_table, regforms_dict.values(),
+                              [is_participant] * len(regforms_dict)))
 
         num_participants = sum(table['num_participants'] for table in tables)
 
@@ -248,8 +252,11 @@ class RHParticipantListPreview(RHParticipantList):
 
     def _check_access(self):
         RHParticipantList._check_access(self)
-        if not self.event.can_manage(session.user, permission='registration', allow_admin=True):
+        if not self.event.can_manage(session.user, permission='registration'):
             raise Forbidden(_('You are not allowed to access this page.'))
+
+    def is_participant(self, user):
+        return can_preview_participant_list(self.event, session.user)
 
 
 class InvitationMixin:
