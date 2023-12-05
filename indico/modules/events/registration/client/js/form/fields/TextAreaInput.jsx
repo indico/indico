@@ -20,10 +20,11 @@ const attributeMap = {
   numberOfRows: 'rows',
 };
 
-export default function TextAreaInput({htmlName, disabled, title, isRequired, ...props}) {
+export default function TextAreaInput({htmlId, htmlName, disabled, title, isRequired, ...props}) {
   const inputProps = mapPropsToAttributes(props, attributeMap, TextAreaInput.defaultProps);
   return (
     <FinalTextArea
+      id={htmlId}
       name={htmlName}
       {...inputProps}
       disabled={disabled}
@@ -34,6 +35,7 @@ export default function TextAreaInput({htmlName, disabled, title, isRequired, ..
 }
 
 TextAreaInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   numberOfRows: PropTypes.number,

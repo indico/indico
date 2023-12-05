@@ -17,13 +17,14 @@ import {getCurrency} from '../../form/selectors';
 
 import '../../../styles/regform.module.scss';
 
-function NumberInputComponent({value, onChange, disabled, price, minValue, maxValue}) {
+function NumberInputComponent({id, value, onChange, disabled, price, minValue, maxValue}) {
   const currency = useSelector(getCurrency);
   const total = (value * price).toFixed(2);
 
   return (
     <div styleName="number-field">
       <input
+        id={id}
         type="number"
         value={value !== null ? value : ''}
         min={minValue}
@@ -41,6 +42,7 @@ function NumberInputComponent({value, onChange, disabled, price, minValue, maxVa
 }
 
 NumberInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -54,12 +56,21 @@ NumberInputComponent.defaultProps = {
   maxValue: null,
 };
 
-export default function NumberInput({htmlName, disabled, isRequired, price, minValue, maxValue}) {
+export default function NumberInput({
+  htmlId,
+  htmlName,
+  disabled,
+  isRequired,
+  price,
+  minValue,
+  maxValue,
+}) {
   const validate = isRequired
     ? v.chain(v.required, v.number(), v.range(minValue, maxValue || Infinity))
     : v.chain(v.optional(), v.number(), v.range(minValue, maxValue || Infinity));
   return (
     <FinalField
+      id={htmlId}
       name={htmlName}
       component={NumberInputComponent}
       required={isRequired}
@@ -75,6 +86,7 @@ export default function NumberInput({htmlName, disabled, isRequired, price, minV
 }
 
 NumberInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

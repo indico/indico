@@ -22,7 +22,7 @@ import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
 
-export default function EmailInput({htmlName, disabled, isRequired}) {
+export default function EmailInput({htmlId, htmlName, disabled, isRequired}) {
   const isMainEmailField = htmlName === 'email';
   const [message, setMessage] = useState({status: '', message: '', forEmail: ''});
   const isUpdateMode = useSelector(getUpdateMode);
@@ -120,6 +120,7 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
   return (
     <FinalInput
       type="email"
+      id={htmlId}
       name={htmlName}
       required={isRequired && isMainEmailField ? 'no-validator' : isRequired}
       disabled={disabled}
@@ -145,6 +146,7 @@ export default function EmailInput({htmlName, disabled, isRequired}) {
 }
 
 EmailInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool.isRequired,

@@ -70,6 +70,7 @@ export default class SingleDatePicker extends React.Component {
       hideKeyboardShortcutsPanel: true,
       showDefaultInputIcon: true,
       focused,
+      ariaLabel: '', // XXX: Suppress aria-label as it interferes with input's label
       ...filteredProps,
     });
   }

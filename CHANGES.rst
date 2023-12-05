@@ -92,6 +92,8 @@ Accessibility
   :pr:`5986`, thanks :user:`foxbunny`)
 - Add proper labels to the captcha play and reload buttons (:issue:`6064`, :pr:`6080`,
   :thanks:`foxbunny`)
+- Associate form labels with form controls in the registration form (:issue:`6059`, :issue:`6073`,
+  :pr:`6076`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

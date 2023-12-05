@@ -28,6 +28,7 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function AccommodationInputComponent({
+  id,
   existingValue,
   value,
   onChange,
@@ -89,15 +90,16 @@ function AccommodationInputComponent({
 
   return (
     <div styleName="accommodation-field">
-      <table styleName="choice-table">
+      <table styleName="choice-table" role="presentation">
         <tbody>
           {choices
             .filter(c => c.isEnabled || !c.isNoAccommodation)
-            .map(c => {
+            .map((c, index) => {
               return (
                 <tr key={c.id} styleName="row">
                   <td>
                     <Form.Radio
+                      id={id ? `${id}-${index}` : ''}
                       style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                       styleName="radio"
                       label={{
@@ -175,6 +177,7 @@ function AccommodationInputComponent({
 }
 
 AccommodationInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -194,6 +197,7 @@ AccommodationInputComponent.propTypes = {
 
 export default function AccommodationInput({
   id,
+  htmlId,
   htmlName,
   disabled,
   isRequired,
@@ -206,6 +210,7 @@ export default function AccommodationInput({
   const existingValue = useSelector(state => getFieldValue(state, id)) || {choice: null};
   return (
     <FinalField
+      id={htmlId}
       name={htmlName}
       existingValue={existingValue}
       component={AccommodationInputComponent}
@@ -230,6 +235,7 @@ export default function AccommodationInput({
 
 AccommodationInput.propTypes = {
   id: PropTypes.number.isRequired,
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

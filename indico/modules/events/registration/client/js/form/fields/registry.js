@@ -62,6 +62,8 @@ Available keys:
 - alwaysRequired: optional; always display the field as required
 - hasPrice: optional; show price field if the whole field can have a price attached
 - noRetentionPeriod: optional; hide the retention period setting
+- renderAsFieldset: optional; whether the field should be rendered in a fieldset; applies
+  to fields that use multiple controls, like radios, checkboxes, multi-button controls
 */
 
 const fieldRegistry = {
@@ -118,6 +120,7 @@ const fieldRegistry = {
     settingsComponent: BooleanSettings,
     hasPrice: true,
     icon: 'switchon',
+    renderAsFieldset: true,
   },
   phone: {
     title: Translate.string('Phone'),
@@ -134,6 +137,7 @@ const fieldRegistry = {
     title: Translate.string('File'),
     inputComponent: FileInput,
     icon: 'upload',
+    renderAsFieldset: true,
   },
   email: {
     title: Translate.string('Email'),
@@ -148,6 +152,7 @@ const fieldRegistry = {
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator, singleChoiceSettingsFormDecorator],
     settingsFormInitialData: singleChoiceSettingsInitialData,
     icon: 'dropmenu',
+    renderAsFieldset: true,
   },
   multi_choice: {
     title: Translate.string('Multiple Choice'),
@@ -157,6 +162,7 @@ const fieldRegistry = {
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator],
     settingsFormInitialData: multiChoiceSettingsInitialData,
     icon: 'list',
+    renderAsFieldset: true,
   },
   accommodation: {
     title: Translate.string('Accommodation'),
@@ -169,6 +175,7 @@ const fieldRegistry = {
     noRequired: true,
     alwaysRequired: true,
     icon: 'home',
+    renderAsFieldset: true,
   },
   accompanying_persons: {
     title: Translate.string('Accompanying Persons'),
@@ -179,6 +186,7 @@ const fieldRegistry = {
     noRequired: true,
     hasPrice: true,
     icon: 'user',
+    renderAsFieldset: true,
   },
 };
 

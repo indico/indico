@@ -27,6 +27,7 @@ import '../../../styles/regform.module.scss';
 import './table.module.scss';
 
 function SingleChoiceDropdown({
+  id,
   existingValue,
   value,
   onChange,
@@ -58,6 +59,7 @@ function SingleChoiceDropdown({
     }));
     extraSlotsDropdown = (
       <Form.Select
+        id={id ? `${id}-extraslots` : ''}
         options={options}
         disabled={
           disabled ||
@@ -108,6 +110,7 @@ function SingleChoiceDropdown({
     <Form.Group styleName="single-choice-dropdown">
       <Form.Field>
         <Dropdown
+          id={id}
           selection
           style={{width: 500, opacity: 1}}
           placeholder={Translate.string('Choose an option')}
@@ -137,6 +140,7 @@ function SingleChoiceDropdown({
 }
 
 SingleChoiceDropdown.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -149,6 +153,7 @@ SingleChoiceDropdown.propTypes = {
 };
 
 function SingleChoiceRadioGroup({
+  id,
   existingValue,
   value,
   onChange,
@@ -182,13 +187,14 @@ function SingleChoiceRadioGroup({
   const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
 
   return (
-    <table styleName="choice-table">
+    <table styleName="choice-table" role="presentation">
       <tbody>
-        {radioChoices.map(c => {
+        {radioChoices.map((c, index) => {
           return (
             <tr key={c.id} styleName="row">
               <td>
                 <Form.Radio
+                  id={id ? `${id}-${index}` : ''}
                   style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                   styleName="radio"
                   label={{
@@ -230,6 +236,7 @@ function SingleChoiceRadioGroup({
                   <td>
                     {c.isEnabled && (
                       <Dropdown
+                        id={id ? `${id}-extraslot` : ''}
                         selection
                         styleName="dropdown"
                         disabled={
@@ -275,6 +282,7 @@ function SingleChoiceRadioGroup({
 }
 
 SingleChoiceRadioGroup.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -287,6 +295,7 @@ SingleChoiceRadioGroup.propTypes = {
 };
 
 function SingleChoiceInputComponent({
+  id,
   existingValue,
   value,
   onChange,
@@ -302,6 +311,7 @@ function SingleChoiceInputComponent({
   if (itemType === 'dropdown') {
     component = (
       <SingleChoiceDropdown
+        id={id}
         value={value}
         existingValue={existingValue}
         onChange={onChange}
@@ -316,6 +326,7 @@ function SingleChoiceInputComponent({
   } else if (itemType === 'radiogroup') {
     component = (
       <SingleChoiceRadioGroup
+        id={id}
         value={value}
         existingValue={existingValue}
         onChange={onChange}
@@ -335,6 +346,7 @@ function SingleChoiceInputComponent({
 }
 
 SingleChoiceInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
   isPurged: PropTypes.bool.isRequired,
@@ -347,6 +359,7 @@ SingleChoiceInputComponent.propTypes = {
 
 export default function SingleChoiceInput({
   id,
+  htmlId,
   htmlName,
   disabled,
   isRequired,
@@ -359,6 +372,7 @@ export default function SingleChoiceInput({
   const existingValue = useSelector(state => getFieldValue(state, id)) || {};
   return (
     <FinalField
+      id={htmlId}
       name={htmlName}
       component={SingleChoiceInputComponent}
       format={v => v || {}}
@@ -383,6 +397,7 @@ export default function SingleChoiceInput({
 
 SingleChoiceInput.propTypes = {
   id: PropTypes.number.isRequired,
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

@@ -19,7 +19,7 @@ import {toMoment} from 'indico/utils/date';
 
 import '../../../styles/regform.module.scss';
 
-function DateInputComponent({value, onChange, disabled, required, dateFormat, timeFormat}) {
+function DateInputComponent({id, value, onChange, disabled, required, dateFormat, timeFormat}) {
   const dateValue = value.split('T')[0];
   const timeValue = value.includes('T') ? value.split('T')[1] : '';
 
@@ -35,6 +35,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
     <Form.Group styleName="date-field">
       <Form.Field>
         <SingleDatePicker
+          id={id}
           name="date"
           disabled={disabled}
           required={required}
@@ -50,6 +51,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
       {timeFormat && (
         <Form.Field>
           <TimePicker
+            id={id}
             name="time"
             disabled={disabled}
             required={required}
@@ -69,6 +71,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
 }
 
 DateInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -91,7 +94,14 @@ DateInputComponent.defaultProps = {
   timeFormat: null,
 };
 
-export default function DateInput({htmlName, disabled, isRequired, dateFormat, timeFormat}) {
+export default function DateInput({
+  htmlId,
+  htmlName,
+  disabled,
+  isRequired,
+  dateFormat,
+  timeFormat,
+}) {
   const friendlyDateFormat = dateFormat.replace(
     /%([HMdmY])/g,
     (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
@@ -105,6 +115,7 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
   if (dateFormat.includes('%d')) {
     return (
       <FinalField
+        id={htmlId}
         name={htmlName}
         component={DateInputComponent}
         required={isRequired}
@@ -145,6 +156,7 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
     };
     return (
       <FinalField
+        id={htmlId}
         type="text"
         name={htmlName}
         component={Input}
@@ -160,6 +172,7 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
 }
 
 DateInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
