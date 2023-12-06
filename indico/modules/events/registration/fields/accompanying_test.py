@@ -9,51 +9,11 @@ import pytest
 from marshmallow import ValidationError
 
 from indico.modules.events.features.util import set_feature_enabled
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import RegistrationFormSection
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
-
-
-def _id(n):
-    assert 0 <= n < 10000000
-    return f'{n:08d}-0000-0000-0000-000000000000'
-
-
-@pytest.fixture
-def create_accompanying_persons_field(db, dummy_regform):
-    def _create_accompanying_persons_field(max_persons, persons_count_against_limit,
-                                           registration=None, data=None, num_persons=0):
-        section = RegistrationFormSection(
-            registration_form=dummy_regform,
-            title='dummy_section',
-            is_manager_only=False
-        )
-        db.session.add(section)
-        db.session.flush()
-        field = RegistrationFormField(
-            input_type='accompanying_persons',
-            title='Field',
-            parent=section,
-            registration_form=dummy_regform
-        )
-        field.field_impl.form_item.data = {
-            'max_persons': max_persons,
-            'persons_count_against_limit': persons_count_against_limit,
-        }
-        field.versioned_data = field.field_impl.form_item.data
-        if registration:
-            registration.data.append(RegistrationData(
-                field_data=field.current_data,
-                data=(data if data is not None else _create_accompanying_persons(num_persons))
-            ))
-            db.session.flush()
-        return field
-
-    return _create_accompanying_persons_field
 
 
 @pytest.fixture
@@ -75,10 +35,6 @@ def create_registration(db, dummy_event, dummy_regform, create_user):
         return reg
 
     return _create_registration
-
-
-def _create_accompanying_persons(n):
-    return [{'id': _id(i), 'firstName': 'Guinea', 'lastName': 'Pig'} for i in range(n)]
 
 
 def _assert_occupied_slots(registration, count):
@@ -110,7 +66,7 @@ def _assert_registration_count(regform, count):
     (5, False, 1, 5),
 ))
 def test_new_registration(dummy_event, dummy_regform, create_accompanying_persons_field, max_persons,
-                          persons_count_against_limit, registration_limit, expected_limit):
+                          create_accompanying_persons, persons_count_against_limit, registration_limit, expected_limit):
     set_feature_enabled(dummy_event, 'registration', True)
 
     field = create_accompanying_persons_field(max_persons, persons_count_against_limit)
@@ -119,14 +75,14 @@ def test_new_registration(dummy_event, dummy_regform, create_accompanying_person
 
     assert field.field_impl._get_field_available_places(None) == expected_limit
     assert not dummy_regform.limit_reached
-    validator(_create_accompanying_persons(0))
+    validator(create_accompanying_persons(0))
     if expected_limit:
-        validator(_create_accompanying_persons(expected_limit))
+        validator(create_accompanying_persons(expected_limit))
         with pytest.raises(ValidationError):
-            validator(_create_accompanying_persons(expected_limit + 1))
+            validator(create_accompanying_persons(expected_limit + 1))
     else:
-        validator(_create_accompanying_persons(1))
-        validator(_create_accompanying_persons(10))
+        validator(create_accompanying_persons(1))
+        validator(create_accompanying_persons(10))
 
 
 @pytest.mark.parametrize(('max_persons', 'persons_count_against_limit', 'registration_limit'), (
@@ -142,14 +98,14 @@ def test_new_registration(dummy_event, dummy_regform, create_accompanying_person
 @pytest.mark.parametrize('num_persons', (0, 1, 5, 10, 15, 20))
 @pytest.mark.usefixtures('dummy_reg')
 def test_modifying_registration_field_untouched(db, dummy_event, dummy_regform, create_accompanying_persons_field,
-                                                max_persons, persons_count_against_limit, registration_limit,
-                                                num_persons):
+                                                create_accompanying_persons, max_persons, persons_count_against_limit,
+                                                registration_limit, num_persons):
     set_feature_enabled(dummy_event, 'registration', True)
 
     dummy_regform.registration_limit = registration_limit
     expected_occupied_slots = 1 + num_persons if persons_count_against_limit else 1
     reg = dummy_event.registrations.one()
-    data = _create_accompanying_persons(num_persons)
+    data = create_accompanying_persons(num_persons)
     field = create_accompanying_persons_field(max_persons, persons_count_against_limit, registration=reg, data=data)
     db.session.flush()
     validator = field.field_impl.get_validators(reg)
@@ -188,8 +144,8 @@ def test_modifying_registration_field_untouched(db, dummy_event, dummy_regform, 
 ))
 @pytest.mark.usefixtures('dummy_reg')
 def test_modifying_registration_field_changed(dummy_event, dummy_regform, create_accompanying_persons_field,
-                                              max_persons, persons_count_against_limit, registration_limit,
-                                              expected_limit, old_num_persons, new_num_persons):
+                                              create_accompanying_persons, max_persons, persons_count_against_limit,
+                                              registration_limit, expected_limit, old_num_persons, new_num_persons):
     set_feature_enabled(dummy_event, 'registration', True)
 
     dummy_regform.registration_limit = registration_limit
@@ -208,9 +164,9 @@ def test_modifying_registration_field_changed(dummy_event, dummy_regform, create
         assert not dummy_regform.limit_reached
     if expected_limit and new_num_persons > old_num_persons and new_num_persons > expected_limit:
         with pytest.raises(ValidationError):
-            validator(_create_accompanying_persons(new_num_persons))
+            validator(create_accompanying_persons(new_num_persons))
     else:
-        validator(_create_accompanying_persons(new_num_persons))
+        validator(create_accompanying_persons(new_num_persons))
 
 
 def test_registration_count_multiple_fields(dummy_regform, create_accompanying_persons_field, create_registration):
