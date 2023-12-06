@@ -24,15 +24,15 @@ const sessionExpiryChannel = new BroadcastChannel('indico-session-expiry');
 function sessionExpiryReducer(state, action) {
   switch (action.type) {
     case 'ACTIVATE_SESSION_TIMEOUT':
-      return {...state, operation: 'active', count: 120};
+      return {...state, operation: 'active'};
     case 'UPDATE_SESSION_EXPIRY':
       return {...state, sessionExpiry: action.sessionExpiry};
     case 'ACTIVATE_SESSION_COUNTDOWN':
-      return {...state, operation: 'countdown'};
+      return {...state, operation: 'countdown', count: action.count};
     case 'UPDATE_SESSION_COUNTDOWN':
       return {...state, count: action.count};
     case 'SESSION_EXPIRE':
-      return {...state, operation: 'expired', count: 0};
+      return {...state, operation: 'expired'};
     case 'RESET':
       return {...state, operation: 'reset'};
     default:
@@ -123,14 +123,7 @@ export default function SessionExpiryManager({initialExpiry, hardExpiry}) {
   const sessionTimeout = useRef();
   const opened = useRef(false);
   const {operation, count, sessionExpiry} = state;
-
-  useEffect(() => {
-    const handler = evt => {
-      dispatch({type: 'UPDATE_SESSION_EXPIRY', sessionExpiry: evt.data});
-    };
-    sessionExpiryChannel.addEventListener('message', handler);
-    return () => sessionExpiryChannel.removeEventListener('message', handler);
-  }, []);
+  const prevOperation = useRef(operation);
 
   const updateSessionExpiry = useCallback(
     expiry => {
@@ -174,13 +167,16 @@ export default function SessionExpiryManager({initialExpiry, hardExpiry}) {
     const freshSessionExpiry = await getFreshSessionExpiry(sessionExpiryURL());
     updateSessionExpiry(freshSessionExpiry);
     if (moment.utc().add(120, 'seconds') >= moment.utc(freshSessionExpiry)) {
-      dispatch({type: 'ACTIVATE_SESSION_COUNTDOWN'});
+      const millisecondsLeft = moment.utc(freshSessionExpiry) - moment.utc();
+      const counter = Math.ceil(millisecondsLeft / 1000);
+      dispatch({type: 'ACTIVATE_SESSION_COUNTDOWN', count: counter});
     } else {
       dispatch({type: 'ACTIVATE_SESSION_TIMEOUT'});
     }
   }, [updateSessionExpiry]);
 
   useEffect(() => {
+    prevOperation.current = operation;
     if (operation === 'active') {
       const delay = Math.max(
         moment.utc(sessionExpiry).subtract('120', 'seconds') - moment.utc(),
@@ -189,8 +185,15 @@ export default function SessionExpiryManager({initialExpiry, hardExpiry}) {
       sessionTimeout.current = setTimeout(checkTimeToExpire, delay);
       return () => clearInterval(sessionTimeout.current);
     }
-    if (operation === 'expired') {
+    if (operation === 'expired' && sessionExpiry !== null) {
       updateSessionExpiry(null);
+    }
+    if (sessionExpiry !== null) {
+      const handler = evt => {
+        dispatch({type: 'UPDATE_SESSION_EXPIRY', sessionExpiry: evt.data});
+      };
+      sessionExpiryChannel.addEventListener('message', handler);
+      return () => sessionExpiryChannel.removeEventListener('message', handler);
     }
   }, [sessionExpiry, operation, checkTimeToExpire, updateSessionExpiry]);
 
@@ -219,7 +222,8 @@ export default function SessionExpiryManager({initialExpiry, hardExpiry}) {
 
   return (
     <>
-      {(operation === 'countdown' || operation === 'reset') && (
+      {(operation === 'countdown' ||
+        (operation === 'reset' && prevOperation.current !== 'expired')) && (
         <SessionExpiryCountdown callback={sessionExpiryCountdownCallback} />
       )}
       <Modal
