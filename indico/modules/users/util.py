@@ -31,7 +31,6 @@ from indico.modules.attachments.models.principals import AttachmentFolderPrincip
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
-from indico.modules.events.editing.models.editable import Editable
 from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
@@ -431,7 +430,7 @@ def anonymize_user(user):
     from indico.modules.rb.models.principals import RoomPrincipal
 
     user.first_name = '<anonymous>'
-    user.last_name = '<anonymous>'
+    user.last_name = f'<anonymous-{user.id}>'
     user.title = UserTitle.none
     user.affiliation = ''
     user.affiliation_id = None
@@ -445,14 +444,21 @@ def anonymize_user(user):
     user.favorite_categories = set()
     user.identities = set()
 
-    # TODO: check what breaks when we delete all emails
     UserEmail.query.filter(UserEmail.user == user).delete()
     email = UserEmail(user_id=user.id, email=f'indico-{user.id}@indico.invalid')
-    editables = Editable.query.filter(Editable.editor == user)
+    db.session.add(email)
+
+    editables = user.editor_for_editables
     for editable in editables:
         editable.editor = None
-        db.session.add(editable)
-    db.session.add(email)
+
+    reservations = user.reservations_booked_for
+    for reservation in reservations:
+        reservation.booked_for_name = user.full_name
+
+    categories = user.category_roles.copy()
+    for category in categories:
+        category.members.remove(user)
 
     principals = [
         EventPrincipal, CategoryPrincipal, AttachmentPrincipal, AttachmentFolderPrincipal,
@@ -464,7 +470,6 @@ def anonymize_user(user):
         principal.query.filter(principal.user == user).delete()
 
     user.is_deleted = True
-    # TODO: More things we can delete?
     db.session.commit()
 
 
