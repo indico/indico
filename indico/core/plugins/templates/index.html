@@ -15,11 +15,11 @@
                     {%- if plugin.configurable %} href="{{ url_for('.details', plugin=plugin.name) }}"
                     {%- else %} title="{% trans %}This plugin has no configurable options{% endtrans %}"
                     {%- endif %}>
-                        <div class="i-badge-legend">
-                            <span class="i-badge-legend-right ellipsize">{{ plugin.version }}</span>
-                        </div>
                         <div class="i-badge-content">
                             <span class="i-badge-title">{{ plugin.title }}</span>
+                        </div>
+                        <div class="i-badge-legend">
+                            <span class="i-badge-legend-right ellipsize">{{ plugin.version }}</span>
                         </div>
                     </a>
                 {% endfor %}

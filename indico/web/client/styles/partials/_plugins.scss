@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'partials/_badges' as badges;
 
 .i-plugins-list {
   & > h2 {
@@ -13,17 +14,11 @@
   }
 
   & > .i-badges-list {
-    display: flex;
-    justify-content: flex-start;
-
     & > .i-badge {
-      @include transition(
-        background-color $default-transition-duration $default-transition-function
-      );
-
       width: 10em;
-      margin-left: 0;
-      margin-right: 1.6em;
+      min-height: 7em;
+
+      @include badges.i-badge-color($light-blue, $dark-blue, $light-gray, true);
 
       &.i-badge-disabled {
         background: repeating-linear-gradient(
@@ -33,14 +28,6 @@
           lighten($dark-blue, 0.5 * $light-color-variation) 10px,
           lighten($dark-blue, 0.5 * $light-color-variation) 20px
         );
-      }
-
-      &:not(.i-badge-disabled):hover {
-        background-color: darken($dark-blue, 2 * $light-color-variation);
-      }
-
-      & > .i-badge-content {
-        height: 4.2em;
       }
     }
   }

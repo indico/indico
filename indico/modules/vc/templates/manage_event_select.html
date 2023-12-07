@@ -6,7 +6,7 @@
             {% trans %}The following video services are available. Click on one to create a new room:{% endtrans %}
         {% endif %}
     </p>
-    <div class="i-badges-list-left i-badges-list-hover">
+    <div class="i-badges-list-space-evenly">
         {%- for plugin in plugins|sort(attribute='title') %}
             {% set action=_("Attach") if attach == '1' else _("Create") %}
             <a href="#" class="js-vc-plugin i-badge i-badge-gray"
