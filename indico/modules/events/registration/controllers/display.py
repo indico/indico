@@ -122,8 +122,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     view_class = WPDisplayRegistrationParticipantList
     preview = False
 
-    def is_participant(self, user):
-        return self.event.is_user_registered(user)
+    def is_participant(self, user, regform=None):
+        return self.event.is_user_registered(user, regform)
 
     @staticmethod
     def _is_checkin_visible(reg):
@@ -162,7 +162,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
                 'num_participants': query.count()}
 
-    def _participant_list_table(self, regform, is_participant):
+    def _participant_list_table(self, regform):
         def _process_registration(reg, column_ids, active_fields):
             data_by_field = reg.data_by_field
 
@@ -200,6 +200,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
+        is_participant = self.is_participant(session.user, regform)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in query
                          if reg.is_publishable(is_participant)]
         return {'headers': headers,
@@ -228,10 +229,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     # The settings might reference forms that are not available
                     # anymore (publishing was disabled, etc.)
                     continue
-                tables.append(self._participant_list_table(regform, is_participant))
+                tables.append(self._participant_list_table(regform))
             # There might be forms that have not been sorted by the user yet
-            tables.extend(map(self._participant_list_table, regforms_dict.values(),
-                              [is_participant] * len(regforms_dict)))
+            tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
         num_participants = sum(table['num_participants'] for table in tables)
 
@@ -255,7 +255,7 @@ class RHParticipantListPreview(RHParticipantList):
         if not self.event.can_manage(session.user, permission='registration'):
             raise Forbidden(_('You are not allowed to access this page.'))
 
-    def is_participant(self, user):
+    def is_participant(self, user, regform=None):
         return can_preview_participant_list(self.event, session.user)
 
 
