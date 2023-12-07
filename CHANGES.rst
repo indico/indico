@@ -100,6 +100,7 @@ Accessibility
 - Associate form labels with form controls in the registration form (:issue:`6059`, :issue:`6073`,
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
+- Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

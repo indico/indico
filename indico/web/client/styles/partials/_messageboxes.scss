@@ -14,7 +14,7 @@ $default-spacing: 10px;
   @include default-border-radius();
   @extend .flexrow;
   flex-wrap: wrap;
-  color: $light-black;
+  color: $dark-black;
   padding: $default-spacing;
   margin-bottom: 18px;
   // overrides custom line-height set by semantic ui that breaks message-boxes
