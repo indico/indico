@@ -55,6 +55,16 @@
                 <a class="icon icon-quill" href="{{ url_for('event_registration.manage_regform', tpl.registration_form) }}">
                     {{ tpl.registration_form.title }}
                 </a>
+                <button class="i-button icon-remove icon-only text-color borderless danger"
+                        title="{% trans %}Unlink registration form{% endtrans %}"
+                        data-href="{{ url_for('.unlink_regform', tpl) }}"
+                        data-method="PATCH"
+                        data-update="#template-list"
+                        data-confirm="{% trans title=tpl.registration_form.title -%}
+                                            Are you sure you want to unlink the registration form '{{ title }}'?
+                                            Any placeholders specific to that registration form will be removed from the template.
+                                      {%- endtrans %}">
+                </button>
             {% endif %}
         </td>
         <td class="text-superfluous">
