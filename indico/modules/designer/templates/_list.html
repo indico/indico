@@ -50,6 +50,12 @@
         </td>
         <td>
             {{ tpl.title }}
+            {% if tpl.registration_form %}
+                | Linked to
+                <a class="icon icon-quill" href="{{ url_for('event_registration.manage_regform', tpl.registration_form) }}">
+                    {{ tpl.registration_form.title }}
+                </a>
+            {% endif %}
         </td>
         <td class="text-superfluous">
             {% if inherited %}
