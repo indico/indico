@@ -312,8 +312,9 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         related_tpls_per_owner = defaultdict(list)
         for bs_tpl in backside_templates:
             related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
+        placeholders = get_nested_placeholder_options(regform=self.template.registration_form)
         return self._render_template('template.html', template=self.template,
-                                     placeholders=get_nested_placeholder_options(regform=self.template.regform),
+                                     placeholders=placeholders,
                                      image_types=get_image_placeholder_types(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
                                      template_data=template_data, backside_template_data=backside_template_data,
@@ -322,7 +323,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
-        placeholders = set(get_placeholder_options(regform=self.template.regform))
+        placeholders = set(get_placeholder_options(regform=self.template.registration_form))
         invalid_placeholders = {x['type'] for x in data['items']} - placeholders
         if invalid_placeholders:
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))

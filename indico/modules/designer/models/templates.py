@@ -84,7 +84,7 @@ class DesignerTemplate(db.Model):
         nullable=False,
         default=False
     )
-    regform = db.relationship(
+    registration_form = db.relationship(
         'RegistrationForm',
         lazy=True,
         foreign_keys=registration_form_id,
