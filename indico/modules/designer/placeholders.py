@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 from io import BytesIO
 
 from babel.numbers import format_currency
@@ -36,7 +37,9 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
 GROUP_TITLES = {
     'registrant': _('Registrant Data'),
     'event': _('Event Data'),
-    'fixed': _('Fixed Data')
+    'fixed': _('Fixed Data'),
+    # Come up with a better name or merge with registrant data
+    'dynamic': _('Dynamic Registration Data')
 }
 
 
@@ -407,3 +410,21 @@ class FixedImagePlaceholder(DesignerPlaceholder):
     def render(cls, item):
         buf = DesignerImageFile.get(item['image_id']).open()
         return Image.open(buf)
+
+
+class DynamicPlaceholder(DesignerPlaceholder):
+    group = 'dynamic'
+
+    def __init__(self, field):
+        self.field = field
+        self.name = f'dynamic-{field.id}'
+        self.description = field.title
+
+    def render(self, registration):
+        data_by_field = registration.data_by_field
+        data = data_by_field.get(self.field.id, None)
+        if data is None:
+            return ''
+
+        # Something like the 'render_data' macro would be nice
+        return json.dumps(data.friendly_data)
