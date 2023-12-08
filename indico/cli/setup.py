@@ -580,7 +580,7 @@ class SetupWizard:
             # Get the timezone from the symlink
             etc_localtime = Path('/etc/localtime')
             if etc_localtime.is_symlink():
-                candidates.append(re.sub(r'.*/usr/share/zoneinfo/', '', etc_localtime.readlink()))
+                candidates.append(re.sub(r'.*/usr/share/zoneinfo/', '', str(etc_localtime.readlink())))
             # We do not try to find a matching zoneinfo based on a checksum
             # as e.g. https://stackoverflow.com/a/12523283/298479 suggests
             # since this is ambiguous and we rather have the user type their
