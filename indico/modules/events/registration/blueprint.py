@@ -165,8 +165,6 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tags/assign', 'manage_r
                  tags.RHRegistrationTagsAssign, methods=('POST',))
 
 # Regform edition: sections
-# The trailing slashes should be added to the blueprints here when Angular is updated
-# Right now, Angular strips off trailing slashes, thus causing Flask to throw errors
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section',
                  sections.RHRegistrationFormAddSection, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>', 'modify_section',

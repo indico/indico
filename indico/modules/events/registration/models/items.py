@@ -331,7 +331,7 @@ class RegistrationFormItem(db.Model):
 
     @property
     def view_data(self):
-        """Return object with data that Angular can understand."""
+        """Return object with data that the frontend can understand."""
         return {'id': self.id, 'description': self.description, 'position': self.position}
 
     @property
