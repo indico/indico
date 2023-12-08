@@ -217,11 +217,16 @@ class BookingEdit extends React.Component {
                 onBookingPeriodChange={this.updateBookingCalendar}
               />
             </Grid.Column>
-            <Grid.Column stretched>
+            <Grid.Column stretched={!timelineError}>
               {timelineError ? (
                 <>
                   <div>
-                    <Message icon="times circle outline" error content={timelineError} />
+                    <Message
+                      icon="times circle outline"
+                      error
+                      content={timelineError}
+                      style={{marginBottom: '2rem'}}
+                    />
                   </div>
                   <DummyTimeline rows={10} />
                 </>
