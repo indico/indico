@@ -31,9 +31,11 @@ from indico.modules.designer.util import (get_all_templates, get_default_badge_o
                                           get_inherited_templates, get_nested_placeholder_options,
                                           get_not_deletable_templates, get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
-from indico.modules.events import Event
+from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.util import check_event_locked
+from indico.modules.logs import LogKind
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
@@ -339,6 +341,35 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                         is_clonable=request.json['is_clonable'],
                         clear_background=request.json['clear_background'])
         flash(_('Template successfully saved.'), 'success')
+        return jsonify_data()
+
+
+class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
+    def _process_args(self):
+        RHModifyDesignerTemplateBase._process_args(self)
+        regform_id = request.view_args['reg_form_id']
+        self.regform = (RegistrationForm.query
+                        .with_parent(self.template.event)  # TODO: must not be category template
+                        .filter_by(id=regform_id, is_deleted=False)
+                        .first_or_404())
+
+    def _process(self):
+        self.template.link_regform(self.regform)
+        self.template.event.log(EventLogRealm.event, LogKind.positive, 'Designer',
+                                'Badge template linked to registration form', session.user,
+                                data={'Template': self.title, 'Registration Form': self.regform.title})
+        flash(_('Template successfully linked.'), 'success')
+        return jsonify_data()
+
+
+class RHUnLinkDesignerTemplate(RHModifyDesignerTemplateBase):
+    def _process(self):
+        regform = self.template.registration_form
+        self.template.unlink_regform()
+        self.template.event.log(EventLogRealm.event, LogKind.negative, 'Designer',
+                                'Badge template unlinked from registration form', session.user,
+                                data={'Template': self.title, 'Registration Form': regform.title})
+        flash(_('Template successfully unlinked.'), 'success')
         return jsonify_data()
 
 
