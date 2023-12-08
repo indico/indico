@@ -149,7 +149,7 @@
                 </div>
                 <div class="group">
                     {% if tpl.type.name == 'poster' and event %}
-                        <button class="i-button icon-print icon-only highlight text-color borderless"
+                        <button class="i-button icon-printer icon-only highlight text-color borderless"
                                 title="{% trans %}Print poster for the event{% endtrans %}"
                                 data-href="{{ url_for('event_management.poster_settings', event, template_id=tpl.id) }}"
                                 data-title="{% trans %}Poster Printing Settings{% endtrans %}"
@@ -167,7 +167,7 @@
                                     {% trans %}Print badges{% endtrans %}
                                 {%- endif -%}
                             {%- endset %}
-                            <button class="i-button icon-print icon-only highlight text-color js-dropdown borderless
+                            <button class="i-button icon-printer icon-only highlight text-color js-dropdown borderless
                                                     {{ 'disabled' if not event.registration_forms }}"
                                     title="{{ print_title if event.registration_forms
                                                 else _('There are no registration forms in this event') }}"
