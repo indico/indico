@@ -10,6 +10,7 @@ from io import BytesIO
 
 from babel.numbers import format_currency
 from PIL import Image
+from speaklater import _LazyString
 
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.events.registration.util import generate_ticket_qr_code
@@ -427,4 +428,14 @@ class DynamicPlaceholder(DesignerPlaceholder):
             return ''
 
         # Something like the 'render_data' macro would be nice
-        return json.dumps(data.friendly_data)
+        return json.dumps(self._strip_lazy_strings(data.friendly_data))
+
+    def _strip_lazy_strings(self, data):
+        if isinstance(data, _LazyString):
+            return str(data)
+        elif isinstance(data, dict):
+            return {k: self._strip_lazy_strings(v) for k, v in data.items()}
+        elif isinstance(data, (list, tuple)):
+            return [self._strip_lazy_strings(v) for v in data]
+        else:
+            return data
