@@ -73,6 +73,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         config = self.config
         badge_rect = (pos_x, self.height - pos_y - tpl_data.height_cm * cm,
                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)
+        registration = person['registration']
 
         if config.dashed_border:
             canvas.saveState()
@@ -92,7 +93,19 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                                                          item['type'] not in image_placeholders))
 
         for item in items:
-            placeholder = placeholders.get(item['type'])
+            type_ = item['type']
+            if type_.startswith('dynamic-'):
+                from indico.modules.designer.placeholders import DynamicPlaceholder, FixedTextPlaceholder
+                field_id = int(type_[len('dynamic-'):])
+                data_by_field = registration.data_by_field
+                if field_id not in data_by_field:
+                    # Just get some other placeholder for now, so it does not explode
+                    placeholder = FixedTextPlaceholder
+                else:
+                    field = data_by_field[field_id].field_data.field
+                    placeholder = DynamicPlaceholder(field)
+            else:
+                placeholder = placeholders.get(item['type'])
 
             if placeholder:
                 if placeholder.group == 'registrant':
@@ -106,6 +119,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                     text = placeholder.render(person['registration'].event)
                 elif placeholder.group == 'fixed':
                     text = placeholder.render(item)
+                elif placeholder.group == 'dynamic':
+                    text = placeholder.render(person['registration'])
                 else:
                     raise ValueError(f'Unknown placeholder group: `{placeholder.group}`')
             else:

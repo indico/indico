@@ -313,7 +313,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         for bs_tpl in backside_templates:
             related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
         return self._render_template('template.html', template=self.template,
-                                     placeholders=get_nested_placeholder_options(),
+                                     placeholders=get_nested_placeholder_options(regform=self.template.regform),
                                      image_types=get_image_placeholder_types(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
                                      template_data=template_data, backside_template_data=backside_template_data,
@@ -322,7 +322,8 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
-        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options())
+        placeholders = set(get_placeholder_options(regform=self.template.regform))
+        invalid_placeholders = {x['type'] for x in data['items']} - placeholders
         if invalid_placeholders:
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
