@@ -80,12 +80,17 @@ DEFAULT_CONFIG = {
 
 
 @signals.core.get_placeholders.connect_via('designer-fields')
-def _get_notification_placeholders(sender, **kwargs):
+def _get_notification_placeholders(sender, regform=None, **kwargs):
     from indico.modules.designer import placeholders
     for name in placeholders.__all__:
         obj = getattr(placeholders, name)
         if isinstance(obj, type) and issubclass(obj, placeholders.DesignerPlaceholder) and hasattr(obj, 'name'):
             yield obj
+
+    if regform:
+        from indico.modules.designer.placeholders import DynamicPlaceholder
+        for field in regform.active_fields:
+            yield DynamicPlaceholder(field=field)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

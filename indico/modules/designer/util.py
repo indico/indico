@@ -32,15 +32,15 @@ FORMAT_MAP_PORTRAIT = {
 }
 
 
-def get_placeholder_options():
+def get_placeholder_options(regform=None):
     return {name: placeholder
-            for name, placeholder in get_placeholders('designer-fields').items()
+            for name, placeholder in get_placeholders('designer-fields', regform=regform).items()
             if not placeholder.admin_only or session.user.is_admin}
 
 
-def get_nested_placeholder_options():
+def get_nested_placeholder_options(regform=None):
     groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.items()}
-    for name, placeholder in get_placeholder_options().items():
+    for name, placeholder in get_placeholder_options(regform=regform).items():
         groups[placeholder.group]['options'][name] = str(placeholder.description)
     return groups
 
