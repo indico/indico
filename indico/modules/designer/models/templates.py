@@ -25,6 +25,8 @@ TEMPLATE_DEFAULTS = {
 class DesignerTemplate(db.Model):
     __tablename__ = 'designer_templates'
     __table_args__ = (db.CheckConstraint('(event_id IS NULL) != (category_id IS NULL)', 'event_xor_category_id_null'),
+                      db.CheckConstraint('(category_id IS NULL) OR (registration_form_id IS NULL)',
+                                         'no_regform_if_category'),
                       {'schema': 'indico'})
 
     id = db.Column(
@@ -38,6 +40,12 @@ class DesignerTemplate(db.Model):
     title = db.Column(
         db.String,
         nullable=False
+    )
+    registration_form_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.forms.id'),
+        index=True,
+        nullable=True
     )
     event_id = db.Column(
         db.Integer,
@@ -75,6 +83,15 @@ class DesignerTemplate(db.Model):
         db.Boolean,
         nullable=False,
         default=False
+    )
+    regform = db.relationship(
+        'RegistrationForm',
+        lazy=True,
+        foreign_keys=registration_form_id,
+        backref=db.backref(
+            'designer_templates',
+            lazy=True
+        )
     )
     category = db.relationship(
         'Category',
