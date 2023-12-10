@@ -1,0 +1,49 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+ind-menu menu {
+  --time-menu-animation: 0.2s;
+  --length-menu-travel: -0.4em;
+  position: absolute;
+  z-index: 1;
+}
+
+ind-menu [aria-expanded='true'] + menu {
+  animation: menu-slide-down var(--time-menu-animation);
+}
+
+ind-menu :not([aria-expanded='true']) + menu {
+  display: none; // must be set to none to hide it from a11y tools and tab navigation as well
+  animation: menu-slide-up var(--time-menu-animation);
+}
+
+@keyframes menu-slide-down {
+  from {
+    display: block;
+    opacity: 0;
+    transform: translateY(var(--length-menu-travel));
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes menu-slide-up {
+  from {
+    display: block;
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    display: none;
+    opacity: 0;
+    transform: translateY(var(--length-menu-travel));
+  }
+}
