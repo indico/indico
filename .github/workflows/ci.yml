@@ -11,10 +11,12 @@ on:
     branches:
       - master
       - '*.x'
+      - a11y
   pull_request:
     branches:
       - master
       - '*.x'
+      - a11y
 
 jobs:
   setup:
