@@ -5,20 +5,37 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'layout';
+@use './variables';
+@use './layout';
+@use './visibility';
+
+%button-pressed-state {
+  box-shadow: inset 0.2em 0.2em 0.2em rgba(0, 0, 0, 0.3);
+}
 
 %button-base {
+  --button-border-color: var(--control-border-color);
+  --button-text-color: var(--control-text-color);
+  --button-surface-color: var(--control-clickable-surface-color);
+  --button-surface-hover-color: var(--control-clickable-surface-focus-color);
+
   @extend %flex-inline-center;
   gap: var(--control-internal-gap);
   padding: var(--control-padding);
 
-  border: var(--control-border);
-  color: var(--control-text-color);
-  background: var(--control-clickable-surface-color);
+  border: var(--control-border-width) solid var(--button-border-color);
+  color: var(--button-text-color);
+  background: var(--button-surface-color);
+  line-height: 1.1;
 
   &:focus,
   &:hover {
-    background-color: var(--control-clickable-surface-focus-color);
+    color: var(--button-text-color); // XXX: needed for when using links as buttons
+    background-color: var(--button-surface-hover-color);
+  }
+
+  &:active {
+    @extend %button-pressed-state;
   }
 }
 
@@ -47,9 +64,12 @@
 }
 
 %button-disabled-state {
-  background: var(--control-disabled-clickable-surface-color);
-  color: var(--control-disabled-text-color);
-  border-color: var(--control-disabled-border-color);
+  --button-disabled-border-color: var(--control-disabled-border-color);
+  --button-disabled-surface-color: var(--control-disabled-clickable-surface-color);
+  --button-disabled-text-color: var(--control-disabled-text-color);
+  background: var(--buttton-disabled-surface-color);
+  color: var(--button-disabled-text-color);
+  border-color: var(--button-disabled-border-color);
 }
 
 %button {
@@ -62,21 +82,30 @@
 }
 
 %button-alt-state {
-  background: var(--control-alt-clickable-surface-color);
-  color: var(--control-alt-text-color);
-  border-color: var(--control-alt-border-color);
-}
-
-%button-alt-hover-state {
-  background: var(--control-alt-clickable-surface-focus-color);
+  --button-surface-color: var(--control-alt-clickable-surface-color);
+  --button-text-color: var(--control-alt-text-color);
+  --button-border-color: var(--control-alt-border-color);
+  --button-surface-hover-color: var(--control-alt-clickable-surface-focus-color);
 }
 
 %button-main-action {
   @extend %button;
   @extend %button-alt-state;
+}
 
-  &:focus-visible,
-  &:hover {
-    @extend %button-alt-hover-state;
+%button-clear {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+}
+
+%button-icon-only {
+  @extend %button-clear;
+  @extend %flex-inline-center;
+  padding: 0;
+
+  span {
+    @extend %visually-hidden;
   }
 }

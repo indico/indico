@@ -1,0 +1,27 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use './variables';
+
+%heading-minor-subsection {
+  border-bottom: 1px solid var(--container-separator-color);
+  font-weight: bold;
+}
+
+%heading-minior-subsection-with-tab {
+  @extend %heading-minor-subsection;
+
+  display: flex;
+
+  --heading-tab-color: var(--background-secondary);
+
+  > :first-child {
+    padding: 0.3em 1em;
+    background-color: var(--heading-tab-color);
+    border-radius: 0.4em 0.4em 0 0;
+  }
+}

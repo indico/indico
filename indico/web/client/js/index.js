@@ -12,7 +12,9 @@ import './legacy/indico.js';
 import './legacy/timetable.js';
 
 import './custom_elements/ind_bypass_block_links.js';
+import './custom_elements/ind_menu.js';
 import './widgets/tz_selector.js';
+import './widgets/dynamic-tips.js';
 
 import '../styles/screen.scss';
 import '../styles/editor-output.scss';

@@ -25,75 +25,74 @@
         </div>
     </div>
 
-    <div class="global-menu toolbar">
+    <div id="global-menu" class="global-menu toolbar">
         {% block global_menu %}
-            {% for item in top_menu_items recursive %}
-                {% if loop.depth0 %}
-                    {# we're inside a section #}
-                    <li>
-                        {% if item.section == 'create-event' and item.url in ('lecture', 'meeting', 'conference') %}
-                            {# special handling for event creation links #}
-                            {{ create_event_link(category, item.url, item.title, id=item.name) }}
-                        {% else %}
-                            <a href="{{ item.url }}">{{ item.title }}</a>
-                        {% endif %}
-                    </li>
-                {% elif not item.is_section %}
-                    <a href="{{ item.url }}">{{ item.title }}</a>
-                {% elif item.items %}
-                    <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{{ item.title }}</a>
-                    <ul class="i-dropdown">
-                        {{ loop(item.items) }}
-                    </ul>
-                {% endif %}
-            {% endfor %}
+            <menu>
+                {% for item in top_menu_items recursive %}
+                    {% if loop.depth0 %}
+                        {# we're inside a section #}
+                        <li>
+                            {% if item.section == 'create-event' and item.url in ('lecture', 'meeting', 'conference') %}
+                                {# special handling for event creation links #}
+                                {{ create_event_link(category, item.url, item.title, id=item.name) }}
+                            {% else %}
+                                <a href="{{ item.url }}">{{ item.title }}</a>
+                            {% endif %}
+                        </li>
+                    {% elif not item.is_section %}
+                        <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+                    {% elif item.items %}
+                        <li>
+                            <ind-menu>
+                                <button>{{ item.title }}</button>
+                                <menu>
+                                    {{ loop(item.items) }}
+                                </menu>
+                            </ind-menu>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </menu>
         {% endblock %}
     </div>
 </div>
 
-<script type="text/html" id="event-type-tooltip-lecture">
-    {%- trans -%}
-        A <strong>lecture</strong> is a simple event to announce a talk.
-    {%- endtrans -%}
-    <br>
-    {%- trans -%}
-        <strong>Features</strong>:
-        poster creation, participant management, ...
-    {%- endtrans -%}
-</script>
-<script type="text/html" id="event-type-tooltip-meeting">
-    {%- trans -%}
-        A <strong>meeting</strong> is an event that defines an agenda with multiple talks.
-    {%- endtrans -%}
-    <br>
-    {%- trans -%}
-        <strong>Features</strong>:
-        timetable, minutes, poster creation, participants management, ...
-    {%- endtrans -%}
-</script>
-<script type="text/html" id="event-type-tooltip-conference">
-    {%- trans -%}
-        A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.
-    {%- endtrans -%}
-    <br>
-    {%- trans -%}
-        <strong>Features</strong>:
-        call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...
-    {%- endtrans -%}
-</script>
-
-<script>
-    (function() {
-        'use strict';
-
-        ['lecture', 'meeting', 'conference'].forEach(function(evt_type) {
-            $('#create-' + evt_type).qtip({
-                content: $('#event-type-tooltip-' + evt_type).html(),
-                position: {
-                    my: 'left center',
-                    at: 'right center'
-                }
-            });
-        });
-    })();
-</script>
+<template data-tooltip-for="create-lecture">
+    <p>
+        {%- trans -%}
+            A <strong>lecture</strong> is a simple event to announce a talk.
+        {%- endtrans -%}
+    </p>
+    <p>
+        {%- trans -%}
+            <strong>Features</strong>:
+            poster creation, participant management, ...
+        {%- endtrans -%}
+    </p>
+</template>
+<template data-tooltip-for="create-meeting">
+    <p>
+        {%- trans -%}
+            A <strong>meeting</strong> is an event that defines an agenda with multiple talks.
+        {%- endtrans -%}
+    </p>
+    <p>
+        {%- trans -%}
+            <strong>Features</strong>:
+            timetable, minutes, poster creation, participants management, ...
+        {%- endtrans -%}
+    </p>
+</template>
+<template data-tooltip-for="create-conference">
+    <p>
+        {%- trans -%}
+            A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.
+        {%- endtrans -%}
+    </p>
+    <p>
+        {%- trans -%}
+            <strong>Features</strong>:
+            call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...
+        {%- endtrans -%}
+    </p>
+</template>

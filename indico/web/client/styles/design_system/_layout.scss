@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use './variables';
+
 @mixin flex-column {
-  --flex-gap: 0.5em;
+  --flex-gap: var(--content-gap-normal);
   display: flex;
   flex-direction: column;
   gap: var(--flex-gap);
@@ -16,15 +18,34 @@
   @include flex-column();
 }
 
+@mixin flex-column-center {
+  align-items: center;
+}
+
+%flex-column-center {
+  @include flex-column-center();
+}
+
 @mixin flex-row {
-  --flex-gap: 0.5em;
+  --flex-gap: var(--content-gap-normal);
+  --flex-wrap: wrap;
   display: flex;
   align-items: center;
   gap: var(--flex-gap);
+  flex-wrap: var(--flex-wrap);
 }
 
 %flex-row {
   @include flex-row();
+}
+
+@mixin flex-split {
+  @include flex-row();
+  justify-content: space-between;
+}
+
+%flex-split {
+  @include flex-split();
 }
 
 @mixin flex-inline-center {
@@ -35,4 +56,48 @@
 
 %flex-inline-center {
   @include flex-inline-center();
+}
+
+@mixin flex-flush-end {
+  @include flex-row();
+  justify-content: flex-end;
+}
+
+%flex-flush-end {
+  @include flex-flush-end();
+}
+
+// Flex column layouts
+
+@mixin flex-column-layout-container {
+  --flex-vertical-align: flex-start;
+  --flex-gap: normal;
+  display: flex;
+  align-items: var(--flex-vertical-align);
+  gap: var(--flex-gap);
+  flex-wrap: wrap;
+}
+
+%flex-column-layout-container {
+  @include flex-column-layout-container();
+}
+
+@mixin flex-column-layout-column {
+  --flex-column-width: var(--content-max-readable-width);
+  flex: 1000;
+  min-width: min(100%, var(--flex-column-width));
+}
+
+%flex-column-layout-column {
+  @include flex-column-layout-column();
+}
+
+@mixin flex-layout-column-fixed {
+  --flex-column-width: var(--content-max-readable-width);
+  flex: 1 0;
+  min-width: min(100%, var(--flex-column-width));
+}
+
+%flex-column-layout-column-fixed {
+  @include flex-layout-column-fixed();
 }

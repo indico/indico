@@ -1,0 +1,112 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+ind-with-tooltip,
+ind-with-toggletip {
+  --tooltip-surface-color: #333;
+  --tooltip-text-color: #fff;
+
+  // XXX: The following variables are set using JavaScript:
+  --top: 0;
+  --left: 0;
+  --right: auto;
+  --bottom: auto;
+  --ref-center: 0;
+  --arrow-borders: transparent;
+
+  [data-tip-content] {
+    display: block;
+    position: fixed;
+    top: var(--top);
+    left: var(--left);
+    right: var(--right);
+    bottom: var(--bottom);
+    max-width: min(calc(100vw - 1em), 40ch);
+    padding: 0.5em;
+
+    cursor: default;
+    color: var(--tooltip-text-color);
+    // XXX: The transparent border serves as faux margin to reduce the number of HTML elements involved
+    border: solid transparent;
+    border-width: 0.5em 0;
+
+    // Reset the default text appearance
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1rem; // FIXME: this needs the base font size to be addressed!
+    text-align: center;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  &[orientation='horizontal'] [data-tip-content] {
+    border-width: 0 0.5em;
+  }
+
+  &:not([shown]) [data-tip-content] {
+    // XXX: Be careful when changing the following values, as they may interfere with initial size calc.
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: 100vw;
+
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // Content background
+  [data-tip-content]::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+
+    background: var(--tooltip-surface-color);
+    border-radius: 0.2em;
+  }
+
+  // Arrow
+
+  [data-tip-content]::after {
+    content: '';
+    position: fixed;
+    display: inline-block;
+
+    border-style: solid;
+    border-color: var(--arrow-borders);
+    border-width: 0.5em;
+  }
+
+  &:not([orientation='horizontal']) [data-tip-content]::after {
+    left: calc(var(--ref-center) - 0.5em);
+    // XXX: One of the calculations below will always be invalid and revert to auto. This is by design.
+    // XXX: The 1px adjustment is for when the browser rendering is inaccurate
+    top: calc(var(--top) - 0.5em + 1px);
+    bottom: calc(var(--bottom) - 0.5em + 1px);
+  }
+
+  &[orientation='horizontal'] [data-tip-content]::after {
+    top: calc(var(--ref-center) - 0.5em);
+    // XXX: One of the calculations below will always be invalid and revert to auto. This is by design.
+    // XXX: The 1px adjustment is for when the browser rendering is inaccurate
+    left: calc(var(--left) - 0.5em + 1px);
+    right: calc(var(--right) - 0.5em + 1px);
+  }
+}
+
+ind-with-toggletip {
+  display: inline-flex;
+
+  button {
+    @extend %flex-inline-center;
+  }
+}

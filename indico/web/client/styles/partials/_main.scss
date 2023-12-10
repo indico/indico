@@ -8,29 +8,53 @@
 @use 'base' as *;
 @use 'partials/icons' as *;
 @use 'partials/buttons' as *;
+@use 'design_system';
 
 /* Styles for the main menu */
 
-.toolbar.global-menu {
-  @include font-family-title-light();
+#global-menu {
+  @extend %text-size-reset;
 
-  height: 3em;
-  line-height: 3em;
-
-  padding: 0 0 0 20px;
-  background: $black;
+  padding: 0 1.4em;
+  background: var(--surface-inverse-color);
   border: none;
   margin-bottom: 0;
 
-  > a {
-    @include transition(background-color);
+  li {
+    list-style: none; // FIXME: This should be in the global reset
+  }
 
-    display: inline-block;
-    height: 3em;
-    line-height: 3em;
+  > menu {
+    @extend %flex-row;
+  }
 
-    color: white;
-    padding: 0 20px;
+  ind-menu > button::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    display: block; // XXX: Required for transform to work
+  }
+
+  ind-menu > button[aria-expanded='true']::after {
+    transform: rotateX(-180deg);
+  }
+
+  ind-menu > menu :is(li, a) {
+    width: 100%;
+  }
+
+  > menu li {
+    list-style: none;
+    padding: 0;
+  }
+
+  li :is(a, button) {
+    @extend %flex-row;
+    flex: none;
+
+    background: var(--surface-inverse-color);
+    color: var(--text-inverse-color);
+    padding: 0.7em 1em;
+    border: none;
 
     &:first-child,
     &.arrow:last-of-type {
@@ -39,7 +63,7 @@
 
     &:hover,
     &.open {
-      background: $light-black !important;
+      background: var(--surface-highlight-inverse-color);
     }
 
     &.arrow {
