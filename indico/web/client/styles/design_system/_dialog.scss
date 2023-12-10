@@ -1,0 +1,80 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2023 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use './variables';
+@use './layout';
+@use './utils';
+@use './button';
+@use 'partials/icons';
+
+%dialog-modal {
+  @extend %text-size-reset;
+
+  --dialog-max-width: 50em;
+  --dialog-max-height: 40em;
+  --dialog-button-bar-justify: flex-end;
+
+  width: min(var(--dialog-max-width), calc(100vw - 1em));
+  height: min(var(--dialog-max-height), calc(100vh - 2em));
+  padding: 0;
+
+  border: 0;
+  box-shadow: var(--modal-control-box-shadow);
+
+  > div {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .titlebar {
+    @extend %flex-split;
+    flex-wrap: nowrap;
+    padding: var(--container-padding) var(--container-padding) 0.5em;
+    border-bottom: 1px solid var(--container-separator-color);
+    flex: none;
+  }
+
+  .titlebar h2 {
+    font: inherit; // FIXME: move to reset
+    color: inherit; // FIXME: move to reset
+    margin: 0; // FIXME: move to reset
+    font-size: var(--text-size-rel-l);
+    line-height: 1.2;
+  }
+
+  .titlebar button[value='close'] {
+    @extend %button-icon-only;
+    padding: 0.2em;
+    border-radius: 50%;
+    font-size: var(--text-size-rel-l);
+
+    &::before {
+      @extend %icon;
+      @extend %icon-close;
+    }
+
+    &:hover {
+      background: var(--surface-default);
+    }
+  }
+
+  .content {
+    @extend %flex-column;
+    padding: var(--container-padding);
+    min-height: 0;
+    flex: 1;
+    overflow: auto;
+  }
+
+  .button-bar {
+    @extend %flex-row;
+    flex: none;
+    justify-content: var(--dialog-button-bar-justify);
+    padding: var(--container-padding);
+  }
+}
