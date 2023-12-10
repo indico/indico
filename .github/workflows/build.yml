@@ -5,6 +5,7 @@ on:
     branches:
       - 'master'
       - '*.x'
+      - 'a11y'
       - '!1.*'
       - '!2.*'
       - '!3.0.*'
@@ -12,6 +13,7 @@ on:
   pull_request:
       branches:
         - 'master'
+        - 'a11y'
         - '*.x'
         - '!1.*'
         - '!2.*'
