@@ -1,3 +1,12 @@
+{% macro _render_badge_link_form_button(regform, tpl) %}
+    {% set endpoint = 'link_regform' %}
+    <a data-href="{{ url_for('link_regform', regform, template_id=tpl.id) }}"
+       data-method="PATCH"
+       data-ajax-dialog>
+        {{ regform.title }}
+    </a>
+{% endmacro %}
+
 {% macro _render_badge_form_button(regform, tpl, format='text', text='') %}
     {% set no_registrations = not regform.registrations|rejectattr('is_deleted')|list %}
     {% set no_registrations_msg %}
@@ -79,6 +88,18 @@
         <td>
             <div class="thin toolbar right">
                 <div class="group">
+                    {% if not tpl.registration_form %}
+                        <button class="i-button icon-printer icon-only highlight text-color js-dropdown borderless"
+                                title="Link to a registration form"
+                                data-toggle="dropdown"></button>
+                        <ul class="i-dropdown">
+                            {% for regform in linkable_forms %}
+                                <li>
+                                    {{ _render_badge_link_form_button(regform, tpl) }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                     {% if not event and tpl.type.name == 'badge' and tpl.is_ticket %}
                         {% set inherited_default = default_ticket == tpl and tpl.category != target and
                                 not target.default_ticket_template %}

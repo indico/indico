@@ -102,3 +102,44 @@ def get_badge_format(tpl):
     return next((frm for frm, frm_size in format_map.items()
                  if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM and
                      frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
+
+
+def get_available_event_templates(regform):
+    return DesignerTemplate.query.with_parent(regform.event).filter(
+        db.or_(
+            DesignerTemplate.registration_form.is_(None),
+            DesignerTemplate.registration_form == regform
+        )
+    ).all()
+
+
+def get_available_templates(regform):
+    default_template = get_default_ticket_on_category(regform.event.category)
+    inherited_templates = get_inherited_templates(regform.event)
+    event_templates = get_available_event_templates(regform)
+    all_templates = set(inherited_templates) | event_templates
+    all_templates.discard(default_template)
+    badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
+                        if tpl.type == TemplateType.badge and tpl != default_tpl]
+    # Show the default template first
+    badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
+
+    return query.all()
+
+
+def can_link_to_regform(regform, template):
+    return template in get_linkable_templates(regform)
+
+
+def get_linkable_templates(regform):
+    return DesignerTemplate.query.with_parent(regform.event).filter(
+        DesignerTemplate.registration_form.is_(None),
+        db.or_(
+            DesignerTemplate.backside_template.registration_form.is_(None),
+            DesignerTemplate.backside_template.registration_form == regform,
+        ),
+        db.or_(
+            DesignerTemplate.backside_template_of.registration_form.is_(None),
+            DesignerTemplate.backside_template_of.registration_form == regform,
+        )
+    ).all()
