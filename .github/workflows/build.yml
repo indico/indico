@@ -33,7 +33,7 @@ jobs:
         with:
           # prefer head commit over merge commit in case of PRs
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         name: Set up Python 🐍
         with:
           python-version: '3.12'
