@@ -6,65 +6,20 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'partials/_badges' as badges;
 
-.i-payments-list {
-  & > .i-badge {
-    &.i-payment-enabled {
-      background-color: $light-green;
+.i-payments-list > .i-badge {
+  width: 10em;
 
-      &,
-      & * {
-        color: $green;
-      }
-
-      &:hover {
-        background-color: darken($light-green, $light-color-variation);
-      }
-
-      & > .i-badge-legend {
-        border-color: $dark-green;
-
-        & > .i-payment-status-disabled {
-          display: none;
-        }
-      }
-    }
-
-    &.i-payment-disabled {
-      background-color: $light-gray;
-
-      &,
-      & * {
-        color: $black;
-      }
-
-      &:hover {
-        background-color: darken($light-gray, $light-color-variation);
-      }
-
-      & > .i-badge-legend {
-        border-color: $dark-gray;
-
-        & > .i-payment-status-enabled {
-          display: none;
-        }
-      }
-    }
-
-    &.i-payment-manual {
-      &:hover {
-        cursor: default;
-        background-color: $light-green;
-      }
-
-      .i-badge-img {
-        color: $black;
-        font-size: 3em;
-
-        &::before {
-          vertical-align: text-bottom;
-        }
-      }
-    }
+  &.i-payment-enabled {
+    @include badges.i-badge-color($green, $light-green, $dark-green, true);
   }
+
+  &.i-payment-disabled {
+    @include badges.i-badge-color($black, $light-gray, $dark-gray, true);
+  }
+}
+
+.i-payment-plugins-list > .i-badge {
+  width: 10em;
 }

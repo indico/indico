@@ -22,7 +22,7 @@
 {% endmacro %}
 
 {% macro stats_badge(label, value) %}
-    <div class="i-badge">
+    <div class="i-badge i-badge-disabled">
         <div class="i-badge-content">
             {% if value is none %}
                 <span class="i-badge-value">&ndash;</span>
@@ -36,7 +36,7 @@
 
 
 {% macro stats_badges(badges, classes='') %}
-    <div class="i-badges-list{% if classes %} {{ classes }}{%  endif %}">
+    <div class="i-badges-list-space-evenly{% if classes %} {{ classes }}{%  endif %}">
         {% for label, value in badges %}
             {{ stats_badge(label, value) }}
         {% endfor %}

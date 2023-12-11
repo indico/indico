@@ -37,31 +37,28 @@
         {% trans %}Payment methods{% endtrans %}
     </h3>
 
-    <div class="i-badges-list left i-badges-list-hover i-payments-list">
-        <a class="i-badge i-payment-enabled i-payment-manual"
+    <div class="i-badges-list i-payments-list">
+        <a class="i-badge i-badge-disabled i-payment-enabled"
            title="{% trans %}Method only available for managers from the management area. Can't be disabled.{% endtrans %}">
-            <div class="i-badge-legend">
-                <span class="i-badge-legend-right i-payment-status-enabled">
-                    {% trans %}enabled{% endtrans %}
-                </span>
-            </div>
             <div class="i-badge-content">
                 <span class="i-badge-img icon-coins"></span>
                 <span class="i-badge-title">
                     {% trans %}Manual{% endtrans %}
                 </span>
             </div>
+            <div class="i-badge-legend">
+                <span class="i-badge-legend-right i-payment-status-enabled">
+                    {% trans %}enabled{% endtrans %}
+                </span>
+            </div>
         </a>
         {%- for short_name, method in methods %}
+            {% set payment_enabled = method in enabled_methods %}
             <a href="#" id="plugin-{{ method.name }}"
-               class="js-edit-method i-badge {%- if method in enabled_methods %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
+               class="js-edit-method i-badge {%- if payment_enabled %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
                data-title="{% trans method=method.title %}Payment settings: {{ method }}{% endtrans %}"
                data-href="{{ url_for('.event_plugin_edit', event, method=short_name) }}"
                data-ajax-dialog>
-                <div class="i-badge-legend">
-                    <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
-                    <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
-                </div>
                 <div class="i-badge-content">
                     <span class="i-badge-img">
                         <img src="{{ method.logo_url }}">
@@ -69,6 +66,13 @@
                     <span class="i-badge-title">
                         {{ method.title }}
                     </span>
+                </div>
+                <div class="i-badge-legend">
+                    {% if payment_enabled %}
+                        <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
+                    {% else %}
+                        <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
+                    {% endif %}
                 </div>
             </a>
         {%- endfor %}

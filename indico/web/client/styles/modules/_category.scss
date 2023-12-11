@@ -98,32 +98,6 @@
 
 .category-statistics {
   max-width: 1600px;
-
-  .i-box {
-    margin-left: 0.8em;
-    margin-right: 0.8em !important;
-    width: 45%;
-
-    &:first-child {
-      margin-left: 0;
-    }
-
-    .i-box-header {
-      text-align: left;
-    }
-
-    .i-box-content {
-      display: inline-block;
-
-      width: 96%;
-      height: 350px;
-      padding: 2% 2% 0 2%;
-    }
-  }
-
-  .i-badges-list > .i-badge {
-    width: 45%;
-  }
 }
 
 .category-sidebar {
