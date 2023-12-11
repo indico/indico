@@ -88,9 +88,11 @@ def _get_notification_placeholders(sender, regform=None, **kwargs):
             yield obj
 
     if regform:
+        from indico.modules.events.registration.models.items import RegistrationFormItemType
         from indico.modules.designer.placeholders import DynamicPlaceholder
         for field in regform.active_fields:
-            yield DynamicPlaceholder(field=field)
+            if field.type != RegistrationFormItemType.field_pd:
+                yield DynamicPlaceholder(field=field)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
