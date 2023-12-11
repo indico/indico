@@ -49,6 +49,10 @@ def get_image_placeholder_types():
     return [name for name, placeholder in get_placeholder_options().items() if placeholder.is_image]
 
 
+def is_dynamic_placeholder(designer_item):
+    return designer_item['type'].startswith('dynamic-')
+
+
 def get_all_templates(obj):
     """Get all templates usable by an event/category."""
     category = (obj.category or Category.get_root()) if isinstance(obj, Event) else obj

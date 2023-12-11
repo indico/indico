@@ -5,12 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import json
 from io import BytesIO
 
 from babel.numbers import format_currency
 from PIL import Image
-from speaklater import _LazyString
 
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.events.registration.util import generate_ticket_qr_code
@@ -414,28 +412,61 @@ class FixedImagePlaceholder(DesignerPlaceholder):
 
 
 class DynamicPlaceholder(DesignerPlaceholder):
+    """Placeholder representing RegistrationData instance for a given regform field.
+
+    Unlike other placeholders which are always present, registration data depends
+    on the linked regform and thus the placeholders must be generated on the fly.
+    """
     group = 'dynamic'
 
     def __init__(self, field):
         self.field = field
         self.name = f'dynamic-{field.id}'
-        self.description = field.title
+
+    @property
+    def description(self):
+        return self.field.title
 
     def render(self, registration):
         data_by_field = registration.data_by_field
         data = data_by_field.get(self.field.id, None)
         if data is None:
             return ''
+        return self._render(data)
 
-        # Something like the 'render_data' macro would be nice
-        return json.dumps(self._strip_lazy_strings(data.friendly_data))
+    def _render(self, data):
+        friendly_data = data.friendly_data
+        if friendly_data is None:
+            return ''
 
-    def _strip_lazy_strings(self, data):
-        if isinstance(data, _LazyString):
-            return str(data)
-        elif isinstance(data, dict):
-            return {k: self._strip_lazy_strings(v) for k, v in data.items()}
-        elif isinstance(data, (list, tuple)):
-            return [self._strip_lazy_strings(v) for v in data]
+        if self.field.input_type == 'multi_choice':
+            return ' · '.join(friendly_data)
+        elif self.field.input_type == 'accommodation':
+            return self._render_accommodation(friendly_data)
         else:
-            return data
+            return friendly_data
+
+    def _render_accommodation(self, friendly_data):
+        if friendly_data.is_no_accommodation:
+            return _('No accommodation')
+
+        arrival = format_date(friendly_data.arrival_date)  # TODO: include locale
+        departure = format_date(friendly_data.departure_date)
+        accommodation = friendly_data.choice
+        return _('''
+Arrival: {arrival} · Departure {departure} · Accommodation: {accommodation}
+''').format(arrival=arrival, departure=departure, accommodation=accommodation)
+
+    @classmethod
+    def from_designer_item(cls, regform, item):
+        """Create an instance of this class from a designer item."""
+        type_ = item['type']
+        try:
+            field_id = int(type_.removeprefix('dynamic-'))
+        except ValueError:
+            raise ValueError(f'Invalid dynamic field type: {type_}')
+
+        field = next((field for field in regform.active_fields if field.id == field_id), None)
+        if not field:
+            return None
+        return cls(field=field)

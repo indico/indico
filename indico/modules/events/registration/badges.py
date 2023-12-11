@@ -15,6 +15,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.modules.designer.pdf import DesignerPDFBase
+from indico.modules.designer.util import is_dynamic_placeholder
 from indico.modules.events.registration.settings import DEFAULT_BADGE_SETTINGS
 from indico.util.i18n import _
 from indico.util.placeholders import get_placeholders
@@ -74,6 +75,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         badge_rect = (pos_x, self.height - pos_y - tpl_data.height_cm * cm,
                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)
         registration = person['registration']
+        regform = registration.registration_form
 
         if config.dashed_border:
             canvas.saveState()
@@ -93,17 +95,12 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                                                          item['type'] not in image_placeholders))
 
         for item in items:
-            type_ = item['type']
-            if type_.startswith('dynamic-'):
-                from indico.modules.designer.placeholders import DynamicPlaceholder, FixedTextPlaceholder
-                field_id = int(type_[len('dynamic-'):])
-                data_by_field = registration.data_by_field
-                if field_id not in data_by_field:
-                    # Just get some other placeholder for now, so it does not explode
-                    placeholder = FixedTextPlaceholder
-                else:
-                    field = data_by_field[field_id].field_data.field
-                    placeholder = DynamicPlaceholder(field)
+            if is_dynamic_placeholder(item):
+                from indico.modules.designer.placeholders import DynamicPlaceholder
+                placeholder = DynamicPlaceholder.from_designer_item(regform, item)
+                if placeholder is None:
+                    # the regform field referenced by the designer item does not exist
+                    continue
             else:
                 placeholder = placeholders.get(item['type'])
 
