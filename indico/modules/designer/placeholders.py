@@ -448,13 +448,13 @@ class DynamicPlaceholder(DesignerPlaceholder):
             return friendly_data
 
     def _render_accommodation(self, friendly_data):
-        if friendly_data.is_no_accommodation:
+        if friendly_data['is_no_accommodation']:
             return _('No accommodation')
 
-        arrival = format_date(friendly_data.arrival_date)  # TODO: include locale
-        departure = format_date(friendly_data.departure_date)
-        accommodation = friendly_data.choice
-        return _('''
+        arrival = format_date(friendly_data['arrival_date'])  # TODO: include locale
+        departure = format_date(friendly_data['departure_date'])
+        accommodation = friendly_data['choice']
+        return _('''\
 Arrival: {arrival} · Departure {departure} · Accommodation: {accommodation}
 ''').format(arrival=arrival, departure=departure, accommodation=accommodation)
 
