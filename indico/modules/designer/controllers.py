@@ -368,7 +368,7 @@ class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
         RHModifyDesignerTemplateBase._process_args(self)
         regform_id = request.view_args['reg_form_id']
         self.regform = (RegistrationForm.query
-                        .with_parent(self.template.event)  # TODO: must not be category template
+                        .with_parent(self.template.event)
                         .filter_by(id=regform_id, is_deleted=False)
                         .first_or_404())
 

@@ -417,6 +417,7 @@ class DynamicPlaceholder(DesignerPlaceholder):
     Unlike other placeholders which are always present, registration data depends
     on the linked regform and thus the placeholders must be generated on the fly.
     """
+
     group = 'dynamic'
 
     def __init__(self, field):

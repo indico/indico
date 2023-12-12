@@ -795,8 +795,8 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
 
 
 def generate_ticket(registration):
-    from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
     from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
+    from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
     template = registration.registration_form.get_ticket_template()
     registrations = [registration]
     signals.event.designer.print_badge_template.send(template, regform=registration.registration_form,
