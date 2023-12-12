@@ -92,7 +92,10 @@
                 <div class="group">
                     {% if not tpl.registration_form and linkable_forms[tpl] %}
                         <button class="i-button icon-plus icon-only highlight text-color js-dropdown borderless"
-                                title="Link to a registration form. This will enable you to use all registration form fields."
+                                title="{% trans %}
+                                            Link to a registration form. This will enable you to use all
+                                            registration form fields in the template.
+                                       {% endtrans %}"
                                 data-toggle="dropdown"></button>
                         <ul class="i-dropdown">
                             {% for regform in linkable_forms[tpl] %}

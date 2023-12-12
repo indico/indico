@@ -91,8 +91,8 @@ def _get_notification_placeholders(sender, regform=None, **kwargs):
         from indico.modules.designer.placeholders import DynamicPlaceholder
         from indico.modules.events.registration.models.items import RegistrationFormItemType
         for field in regform.active_fields:
-            if field.type != RegistrationFormItemType.field_pd:
-                yield DynamicPlaceholder(field=field)
+            if field.type != RegistrationFormItemType.field_pd:  # Personal data are already included in the
+                yield DynamicPlaceholder(field=field)            # 'registrant' group
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
