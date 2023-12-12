@@ -50,6 +50,7 @@ def get_image_placeholder_types():
 
 
 def is_dynamic_placeholder(designer_item):
+    """Return True if the given designer item represents a dynamic registration data placeholder."""
     return designer_item['type'].startswith('dynamic-')
 
 
@@ -104,42 +105,48 @@ def get_badge_format(tpl):
                      frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
 
-def get_available_event_templates(regform):
-    return DesignerTemplate.query.with_parent(regform.event).filter(
-        db.or_(
-            DesignerTemplate.registration_form.is_(None),
-            DesignerTemplate.registration_form == regform
+def remove_dynamic_items(data):
+    """Return a copy of the template data with dynamic registration data placeholders removed."""
+    return data | {
+        'items': [item for item in data['items'] if not is_dynamic_placeholder(item)]
+    }
+
+
+def can_link_to_regform(template, regform):
+    """Return True if the given template can be linked to the given registration form."""
+    return regform in get_linkable_regforms(template)
+
+
+def get_linkable_regforms(template):
+    """Return all registration forms that can be linked to the given template."""
+    if template.category or template.registration_form:
+        return []
+
+    query = RegistrationForm.query.with_parent(template.event).filter(
+        ~RegistrationForm.is_deleted,
+    )
+
+    return [
+        regform for regform in query
+        if (  # If the template has a backside, the backside must be linked to the same regform
+            template.backside_template is None
+            or template.backside_template.registration_form is None
+            or regform == template.backside_template.registration_form
         )
-    ).all()
+        and all(  # If the the template is a backside, all frontsides must be linked to the same regform
+            tpl.registration_form is None or tpl.registration_form == regform for tpl in template.backside_template_of
+        )
+    ]
 
 
-def get_available_templates(regform):
-    default_template = get_default_ticket_on_category(regform.event.category)
-    inherited_templates = get_inherited_templates(regform.event)
-    event_templates = get_available_event_templates(regform)
-    all_templates = set(inherited_templates) | event_templates
-    all_templates.discard(default_template)
-    badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
-                        if tpl.type == TemplateType.badge and tpl != default_tpl]
-    # Show the default template first
-    badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
+def get_printable_event_templates(regform):
+    """Return all templates that can be used to print badges/tickets for the given registration form.
 
-    return query.all()
-
-
-def can_link_to_regform(regform, template):
-    return template in get_linkable_templates(regform)
-
-
-def get_linkable_templates(regform):
+    A template can be used if it is either not linked to anything or linked to the current registation form.
+    """
     return DesignerTemplate.query.with_parent(regform.event).filter(
-        DesignerTemplate.registration_form.is_(None),
         db.or_(
-            DesignerTemplate.backside_template.registration_form.is_(None),
-            DesignerTemplate.backside_template.registration_form == regform,
-        ),
-        db.or_(
-            DesignerTemplate.backside_template_of.registration_form.is_(None),
-            DesignerTemplate.backside_template_of.registration_form == regform,
+            DesignerTemplate.registration_form_id.is_(None),
+            DesignerTemplate.registration_form == regform
         )
     ).all()

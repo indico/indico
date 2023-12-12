@@ -171,38 +171,13 @@ class DesignerTemplate(db.Model):
 
     def link_regform(self, regform):
         """Link this template to a registration form."""
-        if self.category:
-            raise ValueError('Category templates cannot be linked to registration forms')
-
-        if self.event != regform.event:
-            raise ValueError('Cannot link template to a registration form from a different event')
-
-        if (
-            self.backside_template
-            and self.backside_template.registration_form
-            and self.backside_template.registration_form != regform
-        ):
-            raise ValueError('Backside template is linked to a different registration form')
-
-        if self.backside_template_of:
-            if self.backside_template_of.event != regform.event:
-                raise ValueError('Backside template is linked to a different event')
-            if self.backside_template_of.registration_form and self.backside_template_of.registration_form != regform:
-                raise ValueError('Backside template is linked to a different registration form')
-
         self.registration_form = regform
         db.session.commit()
 
     def unlink_regform(self):
         """Unlink this template from a registration form."""
-        if not self.registration_form:
-            raise ValueError('Template is not linked to a registration form')
-
-        data_without_dynamic_fields = self.data | {
-            # TODO: this can for sure be done better..
-            'items': [item for item in self.data['items'] if not item['type'].startswith('dynamic-')]
-        }
-        self.data = data_without_dynamic_fields
+        from indico.modules.designer.util import remove_dynamic_items
+        self.data = remove_dynamic_items(self.data)
         self.registration_form = None
         db.session.commit()
 

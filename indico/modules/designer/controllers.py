@@ -26,10 +26,11 @@ from indico.modules.designer.forms import AddTemplateForm, CloneTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import (get_all_templates, get_default_badge_on_category,
+from indico.modules.designer.util import (can_link_to_regform, get_all_templates, get_default_badge_on_category,
                                           get_default_ticket_on_category, get_image_placeholder_types,
-                                          get_inherited_templates, get_nested_placeholder_options,
-                                          get_not_deletable_templates, get_placeholder_options)
+                                          get_inherited_templates, get_linkable_regforms,
+                                          get_nested_placeholder_options, get_not_deletable_templates,
+                                          get_placeholder_options, remove_dynamic_items)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -88,8 +89,13 @@ def _render_template_list(target, event=None):
     default_ticket = get_default_ticket_on_category(target) if isinstance(target, Category) else None
     default_badge = get_default_badge_on_category(target) if isinstance(target, Category) else None
     not_deletable = get_not_deletable_templates(target)
-    return tpl.render_template_list(target.designer_templates, target, event=event, default_ticket=default_ticket,
-                                    default_badge=default_badge, inherited_templates=get_inherited_templates(target),
+    linkable_forms = defaultdict(list)
+    for template in target.designer_templates:
+        linkable_forms[template] = get_linkable_regforms(template)
+
+    return tpl.render_template_list(target.designer_templates, target, linkable_forms, event=event,
+                                    default_ticket=default_ticket, default_badge=default_badge,
+                                    inherited_templates=get_inherited_templates(target),
                                     not_deletable_templates=not_deletable)
 
 
@@ -172,8 +178,13 @@ class TemplateListMixin(TargetFromURLMixin):
         default_badge = get_default_badge_on_category(self.target) if isinstance(self.target, Category) else None
         signals.event.filter_selectable_badges.send(type(self), badge_templates=templates)
         signals.event.filter_selectable_badges.send(type(self), badge_templates=not_deletable)
+        linkable_forms = defaultdict(list)
+        for template in self.target.designer_templates:
+            linkable_forms[template] = get_linkable_regforms(template)
+
         return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
-                                     default_ticket=default_ticket, default_badge=default_badge)
+                                     default_ticket=default_ticket, default_badge=default_badge,
+                                     linkable_forms=linkable_forms)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
@@ -188,10 +199,11 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
     def clone_template(self, target=None):
         title = f'{self.template.title} (copy)'
-        target_dict = target if target else self.target_dict
+        target_dict = target if target else self.target_dict  # XXX: is self.target_dict set anywhere?
         new_template = DesignerTemplate(title=title, type=self.template.type, **target_dict)
 
         data = deepcopy(self.template.data)
+        data = remove_dynamic_items(data)
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
         for image_item in image_items:
             old_image = DesignerImageFile.get(image_item['image_id'])
@@ -345,6 +357,13 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
 
 
 class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.template,
+            lambda self: self.regform
+        }
+    }
+
     def _process_args(self):
         RHModifyDesignerTemplateBase._process_args(self)
         regform_id = request.view_args['reg_form_id']
@@ -354,23 +373,29 @@ class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
                         .first_or_404())
 
     def _process(self):
+        if not can_link_to_regform(self.template, self.regform):
+            raise ValueError('Cannot link to the specified registration form.')
+
         self.template.link_regform(self.regform)
         self.template.event.log(EventLogRealm.event, LogKind.positive, 'Designer',
                                 'Badge template linked to registration form', session.user,
-                                data={'Template': self.title, 'Registration Form': self.regform.title})
+                                data={'Template': self.template.title, 'Registration Form': self.regform.title})
         flash(_('Template successfully linked.'), 'success')
-        return jsonify_data()
+        return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
 
 class RHUnLinkDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
         regform = self.template.registration_form
+        if not regform:
+            raise ValueError('This template is not linked to any registration form.')
+
         self.template.unlink_regform()
         self.template.event.log(EventLogRealm.event, LogKind.negative, 'Designer',
                                 'Badge template unlinked from registration form', session.user,
-                                data={'Template': self.title, 'Registration Form': regform.title})
+                                data={'Template': self.template.title, 'Registration Form': regform.title})
         flash(_('Template successfully unlinked.'), 'success')
-        return jsonify_data()
+        return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
 
 class RHDownloadTemplateImage(BacksideTemplateProtectionMixin, RHModifyDesignerTemplateBase):
