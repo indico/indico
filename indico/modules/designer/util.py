@@ -12,7 +12,7 @@ from indico.core.db import db
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.pdf import PIXELS_CM
-from indico.modules.designer.placeholders import GROUP_TITLES
+from indico.modules.designer.placeholders import GROUPS
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.util.date_time import now_utc
@@ -39,7 +39,7 @@ def get_placeholder_options(regform=None):
 
 
 def get_nested_placeholder_options(regform=None):
-    groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.items()}
+    groups = {group_id: group | {'options': {}} for group_id, group in GROUPS.items()}
     for name, placeholder in get_placeholder_options(regform=regform).items():
         groups[placeholder.group]['options'][name] = str(placeholder.description)
     return groups

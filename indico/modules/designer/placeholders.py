@@ -33,17 +33,17 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationAccompanyingPersonsPlaceholder', 'RegistrationAccompanyingPersonsAbbrevPlaceholder')
 
 
-GROUP_TITLES = {
-    'registrant': _('Registrant Data'),
-    'event': _('Event Data'),
-    'fixed': _('Fixed Data'),
+GROUPS = {
+    'event': {'title': _('Event Data'), 'position': 1},
+    'fixed': {'title': _('Fixed Data'), 'position': 2},
+    'registrant': {'title': _('Common Registrant Data'), 'position': 3},
     # Come up with a better name or merge with registrant data
-    'dynamic': _('Dynamic Registration Data')
+    'dynamic': {'title': _('Custom Registrant Data'), 'position': 4},
 }
 
 
 class DesignerPlaceholder(Placeholder):
-    #: The group of the placeholder. Must be a valid key from `GROUP_TITLES`.
+    #: The group of the placeholder. Must be a valid key from `GROUPS`.
     group = None
     #: Data source for the placeholder.
     data_source = None
