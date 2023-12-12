@@ -42,7 +42,6 @@ class DesignerTemplate(db.Model):
         nullable=False
     )
     registration_form_id = db.Column(
-        db.Integer,
         db.ForeignKey('event_registration.forms.id'),
         index=True,
         nullable=True
