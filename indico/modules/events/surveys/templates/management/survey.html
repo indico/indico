@@ -95,15 +95,33 @@
     {% if submitted_surveys %}
         <div class="toolbars space-after">
             <div class="toolbar">
-                <button class="i-button icon-checkbox-checked arrow js-dropdown"  data-toggle="dropdown"></button>
-                <ul class="i-dropdown">
-                    <li><a href="#" id="select-all">
-                        {% trans %}All{% endtrans %}
-                    </a></li>
-                    <li><a href="#" id="select-none">
-                        {% trans %}None{% endtrans %}
-                    </a></li>
-                </ul>
+                <div class="group">
+                    <button class="i-button icon-checkbox-checked arrow js-dropdown"  data-toggle="dropdown"></button>
+                    <ul class="i-dropdown">
+                        <li><a href="#" id="select-all">
+                            {% trans %}All{% endtrans %}
+                        </a></li>
+                        <li><a href="#" id="select-none">
+                            {% trans %}None{% endtrans %}
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="group">
+                    <div id="email-authors-container"
+                        class="i-button-wrapper"
+                        data-event-id="{{ event.id }}"
+                        data-object-context="submissions"
+                        data-params-selector="#submission-list input[name=submission_id]:checked">
+                    </div>
+                    <div id="email-submission-container"
+                        class="i-button-wrapper"
+                        data-object-context="submissions"
+                        data-id-selector="#submission-list input[name=submission_id]:checked"
+                        {# data-metadata-url="{{ url_for('.api_email_contrib_roles_metadata', event) }}"
+                        data-preview-url="{{ url_for('.api_email_contrib_roles_preview', event) }}"
+                        data-send-url="{{ url_for('.api_email_contrib_roles_send', event) }}" #}>
+                    </div>
+                </div>
             </div>
             <div class="toolbar">
                 <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart">
@@ -165,6 +183,9 @@
             </div>
         </div>
     {% endif %}
+    <script>
+        setupEmailContribAbstractRoles('#email-submission-container');
+    </script>
 {% endblock %}
 
 {% macro _render_submission_row(submission) %}
