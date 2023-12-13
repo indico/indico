@@ -27,10 +27,14 @@ export default function EmailInput({htmlId, htmlName, disabled, isRequired}) {
   const [message, setMessage] = useState({status: '', message: '', forEmail: ''});
   const isUpdateMode = useSelector(getUpdateMode);
   const {eventId, regformId, registrationUuid, management} = useSelector(getStaticData);
-  const url = useMemo(() => validateEmailURL({event_id: eventId, reg_form_id: regformId}), [
-    eventId,
-    regformId,
-  ]);
+  const invitationToken = useMemo(() => new URLSearchParams(location.search).get('invitation'), []);
+  const url = useMemo(() => {
+    const params = {event_id: eventId, reg_form_id: regformId};
+    if (invitationToken) {
+      params.invitation = invitationToken;
+    }
+    return validateEmailURL(params);
+  }, [eventId, regformId, invitationToken]);
   const validateEmail = useDebouncedAsyncValidate(async email => {
     let msg, response;
     email = email.trim();

@@ -184,13 +184,16 @@ class RegistrationFormScheduleForm(IndicoForm):
 
 
 class InvitationFormBase(IndicoForm):
-    _invitation_fields = ('skip_moderation',)
+    _invitation_fields = ('skip_moderation', 'skip_access_check')
     _email_fields = ('email_from', 'email_subject', 'email_body')
     email_from = SelectField(_('From'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
     email_body = TextAreaField(_('Email body'), [DataRequired()], widget=TinyMCEWidget())
     skip_moderation = BooleanField(_('Skip moderation'), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))
+    skip_access_check = BooleanField(_('Skip access check'), widget=SwitchWidget(),
+                                     description=_('If enabled, the user will be able to register even if the event '
+                                                   'is access-restricted.'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
@@ -470,6 +473,9 @@ class ImportRegistrationsForm(IndicoForm):
                             accepted_file_types='.csv')
     skip_moderation = BooleanField(_('Skip Moderation'), widget=SwitchWidget(), default=True,
                                    description=_('If enabled, the registration will be immediately accepted'))
+    skip_access_check = BooleanField(_('Skip access check'), widget=SwitchWidget(),
+                                     description=_('If enabled, invited people will be able to register even if the '
+                                                   'event is access-restricted.'))
     notify_users = BooleanField(_('E-mail users'), widget=SwitchWidget(),
                                 description=_('Whether the imported users should receive an e-mail notification'))
 
