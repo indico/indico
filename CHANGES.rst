@@ -60,6 +60,7 @@ Improvements
 - Add Outlook online calendar button to share widget (:issue:`6075`, :pr:`6077`)
 - Remove Facebook and Google+ share widgets and make Twitter share button privacy-friendly
   (:pr:`6077`)
+- Do not bother people registering using an invitation link with a CAPTCHA (:pr:`6095`)
 
 Bugfixes
 ^^^^^^^^
