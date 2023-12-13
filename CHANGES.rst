@@ -132,6 +132,7 @@ Security fixes
 
 - Update `Werkzeug <https://pypi.org/project/Werkzeug/>`_ library due to a
   DoS vulnerability while parsing certain file uploads (:cve:`CVE-2023-46136`)
+- Fix registration form CAPTCHA not being fully validated (:pr:`6096`)
 
 Improvements
 ^^^^^^^^^^^^

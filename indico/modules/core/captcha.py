@@ -40,7 +40,12 @@ def generate_captcha_challenge():
 
 
 class CaptchaField(fields.String):
-    """Validates an answer to a CAPTCHA."""
+    """Validate an answer to a CAPTCHA."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs['required'] = True  # it makes no sense to have an optional CAPTCHA field
+        kwargs['allow_none'] = False
+        super().__init__(*args, **kwargs)
 
     def _deserialize(self, value, attr, data, **kwargs):
         user_answer = super()._deserialize(value, attr, data, **kwargs)
