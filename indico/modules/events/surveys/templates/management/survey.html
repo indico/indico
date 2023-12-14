@@ -107,19 +107,9 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <div id="email-authors-container"
-                        class="i-button-wrapper"
-                        data-event-id="{{ event.id }}"
-                        data-object-context="submissions"
-                        data-params-selector="#submission-list input[name=submission_id]:checked">
-                    </div>
                     <div id="email-submission-container"
                         class="i-button-wrapper"
-                        data-object-context="submissions"
-                        data-id-selector="#submission-list input[name=submission_id]:checked"
-                        {# data-metadata-url="{{ url_for('.api_email_contrib_roles_metadata', event) }}"
-                        data-preview-url="{{ url_for('.api_email_contrib_roles_preview', event) }}"
-                        data-send-url="{{ url_for('.api_email_contrib_roles_send', event) }}" #}>
+                        data-event-id="{{ event.id }}">
                     </div>
                 </div>
             </div>
@@ -184,7 +174,7 @@
         </div>
     {% endif %}
     <script>
-        setupEmailContribAbstractRoles('#email-submission-container');
+        setupEmailSurveyParticipantsButton('#email-submission-container');
     </script>
 {% endblock %}
 
