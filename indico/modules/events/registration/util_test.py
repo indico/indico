@@ -197,7 +197,8 @@ def test_import_invitations(monkeypatch, dummy_regform, dummy_user):
     invitations, skipped = import_invitations_from_csv(dummy_regform, BytesIO(csv),
                                                        email_from='noreply@example.test', email_subject='invitation',
                                                        email_body='Invitation to event',
-                                                       skip_moderation=False, skip_existing=True)
+                                                       skip_moderation=False, skip_access_check=False,
+                                                       skip_existing=True)
     assert len(invitations) == 2
     assert skipped == 0
 
@@ -206,12 +207,14 @@ def test_import_invitations(monkeypatch, dummy_regform, dummy_user):
     assert invitations[0].affiliation == 'ACME Inc.'
     assert invitations[0].email == 'bdoe@example.test'
     assert not invitations[0].skip_moderation
+    assert not invitations[0].skip_access_check
 
     assert invitations[1].first_name == 'Jane'
     assert invitations[1].last_name == 'Smith'
     assert invitations[1].affiliation == 'ACME Inc.'
     assert invitations[1].email == 'jsmith@example.test'
     assert not invitations[1].skip_moderation
+    assert not invitations[1].skip_access_check
 
 
 def test_import_invitations_duplicate_invitation(monkeypatch, dummy_regform, dummy_user):
@@ -236,6 +239,7 @@ def test_import_invitations_duplicate_invitation(monkeypatch, dummy_regform, dum
     assert invitations[0].affiliation == 'ACME Inc.'
     assert invitations[0].email == 'jsmith@example.test'
     assert invitations[0].skip_moderation
+    assert invitations[0].skip_access_check
 
 
 def test_import_invitations_duplicate_registration(monkeypatch, dummy_regform):
@@ -262,6 +266,7 @@ def test_import_invitations_duplicate_registration(monkeypatch, dummy_regform):
     assert invitations[0].affiliation == 'ACME Inc.'
     assert invitations[0].email == 'jsmith@example.test'
     assert invitations[0].skip_moderation
+    assert invitations[0].skip_access_check
 
 
 def test_import_invitations_duplicate_user(monkeypatch, dummy_regform, dummy_user):
@@ -289,6 +294,7 @@ def test_import_invitations_duplicate_user(monkeypatch, dummy_regform, dummy_use
     assert invitations[0].affiliation == 'ACME Inc.'
     assert invitations[0].email == 'jsmith@example.test'
     assert invitations[0].skip_moderation
+    assert invitations[0].skip_access_check
 
 
 def test_import_invitations_error(dummy_regform, dummy_user):

@@ -258,7 +258,7 @@ class InvitationMixin:
             flash(_('This invitation does not exist or has been withdrawn.'), 'warning')
 
 
-class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
+class RHRegistrationFormCheckEmail(InvitationMixin, RHRegistrationFormBase):
     """Check how an email will affect the registration."""
 
     ALLOW_PROTECTED_EVENT = True
@@ -270,13 +270,14 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
     }, location='query')
     def _process_args(self, email, update, management):
         RHRegistrationFormBase._process_args(self)
+        InvitationMixin._process_args(self)
         self.email = email
         self.update = update
         self.management = management
         self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None
 
     def _check_access(self):
-        if not self.existing_registration:
+        if not self.existing_registration and not (self.invitation and self.invitation.skip_access_check):
             RHRegistrationFormBase._check_access(self)
 
     def _process(self):
@@ -300,7 +301,12 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     }
 
     def _check_access(self):
-        RHRegistrationFormRegistrationBase._check_access(self)
+        try:
+            RHRegistrationFormRegistrationBase._check_access(self)
+        except Forbidden:
+            if not self.invitation or not self.invitation.skip_access_check:
+                raise
+            self.is_restricted_access = True
         if self.regform.require_login and not session.user and request.method != 'GET':
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))
@@ -435,10 +441,21 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
         RHRegistrationFormBase._process_args(self)
         InvitationMixin._process_args(self)
 
+    def _check_access(self):
+        try:
+            RHRegistrationFormBase._check_access(self)
+        except Forbidden:
+            if not self.invitation.skip_access_check:
+                raise
+            self.is_restricted_access = True
+
     def _process(self):
         if self.invitation.state == InvitationState.pending:
             self.invitation.state = InvitationState.declined
             flash(_('You declined the invitation to register.'))
+        if self.is_restricted_access:
+            # stay on the invitation page because anything else redirects to login
+            return redirect(url_for('.display_regform', self.invitation.locator.uuid))
         return redirect(self.event.url)
 
 

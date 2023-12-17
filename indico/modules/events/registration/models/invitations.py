@@ -73,6 +73,12 @@ class RegistrationInvitation(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether the event access check should be skipped
+    skip_access_check = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The email of the invited person
     email = db.Column(
         db.String,

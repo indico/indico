@@ -61,6 +61,8 @@ Improvements
 - Remove Facebook and Google+ share widgets and make Twitter share button privacy-friendly
   (:pr:`6077`)
 - Do not bother people registering using an invitation link with a CAPTCHA (:pr:`6095`)
+- Add option to allow people to register using an invitation link even if the event is
+  restricted (:pr:`6094`)
 
 Bugfixes
 ^^^^^^^^
