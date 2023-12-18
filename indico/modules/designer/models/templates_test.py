@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-
 pytest_plugins = ('indico.modules.designer.testing.fixtures',
                   'indico.modules.events.registration.testing.fixtures')
 
