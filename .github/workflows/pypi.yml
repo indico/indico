@@ -41,13 +41,13 @@ jobs:
         run: npm ci
       - name: Build wheel 🏗
         run: ./bin/maintenance/build-wheel.py indico
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         name: Upload build artifacts 📦
         with:
           name: indico-wheel
           retention-days: 7
           path: ./dist
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         name: Store Markdown changelog 📜
         with:
           name: changelog
@@ -61,7 +61,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         name: Download build artifacts 📦
       - name: Create draft release 🐙
         run: >-
@@ -85,7 +85,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
       # Try uploading to Test PyPI first, in case something fails.
       - name: Publish to Test PyPI 🧪
         uses: pypa/gh-action-pypi-publish@v1.8.11
