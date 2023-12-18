@@ -1,7 +1,7 @@
 """Add registration_form_id to designer templates
 
 Revision ID: 4e32f4d5ebe4
-Revises: e2b69fe5155d
+Revises: 8e08236a529f
 Create Date: 2023-12-08 10:42:45.632227
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '4e32f4d5ebe4'
-down_revision = 'e2b69fe5155d'
+down_revision = '8e08236a529f'
 branch_labels = None
 depends_on = None
 
