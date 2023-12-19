@@ -38,6 +38,7 @@ from indico.modules.categories.models.event_move_request import EventMoveRequest
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkMixin
 from indico.modules.events.notifications import notify_event_creation
+from indico.modules.events.persons import persons_settings
 from indico.modules.events.settings import (EventSettingProperty, event_contact_settings, event_core_settings,
                                             event_language_settings)
 from indico.modules.events.timetable.models.entries import TimetableEntry
@@ -460,6 +461,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     supported_locales = _EventSettingProperty(event_language_settings, 'supported_locales')
     default_locale = _EventSettingProperty(event_language_settings, 'default_locale')
     enforce_locale = _EventSettingProperty(event_language_settings, 'enforce_locale')
+    show_titles = _EventSettingProperty(persons_settings, 'show_titles')
 
     @classmethod
     def category_chain_overlaps(cls, category_ids):

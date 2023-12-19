@@ -518,4 +518,5 @@ class RHManagePersonLists(EditEventSettingsMixin, RHManageEventBase):
     log_module = 'Persons'
     log_message = 'Settings updated'
     log_fields = {'disallow_custom_persons': 'Disallow custom persons',
-                  'default_search_external': 'Include users with no Indico account by default'}
+                  'default_search_external': 'Include users with no Indico account by default',
+                  'show_titles': 'Show the title of a person'}

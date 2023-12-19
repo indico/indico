@@ -20,6 +20,9 @@ class ManagePersonListsForm(IndicoForm):
     default_search_external = BooleanField(_('Include users with no Indico account by default'), widget=SwitchWidget(),
                                            description=_('If enabled, searching people for speakers/authors will '
                                                          'include those with no Indico account by default.'))
+    show_titles = BooleanField(_('Show titles'), widget=SwitchWidget(),
+                               description=_('If disabled, the title of a person will be hidden everywhere in the event'
+                                             'display pages.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

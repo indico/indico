@@ -27,7 +27,7 @@
     <div class="speaker-list">
         {% call(user_data) render_users(authors|sort(attribute='display_order_key'), separator='') %}
             <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="speaker-item icon-user">
-                {% if user_data.title -%}
+                {% if user_data.contribution.event.show_titles and user_data.title -%}
                     <span class="speaker-title">
                         {{ user_data.title }}
                     </span>
