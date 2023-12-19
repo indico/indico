@@ -36,7 +36,7 @@ Some examples could be:
  * Export your reservations: ``/export/reservation/CERN.json?detail=reservations&from=today&to=today&bookedfor=USERNAME&pretty=yes``
 
 
-See more details about querying in `Exporters <exporters/index.html>`_.
+See more details about querying in :doc:`exporters/index`.
 
 .. _api-authentication:
 
