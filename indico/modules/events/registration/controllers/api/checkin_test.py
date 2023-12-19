@@ -45,6 +45,7 @@ def _assert_successful_request(snapshot, resp, name):
     '/api/checkin/event/{event_id}/forms/{regform_id}/',
     '/api/checkin/event/{event_id}/forms/{regform_id}/registrations/',
     '/api/checkin/event/{event_id}/forms/{regform_id}/registrations/{reg_id}',
+    '/api/checkin/ticket/{ticket_uuid}',
 ))
 def test_unauthorized(dummy_event, dummy_regform, dummy_reg, dummy_user, dummy_personal_token, test_client, auth, url):
     if auth == 'guest':
@@ -57,7 +58,8 @@ def test_unauthorized(dummy_event, dummy_regform, dummy_reg, dummy_user, dummy_p
             # missing scope on the token, so being a manager should not grant access
             dummy_event.update_principal(dummy_user, full_access=True)
 
-    url = url.format(event_id=dummy_event.id, regform_id=dummy_regform.id, reg_id=dummy_reg.id)
+    url = url.format(event_id=dummy_event.id, regform_id=dummy_regform.id,
+                     reg_id=dummy_reg.id, ticket_uuid=dummy_reg.ticket_uuid)
     resp = test_client.get(url, headers=headers)
     assert 'error' in resp.json
     assert resp.status_code == 403
@@ -90,6 +92,9 @@ def test_event_registrations(snapshot, dummy_event, dummy_regform, auth_headers,
 def test_event_registration_details(snapshot, dummy_event, dummy_regform, dummy_reg, auth_headers, test_client):
     resp = test_client.get(f'/api/checkin/event/{dummy_event.id}/forms/{dummy_regform.id}/registrations/{dummy_reg.id}',
                            headers=auth_headers)
+    _assert_successful_request(snapshot, resp, 'checkin_registration_details')
+
+    resp = test_client.get(f'/api/checkin/ticket/{dummy_reg.ticket_uuid}', headers=auth_headers)
     _assert_successful_request(snapshot, resp, 'checkin_registration_details')
 
 
