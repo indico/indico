@@ -17,6 +17,7 @@ import {PrincipalType} from 'indico/react/components/principals/util';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import {snakifyKeys} from 'indico/utils/case';
+import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import {Translate} from '../i18n';
 
@@ -26,7 +27,7 @@ import {PrincipalItem} from './principals/items';
 import './PersonLinkField.module.scss';
 
 const PersonListItem = ({
-  person: {avatarURL, name, affiliation, email},
+  person,
   roles,
   canEdit,
   canDelete,
@@ -36,16 +37,19 @@ const PersonListItem = ({
   disabled,
 }) => (
   <PrincipalItem as={List.Item} styleName="principal">
-    <PrincipalItem.Icon type={PrincipalType.user} avatarURL={avatarURL} styleName="icon" />
+    <PrincipalItem.Icon type={PrincipalType.user} avatarURL={person.avatarURL} styleName="icon" />
     <PrincipalItem.Content
-      name={name}
-      detail={(email ? `${email} ` : '') + (affiliation ? `(${affiliation})` : '')}
+      name={person.name}
+      detail={
+        (person.email ? `${person.email} ` : '') +
+        (person.affiliation ? `(${person.affiliation})` : '')
+      }
     />
     <div styleName="roles">
       {roles &&
-        roles.map(({name: roleName, label, icon, active}, idx) => (
+        roles.map(({name, label, icon, active}, idx) => (
           <Popup
-            key={roleName}
+            key={name}
             trigger={
               <Label
                 as="a"
@@ -63,13 +67,14 @@ const PersonListItem = ({
         ))}
     </div>
     <div styleName="actions">
+      {renderPluginComponents('personListItemActions', {person, onEdit, disabled})}
       {canEdit && (
         <Icon
           styleName="button edit"
           name="pencil alternate"
           title={Translate.string('Edit person')}
           size="large"
-          onClick={onEdit}
+          onClick={() => onEdit('details')}
           disabled={disabled}
         />
       )}
@@ -180,7 +185,7 @@ const PersonLinkSection = ({
               onMove={moveItem}
               person={p}
               onDelete={() => onChange(persons.filter((__, i) => i !== idx))}
-              onEdit={() => onEdit(idx)}
+              onEdit={scope => onEdit(idx, scope)}
               onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
               canDelete={canDelete}
               canEdit={canEdit}
@@ -236,7 +241,7 @@ function PersonLinkField({
   validateEmailUrl,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState('');
   const [selected, setSelected] = useState(null);
   const sections = roles.filter(x => x.section);
   const sectionKeys = new Set(sections.map(x => x.name));
@@ -245,12 +250,12 @@ function PersonLinkField({
 
   const onClose = () => {
     setSelected(null);
-    setModalOpen(false);
+    setModalOpen('');
   };
 
-  const onEdit = idx => {
+  const onEdit = (idx, scope) => {
     setSelected(idx);
-    setModalOpen(true);
+    setModalOpen(scope);
   };
 
   const formatName = ({firstName, lastName}) => {
@@ -319,7 +324,7 @@ function PersonLinkField({
                 label={plural || label}
                 persons={filtered}
                 defaultRoles={roles}
-                onEdit={idx => onEdit(persons.findIndex(p => p === filtered[idx]))}
+                onEdit={(idx, scope) => onEdit(persons.findIndex(p => p === filtered[idx]), scope)}
                 onChange={values =>
                   onChange(persons.filter(p => !filterCondition(p)).concat(values))
                 }
@@ -334,7 +339,7 @@ function PersonLinkField({
               label={sections.length > 0 ? Translate.string('Others') : undefined}
               persons={others}
               defaultRoles={roles}
-              onEdit={idx => onEdit(persons.findIndex(p => p === others[idx]))}
+              onEdit={(idx, scope) => onEdit(persons.findIndex(p => p === others[idx]), scope)}
               onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
               canEdit={canEnterManually}
             />
@@ -376,12 +381,12 @@ function PersonLinkField({
             disabled={!sessionUser}
           />
           {canEnterManually && (
-            <Button type="button" onClick={() => setModalOpen(true)}>
+            <Button type="button" onClick={() => setModalOpen('details')}>
               <Icon name="keyboard" />
               <Translate>Enter manually</Translate>
             </Button>
           )}
-          {modalOpen && (
+          {modalOpen === 'details' && (
             <PersonDetailsModal
               onClose={onClose}
               onSubmit={onSubmit}
@@ -391,6 +396,14 @@ function PersonLinkField({
               validateEmailUrl={validateEmailUrl}
             />
           )}
+          {selected !== null &&
+            renderPluginComponents('personLinkFieldModals', {
+              persons,
+              selected,
+              onChange,
+              onClose,
+              modalOpen,
+            })}
         </Button.Group>
       </DndProvider>
     </div>
@@ -464,6 +477,7 @@ export function WTFPersonLinkField({
         'type',
         'personId',
         'avatarURL',
+        ..._.flatten(getPluginObjects('personLinkCustomFields')),
       ])
     );
     inputField.value = JSON.stringify(
