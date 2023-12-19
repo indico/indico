@@ -43,6 +43,7 @@ class BookingEditForm extends React.Component {
     booking: PropTypes.object.isRequired,
     formProps: PropTypes.object.isRequired,
     onBookingPeriodChange: PropTypes.func,
+    onExtraFieldsChange: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
     bookingReasonRequired: PropTypes.string.isRequired,
   };
@@ -63,7 +64,16 @@ class BookingEditForm extends React.Component {
       newEndTime.isAfter(initialEndTime)
     );
   };
-
+/*
+  addExtraFields = (extraFields) => {
+    debugger
+     const {
+      formProps: {
+        form,
+        values: {extraFields},
+      },
+    } = this.props;
+  }*/
   recurrenceTypeChanged = newType => {
     const {
       booking: {startDt},
@@ -385,7 +395,9 @@ class BookingEditForm extends React.Component {
             disabled={submitSucceeded}
           />
         </Segment>
-        {renderPluginComponents('rb-form-extra_fields', {})}
+        {renderPluginComponents('rb-form-extra_fields', {room: room, booking: this.props.booking, onSubmit: (item) => {
+          this.props.onExtraFieldsChange(item);
+        }})}
 
         {room.canUserViewInternalNotes && (
           <Segment inverted styleName="internal-notes-segment">

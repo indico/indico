@@ -77,6 +77,7 @@ class BookingEdit extends React.Component {
       willBookingSplit: false,
       calendars: null,
       timelineError: null,
+      extraFields: null,
     };
   }
 
@@ -189,7 +190,7 @@ class BookingEdit extends React.Component {
       numberOfConflicts,
       numberOfCandidates,
       isLoading,
-      timelineError,
+      timelineError
     } = this.state;
     const conflictingBooking = numberOfConflicts > 0 && !skipConflicts;
     const submitBlocked =
@@ -215,6 +216,7 @@ class BookingEdit extends React.Component {
                 booking={booking}
                 formProps={fprops}
                 onBookingPeriodChange={this.updateBookingCalendar}
+                onExtraFieldsChange={(extraFields) => this.setState({extraFields})}
               />
             </Grid.Column>
             <Grid.Column stretched={!timelineError}>
@@ -333,6 +335,7 @@ class BookingEdit extends React.Component {
       room_id: roomId,
       user,
       reason: reason || undefined,
+      extra_fields: this.state.extraFields,
       internal_note: internalNote,
     };
     if (isAdminOverrideEnabled) {

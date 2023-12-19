@@ -9,7 +9,7 @@ import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
@@ -115,6 +115,7 @@ class BookRoomModal extends React.Component {
     bookingConflictsVisible: false,
     booking: null,
     selectedEvent: null,
+    extraFields: null,
   };
 
   componentDidMount() {
@@ -242,6 +243,7 @@ class BookRoomModal extends React.Component {
       data.linkType = _.snakeCase(link.type);
       data.linkId = link.id;
     }
+    data.extraFields = this.state.extraFields;
     const rv = await createBooking(data, this.props);
     if (rv.error) {
       return rv.error;
@@ -626,7 +628,7 @@ class BookRoomModal extends React.Component {
                     required={requireReason}
                   />
                 </Segment>
-                {renderPluginComponents('rb-form-extra_fields', {})}
+                {renderPluginComponents('rb-form-extra_fields', {room: room, onSubmit: (item) => {this.setState({extraFields: item})}})}
                 {!link &&
                   !fprops.submitSucceeded &&
                   this.renderRelatedEventsDropdown(
@@ -709,7 +711,7 @@ class BookRoomModal extends React.Component {
           validate={values => validate(values, requireReason)}
           decorators={[formDecorator]}
           render={renderModalContent}
-          initialValues={{user: null, linkBack}}
+          initialValues={{user: null, linkBack, extraFields: null}}
           subscription={{
             submitSucceeded: true,
             submitError: true,
@@ -747,7 +749,7 @@ export default connect(
         fetchRelatedEvents: actions.fetchRelatedEvents,
         resetRelatedEvents: actions.resetRelatedEvents,
         createBooking: (data, props) => {
-          const {reason, internalNote, usage, user, linkType, linkId, linkBack} = data;
+          const {reason, internalNote, usage, user, linkType, linkId, linkBack, extraFields} = data;
           const {
             bookingData: {recurrence, dates, recurrenceWeekdays, timeSlot, isPrebooking},
             room,
@@ -768,6 +770,7 @@ export default connect(
               linkId,
               linkBack,
               isPrebooking,
+              extraFields
             },
             isAdminOverrideEnabled
           );
