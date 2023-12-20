@@ -22,6 +22,11 @@ import {$T} from 'indico/utils/i18n';
     const cachedEvents = {};
     const container = document.querySelector(containerCalendarSelector);
     const calendar = new Calendar(container, {
+      headerToolbar: {
+        start: 'prev,next today',
+        center: 'title',
+        end: 'dayGridMonth,dayGridWeek,dayGridDay',
+      },
       plugins: [dayGridPlugin],
       initialView: 'dayGridMonth',
       timeZone: tz,
