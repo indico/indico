@@ -581,8 +581,10 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                  .filter(Event.starts_between(self.start_dt, self.end_dt),
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
-                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id')))
+                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'category_id', 'own_venue_id')))
         events = self._get_event_data(query)
+        raw_categories = Category.query.options(load_only('id', 'title')).all()
+        categories = [{'title': c.title, 'id': c.id} for c in raw_categories]
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
                                   ~Event.is_deleted,
@@ -591,7 +593,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
                           .order_by(Event.title)
                           .all())
-        return jsonify_data(flash=False, events=events, ongoing_event_count=len(ongoing_events),
+        return jsonify_data(flash=False, events=events, categories=categories, ongoing_event_count=len(ongoing_events),
                             ongoing_events_html=self._render_ongoing_events(ongoing_events))
 
     def _get_event_data(self, event_query):
@@ -602,9 +604,11 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
-                          'url': event.url}
+                          'url': event.url,
+                          'categoryId': event.category_id,
+                          'venueId': event.own_venue_id}
             colors = CALENDAR_COLOR_PALETTE[category_id % len(CALENDAR_COLOR_PALETTE)]
-            event_data.update({'textColor': '#' + colors.text, 'color': '#' + colors.background})
+            event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
         return data
 

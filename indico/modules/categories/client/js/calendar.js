@@ -14,12 +14,13 @@ import {$T} from 'indico/utils/i18n';
 
 (function(global) {
   global.setupCategoryCalendar = function setupCategoryCalendar(
-    containerSelector,
+    containerCalendarSelector,
+    containerLegendSelector,
     tz,
     categoryURL
   ) {
     const cachedEvents = {};
-    const container = document.querySelector(containerSelector);
+    const container = document.querySelector(containerCalendarSelector);
     const calendar = new Calendar(container, {
       plugins: [dayGridPlugin],
       initialView: 'dayGridMonth',
@@ -43,7 +44,7 @@ import {$T} from 'indico/utils/i18n';
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
           successCallback(data.events);
-          const toolbarGroup = $(containerSelector).find(
+          const toolbarGroup = $(containerCalendarSelector).find(
             '.fc-toolbar .fc-toolbar-chunk:last-child'
           );
           const ongoingEventsInfo = $('<a>', {
@@ -74,10 +75,34 @@ import {$T} from 'indico/utils/i18n';
           }
         }
 
+        function updateLegend(data) {
+          const categoryMap = data.categories.reduce((acc, value) => ({
+            ...acc,
+            [value.id]: value.title,
+          }), {});
+          const usedCategories = new Set();
+          const categories = data.events
+            .reduce((acc, value) => {
+              if (usedCategories.has(value.categoryId)) {
+                return acc;
+              }
+              usedCategories.add(value.categoryId);
+              return [
+                ...acc,
+                { title: categoryMap[value.categoryId], color: value.textColor },
+              ];
+            }, [])
+            .sort((a, b) => a.title.localeCompare(b.title));
+            $(containerLegendSelector).append(
+              categories.map(({title, color}) => $('<p>').text(title))
+            );
+        }
+
         start = start.toISOString().substring(0, 10);
         end = end.toISOString().substring(0, 10);
         const key = `${start}-${end}`;
         if (cachedEvents[key]) {
+          updateLegend(cachedEvents[key]);
           updateCalendar(cachedEvents[key]);
         } else {
           $.ajax({
@@ -87,6 +112,7 @@ import {$T} from 'indico/utils/i18n';
             contentType: 'application/json',
             complete: IndicoUI.Dialogs.Util.progress(),
             success(data) {
+              updateLegend(data);
               updateCalendar(data);
               cachedEvents[key] = data;
             },
