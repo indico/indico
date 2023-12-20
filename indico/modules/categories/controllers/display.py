@@ -581,7 +581,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                  .filter(Event.starts_between(self.start_dt, self.end_dt),
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
-                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'category_id', 'own_venue_id')))
+                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id')))
         events = self._get_event_data(query)
         raw_categories = Category.query.options(load_only('id', 'title')).all()
         categories = [{'title': c.title, 'id': c.id} for c in raw_categories]
