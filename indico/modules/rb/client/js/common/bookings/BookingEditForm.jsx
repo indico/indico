@@ -51,6 +51,7 @@ class BookingEditForm extends React.Component {
   static defaultProps = {
     onBookingPeriodChange: () => {},
     hideOptions: {},
+    onExtraFieldsChange: () => null,
   };
 
   showApprovalWarning = (dirtyFields, initialValues, values) => {
@@ -64,16 +65,7 @@ class BookingEditForm extends React.Component {
       newEndTime.isAfter(initialEndTime)
     );
   };
-/*
-  addExtraFields = (extraFields) => {
-    debugger
-     const {
-      formProps: {
-        form,
-        values: {extraFields},
-      },
-    } = this.props;
-  }*/
+
   recurrenceTypeChanged = newType => {
     const {
       booking: {startDt},
@@ -175,6 +167,7 @@ class BookingEditForm extends React.Component {
       formProps,
       hideOptions,
       bookingReasonRequired,
+      onExtraFieldsChange,
     } = this.props;
     const {
       values: {dates, recurrence, timeSlot, usage},
@@ -395,9 +388,13 @@ class BookingEditForm extends React.Component {
             disabled={submitSucceeded}
           />
         </Segment>
-        {renderPluginComponents('rb-form-extra_fields', {room: room, booking: this.props.booking, onSubmit: (item) => {
-          this.props.onExtraFieldsChange(item);
-        }})}
+        {renderPluginComponents('rb-form-extra_fields', {
+          room,
+          booking: this.props.booking,
+          onSubmit: item => {
+            onExtraFieldsChange(item);
+          },
+        })}
 
         {room.canUserViewInternalNotes && (
           <Segment inverted styleName="internal-notes-segment">

@@ -190,7 +190,7 @@ class BookingEdit extends React.Component {
       numberOfConflicts,
       numberOfCandidates,
       isLoading,
-      timelineError
+      timelineError,
     } = this.state;
     const conflictingBooking = numberOfConflicts > 0 && !skipConflicts;
     const submitBlocked =
@@ -216,7 +216,7 @@ class BookingEdit extends React.Component {
                 booking={booking}
                 formProps={fprops}
                 onBookingPeriodChange={this.updateBookingCalendar}
-                onExtraFieldsChange={(extraFields) => this.setState({extraFields})}
+                onExtraFieldsChange={extraFields => this.setState({extraFields})}
               />
             </Grid.Column>
             <Grid.Column stretched={!timelineError}>
@@ -326,6 +326,7 @@ class BookingEdit extends React.Component {
       isAdminOverrideEnabled,
     } = this.props;
     const [repeatFrequency, repeatInterval] = serializeRecurrenceInfo(recurrence);
+    const {extraFields} = this.state;
     const params = {
       start_dt: `${startDate} ${startTime}`,
       end_dt: `${endDate ? endDate : startDate} ${endTime}`,
@@ -335,7 +336,7 @@ class BookingEdit extends React.Component {
       room_id: roomId,
       user,
       reason: reason || undefined,
-      extra_fields: this.state.extraFields,
+      extra_fields: extraFields,
       internal_note: internalNote,
     };
     if (isAdminOverrideEnabled) {

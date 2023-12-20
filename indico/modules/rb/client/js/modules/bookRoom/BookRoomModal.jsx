@@ -9,7 +9,7 @@ import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
@@ -243,7 +243,8 @@ class BookRoomModal extends React.Component {
       data.linkType = _.snakeCase(link.type);
       data.linkId = link.id;
     }
-    data.extraFields = this.state.extraFields;
+    const {extraFields} = this.state;
+    data.extraFields = extraFields;
     const rv = await createBooking(data, this.props);
     if (rv.error) {
       return rv.error;
@@ -628,7 +629,14 @@ class BookRoomModal extends React.Component {
                     required={requireReason}
                   />
                 </Segment>
-                {renderPluginComponents('rb-form-extra_fields', {room: room, onSubmit: (item) => {this.setState({extraFields: item})}})}
+                {renderPluginComponents('rb-form-extra_fields', {
+                  room,
+                  onSubmit: item => {
+                    this.setState({
+                      extraFields: item,
+                    });
+                  },
+                })}
                 {!link &&
                   !fprops.submitSucceeded &&
                   this.renderRelatedEventsDropdown(
@@ -770,7 +778,7 @@ export default connect(
               linkId,
               linkBack,
               isPrebooking,
-              extraFields
+              extraFields,
             },
             isAdminOverrideEnabled
           );
