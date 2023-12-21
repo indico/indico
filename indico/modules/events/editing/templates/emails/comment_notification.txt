@@ -1,11 +1,17 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% block subject -%}{% trans %}New comment{% endtrans %}{%- endblock %}
+{% set title = contribution.verbose_title %}
+
+{% block subject -%}
+    {% trans %}New comment on contribution {{ title }}{% endtrans %}
+{%- endblock %}
 
 {% block body_text -%}
 {% if author_name -%}
-    {% trans name=author_name %}{{ name }} has posted a new comment.{% endtrans %}
+    {% trans %}{{ author_name }} has posted a new comment on contribution {{ title }}:{% endtrans %}
 {%- else -%}
-    {% trans %}Someone has posted a new comment.{% endtrans %}
+    {% trans %}Someone has posted a new comment on contribution {{ title }}.{% endtrans %}
 {%- endif %}
-{% endblock %}
+
+{{ text }}
+{%- endblock %}

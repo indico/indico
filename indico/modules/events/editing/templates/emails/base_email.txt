@@ -4,6 +4,7 @@
 
 {% block body -%}
 {% block body_text %}{% endblock %}
+
 {% trans %}You can view details on the following URL:{% endtrans %}
 {{ timeline_url }}
 {%- endblock %}

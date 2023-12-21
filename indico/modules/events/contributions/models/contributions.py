@@ -485,7 +485,10 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
 
     @property
     def verbose_title(self):
-        return f'#{self.friendly_id} ({self.title})'
+        if self.code:
+            return f'#{self.friendly_id} ({self.code} - {self.title})'
+        else:
+            return f'#{self.friendly_id} ({self.title})'
 
     @property
     def paper(self):
