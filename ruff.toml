@@ -81,7 +81,6 @@ ignore = [
     'PLW1514', # we expect UTF8 environments everywhere
     'PLW1641', # false positives with SA comparator classes
     'PLW2901', # noisy and reassigning to the loop var is usually intentional
-    'PLW3201', # TODO remove after updating to ruff>=1.0.7
     'TRY002',  # super noisy, and those exceptions are pretty exceptional anyway
     'TRY003',  # super noisy and also useless w/ werkzeugs http exceptions
     'TRY200',  # possibly useful but too noisy (also see B904)
@@ -145,8 +144,7 @@ classmethod-decorators = [
 convention = 'pep257'
 
 [pylint]
-# TODO enable after updating to ruff>=1.0.7
-# allow-dunder-method-names = ['__table_args__', '__tablename__', '__clause_element__']
+allow-dunder-method-names = ['__table_args__', '__tablename__', '__clause_element__']
 
 [per-file-ignores]
 # signals use wildcard imports to expose everything in `indico.core.signals`

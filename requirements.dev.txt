@@ -196,7 +196,7 @@ requests==2.31.0
     #   -c requirements.txt
     #   plantweb
     #   sphinx
-ruff==0.1.7
+ruff==0.1.8
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
     # via migra
@@ -279,7 +279,7 @@ werkzeug==3.0.1
     #   -c requirements.txt
     #   flask
     #   pytest-localserver
-wheel==0.41.3
+wheel==0.42.0
     # via pip-tools
 zipp==3.17.0
     # via
