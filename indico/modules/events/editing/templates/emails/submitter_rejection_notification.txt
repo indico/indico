@@ -11,7 +11,9 @@
 {% trans %}Contribution: {{ title }}{% endtrans %}
 {%- if text %}
 
-{% trans -%}{{ submitter_name }} also left a comment:{%- endtrans %}
+{% trans name=submitter_name -%}
+    {{ name }} also left a comment:
+{%- endtrans %}
 {{ text }}
 {%- endif %}
 {% endblock %}
