@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-12-23 11:22+0100\n"
+"POT-Creation-Date: 2023-12-23 19:19+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -744,7 +744,7 @@ msgid "Are you sure you want to reset the review?"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewComment.jsx:55
-#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:249
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:254
 #: indico/modules/users/client/js/PersonalDataForm.jsx:159
 #: indico/modules/users/client/js/ProfilePicture.jsx:207
 msgid "Save changes"
@@ -2035,7 +2035,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:240
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:258
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:758
-#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:252
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:257
 #: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:86
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
@@ -2360,7 +2360,7 @@ msgid "Accompanying persons count against registration limit"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:107
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:39
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:43
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:383
 #: indico/web/client/js/react/components/syncedInputs.jsx:176
 #: indico/web/client/js/react/forms/validators.js:58
@@ -2487,58 +2487,58 @@ msgstr ""
 msgid "Time format"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:50
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:54
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:223
 msgid "Checking email address..."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:62
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:66
 msgid "There is already a registration with this email address."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:64
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:68
 msgid "The user associated with this email address is already registered."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:66
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:70
 msgid "There is no Indico user associated with this email address."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:71
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:75
 msgid "This email address is not associated with your Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:74
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:78
 msgid "The registration will be re-associated to a different user ({name})."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:82
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:86
 msgid "The registration will be disassociated from the current user ({name})."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:90
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:94
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:292
 msgid "The domain used in the email address does not exist."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:92
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:96
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:294
 msgid "This email address is invalid."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:95
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:99
 msgid "The registration will not be associated with any Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:97
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:101
 msgid "The registration will be associated with your Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:100
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:104
 msgid "The registration will remain associated with the Indico account {name}."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:107
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:111
 msgid "The registration will be associated with the Indico account {name}."
 msgstr ""
 
@@ -3078,17 +3078,17 @@ msgstr ""
 msgid "This booking has already started."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:272
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:277
 msgid "Conflicts with new booking"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:274
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:279
 msgid "Your new booking conflicts with another one."
 msgid_plural "{count} occurrences of your booking are unavailable due to conflicts."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:288
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:293
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:216
 msgid "I understand, please skip any days with conflicting occurrences."
 msgstr ""

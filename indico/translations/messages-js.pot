@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-05 11:22+0100\n"
+"POT-Creation-Date: 2023-12-21 19:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -567,7 +567,7 @@ msgid "Clear search"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
+msgid "You selected category \"{0}\". Are you sure you want to proceed?"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23
