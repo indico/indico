@@ -67,6 +67,7 @@ the user object and the event is passed in the `event` kwarg.
 ''')
 
 personal_data = _signals.signal('personal-data', '''
-Expected to return extra data for the user personal data page.
-The *sender* is the user object.
+Called when rendering the user personal data page,
+expected to get extra data for the use of the plugin.
+The *sender* is the class and the user object is passed in the `user` kwarg.
 ''')

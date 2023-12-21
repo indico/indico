@@ -213,7 +213,7 @@ class RHPersonalData(RHUserBase):
         if self.user.affiliation_link:
             current_affiliation = AffiliationSchema().dump(self.user.affiliation_link)
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
-        extra_data = values_from_signal(signals.users.personal_data.send(self.user), as_list=True)
+        extra_data = values_from_signal(signals.users.personal_data.send(self, user=self.user), as_list=True)
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values, locked_fields=locked_fields,
                                                   locked_field_message=multipass.locked_field_message,
