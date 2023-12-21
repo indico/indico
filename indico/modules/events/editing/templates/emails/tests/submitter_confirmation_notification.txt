@@ -3,9 +3,6 @@ Dear John Doe,
 Your revision changes have been confirmed by Jane Doe.
 Contribution: #1 (Dummy Contribution)
 
-Jane Doe also left a comment:
-Great last changes
-
 You can view details on the following URL:
 http://localhost/timeline-url
 

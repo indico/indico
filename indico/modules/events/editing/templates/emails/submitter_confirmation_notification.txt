@@ -11,6 +11,7 @@
     Your revision changes have been confirmed by {{ name }}.
 {%- endtrans %}
 {% trans %}Contribution: {{ title }}{% endtrans %}
+
 {%- if text %}
 
 {% trans name=submitter_name -%}
@@ -18,4 +19,4 @@
 {%- endtrans %}
 {{ text }}
 {%- endif %}
-{% endblock %}
+{%- endblock %}

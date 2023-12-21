@@ -11,4 +11,4 @@
     {{ name }} has uploaded a new revision to an editable you are editor of.
 {% endtrans %}
 Contribution: {{ title }}
-{% endblock %}
+{%- endblock %}

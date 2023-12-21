@@ -25,5 +25,5 @@
 
 {% trans %}{{ name }} also left a comment:{% endtrans %}
 {{ text }}
-{% endif %}
+{%- endif %}
 {%- endblock %}

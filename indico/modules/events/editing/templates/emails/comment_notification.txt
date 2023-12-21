@@ -14,4 +14,4 @@
 {%- endif %}
 
 {{ text }}
-{% endblock %}
+{%- endblock %}
