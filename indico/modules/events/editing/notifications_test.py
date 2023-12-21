@@ -10,17 +10,17 @@ from pathlib import Path
 
 import pytest
 
+from indico.testing.util import assert_email_snapshot
 from indico.web.flask.templating import get_template_module
 
 
 def _assert_snapshot(snapshot, template_name, has_comment=False, **context):
     __tracebackhide__ = True
     template = get_template_module(f'events/editing/emails/{template_name}', **context)
-    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
     name, ext = os.path.splitext(template_name)
     comment_suffix = '_comment' if has_comment else ''
-    snapshot_name = f'{name}{comment_suffix}{ext}'
-    snapshot.assert_match(template.get_body(), snapshot_name)
+    snapshot.snapshot_dir = Path(__file__).parent / 'templates/emails/tests'
+    assert_email_snapshot(snapshot, template, f'{name}{comment_suffix}{ext}')
 
 
 @pytest.mark.parametrize('has_comment', (False, True))
