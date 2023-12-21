@@ -5,11 +5,13 @@
 {% block subject -%}{% trans %}Submitter rejected changes on contribution {{ title }}{% endtrans %}{%- endblock %}
 
 {% block body_text -%}
-{% trans name=submitter_name %}Your revision changes have been rejected by {{ name }} on contribution {{ title }}.{% endtrans %}
-{% if text -%}
-    {% trans linebreak='\n' -%}
-        {{ linebreak }}{{ submitter_name }} also left a comment:
-        {{ linebreak }}{{ text }}
-    {%- endtrans %}
+{% trans name=submitter_name -%}
+    Your revision changes have been rejected by {{ name }}.
+{%- endtrans %}
+{% trans %}Contribution: {{ title }}{% endtrans %}
+{%- if text %}
+
+{% trans -%}{{ submitter_name }} also left a comment:{%- endtrans %}
+{{ text }}
 {%- endif %}
 {% endblock %}

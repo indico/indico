@@ -1,8 +1,9 @@
 Dear John Doe,
 
-Jane Doe has made changes to an editable you are submitter of, on contribution #1 (Dummy Contribution).
-    
-Jane Doe also left a comment: 
+Jane Doe has made changes to an editable you are submitter of.
+Contribution: #1 (Dummy Contribution)
+
+Jane Doe also left a comment:
 Added 2 slides to the presentation
 
 You can view details on the following URL:

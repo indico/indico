@@ -1,6 +1,7 @@
 Dear John Doe,
 
-Jane Doe has uploaded a new revision to an editable you are editor of, for contribution #1 (Dummy Contribution).
+Jane Doe has uploaded a new revision to an editable you are editor of.
+Contribution: #1 (Dummy Contribution)
 
 You can view details on the following URL:
 http://localhost/timeline-url

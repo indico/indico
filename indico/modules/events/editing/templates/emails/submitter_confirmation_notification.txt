@@ -2,14 +2,18 @@
 
 {% set title = contribution.verbose_title %}
 
-{% block subject -%}{% trans %}Submitter confirmed changes for contribution {{ title }}{% endtrans %}{%- endblock %}
+{% block subject -%}
+    {% trans %}Submitter confirmed changes for contribution {{ title }}{% endtrans %}
+{%- endblock %}
 
 {% block body_text -%}
-{% trans name=submitter_name %}Your revision changes have been confirmed by {{ name }} on contribution {{ title }}.{% endtrans %}
-{% if text -%}
-    {% trans linebreak='\n' -%}
-        {{ linebreak }}{{ submitter_name }} also left a comment:
-        {{ linebreak }}{{ text }}
-    {%- endtrans %}
+{% trans name=submitter_name -%}
+    Your revision changes have been confirmed by {{ name }}.
+{%- endtrans %}
+{% trans %}Contribution: {{ title }}{% endtrans %}
+{%- if text %}
+
+{% trans -%}{{ submitter_name }} also left a comment:{%- endtrans %}
+{{ text }}
 {%- endif %}
 {% endblock %}

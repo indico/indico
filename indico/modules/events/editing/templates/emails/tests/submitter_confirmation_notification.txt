@@ -1,8 +1,9 @@
 Dear John Doe,
 
-Your revision changes have been confirmed by Jane Doe on contribution #1 (Dummy Contribution).
+Your revision changes have been confirmed by Jane Doe.
+Contribution: #1 (Dummy Contribution)
 
-Jane Doe also left a comment: 
+Jane Doe also left a comment:
 Great last changes
 
 You can view details on the following URL:
