@@ -40,6 +40,7 @@ function PersonalDataForm({
   lockedFields,
   lockedFieldMessage,
   hasPredefinedAffiliations,
+  extraData,
 }) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
 
@@ -155,6 +156,7 @@ function PersonalDataForm({
               syncedValues,
               lockedFields,
               lockedFieldMessage,
+              extraData,
             })}
             <FinalSubmitButton label={Translate.string('Save changes')} className="submit-button" />
           </Form>
@@ -178,11 +180,13 @@ PersonalDataForm.propTypes = {
   lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
   lockedFieldMessage: PropTypes.string.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
+  extraData: PropTypes.object,
 };
 
 PersonalDataForm.defaultProps = {
   userId: null,
   currentAffiliation: null,
+  extraData: null,
 };
 
 window.setupPersonalDataForm = function setupPersonalDataForm(
@@ -193,7 +197,8 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
   syncedValues,
   lockedFields,
   lockedFieldMessage,
-  hasPredefinedAffiliations
+  hasPredefinedAffiliations,
+  extraData
 ) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
@@ -206,6 +211,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
         lockedFields={lockedFields}
         lockedFieldMessage={lockedFieldMessage}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
+        extraData={extraData}
       />,
       document.querySelector('#personal-details-form-container')
     );

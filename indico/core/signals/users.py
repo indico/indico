@@ -65,3 +65,8 @@ favorite_event_removed = _signals.signal('favorite-event-removed', '''
 Called when a new event is removed from a user's favorites. The *sender* is
 the user object and the event is passed in the `event` kwarg.
 ''')
+
+personal_data = _signals.signal('personal-data', '''
+Expected to return extra data for the user personal data page.
+The *sender* is the user object.
+''')

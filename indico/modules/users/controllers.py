@@ -202,19 +202,24 @@ class RHExportDashboardICSLegacy(RHExportDashboardICS):
 class RHPersonalData(RHUserBase):
     allow_system_user = True
 
+    def get_titles(self):
+        return [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
+
     def _process(self):
-        titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
+        titles = self.get_titles()
         user_values = UserPersonalDataSchema().dump(self.user)
         locked_fields = [] if session.user.is_admin else list(multipass.locked_fields)
         current_affiliation = None
         if self.user.affiliation_link:
             current_affiliation = AffiliationSchema().dump(self.user.affiliation_link)
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+        extra_data = values_from_signal(signals.users.personal_data.send(self.user), as_list=True)
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values, locked_fields=locked_fields,
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
-                                                  has_predefined_affiliations=has_predefined_affiliations)
+                                                  has_predefined_affiliations=has_predefined_affiliations,
+                                                  extra_data=extra_data[0] if extra_data else None)
 
 
 class RHUserDataExport(RHUserBase):
