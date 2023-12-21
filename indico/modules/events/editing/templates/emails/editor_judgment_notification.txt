@@ -1,7 +1,7 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% set title=contribution.verbose_title %}
-{% set name=editor_name if editor_name else 'Someone' %}
+{% set title = contribution.verbose_title %}
+{% set name = editor_name or _('Someone') %}
 {% block subject -%}{% trans %}New editor judgment for contribution {{ title }}{% endtrans %}{%- endblock %}
 
 {% block body_text -%}

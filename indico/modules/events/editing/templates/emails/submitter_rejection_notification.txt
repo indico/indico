@@ -1,6 +1,6 @@
 {% extends 'events/editing/emails/base_email.txt' %}
 
-{% set title=contribution.verbose_title %}
+{% set title = contribution.verbose_title %}
 
 {% block subject -%}{% trans %}Submitter rejected changes on contribution {{ title }}{% endtrans %}{%- endblock %}
 
