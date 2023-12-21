@@ -617,7 +617,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'creationDate': self._serialize_date(event.created_dt),
             'creator': self._serialize_person(event.creator, person_type='Avatar', can_manage=can_manage),
             'hasAnyProtection': event.effective_protection_mode != ProtectionMode.public,
-            'roomMapURL': event.room.map_url if event.room else None,
+            'roomMapURL': event.map_url,
             'folders': build_folders_api_data(event),
             'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair', can_manage=can_manage),
             'material': material_data,
