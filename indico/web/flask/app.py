@@ -362,7 +362,7 @@ def add_plugin_blueprints(app):
 
 def canonicalize_url():
     url_root = request.url_root.rstrip('/')
-    if config.BASE_URL != url_root:
+    if url_root != config.BASE_URL:
         Logger.get('flask').info('Received request with invalid url root for %s', request.url)
         return render_template('bad_url_error.html'), 404
 

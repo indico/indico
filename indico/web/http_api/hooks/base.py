@@ -169,7 +169,7 @@ class HTTPAPIHook:
 
     def __call__(self, user):
         """Perform the actual exporting."""
-        if self.HTTP_POST != (request.method == 'POST'):
+        if (request.method == 'POST') != self.HTTP_POST:
             # XXX: this should never happen, since HTTP_POST is only used within /api/,
             # where the flask url rule requires POST
             raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), 405)

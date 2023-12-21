@@ -69,7 +69,6 @@ ignore = [
     'SIM108',  # noisy ternary
     'SIM114',  # sometimes separate ifs are more readable (especially if they just return a bool)
     'SIM117',  # nested context managers may be more readable
-    'SIM300',  # https://github.com/astral-sh/ruff/issues/6956
     'PLC0415', # local imports are there for a reason
     'PLR09',   # too-many-<whatever> is just noisy
     'PLR0913', # very noisy
