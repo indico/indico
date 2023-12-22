@@ -186,7 +186,7 @@ PersonalDataForm.propTypes = {
 PersonalDataForm.defaultProps = {
   userId: null,
   currentAffiliation: null,
-  extraData: null,
+  extraData: {},
 };
 
 window.setupPersonalDataForm = function setupPersonalDataForm(
