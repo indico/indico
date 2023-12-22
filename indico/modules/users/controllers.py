@@ -221,7 +221,7 @@ class RHPersonalData(RHUserBase):
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations,
-                                                  extra_data=extra_data if extra_data else None)
+                                                  extra_data=extra_data)
 
 
 class RHUserDataExport(RHUserBase):
