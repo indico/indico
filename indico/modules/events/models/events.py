@@ -402,7 +402,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event)
     # - all_legacy_attachment_mappings (LegacyAttachmentMapping.event)
     # - all_notes (EventNote.event)
-    # - all_room_reservation_links (ReservationLink.event)
+    # - all_room_reservation_occurrence_links (ReservationOccurrenceLink.event)
     # - all_vc_room_associations (VCRoomEventAssociation.event)
     # - attachment_folders (AttachmentFolder.linked_event)
     # - clones (Event.cloned_from)
@@ -436,7 +436,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - reminders (EventReminder.event)
     # - requests (Request.event)
     # - roles (EventRole.event)
-    # - room_reservation_links (ReservationLink.linked_event)
+    # - room_reservation_occurrence_links (ReservationOccurrenceLink.linked_event)
     # - session_types (SessionType.event)
     # - sessions (Session.event)
     # - settings (EventSetting.event)
@@ -1049,10 +1049,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def cfp(self):
         from indico.modules.events.papers.models.call_for_papers import CallForPapers
         return CallForPapers(self)
-
-    @property
-    def reservations(self):
-        return [link.reservation for link in self.all_room_reservation_links]
 
     @property
     def has_ended(self):

@@ -10,7 +10,7 @@ from operator import itemgetter
 from babel.dates import get_timezone
 from flask import session
 from marshmallow import ValidationError, fields, post_dump, post_load, validate, validates, validates_schema
-from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
+from marshmallow.fields import Boolean, Date, DateTime, Function, List, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 
@@ -28,8 +28,8 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink, ReservationState
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceLink
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationState
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
@@ -152,6 +152,7 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
 class ReservationLinkedObjectDataSchema(mm.Schema):
     id = Number()
     title = Method('_get_title')
+    url = Function(lambda obj: obj.url)
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
     own_room_id = Number()
@@ -171,15 +172,30 @@ class ReservationUserEventSchema(mm.Schema):
     end_dt = DateTime()
 
 
+class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
+    id = Number()
+    type = EnumField(LinkType, attribute='link_type')
+    object = Nested(ReservationLinkedObjectDataSchema)
+    start_dt = Function(lambda link: NaiveDateTime().get_value(link.reservation_occurrence, 'start_dt'))
+
+    class Meta:
+        model = ReservationOccurrenceLink
+        fields = ('id', 'type', 'object', 'start_dt')
+
+
 class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
     state = EnumField(ReservationState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
+    # HACK: getattr is used since in BookRoomModal occurrence doesn't yet have a link attribute
+    is_linked_to_object = Function(lambda occurrence: bool(getattr(occurrence, 'link', False)))
+    link = Nested(ReservationOccurrenceLinkSchema)
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state',
+                  'is_linked_to_object', 'link')
 
 
 class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
@@ -217,15 +233,6 @@ class ReservationEditLogSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
-class ReservationLinkSchema(mm.SQLAlchemyAutoSchema):
-    type = EnumField(LinkType, attribute='link_type')
-    id = Function(lambda link: link.object.id)
-
-    class Meta:
-        model = ReservationLink
-        fields = ('type', 'id')
-
-
 class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
@@ -237,8 +244,8 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     can_reject = Function(lambda booking: booking.can_reject(session.user))
     permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
-    is_linked_to_object = Function(lambda booking: booking.link is not None)
-    link = Nested(ReservationLinkSchema)
+    is_linked_to_objects = Function(lambda booking: bool(booking.links))
+    links = List(Nested(ReservationOccurrenceLinkSchema))
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -247,7 +254,7 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note',
+                  'is_linked_to_objects', 'links', 'state', 'external_details_url', 'internal_note',
                   'recurrence_weekdays')
 
     def _get_permissions(self, booking):
@@ -572,6 +579,7 @@ concurrent_pre_bookings_schema = ReservationConcurrentOccurrenceSchema(many=True
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_linked_object_data_schema = ReservationLinkedObjectDataSchema()
+reservation_occurrence_link_schema = ReservationOccurrenceLinkSchema()
 reservation_user_event_schema = ReservationUserEventSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))

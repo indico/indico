@@ -47,7 +47,7 @@ import {
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 
 import * as bookingsActions from './actions';
-import LazyBookingObjectLink from './LazyBookingObjectLink';
+import LazyBookingLinks from './LazyBookingLinks';
 import * as bookingsSelectors from './selectors';
 
 import './BookingDetails.module.scss';
@@ -860,8 +860,7 @@ class BookingDetails extends React.Component {
         canEdit,
         isAccepted,
         newBookingId,
-        isLinkedToObject,
-        link,
+        isLinkedToObjects,
         externalDetailsURL,
         recurrenceWeekdays,
       },
@@ -918,9 +917,7 @@ class BookingDetails extends React.Component {
                   {bookedForUser && this.renderBookedFor(bookedForUser)}
                   {bookingReason && this.renderReason(bookingReason)}
                   {room.canUserViewInternalNotes && this.renderNotes(internalNote)}
-                  {isLinkedToObject && (
-                    <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
-                  )}
+                  {isLinkedToObjects && <LazyBookingLinks id={id} />}
                   {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                   {this.renderMessages(error, newBookingId)}
                 </>

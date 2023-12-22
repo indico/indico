@@ -35,6 +35,7 @@ from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.iterables import materialize_iterable
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify
+from indico.web.flask.util import url_for
 
 
 def _get_next_friendly_id(context):
@@ -371,7 +372,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
     # - editables (Editable.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - note (EventNote.contribution)
-    # - room_reservation_links (ReservationLink.contribution)
+    # - room_reservation_occurrence_links (ReservationOccurrenceLink.contribution)
     # - timetable_entry (TimetableEntry.contribution)
     # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
 
@@ -544,6 +545,10 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
                 session_coordinator_priv_enabled(self.event, 'manage-contributions')):
             return True
         return False
+
+    @property
+    def url(self):
+        return url_for('contributions.display_contribution', self)
 
     def can_edit(self, user):
         # Submitters can edit their own contributions if configured

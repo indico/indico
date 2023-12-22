@@ -3,10 +3,10 @@
 {% set ok_text=_("Delete events") %}
 
 {% set confirmation_message %}
-    {% if num_bookings %}
+    {% if num_booking_occurrences %}
         {% trans strong='<strong>'|safe, endstrong='</strong>'|safe -%}
             Please note that if you delete the events you will lose all the information contained in them,
-            {{ strong }}including {{ num_bookings }} Room Booking(s){{ endstrong }}.
+            {{ strong }}including {{ num_booking_occurrences }} Room Booking Occurrences(s){{ endstrong }}.
             This operation is irreversible!
         {%- endtrans %}
     {% else %}

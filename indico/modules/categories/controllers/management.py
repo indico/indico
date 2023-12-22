@@ -37,7 +37,7 @@ from indico.modules.events import Event
 from indico.modules.events.notifications import notify_move_request_closure, notify_move_request_creation
 from indico.modules.events.operations import create_event_request
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
-from indico.modules.rb.models.reservations import Reservation, ReservationLink
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceLink
 from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -428,15 +428,14 @@ class RHDeleteEvents(RHManageCategorySelectedEventsBase):
     def _process(self):
         is_submitted = 'confirmed' in request.form
         if not is_submitted:
-            # find out which active bookings are linked to the events in question
-            num_bookings = (Reservation.query
-                            .join(ReservationLink)
-                            .join(Event, Event.id == ReservationLink.linked_event_id)
-                            .filter(Event.id.in_(e.id for e in self.events),
-                                    Reservation.is_pending | Reservation.is_accepted)
-                            .count())
+            # find out which active booking occurrences are linked to the events in question
+            num_booking_occurrences = (ReservationOccurrence.query
+                                       .join(ReservationOccurrenceLink)
+                                       .join(Event, Event.id == ReservationOccurrenceLink.linked_event_id)
+                                       .filter(Event.id.in_(e.id for e in self.events), ReservationOccurrence.is_valid)
+                                       .count())
             return jsonify_template('events/management/delete_events.html',
-                                    events=self.events, num_bookings=num_bookings)
+                                    events=self.events, num_booking_occurrences=num_booking_occurrences)
         for ev in self.events[:]:
             ev.delete('Bulk-deleted by category manager', session.user)
         flash(ngettext('You have deleted one event', 'You have deleted {} events', len(self.events))

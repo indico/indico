@@ -32,8 +32,8 @@ from indico.modules.rb.operations.bookings import (get_active_bookings, get_book
                                                    has_same_slots, should_split_booking, split_booking)
 from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
-                                       reservation_linked_object_data_schema, reservation_occurrences_schema,
-                                       reservation_user_event_schema)
+                                       reservation_linked_object_data_schema, reservation_occurrence_link_schema,
+                                       reservation_occurrences_schema, reservation_user_event_schema)
 from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
                                     group_by_occurrence_date, is_booking_start_within_grace_period,
@@ -157,7 +157,8 @@ class RHCreateBooking(RHRoomBookingBase):
         obj = get_linked_object(type_, id_)
         if obj is None or not obj.event.can_manage(session.user):
             return
-        booking.linked_object = obj
+        for occurrence in booking.occurrences:
+            occurrence.linked_object = obj
         if link_back:
             obj.inherit_location = False
             obj.room = self.room
@@ -282,6 +283,21 @@ class RHLinkedObjectData(RHRoomBookingBase):
         if not self.linked_object or not self.linked_object.can_access(session.user):
             return jsonify(can_access=False)
         return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object))
+
+
+class RHBookingLinksData(RHRoomBookingBase):
+    """Fetch data from event, contribution or session block."""
+
+    def _process_args(self):
+        booking_id = request.view_args['booking_id']
+        self.booking = Reservation.query.filter_by(id=booking_id).one()
+
+    def _process(self):
+        links = []
+        for occ in self.booking.occurrences:
+            if occ.link and occ.link.object.can_access(session.user):
+                links += [reservation_occurrence_link_schema.dump(occ.link)]
+        return jsonify(links=links)
 
 
 class RHBookingEditCalendars(RHBookingBase):

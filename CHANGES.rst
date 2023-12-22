@@ -92,6 +92,8 @@ Improvements
   (:issue:`5923`, :pr:`5925`, thanks :user:`kewisch`)
 - Add ``indico user delete`` CLI to attempt to permanently delete a user (:pr:`5838`)
 - Add ``indico user anonymize`` CLI to permanently anonymize a user (:pr:`5838`)
+- Add possibility to link room reservations to multiple events, session blocks
+  and contributions (:pr:`6114`, thanks :user:`omegak, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
