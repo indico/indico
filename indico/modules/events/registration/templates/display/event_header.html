@@ -1,11 +1,11 @@
 {% if regforms %}
     <div class="event-details-row">
-        <div class="event-details-label align-top">{% trans %}Registration{% endtrans %}</div>
+        <h2 class="event-details-label">{% trans %}Registration{% endtrans %}</h2>
         <div class="event-details-content">
             {% for regform in regforms %}
                 {% set registration = user_registrations[regform] %}
                 <div class="event-service-row">
-                    <div class="event-service-row-collapsed clearfix">
+                    <div class="event-service-row-collapsed">
                         <div class="event-service-info left">
                             <i class="icon-ticket"></i>
                             <span class="event-service-title">
@@ -78,12 +78,12 @@
 
 {% if published_registrations %}
     <div class="event-details-row">
-        <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
+        <h2 class="event-details-label">{% trans %}Participants{% endtrans %}</h2>
         <div class="event-details-content">
-            <div class="participant-list-wrapper">
-                <ul class="participant-list">
+            <ind-collapsible lines="3" collapsed class="participant-list-wrapper">
+                <ul class="participant-list" data-collapsible>
                     {%- for participant in published_registrations|sort(attribute='display_full_name') -%}
-                        <li class="ui image label meeting-participant {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %} checked-in {% endif %}">
+                        <li class="meeting-participant {% if participant.checked_in and participant.registration_form.publish_checkin_enabled %} checked-in {% endif %}">
                             {%- if not g.static_site -%}
                                 <img src="{{ participant.avatar_url }}" alt="">
                             {%- endif -%}
@@ -96,13 +96,17 @@
                         </li>
                     {%- endif -%}
                 </ul>
-                <a class="trigger icon-expand" title="{% trans %}See the full list{% endtrans %}"></a>
-            </div>
+                <ind-with-tooltip data-collapse-trigger>
+                    <button value="toggle-collapse">
+                        <span data-tip-content>{% trans %}Full participant list{% endtrans %}</span>
+                    </button>
+                </ind-with-tooltip>
+            </ind-collapsible>
         </div>
     </div>
 {% elif num_hidden_registrations %}
     <div class="event-details-row">
-        <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
+        <h2 class="event-details-label">{% trans %}Participants{% endtrans %}</h2>
         <div class="event-details-content">
             <span class="ui circular label">
                 {{ num_hidden_registrations }}

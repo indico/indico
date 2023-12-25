@@ -7,19 +7,19 @@
 <div class="event-details">
     {% if event.description %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}Description{% endtrans %}</div>
+            <h2 class="event-details-label">{% trans %}Description{% endtrans %}</h2>
             <div class="event-details-content">{{ render_description(event, class='event-description editor-output') }}</div>
         </div>
     {% endif %}
     {% if event.references and event.type_.name == "meeting" %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}External references{% endtrans %}</div>
+            <h2 class="event-details-label">{% trans %}External references{% endtrans %}</h2>
             <div class="event-details-content">{{ render_references(event) }}</div>
         </div>
     {% endif %}
     {% if files or folders %}
         <div class="event-details-row">
-            <div class="event-details-label icon-attachment inline-attachments-icon"></div>
+            <h2 class="event-details-label icon-attachment inline-attachments-icon"></h2>
             <div class="event-details-content material-list">
                 {{ render_attachments_folders(files=files, folders=folders) }}
             </div>
@@ -27,7 +27,7 @@
     {% endif %}
     {% if lectures %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}From the same series{% endtrans %}</div>
+            <h2 class="event-details-label">{% trans %}From the same series{% endtrans %}</h2>
             <div class="event-details-content">
                 {% for lecture in lectures %}
                     <a href="{{ lecture.url }}" class="lecture-series-link">{{ lecture.series_pos }}</a>
@@ -37,7 +37,7 @@
     {% endif %}
     {% if event.organizer_info %}
         <div class="event-details-row">
-            <div class="event-details-label">{% trans %}Organized by{% endtrans %}</div>
+            <h2 class="event-details-label">{% trans %}Organized by{% endtrans %}</h2>
             <div class="event-details-content">{{ event.organizer_info | markdown }}</div>
         </div>
     {% endif %}
@@ -46,7 +46,7 @@
 
     {% if event.contact_emails or event.contact_phones %}
         <div class="event-details-row">
-            <div class="event-details-label">{{ event.contact_title }}</div>
+            <h2 class="event-details-label">{{ event.contact_title }}</h2>
             <div class="event-details-content">
                 {% for email in event.contact_emails %}
                     <div>

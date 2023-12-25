@@ -111,6 +111,7 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
+- Add appropriate section headings to event details page (:pr:`6116`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -135,6 +136,7 @@ Internal Changes
 - Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
+- Add ``<ind-collapsible>`` custom element (:pr:`6116`, thanks :user:`foxbunny`)
 
 
 ----

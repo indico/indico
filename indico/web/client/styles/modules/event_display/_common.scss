@@ -8,6 +8,7 @@
 @use 'base' as *;
 @use 'partials/buttons' as *;
 @use 'partials/boxes' as *;
+@use 'design_system';
 
 #flashed-messages {
   &:empty {
@@ -173,5 +174,38 @@
   li {
     padding: 0.2em 1em 0.2em 0;
     background-color: $white;
+  }
+}
+
+div.event-details {
+  @extend %text-size-reset;
+  @extend %flex-column;
+  padding: 1em;
+
+  .event-details-row {
+    @extend %flex-row;
+    --flex-gap: 1em;
+    align-items: stretch;
+    margin-bottom: 0.5em;
+  }
+
+  .event-details-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    font-size: var(--text-size-rel-n); // FIXME: headings should be reset globally
+    flex: 1;
+    max-height: 2.4em;
+    min-width: 10em;
+    margin: 0;
+
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .event-details-content {
+    flex: 1000;
+    min-width: min(100%, 80ch);
   }
 }

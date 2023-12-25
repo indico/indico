@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 
 #event-note-section {
   @include border-bottom($gray);
@@ -149,27 +150,34 @@ li > table + .note-area-wrapper {
     display: none;
   }
 
-  ul.participant-list {
+  .participant-list {
     @include font-family-title();
 
-    padding: 0;
-    margin: 0 0 0 -0.2em;
+    padding: 0.3em 0; // XXX: match the boxed sections like Surveys or Registration
+    @extend %flex-row;
+
     list-style-type: none;
   }
-}
 
-.ui.image.label.meeting-participant {
-  @include font-family-modern-body();
-  font-weight: normal;
-  font-size: 0.95em;
+  .meeting-participant {
+    @include font-family-modern-body();
 
-  display: inline-block;
-  margin-bottom: 4px;
-  margin-left: 0.2em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--content-gap-normal);
+    padding-right: var(--content-gap-normal);
 
-  &.checked-in {
-    background: lighten($pastel-green, 30%);
-    color: darken($pastel-green, 20%);
+    background: var(--background-secondary);
+    border-radius: var(--control-border-radius);
+    overflow: hidden;
+
+    > img {
+      height: 2em;
+    }
+
+    &.checked-in {
+      background: lighten($pastel-green, 30%);
+    }
   }
 }
 

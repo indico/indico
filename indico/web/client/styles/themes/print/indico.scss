@@ -47,8 +47,7 @@ body {
 
 .timetable-duration,
 .dayList .day,
-.dayList .day-title,
-.participant-list-wrapper {
+.dayList .day-title {
   @include black-and-white();
 }
 

@@ -1,0 +1,58 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+
+ind-collapsible {
+  --collapsed-height: 'auto';
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+
+  [data-collapse-trigger] {
+    flex: none;
+  }
+
+  &:not([collapsible]) [data-collapse-trigger] {
+    display: none;
+  }
+
+  button[value='toggle-collapse'] {
+    @extend %button-clear;
+    padding: 0.3em;
+  }
+
+  button[value='toggle-collapse']::after {
+    display: inline-block;
+    @extend %icon;
+    @extend %icon-expand;
+  }
+
+  &:not([collapsed]) button[value='toggle-collapse']::after {
+    transform: rotate(180deg);
+  }
+
+  &[collapsible][collapsed]::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30%;
+
+    background-image: linear-gradient(to top, #fff, rgba(255, 255, 255, 0));
+  }
+
+  &[collapsed] [data-collapsible] {
+    max-height: var(--collapsed-height);
+    overflow: hidden;
+  }
+}
