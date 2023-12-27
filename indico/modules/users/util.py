@@ -33,11 +33,12 @@ from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
-from indico.modules.users.models.users import ProfilePictureSource
+from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.signals import make_interceptable
 from indico.util.string import crc32, remove_accents
 from indico.web.flask.util import send_file, url_for
 
@@ -180,6 +181,11 @@ def get_unlisted_events(user):
             .options(load_only('id', 'title', 'start_dt'))
             .order_by(Event.start_dt)
             .all())
+
+
+@make_interceptable
+def get_user_titles():
+    return [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
 
 
 def serialize_user(user):
