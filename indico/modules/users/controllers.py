@@ -48,7 +48,8 @@ from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_related_categories, get_suggested_categories, get_unlisted_events,
-                                       merge_users, search_users, send_avatar, serialize_user, set_user_avatar)
+                                       get_user_titles, merge_users, search_users, send_avatar, serialize_user,
+                                       set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
@@ -203,7 +204,7 @@ class RHPersonalData(RHUserBase):
     allow_system_user = True
 
     def _process(self):
-        titles = [{'name': t.name, 'title': t.title} for t in UserTitle if t != UserTitle.none]
+        titles = get_user_titles()
         user_values = UserPersonalDataSchema().dump(self.user)
         locked_fields = [] if session.user.is_admin else list(multipass.locked_fields)
         current_affiliation = None
