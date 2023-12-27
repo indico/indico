@@ -599,8 +599,7 @@ class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
         return str(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
 
     def _filter_registrations(self, registrations):
-        template_is_ticket = DesignerTemplate.get_or_404(self.template_id).is_ticket
-        return [r for r in registrations if not template_is_ticket or not r.is_ticket_blocked]
+        return [r for r in registrations if not r.is_ticket_blocked]
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):
