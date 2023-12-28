@@ -10,7 +10,11 @@
 import {Calendar} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import {$T} from 'indico/utils/i18n';
+import CalendarLegend from './components/CalendarLegend';
 
 (function(global) {
   global.setupCategoryCalendar = function setupCategoryCalendar(
@@ -80,6 +84,13 @@ import {$T} from 'indico/utils/i18n';
           }
         }
 
+        function setupCalendarLegend (items, container){
+          ReactDOM.render(
+            React.createElement(CalendarLegend, { items }),
+            container
+          );
+        }
+
         function updateLegend(data) {
           const categoryMap = data.categories.reduce((acc, value) => ({
             ...acc,
@@ -94,13 +105,16 @@ import {$T} from 'indico/utils/i18n';
               usedCategories.add(value.categoryId);
               return [
                 ...acc,
-                { title: categoryMap[value.categoryId], color: value.textColor },
+                {
+                  title: categoryMap[value.categoryId],
+                  textColor: value.textColor,
+                  color: value.color,
+                  id: value.categoryId
+                },
               ];
             }, [])
             .sort((a, b) => a.title.localeCompare(b.title));
-            $(containerLegendSelector).append(
-              categories.map(({title, color}) => $('<p>').text(title))
-            );
+          setupCalendarLegend(categories, document.getElementById(containerLegendSelector));
         }
 
         start = start.toISOString().substring(0, 10);

@@ -29,7 +29,7 @@
     <script>
         setupCategoryCalendar(
             '#event-calendar',
-            '#category-calendar-legend',
+            'category-calendar-legend',
             {{ category.display_tzinfo.zone | tojson }},
             {{ url_for('categories.calendar_events', category) | tojson }}
         );
