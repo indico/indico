@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 
 div.event-service-association-title {
   margin-bottom: 0.3em;
@@ -47,12 +48,11 @@ div.event-service-row {
   }
 
   & > .event-service-row-collapsed {
-    position: relative;
+    @extend %flex-split;
 
     & > .event-service-toolbar {
       margin-bottom: 0;
       padding: 0;
-      margin-right: 2em;
 
       .join-button {
         min-width: 5em;

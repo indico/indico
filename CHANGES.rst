@@ -111,6 +111,7 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
+- Improve font size and color contrast for event/conference description (:pr:`6118`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
