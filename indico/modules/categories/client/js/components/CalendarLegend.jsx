@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import './CalendarLegend.module.scss';
+import {Select} from "semantic-ui-react";
+import {Translate} from "indico/react/i18n";
 
 function LegendItem({title, color, textColor}) {
   return (
@@ -20,14 +22,23 @@ function LegendItem({title, color, textColor}) {
   );
 }
 
-function CalendarLegend({items}) {
-  console.log(items)
+function CalendarLegend({items, groupBy, onFilterChanged}) {
   const parsedItems = items.map(
     ({id, title, color, textColor}) => <LegendItem key={id} title={title} color={color} textColor={textColor} />
   );
+  const options = [
+    {text: Translate.string('Category'), value: 'category'},
+    {text: Translate.string('Location'), value: 'location'},
+  ];
   return (
     <div styleName="legend-container">
-      {parsedItems}
+      <span>{Translate.string('Display by:')}</span>
+      <Select
+        value={groupBy || 'category'}
+        options={options}
+        onChange={(event, data) => onFilterChanged(data.value)}
+      />
+      <div>{parsedItems}</div>
     </div>
   );
 }

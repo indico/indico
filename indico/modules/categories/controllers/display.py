@@ -11,6 +11,7 @@ from io import BytesIO
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
 from time import mktime
+from enum import Enum
 
 import dateutil
 from dateutil.parser import ParserError
@@ -30,6 +31,7 @@ from indico.modules.categories.controllers.util import (get_category_view_params
                                                         group_by_month, make_format_event_date_func,
                                                         make_happening_now_func, make_is_recent_func)
 from indico.modules.categories.models.categories import Category
+from indico.modules.rb.models.locations import Location
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
@@ -567,6 +569,10 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
 
 
 class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
+    class GroupBy(Enum):
+        category = 1
+        location = 2
+
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
         tz = self.category.display_tzinfo
@@ -574,6 +580,11 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
             self.start_dt = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
             self.end_dt = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
         except ParserError as e:
+            raise BadRequest(str(e))
+        group_by = request.args.get('groupBy', self.GroupBy.category.name)
+        try:
+            self.group_by = self.GroupBy[group_by]
+        except KeyError:
             raise BadRequest(str(e))
 
     def _process(self):
@@ -585,6 +596,8 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         events = self._get_event_data(query)
         raw_categories = Category.query.options(load_only('id', 'title')).all()
         categories = [{'title': c.title, 'id': c.id} for c in raw_categories]
+        raw_locations = Location.query.options(load_only('id', 'name')).all()
+        locations = [{'title': l.name, 'id': l.id} for l in raw_locations]
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
                                   ~Event.is_deleted,
@@ -593,21 +606,23 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
                           .order_by(Event.title)
                           .all())
-        return jsonify_data(flash=False, events=events, categories=categories, ongoing_event_count=len(ongoing_events),
+        return jsonify_data(flash=False, events=events, categories=categories, locations=locations,
+                            group_by=self.group_by.name,
+                            ongoing_event_count=len(ongoing_events),
                             ongoing_events_html=self._render_ongoing_events(ongoing_events))
 
     def _get_event_data(self, event_query):
         data = []
         tz = self.category.display_tzinfo
         for event in event_query:
-            category_id = event.category_id
+            comparison_id = event.category_id if self.group_by == self.GroupBy.category else event.own_venue_id or 0
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'url': event.url,
                           'categoryId': event.category_id,
                           'venueId': event.own_venue_id}
-            colors = CALENDAR_COLOR_PALETTE[category_id % len(CALENDAR_COLOR_PALETTE)]
+            colors = CALENDAR_COLOR_PALETTE[comparison_id % len(CALENDAR_COLOR_PALETTE)]
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
         return data

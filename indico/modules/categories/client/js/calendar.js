@@ -15,8 +15,10 @@ import ReactDOM from 'react-dom';
 
 import {$T} from 'indico/utils/i18n';
 import CalendarLegend from './components/CalendarLegend';
+import {Translate} from "indico/react/i18n";
 
 (function(global) {
+  let groupBy = 'category';
   global.setupCategoryCalendar = function setupCategoryCalendar(
     containerCalendarSelector,
     containerLegendSelector,
@@ -84,49 +86,69 @@ import CalendarLegend from './components/CalendarLegend';
           }
         }
 
-        function setupCalendarLegend (items, container){
+        function setupCalendarLegend(data, items, container){
+          const onFilterChanged = filterBy => {
+            groupBy = filterBy;
+            calendar.refetchEvents();
+          };
           ReactDOM.render(
-            React.createElement(CalendarLegend, { items }),
+            React.createElement(CalendarLegend, { items, groupBy: data.group_by, onFilterChanged }),
             container
           );
         }
 
-        function updateLegend(data) {
-          const categoryMap = data.categories.reduce((acc, value) => ({
+        function setupLegendByAttribute(events, items, attr, defaultTitle) {
+          const itemMap = items.reduce((acc, {id, title}) => ({
             ...acc,
-            [value.id]: value.title,
+            [id]: title ?? defaultTitle,
           }), {});
-          const usedCategories = new Set();
-          const categories = data.events
+          const usedItems = new Set();
+          return events
             .reduce((acc, value) => {
-              if (usedCategories.has(value.categoryId)) {
+              const id = value[attr] ?? 0;
+              if (usedItems.has(id)) {
                 return acc;
               }
-              usedCategories.add(value.categoryId);
+              usedItems.add(id);
               return [
                 ...acc,
                 {
-                  title: categoryMap[value.categoryId],
+                  title: itemMap[id] ?? defaultTitle,
                   textColor: value.textColor,
                   color: value.color,
-                  id: value.categoryId
+                  id
                 },
               ];
             }, [])
             .sort((a, b) => a.title.localeCompare(b.title));
-          setupCalendarLegend(categories, document.getElementById(containerLegendSelector));
+        }
+
+        function updateLegend(data) {
+          let items;
+          switch (data.group_by) {
+            case 'category':
+              items = setupLegendByAttribute(data.events, data.categories, 'categoryId', Translate.string('No category'))
+              break;
+            case 'location':
+              items = setupLegendByAttribute(data.events, data.locations, 'venueId', Translate.string('No location'));
+              break;
+            default:
+              items = [];
+              break;
+          }
+          setupCalendarLegend(data, items, document.getElementById(containerLegendSelector));
         }
 
         start = start.toISOString().substring(0, 10);
-        end = end.toISOString().substring(0, 10);
-        const key = `${start}-${end}`;
+        end = end.toISOString().substring(0, 10);;
+        const key = `${start}-${end}-${groupBy}`;
         if (cachedEvents[key]) {
           updateLegend(cachedEvents[key]);
           updateCalendar(cachedEvents[key]);
         } else {
           $.ajax({
             url: categoryURL,
-            data: {start, end},
+            data: {start, end, groupBy},
             dataType: 'json',
             contentType: 'application/json',
             complete: IndicoUI.Dialogs.Util.progress(),
