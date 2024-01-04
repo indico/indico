@@ -6,12 +6,12 @@
 # LICENSE file for more details.
 
 from datetime import date, datetime, time, timedelta
+from enum import Enum
 from functools import partial
 from io import BytesIO
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
 from time import mktime
-from enum import Enum
 
 import dateutil
 from dateutil.parser import ParserError
@@ -31,7 +31,6 @@ from indico.modules.categories.controllers.util import (get_category_view_params
                                                         group_by_month, make_format_event_date_func,
                                                         make_happening_now_func, make_is_recent_func)
 from indico.modules.categories.models.categories import Category
-from indico.modules.rb.models.locations import Location
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
@@ -39,6 +38,7 @@ from indico.modules.categories.views import WPCategory, WPCategoryCalendar
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
+from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table
 from indico.util.date_time import format_date, format_number, now_utc
@@ -584,7 +584,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         group_by = request.args.get('groupBy', self.GroupBy.category.name)
         try:
             self.group_by = self.GroupBy[group_by]
-        except KeyError:
+        except KeyError as e:
             raise BadRequest(str(e))
 
     def _process(self):
@@ -595,9 +595,9 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                  .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id')))
         events = self._get_event_data(query)
         raw_categories = Category.query.options(load_only('id', 'title')).all()
-        categories = [{'title': c.title, 'id': c.id} for c in raw_categories]
+        categories = [{'title': cat.title, 'id': cat.id} for cat in raw_categories]
         raw_locations = Location.query.options(load_only('id', 'name')).all()
-        locations = [{'title': l.name, 'id': l.id} for l in raw_locations]
+        locations = [{'title': loc.name, 'id': loc.id} for loc in raw_locations]
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
                                   ~Event.is_deleted,
