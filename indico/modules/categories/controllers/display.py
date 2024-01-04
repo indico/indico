@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from datetime import date, datetime, time, timedelta
-from enum import Enum
+from enum import Enum, auto
 from functools import partial
 from io import BytesIO
 from itertools import chain, groupby
@@ -17,6 +17,7 @@ import dateutil
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
+from marshmallow_enum import EnumField
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from webargs import fields, validate
@@ -570,21 +571,18 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
 
 class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
     class GroupBy(Enum):
-        category = 1
-        location = 2
+        category = auto()
+        location = auto()
 
-    def _process_args(self):
+    @use_kwargs({'group_by': EnumField(GroupBy, load_default='category')}, location='query')
+    def _process_args(self, group_by):
         RHDisplayCategoryBase._process_args(self)
         tz = self.category.display_tzinfo
+        self.group_by = group_by
         try:
             self.start_dt = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
             self.end_dt = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
         except ParserError as e:
-            raise BadRequest(str(e))
-        group_by = request.args.get('groupBy', self.GroupBy.category.name)
-        try:
-            self.group_by = self.GroupBy[group_by]
-        except KeyError as e:
             raise BadRequest(str(e))
 
     def _process(self):

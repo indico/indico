@@ -9,13 +9,13 @@
 
 import {Calendar} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import {Translate} from 'indico/react/i18n';
 import {$T} from 'indico/utils/i18n';
+
 import CalendarLegend from './components/CalendarLegend';
-import {Translate} from "indico/react/i18n";
 
 (function(global) {
   let groupBy = 'category';
@@ -86,22 +86,25 @@ import {Translate} from "indico/react/i18n";
           }
         }
 
-        function setupCalendarLegend(data, items, container){
+        function setupCalendarLegend(data, items, legendContainer) {
           const onFilterChanged = filterBy => {
             groupBy = filterBy;
             calendar.refetchEvents();
           };
           ReactDOM.render(
-            React.createElement(CalendarLegend, { items, groupBy: data.group_by, onFilterChanged }),
-            container
+            React.createElement(CalendarLegend, {items, groupBy: data.group_by, onFilterChanged}),
+            legendContainer
           );
         }
 
         function setupLegendByAttribute(events, items, attr, defaultTitle) {
-          const itemMap = items.reduce((acc, {id, title}) => ({
-            ...acc,
-            [id]: title ?? defaultTitle,
-          }), {});
+          const itemMap = items.reduce(
+            (acc, {id, title}) => ({
+              ...acc,
+              [id]: title ?? defaultTitle,
+            }),
+            {}
+          );
           const usedItems = new Set();
           return events
             .reduce((acc, value) => {
@@ -116,7 +119,7 @@ import {Translate} from "indico/react/i18n";
                   title: itemMap[id] ?? defaultTitle,
                   textColor: value.textColor,
                   color: value.color,
-                  id
+                  id,
                 },
               ];
             }, [])
@@ -127,10 +130,20 @@ import {Translate} from "indico/react/i18n";
           let items;
           switch (data.group_by) {
             case 'category':
-              items = setupLegendByAttribute(data.events, data.categories, 'categoryId', Translate.string('No category'))
+              items = setupLegendByAttribute(
+                data.events,
+                data.categories,
+                'categoryId',
+                Translate.string('No category')
+              );
               break;
             case 'location':
-              items = setupLegendByAttribute(data.events, data.locations, 'venueId', Translate.string('No location'));
+              items = setupLegendByAttribute(
+                data.events,
+                data.locations,
+                'venueId',
+                Translate.string('No location')
+              );
               break;
             default:
               items = [];
@@ -140,7 +153,7 @@ import {Translate} from "indico/react/i18n";
         }
 
         start = start.toISOString().substring(0, 10);
-        end = end.toISOString().substring(0, 10);;
+        end = end.toISOString().substring(0, 10);
         const key = `${start}-${end}-${groupBy}`;
         if (cachedEvents[key]) {
           updateLegend(cachedEvents[key]);
@@ -148,7 +161,7 @@ import {Translate} from "indico/react/i18n";
         } else {
           $.ajax({
             url: categoryURL,
-            data: {start, end, groupBy},
+            data: {start, end, group_by: groupBy},
             dataType: 'json',
             contentType: 'application/json',
             complete: IndicoUI.Dialogs.Util.progress(),

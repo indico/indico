@@ -7,24 +7,30 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import './CalendarLegend.module.scss';
-import {Select} from "semantic-ui-react";
-import {Translate} from "indico/react/i18n";
+import {Select} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
 
 function LegendItem({title, color, textColor}) {
   return (
     <div styleName="legend-item">
-      <div styleName="color-square" style={{ backgroundColor: color }}></div>
+      <div styleName="color-square" style={{backgroundColor: color}} />
       <span style={{color: textColor}}>{title}</span>
     </div>
   );
 }
 
+LegendItem.propTypes = {
+  title: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  textColor: PropTypes.string.isRequired,
+};
+
 function CalendarLegend({items, groupBy, onFilterChanged}) {
-  const parsedItems = items.map(
-    ({id, title, color, textColor}) => <LegendItem key={id} title={title} color={color} textColor={textColor} />
-  );
+  const parsedItems = items.map(({id, title, color, textColor}) => (
+    <LegendItem key={id} title={title} color={color} textColor={textColor} />
+  ));
   const options = [
     {text: Translate.string('Category'), value: 'category'},
     {text: Translate.string('Location'), value: 'location'},
@@ -44,10 +50,8 @@ function CalendarLegend({items, groupBy, onFilterChanged}) {
 
 CalendarLegend.propTypes = {
   items: PropTypes.array.isRequired,
-};
-
-CalendarLegend.defaultProps = {
-  items: [],
+  groupBy: PropTypes.string.isRequired,
+  onFilterChanged: PropTypes.func.isRequired,
 };
 
 export default CalendarLegend;
