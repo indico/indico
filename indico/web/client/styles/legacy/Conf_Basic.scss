@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+
 /*
         Default Styles and layout for Conf-pages
         Do not custom this CSS
@@ -282,9 +284,17 @@ li.over ul {
 /* ------Misc------ */
 
 .conferenceDetails .description {
-  color: #777;
-  font-size: 1.2em;
+  color: var(--text-color); // TODO: should be fixed at the <body> level
   margin: 1em 0 2em 0;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: inherit; // TODO: Override the style in _conferences.scss, needs to be refactored
+  }
 }
 
 table.conferenceDetails td {

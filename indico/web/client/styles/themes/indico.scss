@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base' as *;
+@use 'design_system';
 
 $indico-theme-color: #1a63a0;
 $header-bg-color: $indico-theme-color !default;
@@ -259,7 +260,6 @@ div.event-header {
   }
 
   @include font-family-modern-body();
-  color: $light-black;
 }
 
 // Meeting Timetable-specific
@@ -554,7 +554,7 @@ ul.day-list {
 .event-sub-header {
   border-radius: 0 0 2px 2px;
   @include drop-shadow();
-  @include font-family-title-light();
+  @include font-family-body();
 
   background: white;
   font-size: 12px;
@@ -654,19 +654,23 @@ a.lecture-series-link {
 }
 
 div.event-details {
+  padding: 2em 2em 1em 1em;
   font-size: 1.1em;
 
   .event-details-row {
     display: flex;
     align-items: flex-start;
     margin-bottom: 0.5em;
+    gap: 1em;
   }
 
   .event-details-label {
     width: 120px;
-    text-align: right;
-    font-weight: bold;
     margin-right: 1em;
+    padding-top: 1em;
+
+    font-weight: bold;
+    text-align: right;
 
     &.align-top {
       align-self: flex-start;
@@ -675,6 +679,8 @@ div.event-details {
 
   .event-details-content {
     flex: 1;
+    font-size: 1.143rem; // TODO: fix font sizes globally
+    color: var(--text-color);
   }
 }
 

@@ -34,6 +34,7 @@
   h6 {
     margin: 1em 0 0.5em;
     font: inherit;
+    color: inherit;
   }
 
   h1 {
@@ -94,6 +95,7 @@
 
   table {
     width: 100%;
+    border: 0;
     border-collapse: collapse;
   }
 
@@ -103,6 +105,8 @@
 
   th,
   td {
+    border-left: 0;
+    border-right: 0;
     border-top: var(--table-border-width) solid var(--table-border-color);
     border-bottom: var(--table-border-width) solid var(--table-border-color);
     padding: 0.5em 0.2em;
@@ -126,7 +130,8 @@
 
   blockquote {
     padding: 0.2em 0 0.2em 1em;
-    border-left: 2px solid var(--container-separator-color);
+    border-left: 0.2em solid var(--container-separator-color);
+    background: var(--surface-alt);
   }
 
   blockquote p:last-child {
@@ -135,5 +140,9 @@
 
   a {
     @extend %link;
+  }
+
+  > :first-child {
+    margin-top: 0;
   }
 }

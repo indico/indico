@@ -2,7 +2,7 @@
     {% set vc_room = event_vc_room.vc_room %}
     {% set plugin = vc_room.plugin %}
     <div class="event-service-row">
-        <div class="event-service-row-collapsed clearfix">
+        <div class="event-service-row-collapsed">
             <div class="event-service-info event-service-row-toggle trigger left">
                 <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
                 <span class="event-service-title">{{ vc_room.name }}</span>
@@ -24,7 +24,7 @@
             {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
         {% else %}
             <div class="event-service-row">
-                <div class="event-service-row-collapsed conference clearfix">
+                <div class="event-service-row-collapsed conference">
                     <div class="event-service-info left">
                         <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
                         <span class="event-service-title">{{ vc_room.name }}</span>
