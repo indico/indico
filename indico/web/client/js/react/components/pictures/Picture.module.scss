@@ -31,10 +31,11 @@
 
   .picture-selection-btn {
     max-width: none !important;
+    margin-right: 22px !important;
+  }
 
-    &:last-of-type {
-      margin-left: 22px !important;
-    }
+  .last-picture-selection-btn {
+    margin-left: 22px !important;
   }
 }
 

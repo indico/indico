@@ -131,7 +131,7 @@ export function PictureArea({
                         />
                       </>
                     ) : (
-                      <Grid columns={2} verticalAlign="middle" celled="internally" centered>
+                      <Grid columns={2} verticalAlign="middle" celled="internally">
                         <Grid.Column>
                           <Button
                             type="button"
@@ -149,7 +149,7 @@ export function PictureArea({
                               <span>
                                 <Button
                                   type="button"
-                                  styleName="picture-selection-btn"
+                                  styleName="picture-selection-btn last-picture-selection-btn"
                                   icon={captureButtonIcon}
                                   content={captureButtonText}
                                   onClick={() => onOpenCameraDialog()}

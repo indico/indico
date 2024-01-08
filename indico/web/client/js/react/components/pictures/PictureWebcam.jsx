@@ -22,16 +22,16 @@ export function PictureWebcam({
   backAction,
   minSize,
 }) {
-  const [userMediaStarted, setUserMediaStarted] = useState(false);
+  const [userMediaActive, setUserMediaActive] = useState(false);
   height = Math.max(height, minSize) + 100;
   width = Math.max(height, minSize) + 100;
   return (
     <>
-      {!userMediaStarted && (
+      {!userMediaActive && (
         <Icon styleName="loading-overlay" loading name="spinner" size="huge" color="grey" />
       )}
       <div
-        styleName={userMediaStarted ? 'picture-outer-div show' : 'picture-outer-div hidden'}
+        styleName={userMediaActive ? 'picture-outer-div show' : 'picture-outer-div hidden'}
         onClick={onCapture}
       >
         <div styleName="picture-inner-div">
@@ -44,12 +44,12 @@ export function PictureWebcam({
             height={height}
             width={width}
             screenshotFormat="image/png"
-            onUserMedia={() => setUserMediaStarted(true)}
             onUserMediaError={onUserMediaError}
+            onUserMedia={() => setUserMediaActive(true)}
             mirrored
           />
           <p>
-            <Translate>click anywhere on the image to take a picture</Translate>
+            <Translate>Click anywhere on the image to take a picture</Translate>
           </p>
           <Icon
             styleName="back"

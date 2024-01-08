@@ -301,12 +301,14 @@ const PictureManager = ({
   } else if (initialPictureDetails !== null && value === initialPictureDetails.uuid) {
     picture = initialPictureDetails;
   }
+
   let pictureAction = null;
   if (failed || uploadFinished) {
     pictureAction = {onClick: reset, icon: 'undo'};
   } else if (isInitialPicture && !required) {
     pictureAction = {onClick: clear, icon: 'x', color: 'red'};
   }
+
   useEffect(() => {
     if (!setValidationError) {
       return;
@@ -330,16 +332,19 @@ const PictureManager = ({
     isCameraAllowed,
     onOpenCameraDialog,
   };
+
   const cropper = {
     pictureCropper: Cropper,
     isEditActive: isEditing,
   };
+
   const descriptionText = minPictureSize
     ? Translate.string(
         'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (.jpg, .png, .gif, .webp)',
         {minPictureSize}
       )
     : Translate.string('Allowed file types: .jpg, .png, .gif');
+
   return (
     <PictureArea
       dropzone={dropzone}

@@ -16,7 +16,7 @@ import 'cropperjs/dist/cropper.css';
 import './Picture.module.scss';
 
 export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize}) {
-  const size = Math.max(minCropSize, 500) + 200;
+  const size = Math.max(minCropSize, 400) + 200;
   return (
     <div styleName="picture-outer-div">
       <div styleName="picture-inner-div cropper-inner-div" style={{width: size}}>
