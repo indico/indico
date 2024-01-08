@@ -1,4 +1,4 @@
-# 
+#
 # Translators:
 # Michito <crossner90@gmail.com>, 2019
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2022
@@ -7,7 +7,7 @@
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2023
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2023
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2023
-# 
+#
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2023-07-23 12:29+0200\n"
@@ -872,7 +872,7 @@ msgstr[1] ""
 msgstr[2] ""
 "Nie ma plików do publikacji. Proszę załadować plik jednego z typów: {types}"
 msgstr[3] ""
-"Nie ma plików do publikacji. Proszę załadować plik jednego z typów:  {types}"
+"Nie ma plików do publikacji. Proszę załadować plik jednego z typów: {types}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/judgment/UpdateFilesForm.jsx:129
 msgid "There is no publishable file uploaded."
@@ -1102,9 +1102,7 @@ msgstr "Odrzucone"
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:164
 #: indico/modules/events/editing/client/js/models.js:53
 msgid "Needs submitter changes"
-msgstr ""
-"Potrzebne zmiany składającego"
-"                                                                                                                                                                "
+msgstr "Potrzebne zmiany składającego"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:170
 #: indico/modules/events/editing/client/js/models.js:50
@@ -1543,9 +1541,7 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:137
 msgid "There are no tags defined for this event"
-msgstr ""
-"Brak tagów określonych dla tego wydarzenia"
-"                                                    "
+msgstr "Brak tagów określonych dla tego wydarzenia"
 
 #: indico/modules/events/editing/client/js/management/tags/TagManager.jsx:147
 msgid "Add new tag"
@@ -1597,9 +1593,7 @@ msgstr "Redagowanie posterów"
 
 #: indico/modules/events/editing/client/js/models.js:66
 msgid "Get next paper"
-msgstr ""
-"Pobierz następny artykuł"
-"                                                             "
+msgstr "Pobierz następny artykuł"
 
 #: indico/modules/events/editing/client/js/models.js:67
 msgid "Get next poster"
@@ -2879,7 +2873,7 @@ msgstr "Składuję..."
 
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:45
 msgid "Configure section \"{section}\""
-msgstr "Skonfiguruj sekcję  \"{section}\""
+msgstr "Skonfiguruj sekcję \"{section}\""
 
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:49
 msgid "Add new section"
@@ -4066,10 +4060,10 @@ msgstr "Obecnie nieużywany"
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:56
 msgid "Used in {count}1{/count} room"
 msgid_plural "Used in {count} rooms"
-msgstr[0] "Użyty w  {count} pokoju"
-msgstr[1] "Użyty w  {count} pokojach"
-msgstr[2] "Użyty w  {count} pokojach"
-msgstr[3] "Użyty w  {count} pokojach"
+msgstr[0] "Użyty w {count} pokoju"
+msgstr[1] "Użyty w {count} pokojach"
+msgstr[2] "Użyty w {count} pokojach"
+msgstr[3] "Użyty w {count} pokojach"
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:84
 msgid "Hidden"
@@ -4085,7 +4079,7 @@ msgid_plural "It is currently used in {count} rooms."
 msgstr[0] "Obecnie używany w {count}1{/count} pokoju."
 msgstr[1] "Obecnie używany w {count} pokojach."
 msgstr[2] "Obecnie używany w {count} pokojach."
-msgstr[3] "Obecnie używany w  {count} pokojach."
+msgstr[3] "Obecnie używany w {count} pokojach."
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:127
 msgid "Add attribute"
@@ -4102,13 +4096,13 @@ msgstr "Dodaj kategorię"
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:41
 msgid "This equipment type provides the {name} feature."
-msgstr "Ten typ sprzętu dostarcza cechy  {name}"
+msgstr "Ten typ sprzętu dostarcza cechy {name}"
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:52
 msgid "Available in {count}1{/count} room"
 msgid_plural "Available in {count} rooms"
 msgstr[0] "Dostępny w {count}1{/count} pokoju"
-msgstr[1] "Dostępny w  {count} pokojach"
+msgstr[1] "Dostępny w {count} pokojach"
 msgstr[2] "Available in {count} pokojach"
 msgstr[3] "Dostępny w {count} pokojach"
 
@@ -4340,7 +4334,7 @@ msgid_plural "Missing placeholders: {placeholders}"
 msgstr[0] "Brakujący symbol zastępczy: {placeholders}"
 msgstr[1] "Brakujące symbole zastępcze: {placeholders}"
 msgstr[2] "Brakujące symbole zastępcze: {placeholders}"
-msgstr[3] "Brakujące symbole zastępcze:  {placeholders}"
+msgstr[3] "Brakujące symbole zastępcze: {placeholders}"
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:155
 msgid "Max. booking length"
@@ -4749,7 +4743,7 @@ msgstr "Przydziel pokój {room} dla tego wydarzenia"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
 msgid "Assign the room {room} to this contribution"
-msgstr "Przydziel pokój  {room} dla tej kontrybucji"
+msgstr "Przydziel pokój {room} dla tej kontrybucji"
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:491
 msgid "Assign the room {room} to this session block"
@@ -5532,7 +5526,7 @@ msgid_plural "Search requires at least {count} characters"
 msgstr[0] "Wyszukanie wymaga co najmniej {count} znaku"
 msgstr[1] "Wyszukanie wymaga co najmniej {count} znaków"
 msgstr[2] "Wyszukanie wymaga co najmniej {count} znaków"
-msgstr[3] "Wyszukanie wymaga co najmniej  {count} znaków"
+msgstr[3] "Wyszukanie wymaga co najmniej {count} znaków"
 
 #: indico/web/client/js/react/components/files/FileArea.jsx:25
 msgid "{size} bytes"
@@ -5637,7 +5631,7 @@ msgid_plural "{total} favorites"
 msgstr[0] "{total} ulubiona"
 msgstr[1] "{total} ulubionych"
 msgstr[2] "{total} ulubionych"
-msgstr[3] "{total}  ulubionych"
+msgstr[3] "{total} ulubionych"
 
 #: indico/web/client/js/react/components/principals/Search.jsx:539
 msgid "Family name"
@@ -5828,7 +5822,7 @@ msgstr "Wartość może wynieść co najwyżej {maxValue}"
 
 #: indico/web/client/js/react/forms/validators.js:46
 msgid "Value must be at least {length} chars"
-msgstr "Wartość musi zawierać przynajmniej  {length} znaków"
+msgstr "Wartość musi zawierać przynajmniej {length} znaków"
 
 #: indico/web/client/js/utils/palette.js:29
 msgid "Red"

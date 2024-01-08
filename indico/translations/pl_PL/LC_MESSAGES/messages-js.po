@@ -1,7 +1,7 @@
 # Translations template for indico.
 # Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# 
+#
 # Translators:
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2018,2020
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
@@ -40,7 +40,7 @@ msgstr "Brak dostępu"
 
 #: indico/modules/attachments/client/js/legacy.js:160
 msgid "This file is protected. You will be redirected to the login page."
-msgstr "Ten plik jest chroniony.  Zostaniesz przekierowany na stronę logowania."
+msgstr "Ten plik jest chroniony. Zostaniesz przekierowany na stronę logowania."
 
 #: indico/modules/attachments/client/js/legacy.js:233
 msgid "Manage material"
@@ -56,7 +56,7 @@ msgstr "Dziś"
 
 #: indico/modules/categories/client/js/calendar.js:50
 msgid "Events happening on {0}"
-msgstr "Wydarzenia o  {0}"
+msgstr "Wydarzenia o {0}"
 
 #: indico/modules/categories/client/js/calendar.js:62
 msgid "{0} long-lasting event not shown"
@@ -244,7 +244,7 @@ msgstr "Błąd!"
 msgid ""
 "Your Indico server is not synchronized with the Community Hub! You can solve"
 " this <a href=\"{0}\">here</a>."
-msgstr "Twój serwer Indico nie jest zsynchronizowany z portalem społecznościowym!  Możesz to rozwiązać <a href=\"{0}\">tutaj</a>."
+msgstr "Twój serwer Indico nie jest zsynchronizowany z portalem społecznościowym! Możesz to rozwiązać <a href=\"{0}\">tutaj</a>."
 
 #: indico/modules/designer/client/js/index.js:31
 #: indico/modules/designer/client/js/index.js:847
@@ -796,7 +796,7 @@ msgstr "Zarządzający wydarzeniami"
 
 #: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
 msgid "Registrants in \"{0}\""
-msgstr "Rejestranci w  \"{0}\""
+msgstr "Rejestranci w \"{0}\""
 
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:245
 msgid "OK"
@@ -957,7 +957,7 @@ msgstr "</strong> przesunięto z "
 msgid ""
 "The <strong>starting time</strong> of the <strong>Event</strong> was moved "
 "from "
-msgstr "<strong>godzinę rozpoczęcia</strong>  <strong>wydarzenia</strong> przesunięto z "
+msgstr "<strong>godzinę rozpoczęcia</strong> <strong>wydarzenia</strong> przesunięto z "
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js:794
 #: indico/web/client/js/legacy/libs/timetable/Base.js:798

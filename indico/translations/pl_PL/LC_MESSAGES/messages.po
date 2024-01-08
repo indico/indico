@@ -1,7 +1,7 @@
 # Translations template for indico.
 # Copyright (C) 2023 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# 
+#
 # Translators:
 # Adrian, 2022
 # Adrian, 2021
@@ -1036,7 +1036,7 @@ msgid_plural ""
 msgstr[0] "Obecnie jest <strong><a href=\"%(url)s\">jeden aktywny klucz API </a></strong> w systemie."
 msgstr[1] "Obecnie jest <strong><a href=\"%(url)s\">%(count)s aktywnych kluczy API </a></strong> w systemie."
 msgstr[2] "Obecnie są <strong><a href=\"%(url)s\">%(count)s aktywne klucze API</a></strong> w systemie."
-msgstr[3] "Obecnie są <strong><a href=\"%(url)s\">%(count)saktywne klucze API </a></strong> w systemie."
+msgstr[3] "Obecnie są <strong><a href=\"%(url)s\">%(count)s aktywne klucze API </a></strong> w systemie."
 
 #: indico/modules/api/templates/user_profile.html:17
 msgid "API keys are deprecated and may be removed in a future Indico version."
@@ -1177,7 +1177,7 @@ msgid_plural "used <strong>%(n)s times</strong>"
 msgstr[0] "wykorzystany raz"
 msgstr[1] "wykorzystany <strong>%(n)s razy</strong>"
 msgstr[2] "wykorzystany <strong>%(n)s razy</strong>"
-msgstr[3] "wykorzystany <strong>%(n)srazy</strong>"
+msgstr[3] "wykorzystany <strong>%(n)s razy</strong>"
 
 #: indico/modules/api/templates/user_profile.html:217
 #, python-format
@@ -1691,7 +1691,7 @@ msgid_plural "%(count)s files"
 msgstr[0] "%(count)s plik"
 msgstr[1] "%(count)s pliki"
 msgstr[2] "%(count)s plików"
-msgstr[3] "%(count)splików"
+msgstr[3] "%(count)s plików"
 
 #: indico/modules/attachments/templates/_protection_message.html:17
 msgid ""
@@ -1834,7 +1834,7 @@ msgstr "Otrzymaliśmy Twój wniosek o rejestrację. Wyślemy Ci e-maila po przet
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
-msgstr "Twój profil Indico został zarejestrowany.  Sprawdź <a href=\"{url}\">Twój profil</a>, gdzie znajdziesz dalsze szczegóły i ustawienia."
+msgstr "Twój profil Indico został zarejestrowany. Sprawdź <a href=\"{url}\">Twój profil</a>, gdzie znajdziesz dalsze szczegóły i ustawienia."
 
 #: indico/modules/auth/controllers.py:358
 msgid "Local account added successfully"
@@ -1982,7 +1982,7 @@ msgid_plural ""
 "You have %(count)s other local accounts that have been used in the past."
 msgstr[0] "Masz inne konto lokalne, którego w przeszłości używałeś."
 msgstr[1] "Masz %(count)s inne lokalne konta, których używałeś."
-msgstr[2] "Masz%(count)s innych lokalnych kont, których używałeś."
+msgstr[2] "Masz %(count)s innych lokalnych kont, których używałeś."
 msgstr[3] "Masz %(count)s innych lokalnych kont, których używałeś."
 
 #: indico/modules/auth/templates/accounts.html:61
@@ -2066,7 +2066,7 @@ msgid ""
 "We have found an existing Indico profile <strong>%(name)s</strong> which "
 "will be linked with this account once you have verified that "
 "<strong>%(emails)s</strong> is actually your email address."
-msgstr "Znaleźliśmy istniejący profil Indico <strong>%(name)s</strong>, który połączymy z tym kontem, gdy sprawdzisz, że  <strong>%(emails)s</strong> jest Twoim adresem e-mail."
+msgstr "Znaleźliśmy istniejący profil Indico <strong>%(name)s</strong>, który połączymy z tym kontem, gdy sprawdzisz, że <strong>%(emails)s</strong> jest Twoim adresem e-mail."
 
 #: indico/modules/auth/templates/link_identity.html:25
 #, python-format
@@ -2087,7 +2087,7 @@ msgstr "Przyślij mi weryfikującego e-maila"
 #: indico/modules/auth/templates/login_page.html:18
 #, python-format
 msgid "Too many failed login attempts. Please wait %(delay)s."
-msgstr "Za dużo nieudanych prób logowania. Proszę czekać%(delay)s."
+msgstr "Za dużo nieudanych prób logowania. Proszę czekać %(delay)s."
 
 #: indico/modules/auth/templates/login_page.html:28
 #, python-format
@@ -2114,7 +2114,7 @@ msgstr "Jeżeli nie masz jeszcze konta Indico, możesz <a href=\"%(url)s\">je tu
 msgid ""
 "If you do not have an account yet, you can <a href=\"%(url)s\" "
 "target=\"_blank\" rel=\"noopener noreferrer\">create one here</a>."
-msgstr "Jeśli nie masz jeszcze konta,  możesz je  <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\">utworzyć tutaj </a>."
+msgstr "Jeśli nie masz jeszcze konta, możesz je <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\">utworzyć tutaj </a>."
 
 #: indico/modules/auth/templates/login_page.html:81
 #: indico/modules/events/payment/templates/event_plugin_edit.html:38
@@ -2283,7 +2283,7 @@ msgstr "Ta informacja zostanie wykorzystana w Twoim profilu użytkownika. Możes
 msgid ""
 "The time zone for the server has been set to %(timezone)s and can be "
 "modified in <span class=\"mono\">indico.conf</span>."
-msgstr "Jako strefę czasową dla serwera przyjęto  %(timezone)s Można ją zmienić w <span class=\"mono\">indico.conf</span>."
+msgstr "Jako strefę czasową dla serwera przyjęto %(timezone)s Można ją zmienić w <span class=\"mono\">indico.conf</span>."
 
 #: indico/modules/bootstrap/templates/bootstrap.html:102
 msgid "Let us know you exist!"
@@ -2578,7 +2578,7 @@ msgid ""
 "From which point in the category tree contents will be visible from (number "
 "of categories upwards). Applies to \"Today's events\" and Calendar. If the "
 "category is moved, this number will be preserved."
-msgstr "Z którego punktu w drzewie kategorii będzie widzialna zawartość (liczba kategorii w górę). Dotyczy \"Dzisiejszych wydarzeń\" i Kalendarza. Po przeniesieniu tej kategorii ta liczba zostanie zachowana.                                                                                                                                           "
+msgstr "Z którego punktu w drzewie kategorii będzie widzialna zawartość (liczba kategorii w górę). Dotyczy \"Dzisiejszych wydarzeń\" i Kalendarza. Po przeniesieniu tej kategorii ta liczba zostanie zachowana."
 
 #: indico/modules/categories/forms.py:96
 msgid "Event creation mode"
@@ -2597,7 +2597,7 @@ msgstr "Widoczność tej kategorii jest obecnie ograniczona przez widoczność '
 
 #: indico/modules/categories/forms.py:126 indico/modules/events/util.py:644
 msgid "IP networks cannot have management permissions: {}"
-msgstr "Sieci IP nie mogą mieć uprawnień do zarządzania:  {}"
+msgstr "Sieci IP nie mogą mieć uprawnień do zarządzania: {}"
 
 #: indico/modules/categories/forms.py:141
 msgid "Category name #1"
@@ -2860,7 +2860,7 @@ msgstr "Twoje wydarzenia przeniesiono do kategorii \"{}\""
 
 #: indico/modules/categories/controllers/management.py:457
 msgid "Your events have been split into the categories \"{}\" and \"{}\""
-msgstr "Twoje wydarzenia podzielono między kategorie  \"{}\" i \"{}\""
+msgstr "Twoje wydarzenia podzielono między kategorie \"{}\" i \"{}\""
 
 #: indico/modules/categories/controllers/management.py:460
 msgid "Split"
@@ -3033,9 +3033,9 @@ msgstr "Ukryto pewne wydarzenia z tej listy."
 msgid "There is one event in the future."
 msgid_plural "There are %(count)s events in the future."
 msgstr[0] "W przyszłości jest jedno wydarzenie."
-msgstr[1] "W przyszłości są%(count)s wydarzenia."
-msgstr[2] "W przyszłości jest%(count)s wydarzeń."
-msgstr[3] "W przyszłości jest  %(count)swydarzeń."
+msgstr[1] "W przyszłości są %(count)s wydarzenia."
+msgstr[2] "W przyszłości jest %(count)s wydarzeń."
+msgstr[3] "W przyszłości jest %(count)s wydarzeń."
 
 #: indico/modules/categories/templates/display/event_list.html:78
 #, python-format
@@ -4031,10 +4031,10 @@ msgid_plural ""
 "This template is used as the back side of %(link_start)s%(tpls_count)s "
 "templates%(link_end)s. The back side of those templates <strong>will be "
 "removed</strong> if the dimensions of this template change."
-msgstr[0] "Ten szablon  jest używany jako rewers %(link_start)sinnego szablonu%(link_end)s. Rewers tamtego szablonu <strong>zostanie usunięty</strong>, jeżeli zmienią się wymiary tego szablonu."
+msgstr[0] "Ten szablon jest używany jako rewers %(link_start)sinnego szablonu%(link_end)s. Rewers tamtego szablonu <strong>zostanie usunięty</strong>, jeżeli zmienią się wymiary tego szablonu."
 msgstr[1] "Ten szablon jest używany jako rewers %(link_start)s%(tpls_count)s szablonów%(link_end)s. Rewers tamtych szablonów <strong>zostanie usuniety</strong>, jeżeli wymiary tego szablonu się zmienią."
-msgstr[2] "Ten szablon jest używany jako rewers%(link_start)s%(tpls_count)s szablonów%(link_end)s. Rewers tamtych szablonów <strong>zostanie usunięty</strong>, jeżeli zmienią się wymiary tego szablonu."
-msgstr[3] "Ten szablon jest używany jako rewers%(link_start)s%(tpls_count)sszablonów%(link_end)s. Rewers tamtych szablonów <strong>zostanie usunięty</strong>, jeżeli zmienia się wymiary tego szablonu."
+msgstr[2] "Ten szablon jest używany jako rewers %(link_start)s%(tpls_count)s szablonów%(link_end)s. Rewers tamtych szablonów <strong>zostanie usunięty</strong>, jeżeli zmienią się wymiary tego szablonu."
+msgstr[3] "Ten szablon jest używany jako rewers %(link_start)s%(tpls_count)s szablonów%(link_end)s. Rewers tamtych szablonów <strong>zostanie usunięty</strong>, jeżeli zmienia się wymiary tego szablonu."
 
 #: indico/modules/designer/templates/template.html:54
 #, python-format
@@ -4261,9 +4261,9 @@ msgid "You have been granted manager/submission privileges for an event."
 msgid_plural ""
 "You have been granted manager/submission privileges for {} events."
 msgstr[0] "Otrzymałeś przywileje zarządzania/zgłaszania dla jednego wydarzenia."
-msgstr[1] "Otrzymałeś przywileje zarządzania/zgłaszania dla  {} wydarzeń."
+msgstr[1] "Otrzymałeś przywileje zarządzania/zgłaszania dla {} wydarzeń."
 msgstr[2] "Otrzymałeś przywileje zarządzania/zgłaszania dla {} wydarzeń."
-msgstr[3] "Otrzymałeś przywileje zarządzania/zgłaszania dla  {} wydarzeń."
+msgstr[3] "Otrzymałeś przywileje zarządzania/zgłaszania dla {} wydarzeń."
 
 #: indico/modules/events/__init__.py:136
 #: indico/modules/events/abstracts/templates/management/overview.html:17
@@ -5701,7 +5701,7 @@ msgid ""
 "Please note that any change in the settings below will only affect the LaTeX"
 " files and not the Book of Abstracts itself. You need to rebuild it and "
 "upload the new version yourself."
-msgstr "Zmiana poniższych ustawień wpłynie tylko na pliki LaTeX, a nie na książkę abstraktów. Musisz sam ją odbudować  i załadować jej nową wersję."
+msgstr "Zmiana poniższych ustawień wpłynie tylko na pliki LaTeX, a nie na książkę abstraktów. Musisz sam ją odbudować i załadować jej nową wersję."
 
 #: indico/modules/events/abstracts/controllers/boa.py:87
 #: indico/modules/events/timetable/controllers/display.py:34
@@ -5893,7 +5893,7 @@ msgid_plural "%(count)s notifications sent"
 msgstr[0] "Wysłano jedno powiadomienie"
 msgstr[1] "Wysłano %(count)s powiadomienia"
 msgstr[2] "Wysłano %(count)s powiadomień"
-msgstr[3] "Wysłano%(count)s powiadomień"
+msgstr[3] "Wysłano %(count)s powiadomień"
 
 #: indico/modules/events/abstracts/templates/invited_abstract.html:9
 msgid "Submit an abstract"
@@ -5910,7 +5910,7 @@ msgstr "Zostałeś zaproszony, żeby dostarczyć abstrakt dla tego wydarzenia. P
 msgid ""
 "You are submitting an abstract on behalf of %(submitter_name)s. Please make "
 "sure this is really what you want to do."
-msgstr "Dostarczasz abstrakt w imieniu%(submitter_name)s. Proszę sprawdzić, czy o to Ci chodzi."
+msgstr "Dostarczasz abstrakt w imieniu %(submitter_name)s. Proszę sprawdzić, czy o to Ci chodzi."
 
 #: indico/modules/events/abstracts/templates/display/_common.html:13
 #: indico/modules/events/abstracts/templates/management/cfa_actions/open.html:4
@@ -6218,7 +6218,7 @@ msgstr[3] "%(count)s tematów"
 msgid ""
 "Filtering is enabled. Displaying %(num_filtered_abstracts)s out of "
 "%(total_abstracts)s abstracts."
-msgstr "Filtrowanie jest włączone. Wyświetlono %(num_filtered_abstracts)s sposród%(total_abstracts)s abstraktów."
+msgstr "Filtrowanie jest włączone. Wyświetlono %(num_filtered_abstracts)s sposród %(total_abstracts)s abstraktów."
 
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:94
 msgid "Reviewed"
@@ -6928,7 +6928,7 @@ msgstr "Ten abstrakt przyjęto dla tematu %(track)s i %(link_start)skontrybucja%
 msgid ""
 "The abstract was accepted and a %(link_start)scontribution%(link_end)s was "
 "created in the event."
-msgstr "Ten abstrakt przyjęto i  %(link_start)skontrybucja%(link_end)s powstała w tym wydarzeniu."
+msgstr "Ten abstrakt przyjęto i %(link_start)skontrybucja%(link_end)s powstała w tym wydarzeniu."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:255
 msgid "The abstract was rejected."
@@ -6937,7 +6937,7 @@ msgstr "Ten abstrakt został odrzucony. "
 #: indico/modules/events/abstracts/templates/reviewing/public.html:259
 #, python-format
 msgid "The abstract was merged into %(link_start)s%(other)s%(link_end)s."
-msgstr "Ten abstrakt został połączony z  %(link_start)s%(other)s%(link_end)s."
+msgstr "Ten abstrakt został połączony z %(link_start)s%(other)s%(link_end)s."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:265
 #, python-format
@@ -6984,7 +6984,7 @@ msgid ""
 "<strong>%(name)s</strong> submitted this abstract and it was finally "
 "accepted for track %(track)s as <span class=\"abstract-contribution-"
 "type\">%(type)s</span>."
-msgstr "<strong>%(name)s</strong> zgłosił ten abstrakt, który ostatecznie przyjęto dla tematu%(track)s jako <span class=\"abstract-contribution-type\">%(type)s</span>."
+msgstr "<strong>%(name)s</strong> zgłosił ten abstrakt, który ostatecznie przyjęto dla tematu %(track)s jako <span class=\"abstract-contribution-type\">%(type)s</span>."
 
 #: indico/modules/events/abstracts/templates/reviewing/public.html:437
 #, python-format
@@ -7125,7 +7125,7 @@ msgstr[3] "Możliwe tematy docelowe: %(tracks)s"
 msgid "You can review this abstract in one track"
 msgid_plural "You can review this abstract in %(missing_groups)s tracks"
 msgstr[0] "Możesz zrecenzować ten abstrakt w jednym temacie"
-msgstr[1] "Możesz zrecenzować ten abstrakt w%(missing_groups)s tematach"
+msgstr[1] "Możesz zrecenzować ten abstrakt w %(missing_groups)s tematach"
 msgstr[2] "Możesz zrecenzować ten abstrakt w %(missing_groups)s tematach"
 msgstr[3] "Możesz zrecenzować ten abstrakt w %(missing_groups)s tematach"
 
@@ -7168,7 +7168,7 @@ msgstr "Próbujesz podpisać zgodę, która wymaga, żebyś się zalogował."
 
 #: indico/modules/events/agreements/controllers.py:57
 msgid "Please log in as {name} to sign this agreement."
-msgstr "Proszę się zalogować jako  {name} aby podpisać tę zgodę."
+msgstr "Proszę się zalogować jako {name} aby podpisać tę zgodę."
 
 #: indico/modules/events/agreements/controllers.py:65
 msgid "The URL for this agreement is invalid."
@@ -8355,7 +8355,7 @@ msgstr "Musisz załadować plik CSV (wartości oddzielane przecinkami) o dokład
 msgid ""
 "Start date/time in %(link)sISO 8601%(endlink)s format %(subitem)se.g. "
 "2017-12-03T12:00:00%(endsubitem)s"
-msgstr "Data/czas rozpoczęcia w formacie  %(link)sISO 8601%(endlink)s %(subitem)snp. 2017-12-03T12:00:00%(endsubitem)s"
+msgstr "Data/czas rozpoczęcia w formacie %(link)sISO 8601%(endlink)s %(subitem)snp. 2017-12-03T12:00:00%(endsubitem)s"
 
 #: indico/modules/events/contributions/templates/management/import_contributions.html:18
 msgid "Duration (minutes)"
@@ -9002,7 +9002,7 @@ msgstr ""
 msgid ""
 "New CSS file saved. Do not forget to enable it (\"Use custom CSS\") after "
 "verifying that it is correct using the preview."
-msgstr "Zapisano nowy plik CSS. Proszę nie zapomnieć o jego włączeniu  (\"Użyj spersonalizowanego CSS\") po sprawdzeniu jego poprawności przez podejrzenie."
+msgstr "Zapisano nowy plik CSS. Proszę nie zapomnieć o jego włączeniu (\"Użyj spersonalizowanego CSS\") po sprawdzeniu jego poprawności przez podejrzenie."
 
 #: indico/modules/events/layout/controllers/layout.py:213
 msgid "CSS file deleted"
@@ -9870,12 +9870,12 @@ msgstr "Wyślij e-maile"
 msgid ""
 "Created by %(name)s (%(email)s) from event on "
 "%(link_start)s%(date)s%(link_end)s"
-msgstr "Utworzone przez  %(name)s (%(email)s) z wydarzenia %(link_start)s%(date)s%(link_end)s"
+msgstr "Utworzone przez %(name)s (%(email)s) z wydarzenia %(link_start)s%(date)s%(link_end)s"
 
 #: indico/modules/events/management/templates/_management_frame.html:20
 #, python-format
 msgid "Created by %(name)s (%(email)s)"
-msgstr "Utworzone przez  %(name)s (%(email)s)"
+msgstr "Utworzone przez %(name)s (%(email)s)"
 
 #: indico/modules/events/management/templates/_registrations_visibility_list.html:2
 msgid "Registrations visibility to other participants"
@@ -10536,7 +10536,7 @@ msgstr "Zaproszenie do przesyłania artykułów jest teraz otwarte"
 
 #: indico/modules/events/papers/controllers/management.py:170
 msgid "Call for papers is now closed"
-msgstr "Zaproszenie do przesyłania artykułów  jest teraz zamknięte"
+msgstr "Zaproszenie do przesyłania artykułów jest teraz zamknięte"
 
 #: indico/modules/events/papers/controllers/management.py:213
 msgid "The reviewing settings were saved successfully"
@@ -10802,7 +10802,7 @@ msgstr ""
 
 #: indico/modules/events/papers/templates/display/_common.html:13
 msgid "The call for papers is closed."
-msgstr "Zaproszenie do przesyłania artykułów  jest zamknięte."
+msgstr "Zaproszenie do przesyłania artykułów jest zamknięte."
 
 #: indico/modules/events/papers/templates/display/_common.html:23
 #, python-format
@@ -11092,7 +11092,7 @@ msgstr ""
 #: indico/modules/events/papers/templates/emails/paper_judgment_notification_email.txt:13
 #, python-format
 msgid "Your paper \"%(title)s\" was accepted."
-msgstr "Twój artykuł  \"%(title)s\" został zaakceptowany."
+msgstr "Twój artykuł \"%(title)s\" został zaakceptowany."
 
 #: indico/modules/events/papers/templates/emails/paper_judgment_notification_email.txt:15
 #, python-format
@@ -11128,7 +11128,7 @@ msgstr "Po zakończeniu procesu recenzji Twój artykuł \"%(title)s (#%(id)s)\",
 msgid ""
 "After the reviewing process your paper \"%(title)s (#%(id)s)\", submitted "
 "for \"%(event_title)s\" is required to be corrected."
-msgstr "Po procesie recenzowania Twój referat \"%(title)s (#%(id)s\",  zgłoszony do \"%(event_title)s\" wymaga korekty."
+msgstr "Po procesie recenzowania Twój referat \"%(title)s (#%(id)s\", zgłoszony do \"%(event_title)s\" wymaga korekty."
 
 #: indico/modules/events/papers/templates/emails/paper_judgment_notification_email.txt:44
 msgid ""
@@ -11357,7 +11357,7 @@ msgstr "Ustaw ostateczny termin zatwierdzania artykułów."
 
 #: indico/modules/events/papers/templates/management/overview.html:150
 msgid "Manage paper templates that can be downloaded in the event area"
-msgstr "Zarządzaj szablonami artykułów, które można  pobrać w obszarze wydarzenia"
+msgstr "Zarządzaj szablonami artykułów, które można pobrać w obszarze wydarzenia"
 
 #: indico/modules/events/papers/templates/management/overview.html:155
 msgid "Manage paper templates"
@@ -11465,7 +11465,7 @@ msgstr "Zaplanuj zaproszenie do przesyłania artykułów "
 
 #: indico/modules/events/papers/templates/management/cfp_actions/ended.html:4
 msgid "The call for papers is closed"
-msgstr "Zaproszenie do przesyłania artykułów  jest zamknięte"
+msgstr "Zaproszenie do przesyłania artykułów jest zamknięte"
 
 #: indico/modules/events/papers/templates/management/cfp_actions/ended.html:9
 #, python-format
@@ -11497,7 +11497,7 @@ msgstr "Przyjęty %(date_time)s przez %(judge)s"
 #: indico/modules/events/papers/templates/reviewing/timeline.html:91
 #, python-format
 msgid "Submitted on %(date_time)s by %(submitter)s"
-msgstr "Wysłany o %(date_time)s  przez %(submitter)s"
+msgstr "Wysłany o %(date_time)s przez %(submitter)s"
 
 #: indico/modules/events/payment/__init__.py:51
 #: indico/modules/events/payment/templates/management/payments.html:5
@@ -11532,7 +11532,7 @@ msgid ""
 "List of currencies that can be selected for an event. When deleting a "
 "currency, existing events will keep using it. The currency code must be a "
 "valid <a href='{0}'>ISO-4217</a> code such as 'EUR' or 'CHF'."
-msgstr "Lista walut do wyboru dla wydarzenia. Istniejące wydarzenia zachowają usuniętą walutę. Kod waluty musi być kodem <a href='{0}'>ISO-4217</a>, np.  'EUR' lub 'CHF'."
+msgstr "Lista walut do wyboru dla wydarzenia. Istniejące wydarzenia zachowają usuniętą walutę. Kod waluty musi być kodem <a href='{0}'>ISO-4217</a>, np. 'EUR' lub 'CHF'."
 
 #: indico/modules/events/payment/forms.py:32
 #: indico/modules/events/registration/forms.py:86
@@ -11728,7 +11728,7 @@ msgid_plural ""
 msgstr[0] "Prawa modyfikowania sesji przyznano jednemu konwenerowi sesji"
 msgstr[1] "Prawa modyfikowania sesji przyznano {} konwenerom sesji"
 msgstr[2] "Prawa modyfikowania sesji przyznano {} konwenerom sesji"
-msgstr[3] "Prawa modyfikowania sesji przyznano  {} konwenerom sesji"
+msgstr[3] "Prawa modyfikowania sesji przyznano {} konwenerom sesji"
 
 #: indico/modules/events/persons/controllers.py:416
 msgid "Submission rights have been revoked from one user"
@@ -12769,7 +12769,7 @@ msgstr "Zapisano ustawienia wyświetlania danych uczestników."
 
 #: indico/modules/events/registration/controllers/management/regforms.py:111
 msgid "The settings for \"{}\" have been saved."
-msgstr "Zapisano ustawienia dla  \"{}\" ."
+msgstr "Zapisano ustawienia dla \"{}\" ."
 
 #: indico/modules/events/registration/controllers/management/regforms.py:203
 msgid "Registration form has been successfully created"
@@ -13788,7 +13788,7 @@ msgstr "Zarządzaj formularzem \"%(title)s\""
 #: indico/modules/events/registration/templates/management/_registration_details.html:42
 #, python-format
 msgid "Last updated by %(updated_by)s on %(timestamp)s."
-msgstr "Ostatnio zmieniony przez %(updated_by)s, data  %(timestamp)s."
+msgstr "Ostatnio zmieniony przez %(updated_by)s, data %(timestamp)s."
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:57
 #: indico/modules/events/registration/templates/management/_registration_details.html:148
@@ -13956,7 +13956,7 @@ msgstr "Czy chcesz wycofać tę rejestrację? To wyśle powiadamiający e-mail."
 msgid ""
 "Filtering is enabled. Displaying %(filtered_registrations)s out of "
 "%(total_registrations)s registrants."
-msgstr "Filtrowanie jest włączone. Wyświetlono %(filtered_registrations)s spośród%(total_registrations)s uczestników."
+msgstr "Filtrowanie jest włączone. Wyświetlono %(filtered_registrations)s spośród %(total_registrations)s uczestników."
 
 #: indico/modules/events/registration/templates/management/_reglist.html:24
 msgid "Full name"
@@ -14279,7 +14279,7 @@ msgstr "Włącz płatności"
 
 #: indico/modules/events/registration/templates/management/regform_list.html:48
 msgid "Add/remove users allowed to manage registrations"
-msgstr "Dodaj/usuń użytkowników,  którym wolno zarządzać rejestracjami"
+msgstr "Dodaj/usuń użytkowników, którym wolno zarządzać rejestracjami"
 
 #: indico/modules/events/registration/templates/management/regform_list.html:53
 msgid "Manage registration managers"
@@ -14512,7 +14512,7 @@ msgstr "Brak tagów."
 msgid ""
 "Change the configuration of the registration list by enabling/disabling the "
 "columns listed below, or by applying filtering (%(filter_icon)s) options."
-msgstr "Zmień układ listy rejestracyjnej  włączając/wyłączając poniższe kolumny, lub stosując opcje filtrujące (%(filter_icon)s)."
+msgstr "Zmień układ listy rejestracyjnej włączając/wyłączając poniższe kolumny, lub stosując opcje filtrujące (%(filter_icon)s)."
 
 #: indico/modules/events/registration/templates/management/reglist_filter.html:83
 msgid "General registration info"
@@ -14786,7 +14786,7 @@ msgstr "Zaktualizowałeś ten wniosek (tylko dane specyficzne dla zarządzania).
 #: indico/modules/events/requests/controllers.py:189
 msgid ""
 "There was a problem withdrawing your request ({0}). Please contact support."
-msgstr "Jest problem z wycofaniem Twojego wniosku  ({0}). Proszę się skontaktować ze wsparciem."
+msgstr "Jest problem z wycofaniem Twojego wniosku ({0}). Proszę się skontaktować ze wsparciem."
 
 #: indico/modules/events/requests/controllers.py:192
 msgid "You have withdrawn your request ({0})"
@@ -16110,9 +16110,9 @@ msgstr "Limit nowych wpisów osiągnięty"
 #, python-format
 msgid "The limit of %(count)s submission has been reached."
 msgid_plural "The limit of %(count)s submissions has been reached."
-msgstr[0] "Osiągnięto limit%(count)s zgłoszenia."
+msgstr[0] "Osiągnięto limit %(count)s zgłoszenia."
 msgstr[1] "Osiągnięto limit %(count)s zgłoszeń."
-msgstr[2] "Osiągnięto limit%(count)s zgłoszeń."
+msgstr[2] "Osiągnięto limit %(count)s zgłoszeń."
 msgstr[3] "Osiągnięto limit %(count)s zgłoszeń."
 
 #: indico/modules/events/surveys/templates/management/survey_actions/not_ready.html:4
@@ -16282,7 +16282,7 @@ msgid_plural "%(count)s additional events have been created."
 msgstr[0] "Utworzono dodatkowe wydarzenie."
 msgstr[1] "Utworzono %(count)s dodatkowe wydarzenia."
 msgstr[2] "Utworzono %(count)s dodatkowych wydarzeń."
-msgstr[3] "Utworzono%(count)s dodatkowych wydarzeń."
+msgstr[3] "Utworzono %(count)s dodatkowych wydarzeń."
 
 #: indico/modules/events/templates/admin/_event_label_list.html:21
 #, python-format
@@ -16308,12 +16308,12 @@ msgstr "Jeszcze nie ma etykiet wydarzeń."
 #: indico/modules/events/templates/admin/_reference_type_list.html:21
 #, python-format
 msgid "Edit %(name)s external ID type"
-msgstr "Edytuj typ zewnętrznego ID%(name)s "
+msgstr "Edytuj typ zewnętrznego ID %(name)s "
 
 #: indico/modules/events/templates/admin/_reference_type_list.html:27
 #, python-format
 msgid "Delete external ID type %(name)s?"
-msgstr "Czy usunąć typ zewnętrznego ID%(name)s?"
+msgstr "Czy usunąć typ zewnętrznego ID %(name)s?"
 
 #: indico/modules/events/templates/admin/_reference_type_list.html:28
 #, python-format
@@ -16608,7 +16608,7 @@ msgid ""
 "The event will <strong>only</strong> be accessible by the "
 "<strong>managers</strong> of <strong>parent categories</strong> and users "
 "you give access to."
-msgstr "To wydarzenie będzie dostępne <strong>tylko</strong> dla  <strong>administratorów</strong>  <strong>kategorii rodzicielskich</strong> i użytkowników, którym przydzielasz dostęp."
+msgstr "To wydarzenie będzie dostępne <strong>tylko</strong> dla <strong>administratorów</strong> <strong>kategorii rodzicielskich</strong> i użytkowników, którym przydzielasz dostęp."
 
 #: indico/modules/events/templates/forms/event_creation_form.html:70
 msgid ""
@@ -16620,7 +16620,7 @@ msgstr "To wydarzenie nie będzie dostępne publicznie, ponieważ kategoria <str
 msgid ""
 "This event will be publicly accessible since the category <strong "
 "class=\"js-category-title\"></strong> is not protected."
-msgstr "To wydarzenie będzie dostępne publicznie, ponieważ kategoria <strong class=\"js-category-title\"></strong>  jest chroniona."
+msgstr "To wydarzenie będzie dostępne publicznie, ponieważ kategoria <strong class=\"js-category-title\"></strong> jest chroniona."
 
 #: indico/modules/events/templates/forms/event_creation_form.html:101
 #: indico/web/templates/_protection_messages.html:73
@@ -16691,7 +16691,7 @@ msgstr "Instrukcje zatwierdzania"
 msgid ""
 "Please don't forget to read the %(link)sjudgment instructions%(endlink)s "
 "before taking your decision."
-msgstr "Proszę przeczytać %(link)s  instrukcje zatwierdzania %(endlink)s przed podjęciem decyzji."
+msgstr "Proszę przeczytać %(link)s instrukcje zatwierdzania %(endlink)s przed podjęciem decyzji."
 
 #: indico/modules/events/templates/reviews/_common.html:129
 msgid "Opening day"
@@ -16728,7 +16728,7 @@ msgstr "Proszę przeczytać %(link)sinstrukcje recenzowania%(endlink)s przed zg�
 #: indico/modules/events/templates/reviews/forms.html:36
 #, python-format
 msgid "Reviewing in %(group_title)s"
-msgstr "Recenzowanie w  %(group_title)s"
+msgstr "Recenzowanie w %(group_title)s"
 
 #: indico/modules/events/templates/reviews/forms.html:42
 msgid "Ratings"
@@ -16946,7 +16946,7 @@ msgstr "Czas zakończenia bloku sesji zmienić na {}"
 #: indico/modules/events/timetable/controllers/legacy.py:340
 msgid ""
 "Contribution '{}' could not be scheduled since it doesn't fit on this day."
-msgstr "Nie można zaplanować kontrybucji  '{}', gdyż nie jest ona właściwa dla tego dnia."
+msgstr "Nie można zaplanować kontrybucji '{}', gdyż nie jest ona właściwa dla tego dnia."
 
 #: indico/modules/events/timetable/controllers/legacy.py:524
 msgid ""
@@ -17023,7 +17023,7 @@ msgstr "Usuń blok sesji"
 #: indico/modules/events/timetable/templates/balloons/block.html:31
 #, python-format
 msgid "Delete session block %(title)s?"
-msgstr "Usuń blok sesji%(title)s?"
+msgstr "Usuń blok sesji %(title)s?"
 
 #: indico/modules/events/timetable/templates/balloons/block.html:32
 #, python-format
@@ -17081,7 +17081,7 @@ msgstr " Usunąć z planu kontrybucję"
 #: indico/modules/events/timetable/templates/balloons/contribution.html:37
 #, python-format
 msgid "Are you sure you want to unschedule the contribution '%(title)s'?"
-msgstr "Czy jesteś pewien, że chcesz usunąć z planu kontrybucję  '%(title)s'?"
+msgstr "Czy jesteś pewien, że chcesz usunąć z planu kontrybucję '%(title)s'?"
 
 #: indico/modules/events/timetable/templates/balloons/contribution.html:42
 #, python-format
@@ -17233,7 +17233,7 @@ msgstr "Tej ścieżki nie można usunąć, ponieważ zawiera ona przyjęte stres
 msgid ""
 "Indico will preselect the session \"%(title)s\" whenever an abstract is "
 "accepted for this track."
-msgstr "Indico wybierze wstępnie sesję  \"%(title)s\" , gdy pewien abstrakt zostanie przyjęty dla tego tematu."
+msgstr "Indico wybierze wstępnie sesję \"%(title)s\" , gdy pewien abstrakt zostanie przyjęty dla tego tematu."
 
 #: indico/modules/events/tracks/templates/_track_list.html:70
 msgid "Edit track group"
@@ -17242,7 +17242,7 @@ msgstr "Edytuj grupę tematów "
 #: indico/modules/events/tracks/templates/_track_list.html:72
 #, python-format
 msgid "Edit track group \"%(title)s\""
-msgstr "Edytuj grupę tematów  \"%(title)s\""
+msgstr "Edytuj grupę tematów \"%(title)s\""
 
 #: indico/modules/events/tracks/templates/_track_list.html:78
 msgid "Delete track group"
@@ -17315,7 +17315,7 @@ msgstr "Lokalne"
 
 #: indico/modules/groups/controllers.py:117
 msgid "The group '{name}' has been created."
-msgstr "Grupa  '{name}' została utworzona."
+msgstr "Grupa '{name}' została utworzona."
 
 #: indico/modules/groups/controllers.py:119
 msgid "The group '{name}' has been updated."
@@ -17547,9 +17547,9 @@ msgid ""
 msgid_plural ""
 "You are about to <strong>delete</strong> the network group "
 "<strong>%(name)s</strong> which is currently in use by %(count)s objects:"
-msgstr[0] "Zamierzasz <strong>usunąć</strong> grupę sieciową <strong>%(name)s</strong>, która jest obecnie wykorzystywana przez%(count)s obiekt:"
+msgstr[0] "Zamierzasz <strong>usunąć</strong> grupę sieciową <strong>%(name)s</strong>, która jest obecnie wykorzystywana przez %(count)s obiekt:"
 msgstr[1] "Zamierzasz<strong>usunąć</strong> grupę sieciową <strong>%(name)s</strong> która jest obecnie wykorzystywana przez %(count)s obiekty:"
-msgstr[2] "Zamierzasz <strong>usunąć</strong> grupę sieciową <strong>%(name)s</strong>, która jest obecnie używana przez%(count)s objiektów:"
+msgstr[2] "Zamierzasz <strong>usunąć</strong> grupę sieciową <strong>%(name)s</strong>, która jest obecnie używana przez %(count)s objiektów:"
 msgstr[3] "Zamierzasz<strong>usunąć </strong> grupę sieciową <strong>%(name)s</strong>, która jest obecne wykorzystywana przez %(count)s obiektów:"
 
 #: indico/modules/networks/templates/delete_network.html:40
@@ -17727,7 +17727,7 @@ msgid ""
 "More than one URL can be specified adding new lines. The redirect_uri sent "
 "by the OAuth client must use the same protocol and host/port. If an entry "
 "contains a path, the redirect_uri's path must start with this path."
-msgstr "Można podać więcej niż jeden URL w kolejnych wierszach. redirect_uri wysyłany przez klienta OAuth musi używać tego samego protokołu i hosta/portu. Jeżeli pozycja zawiera ścieżkę, to ścieżka  redirect_uri musi się zaczynać tą ścieżką."
+msgstr "Można podać więcej niż jeden URL w kolejnych wierszach. redirect_uri wysyłany przez klienta OAuth musi używać tego samego protokołu i hosta/portu. Jeżeli pozycja zawiera ścieżkę, to ścieżka redirect_uri musi się zaczynać tą ścieżką."
 
 #: indico/modules/oauth/forms.py:44
 msgid "Only scopes from this list may be requested by the app."
@@ -19113,8 +19113,8 @@ msgstr "Nie znaleziono użytkowników"
 #, python-format
 msgid "There is one user matching your search criteria."
 msgid_plural "There are %(count)s users matching your search criteria."
-msgstr[0] "Jeden  użytkownik spełnia Twoje kryteria wyszukiwania."
-msgstr[1] "%(count)sużytkowników  spełnia Twoje kryteria wyszukiwania."
+msgstr[0] "Jeden użytkownik spełnia Twoje kryteria wyszukiwania."
+msgstr[1] "%(count)sużytkowników spełnia Twoje kryteria wyszukiwania."
 msgstr[2] "%(count)s użytkowników spełnia Twoje kryteria wyszukiwania."
 msgstr[3] "%(count)s użytkowników spełnia Twoje kryteria wyszukiwania."
 
@@ -19214,7 +19214,7 @@ msgstr "To {plugin_name} pomieszczenie już przydzielono dla tego wydarzenia."
 
 #: indico/modules/vc/controllers.py:123
 msgid "You are not allowed to create {plugin_name} rooms for this event."
-msgstr "Nie jesteś upoważniony do tworzenia  {plugin_name} pomieszczeń dla tego wydarzenia."
+msgstr "Nie jesteś upoważniony do tworzenia {plugin_name} pomieszczeń dla tego wydarzenia."
 
 #: indico/modules/vc/controllers.py:155
 msgid "{plugin_name} room '{room.name}' created"
@@ -19222,7 +19222,7 @@ msgstr "Utworzono {plugin_name} pomieszczenie '{room.name}' "
 
 #: indico/modules/vc/controllers.py:179
 msgid "You are not allowed to modify {} rooms for this event."
-msgstr "Nie wolno Ci zmieniać  {} pomieszczeń dla tego wydarzenia."
+msgstr "Nie wolno Ci zmieniać {} pomieszczeń dla tego wydarzenia."
 
 #: indico/modules/vc/controllers.py:215
 msgid "{plugin_name} room '{room.name}' updated"
@@ -19230,11 +19230,11 @@ msgstr "{plugin_name} pomieszczenie '{room.name}' uaktualniono"
 
 #: indico/modules/vc/controllers.py:231
 msgid "You are not allowed to refresh {plugin_name} rooms for this event."
-msgstr "Nie jesteś upoważniony do odświeżania  {plugin_name}  pomieszczeń dla tego wydarzenia."
+msgstr "Nie jesteś upoważniony do odświeżania {plugin_name}  pomieszczeń dla tego wydarzenia."
 
 #: indico/modules/vc/controllers.py:245
 msgid "{plugin_name} room '{room.name}' refreshed"
-msgstr "{plugin_name} pomieszczenie  '{room.name}' odświeżono"
+msgstr "{plugin_name} pomieszczenie '{room.name}' odświeżono"
 
 #: indico/modules/vc/controllers.py:255
 msgid "You are not allowed to remove {} rooms from this event."
@@ -19414,7 +19414,7 @@ msgstr "Dołącz wideokonferencję"
 
 #: indico/modules/vc/templates/manage_event.html:111
 msgid "Add existing room"
-msgstr "Dodaj istniejące pomieszczenie  "
+msgstr "Dodaj istniejące pomieszczenie "
 
 #: indico/modules/vc/templates/manage_event.html:121
 msgid "There are no Videoconference plugins available."
@@ -19917,7 +19917,7 @@ msgstr "{} nie może wystąpić przed {}"
 
 #: indico/web/forms/validators.py:249 indico/web/forms/validators.py:282
 msgid "{} can't be after {}"
-msgstr "{} nie może wystąpić po  {}"
+msgstr "{} nie może wystąpić po {}"
 
 #: indico/web/forms/validators.py:251 indico/web/forms/validators.py:284
 msgid "{} can't be equal to {}"
@@ -20043,7 +20043,7 @@ msgid ""
 "This object is <strong>only</strong> accessible by the <strong>users "
 "specified</strong> above and the <strong>managers</strong> of <strong>parent"
 " resources</strong>."
-msgstr "Ten obiekt jest <strong>wyłącznie</strong> dostępny dla <strong>użytkowników określonych </strong>powyżej i <strong>zarządców </strong>  <strong>zasobów rodzicielskich</strong>."
+msgstr "Ten obiekt jest <strong>wyłącznie</strong> dostępny dla <strong>użytkowników określonych </strong>powyżej i <strong>zarządców </strong> <strong>zasobów rodzicielskich</strong>."
 
 #: indico/web/templates/_protection_messages.html:47
 #, python-format
@@ -20111,7 +20111,7 @@ msgid "%(networks)s network only"
 msgid_plural "%(networks)s networks only"
 msgstr[0] "Tylko sieć%(networks)s "
 msgstr[1] "Tylko sieci %(networks)s "
-msgstr[2] "Tylko sieci%(networks)s"
+msgstr[2] "Tylko sieci %(networks)s"
 msgstr[3] "Tylko sieci %(networks)s "
 
 #: indico/web/templates/_session_bar.html:44
@@ -20227,7 +20227,7 @@ msgstr "<strong>Konferencja</strong> jest skomplikowanym wydarzeniem obejmujący
 msgid ""
 "<strong>Features</strong>: call for abstracts, registration, e-payment, "
 "timetable, badges creation, paper reviewing,..."
-msgstr "<strong>Cechy</strong>: zaproszenie do przesyłania abstraktów, rejestracja, opłaty elektroniczne, harmonogram,  tworzenie plakietek, recenzowanie artykułów,..."
+msgstr "<strong>Cechy</strong>: zaproszenie do przesyłania abstraktów, rejestracja, opłaty elektroniczne, harmonogram, tworzenie plakietek, recenzowanie artykułów,..."
 
 #: indico/web/templates/pagination.html:7
 msgid "Paginate results"
@@ -20363,14 +20363,14 @@ msgid ""
 "Markdown is a lightweight markup language that makes it easier to write rich"
 " text content. Check the %(link_start)slanguage reference%(link_end)s for "
 "more information."
-msgstr "Markdown jest prostym językiem znaczników.  %(link_start)sDokumentacja języka%(link_end)s zawiera więcej informacji."
+msgstr "Markdown jest prostym językiem znaczników. %(link_start)sDokumentacja języka%(link_end)s zawiera więcej informacji."
 
 #: indico/web/templates/forms/markdown_widget.html:51
 #, python-format
 msgid ""
 "You may write formulae using %(link_start)sLaTeX%(link_end)s (math mode "
 "only) by surrounding them in <code>$...$</code>."
-msgstr "Możesz zapisywać wzory używają %(link_start)sLaTeX%(link_end)s (tylko w trybie math) zapisując je pomiędzy  <code>$...$</code>."
+msgstr "Możesz zapisywać wzory używają %(link_start)sLaTeX%(link_end)s (tylko w trybie math) zapisując je pomiędzy <code>$...$</code>."
 
 #: indico/web/templates/forms/markdown_widget.html:62
 #, python-format
@@ -20405,7 +20405,7 @@ msgstr "Sieć IP"
 msgid ""
 "Since the protection mode is set to <em>inheriting</em>, users from the "
 "<strong>inherited access control list</strong> will also have access."
-msgstr "Ponieważ tryb ochrony jest ustawiony na  <em>dziedziczenie</em>, użytkownicy z <strong>listy kontrolnej dziedziczenia dostępu</strong> będą także mieli dostęp."
+msgstr "Ponieważ tryb ochrony jest ustawiony na <em>dziedziczenie</em>, użytkownicy z <strong>listy kontrolnej dziedziczenia dostępu</strong> będą także mieli dostęp."
 
 #: indico/web/templates/forms/protection_field_acl_message.html:12
 msgid "Inherited access list"
