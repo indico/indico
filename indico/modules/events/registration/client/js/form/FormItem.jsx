@@ -12,6 +12,7 @@ import {Form, Icon, Popup} from 'semantic-ui-react';
 
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Markdown, toClasses} from 'indico/react/util';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {getManagement, getUpdateMode, isPaidItemLocked} from '../form_submission/selectors';
 
@@ -175,6 +176,7 @@ export default function FormItem({
             <Markdown>{description}</Markdown>
           </div>
         )}
+        {renderPluginComponents(`regform-${inputType}-field-item`, inputProps)}
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
       {lockedReason && <ItemLocked reason={lockedReason} />}
