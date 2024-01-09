@@ -61,6 +61,7 @@ module.exports = env => {
       'indico/react/components': '_IndicoReactComponents',
       'indico/react/components/syncedInputs': '_IndicoSyncedInputs',
       'indico/react/forms': '_IndicoReactForm',
+      'indico/react/forms/fields': '_IndicoReactFormField',
       'indico/react/i18n': '_IndicoReactI18n',
       'indico/react/util': '_IndicoReactUtil',
       'indico/utils/axios': '_IndicoUtilsAxios',
