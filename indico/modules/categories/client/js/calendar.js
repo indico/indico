@@ -92,7 +92,11 @@ import CalendarLegend from './components/CalendarLegend';
             calendar.refetchEvents();
           };
           ReactDOM.render(
-            React.createElement(CalendarLegend, {items, groupBy: data.group_by, onFilterChanged}),
+            <CalendarLegend
+              items={items}
+              groupBy={data.group_by}
+              onFilterChanged={onFilterChanged}
+            />,
             legendContainer
           );
         }
