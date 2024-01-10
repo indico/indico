@@ -4,7 +4,8 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
+import colorsys
+import random
 from datetime import date, datetime, time, timedelta
 from enum import Enum, auto
 from functools import partial
@@ -55,13 +56,27 @@ from indico.web.rh import RH, allow_signed_url
 from indico.web.util import jsonify_data
 
 
-CALENDAR_COLOR_PALETTE = [
-    ColorTuple('#1F1100', '#ECC495'),
-    ColorTuple('#0F0202', '#B9CBCA'),
-    ColorTuple('#0D1E1F', '#C2ECEF'),
-    ColorTuple('#000000', '#D0C296'),
-    ColorTuple('#202020', '#EFEBC2')
-]
+def _rgb_to_hex(rgb):
+    return f'#{int(rgb[0] * 255):02x}{int(rgb[1] * 255):02x}{int(rgb[2] * 255):02x}'
+
+
+def _generate_contrast_color(seed):
+    random.seed(seed)
+
+    # Generate a random hue, saturation, and brightness
+    hue = random.random()
+    saturation = random.uniform(0.5, 1.0)
+    brightness = random.uniform(0.5, 1.0)
+
+    # Convert HSB to RGB
+    r, g, b = colorsys.hsv_to_rgb(hue, saturation, brightness)
+    background_color = _rgb_to_hex((r, g, b))
+
+    # Ensure text color is black or mostly black
+    brightness = random.uniform(0.0, 0.1)
+    text_color = _rgb_to_hex((brightness, brightness, brightness))
+
+    return ColorTuple(text=text_color, background=background_color)
 
 
 def _flat_map(func, list_):
@@ -620,7 +635,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           'url': event.url,
                           'categoryId': event.category_id,
                           'venueId': event.own_venue_id}
-            colors = CALENDAR_COLOR_PALETTE[comparison_id % len(CALENDAR_COLOR_PALETTE)]
+            colors = _generate_contrast_color(comparison_id)
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
         return data
