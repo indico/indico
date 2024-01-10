@@ -183,15 +183,5 @@ import CalendarLegend from './components/CalendarLegend';
       },
     });
     calendar.render();
-
-    $('.js-calendar-datepicker').datepicker({
-      dateFormat: 'yy-mm-dd',
-      beforeShowDay(date) {
-        return [date.getDate() === 1, ''];
-      },
-      onSelect(date) {
-        calendar.gotoDate(date);
-      },
-    });
   };
 })(window);
