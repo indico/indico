@@ -8,6 +8,7 @@
 from flask import request
 from sqlalchemy.orm import selectinload, undefer
 from webargs import fields
+from werkzeug.exceptions import NotFound
 
 from indico.core import signals
 from indico.modules.events.management.controllers.base import RHManageEventBase
@@ -106,4 +107,21 @@ class RHCheckinAPIRegistration(RHCheckinAPIRegFormBase):
             signals.event.registration_checkin_updated.send(self.registration)
         if paid is not None and paid != self.registration.is_paid and self.registration.price:
             toggle_registration_payment(self.registration, paid=paid)
+        return CheckinRegistrationSchema().jsonify(self.registration)
+
+
+class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
+    """Get full details for a specific registration from the ticket UUID (checkin secret)."""
+
+    def _process_args(self):
+        ticket_uuid = str(request.view_args['ticket_uuid'])
+        self.registration = (Registration.query
+                             .filter_by(ticket_uuid=ticket_uuid, is_deleted=False)
+                             .first_or_404())
+        self.regform = self.registration.registration_form
+        self.event = self.registration.event
+        if self.regform.is_deleted:
+            raise NotFound
+
+    def _process_GET(self):
         return CheckinRegistrationSchema().jsonify(self.registration)
