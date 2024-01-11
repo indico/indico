@@ -21,7 +21,7 @@ from werkzeug.utils import cached_property
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.modules.users import User
-from indico.util.date_time import get_display_tz
+from indico.util.date_time import get_display_tz, utc_to_server
 from indico.util.i18n import set_best_lang
 from indico.web.util import get_request_user
 
@@ -186,7 +186,12 @@ class IndicoSessionInterface(SessionInterface):
             session_lifetime = self.temporary_session_lifetime
 
         if session.hard_expiry:
-            return min(session_lifetime, session.hard_expiry - datetime.now(timezone.utc))
+            hard_lifetime = session.hard_expiry - datetime.now(timezone.utc)
+            if not session_lifetime:
+                # if we have `SESSION_LIFETIME = 0` ("browser session"), the `min()` logic below
+                # would not work properly because 0 generally means 'no expiry'
+                return hard_lifetime
+            return min(session_lifetime, hard_lifetime)
 
         return session_lifetime
 
@@ -250,6 +255,7 @@ class IndicoSessionInterface(SessionInterface):
         storage_ttl = self.get_storage_lifetime(app, session)
         if session.hard_expiry:
             cookie_lifetime = session.hard_expiry
+            session['_expires'] = utc_to_server(session.hard_expiry).replace(tzinfo=None)
         else:
             cookie_lifetime = self.get_expiration_time(app, session)
             session['_expires'] = datetime.now() + storage_ttl
