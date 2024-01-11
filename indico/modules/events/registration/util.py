@@ -744,7 +744,7 @@ def generate_ticket_qr_code(person):
         border=1
     )
     data = get_ticket_qr_code_data(person)
-    qr.add_data(json.dumps(data))
+    qr.add_data(json.dumps(data, separators=(',', ':')))
     qr.make(fit=True)
     return qr.make_image()._img
 
