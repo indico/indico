@@ -365,30 +365,31 @@ class RHRenderMarkdown(RH):
         return jsonify(html=html)
 
 
-class SessionExpiryMixin:
-    """Return the session expiration time."""
-
-    def _process(self):
-        try:
-            expiry = str(server_to_utc(session['_expires']))
-        except KeyError:
-            expiry = None
-        return jsonify(session_expiry=expiry)
-
-
-class RHSessionExpiry(SessionExpiryMixin, RH):
+class RHSessionExpiry(RH):
     """Return the session expiration time without refreshing the session.
 
     The logic that prevents this endpoint from refreshing the session is
     implemented in ``indico.web.flask.session``.
     """
 
+    def _process(self):
+        try:
+            expiry = str(server_to_utc(session['_expires']))
+        except KeyError:
+            # an empty session (nothing stored on the server at all) also has no expiry
+            expiry = None
+        return jsonify(session_expiry=expiry)
 
-class RHSessionRefresh(SessionExpiryMixin, RH):
-    """Return the sesssion expiration time and refresh the current session.
 
-    Refreshing the session is the standard behavior of almost any endpoint.
+class RHSessionRefresh(RH):
+    """Refresh the current session.
+
+    Refreshing the session is the standard behavior of almost any endpoint,
+    so no custom logic is needed here
 
     The logic that forces this endpoint to always refresh the session is
     implemented in ``indico.web.flask.session``.
     """
+
+    def _process(self):
+        return '', 204
