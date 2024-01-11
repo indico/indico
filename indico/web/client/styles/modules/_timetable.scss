@@ -7,6 +7,7 @@
 
 @use 'base' as *;
 @use 'partials/boxes' as *;
+@use 'design_system';
 
 @mixin base-list-properties() {
   overflow: auto;
@@ -83,10 +84,12 @@
 
   .legendItem {
     @include default-border-radius();
+    @extend %flex-row;
+    --flex-gap: 0.2em;
+    align-items: center;
     background: $pastel-gray;
     color: $black;
     float: left;
-    height: 15px;
     margin: 2px;
     padding: 5px;
     overflow: hidden;
@@ -101,6 +104,7 @@
     margin-top: -2px;
     height: 15px;
     width: 15px;
+    min-width: 15px;
   }
 
   .legendCloseButton {
