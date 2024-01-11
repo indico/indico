@@ -63,11 +63,12 @@ class RHLogin(RH):
     # CSRF check anyway disabling the global check is perfectly fine.
     CSRF_ENABLED = False
 
-    def _process(self):
+    @use_kwargs({'force': fields.Bool(load_default=False)}, location='query')
+    def _process(self, force):
         login_reason = session.pop('login_reason', None)
 
         # User is already logged in
-        if session.user is not None:
+        if session.user is not None and not force:
             multipass.set_next_url()
             return multipass.redirect_success()
 
@@ -112,7 +113,7 @@ class RHLogin(RH):
         providers = list(multipass.auth_providers.values())
         retry_in = login_rate_limiter.get_reset_delay() if rate_limit_exceeded else None
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
-                               login_reason=login_reason, retry_in=retry_in)
+                               login_reason=login_reason, retry_in=retry_in, force=(force or None))
 
 
 class RHLoginForm(RH):
