@@ -11,7 +11,6 @@ import dataclasses
 import itertools
 import uuid
 from operator import attrgetter
-from urllib.parse import urlsplit
 
 from flask import json, session
 from marshmallow import RAISE, ValidationError, fields, validates
@@ -709,7 +708,7 @@ def get_ticket_qr_code_data(person):
     checkin_secret = person['registration'].ticket_uuid
 
     qr_code_version = 2  # Increment this if the QR code format changes
-    url = _strip_scheme_if_https(config.BASE_URL)
+    url = config.BASE_URL.removeprefix('https://')
 
     data = {
         '': [qr_code_version, url, _base64_encode_uuid(checkin_secret)]
@@ -719,13 +718,6 @@ def get_ticket_qr_code_data(person):
 
     signals.event.registration.generate_ticket_qr_code.send(registration, person=person, ticket_data=data)
     return data
-
-
-def _strip_scheme_if_https(url):
-    if urlsplit(config.BASE_URL).scheme == 'https':
-        return url.removeprefix('https://')
-    else:
-        return url
 
 
 def _base64_encode_uuid(uid):
