@@ -55,7 +55,9 @@ colorclass==2.2.2
     #   -c requirements.txt
     #   unbeheader
 coverage==7.3.2
-    # via pytest-cov
+    # via
+    #   coverage
+    #   pytest-cov
 docutils==0.18.1
     # via
     #   plantweb
@@ -106,7 +108,7 @@ itsdangerous==2.1.2
     # via
     #   -c requirements.txt
     #   flask
-jinja2==3.1.2
+jinja2==3.1.3
     # via
     #   -c requirements.txt
     #   flask
