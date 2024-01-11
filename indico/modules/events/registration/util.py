@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import base64
 import csv
 import dataclasses
 import itertools
+import uuid
 from operator import attrgetter
+from urllib.parse import urlsplit
 
 from flask import json, session
 from marshmallow import RAISE, ValidationError, fields, validates
@@ -677,6 +680,58 @@ def build_registration_api_data(registration):
     return registration_info
 
 
+def get_ticket_qr_code_data(person):
+    """Get the data which will be saved in a ticket QR code.
+
+    QR code format:
+
+    {
+        '': [qr_code_version, indico_url, b64(checkin_secret), b64(person_id)],
+        # extra keys may be added by plugins (e.g. site access)
+    }
+
+    This format tries to be as compact as possible so that the resulting QR codes
+    are small and easy to scan. However, we need to stick with a JSON dictionary in
+    order to be compatible with the site access plugin which inserts an extra key
+    with the ADaMS URL.
+
+    Note that `person_id` is only included if this is a ticket for an accompanying person.
+
+    The checkin secret and person id (if present) is base64-encoded to save space
+    (see https://stackoverflow.com/a/53136913/3911147).
+
+    If Indico is running on HTTPS, the scheme ('https://') is stripped from the
+    URL to save a few extra bytes.
+    """
+    registration = person['registration']
+    is_accompanying = person['is_accompanying']
+    person_id = person['id']
+    checkin_secret = person['registration'].ticket_uuid
+
+    qr_code_version = 2  # Increment this if the QR code format changes
+    url = _strip_scheme_if_https(config.BASE_URL)
+
+    data = {
+        '': [qr_code_version, url, _base64_encode_uuid(checkin_secret)]
+    }
+    if is_accompanying:
+        data[''].append(_base64_encode_uuid(person_id))
+
+    signals.event.registration.generate_ticket_qr_code.send(registration, person=person, ticket_data=data)
+    return data
+
+
+def _strip_scheme_if_https(url):
+    if urlsplit(config.BASE_URL).scheme == 'https':
+        return url.removeprefix('https://')
+    else:
+        return url
+
+
+def _base64_encode_uuid(uid):
+    return base64.b64encode(uuid.UUID(uid).bytes).decode('ascii')
+
+
 def generate_ticket_qr_code(person):
     """Generate a Pillow `Image` with a QR Code encoding a check-in ticket.
 
@@ -688,21 +743,8 @@ def generate_ticket_qr_code(person):
         box_size=3,
         border=1
     )
-    registration = person['registration']
-    # accompanying persons check-in is not supported
-    checkin_secret = person['registration'].ticket_uuid if not person['is_accompanying'] else ''
-    qr_data = {
-        'registrant_id': person['id'],
-        'registration_id': person['registration'].id,
-        'regform_id': registration.registration_form_id,
-        'checkin_secret': checkin_secret,
-        'event_id': str(registration.event.id),
-        'server_url': config.BASE_URL,
-        'version': 1
-    }
-    signals.event.registration.generate_ticket_qr_code.send(registration, person=person, ticket_data=qr_data)
-    json_qr_data = json.dumps(qr_data)
-    qr.add_data(json_qr_data)
+    data = get_ticket_qr_code_data(person)
+    qr.add_data(json.dumps(data))
     qr.make(fit=True)
     return qr.make_image()._img
 
