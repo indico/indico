@@ -202,9 +202,9 @@ class RHCreateBooking(RHRoomBookingBase):
 
     @staticmethod
     @make_interceptable
-    def after_create(args: dict[str, typing.Any], reservation: 'Reservation') -> None:
-        """
-        Hook called after a reservation is created.
+    def after_create(args: dict[str, typing.Any], reservation: Reservation) -> None:
+        """Hook called after a reservation is created.
+
         :param args: The data from the request that was used to create the Reservation.
         :param reservation: The Reservation object that was created.
         """
@@ -355,7 +355,7 @@ class RHUpdateBooking(RHBookingBase):
 
         check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 
-        new_booking: typing.Optional['Reservation'] = None
+        new_booking: typing.Optional[Reservation] = None
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)
@@ -378,8 +378,8 @@ class RHUpdateBooking(RHBookingBase):
     @make_interceptable
     def after_update(
             args: dict[str, typing.Any],
-            reservation: 'Reservation',
-            new_split_reservation: typing.Optional['Reservation'] = None,
+            reservation: Reservation,
+            new_split_reservation: typing.Optional[Reservation] = None,
             **kwargs,
     ) -> None:
         """Hook called after a reservation is updated.
