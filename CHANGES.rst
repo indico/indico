@@ -232,6 +232,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Add placeholders for accompanying persons to the badge/ticket designer (:pr:`6033`)
+- Add possibility for plugins to add extra fields in a room booking form. Make interceptable hooks after room booking is created and updated (:pr:`6126`)
 
 Bugfixes
 ^^^^^^^^

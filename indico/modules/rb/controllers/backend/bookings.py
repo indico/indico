@@ -4,6 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+
 import typing
 import uuid
 from datetime import date, datetime, time
@@ -204,10 +205,9 @@ class RHCreateBooking(RHRoomBookingBase):
     def after_create(args: dict[str, typing.Any], reservation: 'Reservation') -> None:
         """
         Hook called after a reservation is created.
-        :param args: The data from the request that was used to create the Reservation
-        :param reservation: The Reservation object that was created
+        :param args: The data from the request that was used to create the Reservation.
+        :param reservation: The Reservation object that was created.
         """
-        pass
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
@@ -388,7 +388,6 @@ class RHUpdateBooking(RHBookingBase):
         :param reservation: The Reservation object that was updated
         :param new_split_reservation: The new Reservation that was created by splitting the original one
         """
-        pass
 
 
 class RHMyUpcomingBookings(RHRoomBookingBase):
