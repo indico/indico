@@ -597,14 +597,15 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
             raise BadRequest(str(e))
 
     def _process(self):
-        query = (Event.query
+        query = (
+            Event.query
                  .filter(Event.starts_between(self.start_dt, self.end_dt),
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
-                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id')))
-        events = self._get_event_data(query)
-        raw_categories = Category.query.options(load_only('id', 'title')).all()
-        categories = [{'title': cat.title, 'id': cat.id} for cat in raw_categories]
+                 .options(undefer(Event.detailed_category_chain),
+                          load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id'))
+        )
+        events, categories = self._get_event_data(query)
         raw_locations = Location.query.options(load_only('id', 'name')).all()
         locations = [{'title': loc.name, 'id': loc.id} for loc in raw_locations]
         ongoing_events = (Event.query
@@ -620,21 +621,34 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                             ongoing_event_count=len(ongoing_events),
                             ongoing_events_html=self._render_ongoing_events(ongoing_events))
 
+    def _find_nearest_category(self, category_chain):
+        for index, category_data in enumerate(category_chain):
+            if category_data['id'] == self.category.id:
+                if index == len(category_chain) - 1:
+                    return category_data
+                else:
+                    return category_chain[index + 1]
+        return {'id': 0, 'title': 'No category'}
+
     def _get_event_data(self, event_query):
         data = []
+        categories = {}
         tz = self.category.display_tzinfo
         for event in event_query:
-            comparison_id = event.category_id if self.group_by == self.GroupBy.category else event.own_venue_id or 0
+            category_data = self._find_nearest_category(event.detailed_category_chain)
+            category_id = category_data['id']
+            comparison_id = category_id if self.group_by == self.GroupBy.category else event.own_venue_id or 0
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'url': event.url,
-                          'categoryId': event.category_id,
+                          'categoryId': category_id,
                           'venueId': event.own_venue_id}
             colors = _generate_contrast_color(comparison_id)
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
-        return data
+            categories[category_id] = category_data
+        return data, list(categories.values())
 
     def _render_ongoing_events(self, ongoing_events):
         template = get_template_module('categories/display/_calendar_ongoing_events.html')
