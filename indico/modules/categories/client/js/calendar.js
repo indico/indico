@@ -19,6 +19,7 @@ import CalendarLegend from './components/CalendarLegend';
 
 (function(global) {
   let groupBy = 'category';
+  const filteredLegendElements = new Set();
   global.setupCategoryCalendar = function setupCategoryCalendar(
     containerCalendarSelector,
     containerLegendSelector,
@@ -54,7 +55,9 @@ import CalendarLegend from './components/CalendarLegend';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          successCallback(data.events);
+          const attr = groupBy === 'category' ? 'categoryId' : 'locationId';
+          const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr]));
+          successCallback(filteredEvents);
           const toolbarGroup = $(containerCalendarSelector).find(
             '.fc-toolbar .fc-toolbar-chunk:last-child'
           );
@@ -91,11 +94,21 @@ import CalendarLegend from './components/CalendarLegend';
             groupBy = filterBy;
             calendar.refetchEvents();
           };
+          const onElementSelected = (id, checked) => {
+            if (checked) {
+              filteredLegendElements.delete(id);
+            } else {
+              filteredLegendElements.add(id);
+            }
+            calendar.refetchEvents();
+          };
+          items = items.map(item => ({...item, checked: !filteredLegendElements.has(item.id)}));
           ReactDOM.render(
             <CalendarLegend
               items={items}
               groupBy={data.group_by}
               onFilterChanged={onFilterChanged}
+              onElementSelected={onElementSelected}
             />,
             legendContainer
           );
