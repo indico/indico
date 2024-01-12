@@ -4,8 +4,8 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+
 import colorsys
-import random
 from datetime import date, datetime, time, timedelta
 from enum import Enum, auto
 from functools import partial
@@ -61,20 +61,16 @@ def _rgb_to_hex(rgb):
 
 
 def _generate_contrast_color(seed):
-    random.seed(seed)
-
-    # Generate a random hue, saturation, and brightness
-    hue = random.random()
-    saturation = random.uniform(0.5, 1.0)
-    brightness = random.uniform(0.5, 1.0)
-
-    # Convert HSB to RGB
+    hue = 1.0 / (1.0 + seed % 20)
+    saturation = 1.0 / (1.0 + seed % 4)
+    if saturation < 0.5:
+        saturation += 0.5
+    brightness = 1.0 / (1.0 + seed % 3)
+    if brightness < 0.5:
+        brightness += 0.5
     r, g, b = colorsys.hsv_to_rgb(hue, saturation, brightness)
     background_color = _rgb_to_hex((r, g, b))
-
-    # Ensure text color is black or mostly black
-    brightness = random.uniform(0.0, 0.1)
-    text_color = _rgb_to_hex((brightness, brightness, brightness))
+    text_color = _rgb_to_hex((0, 0, 0))
 
     return ColorTuple(text=text_color, background=background_color)
 
