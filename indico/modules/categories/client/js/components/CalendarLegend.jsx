@@ -36,7 +36,7 @@ function CalendarLegend({items, groupBy, onFilterChanged}) {
     {text: Translate.string('Location'), value: 'location'},
   ];
   return (
-    <div styleName="legend-container">
+    <div>
       <span>{Translate.string('Display by:')}</span>
       <Select
         value={groupBy || 'category'}
