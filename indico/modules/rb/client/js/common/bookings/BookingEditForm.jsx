@@ -169,6 +169,7 @@ class BookingEditForm extends React.Component {
       bookingReasonRequired,
       onExtraFieldsChange,
     } = this.props;
+    const {booking} = this.props;
     const {
       values: {dates, recurrence, timeSlot, usage},
       submitSucceeded,
@@ -390,10 +391,9 @@ class BookingEditForm extends React.Component {
         </Segment>
         {renderPluginComponents('rb-form-extra_fields', {
           room,
-          booking: this.props.booking,
-          onSubmit: item => {
-            onExtraFieldsChange(item);
-          },
+          booking,
+          formProps,
+          onSubmit: item => onExtraFieldsChange(item),
         })}
 
         {room.canUserViewInternalNotes && (
