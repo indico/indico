@@ -628,7 +628,8 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                     return category_data
                 else:
                     return category_chain[index + 1]
-        return {'id': 0, 'title': 'No category'}
+        # this should never happen
+        raise NotFound
 
     def _get_event_data(self, event_query):
         data = []
