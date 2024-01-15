@@ -12,6 +12,8 @@ import {Checkbox, Icon, Popup, Table} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
+import './PersonList.module.scss';
+
 const getDefaultSort = persons => _.sortBy(persons, 'identifier');
 
 function personListReducer(state, action) {
@@ -178,10 +180,10 @@ export default function PersonList({
                 trigger={<i className={`icon-ticket ${person.registered ? '' : 'inactive'}`} />}
               />
             </Table.Cell>
-            <Table.Cell>{person.fullName}</Table.Cell>
-            <Table.Cell>{person.email}</Table.Cell>
-            <Table.Cell>{person.affiliation}</Table.Cell>
-            <Table.Cell>{person.authorType}</Table.Cell>
+            <Table.Cell styleName="data-cell">{person.fullName}</Table.Cell>
+            <Table.Cell styleName="data-cell">{person.email}</Table.Cell>
+            <Table.Cell styleName="data-cell">{person.affiliation}</Table.Cell>
+            <Table.Cell collapsing>{person.authorType}</Table.Cell>
             <Table.Cell collapsing>
               {roles.map(({icon, isActive, titleActive, titleInactive}) => (
                 <Popup
