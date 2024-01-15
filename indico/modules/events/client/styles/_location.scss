@@ -1,0 +1,26 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+.location-info {
+  @extend %flex-row;
+  --flex-wrap: nowrap;
+
+  ind-with-toggletip > button {
+    @extend %button-clear;
+
+    & > span {
+      @extend %visually-hidden;
+    }
+
+    &::after {
+      @extend %icon;
+      @extend %icon-info;
+    }
+  }
+}

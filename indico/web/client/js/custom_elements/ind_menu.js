@@ -6,30 +6,49 @@
 // LICENSE file for more details.
 
 import './ind_menu.scss';
-import {domReady} from 'indico/utils/domstate';
+import {domReady, getViewportGeometry} from 'indico/utils/domstate';
 
+const HOVER_OUT_TIMEOUT = 500;
 let lastId = 0; // Track the assigned IDs to give each element a unique ID
+
+function getListRightCoordinate(container) {
+  // XXX: Call after the menu is shown
+  const {vw} = getViewportGeometry();
+  const containerBox = container.getBoundingClientRect();
+  const isOnLeftHandSide = containerBox.left + containerBox.width / 2 < vw / 2;
+  if (isOnLeftHandSide) {
+    return 'auto';
+  }
+  return '0';
+}
 
 customElements.define(
   'ind-menu',
   class extends HTMLElement {
+    constructor() {
+      super();
+      Object.defineProperty(this, 'show', {
+        get: () => this.hasAttribute('show'),
+        set: value => {
+          this.toggleAttribute('show', value);
+        },
+      });
+    }
+
     connectedCallback() {
       domReady.then(() => {
-        const trigger = this.querySelector('button');
-        const list = this.querySelector('menu');
+        let hoverOutTimer;
 
-        console.assert(
-          trigger.nextElementSibling === list,
-          'The <menu> element must come after <button>'
-        );
+        this.trigger = this.querySelector('button');
+        this.list = this.querySelector('menu');
 
-        trigger.setAttribute('aria-expanded', false);
+        // Initial setup
+        this.list.id = this.list.id || `dropdown-list-${lastId++}`;
+        this.trigger.setAttribute('aria-controls', this.list.id);
+        this.updateMenuDisplay();
 
-        list.id = list.id || `dropdown-list-${lastId++}`;
-        trigger.setAttribute('aria-controls', list.id);
-
-        trigger.addEventListener('click', () => {
-          trigger.setAttribute('aria-expanded', trigger.getAttribute('aria-expanded') !== 'true');
+        this.trigger.addEventListener('click', () => {
+          this.show = !this.show;
         });
 
         this.addEventListener('focusout', () => {
@@ -38,20 +57,53 @@ customElements.define(
             if (this.contains(document.activeElement)) {
               return;
             }
-            trigger.removeAttribute('aria-expanded');
+            this.trigger.removeAttribute('aria-expanded');
           });
         });
 
         this.addEventListener('keydown', evt => {
-          if (!trigger.hasAttribute('aria-expanded')) {
-            return;
-          }
-          if (evt.code === 'Escape') {
-            trigger.removeAttribute('aria-expanded');
-            trigger.focus();
+          if (this.show && evt.code === 'Escape') {
+            this.show = false;
+            this.trigger.focus();
           }
         });
+
+        this.addEventListener('focusout', () => {
+          // XXX: skip frame to see if the next focused element is still inside the menu
+          requestAnimationFrame(() => {
+            if (!this.contains(document.activeElement)) {
+              this.show = false;
+            }
+          });
+        });
+
+        this.addEventListener('pointerleave', () => {
+          hoverOutTimer = setTimeout(() => {
+            if (!this.contains(document.activeElement)) {
+              this.show = false;
+            }
+          }, HOVER_OUT_TIMEOUT);
+        });
+
+        this.addEventListener('pointenter', () => {
+          clearTimeout(hoverOutTimer);
+        });
       });
+    }
+
+    attributeChangedCallback() {
+      this.updateMenuDisplay();
+    }
+
+    static observedAttributes = ['show'];
+
+    updateMenuDisplay() {
+      this.trigger.setAttribute('aria-expanded', this.show);
+      if (this.show) {
+        requestAnimationFrame(() => {
+          this.list.style.setProperty('--right', getListRightCoordinate(this, this.list));
+        });
+      }
     }
   }
 );

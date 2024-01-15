@@ -1,39 +1,10 @@
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro _render_location_tip(item) -%}
-    {% set show_url = item.room and item.room.map_url %}
-    <div class="location-info-tip">
-        {% if item.room_name -%}
-            <h3>{{ item.room_name }}</h3>
-        {% endif %}
-        {% if item.venue_name -%}
-            <h4>{{ item.venue_name }}</h4>
-        {% endif %}
-        {% if item.address %}
-            <div class="location-address">
-                {{- item.address }}
-            </div>
-        {%- endif %}
-        {% if item.room and item.room.capacity %}
-            <div class="icon-user">
-                {{ item.room.capacity }}
-            </div>
-        {% endif %}
-        {% if show_url %}
-            <a href="{{ item.room.map_url }}" class="map-link">
-                {% trans %}Show room on map{% endtrans %}
-            </a>
-        {% endif %}
-    </div>
-{%- endmacro %}
-
 {% macro render_location(item, parent=none, class='item-location', header=false) -%}
     {% set show_venue = not parent or (parent.venue_name != item.venue_name) %}
     {% set show_room = item.room_name != '' %}
     {% if show_venue or show_room %}
-        <span class="location-info {{ class }}"
-              data-qtip-html=".qtip-hidden-content"
-              data-qtip-opts='{"hide": {"fixed": true, "delay": 500}}'>
+        <span class="location-info {{ class }}">
             <i class="icon-location {{ 'header-data' if header }}"></i>
             <span class="text">
                 {%- if show_venue and show_room -%}
@@ -44,9 +15,38 @@
                     {{ item.room_name }}
                 {%- endif -%}
             </span>
-        </span>
-        <span class="qtip-hidden-content">
-            {{ _render_location_tip(item) }}
+
+            {% set tip_content %}
+                <div data-tip-content>
+                    {% if item.address %}
+                        <address class="location-address">{{ item.address }}</address>
+                    {% endif %}
+
+                    {% if item.room.capacity %}
+                        <div class="room-capacity">
+                            <span>{% trans %}Capacity:{% endtrans %}</span>
+                            {{ item.room.capacity }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endset %}
+
+            {% if item.map_url or item.room and item.room.map_url %}
+                <ind-with-tooltip>
+                    <a href="{{ item.map_url or item.room.map_url }}" class="map-link" target="_blank">
+                        <span>{% trans %}Show location on the map{% endtrans %}</span>
+                        (missing icon)
+                    </a>
+                    {{ tip_content }}
+                </ind-with-tooltip>
+            {% else %}
+                <ind-with-toggletip>
+                    <button>
+                        <span>{% trans %}Show location details{% endtrans %}</span>
+                    </button>
+                    {{ tip_content }}
+                </ind-with-toggletip>
+            {% endif %}
         </span>
     {% endif %}
 {%- endmacro %}
@@ -87,7 +87,7 @@
                 <h3>
                     {%- trans count=contribution.speakers|length -%}
                         Speaker
-                    {%- pluralize -%}
+                        {%- pluralize -%}
                         Speakers
                     {%- endtrans -%}
                 </h3>
@@ -111,19 +111,28 @@
 
 {% macro render_event_time(event, timezone) -%}
     <i class="icon-calendar header-data" title="{% trans %}Start/end date/time of the event{% endtrans %}"></i>
-    <span class="event-time-data">
-        {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
-            {{ render_datetime('startDate', event.start_dt, timezone=timezone, show_weekday=true) }}
-            &rarr;
-            <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
-                {{ event.end_dt | format_time(format='medium', timezone=timezone) }}
-            </time>
-        {% else %}
+    {% if event.start_dt.astimezone(timezone).date() == event.end_dt.astimezone(timezone).date() %}
+        {% set start_time = event.start_dt | format_datetime('medium', timezone=timezone) %}
+        {% set end_time = event.end_dt | format_time('medium', timezone=timezone) %}
+        <span class="event-time-data"
+              aria-label="{% trans %}{{ start_time }} to {{ end_time }} ({{ timezone }}){% endtrans %}">
+                {{ render_datetime('startDate', event.start_dt, timezone=timezone, show_weekday=true) }}
+                &rarr;
+                <time itemprop="endDate" datetime="{{ event.end_dt.isoformat() }}">
+                    {{ event.end_dt | format_time(format='medium', timezone=timezone) }}
+                </time>
+            <span class="timezone">{{ timezone }}</span>
+        </span>
+    {% else %}
+        {% set start_time = event.start_dt | format_datetime('medium', timezone=timezone) %}
+        {% set end_time = event.end_dt | format_datetime('medium', timezone=timezone) %}
+        <span class="event-time-data"
+              aria-label="{% trans %}{{ start_time }} to {{ end_time }} ({{ timezone }}){% endtrans %}">
             {%- set show_weekday = event.type == 'lecture' -%}
             {{ render_datetime('startDate', event.start_dt, timezone=timezone, show_weekday=show_weekday) }}
             &rarr;
             {{ render_datetime('endDate', event.end_dt, timezone=timezone, show_weekday=show_weekday) }}
-        {% endif %}
-        <span class="timezone">{{ timezone }}</span>
-    </span>
+            <span class="timezone">{{ timezone }}</span>
+        </span>
+    {% endif %}
 {%- endmacro %}
