@@ -29,10 +29,16 @@ function LegendItem({title, color, textColor, checked, isSpecial, onChange}) {
 LegendItem.propTypes = {
   title: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
-  textColor: PropTypes.string.isRequired,
-  checked: PropTypes.bool.isRequired,
-  isSpecial: PropTypes.bool.isRequired,
+  textColor: PropTypes.string,
+  checked: PropTypes.bool,
+  isSpecial: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+};
+
+LegendItem.defaultProps = {
+  checked: true,
+  isSpecial: false,
+  textColor: '#000000',
 };
 
 function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
@@ -63,7 +69,8 @@ function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
         value={groupBy || 'category'}
         open={isOpen}
         options={options}
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsOpen(!isOpen)}
+        onBlur={() => setIsOpen(false)}
         onChange={onChange}
       />
       <div>{parsedItems}</div>
