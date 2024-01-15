@@ -93,6 +93,7 @@ import CalendarLegend from './components/CalendarLegend';
         function setupCalendarLegend(data, items, legendContainer) {
           const onFilterChanged = filterBy => {
             groupBy = filterBy;
+            filteredLegendElements.clear();
             calendar.refetchEvents();
           };
           const onElementSelected = (id, checked) => {
