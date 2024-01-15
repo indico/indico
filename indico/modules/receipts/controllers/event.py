@@ -180,6 +180,7 @@ class RHGenerateReceipts(RenderReceiptsBase):
             )
             context = ('event', self.event.id, 'registration', registration.id, 'receipts')
             f.save(context, pdf_content)
+            f.claim()
             receipt = ReceiptFile(
                 file=f,
                 registration=registration,
