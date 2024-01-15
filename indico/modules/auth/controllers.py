@@ -727,7 +727,11 @@ class RHResetPassword(RH):
 
     def _process(self):
         if 'token' in request.args:
-            data = secure_serializer.loads(request.args['token'], max_age=3600, salt='reset-password')
+            try:
+                data = secure_serializer.loads(request.args['token'], max_age=3600, salt='reset-password')
+            except (BadSignature, ValueError):
+                flash(_('This Token is invalid or has expired.'), 'warning')
+                return redirect(url_for('.resetpass'))
             identity = Identity.get(data['id'])
             if not identity:
                 raise BadData('Identity does not exist')
