@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState} from 'react';
 import './CalendarLegend.module.scss';
 import {Checkbox, Select} from 'semantic-ui-react';
 
@@ -33,6 +33,7 @@ LegendItem.propTypes = {
 };
 
 function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
+  const [isOpen, setIsOpen] = useState(false);
   const parsedItems = items.map(({id, title, checked, color, textColor}) => (
     <LegendItem
       key={id}
@@ -47,13 +48,19 @@ function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
     {text: Translate.string('Category'), value: 'category'},
     {text: Translate.string('Location'), value: 'location'},
   ];
+  const onChange = (_, {value}) => {
+    onFilterChanged(value);
+    setIsOpen(false);
+  };
   return (
     <div>
       <h3>{Translate.string('Display by:')}</h3>
       <Select
         value={groupBy || 'category'}
+        open={isOpen}
         options={options}
-        onChange={(_, {value}) => onFilterChanged(value)}
+        onClick={() => setIsOpen(true)}
+        onChange={onChange}
       />
       <div>{parsedItems}</div>
     </div>

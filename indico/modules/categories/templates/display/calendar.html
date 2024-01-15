@@ -29,7 +29,8 @@
             '#event-calendar',
             'category-calendar-legend',
             {{ category.display_tzinfo.zone | tojson }},
-            {{ url_for('categories.calendar_events', category) | tojson }}
+            {{ url_for('categories.calendar_events', category) | tojson }},
+            {{ category.id }}
         );
     </script>
 {% endblock %}

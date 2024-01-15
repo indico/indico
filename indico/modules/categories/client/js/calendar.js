@@ -24,7 +24,8 @@ import CalendarLegend from './components/CalendarLegend';
     containerCalendarSelector,
     containerLegendSelector,
     tz,
-    categoryURL
+    categoryURL,
+    categoryId
   ) {
     const cachedEvents = {};
     const container = document.querySelector(containerCalendarSelector);
@@ -114,7 +115,7 @@ import CalendarLegend from './components/CalendarLegend';
           );
         }
 
-        function setupLegendByAttribute(events, items, attr, defaultTitle) {
+        function setupLegendByAttribute(events, items, attr, defaultTitle, rootId, rootTitle) {
           const itemMap = items.reduce(
             (acc, {id, title}) => ({
               ...acc,
@@ -133,14 +134,21 @@ import CalendarLegend from './components/CalendarLegend';
               return [
                 ...acc,
                 {
-                  title: itemMap[id] ?? defaultTitle,
+                  title: (id === rootId ? rootTitle : itemMap[id]) ?? defaultTitle,
                   textColor: value.textColor,
                   color: value.color,
                   id,
                 },
               ];
             }, [])
-            .sort((a, b) => a.title.localeCompare(b.title));
+            .sort((a, b) => {
+              if (a.id === rootId) {
+                return -1;
+              } else if (b.id === rootId) {
+                return 1;
+              }
+              return a.title.localeCompare(b.title);
+            });
         }
 
         function updateLegend(data) {
@@ -151,7 +159,9 @@ import CalendarLegend from './components/CalendarLegend';
                 data.events,
                 data.categories,
                 'categoryId',
-                Translate.string('No category')
+                Translate.string('No category'),
+                categoryId,
+                Translate.string('This category')
               );
               break;
             case 'location':
@@ -159,7 +169,8 @@ import CalendarLegend from './components/CalendarLegend';
                 data.events,
                 data.locations,
                 'venueId',
-                Translate.string('No location')
+                Translate.string('No location'),
+                0
               );
               break;
             default:
