@@ -401,16 +401,18 @@ class PictureField(FileField):
         def _picture_size_and_type(value):
             if not value:
                 return
-            file = File.query.filter(File.uuid == value, ~File.claimed).first() if value else None
+            file = File.query.filter(File.uuid == value, ~File.claimed).first()
             if not file:
                 raise ValidationError('Invalid file')
-            if file.content_type not in ('image/png', 'image/jpg', 'image/gif', 'image/webp'):
-                raise ValidationError(_('This field can accept only .jpg, .png, .gif and .webp picture formats.'))
+            try:
+                with file.open() as f:
+                    pic = Image.open(f)
+            except OSError:
+                raise ValidationError(_('Invalid picture file.'))
+            if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                raise ValidationError(_('This field only accepts jpg, png, gif and webp picture formats.'))
             min_picture_size = self.form_item.data.get('min_picture_size')
-            if min_picture_size:
-                with file.open() as f, Image.open(f) as picture:
-                    if min(picture.size) < min_picture_size:
-                        raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
-                                              .format(min_picture_size))
-
+            if min_picture_size and min(pic.size) < min_picture_size:
+                raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
+                                      .format(min_picture_size))
         return _picture_size_and_type

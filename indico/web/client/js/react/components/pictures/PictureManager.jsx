@@ -316,11 +316,11 @@ const PictureManager = ({
     if (isUploading) {
       setValidationError(Translate.string('Upload in progress'));
     } else if (failed) {
-      setValidationError(Translate.string('Picture upload or Capture failed'));
+      setValidationError(Translate.string('Picture upload/capture failed'));
     } else if (isCapturing) {
       setValidationError(Translate.string('Picture is being captured'));
     } else if (isEditing) {
-      setValidationError(Translate.string('Picture editing in progress'));
+      setValidationError(Translate.string('Picture is being edited'));
     } else {
       setValidationError(undefined);
     }
@@ -340,10 +340,10 @@ const PictureManager = ({
 
   const descriptionText = minPictureSize
     ? Translate.string(
-        'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (.jpg, .png, .gif, .webp)',
+        'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (jpg, png, gif, webp)',
         {minPictureSize}
       )
-    : Translate.string('Allowed file types: .jpg, .png, .gif');
+    : Translate.string('Allowed file types: jpg, png, gif, webp');
 
   return (
     <PictureArea
