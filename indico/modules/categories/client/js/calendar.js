@@ -12,6 +12,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import CalendarYearMonthPicker from 'indico/react/components/dates/CalendarYearMonthPicker';
 import {Translate} from 'indico/react/i18n';
 import {$T} from 'indico/utils/i18n';
 
@@ -33,7 +34,12 @@ import CalendarLegend from './components/CalendarLegend';
       headerToolbar: {
         start: 'prev,next today',
         center: 'title',
-        end: 'dayGridMonth,dayGridWeek,dayGridDay',
+        end: 'goToDate dayGridMonth,dayGridWeek,dayGridDay',
+      },
+      customButtons: {
+        goToDate: {
+          text: '',
+        },
       },
       plugins: [dayGridPlugin],
       initialView: 'dayGridMonth',
@@ -210,5 +216,24 @@ import CalendarLegend from './components/CalendarLegend';
       },
     });
     calendar.render();
+
+    // set up the datepicker
+    const elem = $('.fc-toolbar-chunk:eq(2) button:first')
+      .css('background-color', 'transparent')
+      .css('border-color', 'transparent')
+      .css('background', 'transparent')
+      .get(0);
+    ReactDOM.render(
+      <CalendarYearMonthPicker
+        onDateChange={date => calendar.gotoDate(date.toDate())}
+        placeholder={Translate.string('Go to date...')}
+        verticalSpacing={0}
+        showDefaultInputIcon={false}
+        isOutsideRange={() => false}
+        noBorder
+        required
+      />,
+      elem
+    );
   };
 })(window);
