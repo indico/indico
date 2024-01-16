@@ -16,7 +16,6 @@ import {FinalPictureManager} from 'indico/react/components';
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getUpdateMode} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
@@ -24,8 +23,7 @@ import './FileInput.module.scss';
 
 export default function PictureInput({htmlName, disabled, isRequired, minPictureSize}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
-  const isUpdateMode = useSelector(getUpdateMode);
-  const initialPictureDetails = isUpdateMode ? fileData[htmlName] || null : null;
+  const initialPictureDetails = fileData ? fileData[htmlName] || null : null;
   const uploadUrlParams = {
     event_id: eventId,
     reg_form_id: regformId,
