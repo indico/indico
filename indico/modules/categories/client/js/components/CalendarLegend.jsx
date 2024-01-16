@@ -17,7 +17,7 @@ function LegendItem({title, color, textColor, checked, url, isSpecial, onChange}
     <div styleName="legend-item">
       <div styleName="color-square" style={{backgroundColor: color}} />
       <span styleName={isSpecial ? 'italic' : undefined} style={{color: textColor}}>
-        {url ? <a href={url}>{title}</a> : title}
+        {url && !isSpecial ? <a href={url}>{title}</a> : title}
       </span>
       <div style={{marginLeft: 'auto'}}>
         <Checkbox checked={checked} onChange={onChange} />
