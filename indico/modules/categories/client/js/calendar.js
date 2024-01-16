@@ -56,8 +56,8 @@ import CalendarLegend from './components/CalendarLegend';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          const attr = groupBy === 'category' ? 'categoryId' : 'locationId';
-          const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr]));
+          const attr = groupBy === 'category' ? 'categoryId' : 'venueId';
+          const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr] ?? 0));
           successCallback(filteredEvents);
           const toolbarGroup = $(containerCalendarSelector).find(
             '.fc-toolbar .fc-toolbar-chunk:last-child'
@@ -118,9 +118,9 @@ import CalendarLegend from './components/CalendarLegend';
 
         function setupLegendByAttribute(events, items, attr, defaultTitle, rootId, rootTitle) {
           const itemMap = items.reduce(
-            (acc, {id, title}) => ({
+            (acc, {id, title, url}) => ({
               ...acc,
-              [id]: title ?? defaultTitle,
+              [id]: {title: title ?? defaultTitle, url},
             }),
             {}
           );
@@ -132,12 +132,14 @@ import CalendarLegend from './components/CalendarLegend';
                 return acc;
               }
               usedItems.add(id);
+              const item = itemMap[id] ?? {};
               return [
                 ...acc,
                 {
-                  title: (id === rootId ? rootTitle : itemMap[id]) ?? defaultTitle,
+                  title: (id === rootId ? rootTitle : item.title) ?? defaultTitle,
                   textColor: value.textColor,
                   color: value.color,
+                  url: item.url,
                   id,
                 },
               ];

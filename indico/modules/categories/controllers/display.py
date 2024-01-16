@@ -638,6 +638,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         for event in event_query:
             category_data = self._find_nearest_category(event.detailed_category_chain)
             category_id = category_data['id']
+            category_data['url'] = url_for('categories.calendar', category_id=category_id)
             comparison_id = category_id if self.group_by == self.GroupBy.category else event.own_venue_id or 0
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),

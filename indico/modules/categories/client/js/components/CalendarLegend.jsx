@@ -12,12 +12,12 @@ import {Checkbox, Select} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-function LegendItem({title, color, textColor, checked, isSpecial, onChange}) {
+function LegendItem({title, color, textColor, checked, url, isSpecial, onChange}) {
   return (
     <div styleName="legend-item">
       <div styleName="color-square" style={{backgroundColor: color}} />
       <span styleName={isSpecial ? 'italic' : undefined} style={{color: textColor}}>
-        {title}
+        {url ? <a href={url}>{title}</a> : title}
       </span>
       <div style={{marginLeft: 'auto'}}>
         <Checkbox checked={checked} onChange={onChange} />
@@ -29,6 +29,7 @@ function LegendItem({title, color, textColor, checked, isSpecial, onChange}) {
 LegendItem.propTypes = {
   title: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
+  url: PropTypes.string,
   textColor: PropTypes.string,
   checked: PropTypes.bool,
   isSpecial: PropTypes.bool,
@@ -36,6 +37,7 @@ LegendItem.propTypes = {
 };
 
 LegendItem.defaultProps = {
+  url: undefined,
   checked: true,
   isSpecial: false,
   textColor: '#000000',
@@ -43,7 +45,7 @@ LegendItem.defaultProps = {
 
 function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
   const [isOpen, setIsOpen] = useState(false);
-  const parsedItems = items.map(({id, title, checked, color, textColor}, index) => (
+  const parsedItems = items.map(({id, title, checked, url, color, textColor}, index) => (
     <LegendItem
       key={id}
       title={title}
@@ -51,6 +53,7 @@ function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
       textColor={textColor}
       checked={checked}
       onChange={(_, data) => onElementSelected(id, data.checked)}
+      url={url}
       isSpecial={index === 0}
     />
   ));
@@ -84,5 +87,4 @@ CalendarLegend.propTypes = {
   onFilterChanged: PropTypes.func.isRequired,
   onElementSelected: PropTypes.func.isRequired,
 };
-
 export default CalendarLegend;
