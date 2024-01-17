@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import managementPreviewURL from 'indico-url:event_registration.manage_registration_picture';
+import managementPreviewURL from 'indico-url:event_registration.manage_registration_file';
 import registrantPreviewURL from 'indico-url:event_registration.registration_picture';
 import uploadURL from 'indico-url:event_registration.upload_registration_file';
 

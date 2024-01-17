@@ -784,6 +784,14 @@ class RegistrationData(StoredFileMixin, db.Model):
             raise Exception('The file locator is only available if there is a file.')
         return dict(self.registration.locator, field_data_id=self.field_data_id, filename=self.filename)
 
+    @locator.registrant_file
+    def locator(self):
+        """A locator that points to the associated file for a registrant."""
+        if not self.filename:
+            raise Exception('The file locator is only available if there is a file.')
+        return dict(self.registration.locator.registrant, registration_id=self.registration.id,
+                    field_data_id=self.field_data_id, filename=self.filename)
+
     @property
     def friendly_data(self):
         return self.get_friendly_data()
