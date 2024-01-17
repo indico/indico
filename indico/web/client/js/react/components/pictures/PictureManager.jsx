@@ -338,13 +338,6 @@ const PictureManager = ({
     isEditActive: isEditing,
   };
 
-  const descriptionText = minPictureSize
-    ? Translate.string(
-        'Minimum picture width or height: {minPictureSize} pixels. Allowed file types: (jpg, png, gif, webp)',
-        {minPictureSize}
-      )
-    : Translate.string('Allowed file types: jpg, png, gif, webp');
-
   return (
     <PictureArea
       dropzone={dropzone}
@@ -354,7 +347,6 @@ const PictureManager = ({
       pictureAction={pictureAction}
       picturePreview={getPreview}
       customFileRejections={customFileRejections}
-      descriptionText={descriptionText}
     />
   );
 };

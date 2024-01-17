@@ -33,8 +33,6 @@ export function PictureArea({
   cropper: {pictureCropper: PictureCropper, isEditActive},
   picture,
   dragText,
-  descriptionText,
-  picturePlaceholder,
   pictureAction,
   picturePreview,
   customFileRejections,
@@ -83,9 +81,6 @@ export function PictureArea({
                 </Grid.Column>
               )}
               <Grid.Column verticalAlign="middle" width={!isDragActive && picture ? 6 : 16}>
-                {!picture && (
-                  <Icon name={picturePlaceholder} size="massive" styleName="picture-placeholder" />
-                )}
                 <Header>
                   {!isDragActive ? dragText : <Translate>Drop picture here</Translate>}
                 </Header>
@@ -171,7 +166,6 @@ export function PictureArea({
                   </>
                 )}
                 <Divider horizontal />
-                <p>{descriptionText}</p>
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -185,7 +179,7 @@ export function PictureArea({
               <Message.List key={file.path}>
                 {errors.map(e => (
                   <Message.Item key={e.code}>
-                    {file.name}:- {e.message}
+                    {file.name}: {e.message}
                   </Message.Item>
                 ))}
               </Message.List>
@@ -221,8 +215,6 @@ PictureArea.propTypes = {
   cropper: PropTypes.object.isRequired,
   picture: pictureDetailsShape,
   dragText: PropTypes.string,
-  descriptionText: PropTypes.string,
-  picturePlaceholder: PropTypes.string,
   pictureAction: fileActionShape,
   picturePreview: PropTypes.func.isRequired,
   customFileRejections: PropTypes.object,
@@ -231,8 +223,6 @@ PictureArea.propTypes = {
 PictureArea.defaultProps = {
   picture: null,
   dragText: Translate.string('Drag a picture here'),
-  descriptionText: Translate.string('Allowed file types: .jpg, .png, .gif.'),
-  picturePlaceholder: 'picture',
   pictureAction: null,
   customFileRejections: null,
 };
