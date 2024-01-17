@@ -15,9 +15,10 @@
   .picture-card {
     .action {
       position: absolute;
-      top: -15px;
+      top: 3px;
       cursor: pointer;
-      right: -15px;
+      right: -1px;
+      background-color: white;
     }
 
     :global(.ui.progress) {

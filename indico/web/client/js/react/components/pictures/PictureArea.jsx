@@ -71,6 +71,7 @@ export function PictureArea({
                     )}
                     {pictureAction && (
                       <Icon
+                        bordered
                         styleName="action"
                         name={pictureAction.icon}
                         color={pictureAction.color}
