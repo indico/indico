@@ -19,12 +19,12 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
-from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
-from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
+from indico.modules.events.registration.controllers import (RegistrationEditMixin, RegistrationFormMixin,
+                                                            RegistrationPictureMixin)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
-from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItem
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
+from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
@@ -531,26 +531,5 @@ class RHReceiptDownload(RHRegistrationFormRegistrationBase):
         return self.receipt_file.file.send()
 
 
-class RHRegistrationDownloadPicture(RHRegistrationFormRegistrationBase):
+class RHRegistrationDownloadPicture(RegistrationPictureMixin, RHRegistrationFormRegistrationBase):
     """Download a picture attached to a registration."""
-
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.field_data.locator.file
-        }
-    }
-
-    def _process_args(self):
-        RHRegistrationFormRegistrationBase._process_args(self)
-        self.field_data = (RegistrationData.query
-                           .filter(RegistrationFormItem.input_type == 'picture',
-                                   RegistrationData.registration_id == request.view_args['registration_id'],
-                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                   RegistrationData.filename.isnot(None))
-                           .join(RegistrationData.field_data)
-                           .join(RegistrationFormFieldData.field)
-                           .options(joinedload('registration').joinedload('registration_form'))
-                           .one())
-
-    def _process(self):
-        return self.field_data.send()

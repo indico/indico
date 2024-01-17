@@ -5,7 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import previewURL from 'indico-url:event_registration.registration_picture';
+import managementPreviewURL from 'indico-url:event_registration.manage_registration_picture';
+import registrantPreviewURL from 'indico-url:event_registration.registration_picture';
 import uploadURL from 'indico-url:event_registration.upload_registration_file';
 
 import PropTypes from 'prop-types';
@@ -16,6 +17,7 @@ import {FinalPictureManager} from 'indico/react/components';
 import {FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
+import {getManagement} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
@@ -24,6 +26,8 @@ import './FileInput.module.scss';
 export default function PictureInput({htmlName, disabled, isRequired, minPictureSize}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const initialPictureDetails = fileData ? fileData[htmlName] || null : null;
+  const isManagement = useSelector(getManagement);
+  const previewURL = isManagement ? managementPreviewURL : registrantPreviewURL;
   const uploadUrlParams = {
     event_id: eventId,
     reg_form_id: regformId,

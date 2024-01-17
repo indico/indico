@@ -67,6 +67,9 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
 _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>',
     'registration_file', reglists.RHRegistrationDownloadAttachment)
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>',
+    'manage_registration_picture', reglists.RHManageRegistrationDownloadPicture)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/approve',
                  'approve_registration', reglists.RHRegistrationApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',

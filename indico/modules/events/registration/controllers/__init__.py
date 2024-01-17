@@ -6,11 +6,13 @@
 # LICENSE file for more details.
 
 from flask import jsonify, request, session
-from sqlalchemy.orm import defaultload
+from sqlalchemy.orm import defaultload, joinedload
 
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.registration.util import (get_flat_section_submission_data, get_form_registration_data,
                                                      make_registration_schema, modify_registration)
 from indico.web.args import parser
@@ -80,3 +82,28 @@ class RegistrationEditMixin:
                                                paid=self.registration.is_paid,
                                                registration_data=registration_data,
                                                file_data=self._get_file_data())
+
+
+class RegistrationPictureMixin:
+    """Download a picture attached to a registration."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.field_data.locator.file
+        }
+    }
+
+    def _process_args(self):
+        super()._process_args()
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationFormItem.input_type == 'picture',
+                                   RegistrationData.registration_id == request.view_args['registration_id'],
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
+                           .join(RegistrationData.field_data)
+                           .join(RegistrationFormFieldData.field)
+                           .options(joinedload('registration').joinedload('registration_form'))
+                           .one())
+
+    def _process(self):
+        return self.field_data.send()

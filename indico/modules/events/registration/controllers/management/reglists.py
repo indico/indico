@@ -37,7 +37,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
-from indico.modules.events.registration.controllers import RegistrationEditMixin
+from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationPictureMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
@@ -215,6 +215,10 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
 
     def _process(self):
         return self.field_data.send()
+
+
+class RHManageRegistrationDownloadPicture(RegistrationPictureMixin, RHManageRegFormBase):
+    """Download a picture attached to a registration."""
 
 
 class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
