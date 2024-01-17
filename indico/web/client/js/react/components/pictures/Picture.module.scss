@@ -28,11 +28,12 @@
 
   .picture-selection-btn {
     max-width: none !important;
-    margin-right: 22px !important;
+    margin-right: auto !important;
   }
 
   .last-picture-selection-btn {
-    margin-left: 22px !important;
+    margin-left: auto !important;
+    transform: translateX(-33%);
   }
 }
 
