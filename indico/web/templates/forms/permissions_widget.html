@@ -10,7 +10,7 @@
                 <a class="i-button label text-color outline add-entry-decoration">
                     {%- trans %}Add{% endtrans -%}
                 </a>
-                <span id="js-add-user-group"></span>
+                <span id="js-add-user-group" style="white-space: nowrap;"></span>
                 {% if field.object_type == 'event' %}
                     <button class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Event Role{% endtrans %}</button>
                     <ul class="i-dropdown entry-role-dropdown" data-items='{{ field.event_roles|tojson|forceescape }}'>
