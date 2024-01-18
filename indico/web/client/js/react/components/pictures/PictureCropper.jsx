@@ -42,19 +42,16 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
           name="arrow left"
           color="grey"
           size="large"
-          onClick={evt => {
-            evt.stopPropagation();
-            backAction();
-          }}
+          onClick={() => backAction()}
         />
         <Button.Group>
           <Button
             styleName="cropper-action-btn"
             icon
             float="left"
-            color="blue"
-            onClick={evt => {
-              evt.stopPropagation();
+            primary
+            type="button"
+            onClick={() => {
               if (cropperRef.current.cropper) {
                 cropperRef.current.cropper.rotate(90);
               }
@@ -63,7 +60,14 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
             <Translate>Rotate</Translate>
             <Icon name="sync" />
           </Button>
-          <Button float="left" styleName="cropper-action-btn" icon color="blue" onClick={onCrop}>
+          <Button
+            type="button"
+            float="left"
+            styleName="cropper-action-btn"
+            icon
+            primary
+            onClick={onCrop}
+          >
             <Translate>Done</Translate>
             <Icon name="check" />
           </Button>
