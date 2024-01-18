@@ -29,7 +29,7 @@ class Breadcrumb:
     icon: str = None
 
 
-def render_breadcrumbs(*titles, category=None, event=None, management=False, category_url_factory=None, endpoint=None):
+def render_breadcrumbs(*titles, category=None, event=None, management=False, category_url_factory=None):
     """Render the breadcrumb navigation.
 
     :param titles: A list of titles, either strings or Breadcrumb objects.
@@ -44,7 +44,6 @@ def render_breadcrumbs(*titles, category=None, event=None, management=False, cat
                                  category url will be used.
     :param management: Whether the event/category breadcrumb trail
                        should link to management pages.
-    :param section: section of the category to inspect. For example: calendar
     """
     assert titles or event or category
 
@@ -65,7 +64,7 @@ def render_breadcrumbs(*titles, category=None, event=None, management=False, cat
         if category_url_factory is None:
             category_url_factory = lambda cat, management: (url_for('categories.manage_content', cat)
                                                             if management and cat.can_manage(session.user)
-                                                            else url_for(endpoint, cat) if endpoint else cat.url)
+                                                            else cat.url)
         for cat in category.chain_query[::-1]:
             items.append(Breadcrumb(cat.title, category_url_factory(cat, management=management)))
         items.reverse()

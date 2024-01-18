@@ -23,7 +23,6 @@ class WPManageUpcomingEvents(WPAdmin):
 class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
     """WP for category display pages."""
 
-    endpoint = 'categories.display'
     template_prefix = 'categories/'
     ALLOW_JSON = False
     bundles = ('module_categories.js', 'module_categories.css')
@@ -58,14 +57,20 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
     def _get_breadcrumbs(self):
         if not self.category or self.category.is_root:
             return ''
-        return render_breadcrumbs(category=self.category, endpoint=self.endpoint)
+        return render_breadcrumbs(category=self.category)
 
 
 class WPCategoryCalendar(WPCategory):
     """WP for category calendar page."""
 
-    endpoint = 'categories.calendar'
     bundles = ('module_categories.calendar.js', 'module_categories.calendar.css')
+
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(
+            _('Calendar'),
+            category=self.category,
+            category_url_factory=lambda cat, management: url_for('categories.calendar', cat)
+        )
 
 
 class WPCategoryManagement(WPCategory):
