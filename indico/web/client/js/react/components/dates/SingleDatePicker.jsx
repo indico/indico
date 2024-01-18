@@ -29,6 +29,8 @@ const PROP_BLACKLIST = new Set([
   'label',
   'disabledDate',
   'render',
+  'yearsBefore',
+  'yearsAfter',
 ]);
 
 export default class SingleDatePicker extends React.Component {
