@@ -42,7 +42,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
-                                                      RejectRegistrantsForm)
+                                                      RegistrationBasePriceForm, RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
@@ -56,6 +56,7 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -142,6 +143,14 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'ticket',
                 url=url_for('.registrations_config_tickets', regform),
                 weight=80,
+            ))
+
+        if event.has_feature('payment'):
+            action_menu_items.append(ActionMenuEntry(
+                _('Update Registration Fee'),
+                'coins',
+                url=url_for('.registrations_base_price', regform),
+                weight=40
             ))
 
         action_menu_items = sorted(
@@ -762,6 +771,27 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
             flash(_('The selected registrations were successfully rejected.'), 'success')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
+
+
+class RHRegistrationsBasePrice(RHRegistrationsActionBase):
+    """Edit the base price of the selected registrations."""
+
+    def _process(self):
+        form = RegistrationBasePriceForm(base_price=self.regform.base_price, currency=self.regform.currency,
+                                         registration_id=[reg.id for reg in self.registrations])
+        if form.validate_on_submit():
+            changes = {reg: (float(reg.base_price), float(form.base_price.data)) for reg in self.registrations}
+            log_fields = {reg: f'{reg.full_name} (#{reg.friendly_id})' for reg in self.registrations}
+            for registration in self.registrations:
+                registration.base_price = form.base_price.data
+                registration.currency = self.regform.currency
+            db.session.flush()
+            flash(_('The registration fees were changed successfully'), 'success')
+            logger.info('Registrations %r had their fee changed by %r', self.registrations, session.user)
+            self.regform.log(EventLogRealm.management, LogKind.change, 'Payments', 'Registration fees changed',
+                             session.user, data={'Changes': make_diff_log(changes, log_fields)})
+            return jsonify_data()
+        return jsonify_form(form, disabled_until_change=False)
 
 
 class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportBase):

@@ -610,6 +610,23 @@ class RegistrationPrivacyForm(IndicoForm):
                                     'that of individual fields.'))
 
 
+class RegistrationBasePriceForm(IndicoForm):
+    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999.99), Optional()],
+                              filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'))
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def __init__(self, *args, **kwargs):
+        currency = kwargs.pop('currency')
+        super().__init__(*args, **kwargs)
+        self.base_price.description = (_('A fixed fee (in {currency}) the selected users have to pay when registering. '
+                                         "Currently, the registration form's fee is set to {form_fee} {currency}.")
+                                       .format(currency=currency, form_fee=kwargs.get('base_price', 0)))
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
+
+
 class PublishReceiptForm(IndicoForm):
     """Form to publish receipts for registrations."""
 
