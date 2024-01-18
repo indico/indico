@@ -685,7 +685,7 @@ def get_ticket_qr_code_data(person):
     QR code format:
 
     {
-        '': [qr_code_version, indico_url, b64(checkin_secret), b64(person_id)],
+        'i': [qr_code_version, indico_url, b64(checkin_secret), b64(person_id)],
         # extra keys may be added by plugins (e.g. site access)
     }
 
@@ -711,10 +711,10 @@ def get_ticket_qr_code_data(person):
     url = config.BASE_URL.removeprefix('https://')
 
     data = {
-        '': [qr_code_version, url, _base64_encode_uuid(checkin_secret)]
+        'i': [qr_code_version, url, _base64_encode_uuid(checkin_secret)]
     }
     if is_accompanying:
-        data[''].append(_base64_encode_uuid(person_id))
+        data['i'].append(_base64_encode_uuid(person_id))
 
     signals.event.registration.generate_ticket_qr_code.send(registration, person=person, ticket_data=data)
     return data
