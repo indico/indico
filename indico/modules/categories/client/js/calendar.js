@@ -232,6 +232,7 @@ import CalendarLegend from './components/CalendarLegend';
         isOutsideRange={() => false}
         noBorder
         required
+        readOnly
       />,
       elem
     );
