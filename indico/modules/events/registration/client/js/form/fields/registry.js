@@ -35,6 +35,7 @@ import MultiChoiceInput, {
 } from './MultiChoiceInput';
 import NumberInput, {NumberSettings, numberSettingsFormValidator} from './NumberInput';
 import PhoneInput from './PhoneInput';
+import PictureInput, {PictureSettings} from './PictureInput';
 import SingleChoiceInput, {
   SingleChoiceSettings,
   singleChoiceSettingsFormDecorator,
@@ -187,6 +188,12 @@ const fieldRegistry = {
     hasPrice: true,
     icon: 'user',
     renderAsFieldset: true,
+  },
+  picture: {
+    title: Translate.string('Picture'),
+    inputComponent: PictureInput,
+    icon: 'image',
+    settingsComponent: PictureSettings,
   },
 };
 

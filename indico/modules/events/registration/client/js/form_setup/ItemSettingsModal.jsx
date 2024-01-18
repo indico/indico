@@ -30,13 +30,15 @@ import {getStaticData, getItemById} from '../form/selectors';
 import * as actions from './actions';
 import ItemTypeDropdown from './ItemTypeDropdown';
 
+const EMPTY_DATA = {}; // avoid new object on every selector call since this triggers a warning
+
 export default function ItemSettingsModal({id, sectionId, defaultNewItemType, onClose}) {
   const dispatch = useDispatch();
   const [newItemType, setNewItemType] = useState(defaultNewItemType);
   const editing = id !== null;
   const staticData = useSelector(getStaticData);
   const {inputType: existingInputType, fieldIsRequired, ...itemData} = useSelector(state =>
-    editing ? getItemById(state, id) : {}
+    editing ? getItemById(state, id) : EMPTY_DATA
   );
   const inputType = editing ? existingInputType : newItemType;
   const fieldRegistry = getFieldRegistry();

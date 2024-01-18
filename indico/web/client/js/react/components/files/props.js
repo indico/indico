@@ -17,3 +17,16 @@ export const fileDetailsShape = PropTypes.shape({
     progress: PropTypes.number.isRequired,
   }),
 });
+
+export const dropzoneShape = PropTypes.shape({
+  getRootProps: PropTypes.func.isRequired,
+  getInputProps: PropTypes.func.isRequired,
+  isDragActive: PropTypes.bool.isRequired,
+  open: PropTypes.func,
+});
+
+export const fileActionShape = PropTypes.shape({
+  icon: PropTypes.string.isRequired,
+  color: PropTypes.string,
+  onClick: PropTypes.func.isRequired,
+});

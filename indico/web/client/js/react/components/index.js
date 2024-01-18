@@ -33,6 +33,7 @@ export {default as ResponsivePopup} from './ResponsivePopup';
 export {default as ListFilter} from './ListFilter';
 export {default as MathJax} from './MathJax';
 export {default as FileSubmission} from './files/FileSubmission';
+export {default as FinalPictureManager} from './pictures/PictureManager';
 export {default as FinalSingleFileManager} from './files/SingleFileManager';
 export {default as ClipboardButton} from './ClipboardButton';
 export {default as RequestConfirm, RequestConfirmDelete} from './RequestConfirm';

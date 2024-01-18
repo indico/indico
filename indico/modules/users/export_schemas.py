@@ -122,7 +122,7 @@ class RegistrationFileExportSchema(Schema):
     class Meta:
         fields = ('registration_id', 'field_data_id', 'filename', 'md5', 'url', '_archive_path')
 
-    url = fields.Function(lambda data: url_for('event_registration.registration_file', data.locator.file,
+    url = fields.Function(lambda data: url_for('event_registration.manage_registration_file', data.locator.file,
                                                _external=True))
     _archive_path = fields.Function(lambda file: build_storage_path(file))
 

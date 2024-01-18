@@ -8,6 +8,7 @@
 from datetime import datetime
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
+from PIL import Image
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
@@ -388,3 +389,30 @@ class EmailField(RegistrationFormFieldBase):
                 raise ValidationError(_('Invalid email address'))
 
         return _indico_email
+
+
+class PictureField(FileField):
+    name = 'picture'
+    setup_schema_fields = {
+        'min_picture_size': fields.Integer(load_default=0, validate=validate.Range(0, 1200)),
+    }
+
+    def get_validators(self, existing_registration):
+        def _picture_size_and_type(value):
+            if not value:
+                return
+            file = File.query.filter(File.uuid == value, ~File.claimed).first()
+            if not file:
+                raise ValidationError('Invalid file')
+            try:
+                with file.open() as f:
+                    pic = Image.open(f)
+            except OSError:
+                raise ValidationError(_('Invalid picture file.'))
+            if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                raise ValidationError(_('This field only accepts jpg, png, gif and webp picture formats.'))
+            min_picture_size = self.form_item.data.get('min_picture_size')
+            if min_picture_size and min(pic.size) < min_picture_size:
+                raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
+                                      .format(min_picture_size))
+        return _picture_size_and_type

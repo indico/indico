@@ -66,7 +66,7 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'toggle_registration_payment', reglists.RHRegistrationTogglePayment, methods=('POST',))
 _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>',
-    'registration_file', reglists.RHRegistrationDownloadAttachment)
+    'manage_registration_file', reglists.RHRegistrationDownloadAttachment)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/approve',
                  'approve_registration', reglists.RHRegistrationApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',
@@ -214,6 +214,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/receipts/<int:file_id>/<filen
                  display.RHReceiptDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
                  display.RHRegistrationAvatar)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/picture/<int:field_data_id>/<filename>',
+                 'registration_picture', display.RHRegistrationDownloadPicture)
 
 
 # API
