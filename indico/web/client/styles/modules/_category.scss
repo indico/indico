@@ -604,6 +604,10 @@ ul.category-resource-qtip {
 .category-calendar-page {
   @include indico-page();
 
+  .DateInput_input {
+    height: 34px;
+  }
+
   .category-calendar-view {
     font-family: 'Roboto', sans-serif;
 
