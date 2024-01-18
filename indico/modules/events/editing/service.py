@@ -160,8 +160,7 @@ def service_handle_new_editable(editable, user):
         raise ServiceRequestFailed(exc)
 
 
-def service_handle_review_editable(editable, user, action, parent_revision, revision=None):
-    new_revision = revision or parent_revision
+def service_handle_review_editable(editable, user, action, parent_revision, new_revision):
     data = {
         'action': action.name,
         'revision': EditingRevisionSignedSchema().dump(new_revision),
