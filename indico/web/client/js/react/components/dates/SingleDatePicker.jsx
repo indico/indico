@@ -7,6 +7,7 @@
 
 import 'react-dates/initialize';
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
@@ -33,10 +34,12 @@ const PROP_BLACKLIST = new Set([
 export default class SingleDatePicker extends React.Component {
   static propTypes = {
     disabledDate: PropTypes.func,
+    threshold: PropTypes.number,
   };
 
   static defaultProps = {
     disabledDate: null,
+    threshold: 5,
   };
 
   state = {
@@ -47,9 +50,34 @@ export default class SingleDatePicker extends React.Component {
     this.setState({focused});
   };
 
+  renderMonthElement = (threshold, {month, onMonthSelect, onYearSelect}) => {
+    const years = [];
+    for (let i = month.year() - threshold; i <= month.year() + threshold; i++) {
+      years.push(i);
+    }
+    return (
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <select value={month.month()} onChange={e => onMonthSelect(month, e.target.value)}>
+          {moment.months().map((text, value) => (
+            <option key={text} value={value}>
+              {text}
+            </option>
+          ))}
+        </select>
+        <select value={month.year()} onChange={e => onYearSelect(month, e.target.value)}>
+          {years.map(y => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
   render() {
     const {focused} = this.state;
-    const {disabledDate} = this.props;
+    const {disabledDate, threshold} = this.props;
     const filteredProps = Object.entries(this.props)
       .filter(([name]) => {
         return !PROP_BLACKLIST.has(name);
@@ -71,6 +99,7 @@ export default class SingleDatePicker extends React.Component {
       showDefaultInputIcon: true,
       focused,
       ariaLabel: '', // XXX: Suppress aria-label as it interferes with input's label
+      renderMonthElement: params => this.renderMonthElement(threshold, params),
       ...filteredProps,
     });
   }

@@ -12,7 +12,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import CalendarYearMonthPicker from 'indico/react/components/dates/CalendarYearMonthPicker';
+import {SingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {$T} from 'indico/utils/i18n';
 
@@ -224,7 +224,7 @@ import CalendarLegend from './components/CalendarLegend';
       .css('background', 'transparent')
       .get(0);
     ReactDOM.render(
-      <CalendarYearMonthPicker
+      <SingleDatePicker
         onDateChange={date => calendar.gotoDate(date.toDate())}
         placeholder={Translate.string('Go to date...')}
         verticalSpacing={0}
