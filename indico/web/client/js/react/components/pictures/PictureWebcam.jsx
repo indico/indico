@@ -57,7 +57,7 @@ export function PictureWebcam({
             color="grey"
             size="large"
             onClick={evt => {
-              evt.stopPropagation();
+              evt.stopPropagation(); // avoid opening the cropper
               backAction();
             }}
           />
