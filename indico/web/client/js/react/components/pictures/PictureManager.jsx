@@ -256,7 +256,7 @@ const PictureManager = ({
         setCustomFileRejections({
           code: 'min-size',
           message: Translate.string(
-            'The picture you uploaded is {width} by {height} pixels. Please upload a picture with a minumum of {minPictureSize} pixels on its shortest side.',
+            'The picture you uploaded is {width} by {height} pixels. Please upload a picture with a minimum of {minPictureSize} pixels on its shortest side.',
             {width: img.naturalWidth, height: img.naturalHeight, minPictureSize}
           ),
         });
