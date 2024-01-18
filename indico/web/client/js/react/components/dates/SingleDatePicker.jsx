@@ -34,12 +34,14 @@ const PROP_BLACKLIST = new Set([
 export default class SingleDatePicker extends React.Component {
   static propTypes = {
     disabledDate: PropTypes.func,
-    threshold: PropTypes.number,
+    yearsBefore: PropTypes.number,
+    yearsAfter: PropTypes.number,
   };
 
   static defaultProps = {
     disabledDate: null,
-    threshold: 5,
+    yearsBefore: 5,
+    yearsAfter: 5,
   };
 
   state = {
@@ -50,9 +52,10 @@ export default class SingleDatePicker extends React.Component {
     this.setState({focused});
   };
 
-  renderMonthElement = (threshold, {month, onMonthSelect, onYearSelect}) => {
+  renderMonthElement = ({month, onMonthSelect, onYearSelect}) => {
     const years = [];
-    for (let i = month.year() - threshold; i <= month.year() + threshold; i++) {
+    const {yearsBefore, yearsAfter} = this.props;
+    for (let i = month.year() - yearsBefore; i <= month.year() + yearsAfter; i++) {
       years.push(i);
     }
     return (
@@ -77,7 +80,7 @@ export default class SingleDatePicker extends React.Component {
 
   render() {
     const {focused} = this.state;
-    const {disabledDate, threshold} = this.props;
+    const {disabledDate} = this.props;
     const filteredProps = Object.entries(this.props)
       .filter(([name]) => {
         return !PROP_BLACKLIST.has(name);
@@ -99,7 +102,7 @@ export default class SingleDatePicker extends React.Component {
       showDefaultInputIcon: true,
       focused,
       ariaLabel: '', // XXX: Suppress aria-label as it interferes with input's label
-      renderMonthElement: params => this.renderMonthElement(threshold, params),
+      renderMonthElement: this.renderMonthElement,
       ...filteredProps,
     });
   }
