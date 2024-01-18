@@ -13,14 +13,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2023-12-21 19:19+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2022\n"
 "Language-Team: Spanish (Spain) (http://app.transifex.com/indico/indico/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.13.1\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -49,22 +49,18 @@ msgstr "Gestionar material"
 msgid "Building package"
 msgstr "Construyendo el paquete"
 
-#: indico/modules/categories/client/js/calendar.js:24
+#: indico/modules/categories/client/js/calendar.js:41
 msgid "Today"
 msgstr "Hoy"
 
-#: indico/modules/categories/client/js/calendar.js:50
-msgid "Events happening on {0}"
-msgstr "Eventos ocurridos el {0}"
-
-#: indico/modules/categories/client/js/calendar.js:62
+#: indico/modules/categories/client/js/calendar.js:53
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] "{0} evento de larga duración no mostrado"
 msgstr[1] "{0} eventos de larga duración no mostrados"
 msgstr[2] "{0} eventos de larga duración no mostrados"
 
-#: indico/modules/categories/client/js/calendar.js:72
+#: indico/modules/categories/client/js/calendar.js:63
 msgid "Long lasting events"
 msgstr "Eventos de larga duración"
 
@@ -342,11 +338,11 @@ msgstr "Deshaciendo la operación anterior ..."
 msgid "Terms and Conditions"
 msgstr "Términos y condiciones"
 
-#: indico/modules/events/registration/client/js/reglists.js:35
+#: indico/modules/events/registration/client/js/reglists.js:43
 msgid "Email Preview"
 msgstr "Vista previa de correo electrónico"
 
-#: indico/modules/events/registration/client/js/reglists.js:52
+#: indico/modules/events/registration/client/js/reglists.js:60
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "¿Realmente desea eliminar el registro seleccionado?"
@@ -384,15 +380,15 @@ msgstr "Copiado al portapapeles"
 msgid "Press {0} to copy"
 msgstr "Presione {0} para copiar"
 
-#: indico/web/client/js/jquery/extensions/global.js:256
+#: indico/web/client/js/jquery/extensions/global.js:259
 msgid "Create new lecture"
 msgstr "Crear nueva presentación"
 
-#: indico/web/client/js/jquery/extensions/global.js:257
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new meeting"
 msgstr "Crear nueva reunión"
 
-#: indico/web/client/js/jquery/extensions/global.js:258
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new conference"
 msgstr "Crear nuevo congreso"
 
@@ -418,12 +414,12 @@ msgstr "Cerrar"
 msgid "You have unsaved changes that will be lost."
 msgstr "Tiene cambios sin guardar que se perderán."
 
-#: indico/web/client/js/jquery/utils/declarative.js:256
+#: indico/web/client/js/jquery/utils/declarative.js:265
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "Confirmar acción"
 
-#: indico/web/client/js/jquery/utils/declarative.js:366
+#: indico/web/client/js/jquery/utils/declarative.js:375
 msgid "Direct link to this item"
 msgstr "Enlace directo a este ítem"
 
@@ -630,8 +626,8 @@ msgid "Clear search"
 msgstr "Borrar búsqueda"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
-msgstr "Seleccionó la categoría {0}. ¿Está seguro de querer continuar?"
+msgid "You selected category \"{0}\". Are you sure you want to proceed?"
+msgstr ""
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
@@ -1024,9 +1020,9 @@ msgstr "mover para cambiar el tamaño"
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
 msgid ""
-"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
-" applied to blocks after."
-msgstr "Actualmente <span class=\"key light\">Shift</span> está presionado. Los cambios se aplicarán a los bloques posteriores."
+"<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
+"applied to blocks after."
+msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
 msgid "Drop to move block inside session"
