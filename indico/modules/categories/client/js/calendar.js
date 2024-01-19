@@ -179,7 +179,7 @@ import CalendarLegend from './components/CalendarLegend';
                 data.events,
                 data.locations,
                 'venueId',
-                Translate.string('No location'),
+                Translate.string('No venue'),
                 0
               );
               break;
