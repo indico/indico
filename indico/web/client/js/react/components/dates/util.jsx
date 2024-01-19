@@ -56,6 +56,7 @@ export const renderMonthElement = (
         className="datepicker-select"
         value={month.month()}
         onChange={e => onMonthSelect(month, e.target.value)}
+        style={{marginRight: 2}}
       >
         {moment.months().map((text, value) => (
           <option key={text} value={value}>
@@ -67,6 +68,7 @@ export const renderMonthElement = (
         className="datepicker-select"
         value={month.year()}
         onChange={e => onYearSelect(month, e.target.value)}
+        style={{marginLeft: 2}}
       >
         {years.map(y => (
           <option key={y} value={y}>

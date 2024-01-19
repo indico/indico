@@ -41,22 +41,24 @@ import CalendarLegend from './components/CalendarLegend';
       customButtons: {
         goToDate: {
           text: Translate.string('Go to...'),
+          icon: 'i-button icon-calendar',
           click: async (_, element) => {
             if (!modalShown) {
               modalShown = true;
               const rect = element.getBoundingClientRect();
               const position = {
-                left: rect.left - 105,
-                top: rect.bottom + 5,
+                left: rect.left - 137,
+                top: rect.bottom + 12,
+              };
+              const closeModal = resolve => {
+                resolve();
+                modalShown = false;
               };
               return injectModal(
                 resolve => (
                   <CalendarSingleDatePicker
                     onDateChange={date => calendar.gotoDate(date.toDate())}
-                    onClose={() => {
-                      resolve();
-                      modalShown = false;
-                    }}
+                    onClose={() => closeModal(resolve)}
                     isOutsideRange={() => false}
                     numberOfMonths={1}
                   />
