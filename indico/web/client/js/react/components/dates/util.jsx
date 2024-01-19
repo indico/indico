@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import React from 'react';
 import {VERTICAL_ORIENTATION, HORIZONTAL_ORIENTATION} from 'react-dates/constants';
 
@@ -37,5 +38,42 @@ export const responsiveReactDates = (Component, props) => {
       <Responsive orientation="portrait">{verticalLayout}</Responsive>
       <Responsive orientation="landscape">{horizontalLayout}</Responsive>
     </Responsive.Tablet>
+  );
+};
+
+export const renderMonthElement = (
+  yearsBefore,
+  yearsAfter,
+  {month, onMonthSelect, onYearSelect}
+) => {
+  const years = [];
+  for (let i = month.year() - yearsBefore; i <= month.year() + yearsAfter; i++) {
+    years.push(i);
+  }
+  return (
+    <div className="datepicker-container">
+      <select
+        className="datepicker-select"
+        value={month.month()}
+        onChange={e => onMonthSelect(month, e.target.value)}
+      >
+        {moment.months().map((text, value) => (
+          <option key={text} value={value}>
+            {text}
+          </option>
+        ))}
+      </select>
+      <select
+        className="datepicker-select"
+        value={month.year()}
+        onChange={e => onYearSelect(month, e.target.value)}
+      >
+        {years.map(y => (
+          <option key={y} value={y}>
+            {y}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };

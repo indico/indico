@@ -10,17 +10,22 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {DayPickerSingleDateController as DayPicker} from 'react-dates';
 
+import {renderMonthElement, responsiveReactDates} from './util';
+
 import 'react-dates/lib/css/_datepicker.css';
 import '../style/dates.scss';
-import {responsiveReactDates} from './util';
 
 export default class CalendarSingleDatePicker extends React.Component {
   static propTypes = {
     disabledDate: PropTypes.func,
+    yearsBefore: PropTypes.number,
+    yearsAfter: PropTypes.number,
   };
 
   static defaultProps = {
     disabledDate: () => false,
+    yearsBefore: 5,
+    yearsAfter: 5,
   };
 
   state = {
@@ -33,13 +38,14 @@ export default class CalendarSingleDatePicker extends React.Component {
 
   render() {
     const {focused} = this.state;
-    const {disabledDate, ...props} = this.props;
+    const {disabledDate, yearsBefore, yearsAfter, ...props} = this.props;
     return responsiveReactDates(DayPicker, {
       ...props,
       focused,
       onFocusChange: this.onFocusChange,
       isOutsideRange: disabledDate,
       hideKeyboardShortcutsPanel: true,
+      renderMonthElement: params => renderMonthElement(yearsBefore, yearsAfter, params),
     });
   }
 }

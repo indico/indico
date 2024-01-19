@@ -7,7 +7,6 @@
 
 import 'react-dates/initialize';
 import _ from 'lodash';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
@@ -15,7 +14,7 @@ import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
 import {FinalField} from 'indico/react/forms';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
-import {responsiveReactDates} from './util';
+import {renderMonthElement, responsiveReactDates} from './util';
 
 import 'react-dates/lib/css/_datepicker.css';
 import '../style/dates.scss';
@@ -54,43 +53,9 @@ export default class SingleDatePicker extends React.Component {
     this.setState({focused});
   };
 
-  renderMonthElement = ({month, onMonthSelect, onYearSelect}) => {
-    const years = [];
-    const {yearsBefore, yearsAfter} = this.props;
-    for (let i = month.year() - yearsBefore; i <= month.year() + yearsAfter; i++) {
-      years.push(i);
-    }
-    return (
-      <div className="datepicker-container">
-        <select
-          className="datepicker-select"
-          value={month.month()}
-          onChange={e => onMonthSelect(month, e.target.value)}
-        >
-          {moment.months().map((text, value) => (
-            <option key={text} value={value}>
-              {text}
-            </option>
-          ))}
-        </select>
-        <select
-          className="datepicker-select"
-          value={month.year()}
-          onChange={e => onYearSelect(month, e.target.value)}
-        >
-          {years.map(y => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  };
-
   render() {
     const {focused} = this.state;
-    const {disabledDate} = this.props;
+    const {disabledDate, yearsBefore, yearsAfter} = this.props;
     const filteredProps = Object.entries(this.props)
       .filter(([name]) => {
         return !PROP_BLACKLIST.has(name);
@@ -112,7 +77,7 @@ export default class SingleDatePicker extends React.Component {
       showDefaultInputIcon: true,
       focused,
       ariaLabel: '', // XXX: Suppress aria-label as it interferes with input's label
-      renderMonthElement: this.renderMonthElement,
+      renderMonthElement: params => renderMonthElement(yearsBefore, yearsAfter, params),
       ...filteredProps,
     });
   }

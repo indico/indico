@@ -12,8 +12,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {SingleDatePicker} from 'indico/react/components';
+import CalendarSingleDatePicker from 'indico/react/components/dates/CalendarSingleDatePicker';
 import {Translate} from 'indico/react/i18n';
+import {injectModal} from 'indico/react/util';
 import {$T} from 'indico/utils/i18n';
 
 import CalendarLegend from './components/CalendarLegend';
@@ -21,6 +22,7 @@ import CalendarLegend from './components/CalendarLegend';
 (function(global) {
   let groupBy = 'category';
   const filteredLegendElements = new Set();
+  let modalShown = false;
   global.setupCategoryCalendar = function setupCategoryCalendar(
     containerCalendarSelector,
     containerLegendSelector,
@@ -38,7 +40,31 @@ import CalendarLegend from './components/CalendarLegend';
       },
       customButtons: {
         goToDate: {
-          text: '',
+          text: Translate.string('Go to...'),
+          click: async (_, element) => {
+            if (!modalShown) {
+              modalShown = true;
+              const rect = element.getBoundingClientRect();
+              const position = {
+                left: rect.left - 105,
+                top: rect.bottom + 5,
+              };
+              return injectModal(
+                resolve => (
+                  <CalendarSingleDatePicker
+                    onDateChange={date => calendar.gotoDate(date.toDate())}
+                    onClose={() => {
+                      resolve();
+                      modalShown = false;
+                    }}
+                    isOutsideRange={() => false}
+                    numberOfMonths={1}
+                  />
+                ),
+                position
+              );
+            }
+          },
         },
       },
       plugins: [dayGridPlugin],
@@ -217,25 +243,5 @@ import CalendarLegend from './components/CalendarLegend';
       },
     });
     calendar.render();
-
-    // set up the datepicker
-    const elem = $('.fc-toolbar-chunk:eq(2) button:first')
-      .css('background-color', 'transparent')
-      .css('border-color', 'transparent')
-      .css('background', 'transparent')
-      .get(0);
-    ReactDOM.render(
-      <SingleDatePicker
-        onDateChange={date => calendar.gotoDate(date.toDate())}
-        placeholder={Translate.string('Go to date...')}
-        verticalSpacing={0}
-        showDefaultInputIcon={false}
-        isOutsideRange={() => false}
-        noBorder
-        required
-        readOnly
-      />,
-      elem
-    );
   };
 })(window);
