@@ -5,8 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import itertools
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 
 import pytest
 from flask import session
@@ -19,10 +21,12 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.modules.events.registration.util import (create_registration, get_event_regforms_registrations,
-                                                     get_registered_event_persons, get_user_data,
-                                                     import_invitations_from_csv, import_registrations_from_csv,
-                                                     import_user_records_from_csv, modify_registration)
+                                                     get_registered_event_persons, get_ticket_qr_code_data,
+                                                     get_user_data, import_invitations_from_csv,
+                                                     import_registrations_from_csv, import_user_records_from_csv,
+                                                     modify_registration)
 from indico.modules.users.models.users import UserTitle
+from indico.testing.util import assert_json_snapshot
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -688,3 +692,26 @@ def test_get_user_data(monkeypatch, dummy_event, dummy_user, dummy_regform):
 
     assert get_user_data(dummy_regform, dummy_user) == {}
     assert get_user_data(dummy_regform, dummy_user, invitation) == {}
+
+
+@pytest.mark.parametrize(('url', 'ticket_uuid', 'person_id'), (
+    ('https://indico.cern.ch', '9982be4e-32cf-4656-a781-62ad45609d12', None),
+    ('http://indico.cern.ch', '9982be4e-32cf-4656-a781-62ad45609d12', None),
+    ('https://indico.cern.ch', '9982be4e-32cf-4656-a781-62ad45609d12', '5fa6d71b-a828-4811-bf9c-7e99df04d0af'),
+), ids=itertools.count())
+def test_get_ticket_qr_code_data(request, mocker, snapshot, dummy_reg, url, ticket_uuid, person_id):
+    class MockConfig:
+        BASE_URL = url
+
+    mocker.patch('indico.modules.events.registration.util.config', MockConfig())
+
+    dummy_reg.ticket_uuid = ticket_uuid
+    person = {
+        'registration': dummy_reg,
+        'id': person_id,
+        'is_accompanying': bool(person_id),
+    }
+
+    data = get_ticket_qr_code_data(person)
+    snapshot.snapshot_dir = Path(__file__).parent / 'tests'
+    assert_json_snapshot(snapshot, data, f'ticket_qr_code_data-{request.node.callspec.id}.json')
