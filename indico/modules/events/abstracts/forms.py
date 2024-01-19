@@ -664,6 +664,7 @@ class AbstractsScheduleForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.timezone = self.event.timezone
         super().__init__(*args, **kwargs)
 
 
