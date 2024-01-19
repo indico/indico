@@ -34,9 +34,9 @@ import CalendarLegend from './components/CalendarLegend';
     const container = document.querySelector(containerCalendarSelector);
     const calendar = new Calendar(container, {
       headerToolbar: {
-        start: 'prev,next today',
+        start: 'prev,next today goToDate',
         center: 'title',
-        end: 'goToDate dayGridMonth,dayGridWeek,dayGridDay',
+        end: 'dayGridMonth,dayGridWeek,dayGridDay',
       },
       customButtons: {
         goToDate: {
@@ -47,7 +47,7 @@ import CalendarLegend from './components/CalendarLegend';
               modalShown = true;
               const rect = element.getBoundingClientRect();
               const position = {
-                left: rect.left - 137,
+                left: rect.left - 7,
                 top: rect.bottom + 12,
               };
               const closeModal = resolve => {
