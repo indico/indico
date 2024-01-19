@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, redirect, session
+from flask import flash, jsonify, redirect, session
+from marshmallow import fields
 
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
@@ -16,7 +17,8 @@ from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _, ngettext
-from indico.util.placeholders import replace_placeholders
+from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -163,3 +165,63 @@ class RHSendSurveyLinks(RHManageSurveyBase):
             email = make_email(to_list=recipient, bcc_list=bcc, from_address=form.from_address.data,
                                template=tpl, html=True)
             send_email(email, self.event, 'Surveys')
+
+
+class RHAPIEmailEventSurveyMetadata(RHManageSurveyBase):
+    def _process(self):
+        with self.event.force_event_locale():
+            tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)
+            body = tpl.get_html_body()
+            subject = tpl.get_subject()
+        placeholders = get_sorted_placeholders('survey-link-email', event=None, survey=self.survey)
+        return jsonify({
+            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'body': body,
+            'subject': subject,
+            'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
+        })
+
+
+class RHEmailEventSurveyPreview(RHManageSurveyBase):
+    """Preview an email with EventSurvey associated placeholders."""
+
+    @use_kwargs({
+        'body': fields.String(required=True),
+        'subject': fields.String(required=True),
+    })
+    def _process(self, body, subject):
+        # person = next(iter(self.recipients)) if self.recipients else session.user
+        email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
+        email_subject = replace_placeholders('survey-link-email', subject, event=self.event, survey=self.survey)
+        tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
+                                  email_body=email_body)
+        print(email_body, email_subject, tpl.get_subject(), tpl.get_html_body())
+        return jsonify(subject=tpl.get_subject(), body=tpl.get_html_body())
+
+
+# class RHAPIEmailEventSurveySend(RHManageSurveyBase):
+#     @use_kwargs({
+#         'from_address': fields.String(required=True, validate=not_empty),
+#         'body': fields.String(required=True, validate=not_empty),
+#         'subject': fields.String(required=True, validate=not_empty),
+#         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
+#         'copy_for_sender': fields.Bool(load_default=False),
+#     })
+#     def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender):
+#         if from_address not in self.event.get_allowed_sender_emails():
+#             abort(422, messages={'from_address': ['Invalid sender address']})
+#         for recipient in self.recipients:
+#             if self.no_account and isinstance(recipient, EventPerson):
+#                 recipient.invited_dt = now_utc()
+#             email_body = replace_placeholders('event-persons-email', body, person=recipient,
+#                                                 event=self.event, register_link=self.no_account)
+#             email_subject = replace_placeholders('event-persons-email', subject, person=recipient,
+#                                                     event=self.event, register_link=self.no_account)
+#             bcc = {session.user.email} if copy_for_sender else set()
+#             bcc.update(bcc_addresses)
+#             with self.event.force_event_locale():
+#                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
+#                 email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
+#                                     template=tpl, html=True)
+#             send_email(email, self.event, 'Event Persons')
+#         return jsonify(count=len(self.recipients))
