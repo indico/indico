@@ -597,14 +597,12 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
             raise BadRequest(str(e))
 
     def _process(self):
-        query = (
-            Event.query
+        query = (Event.query
                  .filter(Event.starts_between(self.start_dt, self.end_dt),
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
                  .options(undefer(Event.detailed_category_chain),
-                          load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id'))
-        )
+                          load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id')))
         events, categories = self._get_event_data(query)
         raw_locations = Location.query.options(load_only('id', 'name')).all()
         locations = [{'title': loc.name, 'id': loc.id} for loc in raw_locations]
