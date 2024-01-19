@@ -61,15 +61,23 @@ export default class SingleDatePicker extends React.Component {
       years.push(i);
     }
     return (
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <select value={month.month()} onChange={e => onMonthSelect(month, e.target.value)}>
+      <div className="datepicker-container">
+        <select
+          className="datepicker-select"
+          value={month.month()}
+          onChange={e => onMonthSelect(month, e.target.value)}
+        >
           {moment.months().map((text, value) => (
             <option key={text} value={value}>
               {text}
             </option>
           ))}
         </select>
-        <select value={month.year()} onChange={e => onYearSelect(month, e.target.value)}>
+        <select
+          className="datepicker-select"
+          value={month.year()}
+          onChange={e => onYearSelect(month, e.target.value)}
+        >
           {years.map(y => (
             <option key={y} value={y}>
               {y}
