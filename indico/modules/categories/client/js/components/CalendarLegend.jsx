@@ -54,7 +54,7 @@ function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
   ));
   const options = [
     {text: Translate.string('Category'), value: 'category'},
-    {text: Translate.string('Location'), value: 'location'},
+    {text: Translate.string('Venue'), value: 'location'},
   ];
   const onChange = (_, {value}) => {
     onFilterChanged(value);
