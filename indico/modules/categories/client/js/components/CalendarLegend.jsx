@@ -41,16 +41,15 @@ LegendItem.defaultProps = {
 
 function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
   const [isOpen, setIsOpen] = useState(false);
-  const parsedItems = items.map(({id, title, checked, url, color, textColor}, index) => (
+  const parsedItems = items.map(({id, title, checked, url, color, isSpecial}) => (
     <LegendItem
       key={id}
       title={title}
       color={color}
-      textColor={textColor}
       checked={checked}
       onChange={(_, data) => onElementSelected(id, data.checked)}
       url={url}
-      isSpecial={index === 0}
+      isSpecial={isSpecial}
     />
   ));
   const options = [

@@ -139,21 +139,22 @@ import CalendarLegend from './components/CalendarLegend';
               }
               usedItems.add(id);
               const item = itemMap[id] ?? {};
+              const isSpecial = id === rootId;
               return [
                 ...acc,
                 {
-                  title: (id === rootId ? rootTitle : item.title) ?? defaultTitle,
-                  textColor: value.textColor,
+                  title: (isSpecial ? rootTitle : item.title) ?? defaultTitle,
                   color: value.color,
                   url: item.url,
+                  isSpecial,
                   id,
                 },
               ];
             }, [])
             .sort((a, b) => {
-              if (a.id === rootId) {
+              if (a.isSpecial) {
                 return -1;
-              } else if (b.id === rootId) {
+              } else if (b.isSpecial) {
                 return 1;
               }
               return a.title.localeCompare(b.title);
