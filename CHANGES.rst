@@ -80,6 +80,7 @@ Bugfixes
 - Show the description of a subcontribution in conference events (:issue:`5946`, :pr:`6056`)
 - Only block templates containing a QR code via ``is_ticket_blocked`` (:pr:`6062`)
 - Use custom map URL in event API if one is set (:pr:`6111`, thanks :user:`stine-fohrmann`)
+- Use the event timezone when scheduling call for abstracts/papers (:pr:`6139`)
 
 Accessibility
 ^^^^^^^^^^^^^
