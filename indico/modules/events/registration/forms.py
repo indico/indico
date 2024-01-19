@@ -611,17 +611,28 @@ class RegistrationPrivacyForm(IndicoForm):
 
 
 class RegistrationBasePriceForm(IndicoForm):
-    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999.99), Optional()],
+    action = SelectField(_('Action'), [DataRequired()])
+    base_price = DecimalField(_('Registration fee'),
+                              [NumberRange(min=0, max=999999.99), HiddenUnless('action', 'custom'), DataRequired()],
                               filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'))
+    apply_complete = BooleanField(_('Apply to complete registrations'), [HiddenUnless('action', {'default', 'custom'})],
+                                  widget=SwitchWidget(),
+                                  description=_('Whether the specified fee should be applied to complete registrations '
+                                                'which have their fee set to zero at the moment.'))
     registration_id = HiddenFieldList()
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         currency = kwargs.pop('currency')
         super().__init__(*args, **kwargs)
-        self.base_price.description = (_('A fixed fee (in {currency}) the selected users have to pay when registering. '
-                                         "Currently, the registration form's fee is set to {form_fee} {currency}.")
-                                       .format(currency=currency, form_fee=kwargs.get('base_price', 0)))
+        self.action.choices = [
+            ('remove', _('Remove fee for unpaid registrations')),
+            ('default', (_("Set fee to the registration form's default ({base_price} {currency})")
+                         .format(base_price=kwargs['base_price'], currency=currency))),
+            ('custom', _('Change fee to custom value'))
+        ]
+        self.base_price.description = (_('A fixed fee (in {currency}) the selected users have to pay when registering.')
+                                       .format(currency=currency))
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form

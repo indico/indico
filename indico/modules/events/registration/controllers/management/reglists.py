@@ -150,7 +150,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 _('Update Registration Fee'),
                 'coins',
                 url=url_for('.registrations_base_price', regform),
-                weight=40
+                weight=40,
+                reload_page=True
             ))
 
         action_menu_items = sorted(
@@ -780,17 +781,42 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
         form = RegistrationBasePriceForm(base_price=self.regform.base_price, currency=self.regform.currency,
                                          registration_id=[reg.id for reg in self.registrations])
         if form.validate_on_submit():
-            changes = {reg: (float(reg.base_price), float(form.base_price.data)) for reg in self.registrations}
+            changes = {}
             log_fields = {reg: f'{reg.full_name} (#{reg.friendly_id})' for reg in self.registrations}
-            for registration in self.registrations:
-                registration.base_price = form.base_price.data
-                registration.currency = self.regform.currency
+            for reg in self.registrations:
+                if form.apply_complete.data and reg.state == RegistrationState.complete and not reg.base_price:
+                    reg.state = RegistrationState.unpaid
+                elif reg.state != RegistrationState.unpaid:
+                    continue
+                new_price = {
+                    'remove': 0,
+                    'default': self.regform.base_price,
+                    'custom': form.base_price.data
+                }
+                changes[reg] = (float(reg.base_price), float(new_price[form.action.data]))
+                reg.base_price = new_price[form.action.data]
+                reg.currency = self.regform.currency
+                if not reg.price:
+                    reg.state = RegistrationState.complete
             db.session.flush()
-            flash(_('The registration fees were changed successfully'), 'success')
-            logger.info('Registrations %r had their fee changed by %r', self.registrations, session.user)
-            self.regform.log(EventLogRealm.management, LogKind.change, 'Payments', 'Registration fees changed',
-                             session.user, data={'Changes': make_diff_log(changes, log_fields)})
-            return jsonify_data()
+            if changes:
+                flash(ngettext('{} registration fee has been updated.',
+                               '{} registration fees have been updated.',
+                               len(changes)).format(len(changes)), 'success')
+                logger.info('%r registrations had their fee changed by %r', len(changes), session.user)
+                self.regform.log(EventLogRealm.management, LogKind.change, 'Payments', 'Registration fees updated',
+                                 session.user, data={'Changes': make_diff_log(changes, log_fields)})
+            skipped = len(self.registrations) - len(changes)
+            if skipped:
+                if form.apply_complete.data:
+                    msg = ngettext('{} registration was skipped because its fee is not zero or it is in an invalid '
+                                   'state.', '{} registrations were skipped because their fees are not zero or they '
+                                   'are in an invalid state.', skipped)
+                else:
+                    msg = ngettext('{} registration was skipped because it is not in the unpaid state.',
+                                   '{} registrations were skipped because they are not in the unpaid state.', skipped)
+                flash(msg.format(skipped), 'warning')
+            return jsonify_data(flash=False)
         return jsonify_form(form, disabled_until_change=False)
 
 
