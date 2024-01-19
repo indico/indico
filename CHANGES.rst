@@ -67,6 +67,8 @@ Improvements
 - Add a picture field for registration forms which can use the local webcam to take a picture
   in addition to uploading one, and also supports cropping/rotating the picture (:pr:`5922`,
   thanks :user:`SegiNyn`)
+- Use a more compact registration ticket QR code format which is faster to scan and less
+  likely to fail in poor lighting conditions (:pr:`6123`)
 
 Bugfixes
 ^^^^^^^^
