@@ -72,8 +72,11 @@ import {SeriesManagement} from './SeriesManagement';
     containerSelector
   ) {
     const element = document.querySelector(containerSelector);
-    const {eventId} = element.dataset;
-    ReactDOM.render(<EmailSurveyParticipantsButton eventId={eventId} />, element);
+    const {eventId, surveyId} = element.dataset;
+    ReactDOM.render(
+      <EmailSurveyParticipantsButton eventId={+eventId} surveyId={+surveyId} />,
+      element
+    );
   };
 
   global.setupAuthorsListButton = function setupAuthorsListButton(containerSelector) {

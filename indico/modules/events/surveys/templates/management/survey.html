@@ -96,20 +96,19 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <div class="group">
-                    <button class="i-button icon-checkbox-checked arrow js-dropdown"  data-toggle="dropdown"></button>
+                    <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
                     <ul class="i-dropdown">
                         <li><a href="#" id="select-all">
-                            {% trans %}All{% endtrans %}
-                        </a></li>
+                                {% trans %}All{% endtrans %}
+                            </a></li>
                         <li><a href="#" id="select-none">
-                            {% trans %}None{% endtrans %}
-                        </a></li>
+                                {% trans %}None{% endtrans %}
+                            </a></li>
                     </ul>
                 </div>
                 <div class="group">
-                    <div id="email-submission-container"
-                        class="i-button-wrapper"
-                        data-event-id="{{ event.id }}">
+                    <div id="email-submission-container" class="i-button-wrapper" data-event-id="{{ event.id }}"
+                        data-survey-id="{{ survey.id }}">
                     </div>
                 </div>
             </div>

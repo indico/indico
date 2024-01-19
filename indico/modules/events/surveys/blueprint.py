@@ -19,15 +19,21 @@ from indico.modules.events.surveys.controllers.management.questionnaire import (
 from indico.modules.events.surveys.controllers.management.results import (RHDeleteSubmissions, RHDisplaySubmission,
                                                                           RHExportSubmissionsCSV,
                                                                           RHExportSubmissionsExcel, RHSurveyResults)
-from indico.modules.events.surveys.controllers.management.survey import (RHCloseSurvey, RHCreateSurvey, RHDeleteSurvey,
-                                                                         RHEditSurvey, RHManageSurvey, RHManageSurveys,
-                                                                         RHOpenSurvey, RHScheduleSurvey,
-                                                                         RHSendSurveyLinks)
+from indico.modules.events.surveys.controllers.management.survey import (RHAPIEmailEventSurveyMetadata, RHCloseSurvey,
+                                                                         RHCreateSurvey, RHDeleteSurvey, RHEditSurvey,
+                                                                         RHEmailEventSurveyPreview, RHManageSurvey,
+                                                                         RHManageSurveys, RHOpenSurvey,
+                                                                         RHScheduleSurvey, RHSendSurveyLinks)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_template_folder='events/surveys',
                       url_prefix='/event/<int:event_id>', event_feature='surveys')
+
+_bp.add_url_rule('api/surveys/<int:survey_id>/email/metadata', 'api_email_event_survey_metadata',
+                 RHAPIEmailEventSurveyMetadata, methods=('POST',))
+_bp.add_url_rule('api/surveys/<int:survey_id>/email/preview', 'api_email_event_survey_preview',
+                 RHEmailEventSurveyPreview, methods=('POST',))
 
 # survey display/submission
 _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)

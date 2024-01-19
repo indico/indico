@@ -1,13 +1,13 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2023 CERN
+// Copyright (C) 2002 - 2024 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import emailMetadataURL from 'indico-url:persons.api_email_event_persons_metadata';
 import emailSendURL from 'indico-url:persons.api_email_event_persons_send';
-import emailPreviewURL from 'indico-url:persons.email_event_persons_preview';
+import emailMetadataURL from 'indico-url:surveys.api_email_event_survey_metadata';
+import emailPreviewURL from 'indico-url:surveys.api_email_event_survey_preview';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
@@ -20,17 +20,16 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import {EmailDialog} from './EmailDialog';
 
-export function EmailSurveyParticipants({context, eventId, onClose}) {
+export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
   const [sentCount, setSentCount] = useState(0);
   const {data, loading} = useIndicoAxios({
-    url: emailMetadataURL({event_id: eventId}),
+    url: emailMetadataURL({event_id: eventId, survey_id: surveyId}),
     method: 'POST',
-    data: context,
   });
   const {senders = [], subject: defaultSubject, body: defaultBody, placeholders = []} = data || {};
 
   const handleSubmit = async data => {
-    const requestData = {...data, ...context};
+    const requestData = {...data};
     let resp;
     try {
       resp = await indicoAxios.post(emailSendURL({event_id: eventId}), requestData);
@@ -61,8 +60,8 @@ export function EmailSurveyParticipants({context, eventId, onClose}) {
       onSubmit={handleSubmit}
       onClose={onClose}
       senders={senders}
-      previewURL={emailPreviewURL({event_id: eventId})}
-      previewContext={context}
+      previewURL={emailPreviewURL({event_id: eventId, survey_id: surveyId})}
+      // previewContext={context}
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody, recipient_roles: []}}
       sentEmailsCount={sentCount}
@@ -81,7 +80,8 @@ export function EmailSurveyParticipants({context, eventId, onClose}) {
 }
 
 EmailSurveyParticipants.propTypes = {
-  context: PropTypes.object.isRequired,
+  // context: PropTypes.object.isRequired,
   eventId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
+  surveyId: PropTypes.number.isRequired,
 };
