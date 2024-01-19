@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import colorsys
 from datetime import date, datetime, time, timedelta
 from enum import Enum, auto
 from functools import partial
@@ -26,7 +25,6 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
 from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
@@ -43,6 +41,7 @@ from indico.modules.news.util import get_recent_news
 from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table
+from indico.util.colors import generate_contrast_colors
 from indico.util.date_time import format_date, format_number, now_utc
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
@@ -54,25 +53,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH, allow_signed_url
 from indico.web.util import jsonify_data
-
-
-def _rgb_to_hex(rgb):
-    return f'#{int(rgb[0] * 255):02x}{int(rgb[1] * 255):02x}{int(rgb[2] * 255):02x}'
-
-
-def _generate_contrast_color(seed):
-    hue = 1.0 / (1.0 + seed % 20)
-    saturation = 1.0 / (1.0 + seed % 4)
-    if saturation < 0.5:
-        saturation += 0.5
-    brightness = 1.0 / (1.0 + seed % 3)
-    if brightness < 0.5:
-        brightness += 0.5
-    r, g, b = colorsys.hsv_to_rgb(hue, saturation, brightness)
-    background_color = _rgb_to_hex((r, g, b))
-    text_color = _rgb_to_hex((1, 1, 1))
-
-    return ColorTuple(text=text_color, background=background_color)
 
 
 def _flat_map(func, list_):
@@ -644,7 +624,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           'url': event.url,
                           'categoryId': category_id,
                           'venueId': event.own_venue_id}
-            colors = _generate_contrast_color(comparison_id)
+            colors = generate_contrast_colors(comparison_id)
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
             categories[category_id] = category_data
