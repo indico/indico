@@ -12,18 +12,19 @@
   margin-top: 5px;
   margin-bottom: 5px;
   cursor: pointer;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
 }
 
 .color-square {
   width: 20px;
   height: 20px;
   margin-right: 10px;
+  flex-shrink: 0;
 }
 
 .italic {
   font-style: italic;
+}
+
+.legend-checkbox {
+  margin-left: auto;
 }

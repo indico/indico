@@ -70,7 +70,7 @@ def _generate_contrast_color(seed):
         brightness += 0.5
     r, g, b = colorsys.hsv_to_rgb(hue, saturation, brightness)
     background_color = _rgb_to_hex((r, g, b))
-    text_color = _rgb_to_hex((0, 0, 0))
+    text_color = _rgb_to_hex((1, 1, 1)) if brightness < 0.7 else _rgb_to_hex((0, 0, 0))
 
     return ColorTuple(text=text_color, background=background_color)
 
