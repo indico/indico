@@ -15,7 +15,6 @@ from indico.web.rh import RH
 
 class RHCategoryBase(RH):
     _category_query_options = ()
-    _section = ''
 
     @property
     def _category_query(self):

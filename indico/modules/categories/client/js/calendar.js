@@ -13,7 +13,7 @@ import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import CalendarSingleDatePicker from 'indico/react/components/dates/CalendarSingleDatePicker';
+import {CalendarSingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {injectModal} from 'indico/react/util';
 import {$T} from 'indico/utils/i18n';
@@ -44,32 +44,33 @@ import CalendarLegend from './components/CalendarLegend';
           text: Translate.string('Go to...'),
           icon: 'i-button icon-calendar',
           click: async (_, element) => {
-            if (!modalShown) {
-              element = element.closest('button');
-              modalShown = true;
-              const rect = element.getBoundingClientRect();
-              const position = {
-                left: rect.left,
-                top: rect.bottom + 10,
-              };
-              const closeModal = resolve => {
-                resolve();
-                modalShown = false;
-              };
-              return injectModal(
-                resolve => (
-                  <CalendarSingleDatePicker
-                    date={moment(calendar.getDate())}
-                    onDateChange={date => calendar.gotoDate(date.toDate())}
-                    onOutsideClick={() => closeModal(resolve)}
-                    onClose={() => closeModal(resolve)}
-                    isOutsideRange={() => false}
-                    numberOfMonths={1}
-                  />
-                ),
-                position
-              );
+            if (modalShown) {
+              return;
             }
+            element = element.closest('button');
+            modalShown = true;
+            const rect = element.getBoundingClientRect();
+            const position = {
+              left: rect.left,
+              top: rect.bottom + 10,
+            };
+            const closeModal = resolve => {
+              resolve();
+              modalShown = false;
+            };
+            return injectModal(
+              resolve => (
+                <CalendarSingleDatePicker
+                  date={moment(calendar.getDate())}
+                  onDateChange={date => calendar.gotoDate(date.toDate())}
+                  onOutsideClick={() => closeModal(resolve)}
+                  onClose={() => closeModal(resolve)}
+                  isOutsideRange={() => false}
+                  numberOfMonths={1}
+                />
+              ),
+              position
+            );
           },
         },
       },

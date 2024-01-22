@@ -607,7 +607,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                 else:
                     return category_chain[index + 1]
         # this should never happen
-        raise NotFound
+        raise Exception(f'Category {self.category.id} not found in category chain')
 
     def _get_event_data(self, event_query):
         data = []

@@ -26,7 +26,7 @@ export function toClasses(...params) {
  * It takes a function which will be called with `resolve, reject` and render
  * the actual component.
  */
-export function injectModal(renderFunc, position) {
+export function injectModal(renderFunc, position = undefined) {
   const container = document.createElement('div');
   document.body.appendChild(container);
 
