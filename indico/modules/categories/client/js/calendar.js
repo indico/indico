@@ -9,6 +9,7 @@
 
 import {Calendar} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -34,7 +35,7 @@ import CalendarLegend from './components/CalendarLegend';
     const container = document.querySelector(containerCalendarSelector);
     const calendar = new Calendar(container, {
       headerToolbar: {
-        start: 'prev,next today goToDate',
+        start: 'prev,next goToDate today',
         center: 'title',
         end: 'dayGridMonth,dayGridWeek,dayGridDay',
       },
@@ -57,7 +58,9 @@ import CalendarLegend from './components/CalendarLegend';
               return injectModal(
                 resolve => (
                   <CalendarSingleDatePicker
+                    date={moment(calendar.getDate())}
                     onDateChange={date => calendar.gotoDate(date.toDate())}
+                    onOutsideClick={() => closeModal(resolve)}
                     onClose={() => closeModal(resolve)}
                     isOutsideRange={() => false}
                     numberOfMonths={1}
