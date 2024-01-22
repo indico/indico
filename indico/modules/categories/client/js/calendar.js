@@ -45,11 +45,12 @@ import CalendarLegend from './components/CalendarLegend';
           icon: 'i-button icon-calendar',
           click: async (_, element) => {
             if (!modalShown) {
+              element = element.closest('button');
               modalShown = true;
               const rect = element.getBoundingClientRect();
               const position = {
-                left: rect.left - 7,
-                top: rect.bottom + 12,
+                left: rect.left,
+                top: rect.bottom + 10,
               };
               const closeModal = resolve => {
                 resolve();
