@@ -68,7 +68,7 @@ def _prepare_registration_data(dummy_reg):
     for data in dummy_reg.data:
         field = data.field_data.field
         if field.personal_data_type and field.personal_data_type.name == 'title':
-            uuid = list(data.field_data.field.data['captions'].keys())[0]
+            uuid = list(data.field_data.field.data['captions'])[0]
             data.data = {uuid: 1}
 
     dummy_reg.base_price = 100
