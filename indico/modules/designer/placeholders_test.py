@@ -5,64 +5,123 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import itertools
+from datetime import datetime
+from operator import attrgetter
+from pathlib import Path
+
 import pytest
+from PIL import Image
 
-from indico.modules.designer.placeholders import (RegistrationAccompanyingPersonsAbbrevPlaceholder,
-                                                  RegistrationAccompanyingPersonsCountPlaceholder,
-                                                  RegistrationAccompanyingPersonsPlaceholder)
-from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import RegistrationFormSection
-from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.modules.designer import placeholders
+from indico.modules.events.models.persons import EventPerson, EventPersonLink
+from indico.modules.events.registration.util import modify_registration
 
 
-pytest_plugins = ('indico.modules.events.registration.testing.fixtures',)
+pytest_plugins = ('indico.modules.events.registration.testing.fixtures', 'indico.modules.designer.testing.fixtures')
 
 
-def _id(n):
-    assert 0 <= n < 10000000
-    return f'{n:08d}-0000-0000-0000-000000000000'
+def _get_placeholders():
+    """Get a list of all designer placeholders."""
+    exports = [getattr(placeholders, name) for name in placeholders.__all__]
+    phs = [obj for obj in exports if issubclass(obj, placeholders.DesignerPlaceholder)]
+    return sorted(phs, key=attrgetter('group', 'name'))
 
 
-def _create_accompanying_persons(n):
-    return [{'id': _id(i), 'firstName': 'Guinea', 'lastName': 'Pig'} for i in range(n)]
+text_placeholders = [ph for ph in _get_placeholders() if not ph.is_image]
+image_placeholders = [ph for ph in _get_placeholders() if ph.is_image]
 
 
-@pytest.fixture
-def create_accompanying_persons_field(db, dummy_regform):
-    def _create_accompanying_persons_field(max_persons, persons_count_against_limit,
-                                           registration=None, data=None, num_persons=0):
-        section = RegistrationFormSection(
-            registration_form=dummy_regform,
-            title='dummy_section',
-            is_manager_only=False
-        )
-        db.session.add(section)
-        db.session.flush()
-        field = RegistrationFormField(
-            input_type='accompanying_persons',
-            title='Field',
-            parent=section,
-            registration_form=dummy_regform
-        )
-        field.field_impl.form_item.data = {
-            'max_persons': max_persons,
-            'persons_count_against_limit': persons_count_against_limit,
-        }
-        field.versioned_data = field.field_impl.form_item.data
-        if registration:
-            registration.data.append(RegistrationData(
-                field_data=field.current_data,
-                data=(data if data is not None else _create_accompanying_persons(num_persons))
-            ))
-            db.session.flush()
-        return field
-
-    return _create_accompanying_persons_field
+def _get_render_kwargs(ph, event, person, registration, item):
+    if ph.group == 'registrant':
+        if ph.data_source == 'person':
+            return {'person': person}
+        else:
+            return {'registration': registration}
+    elif ph.group == 'event':
+        return {'event': event}
+    elif ph.group == 'fixed':
+        return {'item': item}
 
 
-def test_accompanying_persons_placeholder(dummy_reg, create_accompanying_persons_field):
-    create_accompanying_persons_field(2, False, registration=dummy_reg, num_persons=2)
+def _prepare_event_data(dummy_event, dummy_user):
+    dummy_event.start_dt = datetime(2023, 1, 1, 10, 0)
+    dummy_event.end_dt = datetime(2023, 1, 2, 15, 0)
+    dummy_event.title = 'Dummy event title'
+    dummy_event.description = 'Dummy event description'
+    dummy_event.organizer_info = 'CERN'
+    dummy_event.room_name = 'Dummy room'
+    dummy_event.venue_name = 'Dummy venue'
 
-    assert RegistrationAccompanyingPersonsCountPlaceholder.render(dummy_reg) == '2'
-    assert RegistrationAccompanyingPersonsPlaceholder.render(dummy_reg) == 'Guinea PIG, Guinea PIG'
-    assert RegistrationAccompanyingPersonsAbbrevPlaceholder.render(dummy_reg) == 'G. PIG, G. PIG'
+    person = EventPerson.create_from_user(dummy_user, dummy_event)
+    person_link = EventPersonLink(person=person)
+    dummy_event.person_links = [person_link, person_link]
+
+
+def _prepare_registration_data(dummy_reg):
+    modify_registration(dummy_reg, {'email': '1337@example.test', 'first_name': 'Guinea', 'last_name': 'Pig',
+                                    'affiliation': 'CERN', 'address': '1211 Geneva 23, Switzerland',
+                                    'country': 'CH', 'phone': '+41227676000', 'position': 'Developer'},
+                        notify_user=False)
+
+    # Set the registration title
+    for data in dummy_reg.data:
+        field = data.field_data.field
+        if field.personal_data_type and field.personal_data_type.name == 'title':
+            uuid = list(data.field_data.field.data['captions'])[0]
+            data.data = {uuid: 1}
+
+    dummy_reg.base_price = 100
+
+
+def _create_placeholder_template():
+    template = ''
+    for key, group in itertools.groupby(text_placeholders, key=attrgetter('group')):
+        template += f"Group '{key}':\n"
+        for ph in group:
+            template += f'\t{ph.name}: {{{ph.name}}}\n'
+    return template.strip()
+
+
+@pytest.mark.usefixtures('request_context', 'dummy_accompanying_persons_field')
+def test_replace_text_placeholders(snapshot, dummy_event, dummy_reg, dummy_user):
+    # For 'event' placeholders
+    _prepare_event_data(dummy_event, dummy_user)
+
+    # For 'registrant' placeholders
+    _prepare_registration_data(dummy_reg)
+
+    # For fixed text placeholder
+    dummy_item = {'text': 'Hello, world!'}
+
+    # For 'person' data_source
+    dummy_person = {'id': dummy_reg.id,
+                    'first_name': dummy_reg.first_name,
+                    'last_name': dummy_reg.last_name,
+                    'registration': dummy_reg,
+                    'is_accompanying': False}
+
+    template = _create_placeholder_template()
+    for ph in text_placeholders:
+        kwargs = _get_render_kwargs(ph, dummy_event, dummy_person, dummy_reg, dummy_item)
+        template = ph.replace(template, **kwargs)
+
+    snapshot.snapshot_dir = Path(__file__).parent / 'tests'
+    snapshot.assert_match(template, 'test_replace_text_placeholders.txt')
+
+
+@pytest.mark.usefixtures('request_context', 'dummy_event_logo')
+def test_render_image_placeholders(dummy_event, dummy_reg, dummy_designer_image_file):
+    # For fixed image placeholder
+    dummy_item = {'image_id': dummy_designer_image_file.id}
+    # For 'person' data_source
+    dummy_person = {'id': dummy_reg.id,
+                    'first_name': dummy_reg.first_name,
+                    'last_name': dummy_reg.last_name,
+                    'registration': dummy_reg,
+                    'is_accompanying': False}
+
+    for ph in image_placeholders:
+        kwargs = _get_render_kwargs(ph, dummy_event, dummy_person, dummy_reg, dummy_item)
+        res = ph.render(**kwargs)
+        assert isinstance(res, Image.Image)

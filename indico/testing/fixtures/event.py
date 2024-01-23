@@ -13,6 +13,12 @@ from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.util.date_time import now_utc
+from indico.util.string import crc32
+
+
+# https://github.com/mathiasbynens/small/blob/master/bmp.bmp
+DUMMY_BMP_IMAGE = (b'BM\x1e\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x0c\x00'
+                   b'\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\x00\x00\xff\x00')
 
 
 @pytest.fixture
@@ -53,3 +59,14 @@ def create_label(db):
 def dummy_event(create_event):
     """Create a mocked dummy event."""
     return create_event(0)
+
+
+@pytest.fixture
+def dummy_event_logo(dummy_event):
+    dummy_event.logo = DUMMY_BMP_IMAGE
+    dummy_event.logo_metadata = {
+        'hash': crc32(dummy_event.logo),
+        'size': len(dummy_event.logo),
+        'filename': 'dummy-event-logo.bmp',
+        'content_type': 'image/bmp'
+    }

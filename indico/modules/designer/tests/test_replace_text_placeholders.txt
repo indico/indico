@@ -1,0 +1,35 @@
+Group 'event':
+	category_title: dummy
+	event_dates: 1–2 Jan 2023
+	event_description: <div class="preformatted">Dummy event description</div>
+	event_organizers: CERN
+	event_room: Dummy room
+	event_speakers: Guinea Pig, Guinea Pig
+	event_title: Dummy event title
+	event_venue: Dummy venue
+Group 'fixed':
+	fixed: Hello, world!
+Group 'registrant':
+	accompanying_persons: Wanda WHIZBANG, Quentin QUIBBLE, Gertrude GIGGLESNORT, Buford BUMBLEBEE, Penelope PUDDLEJUMPER
+	accompanying_persons_abbrev: W. WHIZBANG, Q. QUIBBLE, G. GIGGLESNORT, B. BUMBLEBEE, P. PUDDLEJUMPER
+	address: 1211 Geneva 23, Switzerland
+	affiliation: CERN
+	amount: 100.00
+	country: Switzerland
+	email: 1337@example.test
+	first_name: Guinea
+	full_name: Mr Pig, Guinea
+	full_name_b: Mr Guinea Pig
+	full_name_b_no_title: Guinea Pig
+	full_name_c: Mr Guinea PIG
+	full_name_d: Mr G. PIG
+	full_name_no_title: Pig, Guinea
+	full_name_no_title_c: PIG, Guinea
+	full_name_no_title_d: PIG, G.
+	last_name: Pig
+	num_accompanying_persons: 5
+	phone: +41227676000
+	position: Developer
+	price: US$100.00
+	registration_friendly_id: 1
+	title: Mr
