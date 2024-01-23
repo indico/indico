@@ -35,11 +35,6 @@ Bugfixes
 - Fix contribution list filters being obscured by the action dialog (:pr:`6055`)
 - Fix emailing Paper Peer Reviewing and Editing teams (:pr:`6145`)
 
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- None so far
-
 
 Version 3.2.8
 -------------
