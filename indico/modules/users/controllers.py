@@ -292,6 +292,7 @@ class RHSearchAffiliations(RH):
                 db.func.lower(Affiliation.name).startswith(q.lower()).desc(),
                 db.func.lower(Affiliation.name)
             )
+            .limit(20)
             .all())
         return AffiliationSchema(many=True).jsonify(res)
 
