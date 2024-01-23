@@ -10,7 +10,7 @@
     {% for user in event_persons -%}
         <tr class="i-table">
             <td class="i-table thin-column hide-if-locked">
-                <input type="checkbox" name="user_id" value="{{ user.id }}" class="select-row"
+                <input type="checkbox" name="person_identifier" value="{{ user.identifier }}" class="select-row"
                        {{ 'disabled' if not user.email }}>
             </td>
             <td class="i-table name-column">{{ user.full_name }}</td>

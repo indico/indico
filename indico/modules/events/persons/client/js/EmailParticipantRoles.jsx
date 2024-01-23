@@ -58,7 +58,9 @@ export function EmailParticipantRoles({
       return handleSubmitError(err);
     }
     setSentCount(resp.data.count);
-    onSubmitSucceeded(resp.data.count);
+    if (onSubmitSucceeded) {
+      onSubmitSucceeded(resp.data.count);
+    }
     setTimeout(() => onClose(), successTimeout);
   };
 
@@ -74,7 +76,6 @@ export function EmailParticipantRoles({
     <EmailDialog
       onSubmit={handleSubmit}
       onClose={onClose}
-      onSubmitSucceeded={onSubmitSucceeded}
       senders={senders}
       recipients={recipients}
       previewURL={emailPreviewURL({event_id: eventId})}
