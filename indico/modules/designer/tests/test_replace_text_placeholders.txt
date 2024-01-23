@@ -18,13 +18,13 @@ Group 'registrant':
 	country: Switzerland
 	email: 1337@example.test
 	first_name: Guinea
-	full_name: Mr PIG, G.
-	full_name_b: Mr G. PIG
-	full_name_b_no_title: G. PIG
-	full_name_c: Mr G. PIG
+	full_name: Mr Pig, Guinea
+	full_name_b: Mr Guinea Pig
+	full_name_b_no_title: Guinea Pig
+	full_name_c: Mr Guinea PIG
 	full_name_d: Mr G. PIG
-	full_name_no_title: PIG, G.
-	full_name_no_title_c: PIG, G.
+	full_name_no_title: Pig, Guinea
+	full_name_no_title_c: PIG, Guinea
 	full_name_no_title_d: PIG, G.
 	last_name: Pig
 	num_accompanying_persons: 5
