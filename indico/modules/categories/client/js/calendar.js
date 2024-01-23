@@ -23,7 +23,8 @@ import CalendarLegend from './components/CalendarLegend';
 (function(global) {
   let groupBy = 'category';
   const filteredLegendElements = new Set();
-  let modalShown = false;
+  let closeCalendar = null;
+  let ignoreClick = false;
   global.setupCategoryCalendar = function setupCategoryCalendar(
     containerCalendarSelector,
     containerLegendSelector,
@@ -44,27 +45,36 @@ import CalendarLegend from './components/CalendarLegend';
           text: Translate.string('Go to...'),
           icon: 'i-button icon-calendar',
           click: async (_, element) => {
-            if (modalShown) {
+            if (ignoreClick) {
+              ignoreClick = false;
               return;
             }
-            element = element.closest('button');
-            modalShown = true;
-            const rect = element.getBoundingClientRect();
+            if (closeCalendar) {
+              closeCalendar();
+              return;
+            }
+            const button = element.closest('button');
+            const rect = button.getBoundingClientRect();
             const position = {
               left: rect.left,
               top: rect.bottom + 10,
             };
-            const closeModal = resolve => {
+            closeCalendar = (resolve, evt = undefined) => {
+              closeCalendar = null;
               resolve();
-              modalShown = false;
+              if (evt && button.contains(evt.target)) {
+                // if the calendar was closed by clicking again on the button, we have to
+                // ignore that click event to avoid opening it again immediately
+                ignoreClick = true;
+              }
             };
-            return injectModal(
+            injectModal(
               resolve => (
                 <CalendarSingleDatePicker
                   date={moment(calendar.getDate())}
                   onDateChange={date => calendar.gotoDate(date.toDate())}
-                  onOutsideClick={() => closeModal(resolve)}
-                  onClose={() => closeModal(resolve)}
+                  onOutsideClick={evt => closeCalendar(resolve, evt)}
+                  onClose={() => closeCalendar(resolve)}
                   isOutsideRange={() => false}
                   numberOfMonths={1}
                 />
