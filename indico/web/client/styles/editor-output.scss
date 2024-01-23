@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+
 // Neither ckeditor nor the markdown editor implement the styles shown in their
 // preview - they need to be manually implemented.
 // These styles apply to the generated output in conference & event description,
@@ -17,53 +19,40 @@
   // https://ckeditor.com/docs/ckeditor5/latest/features/images/images-styles.html
   // Inspired by the default ckeditor styles:
   // https://github.com/ckeditor/ckeditor5/blob/06d11a85/packages/ckeditor5-image/theme/imagestyle.css
-  $image-spacing: 1.5em;
-  display: flow-root;
+  @extend %formatted-text-block;
+  font-family: sans-serif;
+  font-size: 1.143rem; // TODO: fix font sizes globally
 
   img {
     max-width: 100%;
+    width: auto;
+    height: auto;
   }
 
-  // Applies to centered images, which by default have no class added
-  figure {
-    margin: $image-spacing auto;
-  }
-
-  .image-style-align-left,
-  .image-style-align-right,
-  .image-style-side {
-    margin-top: $image-spacing;
-    margin-bottom: $image-spacing;
-  }
-
-  .image-style-align-left {
-    float: left;
-    margin-right: $image-spacing;
-  }
-
-  .image-style-align-right,
-  .image-style-side {
-    float: right;
-    margin-left: $image-spacing;
-  }
-
-  .image-style-side {
+  img[style~='float:'] {
     max-width: 50%;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  // XXX: floating left style="float: left;"
+  img[style~='float:'][style~='left;'] {
+    margin-left: 0;
+    margin-right: 1em;
+  }
+
+  // XXX: floating right style="float: right;"
+  img[style~='float:'][style~='right;'] {
+    margin-left: 1em;
+    margin-right: 0;
+  }
+
+  // XXX: centerted image style="display: block; margin-left: auto; margin-right: auto;"
+  img[style~='display:'][style~='auto;'] {
+    max-width: 66%;
   }
 
   &.weak-hidden {
     display: none;
-  }
-
-  // Nicer quote & code formatting
-  blockquote {
-    padding: 5px 8px 5px 30px;
-    background-color: rgba(102, 128, 153, 0.05);
-    border-left: 10px solid #d6dbdf;
-  }
-
-  pre,
-  code {
-    background-color: #f5f5f5;
   }
 }
