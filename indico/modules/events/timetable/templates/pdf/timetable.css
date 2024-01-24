@@ -1,0 +1,17 @@
+@page {
+  size: {{ page_size}};
+
+  @bottom-center {
+    counter-increment: page {{ page_offset }};
+    content: counter(page);
+  }
+}
+
+.pagebreak {
+  break-after: always;
+}
+
+.timetable-entry {
+  break-inside: avoid;
+}
+

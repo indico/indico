@@ -24,6 +24,7 @@ from indico.modules.events.views import WPSimpleEventDisplay
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
+from weasyprint import CSS, HTML
 
 
 class RHTimetableProtectionBase(RHDisplayEventBase):
@@ -100,7 +101,48 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                                 back_url=url_for('.timetable', self.event))
 
 
+class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
+    def _process(self):
+        form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
+        if form.validate_on_submit():
+            from flask import render_template
+            from indico.modules.events.timetable.models.entries import TimetableEntry
+            from indico.core.db import db
+
+            days = {}
+            for day in self.event.iter_days():
+                entries = (self.event.timetable_entries
+                           .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
+                                           TimetableEntry.parent_id.is_(None))
+                           .order_by(TimetableEntry.start_dt))
+                days[day] = entries
+
+            html = render_template('events/timetable/pdf/timetable.html', event=self.event, days=days)
+            css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data,
+                                  page_offset=form.firstPageNumber.data-1)
+
+            if request.args.get('download') == '1':
+                return send_file('timetable.pdf', create_pdf(html, css), 'application/pdf')
+            else:
+                url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
+                return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
+        return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
+                                back_url=url_for('.timetable', self.event))
+
+
 class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
     def _process(self):
         pdf = get_timetable_offline_pdf_generator(self.event)
         return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+
+
+def create_pdf(html, css) -> BytesIO:
+    css = CSS(string=css)
+    documents = [
+        HTML(string=html).render(stylesheets=(css,))
+    ]
+    all_pages = [p for doc in documents for p in doc.pages]
+    f = BytesIO()
+    documents[0].copy(all_pages).write_pdf(f)
+    f.seek(0)
+    return f
