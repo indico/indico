@@ -68,7 +68,7 @@ import CalendarLegend from './components/CalendarLegend';
                 ignoreClick = true;
               }
             };
-            injectModal(
+            return injectModal(
               resolve => (
                 <CalendarSingleDatePicker
                   date={moment(calendar.getDate())}
