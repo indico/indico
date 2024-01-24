@@ -718,6 +718,17 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
+class RHRegistrationToggleAllowModification(RHManageRegistrationBase):
+    """Let a manager toggle allowance to modify a registration."""
+
+    def _process(self):
+        allow = request.form.get('allow') == '0'
+        if allow != self.registration.allow_modification:
+            pass
+            # toggle_registration_allow_modification(self.registration, allow=allow)
+        return jsonify_data(html=_render_registration_details(self.registration))
+
+
 class RHRegistrationCheckIn(RHManageRegistrationBase):
     """Set checked in state of a registration."""
 

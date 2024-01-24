@@ -49,6 +49,13 @@
                 </a>.
             {% endif %}
         </div>
+        <div class="text">
+            {% if registration.allow_modification %}
+                <div class="label">
+                    {% trans %}You can modify your registration until {% registration.allow_modification_until %} {% endtrans %}
+                </div>
+            {% endif %}
+        </div>
         <div class="toolbar">
             {% if registration.registration_form.modification_mode.name != 'not_allowed' and registration.is_active %}
                 <div class="group">

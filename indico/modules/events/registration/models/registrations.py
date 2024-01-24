@@ -251,6 +251,19 @@ class Registration(db.Model):
         default=False
     )
 
+    #: Whether the person is allowed to modify their registration
+    allow_modification = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+    #: The date/time until which the person can modify their registration
+    allow_modification_until = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
+
     #: The Event containing this registration
     event = db.relationship(
         'Event',

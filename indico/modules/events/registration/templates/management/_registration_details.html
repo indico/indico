@@ -313,3 +313,40 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro _render_allow_modification(registration) %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-exit"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Allow modify registration{% endtrans %}
+                </div>
+                {% trans -%}
+                    You can exceptionally allow this participant to modify their registration.
+                {%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    {% if not registration.allow_modification %}
+                        <button class="i-button big"
+                                data-update="#registration-details"
+                                data-method="POST"
+                                data-params="{{ dict(allow=1) | tojson | forceescape }}"
+                                data-href="{{ url_for('.toggle_registration_allow_modification', registration) }}">
+                            {% trans %}Allow modification{% endtrans %}
+                        </button>
+                    {% else %}
+                        <button class="i-button big"
+                                data-update="#registration-details"
+                                data-method="POST"
+                                data-params="{{ dict(allow=0) | tojson | forceescape }}"
+                                data-href="{{ url_for('.toggle_registration_allow_modification', registration) }}">
+                            {% trans %}Remove allowance{% endtrans %}
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
