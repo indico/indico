@@ -7,6 +7,7 @@
 
 import re
 import sys
+from pathlib import Path
 
 
 # Emojis for headings. This also serves as an exhaustive list of allowed headings
@@ -31,10 +32,10 @@ def fail(msg):
 
 def extract_changelog(text, version, *, allow_unreleased=False):
     """Extract the changelog for a given version."""
-    START_RE = rf'^Version {re.escape(version)}\n-+\n\n\*(Unreleased|Released on .+)\*\n$'
-    END_RE = r'(^----$)|(^Version [0-9.abrc]+$)'
+    start_re = rf'^Version {re.escape(version)}\n-+\n\n\*(Unreleased|Released on .+)\*\n$'
+    end_re = r'(^----$)|(^Version [0-9.abrc]+$)'
 
-    if not (match := re.search(START_RE, text, re.MULTILINE)):
+    if not (match := re.search(start_re, text, re.MULTILINE)):
         fail(f'Version {version} not found in text')
     if match.group(1) == 'Unreleased' and not allow_unreleased:
         fail(f'Version {version} is marked as unreleased')
@@ -43,7 +44,7 @@ def extract_changelog(text, version, *, allow_unreleased=False):
 
     # try to find the next version or separator between big releases. if we don't find one
     # we assume we're at the end of the file and just take everything.
-    if match := re.search(END_RE, text, re.MULTILINE):
+    if match := re.search(end_re, text, re.MULTILINE):
         text = text[:match.start()]
 
     return text.strip()
@@ -107,7 +108,7 @@ def convert_to_markdown(text):
                 continue
             new_lines.append('Note: ' + ' '.join(note_lines))
             in_note = False
-            del note_lines[:]
+            note_lines.clear()
             # fall through to the default below, this is typically the blank line right
             # after the note which we want to keep
         # anything that doesn't need special handling
@@ -118,18 +119,16 @@ def convert_to_markdown(text):
 def main():
     version = sys.argv[1]
     try:
-        destfile = sys.argv[2]
+        destfile = Path(sys.argv[2])
     except IndexError:
         destfile = None
-    with open('CHANGES.rst') as f:
-        changelog = f.read()
+    changelog = Path('CHANGES.rst').read_text()
     changelog = extract_changelog(changelog, version, allow_unreleased=(not destfile))
     changelog = convert_to_markdown(changelog)
     if not destfile:
         print(changelog)
         return
-    with open(destfile, 'w') as f:
-        f.write(changelog)
+    destfile.write_text(changelog)
 
 
 if __name__ == '__main__':
