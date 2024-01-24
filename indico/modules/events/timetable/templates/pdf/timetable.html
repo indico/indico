@@ -1,0 +1,55 @@
+{% macro render_time_and_place(entry) %}
+    {{ _('Time and Place') }}: {{ entry.object.room_name }} ({{ entry.start_dt|format_time(timezone=event.tz) }} - {{ entry.end_dt|format_time(timezone=event.tz) }})
+{% endmacro %}
+
+<div>
+    <h2>{{ event.title }}</h2>
+    <h3>{{ event.start_dt|format_date(timezone=event.tz) }} - {{ event.end_dt|format_date(timezone=event.tz) }}</h3>
+    {% for day in days %}
+        <h4>{{ _('Daily Program') }} {{ day|format_date(timezone=event.tz) }}</h4>
+        <div class="pagebreak">
+            {% for entry in days[day] %}
+                <p class="timetable-entry" style="break-inside:avoid;">
+                    {% if entry.type == 1 %}
+                        {% set session_block = entry.object %}
+                        {% set session = session_block.session %}
+                        {% set conveners = session_block.person_links|map(attribute='full_name')|list %}
+                        <div>
+                            Session: <b>{{ session_block.title or session.title }}</b>
+                        </div>
+                        <div>
+                            {{ render_time_and_place(entry) }}
+                        </div>
+                        {% if conveners %}
+                            <div>
+                                {{ ngettext('Convener', 'Conveners', conveners|length)}}: <b>{{ conveners|join('; ') }}</b>
+                            </div>
+                        {% endif %}
+                    {% elif entry.type == 2 %}
+                        {% set contrib = entry.object %}
+                        {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+                        <div>
+                            Contribution: <b>{{ contrib.title }}</b>
+                        </div>
+                        <div>
+                            {{ render_time_and_place(entry) }}
+                        </div>
+                        {% if speakers %}
+                            <div>
+                                {{ ngettext('Speaker', 'Speakers', speakers|length)}}: <b>{{ speakers|join('; ') }}</b>
+                            </div>
+                        {% endif %}
+                    {% elif entry.type == 3 %}
+                        {% set break = entry.object %}
+                        <div>
+                            Break: <b>{{ break.title }}</b>
+                        </div>
+                        <div>
+                            {{ render_time_and_place(entry) }}
+                        </div>
+                    {% endif %}
+                </p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
