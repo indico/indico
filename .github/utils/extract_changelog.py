@@ -49,6 +49,13 @@ def extract_changelog(text, version, *, allow_unreleased=False):
     return text.strip()
 
 
+def _replace_unsplit(prefix):
+    def _replacer(match):
+        refs = [x.strip() for x in match.group(1).split(',')]
+        return ', '.join(f'{prefix}{ref}' for ref in refs)
+    return _replacer
+
+
 def convert_to_markdown(text):
     """Convert rst changelog to markdown.
 
@@ -58,9 +65,9 @@ def convert_to_markdown(text):
     to headings (or failing if an unknonwn heading is used).
     """
     # github references
-    text = re.sub(r':(?:issue|pr):`(\d+)`', r'#\1', text)  # issue/pr
-    text = re.sub(r':user:`([^`]+)`', r'@\1', text)  # user
-    text = re.sub(r':cve:`([^`]+)`', r'\1', text)  # CVE
+    text = re.sub(r':(?:issue|pr):`([\d, ]+)`', _replace_unsplit('#'), text)  # issue/pr
+    text = re.sub(r':user:`([^`]+)`', _replace_unsplit('@'), text)  # user
+    text = re.sub(r':cve:`([^`]+)`', _replace_unsplit(''), text)  # CVE
     # documentation references
     text = re.sub(r':data:`([^`]+)`', r'[`\1`](https://docs.getindico.io/en/stable/config/settings/#\1)', text)
     text = re.sub(r':ref:`([^<]+) <[^>]+>`', r'\1', text)
