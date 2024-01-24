@@ -20,6 +20,7 @@
 }
 
 .CalendarMonth_caption {
+  padding-top: 18px !important;
   padding-bottom: 42px !important;
 }
 
@@ -33,4 +34,16 @@
 .DateRangePicker_picker.DateRangePicker_picker__fullScreenPortal,
 .SingleDatePicker_picker.SingleDatePicker_picker__fullScreenPortal {
   z-index: 1001 !important;
+}
+
+.datepicker-container {
+  display: flex;
+  justify-content: center;
+  padding: 0 !important;
+}
+
+.datepicker-select {
+  padding: 0 !important;
+  height: 33px !important;
+  width: auto !important;
 }

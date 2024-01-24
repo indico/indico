@@ -4,8 +4,7 @@
 
 {% block side_menu %}
     <div class="category-calendar-side-menu">
-        <div class="js-calendar-datepicker"></div>
-        <input type="hidden" id="date" name="date">
+        <div id="category-calendar-legend"></div>
     </div>
 {% endblock %}
 
@@ -28,8 +27,10 @@
     <script>
         setupCategoryCalendar(
             '#event-calendar',
+            'category-calendar-legend',
             {{ category.display_tzinfo.zone | tojson }},
-            {{ url_for('categories.calendar_events', category) | tojson }}
+            {{ url_for('categories.calendar_events', category) | tojson }},
+            {{ category.id }}
         );
     </script>
 {% endblock %}

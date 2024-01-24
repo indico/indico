@@ -9,18 +9,81 @@
 
 import {Calendar} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import moment from 'moment';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+import {CalendarSingleDatePicker} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
+import {injectModal} from 'indico/react/util';
 import {$T} from 'indico/utils/i18n';
 
+import CalendarLegend from './components/CalendarLegend';
+
 (function(global) {
+  let groupBy = 'category';
+  const filteredLegendElements = new Set();
+  let closeCalendar = null;
+  let ignoreClick = false;
   global.setupCategoryCalendar = function setupCategoryCalendar(
-    containerSelector,
+    containerCalendarSelector,
+    containerLegendSelector,
     tz,
-    categoryURL
+    categoryURL,
+    categoryId
   ) {
     const cachedEvents = {};
-    const container = document.querySelector(containerSelector);
+    const container = document.querySelector(containerCalendarSelector);
     const calendar = new Calendar(container, {
+      headerToolbar: {
+        start: 'prev,next goToDate today',
+        center: 'title',
+        end: 'dayGridMonth,dayGridWeek,dayGridDay',
+      },
+      customButtons: {
+        goToDate: {
+          text: Translate.string('Go to...'),
+          icon: 'i-button icon-calendar',
+          click: async (_, element) => {
+            if (ignoreClick) {
+              ignoreClick = false;
+              return;
+            }
+            if (closeCalendar) {
+              closeCalendar();
+              return;
+            }
+            const button = element.closest('button');
+            const rect = button.getBoundingClientRect();
+            const position = {
+              left: rect.left,
+              top: rect.bottom + 10,
+            };
+            closeCalendar = (resolve, evt = undefined) => {
+              closeCalendar = null;
+              resolve();
+              if (evt && button.contains(evt.target)) {
+                // if the calendar was closed by clicking again on the button, we have to
+                // ignore that click event to avoid opening it again immediately
+                ignoreClick = true;
+              }
+            };
+            await injectModal(
+              resolve => (
+                <CalendarSingleDatePicker
+                  date={moment(calendar.getDate())}
+                  onDateChange={date => calendar.gotoDate(date.toDate())}
+                  onOutsideClick={evt => closeCalendar(resolve, evt)}
+                  onClose={() => closeCalendar(resolve)}
+                  isOutsideRange={() => false}
+                  numberOfMonths={1}
+                />
+              ),
+              position
+            );
+          },
+        },
+      },
       plugins: [dayGridPlugin],
       initialView: 'dayGridMonth',
       timeZone: tz,
@@ -42,8 +105,10 @@ import {$T} from 'indico/utils/i18n';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          successCallback(data.events);
-          const toolbarGroup = $(containerSelector).find(
+          const attr = groupBy === 'category' ? 'categoryId' : 'venueId';
+          const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr] ?? 0));
+          successCallback(filteredEvents);
+          const toolbarGroup = $(containerCalendarSelector).find(
             '.fc-toolbar .fc-toolbar-chunk:last-child'
           );
           const ongoingEventsInfo = $('<a>', {
@@ -74,19 +139,115 @@ import {$T} from 'indico/utils/i18n';
           }
         }
 
+        function setupCalendarLegend(data, items, legendContainer) {
+          const onFilterChanged = filterBy => {
+            groupBy = filterBy;
+            filteredLegendElements.clear();
+            calendar.refetchEvents();
+          };
+          const onElementSelected = (id, checked) => {
+            if (checked) {
+              filteredLegendElements.delete(id);
+            } else {
+              filteredLegendElements.add(id);
+            }
+            calendar.refetchEvents();
+          };
+          items = items.map(item => ({...item, checked: !filteredLegendElements.has(item.id)}));
+          ReactDOM.render(
+            <CalendarLegend
+              items={items}
+              groupBy={data.group_by}
+              onFilterChanged={onFilterChanged}
+              onElementSelected={onElementSelected}
+            />,
+            legendContainer
+          );
+        }
+
+        function setupLegendByAttribute(events, items, attr, defaultTitle, rootId, rootTitle) {
+          const itemMap = items.reduce(
+            (acc, {id, title, url}) => ({
+              ...acc,
+              [id]: {title: title ?? defaultTitle, url},
+            }),
+            {}
+          );
+          const usedItems = new Set();
+          return events
+            .reduce((acc, value) => {
+              const id = value[attr] ?? 0;
+              if (usedItems.has(id)) {
+                return acc;
+              }
+              usedItems.add(id);
+              const item = itemMap[id] ?? {};
+              const isSpecial = id === rootId;
+              return [
+                ...acc,
+                {
+                  title: (isSpecial ? rootTitle : item.title) ?? defaultTitle,
+                  color: value.color,
+                  url: item.url,
+                  isSpecial,
+                  id,
+                },
+              ];
+            }, [])
+            .sort((a, b) => {
+              if (a.isSpecial) {
+                return -1;
+              } else if (b.isSpecial) {
+                return 1;
+              }
+              return a.title.localeCompare(b.title);
+            });
+        }
+
+        function updateLegend(data) {
+          let items;
+          switch (data.group_by) {
+            case 'category':
+              items = setupLegendByAttribute(
+                data.events,
+                data.categories,
+                'categoryId',
+                Translate.string('No category'),
+                categoryId,
+                Translate.string('This category')
+              );
+              break;
+            case 'location':
+              items = setupLegendByAttribute(
+                data.events,
+                data.locations,
+                'venueId',
+                Translate.string('No venue'),
+                0
+              );
+              break;
+            default:
+              items = [];
+              break;
+          }
+          setupCalendarLegend(data, items, document.getElementById(containerLegendSelector));
+        }
+
         start = start.toISOString().substring(0, 10);
         end = end.toISOString().substring(0, 10);
-        const key = `${start}-${end}`;
+        const key = `${start}-${end}-${groupBy}`;
         if (cachedEvents[key]) {
+          updateLegend(cachedEvents[key]);
           updateCalendar(cachedEvents[key]);
         } else {
           $.ajax({
             url: categoryURL,
-            data: {start, end},
+            data: {start, end, group_by: groupBy},
             dataType: 'json',
             contentType: 'application/json',
             complete: IndicoUI.Dialogs.Util.progress(),
             success(data) {
+              updateLegend(data);
               updateCalendar(data);
               cachedEvents[key] = data;
             },
@@ -99,15 +260,5 @@ import {$T} from 'indico/utils/i18n';
       },
     });
     calendar.render();
-
-    $('.js-calendar-datepicker').datepicker({
-      dateFormat: 'yy-mm-dd',
-      beforeShowDay(date) {
-        return [date.getDate() === 1, ''];
-      },
-      onSelect(date) {
-        calendar.gotoDate(date);
-      },
-    });
   };
 })(window);

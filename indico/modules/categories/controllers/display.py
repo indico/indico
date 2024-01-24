@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from datetime import date, datetime, time, timedelta
+from enum import Enum, auto
 from functools import partial
 from io import BytesIO
 from itertools import chain, groupby
@@ -16,6 +17,7 @@ import dateutil
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
+from marshmallow_enum import EnumField
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from webargs import fields, validate
@@ -23,7 +25,6 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
 from indico.modules.categories.controllers.util import (get_category_view_params, get_event_query_filter,
@@ -37,8 +38,10 @@ from indico.modules.categories.views import WPCategory, WPCategoryCalendar
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
+from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table
+from indico.util.colors import generate_contrast_colors
 from indico.util.date_time import format_date, format_number, now_utc
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
@@ -50,15 +53,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.rh import RH, allow_signed_url
 from indico.web.util import jsonify_data
-
-
-CALENDAR_COLOR_PALETTE = [
-    ColorTuple('#1F1100', '#ECC495'),
-    ColorTuple('#0F0202', '#B9CBCA'),
-    ColorTuple('#0D1E1F', '#C2ECEF'),
-    ColorTuple('#000000', '#D0C296'),
-    ColorTuple('#202020', '#EFEBC2')
-]
 
 
 def _flat_map(func, list_):
@@ -567,9 +561,15 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
 
 
 class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
-    def _process_args(self):
+    class GroupBy(Enum):
+        category = auto()
+        location = auto()
+
+    @use_kwargs({'group_by': EnumField(GroupBy, load_default='category')}, location='query')
+    def _process_args(self, group_by):
         RHDisplayCategoryBase._process_args(self)
         tz = self.category.display_tzinfo
+        self.group_by = group_by
         try:
             self.start_dt = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
             self.end_dt = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
@@ -581,8 +581,11 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                  .filter(Event.starts_between(self.start_dt, self.end_dt),
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
-                 .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id')))
-        events = self._get_event_data(query)
+                 .options(undefer(Event.detailed_category_chain),
+                          load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id')))
+        events, categories = self._get_event_data(query)
+        raw_locations = Location.query.options(load_only('id', 'name')).all()
+        locations = [{'title': loc.name, 'id': loc.id} for loc in raw_locations]
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
                                   ~Event.is_deleted,
@@ -591,22 +594,41 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
                           .order_by(Event.title)
                           .all())
-        return jsonify_data(flash=False, events=events, ongoing_event_count=len(ongoing_events),
+        return jsonify_data(flash=False, events=events, categories=categories, locations=locations,
+                            group_by=self.group_by.name,
+                            ongoing_event_count=len(ongoing_events),
                             ongoing_events_html=self._render_ongoing_events(ongoing_events))
+
+    def _find_nearest_category(self, category_chain):
+        for index, category_data in enumerate(category_chain):
+            if category_data['id'] == self.category.id:
+                if index == len(category_chain) - 1:
+                    return category_data
+                else:
+                    return category_chain[index + 1]
+        # this should never happen
+        raise Exception(f'Category {self.category.id} not found in category chain')
 
     def _get_event_data(self, event_query):
         data = []
+        categories = {}
         tz = self.category.display_tzinfo
         for event in event_query:
-            category_id = event.category_id
+            category_data = self._find_nearest_category(event.detailed_category_chain)
+            category_id = category_data['id']
+            category_data['url'] = url_for('categories.calendar', category_id=category_id)
+            comparison_id = category_id if self.group_by == self.GroupBy.category else event.own_venue_id or 0
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
-                          'url': event.url}
-            colors = CALENDAR_COLOR_PALETTE[category_id % len(CALENDAR_COLOR_PALETTE)]
-            event_data.update({'textColor': '#' + colors.text, 'color': '#' + colors.background})
+                          'url': event.url,
+                          'categoryId': category_id,
+                          'venueId': event.own_venue_id}
+            colors = generate_contrast_colors(comparison_id)
+            event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
-        return data
+            categories[category_id] = category_data
+        return data, list(categories.values())
 
     def _render_ongoing_events(self, ongoing_events):
         template = get_template_module('categories/display/_calendar_ongoing_events.html')

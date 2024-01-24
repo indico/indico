@@ -26,9 +26,17 @@ export function toClasses(...params) {
  * It takes a function which will be called with `resolve, reject` and render
  * the actual component.
  */
-export function injectModal(renderFunc) {
+export function injectModal(renderFunc, position = undefined) {
   const container = document.createElement('div');
   document.body.appendChild(container);
+
+  if (position) {
+    const {left, top} = position;
+    container.style.position = 'absolute';
+    container.style.left = `${left}px`;
+    container.style.top = `${top}px`;
+    container.style.zIndex = '1001';
+  }
 
   const cleanup = () =>
     _.defer(() => {

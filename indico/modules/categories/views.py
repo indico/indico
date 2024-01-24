@@ -65,6 +65,13 @@ class WPCategoryCalendar(WPCategory):
 
     bundles = ('module_categories.calendar.js', 'module_categories.calendar.css')
 
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(
+            _('Calendar'),
+            category=self.category,
+            category_url_factory=lambda cat, management: url_for('categories.calendar', cat)
+        )
+
 
 class WPCategoryManagement(WPCategory):
     """WP for category management pages."""

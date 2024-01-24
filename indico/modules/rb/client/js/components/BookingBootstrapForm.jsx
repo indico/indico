@@ -394,6 +394,8 @@ class BookingBootstrapForm extends React.Component {
           <Form.Group inline>
             <SingleDatePicker
               date={startDate}
+              yearsBefore={0}
+              yearsAfter={1}
               onDateChange={date => this.updateDates(date, null)}
               disabledDate={dt => {
                 return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);

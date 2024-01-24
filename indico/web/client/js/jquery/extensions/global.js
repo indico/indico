@@ -56,7 +56,8 @@ $(document).ready(function() {
         $target.data('no-qtip') ||
         ($target.closest('.ui:not(.ui-qtip)').length && !$target.hasClass('ui-qtip')) ||
         $target.closest('.tox-tinymce').length ||
-        $target.closest('.tox').length
+        $target.closest('.tox').length ||
+        $target.closest('.fc-toolbar-chunk')
       ) {
         return;
       }
