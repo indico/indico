@@ -80,6 +80,7 @@ export default class DateForm extends FilterFormComponent {
       <CalendarSingleDatePicker
         date={startDate}
         yearsBefore={0}
+        yearsAfter={1}
         onDateChange={async date => {
           await this.setDates(date, null);
         }}
