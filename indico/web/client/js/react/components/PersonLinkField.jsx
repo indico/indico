@@ -235,6 +235,7 @@ function PersonLinkField({
   autoSort,
   setAutoSort,
   hasPredefinedAffiliations,
+  hideAffiliationField,
   canEnterManually,
   defaultSearchExternal,
   nameFormat,
@@ -395,19 +396,20 @@ function PersonLinkField({
               person={persons[selected]}
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
+              hideAffiliationField={hideAffiliationField}
               validateEmailUrl={validateEmailUrl}
             />
           )}
-          {selected !== null &&
-            renderPluginComponents('personLinkFieldModals', {
-              persons,
-              selected,
-              onChange,
-              onClose,
-              modalOpen,
-            })}
         </Button.Group>
       </DndProvider>
+      {selected !== null &&
+        renderPluginComponents('personLinkFieldModals', {
+          persons,
+          selected,
+          onChange,
+          onClose,
+          modalOpen,
+        })}
     </div>
   );
 }
@@ -422,6 +424,7 @@ PersonLinkField.propTypes = {
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
+  hideAffiliationField: PropTypes.bool,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   nameFormat: PropTypes.string,
@@ -436,6 +439,7 @@ PersonLinkField.defaultProps = {
   autoSort: true,
   setAutoSort: null,
   hasPredefinedAffiliations: false,
+  hideAffiliationField: false,
   canEnterManually: true,
   defaultSearchExternal: false,
   nameFormat: '',
@@ -450,6 +454,7 @@ export function WTFPersonLinkField({
   sessionUser,
   emptyMessage,
   hasPredefinedAffiliations,
+  hideAffiliationField,
   canEnterManually,
   defaultSearchExternal,
   nameFormat,
@@ -505,6 +510,7 @@ export function WTFPersonLinkField({
       autoSort={autoSort}
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
+      hideAffiliationField={hideAffiliationField}
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
@@ -521,6 +527,7 @@ WTFPersonLinkField.propTypes = {
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
+  hideAffiliationField: PropTypes.bool,
   nameFormat: PropTypes.string,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
@@ -534,6 +541,7 @@ WTFPersonLinkField.defaultProps = {
   sessionUser: null,
   emptyMessage: null,
   hasPredefinedAffiliations: false,
+  hideAffiliationField: false,
   canEnterManually: true,
   defaultSearchExternal: false,
   nameFormat: '',

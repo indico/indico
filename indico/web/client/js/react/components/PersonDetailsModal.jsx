@@ -102,6 +102,7 @@ export default function PersonDetailsModal({
   onClose,
   person,
   otherPersons,
+  hideAffiliationField,
   hideEmailField,
   validateEmailUrl,
 }) {
@@ -138,10 +139,12 @@ export default function PersonDetailsModal({
             placeholder={Translate.string('None')}
           />
         </Form.Field>
-        <Form.Field>
-          <Translate as="label">Affiliation</Translate>
-          <FinalAffiliationField hasPredefinedAffiliations={hasPredefinedAffiliations} />
-        </Form.Field>
+        {!hideAffiliationField && (
+          <Form.Field>
+            <Translate as="label">Affiliation</Translate>
+            <FinalAffiliationField hasPredefinedAffiliations={hasPredefinedAffiliations} />
+          </Form.Field>
+        )}
       </Form.Group>
       <Form.Group widths="equal">
         <Form.Field>
@@ -179,6 +182,7 @@ PersonDetailsModal.propTypes = {
   person: PropTypes.object,
   otherPersons: PropTypes.array,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
+  hideAffiliationField: PropTypes.bool,
   hideEmailField: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
 };
@@ -186,6 +190,7 @@ PersonDetailsModal.propTypes = {
 PersonDetailsModal.defaultProps = {
   person: undefined,
   otherPersons: [],
+  hideAffiliationField: false,
   hideEmailField: false,
   validateEmailUrl: null,
 };

@@ -27,6 +27,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
@@ -98,13 +99,19 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def has_predefined_affiliations(self):
-        return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+        return not self.hide_affiliation_field and Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 
     @property
     def default_search_external(self):
         if not self.event:
             return False
         return persons_settings.get(self.event, 'default_search_external')
+
+    @property
+    def hide_affiliation_field(self):
+        if self.event is None:
+            return False
+        return any(values_from_signal(signals.event.hide_affiliation_field.send(self.event)))
 
     @property
     def can_enter_manually(self):
@@ -147,6 +154,8 @@ class PersonLinkListFieldBase(PrincipalListField):
             ):
                 data['affiliation_link'] = Affiliation.get_or_create_from_data(affiliation_data)
                 data['affiliation'] = data['affiliation_link'].name
+        if not self.has_predefined_affiliations:
+            data['affiliation_link'] = None
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None
