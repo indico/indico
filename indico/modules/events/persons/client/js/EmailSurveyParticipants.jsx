@@ -5,17 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import emailSendURL from 'indico-url:persons.api_email_event_persons_send';
 import emailMetadataURL from 'indico-url:surveys.api_email_event_survey_metadata';
 import emailPreviewURL from 'indico-url:surveys.api_email_event_survey_preview';
+import emailSendURL from 'indico-url:surveys.api_email_event_survey_send';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
-import {FinalDropdown, handleSubmitError} from 'indico/react/forms';
+import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {EmailDialog} from './EmailDialog';
@@ -26,26 +25,28 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
     url: emailMetadataURL({event_id: eventId, survey_id: surveyId}),
     method: 'POST',
   });
-  const {senders = [], subject: defaultSubject, body: defaultBody, placeholders = []} = data || {};
+  const {
+    senders = [],
+    recipients = [],
+    subject: defaultSubject,
+    body: defaultBody,
+    placeholders = [],
+  } = data || {};
 
   const handleSubmit = async data => {
     const requestData = {...data};
     let resp;
     try {
-      resp = await indicoAxios.post(emailSendURL({event_id: eventId}), requestData);
+      resp = await indicoAxios.post(
+        emailSendURL({event_id: eventId, survey_id: surveyId}),
+        requestData
+      );
     } catch (err) {
       return handleSubmitError(err);
     }
     setSentCount(resp.data.count);
     setTimeout(() => onClose(), 5000);
   };
-
-  const recipientRoles = [
-    {name: 'speaker', title: Translate.string('Speaker')},
-    {name: 'author', title: Translate.string('Author')},
-    {name: 'coauthor', title: Translate.string('Co-author')},
-    {name: 'submitter', title: Translate.string('Submitter')},
-  ];
 
   if (loading) {
     return (
@@ -60,21 +61,11 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       onSubmit={handleSubmit}
       onClose={onClose}
       senders={senders}
+      recipients={recipients}
       previewURL={emailPreviewURL({event_id: eventId, survey_id: surveyId})}
-      // previewContext={context}
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody, recipient_roles: []}}
       sentEmailsCount={sentCount}
-      recipientsField={
-        <FinalDropdown
-          name="recipient_roles"
-          label={Translate.string('Send emails to these roles')}
-          multiple
-          selection
-          options={recipientRoles.map(({name, title}) => ({value: name, text: title, key: name}))}
-          required
-        />
-      }
     />
   );
 }
