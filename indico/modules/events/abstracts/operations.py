@@ -138,6 +138,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
         changes.update(set_custom_fields(abstract, custom_fields_data))
     abstract.modified_dt = now_utc()
     db.session.flush()
+    signals.event.abstract_updated.send(abstract)
     logger.info('Abstract %s modified by %s', abstract, session.user)
     log_fields = {
         'title': 'Title',
