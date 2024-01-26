@@ -12,14 +12,14 @@ pytest_plugins = ('indico.modules.designer.testing.fixtures',
                   'indico.modules.events.registration.testing.fixtures')
 
 
-def test_get_printable_event_templates(dummy_category, dummy_event, create_regform, create_designer_template):
+def test_get_printable_event_templates(dummy_category, dummy_event, create_regform, create_dummy_designer_template):
     """
     Ensure that all templates that are available for printing for a given regform are
     either linked to the regform or not linked to any.
     """
-    create_designer_template('Category template', category=dummy_category)
-    event_template_1 = create_designer_template('Event template 1', event=dummy_event)
-    event_template_2 = create_designer_template('Event template 2', event=dummy_event)
+    create_dummy_designer_template('Category template', category=dummy_category)
+    event_template_1 = create_dummy_designer_template('Event template 1', event=dummy_event)
+    event_template_2 = create_dummy_designer_template('Event template 2', event=dummy_event)
     regform_1 = create_regform(dummy_event, title='Registration Form 1')
     regform_2 = create_regform(dummy_event, title='Registration Form 2')
 
@@ -32,23 +32,23 @@ def test_get_printable_event_templates(dummy_category, dummy_event, create_regfo
     assert get_printable_event_templates(regform_2) == [event_template_2]
 
 
-def test_can_link_to_regform_category_template(dummy_category, dummy_regform, create_designer_template):
-    template = create_designer_template('Template', category=dummy_category)
+def test_can_link_to_regform_category_template(dummy_category, dummy_regform, create_dummy_designer_template):
+    template = create_dummy_designer_template('Template', category=dummy_category)
     assert not can_link_to_regform(template, dummy_regform)
 
 
-def test_can_link_to_regform_already_linked(dummy_event, dummy_regform, create_designer_template):
-    template = create_designer_template('Template', event=dummy_event)
+def test_can_link_to_regform_already_linked(dummy_event, dummy_regform, create_dummy_designer_template):
+    template = create_dummy_designer_template('Template', event=dummy_event)
     template.link_regform(dummy_regform)
     assert not can_link_to_regform(template, dummy_regform)
 
 
-def test_can_link_to_regform_with_backside_1(dummy_event, create_regform, create_designer_template):
+def test_can_link_to_regform_with_backside_1(dummy_event, create_regform, create_dummy_designer_template):
     """Ensure that if the template to be linked has a backside, it must be linked to the same registration form."""
     regform_1 = create_regform(dummy_event, title='Registration Form 1')
     regform_2 = create_regform(dummy_event, title='Registration Form 2')
-    frontside = create_designer_template('Frontside', event=dummy_event)
-    backside = create_designer_template('Backside', event=dummy_event)
+    frontside = create_dummy_designer_template('Frontside', event=dummy_event)
+    backside = create_dummy_designer_template('Backside', event=dummy_event)
     frontside.backside_template = backside
 
     backside.link_regform(regform_2)
@@ -56,13 +56,13 @@ def test_can_link_to_regform_with_backside_1(dummy_event, create_regform, create
     assert can_link_to_regform(frontside, regform_2)
 
 
-def test_can_link_to_regform_with_backside_2(dummy_event, create_regform, create_designer_template):
+def test_can_link_to_regform_with_backside_2(dummy_event, create_regform, create_dummy_designer_template):
     """Ensure that if the template to be linked has a backside, it must be linked to the same registration form."""
     regform_1 = create_regform(dummy_event, title='Registration Form 1')
     regform_2 = create_regform(dummy_event, title='Registration Form 2')
-    frontside_1 = create_designer_template('Frontside 1', event=dummy_event)
-    frontside_2 = create_designer_template('Frontside 2', event=dummy_event)
-    backside = create_designer_template('Backside', event=dummy_event)
+    frontside_1 = create_dummy_designer_template('Frontside 1', event=dummy_event)
+    frontside_2 = create_dummy_designer_template('Frontside 2', event=dummy_event)
+    backside = create_dummy_designer_template('Backside', event=dummy_event)
     frontside_1.backside_template = backside
     frontside_2.backside_template = backside
 

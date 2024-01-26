@@ -9,15 +9,15 @@ pytest_plugins = ('indico.modules.designer.testing.fixtures',
                   'indico.modules.events.registration.testing.fixtures')
 
 
-def test_template_link_to_regform(dummy_event, dummy_regform, create_designer_template):
+def test_template_link_to_regform(dummy_regform, dummy_designer_template):
     """Ensure that a template can be linked and unlinked from a registration form."""
-    template = create_designer_template('Event template', event=dummy_event)
-    template.link_regform(dummy_regform)
+    dummy_designer_template.link_regform(dummy_regform)
 
-    original_data = template.data
+    original_data = dummy_designer_template.data
     # Add dynamic items to the template
-    template.data = template.data | {'items': [*original_data['items'], {'type': 'dynamic-1'}, {'type': 'dynamic-2'}]}
+    items = {'items': [*original_data['items'], {'type': 'dynamic-1'}, {'type': 'dynamic-2'}]}
+    dummy_designer_template.data = dummy_designer_template.data | items
 
-    template.unlink_regform()
+    dummy_designer_template.unlink_regform()
     # Unlinking deletes all dynamic items (since those reference the regform)
-    assert template.data == original_data
+    assert dummy_designer_template.data == original_data
