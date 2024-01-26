@@ -64,6 +64,7 @@
 
         > .title-with-actions {
           display: flex;
+          align-items: center;
           gap: 1em;
 
           h2,
@@ -77,6 +78,7 @@
           .actions {
             display: inline-block;
             vertical-align: bottom;
+            font-size: 0.8em;
           }
 
           .i-button[class*='icon-']::before {
