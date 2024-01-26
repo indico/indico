@@ -800,11 +800,11 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                     reg.state = RegistrationState.complete
             db.session.flush()
             if changes:
-                flash(ngettext('{} registration fee has been updated.',
-                               '{} registration fees have been updated.',
+                flash(ngettext('Registration fee has been updated for {} registration.',
+                               'Registration fee has been updated for {} registrations.',
                                len(changes)).format(len(changes)), 'success')
                 logger.info('%r registrations had their fee changed by %r', len(changes), session.user)
-                self.regform.log(EventLogRealm.management, LogKind.change, 'Payments', 'Registration fees updated',
+                self.regform.log(EventLogRealm.management, LogKind.change, 'Registration', 'Registration fees updated',
                                  session.user, data={'Changes': make_diff_log(changes, log_fields)})
             skipped = len(self.registrations) - len(changes)
             if skipped:

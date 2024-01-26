@@ -617,13 +617,12 @@ class RegistrationBasePriceForm(IndicoForm):
                               filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'))
     apply_complete = BooleanField(_('Apply to complete registrations'), [HiddenUnless('action', {'default', 'custom'})],
                                   widget=SwitchWidget(),
-                                  description=_('Whether the specified fee should be applied to complete registrations '
-                                                'which have their fee set to zero at the moment.'))
+                                  description=_('If enabled, registrations in the "complete" state that had no fee '
+                                                'before, will have the fee updated and changed to the "unpaid" state.'))
     registration_id = HiddenFieldList()
     submitted = HiddenField()
 
-    def __init__(self, *args, **kwargs):
-        currency = kwargs.pop('currency')
+    def __init__(self, *args, currency, **kwargs):
         super().__init__(*args, **kwargs)
         self.action.choices = [
             ('remove', _('Remove fee for unpaid registrations')),
