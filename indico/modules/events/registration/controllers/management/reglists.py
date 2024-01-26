@@ -784,6 +784,7 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
             changes = {}
             log_fields = {reg: f'{reg.full_name} (#{reg.friendly_id})' for reg in self.registrations}
             for reg in self.registrations:
+                prev_state = reg.state
                 if form.apply_complete.data and reg.state == RegistrationState.complete and not reg.base_price:
                     reg.state = RegistrationState.unpaid
                 elif reg.state != RegistrationState.unpaid:
@@ -798,6 +799,8 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                 reg.currency = self.regform.currency
                 if not reg.price:
                     reg.state = RegistrationState.complete
+                if prev_state != reg.state:
+                    notify_registration_state_update(reg, from_management=True)
             db.session.flush()
             if changes:
                 flash(ngettext('Registration fee has been updated for {} registration.',

@@ -120,6 +120,7 @@ def test_registration_create_override_required(db, dummy_regform, app_context):
         (5, 10, RegistrationState.unpaid, 'custom', 15, True, 15, RegistrationState.unpaid),
     ),
 )
+@pytest.mark.usefixtures('smtp')
 def test_registration_update_base_price(dummy_regform, dummy_user, app_context, base_price_1, base_price_2,
                                         initial_state, action, new_price, apply_complete, expected_price,
                                         expected_state):
