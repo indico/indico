@@ -171,14 +171,12 @@ class DesignerTemplate(db.Model):
     def link_regform(self, regform):
         """Link this template to a registration form."""
         self.registration_form = regform
-        db.session.commit()
 
     def unlink_regform(self):
         """Unlink this template from a registration form."""
         from indico.modules.designer.util import remove_dynamic_items
         self.data = remove_dynamic_items(self.data)
         self.registration_form = None
-        db.session.commit()
 
 
 class _OwnerComparator(Comparator):
