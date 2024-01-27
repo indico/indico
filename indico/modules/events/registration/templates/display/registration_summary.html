@@ -48,11 +48,11 @@
                     {%- trans %}Proceed to checkout{% endtrans -%}
                 </a>.
             {% endif %}
-        </div>
-        <div class="text">
-            {% if registration.allow_modification %}
-                <div class="label">
-                    {% trans %}You can modify your registration until {% registration.allow_modification_until %} {% endtrans %}
+            {% if registration.can_be_modified and not registration.registration_form.is_modification_open %}
+                <div class="text">
+                    {% trans exceptional_modification_allowed_end_dt=registration.exceptional_modification_allowed_end_dt|format_date(timezone=registration.event.tzinfo) -%}
+                    You are allowed to modify your registration until: {{ exceptional_modification_allowed_end_dt }}
+                    {%- endtrans %}
                 </div>
             {% endif %}
         </div>

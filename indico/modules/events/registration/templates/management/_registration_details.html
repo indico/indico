@@ -25,6 +25,7 @@
         {% if registration.state.name not in ('rejected', 'withdrawn') %}
             {{ _render_withdraw_actions(registration) }}
         {% endif %}
+        {{ _render_allow_modification(registration) }}
         {% if all_tags %}
             <div class="action-box">
                 {{ _render_registration_tags(registration, assigned_tags, all_tags) }}
@@ -317,32 +318,43 @@
 {% macro _render_allow_modification(registration) %}
     <div class="action-box">
         <div class="section">
-            <div class="icon icon-exit"></div>
-            <div class="text">
-                <div class="label">
-                    {% trans %}Allow modify registration{% endtrans %}
+            {% if not registration.exceptional_modification_allowed %}
+                <div class="icon icon-edit"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Allow the participant to modify their registration{% endtrans %}
+                    </div>
+                    {% trans -%}
+                        You can exceptionally allow this participant to modify their registration.
+                    {%- endtrans %}
                 </div>
-                {% trans -%}
-                    You can exceptionally allow this participant to modify their registration.
-                {%- endtrans %}
-            </div>
+            {% else %}
+                <div class="icon icon-edit registration-allow-modification"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}The participant can modify their registration{% endtrans %}
+                    </div>
+                    {% trans exceptional_modification_allowed_end_dt=registration.exceptional_modification_allowed_end_dt|format_date(timezone=registration.event.tzinfo) -%}
+                        The participant is allowed to modify their registration until: {{ exceptional_modification_allowed_end_dt }}
+                    {%- endtrans %}
+                </div>
+            {% endif %}
             <div class="toolbar">
                 <div class="group">
-                    {% if not registration.allow_modification %}
-                        <button class="i-button big"
+                    {% if not registration.exceptional_modification_allowed %}
+                        <button class="i-button"
                                 data-update="#registration-details"
-                                data-method="POST"
-                                data-params="{{ dict(allow=1) | tojson | forceescape }}"
-                                data-href="{{ url_for('.toggle_registration_allow_modification', registration) }}">
+                                data-href="{{ url_for('._registration_allow_modification', registration) }}"
+                                data-title="{% trans %}Set deadline{% endtrans %}"
+                                data-ajax-dialog>
                             {% trans %}Allow modification{% endtrans %}
                         </button>
                     {% else %}
-                        <button class="i-button big"
+                        <button class="i-button danger"
                                 data-update="#registration-details"
                                 data-method="POST"
-                                data-params="{{ dict(allow=0) | tojson | forceescape }}"
-                                data-href="{{ url_for('.toggle_registration_allow_modification', registration) }}">
-                            {% trans %}Remove allowance{% endtrans %}
+                                data-href="{{ url_for('._registration_remove_allow_modification', registration) }}">
+                            {% trans %}Close modification{% endtrans %}
                         </button>
                     {% endif %}
                 </div>

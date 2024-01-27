@@ -43,7 +43,8 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
-                                                      RegistrationBasePriceForm, RejectRegistrantsForm)
+                                                      RegistrationBasePriceForm,
+                                                      RegistrationExceptionalModificationForm, RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
@@ -68,6 +69,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -718,15 +720,30 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationToggleAllowModification(RHManageRegistrationBase):
+class RHRegistrationAllowModification(RHManageRegistrationBase):
+    """Allow the participant to modify their registration and add a deadline."""
+
+    def _process(self):
+        event_end_dt = self.regform.event.end_dt
+        default_modification_end_dt = FormDefaults(modification_end_dt=event_end_dt)
+        form = RegistrationExceptionalModificationForm(regform=self.regform, obj=default_modification_end_dt)
+
+        if form.validate_on_submit():
+            if form.modification_end_dt.data:
+                self.registration.exceptional_modification_allowed_end_dt = form.modification_end_dt.data
+            else:
+                self.registration.exceptional_modification_allowed_end_dt = event_end_dt
+            self.registration.exceptional_modification_allowed = True
+            return jsonify_data(html=_render_registration_details(self.registration), flash=False)
+        return jsonify_form(form, submit=_('Set'), disabled_until_change=False)
+
+
+class RHRegistrationRemoveAllowModification(RHManageRegistrationBase):
     """Let a manager toggle allowance to modify a registration."""
 
     def _process(self):
-        allow = request.form.get('allow') == '0'
-        if allow != self.registration.allow_modification:
-            pass
-            # toggle_registration_allow_modification(self.registration, allow=allow)
-        return jsonify_data(html=_render_registration_details(self.registration))
+        self.registration.exceptional_modification_allowed = False
+        return jsonify_data(html=_render_registration_details(self.registration), flash=False)
 
 
 class RHRegistrationCheckIn(RHManageRegistrationBase):
