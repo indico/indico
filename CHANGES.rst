@@ -20,7 +20,6 @@ Internationalization
 Improvements
 ^^^^^^^^^^^^
 
-- Grant exceptions and allow individuals to modify registration (:issue:`5264`, thanks :user:`Thanhphan1147`)
 - Invalidate password reset links once the password has been changed (:pr:`5878`)
 - Add full ACLs for custom conference menu items, instead of just being able to
   restrict them to speakers or registrants (:pr:`5670`, thanks :user:`kewisch`)
@@ -84,6 +83,7 @@ Improvements
 - Support ``~~text~~`` to strike-out text in markdown (:pr:`6166`)
 - Add experimental support for creating Google Wallet tickets (opt-in via :data:`ENABLE_GOOGLE_WALLET`
   ``indico.conf`` setting) (:pr:`6028`, thanks :user:`openprojects`)
+- Grant exceptions and allow individuals to modify registration (:issue:`5264`, thanks :user:`Thanhphan1147`)
 
 Bugfixes
 ^^^^^^^^
