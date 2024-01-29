@@ -733,7 +733,6 @@ class RHRegistrationAllowModification(RHManageRegistrationBase):
                 self.registration.exceptional_modification_allowed_end_dt = form.modification_end_dt.data
             else:
                 self.registration.exceptional_modification_allowed_end_dt = event_end_dt
-            self.registration.exceptional_modification_allowed = True
             return jsonify_data(html=_render_registration_details(self.registration), flash=False)
         return jsonify_form(form, submit=_('Set'), disabled_until_change=False)
 
@@ -742,7 +741,7 @@ class RHRegistrationRemoveAllowModification(RHManageRegistrationBase):
     """Let a manager toggle allowance to modify a registration."""
 
     def _process(self):
-        self.registration.exceptional_modification_allowed = False
+        self.registration.exceptional_modification_allowed_end_dt = None
         return jsonify_data(html=_render_registration_details(self.registration), flash=False)
 
 

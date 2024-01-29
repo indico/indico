@@ -318,7 +318,7 @@
 {% macro _render_allow_modification(registration) %}
     <div class="action-box">
         <div class="section">
-            {% if not registration.exceptional_modification_allowed %}
+            {% if registration.exceptional_modification_allowed_end_dt == None %}
                 <div class="icon icon-edit"></div>
                 <div class="text">
                     <div class="label">
@@ -338,7 +338,7 @@
                     <span class="hide-if-locked">
                         (<a href="#"
                             data-update="#registration-details"
-                            data-href="{{ url_for('._registration_allow_modification', registration) }}"
+                            data-href="{{ url_for('.registration_allow_modification', registration) }}"
                             data-title="{% trans %}Update the modification deadline{% endtrans %}"
                             data-ajax-dialog>
                             {%- trans %}update{% endtrans -%}
@@ -357,7 +357,7 @@
                     <span class="hide-if-locked">
                         (<a href="#"
                            data-update="#registration-details"
-                           data-href="{{ url_for('._registration_allow_modification', registration) }}"
+                           data-href="{{ url_for('.registration_allow_modification', registration) }}"
                            data-title="{% trans %}Update the modification deadline{% endtrans %}"
                            data-ajax-dialog>
                            {%- trans %}update{% endtrans -%}
@@ -367,10 +367,10 @@
             {% endif %}
             <div class="toolbar">
                 <div class="group">
-                    {% if not registration.exceptional_modification_allowed %}
+                    {% if registration.exceptional_modification_allowed_end_dt == None %}
                         <button class="i-button"
                                 data-update="#registration-details"
-                                data-href="{{ url_for('._registration_allow_modification', registration) }}"
+                                data-href="{{ url_for('.registration_allow_modification', registration) }}"
                                 data-title="{% trans %}Set the modification deadline{% endtrans %}"
                                 data-ajax-dialog>
                             {% trans %}Allow modification{% endtrans %}
@@ -379,7 +379,7 @@
                         <button class="i-button danger"
                                 data-update="#registration-details"
                                 data-method="POST"
-                                data-href="{{ url_for('._registration_remove_allow_modification', registration) }}">
+                                data-href="{{ url_for('.registration_remove_allow_modification', registration) }}">
                             {% trans %}Close modification{% endtrans %}
                         </button>
                     {% endif %}

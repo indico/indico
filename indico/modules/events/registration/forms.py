@@ -186,20 +186,13 @@ class RegistrationFormScheduleForm(IndicoForm):
 
 
 class RegistrationExceptionalModificationForm(IndicoForm):
-    modification_end_dt = IndicoDateTimeField(
-        _('Modification deadline'),
-        [Optional()],
-        default_time=time(23, 59),
-        description=_(
-            'Deadline until which registration information can be '
-            'modified (defaults to the end date if empty)'
-        )
-    )
+    modification_end_dt = IndicoDateTimeField(_('Modification deadline'), [Optional()], default_time=time(23, 59),
+                                              description=_('Deadline until which registration information can be '
+                                                            'modified (defaults to the end date if empty)'))
 
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
         self.timezone = regform.event.timezone
-        print(self.timezone)
         super().__init__(*args, **kwargs)
 
 
