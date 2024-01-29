@@ -7,6 +7,7 @@ Create Date: 2024-01-29 16:35:54.553459
 
 import sqlalchemy as sa
 from alembic import op
+
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 
 
