@@ -737,8 +737,8 @@ class RHRegistrationAllowModification(RHManageRegistrationBase):
         return jsonify_form(form, submit=_('Set'), disabled_until_change=False)
 
 
-class RHToggleRegistrationModification(RHManageRegistrationBase):
-    """Enable managers to toggle permission for modifying registrations."""
+class RHRegistrationRemoveAllowModification(RHManageRegistrationBase):
+    """Remove permission to modify a registration."""
 
     def _process(self):
         self.registration.exceptional_modification_allowed_end_dt = None
