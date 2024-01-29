@@ -12,6 +12,7 @@ from webargs.flaskparser import abort
 
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
 from indico.modules.events.surveys.forms import InvitationForm, ScheduleSurveyForm, SurveyForm
@@ -175,7 +176,8 @@ class RHEmailEventSurveyBase(RHManageSurveyBase):
 
     def _process_args(self):
         RHManageSurveyBase._process_args(self)
-        self.recipients.set(self.event.registrations)
+        registrations = Registration.get_all_for_event(self.event)
+        self.recipients.set(registrations)
 
 
 class RHAPIEmailEventSurveyMetadata(RHEmailEventSurveyBase):
