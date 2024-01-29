@@ -66,4 +66,13 @@
   code {
     background-color: #f5f5f5;
   }
+
+  ul,
+  ol {
+    margin-left: 3em;
+  }
+
+  :is(ul, ol) :is(ul, ol) {
+    margin-left: 1.2em;
+  }
 }
