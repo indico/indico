@@ -63,7 +63,7 @@ Improvements
 - Do not bother people registering using an invitation link with a CAPTCHA (:pr:`6095`)
 - Add option to allow people to register using an invitation link even if the event is
   restricted (:pr:`6094`)
-- Improve editing notifications emails (:issue:`6027`, :pr:`6042`)
+- Improve editing notifications emails (:issue:`6027`, :pr:`6042`, :pr:`6154`)
 - Add a picture field for registration forms which can use the local webcam to take a picture
   in addition to uploading one, and also supports cropping/rotating the picture (:pr:`5922`,
   thanks :user:`SegiNyn`)
