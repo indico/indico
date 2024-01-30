@@ -105,7 +105,20 @@ import CalendarLegend from './components/CalendarLegend';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          const attr = groupBy === 'category' ? 'categoryId' : 'venueId';
+          let attr;
+          switch (groupBy) {
+            case 'category':
+              attr = 'categoryId';
+              break;
+            case 'location':
+              attr = 'venueId';
+              break;
+            case 'room':
+              attr = 'roomId';
+              break;
+            default:
+              throw new Error(`Invalid "groupBy": ${groupBy}`);
+          }
           const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr] ?? 0));
           successCallback(filteredEvents);
           const toolbarGroup = $(containerCalendarSelector).find(
@@ -145,23 +158,45 @@ import CalendarLegend from './components/CalendarLegend';
             filteredLegendElements.clear();
             calendar.refetchEvents();
           };
-          const onElementSelected = (id, checked) => {
-            if (checked) {
-              filteredLegendElements.delete(id);
-            } else {
-              filteredLegendElements.add(id);
+          const onElementSelected = (elementId, checked, elementSubitems, parent) => {
+            const handleSingle = (singleId, singleChecked) => {
+              if (singleChecked) {
+                filteredLegendElements.delete(singleId);
+              } else {
+                filteredLegendElements.add(singleId);
+              }
+            };
+            const handleRecursive = (recursiveId, recursiveSubitems) => {
+              handleSingle(recursiveId, checked);
+              recursiveSubitems.forEach(({id, subitems}) => handleRecursive(id, subitems));
+            };
+
+            // handle descendents
+            handleRecursive(elementId, elementSubitems);
+
+            // handle parent
+            if (parent) {
+              const parentChecked = !parent.subitems.every(({id}) =>
+                filteredLegendElements.has(id)
+              );
+              handleSingle(parent.id, parentChecked);
             }
+
             calendar.refetchEvents();
           };
           const selectAll = () => {
-            items.forEach(({id}) => filteredLegendElements.delete(id));
+            items.forEach(({id, subitems}) => onElementSelected(id, true, subitems));
             calendar.refetchEvents();
           };
           const deselectAll = () => {
-            items.forEach(({id}) => filteredLegendElements.add(id));
+            items.forEach(({id, subitems}) => onElementSelected(id, false, subitems));
             calendar.refetchEvents();
           };
-          items = items.map(item => ({...item, checked: !filteredLegendElements.has(item.id)}));
+          const filterLegendElement = item => {
+            item.checked = !filteredLegendElements.has(item.id);
+            item.subitems.forEach(filterLegendElement);
+          };
+          items.forEach(filterLegendElement);
           ReactDOM.render(
             <CalendarLegend
               items={items}
@@ -201,6 +236,8 @@ import CalendarLegend from './components/CalendarLegend';
                   url: item.url,
                   isSpecial,
                   id,
+                  subitems: [],
+                  parent: null,
                 },
               ];
             }, [])
@@ -212,6 +249,60 @@ import CalendarLegend from './components/CalendarLegend';
               }
               return a.title.localeCompare(b.title);
             });
+        }
+
+        function setupLegendByRoom(events, locations, rooms) {
+          const result = setupLegendByAttribute(
+            events,
+            rooms,
+            'roomId',
+            Translate.string('No room'),
+            0
+          );
+          // if there are no locations no need to indent
+          if (locations.length <= 1) {
+            return result;
+          }
+          const roomMap = rooms.reduce(
+            (acc, value) => ({
+              ...acc,
+              [value.id]: value,
+            }),
+            {}
+          );
+          const locationMap = locations.reduce(
+            (acc, value) => ({
+              ...acc,
+              [value.id]: value,
+            }),
+            {}
+          );
+          const groupedLocations = {};
+          const noRoom = [];
+          result.forEach(item => {
+            const room = roomMap[item.id];
+            if (!room) {
+              // this is the "No room" case
+              noRoom.push(item);
+            } else {
+              const location = locationMap[room.venueId];
+              if (!groupedLocations[location.id]) {
+                groupedLocations[location.id] = {
+                  // we make the ID negative in order not to collide with room IDs
+                  id: -location.id,
+                  title: location.title,
+                  isSpecial: false,
+                  subitems: [],
+                  parent: null,
+                };
+              }
+              groupedLocations[location.id].subitems.push({
+                ...item,
+                parent: groupedLocations[location.id],
+              });
+            }
+          });
+          return [...noRoom, ...Object.values(groupedLocations)];
         }
 
         function updateLegend(data) {
@@ -235,6 +326,9 @@ import CalendarLegend from './components/CalendarLegend';
                 Translate.string('No venue'),
                 0
               );
+              break;
+            case 'room':
+              items = setupLegendByRoom(data.events, data.locations, data.rooms);
               break;
             default:
               items = [];
