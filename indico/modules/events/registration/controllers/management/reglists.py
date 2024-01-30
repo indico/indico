@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from io import BytesIO
 from operator import attrgetter
 
+from babel.numbers import format_currency
 from flask import flash, jsonify, redirect, render_template, request, session
 from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
@@ -782,7 +783,8 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                                          registration_id=[reg.id for reg in self.registrations])
         if form.validate_on_submit():
             changes = {}
-            log_fields = {reg: f'{reg.full_name} (#{reg.friendly_id})' for reg in self.registrations}
+            log_fields = {reg: {'title': f'{reg.full_name} (#{reg.friendly_id})', 'type': 'string'}
+                          for reg in self.registrations}
             for reg in self.registrations:
                 prev_state = reg.state
                 if form.apply_complete.data and reg.state == RegistrationState.complete and not reg.base_price:
@@ -793,23 +795,26 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                     'remove': 0,
                     'default': self.regform.base_price,
                     'custom': form.base_price.data
-                }
-                changes[reg] = (float(reg.base_price), float(new_price[form.action.data]))
-                reg.base_price = new_price[form.action.data]
+                }[form.action.data]
+                changes[reg] = (format_currency(reg.base_price, reg.currency, locale='en_GB'),
+                                format_currency(new_price, self.regform.currency, locale='en_GB'))
+                reg.base_price = new_price
                 reg.currency = self.regform.currency
                 if not reg.price:
                     reg.state = RegistrationState.complete
                 if prev_state != reg.state:
                     notify_registration_state_update(reg, from_management=True)
             db.session.flush()
+            skipped = len(self.registrations) - len(changes)
             if changes:
                 flash(ngettext('Registration fee has been updated for {} registration.',
                                'Registration fee has been updated for {} registrations.',
                                len(changes)).format(len(changes)), 'success')
+                # Trim changes
+                changes = {reg: changes[reg] for reg in changes if changes[reg][0] != changes[reg][1]}
                 logger.info('%r registrations had their fee changed by %r', len(changes), session.user)
                 self.regform.log(EventLogRealm.management, LogKind.change, 'Registration', 'Registration fees updated',
                                  session.user, data={'Changes': make_diff_log(changes, log_fields)})
-            skipped = len(self.registrations) - len(changes)
             if skipped:
                 if form.apply_complete.data:
                     msg = ngettext('{} registration was skipped because its fee is not zero or it is in an invalid '
