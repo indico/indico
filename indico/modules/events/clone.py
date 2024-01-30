@@ -227,7 +227,7 @@ class EventPrivacyCloner(EventCloner):
 
     def _has_content(self, event):
         privacy_settings_data = privacy_settings.get_all(event, no_defaults=True)
-        return bool(next((v for v in privacy_settings_data.values() if v), False))
+        return any(privacy_settings_data.values())
 
     def run(self, new_event, cloners, shared_data, event_exists=False):
         with db.session.no_autoflush:
