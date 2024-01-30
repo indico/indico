@@ -15,10 +15,11 @@ from indico.core.config import config
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
-from indico.core.settings.converters import ModelListConverter
+from indico.core.settings.converters import EnumConverter, ModelListConverter
 from indico.modules.categories.models.categories import Category
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_check_if_visible
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
@@ -26,6 +27,14 @@ from indico.web.menu import SideMenuItem, TopMenuItem
 
 logger = Logger.get('rb')
 rb_cache = make_scoped_cache('roombooking')
+
+
+class BookingReasonRequiredOptions(RichIntEnum):
+    __titles__ = [None, _('Always'), _('Never'), _('Not for events')]
+
+    always = 1
+    never = 2
+    not_for_events = 3
 
 
 rb_settings = SettingsProxy('roombooking', {
@@ -44,11 +53,13 @@ rb_settings = SettingsProxy('roombooking', {
     'booking_limit': 365,
     'tileserver_url': None,
     'grace_period': None,
+    'booking_reason_required': BookingReasonRequiredOptions.always,
 }, acls={
     'admin_principals',
     'authorized_principals'
 }, converters={
-    'excluded_categories': ModelListConverter(Category)
+    'excluded_categories': ModelListConverter(Category),
+    'booking_reason_required': EnumConverter(BookingReasonRequiredOptions),
 })
 
 

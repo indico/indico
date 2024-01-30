@@ -20,6 +20,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.rb import BookingReasonRequiredOptions
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
@@ -375,7 +376,7 @@ class CreateBookingSchema(mm.Schema):
     recurrence_weekdays = fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)))
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
-    booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
+    booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), load_default='')
     internal_note = fields.String()
     is_prebooking = fields.Bool(load_default=False)
     link_type = EnumField(LinkType)
@@ -518,6 +519,7 @@ class SettingsSchema(mm.Schema):
     hide_module_if_unauthorized = fields.Bool()
     tileserver_url = fields.String(validate=validate.URL(schemes={'http', 'https'}), allow_none=True)
     booking_limit = fields.Int(validate=not_empty)
+    booking_reason_required = EnumField(BookingReasonRequiredOptions, required=True)
     notifications_enabled = fields.Bool()
     notification_before_days = fields.Int(validate=validate.Range(min=1, max=30))
     notification_before_days_weekly = fields.Int(validate=validate.Range(min=1, max=30))

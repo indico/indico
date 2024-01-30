@@ -26,6 +26,7 @@ export const initialState = {
   internalNotesEnabled: false,
   privacyPolicyHTML: null,
   contactEmail: null,
+  bookingReasonRequired: true,
 };
 
 export default combineReducers({
@@ -44,6 +45,7 @@ export default combineReducers({
           helpURL,
           contactEmail,
           hasPrivacyPolicy,
+          bookingReasonRequired,
           hasTos: hasTOS,
           tosHtml: tosHTML,
           privacyPolicyHtml: privacyPolicyHTML,
@@ -64,6 +66,7 @@ export default combineReducers({
           privacyPolicyHTML,
           contactEmail,
           internalNotesEnabled,
+          bookingReasonRequired,
         };
       }
       case adminActions.SETTINGS_RECEIVED:

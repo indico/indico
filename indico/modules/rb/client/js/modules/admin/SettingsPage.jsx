@@ -23,6 +23,7 @@ import {
   FinalSubmitButton,
   FinalUnloadPrompt,
   validators as v,
+  FinalDropdown,
 } from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
@@ -64,6 +65,21 @@ const SettingsPage = props => {
       </Placeholder>
     );
   }
+
+  const bookingRequiredOptions = [
+    {
+      value: 'always',
+      text: Translate.string('Always'),
+    },
+    {
+      value: 'never',
+      text: Translate.string('Never'),
+    },
+    {
+      value: 'not_for_events',
+      text: Translate.string('Not for events'),
+    },
+  ];
 
   return (
     <>
@@ -165,6 +181,19 @@ const SettingsPage = props => {
               label={Translate.string('Max. booking length')}
               description={Translate.string('The maximum length (in days) a booking may last.')}
               validate={v.min(1)}
+            />
+            <FinalDropdown
+              options={bookingRequiredOptions}
+              hideValidationError
+              required
+              selection
+              multiple={false}
+              search={false}
+              name="booking_reason_required"
+              label={Translate.string('Booking reason required')}
+              description={Translate.string(
+                'Whether to require to set the reason for a booking or not.'
+              )}
             />
             <FinalCheckbox
               name="notifications_enabled"
