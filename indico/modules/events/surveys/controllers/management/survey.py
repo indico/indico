@@ -172,12 +172,12 @@ class RHSendSurveyLinks(RHManageSurveyBase):
 
 
 class RHEmailEventSurveyBase(RHManageSurveyBase):
-    """Sends emails to event participants."""
+    """Send emails to event participants."""
 
     def _process_args(self):
         RHManageSurveyBase._process_args(self)
         registrations = Registration.get_all_for_event(self.event)
-        self.recipients.set(registrations)
+        self.recipients = {x.email for x in registrations}
 
 
 class RHAPIEmailEventSurveyMetadata(RHEmailEventSurveyBase):
@@ -189,7 +189,7 @@ class RHAPIEmailEventSurveyMetadata(RHEmailEventSurveyBase):
         placeholders = get_sorted_placeholders('survey-link-email', event=None, survey=self.survey)
         return jsonify({
             'senders': list(self.event.get_allowed_sender_emails().items()),
-            'recipients': sorted(x.email for x in self.recipients),
+            'recipients': sorted(self.recipients),
             'body': body,
             'subject': subject,
             'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
@@ -204,7 +204,6 @@ class RHEmailEventSurveyPreview(RHEmailEventSurveyBase):
         'subject': fields.String(required=True),
     })
     def _process(self, body, subject):
-        # person = next(iter(self.recipients)) if self.recipients else session.user
         email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
         email_subject = replace_placeholders('survey-link-email', subject, event=self.event, survey=self.survey)
         tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
@@ -230,7 +229,7 @@ class RHAPIEmailEventSurveySend(RHEmailEventSurveyBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=from_address,
+                email = make_email(to_list=recipient, bcc_list=bcc, from_address=from_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Surveys')
         return jsonify(count=len(self.recipients))
