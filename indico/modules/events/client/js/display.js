@@ -5,10 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global ajaxDialog */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {ManageNotes} from 'indico/react/components';
+
+import 'indico/custom_elements/ind_collapsible';
+import 'indico/custom_elements/ind_with_tooltip';
 
 import './util/list_generator';
 import './util/static_filters';
@@ -125,54 +130,6 @@ import './favorite';
           },
           duration: 'fast',
         });
-    });
-
-    const threeRowsHeight = 70;
-    $('.participant-list-wrapper').toggleClass(
-      'collapsible collapsed transparent-overlay',
-      $('.participant-list').height() > threeRowsHeight
-    );
-    const initialHeight = $('.participant-list-wrapper').height();
-
-    $('.participant-list-wrapper.transparent-overlay').on('click', function() {
-      const toggler = $('.participant-list-wrapper > .trigger');
-      const participantList = toggler.siblings('.participant-list');
-      const wrapper = participantList.parent();
-      if (wrapper.hasClass('collapsed')) {
-        const newHeight = participantList.height();
-        participantList.height(initialHeight);
-        wrapper.removeClass('collapsed transparent-overlay');
-        wrapper.animate(
-          {
-            height: newHeight,
-          },
-          {
-            duration: 'fast',
-            start() {
-              toggler.addClass('icon-collapse').removeClass('icon-expand');
-            },
-            complete() {
-              participantList.height(newHeight);
-            },
-          }
-        );
-      } else {
-        wrapper.addClass('transparent-overlay');
-        wrapper.animate(
-          {
-            height: initialHeight,
-          },
-          {
-            duration: 'fast',
-            start() {
-              toggler.removeClass('icon-collapse').addClass('icon-expand');
-            },
-            complete() {
-              wrapper.addClass('collapsed');
-            },
-          }
-        );
-      }
     });
 
     $('a.js-show-note-toggle').on('click', function(e) {

@@ -90,6 +90,7 @@ export class TipBase extends HTMLElement {
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);
     this.dismiss = this.dismiss.bind(this);
+    this.updatePosition = this.updatePosition.bind(this);
   }
 
   connectedCallback() {
