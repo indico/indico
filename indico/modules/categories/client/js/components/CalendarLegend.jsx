@@ -56,7 +56,14 @@ LegendItem.defaultProps = {
   isSpecial: false,
 };
 
-function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
+function CalendarLegend({
+  items,
+  groupBy,
+  onFilterChanged,
+  onElementSelected,
+  selectAll,
+  deselectAll,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const parsedItems = items.map(({id, title, checked, url, color, isSpecial}) => (
     <LegendItem
@@ -88,6 +95,15 @@ function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
         onBlur={() => setIsOpen(false)}
         onChange={onChange}
       />
+      <div styleName="toggle-container">
+        <span onClick={selectAll} style={{cursor: 'pointer', marginRight: '8px'}}>
+          {Translate.string('Select all')}
+        </span>
+        {' | '}
+        <span onClick={deselectAll} style={{cursor: 'pointer', marginLeft: '8px'}}>
+          {Translate.string('Clear')}
+        </span>
+      </div>
       <div>{parsedItems}</div>
     </div>
   );
@@ -98,5 +114,7 @@ CalendarLegend.propTypes = {
   groupBy: PropTypes.string.isRequired,
   onFilterChanged: PropTypes.func.isRequired,
   onElementSelected: PropTypes.func.isRequired,
+  selectAll: PropTypes.func.isRequired,
+  deselectAll: PropTypes.func.isRequired,
 };
 export default CalendarLegend;

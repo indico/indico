@@ -153,6 +153,14 @@ import CalendarLegend from './components/CalendarLegend';
             }
             calendar.refetchEvents();
           };
+          const selectAll = () => {
+            items.forEach(({id}) => filteredLegendElements.delete(id));
+            calendar.refetchEvents();
+          };
+          const deselectAll = () => {
+            items.forEach(({id}) => filteredLegendElements.add(id));
+            calendar.refetchEvents();
+          };
           items = items.map(item => ({...item, checked: !filteredLegendElements.has(item.id)}));
           ReactDOM.render(
             <CalendarLegend
@@ -160,6 +168,8 @@ import CalendarLegend from './components/CalendarLegend';
               groupBy={data.group_by}
               onFilterChanged={onFilterChanged}
               onElementSelected={onElementSelected}
+              selectAll={selectAll}
+              deselectAll={deselectAll}
             />,
             legendContainer
           );
