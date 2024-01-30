@@ -114,19 +114,20 @@
         {% endif %}
         {% set dropdown_options = item.get_manage_button_options(note_may_exist=show_note_operations) %}
         {% if dropdown_options %}
-            <div class="group manage-button">
-                <button class="tiny compact ui icon button js-dropdown" style="white-space: nowrap;" data-toggle="dropdown" title="{% trans %}Manage{% endtrans %}">
-                    <i class="edit icon"></i>
-                    <i class="caret down icon"></i>
-                </button>
-                <ul class="i-dropdown">
+            <ind-menu class="manage-button">
+                <ind-with-tooltip>
+                    <button aria-controls="event-management-menu">
+                        <span data-tip-content>{% trans %}Manage event{% endtrans %}</span>
+                    </button>
+                </ind-with-tooltip>
+                <menu id="event-management-menu">
                     {% for opt in dropdown_options %}
                         <li>
                             {{ _render_dropdown_option(opt, item, item_type) }}
                         </li>
                     {% endfor %}
-                </ul>
-            </div>
+                </menu>
+            </ind-menu>
         {% endif %}
         </div>
 {%- endmacro %}

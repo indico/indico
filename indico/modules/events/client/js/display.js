@@ -8,7 +8,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import 'indico/custom_elements/ind_with_tooltip';
+import 'indico/custom_elements/ind_with_toggletip';
 import {ManageNotes} from 'indico/react/components';
+
+import '../styles/display.scss';
 
 import './util/list_generator';
 import './util/static_filters';
