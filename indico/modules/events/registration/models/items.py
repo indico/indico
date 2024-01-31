@@ -49,7 +49,7 @@ class PersonalDataType(IndicoIntEnum):
     """Description of the personal data items that exist on every registration form."""
 
     __titles__ = [None, 'Email Address', 'First Name', 'Last Name', 'Affiliation', 'Title', 'Address',
-                  'Phone Number', 'Country', 'Position']
+                  'Phone Number', 'Country', 'Position', 'Picture Id']
     email = 1
     first_name = 2
     last_name = 3
@@ -59,6 +59,7 @@ class PersonalDataType(IndicoIntEnum):
     phone = 7
     country = 8
     position = 9
+    picture = 10
 
     def get_title(self):
         return self.__titles__[self]
@@ -126,6 +127,12 @@ class PersonalDataType(IndicoIntEnum):
                     'choices': [dict(title_item, id=str(uuid4()), caption=orig_string(t.title))
                                 for t in UserTitle if t]
                 }
+            }),
+            (cls.picture, {
+                'title': cls.picture.get_title(),
+                'input_type': 'picture',
+                'is_enabled': False,
+                'position': 1005
             }),
         ]
 

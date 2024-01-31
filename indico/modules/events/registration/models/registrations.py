@@ -453,6 +453,16 @@ class Registration(db.Model):
         return url_for('event_registration.registration_avatar', self)
 
     @property
+    def picture_url(self):
+        """Return the url of the picture in personal data."""
+        picture = [d for d in self.data if d.field_data.field.personal_data_type is not None
+                   and d.field_data.field.input_type == 'picture']
+        if picture and picture[0].filename:
+            return url_for('event_registration.registration_picture', self,
+                           {'field_data_id': picture[0].field_data_id, 'filename': picture[0].filename})
+        return None
+
+    @property
     def external_registration_details_url(self):
         return url_for('event_registration.registration_details', self, _external=True)
 
@@ -595,7 +605,7 @@ class Registration(db.Model):
         personal_data = {}
         for data in self.data:
             field = data.field_data.field
-            if field.personal_data_type is not None and data.data:
+            if field.personal_data_type is not None and (data.data or data.filename):
                 personal_data[field.personal_data_type.name] = data.friendly_data
         # might happen with imported legacy registrations (missing personal data)
         personal_data.setdefault('first_name', self.first_name)
