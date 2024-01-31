@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.categories.models.categories import Category
+from indico.modules.designer import TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.pdf import PIXELS_CM
 from indico.modules.designer.placeholders import GROUPS
@@ -119,7 +120,7 @@ def can_link_to_regform(template, regform):
 
 def get_linkable_regforms(template):
     """Return all registration forms that can be linked to the given template."""
-    if template.category or template.registration_form:
+    if template.category or template.type == TemplateType.poster or template.registration_form:
         return []
 
     query = RegistrationForm.query.with_parent(template.event).filter(

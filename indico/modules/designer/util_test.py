@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.modules.designer import TemplateType
 from indico.modules.designer.util import can_link_to_regform, get_printable_event_templates
 
 
@@ -34,6 +35,11 @@ def test_get_printable_event_templates(dummy_category, dummy_event, create_regfo
 
 def test_can_link_to_regform_category_template(dummy_category, dummy_regform, create_dummy_designer_template):
     template = create_dummy_designer_template('Template', category=dummy_category)
+    assert not can_link_to_regform(template, dummy_regform)
+
+
+def test_can_link_to_regform_poster(dummy_event, dummy_regform, create_dummy_designer_template):
+    template = create_dummy_designer_template('Poster', event=dummy_event, type=TemplateType.poster)
     assert not can_link_to_regform(template, dummy_regform)
 
 

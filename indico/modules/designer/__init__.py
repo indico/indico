@@ -69,7 +69,7 @@ DEFAULT_CONFIG = {
     TemplateType.poster: {
         'tpl_size': [1050, 1484],  # A4 50 px/cm
         'zoom_factor': 0.5,
-        'disallow_groups': ('registrant',)
+        'disallow_groups': ('registrant', 'regform_fields')
     },
     TemplateType.badge: {
         'tpl_size': [425, 270],  # A4 50 px/cm
