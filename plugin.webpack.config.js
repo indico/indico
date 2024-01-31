@@ -50,6 +50,7 @@ module.exports = env => {
       'jquery': 'jQuery',
       'moment': 'moment',
       'react': '_IndicoCoreReact',
+      'react-dnd': '_IndicoCoreReactDnd',
       'react-dom': '_IndicoCoreReactDom',
       'react-redux': '_IndicoCoreReactRedux',
       'react-router': '_IndicoCoreReactRouter',
