@@ -453,16 +453,6 @@ class Registration(db.Model):
         return url_for('event_registration.registration_avatar', self)
 
     @property
-    def picture_url(self):
-        """Return the url of the picture in personal data."""
-        picture = [d for d in self.data if d.field_data.field.personal_data_type is not None
-                   and d.field_data.field.input_type == 'picture']
-        if picture and picture[0].filename:
-            return url_for('event_registration.registration_picture', self,
-                           {'field_data_id': picture[0].field_data_id, 'filename': picture[0].filename})
-        return None
-
-    @property
     def external_registration_details_url(self):
         return url_for('event_registration.registration_details', self, _external=True)
 

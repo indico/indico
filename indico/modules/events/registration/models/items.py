@@ -49,7 +49,7 @@ class PersonalDataType(IndicoIntEnum):
     """Description of the personal data items that exist on every registration form."""
 
     __titles__ = [None, 'Email Address', 'First Name', 'Last Name', 'Affiliation', 'Title', 'Address',
-                  'Phone Number', 'Country', 'Position', 'Picture Id']
+                  'Phone Number', 'Country', 'Position', 'Picture']
     email = 1
     first_name = 2
     last_name = 3
