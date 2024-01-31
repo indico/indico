@@ -174,8 +174,8 @@ class DesignerTemplate(db.Model):
 
     def unlink_regform(self):
         """Unlink this template from a registration form."""
-        from indico.modules.designer.util import remove_dynamic_items
-        self.data = remove_dynamic_items(self.data)
+        from indico.modules.designer.util import remove_regform_field_placeholders
+        self.data = remove_regform_field_placeholders(self.data)
         self.registration_form = None
 
 

@@ -15,7 +15,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.modules.designer.pdf import DesignerPDFBase
-from indico.modules.designer.util import is_dynamic_placeholder
+from indico.modules.designer.util import is_regform_field_placeholder
 from indico.modules.events.registration.settings import DEFAULT_BADGE_SETTINGS
 from indico.util.i18n import _
 from indico.util.placeholders import get_placeholders
@@ -95,9 +95,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                                                          item['type'] not in image_placeholders))
 
         for item in items:
-            if is_dynamic_placeholder(item):
-                from indico.modules.designer.placeholders import DynamicPlaceholder
-                placeholder = DynamicPlaceholder.from_designer_item(regform, item)
+            if is_regform_field_placeholder(item):
+                from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
+                placeholder = RegistrationFormFieldPlaceholder.from_designer_item(regform, item)
                 if placeholder is None:
                     # the regform field referenced by the designer item does not exist
                     continue
@@ -116,7 +116,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                     text = placeholder.render(person['registration'].event)
                 elif placeholder.group == 'fixed':
                     text = placeholder.render(item)
-                elif placeholder.group == 'dynamic':
+                elif placeholder.group == 'regform_fields':
                     text = placeholder.render(person['registration'])
                 else:
                     raise ValueError(f'Unknown placeholder group: `{placeholder.group}`')

@@ -37,8 +37,7 @@ GROUPS = {
     'event': {'title': _('Event Data'), 'position': 1},
     'fixed': {'title': _('Fixed Data'), 'position': 2},
     'registrant': {'title': _('Common Registrant Data'), 'position': 3},
-    # Come up with a better name or merge with registrant data
-    'dynamic': {'title': _('Custom Registrant Data'), 'position': 4},
+    'regform_fields': {'title': _('Custom Registrant Data'), 'position': 4},
 }
 
 
@@ -411,18 +410,18 @@ class FixedImagePlaceholder(DesignerPlaceholder):
         return Image.open(buf)
 
 
-class DynamicPlaceholder(DesignerPlaceholder):
-    """Placeholder representing RegistrationData instance for a given regform field.
+class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
+    """Placeholder representing a `RegistrationData` instance for a given regform field.
 
     Unlike other placeholders which are always present, registration data depends
     on the linked regform and thus the placeholders must be generated on the fly.
     """
 
-    group = 'dynamic'
+    group = 'regform_fields'
 
     def __init__(self, field):
         self.field = field
-        self.name = f'dynamic-{field.id}'
+        self.name = f'field-{field.id}'
 
     @property
     def description(self):
@@ -463,9 +462,9 @@ Arrival: {arrival} · Departure {departure} · Accommodation: {accommodation}
         """Create an instance of this class from a designer item."""
         type_ = item['type']
         try:
-            field_id = int(type_.removeprefix('dynamic-'))
+            field_id = int(type_.removeprefix('field-'))
         except ValueError:
-            raise ValueError(f'Invalid dynamic field type: {type_}')
+            raise ValueError(f'Invalid field type: {type_}')
 
         field = next((field for field in regform.active_fields if field.id == field_id), None)
         if not field:

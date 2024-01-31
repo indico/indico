@@ -30,7 +30,7 @@ from indico.modules.designer.util import (can_link_to_regform, get_all_templates
                                           get_default_ticket_on_category, get_image_placeholder_types,
                                           get_inherited_templates, get_linkable_regforms,
                                           get_nested_placeholder_options, get_not_deletable_templates,
-                                          get_placeholder_options, remove_dynamic_items)
+                                          get_placeholder_options, remove_regform_field_placeholders)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -203,7 +203,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
         new_template = DesignerTemplate(title=title, type=self.template.type, **target_dict)
 
         data = deepcopy(self.template.data)
-        data = remove_dynamic_items(data)
+        data = remove_regform_field_placeholders(data)
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
         for image_item in image_items:
             old_image = DesignerImageFile.get(image_item['image_id'])

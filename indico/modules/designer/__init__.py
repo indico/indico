@@ -80,7 +80,7 @@ DEFAULT_CONFIG = {
 
 
 @signals.core.get_placeholders.connect_via('designer-fields')
-def _get_notification_placeholders(sender, regform=None, **kwargs):
+def _get_designer_placeholders(sender, regform=None, **kwargs):
     from indico.modules.designer import placeholders
     for name in placeholders.__all__:
         obj = getattr(placeholders, name)
@@ -88,11 +88,11 @@ def _get_notification_placeholders(sender, regform=None, **kwargs):
             yield obj
 
     if regform:
-        from indico.modules.designer.placeholders import DynamicPlaceholder
+        from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
         from indico.modules.events.registration.models.items import RegistrationFormItemType
         for field in regform.active_fields:
-            if field.type != RegistrationFormItemType.field_pd:  # Personal data are already included in the
-                yield DynamicPlaceholder(field=field)            # 'registrant' group
+            if field.type != RegistrationFormItemType.field_pd:      # Personal data fields are already included
+                yield RegistrationFormFieldPlaceholder(field=field)  # in the 'registrant' group
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

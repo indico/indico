@@ -14,10 +14,10 @@ def test_template_link_to_regform(dummy_regform, dummy_designer_template):
     dummy_designer_template.link_regform(dummy_regform)
 
     original_data = dummy_designer_template.data
-    # Add dynamic items to the template
-    items = {'items': [*original_data['items'], {'type': 'dynamic-1'}, {'type': 'dynamic-2'}]}
+    # Add regform field placeholders to the template
+    items = {'items': [*original_data['items'], {'type': 'field-1'}, {'type': 'field-2'}]}
     dummy_designer_template.data = dummy_designer_template.data | items
 
     dummy_designer_template.unlink_regform()
-    # Unlinking deletes all dynamic items (since those reference the regform)
+    # Unlinking deletes all items referencing regform fields
     assert dummy_designer_template.data == original_data

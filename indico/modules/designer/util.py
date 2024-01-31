@@ -49,9 +49,9 @@ def get_image_placeholder_types():
     return [name for name, placeholder in get_placeholder_options().items() if placeholder.is_image]
 
 
-def is_dynamic_placeholder(designer_item):
-    """Return True if the given designer item represents a dynamic registration data placeholder."""
-    return designer_item['type'].startswith('dynamic-')
+def is_regform_field_placeholder(designer_item):
+    """Return `True` if the given designer item references a regform field placeholder."""
+    return designer_item['type'].startswith('field-')
 
 
 def get_all_templates(obj):
@@ -105,10 +105,10 @@ def get_badge_format(tpl):
                      frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
 
-def remove_dynamic_items(data):
-    """Return a copy of the template data with dynamic registration data placeholders removed."""
+def remove_regform_field_placeholders(data):
+    """Return a copy of the template data with regform field placeholders removed."""
     return data | {
-        'items': [item for item in data['items'] if not is_dynamic_placeholder(item)]
+        'items': [item for item in data['items'] if not is_regform_field_placeholder(item)]
     }
 
 
