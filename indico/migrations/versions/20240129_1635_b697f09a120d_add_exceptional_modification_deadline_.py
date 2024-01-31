@@ -20,9 +20,9 @@ depends_on = None
 
 def upgrade():
     op.add_column('registrations',
-                  sa.Column('exceptional_modification_allowed_end_dt', UTCDateTime, nullable=True),
+                  sa.Column('modification_end_dt', UTCDateTime, nullable=True),
                   schema='event_registration')
 
 
 def downgrade():
-    op.drop_column('registrations', 'exceptional_modification_allowed_end_dt', schema='event_registration')
+    op.drop_column('registrations', 'modification_end_dt', schema='event_registration')

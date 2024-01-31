@@ -60,6 +60,7 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
+from indico.util.date_time import now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -720,29 +721,27 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationAllowModification(RHManageRegistrationBase):
-    """Allow the participant to modify their registration and add a deadline."""
+class RHRegistrationScheduleModification(RHManageRegistrationBase):
+    """Let a manager schedule the registration modification deadline."""
 
     def _process(self):
-        event_end_dt = self.regform.event.end_dt
-        default_modification_end_dt = FormDefaults(modification_end_dt=event_end_dt)
-        form = RegistrationExceptionalModificationForm(regform=self.regform, obj=default_modification_end_dt)
+        default_modification_end_dt = now_utc() + relativedelta(weeks=1)
+        modification_form_defaults = FormDefaults(modification_end_dt=default_modification_end_dt)
+        form = RegistrationExceptionalModificationForm(regform=self.regform, obj=modification_form_defaults)
 
         if form.validate_on_submit():
-            if form.modification_end_dt.data:
-                self.registration.exceptional_modification_allowed_end_dt = form.modification_end_dt.data
-            else:
-                self.registration.exceptional_modification_allowed_end_dt = event_end_dt
-            return jsonify_data(html=_render_registration_details(self.registration), flash=False)
+            self.registration.modification_end_dt = form.modification_end_dt.data
+            flash(_('Deadline for registration modification have been scheduled'), 'success')
+            return jsonify_data(html=_render_registration_details(self.registration))
         return jsonify_form(form, submit=_('Set'), disabled_until_change=False)
 
 
-class RHRegistrationRemoveAllowModification(RHManageRegistrationBase):
-    """Remove permission to modify a registration."""
+class RHRegistrationRemoveModification(RHManageRegistrationBase):
+    """Let a manager close modification for a registration."""
 
     def _process(self):
-        self.registration.exceptional_modification_allowed_end_dt = None
-        return jsonify_data(html=_render_registration_details(self.registration), flash=False)
+        self.registration.modification_end_dt = None
+        return jsonify_data(html=_render_registration_details(self.registration))
 
 
 class RHRegistrationCheckIn(RHManageRegistrationBase):

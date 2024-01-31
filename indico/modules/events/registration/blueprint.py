@@ -77,12 +77,12 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
                  'hide_registration', reglists.RHRegistrationHide, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/withdraw',
                  'manage_withdraw_registration', reglists.RHRegistrationManageWithdraw, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/remove-allow-modification',
-                 'registration_remove_allow_modification',
-                 reglists.RHRegistrationRemoveAllowModification, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/allow-modification',
-                 'registration_allow_modification',
-                 reglists.RHRegistrationAllowModification, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/close-modification',
+                 'registration_close_modification',
+                 reglists.RHRegistrationRemoveModification, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/schedule-modification',
+                 'registration_schedule_modification',
+                 reglists.RHRegistrationScheduleModification, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
                  'registration_check_in', reglists.RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
 _bp.add_url_rule(

@@ -50,8 +50,8 @@
             {% endif %}
             {% if registration.can_be_modified and not registration.registration_form.is_modification_open %}
                 <div class="text">
-                    {% trans exceptional_modification_allowed_end_dt=registration.exceptional_modification_allowed_end_dt|format_date(timezone=registration.event.tzinfo) -%}
-                    You are allowed to modify your registration until: {{ exceptional_modification_allowed_end_dt }}
+                    {% trans modification_end_dt=registration.modification_end_dt|format_date(timezone=registration.event.tzinfo) -%}
+                    You are allowed to modify your registration until: {{ modification_end_dt }}
                     {%- endtrans %}
                 </div>
             {% endif %}
