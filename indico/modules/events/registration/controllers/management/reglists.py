@@ -782,48 +782,59 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
         form = RegistrationBasePriceForm(base_price=self.regform.base_price, currency=self.regform.currency,
                                          registration_id=[reg.id for reg in self.registrations])
         if form.validate_on_submit():
-            changes = {}
-            log_fields = {reg: {'title': f'{reg.full_name} (#{reg.friendly_id})', 'type': 'string'}
-                          for reg in self.registrations}
+            log_fields = {
+                'base_price': {'title': 'Registration Fee', 'type': 'string'},
+                'state': 'State'
+            }
+            num_skipped = 0
+            num_updates = 0
             for reg in self.registrations:
                 prev_state = reg.state
                 if form.apply_complete.data and reg.state == RegistrationState.complete and not reg.base_price:
                     reg.state = RegistrationState.unpaid
                 elif reg.state != RegistrationState.unpaid:
+                    num_skipped += 1
                     continue
                 new_price = {
                     'remove': 0,
                     'default': self.regform.base_price,
                     'custom': form.base_price.data
                 }[form.action.data]
-                changes[reg] = (format_currency(reg.base_price, reg.currency, locale='en_GB'),
-                                format_currency(new_price, self.regform.currency, locale='en_GB'))
-                reg.base_price = new_price
-                reg.currency = self.regform.currency
+                changes = {}
+                if reg.base_price != new_price or reg.currency != self.regform.currency:
+                    changes['base_price'] = (format_currency(reg.base_price, reg.currency, locale='en_GB'),
+                                             format_currency(new_price, self.regform.currency, locale='en_GB'))
+                    reg.base_price = new_price
+                    reg.currency = self.regform.currency
                 if not reg.price:
                     reg.state = RegistrationState.complete
                 if prev_state != reg.state:
+                    changes['state'] = (prev_state, reg.state)
                     notify_registration_state_update(reg, from_management=True)
+                if changes:
+                    reg.log(EventLogRealm.management, LogKind.change, 'Registration',
+                            f'Registration fee updated: {reg.full_name}',
+                            session.user, data={'Changes': make_diff_log(changes, log_fields)})
+                    num_updates += 1
             db.session.flush()
-            skipped = len(self.registrations) - len(changes)
-            if changes:
+            # we count an update as a success even if nothing has changed
+            num_successes = len(self.registrations) - num_skipped
+            if num_successes:
                 flash(ngettext('Registration fee has been updated for {} registration.',
                                'Registration fee has been updated for {} registrations.',
-                               len(changes)).format(len(changes)), 'success')
-                # Trim changes
-                changes = {reg: changes[reg] for reg in changes if changes[reg][0] != changes[reg][1]}
-                logger.info('%r registrations had their fee changed by %r', len(changes), session.user)
-                self.regform.log(EventLogRealm.management, LogKind.change, 'Registration', 'Registration fees updated',
-                                 session.user, data={'Changes': make_diff_log(changes, log_fields)})
-            if skipped:
+                               num_successes).format(num_successes), 'success')
+            if num_updates:
+                logger.info('%r registrations had their fee changed by %r', num_updates, session.user)
+            if num_skipped:
                 if form.apply_complete.data:
                     msg = ngettext('{} registration was skipped because its fee is not zero or it is in an invalid '
                                    'state.', '{} registrations were skipped because their fees are not zero or they '
-                                   'are in an invalid state.', skipped)
+                                   'are in an invalid state.', num_skipped)
                 else:
                     msg = ngettext('{} registration was skipped because it is not in the unpaid state.',
-                                   '{} registrations were skipped because they are not in the unpaid state.', skipped)
-                flash(msg.format(skipped), 'warning')
+                                   '{} registrations were skipped because they are not in the unpaid state.',
+                                   num_skipped)
+                flash(msg.format(num_skipped), 'warning')
             return jsonify_data(flash=False)
         return jsonify_form(form, disabled_until_change=False)
 
