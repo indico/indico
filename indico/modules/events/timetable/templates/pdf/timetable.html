@@ -1,55 +1,66 @@
-{% macro render_time_and_place(entry) %}
-    {{ _('Time and Place') }}: {{ entry.object.room_name }} ({{ entry.start_dt|format_time(timezone=event.tz) }} - {{ entry.end_dt|format_time(timezone=event.tz) }})
-{% endmacro %}
+{% from 'events/timetable/pdf/_cover_page.html' import render_cover_page %}
+{% from 'events/timetable/pdf/_toc.html' import render_toc %}
+{% from 'events/timetable/pdf/_program.html' import render_program %}
 
-<div>
-    <h2>{{ event.title }}</h2>
-    <h3>{{ event.start_dt|format_date(timezone=event.tz) }} - {{ event.end_dt|format_date(timezone=event.tz) }}</h3>
+<style>
+    @page {
+        size: {{ page_size }};
+        margin: 10mm;
+    }
+
+    @page :first {
+        counter-reset: toc-page;
+        counter-reset: program-page {{ page_offset }};
+
+        @bottom-center {
+            content: '{{ now|format_date(format='full', timezone=event.tz) }}';
+        }
+    }
+
+    @page toc {
+        counter-increment: toc-page;
+
+        @bottom-center {
+            content: counter(toc-page, lower-roman);
+        }
+    }
+
     {% for day in days %}
-        <h4>{{ _('Daily Program') }} {{ day|format_date(timezone=event.tz) }}</h4>
-        <div class="pagebreak">
-            {% for entry in days[day] %}
-                <p class="timetable-entry" style="break-inside:avoid;">
-                    {% if entry.type == 1 %}
-                        {% set session_block = entry.object %}
-                        {% set session = session_block.session %}
-                        {% set conveners = session_block.person_links|map(attribute='full_name')|list %}
-                        <div>
-                            Session: <b>{{ session_block.title or session.title }}</b>
-                        </div>
-                        <div>
-                            {{ render_time_and_place(entry) }}
-                        </div>
-                        {% if conveners %}
-                            <div>
-                                {{ ngettext('Convener', 'Conveners', conveners|length)}}: <b>{{ conveners|join('; ') }}</b>
-                            </div>
-                        {% endif %}
-                    {% elif entry.type == 2 %}
-                        {% set contrib = entry.object %}
-                        {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
-                        <div>
-                            Contribution: <b>{{ contrib.title }}</b>
-                        </div>
-                        <div>
-                            {{ render_time_and_place(entry) }}
-                        </div>
-                        {% if speakers %}
-                            <div>
-                                {{ ngettext('Speaker', 'Speakers', speakers|length)}}: <b>{{ speakers|join('; ') }}</b>
-                            </div>
-                        {% endif %}
-                    {% elif entry.type == 3 %}
-                        {% set break = entry.object %}
-                        <div>
-                            Break: <b>{{ break.title }}</b>
-                        </div>
-                        <div>
-                            {{ render_time_and_place(entry) }}
-                        </div>
-                    {% endif %}
-                </p>
-            {% endfor %}
-        </div>
+        @page program-{{ loop.index }} {
+            counter-increment: program-page;
+
+            @bottom-center {
+                content: counter(program-page);
+            }
+
+            @top-left {
+                font-size: 0.8em;
+                color: grey;
+                content: '{{ event.title }} / Programme';
+            }
+
+            @top-right {
+                font-size: 0.8em;
+                color: grey;
+                content: '{{ day|format_skeleton('EEEEdMMMM') }}';
+            }
+        }
+
+        @page program-{{ loop.index }}:first {
+            @top-right {
+                content: 'YYY' !important;
+            }
+        }
+
+        .program-{{ loop.index }} {
+            page: program-{{ loop.index }};
+        }
     {% endfor %}
-</div>
+</style>
+{% if show_cover_page %}
+    {{ render_cover_page(event) }}
+{% endif %}
+{% if show_toc %}
+    {{ render_toc(event, days, show_session_toc, show_contribs, show_breaks) }}
+{% endif %}
+{{ render_program(event, days, show_affiliation, show_contribs, show_breaks, show_title, new_page_per_session) }}
