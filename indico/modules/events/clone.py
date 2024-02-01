@@ -225,6 +225,10 @@ class EventPrivacyCloner(EventCloner):
     def is_available(self):
         return self._has_content(self.old_event)
 
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            return [_('The target event already has privacy settings')]
+
     def _has_content(self, event):
         privacy_settings_data = privacy_settings.get_all(event, no_defaults=True)
         return any(privacy_settings_data.values())
