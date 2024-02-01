@@ -146,12 +146,14 @@
 
                 <div id="event-action-menu-actions">
                     <div class="action-menu-buttons {{ 'event-locked' if event.is_locked }}">
-                        {{ _render_move_event(event) }}
-                        {{ _render_import_event(event) }}
-                        {% if not event.is_unlisted %}{{ _render_manage_series(event) }}{% endif %}
-                        {{ _render_lock_event(event) }}
-                        {{ _render_delete_event(event) }}
-                        {{ _render_change_event_type(event, event_types) }}
+                        {% block event_actions scoped %}
+                            {{ _render_move_event(event) }}
+                            {{ _render_import_event(event) }}
+                            {% if not event.is_unlisted %}{{ _render_manage_series(event) }}{% endif %}
+                            {{ _render_lock_event(event) }}
+                            {{ _render_delete_event(event) }}
+                            {{ _render_change_event_type(event, event_types) }}
+                        {% endblock %}
                     </div>
                 </div>
 
