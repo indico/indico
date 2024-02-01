@@ -21,6 +21,8 @@ from indico.modules.events.timetable.util import (get_timetable_offline_pdf_gene
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
+from indico.modules.receipts.util import sandboxed_url_fetcher
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
@@ -108,6 +110,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
             from flask import render_template
             from indico.modules.events.timetable.models.entries import TimetableEntry
             from indico.core.db import db
+            from pathlib import Path
 
             days = {}
             for day in self.event.iter_days():
@@ -117,12 +120,29 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                            .order_by(TimetableEntry.start_dt))
                 days[day] = entries
 
-            html = render_template('events/timetable/pdf/timetable.html', event=self.event, days=days)
+            now = now_utc()
+            html = render_template('events/timetable/pdf/timetable.html', event=self.event, days=days, now=now,
+                                   show_title=form.other.data['showSpeakerTitle'],
+                                   show_affiliation=form.other.data['showSpeakerAffiliation'],
+                                   show_cover_page=form.document_settings.data['showCoverPage'],
+                                   show_toc=form.document_settings.data['showTableContents'],
+                                   show_session_toc=form.document_settings.data['showSessionTOC'],
+                                   page_size=form.pagesize.data,
+                                   page_offset=form.firstPageNumber.data-1,
+                                   show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
+                                   show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
+                                   new_page_per_session=form.session_info.data['newPagePerSession'],
+                                   use_session_colors=form.session_info.data['useSessionColorCodes'],
+                                   )
+
             css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data,
-                                  page_offset=form.firstPageNumber.data-1)
+                                  page_offset=form.firstPageNumber.data-1, event=self.event)
+
+            # Path('/home/troun/dev/pdf-timetable/index.html').write_text(html)
+            # Path('/home/troun/dev/pdf-timetable/main.css').write_text(css)
 
             if request.args.get('download') == '1':
-                return send_file('timetable.pdf', create_pdf(html, css), 'application/pdf')
+                return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
             else:
                 url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
                 return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
@@ -136,10 +156,13 @@ class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
         return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
 
 
-def create_pdf(html, css) -> BytesIO:
-    css = CSS(string=css)
+def create_pdf(html, css, event) -> BytesIO:
+    css_url_fetcher = sandboxed_url_fetcher(event)
+    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_logo=True)
+
+    css = CSS(string=css, url_fetcher=css_url_fetcher)
     documents = [
-        HTML(string=html).render(stylesheets=(css,))
+        HTML(string=html, url_fetcher=html_url_fetcher).render(stylesheets=(css,))
     ]
     all_pages = [p for doc in documents for p in doc.pages]
     f = BytesIO()

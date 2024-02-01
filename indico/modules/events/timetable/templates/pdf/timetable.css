@@ -1,10 +1,7 @@
-@page {
-  size: {{ page_size}};
-
-  @bottom-center {
-    counter-increment: page {{ page_offset }};
-    content: counter(page);
-  }
+* {
+  box-sizing: border-box;
+  font-family: Lato;
+  line-height: 1.2em;
 }
 
 .pagebreak {
@@ -13,5 +10,94 @@
 
 .timetable-entry {
   break-inside: avoid;
+  /* border: 1px solid black; */
 }
 
+.timetable-entry > div {
+  padding: 1em;
+}
+
+.cover {
+  counter-reset: program-page 7;
+  display: flex;
+  min-height: 100vh;
+  border: 1px solid red;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cover > div {
+  text-align: center;
+}
+
+.toc {
+  page: toc;
+}
+
+.toc h1 {
+  text-align: center;
+}
+
+.toc ol {
+  padding: 0;
+}
+
+.toc .toc-item {
+  list-style: none;
+}
+
+.toc > ol > .toc-item {
+  padding-top: 1em;
+}
+
+.toc .toc-item .toc-item {
+  padding-left: 5em;
+}
+
+.toc .toc-item a::after {
+  content: leader('.') target-counter(attr(href), page, decimal);
+}
+
+.toc .toc-item a {
+  text-decoration: none;
+}
+
+.toc .toc-item {
+  margin-top: 0.5em;
+}
+
+#footer {
+  position: running(footer);
+}
+
+#footer::after {
+  content: target-counter('#footer', page, decimal);
+}
+
+/* body {
+  border: 1px solid green;
+} */
+
+.time-and-place {
+  /* line-height: 1.2em; */
+  /* max-width: 30%; */
+}
+
+.content {
+  /* padding-left: 2em; */
+}
+
+.day-program {
+  width: 100%;
+  border: none;
+  border-collapse: collapse;
+}
+
+table, tr, td {
+  border: none;
+}
+
+.day-program td {
+  padding: 0.5em;
+  vertical-align: top;
+}
