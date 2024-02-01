@@ -66,6 +66,7 @@ def _get_cloners(sender, **kwargs):
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.abstracts.models.abstracts import Abstract
     from indico.modules.events.abstracts.models.comments import AbstractComment
+    from indico.modules.events.abstracts.models.email_logs import AbstractEmailLogEntry
     from indico.modules.events.abstracts.models.reviews import AbstractReview
     from indico.modules.events.abstracts.settings import abstracts_settings
     Abstract.query.filter_by(submitter_id=source.id).update({Abstract.submitter_id: target.id})
@@ -74,6 +75,7 @@ def _merge_users(target, source, **kwargs):
     AbstractComment.query.filter_by(user_id=source.id).update({AbstractComment.user_id: target.id})
     AbstractComment.query.filter_by(modified_by_id=source.id).update({AbstractComment.modified_by_id: target.id})
     AbstractReview.query.filter_by(user_id=source.id).update({AbstractReview.user_id: target.id})
+    AbstractEmailLogEntry.query.filter_by(user_id=source.id).update({AbstractEmailLogEntry.user_id: target.id})
     abstracts_settings.acls.merge_users(target, source)
 
 
