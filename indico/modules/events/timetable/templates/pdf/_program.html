@@ -1,0 +1,132 @@
+{% macro render_program(event, days, show_affiliation, show_contribs, show_breaks, show_title, new_page_per_session) %}
+    {% for day in days %}
+        <div class="pagebreak program-{{loop.index}}" id="day-{{ loop.index }}">
+            <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
+            <table class="day-program">
+                <tbody>
+                    {% for entry in days[day] %}
+                        {# <tr class="timetable-entry" id="entry-{{ entry.id }}" style="{{'break-inside:avoid;' if new_page_per_session else ''}}"> #}
+                            {% if entry.type == 1 %}
+                                {{ render_session_block(entry, show_affiliation, show_title, new_page_per_session) }}
+                            {% elif entry.type == 2 and show_contribs %}
+                                {{ render_contrib(entry) }}
+                            {% elif entry.type == 3 and show_breaks %}
+                                {{ render_break(entry) }}
+                            {% endif %}
+                        {# </tr> #}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_session_block(entry, show_affiliation, show_title, new_page_per_session) %}
+    {% set session_block = entry.object %}
+    {% set session = session_block.session %}
+    {% set conveners = session_block.person_links %}
+        {# {% if new_page_per_session %}
+            <div class="pagebreak"></div>
+        {% endif %} #}
+        <tr class="timetable-entry {{'pagebreak' if new_page_per_session else ''}}" id="entry-{{ entry.id }}" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
+            <td class="time-and-place">
+                <div>{{ render_time(entry) }}</div>
+                <div>{{ render_place(entry) }}</div>
+            </td>
+            <td class="content">
+                <div style="font-size: 1.1em;">
+                    {% if session.title and session_block.title %}
+                        {{ session.title }}: {{ session_block.title }}
+                    {% else %}
+                        {{ session_block.title or session.title }}
+                    {% endif %}
+                </div>
+                {% if conveners %}
+                    <div style="padding-left: 1em;">
+                        {{ ngettext('Convener', 'Conveners', conveners|length)}}:
+                        {% for convener in conveners %}
+                            {{ render_name(convener, title=show_title, affiliation=show_affiliation) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+        {% if entry.children %}
+            <tr style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
+                <td></td>
+                <td>
+                    <table style="padding-top: 1em; padding-left: -3em;">
+                        <tbody>
+                            {% for child in entry.children %}
+                                <tr>
+                                    <td style="white-space: nowrap">{{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}</td>
+                                    <td>
+                                        <div>{{ child.object.title }}</div>
+                                        <div style="padding-left: 1em;">
+                                            Speakers:
+                                            Albert Einstein, Robert Oppenheimer, Marie Curie, Isaac Newton, Nikola Tesla
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        {% endif %}
+{% endmacro %}
+
+{% macro render_contrib(entry) %}
+    {% set contrib = entry.object %}
+    {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+    <tr class="timetable-entry" id="entry-{{ entry.id }}" style="background-color: #f8f2e8;">
+        <td class="time-and-place">
+            <div>{{ render_time(entry) }}</div>
+            <div>{{ render_place(entry) }}</div>
+        </td>
+        <td class="contrib content" style="background-color: #f8f2e8;">
+            <div style="font-size: 1.1em;">
+                {{ contrib.title }}
+            </div>
+            {% if speakers %}
+                <div style="padding-left: 1em;">
+                    {{ ngettext('Speaker', 'Speakers', speakers|length)}}: <b>{{ speakers|join('; ') }}</b>
+                </div>
+            {% endif %}
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro render_break(entry) %}
+    {% set break = entry.object %}
+    <tr class="timetable-entry" id="entry-{{ entry.id }}" style="background-color: #{{ break.colors.background }}; color: #{{ break.colors.text }};">
+        <td class="time-and-place">
+            <div>{{ render_time(entry) }}</div>
+            <div>{{ render_place(entry) }}</div>
+        </td>
+        <td class="content" style="background-color: #{{ break.colors.background }}; color: #{{ break.colors.text }}; font-size: 1.1em;">
+            {{ break.title }}
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro render_time_and_place(entry) %}
+    ({{ entry.start_dt|format_time(timezone=entry.event.tz) }} - {{ entry.end_dt|format_time(timezone=entry.event.tz) }}) {{ entry.object.room_name }}
+{% endmacro %}
+
+{% macro render_time(entry) %}
+    {{ entry.start_dt|format_time(timezone=entry.event.tz) }} - {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
+{% endmacro %}
+
+{% macro render_place(entry) %}
+    {{ entry.object.room_name }}
+{% endmacro %}
+
+{% macro render_name(person, title=false, affiliation=false) %}
+    {% set name = person.get_full_name(show_title=title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) %}
+    {% if affiliation and person.affiliation %}
+        {{ name }} ({{ person.affiliation }})
+    {% else %}
+        {{ name }}
+    {% endif %}
+{% endmacro %}
