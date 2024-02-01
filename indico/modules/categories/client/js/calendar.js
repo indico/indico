@@ -105,19 +105,9 @@ import CalendarLegend from './components/CalendarLegend';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          let attr;
-          switch (groupBy) {
-            case 'category':
-              attr = 'categoryId';
-              break;
-            case 'location':
-              attr = 'venueId';
-              break;
-            case 'room':
-              attr = 'roomId';
-              break;
-            default:
-              throw new Error(`Invalid "groupBy": ${groupBy}`);
+          const attr = {category: 'categoryId', location: 'venueId', room: 'roomId'}[groupBy];
+          if (!attr) {
+            throw new Error(`Invalid "groupBy": ${groupBy}`);
           }
           const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr] ?? 0));
           successCallback(filteredEvents);
