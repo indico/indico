@@ -613,6 +613,13 @@ registration_data:
     input_type: single_choice
     position: 1004
     title: Title
+  - data: null
+    default_value: null
+    description: ''
+    id: <id>
+    input_type: picture
+    position: 1005
+    title: Picture
   id: <id>
   position: 1
   title: Personal Data
