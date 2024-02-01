@@ -11,6 +11,7 @@ from babel.numbers import format_currency
 from PIL import Image
 
 from indico.modules.designer.models.images import DesignerImageFile
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime, format_interval
 from indico.util.i18n import _
@@ -29,7 +30,7 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder', 'FixedTextPlaceholder',
-           'FixedImagePlaceholder', 'RegistrationAccompanyingPersonsCountPlaceholder',
+           'FixedImagePlaceholder', 'RegistrationAccompanyingPersonsCountPlaceholder', 'RegistrationPicturePlaceholder',
            'RegistrationAccompanyingPersonsPlaceholder', 'RegistrationAccompanyingPersonsAbbrevPlaceholder')
 
 
@@ -359,6 +360,20 @@ class RegistrationPhonePlaceholder(RegistrationPDPlaceholder):
     name = 'phone'
     description = _('Phone')
     field = 'phone'
+
+
+class RegistrationPicturePlaceholder(RegistrationPDPlaceholder):
+    name = 'picture'
+    description = _('Picture')
+    is_image = True
+
+    @classmethod
+    def render(cls, registration):
+        picture_data = [d for d in registration.data
+                        if d.field_data.field.personal_data_type == PersonalDataType.picture]
+        if picture_data and picture_data[0].filename:
+            buf = picture_data[0].open()
+            return Image.open(buf)
 
 
 class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
