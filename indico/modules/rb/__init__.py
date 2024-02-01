@@ -30,11 +30,11 @@ rb_cache = make_scoped_cache('roombooking')
 
 
 class BookingReasonRequiredOptions(RichIntEnum):
-    __titles__ = [None, _('Always'), _('Never'), _('Not for events')]
+    __titles__ = [None, _('Never'), _('Always'), _('Not for events')]
 
+    never = 0
     always = 1
-    never = 2
-    not_for_events = 3
+    not_for_events = 2
 
 
 rb_settings = SettingsProxy('roombooking', {

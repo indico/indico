@@ -191,9 +191,7 @@ const SettingsPage = props => {
               search={false}
               name="booking_reason_required"
               label={Translate.string('Booking reason required')}
-              description={Translate.string(
-                'Whether to require to set the reason for a booking or not.'
-              )}
+              description={Translate.string('Specify when a booking reason must be provided.')}
             />
             <FinalCheckbox
               name="notifications_enabled"
