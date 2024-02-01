@@ -193,6 +193,7 @@ def _get_cloners(sender, **kwargs):
     yield clone.EventPersonLinkCloner
     yield clone.EventProtectionCloner
     yield clone.EventSeriesCloner
+    yield clone.EventPrivacyCloner
 
 
 @signals.event.cloned.connect

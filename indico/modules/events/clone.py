@@ -11,6 +11,7 @@ from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.modules.attachments.settings import attachments_settings
 from indico.modules.events.cloning import EventCloner, get_attrs_to_clone
 from indico.modules.events.contributions import contribution_settings
+from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.principals import EventPrincipal
@@ -213,3 +214,29 @@ class EventSeriesCloner(EventCloner):
             # placeholder-like stuff in the pattern
             new_event.title = series.event_title_pattern.replace('{n}', str(n))
         db.session.flush()
+
+
+class EventPrivacyCloner(EventCloner):
+    name = 'event_privacy'
+    friendly_name = _('Privacy settings')
+    is_default = True
+
+    @property
+    def is_available(self):
+        return self._has_content(self.old_event)
+
+    def get_conflicts(self, target_event):
+        if self._has_content(target_event):
+            return [_('The target event already has privacy settings')]
+
+    def _has_content(self, event):
+        privacy_settings_data = privacy_settings.get_all(event, no_defaults=True)
+        return any(privacy_settings_data.values())
+
+    def run(self, new_event, cloners, shared_data, event_exists=False):
+        with db.session.no_autoflush:
+            self._clone_privacy_settings(new_event)
+        db.session.flush()
+
+    def _clone_privacy_settings(self, new_event):
+        privacy_settings.set_multi(new_event, privacy_settings.get_all(self.old_event, no_defaults=True))

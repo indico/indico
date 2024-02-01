@@ -73,6 +73,7 @@ Improvements
   (:issue:`6105, 6106, 6128`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`)
 - Add week and day views in the category calendar and improve navigation controls
   (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`).
+- Add the ability to clone privacy settings (:pr:`6156`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
