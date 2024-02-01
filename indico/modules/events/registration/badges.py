@@ -129,7 +129,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             item_data = {'item': item, 'text': text, 'pos_x': pos_x, 'pos_y': pos_y}
             for update in values_from_signal(
                 signals.event.designer.draw_item_on_badge.send(person['registration'], items=items, height=self.height,
-                                                               width=self.width, data=item_data, person=person),
+                                                               width=self.width, data=item_data, person=person,
+                                                               template_data=tpl_data),
                 as_list=True
             ):
                 item_data.update(update)
