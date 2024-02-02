@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-# ruff: noqa: PGH001
-
 import os
 import posixpath
 import re

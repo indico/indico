@@ -37,7 +37,7 @@ class RHFeatures(RHFeaturesBase):
                 continue
             field = BooleanField(feature.friendly_name, widget=SwitchWidget(), description=feature.description)
             setattr(form_class, name, field)
-        defaults = {name: True for name in get_enabled_features(self.event)}
+        defaults = dict.fromkeys(get_enabled_features(self.event), True)
         return form_class(csrf_enabled=False, obj=FormDefaults(defaults))
 
     def _process(self):

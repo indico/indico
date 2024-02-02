@@ -318,7 +318,7 @@ class TimeRange:
     def __call__(self, form, field):
         def _format_time(value):
             return format_time(value) if value else None
-        if self.earliest and field.data < self.earliest or self.latest and field.data > self.latest:
+        if (self.earliest and field.data < self.earliest) or (self.latest and field.data > self.latest):
             if self.earliest is not None and self.latest is not None:
                 message = _('Must be between {earliest} and {latest}.')
             elif self.latest is None:
@@ -345,7 +345,7 @@ class WordCount:
 
     def __call__(self, form, field):
         count = len(re.split(r'\s+', field.data, flags=re.UNICODE)) if field.data else 0
-        if count < self.min or self.max != -1 and count > self.max:
+        if count < self.min or (self.max != -1 and count > self.max):
             if self.max == -1:
                 message = ngettext('Field must contain at least {min} word.',
                                    'Field must contain at least {min} words.', self.min)

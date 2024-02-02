@@ -539,7 +539,7 @@ class Room(ProtectionManagersMixin, db.Model):
         non_reservable_rooms = set()
         for room in all_rooms_query:
             is_owner = user == room.owner
-            data[room.id] = {x: False for x in permissions}
+            data[room.id] = dict.fromkeys(permissions, False)
             if room.reservations_need_confirmation:
                 prebooking_required_rooms.add(room.id)
             if not room.is_reservable:

@@ -143,7 +143,7 @@ class RHCreateBooking(RHRoomBookingBase):
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if (self.prebook and not self.room.can_prebook(session.user) or
+        if ((self.prebook and not self.room.can_prebook(session.user)) or
                 (not self.prebook and not self.room.can_book(session.user))):
             raise Forbidden('Not authorized to book this room')
 
