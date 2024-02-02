@@ -405,6 +405,8 @@ Internal Changes
   element (:pr:`6098`, thanks :user:`foxbunny`)
 - Add ``<ind-with-tooltip>`` and ``<ind-with-toggletip>`` custom elements (:pr:`5931`, thanks
   :user:`foxbunny`)
+- Add ``<ind-toggle-trigger>`` custom elements for controls that toggle the visibility of another
+  element (:pr:`6098`, thanks :user:`foxbunny`)
 
 
 ----
