@@ -1064,22 +1064,25 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
 
-    def is_user_registered(self, user):
+    def is_user_registered(self, user, registration_form=None):
         """Check whether the user is registered in the event.
 
+        If registration form is used, check also if the registration belongs to that registration form.
         This takes both unpaid and complete registrations into account.
         """
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration, RegistrationState
         if user is None:
             return False
-        return (Registration.query.with_parent(self)
-                .join(Registration.registration_form)
-                .filter(Registration.user == user,
-                        Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
-                        ~Registration.is_deleted,
-                        ~RegistrationForm.is_deleted)
-                .has_rows())
+        query = (Registration.query.with_parent(self)
+                 .join(Registration.registration_form)
+                 .filter(Registration.user == user,
+                         Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                         ~Registration.is_deleted,
+                         ~RegistrationForm.is_deleted))
+        if registration_form:
+            query = query.filter(RegistrationForm.id == registration_form.id)
+        return query.has_rows()
 
     def is_user_speaker(self, user):
         from indico.modules.events.contributions import Contribution

@@ -126,6 +126,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return reg.registration_form.publish_checkin_enabled and reg.checked_in
 
     def _merged_participant_list_table(self):
+        def _is_participant(reg):
+            return reg.event.is_user_registered(session.user, reg.registration_form)
+
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
             columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
@@ -150,9 +153,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
                  .signal_query('merged-participant-list-publishable-registrations', event=self.event))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
-                                                     for reg in query if reg.is_publishable(is_participant)),
+                                                     for reg in query if reg.is_publishable(_is_participant(reg))),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
         return {'headers': headers,
                 'rows': registrations,
@@ -197,7 +199,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
-        is_participant = self.event.is_user_registered(session.user)
+        is_participant = self.event.is_user_registered(session.user, regform)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in query
                          if reg.is_publishable(is_participant)]
         return {'headers': headers,
