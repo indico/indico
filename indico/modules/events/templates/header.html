@@ -189,8 +189,8 @@
 {{ render_announcements(legacy=true) }}
 
 <div class="page-header page-header-dark event-page-header">
-    <div class="main-action-bar flexrow f-j-space-between f-a-center">
-        <div class="button-bar flexrow f-j-start">
+    <div class="main-action-bar">
+        <div class="button-bar">
             {% if event.type != 'conference' or show_nav_bar %}
                 {{ _render_nav_bar() }}
             {% endif %}
@@ -246,9 +246,18 @@
             {% endif %}
         </div>
 
-        {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone, force_locale=force_locale,
-                              force_locale_alts=force_locale_alts) }}
+        <div class="header-controls">
+            {{ render_protection_indicator(event) }}
+            <ind-toggle-trigger>
+                <button class="header-menu-trigger" aria-controls="session-menu">
+                    <span>{% trans %}Menu{% endtrans %}</span>
+                </button>
+            </ind-toggle-trigger>
+        </div>
     </div>
+
+    {{ render_session_menu(protected_object=event, local_tz=event.display_tzinfo.zone, force_locale=force_locale,
+                           force_locale_alts=force_locale_alts) }}
 
     {# This div is used for inserting content under the header such as the filtering options for meetings #}
     <div id="pageSubHeader"></div>

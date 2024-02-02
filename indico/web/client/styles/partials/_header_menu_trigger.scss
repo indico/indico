@@ -1,0 +1,25 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+@use './header_controls';
+
+%header-menu-trigger {
+  @extend %button-clear;
+  @extend %header-menu-control;
+
+  &::after {
+    @extend %icon;
+    @extend %icon-menu;
+    font-size: 1.5em;
+  }
+
+  > span {
+    @extend %visually-hidden;
+  }
+}

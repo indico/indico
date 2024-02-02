@@ -1,0 +1,224 @@
+{% macro _settings_section(section_id, heading_id, title, heading_extra='') %}
+    <section id="{{ section_id }}" aria-labelledby="{{ heading_id }}">
+        <heading>
+            <h2 id="{{ heading_id }}">{{ title }}</h2>
+            {{ heading_extra }}
+        </heading>
+        {{ caller() }}
+    </section>
+{% endmacro %}
+
+{% macro _render_protection_info(protection_data) %}
+    {% set title %}{% trans %}Page access information{% endtrans %}{% endset %}
+    {% call _settings_section('protection-details-info', 'protection-details', title) %}
+        <div data-level="{{ protection_data.protection_level }}">
+            <div>
+                <p>
+                    {% if protection_data.protection_level == 'public' %}
+                        {% trans %}The information on this page is visible to anyone{% endtrans %}
+                    {% elif protection_data.protection_level == 'network' %}
+                        {% trans count=protection_data.networks_with_access|length, networks=protection_data.networks_with_access|join('/') %}
+                            The information on this page is restricted for display on the {{ networks }} network only.
+                            {% pluralize %}
+                            The information on this page is restricted for display on the {{ networks }} networks only.
+                        {% endtrans %}
+                    {% elif protection_data.protection_level == 'restricted' %}
+                        {% trans %}
+                            The information on this page is restricted for display to named individuals or specific groups.
+                        {% endtrans %}
+                    {% endif %}
+                </p>
+                {% if protection_data.disclaimer %}
+                    {{ protection_data.disclaimer|sanitize_html|trim }}
+                {% endif %}
+            </div>
+        </div>
+    {% endcall %}
+{% endmacro %}
+
+{% macro _render_timezone_selector(timezone_data) %}
+    {% set title %}{% trans %}Timezone{% endtrans %}{% endset %}
+    {% call _settings_section('tz-selector-controls', 'tz-selector', title) %}
+        {% if timezone_data.has_no_choice %}
+            <p class="tz-locked-note">{% trans active_tz=timezone_data.active_tz %}The active timezone is {{ active_tz }}. Management areas always use the timezone of the event/category.{% endtrans %}.</p>
+        {% else %}
+            <ind-tz-form>
+                <form action="{{ url_for('core.change_tz') }}" method="post">
+                <input type="hidden" name="url" value="{{ request.url }}">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+
+                <fieldset id="tz-modes">
+                    <legend>Use timezone based on:</legend>
+
+                    <div class="tz-option-frame">
+                        <input type="radio" name="tz_mode" id="tz-mode-local" value="{{ timezone_data.LOCAL }}"
+                               {{ 'checked' if timezone_data.tz_mode == timezone_data.LOCAL }}>
+                        <label for="tz-mode-local">{% trans %}Event/category{% endtrans %}</label>
+                    </div>
+                    {% if session.user %}
+                        <div class="tz-option-frame">
+                            <input type="radio" name="tz_mode" id="tz-mode-user" value="{{ timezone_data.USER }}"
+                                   data-user-tz="{{ timezone_data.profile_tz }}"
+                                   {{ 'checked' if timezone_data.tz_mode == timezone_data.USER }}>
+                            <div>
+                                <label for="tz-mode-user">{% trans %}Profile{% endtrans %}</label>
+                                <span class="pause">;</span>
+                                <div>{{ timezone_data.profile_tz }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="tz-option-frame">
+                        <input type="radio" name="tz_mode" id="tz-mode-custom" value="{{ timezone_data.CUSTOM }}"
+                               {{ 'checked' if timezone_data.tz_mode == timezone_data.CUSTOM }}>
+                        <div>
+                            <label for="tz-mode-custom">{% trans %}Custom{% endtrans %}</label>
+                            <span class="pause">;</span>
+                            <label class="tz-custom-field">
+                                <span>{% trans %}Select a custom timezone{% endtrans %}</span>
+                                <select name="tz" size="7">
+                                    {% for tz in timezone_data.all_tzs -%} {% set is_profile_timezone = tz == timezone_data.profile_tz %}
+                                        <option value="{{ tz }}" {{ 'selected' if tz == timezone_data.active_tz }} {{ 'data-profile' if is_profile_timezone }}>
+                                            {{ tz }}
+                                        </option>
+                                    {%- endfor %}
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+                {% if session.user %}
+                    <label class="tz-remember-setting">
+                        <input type="checkbox" name="update_user" value="1">
+                        <span>{% trans %}Remember this setting{% endtrans %}</span>
+                    </label>
+                {% endif %}
+                <button>{% trans %}Save{% endtrans %}</button>
+            </form>
+            </ind-tz-form>
+        {% endif %}
+    {% endcall %}
+{% endmacro %}
+
+{% macro _render_language_selector(locale_data) %}
+    {% set title %}{% trans %}Language{% endtrans %}{% endset %}
+    {% call _settings_section('language-settings-controls', 'language-settings', title) %}
+        <div>
+            {% if locale_data.has_no_choice %}
+                <p>{% trans %}This page does not allow alternative languages.{% endtrans %}</p>
+            {% else %}
+                {% if locale_data.has_restricted_choice %}
+                    <p>{% trans %}Some languages are not available on this page.{% endtrans %}</p>
+                {% endif %}
+
+                <form action="{{ url_for('core.change_lang') }}" method="post">
+                    <input type="hidden" name="url" value="{{ request.url }}">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <ul id="language-list">
+                        {% for locale in locale_data.selectable_locales %}
+                            {% set html_lang_attr = locale.replace('_', '-') %}
+                            {% set language_display = locale_data.get_locale_display(locale) %}
+
+                            {% if locale == locale_data.current_locale %}
+                                <li data-current>
+                                    <span lang="{{ html_lang_attr }}">{{ language_display }}</span>
+                                    <span>({% trans %}current language{% endtrans %})</span>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <button name="lang" value="{{ locale }}" lang="{{ html_lang_attr }}">
+                                        {{ language_display }}
+                                    </button>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </form>
+            {% endif %}
+        </div>
+    {% endcall %}
+{% endmacro %}
+
+{% macro login_link() %}
+
+    <a href="{{ url_for_login(after_login_url) }}">
+        <span>{%- trans %}Login{% endtrans -%}</span>
+    </a>
+{% endmacro %}
+
+{% macro _render_user_settings(locale_data) %}
+    <section id="user-settings-controls" aria-labelled-by="user-settings">
+        <header>
+            <h2 id="user-settings">{% trans %}My profile{% endtrans %}</h2>
+        </header>
+
+        <div>
+            {% if session.user %}
+                <div>{{ session.user.full_name }}</div>
+                <div>{{ session.user.email }}</div>
+            {% endif %}
+        </div>
+
+        {% if session.user %}
+            <menu>
+                <li>
+                    <a href="{{ url_for('users.user_dashboard', user_id=none) }}">
+                        {%- trans %}My profile{% endtrans -%}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('users.user_preferences', user_id=none) }}">
+                        {%- trans %}My preferences{% endtrans -%}
+                    </a>
+                </li>
+                {% if session.user.is_admin %}
+                    <li>
+                        <span id="login-as"></span>
+                    </li>
+                {% endif %}
+                {% if 'login_as_orig_user' in session %}
+                    <li>
+                        <a class="undo-login-as" data-href="{{ url_for('auth.admin_impersonate') }}">
+                            {%- trans name=session.login_as_orig_user.user_name -%}
+                                Switch back to {{ name }}
+                            {%- endtrans -%}
+                        </a>
+                    </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for_logout(request.relative_url) }}">
+                        {%- trans %}Logout{% endtrans -%}
+                    </a>
+                </li>
+            </menu>
+        {% else %}
+            {% set next_url = request.values.get('next') %}
+            {% if not next_url and request.endpoint != config.MULTIPASS_LOGIN_ENDPOINT %}
+                {% set after_login_url = request.relative_url %}
+            {% else %}
+                {% set after_login_url = next_url %}
+            {% endif %}
+            <div>
+                <a href="{{ url_for_login(after_login_url) }}">
+                    {%- trans %}Login{% endtrans -%}
+                </a>
+            </div>
+        {% endif %}
+    </section>
+{% endmacro %}
+
+{% macro render_session_menu(protection_data, timezone_data, locale_data) %}
+    <ind-session-menu id="session-menu" hidden>
+        {% set is_protected = protection_data.protected_object %}
+        {% if protection_data.object and (session.user or is_protected) %}
+            <div class="menu-header">
+                {{ _render_protection_info(protection_data) }}
+            </div>
+        {% endif %}
+
+        <div class="menu-content">
+            {{ _render_language_selector(locale_data) }}
+            {{ _render_timezone_selector(timezone_data) }}
+            {{ _render_user_settings(locale_data) }}
+        </div>
+    </ind-session-menu>
+{% endmacro %}

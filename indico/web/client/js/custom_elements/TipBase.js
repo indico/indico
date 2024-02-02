@@ -153,9 +153,6 @@ export class TipBase extends HTMLElement {
 
   setup() {
     window.addEventListener('keydown', this.dismiss);
-    this.$tip.addEventListener('click', evt => {
-      evt.preventDefault();
-    });
     this.addEventListener('toggle', () => {
       if (this.shown) {
         window.addEventListener('resize', this.updatePosition);

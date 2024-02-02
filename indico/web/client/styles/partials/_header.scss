@@ -1,0 +1,47 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base' as *;
+@use 'partials/icons';
+@use 'partials/header_menu_trigger';
+@use 'partials/header_layout';
+@use 'partials/user_icon';
+@use 'design_system';
+
+#page-header {
+  @extend %page-header;
+
+  .page-banner {
+    @extend %page-header-banner;
+  }
+
+  .page-branding {
+    @extend %page-header-branding;
+    background-image: linear-gradient(
+      to right,
+      var(--accent-color) 80%,
+      var(--surface-inverse-color)
+    );
+  }
+
+  .header-controls {
+    @extend %page-header-controls;
+  }
+
+  .header-menu-trigger {
+    @extend %header-menu-trigger;
+  }
+}
+
+#header-logo {
+  display: inline-flex; // fixes alignment issue
+  padding: 0.5em 2em;
+
+  img {
+    height: 2em;
+  }
+}

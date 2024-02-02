@@ -9,23 +9,33 @@
 @use 'partials/icons' as *;
 @use 'partials/buttons' as *;
 @use 'design_system';
+@use 'partials/header';
+@use 'partials/protection_indicator';
+@use 'partials/session_menu';
 
 /* Styles for the main menu */
 
 #global-menu {
   @extend %text-size-reset;
+  display: flex;
+  gap: var(--content-gap-between-groups);
+  justify-content: space-between;
+  align-items: flex-start;
 
   padding: 0 1.4em;
   background: var(--surface-inverse-color);
+  color: var(--text-inverse-color);
   border: none;
   margin-bottom: 0;
 
   li {
+    flex: none;
     list-style: none; // FIXME: This should be in the global reset
   }
 
   > menu {
     @extend %flex-row;
+    flex: 1 1;
   }
 
   ind-menu > button::after {
@@ -76,6 +86,23 @@
   }
 }
 
+#page-timezone {
+  @extend %flex-row;
+  --flex-wrap: nowrap;
+  padding: 0.7em 0 0.7em 1.4em;
+
+  &::before {
+    @extend %icon;
+    @extend %icon-time;
+  }
+
+  &[data-locked='true']::after {
+    @extend %icon;
+    @extend %icon-lock;
+    color: var(--highlight-color);
+  }
+}
+
 /* Header */
 
 div.page-header {
@@ -95,7 +122,8 @@ div.page-header-dark {
 }
 
 /* Announcements */
-div.announcement-bar {
+
+.announcement-bar {
   @include font-family-title();
 
   display: flex;
@@ -161,7 +189,7 @@ div.announcement-bar {
 
 /* Breadcrumbs */
 
-div.main-breadcrumb {
+.main-breadcrumb {
   @include font-family-title();
 
   background-color: darken($light-gray, 5%);
@@ -248,7 +276,7 @@ div.tz-selector-widget {
 
 /* Impersonation header */
 
-div.impersonation-header {
+.impersonation-header {
   padding: 0.5em;
   background-color: $dark-black;
   color: lighten($yellow, 15%);

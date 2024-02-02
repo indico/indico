@@ -1,0 +1,29 @@
+{% macro render_user_icon() %}
+    <div class="user-icon">
+        {% if session.user %}
+            {% set user = session.user %}
+            <ind-with-toggletip>
+                <button>
+                    <img src="{{ user.avatar_url }}" aria-hidden="true">
+                    <span>{% trans %}User account information{% endtrans %}</span>
+                </button>
+                <div data-tip-content>
+                    {% set user_name = user.full_name %}
+                    {% trans %}You are logged in as {{ user_name }}{% endtrans %}
+                </div>
+            </ind-with-toggletip>
+        {% else %}
+            {% set next_url = request.values.get('next') %}
+            {% if not next_url and request.endpoint != config.MULTIPASS_LOGIN_ENDPOINT %}
+                {% set after_login_url = request.relative_url %}
+            {% else %}
+                {% set after_login_url = next_url %}
+            {% endif %}
+
+            <a href="{{ url_for_login(after_login_url) }}">
+                <span>{%- trans %}Login{% endtrans -%}</span>
+            </a>
+        {% endif %}
+    </div>
+{% endmacro %}
+

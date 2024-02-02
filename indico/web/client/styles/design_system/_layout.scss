@@ -7,6 +7,16 @@
 
 @use './variables';
 
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+%flex-center {
+  @include flex-center();
+}
+
 @mixin flex-column {
   --flex-gap: var(--content-gap-normal);
   display: flex;
@@ -49,9 +59,11 @@
 }
 
 @mixin flex-inline-center {
+  --flex-gap: var(--content-gap-within-inline);
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  gap: var(--flex-gap);
 }
 
 %flex-inline-center {

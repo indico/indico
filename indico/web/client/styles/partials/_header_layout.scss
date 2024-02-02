@@ -1,0 +1,39 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+%page-header {
+  @extend %text-size-reset;
+  color: var(--text-inverse-color);
+}
+
+%page-header-banner {
+  --page-header-banner-surface-color: var(--surface-inverse-color);
+  @extend %flex-split;
+  align-items: stretch;
+  background: var(--page-header-banner-surface-color);
+}
+
+%page-header-branding {
+  @extend %flex-row;
+  flex: 1000 0;
+}
+
+%page-header-controls {
+  @extend %flex-row;
+  --page-header-controls-min-w: 15em;
+  --flex-wrap: nowrap;
+
+  flex: 1;
+  min-width: var(--page-header-controls-min-w);
+  justify-content: flex-end;
+
+  & > * {
+    flex: none;
+  }
+}

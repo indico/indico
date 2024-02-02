@@ -1,0 +1,35 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use './variables';
+@use './visibility';
+
+%spinner {
+  @extend %hide-content;
+
+  --spinner-size: 3em;
+  --spinner-color: var(--accent-color);
+  --spinner-stroke-width: 5px;
+
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border: var(--spinner-stroke-width) solid var(--spinner-color);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
