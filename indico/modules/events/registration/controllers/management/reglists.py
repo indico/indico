@@ -150,7 +150,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
             action_menu_items.append(ActionMenuEntry(
                 _('Update Registration Fee'),
                 'coins',
-                url=url_for('.registrations_base_price', regform),
+                url=url_for('.registrations_update_price', regform),
                 weight=40,
                 reload_page=True
             ))
@@ -810,6 +810,7 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                     reg.state = RegistrationState.complete
                 if prev_state != reg.state:
                     changes['state'] = (prev_state, reg.state)
+                    signals.event.registration_state_updated.send(self, previous_state=prev_state, silent=True)
                     notify_registration_state_update(reg, from_management=True)
                 if changes:
                     reg.log(EventLogRealm.management, LogKind.change, 'Registration',

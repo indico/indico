@@ -29,9 +29,9 @@ def log_registration_check_in(registration, **kwargs):
                      log_text.format(registration.full_name), session.user)
 
 
-def log_registration_updated(registration, previous_state, **kwargs):
+def log_registration_updated(registration, previous_state, silent=False, **kwargs):
     """Log the registration status change to the event log."""
-    if not previous_state:
+    if not previous_state or silent:
         return
     previous_state_title = orig_string(previous_state.title)
     data = {'Previous state': previous_state_title}

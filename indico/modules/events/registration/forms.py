@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from datetime import time, timedelta
+from decimal import Decimal
 from operator import itemgetter
 
 import jsonschema
@@ -614,7 +615,8 @@ class RegistrationPrivacyForm(IndicoForm):
 class RegistrationBasePriceForm(IndicoForm):
     action = SelectField(_('Action'), [DataRequired()])
     base_price = DecimalField(_('Registration fee'),
-                              [NumberRange(min=0, max=999999.99), HiddenUnless('action', 'custom'), DataRequired()],
+                              [NumberRange(min=Decimal('0.01'), max=999999999.99), HiddenUnless('action', 'custom'),
+                               DataRequired()],
                               filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'))
     apply_complete = BooleanField(_('Apply to complete registrations'), [HiddenUnless('action', {'default', 'custom'})],
                                   widget=SwitchWidget(),
