@@ -12,3 +12,9 @@
   height: 1px;
   overflow: hidden;
 }
+
+%hide-content {
+  overflow: hidden;
+  text-indent: -100vw;
+  white-space: nowrap;
+}

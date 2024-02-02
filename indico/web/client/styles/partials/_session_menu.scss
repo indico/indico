@@ -1,0 +1,230 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'base/palette' as *;
+
+#session-menu {
+  @extend %flex-column;
+  --flex-gap: var(--content-gap-between-groups);
+  padding: 1em 2em 2em;
+  background: var(--background-base);
+  color: var(--text-color);
+
+  .menu-header,
+  .menu-content {
+    width: 100%;
+    max-width: 80em;
+    margin: 0 auto;
+  }
+
+  .menu-content {
+    @extend %flex-row;
+    --flex-gap: var(--content-gap-between-sections);
+    align-items: flex-start;
+  }
+
+  .menu-content > * {
+    flex: 1;
+    min-width: 15em;
+  }
+
+  ul,
+  menu {
+    // FIXME: move to reset
+    padding: 0;
+    list-style: none;
+  }
+
+  p {
+    margin: 0; // FIXME: this is an override for SUI default style
+  }
+
+  li {
+    @extend %flex-row;
+  }
+
+  h2 {
+    @extend %heading-minor-subsection;
+  }
+
+  section {
+    @extend %flex-column;
+  }
+
+  section header + * {
+    padding: var(--content-gap-between-groups) 0;
+  }
+}
+
+#session-menu[hidden] {
+  display: none;
+}
+
+#protection-details-info {
+  h2 {
+    @extend %visually-hidden;
+  }
+
+  [data-level] {
+    @extend %flex-row;
+    --flex-wrap: nowrap;
+    --flex-gap: var(--content-gap-between-groups);
+    padding: 0.5em 1em;
+    border-radius: var(--control-border-radius);
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+  }
+
+  [data-level] > div {
+    @extend %flex-column;
+  }
+
+  [data-level='public'] {
+    color: var(--safe-text-color);
+    background: var(--safe-surface-color);
+
+    &::before {
+      @extend %icon;
+      @extend %icon-earth;
+    }
+  }
+
+  [data-level='network'] {
+    color: var(--restricted-text-color);
+    background: var(--restricted-surface-color);
+
+    &::before {
+      @extend %icon;
+      @extend %icon-lan;
+    }
+  }
+
+  [data-level='restricted'] {
+    color: var(--protected-text-color);
+    background: var(--protected-surface-color);
+
+    &::before {
+      @extend %icon;
+      @extend %icon-shield;
+    }
+  }
+}
+
+#tz-selector-controls {
+  form,
+  fieldset {
+    @extend %flex-column;
+    min-width: 0;
+  }
+
+  form {
+    --flex-gap: var(--content-gap-between-groups);
+  }
+
+  legend {
+    padding: var(--container-padding) 0;
+  }
+
+  select {
+    @extend %reset-select-list-style;
+    @extend %select-list;
+  }
+
+  .pause {
+    @extend %visually-hidden;
+  }
+
+  .tz-locked-note {
+    @extend %notice;
+    --notice-text-size: inherit;
+    margin: 1em 0;
+  }
+
+  .tz-option-frame {
+    @extend %radio-control-subgroup;
+  }
+
+  .tz-option-frame > [type='radio'] {
+    margin-top: 0.08em; // XXX: vertically align with label
+  }
+
+  .tz-option-frame > :not([type='radio']) {
+    @extend %flex-column;
+    --flex-gap: var(--content-gap-between-groups);
+    align-items: stretch;
+    flex: 1 1;
+    min-width: 0;
+  }
+
+  .tz-option-frame label:first-of-type {
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .tz-custom-field span {
+    @extend %visually-hidden;
+  }
+
+  .tz-custom-field select {
+    background: inherit;
+  }
+
+  [type='checkbox'] {
+    @extend %checkbox;
+  }
+
+  .tz-remember-setting {
+    @extend %flex-row;
+    --flex-wrap: nowrap;
+  }
+
+  button {
+    @extend %button-main-action;
+  }
+}
+
+#language-settings-controls {
+  button {
+    @extend %link-button;
+    padding: 0.5em 0;
+    width: 100%;
+  }
+
+  [data-current] {
+    padding: 0.5em 0.5em;
+    margin-left: -0.5em;
+    background: var(--control-disabled-clickable-surface-color);
+    color: var(--control-disabled-text-color);
+    border-radius: var(--control-border-radius);
+  }
+
+  [data-current]::after {
+    @extend %icon;
+    @extend %icon-checkmark;
+    line-height: 0;
+  }
+
+  [data-current] > :last-child {
+    @extend %visually-hidden;
+  }
+}
+
+#user-settings-controls {
+  menu {
+    @extend %flex-column;
+    --flex-gap: var(--content-gap-between-groups);
+  }
+
+  a {
+    @extend %link;
+  }
+}

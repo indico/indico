@@ -8,7 +8,17 @@
 @use './variables';
 @use './utils';
 @use './layout';
+@use './visibility';
 @use 'partials/icons';
+
+%reset-select-list-style {
+  // FIXME: This is an override for the SUI styles, should not be needed
+  color: inherit;
+  font: inherit;
+  outline: revert;
+  padding: 0;
+  background: default;
+}
 
 %form-label {
   @extend %reset-font-and-color;
@@ -22,7 +32,8 @@
 }
 
 %select-list {
-  border: var(--control-border);
+  width: 100%;
+  border: 1px solid var(--control-border-color);
   border-radius: var(--control-border-radius);
 
   option:not(:checked):hover {
@@ -41,7 +52,7 @@
   width: 1.5em;
   height: 1.5em;
   background: var(--control-indented-bg-color);
-  border: var(--control-border);
+  border: 1px solid var(--control-clickable-border-color);
   border-radius: var(--control-border-radius);
 
   &:checked {
@@ -66,5 +77,43 @@
   &:checked::before {
     @extend %icon;
     @extend %icon-checkmark;
+  }
+}
+
+%input-with-icon {
+  // XXX: placed on the label that wraps the input and an icon
+  @extend %flex-row;
+  position: relative;
+  line-height: 1.1;
+
+  span {
+    @extend %visually-hidden;
+  }
+
+  input {
+    width: 100%;
+    padding: var(--control-padding);
+    padding-right: calc(var(--control-padding) * 2 + 1em);
+  }
+
+  &::after {
+    @extend %icon;
+    position: absolute;
+    right: var(--control-padding);
+  }
+}
+
+%radio-control-subgroup {
+  @extend %flex-row;
+  --flex-wrap: nowrap;
+  align-items: flex-start;
+  padding: var(--container-padding);
+  border: 2px solid var(--subgroup-border-color);
+  border-radius: var(--control-border-radius);
+
+  &:has([type='radio']:checked) {
+    border-color: var(--subgroup-highlight-border-color);
+    color: var(--subgroup-highlight-text-color);
+    background: var(--subgroup-highlight-surface-color);
   }
 }

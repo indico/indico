@@ -328,6 +328,7 @@ Improvements
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
+- Convert the session bar into a pull-down menu (:issue:`5966`, :pr:`6048`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -402,6 +403,8 @@ Internal Changes
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
 - Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
+- Add ``<ind-toggle-trigger>`` custom elements for controls that toggle the visibility of another
+  element (:pr:`6098`, thanks :user:`foxbunny`)
 
 
 ----

@@ -48,6 +48,7 @@ from indico.util.i18n import (_, babel, get_all_locales, get_current_locale, get
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
+from indico.util.timezones import ActiveTz
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (call_template_hook, decodeprincipal, dedent, groupby, instanceof, markdown,
@@ -57,7 +58,7 @@ from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
-from indico.web.views import render_session_bar
+from indico.web.views import render_protection_indicator, render_session_menu
 
 
 def configure_app(app):
@@ -215,9 +216,11 @@ def setup_jinja(app):
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
-    app.add_template_global(render_session_bar)
+    app.add_template_global(render_protection_indicator)
+    app.add_template_global(render_session_menu)
     app.add_template_global(get_request_stats)
     app.add_template_global(_get_indico_version(), 'indico_version')
+    app.add_template_global(ActiveTz.get_active_tz, 'get_active_tz')
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
