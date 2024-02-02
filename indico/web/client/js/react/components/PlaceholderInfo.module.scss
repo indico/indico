@@ -13,6 +13,9 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  line-height: 1.7;
+  max-height: 30em;
+  overflow-y: auto;
 
   li:not(:last-child) {
     margin-bottom: 0.3em;
