@@ -40,7 +40,7 @@ from indico.util.string import render_markdown, sanitize_html
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import safe_redirect, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
 from indico.web.util import signed_url_for_user
@@ -124,6 +124,7 @@ class RHChangeTimezone(RH):
     def _process(self):
         mode = request.form['tz_mode']
         tz = request.form.get('tz')
+        redirect_url = request.form.get('url')
         update_user = request.form.get('update_user') == '1'
 
         if mode == 'local':
@@ -138,6 +139,8 @@ class RHChangeTimezone(RH):
         if update_user and session.user:
             session.user.settings.set('force_timezone', mode != 'local')
 
+        if redirect_url:
+            return safe_redirect(redirect_url)
         return '', 204
 
 
@@ -146,11 +149,16 @@ class RHChangeLanguage(RH):
 
     def _process(self):
         language = request.form['lang']
+        redirect_url = request.form.get('url')
+
         if language not in get_all_locales():
             raise UserValueError('Invalid language')
         session.lang = language
         if session.user:
             session.user.settings.set('lang', language)
+
+        if redirect_url:
+            return safe_redirect(redirect_url)
         return '', 204
 
 

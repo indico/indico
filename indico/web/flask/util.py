@@ -360,3 +360,14 @@ class XAccelMiddleware:
         for base, uri in self.mapping:
             if path.startswith(str(base + '/')):
                 return uri + path[len(base):]
+
+
+def safe_redirect(location: str, code: int = 302):
+    """Redirect to a target URL in a safe way.
+
+    If the specified location is not relative, the redirect will instead go to ``/``.
+    """
+    url_info = urlsplit(location)
+    if url_info.netloc and url_info.netloc != request.host:
+        location = '/'
+    return redirect(location)

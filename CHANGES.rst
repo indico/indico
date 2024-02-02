@@ -94,6 +94,7 @@ Improvements
 - Add ``indico user anonymize`` CLI to permanently anonymize a user (:pr:`5838`)
 - Add possibility to link room reservations to multiple events, session blocks and contributions
   (:issue:`6113`, :pr:`6114`, thanks :user:`omegak, unconventionaldotdev`)
+- Convert the session bar into a pull-down menu (:issue:`5966`, :pr:`6048`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -160,6 +161,8 @@ Internal Changes
 - Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
+- Add ``<ind-toggle-trigger>`` custom elements for controls that toggle the visibility of another
+  element (:pr:`6098`, thanks :user:`foxbunny`)
 
 
 ----

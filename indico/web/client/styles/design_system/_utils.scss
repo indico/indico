@@ -16,5 +16,6 @@
 }
 
 %text-size-reset {
-  font-size: 1.143rem;
+  font-size: min(4.5vh, 1.143rem);
+  line-height: 1.1;
 }

@@ -13,7 +13,11 @@ import './legacy/timetable.js';
 
 import './custom_elements/ind_bypass_block_links.js';
 import './custom_elements/ind_menu.js';
-import './widgets/tz_selector.js';
+import './custom_elements/ind_session_menu.js';
+import './custom_elements/ind_toggle_trigger.js';
+import './custom_elements/ind_with_toggletip.js';
+import './custom_elements/ind_tz_form.js';
+
 import './widgets/dynamic-tips.js';
 
 import '../styles/screen.scss';

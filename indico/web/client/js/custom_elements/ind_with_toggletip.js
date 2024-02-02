@@ -25,21 +25,31 @@ customElements.define(
     hide() {
       this.shown = false;
       this.$tip.hidden = true;
-      this.$tip.innerHTML = '';
     }
 
     setup() {
       super.setup();
 
-      // NB: The tip is an aria-live region. Because of this, it is necessary to clear the content.
+      // XXX: The tip is an aria-live region. Because of this, it is necessary to clear the content.
       // Live regions are (usually) only announced when content changes. (See also the hide() method.)
       this.tipContent = this.$tip.innerHTML;
-      this.$tip.innerHTML = '';
+
+      // XXX: Because the toggle tip can contain interactive elements such as links, we must make sure
+      // the focusout handler doesn't immediately remove the content before the browser has had a chance
+      // to process the click. The delay of 200ms was derived by testing the maximum time between focusin
+      // and click events.
+      const delayedUnfocusListener = () => {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(this.hide, 200);
+      };
 
       this.addEventListener('click', evt => {
-        // NB: The toggletip button can trigger the toggle tip even when it is still open,
+        // Abort unfocus listener
+        clearTimeout(this.timer);
+
+        // XXX: The toggletip button can trigger the toggle tip even when it is still open,
         // so we must clean up just in case.
-        this.removeEventListener('focusout', this.hide);
+        this.removeEventListener('focusout', delayedUnfocusListener);
         this.hide();
 
         const $target = evt.target.closest('button');
@@ -47,7 +57,7 @@ customElements.define(
           return;
         }
         this.show();
-        this.addEventListener('focusout', this.hide, {once: true});
+        this.addEventListener('focusout', delayedUnfocusListener, {once: true});
       });
     }
   }

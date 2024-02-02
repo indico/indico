@@ -8,6 +8,9 @@
 @use 'base' as *;
 @use 'partials/buttons' as *;
 @use 'partials/boxes' as *;
+@use 'partials/header_menu_trigger';
+@use 'partials/header_layout';
+@use 'design_system';
 
 #flashed-messages {
   &:empty {
@@ -63,38 +66,37 @@
 }
 
 .event-page-header {
-  .session-bar {
-    margin-top: 0;
-    margin-right: 0.8em;
-  }
+  @extend %page-header;
 
   .main-action-bar {
-    height: 50px;
-    min-height: 50px;
+    @extend %page-header-banner;
+    --page-header-banner-surface-color: #424242;
+    color: var(--text-inverse-color);
+    align-items: stretch;
   }
 
   .button-bar {
-    align-self: stretch;
+    @extend %page-header-branding;
+    align-items: stretch;
 
     .i-button {
       @include i-button-states($black, transparent, transparent, $gray, white, false);
+      height: 100%;
       border-radius: 0;
       padding: 0 0.8em;
-      font-size: 1.1em;
       margin: 0;
       border: none;
     }
 
     .separator {
-      margin: 10px 5px;
-      width: 1px;
-      border-right: 1px dotted $light-black;
+      height: 100%;
+      display: inline-block;
+      border-right: 1px dotted var(--container-separator-color);
     }
 
     .i-dropdown {
       @include border-all($color: $black);
       @include single-box-shadow($color: $black);
-
       background: $dark-black;
 
       li {
@@ -135,6 +137,20 @@
       color: white;
     }
   }
+
+  .header-controls {
+    @extend %text-size-reset;
+    @extend %flex-row;
+    --flex-wrap: nowrap;
+  }
+
+  .header-menu-trigger {
+    @extend %header-menu-trigger;
+  }
+}
+
+#session-menu {
+  @extend %text-size-reset;
 }
 
 .reference-list {

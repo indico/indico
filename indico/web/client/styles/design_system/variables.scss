@@ -7,8 +7,9 @@
 
 body {
   // Color palette
+  --background-base: #fff;
   --text-color: #333;
-  --text-inverse-color: #fff;
+  --text-inverse-color: var(--background-base);
   --text-disabled-color: #999;
   --text-secondary-color: #6e6e6e;
   --background-secondary: #f7f7f7;
@@ -30,6 +31,18 @@ body {
   --protected-color: #cc6300; // XXX: min font size 1.2rem or 1rem bold (or solid icon)
   --highlight-color: #fff9b8; // XXX: Subtle highlight / background of large highlighted areas
   --attention-color: #fd0; // XXX: Small UI bits that scream for attention
+
+  --safe-text-color: var(--text-color);
+  --safe-surface-color: #d1efad;
+  --safe-alt-surface-color: #e8ffd4;
+
+  --restricted-text-color: var(--text-color);
+  --restricted-surface-color: var(--attention-color);
+  --restricted-alt-surface-color: var(--highlight-color);
+
+  --protected-text-color: var(--text-inverse-color);
+  --protected-surface-color: #b85900;
+  --protected-alt-surface-color: #864601;
 
   --text-red-color: #db1a1a;
   --text-green-color: #216901;
@@ -127,4 +140,10 @@ body {
 
   // Modal controls
   --modal-control-box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.3);
+
+  // Subgroups
+  --subgroup-border-color: var(--border-disabled-color);
+  --subgroup-highlight-border-color: var(--accent-highlight-color);
+  --subgroup-highlight-surface-color: #def0f7;
+  --subgroup-highlight-text-color: inherit;
 }

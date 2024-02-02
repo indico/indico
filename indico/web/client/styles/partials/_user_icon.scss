@@ -1,0 +1,35 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use './header_controls';
+
+.user-icon {
+  button {
+    --icon-size: 1.8em;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    border-radius: 50%;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  button span {
+    @extend %visually-hidden;
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 1;
+  }
+
+  a {
+    @extend %header-menu-control;
+  }
+}
