@@ -206,7 +206,7 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
     }
     if narrow:
         long_names = short_names
-    values = {key: 0 for key in field_order}
+    values = dict.fromkeys(field_order, 0)
     values['seconds'] = delta.total_seconds()
     values['days'], values['seconds'] = divmod(values['seconds'], 86400)
     values['hours'], values['seconds'] = divmod(values['seconds'], 3600)

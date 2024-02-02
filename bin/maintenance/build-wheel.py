@@ -216,7 +216,7 @@ def _patch_version(add_version_suffix, file_name, search, replace):
         old_content = f.read()
         f.seek(0)
         f.truncate()
-        f.write(re.sub(search, replace.format(suffix), old_content, flags=re.M))
+        f.write(re.sub(search, replace.format(suffix), old_content, flags=re.MULTILINE))
         f.flush()
         try:
             yield

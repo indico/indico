@@ -608,7 +608,7 @@ class RichMarkup(Markup):
     it in a jinja template.
     """
 
-    __slots__ = ('_preformatted', '_linker')
+    __slots__ = ('_linker', '_preformatted')
 
     def __new__(cls, content: str = '', preformatted: t.Optional[bool] = None):
         obj = Markup.__new__(cls, content)
