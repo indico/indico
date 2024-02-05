@@ -1,4 +1,4 @@
-"""Update constraint valid_enum_personal_data_type
+"""Add picture personal data type for registrations
 
 Revision ID: 17996ef18cb9
 Revises: 8e08236a529f

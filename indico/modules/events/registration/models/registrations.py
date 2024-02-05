@@ -26,6 +26,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
@@ -592,16 +593,24 @@ class Registration(db.Model):
                                 abbrev_first_name=abbrev_first_name)
 
     def get_personal_data(self):
+        # the personal data picture is not rendered in this method,
+        # use get_personal_data_picture to get the picture data.
         personal_data = {}
         for data in self.data:
             field = data.field_data.field
-            if field.personal_data_type is not None and (data.data or data.filename):
+            if field.personal_data_type is not None and data.data:
                 personal_data[field.personal_data_type.name] = data.friendly_data
         # might happen with imported legacy registrations (missing personal data)
         personal_data.setdefault('first_name', self.first_name)
         personal_data.setdefault('last_name', self.last_name)
         personal_data.setdefault('email', self.email)
         return personal_data
+
+    def get_personal_data_picture(self):
+        for data in self.data:
+            if data.field_data.field.personal_data_type == PersonalDataType.picture:
+                return data if data.filename else None
+        return None
 
     def _render_price(self, price):
         locale = 'en_GB'

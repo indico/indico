@@ -369,11 +369,10 @@ class RegistrationPicturePlaceholder(RegistrationPDPlaceholder):
 
     @classmethod
     def render(cls, registration):
-        picture_data = [d for d in registration.data
-                        if d.field_data.field.personal_data_type == PersonalDataType.picture]
-        if picture_data and picture_data[0].filename:
-            buf = picture_data[0].open()
+        if picture_data := registration.get_personal_data_picture():
+            buf = picture_data.open()
             return Image.open(buf)
+        return None
 
 
 class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
