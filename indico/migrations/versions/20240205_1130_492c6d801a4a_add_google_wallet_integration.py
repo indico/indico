@@ -1,7 +1,7 @@
 """Add Google Wallet integration
 
 Revision ID: 492c6d801a4a
-Revises: 0acf26d68434
+Revises: 8e08236a529f
 Create Date: 2023-11-07 09:56:13.034271
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '492c6d801a4a'
-down_revision = '0acf26d68434'
+down_revision = '8e08236a529f'
 branch_labels = None
 depends_on = None
 
