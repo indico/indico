@@ -11,7 +11,6 @@ from babel.numbers import format_currency
 from PIL import Image
 
 from indico.modules.designer.models.images import DesignerImageFile
-from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime, format_interval
 from indico.util.i18n import _
