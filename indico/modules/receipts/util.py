@@ -233,7 +233,7 @@ def _get_default_value(field):
     return field['attributes'].get('value', '')
 
 
-def get_dummy_preview_data(custom_fields: dict) -> dict:
+def get_dummy_preview_data(custom_fields: dict, custom_fields_values: t.Optional[dict] = None) -> dict:
     """Get dummy preview data for rendering a document template.
 
     Most document templates are written inthe context of a category, so it is not
@@ -241,12 +241,15 @@ def get_dummy_preview_data(custom_fields: dict) -> dict:
     serializes dummy data that can be used instead.
     """
     from indico.modules.receipts.schemas import TemplateDataSchema
+    if custom_fields_values is None:
+        custom_fields_values = {}
     dummy_file = Path(current_app.root_path) / 'modules' / 'receipts' / 'dummy_data.yaml'
     dummy_data = yaml.safe_load(dummy_file.read_text())
     try:
         return TemplateDataSchema().load({
             **dummy_data,
-            'custom_fields': {f['name']: _get_default_value(f) for f in custom_fields},
+            'custom_fields': {f['name']: custom_fields_values.get(f['name'], _get_default_value(f))
+                              for f in custom_fields},
         })
     except ValidationError as exc:
         # This is a bug that generally happens only during development, but having the
