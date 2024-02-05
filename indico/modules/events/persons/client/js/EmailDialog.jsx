@@ -151,7 +151,7 @@ export function EmailDialog({
           name="body"
           label={Translate.string('Email body')}
           required
-          config={{images: false}}
+          config={{images: false, forceAbsoluteURLs: true}}
         />
         {placeholders.length > 0 && (
           <Form.Field>

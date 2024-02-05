@@ -11,7 +11,13 @@ import {getConfig} from 'indico/tinymce';
 
 (function(global) {
   global.setupTinyMCEWidget = async function setupTinyMCEWidget(options) {
-    const {fieldId, images = true, imageUploadURL = null, height = 475} = options;
+    const {
+      fieldId,
+      images = true,
+      imageUploadURL = null,
+      forceAbsoluteURLs = false,
+      height = 475,
+    } = options;
     const contentCSS = JSON.parse(document.body.dataset.tinymceContentCss);
 
     const field = document.getElementById(fieldId);
@@ -22,6 +28,6 @@ import {getConfig} from 'indico/tinymce';
       // closed and then reopened) won't do anything
       tinymce.remove(old);
     }
-    tinymce.init(getConfig(field, {images, imageUploadURL, height, contentCSS}));
+    tinymce.init(getConfig(field, {images, imageUploadURL, forceAbsoluteURLs, height, contentCSS}));
   };
 })(window);

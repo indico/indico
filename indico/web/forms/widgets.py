@@ -115,15 +115,17 @@ class TinyMCEWidget(JinjaWidget):
     """Render a TinyMCE WYSIWYG editor.
 
     :param images: Whether to allow images.
-    :param html_embed: Whether to enable raw HTML embedding.
+    :param absolute_urls: Whether to use fully absolute URLs for links/images.
+                          This MUST be set for emails, and used together with
+                          the `NoRelativeURLs` validator on the field.
     :param height: The height of the editor.
 
     If the form has a ``editor_upload_url`` attribute and images are enabled,
     the editor will allow pasting/selecting images and upload them using that URL.
     """
 
-    def __init__(self, *, images=False, height=600):
-        super().__init__('forms/tinymce_widget.html', images=images, height=height)
+    def __init__(self, *, images=False, absolute_urls=False, height=600):
+        super().__init__('forms/tinymce_widget.html', images=images, absolute_urls=absolute_urls, height=height)
 
 
 class SwitchWidget(JinjaWidget):
