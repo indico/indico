@@ -143,10 +143,10 @@ flask-wtf==1.2.1
     # via -r requirements.in
 fonttools==4.45.0
     # via weasyprint
-greenlet==3.0.1
-    # via sqlalchemy
 google-auth==2.23.4
     # via -r requirements.in
+greenlet==3.0.1
+    # via sqlalchemy
 hiredis==2.2.3
     # via redis
 html2text==2020.1.16
@@ -336,9 +336,9 @@ rpds-py==0.12.0
     # via
     #   jsonschema
     #   referencing
-sentry-sdk==1.35.0
 rsa==4.9
     # via google-auth
+sentry-sdk==1.35.0
     # via -r requirements.in
 simplejson==3.19.2
     # via -r requirements.in
