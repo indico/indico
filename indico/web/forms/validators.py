@@ -13,7 +13,7 @@ from wtforms.validators import EqualTo, Length, Regexp, StopValidation, Validati
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.passwords import validate_secure_password
-from indico.util.string import is_valid_mail
+from indico.util.string import has_relative_links, is_valid_mail
 
 
 class UsedIf:
@@ -407,3 +407,15 @@ class SecurePassword:
         password = field.data or ''
         if error := validate_secure_password(self.context, password, username=username):
             raise ValidationError(error)
+
+
+class NoRelativeURLs:
+    """Validate that an HTML strings contains no relative URLs.
+
+    This checks only ``img[src]`` and ``a[href]``, but not URLs present as plain
+    text or in any other (unexpected) places.
+    """
+
+    def __call__(self, form, field):
+        if field.data and has_relative_links(field.data):
+            raise ValidationError(_('Links and images may not use relative URLs.'))

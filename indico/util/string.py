@@ -18,6 +18,7 @@ from email.utils import escapesre, specialsre
 from enum import Enum
 from itertools import chain
 from operator import attrgetter
+from urllib.parse import urlsplit
 from uuid import uuid4
 from xml.etree.ElementTree import Element
 
@@ -282,6 +283,15 @@ def sanitize_for_platypus(text):
     doc = html.fromstring(res)
     doc.make_links_absolute(config.BASE_URL, resolve_base_href=False)
     return etree.tostring(doc).decode()
+
+
+def has_relative_links(html_text):
+    doc = html.fromstring(html_text)
+    return any(
+        (data := urlsplit(link)) and (not data.scheme or not data.netloc)
+        for el, attrib, link, _pos in doc.iterlinks()
+        if (el.tag, attrib) in {('a', 'href'), ('img', 'src')}
+    )
 
 
 def is_valid_mail(emails_string, multi=True):

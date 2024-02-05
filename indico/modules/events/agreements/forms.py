@@ -12,7 +12,7 @@ from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.validators import NoRelativeURLs, UsedIf
 from indico.web.forms.widgets import TinyMCEWidget
 
 
@@ -26,7 +26,7 @@ class AgreementEmailForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()])
     cc_addresses = EmailField(_('CC'), [Optional(), Email()],
                               description=_('Warning: this email address will be able to sign the agreement!'))
-    body = TextAreaField(_('Email body'), widget=TinyMCEWidget())
+    body = TextAreaField(_('Email body'), [NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
 
     def __init__(self, *args, **kwargs):
         self._definition = kwargs.pop('definition')

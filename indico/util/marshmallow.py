@@ -24,7 +24,7 @@ from indico.core.config import config
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import get_format_placeholders
+from indico.util.string import get_format_placeholders, has_relative_links
 from indico.util.user import principal_from_identifier
 
 
@@ -55,6 +55,12 @@ def not_empty(value):
     """
     if not value:
         raise ValidationError(_('This field cannot be empty.'))
+
+
+def no_relative_urls(value):
+    """Validator that checks links/images use absolute URLs."""
+    if value and has_relative_links(value):
+        raise ValidationError(_('Links and images may not use relative URLs.'))
 
 
 def validate_placeholders(format_string, valid_placeholders, required_placeholders=None):
