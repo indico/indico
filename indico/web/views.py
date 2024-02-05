@@ -179,7 +179,7 @@ class WPBundleMixin:
         for class_ in reversed(cls.mro()[:-1]):
             attr = class_.__dict__.get('bundles', ())
             if isinstance(attr, classproperty):
-                attr = attr.__get__(None, class_)  # noqa: PLC2801
+                attr = attr.__get__(None, class_)
             elif isinstance(attr, property):
                 attr = attr.fget(cls)
 

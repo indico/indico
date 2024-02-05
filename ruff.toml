@@ -45,6 +45,7 @@ ignore = [
     'RUF012',  # ultra-noisy and dicts in classvars are very common
     'RUF015',  # not always more readable, and we don't do it for huge lists
     'RUF022',  # autofix messes up out formatting instead of just sorting
+    'RUF027',  # also triggers on i18n functions -> too noisy for now
     'D205',    # too many docstrings which have no summary line
     'D301',    # https://github.com/astral-sh/ruff/issues/8696
     'D1',      # we have way too many missing docstrings :(
