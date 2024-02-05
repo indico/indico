@@ -124,4 +124,4 @@ def test_render_image_placeholders(dummy_event, dummy_reg, dummy_designer_image_
     for ph in image_placeholders:
         kwargs = _get_render_kwargs(ph, dummy_event, dummy_person, dummy_reg, dummy_item)
         res = ph.render(**kwargs)
-        assert (isinstance(res, Image.Image) or res is None)
+        assert isinstance(res, Image.Image) or res is None
