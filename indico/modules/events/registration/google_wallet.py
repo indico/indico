@@ -187,8 +187,8 @@ class GoogleWalletManager:
 
     def create_object_template(self, issuer_id: str, class_suffix: str, object_suffix: str) -> dict:
         """This method will return a dict format ticket object template."""
-        from indico.modules.events.registration.util import get_persons, get_qr_data
-        qr_data = get_qr_data(get_persons([self.registration])[0])
+        from indico.modules.events.registration.util import get_persons, get_ticket_qr_code_data
+        qr_data = get_ticket_qr_code_data(get_persons([self.registration])[0])
         dict_template = {
             'id': f'{issuer_id}.{object_suffix}',
             'classId': f'{issuer_id}.{class_suffix}',
