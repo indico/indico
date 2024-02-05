@@ -86,6 +86,20 @@
                 </div>
             </div>
         {% endif %}
+        <div class="section">
+            <div class="icon icon-mail"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Email{% endtrans %}
+                </div>
+                {% trans %}Email event participants.{% endtrans %}
+            </div>
+            <div class="toolbar">
+                <div id="email-submission-container" class="i-button-wrapper" data-event-id="{{ event.id }}"
+                    data-survey-id="{{ survey.id }}">
+                </div>
+            </div>
+        </div>
     </div>
 
     <h2>
@@ -95,22 +109,15 @@
     {% if submitted_surveys %}
         <div class="toolbars space-after">
             <div class="toolbar">
-                <div class="group">
-                    <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
-                    <ul class="i-dropdown">
-                        <li>
-                            <a href="#" id="select-all">{% trans %}All{% endtrans %}</a>
-                        </li>
-                        <li>
-                            <a href="#" id="select-none">{% trans %}None{% endtrans %}</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="group">
-                    <div id="email-submission-container" class="i-button-wrapper" data-event-id="{{ event.id }}"
-                        data-survey-id="{{ survey.id }}">
-                    </div>
-                </div>
+                <button class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></button>
+                <ul class="i-dropdown">
+                    <li>
+                        <a href="#" id="select-all">{% trans %}All{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="#" id="select-none">{% trans %}None{% endtrans %}</a>
+                    </li>
+                </ul>
             </div>
             <div class="toolbar">
                 <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart">
