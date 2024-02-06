@@ -6,10 +6,12 @@
 # LICENSE file for more details.
 
 from datetime import time, timedelta
+from decimal import Decimal
 from operator import itemgetter
 
 import jsonschema
-from flask import request
+from babel.numbers import format_currency
+from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
@@ -609,6 +611,34 @@ class RegistrationPrivacyForm(IndicoForm):
         if fields:
             raise ValidationError(_('The retention period of the whole form cannot be lower than '
                                     'that of individual fields.'))
+
+
+class RegistrationBasePriceForm(IndicoForm):
+    action = SelectField(_('Action'), [DataRequired()])
+    base_price = DecimalField(_('Registration fee'),
+                              [NumberRange(min=Decimal('0.01'), max=999999999.99), HiddenUnless('action', 'custom'),
+                               DataRequired()],
+                              filters=[lambda x: x if x is not None else 0], widget=NumberInput(step='0.01'))
+    apply_complete = BooleanField(_('Apply to complete registrations'), [HiddenUnless('action', {'default', 'custom'})],
+                                  widget=SwitchWidget(),
+                                  description=_('If enabled, registrations in the "complete" state that had no fee '
+                                                'before, will have the fee updated and changed to the "unpaid" state.'))
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
+
+    def __init__(self, *args, currency, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.action.choices = [
+            ('remove', _('Remove fee for unpaid registrations')),
+            ('default', (_("Set fee to the registration form's default ({})")
+                         .format(format_currency(kwargs['base_price'], currency, locale=session.lang)))),
+            ('custom', _('Change fee to custom value'))
+        ]
+        self.base_price.description = (_('A fixed fee (in {currency}) the selected users have to pay when registering.')
+                                       .format(currency=currency))
+
+    def is_submitted(self):
+        return super().is_submitted() and 'submitted' in request.form
 
 
 class PublishReceiptForm(IndicoForm):

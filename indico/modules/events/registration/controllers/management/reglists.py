@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from io import BytesIO
 from operator import attrgetter
 
+from babel.numbers import format_currency
 from flask import flash, jsonify, redirect, render_template, request, session
 from pypdf import PdfWriter
 from sqlalchemy.orm import joinedload, subqueryload
@@ -42,7 +43,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
-                                                      RejectRegistrantsForm)
+                                                      RegistrationBasePriceForm, RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
@@ -56,6 +57,7 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -142,6 +144,15 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'ticket',
                 url=url_for('.registrations_config_tickets', regform),
                 weight=80,
+            ))
+
+        if event.has_feature('payment'):
+            action_menu_items.append(ActionMenuEntry(
+                _('Update Registration Fee'),
+                'coins',
+                url=url_for('.registrations_update_price', regform),
+                weight=40,
+                reload_page=True
             ))
 
         action_menu_items = sorted(
@@ -762,6 +773,71 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
             flash(_('The selected registrations were successfully rejected.'), 'success')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
+
+
+class RHRegistrationsBasePrice(RHRegistrationsActionBase):
+    """Edit the base price of the selected registrations."""
+
+    def _process(self):
+        form = RegistrationBasePriceForm(base_price=self.regform.base_price, currency=self.regform.currency,
+                                         registration_id=[reg.id for reg in self.registrations])
+        if form.validate_on_submit():
+            log_fields = {
+                'base_price': {'title': 'Registration Fee', 'type': 'string'},
+                'state': 'State'
+            }
+            num_skipped = 0
+            num_updates = 0
+            for reg in self.registrations:
+                prev_state = reg.state
+                if form.apply_complete.data and reg.state == RegistrationState.complete and not reg.base_price:
+                    reg.state = RegistrationState.unpaid
+                elif reg.state != RegistrationState.unpaid:
+                    num_skipped += 1
+                    continue
+                new_price = {
+                    'remove': 0,
+                    'default': self.regform.base_price,
+                    'custom': form.base_price.data
+                }[form.action.data]
+                changes = {}
+                if reg.base_price != new_price or reg.currency != self.regform.currency:
+                    changes['base_price'] = (format_currency(reg.base_price, reg.currency, locale='en_GB'),
+                                             format_currency(new_price, self.regform.currency, locale='en_GB'))
+                    reg.base_price = new_price
+                    reg.currency = self.regform.currency
+                if not reg.price:
+                    reg.state = RegistrationState.complete
+                if prev_state != reg.state:
+                    changes['state'] = (prev_state, reg.state)
+                    signals.event.registration_state_updated.send(self, previous_state=prev_state, silent=True)
+                    notify_registration_state_update(reg, from_management=True)
+                if changes:
+                    reg.log(EventLogRealm.management, LogKind.change, 'Registration',
+                            f'Registration fee updated: {reg.full_name}',
+                            session.user, data={'Changes': make_diff_log(changes, log_fields)})
+                    num_updates += 1
+            db.session.flush()
+            # we count an update as a success even if nothing has changed
+            num_successes = len(self.registrations) - num_skipped
+            if num_successes:
+                flash(ngettext('Registration fee has been updated for {} registration.',
+                               'Registration fee has been updated for {} registrations.',
+                               num_successes).format(num_successes), 'success')
+            if num_updates:
+                logger.info('%r registrations had their fee changed by %r', num_updates, session.user)
+            if num_skipped:
+                if form.apply_complete.data:
+                    msg = ngettext('{} registration was skipped because its fee is not zero or it is in an invalid '
+                                   'state.', '{} registrations were skipped because their fees are not zero or they '
+                                   'are in an invalid state.', num_skipped)
+                else:
+                    msg = ngettext('{} registration was skipped because it is not in the unpaid state.',
+                                   '{} registrations were skipped because they are not in the unpaid state.',
+                                   num_skipped)
+                flash(msg.format(num_skipped), 'warning')
+            return jsonify_data(flash=False)
+        return jsonify_form(form, disabled_until_change=False)
 
 
 class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportBase):
