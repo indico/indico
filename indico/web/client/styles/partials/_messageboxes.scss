@@ -37,6 +37,11 @@ $default-spacing: 10px;
       margin-bottom: 0;
     }
 
+    ul,
+    ol {
+      margin-left: 1em;
+    }
+
     &.normal-size {
       font-size: 1em;
     }
