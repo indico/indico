@@ -59,6 +59,21 @@
   }
 }
 
+.category-description {
+  ul,
+  ol {
+    margin-left: 3em;
+  }
+
+  :is(ul, ol) :is(ul, ol) {
+    margin-left: 1.2em;
+  }
+
+  :is(ul, ol) + p {
+    margin-top: 1em;
+  }
+}
+
 .category-content-wrapper {
   overflow: hidden;
   padding: 2em;
