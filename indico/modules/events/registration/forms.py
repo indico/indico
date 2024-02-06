@@ -79,7 +79,7 @@ class RegistrationFormEditForm(IndicoForm):
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
-    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999.99), Optional(),
+    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999999.99), Optional(),
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_('A fixed fee all users have to pay when registering.'))
