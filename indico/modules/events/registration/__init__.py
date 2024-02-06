@@ -250,8 +250,4 @@ def _patch_google_wallet_class(event, **kwargs):
         if gwm.credentials:
             ticket_class = gwm.create_class_template(gwm.settings['google_wallet_issuer_id'],
                                                      f'TicketClass-{event.id}')
-            try:
-                gwm.patch_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{event.id}', ticket_class)
-            except Exception as e:
-                from indico.core.logger import Logger  # Locally imported to avoid circular import issues.
-                Logger.get('events.registration').warning('Cannot update Google Wallet link: %s', str(e))
+            return gwm.patch_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{event.id}', ticket_class)
