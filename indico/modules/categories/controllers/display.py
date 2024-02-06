@@ -565,7 +565,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         category = auto()
         location = auto()
 
-    @use_kwargs({'group_by': EnumField(GroupBy, load_default='category')}, location='query')
+    @use_kwargs({'group_by': EnumField(GroupBy, load_default=GroupBy.category)}, location='query')
     def _process_args(self, group_by):
         RHDisplayCategoryBase._process_args(self)
         tz = self.category.display_tzinfo
