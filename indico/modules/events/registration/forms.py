@@ -15,7 +15,7 @@ from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets import NumberInput
+from wtforms.widgets import HiddenInput, NumberInput
 
 from indico.core import signals
 from indico.core.config import config
@@ -24,7 +24,6 @@ from indico.modules.designer import PageLayout, PageOrientation, PageSize, Templ
 from indico.modules.designer.util import get_default_ticket_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
-from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormItem
@@ -347,9 +346,9 @@ class TicketsForm(IndicoForm):
         badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
         self.ticket_template_id.choices = badge_templates
 
-    def validate_ticket_google_wallet_enabled(self, field):
-        if field.data and not GoogleWalletManager.get_google_wallet_settings(self.event.category):
-            raise ValidationError(_('Missing Google Wallet configuration at Category level.'))
+        self.regform = kwargs.get('obj')
+        if not self.regform.is_google_wallet_configured:  # Do not show if not configured at Category level
+            self.ticket_google_wallet_enabled.widget = HiddenInput()
 
 
 class ParticipantsDisplayForm(IndicoForm):

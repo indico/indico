@@ -20,6 +20,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
+from indico.modules.events.registration import GoogleWalletManager
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
 from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
                                                                      RegistrationState)
@@ -530,6 +531,10 @@ class RegistrationForm(db.Model):
         """Get the current ticket template or, if not set, the default category one."""
         from indico.modules.designer.util import get_default_ticket_on_category
         return self.ticket_template or get_default_ticket_on_category(self.event.category)
+
+    @property
+    def is_google_wallet_configured(self):
+        return GoogleWalletManager.get_google_wallet_settings(self.event.category) is not None
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')

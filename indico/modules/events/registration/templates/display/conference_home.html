@@ -17,7 +17,7 @@
                             {%- endtrans %}
                         </a>
                     </li>
-                    {% if regform.ticket_google_wallet_enabled %}
+                    {% if regform.is_google_wallet_configured and regform.ticket_google_wallet_enabled %}
                         <li>
                             <a href="{{ url_for('event_registration.ticket_google_wallet', regform) }}"
                                class="icon-ticket"
