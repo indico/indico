@@ -244,14 +244,14 @@ class RegistrationPermission(ManagementPermission):
 
 
 @signals.event.updated.connect
-def _patch_google_wallet_class(sender, obj=None, **kwargs):
-    if sender.has_google_wallet_tickets:
-        gwm = GoogleWalletManager(sender)
+def _patch_google_wallet_class(event, **kwargs):
+    if event.has_google_wallet_tickets:
+        gwm = GoogleWalletManager(event)
         if gwm.credentials:
             ticket_class = gwm.create_class_template(gwm.settings['google_wallet_issuer_id'],
-                                                     f'TicketClass-{sender.id}')
+                                                     f'TicketClass-{event.id}')
             try:
-                gwm.patch_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{sender.id}', ticket_class)
+                gwm.patch_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{event.id}', ticket_class)
             except Exception as e:
                 from indico.core.logger import Logger  # Locally imported to avoid circular import issues.
                 Logger.get('events.registration').warning('Cannot update Google Wallet link: %s', str(e))
