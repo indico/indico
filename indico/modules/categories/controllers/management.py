@@ -101,7 +101,6 @@ class RHManageCategoryContent(RHManageCategoryBase):
 
 
 class RHManageCategorySettings(RHManageCategoryBase):
-
     def _process(self):
         additional_keys = ('google_wallet_application_credentials', 'google_wallet_issuer_name',
                            'google_wallet_issuer_id')
