@@ -7,7 +7,7 @@
 
 from typing import Optional
 
-from flask import flash, json
+from flask import flash
 from google.auth import crypt, jwt
 from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.service_account import Credentials
@@ -36,8 +36,6 @@ class GoogleWalletManager:
 
         # Set up authenticated client
         if self.settings:
-            self.settings['google_wallet_application_credentials'] = json.loads(
-                self.settings['google_wallet_application_credentials'])
             self.auth()
 
     @staticmethod

@@ -4,7 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
+import ast
 import os
 import random
 from io import BytesIO
@@ -120,6 +120,8 @@ class RHManageCategorySettings(RHManageCategoryBase):
             new_dict.setdefault('google_wallet_settings', {})
             for key in additional_keys:
                 new_dict['google_wallet_settings'][key] = new_dict.pop(key, {})
+                if key == 'google_wallet_application_credentials':
+                    new_dict['google_wallet_settings'][key] = ast.literal_eval(new_dict['google_wallet_settings'][key])
             if not new_dict.pop('google_wallet_enabled'):
                 new_dict['google_wallet_settings'] = {}
             update_category(self.category, new_dict, skip={'meeting_theme', 'lecture_theme'},
