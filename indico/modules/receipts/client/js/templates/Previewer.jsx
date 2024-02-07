@@ -8,12 +8,14 @@
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {pdfjs, Document, Page} from 'react-pdf';
-import {Loader, Message, Pagination} from 'semantic-ui-react';
+import {Form, Loader, Message, Pagination} from 'semantic-ui-react';
 
-import PlaceholderInfo from 'indico/react/components/PlaceholderInfo';
+import {PlaceholderInfo} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
+
+import TemplateParameterEditor, {getDefaultFieldValue} from '../printing/TemplateParameterEditor';
 
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -46,19 +48,38 @@ export default function Previewer({url, data}) {
   const [placeholders, setPlaceholders] = useState(null);
   const [error, setError] = useState(null);
   const [limited, setLimited] = useState(false);
+  const [customFields, setCustomFields] = useState([]);
+  const [customFieldValues, setCustomFieldValues] = useState({});
 
   useEffect(() => {
     setLoading(true);
     (async () => {
       try {
-        const {data: previewData} = await debounce(() => indicoAxios.post(url, data));
+        const {data: previewData} = await debounce(() =>
+          indicoAxios.post(url, {...data, custom_fields_values: customFieldValues})
+        );
         const dummyData = previewData.data;
+        const newCustomFields = previewData.custom_fields;
         const newContent = Uint8Array.from(atob(previewData.pdf), c => c.charCodeAt(0)).buffer;
         if (dummyData) {
           setPlaceholders(processPlaceholders(dummyData));
         }
         if (previewData.limited !== undefined) {
           setLimited(previewData.limited);
+        }
+        if (newCustomFields) {
+          setCustomFields(newCustomFields);
+          const addedFields = newCustomFields.filter(
+            f => !Object.keys(customFieldValues).includes(f.name)
+          );
+          if (addedFields.length > 0) {
+            setCustomFieldValues(
+              Object.assign(
+                customFieldValues,
+                ...addedFields.map(f => ({[f.name]: getDefaultFieldValue(f)}))
+              )
+            );
+          }
         }
         setLoading(false);
         setContent(newContent);
@@ -78,7 +99,7 @@ export default function Previewer({url, data}) {
         }
       }
     })();
-  }, [url, data]);
+  }, [url, data, customFieldValues]);
 
   return (
     <>
@@ -94,6 +115,16 @@ export default function Previewer({url, data}) {
             </ul>
           </Message>
         ))}
+      {customFields.length > 0 && (
+        <Form style={{marginTop: '0.5em'}}>
+          <TemplateParameterEditor
+            customFields={customFields}
+            value={customFieldValues}
+            onChange={value => setCustomFieldValues(value)}
+            title={Translate.string('Sample parameters')}
+          />
+        </Form>
+      )}
       <div styleName={`previewer ${loading ? 'loading' : ''}`}>
         {content && (
           <Document

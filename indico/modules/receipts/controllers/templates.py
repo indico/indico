@@ -166,16 +166,19 @@ class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
         'html': fields.String(required=True, validate=validate.Length(3)),
         'css': fields.String(required=True),
         'yaml': YAML(ReceiptTplMetadataSchema, required=True),
+        'custom_fields_values': fields.Dict(keys=fields.String, load_default=lambda: {}),
     })
-    def _process(self, html, css, yaml):
+    def _process(self, html, css, yaml, custom_fields_values):
         g.template_stack = [TemplateStackEntry(None)]
         # Just some dummy data to test the template
-        dummy_data = get_dummy_preview_data(yaml.get('custom_fields', []))
+        custom_fields = yaml.get('custom_fields', [])
+        dummy_data = get_dummy_preview_data(custom_fields, custom_fields_values)
         compiled_html = compile_jinja_code(html, dummy_data, use_stack=True)
         pdf_data = create_pdf(self.target, [compiled_html], css)
         return jsonify({
             'pdf': base64.b64encode(pdf_data.getvalue()),
-            'data': get_preview_placeholders(dummy_data)
+            'data': get_preview_placeholders(dummy_data),
+            'custom_fields': custom_fields,
         })
 
 

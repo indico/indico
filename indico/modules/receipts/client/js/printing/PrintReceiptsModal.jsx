@@ -32,7 +32,7 @@ import {snakifyKeys} from 'indico/utils/case';
 import Previewer from '../templates/Previewer.jsx';
 
 import {printReceipt} from './print.jsx';
-import TemplateParameterEditor from './TemplateParameterEditor.jsx';
+import TemplateParameterEditor, {getDefaultFieldValue} from './TemplateParameterEditor.jsx';
 
 const makeSubmitLabel = ({publish, notify_users: notifyUsers}, numRegistrants) => {
   if (publish) {
@@ -55,16 +55,6 @@ const makeSubmitLabel = ({publish, notify_users: notifyUsers}, numRegistrants) =
         numRegistrants
       )
     : PluralTranslate.string('Save to registration', 'Save to registrations', numRegistrants);
-};
-
-const getDefaultValue = f => {
-  if (f.type === 'dropdown') {
-    return f.attributes.options[f.attributes.default];
-  } else if (f.type === 'checkbox') {
-    return f.attributes.value || false;
-  } else {
-    return f.attributes.value || '';
-  }
 };
 
 const downloadOptions = [
@@ -104,7 +94,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
     form.change(
       'custom_fields',
       customFields
-        ? Object.assign({}, ...customFields.map(f => ({[f.name]: getDefaultValue(f)})))
+        ? Object.assign({}, ...customFields.map(f => ({[f.name]: getDefaultFieldValue(f)})))
         : {}
     );
     form.change('filename', defaultFilename || formatters.slugify(title));
@@ -209,6 +199,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                     customFields={template ? getCustomFields(template) : []}
                     title={Translate.string('Template Parameters')}
                     disabled={receiptIds.length > 0}
+                    defaultOpen
                   />
                 )}
               </Field>
