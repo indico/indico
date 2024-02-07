@@ -30,6 +30,8 @@ from werkzeug.exceptions import UnprocessableEntity
 
 from indico.core.config import config
 from indico.core.logger import Logger
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.util import get_attached_items
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -153,18 +155,18 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
     allow_external_urls = receipts_settings.get('allow_external_urls')
 
     def _fetcher(url: str) -> dict:
-        if allow_event_images and url.startswith('event://'):
-            img_ref = url[8:]
-            if img_ref == 'logo':
+        url_data = urlparse(url)
+        if allow_event_images and url_data.scheme == 'event':
+            if url_data.netloc == 'logo':
                 return {
                     'mime_type': event.logo_metadata['content_type'],
                     'string': event.logo
                 }
-            elif img_ref.startswith('images/'):
-                try:
-                    img_id = int(img_ref[7:])
-                except ValueError:
-                    raise ValueError('Invalid event-local image reference')
+            try:
+                img_id = int(url_data.path[1:])
+            except ValueError:
+                raise ValueError('Invalid event-local image reference')
+            if url_data.netloc == 'images':
                 image = event.layout_images.filter_by(id=img_id).first()
                 if not image:
                     raise ValueError('Event-local image not found')
@@ -173,10 +175,19 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
                         'mime_type': image.content_type,
                         'string': f.read()
                     }
+            elif url_data.netloc == 'attachments':
+                attachment = get_event_attachment_images(event).get(url)
+                if not attachment:
+                    raise ValueError('Event-local attachment not found')
+                with attachment.file.open() as f:
+                    print('open')
+                    return {
+                        'mime_type': attachment.file.content_type,
+                        'string': f.read()
+                    }
             raise ValueError('Invalid event-local image reference')
 
         # Make sure people don't do anything funny...
-        url_data = urlparse(url)
         if url_data.scheme not in {'http', 'https'}:
             if url_data.scheme == 'file':
                 logger.warning('Attempted to use local file URL %s in a document template', url)
@@ -310,3 +321,13 @@ def get_preview_placeholders(value):
         x[0].startswith('registration.field_data['),
     ))
     return placeholders
+
+
+def get_event_attachment_images(event: Event) -> dict[str, Attachment]:
+    """Get a dict of the event's attached images indexed by their identifier path."""
+    attached_items = get_attached_items(event)
+    all_attachments = attached_items.get('files', []).copy()
+    for folder in attached_items.get('folders', []):
+        all_attachments.extend(folder.attachments)
+    return {f'event://attachments/{attachment.file_id}': attachment
+            for attachment in all_attachments if attachment.file.is_image}

@@ -80,6 +80,10 @@ class AttachmentFile(StoredFileMixin, db.Model):
     def is_previewable(self):
         return get_file_previewer(self) is not None
 
+    @property
+    def is_image(self):
+        return self.content_type.startswith('image/')
+
     @no_autoflush
     def _build_storage_path(self):
         folder = self.attachment.folder

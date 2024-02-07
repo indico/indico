@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Dropdown, Header, HeaderContent, HeaderSubheader, Image} from 'semantic-ui-react';
+import {Form, Header, HeaderContent, HeaderSubheader, Image} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -19,16 +19,17 @@ const imageShape = {
 
 const imageSource = {
   images: Translate.string('from Images'),
+  attachments: Translate.string('from Materials'),
   logo: Translate.string('from Event'),
 };
 
 const EventImageSelectField = ({name, label, value, required, onChange, onOpen, eventImages}) => (
-  <Dropdown
+  <Form.Dropdown
     label={label}
     name={name}
     options={eventImages.map(({identifier, filename, url}) => ({
       key: identifier,
-      value: `event://${identifier}`,
+      value: identifier,
       text: filename,
       content: (
         <Header style={{fontSize: 14}}>
@@ -50,7 +51,6 @@ const EventImageSelectField = ({name, label, value, required, onChange, onOpen, 
     onOpen={onOpen}
     selection
     search
-    fluid
   />
 );
 
