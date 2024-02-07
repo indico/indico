@@ -61,6 +61,7 @@ for object_type in ('event', 'category'):
 
 # Receipt template operations within an event
 _bp.add_url_rule('/event/<int:event_id>/manage/receipts/templates', 'all_templates', event.RHAllEventTemplates)
+_bp.add_url_rule('/event/<int:event_id>/manage/receipts/images', 'images', event.RHEventImages)
 _bp.add_url_rule('/event/<int:event_id>/manage/receipts/export/receipts.<any(pdf,zip):format>',
                  'receipts_export', event.RHExportReceipts, methods=('POST',))
 _bp.add_url_rule('/event/<int:event_id>/manage/receipts/<int:template_id>/preview', 'receipts_preview',

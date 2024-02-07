@@ -15,7 +15,8 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
-import TemplateParameterEditor, {getDefaultFieldValue} from '../printing/TemplateParameterEditor';
+import TemplateParameterEditor from '../printing/TemplateParameterEditor';
+import {getDefaultFieldValue} from '../printing/util';
 
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';

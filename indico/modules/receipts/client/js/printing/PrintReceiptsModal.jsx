@@ -29,10 +29,11 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 import {downloadBlob} from 'indico/utils/browser';
 import {snakifyKeys} from 'indico/utils/case';
 
-import Previewer from '../templates/Previewer.jsx';
+import Previewer from '../templates/Previewer';
 
-import {printReceipt} from './print.jsx';
-import TemplateParameterEditor, {getDefaultFieldValue} from './TemplateParameterEditor.jsx';
+import {printReceipt} from './print';
+import TemplateParameterEditor from './TemplateParameterEditor';
+import {fetchEventImages, getDefaultFieldValue} from './util';
 
 const makeSubmitLabel = ({publish, notify_users: notifyUsers}, numRegistrants) => {
   if (publish) {
@@ -82,6 +83,7 @@ const archiveFilename = {
 export default function PrintReceiptsModal({onClose, registrationIds, eventId}) {
   const [receiptIds, setReceiptIds] = useState([]);
   const [downloading, setDownloading] = useState(false);
+  const [eventImages, setEventImages] = useState([]);
 
   const {data: templateList, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
     trigger: eventId,
@@ -199,6 +201,8 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                     customFields={template ? getCustomFields(template) : []}
                     title={Translate.string('Template Parameters')}
                     disabled={receiptIds.length > 0}
+                    eventImages={eventImages}
+                    fetchImages={() => fetchEventImages(eventImages, setEventImages, eventId)}
                     defaultOpen
                   />
                 )}

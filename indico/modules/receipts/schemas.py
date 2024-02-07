@@ -54,12 +54,17 @@ class _TextareaAttributesSchema(mm.Schema):
     label = fields.String(required=True)
 
 
+class _ImageAttributesSchema(mm.Schema):
+    label = fields.String(required=True)
+
+
 class CustomFieldAttributesSchema(OneOfSchema):
     type_schemas = {
         'checkbox': _CheckboxAttributesSchema,
         'dropdown': _DropdownAttributesSchema,
         'input': _InputAttributesSchema,
         'textarea': _TextareaAttributesSchema,
+        'image': _ImageAttributesSchema,
     }
 
 

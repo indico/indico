@@ -36,7 +36,7 @@ from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 
 
 class RHAllEventTemplates(RHManageRegFormsBase):
@@ -66,6 +66,24 @@ class RHAllEventTemplates(RHManageRegFormsBase):
             if filename := receipt_defaults.get(self.event, f"filename:{tpl['id']}"):
                 tpl['default_filename'] = filename
         return jsonify(templates)
+
+
+class RHEventImages(RHManageRegFormsBase):
+    """Get all available images for an event."""
+
+    def _process(self):
+        images = [{
+            'identifier': f'images/{img.id}',
+            'filename': img.filename,
+            'url': url_for('event_images.image_display', img)
+        } for img in self.event.layout_images]
+        if self.event.logo:
+            images.append({
+                'identifier': 'logo',
+                'filename': _('Event logo'),
+                'url': self.event.logo_url
+            })
+        return jsonify(images=images)
 
 
 class EventReceiptTemplateMixin:

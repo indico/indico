@@ -9,20 +9,21 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Accordion, Form} from 'semantic-ui-react';
 
-export const getDefaultFieldValue = f => {
-  if (f.type === 'dropdown') {
-    return f.attributes.options[f.attributes.default];
-  } else if (f.type === 'checkbox') {
-    return f.attributes.value || false;
-  } else {
-    return f.attributes.value || '';
-  }
-};
+import EventImageSelectField from './EventImageSelectField';
 
 /**
  * This component represents a custom field which can contain a "text" (str), "choice" or "yes/no" (boolean).
  */
-function CustomField({name, value, type, attributes, validations, onChange}) {
+function CustomField({
+  name,
+  value,
+  type,
+  attributes,
+  validations,
+  onChange,
+  eventImages,
+  fetchImages,
+}) {
   if (type === 'input') {
     return (
       <Form.Input
@@ -68,6 +69,18 @@ function CustomField({name, value, type, attributes, validations, onChange}) {
         required={validations.required}
       />
     );
+  } else if (type === 'image') {
+    return (
+      <EventImageSelectField
+        label={attributes.label}
+        name={name}
+        value={value}
+        required={validations.required}
+        onChange={onChange}
+        eventImages={eventImages}
+        onOpen={() => fetchImages()}
+      />
+    );
   }
 }
 
@@ -80,10 +93,14 @@ CustomField.propTypes = {
     required: PropTypes.bool,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
+  eventImages: PropTypes.arrayOf(PropTypes.object),
+  fetchImages: PropTypes.func,
 };
 
 CustomField.defaultProps = {
   value: null,
+  eventImages: [],
+  fetchImages: () => {},
 };
 
 export default function TemplateParameterEditor({
@@ -91,6 +108,8 @@ export default function TemplateParameterEditor({
   value,
   onChange,
   title,
+  eventImages,
+  fetchImages,
   defaultOpen,
 }) {
   if (customFields.length === 0 || Object.keys(value).length === 0) {
@@ -115,6 +134,8 @@ export default function TemplateParameterEditor({
                 name={name}
                 attributes={attributes}
                 validations={validations}
+                eventImages={eventImages}
+                fetchImages={fetchImages}
               />
             )),
           },
@@ -131,10 +152,14 @@ TemplateParameterEditor.propTypes = {
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   title: PropTypes.string,
+  eventImages: PropTypes.arrayOf(PropTypes.object),
+  fetchImages: PropTypes.func,
   defaultOpen: PropTypes.bool,
 };
 
 TemplateParameterEditor.defaultProps = {
   title: '',
+  eventImages: [],
+  fetchImages: () => {},
   defaultOpen: false,
 };

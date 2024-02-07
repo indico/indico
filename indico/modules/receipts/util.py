@@ -145,7 +145,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
         raise UnprocessableEntity(e)
 
 
-def sandboxed_url_fetcher(event: Event, allow_event_logo: bool = False) -> t.Callable[[str], dict]:
+def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.Callable[[str], dict]:
     """Fetch also "event-local" URLs.
 
     More info on fetchers: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#url-fetchers
@@ -153,11 +153,27 @@ def sandboxed_url_fetcher(event: Event, allow_event_logo: bool = False) -> t.Cal
     allow_external_urls = receipts_settings.get('allow_external_urls')
 
     def _fetcher(url: str) -> dict:
-        if allow_event_logo and url == 'event://logo':
-            return {
-                'mime_type': event.logo_metadata['content_type'],
-                'string': event.logo
-            }
+        if allow_event_images and url.startswith('event://'):
+            img_ref = url[8:]
+            if img_ref == 'logo':
+                return {
+                    'mime_type': event.logo_metadata['content_type'],
+                    'string': event.logo
+                }
+            elif img_ref.startswith('images/'):
+                try:
+                    img_id = int(img_ref[7:])
+                except ValueError:
+                    raise ValueError('Invalid event-local image reference')
+                image = event.layout_images.filter_by(id=img_id).first()
+                if not image:
+                    raise ValueError('Event-local image not found')
+                with image.open() as f:
+                    return {
+                        'mime_type': image.content_type,
+                        'string': f.read()
+                    }
+            raise ValueError('Invalid event-local image reference')
 
         # Make sure people don't do anything funny...
         url_data = urlparse(url)
@@ -183,7 +199,7 @@ def create_pdf(event: Event, html_sources: list[str], css: str) -> BytesIO:
     :return: a the rendered PDF blob
     """
     css_url_fetcher = sandboxed_url_fetcher(event)
-    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_logo=True)
+    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
     try:
         css = CSS(string=f'{css}{DEFAULT_CSS}', url_fetcher=css_url_fetcher)
     except IndexError:
