@@ -245,7 +245,9 @@ class RegistrationPermission(ManagementPermission):
 
 @signals.event.updated.connect
 def _patch_google_wallet_class(event, **kwargs):
-    if event.has_google_wallet_tickets:
+    changes = kwargs.get('changes')
+    look_for = ['title', 'start_dt', 'end_dt', 'location_data']  # Fields that will update Google Wallet content
+    if [i for i in look_for if i in changes] and event.has_google_wallet_tickets:
         gwm = GoogleWalletManager(event)
         if gwm.credentials:
             ticket_class = gwm.create_class_template(gwm.settings['google_wallet_issuer_id'],
