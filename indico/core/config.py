@@ -28,6 +28,7 @@ from indico.util.string import crc32, snakify
 
 # Note: Whenever you add/change something here, you MUST update the docs (settings.rst) as well
 DEFAULTS = {
+    'ABSOLUTE_LOGO_URL': None,
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,
@@ -208,6 +209,9 @@ def load_config(only_defaults=False, override=None):
         data['CONFIG_PATH_RESOLVED'] = resolved_path
         if resolved_path is not None:
             data['LOGGING_CONFIG_PATH'] = os.path.join(os.path.dirname(resolved_path), data['LOGGING_CONFIG_FILE'])
+        if data['LOGO_URL'] is not None:
+            data['ABSOLUTE_LOGO_URL'] = data['LOGO_URL'] if data['LOGO_URL'].startswith('http') else \
+                f"{data['BASE_URL']}{data['LOGO_URL']}"
 
     if override:
         data.update(_sanitize_data(override, allow_internal=True))

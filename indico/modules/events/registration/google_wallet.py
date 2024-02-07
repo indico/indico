@@ -57,9 +57,8 @@ class GoogleWalletManager:
     def create_class_template(self, issuer_id: str, class_suffix: str) -> dict:
         """This method will return a dict format ticket class template."""
         from indico.modules.categories.controllers.util import make_format_event_date_func
-        logo_url = f'{config.BASE_URL}{config.IMAGES_BASE_URL}/logo_indico.png'
-        if config.LOGO_URL:
-            logo_url = config.LOGO_URL if 'http' in config.LOGO_URL else f'{config.BASE_URL}{config.LOGO_URL}'
+        logo_url = config.ABSOLUTE_LOGO_URL if config.LOGO_URL else \
+            f'{config.BASE_URL}{config.IMAGES_BASE_URL}/logo_indico.png'
         dict_template = {
             'id': f'{issuer_id}.{class_suffix}',
             'issuerName': self.settings['google_wallet_issuer_name'],
