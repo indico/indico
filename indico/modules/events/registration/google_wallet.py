@@ -156,7 +156,7 @@ class GoogleWalletManager:
                     raise BadRequest(response.text)  # Something else went wrong...
             return response.json()
         elif response.status_code != 404:
-            Logger.get('events').warning('Cannot create Google Wallet class: %s', response.text)
+            Logger.get('events').warning('Cannot get Google Wallet class: %s', response.text)
             raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
 
         # See link below for more information on required properties
