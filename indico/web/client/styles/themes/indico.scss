@@ -258,6 +258,15 @@ div.event-header {
     margin-bottom: 0.5em;
   }
 
+  ul,
+  ol {
+    margin-left: 3em;
+  }
+
+  :is(ul, ol) :is(ul, ol) {
+    margin-left: 1.2em;
+  }
+
   @include font-family-modern-body();
   color: $light-black;
 }
