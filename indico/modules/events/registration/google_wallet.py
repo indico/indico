@@ -12,7 +12,7 @@ from google.auth import crypt, jwt
 from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.service_account import Credentials
 from requests.exceptions import RequestException
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, ServiceUnavailable
 
 from indico.core import signals
 from indico.core.config import config
@@ -157,7 +157,7 @@ class GoogleWalletManager:
             return response.json()
         elif response.status_code != 404:
             Logger.get('events').warning('Cannot create Google Wallet class: %s', response.text)
-            raise BadRequest(response.text)  # Something else went wrong...
+            raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
 
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketclass
@@ -235,7 +235,7 @@ class GoogleWalletManager:
             return response.json()
         elif response.status_code != 404:
             Logger.get('events').warning('Cannot create Google Wallet object: %s', response.text)
-            raise BadRequest(response.text)  # Something else went wrong...
+            raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
 
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketobject
