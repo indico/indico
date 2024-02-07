@@ -467,8 +467,7 @@ class Registration(db.Model):
         """Check whether the ticket is blocked by a plugin."""
         return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))
 
-    @property
-    def ticket_google_wallet_url(self):
+    def generate_ticket_google_wallet_url(self):
         """Return link to Google Wallet ticket display."""
         gwm = GoogleWalletManager(self.event, registration=self)
         if not gwm.credentials:
