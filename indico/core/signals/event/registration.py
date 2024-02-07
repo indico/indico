@@ -130,7 +130,7 @@ at the top of the list of registrants/participants. The `sender` is the correspo
 registration form.
 ''')
 
-google_wallet_object_template_created = _signals.signal('google-wallet-object-created', '''
+google_wallet_object_template_created = _signals.signal('google-wallet-object-template-created', '''
 Called when a new Google Wallet object has been created. The `sender` is the `Registration` object.
 The `data` kwarg contains the dictionary template used to create the object.
 ''')
