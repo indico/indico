@@ -16,13 +16,13 @@ from indico.web.forms.fields import (IndicoEnumRadioField, IndicoQuerySelectMult
                                      IndicoSelectMultipleCheckboxField)
 from indico.web.forms.validators import (ConfirmPassword, HiddenUnless, IndicoRegexp, SecurePassword, SoftLength,
                                          WordCount)
-from indico.web.forms.widgets import RemoteDropdownWidget, TypeaheadWidget
+from indico.web.forms.widgets import DropdownWidget, TypeaheadWidget
 
 
 def is_single_line_field(field):
-    if isinstance(field.widget, (RemoteDropdownWidget, TypeaheadWidget)):
+    if isinstance(field.widget, TypeaheadWidget):
         return True
-    if isinstance(field.widget, Select):
+    if isinstance(field.widget, (DropdownWidget, Select)):
         return not field.widget.multiple
     if isinstance(field.widget, Input):
         return field.widget.input_type not in {'checkbox', 'radio', 'hidden'}

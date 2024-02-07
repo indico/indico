@@ -34,14 +34,14 @@ const highlightSearch = (text, query = '') => {
 };
 
 /**
- * Dropdown which can dynamically query the backend
+ * Dropdown which can be passed the options or dynamically query the backend
  * for results using the search input. This is a replacement
  * for the selectize.js library.
  *
  * It can be both controlled and uncontrolled.
  * To make it controlled pass the value prop to it.
  */
-export function RemoteSearchDropdown({
+export function SearchDropdown({
   searchUrl,
   searchMethod,
   searchPayload,
@@ -51,8 +51,12 @@ export function RemoteSearchDropdown({
   valueField,
   labelField,
   searchField,
+  defaultValue,
   value: valueFromProps,
   onChange: onChangeFromProps,
+  options: optionsFromProps,
+  allowAdditions,
+  multiple,
   dropdownProps,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,7 +64,10 @@ export function RemoteSearchDropdown({
   const [loading, setLoading] = useState(false);
 
   const isControlled = valueFromProps !== undefined;
-  const [internalValue, setInternalValue] = useState(null);
+  const initialValue = defaultValue.map(val => val[valueField]);
+  const [internalValue, setInternalValue] = useState(
+    initialValue ? (multiple ? initialValue : initialValue[0]) : null
+  );
   const value = isControlled ? valueFromProps : internalValue;
 
   const debounce = useMemo(() => makeAsyncDebounce(200), []);
@@ -144,10 +151,14 @@ export function RemoteSearchDropdown({
   );
 
   useEffect(() => {
+    if (optionsFromProps.length !== 0) {
+      setOptions(transformOptions(optionsFromProps));
+      return;
+    }
     if (preload) {
       fetchData();
     }
-  }, [preload, fetchData]);
+  }, [preload, fetchData, optionsFromProps, transformOptions]);
 
   const onChange = (evt, {value: newValue}) => {
     setSearchQuery('');
@@ -157,10 +168,14 @@ export function RemoteSearchDropdown({
     }
   };
 
+  const onAddItem = (evt, {value: newValue}) => {
+    setOptions(prevOptions => [...prevOptions, {text: newValue, value: newValue}]);
+  };
+
   const onSearch = (evt, {searchQuery: newSearchQuery}) => {
     setSearchQuery(newSearchQuery);
 
-    if (preload) {
+    if (preload || optionsFromProps.length !== 0) {
       return;
     }
 
@@ -221,12 +236,16 @@ export function RemoteSearchDropdown({
         loading ? Translate.string('Loading…') : searchDisabled ? searchDisabledMessage : undefined
       }
       loading={loading}
+      multiple={multiple}
+      allowAdditions={allowAdditions}
+      onAddItem={onAddItem}
+      renderLabel={label => ({color: 'blue', content: label.text})}
       {...dropdownProps}
     />
   );
 }
 
-RemoteSearchDropdown.propTypes = {
+SearchDropdown.propTypes = {
   /** Number of characters needed to start fetching results. */
   minTriggerLength: PropTypes.number,
   /** The URL used to retrieve items */
@@ -251,11 +270,20 @@ RemoteSearchDropdown.propTypes = {
   value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number]),
   /** Called when the value changes with the new value as the first argument */
   onChange: PropTypes.func,
+  /** Default value to be set as the first internalValue of the dropdown, if present. */
+  defaultValue: PropTypes.array,
+  /** Options to pass to the dropdown. If options are passed then the component does not
+      dynamically fetch the data */
+  options: PropTypes.array,
+  /** Allow adding new values to the options */
+  allowAdditions: PropTypes.bool,
+  /** Allow selecting multiple values */
+  multiple: PropTypes.bool,
   /** Extra props to pass to <Dropdown /> */
   dropdownProps: PropTypes.object,
 };
 
-RemoteSearchDropdown.defaultProps = {
+SearchDropdown.defaultProps = {
   minTriggerLength: 3,
   searchUrl: null,
   searchMethod: 'GET',
@@ -265,23 +293,27 @@ RemoteSearchDropdown.defaultProps = {
   searchField: 'name',
   allowById: false,
   preload: false,
+  defaultValue: [],
   value: undefined,
   onChange: () => {},
+  options: [],
+  allowAdditions: false,
+  multiple: false,
   dropdownProps: {},
 };
 
 /**
- * WTForms wrapper for RemoteSearchDropdown
+ * WTForms wrapper for SearchDropdown
  */
-export default function WTFRemoteSearchDropdown({fieldId, ...rest}) {
+export default function WTFSearchDropdown({fieldId, ...rest}) {
   const field = useMemo(() => document.getElementById(`${fieldId}-data`), [fieldId]);
   const onChange = value => {
     field.value = value;
     field.dispatchEvent(new Event('change', {bubbles: true}));
   };
-  return <RemoteSearchDropdown onChange={onChange} {...rest} />;
+  return <SearchDropdown onChange={onChange} {...rest} />;
 }
 
-WTFRemoteSearchDropdown.propTypes = {
+WTFSearchDropdown.propTypes = {
   fieldId: PropTypes.string.isRequired,
 };

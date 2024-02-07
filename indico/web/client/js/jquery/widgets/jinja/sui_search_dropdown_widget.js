@@ -8,13 +8,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {WTFRemoteSearchDropdown} from 'indico/react/components';
+import {WTFSearchDropdown} from 'indico/react/components';
 
-window.setupRemoteSearchDropdownWidget = function setupRemoteSearchDropdownWidget(props) {
+window.setupSearchDropdownWidget = function setupSearchDropdownWidget(props) {
   // Make sure the dropdown is displayed above the dialog
   const field = $(`#${props.fieldId}`);
   field.closest('.ui-dialog-content').css('overflow', 'inherit');
   field.closest('.exclusivePopup').css('overflow', 'inherit');
 
-  ReactDOM.render(<WTFRemoteSearchDropdown fieldId={props.fieldId} {...props} />, field[0]);
+  ReactDOM.render(<WTFSearchDropdown fieldId={props.fieldId} {...props} />, field[0]);
 };

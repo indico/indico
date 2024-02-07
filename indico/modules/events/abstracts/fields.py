@@ -28,7 +28,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import JSONField
-from indico.web.forms.widgets import JinjaWidget, RemoteDropdownWidget
+from indico.web.forms.widgets import DropdownWidget, JinjaWidget
 
 
 def _serialize_user(user):
@@ -150,8 +150,8 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 class AbstractField(QuerySelectField):
     """A field with dynamic fetching to select an abstract from an event."""
 
-    widget = RemoteDropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                                  search_method='POST', inline_js=True)
+    widget = DropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
+                            search_method='POST', inline_js=True)
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('allow_blank', True)
@@ -180,7 +180,7 @@ class AbstractField(QuerySelectField):
                 if abstract.can_access(session.user)]
 
     def _value(self):
-        return self._serialize_abstract(self.data) if self.data else None
+        return [self._serialize_abstract(self.data)] if self.data else None
 
     def pre_validate(self, form):
         super().pre_validate(form)
