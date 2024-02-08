@@ -153,6 +153,10 @@ class RenderReceiptsBase(EventReceiptTemplateMixin, RHManageRegFormsBase):
 
     def _get_custom_fields(self):
         custom_fields = {f['name']: self.custom_fields_raw.get(f['name']) for f in self.template.custom_fields}
+        if any(not custom_fields[f['name']].startswith('event://')
+               for f in self.template.custom_fields
+               if f['type'] == 'image' and custom_fields[f['name']]):
+            abort(422)
         missing = [f['attributes']['label'] for f in self.template.custom_fields
                    if not custom_fields[f['name']] and f.get('validations', {}).get('required')]
         if missing:
