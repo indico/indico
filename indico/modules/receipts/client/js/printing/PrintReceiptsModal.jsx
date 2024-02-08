@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import allTemplatesURL from 'indico-url:receipts.all_templates';
+import eventImagesURL from 'indico-url:receipts.images';
 import exportReceiptsURL from 'indico-url:receipts.receipts_export';
 import previewReceiptsURL from 'indico-url:receipts.receipts_preview';
 
@@ -32,8 +33,7 @@ import {snakifyKeys} from 'indico/utils/case';
 import Previewer from '../templates/Previewer';
 
 import {printReceipt} from './print';
-import TemplateParameterEditor from './TemplateParameterEditor';
-import {fetchEventImages, getDefaultFieldValue} from './util';
+import TemplateParameterEditor, {getDefaultFieldValue} from './TemplateParameterEditor';
 
 const makeSubmitLabel = ({publish, notify_users: notifyUsers}, numRegistrants) => {
   if (publish) {
@@ -97,7 +97,13 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
       return;
     }
     setLoadingImages(true);
-    await fetchEventImages(eventImages, setEventImages, eventId);
+    let response;
+    try {
+      response = await indicoAxios.get(eventImagesURL({event_id: eventId}));
+      setEventImages(response.data.images);
+    } catch (error) {
+      return handleAxiosError(error);
+    }
     setLoadingImages(false);
   };
 

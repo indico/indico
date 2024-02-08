@@ -11,6 +11,18 @@ import {Accordion, Form} from 'semantic-ui-react';
 
 import EventImageSelectField from './EventImageSelectField';
 
+export const getDefaultFieldValue = f => {
+  if (f.type === 'dropdown') {
+    return f.attributes.options[f.attributes.default];
+  } else if (f.type === 'checkbox') {
+    return f.attributes.value || false;
+  } else if (f.type === 'image') {
+    return null;
+  } else {
+    return f.attributes.value || '';
+  }
+};
+
 /**
  * This component represents a custom field which can contain a "text" (str), "choice" or "yes/no" (boolean).
  */
