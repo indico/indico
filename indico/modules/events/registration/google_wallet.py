@@ -214,7 +214,7 @@ class GoogleWalletManager:
                 }
             ],
             'ticketHolderName': self.registration.full_name,
-            'ticketNumber': self.registration.id
+            'ticketNumber': f'#{self.registration.friendly_id}'
         }
         signals.event.registration.google_wallet_object_template_created.send(self.registration, data=dict_template)
         return dict_template
