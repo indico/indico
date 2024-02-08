@@ -84,12 +84,22 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
   const [receiptIds, setReceiptIds] = useState([]);
   const [downloading, setDownloading] = useState(false);
   const [eventImages, setEventImages] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   const {data: templateList, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
     trigger: eventId,
     camelize: true,
   });
   const ready = !loading && !!templateList;
+
+  const fetchImages = async () => {
+    if (loadingImages) {
+      return;
+    }
+    setLoadingImages(true);
+    await fetchEventImages(eventImages, setEventImages, eventId);
+    setLoadingImages(false);
+  };
 
   const makeUpdateTemplateFields = form => templateId => {
     const {customFields, defaultFilename, title} = templateList.find(t => t.id === templateId);
@@ -100,6 +110,10 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
         : {}
     );
     form.change('filename', defaultFilename || formatters.slugify(title));
+    // preload event images if necessary
+    if (!eventImages.length && customFields.some(f => f.type === 'image')) {
+      fetchImages();
+    }
   };
 
   const downloadReceipts = async format => {
@@ -202,7 +216,8 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
                     title={Translate.string('Template Parameters')}
                     disabled={receiptIds.length > 0}
                     eventImages={eventImages}
-                    fetchImages={() => fetchEventImages(eventImages, setEventImages, eventId)}
+                    fetchImages={fetchImages}
+                    loadingImages={loadingImages}
                     defaultOpen
                   />
                 )}

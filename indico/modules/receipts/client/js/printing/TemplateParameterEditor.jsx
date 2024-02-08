@@ -23,6 +23,7 @@ function CustomField({
   onChange,
   eventImages,
   fetchImages,
+  loadingImages,
 }) {
   if (type === 'input') {
     return (
@@ -76,6 +77,7 @@ function CustomField({
         name={name}
         value={value}
         required={validations.required}
+        loading={loadingImages}
         onChange={onChange}
         eventImages={eventImages}
         onOpen={() => fetchImages()}
@@ -95,12 +97,14 @@ CustomField.propTypes = {
   onChange: PropTypes.func.isRequired,
   eventImages: PropTypes.arrayOf(PropTypes.object),
   fetchImages: PropTypes.func,
+  loadingImages: PropTypes.bool,
 };
 
 CustomField.defaultProps = {
   value: null,
   eventImages: [],
   fetchImages: () => {},
+  loadingImages: false,
 };
 
 export default function TemplateParameterEditor({
@@ -110,6 +114,7 @@ export default function TemplateParameterEditor({
   title,
   eventImages,
   fetchImages,
+  loadingImages,
   defaultOpen,
 }) {
   if (customFields.length === 0 || Object.keys(value).length === 0) {
@@ -136,6 +141,7 @@ export default function TemplateParameterEditor({
                 validations={validations}
                 eventImages={eventImages}
                 fetchImages={fetchImages}
+                loadingImages={loadingImages}
               />
             )),
           },
@@ -154,6 +160,7 @@ TemplateParameterEditor.propTypes = {
   title: PropTypes.string,
   eventImages: PropTypes.arrayOf(PropTypes.object),
   fetchImages: PropTypes.func,
+  loadingImages: PropTypes.bool,
   defaultOpen: PropTypes.bool,
 };
 
@@ -161,5 +168,6 @@ TemplateParameterEditor.defaultProps = {
   title: '',
   eventImages: [],
   fetchImages: () => {},
+  loadingImages: false,
   defaultOpen: false,
 };

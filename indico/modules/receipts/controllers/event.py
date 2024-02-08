@@ -12,6 +12,7 @@ from io import BytesIO
 
 from flask import g, jsonify, request, session
 from marshmallow import fields
+from PIL import Image
 from pypdf import PdfWriter
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
@@ -34,10 +35,11 @@ from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code
                                           get_safe_template_context, is_image_supported)
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.images import square
 from indico.util.marshmallow import not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import send_file
 
 
 class RHAllEventTemplates(RHManageRegFormsBase):
@@ -72,12 +74,24 @@ class RHAllEventTemplates(RHManageRegFormsBase):
 class RHEventImages(RHManageRegFormsBase):
     """Get all available images for an event."""
 
+    def _make_preview(self, img):
+        if not is_image_supported(img.content_type):
+            return ''
+        with img.open() as f, Image.open(f) as pic:
+            pic = square(pic)
+            if pic.height > 256:
+                pic = pic.resize((256, 256), resample=Image.BICUBIC)
+            image_bytes = BytesIO()
+            pic.save(image_bytes, 'PNG')
+            image_bytes.seek(0)
+            return base64.b64encode(image_bytes.read())
+
     def _process(self):
-        # Fetch event images
+        # Fetch layout images
         images = [{
             'identifier': f'event://images/{img.id}',
             'filename': img.filename,
-            'url': url_for('event_images.image_display', img),
+            'preview': self._make_preview(img),
             'supported': is_image_supported(img.content_type)
         } for img in self.event.layout_images]
 
@@ -88,7 +102,7 @@ class RHEventImages(RHManageRegFormsBase):
             'filename': (attachment.file.filename
                          if attachment.folder.is_default
                          else f'{attachment.folder.title}/{attachment.file.filename}'),
-            'url': attachment.download_url,
+            'preview': self._make_preview(attachment.file),
             'supported': is_image_supported(attachment.file.content_type)
         } for id, attachment in attachments.items()])
 
@@ -97,7 +111,7 @@ class RHEventImages(RHManageRegFormsBase):
             images.append({
                 'identifier': 'event://logo',
                 'filename': self.event.logo_metadata['filename'],
-                'url': self.event.logo_url,
+                'preview': base64.b64encode(self.event.logo),
                 'supported': True  # event logos are always saved in PNG
             })
         return jsonify(images=images)
