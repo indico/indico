@@ -15,28 +15,30 @@ const imageShape = {
   identifier: PropTypes.string.isRequired,
   filename: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  supported: PropTypes.bool.isRequired,
 };
 
 const imageSource = {
   images: Translate.string('from Images'),
   attachments: Translate.string('from Materials'),
-  logo: Translate.string('from Event'),
+  logo: Translate.string('from Logo'),
 };
 
 const EventImageSelectField = ({name, label, value, required, onChange, onOpen, eventImages}) => (
   <Form.Dropdown
     label={label}
     name={name}
-    options={eventImages.map(({identifier, filename, url}) => ({
+    options={eventImages.map(({identifier, filename, url, supported}) => ({
       key: identifier,
       value: identifier,
       text: filename,
+      disabled: !supported,
       content: (
         <Header style={{fontSize: 14}}>
           <Image src={url} />
           <HeaderContent>
             {filename}
-            <HeaderSubheader content={imageSource[identifier.split('/', 1)[0]]} />
+            <HeaderSubheader content={imageSource[new URL(identifier).host]} />
           </HeaderContent>
         </Header>
       ),

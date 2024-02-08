@@ -31,7 +31,7 @@ from indico.modules.receipts.schemas import ReceiptTemplateDBSchema
 from indico.modules.receipts.settings import receipt_defaults
 from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code, create_pdf,
                                           get_event_attachment_images, get_inherited_templates,
-                                          get_safe_template_context)
+                                          get_safe_template_context, is_image_supported)
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
@@ -77,25 +77,28 @@ class RHEventImages(RHManageRegFormsBase):
         images = [{
             'identifier': f'event://images/{img.id}',
             'filename': img.filename,
-            'url': url_for('event_images.image_display', img)
+            'url': url_for('event_images.image_display', img),
+            'supported': is_image_supported(img.content_type)
         } for img in self.event.layout_images]
 
         # Fetch image attachments
         attachments = get_event_attachment_images(self.event)
         images.extend([{
-            'identifier': identifier,
+            'identifier': f'event://attachments/{id}',
             'filename': (attachment.file.filename
                          if attachment.folder.is_default
                          else f'{attachment.folder.title}/{attachment.file.filename}'),
-            'url': attachment.download_url
-        } for identifier, attachment in attachments.items()])
+            'url': attachment.download_url,
+            'supported': is_image_supported(attachment.file.content_type)
+        } for id, attachment in attachments.items()])
 
         # Fetch event logo
         if self.event.logo:
             images.append({
                 'identifier': 'event://logo',
-                'filename': _('Event logo'),
-                'url': self.event.logo_url
+                'filename': self.event.logo_metadata['filename'],
+                'url': self.event.logo_url,
+                'supported': True  # event logos are always saved in PNG
             })
         return jsonify(images=images)
 

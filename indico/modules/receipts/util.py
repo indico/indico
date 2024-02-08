@@ -20,6 +20,7 @@ from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
 from markupsafe import Markup
 from marshmallow import ValidationError
+from PIL import Image
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.python import PythonLexer
@@ -166,26 +167,20 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
                 img_id = int(url_data.path[1:])
             except ValueError:
                 raise ValueError('Invalid event-local image reference')
+            image = None
             if url_data.netloc == 'images':
                 image = event.layout_images.filter_by(id=img_id).first()
-                if not image:
-                    raise ValueError('Event-local image not found')
-                with image.open() as f:
-                    return {
-                        'mime_type': image.content_type,
-                        'string': f.read()
-                    }
-            elif url_data.netloc == 'attachments':
-                attachment = get_event_attachment_images(event).get(url)
-                if not attachment:
-                    raise ValueError('Event-local attachment not found')
-                with attachment.file.open() as f:
-                    print('open')
-                    return {
-                        'mime_type': attachment.file.content_type,
-                        'string': f.read()
-                    }
-            raise ValueError('Invalid event-local image reference')
+            elif url_data.netloc == 'attachments' and (attachment := get_event_attachment_images(event).get(img_id)):
+                image = attachment.file
+            if not image:
+                raise ValueError('Invalid event-local image reference')
+            if not is_image_supported(image.content_type):
+                raise ValueError('Unsupported image format')
+            with image.open() as f:
+                return {
+                    'mime_type': image.content_type,
+                    'string': f.read()
+                }
 
         # Make sure people don't do anything funny...
         if url_data.scheme not in {'http', 'https'}:
@@ -324,10 +319,14 @@ def get_preview_placeholders(value):
 
 
 def get_event_attachment_images(event: Event) -> dict[str, Attachment]:
-    """Get a dict of the event's attached images indexed by their identifier path."""
+    """Get a dict of the event's attached images indexed by the attachment's ID."""
     attached_items = get_attached_items(event)
     all_attachments = attached_items.get('files', []).copy()
     for folder in attached_items.get('folders', []):
         all_attachments.extend(folder.attachments)
-    return {f'event://attachments/{attachment.file_id}': attachment
-            for attachment in all_attachments if attachment.file.is_image}
+    return {attachment.id: attachment for attachment in all_attachments if attachment.file.is_image}
+
+
+def is_image_supported(content_type: str) -> bool:
+    """Check if the given content type is an image supported by Pillow."""
+    return content_type.split('/')[1].upper() in Image.OPEN
