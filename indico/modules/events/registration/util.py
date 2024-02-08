@@ -581,15 +581,16 @@ def get_registrations_with_tickets(user, event):
     return [r for r in query if not _is_ticket_blocked(r)]
 
 
-def get_published_registrations(event, is_participant):
+def get_published_registrations(event, is_participant, user_regform=None):
     """Get a list of published registrations for an event.
 
     :param event: the `Event` to get registrations for
     :param is_participant: whether the user accessing the registrations is a participant of the event
+    :params user_regform: the registration form in which user had registered if he did
     :return: list of `Registration` objects
     """
     query = (Registration.query.with_parent(event)
-             .filter(Registration.is_publishable(is_participant),
+             .filter(Registration.is_publishable(user_regform, event.hide_participants_from_other_forms),
                      ~RegistrationForm.is_deleted,
                      ~Registration.is_deleted)
              .join(Registration.registration_form)
@@ -601,16 +602,17 @@ def get_published_registrations(event, is_participant):
     return query.all()
 
 
-def count_hidden_registrations(event, is_participant):
+def count_hidden_registrations(event, is_participant, user_regform=None):
     """Get the number of hidden registrations for an event.
 
     :param event: the `Event` to get registrations for
     :param is_participant: whether the user accessing the registrations is a participant of the event
+    :params user_regform: the registration form in which user had registered if he did
     :return: number of registrations
     """
     query = (Registration.query.with_parent(event)
              .filter(Registration.is_state_publishable,
-                     ~Registration.is_publishable(is_participant),
+                     ~Registration.is_publishable(user_regform, event.hide_participants_from_other_forms),
                      RegistrationForm.is_participant_list_visible(is_participant))
              .join(Registration.registration_form))
 

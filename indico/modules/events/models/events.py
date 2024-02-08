@@ -35,6 +35,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, get_related_object
 from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest, MoveRequestState
+from indico.modules.events import privacy_settings
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import EventPerson, PersonLinkMixin
 from indico.modules.events.notifications import notify_event_creation
@@ -526,17 +527,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def participation_regform(self):
         return next((form for form in self.registration_forms if form.is_participation), None)
 
-    @memoize_request
-    def get_published_registrations(self, user):
-        from indico.modules.events.registration.util import get_published_registrations
-        is_participant = self.is_user_registered(user)
-        return get_published_registrations(self, is_participant)
+    @property
+    def hide_participants_from_other_forms(self):
+        return privacy_settings.get(self, 'hide_participants_from_other_forms', False)
 
     @memoize_request
-    def count_hidden_registrations(self, user):
+    def get_published_registrations(self, user, user_regform=None):
+        from indico.modules.events.registration.util import get_published_registrations
+        is_participant = self.is_user_registered(user)
+        return get_published_registrations(self, is_participant, user_regform)
+
+    @memoize_request
+    def count_hidden_registrations(self, user, user_regform=None):
         from indico.modules.events.registration.util import count_hidden_registrations
         is_participant = self.is_user_registered(user)
-        return count_hidden_registrations(self, is_participant)
+        return count_hidden_registrations(self, is_participant, user_regform)
 
     @property
     def protection_parent(self):

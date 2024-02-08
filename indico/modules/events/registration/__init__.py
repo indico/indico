@@ -87,12 +87,14 @@ def _inject_event_header(event, **kwargs):
                                                                                   include_scheduled=False)
         # A participant could appear more than once in the list in case he register to multiple registration form.
         # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
+        user_regforms = [k for k, v in user_registrations.items() if v is not None]
+        user_regform = user_regforms[0] if user_regforms else None
         return render_template(
             'events/registration/display/event_header.html',
             regforms=displayed_regforms,
             user_registrations=user_registrations,
-            published_registrations=event.get_published_registrations(session.user),
-            num_hidden_registrations=event.count_hidden_registrations(session.user)
+            published_registrations=event.get_published_registrations(session.user, user_regform),
+            num_hidden_registrations=event.count_hidden_registrations(session.user, user_regform)
         )
 
 

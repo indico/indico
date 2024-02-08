@@ -323,33 +323,36 @@ class Registration(db.Model):
                 r.user = target
 
     @hybrid_method
-    def is_publishable(self, is_participant):
+    def is_publishable(self, user_regform, hide_participants_from_other_forms=False):
         if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False
         if (self.registration_form.publish_registrations_duration is not None
                 and self.event.end_dt + self.registration_form.publish_registrations_duration <= now_utc()):
             return False
         if self.visibility == RegistrationVisibility.participants:
-            return is_participant
+            return self.registration_form == user_regform \
+                if hide_participants_from_other_forms else user_regform is not None
         if self.visibility == RegistrationVisibility.all:
             return True
         return False
 
     @is_publishable.expression
-    def is_publishable(cls, is_participant):
+    def is_publishable(cls, user_regform, hide_participants_from_other_forms=False):
         from indico.modules.events import Event
         from indico.modules.events.registration.models.forms import RegistrationForm
 
         def _has_regform_publish_mode(mode):
-            if is_participant:
-                return cls.registration_form.has(publish_registrations_participants=mode)
-            else:
-                return cls.registration_form.has(publish_registrations_public=mode)
-        consent_criterion = (
-            cls.consent_to_publish.in_([RegistrationVisibility.all, RegistrationVisibility.participants])
-            if is_participant else
-            cls.consent_to_publish == RegistrationVisibility.all
-        )
+            return db.or_(db.and_(is_participant, cls.registration_form.has(publish_registrations_participants=mode)),
+                          db.and_(~is_participant, cls.registration_form.has(publish_registrations_public=mode)))
+        if user_regform:
+            is_participant = (cls.registration_form == user_regform
+                              if hide_participants_from_other_forms else cls.event == user_regform.event)
+        else:
+            is_participant = db.text('false')
+        consent_criterion = db.or_(
+            db.and_(is_participant, cls.consent_to_publish.in_([RegistrationVisibility.all,
+                                                               RegistrationVisibility.participants])),
+            db.and_(~is_participant, cls.consent_to_publish == RegistrationVisibility.all))
         return db.and_(
             ~cls.participant_hidden,
             cls.is_state_publishable,

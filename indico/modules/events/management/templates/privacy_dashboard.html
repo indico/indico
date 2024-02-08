@@ -18,6 +18,7 @@
     {% endcall %}
     {% if regforms %}
         {% call form_fieldset(_('Registration forms')) %}
+            {{ form_row(form.hide_participants_from_other_forms) }}
             {{ render_registrations_visibility_list(regforms) }}
         {% endcall %}
     {% endif %}
