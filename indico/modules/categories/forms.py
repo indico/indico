@@ -10,7 +10,9 @@ from functools import partial
 from flask import request
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
+from wtforms.widgets import HiddenInput
 
+from indico.core.config import config
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories.models.categories import Category, EventCreationMode, EventMessageMode
 from indico.modules.categories.models.roles import CategoryRole
@@ -89,6 +91,11 @@ class CategorySettingsForm(IndicoForm):
                                                                       'every time a new event is created inside the '
                                                                       'category or one of its subcategories. '
                                                                       'One email address per line.'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not config.ENABLE_GOOGLE_WALLET:
+            self.google_wallet_enabled.widget = HiddenInput()
 
 
 class CategoryIconForm(IndicoForm):

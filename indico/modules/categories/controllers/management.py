@@ -17,6 +17,7 @@ from sqlalchemy.orm import joinedload, load_only, undefer_group
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.modules.categories import logger
@@ -105,6 +106,8 @@ class RHManageCategorySettings(RHManageCategoryBase):
     def _process(self):
         additional_keys = ('google_wallet_application_credentials', 'google_wallet_issuer_name',
                            'google_wallet_issuer_id')
+        if not config.ENABLE_GOOGLE_WALLET:
+            self.category.google_wallet_settings = {}
         kwargs = {
             'meeting_theme': self.category.default_event_themes['meeting'],
             'lecture_theme': self.category.default_event_themes['lecture'],
@@ -119,12 +122,16 @@ class RHManageCategorySettings(RHManageCategoryBase):
         if form.validate_on_submit():
             new_dict = form.data
             new_dict.setdefault('google_wallet_settings', {})
-            for key in additional_keys:
-                new_dict['google_wallet_settings'][key] = new_dict.pop(key, {})
-                if key == 'google_wallet_application_credentials':
-                    new_dict['google_wallet_settings'][key] = ast.literal_eval(new_dict['google_wallet_settings'][key])
-            if not new_dict.pop('google_wallet_enabled'):
-                new_dict['google_wallet_settings'] = {}
+            if new_dict.pop('google_wallet_enabled'):
+                for key in additional_keys:
+                    new_dict['google_wallet_settings'][key] = new_dict.pop(key, {})
+                    if key == 'google_wallet_application_credentials':
+                        new_dict['google_wallet_settings'][key] = ast.literal_eval(
+                            new_dict['google_wallet_settings'][key])
+            else:
+                for key in additional_keys:
+                    del new_dict[key]
+
             update_category(self.category, new_dict, skip={'meeting_theme', 'lecture_theme'},
                             _extra_log_fields={'google_wallet_settings': 'Google Wallet configuration settings'})
             self.category.default_event_themes = {

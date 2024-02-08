@@ -874,6 +874,12 @@ System
 
     Default: ``False``
 
+.. data:: ENABLE_GOOGLE_WALLET
+
+    Whether to enable the Google Wallet ticket.
+
+    Default: ``False``
+
 .. data:: PLUGINS
 
     The list of :ref:`Indico plugins <installation-plugins>` to enable.
