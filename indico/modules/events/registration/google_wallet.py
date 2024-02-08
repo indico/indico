@@ -69,21 +69,6 @@ class GoogleWalletManager:
                     'value': self.event.title
                 }
             },
-            'venue': {
-                'name': {
-                    'defaultValue': {
-                        'language': 'en-US',
-                        'value': self.event.venue_name if not self.event.room_name
-                        else f'{self.event.venue_name} - Room {self.event.room_name}'
-                    }
-                },
-                'address': {
-                    'defaultValue': {
-                        'language': 'en-US',
-                        'value': self.event.address
-                    }
-                }
-            },
             'logo': {
                 'sourceUri': {
                     'uri': logo_url
@@ -130,8 +115,23 @@ class GoogleWalletManager:
                 }
             }
         }
-        if not dict_template['venue']['name']['defaultValue']['value']:
-            dict_template.pop('venue')
+        if self.event.venue:
+            dict_template['venue'] = {
+                'name': {
+                    'defaultValue': {
+                        'language': 'en-US',
+                        'value': self.event.venue_name if not self.event.room_name
+                        else f'{self.event.venue_name} - Room {self.event.room_name}'
+                    }
+                }
+            }
+            if self.event.address:  # In Google Wallet the address is displayed ONLY if venue name is present
+                dict_template['venue']['address'] = {
+                    'defaultValue': {
+                        'language': 'en-US',
+                        'value': self.event.address
+                    }
+                }
         if self.event.has_logo and self.event.is_public:  # Event logo MUST be reachable via URL as anon
             dict_template['heroImage'] = {
                 'sourceUri': {
