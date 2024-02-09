@@ -810,7 +810,7 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
                     reg.state = RegistrationState.complete
                 if prev_state != reg.state:
                     changes['state'] = (prev_state, reg.state)
-                    signals.event.registration_state_updated.send(self, previous_state=prev_state, silent=True)
+                    signals.event.registration_state_updated.send(reg, previous_state=prev_state, silent=True)
                     notify_registration_state_update(reg, from_management=True)
                 if changes:
                     reg.log(EventLogRealm.management, LogKind.change, 'Registration',
