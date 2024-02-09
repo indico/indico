@@ -74,17 +74,30 @@ class RHAllEventTemplates(RHManageRegFormsBase):
 class RHEventImages(RHManageRegFormsBase):
     """Get all available images for an event."""
 
-    def _make_preview(self, img):
-        if not is_image_supported(img.content_type):
-            return ''
-        with img.open() as f, Image.open(f) as pic:
-            pic = square(pic)
-            if pic.height > 256:
-                pic = pic.resize((256, 256), resample=Image.BICUBIC)
+    PREVIEW_SIZE = 256
+
+    def _make_preview(self, img, byte_array=False):
+        def _process_img(preview):
+            preview = square(preview)
+            if preview.height > self.PREVIEW_SIZE:
+                preview = preview.resize((self.PREVIEW_SIZE, self.PREVIEW_SIZE), resample=Image.BICUBIC)
+            # properly remove transparencies to prepare for JPEG conversion
+            if preview.mode in {'RGBA', 'LA'}:
+                background = Image.new(preview.mode[:-1], preview.size, 'white')
+                background.paste(preview, preview.split()[-1])
+                preview = background
             image_bytes = BytesIO()
-            pic.save(image_bytes, 'PNG')
+            preview.save(image_bytes, 'JPEG')
             image_bytes.seek(0)
             return base64.b64encode(image_bytes.read())
+
+        if byte_array:
+            with Image.open(BytesIO(img)) as preview:
+                return _process_img(preview)
+        if not is_image_supported(img.content_type):
+            return ''
+        with img.open() as f, Image.open(f) as preview:
+            return _process_img(preview)
 
     def _process(self):
         # Fetch layout images
@@ -99,9 +112,9 @@ class RHEventImages(RHManageRegFormsBase):
         attachments = get_event_attachment_images(self.event)
         images.extend([{
             'identifier': f'event://attachments/{id}',
-            'filename': (attachment.file.filename
+            'filename': (attachment.title
                          if attachment.folder.is_default
-                         else f'{attachment.folder.title}/{attachment.file.filename}'),
+                         else f'{attachment.folder.title}/{attachment.title}'),
             'preview': self._make_preview(attachment.file),
             'supported': is_image_supported(attachment.file.content_type)
         } for id, attachment in attachments.items()])
@@ -111,7 +124,7 @@ class RHEventImages(RHManageRegFormsBase):
             images.append({
                 'identifier': 'event://logo',
                 'filename': self.event.logo_metadata['filename'],
-                'preview': base64.b64encode(self.event.logo),
+                'preview': self._make_preview(self.event.logo, byte_array=True),
                 'supported': True  # event logos are always saved in PNG
             })
         return jsonify(images=images)
