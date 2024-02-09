@@ -623,7 +623,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
             room = event.room
             if room and room.id not in rooms:
                 rooms[room.id] = {'id': room.id,
-                                  'title': room.verbose_name or room.generate_name(),
+                                  'title': room.full_name,
                                   'venueId': room.location_id}
             if self.group_by == self.GroupBy.category:
                 comparison_id = category_id

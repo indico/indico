@@ -200,7 +200,15 @@ import CalendarLegend from './components/CalendarLegend';
           );
         }
 
-        function setupLegendByAttribute(events, items, attr, defaultTitle, rootId, rootTitle) {
+        function setupLegendByAttribute(
+          events,
+          items,
+          attr,
+          defaultTitle,
+          rootId,
+          rootTitle,
+          sortMethod
+        ) {
           const itemMap = items.reduce(
             (acc, {id, title, url}) => ({
               ...acc,
@@ -237,17 +245,19 @@ import CalendarLegend from './components/CalendarLegend';
               } else if (b.isSpecial) {
                 return 1;
               }
-              return a.title.localeCompare(b.title);
+              return sortMethod ? sortMethod(a.title, b.title) : a.title.localeCompare(b.title);
             });
         }
 
         function setupLegendByRoom(events, locations, rooms) {
+          const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
           const result = setupLegendByAttribute(
             events,
             rooms,
             'roomId',
             Translate.string('No room'),
-            0
+            0,
+            collator.compare
           );
           // if there are no locations no need to indent
           if (locations.length <= 1) {
