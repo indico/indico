@@ -80,6 +80,8 @@ Improvements
   thanks :user:`Moliholy, unconventionaldotdev`)
 - Add a "Picture" personal data field to registrations. When used, it allows including the
   picture provided by the user on badges/tickets (:pr:`6160`, thanks :user:`vtran99`)
+- Filter events by room in the calendar legend
+  (:issue:`6148, 6149`, :pr:`6158`, thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
