@@ -1,7 +1,7 @@
 """Add picture personal data type for registrations
 
 Revision ID: 17996ef18cb9
-Revises: 8e08236a529f
+Revises: 5bb555dd91eb
 Create Date: 2024-01-30 15:31:42.810562
 """
 
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '17996ef18cb9'
-down_revision = '8e08236a529f'
+down_revision = '5bb555dd91eb'
 branch_labels = None
 depends_on = None
 
