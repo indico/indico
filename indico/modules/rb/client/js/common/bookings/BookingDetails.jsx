@@ -916,7 +916,7 @@ class BookingDetails extends React.Component {
               <Grid.Column>
                 <>
                   {bookedForUser && this.renderBookedFor(bookedForUser)}
-                  {this.renderReason(bookingReason)}
+                  {bookingReason && this.renderReason(bookingReason)}
                   {room.canUserViewInternalNotes && this.renderNotes(internalNote)}
                   {isLinkedToObject && (
                     <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
