@@ -1,0 +1,31 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.image-select-field :global(.ui.selection.dropdown .menu > .item) {
+  padding: 0 !important;
+
+  .option-header {
+    font-size: 0.9em;
+    display: flex;
+  }
+
+  .preview {
+    display: flex;
+    width: 4.5em;
+    height: 4.5em;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  :global(.content) {
+    padding: 1em;
+  }
+}

@@ -7,17 +7,11 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {
-  Form,
-  Header,
-  HeaderContent,
-  HeaderSubheader,
-  Icon,
-  IconGroup,
-  Image,
-} from 'semantic-ui-react';
+import {Form, Header, HeaderContent, HeaderSubheader, Icon, IconGroup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+
+import './EventImageSelectField.module.scss';
 
 const imageShape = {
   identifier: PropTypes.string.isRequired,
@@ -32,6 +26,28 @@ const imageSource = {
   logo: Translate.string('from Logo'),
 };
 
+const EventImageOption = ({identifier, filename, preview, supported}) => (
+  <Header styleName="option-header">
+    <div
+      styleName="preview"
+      style={preview ? {backgroundImage: `url('data:image/jpeg;base64,${preview}')`} : undefined}
+    >
+      {!preview && (
+        <IconGroup size="big">
+          <Icon name="file image" />
+          <Icon corner="bottom right" name="dont" />
+        </IconGroup>
+      )}
+    </div>
+    <HeaderContent>
+      {filename} {!supported && <Translate as="em">(unsupported image type)</Translate>}
+      <HeaderSubheader content={imageSource[new URL(identifier).host]} />
+    </HeaderContent>
+  </Header>
+);
+
+EventImageOption.propTypes = imageShape;
+
 const EventImageSelectField = ({
   name,
   label,
@@ -45,27 +61,12 @@ const EventImageSelectField = ({
   <Form.Dropdown
     label={label}
     name={name}
-    options={eventImages.map(({identifier, filename, preview, supported}) => ({
-      key: identifier,
-      value: identifier,
-      text: filename,
-      disabled: !supported,
-      content: (
-        <Header style={{fontSize: 14}}>
-          {preview ? (
-            <Image src={`data:image/jpeg;base64,${preview}`} />
-          ) : (
-            <IconGroup size="big">
-              <Icon name="file image" />
-              <Icon corner="top right" name="exclamation circle" />
-            </IconGroup>
-          )}
-          <HeaderContent>
-            {filename}
-            <HeaderSubheader content={imageSource[new URL(identifier).host]} />
-          </HeaderContent>
-        </Header>
-      ),
+    options={eventImages.map(image => ({
+      key: image.identifier,
+      value: image.identifier,
+      text: image.filename,
+      disabled: !image.supported,
+      content: <EventImageOption {...image} />,
     }))}
     noResultsMessage={
       loading
@@ -80,6 +81,7 @@ const EventImageSelectField = ({
     clearable={!required}
     onChange={(_, {value: v}) => onChange(v)}
     onOpen={onOpen}
+    styleName="image-select-field"
     selection
     search
   />
