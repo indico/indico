@@ -114,7 +114,12 @@
                                             {% endif %}
                                         </td>
                                     {% else %}
-                                        <td class="i-table">{{ data[item.id].friendly_data if item.id in data }}</td>
+                                        {% set search_value = data[item.id].search_data if item.id in data else '' %}
+                                        <td class="i-table" data-text="{{ search_value }}">
+                                            {%- if item.id in data and data[item.id].friendly_data %}
+                                                {{- data[item.id].friendly_data }}
+                                            {%- endif %}
+                                        </td>
                                     {% endif %}
                                 {% endfor %}
                                 {% for item in dynamic_columns %}
