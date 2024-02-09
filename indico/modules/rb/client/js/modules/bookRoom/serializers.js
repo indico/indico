@@ -18,7 +18,10 @@ export const ajax = {
   repeat_frequency: recurrenceFrequencySerializer,
   repeat_interval: recurrenceIntervalSerializer,
   recurrence_weekdays: recurrenceWeekdaysSerializer,
-  reason: ({reason}) => reason,
+  reason: {
+    onlyIf: ({reason}) => !!reason,
+    serializer: ({reason}) => reason,
+  },
   user: {
     onlyIf: ({usage}) => usage === 'someone',
     serializer: ({user}) => user,
