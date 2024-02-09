@@ -177,6 +177,8 @@ class RHCreateBooking(RHRoomBookingBase):
                    .format(self.room.name, booking_limit_days))
             raise ExpectedError(msg)
 
+        self._validate_reason(args['booking_reason'], args.get('link_id'))
+
         try:
             resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
                                                 ignore_admin=(not admin_override))
@@ -330,6 +332,8 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_interval': args['repeat_interval'],
             'recurrence_weekdays': args['recurrence_weekdays'],
         }
+
+        self._validate_reason(args['booking_reason'], args.get('link_id'))
 
         check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 

@@ -9,9 +9,11 @@ from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
+from indico.modules.rb import BookingReasonRequiredOptions, rb_settings
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.i18n import _
 from indico.web.rh import RHProtected
+from indico.web.util import ExpectedError
 
 
 class RHRoomBookingBase(RHProtected):
@@ -23,3 +25,13 @@ class RHRoomBookingBase(RHProtected):
         RHProtected._check_access(self)
         if not rb_check_user_access(session.user):
             raise Forbidden(_('You are not authorized to access the room booking system.'))
+
+    def _validate_reason(self, reason, link):
+        required = rb_settings.get('booking_reason_required')
+        validate = False
+        if required == BookingReasonRequiredOptions.always:
+            validate = True
+        elif required == BookingReasonRequiredOptions.not_for_events:
+            validate = link is None
+        if validate and not reason:
+            raise ExpectedError(_('You must specify a reason for booking'))
