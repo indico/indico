@@ -593,8 +593,8 @@ class Registration(db.Model):
                                 abbrev_first_name=abbrev_first_name)
 
     def get_personal_data(self):
-        # the personal data picture is not rendered in this method,
-        # use get_personal_data_picture to get the picture data.
+        # the personal data picture is not included in this method since it's rather
+        # useless here. use `get_personal_data_picture` to get it when needed
         personal_data = {}
         for data in self.data:
             field = data.field_data.field
