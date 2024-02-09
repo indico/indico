@@ -376,7 +376,7 @@ class CreateBookingSchema(mm.Schema):
     recurrence_weekdays = fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)))
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
-    booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), load_default='')
+    booking_reason = fields.String(data_key='reason', validate=validate.Regexp(r'^(?:.{0}|.{3,})$'), load_default='')
     internal_note = fields.String()
     is_prebooking = fields.Bool(load_default=False)
     link_type = EnumField(LinkType)

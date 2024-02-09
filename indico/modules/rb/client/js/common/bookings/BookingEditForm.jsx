@@ -28,6 +28,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
+import {selectors as configSelectors} from '../../common/config';
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
 import {FinalWeekdayRecurrencePicker} from '../../components/WeekdayRecurrencePicker';
 import {sanitizeRecurrence, getRecurrenceInfo} from '../../util';
@@ -42,11 +43,13 @@ class BookingEditForm extends React.Component {
     formProps: PropTypes.object.isRequired,
     onBookingPeriodChange: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
+    bookingReasonRequired: PropTypes.bool,
   };
 
   static defaultProps = {
     onBookingPeriodChange: () => {},
     hideOptions: {},
+    bookingReasonRequired: true,
   };
 
   showApprovalWarning = (dirtyFields, initialValues, values) => {
@@ -157,10 +160,11 @@ class BookingEditForm extends React.Component {
   render() {
     const {
       user: sessionUser,
-      booking: {bookedForUser, startDt, endDt, room, isAccepted, repetition},
+      booking: {bookedForUser, startDt, endDt, room, isAccepted, repetition, link},
       onBookingPeriodChange,
       formProps,
       hideOptions,
+      bookingReasonRequired,
     } = this.props;
     const {
       values: {dates, recurrence, timeSlot, usage},
@@ -168,6 +172,8 @@ class BookingEditForm extends React.Component {
       form,
       handleSubmit,
     } = formProps;
+    const requireReason =
+      {always: true, never: false, not_for_events: !link}[bookingReasonRequired] ?? true;
     const bookedByCurrentUser = sessionUser.id === bookedForUser.id;
     const today = moment();
     const bookingStarted = today.isAfter(startDt, 'day');
@@ -374,7 +380,7 @@ class BookingEditForm extends React.Component {
           <FinalTextArea
             name="reason"
             placeholder={Translate.string('Reason for booking')}
-            required
+            required={requireReason}
             disabled={submitSucceeded}
           />
         </Segment>
@@ -396,4 +402,5 @@ class BookingEditForm extends React.Component {
 
 export default connect(state => ({
   user: userSelectors.getUserInfo(state),
+  bookingReasonRequired: configSelectors.getBookingReasonRequired(state),
 }))(Overridable.component('BookingEditForm', BookingEditForm));
