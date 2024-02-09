@@ -324,7 +324,7 @@ def get_event_attachment_images(event: Event) -> dict[str, Attachment]:
     all_attachments = attached_items.get('files', []).copy()
     for folder in attached_items.get('folders', []):
         all_attachments.extend(folder.attachments)
-    return {attachment.id: attachment for attachment in all_attachments if attachment.file.is_image}
+    return {att.id: att for att in all_attachments if att.file.is_image}
 
 
 def is_image_supported(content_type: str) -> bool:

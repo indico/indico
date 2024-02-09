@@ -23,7 +23,7 @@ const imageShape = {
 const imageSource = {
   images: Translate.string('from Images'),
   attachments: Translate.string('from Materials'),
-  logo: Translate.string('from Logo'),
+  logo: Translate.string('Event Logo'),
 };
 
 const EventImageOption = ({identifier, filename, preview, supported}) => (
@@ -48,7 +48,7 @@ const EventImageOption = ({identifier, filename, preview, supported}) => (
 
 EventImageOption.propTypes = imageShape;
 
-const EventImageSelectField = ({
+export default function EventImageSelectField({
   name,
   label,
   value,
@@ -57,35 +57,37 @@ const EventImageSelectField = ({
   onChange,
   onOpen,
   eventImages,
-}) => (
-  <Form.Dropdown
-    label={label}
-    name={name}
-    options={eventImages.map(image => ({
-      key: image.identifier,
-      value: image.identifier,
-      text: image.filename,
-      disabled: !image.supported,
-      content: <EventImageOption {...image} />,
-    }))}
-    noResultsMessage={
-      loading
-        ? Translate.string('Loading images...')
-        : Translate.string('No images were found in this event.')
-    }
-    value={value}
-    required={required}
-    loading={loading}
-    selectOnNavigation={false}
-    selectOnBlur={false}
-    clearable={!required}
-    onChange={(_, {value: v}) => onChange(v)}
-    onOpen={onOpen}
-    styleName="image-select-field"
-    selection
-    search
-  />
-);
+}) {
+  return (
+    <Form.Dropdown
+      label={label}
+      name={name}
+      options={eventImages.map(image => ({
+        key: image.identifier,
+        value: image.identifier,
+        text: image.filename,
+        disabled: !image.supported,
+        content: <EventImageOption {...image} />,
+      }))}
+      noResultsMessage={
+        loading
+          ? Translate.string('Loading images...')
+          : Translate.string('No images were found in this event.')
+      }
+      value={value}
+      required={required}
+      loading={loading}
+      selectOnNavigation={false}
+      selectOnBlur={false}
+      clearable={!required}
+      onChange={(_, {value: v}) => onChange(v)}
+      onOpen={onOpen}
+      styleName="image-select-field"
+      selection
+      search
+    />
+  );
+}
 
 EventImageSelectField.propTypes = {
   name: PropTypes.string.isRequired,
@@ -106,5 +108,3 @@ EventImageSelectField.defaultProps = {
   onOpen: () => {},
   eventImages: [],
 };
-
-export default EventImageSelectField;
