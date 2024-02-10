@@ -16,6 +16,7 @@ from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLanguagesForm, EventLocationForm,
                                                     EventPersonsForm)
+from indico.modules.events.management.settings import misc_settings
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
 from indico.modules.events.models.labels import EventLabel
@@ -27,9 +28,11 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_check_if_visible
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoTagListField
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -147,6 +150,19 @@ class RHEditEventContactInfo(RHEditEventDataBase):
 class RHEditEventClassification(RHEditEventDataBase):
     form_class = EventClassificationForm
     section_name = 'classification'
+
+    def _process(self):
+        allowed_keywords = misc_settings.get('allowed_keywords')
+        if allowed_keywords:
+            default = list(filter(lambda kw: kw in allowed_keywords, self.event.keywords))
+            self.form_class.keywords = IndicoSelectMultipleCheckboxField(_('Keywords'), choices=allowed_keywords,
+                                                                         default=default)
+        else:
+            self.form_class.keywords = IndicoTagListField(_('Keywords'))
+        return super()._process()
+
+    def render_form(self, form):
+        return jsonify_form(form, footer_align_right=True, disabled_until_change=False)
 
 
 class RHEditEventLanguages(RHEditEventDataBase):

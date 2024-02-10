@@ -105,7 +105,12 @@ import CalendarLegend from './components/CalendarLegend';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          const attr = {category: 'categoryId', location: 'venueId', room: 'roomId'}[groupBy];
+          const attr = {
+            category: 'categoryId',
+            location: 'venueId',
+            room: 'roomId',
+            keywords: 'keywordId',
+          }[groupBy];
           if (!attr) {
             throw new Error(`Invalid "groupBy": ${groupBy}`);
           }
@@ -195,6 +200,7 @@ import CalendarLegend from './components/CalendarLegend';
               onElementSelected={onElementSelected}
               selectAll={selectAll}
               deselectAll={deselectAll}
+              filterByKeywords={data.allow_keywords}
             />,
             legendContainer
           );
@@ -204,15 +210,15 @@ import CalendarLegend from './components/CalendarLegend';
           events,
           items,
           attr,
-          defaultTitle,
-          rootId,
-          rootTitle = undefined,
+          defaultTitles = [],
+          rootIds = [],
+          rootTitles = [],
           sortMethod = undefined,
         }) {
           const itemMap = items.reduce(
             (acc, {id, title, url}) => ({
               ...acc,
-              [id]: {title: title ?? defaultTitle, url},
+              [id]: {title: title ?? defaultTitles[0], url},
             }),
             {}
           );
@@ -225,11 +231,12 @@ import CalendarLegend from './components/CalendarLegend';
               }
               usedItems.add(id);
               const item = itemMap[id] ?? {};
-              const isSpecial = id === rootId;
+              const idx = rootIds.findIndex(rootId => rootId === id);
+              const isSpecial = idx !== -1;
               return [
                 ...acc,
                 {
-                  title: (isSpecial ? rootTitle : item.title) ?? defaultTitle,
+                  title: (isSpecial ? rootTitles[idx] : item.title) ?? defaultTitles[idx],
                   color: value.color,
                   url: item.url,
                   isSpecial,
@@ -255,9 +262,9 @@ import CalendarLegend from './components/CalendarLegend';
             events,
             items: rooms,
             attr: 'roomId',
-            defaultTitle: Translate.string('No room'),
-            rootId: 0,
-            rootTitle: Translate.string('No room'),
+            defaultTitles: [Translate.string('No room')],
+            rootIds: [0],
+            rootTitles: [Translate.string('No room')],
             sortMethod: collator.compare,
           });
           // if there are no locations no need to indent
@@ -315,8 +322,8 @@ import CalendarLegend from './components/CalendarLegend';
                 items: data.categories,
                 attr: 'categoryId',
                 defaultTitle: Translate.string('No category'),
-                rootId: categoryId,
-                rootTitle: Translate.string('This category'),
+                rootId: [categoryId],
+                rootTitles: [Translate.string('This category')],
               });
               break;
             case 'location':
@@ -324,12 +331,25 @@ import CalendarLegend from './components/CalendarLegend';
                 events: data.events,
                 items: data.locations,
                 attr: 'venueId',
-                defaultTitle: Translate.string('No venue'),
-                rootId: 0,
+                defaultTitles: [Translate.string('No venue')],
+                rootIds: [0],
               });
               break;
             case 'room':
               items = setupLegendByRoom(data.events, data.locations, data.rooms);
+              break;
+            case 'keywords':
+              items = setupLegendByAttribute({
+                events: data.events,
+                items: data.keywords,
+                attr: 'keywordId',
+                defaultTitles: [
+                  Translate.string('Invalid keywords'),
+                  Translate.string('No keywords'),
+                  Translate.string('Many keywords'),
+                ],
+                rootIds: [-1, 0, 1],
+              });
               break;
             default:
               items = [];

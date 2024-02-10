@@ -114,6 +114,7 @@ function CalendarLegend({
   onElementSelected,
   selectAll,
   deselectAll,
+  filterByKeywords,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const parsedItems = items.map(item => mapPlainItemToLegendItem(item, onElementSelected, 0));
@@ -122,6 +123,9 @@ function CalendarLegend({
     {text: Translate.string('Venue'), value: 'location'},
     {text: Translate.string('Room'), value: 'room'},
   ];
+  if (filterByKeywords) {
+    options.push({text: Translate.string('Keywords'), value: 'keywords'});
+  }
   const onChange = (_, {value}) => {
     onFilterChanged(value);
     setIsOpen(false);
@@ -158,6 +162,11 @@ CalendarLegend.propTypes = {
   onElementSelected: PropTypes.func.isRequired,
   selectAll: PropTypes.func.isRequired,
   deselectAll: PropTypes.func.isRequired,
+  filterByKeywords: PropTypes.bool,
+};
+
+CalendarLegend.defaultProps = {
+  filterByKeywords: false,
 };
 
 export default CalendarLegend;

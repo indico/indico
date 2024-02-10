@@ -21,7 +21,7 @@ from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
+from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField, IndicoTagListField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.fields.colors import SUIColorPickerField
 from indico.web.forms.fields.principals import PrincipalListField
@@ -71,6 +71,10 @@ class EventLabelForm(IndicoForm):
             query = query.filter(EventLabel.id != self.event_label.id)
         if query.has_rows():
             raise ValidationError(_('This title is already in use.'))
+
+
+class EventKeywordsForm(IndicoForm):
+    keywords = IndicoTagListField(_('Keywords'))
 
 
 class EventCreationFormBase(IndicoForm):

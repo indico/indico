@@ -1,0 +1,33 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {% trans %}Allowed event keywords{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    {% trans %}Define the list of allowed event keywords. An empty list implies any keyword is valid.
+    {% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, back_button=false, disabled_until_change=False) }}
+
+    <script language="javascript">
+        $(document).ready(function () {
+            const id = 'keyword-continer';
+            const input = $('#keywords');
+            const field = input.parent();
+            field.attr('id', id).addClass('i-taglist-field');
+            input.remove();
+            new Taggle(id, {
+                tags: {{ keywords|tojson }},
+                allowDuplicates: false,
+                preserveCase: true,
+                saveOnBlur: true,
+                placeholder: '',
+                hiddenInputName: 'keywords',
+            });
+        });
+    </script>
+{% endblock %}

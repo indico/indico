@@ -10,7 +10,8 @@ from webargs import fields
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.forms import EventLabelForm, ReferenceTypeForm, UnlistedEventsForm
+from indico.modules.events.forms import EventKeywordsForm, EventLabelForm, ReferenceTypeForm, UnlistedEventsForm
+from indico.modules.events.management.settings import misc_settings
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
@@ -119,6 +120,21 @@ class RHCreateEventLabel(RHAdminBase):
             flash(_("Event label '{}' created successfully").format(event_label.title), 'success')
             return jsonify_data(html=_render_event_label_list())
         return jsonify_form(form)
+
+
+class RHUpdateEventKeywords(RHAdminBase):
+    """Update event keywords."""
+
+    def _process(self):
+        form = EventKeywordsForm()
+        keywords = None
+        if form.validate_on_submit():
+            keywords = sorted({kw.lower() for kw in form.data.get('keywords', [])})
+            misc_settings.set('allowed_keywords', keywords)
+            flash(_('Allowed keywords have been saved'), 'success')
+        if not keywords:
+            keywords = misc_settings.get('allowed_keywords')
+        return WPEventAdmin.render_template('admin/event_keywords.html', 'event_keywords', keywords=keywords, form=form)
 
 
 class RHEditEventLabel(RHManageEventLabelBase):
