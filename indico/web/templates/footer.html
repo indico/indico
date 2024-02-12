@@ -9,7 +9,7 @@
         <div class="flexrow f-j-space-between">
             <div class="flexrow f-a-center f-self-stretch">
                 {% block footer_logo %}
-                    {% set filename = 'indico_small_white.png' if dark|default(false) else 'indico_small.png' %}
+                    {% set filename = 'indico_small_white.svg' if dark|default(false) else 'indico_small.svg' %}
                     <img src="{{ url_for('assets.image', filename=filename) }}" class="footer-logo" alt="Indico">
                 {% endblock %}
                 <div class="f-self-no-shrink" style="margin-left: 1em;">
