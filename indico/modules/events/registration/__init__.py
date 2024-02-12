@@ -249,7 +249,7 @@ def _patch_google_wallet_class(event, changes, **kwargs):
     if not config.ENABLE_GOOGLE_WALLET:
         return
     look_for = ['title', 'start_dt', 'end_dt', 'location_data']  # Fields that will update Google Wallet content
-    if [i for i in look_for if i in changes] and event.has_google_wallet_tickets:
+    if set(changes) & look_for and event.has_google_wallet_tickets:
         gwm = GoogleWalletManager(event)
         if gwm.configured():
             ticket_class = gwm.create_class_template(gwm.settings['google_wallet_issuer_id'],
