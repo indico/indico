@@ -184,11 +184,8 @@ const SettingsPage = props => {
             />
             <FinalDropdown
               options={bookingRequiredOptions}
-              hideValidationError
               required
               selection
-              multiple={false}
-              search={false}
               name="booking_reason_required"
               label={Translate.string('Booking reason required')}
               description={Translate.string('Specify when a booking reason must be provided.')}
