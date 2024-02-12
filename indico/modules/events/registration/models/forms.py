@@ -16,6 +16,7 @@ from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -534,7 +535,8 @@ class RegistrationForm(db.Model):
 
     @property
     def is_google_wallet_configured(self):
-        return GoogleWalletManager.get_google_wallet_settings(self.event.category) is not None
+        return (config.ENABLE_GOOGLE_WALLET and GoogleWalletManager.get_google_wallet_settings(self.event.category)
+                is not None)
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
