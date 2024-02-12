@@ -379,6 +379,7 @@ class BookingEditForm extends React.Component {
           </FieldCondition>
           <FinalTextArea
             name="reason"
+            nullIfEmpty
             placeholder={Translate.string('Reason for booking')}
             required={requireReason}
             disabled={submitSucceeded}

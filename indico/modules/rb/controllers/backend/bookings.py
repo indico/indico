@@ -41,7 +41,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_args
 from indico.web.flask.util import url_for
 from indico.web.util import ExpectedError
 
@@ -177,8 +177,6 @@ class RHCreateBooking(RHRoomBookingBase):
                    .format(self.room.name, booking_limit_days))
             raise ExpectedError(msg)
 
-        self._validate_reason(args['booking_reason'], args.get('link_id'))
-
         try:
             resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook,
                                                 ignore_admin=(not admin_override))
@@ -306,7 +304,7 @@ class RHUpdateBooking(RHBookingBase):
         if not self.booking.can_edit(session.user):
             raise Forbidden
 
-    @use_args(CreateBookingSchema)
+    @use_rh_args(CreateBookingSchema)
     def _process(self, args):
         room = self.booking.room
 
@@ -332,8 +330,6 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_interval': args['repeat_interval'],
             'recurrence_weekdays': args['recurrence_weekdays'],
         }
-
-        self._validate_reason(args['booking_reason'], args.get('link_id'))
 
         check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 
