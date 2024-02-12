@@ -76,6 +76,8 @@ Improvements
 - Add the ability to clone privacy settings (:pr:`6156`, thanks :user:`SegiNyn`)
 - Add option for managers to change the registration fee of a set of registrations (:issue:`6132`,
   :pr:`6138`)
+- Add setting to configure whether room bookings require a reason (:issue:`6150`, :pr:`6155`,
+  thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
