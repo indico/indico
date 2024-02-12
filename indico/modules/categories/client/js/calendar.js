@@ -257,6 +257,7 @@ import CalendarLegend from './components/CalendarLegend';
             'roomId',
             Translate.string('No room'),
             0,
+            Translate.string('No room'),
             collator.compare
           );
           // if there are no locations no need to indent
