@@ -876,7 +876,7 @@ System
 
 .. data:: ENABLE_GOOGLE_WALLET
 
-    Whether to enable the Google Wallet ticket.
+    Whether to enable the Google Wallet integration for event tickets.
 
     Default: ``False``
 
