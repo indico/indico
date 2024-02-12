@@ -620,6 +620,7 @@ class BookRoomModal extends React.Component {
                   </FieldCondition>
                   <FinalTextArea
                     name="reason"
+                    nullIfEmpty
                     placeholder={Translate.string('Reason for booking')}
                     disabled={fprops.submitSucceeded}
                     required={requireReason}
