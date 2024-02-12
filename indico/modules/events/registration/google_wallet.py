@@ -275,5 +275,6 @@ class GoogleWalletManager:
         token = jwt.encode(signer, claims).decode('utf-8')
         return f'https://pay.google.com/gp/v/save/{token}' if token else ''
 
+    @property
     def configured(self):
         return bool(self.credentials)
