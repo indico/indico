@@ -409,7 +409,7 @@ class CreateBookingSchema(mm.Schema):
         elif required == BookingReasonRequiredOptions.not_for_events:
             validate = link_id is None
         if validate and not booking_reason:
-            raise ValidationError('Booking reason not specified')
+            raise ValidationError('Booking reason not specified', 'reason')
 
     @post_load
     def _weekdays_only_weekly(self, data, **kwargs):
