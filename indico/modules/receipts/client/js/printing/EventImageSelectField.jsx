@@ -72,37 +72,48 @@ export default function EventImageSelectField({
   required,
   loading,
   onChange,
-  onOpen,
+  onRefresh,
   eventImages,
 }) {
   return (
-    <Form.Dropdown
-      label={label}
-      name={name}
-      options={eventImages.map(image => ({
-        key: image.identifier,
-        value: image.identifier,
-        text: image.filename,
-        disabled: !image.preview,
-        content: <EventImageOption {...image} />,
-      }))}
-      noResultsMessage={
-        loading
-          ? Translate.string('Loading images...')
-          : Translate.string('No images were found in this event.')
-      }
-      value={value}
-      required={required}
-      loading={loading}
-      selectOnNavigation={false}
-      selectOnBlur={false}
-      clearable={!required}
-      onChange={(_, {value: v}) => onChange(v)}
-      onOpen={onOpen}
-      styleName="image-select-field"
-      selection
-      search
-    />
+    <Form.Group styleName="image-select-field">
+      <Form.Dropdown
+        label={label}
+        name={name}
+        options={eventImages.map(image => ({
+          key: image.identifier,
+          value: image.identifier,
+          text: image.filename,
+          disabled: !image.preview,
+          content: <EventImageOption {...image} />,
+        }))}
+        placeholder={Translate.string('Select an image from the event')}
+        noResultsMessage={
+          loading
+            ? Translate.string('Loading images...')
+            : Translate.string('No images were found in this event.')
+        }
+        value={value}
+        required={required}
+        loading={loading}
+        selectOnNavigation={false}
+        selectOnBlur={false}
+        clearable={!required}
+        onChange={(_, {value: v}) => onChange(v)}
+        selection
+        search
+        width={16}
+      />
+      {onRefresh && (
+        <Popup
+          content={Translate.string('Get new images')}
+          trigger={
+            <Icon name="sync" color="grey" onClick={onRefresh} disabled={loading} link={!loading} />
+          }
+          disabled={loading}
+        />
+      )}
+    </Form.Group>
   );
 }
 
@@ -112,8 +123,8 @@ EventImageSelectField.propTypes = {
   value: PropTypes.string,
   required: PropTypes.bool,
   loading: PropTypes.bool,
-  onChange: PropTypes.func,
-  onOpen: PropTypes.func,
+  onChange: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func,
   eventImages: PropTypes.arrayOf(PropTypes.shape(imageShape)),
 };
 
@@ -121,7 +132,6 @@ EventImageSelectField.defaultProps = {
   value: null,
   required: false,
   loading: false,
-  onChange: () => {},
-  onOpen: () => {},
+  onRefresh: null,
   eventImages: [],
 };

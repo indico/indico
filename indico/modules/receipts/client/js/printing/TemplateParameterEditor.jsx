@@ -92,7 +92,7 @@ function CustomField({
         loading={loadingImages}
         onChange={onChange}
         eventImages={eventImages}
-        onOpen={() => fetchImages()}
+        onRefresh={() => fetchImages()}
       />
     );
   }
