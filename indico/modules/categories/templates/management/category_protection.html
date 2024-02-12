@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+    {{ template_hook('category-protection-page', category=category) }}
     {{ form_header(form) }}
     {{ form_row(form.permissions, skip_label=true) }}
     {{ form_rows(form, skip=('permissions',),
