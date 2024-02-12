@@ -51,7 +51,8 @@ class RHConfig(RHRoomBookingBase):
                        has_tos=bool(tos_url or tos_html),
                        tos_html=tos_html,
                        has_privacy_policy=bool(privacy_policy_url or privacy_policy_html),
-                       privacy_policy_html=privacy_policy_html)
+                       privacy_policy_html=privacy_policy_html,
+                       booking_reason_required=rb_settings.get('booking_reason_required').name)
 
 
 class RHNotificationSettings(RHRoomBookingBase):

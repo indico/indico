@@ -41,7 +41,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_args
 from indico.web.flask.util import url_for
 from indico.web.util import ExpectedError
 
@@ -304,7 +304,7 @@ class RHUpdateBooking(RHBookingBase):
         if not self.booking.can_edit(session.user):
             raise Forbidden
 
-    @use_args(CreateBookingSchema)
+    @use_rh_args(CreateBookingSchema)
     def _process(self, args):
         room = self.booking.room
 

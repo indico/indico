@@ -20,6 +20,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.rb import BookingReasonRequiredOptions, rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
@@ -368,6 +369,9 @@ class RBUserSchema(UserSchema):
 
 
 class CreateBookingSchema(mm.Schema):
+    class Meta:
+        rh_context = ('booking',)
+
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
     repeat_frequency = EnumField(RepeatFrequency, required=True)
@@ -375,7 +379,7 @@ class CreateBookingSchema(mm.Schema):
     recurrence_weekdays = fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)))
     room_id = fields.Int(required=True)
     booked_for_user = Principal(data_key='user', allow_external_users=True)
-    booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
+    booking_reason = fields.String(data_key='reason', load_default='')
     internal_note = fields.String()
     is_prebooking = fields.Bool(load_default=False)
     link_type = EnumField(LinkType)
@@ -392,6 +396,20 @@ class CreateBookingSchema(mm.Schema):
     def _check_weekdays_unique(self, weekdays, **kwargs):
         if weekdays and len(weekdays) != len(set(weekdays)):
             raise ValidationError('Duplicate weekdays')
+
+    @validates_schema(skip_on_field_errors=True)
+    def _check_booking_reason(self, data, **kwargs):
+        booking = self.context.get('booking')
+        link_id = booking.link_id if booking else data.get('link_id')
+        booking_reason = data.get('booking_reason')
+        required = rb_settings.get('booking_reason_required')
+        validate = False
+        if required == BookingReasonRequiredOptions.always:
+            validate = True
+        elif required == BookingReasonRequiredOptions.not_for_events:
+            validate = link_id is None
+        if validate and not booking_reason:
+            raise ValidationError('Booking reason not specified', 'reason')
 
     @post_load
     def _weekdays_only_weekly(self, data, **kwargs):
@@ -518,6 +536,7 @@ class SettingsSchema(mm.Schema):
     hide_module_if_unauthorized = fields.Bool()
     tileserver_url = fields.String(validate=validate.URL(schemes={'http', 'https'}), allow_none=True)
     booking_limit = fields.Int(validate=not_empty)
+    booking_reason_required = EnumField(BookingReasonRequiredOptions, required=True)
     notifications_enabled = fields.Bool()
     notification_before_days = fields.Int(validate=validate.Range(min=1, max=30))
     notification_before_days_weekly = fields.Int(validate=validate.Range(min=1, max=30))
