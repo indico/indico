@@ -174,13 +174,18 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
                 image = attachment.file
             if not image:
                 raise ValueError('Invalid event-local image reference')
-            if not is_image_supported(image.content_type):
-                raise ValueError('Unsupported image format')
-            with image.open() as f:
-                return {
-                    'mime_type': image.content_type,
-                    'string': f.read()
-                }
+            try:
+                with image.open() as f, Image.open(f) as pic:
+                    if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                        raise ValueError('Unsupported image format')
+                    output = BytesIO()
+                    pic.save(output, format=pic.format)
+                    return {
+                        'mime_type': image.content_type,
+                        'string': output.getvalue()
+                    }
+            except OSError:
+                raise ValueError('Invalid image file')
 
         # Make sure people don't do anything funny...
         if url_data.scheme not in {'http', 'https'}:
@@ -325,8 +330,3 @@ def get_event_attachment_images(event: Event) -> dict[str, Attachment]:
     for folder in attached_items.get('folders', []):
         all_attachments.extend(folder.attachments)
     return {att.id: att for att in all_attachments if att.file.is_image}
-
-
-def is_image_supported(content_type: str) -> bool:
-    """Check if the given content type is an image supported by Pillow."""
-    return content_type.split('/')[1].upper() in Image.OPEN

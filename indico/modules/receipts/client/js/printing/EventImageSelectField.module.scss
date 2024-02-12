@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .image-select-field :global(.ui.selection.dropdown .menu > .item) {
   padding: 0 !important;
 
@@ -20,9 +22,7 @@
     align-items: center;
     justify-content: center;
     vertical-align: middle;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: no-repeat center/cover $light-gray;
   }
 
   :global(.content) {

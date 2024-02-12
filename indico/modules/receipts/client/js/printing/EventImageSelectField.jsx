@@ -7,7 +7,15 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Form, Header, HeaderContent, HeaderSubheader, Icon, IconGroup} from 'semantic-ui-react';
+import {
+  Form,
+  Header,
+  HeaderContent,
+  HeaderSubheader,
+  Icon,
+  IconGroup,
+  Popup,
+} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -17,7 +25,6 @@ const imageShape = {
   identifier: PropTypes.string.isRequired,
   filename: PropTypes.string.isRequired,
   preview: PropTypes.string.isRequired,
-  supported: PropTypes.bool.isRequired,
 };
 
 const imageSource = {
@@ -26,25 +33,35 @@ const imageSource = {
   logo: Translate.string('Event Logo'),
 };
 
-const EventImageOption = ({identifier, filename, preview, supported}) => (
-  <Header styleName="option-header">
-    <div
-      styleName="preview"
-      style={preview ? {backgroundImage: `url('data:image/jpeg;base64,${preview}')`} : undefined}
-    >
-      {!preview && (
-        <IconGroup size="big">
-          <Icon name="file image" />
-          <Icon corner="bottom right" name="dont" />
-        </IconGroup>
-      )}
-    </div>
-    <HeaderContent>
-      {filename} {!supported && <Translate as="em">(unsupported image type)</Translate>}
-      <HeaderSubheader content={imageSource[new URL(identifier).host]} />
-    </HeaderContent>
-  </Header>
-);
+function EventImageOption({identifier, filename, preview}) {
+  return (
+    <Header styleName="option-header">
+      <div
+        styleName="preview"
+        style={preview ? {backgroundImage: `url('data:image/jpeg;base64,${preview}')`} : undefined}
+      >
+        {!preview && (
+          <IconGroup size="big">
+            <Icon name="file image" color="grey" />
+            <Icon corner="bottom right" name="dont" color="grey" />
+          </IconGroup>
+        )}
+      </div>
+      <HeaderContent>
+        {!preview && (
+          <Popup
+            content={Translate.string(
+              'This field only accepts jpg, png, gif and webp picture formats.'
+            )}
+            trigger={<Icon name="warning sign" />}
+          />
+        )}
+        {filename}
+        <HeaderSubheader content={imageSource[new URL(identifier).host]} />
+      </HeaderContent>
+    </Header>
+  );
+}
 
 EventImageOption.propTypes = imageShape;
 
@@ -66,7 +83,7 @@ export default function EventImageSelectField({
         key: image.identifier,
         value: image.identifier,
         text: image.filename,
-        disabled: !image.supported,
+        disabled: !image.preview,
         content: <EventImageOption {...image} />,
       }))}
       noResultsMessage={

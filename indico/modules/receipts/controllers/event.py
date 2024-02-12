@@ -32,7 +32,7 @@ from indico.modules.receipts.schemas import ReceiptTemplateDBSchema
 from indico.modules.receipts.settings import receipt_defaults
 from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code, create_pdf,
                                           get_event_attachment_images, get_inherited_templates,
-                                          get_safe_template_context, is_image_supported)
+                                          get_safe_template_context)
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.images import square
@@ -94,18 +94,20 @@ class RHEventImages(RHManageRegFormsBase):
         if isinstance(img, bytes):
             with Image.open(BytesIO(img)) as preview:
                 return _process_img(preview)
-        if not is_image_supported(img.content_type):
+        try:
+            with img.open() as f, Image.open(f) as preview:
+                if preview.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                    return ''
+                return _process_img(preview)
+        except OSError:
             return ''
-        with img.open() as f, Image.open(f) as preview:
-            return _process_img(preview)
 
     def _process(self):
         # Fetch layout images
         images = [{
             'identifier': f'event://images/{img.id}',
             'filename': img.filename,
-            'preview': self._make_preview(img),
-            'supported': is_image_supported(img.content_type)
+            'preview': self._make_preview(img)
         } for img in self.event.layout_images]
 
         # Fetch image attachments
@@ -115,8 +117,7 @@ class RHEventImages(RHManageRegFormsBase):
             'filename': (attachment.title
                          if attachment.folder.is_default
                          else f'{attachment.folder.title}/{attachment.title}'),
-            'preview': self._make_preview(attachment.file),
-            'supported': is_image_supported(attachment.file.content_type)
+            'preview': self._make_preview(attachment.file)
         } for id, attachment in attachments.items())
 
         # Fetch event logo
@@ -124,8 +125,7 @@ class RHEventImages(RHManageRegFormsBase):
             images.append({
                 'identifier': 'event://logo',
                 'filename': self.event.logo_metadata['filename'],
-                'preview': self._make_preview(self.event.logo),
-                'supported': True  # event logos are always saved in PNG
+                'preview': self._make_preview(self.event.logo)
             })
         return jsonify(images=images)
 
