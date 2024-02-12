@@ -15,7 +15,7 @@ from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets import HiddenInput, NumberInput
+from wtforms.widgets import NumberInput
 
 from indico.core import signals
 from indico.core.config import config
@@ -348,7 +348,7 @@ class TicketsForm(IndicoForm):
 
         self.regform = kwargs.get('obj')
         if not self.regform.is_google_wallet_configured:  # Do not show if not configured at Category level
-            self.ticket_google_wallet_enabled.widget = HiddenInput()
+            del self.ticket_google_wallet_enabled
 
 
 class ParticipantsDisplayForm(IndicoForm):
