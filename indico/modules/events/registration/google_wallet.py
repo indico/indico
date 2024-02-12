@@ -11,13 +11,16 @@ from flask import flash
 from google.auth import crypt, jwt
 from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.service_account import Credentials
-from requests.exceptions import RequestException
+from requests.exceptions import HTTPError, RequestException
 from werkzeug.exceptions import BadRequest, ServiceUnavailable
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.util.i18n import _
+
+
+logger = Logger.get('events.registration')
 
 
 class GoogleWalletManager:
@@ -174,11 +177,16 @@ class GoogleWalletManager:
         The PATCH method supports patch semantics.
         """
         # Check if the class exists
-        from indico.core.logger import Logger  # Locally imported to avoid circular import issues.
         try:
             response = self.http_client.get(url=f'{self.class_url}/{issuer_id}.{class_suffix}')
+            response.raise_for_status()
+        except HTTPError as exc:
+            if exc.response.status_code != 404:
+                logger.warning('Could not update Google Wallet link: %s', exc.response.text)
+            return None
         except RequestException as exc:
-            Logger.get('events.registration').warning('Cannot update Google Wallet link: %s', str(exc))
+            logger.warning('Could not update Google Wallet link: %s', exc)
+            return None
 
         if response.status_code == 200:
             response = self.http_client.patch(url=f'{self.class_url}/{issuer_id}.{class_suffix}', json=patch_body)
