@@ -43,13 +43,12 @@ class BookingEditForm extends React.Component {
     formProps: PropTypes.object.isRequired,
     onBookingPeriodChange: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
-    bookingReasonRequired: PropTypes.string,
+    bookingReasonRequired: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
     onBookingPeriodChange: () => {},
     hideOptions: {},
-    bookingReasonRequired: true,
   };
 
   showApprovalWarning = (dirtyFields, initialValues, values) => {

@@ -93,7 +93,7 @@ class BookRoomModal extends React.Component {
       booking: IndicoPropTypes.i18n,
       preBooking: IndicoPropTypes.i18n,
     }),
-    bookingReasonRequired: PropTypes.string,
+    bookingReasonRequired: PropTypes.string.isRequired,
     bookingGracePeriod: PropTypes.number,
   };
 
@@ -106,7 +106,6 @@ class BookRoomModal extends React.Component {
       booking: <Translate>Create Booking</Translate>,
       preBooking: <Translate>Create Pre-booking</Translate>,
     },
-    bookingReasonRequired: 'always',
     bookingGracePeriod: null,
   };
 
