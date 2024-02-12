@@ -332,7 +332,7 @@ class BookingEdit extends React.Component {
       recurrence_weekdays: recurrence.weekdays,
       room_id: roomId,
       user,
-      reason,
+      reason: reason || undefined,
       internal_note: internalNote,
     };
     if (isAdminOverrideEnabled) {
