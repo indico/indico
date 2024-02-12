@@ -14,7 +14,6 @@ import subprocess
 import sys
 from contextlib import contextmanager
 from functools import wraps
-from itertools import chain
 from pathlib import Path
 from pkgutil import walk_packages
 
@@ -644,29 +643,31 @@ def _extract_placeholders(string):
 
 def _get_invalid_po_format_strings(path):
     with open(path, 'rb') as f:
-        po_data = read_po(f)
+        catalog = read_po(f)
     invalid = []
-    for msg in po_data:
-        all_orig = msg.id if isinstance(msg.id, tuple) else (msg.id,)
+    for msg in catalog:
         all_trans = msg.string if isinstance(msg.string, tuple) else (msg.string,)
         if not any(all_trans):  # not translated
             continue
-        for orig, trans in zip(all_orig, all_trans):
+
+        if not msg.pluralizable:
+            msg_pairs = ((msg.id, msg.string),)
+        elif catalog.num_plurals == 1:
+            # Pluralized messages with nplurals=1 should be compared against the 'msgid_plural'
+            msg_pairs = ((msg.id[1], msg.string[0]),)
+        else:
+            # Pluralized messages with nplurals>1 should compare 'msgstr[0]' against the singular and
+            # any other 'msgstr[X]' against 'msgid_plural'.
+            msg_pairs = ((msg.id[0], msg.string[0]), *((msg.id[1], t) for t in msg.string[1:]))
+
+        for orig, trans in msg_pairs:
             # brace format only; python-format (%s etc) is too vague
             # since there are many strings containing e.g. just `%`
             # which are never used for formatting, and babel's
             # `_validate_format` checker fails on those too
             orig_placeholders = _extract_placeholders(orig)
-            # in some cases the english singular doesn't use the placeholder but rather e.g. "One".
-            # but depending on the language (usually with nplurals=1) the singular version MUST include
-            # the placeholder, so we need to consider those as well
-            orig_plural_placeholders = set(chain.from_iterable(map(_extract_placeholders, all_orig[1:])))
             trans_placeholders = _extract_placeholders(trans)
-            if (
-                trans_placeholders not in (orig_placeholders, orig_plural_placeholders) or
-                (not orig_plural_placeholders and trans_placeholders != orig_placeholders) or
-                (not orig_placeholders and trans_placeholders and trans_placeholders != orig_plural_placeholders)
-            ):
+            if orig_placeholders != trans_placeholders:
                 invalid.append({
                     'orig': orig,
                     'trans': trans,
