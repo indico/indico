@@ -9,6 +9,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Accordion, Form} from 'semantic-ui-react';
 
+import {useIndicoAxios} from 'indico/react/hooks';
+
 import EventImageSelectField from './EventImageSelectField';
 
 export const getDefaultFieldValue = f => {
@@ -92,7 +94,7 @@ function CustomField({
         loading={loadingImages}
         onChange={onChange}
         eventImages={eventImages}
-        onRefresh={() => fetchImages()}
+        onRefresh={fetchImages && (() => fetchImages())}
       />
     );
   }
@@ -115,7 +117,7 @@ CustomField.propTypes = {
 CustomField.defaultProps = {
   value: null,
   eventImages: [],
-  fetchImages: () => {},
+  fetchImages: null,
   loadingImages: false,
 };
 
@@ -124,11 +126,14 @@ export default function TemplateParameterEditor({
   value,
   onChange,
   title,
-  eventImages,
-  fetchImages,
-  loadingImages,
+  fetchImagesURL,
   defaultOpen,
 }) {
+  const {data, loading, reFetch} = useIndicoAxios(
+    {url: fetchImagesURL || ''},
+    {camelize: true, manual: !customFields.some(f => f.type === 'image') || !fetchImagesURL}
+  );
+
   if (customFields.length === 0 || Object.keys(value).length === 0) {
     return null;
   }
@@ -151,9 +156,9 @@ export default function TemplateParameterEditor({
                 name={name}
                 attributes={attributes}
                 validations={validations}
-                eventImages={eventImages}
-                fetchImages={fetchImages}
-                loadingImages={loadingImages}
+                eventImages={data?.images || []}
+                fetchImages={fetchImagesURL && reFetch}
+                loadingImages={loading}
               />
             )),
           },
@@ -170,16 +175,12 @@ TemplateParameterEditor.propTypes = {
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   title: PropTypes.string,
-  eventImages: PropTypes.arrayOf(PropTypes.object),
-  fetchImages: PropTypes.func,
-  loadingImages: PropTypes.bool,
+  fetchImagesURL: PropTypes.string,
   defaultOpen: PropTypes.bool,
 };
 
 TemplateParameterEditor.defaultProps = {
   title: '',
-  eventImages: [],
-  fetchImages: () => {},
-  loadingImages: false,
+  fetchImagesURL: null,
   defaultOpen: false,
 };
