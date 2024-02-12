@@ -33,6 +33,7 @@ from indico.modules.receipts.settings import receipt_defaults
 from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code, create_pdf,
                                           get_event_attachment_images, get_inherited_templates,
                                           get_safe_template_context)
+from indico.util.caching import memoize_redis
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.images import square
@@ -40,6 +41,9 @@ from indico.util.marshmallow import not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
+
+
+IMAGE_PREVIEW_SIZE = 256
 
 
 class RHAllEventTemplates(RHManageRegFormsBase):
@@ -71,43 +75,43 @@ class RHAllEventTemplates(RHManageRegFormsBase):
         return jsonify(templates)
 
 
+@memoize_redis(3600)
+def _make_image_preview(img):
+    def _process_img(preview):
+        preview = square(preview)
+        if preview.height > IMAGE_PREVIEW_SIZE:
+            preview = preview.resize((IMAGE_PREVIEW_SIZE, IMAGE_PREVIEW_SIZE), resample=Image.BICUBIC)
+        # properly remove transparencies to prepare for JPEG conversion
+        if preview.mode in {'RGBA', 'LA'}:
+            background = Image.new(preview.mode[:-1], preview.size, 'white')
+            background.paste(preview, preview.split()[-1])
+            preview = background
+        image_bytes = BytesIO()
+        preview.save(image_bytes, 'JPEG')
+        image_bytes.seek(0)
+        return base64.b64encode(image_bytes.read())
+
+    if isinstance(img, bytes):
+        with Image.open(BytesIO(img)) as preview:
+            return _process_img(preview)
+    try:
+        with img.open() as f, Image.open(f) as preview:
+            if preview.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                return ''
+            return _process_img(preview)
+    except OSError:
+        return ''
+
+
 class RHEventImages(RHManageRegFormsBase):
     """Get all available images for an event."""
-
-    PREVIEW_SIZE = 256
-
-    def _make_preview(self, img):
-        def _process_img(preview):
-            preview = square(preview)
-            if preview.height > self.PREVIEW_SIZE:
-                preview = preview.resize((self.PREVIEW_SIZE, self.PREVIEW_SIZE), resample=Image.BICUBIC)
-            # properly remove transparencies to prepare for JPEG conversion
-            if preview.mode in {'RGBA', 'LA'}:
-                background = Image.new(preview.mode[:-1], preview.size, 'white')
-                background.paste(preview, preview.split()[-1])
-                preview = background
-            image_bytes = BytesIO()
-            preview.save(image_bytes, 'JPEG')
-            image_bytes.seek(0)
-            return base64.b64encode(image_bytes.read())
-
-        if isinstance(img, bytes):
-            with Image.open(BytesIO(img)) as preview:
-                return _process_img(preview)
-        try:
-            with img.open() as f, Image.open(f) as preview:
-                if preview.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
-                    return ''
-                return _process_img(preview)
-        except OSError:
-            return ''
 
     def _process(self):
         # Fetch layout images
         images = [{
             'identifier': f'event://images/{img.id}',
             'filename': img.filename,
-            'preview': self._make_preview(img)
+            'preview': _make_image_preview(img)
         } for img in self.event.layout_images]
 
         # Fetch image attachments
@@ -117,7 +121,7 @@ class RHEventImages(RHManageRegFormsBase):
             'filename': (attachment.title
                          if attachment.folder.is_default
                          else f'{attachment.folder.title}/{attachment.title}'),
-            'preview': self._make_preview(attachment.file)
+            'preview': _make_image_preview(attachment.file)
         } for id, attachment in attachments.items())
 
         # Fetch event logo
@@ -125,7 +129,7 @@ class RHEventImages(RHManageRegFormsBase):
             images.append({
                 'identifier': 'event://logo',
                 'filename': self.event.logo_metadata['filename'],
-                'preview': self._make_preview(self.event.logo)
+                'preview': _make_image_preview(self.event.logo)
             })
         return jsonify(images=images)
 
