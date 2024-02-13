@@ -29,6 +29,20 @@ def dummy_regform(db, dummy_event):
 
 
 @pytest.fixture
+def dummy_regform2(db, dummy_event):
+    """Create a second dummy registration form for the dummy event."""
+    regform = RegistrationForm(id=420, event=dummy_event, title='Registration Form', currency='USD')
+    create_personal_data_fields(regform)
+
+    # enable all fields
+    for field in regform.sections[0].fields:
+        field.is_enabled = True
+    db.session.add(regform)
+    db.session.flush()
+    return regform
+
+
+@pytest.fixture
 def dummy_reg(db, dummy_event, dummy_regform, dummy_user):
     """Create a dummy registration for the dummy event."""
     reg = Registration(
