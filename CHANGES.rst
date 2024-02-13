@@ -78,6 +78,8 @@ Improvements
   :pr:`6138`)
 - Add setting to configure whether room bookings require a reason (:issue:`6150`, :pr:`6155`,
   thanks :user:`Moliholy, unconventionaldotdev`)
+- Add a "Picture" personal data field to registrations. When used, it allows including the
+  picture provided by the user on badges/tickets (:pr:`6160`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
