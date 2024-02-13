@@ -31,7 +31,7 @@ def dummy_regform(db, dummy_event):
 @pytest.fixture
 def dummy_regform2(db, dummy_event):
     """Create a second dummy registration form for the dummy event."""
-    regform = RegistrationForm(id=420, event=dummy_event, title='Registration Form', currency='USD')
+    regform = RegistrationForm(id=421, event=dummy_event, title='Registration Form', currency='USD')
     create_personal_data_fields(regform)
 
     # enable all fields
