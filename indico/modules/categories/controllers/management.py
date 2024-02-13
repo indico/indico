@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import ast
 import os
 import random
 from io import BytesIO
@@ -17,6 +16,7 @@ from sqlalchemy.orm import joinedload, load_only, undefer_group
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.modules.categories import logger
@@ -107,10 +107,12 @@ class RHManageCategorySettings(RHManageCategoryBase):
                            'google_wallet_issuer_id')
         kwargs = {
             'meeting_theme': self.category.default_event_themes['meeting'],
-            'lecture_theme': self.category.default_event_themes['lecture'],
-            'google_wallet_enabled': self.category.google_wallet_settings}
-        if self.category.google_wallet_settings:
-            kwargs.update({key: self.category.google_wallet_settings[key] for key in additional_keys})
+            'lecture_theme': self.category.default_event_themes['lecture']}
+
+        if config.ENABLE_GOOGLE_WALLET:
+            kwargs['google_wallet_enabled'] = self.category.google_wallet_settings
+            if self.category.google_wallet_settings:
+                kwargs.update({key: self.category.google_wallet_settings[key] for key in additional_keys})
         defaults = FormDefaults(self.category, **kwargs)
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
@@ -122,9 +124,6 @@ class RHManageCategorySettings(RHManageCategoryBase):
             if new_dict.pop('google_wallet_enabled'):
                 for key in additional_keys:
                     new_dict['google_wallet_settings'][key] = new_dict.pop(key, {})
-                    if key == 'google_wallet_application_credentials':
-                        new_dict['google_wallet_settings'][key] = ast.literal_eval(
-                            new_dict['google_wallet_settings'][key])
             else:
                 for key in additional_keys:
                     del new_dict[key]
