@@ -85,7 +85,7 @@ class CloneCalculator:
         if form.validate():
             return self._calculate(form)
         else:
-            raise ValueError([(str(getattr(form, k).label.text), v) for k, v in form.errors.items()])
+            raise ValueError('<br>'.join(form.error_list))
 
 
 class PatternCloneCalculator(CloneCalculator):
