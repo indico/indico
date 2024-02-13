@@ -1,14 +1,14 @@
 # Translations template for indico.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-21 19:19+0100\n"
+"POT-Creation-Date: 2024-02-13 23:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,17 +41,17 @@ msgstr ""
 msgid "Building package"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:41
+#: indico/modules/categories/client/js/calendar.js:104
 msgid "Today"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:53
+#: indico/modules/categories/client/js/calendar.js:118
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/calendar.js:63
+#: indico/modules/categories/client/js/calendar.js:128
 msgid "Long lasting events"
 msgstr ""
 
@@ -339,15 +339,15 @@ msgstr ""
 msgid "Press {0} to copy"
 msgstr ""
 
-#: indico/web/client/js/jquery/extensions/global.js:259
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new lecture"
 msgstr ""
 
-#: indico/web/client/js/jquery/extensions/global.js:260
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new meeting"
 msgstr ""
 
-#: indico/web/client/js/jquery/extensions/global.js:261
+#: indico/web/client/js/jquery/extensions/global.js:262
 msgid "Create new conference"
 msgstr ""
 
