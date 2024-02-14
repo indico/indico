@@ -701,6 +701,10 @@ def _get_mismatched_html_tags(path):
             orig_tags = sorted(re.findall(r'<[^>]+>', orig))
             trans_tags = sorted(re.findall(r'<[^>]+>', trans))
 
+            # Ignore line breaks
+            orig_tags = [tag for tag in orig_tags if tag != '<br>']
+            trans_tags = [tag for tag in trans_tags if tag != '<br>']
+
             if orig_tags != trans_tags:
                 mismatched.append({
                     'orig': orig,
