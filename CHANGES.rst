@@ -95,6 +95,8 @@ Bugfixes
 - Use custom map URL in event API if one is set (:pr:`6111`, thanks :user:`stine-fohrmann`)
 - Use the event timezone when scheduling call for abstracts/papers (:pr:`6139`)
 - Allow setting registration fees larger than 999999.99 (:pr:`6172`)
+- Populate fields such as first and last name from the multipass login provider (e.g. LDAP) during
+  sign-up regardless of synchronization settings (:pr:`6182`)
 
 Accessibility
 ^^^^^^^^^^^^^
