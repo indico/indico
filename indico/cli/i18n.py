@@ -618,6 +618,21 @@ def _check_format_strings(root_path='indico/translations'):
     return all_valid
 
 
+def _check_mismatched_html_tags(root_path='indico/translations'):
+    all_valid = True
+    for path in Path(root_path).glob('**/*.po'):
+        invalid = _get_mismatched_html_tags(path)
+        if invalid:
+            all_valid = False
+            click.echo(f'Found mismatched HTML tags in {os.path.relpath(path, root_path)}')
+            for item in invalid:
+                click.echo(cformat('%{yellow}{}%{reset} | %{yellow!}{}%{reset}\n%{red}{}%{reset} != %{red!}{}%{reset}')
+                           .format(item['orig'], item['trans'],
+                                   list(item['orig_tags']), list(item['trans_tags'])))
+            click.echo()
+    return all_valid
+
+
 @cli.command()
 def check_format_strings():
     """Check whether format strings match.
@@ -632,6 +647,20 @@ def check_format_strings():
     sys.exit(0 if all_valid else 1)
 
 
+@cli.command()
+def check_html_tags():
+    """Check whether the HTML tags in the source and the translated message match.
+
+    This helps find cases where e.g. the translated message does not properly
+    close the tags. Additionally, this ensures that no one sneaks in dangerous
+    HTML (like a <script> tag) into the translations.
+    """
+    all_valid = _check_mismatched_html_tags()
+    if all_valid:
+        click.secho('No issues found!', fg='green', bold=True)
+    sys.exit(0 if all_valid else 1)
+
+
 def _extract_placeholders(string):
     return set(re.findall(r'(\{[^}]+\})', string))
 
@@ -639,22 +668,9 @@ def _extract_placeholders(string):
 def _get_invalid_po_format_strings(path):
     with open(path, 'rb') as f:
         catalog = read_po(f)
+
     invalid = []
-    for msg in catalog:
-        all_trans = msg.string if isinstance(msg.string, tuple) else (msg.string,)
-        if not any(all_trans):  # not translated
-            continue
-
-        if not msg.pluralizable:
-            msg_pairs = ((msg.id, msg.string),)
-        elif catalog.num_plurals == 1:
-            # Pluralized messages with nplurals=1 should be compared against the 'msgid_plural'
-            msg_pairs = ((msg.id[1], msg.string[0]),)
-        else:
-            # Pluralized messages with nplurals>1 should compare 'msgstr[0]' against the singular and
-            # any other 'msgstr[X]' against 'msgid_plural'.
-            msg_pairs = ((msg.id[0], msg.string[0]), *((msg.id[1], t) for t in msg.string[1:]))
-
+    for msg_pairs in _iter_msg_pairs(catalog):
         for orig, trans in msg_pairs:
             # brace format only; python-format (%s etc) is too vague
             # since there are many strings containing e.g. just `%`
@@ -670,3 +686,61 @@ def _get_invalid_po_format_strings(path):
                     'trans_placeholders': trans_placeholders
                 })
     return invalid
+
+
+def _get_mismatched_html_tags(path):
+    with open(path, 'rb') as f:
+        catalog = read_po(f)
+
+    mismatched = []
+    for msg_pairs in _iter_msg_pairs(catalog):
+        for orig, trans in msg_pairs:
+            if not orig:  # Ignore the empty message
+                continue
+
+            orig_tags = sorted(re.findall(r'<[^>]+>', orig))
+            trans_tags = sorted(re.findall(r'<[^>]+>', trans))
+
+            if orig_tags != trans_tags:
+                mismatched.append({
+                    'orig': orig,
+                    'trans': trans,
+                    'orig_tags': orig_tags,
+                    'trans_tags': trans_tags
+                })
+
+    return mismatched
+
+
+def _iter_msg_pairs(catalog):
+    """Iterate over all (original, translated) message pairs in the catalog.
+
+    For singular messages, this produces a single pair (original, translated).
+    For plural messages, this produces a pair for each plural form. For example,
+    for a language with 4 plural forms, this will generate:
+
+        (orig_singular, trans_singular),
+        (orig_plural,   trans_plural_1),
+        (orig_plural,   trans_plural_2),
+        (orig_plural,   trans_plural_3)
+
+    For languages with nplurals=1, this generates a single pair:
+
+        (orig_plural, trans_plural)
+    """
+    for msg in catalog:
+        all_trans = msg.string if isinstance(msg.string, tuple) else (msg.string,)
+        if not any(all_trans):  # not translated
+            continue
+
+        if not msg.pluralizable:
+            msg_pairs = ((msg.id, msg.string),)
+        elif catalog.num_plurals == 1:
+            # Pluralized messages with nplurals=1 should be compared against the 'msgid_plural'
+            msg_pairs = ((msg.id[1], msg.string[0]),)
+        else:
+            # Pluralized messages with nplurals>1 should compare 'msgstr[0]' against the singular and
+            # any other 'msgstr[X]' against 'msgid_plural'.
+            msg_pairs = ((msg.id[0], msg.string[0]), *((msg.id[1], t) for t in msg.string[1:]))
+
+        yield msg_pairs
