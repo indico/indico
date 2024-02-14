@@ -547,7 +547,9 @@ class MultipassRegistrationHandler(RegistrationHandler):
             locked_fields = list(multipass.locked_fields - required_empty_fields)
         else:
             synced_values = {}
-            initial_values.update(pending_data)
+            allowed_fields = {'first_name', 'last_name', 'affiliation', 'phone', 'address'}
+            multipass_data = {k: v for k, v in self.identity_info['data'].items() if k in allowed_fields and v}
+            initial_values.update(pending_data or multipass_data)
             locked_fields = []
 
         return {
