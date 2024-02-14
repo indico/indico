@@ -40,7 +40,7 @@ const processPlaceholders = placeholderData =>
 
 const debounce = makeAsyncDebounce(250);
 
-export default function Previewer({url, data}) {
+export default function Previewer({url, data, fetchImagesURL}) {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [numPages, setNumPages] = useState(null);
@@ -122,6 +122,7 @@ export default function Previewer({url, data}) {
             value={customFieldValues}
             onChange={value => setCustomFieldValues(value)}
             title={Translate.string('Sample parameters')}
+            fetchImagesURL={fetchImagesURL}
           />
         </Form>
       )}
@@ -168,4 +169,9 @@ export default function Previewer({url, data}) {
 Previewer.propTypes = {
   url: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
+  fetchImagesURL: PropTypes.string,
+};
+
+Previewer.defaultProps = {
+  fetchImagesURL: null,
 };
