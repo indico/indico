@@ -43,6 +43,10 @@ import SingleChoiceInput, {
 } from './SingleChoiceInput';
 import TextAreaInput, {TextAreaSettings} from './TextAreaInput';
 import TextInput, {TextSettings, textSettingsFormValidator} from './TextInput';
+import TimetableSessionsInput, {
+  TimetableSessionsSettings,
+  timetableSessionsSettingsInitialData,
+} from './TimetableSessions';
 
 /*
 Available keys:
@@ -194,6 +198,16 @@ const fieldRegistry = {
     inputComponent: PictureInput,
     icon: 'image',
     settingsComponent: PictureSettings,
+  },
+  sessions: {
+    title: Translate.string('Timetable Sessions'),
+    inputComponent: TimetableSessionsInput,
+    settingsComponent: TimetableSessionsSettings,
+    settingsFormInitialData: timetableSessionsSettingsInitialData,
+    noRequired: true,
+    hasPrice: false,
+    icon: 'list',
+    renderAsFieldset: true,
   },
 };
 
