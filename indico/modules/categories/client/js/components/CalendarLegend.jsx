@@ -29,11 +29,15 @@ function LegendItem({
       checkboxRef.current.handleChange();
     }
   };
+  const textStyle = {color: 'black'};
+  if (hasSubitems) {
+    textStyle.fontWeight = 'bold';
+  }
   return (
     <div styleName="legend-item" onClick={handleDivClick} style={{marginLeft: depth * 30}}>
       {color ? <div styleName="color-square" style={{backgroundColor: color}} /> : undefined}
-      {hasSubitems ? <div styleName="color-square">{'\u25BC'}</div> : undefined}
-      <span styleName={isSpecial ? 'italic' : undefined} style={{color: 'black'}}>
+      {hasSubitems ? <div styleName="color-square" /> : undefined}
+      <span styleName={isSpecial ? 'italic' : undefined} style={textStyle}>
         {url && !isSpecial ? (
           <a href={url} onClick={e => e.stopPropagation()}>
             {title}
