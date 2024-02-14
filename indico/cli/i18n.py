@@ -630,8 +630,7 @@ def _check_mismatched_html_tags(root_path='indico/translations'):
             click.echo(f'Found mismatched HTML tags in {os.path.relpath(path, root_path)}')
             for item in invalid:
                 click.echo(cformat('%{yellow}{}%{reset} | %{yellow!}{}%{reset}\n%{red}{}%{reset} != %{red!}{}%{reset}')
-                           .format(item['orig'], item['trans'],
-                                   list(item['orig_tags']), list(item['trans_tags'])))
+                           .format(item['orig'], item['trans'], list(item['orig_tags']), list(item['trans_tags'])))
             click.echo()
     return all_valid
 
