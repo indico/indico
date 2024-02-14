@@ -163,6 +163,12 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
                     'mime_type': event.logo_metadata['content_type'],
                     'string': event.logo
                 }
+            if url_data.netloc == 'placeholder':
+                placeholder_image = Path(current_app.root_path) / 'web' / 'static' / 'images' / 'placeholder_image.svg'
+                return {
+                    'mime_type': 'image/svg+xml',
+                    'string': placeholder_image.read_text()
+                }
             try:
                 img_id = int(url_data.path[1:])
             except ValueError:

@@ -24,23 +24,24 @@ import './EventImageSelectField.module.scss';
 const imageShape = {
   identifier: PropTypes.string.isRequired,
   filename: PropTypes.string.isRequired,
-  preview: PropTypes.string.isRequired,
+  preview: PropTypes.string,
+  previewURL: PropTypes.string,
 };
 
 const imageSource = {
   images: Translate.string('from Images'),
   attachments: Translate.string('from Materials'),
+  placeholder: Translate.string('from Indico'),
   logo: Translate.string('Event Logo'),
 };
 
-function EventImageOption({identifier, filename, preview}) {
+function EventImageOption({identifier, filename, preview, previewURL}) {
+  const url = previewURL ? `url('${previewURL}')` : `url('data:image/jpeg;base64,${preview}')`;
+  const isInvalid = !preview && !previewURL;
   return (
     <Header styleName="option-header">
-      <div
-        styleName="preview"
-        style={preview ? {backgroundImage: `url('data:image/jpeg;base64,${preview}')`} : undefined}
-      >
-        {!preview && (
+      <div styleName="preview" style={preview || previewURL ? {backgroundImage: url} : undefined}>
+        {isInvalid && (
           <IconGroup size="big">
             <Icon name="file image" color="grey" />
             <Icon corner="bottom right" name="dont" color="grey" />
@@ -48,7 +49,7 @@ function EventImageOption({identifier, filename, preview}) {
         )}
       </div>
       <HeaderContent>
-        {!preview && (
+        {isInvalid && (
           <Popup
             content={Translate.string(
               'This field only accepts jpg, png, gif and webp picture formats.'
@@ -64,6 +65,11 @@ function EventImageOption({identifier, filename, preview}) {
 }
 
 EventImageOption.propTypes = imageShape;
+
+EventImageOption.defaultProps = {
+  preview: '',
+  previewURL: '',
+};
 
 export default function EventImageSelectField({
   name,
@@ -84,7 +90,7 @@ export default function EventImageSelectField({
           key: image.identifier,
           value: image.identifier,
           text: image.filename,
-          disabled: !image.preview,
+          disabled: !image.preview && !image.previewURL,
           content: <EventImageOption {...image} />,
         }))}
         placeholder={Translate.string('Select an image from the event')}

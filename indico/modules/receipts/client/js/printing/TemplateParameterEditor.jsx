@@ -133,6 +133,15 @@ export default function TemplateParameterEditor({
     {url: fetchImagesURL || ''},
     {camelize: true, manual: !customFields.some(f => f.type === 'image') || !fetchImagesURL}
   );
+  const eventImages = fetchImagesURL
+    ? data?.images || []
+    : [
+        {
+          identifier: 'event://placeholder',
+          filename: 'placeholder.png',
+          previewURL: `${Indico.Urls.ImagesBase}/placeholder_image.svg`,
+        },
+      ];
 
   if (customFields.length === 0 || Object.keys(value).length === 0) {
     return null;
@@ -156,7 +165,7 @@ export default function TemplateParameterEditor({
                 name={name}
                 attributes={attributes}
                 validations={validations}
-                eventImages={data?.images || []}
+                eventImages={eventImages}
                 fetchImages={fetchImagesURL && reFetch}
                 loadingImages={loading}
               />
