@@ -610,8 +610,7 @@ def pull_all_plugins(plugins_dir, languages):
 def _check_format_strings(root_path='indico/translations'):
     all_valid = True
     for path in Path(root_path).glob('**/*.po'):
-        invalid = _get_invalid_po_format_strings(path)
-        if invalid:
+        if invalid := _get_invalid_po_format_strings(path):
             all_valid = False
             click.echo(f'Found invalid format strings in {path.relative_to(root_path)}')
             for item in invalid:
