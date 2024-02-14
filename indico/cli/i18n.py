@@ -375,6 +375,10 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
             click.secho('Exiting compile command for indico due to invalid format strings.', fg='red', bold=True,
                         err=True)
             sys.exit(1)
+        if not _check_mismatched_html_tags():
+            click.secho('Exiting compile command for indico due to mismatched HTML tags.', fg='red', bold=True,
+                        err=True)
+            sys.exit(1)
     try:
         if python:
             _run_command(babel_cmd, extra=extra)
