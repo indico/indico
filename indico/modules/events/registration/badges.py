@@ -134,8 +134,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                 as_list=True
             ):
                 item_data.update(update)
-            self._draw_item(canvas, item_data['item'], tpl_data, item_data['text'], item_data['pos_x'],
-                            item_data['pos_y'])
+            if item_data['text'] is not None:
+                self._draw_item(canvas, item_data['item'], tpl_data, item_data['text'], item_data['pos_x'],
+                                item_data['pos_y'])
 
 
 class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):

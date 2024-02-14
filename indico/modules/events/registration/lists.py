@@ -92,7 +92,7 @@ class RegistrationListGenerator(ListGeneratorBase):
             },
         }
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
-                               'phone', 'country')
+                               'phone', 'country', 'picture')
         self.list_config = self._get_config()
 
     def _get_registration_tag_choices(self):

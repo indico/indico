@@ -29,7 +29,7 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder', 'EventLogoPlaceholder', 'FixedTextPlaceholder',
-           'FixedImagePlaceholder', 'RegistrationAccompanyingPersonsCountPlaceholder',
+           'FixedImagePlaceholder', 'RegistrationAccompanyingPersonsCountPlaceholder', 'RegistrationPicturePlaceholder',
            'RegistrationAccompanyingPersonsPlaceholder', 'RegistrationAccompanyingPersonsAbbrevPlaceholder')
 
 
@@ -359,6 +359,19 @@ class RegistrationPhonePlaceholder(RegistrationPDPlaceholder):
     name = 'phone'
     description = _('Phone')
     field = 'phone'
+
+
+class RegistrationPicturePlaceholder(RegistrationPDPlaceholder):
+    name = 'picture'
+    description = _('Picture')
+    is_image = True
+
+    @classmethod
+    def render(cls, registration):
+        if picture_data := registration.get_personal_data_picture():
+            buf = picture_data.open()
+            return Image.open(buf)
+        return None
 
 
 class RegistrationTicketQRPlaceholder(DesignerPlaceholder):

@@ -200,7 +200,7 @@ def get_user_data(regform, user, invitation=None):
         user_data = {}
     else:
         user_data = {t.name: getattr(user, t.name, None) for t in PersonalDataType
-                     if t.name != 'title' and getattr(user, t.name, None)}
+                     if t.name not in {'title', 'picture'} and getattr(user, t.name, None)}
         if (
             (country_field := get_country_field(regform)) and
             country_field.data.get('use_affiliation_country') and
