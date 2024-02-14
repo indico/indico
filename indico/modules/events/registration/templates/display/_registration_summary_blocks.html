@@ -98,6 +98,15 @@
                 <li>{{ item }}</li>
             {%- endfor %}
         </ul>
+    {% elif field.input_type == 'sessions' and friendly_data%}
+        {% for key, value in friendly_data.items() -%}
+            <dl>
+                <dt>{{key}}</dt>
+                {% for item in value %}
+                    <dd>{{ item.full_title }}</dd>
+                {% endfor %}
+            </dl>
+        {%- endfor %}
     {% elif field.input_type == 'file' and friendly_data and from_management %}
         <a href="{{ url_for('.manage_registration_file', data[field.id].locator.file) }}">{{ friendly_data }}</a>
     {% elif field.input_type == 'picture' and friendly_data %}
