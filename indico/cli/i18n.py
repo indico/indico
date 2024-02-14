@@ -613,7 +613,7 @@ def _check_format_strings(root_path='indico/translations'):
         invalid = _get_invalid_po_format_strings(path)
         if invalid:
             all_valid = False
-            click.echo(f'Found invalid format strings in {os.path.relpath(path, root_path)}')
+            click.echo(f'Found invalid format strings in {path.relative_to(root_path)}')
             for item in invalid:
                 click.echo(cformat('%{yellow}{}%{reset} | %{yellow!}{}%{reset}\n%{red}{}%{reset} != %{red!}{}%{reset}')
                            .format(item['orig'], item['trans'],
@@ -627,7 +627,7 @@ def _check_mismatched_html_tags(root_path='indico/translations'):
     for path in Path(root_path).glob('**/*.po'):
         if invalid := _get_mismatched_html_tags(path):
             all_valid = False
-            click.echo(f'Found mismatched HTML tags in {os.path.relpath(path, root_path)}')
+            click.echo(f'Found mismatched HTML tags in {path.relative_to(root_path)}')
             for item in invalid:
                 click.echo(cformat('%{yellow}{}%{reset} | %{yellow!}{}%{reset}\n%{red}{}%{reset} != %{red!}{}%{reset}')
                            .format(item['orig'], item['trans'], list(item['orig_tags']), list(item['trans_tags'])))
