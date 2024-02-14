@@ -738,13 +738,11 @@ def _iter_msg_pairs(catalog):
             continue
 
         if not msg.pluralizable:
-            msg_pairs = ((msg.id, msg.string),)
+            yield ((msg.id, msg.string),)
         elif catalog.num_plurals == 1:
             # Pluralized messages with nplurals=1 should be compared against the 'msgid_plural'
-            msg_pairs = ((msg.id[1], msg.string[0]),)
+            yield ((msg.id[1], msg.string[0]),)
         else:
             # Pluralized messages with nplurals>1 should compare 'msgstr[0]' against the singular and
             # any other 'msgstr[X]' against 'msgid_plural'.
-            msg_pairs = ((msg.id[0], msg.string[0]), *((msg.id[1], t) for t in msg.string[1:]))
-
-        yield msg_pairs
+            yield ((msg.id[0], msg.string[0]), *((msg.id[1], t) for t in msg.string[1:]))
