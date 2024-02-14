@@ -625,8 +625,7 @@ def _check_format_strings(root_path='indico/translations'):
 def _check_mismatched_html_tags(root_path='indico/translations'):
     all_valid = True
     for path in Path(root_path).glob('**/*.po'):
-        invalid = _get_mismatched_html_tags(path)
-        if invalid:
+        if invalid := _get_mismatched_html_tags(path):
             all_valid = False
             click.echo(f'Found mismatched HTML tags in {os.path.relpath(path, root_path)}')
             for item in invalid:
@@ -659,8 +658,7 @@ def check_html_tags():
     close the tags. Additionally, this ensures that no one sneaks in dangerous
     HTML (like a <script> tag) into the translations.
     """
-    all_valid = _check_mismatched_html_tags()
-    if all_valid:
+    if all_valid := _check_mismatched_html_tags():
         click.secho('No issues found!', fg='green', bold=True)
     sys.exit(0 if all_valid else 1)
 
