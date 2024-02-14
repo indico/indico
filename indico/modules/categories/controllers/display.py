@@ -19,7 +19,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from marshmallow_enum import EnumField
 from pytz import utc
-from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
+from sqlalchemy.orm import joinedload, load_only, selectinload, subqueryload, undefer, undefer_group
 from webargs import fields, validate
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -564,6 +564,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
     class GroupBy(Enum):
         category = auto()
         location = auto()
+        room = auto()
 
     @use_kwargs({'group_by': EnumField(GroupBy, load_default=GroupBy.category)}, location='query')
     def _process_args(self, group_by):
@@ -582,8 +583,9 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                          Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
                  .options(undefer(Event.detailed_category_chain),
-                          load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id')))
-        events, categories = self._get_event_data(query)
+                          selectinload('own_room'),
+                          load_only('id', 'title', 'start_dt', 'end_dt', 'category_id', 'own_venue_id', 'own_room_id')))
+        events, categories, rooms = self._get_event_data(query)
         raw_locations = Location.query.options(load_only('id', 'name')).all()
         locations = [{'title': loc.name, 'id': loc.id} for loc in raw_locations]
         ongoing_events = (Event.query
@@ -594,7 +596,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
                           .order_by(Event.title)
                           .all())
-        return jsonify_data(flash=False, events=events, categories=categories, locations=locations,
+        return jsonify_data(flash=False, events=events, categories=categories, locations=locations, rooms=rooms,
                             group_by=self.group_by.name,
                             ongoing_event_count=len(ongoing_events),
                             ongoing_events_html=self._render_ongoing_events(ongoing_events))
@@ -612,23 +614,35 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
     def _get_event_data(self, event_query):
         data = []
         categories = {}
+        rooms = {}
         tz = self.category.display_tzinfo
         for event in event_query:
             category_data = self._find_nearest_category(event.detailed_category_chain)
             category_id = category_data['id']
             category_data['url'] = url_for('categories.calendar', category_id=category_id)
-            comparison_id = category_id if self.group_by == self.GroupBy.category else event.own_venue_id or 0
+            room = event.room
+            if room and room.id not in rooms:
+                rooms[room.id] = {'id': room.id,
+                                  'title': room.full_name,
+                                  'venueId': room.location_id}
+            if self.group_by == self.GroupBy.category:
+                comparison_id = category_id
+            elif self.group_by == self.GroupBy.location:
+                comparison_id = event.own_venue_id or 0
+            else:
+                comparison_id = room.id if room else 0
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'url': event.url,
                           'categoryId': category_id,
-                          'venueId': event.own_venue_id}
+                          'venueId': event.own_venue_id,
+                          'roomId': room.id if room else None}
             colors = generate_contrast_colors(comparison_id)
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
             categories[category_id] = category_data
-        return data, list(categories.values())
+        return data, list(categories.values()), list(rooms.values())
 
     def _render_ongoing_events(self, ongoing_events):
         template = get_template_module('categories/display/_calendar_ongoing_events.html')

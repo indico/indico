@@ -69,8 +69,8 @@ Improvements
   thanks :user:`SegiNyn`)
 - Use a more compact registration ticket QR code format which is faster to scan and less
   likely to fail in poor lighting conditions (:pr:`6123`)
-- Add a legend to the category calendar, allowing to filter events either by category or location
-  (:issue:`6105, 6106, 6128`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`)
+- Add a legend to the category calendar, allowing to filter events either by category, venue or room
+  (:issue:`6105, 6106, 6128, 6148, 6149`, :pr:`6110, 6158`, thanks :user:`Moliholy, unconventionaldotdev`)
 - Add week and day views in the category calendar and improve navigation controls
   (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`).
 - Add the ability to clone privacy settings (:pr:`6156`, thanks :user:`SegiNyn`)
@@ -80,6 +80,8 @@ Improvements
   thanks :user:`Moliholy, unconventionaldotdev`)
 - Add a "Picture" personal data field to registrations. When used, it allows including the
   picture provided by the user on badges/tickets (:pr:`6160`, thanks :user:`vtran99`)
+- Filter events by room in the calendar legend
+  (:issue:`6148, 6149`, :pr:`6158`, thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

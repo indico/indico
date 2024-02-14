@@ -12,17 +12,32 @@ import {Checkbox, Select} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import './CalendarLegend.module.scss';
 
-function LegendItem({title, color, checked, url, isSpecial, onChange}) {
+function LegendItem({
+  title,
+  color,
+  checked,
+  url,
+  isSpecial,
+  onChange,
+  depth,
+  indeterminate,
+  hasSubitems,
+}) {
   const checkboxRef = useRef(null);
   const handleDivClick = () => {
     if (checkboxRef.current) {
       checkboxRef.current.handleChange();
     }
   };
+  const textStyle = {color: 'black'};
+  if (hasSubitems) {
+    textStyle.fontWeight = 'bold';
+  }
   return (
-    <div styleName="legend-item" onClick={handleDivClick}>
-      <div styleName="color-square" style={{backgroundColor: color}} />
-      <span styleName={isSpecial ? 'italic' : undefined} style={{color: 'black'}}>
+    <div styleName="legend-item" onClick={handleDivClick} style={{marginLeft: depth * 30}}>
+      {color ? <div styleName="color-square" style={{backgroundColor: color}} /> : undefined}
+      {hasSubitems ? <div styleName="color-square" /> : undefined}
+      <span styleName={isSpecial ? 'italic' : undefined} style={textStyle}>
         {url && !isSpecial ? (
           <a href={url} onClick={e => e.stopPropagation()}>
             {title}
@@ -36,6 +51,7 @@ function LegendItem({title, color, checked, url, isSpecial, onChange}) {
         styleName="legend-checkbox"
         checked={checked}
         onChange={onChange}
+        indeterminate={indeterminate}
       />
     </div>
   );
@@ -43,35 +59,68 @@ function LegendItem({title, color, checked, url, isSpecial, onChange}) {
 
 LegendItem.propTypes = {
   title: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
+  color: PropTypes.string,
   url: PropTypes.string,
   checked: PropTypes.bool,
   isSpecial: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  depth: PropTypes.number,
+  indeterminate: PropTypes.bool,
+  hasSubitems: PropTypes.bool,
 };
 
 LegendItem.defaultProps = {
   url: undefined,
   checked: true,
   isSpecial: false,
+  depth: 0,
+  color: undefined,
+  indeterminate: false,
+  hasSubitems: false,
 };
 
-function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const parsedItems = items.map(({id, title, checked, url, color, isSpecial}) => (
+function mapPlainItemToLegendItem(
+  {id, title, checked, url, color, isSpecial, subitems, parent},
+  onElementSelected,
+  depth
+) {
+  const hasSubitems = subitems.length > 0;
+  const indeterminate =
+    hasSubitems && subitems.some(si => si.checked) && subitems.some(si => !si.checked);
+  const result = (
     <LegendItem
       key={id}
       title={title}
       color={color}
       checked={checked}
-      onChange={(_, data) => onElementSelected(id, data.checked)}
+      onChange={(_, data) => onElementSelected(id, data.checked, subitems, parent)}
       url={url}
       isSpecial={isSpecial}
+      depth={depth}
+      indeterminate={indeterminate}
+      hasSubitems={hasSubitems}
     />
-  ));
+  );
+  return [
+    result,
+    ...subitems.map(si => mapPlainItemToLegendItem(si, onElementSelected, depth + 1)),
+  ];
+}
+
+function CalendarLegend({
+  items,
+  groupBy,
+  onFilterChanged,
+  onElementSelected,
+  selectAll,
+  deselectAll,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const parsedItems = items.map(item => mapPlainItemToLegendItem(item, onElementSelected, 0));
   const options = [
     {text: Translate.string('Category'), value: 'category'},
     {text: Translate.string('Venue'), value: 'location'},
+    {text: Translate.string('Room'), value: 'room'},
   ];
   const onChange = (_, {value}) => {
     onFilterChanged(value);
@@ -88,6 +137,15 @@ function CalendarLegend({items, groupBy, onFilterChanged, onElementSelected}) {
         onBlur={() => setIsOpen(false)}
         onChange={onChange}
       />
+      <div styleName="toggle-container">
+        <span onClick={selectAll} style={{cursor: 'pointer', marginRight: '8px'}}>
+          <Translate>Select all</Translate>
+        </span>
+        {' | '}
+        <span onClick={deselectAll} style={{cursor: 'pointer', marginLeft: '8px'}}>
+          <Translate>Clear</Translate>
+        </span>
+      </div>
       <div>{parsedItems}</div>
     </div>
   );
@@ -98,5 +156,8 @@ CalendarLegend.propTypes = {
   groupBy: PropTypes.string.isRequired,
   onFilterChanged: PropTypes.func.isRequired,
   onElementSelected: PropTypes.func.isRequired,
+  selectAll: PropTypes.func.isRequired,
+  deselectAll: PropTypes.func.isRequired,
 };
+
 export default CalendarLegend;
