@@ -200,15 +200,15 @@ import CalendarLegend from './components/CalendarLegend';
           );
         }
 
-        function setupLegendByAttribute(
+        function setupLegendByAttribute({
           events,
           items,
           attr,
           defaultTitle,
           rootId,
-          rootTitle,
-          sortMethod
-        ) {
+          rootTitle = undefined,
+          sortMethod = undefined,
+        }) {
           const itemMap = items.reduce(
             (acc, {id, title, url}) => ({
               ...acc,
@@ -251,15 +251,15 @@ import CalendarLegend from './components/CalendarLegend';
 
         function setupLegendByRoom(events, locations, rooms) {
           const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-          const result = setupLegendByAttribute(
+          const result = setupLegendByAttribute({
             events,
-            rooms,
-            'roomId',
-            Translate.string('No room'),
-            0,
-            Translate.string('No room'),
-            collator.compare
-          );
+            items: rooms,
+            attr: 'roomId',
+            defaultTitle: Translate.string('No room'),
+            rootId: 0,
+            rootTitle: Translate.string('No room'),
+            sortMethod: collator.compare,
+          });
           // if there are no locations no need to indent
           if (locations.length <= 1) {
             return result;
@@ -310,23 +310,23 @@ import CalendarLegend from './components/CalendarLegend';
           let items;
           switch (data.group_by) {
             case 'category':
-              items = setupLegendByAttribute(
-                data.events,
-                data.categories,
-                'categoryId',
-                Translate.string('No category'),
-                categoryId,
-                Translate.string('This category')
-              );
+              items = setupLegendByAttribute({
+                events: data.events,
+                items: data.categories,
+                attr: 'categoryId',
+                defaultTitle: Translate.string('No category'),
+                rootId: categoryId,
+                rootTitle: Translate.string('This category'),
+              });
               break;
             case 'location':
-              items = setupLegendByAttribute(
-                data.events,
-                data.locations,
-                'venueId',
-                Translate.string('No venue'),
-                0
-              );
+              items = setupLegendByAttribute({
+                events: data.events,
+                items: data.locations,
+                attr: 'venueId',
+                defaultTitle: Translate.string('No venue'),
+                rootId: 0,
+              });
               break;
             case 'room':
               items = setupLegendByRoom(data.events, data.locations, data.rooms);
