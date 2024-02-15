@@ -181,11 +181,17 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
             if not image:
                 raise ValueError('Invalid event-local image reference')
             try:
-                with image.open() as f, Image.open(f) as pic:
-                    if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
-                        raise ValueError('Unsupported image format')
-                    output = BytesIO()
-                    pic.save(output, format=pic.format)
+                with image.open() as f:
+                    if image.content_type == 'image/svg+xml':
+                        return {
+                            'mime_type': 'image/svg+xml',
+                            'string': f.read()
+                        }
+                    with Image.open(f) as pic:
+                        if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                            raise ValueError('Unsupported image format')
+                        output = BytesIO()
+                        pic.save(output, format=pic.format)
                     return {
                         'mime_type': image.content_type,
                         'string': output.getvalue()

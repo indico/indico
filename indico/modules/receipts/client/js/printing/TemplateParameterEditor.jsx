@@ -139,7 +139,7 @@ export default function TemplateParameterEditor({
         {
           identifier: 'event://placeholder',
           filename: 'placeholder.png',
-          previewURL: `${Indico.Urls.ImagesBase}/placeholder_image.svg`,
+          preview: `${Indico.Urls.ImagesBase}/placeholder_image.svg`,
         },
       ];
 

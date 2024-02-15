@@ -18,6 +18,7 @@ from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.modules.attachments.models.attachments import AttachmentFile
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.registration.controllers.management import RHManageRegFormsBase
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -89,11 +90,13 @@ def _make_image_preview(img):
         image_bytes = BytesIO()
         preview.save(image_bytes, 'JPEG')
         image_bytes.seek(0)
-        return base64.b64encode(image_bytes.read())
+        return f'data:image/jpeg;base64,{base64.b64encode(image_bytes.read()).decode()}'
 
     if isinstance(img, bytes):
         with Image.open(BytesIO(img)) as preview:
             return _process_img(preview)
+    if isinstance(img, AttachmentFile) and img.content_type == 'image/svg+xml':
+        return img.attachment.download_url
     try:
         with img.open() as f, Image.open(f) as preview:
             if preview.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
