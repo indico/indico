@@ -169,7 +169,10 @@ export function SearchDropdown({
   };
 
   const onAddItem = (evt, {value: newValue}) => {
-    setOptions(prevOptions => [...prevOptions, {text: newValue, value: newValue}]);
+    const newOption = transformOptions([
+      {[labelField]: newValue, [valueField]: newValue, [searchField]: newValue},
+    ])[0];
+    setOptions(prevOptions => [...prevOptions, newOption]);
   };
 
   const onSearch = (evt, {searchQuery: newSearchQuery}) => {
