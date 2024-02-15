@@ -221,7 +221,7 @@ export function SearchDropdown({
     <Dropdown
       fluid
       selection
-      clearable={!dropdownProps.required}
+      clearable={!dropdownProps.required && !multiple}
       selectOnNavigation={false}
       selectOnBlur={false}
       defaultOpen={false}
