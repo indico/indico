@@ -41,7 +41,6 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
-from indico.util.signals import make_interceptable
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_kwargs, use_rh_args
