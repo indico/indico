@@ -267,7 +267,7 @@ SearchDropdown.propTypes = {
       will be done locally on the returned data. This also sets minTriggerLength to zero. */
   preload: PropTypes.bool,
   /** Use this prop to make the component controlled */
-  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Called when the value changes with the new value as the first argument */
   onChange: PropTypes.func,
   /** Default value to be set as the first internalValue of the dropdown, if present. */
