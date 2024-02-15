@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import typing
+import typing as t
 import uuid
 from datetime import date, datetime, time
 
@@ -191,7 +191,6 @@ class RHCreateBooking(RHRoomBookingBase):
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(str(e))
-        self.after_create(args, reservation=resv)
 
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
@@ -199,15 +198,6 @@ class RHCreateBooking(RHRoomBookingBase):
         else:
             data = {'bookings': serialized_occurrences}
         return jsonify(room_id=self.room.id, booking=reservation_details_schema.dump(resv), calendar_data=data)
-
-    @staticmethod
-    @make_interceptable
-    def after_create(args: dict[str, typing.Any], reservation: Reservation) -> None:
-        """Hook called after a reservation is created.
-
-        :param args: The data from the request that was used to create the Reservation.
-        :param reservation: The Reservation object that was created.
-        """
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
@@ -355,39 +345,23 @@ class RHUpdateBooking(RHBookingBase):
 
         check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 
-        new_booking: typing.Optional[Reservation] = None
+        new_booking: t.Optional[Reservation] = None
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)
-            self.booking.modify(new_booking_data, session.user)
+            self.booking.modify(new_booking_data, session.user, request_data=args)
             if (has_slot_changed and not room.can_book(session.user, allow_admin=False) and
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
                 self.booking.reset_approval(session.user)
         else:
-            new_booking = split_booking(self.booking, new_booking_data)
+            new_booking = split_booking(self.booking, new_booking_data, request_data=args)
             additional_booking_attrs['new_booking_id'] = new_booking.id
 
         db.session.flush()
-        self.after_update(args, reservation=self.booking, new_split_reservation=new_booking)
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
         return jsonify(booking=(serialize_booking_details(self.booking) | additional_booking_attrs),
                        room_calendar=list(serialize_availability(calendar).values()))
-
-    @staticmethod
-    @make_interceptable
-    def after_update(
-            args: dict[str, typing.Any],
-            reservation: Reservation,
-            new_split_reservation: typing.Optional[Reservation] = None,
-            **kwargs,
-    ) -> None:
-        """Hook called after a reservation is updated.
-
-        :param args: The data from the request that was used to update the Reservation
-        :param reservation: The Reservation object that was updated
-        :param new_split_reservation: The new Reservation that was created by splitting the original one
-        """
 
 
 class RHMyUpcomingBookings(RHRoomBookingBase):

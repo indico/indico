@@ -169,7 +169,7 @@ class BookingEditForm extends React.Component {
       bookingReasonRequired,
       onExtraFieldsChange,
     } = this.props;
-    const {booking} = this.props;
+    const {bookedForUser, startDt, endDt, room, isAccepted, repetition} = booking;
     const {
       values: {dates, recurrence, timeSlot, usage},
       submitSucceeded,
@@ -389,7 +389,7 @@ class BookingEditForm extends React.Component {
             disabled={submitSucceeded}
           />
         </Segment>
-        {renderPluginComponents('rb-form-extra_fields', {
+        {renderPluginComponents('rb-booking-form-extra-fields', {
           room,
           booking,
           formProps,

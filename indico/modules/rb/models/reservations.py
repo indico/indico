@@ -327,7 +327,7 @@ class Reservation(db.Model):
         reservation.end_dt = occurrences[-1].end_dt
 
         db.session.flush()
-        signals.rb.booking_created.send(reservation)
+        signals.rb.booking_created.send(reservation, data=data)
         notify_creation(reservation)
         return reservation
 
@@ -549,11 +549,12 @@ class Reservation(db.Model):
     def is_owned_by(self, user):
         return self.created_by_user == user
 
-    def modify(self, data, user):
+    def modify(self, data, user, request_data):
         """Modify an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
         :param user: The :class:`.User` who modifies the booking.
+        :param request_data: full data from the request form
         """
         from indico.modules.rb import rb_settings
 
@@ -673,7 +674,7 @@ class Reservation(db.Model):
         if not any(occ.is_valid for occ in self.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
 
-        signals.rb.booking_modified.send(self, changes=changes)
+        signals.rb.booking_modified.send(self, changes=changes, data=request_data)
 
         notify_modification(self, changes)
         return True

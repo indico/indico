@@ -629,7 +629,7 @@ class BookRoomModal extends React.Component {
                     required={requireReason}
                   />
                 </Segment>
-                {renderPluginComponents('rb-form-extra_fields', {
+                {renderPluginComponents('rb-booking-form-extra-fields', {
                   room,
                   onSubmit: item => {
                     this.setState({

@@ -139,6 +139,8 @@ Improvements
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
+- Allow plugins to add extra fields to the room booking form (:pr:`6126`)
+- Send a new ``data`` argument containing the full form data in ``rb.booking_created`` and ``rb.booking_modified`` signals (:pr:`6126`)
 
 Bugfixes
 ^^^^^^^^
@@ -232,8 +234,6 @@ Improvements
 ^^^^^^^^^^^^
 
 - Add placeholders for accompanying persons to the badge/ticket designer (:pr:`6033`)
-- Allow plugins to add extra fields to the room booking form (:pr:`6126`)
-- Add interceptable hooks after a room booking is created/updated (:pr:`6126`)
 
 Bugfixes
 ^^^^^^^^
