@@ -162,14 +162,14 @@ class BookingEditForm extends React.Component {
   render() {
     const {
       user: sessionUser,
-      booking: {bookedForUser, startDt, endDt, room, isAccepted, repetition, link},
+      booking,
       onBookingPeriodChange,
       formProps,
       hideOptions,
       bookingReasonRequired,
       onExtraFieldsChange,
     } = this.props;
-    const {bookedForUser, startDt, endDt, room, isAccepted, repetition} = booking;
+    const {bookedForUser, startDt, endDt, room, isAccepted, repetition, link} = booking;
     const {
       values: {dates, recurrence, timeSlot, usage},
       submitSucceeded,
