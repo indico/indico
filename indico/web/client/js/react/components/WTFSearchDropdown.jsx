@@ -74,8 +74,8 @@ export function SearchDropdown({
 
   const getIdFromQuery = query => (query.match(/^#(\d+)$/) || {1: null})[1];
 
-  if (preload) {
-    // No need to limit the search length when all data is preloaded
+  if (preload || !searchUrl) {
+    // No need to limit the search length when all data is preloaded or static
     minTriggerLength = 0;
   }
   const searchDisabled =
