@@ -305,15 +305,20 @@ SearchDropdown.defaultProps = {
 /**
  * WTForms wrapper for SearchDropdown
  */
-export default function WTFSearchDropdown({fieldId, ...rest}) {
+export default function WTFSearchDropdown({fieldId, multiple, ...rest}) {
   const field = useMemo(() => document.getElementById(`${fieldId}-data`), [fieldId]);
   const onChange = value => {
-    field.value = value;
+    field.value = multiple ? JSON.stringify(value) : value;
     field.dispatchEvent(new Event('change', {bubbles: true}));
   };
-  return <SearchDropdown onChange={onChange} {...rest} />;
+  return <SearchDropdown onChange={onChange} multiple={multiple} {...rest} />;
 }
 
 WTFSearchDropdown.propTypes = {
   fieldId: PropTypes.string.isRequired,
+  multiple: PropTypes.bool,
+};
+
+WTFSearchDropdown.defaultProps = {
+  multiple: false,
 };
