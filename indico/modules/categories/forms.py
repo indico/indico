@@ -94,13 +94,9 @@ class CategorySettingsForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not config.ENABLE_GOOGLE_WALLET:
-            new_basic_fields = []
             for field in self.BASIC_FIELDS:
-                if not field.startswith('google_wallet'):
-                    new_basic_fields.append(field)
-                else:
+                if field.startswith('google_wallet'):
                     delattr(self, field)
-            self.BASIC_FIELDS = tuple(new_basic_fields)
 
 
 class CategoryIconForm(IndicoForm):
