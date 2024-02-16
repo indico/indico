@@ -585,8 +585,8 @@ def get_published_registrations(event, user, hide_participants_from_other_forms)
     """Get a list of published registrations for an event.
 
     :param event: the `Event` to get registrations for
-    :param is_participant: whether the user accessing the registrations is a participant of the event
-    :params hide_participants_from_other_forms: if True, show only participants from the same registration form
+    :param user: the user who can see the participants
+    :param hide_participants_from_other_forms: if True, show only participants from the same registration form
     :return: list of `Registration` objects
     """
     query = (Registration.query.with_parent(event)
@@ -607,8 +607,8 @@ def count_hidden_registrations(event, user, is_participant, hide_participants_fr
 
     :param event: the `Event` to get registrations for
     :param is_participant: whether the user accessing the registrations is a participant of the event
-    :params hide_participants_from_other_forms: if True, show only participants from the same registration form
-    :params user_regform: the registration form in which user had registered if he did
+    :param user: the user who can see the participants
+    :param hide_participants_from_other_forms: if True, show only participants from the same registration form
     :return: number of registrations
     """
     query = (Registration.query.with_parent(event)
