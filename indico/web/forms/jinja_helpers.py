@@ -20,9 +20,9 @@ from indico.web.forms.widgets import DropdownWidget, TypeaheadWidget
 
 
 def is_single_line_field(field):
-    if isinstance(field.widget, TypeaheadWidget):
+    if isinstance(field.widget, (DropdownWidget, TypeaheadWidget)):
         return True
-    if isinstance(field.widget, (DropdownWidget, Select)):
+    if isinstance(field.widget, Select):
         return not field.widget.multiple
     if isinstance(field.widget, Input):
         return field.widget.input_type not in {'checkbox', 'radio', 'hidden'}
