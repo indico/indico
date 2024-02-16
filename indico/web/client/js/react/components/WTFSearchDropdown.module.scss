@@ -8,3 +8,7 @@
 :global(.ui.multiple.search.dropdown) :global(input[type='text'].search) {
   margin: 0em 0.64285714em;
 }
+
+:global(.ui.multiple.search.dropdown) :global(a.label) {
+  cursor: default;
+}
