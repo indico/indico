@@ -70,7 +70,15 @@ export default function EditableList({management}) {
   const codePresent = Object.values(contribList).some(c => c.code);
   return (
     <EditableListDisplay
-      initialContribList={contribList}
+      initialContribList={
+        (contribList.map(c => {
+          if (c.editable && c.editable.state === 'accepted' && c.editable.submitterAcceptance) {
+            c.editable.state = 'accepted_submitter';
+          }
+          return c;
+        }),
+        contribList)
+      }
       codePresent={codePresent}
       editableType={type}
       eventId={eventId}
@@ -157,7 +165,18 @@ function EditableListDisplay({
         options: [
           {value: 'not_submitted', text: Translate.string('Not submitted'), color: 'default'},
           {value: 'ready_for_review', text: Translate.string('Ready for review'), color: 'grey'},
-          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true, color: 'green'},
+          {
+            value: 'accepted',
+            text: Translate.string('Accepted by editor'),
+            exclusive: true,
+            color: 'green',
+          },
+          {
+            value: 'accepted_submitter',
+            text: Translate.string('Accepted by submitter'),
+            exclusive: true,
+            color: 'green',
+          },
           {value: 'rejected', text: Translate.string('Rejected'), exclusive: true, color: 'black'},
           {
             value: 'needs_submitter_changes',
