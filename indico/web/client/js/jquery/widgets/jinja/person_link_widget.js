@@ -19,10 +19,10 @@ import {camelizeKeys} from 'indico/utils/case';
       roles,
       sessionUser,
       hasPredefinedAffiliations,
-      hideAffiliationField,
       canEnterManually,
       defaultSearchExternal,
       nameFormat,
+      extraParams,
       ...rest
     } = options;
     const field = document.getElementById(fieldId);
@@ -52,10 +52,10 @@ import {camelizeKeys} from 'indico/utils/case';
         roles={roles || []}
         sessionUser={user}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
-        hideAffiliationField={hideAffiliationField}
         canEnterManually={canEnterManually}
         defaultSearchExternal={defaultSearchExternal}
         nameFormat={nameFormat}
+        extraParams={camelizeKeys(extraParams)}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)

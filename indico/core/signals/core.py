@@ -85,6 +85,17 @@ should never be registered without restricting the sender to ensure
 only the correct field types are returned.
 ''')
 
+get_field_extra_params = _signals.signal('get-field-extra-params', '''
+The signal should return a dict containing extra parameters to pass to
+to PersonLinkFields. The *sender* is the field.
+
+The parameter `disable_affiliations` can be used to disable the
+affiliations field in the person details modal.
+
+All paremeters are camelized and passed to the `personListItemActions`
+and `personLinkFieldModals` React hooks.
+''')
+
 db_schema_created = _signals.signal('db-schema-created', '''
 Executed when a new database schema is created.  The *sender* is the
 name of the schema.

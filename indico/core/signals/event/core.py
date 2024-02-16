@@ -114,8 +114,3 @@ The `event` object is the sender.
 The signal should return a bool to determine if the Participant list menu
 should be displayed on the Event page.
 ''')
-
-hide_affiliation_field = _signals.signal('hide-affiliation-field', '''
-The signal should return a bool to determine if the the affiliation field
-should be hidden in PersonLinkFields. The *sender* is the Event.
-''')

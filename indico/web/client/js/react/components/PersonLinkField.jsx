@@ -35,6 +35,7 @@ const PersonListItem = ({
   onEdit,
   onClickRole,
   disabled,
+  extraParams,
 }) => (
   <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={person.avatarURL} styleName="icon" />
@@ -67,7 +68,7 @@ const PersonListItem = ({
         ))}
     </div>
     <div styleName="actions">
-      {renderPluginComponents('personListItemActions', {person, onEdit, disabled})}
+      {renderPluginComponents('personListItemActions', {person, onEdit, disabled, extraParams})}
       {canEdit && (
         <Icon
           styleName="button edit"
@@ -102,6 +103,7 @@ PersonListItem.propTypes = {
   disabled: PropTypes.bool,
   avatarURL: PropTypes.string,
   onClickRole: PropTypes.func,
+  extraParams: PropTypes.object,
 };
 
 PersonListItem.defaultProps = {
@@ -111,6 +113,7 @@ PersonListItem.defaultProps = {
   avatarURL: null,
   onDelete: null,
   onClickRole: null,
+  extraParams: {},
 };
 
 const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
@@ -153,6 +156,7 @@ const PersonLinkSection = ({
   canDelete,
   drag,
   dragType,
+  extraParams,
 }) => {
   const onClickRole = (personIndex, roleIndex, value) => {
     const role = defaultRoles[roleIndex];
@@ -194,6 +198,7 @@ const PersonLinkSection = ({
                 name,
                 active: p.roles && p.roles.includes(name),
               }))}
+              extraParams={extraParams}
             />
           ))
         ) : (
@@ -214,6 +219,7 @@ PersonLinkSection.propTypes = {
   canDelete: PropTypes.bool,
   drag: PropTypes.bool,
   dragType: PropTypes.string.isRequired,
+  extraParams: PropTypes.object,
 };
 
 PersonLinkSection.defaultProps = {
@@ -223,6 +229,7 @@ PersonLinkSection.defaultProps = {
   canEdit: true,
   canDelete: true,
   drag: false,
+  extraParams: {},
 };
 
 function PersonLinkField({
@@ -235,11 +242,11 @@ function PersonLinkField({
   autoSort,
   setAutoSort,
   hasPredefinedAffiliations,
-  hideAffiliationField,
   canEnterManually,
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
+  extraParams,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState('');
@@ -332,6 +339,7 @@ function PersonLinkField({
                   onChange(persons.filter(p => !filterCondition(p)).concat(values))
                 }
                 canEdit={canEnterManually}
+                extraParams={extraParams}
               />
             );
           })}
@@ -345,6 +353,7 @@ function PersonLinkField({
               onEdit={(idx, scope) => onEdit(persons.findIndex(p => p === others[idx]), scope)}
               onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
               canEdit={canEnterManually}
+              extraParams={extraParams}
             />
           )}
           {persons.length === 0 && (emptyMessage || <Translate>There are no persons</Translate>)}
@@ -396,8 +405,8 @@ function PersonLinkField({
               person={persons[selected]}
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
-              hideAffiliationField={hideAffiliationField}
               validateEmailUrl={validateEmailUrl}
+              extraParams={extraParams}
             />
           )}
         </Button.Group>
@@ -409,6 +418,7 @@ function PersonLinkField({
           onChange,
           onClose,
           modalOpen,
+          extraParams,
         })}
     </div>
   );
@@ -424,11 +434,11 @@ PersonLinkField.propTypes = {
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
-  hideAffiliationField: PropTypes.bool,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   nameFormat: PropTypes.string,
   validateEmailUrl: PropTypes.string,
+  extraParams: PropTypes.object,
 };
 
 PersonLinkField.defaultProps = {
@@ -439,11 +449,11 @@ PersonLinkField.defaultProps = {
   autoSort: true,
   setAutoSort: null,
   hasPredefinedAffiliations: false,
-  hideAffiliationField: false,
   canEnterManually: true,
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,
+  extraParams: {},
 };
 
 export function WTFPersonLinkField({
@@ -454,11 +464,11 @@ export function WTFPersonLinkField({
   sessionUser,
   emptyMessage,
   hasPredefinedAffiliations,
-  hideAffiliationField,
   canEnterManually,
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
+  extraParams,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -510,11 +520,11 @@ export function WTFPersonLinkField({
       autoSort={autoSort}
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
-      hideAffiliationField={hideAffiliationField}
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
       validateEmailUrl={validateEmailUrl}
+      extraParams={extraParams}
     />
   );
 }
@@ -527,11 +537,11 @@ WTFPersonLinkField.propTypes = {
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
-  hideAffiliationField: PropTypes.bool,
   nameFormat: PropTypes.string,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
+  extraParams: PropTypes.object,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -541,9 +551,9 @@ WTFPersonLinkField.defaultProps = {
   sessionUser: null,
   emptyMessage: null,
   hasPredefinedAffiliations: false,
-  hideAffiliationField: false,
   canEnterManually: true,
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,
+  extraParams: {},
 };

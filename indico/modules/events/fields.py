@@ -99,19 +99,13 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def has_predefined_affiliations(self):
-        return not self.hide_affiliation_field and Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+        return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 
     @property
     def default_search_external(self):
         if not self.event:
             return False
         return persons_settings.get(self.event, 'default_search_external')
-
-    @property
-    def hide_affiliation_field(self):
-        if self.event is None:
-            return False
-        return any(values_from_signal(signals.event.hide_affiliation_field.send(self.event)))
 
     @property
     def can_enter_manually(self):
@@ -131,10 +125,16 @@ class PersonLinkListFieldBase(PrincipalListField):
     def validate_email_url(self):
         return url_for('events.check_email', self.object) if self.object else None
 
+    @property
+    def extra_params(self):
+        values = values_from_signal(signals.core.get_field_extra_params.send(self), as_list=True)
+        return {k: v for d in values for k, v in d.items()}
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         identifier = data.get('identifier')
+        affiliations_disabled = self.extra_params.get('disable_affiliations', False)
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
         if not self.can_enter_manually and not data.get('type'):
             raise UserValueError('Manually entered persons are not allowed')
@@ -149,12 +149,13 @@ class PersonLinkListFieldBase(PrincipalListField):
                 data['_title'] = UserTitle.none
                 data['affiliation_link'] = None
             if (
+                not affiliations_disabled and
                 (affiliation_data := external_user_data.get('affiliation_data')) and
                 data['affiliation'] == affiliation_data['name']
             ):
                 data['affiliation_link'] = Affiliation.get_or_create_from_data(affiliation_data)
                 data['affiliation'] = data['affiliation_link'].name
-        if not self.has_predefined_affiliations:
+        if not self.has_predefined_affiliations or affiliations_disabled:
             data['affiliation_link'] = None
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
