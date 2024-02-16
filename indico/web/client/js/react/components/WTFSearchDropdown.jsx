@@ -87,18 +87,20 @@ export function SearchDropdown({
     if (searchDisabled) {
       return [];
     }
-
     query = query.toLowerCase();
     const id = getIdFromQuery(query);
-    return opts
-      .filter(opt => (id === null ? opt.search.includes(query) : +opt['friendly-id'] === +id))
-      .map(opt => ({
-        ...opt,
-        // this might lead to some unexpected results when
-        // searchField !== labelField, because the filtering is done
-        // on searchField but highlighting happens on labelField
-        text: highlightSearch(opt.text, query),
-      }));
+    opts = opts.filter(opt =>
+      id === null ? opt.search.includes(query) : +opt['friendly-id'] === +id
+    );
+    return allowAdditions
+      ? opts
+      : opts.map(opt => ({
+          ...opt,
+          // this might lead to some unexpected results when
+          // searchField !== labelField, because the filtering is done
+          // on searchField but highlighting happens on labelField
+          text: highlightSearch(opt.text, query),
+        }));
   };
 
   const transformOptions = useCallback(
