@@ -1,6 +1,7 @@
 name: CI
 
 env:
+  TZ: Europe/Zurich
   PYTHON_VERSION_39: '3.9.18'
   PYTHON_VERSION_310: '3.10.13'
   PYTHON_VERSION_311: '3.11.8'
