@@ -12,6 +12,7 @@ from io import BytesIO
 
 from flask import g, jsonify, request, session
 from marshmallow import fields
+from PIL import Image
 from pypdf import PdfWriter
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
@@ -29,14 +30,20 @@ from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import ReceiptTemplateDBSchema
 from indico.modules.receipts.settings import receipt_defaults
-from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code, create_pdf, get_inherited_templates,
+from indico.modules.receipts.util import (TemplateStackEntry, compile_jinja_code, create_pdf,
+                                          get_event_attachment_images, get_inherited_templates,
                                           get_safe_template_context)
+from indico.util.caching import memoize_redis
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.images import square
 from indico.util.marshmallow import not_empty
 from indico.util.string import slugify
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file
+
+
+IMAGE_PREVIEW_SIZE = 256
 
 
 class RHAllEventTemplates(RHManageRegFormsBase):
@@ -66,6 +73,63 @@ class RHAllEventTemplates(RHManageRegFormsBase):
             if filename := receipt_defaults.get(self.event, f"filename:{tpl['id']}"):
                 tpl['default_filename'] = filename
         return jsonify(templates)
+
+
+@memoize_redis(3600)
+def _make_image_preview(img):
+    def _process_img(preview):
+        if preview.mode not in {'RGBA', 'RGB'}:
+            preview = preview.convert('RGB')
+        preview = square(preview)
+        if preview.height > IMAGE_PREVIEW_SIZE:
+            preview = preview.resize((IMAGE_PREVIEW_SIZE, IMAGE_PREVIEW_SIZE), resample=Image.BICUBIC)
+        image_bytes = BytesIO()
+        imgtype = 'png' if preview.mode == 'RGBA' else 'jpeg'
+        preview.save(image_bytes, imgtype.upper())
+        image_bytes.seek(0)
+        return f'data:image/{imgtype};base64,{base64.b64encode(image_bytes.read()).decode()}'
+
+    if isinstance(img, bytes):
+        with Image.open(BytesIO(img)) as preview:
+            return _process_img(preview)
+    try:
+        with img.open() as f, Image.open(f) as preview:
+            if preview.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                return ''
+            return _process_img(preview)
+    except OSError:
+        return ''
+
+
+class RHEventImages(RHManageRegFormsBase):
+    """Get all available images for an event."""
+
+    def _process(self):
+        # Fetch layout images
+        images = [{
+            'identifier': f'event://images/{img.id}',
+            'filename': img.filename,
+            'preview': _make_image_preview(img)
+        } for img in self.event.layout_images]
+
+        # Fetch image attachments
+        attachments = get_event_attachment_images(self.event)
+        images.extend({
+            'identifier': f'event://attachments/{id}',
+            'filename': (attachment.title
+                         if attachment.folder.is_default
+                         else f'{attachment.folder.title}/{attachment.title}'),
+            'preview': _make_image_preview(attachment.file)
+        } for id, attachment in attachments.items())
+
+        # Fetch event logo
+        if self.event.has_logo:
+            images.append({
+                'identifier': 'event://logo',
+                'filename': self.event.logo_metadata['filename'],
+                'preview': _make_image_preview(self.event.logo)
+            })
+        return jsonify(images=images)
 
 
 class EventReceiptTemplateMixin:
@@ -104,6 +168,10 @@ class RenderReceiptsBase(EventReceiptTemplateMixin, RHManageRegFormsBase):
 
     def _get_custom_fields(self):
         custom_fields = {f['name']: self.custom_fields_raw.get(f['name']) for f in self.template.custom_fields}
+        if any(not custom_fields[f['name']].startswith('event://')
+               for f in self.template.custom_fields
+               if f['type'] == 'image' and custom_fields[f['name']]):
+            abort(422)
         missing = [f['attributes']['label'] for f in self.template.custom_fields
                    if not custom_fields[f['name']] and f.get('validations', {}).get('required')]
         if missing:

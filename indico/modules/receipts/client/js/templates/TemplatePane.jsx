@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import eventImagesURL from 'indico-url:receipts.images';
 import templateLivePreviewURL from 'indico-url:receipts.template_live_preview';
 
 import _ from 'lodash';
@@ -47,7 +48,11 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
           </Grid.Column>
           <Grid.Column>
             {data.html && data.html.length >= 3 ? (
-              <Previewer url={templateLivePreviewURL(targetLocator)} data={data} />
+              <Previewer
+                url={templateLivePreviewURL(targetLocator)}
+                data={data}
+                fetchImagesURL={'event_id' in targetLocator ? eventImagesURL(targetLocator) : null}
+              />
             ) : (
               <Segment placeholder>
                 <Header icon>

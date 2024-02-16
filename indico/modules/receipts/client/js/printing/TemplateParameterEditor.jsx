@@ -9,11 +9,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Accordion, Form} from 'semantic-ui-react';
 
+import {useIndicoAxios} from 'indico/react/hooks';
+
+import EventImageSelectField from './EventImageSelectField';
+
 export const getDefaultFieldValue = f => {
   if (f.type === 'dropdown') {
     return f.attributes.options[f.attributes.default];
   } else if (f.type === 'checkbox') {
     return f.attributes.value || false;
+  } else if (f.type === 'image') {
+    return null;
   } else {
     return f.attributes.value || '';
   }
@@ -22,7 +28,17 @@ export const getDefaultFieldValue = f => {
 /**
  * This component represents a custom field which can contain a "text" (str), "choice" or "yes/no" (boolean).
  */
-function CustomField({name, value, type, attributes, validations, onChange}) {
+function CustomField({
+  name,
+  value,
+  type,
+  attributes,
+  validations,
+  onChange,
+  eventImages,
+  fetchImages,
+  loadingImages,
+}) {
   if (type === 'input') {
     return (
       <Form.Input
@@ -68,6 +84,19 @@ function CustomField({name, value, type, attributes, validations, onChange}) {
         required={validations.required}
       />
     );
+  } else if (type === 'image') {
+    return (
+      <EventImageSelectField
+        label={attributes.label}
+        name={name}
+        value={value}
+        required={validations.required}
+        loading={loadingImages}
+        onChange={onChange}
+        eventImages={eventImages}
+        onRefresh={fetchImages && (() => fetchImages())}
+      />
+    );
   }
 }
 
@@ -80,10 +109,16 @@ CustomField.propTypes = {
     required: PropTypes.bool,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
+  eventImages: PropTypes.arrayOf(PropTypes.object),
+  fetchImages: PropTypes.func,
+  loadingImages: PropTypes.bool,
 };
 
 CustomField.defaultProps = {
   value: null,
+  eventImages: [],
+  fetchImages: null,
+  loadingImages: false,
 };
 
 export default function TemplateParameterEditor({
@@ -91,8 +126,23 @@ export default function TemplateParameterEditor({
   value,
   onChange,
   title,
+  fetchImagesURL,
   defaultOpen,
 }) {
+  const {data, loading, reFetch} = useIndicoAxios(
+    {url: fetchImagesURL || ''},
+    {camelize: true, manual: !customFields.some(f => f.type === 'image') || !fetchImagesURL}
+  );
+  const eventImages = fetchImagesURL
+    ? data?.images || []
+    : [
+        {
+          identifier: 'event://placeholder',
+          filename: 'placeholder.png',
+          preview: `${Indico.Urls.ImagesBase}/placeholder_image.svg`,
+        },
+      ];
+
   if (customFields.length === 0 || Object.keys(value).length === 0) {
     return null;
   }
@@ -115,6 +165,9 @@ export default function TemplateParameterEditor({
                 name={name}
                 attributes={attributes}
                 validations={validations}
+                eventImages={eventImages}
+                fetchImages={fetchImagesURL && reFetch}
+                loadingImages={loading}
               />
             )),
           },
@@ -131,10 +184,12 @@ TemplateParameterEditor.propTypes = {
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   title: PropTypes.string,
+  fetchImagesURL: PropTypes.string,
   defaultOpen: PropTypes.bool,
 };
 
 TemplateParameterEditor.defaultProps = {
   title: '',
+  fetchImagesURL: null,
   defaultOpen: false,
 };
