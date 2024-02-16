@@ -4,7 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-import hashlib
+
 from datetime import date, datetime, time, timedelta
 from enum import Enum, auto
 from functools import partial
@@ -49,6 +49,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import LowercaseString, not_empty
 from indico.util.signals import values_from_signal
+from indico.util.string import crc32
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -618,7 +619,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
 
     def _get_event_data(self, event_query):
         def calculate_keyword_id(kw):
-            return int(hashlib.sha256(kw.encode()).hexdigest()[:8], 16) + 3
+            return crc32(kw) + 3
 
         data = []
         categories = {}
@@ -651,10 +652,11 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                 colors = generate_contrast_colors(room.id if room else 0)
             else:
                 # by keywords
-                if any(kw not in allowed_keywords for kw in event.keywords):
-                    keyword_id = -1
-                elif len(event.keywords) == 0:
+                allowed_keywords_set = set(allowed_keywords)
+                if not event.keywords:
                     keyword_id = 0
+                elif any(kw not in allowed_keywords_set for kw in event.keywords):
+                    keyword_id = -1
                 elif len(event.keywords) > 1:
                     keyword_id = 1
                 else:

@@ -127,13 +127,12 @@ class RHUpdateEventKeywords(RHAdminBase):
 
     def _process(self):
         form = EventKeywordsForm()
-        keywords = None
+        keywords = misc_settings.get('allowed_keywords')
         if form.validate_on_submit():
             keywords = sorted({kw.lower() for kw in form.data.get('keywords', [])})
             misc_settings.set('allowed_keywords', keywords)
             flash(_('Allowed keywords have been saved'), 'success')
-        if not keywords:
-            keywords = misc_settings.get('allowed_keywords')
+            return redirect(url_for('.event_keywords'))
         return WPEventAdmin.render_template('admin/event_keywords.html', 'event_keywords', keywords=keywords, form=form)
 
 

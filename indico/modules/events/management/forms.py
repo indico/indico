@@ -234,7 +234,8 @@ class EventClassificationForm(IndicoForm):
 
     def validate_keywords(self, field):
         allowed_keywords = set(misc_settings.get('allowed_keywords'))
-        if allowed_keywords and field.data and not all(kw in allowed_keywords for kw in field.data):
+        keywords = set(field.data)
+        if allowed_keywords and not (keywords <= allowed_keywords):
             raise ValidationError(_('Keyword not allowed'))
 
 

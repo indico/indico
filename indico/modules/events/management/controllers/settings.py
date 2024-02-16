@@ -148,18 +148,17 @@ class RHEditEventContactInfo(RHEditEventDataBase):
 
 
 class RHEditEventClassification(RHEditEventDataBase):
-    form_class = EventClassificationForm
     section_name = 'classification'
 
-    def _process(self):
-        allowed_keywords = misc_settings.get('allowed_keywords')
-        if allowed_keywords:
-            default = list(filter(lambda kw: kw in allowed_keywords, self.event.keywords))
-            self.form_class.keywords = IndicoSelectMultipleCheckboxField(_('Keywords'), choices=allowed_keywords,
-                                                                         default=default)
+    @property
+    def form_class(self):
+        if allowed_keywords := misc_settings.get('allowed_keywords'):
+            allowed_keywords_set = set(allowed_keywords)
+            default = [kw in allowed_keywords_set for kw in self.event.keywords]
+            keywords = IndicoSelectMultipleCheckboxField(_('Keywords'), choices=allowed_keywords, default=default)
         else:
-            self.form_class.keywords = IndicoTagListField(_('Keywords'))
-        return super()._process()
+            keywords = IndicoTagListField(_('Keywords'))
+        return type('_EventClassificationForm', (EventClassificationForm,), {'keywords': keywords})
 
     def render_form(self, form):
         return jsonify_form(form, footer_align_right=True, disabled_until_change=False)
