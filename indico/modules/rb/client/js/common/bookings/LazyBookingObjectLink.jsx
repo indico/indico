@@ -12,8 +12,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Placeholder, Segment} from 'semantic-ui-react';
 
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {camelizeKeys} from 'indico/utils/case';
+import {useIndicoAxios} from 'indico/react/hooks';
 
 import BookingObjectLink from './BookingObjectLink';
 
@@ -21,63 +20,39 @@ import BookingObjectLink from './BookingObjectLink';
  * `LazyBookingObjectLink` wraps `BookingObjectLink` and loads the data
  * of the object on demand.
  */
-export default class LazyBookingObjectLink extends React.PureComponent {
-  static propTypes = {
-    type: PropTypes.oneOf(['event', 'contribution', 'sessionBlock']).isRequired,
-    id: PropTypes.number.isRequired,
-    /** Whether it is a pending link or the booking is already linked */
-    pending: PropTypes.bool,
-  };
+export default function LazyBookingObjectLink({type, id, pending}) {
+  const {data, loading} = useIndicoAxios(getLinkedObjectDataURL({type: _.snakeCase(type), id}), {
+    camelize: true,
+  });
 
-  static defaultProps = {
-    pending: false,
-  };
-
-  state = {
-    loaded: false,
-    link: {},
-    canAccess: false,
-  };
-
-  componentDidMount() {
-    const {type, id} = this.props;
-    this.fetchLinkedObjectData(type, id);
+  if (loading) {
+    return (
+      <Segment>
+        <Placeholder fluid>
+          <Placeholder.Header image>
+            <Placeholder.Line length="full" />
+            <Placeholder.Line length="full" />
+          </Placeholder.Header>
+        </Placeholder>
+      </Segment>
+    );
+  } else if (!data) {
+    // first render or error
+    return null;
   }
 
-  async fetchLinkedObjectData(type, id) {
-    let response;
-    try {
-      response = await indicoAxios.get(getLinkedObjectDataURL({type: _.snakeCase(type), id}));
-    } catch (error) {
-      handleAxiosError(error);
-      return;
-    }
-    const {canAccess, ...data} = camelizeKeys(response.data);
-    this.setState({
-      loaded: true,
-      link: canAccess ? {type, ...data} : null,
-      canAccess,
-    });
-  }
-
-  render() {
-    const {pending} = this.props;
-    const {loaded, link, canAccess} = this.state;
-    if (loaded && !canAccess) {
-      return null;
-    } else if (loaded) {
-      return <BookingObjectLink pending={pending} link={link} />;
-    } else {
-      return (
-        <Segment>
-          <Placeholder fluid>
-            <Placeholder.Header image>
-              <Placeholder.Line length="full" />
-              <Placeholder.Line length="full" />
-            </Placeholder.Header>
-          </Placeholder>
-        </Segment>
-      );
-    }
-  }
+  const {canAccess, ...rest} = data;
+  const link = canAccess ? {type, ...rest} : null;
+  return canAccess ? <BookingObjectLink pending={pending} link={link} /> : null;
 }
+
+LazyBookingObjectLink.propTypes = {
+  type: PropTypes.oneOf(['event', 'contribution', 'sessionBlock']).isRequired,
+  id: PropTypes.number.isRequired,
+  /** Whether it is a pending link or the booking is already linked */
+  pending: PropTypes.bool,
+};
+
+LazyBookingObjectLink.defaultProps = {
+  pending: false,
+};
