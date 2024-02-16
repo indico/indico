@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import column_property, mapper
+from sqlalchemy.orm import aliased, column_property, mapper
 
 from indico.core import signals
 from indico.core.config import config
@@ -323,30 +323,38 @@ class Registration(db.Model):
                 r.user = target
 
     @hybrid_method
-    def is_publishable(self, user_regform, hide_participants_from_other_forms=False):
+    def is_publishable(self, user, hide_participants_from_other_forms=False):
         if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False
         if (self.registration_form.publish_registrations_duration is not None
                 and self.event.end_dt + self.registration_form.publish_registrations_duration <= now_utc()):
             return False
         if self.visibility == RegistrationVisibility.participants:
-            return self.registration_form == user_regform \
-                if hide_participants_from_other_forms else user_regform is not None
+            return self.event.is_user_registered(user, self if hide_participants_from_other_forms else None)
         if self.visibility == RegistrationVisibility.all:
             return True
         return False
 
     @is_publishable.expression
-    def is_publishable(cls, user_regform, hide_participants_from_other_forms=False):
+    def is_publishable(cls, user, hide_participants_from_other_forms=False):
         from indico.modules.events import Event
         from indico.modules.events.registration.models.forms import RegistrationForm
 
         def _has_regform_publish_mode(mode):
             return db.or_(db.and_(is_participant, cls.registration_form.has(publish_registrations_participants=mode)),
                           db.and_(~is_participant, cls.registration_form.has(publish_registrations_public=mode)))
-        if user_regform:
-            is_participant = (cls.registration_form == user_regform
-                              if hide_participants_from_other_forms else cls.event == user_regform.event)
+        if user:
+            reg_alias = aliased(Registration)
+            query = (db.session.query(reg_alias)
+                     .join(reg_alias.registration_form)
+                     .filter(reg_alias.event_id == cls.event_id,
+                             reg_alias.user == user,
+                             reg_alias.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                             ~reg_alias.is_deleted,
+                             ~RegistrationForm.is_deleted))
+            if hide_participants_from_other_forms:
+                query = query.filter(reg_alias.registration_form_id == cls.registration_form_id)
+            is_participant = query.exists()
         else:
             is_participant = db.text('false')
         consent_criterion = db.or_(

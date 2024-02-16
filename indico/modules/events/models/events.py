@@ -532,16 +532,15 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return privacy_settings.get(self, 'hide_participants_from_other_forms', False)
 
     @memoize_request
-    def get_published_registrations(self, user, user_regform=None):
+    def get_published_registrations(self, user):
         from indico.modules.events.registration.util import get_published_registrations
-        is_participant = self.is_user_registered(user)
-        return get_published_registrations(self, is_participant, user_regform)
+        return get_published_registrations(self, user, self.hide_participants_from_other_forms)
 
     @memoize_request
-    def count_hidden_registrations(self, user, user_regform=None):
+    def count_hidden_registrations(self, user):
         from indico.modules.events.registration.util import count_hidden_registrations
         is_participant = self.is_user_registered(user)
-        return count_hidden_registrations(self, is_participant, user_regform)
+        return count_hidden_registrations(self, user, is_participant, self.hide_participants_from_other_forms)
 
     @property
     def protection_parent(self):
@@ -1069,22 +1068,25 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
 
-    def is_user_registered(self, user):
+    def is_user_registered(self, user, registration=None):
         """Check whether the user is registered in the event.
 
+        If registration, return True only if user is registered in the same regform as registration.
         This takes both unpaid and complete registrations into account.
         """
         from indico.modules.events.registration.models.forms import RegistrationForm
         from indico.modules.events.registration.models.registrations import Registration, RegistrationState
         if user is None:
             return False
-        return (Registration.query.with_parent(self)
-                .join(Registration.registration_form)
-                .filter(Registration.user == user,
-                        Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
-                        ~Registration.is_deleted,
-                        ~RegistrationForm.is_deleted)
-                .has_rows())
+        query = (Registration.query.with_parent(self)
+                 .join(Registration.registration_form)
+                 .filter(Registration.user == user,
+                         Registration.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                         ~Registration.is_deleted,
+                         ~RegistrationForm.is_deleted))
+        if registration:
+            query = query.filter(Registration.registration_form == registration.registration_form)
+        return query.has_rows()
 
     def is_user_speaker(self, user):
         from indico.modules.events.contributions import Contribution
