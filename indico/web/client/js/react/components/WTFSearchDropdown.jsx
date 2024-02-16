@@ -13,6 +13,8 @@ import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
+import './WTFSearchDropdown.module.scss';
+
 const naturalSort = (options, key = 'text') => {
   const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
   return options.sort((a, b) => collator.compare(a[key], b[key]));
