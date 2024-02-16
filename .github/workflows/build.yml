@@ -25,6 +25,9 @@ on:
         - synchronize
         - labeled
 
+env:
+  TZ: Europe/Zurich
+
 jobs:
   build:
     name: Build package 📦
