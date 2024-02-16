@@ -159,6 +159,8 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
         url_data = urlparse(url)
         if allow_event_images and url_data.scheme == 'event':
             if url_data.netloc == 'logo':
+                if not event.has_logo:
+                    raise ValueError('Event has no logo')
                 return {
                     'mime_type': event.logo_metadata['content_type'],
                     'string': event.logo
@@ -181,20 +183,13 @@ def sandboxed_url_fetcher(event: Event, allow_event_images: bool = False) -> t.C
             if not image:
                 raise ValueError('Invalid event-local image reference')
             try:
-                with image.open() as f:
-                    if image.content_type == 'image/svg+xml':
-                        return {
-                            'mime_type': 'image/svg+xml',
-                            'string': f.read()
-                        }
-                    with Image.open(f) as pic:
-                        if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
-                            raise ValueError('Unsupported image format')
-                        output = BytesIO()
-                        pic.save(output, format=pic.format)
+                with image.open() as f, Image.open(f) as pic:
+                    if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
+                        raise ValueError('Unsupported image format')
+                    f.seek(0)
                     return {
                         'mime_type': image.content_type,
-                        'string': output.getvalue()
+                        'string': f.read()
                     }
             except OSError:
                 raise ValueError('Invalid image file')
