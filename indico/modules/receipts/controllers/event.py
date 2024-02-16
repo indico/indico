@@ -78,18 +78,16 @@ class RHAllEventTemplates(RHManageRegFormsBase):
 @memoize_redis(3600)
 def _make_image_preview(img):
     def _process_img(preview):
+        if preview.mode not in {'RGBA', 'RGB'}:
+            preview = preview.convert('RGB')
         preview = square(preview)
         if preview.height > IMAGE_PREVIEW_SIZE:
             preview = preview.resize((IMAGE_PREVIEW_SIZE, IMAGE_PREVIEW_SIZE), resample=Image.BICUBIC)
-        # properly remove transparencies to prepare for JPEG conversion
-        if preview.mode in {'RGBA', 'LA'}:
-            background = Image.new(preview.mode[:-1], preview.size, 'white')
-            background.paste(preview, preview.split()[-1])
-            preview = background
         image_bytes = BytesIO()
-        preview.save(image_bytes, 'JPEG')
+        imgtype = 'png' if preview.mode == 'RGBA' else 'jpeg'
+        preview.save(image_bytes, imgtype.upper())
         image_bytes.seek(0)
-        return f'data:image/jpeg;base64,{base64.b64encode(image_bytes.read()).decode()}'
+        return f'data:image/{imgtype};base64,{base64.b64encode(image_bytes.read()).decode()}'
 
     if isinstance(img, bytes):
         with Image.open(BytesIO(img)) as preview:
