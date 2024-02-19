@@ -1,7 +1,7 @@
 """Force accepting terms of service
 
 Revision ID: e4ac92d27295
-Revises: e2b69fe5155d
+Revises: 17996ef18cb9
 Create Date: 2023-12-11 23:20:56.153443
 """
 
@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = 'e4ac92d27295'
-down_revision = 'e2b69fe5155d'
+down_revision = '17996ef18cb9'
 branch_labels = None
 depends_on = None
 
