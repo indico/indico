@@ -24,6 +24,7 @@ import 'moment/locale/uk';
 import 'moment/locale/zh-cn';
 import 'moment/locale/es';
 import 'moment/locale/fr';
+import 'moment/locale/pt-br';
 // Last imported locale is used as fallback
 import 'moment/locale/en-gb';
 
