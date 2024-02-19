@@ -27,10 +27,10 @@
     </p>
 
     {% call form_row(form.accept_terms, skip_label=True) %}
-        {% set tos_link_start = ('<a href="' ~ url_for('legal.display_tos') ~ '">')|safe if tos_url else "" %}
-        {% set pp_link_start = ('<a href="' ~ url_for('legal.display_privacy') ~ '">')|safe if privacy_policy_url else "" %}
-        {% set tos_link_end = '</a>'|safe if tos_url else "" %}
-        {% set pp_link_end = '</a>'|safe if privacy_policy_url else "" %}
+        {% set tos_link_start = '<a href="%s">'|format(url_for('legal.display_tos'))|safe if tos_url else '' %}
+        {% set pp_link_start = '<a href="%s">'|format(url_for('legal.display_privacy'))|safe if privacy_policy_url else '' %}
+        {% set tos_link_end = '</a>'|safe if tos_url else '' %}
+        {% set pp_link_end = '</a>'|safe if privacy_policy_url else '' %}
 
         {% if (tos or tos_url) and (privacy_policy or privacy_policy_url) %}
             {% trans tos_link_start=tos_link_start, pp_link_start=pp_link_start, tos_link_end=tos_link_end, pp_link_end=pp_link_end %}
