@@ -16,7 +16,7 @@ from indico.web.forms.widgets import TinyMCEWidget
 
 class AgreementForm(IndicoForm):
     # Label needs to be set in the html template
-    accept_terms = BooleanField('', [InputRequired()])
+    accept_terms = BooleanField(_('Accept terms'), [InputRequired()])
 
 
 class LegalMessagesForm(IndicoForm):

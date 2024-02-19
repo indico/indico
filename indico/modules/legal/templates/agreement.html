@@ -32,20 +32,22 @@
         {% set tos_link_end = '</a>'|safe if tos_url else '' %}
         {% set pp_link_end = '</a>'|safe if privacy_policy_url else '' %}
 
-        {% if (tos or tos_url) and (privacy_policy or privacy_policy_url) %}
-            {% trans tos_link_start=tos_link_start, pp_link_start=pp_link_start, tos_link_end=tos_link_end, pp_link_end=pp_link_end %}
-                I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }} and
-                and {{ pp_link_start }}privacy policy{{ pp_link_end }}.
-            {% endtrans %}
-        {%- elif tos or tos_url %}
-            {% trans tos_link_start=tos_link_start, tos_link_end=tos_link_end %}
-                I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }}.
-            {% endtrans %}
-        {%- elif privacy_policy or privacy_policy_url %}
-            {% trans pp_link_start=pp_link_start, pp_link_end=pp_link_end %}
-                I have read, understood and accept the {{ pp_link_start }}privacy policy{{ pp_link_end }}.
-            {% endtrans %}
-        {%- endif -%}
+        <div class="form-field-description">
+            {% if (tos or tos_url) and (privacy_policy or privacy_policy_url) %}
+                {% trans tos_link_start=tos_link_start, pp_link_start=pp_link_start, tos_link_end=tos_link_end, pp_link_end=pp_link_end %}
+                    I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }}
+                    and {{ pp_link_start }}privacy policy{{ pp_link_end }}.
+                {% endtrans %}
+            {%- elif tos or tos_url %}
+                {% trans tos_link_start=tos_link_start, tos_link_end=tos_link_end %}
+                    I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }}.
+                {% endtrans %}
+            {%- elif privacy_policy or privacy_policy_url %}
+                {% trans pp_link_start=pp_link_start, pp_link_end=pp_link_end %}
+                    I have read, understood and accept the {{ pp_link_start }}privacy policy{{ pp_link_end }}.
+                {% endtrans %}
+            {%- endif -%}
+        </div>
     {% endcall %}
 
     {% call form_footer(form) %}
