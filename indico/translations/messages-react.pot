@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-02-24 23:56+0100\n"
+"POT-Creation-Date: 2024-02-24 10:15+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -154,7 +154,7 @@ msgid "Export"
 msgstr ""
 
 #: indico/modules/categories/client/js/base.jsx:30
-#: indico/modules/categories/client/js/components/CalendarLegend.jsx:73
+#: indico/modules/categories/client/js/components/CalendarLegend.jsx:121
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:155
 msgid "Category"
 msgstr ""
@@ -163,24 +163,42 @@ msgstr ""
 msgid "Go to..."
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:215
+#: indico/modules/categories/client/js/calendar.js:258
+#: indico/modules/categories/client/js/calendar.js:260
+msgid "No room"
+msgstr ""
+
+#: indico/modules/categories/client/js/calendar.js:317
 msgid "No category"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:217
+#: indico/modules/categories/client/js/calendar.js:319
 msgid "This category"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:225
+#: indico/modules/categories/client/js/calendar.js:327
 msgid "No venue"
 msgstr ""
 
-#: indico/modules/categories/client/js/components/CalendarLegend.jsx:74
+#: indico/modules/categories/client/js/components/CalendarLegend.jsx:122
 msgid "Venue"
 msgstr ""
 
-#: indico/modules/categories/client/js/components/CalendarLegend.jsx:82
+#: indico/modules/categories/client/js/components/CalendarLegend.jsx:123
+#: indico/modules/rb/client/js/components/RoomSelector.jsx:158
+msgid "Room"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CalendarLegend.jsx:131
 msgid "Display by:"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CalendarLegend.jsx:142
+msgid "Select all"
+msgstr ""
+
+#: indico/modules/categories/client/js/components/CalendarLegend.jsx:146
+msgid "Clear"
 msgstr ""
 
 #: indico/modules/categories/client/js/components/CategoryModeration.jsx:79
@@ -3877,10 +3895,6 @@ msgstr ""
 msgid "Geographical Coordinates"
 msgstr ""
 
-#: indico/modules/rb/client/js/components/RoomSelector.jsx:158
-msgid "Room"
-msgstr ""
-
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:200
 msgid "There are no rooms selected."
 msgstr ""
@@ -4975,98 +4989,134 @@ msgstr ""
 msgid "Concurrent Pre-Bookings"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:40
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:31
+msgid "from Images"
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:32
+msgid "from Materials"
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:33
+msgid "from Indico"
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:34
+msgid "Event Logo"
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:51
+msgid "This field only accepts jpg, png, gif and webp picture formats."
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:88
+msgid "Select an image from the event"
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:91
+msgid "Loading images..."
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:92
+msgid "No images were found in this event."
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/EventImageSelectField.jsx:107
+msgid "Get new images"
+msgstr ""
+
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:41
 msgid "Publish and send to registrant"
 msgid_plural "Publish and send to registrants"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:45
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:46
 msgid "Save and publish to registration"
 msgid_plural "Save and publish to registrations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:52
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:53
 msgid "Save and send to registrant"
 msgid_plural "Save and send to registrants"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:57
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:58
 msgid "Save to registration"
 msgid_plural "Save to registrations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:64
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:65
 msgid "as a single PDF document"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:69
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:70
 msgid "as a ZIP archive"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:144
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:145
 msgid "Generate Documents"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:154
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:155
 msgid "Generating document for a single registrant"
 msgid_plural "Generating documents for {numberOfRegistrants} registrants"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:167
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:168
 msgid "Successfully generated document for a single registrant"
 msgid_plural "Successfully generated {numberOfReceipts} documents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:182
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:183
 msgid "Document Template"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:183
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:184
 msgid "Select a document template"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:200
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:201
 #: indico/modules/receipts/client/js/templates/Previewer.jsx:32
 msgid "Template Parameters"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:210
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:212
 msgid "Filename"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:224
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:226
 msgid "Remember settings"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:225
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:227
 msgid ""
 "Prefill template parameters (if present) and filename when generating more "
 "documents for the same template in this event."
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:233
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:235
 msgid "Publish document"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:234
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:236
 msgid "Make the resulting document available on the registration page."
 msgid_plural "Make the resulting documents available on the registration pages."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:245
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:247
 msgid "Notify registrants via e-mail"
 msgid_plural "Notify registrants via e-mail"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:252
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:254
 msgid ""
 "Send an e-mail to the registrant informing them that the document is "
 "available."
@@ -5076,20 +5126,20 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:257
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:259
 msgid "Send an e-mail to the registrant with the document attached."
 msgid_plural "Send an e-mail to the registrants with the document attached."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:297
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:299
 #: indico/modules/users/client/js/DataExport.jsx:123
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:235
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:245
 msgid "Download"
 msgstr ""
 
-#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:320
+#: indico/modules/receipts/client/js/printing/PrintReceiptsModal.jsx:322
 msgid "Please select a template to preview it..."
 msgstr ""
 
@@ -5137,7 +5187,7 @@ msgstr ""
 msgid "Sample parameters"
 msgstr ""
 
-#: indico/modules/receipts/client/js/templates/Previewer.jsx:158
+#: indico/modules/receipts/client/js/templates/Previewer.jsx:159
 msgid "The preview is limited to a few registrations for performance reasons."
 msgstr ""
 
@@ -5201,15 +5251,15 @@ msgstr ""
 msgid "Template deleted"
 msgstr ""
 
-#: indico/modules/receipts/client/js/templates/TemplatePane.jsx:33
+#: indico/modules/receipts/client/js/templates/TemplatePane.jsx:34
 msgid "Add document template"
 msgstr ""
 
-#: indico/modules/receipts/client/js/templates/TemplatePane.jsx:34
+#: indico/modules/receipts/client/js/templates/TemplatePane.jsx:35
 msgid "Edit document template"
 msgstr ""
 
-#: indico/modules/receipts/client/js/templates/TemplatePane.jsx:55
+#: indico/modules/receipts/client/js/templates/TemplatePane.jsx:60
 msgid "Start writing a template to see the preview here..."
 msgstr ""
 

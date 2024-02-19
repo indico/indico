@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-02-13 23:55+0100\n"
+"POT-Creation-Date: 2024-02-19 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,13 +45,13 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:118
+#: indico/modules/categories/client/js/calendar.js:121
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/calendar.js:128
+#: indico/modules/categories/client/js/calendar.js:131
 msgid "Long lasting events"
 msgstr ""
 
