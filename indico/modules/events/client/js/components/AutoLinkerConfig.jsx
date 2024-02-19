@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import autoLinkerConfigUrl from 'indico-url:events.autolinker_config';
+import autoLinkerConfigURL from 'indico-url:events.autolinker_config';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
@@ -62,7 +62,7 @@ export default function AutoLinkerConfig({rules, onChange}) {
   const onAdd = async () => {
     try {
       const newRules = [...rules, newRule];
-      await indicoAxios.post(autoLinkerConfigUrl(), {rules: newRules});
+      await indicoAxios.post(autoLinkerConfigURL(), {rules: newRules});
       onChange(newRules);
       setNewRule({regex: '', url: ''});
     } catch (e) {
@@ -79,7 +79,7 @@ export default function AutoLinkerConfig({rules, onChange}) {
     try {
       const newRules = [...rules];
       const [oldRule] = newRules.splice(n, 1);
-      await indicoAxios.post(autoLinkerConfigUrl(), {rules: newRules});
+      await indicoAxios.post(autoLinkerConfigURL(), {rules: newRules});
       onChange(newRules);
       setNewRule(oldRule);
     } catch (e) {

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import autoLinkerRulesUrl from 'indico-url:events.autolinker_rules';
+import autoLinkerRulesURL from 'indico-url:events.autolinker_rules';
 
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
@@ -18,7 +18,7 @@ import AutoLinkerTestDrive from './components/AutoLinkerTestDrive';
 
 function AutoLinker() {
   const [_rules, setRules] = useState(null);
-  const {data, loading} = useIndicoAxios(autoLinkerRulesUrl(), {
+  const {data, loading} = useIndicoAxios(autoLinkerRulesURL(), {
     camelize: true,
   });
 
