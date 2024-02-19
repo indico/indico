@@ -318,7 +318,7 @@
 {% macro _render_allow_modification(registration) %}
     <div class="action-box">
         <div class="section">
-            {% if registration.modification_end_dt == None %}
+            {% if registration.modification_end_dt is none %}
                 <div class="icon icon-edit"></div>
                 <div class="text">
                     <div class="label">
@@ -350,7 +350,7 @@
             {% endif %}
             <div class="toolbar">
                 <div class="group">
-                    {% if registration.modification_end_dt == None %}
+                    {% if registration.modification_end_dt is none %}
                         <button class="i-button icon-time"
                                 data-update="#registration-details"
                                 data-href="{{ url_for('.registration_schedule_modification', registration) }}"
