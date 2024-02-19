@@ -469,7 +469,7 @@ class RegistrationHandler:
             affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None)
 
             if legal_settings.get('terms_require_accept'):
-                accept_registration_terms = fields.Bool(required=True, validate=not_empty)
+                accept_terms = fields.Bool(required=True, validate=not_empty)
 
             if self.moderate_registrations:
                 if 'comment' in mandatory_fields:
