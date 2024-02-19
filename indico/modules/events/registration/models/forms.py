@@ -233,7 +233,7 @@ class RegistrationForm(db.Model):
         default=False
     )
     #: Whether to enable Google Wallet integration
-    ticket_google_wallet_enabled = db.Column(
+    is_google_wallet_enabled = db.Column(
         db.Boolean,
         nullable=False,
         default=True
@@ -537,6 +537,10 @@ class RegistrationForm(db.Model):
     def is_google_wallet_configured(self):
         return (config.ENABLE_GOOGLE_WALLET and GoogleWalletManager.get_google_wallet_settings(self.event.category)
                 is not None)
+
+    @property
+    def is_google_wallet_available(self):
+        return self.is_google_wallet_enabled and self.is_google_wallet_configured
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')

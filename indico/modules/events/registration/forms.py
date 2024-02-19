@@ -307,9 +307,9 @@ class EmailRegistrantsForm(IndicoForm):
 class TicketsForm(IndicoForm):
     tickets_enabled = BooleanField(_('Enable Tickets'), widget=SwitchWidget(),
                                    description=_('Create tickets for registrations using this registration form.'))
-    ticket_google_wallet_enabled = BooleanField(_('Enable Google Wallet'), [HiddenUnless('tickets_enabled',
-                                                                                         preserve_data=True)],
-                                                widget=SwitchWidget(), description=_('Add Google Wallet integration.'))
+    is_google_wallet_enabled = BooleanField(_('Enable Google Wallet'), [HiddenUnless('tickets_enabled',
+                                                                                     preserve_data=True)],
+                                            widget=SwitchWidget(), description=_('Add Google Wallet integration.'))
     ticket_on_email = BooleanField(_('Send with an e-mail'), [HiddenUnless('tickets_enabled',
                                                                            preserve_data=True)],
                                    widget=SwitchWidget(),
@@ -348,7 +348,7 @@ class TicketsForm(IndicoForm):
 
         self.regform = kwargs.get('obj')
         if not self.regform.is_google_wallet_configured:  # Do not show if not configured at Category level
-            del self.ticket_google_wallet_enabled
+            del self.is_google_wallet_enabled
 
 
 class ParticipantsDisplayForm(IndicoForm):
