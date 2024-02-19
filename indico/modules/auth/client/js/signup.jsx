@@ -78,13 +78,14 @@ function Signup({
   };
 
   const termsAcceptLabel = () => {
+    const stopPropagation = evt => evt.stopPropagation();
     const tosLinkWrapper = tosUrl ? (
-      <a href={tosURL()} rel="noreferrer" target="_blank" />
+      <a href={tosURL()} rel="noreferrer" target="_blank" onClick={stopPropagation} />
     ) : (
       <span />
     );
     const privacyPolicyLinkWrapper = privacyPolicyUrl ? (
-      <a href={privacyPolicyURL()} rel="noreferrer" target="_blank" />
+      <a href={privacyPolicyURL()} rel="noreferrer" target="_blank" onClick={stopPropagation} />
     ) : (
       <span />
     );
