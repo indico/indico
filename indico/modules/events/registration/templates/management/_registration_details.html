@@ -339,13 +339,12 @@
             {% else %}
                 <div class="icon icon-edit registration-allow-modification"></div>
                 <div class="text">
-                        <div class="label">
-                            {% trans %}The participant can modify their registration{% endtrans %}
-                        </div>
+                    <div class="label">
+                        {% trans %}The participant can modify their registration{% endtrans %}
+                    </div>
                     {% trans modification_end_dt=registration.modification_end_dt|format_date(timezone=registration.event.tzinfo) -%}
                         The participant is allowed to modify their registration until: {{ modification_end_dt }}
                     {%- endtrans %}
-                    </span>
                 </div>
             {% endif %}
             <div class="toolbar">
