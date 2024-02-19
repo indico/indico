@@ -6,5 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    {{ tos|sanitize_html }}
+    <div class="editor-output">
+        {{ tos|sanitize_html }}
+    </div>
 {% endblock %}

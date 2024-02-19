@@ -285,13 +285,16 @@ function Signup({
           {termsRequireAccept && !!tos && !tosUrl && (
             <>
               <h3>{Translate.string('Terms of service')}</h3>
-              <div className="field policy" dangerouslySetInnerHTML={{__html: tos}} />
+              <div className="field policy editor-output" dangerouslySetInnerHTML={{__html: tos}} />
             </>
           )}
           {termsRequireAccept && !!privacyPolicy && !privacyPolicyUrl && (
             <>
               <h3>{Translate.string('Privacy policy')}</h3>
-              <div className="field policy" dangerouslySetInnerHTML={{__html: privacyPolicy}} />
+              <div
+                className="field policy editor-output"
+                dangerouslySetInnerHTML={{__html: privacyPolicy}}
+              />
             </>
           )}
           {termsRequireAccept && !!termsEffectiveDate && (

@@ -10,14 +10,14 @@
     </p>
     {% if tos and not tos_url %}
         {% call form_fieldset(_('Terms of Service')) %}
-            <div class="field policy">
+            <div class="field policy editor-output">
                 {{ tos|sanitize_html }}
             </div>
         {% endcall %}
     {% endif %}
     {% if privacy_policy and not privacy_policy_url %}
         {% call form_fieldset(_('Privacy Policy')) %}
-        <div class="field policy">
+        <div class="field policy editor-output">
             {{ privacy_policy|sanitize_html }}
         </div>
         {% endcall %}
