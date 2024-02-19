@@ -54,11 +54,13 @@ export function handleSubmitError(error, fieldErrorMap = {}) {
 }
 
 /** Conditionally show content within a FinalForm depending on the value of another field */
-export const FieldCondition = ({when, is, children}) => (
+export const FieldCondition = ({when, is, children, inverted}) => (
   <Field
     name={when}
     subscription={{value: true}}
-    render={({input: {value}}) => (value === is ? children : null)}
+    render={({input: {value}}) =>
+      inverted ? (value !== is ? children : null) : value === is ? children : null
+    }
   />
 );
 
@@ -66,10 +68,12 @@ FieldCondition.propTypes = {
   when: PropTypes.string.isRequired,
   is: PropTypes.any,
   children: PropTypes.node.isRequired,
+  inverted: PropTypes.bool,
 };
 
 FieldCondition.defaultProps = {
   is: true,
+  inverted: false,
 };
 
 /**
