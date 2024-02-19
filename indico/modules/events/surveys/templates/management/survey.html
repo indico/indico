@@ -90,13 +90,13 @@
             <div class="icon icon-mail"></div>
             <div class="text">
                 <div class="label">
-                    {% trans %}Email{% endtrans %}
+                    {% trans %}Email participants{% endtrans %}
                 </div>
-                {% trans %}Email event participants.{% endtrans %}
+                {% trans %}Email event participants about this survey.{% endtrans %}
             </div>
             <div class="toolbar">
                 <div id="email-submission-container" class="i-button-wrapper" data-event-id="{{ event.id }}"
-                     data-survey-id="{{ survey.id }}">
+                     data-survey-id="{{ survey.id }}" data-survey-active="{{ survey.is_active | tojson }}">
                 </div>
             </div>
         </div>

@@ -20,7 +20,7 @@ import './badges';
 import {AuthorsListButton} from 'indico/modules/events/persons/AuthorsListButton';
 import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
-import {EmailSurveyParticipantsButton} from 'indico/modules/events/persons/EmailSurveyParticipantsButton';
+import {EmailSurveyParticipantsButton} from 'indico/modules/events/surveys/EmailSurveyParticipantsButton';
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
 
@@ -72,9 +72,13 @@ import {SeriesManagement} from './SeriesManagement';
     containerSelector
   ) {
     const element = document.querySelector(containerSelector);
-    const {eventId, surveyId} = element.dataset;
+    const {eventId, surveyId, surveyActive} = element.dataset;
     ReactDOM.render(
-      <EmailSurveyParticipantsButton eventId={+eventId} surveyId={+surveyId} />,
+      <EmailSurveyParticipantsButton
+        eventId={+eventId}
+        surveyId={+surveyId}
+        surveyActive={JSON.parse(surveyActive)}
+      />,
       element
     );
   };

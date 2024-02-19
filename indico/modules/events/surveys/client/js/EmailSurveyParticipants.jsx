@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import emailMetadataURL from 'indico-url:surveys.api_email_event_survey_metadata';
-import emailPreviewURL from 'indico-url:surveys.api_email_event_survey_preview';
-import emailSendURL from 'indico-url:surveys.api_email_event_survey_send';
+import emailMetadataURL from 'indico-url:surveys.manage_email_event_survey_metadata';
+import emailPreviewURL from 'indico-url:surveys.manage_email_event_survey_preview';
+import emailSendURL from 'indico-url:surveys.manage_email_event_survey_send';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
@@ -17,7 +17,7 @@ import {handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {indicoAxios} from 'indico/utils/axios';
 
-import {EmailDialog} from './EmailDialog';
+import {EmailDialog} from '../../../persons/client/js/EmailDialog';
 
 export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
   const [sentCount, setSentCount] = useState(0);
@@ -64,14 +64,13 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       recipients={recipients}
       previewURL={emailPreviewURL({event_id: eventId, survey_id: surveyId})}
       placeholders={placeholders}
-      initialFormValues={{subject: defaultSubject, body: defaultBody, recipient_roles: []}}
+      initialFormValues={{subject: defaultSubject, body: defaultBody}}
       sentEmailsCount={sentCount}
     />
   );
 }
 
 EmailSurveyParticipants.propTypes = {
-  // context: PropTypes.object.isRequired,
   eventId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
   surveyId: PropTypes.number.isRequired,
