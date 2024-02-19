@@ -59,7 +59,8 @@ export const FieldCondition = ({when, is, children, inverted}) => (
     name={when}
     subscription={{value: true}}
     render={({input: {value}}) =>
-      inverted ? (value !== is ? children : null) : value === is ? children : null
+      // eslint-disable-next-line no-bitwise
+      (value === is) ^ inverted ? children : null
     }
   />
 );
