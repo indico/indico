@@ -147,7 +147,7 @@ def get_linked_events(user, dt, limit=None, load_also=()):
     for event_id, roles in get_events_with_paper_roles(user, dt).items():
         links.setdefault(event_id, set()).update(roles)
     for event in user.favorite_events:
-        if event.start_dt >= dt:
+        if dt is None or event.start_dt >= dt:
             links.setdefault(event.id, set()).add('favorited')
 
     if not links:
