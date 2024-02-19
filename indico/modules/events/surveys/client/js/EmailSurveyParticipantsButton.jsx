@@ -12,7 +12,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {EmailSurveyParticipants} from './EmailSurveyParticipants';
 
-export function EmailSurveyParticipantsButton({eventId, surveyId}) {
+export function EmailSurveyParticipantsButton({eventId, surveyId, surveyActive}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -20,6 +20,7 @@ export function EmailSurveyParticipantsButton({eventId, surveyId}) {
       <button
         type="button"
         className="i-button icon-mail"
+        disabled={!surveyActive}
         onClick={evt => {
           if (!evt.target.classList.contains('disabled')) {
             setOpen(true);
@@ -42,4 +43,5 @@ export function EmailSurveyParticipantsButton({eventId, surveyId}) {
 EmailSurveyParticipantsButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   surveyId: PropTypes.number.isRequired,
+  surveyActive: PropTypes.bool.isRequired,
 };
