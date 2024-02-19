@@ -1,0 +1,50 @@
+name: Translation build
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+
+env:
+  TZ: Europe/Zurich
+
+jobs:
+  build:
+    name: Build package 📦
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        name: Set up Python 🐍
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements.dev.txt
+      - uses: actions/setup-node@v4
+        name: Setup Node
+        with:
+          node-version: 18.x
+      - name: Install build deps 🔧
+        run: |
+          sudo apt-get install libpq-dev
+          pip install --user -U pip setuptools wheel
+          pip install --user -e '.[dev]'
+      - name: Install npm deps ☕
+        run: npm ci
+      - name: Install Transifex client 📥
+        run: curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
+      - name: Pull and compile translations 🌍
+        run: |
+          ./tx --token ${{ secrets.TX_TOKEN }} pull --all --force
+          indico i18n compile indico --no-check
+      - name: Enable moment locales 🕒
+        run: python .github/utils/patch_moment_locales.py
+      - name: Build wheel 🏗
+        run: ./bin/maintenance/build-wheel.py indico --add-version-suffix --ignore-unclean
+      - uses: actions/upload-artifact@v4
+        name: Upload build artifacts 📦
+        with:
+          name: indico-translation-wheel
+          retention-days: 1
+          path: ./dist
