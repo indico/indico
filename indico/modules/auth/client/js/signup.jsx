@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import privacyPolicyUrlRoute from 'indico-url:legal.display_privacy';
-import tosUrlRoute from 'indico-url:legal.display_tos';
+import privacyPolicyURL from 'indico-url:legal.display_privacy';
+import tosURL from 'indico-url:legal.display_tos';
 
 import _ from 'lodash';
 import moment from 'moment';
@@ -79,12 +79,12 @@ function Signup({
 
   const termsAcceptLabel = () => {
     const tosLinkWrapper = tosUrl ? (
-      <a href={tosUrlRoute()} rel="noreferrer" target="_blank" />
+      <a href={tosURL()} rel="noreferrer" target="_blank" />
     ) : (
       <span />
     );
     const privacyPolicyLinkWrapper = privacyPolicyUrl ? (
-      <a href={privacyPolicyUrlRoute()} rel="noreferrer" target="_blank" />
+      <a href={privacyPolicyURL()} rel="noreferrer" target="_blank" />
     ) : (
       <span />
     );
