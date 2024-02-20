@@ -128,6 +128,12 @@
                     {{ registration.submitted_dt|format_date }}
                 </span>
             </div>
+            <div class="right">
+                <button data-href="{{ url_for('.edit_registration', registration) }}" data-method="GET"
+                   class="i-button big highlight hide-if-locked" {% if registration.is_cancelled %} disabled{% endif %}>
+                    {%- trans %}Modify{% endtrans -%}
+                </button>
+            </div>
         </div>
         <div class="i-box-content">
             <table class="registration-info">
