@@ -15,7 +15,7 @@ from setuptools import setup
 
 def read_requirements_file(fname):
     with open(fname) as f:
-        return [dep for d in f.readlines() if (dep := d.strip()) and not (dep.startswith(('-', '#')) or '://' in dep)]
+        return [dep for d in f if (dep := d.strip()) and not (dep.startswith(('-', '#')) or '://' in dep)]
 
 
 def get_requirements(fname):
