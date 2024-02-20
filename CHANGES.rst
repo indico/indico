@@ -80,6 +80,7 @@ Improvements
   thanks :user:`Moliholy, unconventionaldotdev`)
 - Add a "Picture" personal data field to registrations. When used, it allows including the
   picture provided by the user on badges/tickets (:pr:`6160`, thanks :user:`vtran99`)
+- Support ``~~text~~`` to strike-out text in markdown (:pr:`6166`)
 
 Bugfixes
 ^^^^^^^^
