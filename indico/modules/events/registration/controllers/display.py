@@ -485,9 +485,9 @@ class RHTicketGoogleWallet(RHTicketDownload):
     """Generate Google Wallet link to ticket for a given registration."""
 
     def _process(self):
-        if not self.regform.is_google_wallet_enabled:
-            raise NotFound
-        return redirect(self.registration.generate_ticket_google_wallet_url(), code=302)
+        if not (url := self.registration.generate_ticket_google_wallet_url()):
+            raise NotFound('Google Wallet tickets are not available')
+        return redirect(url)
 
 
 class RHRegistrationAvatar(RHDisplayEventBase):

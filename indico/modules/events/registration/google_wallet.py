@@ -38,8 +38,12 @@ class GoogleWalletManager:
         self.object_url = f'{self.base_url}/eventTicketObject'
 
         # Set up authenticated client
-        if self.settings:
+        if self.configured:
             self.auth()
+
+    @property
+    def configured(self):
+        return config.ENABLE_GOOGLE_WALLET and bool(self.settings['google_wallet_enabled'])
 
     @staticmethod
     def get_google_wallet_settings(category):
@@ -48,7 +52,7 @@ class GoogleWalletManager:
                 return category.google_wallet_settings
             else:
                 category = category.parent
-        return None
+        return {'google_wallet_enabled': False}
 
     def auth(self):
         """Create authenticated HTTP client using a service account file."""
@@ -275,7 +279,3 @@ class GoogleWalletManager:
         signer = crypt.RSASigner.from_service_account_info(self.settings['google_wallet_application_credentials'])
         token = jwt.encode(signer, claims).decode('utf-8')
         return f'https://pay.google.com/gp/v/save/{token}' if token else ''
-
-    @property
-    def configured(self):
-        return bool(self.credentials)
