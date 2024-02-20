@@ -8,8 +8,9 @@
 from functools import partial
 
 from flask import request
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
+from wtforms.widgets import TextArea
 
 from indico.core.config import config
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
@@ -28,6 +29,7 @@ from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFi
                                      IndicoMarkdownField, IndicoProtectionField, IndicoSinglePalettePickerField,
                                      IndicoTimezoneSelectField, MultipleItemsField)
 from indico.web.forms.fields.principals import PermissionsField
+from indico.web.forms.fields.simple import JSONField
 from indico.web.forms.validators import HiddenUnless
 from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
@@ -78,11 +80,12 @@ class CategorySettingsForm(IndicoForm):
                                          description=_('If enabled, you can configure Google credentials so events '
                                                        'within this category can export their tickets to Google '
                                                        'Wallet.'))
-    google_wallet_application_credentials = TextAreaField(_('Google Credentials'),
-                                                          [DataRequired(),
-                                                           HiddenUnless('google_wallet_enabled', preserve_data=True)],
-                                                          description=_('JSON key credentials for the Google Service '
-                                                                        'Account'))
+    google_wallet_application_credentials = JSONField(_('Google Credentials'),
+                                                      [DataRequired(),
+                                                       HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                                      widget=TextArea(),
+                                                      description=_('JSON key credentials for the Google Service '
+                                                                    'Account'))
     google_wallet_issuer_name = StringField(_('Issuer Name'),
                                             [DataRequired(),
                                              HiddenUnless('google_wallet_enabled', preserve_data=True)],
