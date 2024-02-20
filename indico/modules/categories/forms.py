@@ -22,7 +22,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.networks import IPNetworkGroup
 from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFieldList, IndicoEnumSelectField,
                                      IndicoMarkdownField, IndicoProtectionField, IndicoSinglePalettePickerField,
@@ -91,12 +91,31 @@ class CategorySettingsForm(IndicoForm):
                                                                       'category or one of its subcategories. '
                                                                       'One email address per line.'))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
+        self.category = category
         if not config.ENABLE_GOOGLE_WALLET:
             for field in self.BASIC_FIELDS:
                 if field.startswith('google_wallet'):
                     delattr(self, field)
+
+    @generated_data
+    def google_wallet_settings(self):
+        google_wallet_keys = (
+            'google_wallet_application_credentials',
+            'google_wallet_issuer_name',
+            'google_wallet_issuer_id',
+        )
+        if 'google_wallet_enabled' in self and self.google_wallet_enabled.data:
+            return {k: v for k, v in self.data.items() if k in google_wallet_keys}
+        else:
+            delattr(self, 'google_wallet_enabled')
+            return self.category.google_wallet_settings
+
+    @property
+    def data(self):
+        wallet_settings = self.google_wallet_settings.data
+        return {k: v for k, v in super().data.items() if k not in wallet_settings}
 
 
 class CategoryIconForm(IndicoForm):
