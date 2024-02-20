@@ -95,22 +95,24 @@ class CategorySettingsForm(IndicoForm):
         super().__init__(*args, **kwargs)
         self.category = category
         if not config.ENABLE_GOOGLE_WALLET:
-            for field in self.BASIC_FIELDS:
-                if field.startswith('google_wallet'):
-                    delattr(self, field)
+            for field in list(self):
+                if field.name.startswith('google_wallet_'):
+                    delattr(self, field.name)
 
     @generated_data
     def google_wallet_settings(self):
+        if not config.ENABLE_GOOGLE_WALLET:
+            return self.category.google_wallet_settings
+
         google_wallet_keys = (
+            'google_wallet_enabled',
             'google_wallet_application_credentials',
             'google_wallet_issuer_name',
             'google_wallet_issuer_id',
         )
-        if 'google_wallet_enabled' in self and self.google_wallet_enabled.data:
-            return {k: v for k, v in self.data.items() if k in google_wallet_keys}
-        else:
-            delattr(self, 'google_wallet_enabled')
-            return self.category.google_wallet_settings
+        wallet_settings = {k: getattr(self, k).data for k in google_wallet_keys}
+        wallet_settings['google_wallet_enabled'] = self.google_wallet_enabled.data
+        return wallet_settings
 
     @property
     def data(self):

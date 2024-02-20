@@ -103,26 +103,19 @@ class RHManageCategoryContent(RHManageCategoryBase):
 
 class RHManageCategorySettings(RHManageCategoryBase):
     def _process(self):
-        additional_keys = ('google_wallet_application_credentials', 'google_wallet_issuer_name',
-                           'google_wallet_issuer_id')
         kwargs = {
             'meeting_theme': self.category.default_event_themes['meeting'],
             'lecture_theme': self.category.default_event_themes['lecture']}
 
         if config.ENABLE_GOOGLE_WALLET:
-            kwargs['google_wallet_enabled'] = self.category.google_wallet_settings
-            if self.category.google_wallet_settings:
-                kwargs.update({key: self.category.google_wallet_settings[key] for key in additional_keys})
+            kwargs |= self.category.google_wallet_settings
         defaults = FormDefaults(self.category, **kwargs)
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
         logo_form = CategoryLogoForm(obj=self.category)
 
         if form.validate_on_submit():
-            form.category = self.category
-            new_dict = form.data
-            update_category(self.category, new_dict, skip={'meeting_theme', 'lecture_theme'},
-                            _extra_log_fields={'google_wallet_settings': 'Google Wallet configuration settings'})
+            update_category(self.category, form.data, skip={'meeting_theme', 'lecture_theme'})
             self.category.default_event_themes = {
                 'meeting': form.meeting_theme.data,
                 'lecture': form.lecture_theme.data

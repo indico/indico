@@ -88,6 +88,7 @@ def _log_category_update(category, changes, extra_log_fields):
         'event_message': 'Event header message',
         'notify_managers': 'Notify managers about event creation',
         'event_creation_notification_emails': 'Event creation notification emails',
+        'google_wallet_settings': 'Google Wallet credentials',
         **(extra_log_fields or {})
     }
     if changes:
