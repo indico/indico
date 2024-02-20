@@ -13,6 +13,8 @@ import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {makeAsyncDebounce} from 'indico/utils/debounce';
 
+import './WTFSearchDropdown.module.scss';
+
 const naturalSort = (options, key = 'text') => {
   const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
   return options.sort((a, b) => collator.compare(a[key], b[key]));
@@ -34,14 +36,14 @@ const highlightSearch = (text, query = '') => {
 };
 
 /**
- * Dropdown which can dynamically query the backend
+ * Dropdown which can be passed the options or dynamically query the backend
  * for results using the search input. This is a replacement
  * for the selectize.js library.
  *
  * It can be both controlled and uncontrolled.
  * To make it controlled pass the value prop to it.
  */
-export function RemoteSearchDropdown({
+export function SearchDropdown({
   searchUrl,
   searchMethod,
   searchPayload,
@@ -51,8 +53,12 @@ export function RemoteSearchDropdown({
   valueField,
   labelField,
   searchField,
+  defaultValue,
   value: valueFromProps,
   onChange: onChangeFromProps,
+  options: optionsFromProps,
+  allowAdditions,
+  multiple,
   dropdownProps,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,15 +66,18 @@ export function RemoteSearchDropdown({
   const [loading, setLoading] = useState(false);
 
   const isControlled = valueFromProps !== undefined;
-  const [internalValue, setInternalValue] = useState(null);
+  const initialValue = defaultValue.map(val => val[valueField]);
+  const [internalValue, setInternalValue] = useState(
+    initialValue ? (multiple ? initialValue : initialValue[0]) : null
+  );
   const value = isControlled ? valueFromProps : internalValue;
 
   const debounce = useMemo(() => makeAsyncDebounce(200), []);
 
   const getIdFromQuery = query => (query.match(/^#(\d+)$/) || {1: null})[1];
 
-  if (preload) {
-    // No need to limit the search length when all data is preloaded
+  if (preload || !searchUrl) {
+    // No need to limit the search length when all data is preloaded or static
     minTriggerLength = 0;
   }
   const searchDisabled =
@@ -78,18 +87,20 @@ export function RemoteSearchDropdown({
     if (searchDisabled) {
       return [];
     }
-
     query = query.toLowerCase();
     const id = getIdFromQuery(query);
-    return opts
-      .filter(opt => (id === null ? opt.search.includes(query) : +opt['friendly-id'] === +id))
-      .map(opt => ({
-        ...opt,
-        // this might lead to some unexpected results when
-        // searchField !== labelField, because the filtering is done
-        // on searchField but highlighting happens on labelField
-        text: highlightSearch(opt.text, query),
-      }));
+    opts = opts.filter(opt =>
+      id === null ? opt.search.includes(query) : +opt['friendly-id'] === +id
+    );
+    return allowAdditions
+      ? opts
+      : opts.map(opt => ({
+          ...opt,
+          // this might lead to some unexpected results when
+          // searchField !== labelField, because the filtering is done
+          // on searchField but highlighting happens on labelField
+          text: highlightSearch(opt.text, query),
+        }));
   };
 
   const transformOptions = useCallback(
@@ -144,10 +155,14 @@ export function RemoteSearchDropdown({
   );
 
   useEffect(() => {
+    if (optionsFromProps.length !== 0) {
+      setOptions(transformOptions(optionsFromProps));
+      return;
+    }
     if (preload) {
       fetchData();
     }
-  }, [preload, fetchData]);
+  }, [preload, fetchData, optionsFromProps, transformOptions]);
 
   const onChange = (evt, {value: newValue}) => {
     setSearchQuery('');
@@ -157,10 +172,17 @@ export function RemoteSearchDropdown({
     }
   };
 
+  const onAddItem = (evt, {value: newValue}) => {
+    const newOption = transformOptions([
+      {[labelField]: newValue, [valueField]: newValue, [searchField]: newValue},
+    ])[0];
+    setOptions(prevOptions => [...prevOptions, newOption]);
+  };
+
   const onSearch = (evt, {searchQuery: newSearchQuery}) => {
     setSearchQuery(newSearchQuery);
 
-    if (preload) {
+    if (preload || optionsFromProps.length !== 0) {
       return;
     }
 
@@ -204,9 +226,10 @@ export function RemoteSearchDropdown({
 
   return (
     <Dropdown
+      styleName="dropdown"
       fluid
       selection
-      clearable={!dropdownProps.required}
+      clearable={!dropdownProps.required && !multiple}
       selectOnNavigation={false}
       selectOnBlur={false}
       defaultOpen={false}
@@ -221,12 +244,16 @@ export function RemoteSearchDropdown({
         loading ? Translate.string('Loading…') : searchDisabled ? searchDisabledMessage : undefined
       }
       loading={loading}
+      multiple={multiple}
+      allowAdditions={allowAdditions}
+      onAddItem={onAddItem}
+      renderLabel={label => ({color: 'blue', content: label.text})}
       {...dropdownProps}
     />
   );
 }
 
-RemoteSearchDropdown.propTypes = {
+SearchDropdown.propTypes = {
   /** Number of characters needed to start fetching results. */
   minTriggerLength: PropTypes.number,
   /** The URL used to retrieve items */
@@ -248,14 +275,23 @@ RemoteSearchDropdown.propTypes = {
       will be done locally on the returned data. This also sets minTriggerLength to zero. */
   preload: PropTypes.bool,
   /** Use this prop to make the component controlled */
-  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Called when the value changes with the new value as the first argument */
   onChange: PropTypes.func,
+  /** Default value to be set as the first internalValue of the dropdown, if present. */
+  defaultValue: PropTypes.array,
+  /** Options to pass to the dropdown. If options are passed then the component does not
+      dynamically fetch the data */
+  options: PropTypes.array,
+  /** Allow adding new values to the options */
+  allowAdditions: PropTypes.bool,
+  /** Allow selecting multiple values */
+  multiple: PropTypes.bool,
   /** Extra props to pass to <Dropdown /> */
   dropdownProps: PropTypes.object,
 };
 
-RemoteSearchDropdown.defaultProps = {
+SearchDropdown.defaultProps = {
   minTriggerLength: 3,
   searchUrl: null,
   searchMethod: 'GET',
@@ -265,23 +301,32 @@ RemoteSearchDropdown.defaultProps = {
   searchField: 'name',
   allowById: false,
   preload: false,
+  defaultValue: [],
   value: undefined,
   onChange: () => {},
+  options: [],
+  allowAdditions: false,
+  multiple: false,
   dropdownProps: {},
 };
 
 /**
- * WTForms wrapper for RemoteSearchDropdown
+ * WTForms wrapper for SearchDropdown
  */
-export default function WTFRemoteSearchDropdown({fieldId, ...rest}) {
+export default function WTFSearchDropdown({fieldId, multiple, ...rest}) {
   const field = useMemo(() => document.getElementById(`${fieldId}-data`), [fieldId]);
   const onChange = value => {
-    field.value = value;
+    field.value = multiple ? JSON.stringify(value) : value;
     field.dispatchEvent(new Event('change', {bubbles: true}));
   };
-  return <RemoteSearchDropdown onChange={onChange} {...rest} />;
+  return <SearchDropdown onChange={onChange} multiple={multiple} {...rest} />;
 }
 
-WTFRemoteSearchDropdown.propTypes = {
+WTFSearchDropdown.propTypes = {
   fieldId: PropTypes.string.isRequired,
+  multiple: PropTypes.bool,
+};
+
+WTFSearchDropdown.defaultProps = {
+  multiple: false,
 };

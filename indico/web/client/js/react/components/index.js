@@ -56,7 +56,7 @@ export {default as WTFPrincipalListField} from './WTFPrincipalListField';
 export {default as WTFPrincipalField} from './WTFPrincipalField';
 export {default as WTFLinkListField} from './WTFLinkListField';
 export {default as WTFSUIColorPicker} from './WTFSUIColorPicker';
-export {default as WTFRemoteSearchDropdown} from './WTFRemoteSearchDropdown';
+export {default as WTFSearchDropdown} from './WTFSearchDropdown';
 export {default as ICSCalendarLink} from './ICSCalendarLink';
 export {default as Favorite} from './Favorite';
 export {default as PersonDetailsModal} from './PersonDetailsModal';

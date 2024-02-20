@@ -148,8 +148,8 @@ class SwitchWidget(JinjaWidget):
                                 confirm_disable=self.confirm_disable)
 
 
-class RemoteDropdownWidget(JinjaWidget):
-    """Render a SUI Dropdown which can dynamically fetch results.
+class DropdownWidget(JinjaWidget):
+    """Render a SUI Dropdown which can dynamically fetch results or be directly passed the choices.
 
     :param search_url: The URL used to retrieve items.
     :param search_method: The method used to retrieve items.
@@ -166,10 +166,14 @@ class RemoteDropdownWidget(JinjaWidget):
                         item label.
     :param search_field: The attribute of the response used to search
                          in locally available data.
+    :param choices: The dropdown choices when not fetching dynamically.
+    :param allow_additions: Whether to allow adding new values to the options.
+    :param multiple: Whether to allow selecting multiple values.
     """
 
-    def __init__(self, search_url=None, search_method='GET', min_trigger_length=3, allow_by_id=False, preload=False,
-                 value_field='id', label_field='name', search_field='name', inline_js=False):
+    def __init__(self, *, search_url=None, search_method='GET', min_trigger_length=3, allow_by_id=False, preload=False,
+                 value_field='id', label_field='name', search_field='name', choices=None, allow_additions=False,
+                 multiple=False, inline_js=False):
         self.min_trigger_length = min_trigger_length
         self.allow_by_id = allow_by_id
         self.preload = preload
@@ -178,16 +182,22 @@ class RemoteDropdownWidget(JinjaWidget):
         self.value_field = value_field
         self.label_field = label_field
         self.search_field = search_field
-        super().__init__('forms/sui_remote_search_dropdown_widget.html', inline_js=inline_js)
+        self.choices = choices
+        self.allow_additions = allow_additions
+        self.multiple = multiple
+        super().__init__('forms/sui_search_dropdown_widget.html', inline_js=inline_js)
 
     def __call__(self, field, **kwargs):
+        choices = self.choices if self.choices is not None else getattr(field, 'serialized_choices', [])
         return super().__call__(field,
                                 search_url=getattr(field, 'search_url', self.search_url),
                                 search_method=self.search_method,
                                 search_payload=getattr(field, 'search_payload', None),
                                 min_trigger_length=self.min_trigger_length, preload=self.preload,
                                 allow_by_id=self.allow_by_id, value_field=self.value_field,
-                                label_field=self.label_field, search_field=self.search_field, input_args=kwargs)
+                                label_field=self.label_field, choices=choices,
+                                allow_additions=self.allow_additions, multiple=self.multiple,
+                                search_field=self.search_field, input_args=kwargs)
 
 
 class TypeaheadWidget(JinjaWidget):

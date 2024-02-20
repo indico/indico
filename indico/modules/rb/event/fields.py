@@ -9,12 +9,12 @@ from wtforms import Field
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.forms.widgets import RemoteDropdownWidget
+from indico.web.forms.widgets import DropdownWidget
 
 
 class LinkedObjectField(Field):
-    widget = RemoteDropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                                  inline_js=True)
+    widget = DropdownWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
+                            inline_js=True)
 
     def __init__(self, *args, **kwargs):
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')

@@ -10,8 +10,9 @@
 
 {% block javascript %}
     <script>
-        setupRemoteSearchDropdownWidget({
+        setupSearchDropdownWidget({
             fieldId: {{ field.id | tojson }},
+            defaultValue: {{ (field._value() or []) | tojson }},
             minTriggerLength: {{ min_trigger_length | tojson }},
             searchUrl: {{ search_url | tojson }},
             searchMethod: {{ search_method | tojson }},
@@ -21,6 +22,9 @@
             searchField: {{ search_field | tojson }},
             allowById: {{ allow_by_id | tojson }},
             preload: {{ preload | tojson }},
+            options: {{ (choices or []) | tojson }},
+            allowAdditions: {{ allow_additions | tojson }},
+            multiple: {{ multiple | tojson }},
             dropdownProps: {{ input_args | tojson }}
         });
     </script>
