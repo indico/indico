@@ -71,7 +71,7 @@ export default function EditableList({management}) {
   return (
     <EditableListDisplay
       initialContribList={contribList.map(c =>
-        c.editable && c.editable.submitterAcceptance
+        c.editable?.submitterAcceptance
           ? {...c, editable: {...c.editable, state: 'accepted_submitter'}}
           : c
       )}
@@ -163,7 +163,7 @@ function EditableListDisplay({
           {value: 'ready_for_review', text: Translate.string('Ready for review'), color: 'grey'},
           {
             value: 'accepted',
-            text: Translate.string('Accepted'),
+            text: Translate.string('Accepted', 'Editable'),
             exclusive: true,
             color: 'green',
           },
