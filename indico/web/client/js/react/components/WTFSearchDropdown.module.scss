@@ -5,11 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-:global(.ui.multiple.search.dropdown) :global(input[type='text'].search) {
-  margin: 0em 0.64285714em;
-  height: 2em;
-}
+.dropdown:global(.ui.multiple.search.dropdown) {
+  :global(input[type='text'].search) {
+    margin: 0 0.64285714em;
+    height: 2em;
+  }
 
-:global(.ui.multiple.search.dropdown) :global(a.label) {
-  cursor: default;
+  :global(a.label) {
+    cursor: default;
+  }
 }

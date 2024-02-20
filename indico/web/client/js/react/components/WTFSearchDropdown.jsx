@@ -226,6 +226,7 @@ export function SearchDropdown({
 
   return (
     <Dropdown
+      styleName="dropdown"
       fluid
       selection
       clearable={!dropdownProps.required && !multiple}
