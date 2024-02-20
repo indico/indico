@@ -590,7 +590,8 @@ function EditableListDisplay({
           )}
         </div>
         <ListFilter
-          list={filterableContribs}
+          name="editable-list-filter"
+          list={filterableContribs || []}
           filterOptions={filterOptions}
           searchableId={e => e.searchableId}
           searchableFields={e => e.searchableFields}

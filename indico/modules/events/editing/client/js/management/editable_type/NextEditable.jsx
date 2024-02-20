@@ -209,7 +209,8 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       <Modal.Content>
         <div styleName="filetype-list">
           <ListFilter
-            list={editables}
+            name="get-next-editable-filter"
+            list={editables || []}
             filters={filters}
             filterOptions={filterOptions}
             searchableId={e => e.contributionFriendlyId}
