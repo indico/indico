@@ -5,10 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from enum import Enum, auto
 from typing import Optional
 
 from flask import flash
-from google.auth import crypt, jwt
+from google.auth import jwt
+from google.auth.crypt import RSASigner
+from google.auth.exceptions import GoogleAuthError
 from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.service_account import Credentials
 from requests.exceptions import HTTPError, RequestException
@@ -20,7 +23,16 @@ from indico.core.logger import Logger
 from indico.util.i18n import _
 
 
-logger = Logger.get('events.registration')
+API_BASE_URL = 'https://walletobjects.googleapis.com/walletobjects/v1'
+logger = Logger.get('events.registration.google_wallt')
+
+
+class GoogleCredentialValidationResult(Enum):
+    ok = auto()
+    invalid = auto()
+    refused = auto()
+    bad_issuer = auto()
+    failed = auto()
 
 
 class GoogleWalletManager:
@@ -32,10 +44,8 @@ class GoogleWalletManager:
         self.settings = self.get_google_wallet_settings(self.event.category)
         self.credentials = None
         self.http_client = None
-        self.base_url = 'https://walletobjects.googleapis.com/walletobjects/v1'
-        self.batch_url = 'https://walletobjects.googleapis.com/batch'
-        self.class_url = f'{self.base_url}/eventTicketClass'
-        self.object_url = f'{self.base_url}/eventTicketObject'
+        self.class_url = f'{API_BASE_URL}/eventTicketClass'
+        self.object_url = f'{API_BASE_URL}/eventTicketObject'
 
         # Set up authenticated client
         if self.configured:
@@ -44,6 +54,28 @@ class GoogleWalletManager:
     @property
     def configured(self):
         return config.ENABLE_GOOGLE_WALLET and bool(self.settings['google_wallet_enabled'])
+
+    @classmethod
+    def verify_credentials(cls, account_info_json, issuer_id) -> GoogleCredentialValidationResult:
+        try:
+            credentials = Credentials.from_service_account_info(
+                account_info_json,
+                scopes=['https://www.googleapis.com/auth/wallet_object.issuer']
+            )
+        except GoogleAuthError as exc:
+            logger.info('Could not load GCP credentials: %s', exc)
+            return GoogleCredentialValidationResult.invalid
+        client = AuthorizedSession(credentials)
+        resp = client.get(f'{API_BASE_URL}/issuer/{issuer_id}')
+        if resp.ok:
+            return GoogleCredentialValidationResult.ok
+        logger.info('Could not validate GCP credentials (%d): %s', resp.status_code, resp.text)
+        if resp.status_code == 403:
+            return GoogleCredentialValidationResult.refused
+        elif resp.status_code == 404:
+            return GoogleCredentialValidationResult.bad_issuer
+        else:
+            return GoogleCredentialValidationResult.failed
 
     @staticmethod
     def get_google_wallet_settings(category):
@@ -276,6 +308,6 @@ class GoogleWalletManager:
         }
 
         # The service account credentials are used to sign the JWT
-        signer = crypt.RSASigner.from_service_account_info(self.settings['google_wallet_application_credentials'])
+        signer = RSASigner.from_service_account_info(self.settings['google_wallet_application_credentials'])
         token = jwt.encode(signer, claims).decode('utf-8')
         return f'https://pay.google.com/gp/v/save/{token}' if token else ''

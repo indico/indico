@@ -85,7 +85,7 @@ def _format_wallet_credentials(credentials):
 
 
 def _log_category_update(category, changes, extra_log_fields):
-    if google_wallet_settings := changes.pop('google_wallet_settings'):
+    if google_wallet_settings := changes.pop('google_wallet_settings', None):
         google_wallet_keys = ('google_wallet_enabled', 'google_wallet_application_credentials',
                               'google_wallet_issuer_name', 'google_wallet_issuer_id')
         for key in google_wallet_keys:

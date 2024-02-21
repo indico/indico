@@ -20,6 +20,7 @@ from indico.modules.categories.util import get_image_data, get_visibility_option
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
+from indico.modules.events.registration.google_wallet import GoogleCredentialValidationResult, GoogleWalletManager
 from indico.modules.networks import IPNetworkGroup
 from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
@@ -103,6 +104,47 @@ class CategorySettingsForm(IndicoForm):
             for field in list(self):
                 if field.name.startswith('google_wallet_'):
                     delattr(self, field.name)
+
+    def validate(self, extra_validators=None):
+        form_valid = super().validate(extra_validators=extra_validators)
+
+        if not config.ENABLE_GOOGLE_WALLET:
+            return form_valid
+
+        enabled = self.google_wallet_enabled.data
+        credentials = self.google_wallet_application_credentials.data
+        issuer_id = self.google_wallet_issuer_id.data
+
+        if (
+            credentials and
+            enabled and (
+                self.category.google_wallet_settings.get('google_wallet_application_credentials') != credentials or
+                self.category.google_wallet_settings.get('google_wallet_issuer_id') != issuer_id
+            )
+        ):
+            res = GoogleWalletManager.verify_credentials(credentials, issuer_id)
+            if res == GoogleCredentialValidationResult.invalid:
+                self.google_wallet_application_credentials.errors.append(
+                    _('The credentials could not be loaded.')
+                )
+                return False
+            elif res == GoogleCredentialValidationResult.refused:
+                self.google_wallet_application_credentials.errors.append(
+                    _('The credentials are invalid or have no access to the Google Wallet API.')
+                )
+                return False
+            elif res == GoogleCredentialValidationResult.failed:
+                self.google_wallet_application_credentials.errors.append(
+                    _('There was an error validating your credentials. Contact your Indico administrator for details.')
+                )
+                return False
+            elif res == GoogleCredentialValidationResult.bad_issuer:
+                self.google_wallet_issuer_id.errors.append(
+                    _('The Issuer ID is invalid or not linked to your credentials.')
+                )
+                return False
+
+        return form_valid
 
     @generated_data
     def google_wallet_settings(self):
