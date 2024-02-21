@@ -35,7 +35,7 @@ from indico.modules.categories.serialize import (serialize_categories_ical, seri
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryCalendar
-from indico.modules.events.management.settings import misc_settings
+from indico.modules.events.management.settings import event_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
@@ -625,7 +625,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         categories = {}
         rooms = {}
         keywords = {}
-        allowed_keywords = misc_settings.get('allowed_keywords')
+        allowed_keywords = event_settings.get('allowed_keywords')
         allowed_keywords_set = set(allowed_keywords)
         tz = self.category.display_tzinfo
         for event in event_query:

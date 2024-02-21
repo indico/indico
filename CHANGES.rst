@@ -69,8 +69,11 @@ Improvements
   thanks :user:`SegiNyn`)
 - Use a more compact registration ticket QR code format which is faster to scan and less
   likely to fail in poor lighting conditions (:pr:`6123`)
-- Add a legend to the category calendar, allowing to filter events either by category, venue, room or keywords
-  (:issue:`6105, 6106, 6128, 6148, 6149, 6127`, :pr:`6110, 6158, 6183`, thanks :user:`Moliholy, unconventionaldotdev`)
+- Add a legend to the category calendar, allowing to filter events either by category, venue,
+  room or keywords (:issue:`6105, 6106, 6128, 6148, 6149, 6127`, :pr:`6110, 6158, 6183`,
+  thanks :user:`Moliholy, unconventionaldotdev`)
+- Allow to configure a restrictive set of allowed keywords (:issue:`6127`, :pr:`6183`,
+  thanks :user:`Moliholy, unconventionaldotdev`).
 - Add week and day views in the category calendar and improve navigation controls
   (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`).
 - Add the ability to clone privacy settings (:pr:`6156`, thanks :user:`SegiNyn`)

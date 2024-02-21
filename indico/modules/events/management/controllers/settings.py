@@ -16,7 +16,7 @@ from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLanguagesForm, EventLocationForm,
                                                     EventPersonsForm)
-from indico.modules.events.management.settings import misc_settings
+from indico.modules.events.management.settings import event_settings
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
 from indico.modules.events.models.labels import EventLabel
@@ -152,10 +152,10 @@ class RHEditEventClassification(RHEditEventDataBase):
 
     @property
     def form_class(self):
-        if allowed_keywords := misc_settings.get('allowed_keywords'):
-            allowed_keywords_set = set(allowed_keywords)
-            default = [kw in allowed_keywords_set for kw in self.event.keywords]
-            keywords = IndicoSelectMultipleCheckboxField(_('Keywords'), choices=allowed_keywords, default=default)
+        if allowed_keywords := event_settings.get('allowed_keywords'):
+            default = sorted(set(allowed_keywords) & set(self.event.keywords))
+            choices = set(allowed_keywords) | set(self.event.keywords)
+            keywords = IndicoSelectMultipleCheckboxField(_('Keywords'), choices=choices, default=default)
         else:
             keywords = IndicoTagListField(_('Keywords'))
         return type('_EventClassificationForm', (EventClassificationForm,), {'keywords': keywords})

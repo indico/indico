@@ -24,6 +24,6 @@ privacy_settings = EventSettingsProxy('privacy', {
     'privacy_policy': '',
 })
 
-misc_settings = SettingsProxy('misc', {
+event_settings = SettingsProxy('events', {
     'allowed_keywords': [],
 })
