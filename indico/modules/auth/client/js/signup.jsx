@@ -284,23 +284,21 @@ function Signup({
             </Fieldset>
           )}
           {termsRequireAccept && !!tos && !tosUrl && (
-            <>
-              <h3>{Translate.string('Terms of service')}</h3>
+            <Fieldset legend={Translate.string('Terms of service')}>
               <div className="field policy editor-output" dangerouslySetInnerHTML={{__html: tos}} />
-            </>
+            </Fieldset>
           )}
           {termsRequireAccept && !!privacyPolicy && !privacyPolicyUrl && (
-            <>
-              <h3>{Translate.string('Privacy policy')}</h3>
+            <Fieldset legend={Translate.string('Privacy policy')}>
               <div
                 className="field policy editor-output"
                 dangerouslySetInnerHTML={{__html: privacyPolicy}}
               />
-            </>
+            </Fieldset>
           )}
           {termsRequireAccept && !!termsEffectiveDate && (
             <div className="field">
-              {Translate.string('Last updated')}: {moment(termsEffectiveDate).format('LL')}
+              <Translate>Last updated</Translate>: {moment(termsEffectiveDate).format('LL')}
             </div>
           )}
           {termsRequireAccept && (
