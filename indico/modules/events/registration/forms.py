@@ -190,8 +190,7 @@ class RegistrationExceptionalModificationForm(IndicoForm):
                                               description=_('Deadline until which registration information can be '
                                                             'modified (Will not allow modification if empty)'))
 
-    def __init__(self, *args, **kwargs):
-        regform = kwargs.pop('regform')
+    def __init__(self, *args, regform, **kwargs):
         self.timezone = regform.event.timezone
         super().__init__(*args, **kwargs)
 
