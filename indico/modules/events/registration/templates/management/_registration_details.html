@@ -25,7 +25,12 @@
         {% if registration.state.name not in ('rejected', 'withdrawn') %}
             {{ _render_withdraw_actions(registration) }}
         {% endif %}
-        {{ _render_allow_modification(registration) if registration.is_active }}
+        {{
+            _render_allow_modification(registration)
+            if (registration.is_active
+                and
+                registration.registration_form.is_modification_allowed(registration))
+        }}
         {% if all_tags %}
             <div class="action-box">
                 {{ _render_registration_tags(registration, assigned_tags, all_tags) }}
