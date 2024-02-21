@@ -731,7 +731,7 @@ class RHRegistrationScheduleModification(RHManageRegistrationBase):
 
         if form.validate_on_submit():
             self.registration.modification_end_dt = form.modification_end_dt.data
-            flash(_('Deadline for registration modification have been scheduled'), 'success')
+            flash(_('Deadline for registration modification has been scheduled'), 'success')
             return jsonify_data(html=_render_registration_details(self.registration))
         return jsonify_form(form, submit=_('Set'), disabled_until_change=False)
 
