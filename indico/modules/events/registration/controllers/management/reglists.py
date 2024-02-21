@@ -732,8 +732,13 @@ class RHRegistrationScheduleModification(RHManageRegistrationBase):
         if form.validate_on_submit():
             self.registration.modification_end_dt = form.modification_end_dt.data
             flash(_('Deadline for registration modification has been scheduled'), 'success')
+            self.registration.log(EventLogRealm.management, LogKind.change, 'Registration',
+                                  (f'Modification deadline updated for user: {self.registration.email}',
+                                   f' until: {self.registration.modification_end_dt}'),
+                                  session.user,
+                                  data={'Modification': self.registration.can_be_modified})
             return jsonify_data(html=_render_registration_details(self.registration))
-        return jsonify_form(form, submit=_('Set'), disabled_until_change=False)
+        return jsonify_form(form, disabled_until_change=False)
 
 
 class RHRegistrationRemoveModification(RHManageRegistrationBase):
@@ -741,6 +746,9 @@ class RHRegistrationRemoveModification(RHManageRegistrationBase):
 
     def _process(self):
         self.registration.modification_end_dt = None
+        self.registration.log(EventLogRealm.management, LogKind.change, 'Registration',
+                              f'Modification closed for user: {self.registration.email}', session.user,
+                              data={'Modification': self.registration.can_be_modified})
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
