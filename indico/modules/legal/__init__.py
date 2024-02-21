@@ -61,39 +61,46 @@ def _inject_privacy_footer(**kwargs):
 
 @template_hook('global-announcement', markup=False)
 def _inject_announcement_header(**kwargs):
-    # Don't show if no user or not admin
-    if not session.user or not session.user.is_admin:
+    # Run through the common checks
+    if not check_terms_required():
+        return
+
+    # Only show the banner for admins
+    if not session.user.is_admin:
         return
 
     # Don't show the banner on the accept terms page
     if request.endpoint == 'legal.accept_agreement':
         return
 
-    # Don't show the banner if accepting terms is not required
-    terms_date = legal_settings.get('terms_effective_date')
-    if not legal_settings.get('terms_require_accept') or not terms_date or terms_date > now_utc():
-        return
-
-    # If you have accepted the most current terms, you are good
-    if session.user.accepted_tos_dt and session.user.accepted_tos_dt >= terms_date:
-        return
-
     # Everyone else gets the warning
     return 'warning', render_template('legal/admin_agreement_banner.html'), True
 
 
-def confirm_rh_terms_required():
-    # Don't confirm if terms are not required
+def check_terms_required():
+    # If you are not logged in, they are not required
+    if not session.user:
+        return False
+
+    # Don't require if terms are not required, or not required yet
     terms_date = legal_settings.get('terms_effective_date')
     if not legal_settings.get('terms_require_accept') or not terms_date or terms_date > now_utc():
-        return
-
-    # If you are not logged in or admin, we're not checking
-    if not session.user or session.user.is_admin:
-        return
+        return False
 
     # If you have accepted the most current terms, you are good
     if session.user.accepted_tos_dt and session.user.accepted_tos_dt >= terms_date:
+        return False
+
+    return True
+
+
+def confirm_rh_terms_required():
+    # Run through the common checks
+    if not check_terms_required():
+        return
+
+    # If you are admin, we'll show the banner instead
+    if session.user.is_admin:
         return
 
     # Certain endpoints need to be passed through.
