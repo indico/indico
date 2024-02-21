@@ -10,6 +10,7 @@ from flask import redirect, render_template, request, session
 from indico.core import signals
 from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import ServerDateConverter
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -70,7 +71,7 @@ def _inject_announcement_header(**kwargs):
 
     # Don't show the banner if accepting terms is not required
     terms_date = legal_settings.get('terms_effective_date')
-    if not legal_settings.get('terms_require_accept') or not terms_date:
+    if not legal_settings.get('terms_require_accept') or not terms_date or terms_date > now_utc():
         return
 
     # If you have accepted the most current terms, you are good
@@ -82,8 +83,9 @@ def _inject_announcement_header(**kwargs):
 
 
 def confirm_rh_terms_required():
+    # Don't confirm if terms are not required
     terms_date = legal_settings.get('terms_effective_date')
-    if not legal_settings.get('terms_require_accept') or not terms_date:
+    if not legal_settings.get('terms_require_accept') or not terms_date or terms_date > now_utc():
         return
 
     # If you are not logged in or admin, we're not checking

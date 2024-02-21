@@ -58,7 +58,7 @@ class RHAcceptTerms(RH):
 
         if form.validate_on_submit():
             if not request.args.get('preview', False) and form.data['accept_terms']:
-                session.user.accepted_tos_dt = max(now_utc(), terms_date)
+                session.user.accepted_tos_dt = now_utc()
 
             returnpath = session.pop('legal_agreement_return_path', url_for_index())
             return redirect(returnpath)
