@@ -24,6 +24,8 @@ import {camelizeKeys} from 'indico/utils/case';
 import {FinalMarkdownEditor} from '../MarkdownEditor';
 import {FinalTinyMCETextEditor} from '../TinyMCETextEditor';
 
+import {NoteConflictModal} from './NoteConflictModal';
+
 import 'react-markdown-editor-lite/lib/index.css';
 
 export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
@@ -34,6 +36,8 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [saved, setSaved] = useState(false);
   const [renderMode, setRenderMode] = useState(undefined);
   const [closeAndReload, setCloseAndReload] = useState(false);
+  const [currentNoteRevision, setCurrentNoteRevision] = useState(null);
+  const [noteConflict, setNoteConflict] = useState(false);
 
   const combineNotes = (resp, mode) => {
     if (mode === 'markdown') {
@@ -71,6 +75,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     try {
       resp = await indicoAxios.get(getNoteURL || apiURL);
       resp = camelizeKeys(resp);
+      console.log(resp.data);
     } catch (error) {
       handleAxiosError(error);
       return;
@@ -105,11 +110,43 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     }
   }, [apiURL, getNoteURL]);
 
+  const getCurrentNoteRevision = useCallback(async () => {
+    let resp;
+    try {
+      resp = await indicoAxios.get(apiURL || getNoteURL);
+      console.log('apiURL -> ', apiURL);
+      console.log('getNoteURL -> ', getNoteURL);
+    } catch (e) {
+      handleAxiosError(e);
+      return;
+    }
+    const revisionInfo = {
+      id: resp.data.id,
+      source: resp.data.source,
+      created: resp.data.createdDt,
+      renderMode: resp.data.renderMode,
+    };
+    setCurrentNoteRevision(revisionInfo);
+  }, [apiURL, getNoteURL]);
+
   const handleSubmit = async ({source}) => {
     // getData is currently unused, keeping it around in case we need to enable lazyValue
     // for the TinyMCE editor widget in case larger notes cause performance issues that
     // can be resolved by only rendering them to an html string at submission time
     const currentValue = source.getData ? source.getData() : source;
+
+    const resp = await indicoAxios.get(apiURL || getNoteURL);
+    const currentNoteRevId = resp.data.id;
+    console.log('(fetch) currentNoteRevId -> ', currentNoteRevId);
+    console.log('(state) currentNoteRevision -> ', currentNoteRevision.id);
+
+    if (currentNoteRevId !== currentNoteRevision) {
+      console.log('compared');
+      console.log('currentNoteRevId -> ', currentNoteRevId);
+      console.log('currentNoteRevision -> ', currentNoteRevision.id);
+      return setNoteConflict(true);
+    }
+
     try {
       if (!currentValue) {
         await indicoAxios.delete(apiURL);
@@ -142,7 +179,8 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   useEffect(() => {
     setLoading(true);
     getNote();
-  }, [getNote]);
+    getCurrentNoteRevision();
+  }, [getNote, getCurrentNoteRevision]);
 
   useEffect(() => {
     if (closeAndReload) {
@@ -201,6 +239,12 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
             />
           )}
         </FinalModalForm>
+      )}
+      {noteConflict && (
+        <NoteConflictModal
+          currentNoteSource={currentInput}
+          externalNoteSource={currentNoteRevision}
+        />
       )}
     </>
   );
