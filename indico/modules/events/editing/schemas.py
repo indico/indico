@@ -246,11 +246,15 @@ class EditableDumpSchema(EditableSchema):
 class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count')
+        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count', 'tags')
 
     state = EnumField(EditableState)
     editor = fields.Nested(EditingUserSchema)
     timeline_url = fields.String()
+    tags = fields.Method('_get_tags')
+
+    def _get_tags(self, editable):
+        return [EditingTagSchema().dump(t) for t in editable.latest_revision.tags]
 
 
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):

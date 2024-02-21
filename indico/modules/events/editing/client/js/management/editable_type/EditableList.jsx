@@ -210,6 +210,21 @@ function EditableListDisplay({
         isMatch: (contrib, selectedOptions) =>
           contrib.c.keywords.some(k => selectedOptions.includes(k)),
       },
+      {
+        key: 'tags',
+        text: Translate.string('Tags'),
+        options: _.uniq(
+          contribsWithEditables
+            .map(c => c.editable.tags)
+            .filter(x => x)
+            .reduce((pre, cur) => pre.concat(cur))
+            .map(t => ({value: t.code, text: t.code, color: t.color}))
+        ),
+        isMatch: (contrib, selectedOptions) =>
+          contrib.c.editable &&
+          contrib.c.editable.tags &&
+          selectedOptions.some(tag => contrib.c.editable.tags.map(t => t.code).includes(tag)),
+      },
     ],
     [contribList, contribsWithEditables]
   );
