@@ -17,7 +17,7 @@ from indico.modules.events.registration.models.registrations import PublishRegis
 from indico.util.i18n import _
 from indico.util.string import sanitize_email, validate_email
 from indico.web.forms.fields.util import is_preprocessed_formdata
-from indico.web.forms.widgets import HiddenInputs, JinjaWidget, PasswordWidget
+from indico.web.forms.widgets import DropdownWidget, HiddenInputs, JinjaWidget, PasswordWidget
 
 
 class IndicoSelectMultipleCheckboxField(SelectMultipleField):
@@ -169,6 +169,21 @@ class IndicoEmailRecipientsField(Field):
         self.data = sorted(data, key=str.lower)
         self.text_value = ', '.join(data)
         self.count = len(data)
+
+
+class IndicoStrictKeywordsField(Field):
+    widget = DropdownWidget(allow_additions=False, multiple=True)
+
+    def __init__(self, *args, **kwargs):
+        self.serialized_choices = kwargs.pop('choices', [])
+        super().__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        super().process_formdata(valuelist)
+        self.data = sorted(json.loads(self.data))
+
+    def _value(self):
+        return [{'id': d, 'name': d} for d in self.data]
 
 
 class IndicoTagListField(HiddenFieldList):

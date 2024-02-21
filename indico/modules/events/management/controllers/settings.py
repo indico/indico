@@ -32,7 +32,7 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, IndicoTagListField
+from indico.web.forms.fields import IndicoStrictKeywordsField, IndicoTagListField
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -153,9 +153,8 @@ class RHEditEventClassification(RHEditEventDataBase):
     @property
     def form_class(self):
         if allowed_keywords := event_settings.get('allowed_keywords'):
-            default = sorted(set(allowed_keywords) & set(self.event.keywords))
-            choices = set(allowed_keywords) | set(self.event.keywords)
-            keywords = IndicoSelectMultipleCheckboxField(_('Keywords'), choices=choices, default=default)
+            choices = [{'id': kw, 'name': kw} for kw in (set(allowed_keywords) | set(self.event.keywords))]
+            keywords = IndicoStrictKeywordsField(_('Keywords'), choices=choices)
         else:
             keywords = IndicoTagListField(_('Keywords'))
         return type('_EventClassificationForm', (EventClassificationForm,), {'keywords': keywords})
