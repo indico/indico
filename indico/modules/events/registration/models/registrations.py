@@ -417,7 +417,7 @@ class Registration(db.Model):
         return dict(self.registration_form.locator, token=self.uuid)
 
     @property
-    def exceptional_modification_deadline_passed(self):
+    def modification_deadline_passed(self):
         if self.modification_end_dt is None:
             return True
         return self.modification_end_dt < now_utc()
@@ -429,8 +429,7 @@ class Registration(db.Model):
         if regform.is_modification_allowed(self):
             if regform.is_modification_open:
                 return True
-            return (self.modification_end_dt is not None
-                    and not self.exceptional_modification_deadline_passed)
+            return not self.modification_deadline_passed
         return False
 
     @property

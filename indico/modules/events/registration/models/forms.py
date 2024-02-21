@@ -499,6 +499,9 @@ class RegistrationForm(db.Model):
         """Check whether a registration may be modified."""
         if not registration.is_active:
             return False
+        if (registration.modification_end_dt is not None
+            and not registration.modification_deadline_passed):
+            return True
         elif self.modification_mode == ModificationMode.allowed_always:
             return True
         elif self.modification_mode == ModificationMode.allowed_until_approved:
