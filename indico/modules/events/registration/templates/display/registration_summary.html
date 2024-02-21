@@ -57,7 +57,7 @@
             {% endif %}
         </div>
         <div class="toolbar">
-            {% if (registration.registration_form.modification_mode.name != 'not_allowed' or registration.modification_end_dt) 
+            {% if (registration.registration_form.modification_mode.name != 'not_allowed' or not registration.modification_deadline_passed)
                    and registration.is_active
             %}
                 <div class="group">
