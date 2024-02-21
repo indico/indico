@@ -135,10 +135,10 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     const filetypesKeyExpr = /^filetypes_(\d+)$/;
     const formatFilterOptions = options => {
       const extOptionExpr = /^has_ext_(.*)$/;
-      const extensionOptions = options.filter(o => extOptionExpr.exec(o));
+      const extensionOptions = Object.keys(options).filter(o => extOptionExpr.exec(o));
       return extensionOptions.length > 0
         ? extensionOptions.map(o => extOptionExpr.exec(o)[1])
-        : !options.includes('has_no_files');
+        : !options.has_no_files;
     };
     const newFilters = Object.keys(activeFilters)
       .filter(f => filetypesKeyExpr.exec(f))
@@ -159,7 +159,8 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
     const filtered = _editables.filter(x =>
       filterOptions.every(
-        ({key, isMatch}) => !activeFilters[key] || !isMatch || isMatch(x, activeFilters[key] || [])
+        ({key, isMatch}) =>
+          !activeFilters[key] || !isMatch || isMatch(x, Object.keys(activeFilters[key] || {}))
       )
     );
     setFilters(activeFilters);
