@@ -26,29 +26,7 @@
         {% trans %}Last updated:{% endtrans %} {{ terms_effective_date|format_date(timezone=session.tzinfo) }}
     </p>
 
-    {% call form_row(form.accept_terms, skip_label=true) %}
-        {% set tos_link_start = '<a href="%s">'|format(url_for('legal.display_tos'))|safe if tos_url else '' %}
-        {% set pp_link_start = '<a href="%s">'|format(url_for('legal.display_privacy'))|safe if privacy_policy_url else '' %}
-        {% set tos_link_end = '</a>'|safe if tos_url else '' %}
-        {% set pp_link_end = '</a>'|safe if privacy_policy_url else '' %}
-
-        <div class="form-field-description">
-            {% if (tos or tos_url) and (privacy_policy or privacy_policy_url) %}
-                {% trans tos_link_start=tos_link_start, pp_link_start=pp_link_start, tos_link_end=tos_link_end, pp_link_end=pp_link_end %}
-                    I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }}
-                    and {{ pp_link_start }}privacy policy{{ pp_link_end }}.
-                {% endtrans %}
-            {%- elif tos or tos_url %}
-                {% trans tos_link_start=tos_link_start, tos_link_end=tos_link_end %}
-                    I have read, understood and accept the {{ tos_link_start }}terms of service{{ tos_link_end }}.
-                {% endtrans %}
-            {%- elif privacy_policy or privacy_policy_url %}
-                {% trans pp_link_start=pp_link_start, pp_link_end=pp_link_end %}
-                    I have read, understood and accept the {{ pp_link_start }}privacy policy{{ pp_link_end }}.
-                {% endtrans %}
-            {%- endif -%}
-        </div>
-    {% endcall %}
+    {{form_row(form.accept_terms, skip_label=true)}}
 
     {% call form_footer(form) %}
         <input class="submit right i-button big highlight" type="submit" value="{% trans %}Confirm{% endtrans %}">

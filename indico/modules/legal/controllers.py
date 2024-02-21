@@ -9,7 +9,7 @@ from flask import redirect, session
 
 from indico.modules.admin import RHAdminBase
 from indico.modules.legal import check_terms_required, legal_settings
-from indico.modules.legal.forms import AgreementForm, LegalMessagesForm
+from indico.modules.legal.forms import LegalMessagesForm, create_agreement_form
 from indico.modules.legal.views import WPDisplayAgreement, WPDisplayPrivacyPolicy, WPDisplayTOS, WPManageLegalMessages
 from indico.util.date_time import now_utc
 from indico.web.flask.util import url_for
@@ -47,7 +47,7 @@ class RHAcceptTerms(RH):
         if not check_terms_required():
             return redirect(url_for_index())
 
-        form = AgreementForm()
+        form = create_agreement_form()
 
         if form.validate_on_submit():
             if form.data['accept_terms']:

@@ -5,18 +5,44 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from markupsafe import Markup
 from wtforms.fields import BooleanField, TextAreaField, URLField
 from wtforms.validators import URL, InputRequired, Optional
 
+from indico.modules.legal import legal_settings
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoDateField
 from indico.web.forms.widgets import TinyMCEWidget
 
 
-class AgreementForm(IndicoForm):
-    # Label needs to be set in the html template
-    accept_terms = BooleanField(_('Accept terms'), [InputRequired()])
+def create_agreement_form(*args, **kwargs):
+    tos = legal_settings.get('tos')
+    tos_url = legal_settings.get('tos_url')
+    privacy_policy = legal_settings.get('privacy_policy')
+    privacy_policy_url = legal_settings.get('privacy_policy_url')
+
+    placeholders = {
+        'tos_link_start': f'<a href="{url_for("legal.display_tos")}">' if tos_url else '',
+        'tos_link_end': '</a>' if tos_url else '',
+        'pp_link_start': f'<a href="{url_for("legal.display_privacy")}">' if privacy_policy_url else '',
+        'pp_link_end': '</a>' if privacy_policy_url else '',
+    }
+
+    if (tos or tos_url) and (privacy_policy or privacy_policy_url):
+        label = _('I have read, understood and accept the {tos_link_start}terms of service{tos_link_end}'
+                  ' and {pp_link_start}privacy policy{pp_link_end}.').format(**placeholders)
+    elif tos or tos_url:
+        label = _('I have read, understood and accept the'
+                  ' {tos_link_start}terms of service{tos_link_end}.').format(**placeholders)
+    elif privacy_policy or privacy_policy_url:
+        label = _('I have read, understood and accept the'
+                  ' {pp_link_start}privacy policy{pp_link_end}.').format(**placeholders)
+
+    form_cls = type('_AgreementForm', (IndicoForm,), {})
+    form_cls.accept_terms = BooleanField(Markup(label), [InputRequired()])
+    return form_cls(*args, **kwargs)
 
 
 class LegalMessagesForm(IndicoForm):
