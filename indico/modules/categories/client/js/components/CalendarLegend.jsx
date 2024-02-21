@@ -79,23 +79,19 @@ LegendItem.defaultProps = {
   hasSubitems: false,
 };
 
-function mapPlainItemToLegendItem(
-  {id, title, checked, url, color, isSpecial, subitems, parent},
-  onElementSelected,
-  depth
-) {
-  const hasSubitems = subitems.length > 0;
+function mapPlainItemToLegendItem(item, onElementSelected, depth) {
+  const hasSubitems = item.subitems.length > 0;
   const indeterminate =
-    hasSubitems && subitems.some(si => si.checked) && subitems.some(si => !si.checked);
+    hasSubitems && item.subitems.some(si => si.checked) && item.subitems.some(si => !si.checked);
   const result = (
     <LegendItem
-      key={id}
-      title={title}
-      color={color}
-      checked={checked}
-      onChange={(_, data) => onElementSelected(id, data.checked, subitems, parent)}
-      url={url}
-      isSpecial={isSpecial}
+      key={item.id}
+      title={item.title}
+      color={item.color}
+      checked={item.checked}
+      onChange={(_, data) => onElementSelected(item, data.checked)}
+      url={item.url}
+      isSpecial={item.isSpecial}
       depth={depth}
       indeterminate={indeterminate}
       hasSubitems={hasSubitems}
@@ -103,7 +99,7 @@ function mapPlainItemToLegendItem(
   );
   return [
     result,
-    ...subitems.map(si => mapPlainItemToLegendItem(si, onElementSelected, depth + 1)),
+    ...item.subitems.map(si => mapPlainItemToLegendItem(si, onElementSelected, depth + 1)),
   ];
 }
 

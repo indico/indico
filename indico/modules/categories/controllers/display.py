@@ -624,10 +624,17 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         data = []
         categories = {}
         rooms = {}
-        keywords = []
+        keywords = {}
         allowed_keywords = misc_settings.get('allowed_keywords')
+        allowed_keywords_set = set(allowed_keywords)
         tz = self.category.display_tzinfo
         for event in event_query:
+            event.keywords = [keyword for keyword in event.keywords if keyword in allowed_keywords_set]
+            for keyword in event.keywords:
+                keyword_id = calculate_keyword_id(keyword)
+                if keyword_id not in keywords:
+                    keywords[keyword_id] = {'id': keyword_id, 'title': keyword,
+                                            'color': f'#{generate_contrast_colors(keyword_id).background}'}
             category_data = self._find_nearest_category(event.detailed_category_chain)
             category_id = category_data['id']
             category_data['url'] = url_for('categories.calendar', category_id=category_id)
@@ -652,23 +659,19 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                 colors = generate_contrast_colors(room.id if room else 0)
             else:
                 # by keywords
-                allowed_keywords_set = set(allowed_keywords)
                 if not event.keywords:
                     keyword_id = 0
-                elif any(kw not in allowed_keywords_set for kw in event.keywords):
-                    keyword_id = -1
                 elif len(event.keywords) > 1:
                     keyword_id = 1
                 else:
-                    keyword = event.keywords[0]
-                    keyword_id = calculate_keyword_id(keyword)
-                    keywords.append({'id': keyword_id, 'title': keyword})
+                    # only one keyword
+                    keyword_id = calculate_keyword_id(event.keywords[0])
                 event_data['keywordId'] = keyword_id
                 colors = generate_contrast_colors(keyword_id)
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
             data.append(event_data)
             categories[category_id] = category_data
-        return data, list(categories.values()), list(rooms.values()), keywords, allowed_keywords
+        return data, list(categories.values()), list(rooms.values()), list(keywords.values()), allowed_keywords
 
     def _render_ongoing_events(self, ongoing_events):
         template = get_template_module('categories/display/_calendar_ongoing_events.html')
