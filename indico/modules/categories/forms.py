@@ -82,19 +82,20 @@ class CategorySettingsForm(IndicoForm):
                                                        'within this category can export their tickets to Google '
                                                        'Wallet.'))
     google_wallet_application_credentials = JSONField(_('Google Credentials'),
-                                                      [DataRequired(),
-                                                       HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                                      [HiddenUnless('google_wallet_enabled', preserve_data=True),
+                                                       DataRequired()],
+                                                      default={},
                                                       widget=TextArea(),
                                                       description=_('JSON key credentials for the Google Service '
                                                                     'Account'))
     google_wallet_issuer_name = StringField(_('Issuer Name'),
-                                            [DataRequired(),
-                                             HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                            [HiddenUnless('google_wallet_enabled', preserve_data=True),
+                                             DataRequired()],
                                             description=_('Issuer name that will appear in the Google Wallet ticket '
                                                           'top header.'))
     google_wallet_issuer_id = StringField(_('Issuer ID'),
-                                          [DataRequired(),
-                                           HiddenUnless('google_wallet_enabled', preserve_data=True)],
+                                          [HiddenUnless('google_wallet_enabled', preserve_data=True),
+                                           DataRequired()],
                                           description=_('Issuer ID assigned in the "Google Pay & Wallet" console.'))
 
     def __init__(self, *args, category, **kwargs):
