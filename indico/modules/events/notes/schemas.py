@@ -12,7 +12,7 @@ from indico.modules.events.notes.models.notes import EventNoteRevision
 class EventNoteSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventNoteRevision
-        fields = ('source', 'render_mode')
+        fields = ('id', 'created_dt', 'source', 'render_mode')
 
 
 class CompiledEventNoteSchema(mm.SQLAlchemyAutoSchema):
