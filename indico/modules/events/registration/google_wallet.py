@@ -209,7 +209,7 @@ class GoogleWalletManager:
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketclass
         new_class = self.create_class_template()
-        response = self.http_client.post(url=self.class_url, json=new_class)
+        response = self.http_client.post(self.class_url, json=new_class)
 
         if response.status_code == 200:
             return response.json()
@@ -224,7 +224,7 @@ class GoogleWalletManager:
         issuer_id = self.settings['google_wallet_issuer_id']
         # Check if the class exists
         try:
-            response = self.http_client.get(url=f'{self.class_url}/{issuer_id}.{self.class_suffix}')
+            response = self.http_client.get(f'{self.class_url}/{issuer_id}.{self.class_suffix}')
             response.raise_for_status()
         except HTTPError as exc:
             if exc.response.status_code != 404:
@@ -235,7 +235,7 @@ class GoogleWalletManager:
             return None
 
         if response.status_code == 200:
-            response = self.http_client.patch(url=f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=patch_body)
+            response = self.http_client.patch(f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=patch_body)
             return response.json()
         elif response.status_code == 404:
             return None  # Class does not exist.
@@ -278,12 +278,12 @@ class GoogleWalletManager:
         """Create/patch an object."""
         issuer_id = self.settings['google_wallet_issuer_id']
         # Check if the object exists
-        response = self.http_client.get(url=f'{self.object_url}/{issuer_id}.{object_suffix}')
+        response = self.http_client.get(f'{self.object_url}/{issuer_id}.{object_suffix}')
 
         if response.status_code == 200:
             if update:
                 updated_object = self.create_object_template(object_suffix)
-                response = self.http_client.put(url=f'{self.object_url}/{issuer_id}.{object_suffix}',
+                response = self.http_client.put(f'{self.object_url}/{issuer_id}.{object_suffix}',
                                                 json=updated_object)
                 if response.status_code != 200:
                     raise BadRequest(response.text)  # Something else went wrong...
@@ -296,7 +296,7 @@ class GoogleWalletManager:
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketobject
         new_object = self.create_object_template(object_suffix)
         # Create the object
-        response = self.http_client.post(url=self.object_url, json=new_object)
+        response = self.http_client.post(self.object_url, json=new_object)
         if response.status_code != 200:
             raise BadRequest(response.text)
         return response.json()
