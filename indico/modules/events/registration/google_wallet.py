@@ -25,7 +25,7 @@ from indico.util.i18n import _
 
 
 API_BASE_URL = 'https://walletobjects.googleapis.com/walletobjects/v1'
-logger = Logger.get('events.registration.google_wallt')
+logger = Logger.get('events.registration.google_wallet')
 
 
 class GoogleCredentialValidationResult(Enum):
@@ -203,7 +203,7 @@ class GoogleWalletManager:
                     raise BadRequest(response.text)  # Something else went wrong...
             return response.json()
         elif response.status_code != 404:
-            Logger.get('events').warning('Cannot get Google Wallet class: %s', response.text)
+            logger.warning('Cannot get Google Wallet class: %s', response.text)
             raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
 
         # See link below for more information on required properties
@@ -289,7 +289,7 @@ class GoogleWalletManager:
                     raise BadRequest(response.text)  # Something else went wrong...
             return response.json()
         elif response.status_code != 404:
-            Logger.get('events').warning('Cannot create Google Wallet object: %s', response.text)
+            logger.warning('Cannot create Google Wallet object: %s', response.text)
             raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
 
         # See link below for more information on required properties
