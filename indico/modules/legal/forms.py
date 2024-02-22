@@ -24,9 +24,9 @@ def create_agreement_form(*args, **kwargs):
     privacy_policy_url = legal_settings.get('privacy_policy_url')
 
     placeholders = {
-        'tos_link_start': f'<a href="{url_for("legal.display_tos")}">' if tos_url else '',
+        'tos_link_start': f'''<a href="{url_for('legal.display_tos')}">''' if tos_url else '',
         'tos_link_end': '</a>' if tos_url else '',
-        'pp_link_start': f'<a href="{url_for("legal.display_privacy")}">' if privacy_policy_url else '',
+        'pp_link_start': f'''<a href="{url_for('legal.display_privacy')}">''' if privacy_policy_url else '',
         'pp_link_end': '</a>' if privacy_policy_url else '',
     }
 
