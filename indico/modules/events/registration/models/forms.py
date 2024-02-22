@@ -236,7 +236,7 @@ class RegistrationForm(db.Model):
     is_google_wallet_enabled = db.Column(
         db.Boolean,
         nullable=False,
-        default=True
+        default=False
     )
     #: Whether to send tickets by e-mail
     ticket_on_email = db.Column(
