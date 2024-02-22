@@ -20,6 +20,7 @@ import {
   validators as v,
   parsers as p,
 } from 'indico/react/forms';
+import {Fieldset} from 'indico/react/forms/fields';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
 import {renderPluginComponents} from 'indico/utils/plugins';
@@ -151,7 +152,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
-            <>
+            <Fieldset legend={Translate.string('Privacy')} compact>
               <FinalInput
                 name="retentionPeriod"
                 type="number"
@@ -161,6 +162,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 max="521"
                 validate={v.optional(v.range(1, 521))}
                 label={Translate.string('Retention period (weeks)')}
+                description={Translate.string(
+                  'Specify how long user-provided data for this field will be preserved in the database.'
+                )}
               />
               <FormSpy subscription={{values: true}}>
                 {({values}) =>
@@ -179,7 +183,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                   )
                 }
               </FormSpy>
-            </>
+            </Fieldset>
           )}
           {isUnsupportedField && (
             <Message visible warning>
