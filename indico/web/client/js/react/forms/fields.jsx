@@ -798,12 +798,12 @@ ActionButton.propTypes = {
   }).isRequired,
 };
 
-export function Fieldset({legend, children, active}) {
+export function Fieldset({legend, children, active, compact}) {
   if (!active) {
     return children;
   }
   return (
-    <fieldset styleName="fieldset">
+    <fieldset styleName={`fieldset ${compact ? 'compact' : ''}`}>
       <legend>{legend}</legend>
       {children}
     </fieldset>
@@ -814,8 +814,10 @@ Fieldset.propTypes = {
   legend: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
   active: PropTypes.bool,
+  compact: PropTypes.bool,
 };
 
 Fieldset.defaultProps = {
   active: true,
+  compact: false,
 };

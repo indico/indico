@@ -36,7 +36,7 @@
     color: $light-black;
   }
 
-  & + .fieldset {
+  & + .fieldset:not(.compact) {
     margin-top: 2em;
   }
 }
