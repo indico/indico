@@ -301,6 +301,24 @@ class GoogleWalletManager:
             raise BadRequest(response.text)
         return response.json()
 
+    def patch_object(self, object_suffix: str):
+        """Silently patch an object if it exists.
+
+        If the object does not exist, no action is performed.
+        """
+        issuer_id = self.settings['google_wallet_issuer_id']
+        resp = self.http_client.get(f'{self.object_url}/{issuer_id}.{object_suffix}')
+        if resp.status_code == 404:
+            return
+        elif resp.status_code != 200:
+            logger.warning('Cannot retrieve Google Wallet object: %s', resp.text)
+            # fail silently here since not updating e.g. the exact name in a ticket is not a big deal
+            return
+        updated_object = self.create_object_template(object_suffix)
+        resp = self.http_client.put(f'{self.object_url}/{issuer_id}.{object_suffix}', json=updated_object)
+        if not resp.ok:
+            logger.warning('Cannot update Google Wallet object: %s', resp.text)
+
     def get_link(self, ticket_class: str, ticket_object: str) -> str:
         """Create a Google Wallet link."""
         # Create the JWT claims
