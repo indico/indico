@@ -68,6 +68,10 @@ class JSONField(HiddenField):
     #: Whether an object may be populated with the data from this field
     CAN_POPULATE = False
 
+    def __init__(self, *args, empty_if_null=False, **kwargs):
+        self.empty_if_null = empty_if_null
+        super().__init__(*args, **kwargs)
+
     def process_formdata(self, valuelist):
         if is_preprocessed_formdata(valuelist):
             self.data = valuelist[0]
@@ -75,7 +79,7 @@ class JSONField(HiddenField):
             self.data = json.loads(valuelist[0])
 
     def _value(self):
-        return json.dumps(self.data)
+        return '' if self.data is None and self.empty_if_null else json.dumps(self.data)
 
     def populate_obj(self, obj, name):
         if self.CAN_POPULATE:

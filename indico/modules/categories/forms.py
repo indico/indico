@@ -39,7 +39,7 @@ class CategorySettingsForm(IndicoForm):
     BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
                     'suggestions_disabled', 'is_flat_view_enabled', 'show_future_months',
                     'event_creation_notification_emails', 'notify_managers')
-    GOOGLE_WALLET_FIELDS = ('google_wallet_enabled', 'google_wallet_application_credentials',
+    GOOGLE_WALLET_FIELDS = ('google_wallet_mode', 'google_wallet_application_credentials',
                             'google_wallet_issuer_name', 'google_wallet_issuer_id')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
@@ -77,24 +77,25 @@ class CategorySettingsForm(IndicoForm):
                                                                       'every time a new event is created inside the '
                                                                       'category or one of its subcategories. '
                                                                       'One email address per line.'))
-    google_wallet_enabled = BooleanField(_('Enable Google Wallet'), widget=SwitchWidget(),
-                                         description=_('If enabled, you can configure Google credentials so events '
-                                                       'within this category can export their tickets to Google '
-                                                       'Wallet.'))
+    google_wallet_mode = SelectField(_('Configuration'), [DataRequired()],
+                                     description=_('The Google Wallet configuration is, by default, inherited from the '
+                                                   'parent category. You can also explicitly disable it or provide '
+                                                   'your own configuration instead.'))
     google_wallet_application_credentials = JSONField(_('Google Credentials'),
-                                                      [HiddenUnless('google_wallet_enabled', preserve_data=True),
+                                                      [HiddenUnless('google_wallet_mode', 'enabled',
+                                                                    preserve_data=True),
                                                        DataRequired()],
-                                                      default={},
+                                                      empty_if_null=True,
                                                       widget=TextArea(),
                                                       description=_('JSON key credentials for the Google Service '
                                                                     'Account'))
     google_wallet_issuer_name = StringField(_('Issuer Name'),
-                                            [HiddenUnless('google_wallet_enabled', preserve_data=True),
+                                            [HiddenUnless('google_wallet_mode', 'enabled', preserve_data=True),
                                              DataRequired()],
                                             description=_('Issuer name that will appear in the Google Wallet ticket '
                                                           'top header.'))
     google_wallet_issuer_id = StringField(_('Issuer ID'),
-                                          [HiddenUnless('google_wallet_enabled', preserve_data=True),
+                                          [HiddenUnless('google_wallet_mode', 'enabled', preserve_data=True),
                                            DataRequired()],
                                           description=_('Issuer ID assigned in the "Google Pay & Wallet" console.'))
 
@@ -105,6 +106,20 @@ class CategorySettingsForm(IndicoForm):
             for field in list(self):
                 if field.name.startswith('google_wallet_'):
                     delattr(self, field.name)
+        elif category.parent:
+            inherited_settings = GoogleWalletManager.get_google_wallet_settings(category.parent)
+            parent_enabled = inherited_settings['google_wallet_mode']
+            self.google_wallet_mode.choices = [
+                ('inheriting', (_('Inheriting: Use configuration from parent category') if parent_enabled else
+                                _('Inheriting: Disabled (not configured on any parent category)'))),
+                ('disabled', _('Disabled: Ignore any inherited configuration')),
+                ('enabled', _('Enabled: Use custom configuration'))
+            ]
+        else:
+            self.google_wallet_mode.choices = [
+                ('disabled', _('Disable')),
+                ('enabled', _('Enabled'))
+            ]
 
     def validate(self, extra_validators=None):
         form_valid = super().validate(extra_validators=extra_validators)
@@ -112,7 +127,7 @@ class CategorySettingsForm(IndicoForm):
         if not config.ENABLE_GOOGLE_WALLET:
             return form_valid
 
-        enabled = self.google_wallet_enabled.data
+        enabled = self.google_wallet_mode.data == 'enabled'
         credentials = self.google_wallet_application_credentials.data
         issuer_id = self.google_wallet_issuer_id.data
 
@@ -152,20 +167,14 @@ class CategorySettingsForm(IndicoForm):
         if not config.ENABLE_GOOGLE_WALLET:
             return self.category.google_wallet_settings
 
-        google_wallet_keys = (
-            'google_wallet_enabled',
-            'google_wallet_application_credentials',
-            'google_wallet_issuer_name',
-            'google_wallet_issuer_id',
-        )
-        wallet_settings = {k: getattr(self, k).data for k in google_wallet_keys}
-        wallet_settings['google_wallet_enabled'] = self.google_wallet_enabled.data
+        wallet_settings = {k: getattr(self, k).data for k in self.GOOGLE_WALLET_FIELDS}
+        enabled = {'inheriting': None, 'enabled': True, 'disabled': False}[self.google_wallet_mode.data]
+        wallet_settings['google_wallet_mode'] = enabled
         return wallet_settings
 
     @property
     def data(self):
-        wallet_settings = self.google_wallet_settings.data
-        return {k: v for k, v in super().data.items() if k not in wallet_settings}
+        return {k: v for k, v in super().data.items() if k not in self.GOOGLE_WALLET_FIELDS}
 
 
 class CategoryIconForm(IndicoForm):

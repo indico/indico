@@ -53,7 +53,7 @@ class GoogleWalletManager:
 
     @property
     def configured(self):
-        return config.ENABLE_GOOGLE_WALLET and bool(self.settings['google_wallet_enabled'])
+        return config.ENABLE_GOOGLE_WALLET and bool(self.settings['google_wallet_mode'])
 
     @classmethod
     def verify_credentials(cls, account_info_json, issuer_id) -> GoogleCredentialValidationResult:
@@ -80,11 +80,11 @@ class GoogleWalletManager:
     @staticmethod
     def get_google_wallet_settings(category):
         while category:
-            if category.google_wallet_settings:
+            if category.google_wallet_settings.get('google_wallet_mode') is not None:
                 return category.google_wallet_settings
             else:
                 category = category.parent
-        return {'google_wallet_enabled': False}
+        return {'google_wallet_mode': False}
 
     def auth(self):
         """Create authenticated HTTP client using a service account file."""
