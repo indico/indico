@@ -55,6 +55,10 @@ class GoogleWalletManager:
     def configured(self):
         return config.ENABLE_GOOGLE_WALLET and bool(self.settings['google_wallet_mode'])
 
+    @property
+    def class_suffix(self):
+        return f'TicketClass-{self.event.id}'
+
     @classmethod
     def verify_credentials(cls, account_info_json, issuer_id) -> GoogleCredentialValidationResult:
         try:
@@ -94,14 +98,14 @@ class GoogleWalletManager:
         )
         self.http_client = AuthorizedSession(self.credentials)
 
-    def create_class_template(self, class_suffix: str) -> dict:
+    def create_class_template(self) -> dict:
         """This method will return a dict format ticket class template."""
         from indico.modules.categories.controllers.util import make_format_event_date_func
         issuer_id = self.settings['google_wallet_issuer_id']
         logo_url = (config.ABSOLUTE_LOGO_URL if config.LOGO_URL else
                     f'{config.BASE_URL}{config.IMAGES_BASE_URL}/logo_indico.png')
         dict_template = {
-            'id': f'{issuer_id}.{class_suffix}',
+            'id': f'{issuer_id}.{self.class_suffix}',
             'issuerName': self.settings['google_wallet_issuer_name'],
             'reviewStatus': 'UNDER_REVIEW',
             'eventName': {
@@ -182,18 +186,18 @@ class GoogleWalletManager:
         signals.event.google_wallet_class_template_created.send(self.event, data=dict_template)
         return dict_template
 
-    def create_class(self, class_suffix: str, update: bool = False) -> str:
+    def create_class(self, *, update: bool = False) -> str:
         """Create/update a class."""
         issuer_id = self.settings['google_wallet_issuer_id']
 
         # Check if the class exists
-        response = self.http_client.get(url=f'{self.class_url}/{issuer_id}.{class_suffix}')
+        response = self.http_client.get(f'{self.class_url}/{issuer_id}.{self.class_suffix}')
 
         if response.status_code == 200:
             # Class already exists
             if update:
-                updated_class = self.create_class_template(class_suffix)
-                response = self.http_client.put(url=f'{self.class_url}/{issuer_id}.{class_suffix}', json=updated_class)
+                updated_class = self.create_class_template()
+                response = self.http_client.put(f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=updated_class)
                 if response.status_code != 200:
                     raise BadRequest(response.text)  # Something else went wrong...
             return response.json()
@@ -203,7 +207,7 @@ class GoogleWalletManager:
 
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketclass
-        new_class = self.create_class_template(class_suffix)
+        new_class = self.create_class_template()
         response = self.http_client.post(url=self.class_url, json=new_class)
 
         if response.status_code == 200:
@@ -211,7 +215,7 @@ class GoogleWalletManager:
         else:
             raise BadRequest(response.text)
 
-    def patch_class(self, class_suffix: str, patch_body: dict) -> Optional[str]:
+    def patch_class(self, patch_body: dict) -> Optional[str]:
         """Patch a class.
 
         The PATCH method supports patch semantics.
@@ -219,7 +223,7 @@ class GoogleWalletManager:
         issuer_id = self.settings['google_wallet_issuer_id']
         # Check if the class exists
         try:
-            response = self.http_client.get(url=f'{self.class_url}/{issuer_id}.{class_suffix}')
+            response = self.http_client.get(url=f'{self.class_url}/{issuer_id}.{self.class_suffix}')
             response.raise_for_status()
         except HTTPError as exc:
             if exc.response.status_code != 404:
@@ -230,21 +234,21 @@ class GoogleWalletManager:
             return None
 
         if response.status_code == 200:
-            response = self.http_client.patch(url=f'{self.class_url}/{issuer_id}.{class_suffix}', json=patch_body)
+            response = self.http_client.patch(url=f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=patch_body)
             return response.json()
         elif response.status_code == 404:
             return None  # Class does not exist.
         else:
             flash(_('Cannot update Google Wallet class.'), 'warning')
 
-    def create_object_template(self, class_suffix: str, object_suffix: str) -> dict:
+    def create_object_template(self, object_suffix: str) -> dict:
         """This method will return a dict format ticket object template."""
         from indico.modules.events.registration.util import get_persons, get_ticket_qr_code_data
         qr_data = get_ticket_qr_code_data(get_persons([self.registration])[0])
         issuer_id = self.settings['google_wallet_issuer_id']
         dict_template = {
             'id': f'{issuer_id}.{object_suffix}',
-            'classId': f'{issuer_id}.{class_suffix}',
+            'classId': f'{issuer_id}.{self.class_suffix}',
             'state': 'ACTIVE',
             'barcode': {
                 'type': 'QR_CODE',
@@ -269,7 +273,7 @@ class GoogleWalletManager:
         signals.event.registration.google_wallet_object_template_created.send(self.registration, data=dict_template)
         return dict_template
 
-    def create_object(self, class_suffix: str, object_suffix: str, update: bool = False) -> str:
+    def create_object(self, object_suffix: str, *, update: bool = False) -> str:
         """Create/patch an object."""
         issuer_id = self.settings['google_wallet_issuer_id']
         # Check if the object exists
@@ -277,7 +281,7 @@ class GoogleWalletManager:
 
         if response.status_code == 200:
             if update:
-                updated_object = self.create_object_template(class_suffix, object_suffix)
+                updated_object = self.create_object_template(object_suffix)
                 response = self.http_client.put(url=f'{self.object_url}/{issuer_id}.{object_suffix}',
                                                 json=updated_object)
                 if response.status_code != 200:
@@ -289,7 +293,7 @@ class GoogleWalletManager:
 
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketobject
-        new_object = self.create_object_template(class_suffix, object_suffix)
+        new_object = self.create_object_template(object_suffix)
         # Create the object
         response = self.http_client.post(url=self.object_url, json=new_object)
         if response.status_code != 200:

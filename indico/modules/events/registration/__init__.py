@@ -253,5 +253,5 @@ def _patch_google_wallet_class(event, changes, **kwargs):
     if set(changes) & wallet_fields and event.has_google_wallet_tickets:
         gwm = GoogleWalletManager(event)
         if gwm.configured:
-            ticket_class = gwm.create_class_template(f'TicketClass-{event.id}')
-            return gwm.patch_class(f'TicketClass-{event.id}', ticket_class)
+            ticket_class = gwm.create_class_template()
+            return gwm.patch_class(ticket_class)

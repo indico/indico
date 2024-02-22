@@ -472,10 +472,6 @@ class Registration(db.Model):
         return f'Ticket-{self.event_id}-{self.registration_form_id}-{self.id}'
 
     @property
-    def google_wallet_ticket_class(self):
-        return f'TicketClass-{self.event_id}'
-
-    @property
     def is_paid(self):
         """Return whether the registration has been paid for."""
         paid_states = {TransactionStatus.successful, TransactionStatus.pending}
@@ -751,8 +747,8 @@ class Registration(db.Model):
         gwm = GoogleWalletManager(self.event, registration=self)
         if not gwm.configured:
             return None
-        ticket_class = gwm.create_class(self.google_wallet_ticket_class)
-        ticket_obj = gwm.create_object(self.google_wallet_ticket_class, self.google_wallet_ticket_id)
+        ticket_class = gwm.create_class()
+        ticket_obj = gwm.create_object(self.google_wallet_ticket_id)
         return gwm.get_link(ticket_class, ticket_obj)
 
 
