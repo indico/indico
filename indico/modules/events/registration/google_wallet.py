@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 from enum import Enum, auto
 from typing import Optional
 
@@ -252,7 +253,7 @@ class GoogleWalletManager:
             'state': 'ACTIVE',
             'barcode': {
                 'type': 'QR_CODE',
-                'value': str(qr_data)
+                'value': json.dumps(qr_data, separators=(',', ':')),
             },
             'hexBackgroundColor': '#007cac',
             'textModulesData': [
