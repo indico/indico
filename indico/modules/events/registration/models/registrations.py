@@ -467,17 +467,13 @@ class Registration(db.Model):
         """Check whether the ticket is blocked by a plugin."""
         return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))
 
-    def generate_ticket_google_wallet_url(self):
-        """Return link to Google Wallet ticket display."""
-        if not self.registration_form.is_google_wallet_enabled:
-            return None
-        gwm = GoogleWalletManager(self.event, registration=self)
-        if not gwm.configured:
-            return None
-        ticket_class = gwm.create_class(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{self.event_id}')
-        ticket_obj = gwm.create_object(gwm.settings['google_wallet_issuer_id'], f'TicketClass-{self.event_id}',
-                                       f'Ticket-{self.event_id}-{self.registration_form_id}-{self.id}')
-        return gwm.get_link(ticket_class, ticket_obj)
+    @property
+    def google_wallet_ticket_id(self):
+        return f'Ticket-{self.event_id}-{self.registration_form_id}-{self.id}'
+
+    @property
+    def google_wallet_ticket_class(self):
+        return f'TicketClass-{self.event_id}'
 
     @property
     def is_paid(self):
@@ -747,6 +743,17 @@ class Registration(db.Model):
         if not self.transaction or self.transaction.status != TransactionStatus.pending:
             return False
         return self.transaction.is_pending_expired()
+
+    def generate_ticket_google_wallet_url(self):
+        """Return link to Google Wallet ticket display."""
+        if not self.registration_form.is_google_wallet_enabled:
+            return None
+        gwm = GoogleWalletManager(self.event, registration=self)
+        if not gwm.configured:
+            return None
+        ticket_class = gwm.create_class(self.google_wallet_ticket_class)
+        ticket_obj = gwm.create_object(self.google_wallet_ticket_class, self.google_wallet_ticket_id)
+        return gwm.get_link(ticket_class, ticket_obj)
 
 
 class RegistrationData(StoredFileMixin, db.Model):
