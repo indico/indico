@@ -253,14 +253,13 @@ def _patch_google_wallet_class(event, changes, **kwargs):
     if set(changes) & wallet_fields and event.has_google_wallet_tickets:
         gwm = GoogleWalletManager(event)
         if gwm.configured:
-            ticket_class_data = gwm.create_class_template()
-            gwm.patch_class(ticket_class_data)
+            gwm.patch_ticket_class()
 
 
 @signals.event.registration_personal_data_modified.connect
 def _patch_google_wallet_ticket(registration, change, **kwargs):
     wallet_fields = {'first_name', 'last_name', 'email'}
     if set(change) & wallet_fields and registration.event.has_google_wallet_tickets:
-        gwm = GoogleWalletManager(registration.event, registration)
+        gwm = GoogleWalletManager(registration.event)
         if gwm.configured:
-            gwm.patch_object(registration.google_wallet_ticket_id)
+            gwm.patch_ticket_object(registration)
