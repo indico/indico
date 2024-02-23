@@ -202,7 +202,7 @@ class GoogleWalletManager:
         signals.event.registration.google_wallet_ticket_class_data.send(self.event, data=data)
         return data
 
-    def build_ticket_object(self, registration) -> dict:
+    def build_ticket_object_data(self, registration) -> dict:
         """Generate the object data for an individual ticket."""
         from indico.modules.events.registration.util import get_persons, get_ticket_qr_code_data
         qr_data = get_ticket_qr_code_data(get_persons([registration])[0])
@@ -279,7 +279,7 @@ class GoogleWalletManager:
         resp = self.http_client.get(f'{self.object_url}/{issuer_id}.{object_suffix}')
         if resp.status_code == 200:
             if update:
-                data = self.build_ticket_object(registration)
+                data = self.build_ticket_object_data(registration)
                 resp = self.http_client.put(f'{self.object_url}/{issuer_id}.{object_suffix}', json=data)
                 resp.raise_for_status()
             return resp.json()['id']
@@ -288,7 +288,7 @@ class GoogleWalletManager:
 
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketobject
-        data = self.build_ticket_object(registration)
+        data = self.build_ticket_object_data(registration)
         resp = self.http_client.post(self.object_url, json=data)
         resp.raise_for_status()
         return resp.json()['id']
@@ -307,7 +307,7 @@ class GoogleWalletManager:
             return
         resp.raise_for_status()
         # Update the object
-        data = self.build_ticket_object(registration)
+        data = self.build_ticket_object_data(registration)
         resp = self.http_client.put(f'{self.object_url}/{issuer_id}.{object_suffix}', json=data)
         resp.raise_for_status()
 
