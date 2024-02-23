@@ -131,17 +131,8 @@ class GoogleWalletManager:
             'id': f'{issuer_id}.{self.class_suffix}',
             'issuerName': self.settings['google_wallet_issuer_name'],
             'reviewStatus': 'UNDER_REVIEW',
-            'eventName': {
-                'defaultValue': {
-                    'language': 'en-US',
-                    'value': self.event.title
-                }
-            },
-            'logo': {
-                'sourceUri': {
-                    'uri': logo_url
-                }
-            },
+            'eventName': {'defaultValue': {'language': 'en-US', 'value': self.event.title}},
+            'logo': {'sourceUri': {'uri': logo_url}},
             'venue': None,  # removes existing venue unless populated below
             'textModulesData': [
                 {
@@ -152,41 +143,32 @@ class GoogleWalletManager:
                     # well since certain changes (auto-extend when moving a contribution for example) are not
                     # covered by the `event.updated` signal.
                     'body': make_format_event_date_func(self.event.category)(self.event),
-                    'id': 'datefield'
+                    'id': 'datefield',
                 },
             ],
             'classTemplateInfo': {
                 'cardTemplateOverride': {
-                    'cardRowTemplateInfos': [{
-                        'oneItem': {
-                            'item': {
-                                'firstValue': {
-                                    'fields': [{
-                                        'fieldPath': "class.textModulesData['datefield']"
-                                    }]
-                                }
-                            },
-                        }
-                    }, {
-                        'twoItems': {
-                            'startItem': {
-                                'firstValue': {
-                                    'fields': [{
-                                        'fieldPath': "object.textModulesData['namefield']"
-                                    }]
-                                }
-                            },
-                            'endItem': {
-                                'firstValue': {
-                                    'fields': [{
-                                        'fieldPath': "object.textModulesData['emailfield']"
-                                    }]
-                                }
-                            },
-                        }
-                    }]
+                    'cardRowTemplateInfos': [
+                        {
+                            'oneItem': {
+                                'item': {
+                                    'firstValue': {'fields': [{'fieldPath': "class.textModulesData['datefield']"}]}
+                                },
+                            }
+                        },
+                        {
+                            'twoItems': {
+                                'startItem': {
+                                    'firstValue': {'fields': [{'fieldPath': "object.textModulesData['namefield']"}]}
+                                },
+                                'endItem': {
+                                    'firstValue': {'fields': [{'fieldPath': "object.textModulesData['emailfield']"}]}
+                                },
+                            }
+                        },
+                    ]
                 }
-            }
+            },
         }
 
         # The venue can only be set if there is a name AND an address
@@ -235,19 +217,11 @@ class GoogleWalletManager:
             },
             'hexBackgroundColor': '#007cac',
             'textModulesData': [
-                {
-                    'header': 'Name',
-                    'body': registration.full_name,
-                    'id': 'namefield'
-                },
-                {
-                    'header': 'Email',
-                    'body': registration.email,
-                    'id': 'emailfield'
-                }
+                {'header': 'Name', 'body': registration.full_name, 'id': 'namefield'},
+                {'header': 'Email', 'body': registration.email, 'id': 'emailfield'},
             ],
             'ticketHolderName': registration.full_name,
-            'ticketNumber': f'#{registration.friendly_id}'
+            'ticketNumber': f'#{registration.friendly_id}',
         }
         signals.event.registration.google_wallet_ticket_object_data.send(registration, data=data)
         return data
