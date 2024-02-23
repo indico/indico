@@ -35,8 +35,10 @@ jobs:
       - name: Install Transifex client 📥
         run: curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
       - name: Pull and compile translations 🌍
+        env:
+          TX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
         run: |
-          ./tx --token ${{ secrets.TRANSIFEX_TOKEN }} pull --all --force
+          ./tx pull --all --force
           indico i18n compile indico --no-check
       - name: Enable moment locales 🕒
         run: python .github/utils/patch_moment_locales.py
