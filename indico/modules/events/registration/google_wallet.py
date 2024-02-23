@@ -120,10 +120,15 @@ class GoogleWalletManager:
                     'uri': logo_url
                 }
             },
+            'venue': None,  # removes existing venue unless populated below
             'textModulesData': [
                 {
                     'header': 'Date',
                     'language': 'en-US',
+                    # Note: This only returns the date (ie no time). Should we ever decide to include the time
+                    # in the ticket as well, it'll be necessary to handle the `event.times_changed` signal as
+                    # well since certain changes (auto-extend when moving a contribution for example) are not
+                    # covered by the `event.updated` signal.
                     'body': make_format_event_date_func(self.event.category)(self.event),
                     'id': 'datefield'
                 },
@@ -161,29 +166,35 @@ class GoogleWalletManager:
                 }
             }
         }
-        if self.event.venue:
+
+        # The venue can only be set if there is a name AND an address
+        if self.event.address and self.event.has_location_info:
+            venue_name = (f'{self.event.room_name} ({self.event.venue_name})'
+                          if self.event.room_name and self.event.venue_name
+                          else (self.event.venue_name or self.event.room_name))
             dict_template['venue'] = {
                 'name': {
                     'defaultValue': {
                         'language': 'en-US',
-                        'value': self.event.venue_name if not self.event.room_name
-                        else f'{self.event.venue_name} - Room {self.event.room_name}'
+                        'value': venue_name,
                     }
-                }
-            }
-            if self.event.address:  # In Google Wallet the address is displayed ONLY if venue name is present
-                dict_template['venue']['address'] = {
+                },
+                'address': {
                     'defaultValue': {
                         'language': 'en-US',
                         'value': self.event.address
                     }
                 }
-        if self.event.has_logo and self.event.is_public:  # Event logo MUST be reachable via URL as anon
+            }
+
+        # The event logo MUST be reachable by Google, ie the event cannot be restricted
+        if self.event.has_logo and self.event.is_public:
             dict_template['heroImage'] = {
                 'sourceUri': {
                     'uri': self.event.external_logo_url
                 }
             }
+
         signals.event.google_wallet_class_template_created.send(self.event, data=dict_template)
         return dict_template
 
