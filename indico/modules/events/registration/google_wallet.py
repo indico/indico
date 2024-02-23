@@ -7,7 +7,6 @@
 
 import json
 from enum import Enum, auto
-from typing import Optional
 
 from flask import flash
 from google.auth import jwt
@@ -212,7 +211,7 @@ class GoogleWalletManager:
                 response = self.http_client.put(f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=updated_class)
                 if response.status_code != 200:
                     raise BadRequest(response.text)  # Something else went wrong...
-            return response.json()
+            return response.json()['id']
         elif response.status_code != 404:
             logger.warning('Cannot get Google Wallet class: %s', response.text)
             raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
@@ -223,11 +222,11 @@ class GoogleWalletManager:
         response = self.http_client.post(self.class_url, json=new_class)
 
         if response.status_code == 200:
-            return response.json()
+            return response.json()['id']
         else:
             raise BadRequest(response.text)
 
-    def patch_class(self, patch_body: dict) -> Optional[str]:
+    def patch_class(self, patch_body: dict):
         """Patch a class.
 
         The PATCH method supports patch semantics.
@@ -240,16 +239,17 @@ class GoogleWalletManager:
         except HTTPError as exc:
             if exc.response.status_code != 404:
                 logger.warning('Could not update Google Wallet link: %s', exc.response.text)
-            return None
+            return
         except RequestException as exc:
             logger.warning('Could not update Google Wallet link: %s', exc)
-            return None
+            return
 
         if response.status_code == 200:
             response = self.http_client.patch(f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=patch_body)
-            return response.json()
+            # TODO handle errors!!
+            return
         elif response.status_code == 404:
-            return None  # Class does not exist.
+            return   # Class does not exist.
         else:
             flash(_('Cannot update Google Wallet class.'), 'warning')
 
@@ -298,7 +298,7 @@ class GoogleWalletManager:
                                                 json=updated_object)
                 if response.status_code != 200:
                     raise BadRequest(response.text)  # Something else went wrong...
-            return response.json()
+            return response.json()['id']
         elif response.status_code != 404:
             logger.warning('Cannot create Google Wallet object: %s', response.text)
             raise ServiceUnavailable(_('Could not generate ticket'))  # Something else went wrong...
@@ -310,7 +310,7 @@ class GoogleWalletManager:
         response = self.http_client.post(self.object_url, json=new_object)
         if response.status_code != 200:
             raise BadRequest(response.text)
-        return response.json()
+        return response.json()['id']
 
     def patch_object(self, object_suffix: str):
         """Silently patch an object if it exists.
@@ -330,24 +330,21 @@ class GoogleWalletManager:
         if not resp.ok:
             logger.warning('Cannot update Google Wallet object: %s', resp.text)
 
-    def get_link(self, ticket_class: str, ticket_object: str) -> str:
+    def get_link(self, ticket_class_id: str, ticket_object_id: str) -> str:
         """Create a Google Wallet link."""
-        # Create the JWT claims
-        if not (self.registration or self.event):
-            raise ValueError('Missing Registration or Event')
         claims = {
             'iss': self.credentials.service_account_email,
             'aud': 'google',
             'origins': [config.BASE_URL],
             'typ': 'savetowallet',
             'payload': {
-                # The listed classes and objects will be created
-                'eventTicketClasses': [ticket_class],
-                'eventTicketObjects': [ticket_object]
+                'eventTicketObjects': [{
+                    'classId': ticket_class_id,
+                    'id': ticket_object_id,
+                }]
             }
         }
 
-        # The service account credentials are used to sign the JWT
         signer = RSASigner.from_service_account_info(self.settings['google_wallet_application_credentials'])
         token = jwt.encode(signer, claims).decode('utf-8')
         return f'https://pay.google.com/gp/v/save/{token}' if token else ''

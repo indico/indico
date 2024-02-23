@@ -747,9 +747,9 @@ class Registration(db.Model):
         gwm = GoogleWalletManager(self.event, registration=self)
         if not gwm.configured:
             return None
-        ticket_class = gwm.create_class()
-        ticket_obj = gwm.create_object(self.google_wallet_ticket_id)
-        return gwm.get_link(ticket_class, ticket_obj)
+        ticket_class_id = gwm.create_class()
+        ticket_obj_id = gwm.create_object(self.google_wallet_ticket_id)
+        return gwm.get_link(ticket_class_id, ticket_obj_id)
 
 
 class RegistrationData(StoredFileMixin, db.Model):
