@@ -21,6 +21,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 
 API_BASE_URL = 'https://walletobjects.googleapis.com/walletobjects/v1'
@@ -134,6 +135,14 @@ class GoogleWalletManager:
             'eventName': {'defaultValue': {'language': 'en-US', 'value': self.event.title}},
             'logo': {'sourceUri': {'uri': logo_url}},
             'venue': None,  # removes existing venue unless populated below
+            'linksModuleData': {
+                'uris': [
+                    {
+                        'description': 'Indico event page',
+                        'uri': self.event.external_url,
+                    },
+                ],
+            },
             'textModulesData': [
                 {
                     'header': 'Date',
@@ -220,6 +229,15 @@ class GoogleWalletManager:
                 {'header': 'Name', 'body': registration.full_name, 'id': 'namefield'},
                 {'header': 'Email', 'body': registration.email, 'id': 'emailfield'},
             ],
+            'linksModuleData': {
+                'uris': [
+                    {
+                        'description': 'Registration details',
+                        'uri': url_for('event_registration.display_regform', registration.locator.uuid, _external=True),
+                        'id': 'reglinkfield',
+                    },
+                ],
+            },
             'ticketHolderName': registration.full_name,
             'ticketNumber': f'#{registration.friendly_id}',
         }
