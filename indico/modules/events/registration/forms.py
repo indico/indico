@@ -335,19 +335,16 @@ class TicketsForm(IndicoForm):
     ticket_template_id = SelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
                                                             Optional()], coerce=int)
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, regform, **kwargs):
         super().__init__(*args, **kwargs)
-        default_tpl = get_default_ticket_on_category(self.event.category)
-        all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
+        default_tpl = get_default_ticket_on_category(event.category)
+        all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
                            if tpl.type == TemplateType.badge and tpl != default_tpl]
         # Show the default template first
         badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
         self.ticket_template_id.choices = badge_templates
-
-        self.regform = kwargs.get('obj')
-        if not self.regform.is_google_wallet_configured:  # Do not show if not configured at Category level
+        if not regform.is_google_wallet_configured:
             del self.is_google_wallet_enabled
 
 
