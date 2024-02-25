@@ -105,7 +105,8 @@ class RHManageCategorySettings(RHManageCategoryBase):
     def _process(self):
         kwargs = {
             'meeting_theme': self.category.default_event_themes['meeting'],
-            'lecture_theme': self.category.default_event_themes['lecture']}
+            'lecture_theme': self.category.default_event_themes['lecture']
+        }
 
         if config.ENABLE_GOOGLE_WALLET:
             kwargs |= self.category.google_wallet_settings
