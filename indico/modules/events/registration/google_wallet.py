@@ -347,4 +347,4 @@ class GoogleWalletManager:
         }
         signer = RSASigner.from_service_account_info(self.settings['google_wallet_application_credentials'])
         token = jwt.encode(signer, claims).decode('utf-8')
-        return f'https://pay.google.com/gp/v/save/{token}' if token else ''
+        return f'https://pay.google.com/gp/v/save/{token}'
