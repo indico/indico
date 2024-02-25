@@ -18,14 +18,14 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('forms', sa.Column('is_google_wallet_enabled', sa.Boolean(), nullable=False,
+    op.add_column('forms', sa.Column('ticket_google_wallet', sa.Boolean(), nullable=False,
                                      server_default='false'), schema='event_registration')
     op.add_column('categories', sa.Column('google_wallet_settings', postgresql.JSONB(), nullable=False,
                                           server_default='{}'), schema='categories')
-    op.alter_column('forms', 'is_google_wallet_enabled', server_default=None, schema='event_registration')
+    op.alter_column('forms', 'ticket_google_wallet', server_default=None, schema='event_registration')
     op.alter_column('categories', 'google_wallet_settings', server_default=None, schema='categories')
 
 
 def downgrade():
-    op.drop_column('forms', 'is_google_wallet_enabled', schema='event_registration')
+    op.drop_column('forms', 'ticket_google_wallet', schema='event_registration')
     op.drop_column('categories', 'google_wallet_settings', schema='categories')

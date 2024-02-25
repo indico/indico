@@ -742,7 +742,7 @@ class Registration(db.Model):
 
     def generate_ticket_google_wallet_url(self):
         """Return link to Google Wallet ticket display."""
-        if not self.registration_form.is_google_wallet_enabled:
+        if not self.registration_form.ticket_google_wallet:
             return None
         gwm = GoogleWalletManager(self.event)
         if gwm.configured:

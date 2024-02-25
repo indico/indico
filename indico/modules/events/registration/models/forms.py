@@ -233,7 +233,7 @@ class RegistrationForm(db.Model):
         default=False
     )
     #: Whether to allow exporting tickets to Google Wallet
-    is_google_wallet_enabled = db.Column(
+    ticket_google_wallet = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -540,7 +540,7 @@ class RegistrationForm(db.Model):
 
     @property
     def is_google_wallet_available(self):
-        return self.is_google_wallet_enabled and self.is_google_wallet_configured
+        return self.ticket_google_wallet and self.is_google_wallet_configured
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')

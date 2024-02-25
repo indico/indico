@@ -307,9 +307,10 @@ class EmailRegistrantsForm(IndicoForm):
 class TicketsForm(IndicoForm):
     tickets_enabled = BooleanField(_('Enable Tickets'), widget=SwitchWidget(),
                                    description=_('Create tickets for registrations using this registration form.'))
-    is_google_wallet_enabled = BooleanField(_('Enable Google Wallet'), [HiddenUnless('tickets_enabled',
-                                                                                     preserve_data=True)],
-                                            widget=SwitchWidget(), description=_('Add Google Wallet integration.'))
+    ticket_google_wallet = BooleanField(_('Export to Google Wallet'), [HiddenUnless('tickets_enabled',
+                                                                                    preserve_data=True)],
+                                        widget=SwitchWidget(),
+                                        description=_('Allow users to export their to Google Wallet.'))
     ticket_on_email = BooleanField(_('Send with an e-mail'), [HiddenUnless('tickets_enabled',
                                                                            preserve_data=True)],
                                    widget=SwitchWidget(),
@@ -345,7 +346,7 @@ class TicketsForm(IndicoForm):
         badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
         self.ticket_template_id.choices = badge_templates
         if not regform.is_google_wallet_configured:
-            del self.is_google_wallet_enabled
+            del self.ticket_google_wallet
 
 
 class ParticipantsDisplayForm(IndicoForm):

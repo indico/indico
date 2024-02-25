@@ -1148,7 +1148,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def has_google_wallet_tickets(self):
         from indico.modules.events.registration.models.forms import RegistrationForm
         google_wallet_enabled = (RegistrationForm.query.with_parent(self)
-                                 .filter(RegistrationForm.is_google_wallet_enabled).has_rows())
+                                 .filter(RegistrationForm.ticket_google_wallet).has_rows())
         if google_wallet_enabled:
             from indico.modules.events.registration.models.registrations import Registration, RegistrationState
             has_registrations = (Registration.query.with_parent(self)
