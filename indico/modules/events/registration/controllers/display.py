@@ -482,7 +482,7 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
 
 
 class RHTicketGoogleWallet(RHTicketDownload):
-    """Generate Google Wallet link to ticket for a given registration."""
+    """Redirect to the Google Wallet page for a registration ticket."""
 
     def _process(self):
         if not (url := self.registration.generate_ticket_google_wallet_url()):
