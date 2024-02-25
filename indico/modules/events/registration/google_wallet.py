@@ -106,6 +106,11 @@ class GoogleWalletManager:
             return GoogleCredentialValidationResult.failed
 
     @staticmethod
+    def event_uses_google_wallet_tickets(event):
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        return RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_google_wallet).has_rows()
+
+    @staticmethod
     def get_google_wallet_settings(category):
         while category:
             if category.google_wallet_settings.get('google_wallet_mode') is not None:

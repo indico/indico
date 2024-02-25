@@ -248,9 +248,8 @@ class RegistrationPermission(ManagementPermission):
 def _patch_google_wallet_class(event, changes, **kwargs):
     if not config.ENABLE_GOOGLE_WALLET:
         return
-    # Update wallet if fields related to the date changed
     wallet_fields = {'title', 'start_dt', 'end_dt', 'location_data'}
-    if set(changes) & wallet_fields and event.has_google_wallet_tickets:
+    if set(changes) & wallet_fields and GoogleWalletManager.event_uses_google_wallet_tickets(event):
         gwm = GoogleWalletManager(event)
         if gwm.configured:
             gwm.patch_ticket_class()
@@ -259,7 +258,7 @@ def _patch_google_wallet_class(event, changes, **kwargs):
 @signals.event.registration_personal_data_modified.connect
 def _patch_google_wallet_ticket(registration, change, **kwargs):
     wallet_fields = {'first_name', 'last_name', 'email'}
-    if set(change) & wallet_fields and registration.event.has_google_wallet_tickets:
+    if set(change) & wallet_fields and registration.registration_form.ticket_google_wallet:
         gwm = GoogleWalletManager(registration.event)
         if gwm.configured:
             gwm.patch_ticket_object(registration)
