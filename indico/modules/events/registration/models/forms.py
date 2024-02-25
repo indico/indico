@@ -232,7 +232,7 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether to enable Google Wallet integration
+    #: Whether to allow exporting tickets to Google Wallet
     is_google_wallet_enabled = db.Column(
         db.Boolean,
         nullable=False,
