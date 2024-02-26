@@ -310,7 +310,9 @@ class TicketsForm(IndicoForm):
     ticket_google_wallet = BooleanField(_('Export to Google Wallet'), [HiddenUnless('tickets_enabled',
                                                                                     preserve_data=True)],
                                         widget=SwitchWidget(),
-                                        description=_('Allow users to export their ticket to Google Wallet.'))
+                                        description=_('Allow users to export their ticket to Google Wallet. '
+                                                      'This currently does not support tickets for accompanying '
+                                                      'persons.'))
     ticket_on_email = BooleanField(_('Send with an e-mail'), [HiddenUnless('tickets_enabled',
                                                                            preserve_data=True)],
                                    widget=SwitchWidget(),
