@@ -20,6 +20,7 @@ from werkzeug.exceptions import ServiceUnavailable
 from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
+from indico.modules.events.registration.settings import event_wallet_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
@@ -91,7 +92,7 @@ class GoogleWalletManager:
         Each event has one ticket class that holds shared data such as the title
         and dates of the event.
         """
-        return f'TicketClass-{self.event.id}'
+        return event_wallet_settings.get(self.event, 'google_wallet_class_id', f'Indico-Event-{self.event.id}')
 
     @classmethod
     def verify_credentials(cls, account_info_json, issuer_id) -> GoogleCredentialValidationResult:
@@ -117,8 +118,7 @@ class GoogleWalletManager:
 
     @staticmethod
     def event_uses_google_wallet_tickets(event):
-        from indico.modules.events.registration.models.forms import RegistrationForm
-        return RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_google_wallet).has_rows()
+        return event_wallet_settings.get(event, 'google_wallet_class_id') is not None
 
     @staticmethod
     def get_google_wallet_settings(category):
@@ -274,6 +274,7 @@ class GoogleWalletManager:
         data = self.build_class_data()
         resp = self.http_client.post(API_CLASS_URL, json=data)
         resp.raise_for_status()
+        event_wallet_settings.set(self.event, 'google_wallet_class_id', self.class_id)
         return resp.json()['id']
 
     @handle_http_errors(silent=True)

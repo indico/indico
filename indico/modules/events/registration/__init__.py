@@ -260,7 +260,11 @@ def _patch_google_wallet_ticket(registration, change, **kwargs):
     if not config.ENABLE_GOOGLE_WALLET:
         return
     wallet_fields = {'first_name', 'last_name', 'email'}
-    if set(change) & wallet_fields and registration.registration_form.ticket_google_wallet:
+    if (
+        set(change) & wallet_fields and
+        GoogleWalletManager.event_uses_google_wallet_tickets(registration.event) and
+        registration.registration_form.ticket_google_wallet
+    ):
         gwm = GoogleWalletManager(registration.event)
         if gwm.configured:
             gwm.patch_ticket_object(registration)
