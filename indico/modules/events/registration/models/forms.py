@@ -21,7 +21,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.events.registration import GoogleWalletManager
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
 from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
                                                                      RegistrationState)
@@ -535,8 +534,7 @@ class RegistrationForm(db.Model):
 
     @property
     def is_google_wallet_configured(self):
-        return (config.ENABLE_GOOGLE_WALLET and
-                GoogleWalletManager.get_google_wallet_settings(self.event.category) is not None)
+        return config.ENABLE_GOOGLE_WALLET and self.event.category.effective_google_wallet_config is not None
 
     @property
     def is_google_wallet_available(self):

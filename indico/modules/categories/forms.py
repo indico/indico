@@ -115,7 +115,7 @@ class CategorySettingsForm(IndicoForm):
                 if field.name.startswith('google_wallet_'):
                     delattr(self, field.name)
         elif category.parent:
-            parent_configured = GoogleWalletManager.get_google_wallet_settings(category.parent) is not None
+            parent_configured = category.parent.effective_google_wallet_config is not None
             self.google_wallet_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
         else:
             self.google_wallet_mode.skip = {InheritableConfigMode.inheriting}

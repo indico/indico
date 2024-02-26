@@ -20,7 +20,6 @@ from werkzeug.exceptions import ServiceUnavailable
 from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.modules.categories.models.categories import InheritableConfigMode
 from indico.modules.events.registration.settings import event_wallet_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -68,7 +67,7 @@ class GoogleWalletManager:
 
     def __init__(self, event):
         self.event = event
-        self.settings = self.get_google_wallet_settings(self.event.category)
+        self.settings = self.event.category.effective_google_wallet_config
         self.credentials, self.http_client = self._load_credentials()
 
     def _load_credentials(self):
@@ -120,17 +119,6 @@ class GoogleWalletManager:
     @staticmethod
     def event_uses_google_wallet_tickets(event):
         return event_wallet_settings.get(event, 'google_wallet_class_id') is not None
-
-    @staticmethod
-    def get_google_wallet_settings(category):
-        while category:
-            if category.google_wallet_mode == InheritableConfigMode.disabled:
-                return None
-            elif category.google_wallet_mode == InheritableConfigMode.enabled:
-                return category.google_wallet_settings
-            else:
-                category = category.parent
-        return None
 
     def _make_id(self, id):
         issuer_id = self.settings['google_wallet_issuer_id']
