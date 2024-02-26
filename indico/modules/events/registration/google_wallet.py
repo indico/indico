@@ -25,6 +25,8 @@ from indico.web.flask.util import url_for
 
 
 API_BASE_URL = 'https://walletobjects.googleapis.com/walletobjects/v1'
+API_CLASS_URL = f'{API_BASE_URL}/eventTicketClass'
+API_OBJECT_URL = f'{API_BASE_URL}/eventTicketObject'
 logger = Logger.get('events.registration.google_wallet')
 
 
@@ -67,8 +69,6 @@ class GoogleWalletManager:
         self.settings = self.get_google_wallet_settings(self.event.category)
         self.credentials = None
         self.http_client = None
-        self.class_url = f'{API_BASE_URL}/eventTicketClass'
-        self.object_url = f'{API_BASE_URL}/eventTicketObject'
 
         # Set up authenticated client
         if self.configured:
@@ -257,11 +257,11 @@ class GoogleWalletManager:
 
         If it already exists nothing is done, unless `update` is specified.
         """
-        resp = self.http_client.get(f'{self.class_url}/{self._make_id(self.class_id)}')
+        resp = self.http_client.get(f'{API_CLASS_URL}/{self._make_id(self.class_id)}')
         if resp.status_code == 200:
             if update:
                 data = self.build_class_data()
-                resp = self.http_client.put(f'{self.class_url}/{self._make_id(self.class_id)}', json=data)
+                resp = self.http_client.put(f'{API_CLASS_URL}/{self._make_id(self.class_id)}', json=data)
                 resp.raise_for_status()
             return resp.json()['id']
         elif resp.status_code != 404:
@@ -270,7 +270,7 @@ class GoogleWalletManager:
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketclass
         data = self.build_class_data()
-        resp = self.http_client.post(self.class_url, json=data)
+        resp = self.http_client.post(API_CLASS_URL, json=data)
         resp.raise_for_status()
         return resp.json()['id']
 
@@ -281,14 +281,14 @@ class GoogleWalletManager:
         This method fails silently and just logs errors to allow making changes
         to an event even if something fails when making requests to the Wallet API.
         """
-        resp = self.http_client.get(f'{self.class_url}/{self._make_id(self.class_id)}')
+        resp = self.http_client.get(f'{API_CLASS_URL}/{self._make_id(self.class_id)}')
         if resp.status_code == 404:
             # Nothing to do if the class doesn't exist
             return
         resp.raise_for_status()
         # Update the class
         data = self.build_class_data()
-        resp = self.http_client.patch(f'{self.class_url}/{self._make_id(self.class_id)}', json=data)
+        resp = self.http_client.patch(f'{API_CLASS_URL}/{self._make_id(self.class_id)}', json=data)
         resp.raise_for_status()
 
     @handle_http_errors()
@@ -298,11 +298,11 @@ class GoogleWalletManager:
         If it already exists nothing is done, unless `update` is specified.
         """
         object_id = registration.google_wallet_ticket_id
-        resp = self.http_client.get(f'{self.object_url}/{self._make_id(object_id)}')
+        resp = self.http_client.get(f'{API_OBJECT_URL}/{self._make_id(object_id)}')
         if resp.status_code == 200:
             if update:
                 data = self.build_ticket_object_data(registration)
-                resp = self.http_client.put(f'{self.object_url}/{self._make_id(object_id)}', json=data)
+                resp = self.http_client.put(f'{API_OBJECT_URL}/{self._make_id(object_id)}', json=data)
                 resp.raise_for_status()
             return resp.json()['id']
         elif resp.status_code != 404:
@@ -311,7 +311,7 @@ class GoogleWalletManager:
         # See link below for more information on required properties
         # https://developers.google.com/wallet/tickets/events/rest/v1/eventticketobject
         data = self.build_ticket_object_data(registration)
-        resp = self.http_client.post(self.object_url, json=data)
+        resp = self.http_client.post(API_OBJECT_URL, json=data)
         resp.raise_for_status()
         return resp.json()['id']
 
@@ -322,14 +322,14 @@ class GoogleWalletManager:
         If the object does not exist, no action is performed.
         """
         object_id = registration.google_wallet_ticket_id
-        resp = self.http_client.get(f'{self.object_url}/{self._make_id(object_id)}')
+        resp = self.http_client.get(f'{API_OBJECT_URL}/{self._make_id(object_id)}')
         if resp.status_code == 404:
             # Nothing to do if the object doesn't exist
             return
         resp.raise_for_status()
         # Update the object
         data = self.build_ticket_object_data(registration)
-        resp = self.http_client.put(f'{self.object_url}/{self._make_id(object_id)}', json=data)
+        resp = self.http_client.put(f'{API_OBJECT_URL}/{self._make_id(object_id)}', json=data)
         resp.raise_for_status()
 
     def get_ticket_link(self, registration) -> str:
