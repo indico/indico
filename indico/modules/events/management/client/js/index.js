@@ -220,7 +220,11 @@ import {SeriesManagement} from './SeriesManagement';
 
     $('.js-event-person-list td').on('mouseenter', function() {
       const $this = $(this);
-      if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+      if (
+        this.offsetWidth < this.scrollWidth &&
+        !$this.attr('title') &&
+        !$this.find('.js-popup-container').length
+      ) {
         $this.attr('title', $this.text());
       }
     });
