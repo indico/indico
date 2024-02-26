@@ -67,12 +67,18 @@ class GoogleWalletManager:
     def __init__(self, event):
         self.event = event
         self.settings = self.get_google_wallet_settings(self.event.category)
-        self.credentials = None
-        self.http_client = None
+        self.credentials, self.http_client = self._load_credentials()
 
-        # Set up authenticated client
-        if self.configured:
-            self.auth()
+    def _load_credentials(self):
+        """Load Google credentials and setup authenticated HTTP client."""
+        if not self.configured:
+            return None, None
+        credentials = Credentials.from_service_account_info(
+            self.settings['google_wallet_credentials'],
+            scopes=['https://www.googleapis.com/auth/wallet_object.issuer']
+        )
+        http_client = AuthorizedSession(credentials)
+        return credentials, http_client
 
     @property
     def configured(self):
@@ -122,14 +128,6 @@ class GoogleWalletManager:
             else:
                 category = category.parent
         return {'google_wallet_mode': False}
-
-    def auth(self):
-        """Create authenticated HTTP client using a service account file."""
-        self.credentials = Credentials.from_service_account_info(
-            self.settings['google_wallet_credentials'],
-            scopes=['https://www.googleapis.com/auth/wallet_object.issuer']
-        )
-        self.http_client = AuthorizedSession(self.credentials)
 
     def _make_id(self, id):
         issuer_id = self.settings['google_wallet_issuer_id']
