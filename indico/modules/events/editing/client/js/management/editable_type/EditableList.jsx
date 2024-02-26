@@ -213,16 +213,15 @@ function EditableListDisplay({
       {
         key: 'tags',
         text: Translate.string('Tags'),
-        options: _.uniq(
+        options: _.uniqBy(
           contribsWithEditables
             .map(c => c.editable.tags)
             .filter(x => x)
-            .reduce((pre, cur) => pre.concat(cur))
-            .map(t => ({value: t.code, text: t.code, color: t.color}))
-        ),
+            .reduce((pre, cur) => pre.concat(cur)),
+          'code'
+        ).map(t => ({value: t.code, text: t.code, color: t.color})),
         isMatch: (contrib, selectedOptions) =>
-          contrib.c.editable &&
-          contrib.c.editable.tags &&
+          contrib.c.editable?.tags &&
           selectedOptions.some(tag => contrib.c.editable.tags.map(t => t.code).includes(tag)),
       },
     ],

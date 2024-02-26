@@ -246,15 +246,19 @@ class EditableDumpSchema(EditableSchema):
 class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count', 'tags')
+        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count')
 
     state = EnumField(EditableState)
     editor = fields.Nested(EditingUserSchema)
     timeline_url = fields.String()
-    tags = fields.Method('_get_tags')
 
-    def _get_tags(self, editable):
-        return [EditingTagSchema().dump(t) for t in editable.latest_revision.tags]
+
+class EditableWithTagsSchema(EditableBasicSchema):
+    class Meta(EditableBasicSchema.Meta):
+        model = Editable
+        fields = (*EditableBasicSchema.Meta.fields, 'tags')
+
+    tags = fields.List(fields.Nested(EditingTagSchema), attribute='latest_revision.tags')
 
 
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
@@ -269,7 +273,7 @@ class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
         editable = contribution.get_editable(editable_type)
         if not editable:
             return None
-        return EditableBasicSchema().dump(editable)
+        return EditableWithTagsSchema().dump(editable)
 
 
 class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
