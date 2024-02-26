@@ -79,7 +79,7 @@ class GoogleWalletManager:
         return config.ENABLE_GOOGLE_WALLET and bool(self.settings['google_wallet_mode'])
 
     @property
-    def class_suffix(self):
+    def class_id(self):
         """The unique identifier for an event ticket."""
         return f'TicketClass-{self.event.id}'
 
@@ -127,14 +127,17 @@ class GoogleWalletManager:
         )
         self.http_client = AuthorizedSession(self.credentials)
 
+    def _make_id(self, id):
+        issuer_id = self.settings['google_wallet_issuer_id']
+        return f'{issuer_id}.{id}'
+
     def build_class_data(self) -> dict:
         """This method will return a dict format ticket class template."""
         from indico.modules.categories.controllers.util import make_format_event_date_func
-        issuer_id = self.settings['google_wallet_issuer_id']
         logo_url = (config.ABSOLUTE_LOGO_URL if config.LOGO_URL else
                     f'{config.BASE_URL}{config.IMAGES_BASE_URL}/logo_indico.png')
         data = {
-            'id': f'{issuer_id}.{self.class_suffix}',
+            'id': self._make_id(self.class_id),
             'issuerName': self.settings['google_wallet_issuer_name'],
             'reviewStatus': 'UNDER_REVIEW',
             'eventName': {'defaultValue': {'language': 'en-US', 'value': self.event.title}},
@@ -220,10 +223,9 @@ class GoogleWalletManager:
         """Generate the object data for an individual ticket."""
         from indico.modules.events.registration.util import get_persons, get_ticket_qr_code_data
         qr_data = get_ticket_qr_code_data(get_persons([registration])[0])
-        issuer_id = self.settings['google_wallet_issuer_id']
         data = {
-            'id': f'{issuer_id}.{registration.google_wallet_ticket_id}',
-            'classId': f'{issuer_id}.{self.class_suffix}',
+            'id': self._make_id(registration.google_wallet_ticket_id),
+            'classId': self._make_id(self.class_id),
             'state': 'ACTIVE',
             'barcode': {
                 'type': 'QR_CODE',
@@ -255,12 +257,11 @@ class GoogleWalletManager:
 
         If it already exists nothing is done, unless `update` is specified.
         """
-        issuer_id = self.settings['google_wallet_issuer_id']
-        resp = self.http_client.get(f'{self.class_url}/{issuer_id}.{self.class_suffix}')
+        resp = self.http_client.get(f'{self.class_url}/{self._make_id(self.class_id)}')
         if resp.status_code == 200:
             if update:
                 data = self.build_class_data()
-                resp = self.http_client.put(f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=data)
+                resp = self.http_client.put(f'{self.class_url}/{self._make_id(self.class_id)}', json=data)
                 resp.raise_for_status()
             return resp.json()['id']
         elif resp.status_code != 404:
@@ -280,15 +281,14 @@ class GoogleWalletManager:
         This method fails silently and just logs errors to allow making changes
         to an event even if something fails when making requests to the Wallet API.
         """
-        issuer_id = self.settings['google_wallet_issuer_id']
-        resp = self.http_client.get(f'{self.class_url}/{issuer_id}.{self.class_suffix}')
+        resp = self.http_client.get(f'{self.class_url}/{self._make_id(self.class_id)}')
         if resp.status_code == 404:
             # Nothing to do if the class doesn't exist
             return
         resp.raise_for_status()
         # Update the class
         data = self.build_class_data()
-        resp = self.http_client.patch(f'{self.class_url}/{issuer_id}.{self.class_suffix}', json=data)
+        resp = self.http_client.patch(f'{self.class_url}/{self._make_id(self.class_id)}', json=data)
         resp.raise_for_status()
 
     @handle_http_errors()
@@ -297,13 +297,12 @@ class GoogleWalletManager:
 
         If it already exists nothing is done, unless `update` is specified.
         """
-        object_suffix = registration.google_wallet_ticket_id
-        issuer_id = self.settings['google_wallet_issuer_id']
-        resp = self.http_client.get(f'{self.object_url}/{issuer_id}.{object_suffix}')
+        object_id = registration.google_wallet_ticket_id
+        resp = self.http_client.get(f'{self.object_url}/{self._make_id(object_id)}')
         if resp.status_code == 200:
             if update:
                 data = self.build_ticket_object_data(registration)
-                resp = self.http_client.put(f'{self.object_url}/{issuer_id}.{object_suffix}', json=data)
+                resp = self.http_client.put(f'{self.object_url}/{self._make_id(object_id)}', json=data)
                 resp.raise_for_status()
             return resp.json()['id']
         elif resp.status_code != 404:
@@ -322,16 +321,15 @@ class GoogleWalletManager:
 
         If the object does not exist, no action is performed.
         """
-        issuer_id = self.settings['google_wallet_issuer_id']
-        object_suffix = registration.google_wallet_ticket_id
-        resp = self.http_client.get(f'{self.object_url}/{issuer_id}.{object_suffix}')
+        object_id = registration.google_wallet_ticket_id
+        resp = self.http_client.get(f'{self.object_url}/{self._make_id(object_id)}')
         if resp.status_code == 404:
             # Nothing to do if the object doesn't exist
             return
         resp.raise_for_status()
         # Update the object
         data = self.build_ticket_object_data(registration)
-        resp = self.http_client.put(f'{self.object_url}/{issuer_id}.{object_suffix}', json=data)
+        resp = self.http_client.put(f'{self.object_url}/{self._make_id(object_id)}', json=data)
         resp.raise_for_status()
 
     def get_ticket_link(self, registration) -> str:
