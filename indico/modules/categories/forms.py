@@ -98,7 +98,8 @@ class CategorySettingsForm(IndicoForm):
                                            DataRequired()],
                                           description=_('Issuer ID assigned in the "Google Pay & Wallet" console. '
                                                         'The same Issuer ID must never be used on more than one '
-                                                        'Indico server.'))
+                                                        'Indico server. Changing it will also break updates to '
+                                                        'any existing tickets.'))
 
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
