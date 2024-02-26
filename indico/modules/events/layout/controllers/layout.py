@@ -29,6 +29,7 @@ from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.signing import secure_serializer
 from indico.util.string import crc32
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -248,6 +249,12 @@ class RHLayoutCSSSaveTheme(RHLayoutBase):
 
 class RHLogoDisplay(RHDisplayEventBase):
     def _check_access(self):
+        if (
+            (token := request.args.get('token')) and
+            secure_serializer.loads(token, salt='event-logo-download') == self.event.id
+        ):
+            return
+
         try:
             RHDisplayEventBase._check_access(self)
         except RegistrationRequired:

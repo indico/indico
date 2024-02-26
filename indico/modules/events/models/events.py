@@ -49,6 +49,7 @@ from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _, force_locale, get_all_locales
 from indico.util.iterables import materialize_iterable
+from indico.util.signing import secure_serializer
 from indico.util.string import format_repr, text_to_repr
 from indico.web.flask.util import url_for
 
@@ -521,6 +522,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def external_logo_url(self):
         return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'], _external=True)
+
+    @property
+    def external_signed_logo_url(self):
+        return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'],
+                       token=secure_serializer.dumps(self.id, salt='event-logo-download'), _external=True)
 
     @property
     def participation_regform(self):

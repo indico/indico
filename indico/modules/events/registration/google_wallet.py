@@ -203,11 +203,10 @@ class GoogleWalletManager:
                 }
             }
 
-        # The event logo MUST be reachable by Google, ie the event cannot be restricted
-        if self.event.has_logo and self.event.is_public:
+        if self.event.has_logo:
             data['heroImage'] = {
                 'sourceUri': {
-                    'uri': self.event.external_logo_url
+                    'uri': self.event.external_signed_logo_url
                 }
             }
 
