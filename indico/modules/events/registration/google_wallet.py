@@ -80,7 +80,11 @@ class GoogleWalletManager:
 
     @property
     def class_id(self):
-        """The unique identifier for an event ticket."""
+        """The unique identifier for an event ticket class.
+
+        Each event has one ticket class that holds shared data such as the title
+        and dates of the event.
+        """
         return f'TicketClass-{self.event.id}'
 
     @classmethod
