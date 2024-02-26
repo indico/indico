@@ -98,6 +98,7 @@ Bugfixes
 - Allow setting registration fees larger than 999999.99 (:pr:`6172`)
 - Populate fields such as first and last name from the multipass login provider (e.g. LDAP) during
   sign-up regardless of synchronization settings (:pr:`6182`)
+- Hide redundant affiliations tooltip on the Participant Roles list (:pr:`6201`)
 
 Accessibility
 ^^^^^^^^^^^^^
