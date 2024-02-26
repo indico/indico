@@ -94,8 +94,8 @@ def _format_wallet_mode(mode):
 
 def _log_category_update(category, changes, extra_log_fields):
     if google_wallet_settings := changes.pop('google_wallet_settings', None):
-        google_wallet_keys = ('google_wallet_mode', 'google_wallet_application_credentials',
-                              'google_wallet_issuer_name', 'google_wallet_issuer_id')
+        google_wallet_keys = ('google_wallet_mode', 'google_wallet_credentials', 'google_wallet_issuer_name',
+                              'google_wallet_issuer_id')
         for key in google_wallet_keys:
             old = google_wallet_settings[0].get(key)
             new = google_wallet_settings[1].get(key)
@@ -119,7 +119,7 @@ def _log_category_update(category, changes, extra_log_fields):
         },
         'google_wallet_issuer_id': {'title': 'Google Wallet Issuer ID', 'type': 'string'},
         'google_wallet_issuer_name': {'title': 'Google Wallet Issuer name', 'type': 'string'},
-        'google_wallet_application_credentials': {
+        'google_wallet_credentials': {
             'title': 'Google Wallet credentials',
             'type': 'text',
             'convert': lambda changes: [_format_wallet_credentials(x) for x in changes],

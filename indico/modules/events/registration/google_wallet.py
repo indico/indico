@@ -122,7 +122,7 @@ class GoogleWalletManager:
     def auth(self):
         """Create authenticated HTTP client using a service account file."""
         self.credentials = Credentials.from_service_account_info(
-            self.settings['google_wallet_application_credentials'],
+            self.settings['google_wallet_credentials'],
             scopes=['https://www.googleapis.com/auth/wallet_object.issuer']
         )
         self.http_client = AuthorizedSession(self.credentials)
@@ -348,6 +348,6 @@ class GoogleWalletManager:
                 }]
             }
         }
-        signer = RSASigner.from_service_account_info(self.settings['google_wallet_application_credentials'])
+        signer = RSASigner.from_service_account_info(self.settings['google_wallet_credentials'])
         token = jwt.encode(signer, claims).decode('utf-8')
         return f'https://pay.google.com/gp/v/save/{token}'

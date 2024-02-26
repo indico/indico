@@ -39,8 +39,8 @@ class CategorySettingsForm(IndicoForm):
     BASIC_FIELDS = ('title', 'description', 'timezone', 'lecture_theme', 'meeting_theme', 'visibility',
                     'suggestions_disabled', 'is_flat_view_enabled', 'show_future_months',
                     'event_creation_notification_emails', 'notify_managers')
-    GOOGLE_WALLET_FIELDS = ('google_wallet_mode', 'google_wallet_application_credentials',
-                            'google_wallet_issuer_name', 'google_wallet_issuer_id')
+    GOOGLE_WALLET_FIELDS = ('google_wallet_mode', 'google_wallet_credentials', 'google_wallet_issuer_name',
+                            'google_wallet_issuer_id')
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
@@ -81,14 +81,12 @@ class CategorySettingsForm(IndicoForm):
                                      description=_('The Google Wallet configuration is, by default, inherited from the '
                                                    'parent category. You can also explicitly disable it or provide '
                                                    'your own configuration instead.'))
-    google_wallet_application_credentials = JSONField(_('Google Credentials'),
-                                                      [HiddenUnless('google_wallet_mode', 'enabled',
-                                                                    preserve_data=True),
-                                                       DataRequired()],
-                                                      empty_if_null=True,
-                                                      widget=TextArea(),
-                                                      description=_('JSON key credentials for the Google Service '
-                                                                    'Account'))
+    google_wallet_credentials = JSONField(_('Google Credentials'),
+                                          [HiddenUnless('google_wallet_mode', 'enabled', preserve_data=True),
+                                           DataRequired()],
+                                          empty_if_null=True,
+                                          widget=TextArea(),
+                                          description=_('JSON key credentials for the Google Service Account'))
     google_wallet_issuer_name = StringField(_('Issuer Name'),
                                             [HiddenUnless('google_wallet_mode', 'enabled', preserve_data=True),
                                              DataRequired()],
@@ -131,29 +129,29 @@ class CategorySettingsForm(IndicoForm):
             return form_valid
 
         enabled = self.google_wallet_mode.data == 'enabled'
-        credentials = self.google_wallet_application_credentials.data
+        credentials = self.google_wallet_credentials.data
         issuer_id = self.google_wallet_issuer_id.data
 
         if (
             credentials and
             enabled and (
-                self.category.google_wallet_settings.get('google_wallet_application_credentials') != credentials or
+                self.category.google_wallet_settings.get('google_wallet_credentials') != credentials or
                 self.category.google_wallet_settings.get('google_wallet_issuer_id') != issuer_id
             )
         ):
             res = GoogleWalletManager.verify_credentials(credentials, issuer_id)
             if res == GoogleCredentialValidationResult.invalid:
-                self.google_wallet_application_credentials.errors.append(
+                self.google_wallet_credentials.errors.append(
                     _('The credentials could not be loaded.')
                 )
                 return False
             elif res == GoogleCredentialValidationResult.refused:
-                self.google_wallet_application_credentials.errors.append(
+                self.google_wallet_credentials.errors.append(
                     _('The credentials are invalid or have no access to the Google Wallet API.')
                 )
                 return False
             elif res == GoogleCredentialValidationResult.failed:
-                self.google_wallet_application_credentials.errors.append(
+                self.google_wallet_credentials.errors.append(
                     _('There was an error validating your credentials. Contact your Indico administrator for details.')
                 )
                 return False
