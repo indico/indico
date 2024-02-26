@@ -32,23 +32,8 @@ def _get_font_size(text):
 class RegistrantsListToBadgesPDF(DesignerPDFBase):
     def __init__(self, template, config, event, registrations, include_accompanying_persons):
         super().__init__(template, config)
-        self.persons = []
-        for registration in registrations:
-            self.persons.append({
-                'id': registration.id,
-                'first_name': registration.first_name,
-                'last_name': registration.last_name,
-                'registration': registration,
-                'is_accompanying': False,
-            })
-            if include_accompanying_persons:
-                self.persons.extend({
-                    'id': person['id'],
-                    'first_name': person['firstName'],
-                    'last_name': person['lastName'],
-                    'registration': registration,
-                    'is_accompanying': True,
-                } for person in registration.accompanying_persons)
+        from indico.modules.events.registration.util import get_persons
+        self.persons = get_persons(registrations, include_accompanying_persons)
 
     def _build_config(self, config_data):
         return ConfigData(**config_data)

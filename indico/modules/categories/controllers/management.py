@@ -16,6 +16,7 @@ from sqlalchemy.orm import joinedload, load_only, undefer_group
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.modules.categories import logger
@@ -102,9 +103,14 @@ class RHManageCategoryContent(RHManageCategoryBase):
 
 class RHManageCategorySettings(RHManageCategoryBase):
     def _process(self):
-        defaults = FormDefaults(self.category,
-                                meeting_theme=self.category.default_event_themes['meeting'],
-                                lecture_theme=self.category.default_event_themes['lecture'])
+        kwargs = {
+            'meeting_theme': self.category.default_event_themes['meeting'],
+            'lecture_theme': self.category.default_event_themes['lecture']
+        }
+
+        if config.ENABLE_GOOGLE_WALLET:
+            kwargs |= self.category.google_wallet_settings
+        defaults = FormDefaults(self.category, **kwargs)
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
         logo_form = CategoryLogoForm(obj=self.category)

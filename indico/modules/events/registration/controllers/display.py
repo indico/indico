@@ -481,6 +481,15 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
+class RHTicketGoogleWallet(RHTicketDownload):
+    """Redirect to the Google Wallet page for a registration ticket."""
+
+    def _process(self):
+        if not (url := self.registration.generate_ticket_google_wallet_url()):
+            raise NotFound('Google Wallet tickets are not available')
+        return redirect(url)
+
+
 class RHRegistrationAvatar(RHDisplayEventBase):
     """Display a standard avatar for a registration based on the full name."""
 

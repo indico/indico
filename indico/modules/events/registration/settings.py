@@ -73,3 +73,7 @@ class RegistrationSettingsProxy(EventSettingsProxy):
 
 
 event_badge_settings = EventSettingsProxy('badge', DEFAULT_BADGE_SETTINGS, converters=BADGE_SETTING_CONVERTERS)
+
+event_wallet_settings = EventSettingsProxy('wallet', {
+    'google_wallet_class_id': None,
+})

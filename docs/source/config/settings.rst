@@ -323,6 +323,14 @@ Customization
 
     Default: ``None``
 
+.. data:: WALLET_LOGO_URL
+
+    The URL to a custom logo used in Google Wallet tickets.  If unset, a compact
+    version of the default Indico logo is used.  The URL must publicly accessible
+    from the Internet and changes typically do not affect existing tickets.
+
+    Default: ``None``
+
 .. data:: CUSTOM_COUNTRIES
 
     A dict with country name overrides.  This can be useful if the official
@@ -871,6 +879,12 @@ System
 .. data:: ENABLE_ROOMBOOKING
 
     Whether to enable the room booking system.
+
+    Default: ``False``
+
+.. data:: ENABLE_GOOGLE_WALLET
+
+    Whether to enable the Google Wallet integration for event tickets.
 
     Default: ``False``
 

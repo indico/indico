@@ -16,6 +16,7 @@ from indico.modules.categories.util import format_visibility
 from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.signals import make_interceptable
+from indico.util.string import crc32
 
 
 def create_category(parent, data):
@@ -76,7 +77,21 @@ def update_category_protection(category, data, *, _extra_log_fields=None):
                      data={'Changes': make_diff_log(changes, log_fields)})
 
 
+def _format_wallet_credentials(credentials):
+    if not credentials:
+        return '{}'
+    keyhash = crc32(credentials.get('private_key') or '')
+    return repr({**credentials, 'private_key': f'<hidden:{keyhash}>'})
+
+
 def _log_category_update(category, changes, extra_log_fields):
+    if google_wallet_settings := changes.pop('google_wallet_settings', None):
+        google_wallet_keys = ('google_wallet_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
+        for key in google_wallet_keys:
+            old = google_wallet_settings[0].get(key)
+            new = google_wallet_settings[1].get(key)
+            if old != new:
+                changes[key] = (old, new)
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
         'description': 'Description',
@@ -88,6 +103,14 @@ def _log_category_update(category, changes, extra_log_fields):
         'event_message': 'Event header message',
         'notify_managers': 'Notify managers about event creation',
         'event_creation_notification_emails': 'Event creation notification emails',
+        'google_wallet_mode': 'Google Wallet mode',
+        'google_wallet_issuer_id': {'title': 'Google Wallet Issuer ID', 'type': 'string'},
+        'google_wallet_issuer_name': {'title': 'Google Wallet Issuer name', 'type': 'string'},
+        'google_wallet_credentials': {
+            'title': 'Google Wallet credentials',
+            'type': 'text',
+            'convert': lambda changes: [_format_wallet_credentials(x) for x in changes],
+        },
         **(extra_log_fields or {})
     }
     if changes:

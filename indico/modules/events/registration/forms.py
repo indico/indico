@@ -307,6 +307,12 @@ class EmailRegistrantsForm(IndicoForm):
 class TicketsForm(IndicoForm):
     tickets_enabled = BooleanField(_('Enable Tickets'), widget=SwitchWidget(),
                                    description=_('Create tickets for registrations using this registration form.'))
+    ticket_google_wallet = BooleanField(_('Export to Google Wallet'), [HiddenUnless('tickets_enabled',
+                                                                                    preserve_data=True)],
+                                        widget=SwitchWidget(),
+                                        description=_('Allow users to export their ticket to Google Wallet. '
+                                                      'This currently does not support tickets for accompanying '
+                                                      'persons.'))
     ticket_on_email = BooleanField(_('Send with an e-mail'), [HiddenUnless('tickets_enabled',
                                                                            preserve_data=True)],
                                    widget=SwitchWidget(),
@@ -332,8 +338,7 @@ class TicketsForm(IndicoForm):
     ticket_template_id = SelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
                                                             Optional()], coerce=int)
 
-    def __init__(self, *args, **kwargs):
-        event = kwargs.pop('event')
+    def __init__(self, *args, event, regform, **kwargs):
         super().__init__(*args, **kwargs)
         default_tpl = get_default_ticket_on_category(event.category)
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
@@ -342,6 +347,8 @@ class TicketsForm(IndicoForm):
         # Show the default template first
         badge_templates.insert(0, (default_tpl.id, '{} ({})'.format(default_tpl.title, _('Default category template'))))
         self.ticket_template_id.choices = badge_templates
+        if not regform.is_google_wallet_configured:
+            del self.ticket_google_wallet
 
 
 class ParticipantsDisplayForm(IndicoForm):

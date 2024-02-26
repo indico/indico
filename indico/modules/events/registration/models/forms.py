@@ -16,6 +16,7 @@ from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -226,6 +227,12 @@ class RegistrationForm(db.Model):
     )
     #: Whether tickets are enabled for this form
     tickets_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Whether to allow exporting tickets to Google Wallet
+    ticket_google_wallet = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -524,6 +531,16 @@ class RegistrationForm(db.Model):
         """Get the current ticket template or, if not set, the default category one."""
         from indico.modules.designer.util import get_default_ticket_on_category
         return self.ticket_template or get_default_ticket_on_category(self.event.category)
+
+    @property
+    def is_google_wallet_configured(self):
+        if not config.ENABLE_GOOGLE_WALLET or self.event.is_unlisted:
+            return False
+        return self.event.category.effective_google_wallet_config is not None
+
+    @property
+    def is_google_wallet_available(self):
+        return self.ticket_google_wallet and self.is_google_wallet_configured
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')

@@ -43,6 +43,8 @@ brotli==1.1.0
     # via fonttools
 cachelib==0.9.0
     # via flask-caching
+cachetools==5.3.2
+    # via google-auth
 captcha==0.5.0
     # via -r requirements.in
 celery==5.3.5
@@ -141,6 +143,8 @@ flask-wtf==1.2.1
     # via -r requirements.in
 fonttools==4.45.0
     # via weasyprint
+google-auth==2.28.1
+    # via -r requirements.in
 greenlet==3.0.1
     # via sqlalchemy
 hiredis==2.2.3
@@ -267,6 +271,12 @@ pure-eval==0.2.2
     # via
     #   sentry-sdk
     #   stack-data
+pyasn1==0.5.1
+    # via
+    #   pyasn1-modules
+    #   rsa
+pyasn1-modules==0.3.0
+    # via google-auth
 pycountry==22.3.5
     # via -r requirements.in
 pycparser==2.21
@@ -326,6 +336,8 @@ rpds-py==0.12.0
     # via
     #   jsonschema
     #   referencing
+rsa==4.9
+    # via google-auth
 sentry-sdk==1.35.0
     # via -r requirements.in
 simplejson==3.19.2

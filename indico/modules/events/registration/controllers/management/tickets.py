@@ -38,7 +38,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
     """Display and modify ticket settings."""
 
     def _process(self):
-        form = TicketsForm(obj=self.regform, event=self.event)
+        form = TicketsForm(obj=self.regform, regform=self.regform, event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()

@@ -12,7 +12,7 @@ import re
 import socket
 import warnings
 from datetime import timedelta
-from urllib.parse import urlsplit
+from urllib.parse import urljoin, urlsplit
 
 import pytz
 from celery.schedules import crontab
@@ -48,6 +48,7 @@ DEFAULTS = {
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
     'EMAIL_BACKEND': 'indico.vendor.django_mail.backends.smtp.EmailBackend',
+    'ENABLE_GOOGLE_WALLET': False,
     'ENABLE_ROOMBOOKING': False,
     'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
@@ -103,6 +104,7 @@ DEFAULTS = {
     'SYSTEM_NOTICES_URL': 'https://getindico.io/notices.yml',
     'TEMP_DIR': '/opt/indico/tmp',
     'USE_PROXY': False,
+    'WALLET_LOGO_URL': None,
     'WORKER_NAME': socket.getfqdn(),
     'XELATEX_PATH': None,
 }
@@ -267,6 +269,14 @@ class IndicoConfig:
     @property
     def LATEX_ENABLED(self):
         return bool(self.XELATEX_PATH)
+
+    @property
+    def ABSOLUTE_LOGO_URL(self):
+        return urljoin(self.BASE_URL, self.LOGO_URL) if self.LOGO_URL else None
+
+    @property
+    def ABSOLUTE_WALLET_LOGO_URL(self):
+        return urljoin(self.BASE_URL, self.WALLET_LOGO_URL) if self.WALLET_LOGO_URL else None
 
     def validate(self):
         from indico.core.auth import login_rate_limiter

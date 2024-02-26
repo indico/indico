@@ -8,6 +8,7 @@
 from flask import flash, render_template, session
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
@@ -15,6 +16,7 @@ from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.models.events import EventType
+from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.logging import connect_log_signals
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
 from indico.util.i18n import _, ngettext
@@ -240,3 +242,29 @@ class RegistrationPermission(ManagementPermission):
     friendly_name = _('Registration')
     description = _('Grants management access to the registration form.')
     user_selectable = True
+
+
+@signals.event.updated.connect
+def _patch_google_wallet_class(event, changes, **kwargs):
+    if not config.ENABLE_GOOGLE_WALLET:
+        return
+    wallet_fields = {'title', 'start_dt', 'end_dt', 'location_data'}
+    if set(changes) & wallet_fields and GoogleWalletManager.event_uses_google_wallet_tickets(event):
+        gwm = GoogleWalletManager(event)
+        if gwm.configured:
+            gwm.patch_ticket_class()
+
+
+@signals.event.registration_personal_data_modified.connect
+def _patch_google_wallet_ticket(registration, change, **kwargs):
+    if not config.ENABLE_GOOGLE_WALLET:
+        return
+    wallet_fields = {'first_name', 'last_name', 'email'}
+    if (
+        set(change) & wallet_fields and
+        GoogleWalletManager.event_uses_google_wallet_tickets(registration.event) and
+        registration.registration_form.ticket_google_wallet
+    ):
+        gwm = GoogleWalletManager(registration.event)
+        if gwm.configured:
+            gwm.patch_ticket_object(registration)

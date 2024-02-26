@@ -63,6 +63,23 @@ class EventCreationMode(RichIntEnum):
     open = 3
 
 
+class InheritableConfigMode(RichIntEnum):
+    __titles__ = [
+        _('Disabled: Ignore any inherited configuration'),
+        _('Enabled: Use configuration from this category'),
+        _('Inheriting: Use configuration from parent category'),
+    ]
+    disabled = 0
+    enabled = 1
+    inheriting = 2
+
+    @classmethod
+    def get_form_field_titles(cls, parent_configured):
+        if parent_configured:
+            return cls.__titles__
+        return [*cls.__titles__[:2], _('Inheriting: Disabled (not configured on any parent category)')]
+
+
 class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, AttachedItemsMixin, db.Model):
     """An Indico category."""
 
@@ -84,7 +101,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 db.CheckConstraint('(id != 0) OR NOT is_deleted', 'root_not_deleted'),
                 db.CheckConstraint(f'(id != 0) OR (protection_mode != {ProtectionMode.inheriting})',
                                    'root_not_inheriting'),
+                db.CheckConstraint(f'(id != 0) OR (google_wallet_mode != {InheritableConfigMode.inheriting})',
+                                   'root_not_inheriting_gw_mode'),
                 db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
+                db.CheckConstraint(f'(google_wallet_mode != {InheritableConfigMode.enabled}) OR '
+                                   "(google_wallet_settings != '{}'::jsonb)",
+                                   'gw_configured_if_enabled'),
                 {'schema': 'categories'})
 
     @declared_attr
@@ -179,6 +201,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         db.Integer,
         nullable=False,
         default=0
+    )
+    google_wallet_mode = db.Column(
+        PyIntEnum(InheritableConfigMode),
+        nullable=False,
+        default=InheritableConfigMode.inheriting,
+    )
+    google_wallet_settings = db.Column(
+        JSONB,
+        nullable=False,
+        default={}
     )
     is_flat_view_enabled = db.Column(
         db.Boolean,
@@ -452,6 +484,20 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                      .where(cat_alias.parent_id == cte_query.c.id))
         return cte_query.union_all(rec_query)
 
+    @classmethod
+    def get_google_wallet_config_cte(cls):
+        cat_alias: Category = db.aliased(cls)
+        cte_query = (select([cat_alias.id, cat_alias.google_wallet_mode, cat_alias.google_wallet_settings])
+                     .where(cat_alias.parent_id.is_(None))
+                     .cte(recursive=True))
+        rec_query = (select([cat_alias.id,
+                             db.case({InheritableConfigMode.inheriting.value: cte_query.c.google_wallet_mode},
+                                     else_=cat_alias.google_wallet_mode, value=cat_alias.google_wallet_mode),
+                             db.case({InheritableConfigMode.inheriting.value: cte_query.c.google_wallet_settings},
+                                     else_=cat_alias.google_wallet_settings, value=cat_alias.google_wallet_mode)])
+                     .where(cat_alias.parent_id == cte_query.c.id))
+        return cte_query.union_all(rec_query)
+
     @property
     def deep_children_query(self):
         """Get a query object for all subcategories.
@@ -624,6 +670,15 @@ def _mappers_configured():
     cte = Category.get_protection_cte()
     query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery()
     Category.effective_protection_mode = column_property(query, deferred=True, expire_on_flush=False)
+
+    # Category.effective_google_wallet_config -- the effective google wallet config
+    # of the category, even if it's inheriting it from its parent category
+    cte = Category.get_google_wallet_config_cte()
+    query = (select([db.case({InheritableConfigMode.disabled: None},
+                             else_=cte.c.google_wallet_settings,
+                             value=cte.c.google_wallet_mode)])
+             .where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery())
+    Category.effective_google_wallet_config = column_property(query, deferred=True, expire_on_flush=False)
 
     # Category.effective_icon_data -- the effective icon data of the category,
     # either set on the category itself or inherited from it

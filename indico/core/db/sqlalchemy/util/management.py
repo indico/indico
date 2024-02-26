@@ -106,6 +106,7 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
     """Create all tables and required initial objects."""
     from indico.core.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.categories import Category
+    from indico.modules.categories.models.categories import InheritableConfigMode
     from indico.modules.designer import TemplateType
     from indico.modules.designer.models.templates import DesignerTemplate
     from indico.modules.users import User
@@ -118,7 +119,8 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
         db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
         if verbose:
             click.secho('Creating root category', fg='green')
-        cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public)
+        cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public,
+                       google_wallet_mode=InheritableConfigMode.disabled)
         db.session.add(cat)
         db.session.flush()
         if verbose:

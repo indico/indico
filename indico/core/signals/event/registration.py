@@ -129,3 +129,15 @@ Called when composing the list of menu items to be displayed under the "Actions"
 at the top of the list of registrants/participants. The `sender` is the corresponding
 registration form.
 ''')
+
+google_wallet_ticket_class_data = _signals.signal('google-wallet-ticket-class-data', '''
+Called when data for a Google Wallet ticket class has been generated. The `sender` is the
+`Event` object, the `data` kwarg contains the data that will be passed to the Google
+Wallet API.
+''')
+
+google_wallet_ticket_object_data = _signals.signal('google-wallet-ticket-object-data', '''
+Called when data for a Google Wallet ticket object has been generated. The `sender` is the
+`Registration` object, the `data` kwarg contains the data that will be passed to the Google
+Wallet API.
+''')
