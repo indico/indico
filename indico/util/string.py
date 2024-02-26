@@ -33,25 +33,49 @@ from sqlalchemy import ForeignKeyConstraint, inspect
 
 
 # basic list of tags, used for markdown content
-BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS | {
+if ( int(bleach.__version__[0]) > 5 ):
+ BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS | {
     'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
     'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote'
-}
+ }
+else:
+ BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
+    'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
+    'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote'
+ ]
+ 
 BLEACH_ALLOWED_ATTRIBUTES = {**bleach.ALLOWED_ATTRIBUTES, 'img': ['src', 'alt', 'style']}
 # extended list of tags, used for HTML content
-BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS | {
+if ( int(bleach.__version__[0]) > 5 ):
+ BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS | {
     'address', 'area', 'bdo', 'big', 'caption', 'center', 'cite', 'col', 'colgroup', 'del', 'dfn', 'dir', 'div',
     'fieldset', 'font', 'ins', 'kbd', 'legend', 'map', 'menu', 'q', 's', 'samp', 'span', 'strike', 'tfoot', 'tt', 'u',
     'var'
-}
+ }
+else:
+ BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS + [
+    'address', 'area', 'bdo', 'big', 'caption', 'center', 'cite', 'col', 'colgroup', 'del', 'dfn', 'dir', 'div',
+    'fieldset', 'font', 'ins', 'kbd', 'legend', 'map', 'menu', 'q', 's', 'samp', 'span', 'strike', 'tfoot', 'tt', 'u',
+    'var'
+ ]
+
 # yuck, this is ugly, but all these attributes were allowed in legacy...
-BLEACH_ALLOWED_ATTRIBUTES_HTML = BLEACH_ALLOWED_ATTRIBUTES | {'*': [
+if ( int(bleach.__version__[0]) > 5 ):
+ BLEACH_ALLOWED_ATTRIBUTES_HTML = BLEACH_ALLOWED_ATTRIBUTES | {'*': [
     'align', 'abbr', 'alt', 'border', 'bgcolor', 'class', 'cellpadding', 'cellspacing', 'color', 'char', 'charoff',
     'cite', 'clear', 'colspan', 'compact', 'dir', 'disabled', 'face', 'href', 'height', 'headers', 'hreflang', 'hspace',
     'id', 'ismap', 'lang', 'name', 'noshade', 'nowrap', 'rel', 'rev', 'rowspan', 'rules', 'size', 'scope', 'shape',
     'span', 'src', 'start', 'style', 'summary', 'tabindex', 'target', 'title', 'type', 'valign', 'value', 'vspace',
     'width', 'wrap'
-], 'img': [*BLEACH_ALLOWED_ATTRIBUTES['img'], 'usemap'], 'area': ['coords']}
+ ], 'img': [*BLEACH_ALLOWED_ATTRIBUTES['img'], 'usemap'], 'area': ['coords']}
+else:
+ BLEACH_ALLOWED_ATTRIBUTES_HTML = BLEACH_ALLOWED_ATTRIBUTES | {'*': [
+    'align', 'abbr', 'alt', 'border', 'bgcolor', 'class', 'cellpadding', 'cellspacing', 'color', 'char', 'charoff',
+    'cite', 'clear', 'colspan', 'compact', 'dir', 'disabled', 'face', 'href', 'height', 'headers', 'hreflang', 'hspace',
+    'id', 'ismap', 'lang', 'name', 'noshade', 'nowrap', 'rel', 'rev', 'rowspan', 'rules', 'size', 'scope', 'shape',
+    'span', 'src', 'start', 'style', 'summary', 'tabindex', 'target', 'title', 'type', 'valign', 'value', 'vspace',
+    'width', 'wrap'
+ ], 'img': [*BLEACH_ALLOWED_ATTRIBUTES['img'], 'usemap'], 'area': ['coords']}
 BLEACH_ALLOWED_STYLES_HTML = [
     'background-color', 'border-top-color', 'border-top-style', 'border-top-width', 'border-top', 'border-right-color',
     'border-right-style', 'border-right-width', 'border-right', 'border-bottom-color', 'border-bottom-style',
