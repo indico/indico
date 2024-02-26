@@ -1,3 +1,5 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro with_default(content='') %}
     {% set content = (caller() if caller is defined else content) | trim %}
     {%- if content -%}
@@ -99,7 +101,7 @@
 {% endmacro %}
 
 
-{% macro render_section_location(event, with_container=true) %}
+{% macro render_section_location(event, wallet_location_warning, with_container=true) %}
     {% call render_section(event, 'location', 'icon-location', '.edit_location', _('Edit event location'),
                            with_container=with_container) %}
         <dl class="i-data-list">
@@ -115,6 +117,17 @@
             <dt>{% trans %}Map URL{% endtrans %}</dt>
             <dd class="break-word">{{ with_default(event.map_url) }}</dd>
         </dl>
+
+        {% if wallet_location_warning %}
+            <br>
+            {% call message_box('warning') %}
+                {% trans %}
+                    Google Wallet ticketing is enabled in this event and you specified a venue/room or address, but
+                    not both. For the ticket in Google Wallet to display information about the event's physical
+                    location you need to fill in both fields.
+                {% endtrans %}
+            {% endcall %}
+        {% endif %}
     {% endcall %}
 
 {% endmacro %}
@@ -264,7 +277,7 @@
 {% endmacro %}
 
 
-{% macro render_event_settings(event, has_reference_types, has_event_labels, section=none, with_container=true) %}
+{% macro render_event_settings(event, has_reference_types, has_event_labels, wallet_location_warning, section=none, with_container=true) %}
     {% if section is none or section == 'data' %}
         {{ render_section_data(event, with_container=with_container) }}
     {% endif %}
@@ -272,7 +285,7 @@
         {{ render_section_dates(event, with_container=with_container) }}
     {% endif %}
     {% if section is none or section == 'location' %}
-        {{ render_section_location(event, with_container=with_container) }}
+        {{ render_section_location(event, wallet_location_warning, with_container=with_container) }}
     {% endif %}
     {% if section is none or section == 'persons' %}
         {{ render_section_persons(event, with_container=with_container) }}

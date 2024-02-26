@@ -21,6 +21,7 @@ from indico.modules.events.management.views import WPEventSettings, render_event
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -30,6 +31,12 @@ from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+
+
+def _show_wallet_location_warning(event):
+    if bool(event.address) == event.has_location_info:
+        return False
+    return RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_google_wallet).has_rows()
 
 
 class RHEventSettings(RHManageEventBase):
@@ -73,7 +80,8 @@ class RHEventSettings(RHManageEventBase):
                                                show_booking_warning=show_booking_warning,
                                                show_draft_warning=should_show_draft_warning(self.event),
                                                has_reference_types=has_reference_types,
-                                               has_event_labels=has_event_labels)
+                                               has_event_labels=has_event_labels,
+                                               wallet_location_warning=_show_wallet_location_warning(self.event))
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -88,7 +96,8 @@ class RHEditEventDataBase(RHManageEventBase):
         assert self.section_name
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
-        return tpl.render_event_settings(self.event, has_reference_types, has_event_labels,
+        wallet_location_warning = _show_wallet_location_warning(self.event)
+        return tpl.render_event_settings(self.event, has_reference_types, has_event_labels, wallet_location_warning,
                                          section=self.section_name, with_container=False)
 
     def jsonify_success(self):
