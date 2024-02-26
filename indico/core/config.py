@@ -104,6 +104,7 @@ DEFAULTS = {
     'SYSTEM_NOTICES_URL': 'https://getindico.io/notices.yml',
     'TEMP_DIR': '/opt/indico/tmp',
     'USE_PROXY': False,
+    'WALLET_LOGO_URL': None,
     'WORKER_NAME': socket.getfqdn(),
     'XELATEX_PATH': None,
 }
@@ -272,6 +273,10 @@ class IndicoConfig:
     @property
     def ABSOLUTE_LOGO_URL(self):
         return urljoin(self.BASE_URL, self.LOGO_URL) if self.LOGO_URL else None
+
+    @property
+    def ABSOLUTE_WALLET_LOGO_URL(self):
+        return urljoin(self.BASE_URL, self.WALLET_LOGO_URL) if self.WALLET_LOGO_URL else None
 
     def validate(self):
         from indico.core.auth import login_rate_limiter
