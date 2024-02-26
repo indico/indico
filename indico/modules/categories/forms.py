@@ -93,11 +93,14 @@ class CategorySettingsForm(IndicoForm):
                                             [HiddenUnless('google_wallet_mode', 'enabled', preserve_data=True),
                                              DataRequired()],
                                             description=_('Issuer name that will appear in the Google Wallet ticket '
-                                                          'top header.'))
+                                                          'top header. Google recommends a maximum length of 20 chars '
+                                                          'to ensure readability on all devices.'))
     google_wallet_issuer_id = StringField(_('Issuer ID'),
                                           [HiddenUnless('google_wallet_mode', 'enabled', preserve_data=True),
                                            DataRequired()],
-                                          description=_('Issuer ID assigned in the "Google Pay & Wallet" console.'))
+                                          description=_('Issuer ID assigned in the "Google Pay & Wallet" console. '
+                                                        'The same Issuer ID must never be used on more than one '
+                                                        'Indico server.'))
 
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
