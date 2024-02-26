@@ -67,7 +67,7 @@ class GoogleWalletManager:
 
     def __init__(self, event):
         self.event = event
-        self.settings = self.event.category.effective_google_wallet_config
+        self.settings = self.event.category.effective_google_wallet_config if not self.event.is_unlisted else None
         self.credentials, self.http_client = self._load_credentials()
 
     def _load_credentials(self):
