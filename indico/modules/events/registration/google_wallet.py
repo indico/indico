@@ -92,6 +92,8 @@ class GoogleWalletManager:
         Each event has one ticket class that holds shared data such as the title
         and dates of the event.
         """
+        # If we have an ID stored we use that one. It should always be identical to the default,
+        # unless we ever have to change the default for some reason...
         return event_wallet_settings.get(self.event, 'google_wallet_class_id', f'Indico-Event-{self.event.id}')
 
     @classmethod
