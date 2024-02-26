@@ -536,7 +536,7 @@ class RegistrationForm(db.Model):
     @property
     def is_google_wallet_configured(self):
         return (config.ENABLE_GOOGLE_WALLET and
-                GoogleWalletManager.get_google_wallet_settings(self.event.category)['google_wallet_mode'])
+                GoogleWalletManager.get_google_wallet_settings(self.event.category) is not None)
 
     @property
     def is_google_wallet_available(self):

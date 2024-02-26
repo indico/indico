@@ -84,18 +84,9 @@ def _format_wallet_credentials(credentials):
     return repr({**credentials, 'private_key': f'<hidden:{keyhash}>'})
 
 
-def _format_wallet_mode(mode):
-    return {
-        None: 'Inheriting',
-        False: 'Disabled',
-        True: 'Enabled',
-    }[mode]
-
-
 def _log_category_update(category, changes, extra_log_fields):
     if google_wallet_settings := changes.pop('google_wallet_settings', None):
-        google_wallet_keys = ('google_wallet_mode', 'google_wallet_credentials', 'google_wallet_issuer_name',
-                              'google_wallet_issuer_id')
+        google_wallet_keys = ('google_wallet_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
         for key in google_wallet_keys:
             old = google_wallet_settings[0].get(key)
             new = google_wallet_settings[1].get(key)
@@ -112,11 +103,7 @@ def _log_category_update(category, changes, extra_log_fields):
         'event_message': 'Event header message',
         'notify_managers': 'Notify managers about event creation',
         'event_creation_notification_emails': 'Event creation notification emails',
-        'google_wallet_mode': {
-            'title': 'Google Wallet mode',
-            'type': 'string',
-            'convert': lambda changes: [_format_wallet_mode(x) for x in changes],
-        },
+        'google_wallet_mode': 'Google Wallet mode',
         'google_wallet_issuer_id': {'title': 'Google Wallet Issuer ID', 'type': 'string'},
         'google_wallet_issuer_name': {'title': 'Google Wallet Issuer name', 'type': 'string'},
         'google_wallet_credentials': {

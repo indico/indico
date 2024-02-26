@@ -63,6 +63,23 @@ class EventCreationMode(RichIntEnum):
     open = 3
 
 
+class InheritableConfigMode(RichIntEnum):
+    __titles__ = [
+        _('Disabled: Ignore any inherited configuration'),
+        _('Enabled: Use configuration from this category'),
+        _('Inheriting: Use configuration from parent category'),
+    ]
+    disabled = 0
+    enabled = 1
+    inheriting = 2
+
+    @classmethod
+    def get_form_field_titles(cls, parent_configured):
+        if parent_configured:
+            return cls.__titles__
+        return [*cls.__titles__[:2], _('Inheriting: Disabled (not configured on any parent category)')]
+
+
 class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, AttachedItemsMixin, db.Model):
     """An Indico category."""
 
@@ -84,7 +101,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                 db.CheckConstraint('(id != 0) OR NOT is_deleted', 'root_not_deleted'),
                 db.CheckConstraint(f'(id != 0) OR (protection_mode != {ProtectionMode.inheriting})',
                                    'root_not_inheriting'),
+                db.CheckConstraint(f'(id != 0) OR (google_wallet_mode != {InheritableConfigMode.inheriting})',
+                                   'root_not_inheriting_gw_mode'),
                 db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
+                db.CheckConstraint(f'(google_wallet_mode != {InheritableConfigMode.enabled}) OR '
+                                   "(google_wallet_settings != '{}'::jsonb)",
+                                   'gw_configured_if_enabled'),
                 {'schema': 'categories'})
 
     @declared_attr
@@ -179,6 +201,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         db.Integer,
         nullable=False,
         default=0
+    )
+    google_wallet_mode = db.Column(
+        PyIntEnum(InheritableConfigMode),
+        nullable=False,
+        default=InheritableConfigMode.inheriting,
     )
     google_wallet_settings = db.Column(
         JSONB,

@@ -110,12 +110,6 @@ class RHManageCategorySettings(RHManageCategoryBase):
 
         if config.ENABLE_GOOGLE_WALLET:
             kwargs |= self.category.google_wallet_settings
-            # TODO: replace with match block once we dropped Python 3.9 support
-            kwargs['google_wallet_mode'] = {
-                True: 'enabled',
-                False: 'disabled',
-                None: 'inheriting',
-            }[kwargs.pop('google_wallet_mode', None)]
         defaults = FormDefaults(self.category, **kwargs)
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
