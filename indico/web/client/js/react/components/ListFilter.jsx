@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Icon, Input, Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -54,50 +54,41 @@ export default function ListFilter({
   const [internalFilters, setInternalFilters] = useState({});
   const [internalSearchText, setInternalSearchText] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState(-1);
-  const [loadedFilters, setLoadedFilters] = useState(false);
   const filters = onChangeFilters ? externalFilters : internalFilters;
   const searchText = onChangeSearchText ? externalSearchText : internalSearchText;
-  const optionsMap = useMemo(() => new Map(filterOptions.map(o => [o.key, o])), [filterOptions]);
+  const optionsMap = new Map(filterOptions.map(o => [o.key, o]));
 
-  const matchFilters = useCallback(
-    (value, e) =>
-      filterOptions.every(
-        ({key, isMatch}) => !value[key] || !isMatch || isMatch(e, Object.keys(value[key] || {}))
-      ),
-    [filterOptions]
-  );
+  const matchFilters = (value, e) =>
+    filterOptions.every(
+      ({key, isMatch}) => !value[key] || !isMatch || isMatch(e, Object.keys(value[key] || {}))
+    );
 
-  const matchSearch = useCallback(
-    (value, e) => {
-      if (!value) {
-        return true;
+  const matchSearch = (value, e) => {
+    if (!value) {
+      return true;
+    }
+    if (searchableId) {
+      const match = value.match(/^#(\d+)$/);
+      if (match) {
+        return searchableId(e) === +match[1];
       }
-      if (searchableId) {
-        const match = value.match(/^#(\d+)$/);
-        if (match) {
-          return searchableId(e) === +match[1];
-        }
-      }
-      return (
-        !searchableFields ||
-        searchableFields(e).some(f => f.toLowerCase().includes(value.toLowerCase()))
-      );
-    },
-    [searchableId, searchableFields]
-  );
+    }
+    return (
+      !searchableFields ||
+      searchableFields(e).some(f => f.toLowerCase().includes(value.toLowerCase()))
+    );
+  };
 
-  const setFilters = useCallback(
-    value => {
-      if (onChangeFilters) {
-        onChangeFilters(value);
-        return;
-      }
-      setInternalFilters(value);
-      const filtered = list.filter(e => matchFilters(value, e) && matchSearch(searchText, e));
-      onChangeList(new Set(filtered.map(e => e.id)));
-    },
-    [onChangeFilters, onChangeList, list, matchFilters, matchSearch, searchText]
-  );
+  const setFilters = value => {
+    localStorage.setItem(name, JSON.stringify(value));
+    if (onChangeFilters) {
+      onChangeFilters(value);
+      return;
+    }
+    setInternalFilters(value);
+    const filtered = list.filter(e => matchFilters(value, e) && matchSearch(searchText, e));
+    onChangeList(new Set(filtered.map(e => e.id)));
+  };
 
   const getLabelOpts = color => {
     if (color === 'default') {
@@ -108,19 +99,16 @@ export default function ListFilter({
     return null;
   };
 
-  const setSearchText = useCallback(
-    value => {
-      if (onChangeSearchText) {
-        onChangeSearchText(value);
-        return;
-      }
-      setInternalSearchText(value);
-      value = value.toLowerCase().trim();
-      const filtered = list.filter(e => matchFilters(filters, e) && matchSearch(value, e));
-      onChangeList(new Set(filtered.map(e => e.id)));
-    },
-    [onChangeSearchText, onChangeList, list, matchFilters, matchSearch, filters]
-  );
+  const setSearchText = value => {
+    if (onChangeSearchText) {
+      onChangeSearchText(value);
+      return;
+    }
+    setInternalSearchText(value);
+    value = value.toLowerCase().trim();
+    const filtered = list.filter(e => matchFilters(filters, e) && matchSearch(value, e));
+    onChangeList(new Set(filtered.map(e => e.id)));
+  };
 
   const toggleFilter = (filterKey, optionValue) => {
     const optionObject = optionsMap.get(filterKey).options.find(x => x.value === optionValue);
@@ -141,19 +129,12 @@ export default function ListFilter({
     setFilters({...filters, [filterKey]: selectedOptions});
   };
 
-  // store filters in the local storage
+  // get filters from the local storage
   useEffect(() => {
-    if (loadedFilters) {
-      localStorage.setItem(name, JSON.stringify({filters, searchText}));
-      return;
-    }
-    const storedFilters = JSON.parse(localStorage.getItem(name));
-    if (storedFilters) {
-      setFilters(_.pickBy(storedFilters.filters, (__, key) => optionsMap.has(key)));
-      setSearchText(storedFilters.searchText);
-    }
-    setLoadedFilters(true);
-  }, [filters, loadedFilters, name, optionsMap, searchText, setFilters, setSearchText]);
+    const storedFilters = JSON.parse(localStorage.getItem(name)) || {};
+    setFilters(_.pickBy(storedFilters, (__, key) => optionsMap.has(key)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div styleName="filters-container">
@@ -165,7 +146,6 @@ export default function ListFilter({
         button
         className={Object.keys(filters).length > 0 ? 'orange icon' : 'icon'}
         onClose={() => setOpenSubmenu(-1)}
-        loading={!loadedFilters || filterOptions.length === 0}
       >
         <Dropdown.Menu styleName="filters-menu">
           {Object.keys(filters).length > 0 ? (

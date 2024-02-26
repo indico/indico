@@ -11,7 +11,7 @@ import editableListURL from 'indico-url:event_editing.api_filter_editables_by_fi
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
+import React, {useState, useMemo, useRef} from 'react';
 import {useHistory} from 'react-router-dom';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
 
@@ -72,25 +72,19 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
   };
 
-  const getEditables = useCallback(
-    async _filters => {
-      let response;
-      try {
-        response = await indicoAxios.post(
-          editableListURL({event_id: eventId, type: editableType}),
-          {
-            extensions: _.pickBy(_filters, x => Array.isArray(x)),
-            has_files: _.pickBy(_filters, x => !Array.isArray(x)),
-          }
-        );
-      } catch (e) {
-        handleAxiosError(e);
-        return;
-      }
-      return camelizeKeys(response.data);
-    },
-    [eventId, editableType]
-  );
+  const getEditables = async _filters => {
+    let response;
+    try {
+      response = await indicoAxios.post(editableListURL({event_id: eventId, type: editableType}), {
+        extensions: _.pickBy(_filters, x => Array.isArray(x)),
+        has_files: _.pickBy(_filters, x => !Array.isArray(x)),
+      });
+    } catch (e) {
+      handleAxiosError(e);
+      return;
+    }
+    return camelizeKeys(response.data);
+  };
 
   const filterOptions = useMemo(
     () => [
@@ -192,17 +186,6 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
       history.push(selectedEditable.timelineURL);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      setSelectedEditable(null);
-      setLoading(true);
-      const _editables = await getEditables();
-      setEditables(_editables);
-      _setFilteredSet(new Set(_editables.map(e => e.id)));
-      setLoading(false);
-    })();
-  }, [eventId, editableType, getEditables]);
 
   return (
     <Modal onClose={onClose} closeOnDimmerClick={false} open>
