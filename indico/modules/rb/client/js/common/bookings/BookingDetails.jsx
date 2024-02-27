@@ -33,7 +33,7 @@ import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {toMoment, serializeDate} from 'indico/utils/date';
-import {renderPluginComponents} from "indico/utils/plugins";
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {openModal} from '../../actions';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
