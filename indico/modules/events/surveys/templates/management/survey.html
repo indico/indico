@@ -96,7 +96,7 @@
             </div>
             <div class="toolbar">
                 <div id="email-submission-container" class="i-button-wrapper" data-event-id="{{ event.id }}"
-                     data-survey-id="{{ survey.id }}" data-survey-active="{{ survey.is_active | tojson }}">
+                     data-survey-id="{{ survey.id }}" {% if survey.is_active %}data-survey-active{% endif %}>
                 </div>
             </div>
         </div>
