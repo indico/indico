@@ -11,7 +11,7 @@ from webargs import fields
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.modules.events.forms import EventKeywordsForm, EventLabelForm, ReferenceTypeForm, UnlistedEventsForm
-from indico.modules.events.management.settings import event_settings
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
@@ -127,10 +127,10 @@ class RHUpdateEventKeywords(RHAdminBase):
 
     def _process(self):
         form = EventKeywordsForm()
-        keywords = event_settings.get('allowed_keywords')
+        keywords = global_event_settings.get('allowed_keywords')
         if form.validate_on_submit():
             keywords = sorted({kw.lower() for kw in form.data.get('keywords', [])})
-            event_settings.set('allowed_keywords', keywords)
+            global_event_settings.set('allowed_keywords', keywords)
             flash(_('Allowed keywords have been saved'), 'success')
             return redirect(url_for('.event_keywords'))
         return WPEventAdmin.render_template('admin/event_keywords.html', 'event_keywords', keywords=keywords, form=form)

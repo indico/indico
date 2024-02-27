@@ -35,7 +35,7 @@ from indico.modules.categories.serialize import (serialize_categories_ical, seri
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryCalendar
-from indico.modules.events.management.settings import event_settings
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.news.util import get_recent_news
@@ -591,7 +591,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                                     'keywords')))
         events, categories, rooms, keywords, allowed_keywords = self._get_event_data(query)
         raw_locations = Location.query.options(load_only('id', 'name')).all()
-        allow_keywords = len(allowed_keywords) > 0
+        allow_keywords = bool(allowed_keywords)
         locations = [{'title': loc.name, 'id': loc.id} for loc in raw_locations]
         ongoing_events = (Event.query
                           .filter(Event.is_visible_in(self.category.id),
@@ -619,13 +619,14 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
 
     def _get_event_data(self, event_query):
         def calculate_keyword_id(kw):
+            # we add 3 in order not to collide with special items with ids 0 and 1
             return crc32(kw) + 3
 
         data = []
         categories = {}
         rooms = {}
         keywords = {}
-        allowed_keywords = event_settings.get('allowed_keywords')
+        allowed_keywords = global_event_settings.get('allowed_keywords')
         allowed_keywords_set = set(allowed_keywords)
         tz = self.category.display_tzinfo
         for event in event_query:
@@ -633,8 +634,8 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
             for keyword in event.keywords:
                 keyword_id = calculate_keyword_id(keyword)
                 if keyword_id not in keywords:
-                    keywords[keyword_id] = {'id': keyword_id, 'title': keyword,
-                                            'color': f'#{generate_contrast_colors(keyword_id).background}'}
+                    keywords.setdefault(keyword_id, {'id': keyword_id, 'title': keyword,
+                                                     'color': f'#{generate_contrast_colors(keyword_id).background}'})
             category_data = self._find_nearest_category(event.detailed_category_chain)
             category_id = category_data['id']
             category_data['url'] = url_for('categories.calendar', category_id=category_id)
