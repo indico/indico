@@ -272,7 +272,7 @@ def _get_current_locale(locale):
 
 
 def get_all_locales():
-    """List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal)}``."""
+    """List all available locales/names e.g. ``{'pt_PT': ('Portuguese', 'Portugal', True)}``."""
     if not has_app_context():
         return {}
     else:
