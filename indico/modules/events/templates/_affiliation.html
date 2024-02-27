@@ -2,7 +2,7 @@
     {% set details = person.affiliation_details %}
     {%- if details -%}
         {%- set uuid = uuid() -%}
-        <span id="affiliation-popup-container-{{ uuid }}">{#--#}
+        <span class="js-popup-container" id="affiliation-popup-container-{{ uuid }}">{#--#}
             <span id="affiliation-popup-{{ uuid }}"></span>{#--#}
             <span>{{ details.name }}</span>{#--#}
         </span>{#--#}
