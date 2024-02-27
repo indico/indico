@@ -52,6 +52,7 @@ import * as bookingsSelectors from './selectors';
 
 import './BookingDetails.module.scss';
 import '../../components/WeekdayInformation.module.scss';
+import {renderPluginComponents} from "indico/utils/plugins";
 
 class BookingDetails extends React.Component {
   static propTypes = {
@@ -911,6 +912,7 @@ class BookingDetails extends React.Component {
                   occurrenceCount={occurrenceCount}
                   recurrenceWeekdays={recurrenceWeekdays}
                 />
+                {renderPluginComponents('rb-booking-detail-extra-fields', {id})}
               </Grid.Column>
               <Grid.Column>
                 <>
