@@ -236,7 +236,7 @@ class EventClassificationForm(IndicoForm):
         allowed_keywords = set(event_settings.get('allowed_keywords'))
         keywords = set(field.data)
         if allowed_keywords and not (keywords <= allowed_keywords):
-            raise ValidationError(_('Keyword not allowed'))
+            raise ValidationError('Invalid keyword found')
 
 
 class EventPrivacyForm(IndicoForm):
