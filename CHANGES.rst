@@ -95,9 +95,6 @@ Improvements
 - Add possibility to link room reservations to multiple events, session blocks and contributions
   (:issue:`6113`, :pr:`6114`, thanks :user:`omegak, unconventionaldotdev`)
 - Convert the session bar into a pull-down menu (:issue:`5966`, :pr:`6048`, thanks :user:`foxbunny`)
-- Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
-- React-based category navigator implementation with accessibility improvements (:issue:`5917`, :pr:`5931`, thanks :user:`foxbunny`)
-- Add tooltip and toggletip custom elements (:pr:`5931`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -140,6 +137,8 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
+- Convert category navigator to react and improve its accessibility (:issue:`5917`, :pr:`5931`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -166,6 +165,8 @@ Internal Changes
   thanks :user:`foxbunny`)
 - Add ``<ind-toggle-trigger>`` custom elements for controls that toggle the visibility of another
   element (:pr:`6098`, thanks :user:`foxbunny`)
+- Add ``<ind-with-tooltip>`` and ``<ind-with-toggletip>`` custom elements (:pr:`5931`, thanks
+  :user:`foxbunny`)
 
 
 ----
