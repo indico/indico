@@ -33,6 +33,7 @@ import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {toMoment, serializeDate} from 'indico/utils/date';
+import {renderPluginComponents} from "indico/utils/plugins";
 
 import {openModal} from '../../actions';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
@@ -52,7 +53,6 @@ import * as bookingsSelectors from './selectors';
 
 import './BookingDetails.module.scss';
 import '../../components/WeekdayInformation.module.scss';
-import {renderPluginComponents} from "indico/utils/plugins";
 
 class BookingDetails extends React.Component {
   static propTypes = {
