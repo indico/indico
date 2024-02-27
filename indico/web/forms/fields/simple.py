@@ -182,8 +182,8 @@ class IndicoStrictKeywordsField(Field):
         super().process_formdata(valuelist)
         self.data = sorted(json.loads(self.data))
 
-    def _value(self):
-        return [{'id': d, 'name': d} for d in self.data]
+    def _value(self, for_react=False):
+        return [{'id': d, 'name': d} for d in self.data] if for_react else self.data
 
 
 class IndicoTagListField(HiddenFieldList):
