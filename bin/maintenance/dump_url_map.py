@@ -19,7 +19,7 @@ def get_map_version():
     # whenever something changed
     h = hashlib.md5()
     h.update(os.getcwd().encode())
-    if (not os.environ.get("INDICO_NO_GIT")):
+    if not os.environ.get('INDICO_NO_GIT'):
       h.update(subprocess.check_output(['git', 'describe', '--always']))
       h.update(subprocess.check_output(['git', 'status']))
       h.update(subprocess.check_output(['git', 'diff']))
