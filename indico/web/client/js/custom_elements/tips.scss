@@ -20,6 +20,8 @@ ind-with-toggletip {
   --ref-center: 0;
   --arrow-borders: transparent;
 
+  display: inline-block;
+
   [data-tip-content] {
     display: flex;
     flex-direction: column;

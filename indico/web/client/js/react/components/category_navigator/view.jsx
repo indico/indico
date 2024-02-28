@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Dialog from 'indico/react/components/Dialog';
-import {Translate, PluralTranslate, Param} from 'indico/react/i18n';
+import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import 'indico/custom_elements/ind_with_tooltip';
 import 'indico/custom_elements/ind_with_toggletip';
 
@@ -136,40 +136,41 @@ CategoryItemLabelView.propTypes = {
 };
 
 function CategoryStatsView({category}) {
-  const {title, deepEventCount: events, deepCategoryCount: subcategories} = category;
-
-  const categoryTipText = Translate.string(
-    '{title} category contains {events} and {subcategories}',
-    {
-      title,
-      events: PluralTranslate.string('{count} event', '{count} events', events, {
-        count: events,
-      }),
-      subcategories: PluralTranslate.string(
-        '{count} subcategory',
-        '{count} subcategories',
-        subcategories,
-        {count: subcategories}
-      ),
-    }
-  );
-
   return (
     <span className="category-nav-stats">
       <span className="category-nav-stats-events" aria-hidden="true">
-        <span aria-hidden="true">{events}</span>
+        <span aria-hidden="true">{category.deepEventCount}</span>
       </span>
       <span className="category-nav-stats-subcategories" aria-hidden="true">
-        <span aria-hidden="true">{subcategories}</span>
+        <span aria-hidden="true">{category.deepCategoryCount}</span>
       </span>
-      <ind-with-toggletip>
+      <ind-with-toggletip key={category.id}>
         <button type="button">
           <span>
             <Translate>Show category stats</Translate>
           </span>
         </button>
         <span data-tip-content aria-live="polite">
-          {categoryTipText}
+          <PluralTranslate count={category.deepEventCount}>
+            <Singular>
+              There is <Param value={category.deepEventCount} name="count" /> event in{' '}
+              <Param value={category.title} name="title" />.
+            </Singular>
+            <Plural>
+              There are <Param value={category.deepEventCount} name="count" /> events in{' '}
+              <Param value={category.title} name="title" />.
+            </Plural>
+          </PluralTranslate>{' '}
+          <PluralTranslate count={category.deepCategoryCount}>
+            <Singular>
+              Category contains <Param value={category.deepCategoryCount} name="count" />{' '}
+              subcategory.
+            </Singular>
+            <Plural>
+              Category contains <Param value={category.deepCategoryCount} name="count" />{' '}
+              subcategories.
+            </Plural>
+          </PluralTranslate>
         </span>
       </ind-with-toggletip>
     </span>

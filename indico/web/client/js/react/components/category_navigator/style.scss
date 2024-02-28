@@ -13,14 +13,14 @@
   @extend %flex-split;
 
   min-height: 3.2em;
-  padding: 0 0.5em;
+  padding: var(--content-gap-within-inline) var(--content-gap-normal);
 
   background: var(--background-base);
   border-left: 3px solid var(--container-separator-color);
   border-bottom: 1px solid var(--container-separator-color);
 
   > * {
-    padding: 1em;
+    padding: 0.5em;
   }
 
   > :first-child::before {
@@ -116,13 +116,6 @@
   border-left-color: var(--accent-color);
 }
 
-%category-title-with-breadcrumb {
-  @extend %flex-column;
-  --flex-gap: var(--content-gap-within-inline);
-  align-items: flex-start;
-  padding: 0.5em 1em;
-}
-
 #category-nav-dialog {
   @extend %dialog-modal;
 
@@ -140,7 +133,7 @@
     @extend %flex-row;
     --flex-gap: var(--content-gap-within-inline);
 
-    font-size: 87.5%;
+    font-size: var(--text-size-rel-s);
 
     button {
       @extend %link-button;
@@ -163,10 +156,6 @@
     header {
       @extend %category-list-item;
       @extend %category-list-item-highlighted;
-    }
-
-    ul {
-      padding-left: 1em;
     }
 
     li {
@@ -197,7 +186,6 @@
       @extend %flex-column;
       --flex-gap: var(--content-gap-within-inline);
       align-items: flex-start;
-      padding: 0.5em 0;
       flex: 1000;
     }
   }

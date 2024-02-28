@@ -19,7 +19,9 @@ export default function NavigateTo({category}) {
   return (
     <ind-with-tooltip>
       <a href={categoryURL({category_id: category.id})} styleName="navigate-to">
-        Navigate
+        <Translate as="span" aria-hidden="true">
+          Navigate
+        </Translate>
         <Translate as="span" data-tip-content>
           Navigate to <Param name="title" value={category.title} />
         </Translate>
@@ -29,5 +31,5 @@ export default function NavigateTo({category}) {
 }
 
 NavigateTo.propTypes = {
-  category: PropTypes.object,
+  category: PropTypes.object.isRequired,
 };
