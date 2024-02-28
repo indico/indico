@@ -13,12 +13,12 @@ import React from 'react';
 import {Param, Translate} from 'indico/react/i18n';
 import 'indico/custom_elements/ind_with_tooltip';
 
-import css from './NavigateTo.module.scss';
+import './NavigateTo.module.scss';
 
 export default function NavigateTo({category}) {
   return (
     <ind-with-tooltip>
-      <a href={categoryURL({category_id: category.id})} className={css.NavigateTo}>
+      <a href={categoryURL({category_id: category.id})} styleName="navigate-to">
         Navigate
         <Translate as="span" data-tip-content>
           Navigate to <Param name="title" value={category.title} />

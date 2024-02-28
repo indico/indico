@@ -8,7 +8,7 @@
 @use 'partials/icons';
 @use 'design_system';
 
-.NavigateTo {
+.navigate-to {
   @extend %button-surfaceless;
 
   &::after {

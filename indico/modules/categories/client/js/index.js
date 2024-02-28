@@ -19,8 +19,8 @@ import SearchBox from 'indico/modules/search/components/SearchBox';
 
 import CategoryModeration from './components/CategoryModeration';
 import CategoryStatistics from './components/CategoryStatistics';
-import './ind-category-navigator';
 import {LocaleContext} from './context.js';
+import './ind-category-navigator';
 
 (function(global) {
   document.addEventListener('DOMContentLoaded', () => {
