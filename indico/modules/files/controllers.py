@@ -12,7 +12,6 @@ from flask import request
 from marshmallow import fields
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
-from indico.core.db import db
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.util.signing import secure_serializer
@@ -40,14 +39,7 @@ class UploadFileMixin:
         from indico.modules.files.schemas import FileSchema
         context = self.get_file_context()
         content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
-        f = File(filename=file.filename, content_type=content_type)
-        f.save(context, stream)
-        if not f.size:
-            f.delete()
-            raise UnprocessableEntity
-        db.session.add(f)
-        db.session.flush()
-        logger.info('File %r uploaded (context: %r)', f, context)
+        f = File.create_from_stream(stream, file.filename, content_type, context)
         return FileSchema().jsonify(f), 201
 
     def get_file_context(self):
