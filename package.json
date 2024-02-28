@@ -58,6 +58,7 @@
     "qtip2": "git+https://indico@github.com/indico/qTip2.git#95a42a3be49767a631310a5a8bd924f386220799",
     "rc-time-picker": "^3.7.3",
     "react": "^17.0.2",
+    "react-big-calendar": "^1.11.0",
     "react-charts": "2.0.0-beta.7",
     "react-cropper": "^2.3.3",
     "react-dates": "^21.8.0",
