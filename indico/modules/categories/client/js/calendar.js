@@ -119,7 +119,7 @@ import CalendarLegend from './components/CalendarLegend';
           const filteredEvents = data.events.filter(e => {
             let result = !filteredLegendElements.has(e[attr] ?? 0);
             if (filteringByKeyword() && e.keywords.length) {
-              result &&= !e.keywords.every(kw => filteredKeywords.has(kw));
+              result ||= !e.keywords.every(kw => filteredKeywords.has(kw));
             }
             return result;
           });
@@ -355,7 +355,7 @@ import CalendarLegend from './components/CalendarLegend';
                 events: manyKeywords,
                 items: keywords,
                 attr: 'keywordId',
-                defaultTitle: Translate.string('Many keywords'),
+                defaultTitle: Translate.string('Multiple keywords'),
                 rootId: 1,
               }),
             ];
