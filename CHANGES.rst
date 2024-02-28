@@ -98,6 +98,7 @@ Improvements
 - Take visibility restrictions into account in the atom feed (:pr:`5472`, thanks :user:`bpedersen2`)
 - Allow linking badge templates to registration forms in order to use custom fields in them
   (:pr:`6088`)
+- Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 
 Bugfixes
 ^^^^^^^^
