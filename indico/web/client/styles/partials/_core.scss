@@ -9,12 +9,12 @@
 
 @use 'base' as *;
 
-.right:not(.ui.labeled) {
+.right:not(.ui.labeled):not(i.icon) {
   float: right;
   margin-left: auto;
 }
 
-.left {
+.left:not(i.icon) {
   float: left;
 }
 
