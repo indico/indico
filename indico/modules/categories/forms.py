@@ -7,8 +7,11 @@
 
 from functools import partial
 
+from cryptography import x509
+from cryptography.exceptions import UnsupportedAlgorithm
+from cryptography.hazmat.primitives import serialization
 from flask import request
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 from wtforms.widgets import TextArea
 
@@ -28,8 +31,8 @@ from indico.util.user import principal_from_identifier
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFieldList, IndicoEnumSelectField,
-                                     IndicoMarkdownField, IndicoProtectionField, IndicoSinglePalettePickerField,
-                                     IndicoTimezoneSelectField, MultipleItemsField)
+                                     IndicoMarkdownField, IndicoPasswordField, IndicoProtectionField,
+                                     IndicoSinglePalettePickerField, IndicoTimezoneSelectField, MultipleItemsField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import JSONField
 from indico.web.forms.validators import HiddenUnless
@@ -43,6 +46,9 @@ class CategorySettingsForm(IndicoForm):
     GOOGLE_WALLET_FIELDS = ('google_wallet_mode', 'google_wallet_credentials', 'google_wallet_issuer_name',
                             'google_wallet_issuer_id')
     GOOGLE_WALLET_JSON_FIELDS = ('google_wallet_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
+    APPLE_PASS_FIELDS = ('apple_pass_mode', 'apple_pass_certificate', 'apple_pass_key', 'apple_pass_password')
+    APPLE_PASS_JSON_FIELDS = ('apple_pass_certificate', 'apple_pass_key', 'apple_pass_password')
+
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
@@ -106,6 +112,23 @@ class CategorySettingsForm(IndicoForm):
                                                         'The same Issuer ID must never be used on more than one '
                                                         'Indico server. Changing it will also break updates to '
                                                         'any existing tickets.'))
+    apple_pass_mode = IndicoEnumSelectField(_('Configuration'), enum=InheritableConfigMode,
+                                            description=_('The Apple Pass configuration is, by default, '
+                                                          'inherited from the parent category. You can also '
+                                                          'explicitly disable it or provide your own configuration '
+                                                          'instead.'))
+    apple_pass_certificate = TextAreaField(_('Certificate.pem'),
+                                           [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
+                                                         preserve_data=True), DataRequired()],
+                                           description=_('Content of the Certificate.pem file.'))
+    apple_pass_key = TextAreaField(_('Private.key'),
+                                   [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
+                                                 preserve_data=True), DataRequired()],
+                                   description=_('Content of the Private.key file.'))
+    apple_pass_password = IndicoPasswordField(_('Password for the Private.key'),
+                                              [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
+                                                            preserve_data=True), DataRequired()],
+                                              description=_('Password used to decrypt the Private.key file.'))
 
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
@@ -119,47 +142,86 @@ class CategorySettingsForm(IndicoForm):
             self.google_wallet_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
         else:
             self.google_wallet_mode.skip = {InheritableConfigMode.inheriting}
+        if not config.ENABLE_APPLE_PASS:
+            for field in list(self):
+                if field.name.startswith('apple_pass_'):
+                    delattr(self, field.name)
+        elif category.parent:
+            parent_configured = category.parent.effective_apple_pass_config is not None
+            self.apple_pass_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
+        else:
+            self.apple_pass_mode.skip = {InheritableConfigMode.inheriting}
 
     def validate(self, extra_validators=None):
         form_valid = super().validate(extra_validators=extra_validators)
+        if config.ENABLE_GOOGLE_WALLET:
+            enabled = self.google_wallet_mode.data == InheritableConfigMode.enabled
+            credentials = self.google_wallet_credentials.data
+            issuer_id = self.google_wallet_issuer_id.data
 
-        if not config.ENABLE_GOOGLE_WALLET:
-            return form_valid
-
-        enabled = self.google_wallet_mode.data == InheritableConfigMode.enabled
-        credentials = self.google_wallet_credentials.data
-        issuer_id = self.google_wallet_issuer_id.data
-
-        if (
-            credentials and
-            enabled and (
-                self.category.google_wallet_settings.get('google_wallet_credentials') != credentials or
-                self.category.google_wallet_settings.get('google_wallet_issuer_id') != issuer_id
-            )
-        ):
-            res = GoogleWalletManager.verify_credentials(credentials, issuer_id)
-            if res == GoogleCredentialValidationResult.invalid:
-                self.google_wallet_credentials.errors.append(
-                    _('The credentials could not be loaded.')
+            if (
+                credentials and
+                enabled and (
+                    self.category.google_wallet_settings.get('google_wallet_credentials') != credentials or
+                    self.category.google_wallet_settings.get('google_wallet_issuer_id') != issuer_id
                 )
-                return False
-            elif res == GoogleCredentialValidationResult.refused:
-                self.google_wallet_credentials.errors.append(
-                    _('The credentials are invalid or have no access to the Google Wallet API.')
-                )
-                return False
-            elif res == GoogleCredentialValidationResult.failed:
-                self.google_wallet_credentials.errors.append(
-                    _('There was an error validating your credentials. Contact your Indico administrator for details.')
-                )
-                return False
-            elif res == GoogleCredentialValidationResult.bad_issuer:
-                self.google_wallet_issuer_id.errors.append(
-                    _('The Issuer ID is invalid or not linked to your credentials.')
-                )
-                return False
+            ):
+                res = GoogleWalletManager.verify_credentials(credentials, issuer_id)
+                if res == GoogleCredentialValidationResult.invalid:
+                    self.google_wallet_credentials.errors.append(
+                        _('The credentials could not be loaded.')
+                    )
+                    return False
+                elif res == GoogleCredentialValidationResult.refused:
+                    self.google_wallet_credentials.errors.append(
+                        _('The credentials are invalid or have no access to the Google Wallet API.')
+                    )
+                    return False
+                elif res == GoogleCredentialValidationResult.failed:
+                    self.google_wallet_credentials.errors.append(
+                        _('There was an error validating your credentials. Contact your Indico administrator for '
+                          'details.')
+                    )
+                    return False
+                elif res == GoogleCredentialValidationResult.bad_issuer:
+                    self.google_wallet_issuer_id.errors.append(
+                        _('The Issuer ID is invalid or not linked to your credentials.')
+                    )
+                    return False
 
         return form_valid
+
+    def validate_apple_pass_certificate(self, field):
+        try:
+            x509.load_pem_x509_certificate(field.data.encode('UTF-8'))
+            return True
+        except ValueError:
+            raise ValidationError(_('The provided Certificate.pem is malformed.'))
+
+    def validate_apple_pass_key(self, field):
+        try:
+            serialization.load_pem_private_key(field.data.encode('UTF-8'), password=None)
+        except ValueError:
+            raise ValidationError(_('The provided Private.key is malformed.'))
+        except TypeError:
+            # This is because I provided an empty pass, just to check the Private.key is not malformed.
+            # Is there a better way to check it?
+            return True
+        except UnsupportedAlgorithm:
+            raise ValidationError(_('The provided Private.key type is not supported by the system. '
+                                    'Please contact support.'))
+
+    def validate_apple_pass_password(self, field):
+        # Do not check the password if the Private.key is malformed.
+        # @validates_schema(skip_on_field_errors=True) seems not to be working :(
+        if self.apple_pass_key.errors:
+            return True
+        try:
+            serialization.load_pem_private_key(self.apple_pass_key.data.encode('UTF-8'),
+                                               password=field.data.encode('UTF-8'))
+            return True
+        except ValueError:
+            raise ValidationError(_('The provided password is incorrect.'))
 
     @generated_data
     def google_wallet_settings(self):
@@ -167,9 +229,16 @@ class CategorySettingsForm(IndicoForm):
             return self.category.google_wallet_settings
         return {k: getattr(self, k).data for k in self.GOOGLE_WALLET_JSON_FIELDS}
 
+    @generated_data
+    def apple_pass_settings(self):
+        if not config.ENABLE_APPLE_PASS:
+            return self.category.apple_pass_settings
+        return {k: getattr(self, k).data for k in self.APPLE_PASS_JSON_FIELDS}
+
     @property
     def data(self):
-        return {k: v for k, v in super().data.items() if k not in self.GOOGLE_WALLET_JSON_FIELDS}
+        return {k: v for k, v in super().data.items() if not (k in self.GOOGLE_WALLET_JSON_FIELDS or
+                                                              k in self.APPLE_PASS_JSON_FIELDS)}
 
 
 class CategoryIconForm(IndicoForm):
