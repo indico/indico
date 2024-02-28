@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.3",
+    "@babel/runtime": "^7.24.0",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@tinymce/tinymce-react": "^4.3.0",
@@ -57,6 +57,7 @@
     "qtip2": "git+https://indico@github.com/indico/qTip2.git#8951e5538a5c0833021b2d2b5d8a587a2c24faae",
     "rc-time-picker": "^3.7.3",
     "react": "^17.0.2",
+    "react-big-calendar": "^1.11.0",
     "react-charts": "2.0.0-beta.7",
     "react-cropper": "^2.3.3",
     "react-dates": "^21.8.0",
