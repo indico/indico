@@ -9,10 +9,12 @@ import posixpath
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import JSONB, UUID
+from werkzeug.exceptions import UnprocessableEntity
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
+from indico.modules.files import logger
 from indico.util.fs import secure_filename
 from indico.util.signing import secure_serializer
 from indico.util.string import format_repr, strict_str
@@ -55,6 +57,18 @@ class File(StoredFileMixin, db.Model):
     # - data_export_of (DataExportRequest.file)
     # - editing_revision_files (EditingRevisionFile.file)
     # - receipt_file (ReceiptFile.file)
+
+    @classmethod
+    def create_from_stream(cls, stream, filename, content_type, context):
+        f = cls(filename=filename, content_type=content_type)
+        f.save(context, stream)
+        if not f.size:
+            f.delete()
+            raise UnprocessableEntity
+        db.session.add(f)
+        db.session.flush()
+        logger.info('File %r created (context: %r)', f, context)
+        return f
 
     def claim(self):
         """Mark the file as claimed by some object it's linked to.
