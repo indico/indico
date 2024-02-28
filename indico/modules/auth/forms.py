@@ -108,7 +108,7 @@ class RegistrationEmailForm(IndicoForm):
 class LocalRegistrationForm(IndicoForm):
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
-    affiliation = StringField(_('Affiliation'))
+    affiliation = StringField(_('Affiliation'), [DataRequired()])
     email = EmailField(_('Email address'), [Email(), _check_existing_email])
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
@@ -116,6 +116,8 @@ class LocalRegistrationForm(IndicoForm):
                              render_kw={'autocomplete': 'new-password'})
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
                                      render_kw={'autocomplete': 'new-password'})
+    comment = TextAreaField(_('Comment'), [DataRequired()], description=_('Please provide additional information or a comment for '
+                                                        'administrators who will review your registration request.'))
 
     @property
     def data(self):
