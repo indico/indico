@@ -338,6 +338,14 @@ Customization
 
     Default: ``None``
 
+.. data:: ABSOLUTE_PASS_LOGO_PATH
+
+    The PATH to a custom logo used in Apple Pass tickets.  If unset, a compact
+    version of the default Indico logo is used.  The PATH must accessible on the filesystem
+    from the user that is running the Indico service and changes typically do not affect existing tickets.
+
+    Default: ``None``
+
 .. data:: CUSTOM_COUNTRIES
 
     A dict with country name overrides.  This can be useful if the official

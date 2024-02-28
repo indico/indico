@@ -28,6 +28,7 @@ from indico.util.string import crc32, snakify
 
 # Note: Whenever you add/change something here, you MUST update the docs (settings.rst) as well
 DEFAULTS = {
+    'ABSOLUTE_PASS_LOGO_PATH': None,
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,
@@ -48,6 +49,7 @@ DEFAULTS = {
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
     'EMAIL_BACKEND': 'indico.vendor.django_mail.backends.smtp.EmailBackend',
+    'ENABLE_APPLE_PASS': False,
     'ENABLE_GOOGLE_WALLET': False,
     'ENABLE_ROOMBOOKING': False,
     'EXPERIMENTAL_EDITING_SERVICE': False,

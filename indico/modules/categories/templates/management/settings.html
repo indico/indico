@@ -33,6 +33,11 @@
                 {{ form_rows(form, fields=form.GOOGLE_WALLET_FIELDS) }}
             {% endcall %}
         {% endif %}
+        {% if indico_config.ENABLE_APPLE_PASS %}
+            {% call form_fieldset(_('Apple Pass')) %}
+                {{ form_rows(form, fields=form.APPLE_PASS_FIELDS) }}
+            {% endcall %}
+        {% endif %}
         {% call form_fieldset(_('Event Header')) %}
             {{ form_rows(form, fields=form.EVENT_HEADER_FIELDS) }}
         {% endcall %}

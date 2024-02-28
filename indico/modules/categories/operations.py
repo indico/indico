@@ -87,13 +87,17 @@ def _format_wallet_credentials(credentials):
 
 
 def _log_category_update(category, changes, extra_log_fields):
-    if google_wallet_settings := changes.pop('google_wallet_settings', None):
-        google_wallet_keys = ('google_wallet_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
-        for key in google_wallet_keys:
-            old = google_wallet_settings[0].get(key)
-            new = google_wallet_settings[1].get(key)
-            if old != new:
-                changes[key] = (old, new)
+    extra_fields = {'google_wallet_settings': ('google_wallet_credentials', 'google_wallet_issuer_name',
+                                               'google_wallet_issuer_id'),
+                    'apple_pass_settings': ('apple_pass_certificate', 'apple_pass_key', 'apple_pass_password')}
+    for extra_field in extra_fields:
+        if settings := changes.pop(extra_field, None):
+            for key in extra_fields[extra_field]:
+                old = settings[0].get(key)
+                new = settings[1].get(key)
+                if old != new:
+                    changes[key] = (old, new)
+
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
         'description': 'Description',
@@ -113,6 +117,10 @@ def _log_category_update(category, changes, extra_log_fields):
             'type': 'text',
             'convert': lambda changes: [_format_wallet_credentials(x) for x in changes],
         },
+        'apple_pass_mode': 'Apple Pass mode',
+        'apple_pass_certificate': {'title': 'Apple Pass certificate', 'type': 'string'},
+        'apple_pass_key': {'title': 'Apple Pass private key', 'type': 'string'},
+        'apple_pass_password': {'title': 'Apple Pass certificate password', 'type': 'string'},
         **(extra_log_fields or {})
     }
     if changes:

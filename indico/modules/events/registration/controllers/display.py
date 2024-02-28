@@ -4,7 +4,6 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
@@ -536,6 +535,16 @@ class RHTicketGoogleWallet(RHTicketDownload):
         if not (url := self.registration.generate_ticket_google_wallet_url()):
             raise NotFound('Google Wallet tickets are not available')
         return redirect(url)
+
+
+class RHTicketApplePass(RHTicketDownload):
+    """Download Apple Pass registration ticket."""
+
+    def _process(self):
+        if not (apple_pass := self.registration.generate_ticket_apple_pass()):
+            raise NotFound('Apple Pass tickets are not available')
+        filename = secure_filename(f'{self.event.title}-Ticket.pkpass', 'apple_pass.pkpass')
+        return send_file(filename, apple_pass, mimetype='application/vnd.apple.pkpass', no_cache=True)
 
 
 class RHRegistrationAvatar(RHDisplayEventBase):

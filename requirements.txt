@@ -381,6 +381,8 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
+wallet-py3k==0.0.4
+    # via -r requirements.in
 wcwidth==0.2.13
     # via prompt-toolkit
 weasyprint==61.2
