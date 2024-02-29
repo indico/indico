@@ -30,7 +30,7 @@ def _prettify_params(args):
 
 
 def _interesting_tb_item(item, paths):
-    return (item[0].endswith('.tpl.py') or any(item[0].startswith(p) for p in paths)) and 'sqlalchemy' not in item[0]
+    return any(item[0].startswith(p) for p in paths) and 'sqlalchemy' not in item[0]
 
 
 def _frame_to_tuple(frame):
