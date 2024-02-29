@@ -139,8 +139,6 @@ Improvements
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
-- Allow plugins to add extra fields to the room booking form (:pr:`6126`)
-- Send a new ``data`` argument containing the full form data in ``rb.booking_created`` and ``rb.booking_modified`` signals (:pr:`6126`)
 
 Bugfixes
 ^^^^^^^^
@@ -213,6 +211,7 @@ Internal Changes
 - Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
+- Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
 
 
 ----
