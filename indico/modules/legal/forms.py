@@ -31,17 +31,20 @@ def create_agreement_form(*args, **kwargs):
     }
 
     if (tos or tos_url) and (privacy_policy or privacy_policy_url):
-        label = _('I have read, understood and accept the {tos_link_start}terms of service{tos_link_end}'
-                  ' and {pp_link_start}privacy policy{pp_link_end}.').format(**placeholders)
+        label = _('Accept terms of service & privacy policy')
+        desc = _('I have read, understood and accept the {tos_link_start}terms of service{tos_link_end} '
+                 'and {pp_link_start}privacy policy{pp_link_end}.').format(**placeholders)
     elif tos or tos_url:
-        label = _('I have read, understood and accept the'
-                  ' {tos_link_start}terms of service{tos_link_end}.').format(**placeholders)
+        label = _('Accept terms of service')
+        desc = (_('I have read, understood and accept the {tos_link_start}terms of service{tos_link_end}.')
+                .format(**placeholders))
     elif privacy_policy or privacy_policy_url:
-        label = _('I have read, understood and accept the'
-                  ' {pp_link_start}privacy policy{pp_link_end}.').format(**placeholders)
+        label = _('Accept privacy policy')
+        desc = (_('I have read, understood and accept the {pp_link_start}privacy policy{pp_link_end}.')
+                .format(**placeholders))
 
     form_cls = type('_AgreementForm', (IndicoForm,), {})
-    form_cls.accept_terms = BooleanField(Markup(label), [InputRequired()])
+    form_cls.accept_terms = BooleanField(label, [InputRequired()], description=Markup(desc))
     return form_cls(*args, **kwargs)
 
 
