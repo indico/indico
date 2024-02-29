@@ -87,6 +87,8 @@ Improvements
   (:issue:`5264`, :pr:`6152`, thanks :user:`Thanhphan1147`)
 - Add option to require users to agree to terms during signup or after they have been updated
   (:issue:`5923`, :pr:`5925`, thanks :user:`kewisch`)
+- Add ``indico user delete`` CLI to attempt to permanently delete a user (:pr:`5838`)
+- Add ``indico user anonymize`` CLI to permanently anonymize a user (:pr:`5838`)
 
 Bugfixes
 ^^^^^^^^
