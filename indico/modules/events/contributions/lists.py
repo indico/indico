@@ -13,6 +13,7 @@ from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.fields import ContributionFieldValue
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -32,7 +33,7 @@ class ContributionListGenerator(ListGeneratorBase):
 
     def __init__(self, event):
         super().__init__(event)
-        self.default_list_config = {'filters': {'items': {}}}
+        self.default_list_config = {'filters': {'fields': {}, 'items': {}}}
 
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
@@ -57,6 +58,22 @@ class ContributionListGenerator(ListGeneratorBase):
 
         self.list_config = self._get_config()
 
+    def get_all_contribution_fields(self):
+        """Return the list of contribution fields for the event."""
+        return self.event.contribution_fields.all()
+
+    def _get_filters_from_request(self):
+        filters = super()._get_filters_from_request()
+        for field in self.event.contribution_fields:
+            if field.field_type == 'single_choice':
+                options = [x if x != 'None' else None for x in request.form.getlist(f'field_{field.id}')]
+                if options:
+                    filters['fields'][str(field.id)] = options
+        # Ensure enum filters remain as integers
+        for idx, value in enumerate(filters['items'].get('state', [])):
+            filters['items']['state'][idx] = int(value)
+        return filters
+
     def _build_query(self):
         timetable_entry_strategy = joinedload('timetable_entry')
         timetable_entry_strategy.lazyload('*')
@@ -64,6 +81,7 @@ class ContributionListGenerator(ListGeneratorBase):
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),
+                         joinedload('field_values'),
                          subqueryload('person_links'),
                          db.undefer('subcontribution_count'),
                          db.undefer('attachment_count'),
@@ -86,53 +104,73 @@ class ContributionListGenerator(ListGeneratorBase):
                                                 ~RegistrationForm.is_deleted)))
 
     def _filter_list_entries(self, query, filters):
-        if not filters.get('items'):
-            return query
         criteria = []
-        if 'status' in filters['items']:
-            filtered_statuses = filters['items']['status']
-            status_criteria = []
-            if 'scheduled' in filtered_statuses:
-                status_criteria.append(Contribution.is_scheduled)
-            if 'unscheduled' in filtered_statuses:
-                status_criteria.append(~Contribution.is_scheduled)
-            if status_criteria:
-                criteria.append(db.or_(*status_criteria))
+        field_filters = filters.get('fields')
+        item_filters = filters.get('items')
 
-        if 'people' in filters['items']:
-            filtered_people = filters['items'].get('people')
-            contrib_query = self._build_registration_query()
-            people_criteria = []
-            if 'registered' in filtered_people:
-                people_criteria.append(Contribution.id.in_(contrib_query))
-            if 'not_registered' in filtered_people:
-                people_criteria.append(~Contribution.id.in_(contrib_query))
-            if people_criteria:
-                criteria.append(db.or_(*people_criteria))
-        if 'speakers' in filters['items']:
-            filtered_people = filters['items'].get('speakers')
-            contrib_query = self._build_registration_query(is_speaker=True)
-            people_criteria = []
-            if 'registered' in filtered_people:
-                people_criteria.append(Contribution.id.in_(contrib_query))
-            if 'not_registered' in filtered_people:
-                people_criteria.append(~Contribution.id.in_(contrib_query))
-            if people_criteria:
-                criteria.append(db.or_(*people_criteria))
+        if not (field_filters or item_filters):
+            return query
 
-        filter_cols = {'session': Contribution.session_id,
-                       'track': Contribution.track_id,
-                       'type': Contribution.type_id}
-        for key, column in filter_cols.items():
-            ids = set(filters['items'].get(key, ()))
-            if not ids:
-                continue
-            column_criteria = []
-            if None in ids:
-                column_criteria.append(column.is_(None))
-            if ids - {None}:
-                column_criteria.append(column.in_(ids - {None}))
-            criteria.append(db.or_(*column_criteria))
+        if field_filters:
+            for field_id, field_values in field_filters.items():
+                field_values = set(field_values)
+
+                field_criteria = []
+
+                if field_values:
+                    field_criteria.append(Contribution.field_values.any(db.and_(
+                        ContributionFieldValue.contribution_field_id == field_id,
+                        ContributionFieldValue.data.op('#>>')('{}').is_(None)
+                    )))
+
+                criteria.append(db.or_(*field_criteria))
+
+        if item_filters:
+            if 'status' in filters['items']:
+                filtered_statuses = filters['items']['status']
+                status_criteria = []
+                if 'scheduled' in filtered_statuses:
+                    status_criteria.append(Contribution.is_scheduled)
+                if 'unscheduled' in filtered_statuses:
+                    status_criteria.append(~Contribution.is_scheduled)
+                if status_criteria:
+                    criteria.append(db.or_(*status_criteria))
+
+            if 'people' in filters['items']:
+                filtered_people = filters['items'].get('people')
+                contrib_query = self._build_registration_query()
+                people_criteria = []
+                if 'registered' in filtered_people:
+                    people_criteria.append(Contribution.id.in_(contrib_query))
+                if 'not_registered' in filtered_people:
+                    people_criteria.append(~Contribution.id.in_(contrib_query))
+                if people_criteria:
+                    criteria.append(db.or_(*people_criteria))
+            if 'speakers' in filters['items']:
+                filtered_people = filters['items'].get('speakers')
+                contrib_query = self._build_registration_query(is_speaker=True)
+                people_criteria = []
+                if 'registered' in filtered_people:
+                    people_criteria.append(Contribution.id.in_(contrib_query))
+                if 'not_registered' in filtered_people:
+                    people_criteria.append(~Contribution.id.in_(contrib_query))
+                if people_criteria:
+                    criteria.append(db.or_(*people_criteria))
+
+            filter_cols = {'session': Contribution.session_id,
+                           'track': Contribution.track_id,
+                           'type': Contribution.type_id}
+            for key, column in filter_cols.items():
+                ids = set(filters['items'].get(key, ()))
+                if not ids:
+                    continue
+                column_criteria = []
+                if None in ids:
+                    column_criteria.append(column.is_(None))
+                if ids - {None}:
+                    column_criteria.append(column.in_(ids - {None}))
+                criteria.append(db.or_(*column_criteria))
+
         return query.filter(*criteria)
 
     def get_list_kwargs(self):
