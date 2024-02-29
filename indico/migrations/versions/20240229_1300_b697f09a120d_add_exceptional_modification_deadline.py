@@ -1,7 +1,7 @@
 """Add exceptional modification deadline to registrations
 
 Revision ID: b697f09a120d
-Revises: 17996ef18cb9
+Revises: 492c6d801a4a
 Create Date: 2024-01-29 16:35:54.553459
 """
 
@@ -13,7 +13,7 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = 'b697f09a120d'
-down_revision = '17996ef18cb9'
+down_revision = '492c6d801a4a'
 branch_labels = None
 depends_on = None
 
