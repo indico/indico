@@ -56,9 +56,9 @@ def register_user(email, extra_emails, user_data, identity_data, settings, from_
     is handled by the `users` module.
     """
     identity = Identity(**identity_data)
-    if (accepted_tos_dt := user_data.get('accepted_tos_dt', None)) and isinstance(accepted_tos_dt, str):
+    if (accepted_terms_dt := user_data.get('accepted_terms_dt')) and isinstance(accepted_terms_dt, str):
         # if we come from a registration request, the timestamp is a string since it had to be jsonified
-        user_data['accepted_tos_dt'] = datetime.fromisoformat(accepted_tos_dt)
+        user_data['accepted_terms_dt'] = datetime.fromisoformat(accepted_terms_dt)
     user = create_user(email, user_data, identity=identity, settings=settings, other_emails=extra_emails,
                        from_moderation=from_moderation)
     return user, identity

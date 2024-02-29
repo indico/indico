@@ -1,4 +1,4 @@
-"""Add accepted_tos_dt to users
+"""Add accepted_terms_dt to users
 
 Revision ID: e4ac92d27295
 Revises: b697f09a120d
@@ -19,8 +19,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('users', sa.Column('accepted_tos_dt', UTCDateTime, nullable=True), schema='users')
+    op.add_column('users', sa.Column('accepted_terms_dt', UTCDateTime, nullable=True), schema='users')
 
 
 def downgrade():
-    op.drop_column('users', 'accepted_tos_dt', schema='users')
+    op.drop_column('users', 'accepted_terms_dt', schema='users')

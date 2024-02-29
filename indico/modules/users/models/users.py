@@ -278,8 +278,8 @@ class User(PersonMixin, db.Model):
         nullable=False,
         default=False
     )
-    #: the date the user has last accepted the terms of service
-    accepted_tos_dt = db.Column(
+    #: the date the user has last accepted the terms of service and privacy policy
+    accepted_terms_dt = db.Column(
         UTCDateTime,
         nullable=True,
         default=None

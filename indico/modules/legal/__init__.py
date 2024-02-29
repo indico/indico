@@ -88,7 +88,7 @@ def check_terms_required():
         return False
 
     # If you have accepted the most current terms, you are good
-    if session.user.accepted_tos_dt and session.user.accepted_tos_dt >= terms_date:
+    if session.user.accepted_terms_dt and session.user.accepted_terms_dt >= terms_date:
         return False
 
     return True
