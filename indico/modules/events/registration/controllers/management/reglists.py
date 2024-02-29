@@ -43,7 +43,8 @@ from indico.modules.events.registration.controllers.management import (RHManageR
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
-                                                      RegistrationBasePriceForm, RejectRegistrantsForm)
+                                                      RegistrationBasePriceForm,
+                                                      RegistrationExceptionalModificationForm, RejectRegistrantsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
@@ -59,6 +60,7 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
+from indico.util.date_time import now_utc, relativedelta
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
@@ -68,6 +70,7 @@ from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -715,6 +718,37 @@ class RHRegistrationManageWithdraw(RHManageRegistrationBase):
         flash(_('The registration has been withdrawn.'), 'success')
         logger.info('Registration %r was withdrawn by %r', self.registration, session.user)
         notify_registration_state_update(self.registration, from_management=True)
+        return jsonify_data(html=_render_registration_details(self.registration))
+
+
+class RHRegistrationScheduleModification(RHManageRegistrationBase):
+    """Let a manager schedule the registration modification deadline."""
+
+    def _process(self):
+        default_modification_end_dt = now_utc() + relativedelta(weeks=1)
+        modification_form_defaults = FormDefaults(modification_end_dt=default_modification_end_dt)
+        form = RegistrationExceptionalModificationForm(regform=self.regform, obj=modification_form_defaults)
+
+        if form.validate_on_submit():
+            self.registration.modification_end_dt = form.modification_end_dt.data
+            flash(_('Deadline for registration modification has been scheduled'), 'success')
+            self.registration.log(EventLogRealm.management, LogKind.change, 'Registration',
+                                  (f'Modification deadline updated for user: {self.registration.email}',
+                                   f' until: {self.registration.modification_end_dt}'),
+                                  session.user,
+                                  data={'Modification': self.registration.can_be_modified})
+            return jsonify_data(html=_render_registration_details(self.registration))
+        return jsonify_form(form, disabled_until_change=False)
+
+
+class RHRegistrationRemoveModification(RHManageRegistrationBase):
+    """Let a manager close modification for a registration."""
+
+    def _process(self):
+        self.registration.modification_end_dt = None
+        self.registration.log(EventLogRealm.management, LogKind.change, 'Registration',
+                              f'Modification closed for user: {self.registration.email}', session.user,
+                              data={'Modification': self.registration.can_be_modified})
         return jsonify_data(html=_render_registration_details(self.registration))
 
 

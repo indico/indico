@@ -48,9 +48,17 @@
                     {%- trans %}Proceed to checkout{% endtrans -%}
                 </a>.
             {% endif %}
+            {% if registration.can_be_modified and not registration.registration_form.is_modification_open %}
+                <div class="text">
+                    {% trans modification_end_dt=registration.modification_end_dt|format_date(timezone=registration.event.tzinfo) -%}
+                        You are allowed to modify your registration until: {{ modification_end_dt }}
+                    {%- endtrans %}
+                </div>
+            {% endif %}
         </div>
         <div class="toolbar">
-            {% if registration.registration_form.modification_mode.name != 'not_allowed' and registration.is_active %}
+            {% if registration.is_active and (registration.registration_form.modification_mode.name != 'not_allowed' or
+                                              not registration.modification_deadline_passed) %}
                 <div class="group">
                     <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
                        class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"

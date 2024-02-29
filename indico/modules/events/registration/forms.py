@@ -185,6 +185,16 @@ class RegistrationFormScheduleForm(IndicoForm):
         super().__init__(*args, **kwargs)
 
 
+class RegistrationExceptionalModificationForm(IndicoForm):
+    modification_end_dt = IndicoDateTimeField(_('Modification deadline'), [DataRequired()], default_time=time(23, 59),
+                                              description=_('Deadline until which registration information can be '
+                                                            'modified'))
+
+    def __init__(self, *args, regform, **kwargs):
+        self.timezone = regform.event.timezone
+        super().__init__(*args, **kwargs)
+
+
 class InvitationFormBase(IndicoForm):
     _invitation_fields = ('skip_moderation', 'skip_access_check')
     _email_fields = ('email_from', 'email_subject', 'email_body')

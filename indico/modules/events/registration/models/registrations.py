@@ -250,6 +250,11 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
+    #: The date/time until which the person can modify their registration
+    modification_end_dt = db.Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: The Event containing this registration
     event = db.relationship(
@@ -411,9 +416,14 @@ class Registration(db.Model):
         return dict(self.registration_form.locator, token=self.uuid)
 
     @property
+    def modification_deadline_passed(self):
+        if self.modification_end_dt is None:
+            return True
+        return self.modification_end_dt < now_utc()
+
+    @property
     def can_be_modified(self):
-        regform = self.registration_form
-        return regform.is_modification_open and regform.is_modification_allowed(self)
+        return self.registration_form.is_modification_allowed(self)
 
     @property
     def can_be_withdrawn(self):
