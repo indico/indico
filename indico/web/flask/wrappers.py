@@ -65,6 +65,9 @@ class IndicoRequest(Request):
         if self.remote_addr is not None and self.remote_addr.startswith('::ffff:'):
             # convert ipv6-style ipv4 to the regular ipv4 notation
             self.remote_addr = self.remote_addr[7:]
+        if self.remote_addr is not None and '%' in self.remote_addr:
+            # remove interface specifiers in case of link-local ipv6
+            self.remote_addr = self.remote_addr.split('%', 1)[0]
 
     @cached_property
     def id(self):
