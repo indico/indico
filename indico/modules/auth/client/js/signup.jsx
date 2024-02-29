@@ -5,7 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import privacyPolicyURL from 'indico-url:legal.display_privacy';
+import tosURL from 'indico-url:legal.display_tos';
+
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -24,13 +28,19 @@ import {
   handleSubmitError,
   getValuesForFields,
 } from 'indico/react/forms';
-import {Fieldset, FinalTextArea} from 'indico/react/forms/fields';
-import {Translate} from 'indico/react/i18n';
+import {Fieldset, FinalTextArea, FinalCheckbox} from 'indico/react/forms/fields';
+import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 function Signup({
   cancelURL,
   moderated,
+  tosUrl,
+  tos,
+  privacyPolicyUrl,
+  privacyPolicy,
+  termsRequireAccept,
+  termsEffectiveDate,
   initialValues,
   hasPredefinedAffiliations,
   showAccountForm,
@@ -65,6 +75,56 @@ function Signup({
     location.href = resp.data.redirect;
     // never finish submitting to avoid fields being re-enabled
     await new Promise(() => {});
+  };
+
+  const termsAcceptLabel = () => {
+    const stopPropagation = evt => evt.stopPropagation();
+    const tosLinkWrapper = tosUrl ? (
+      <a href={tosURL()} rel="noreferrer" target="_blank" onClick={stopPropagation} />
+    ) : (
+      <span />
+    );
+    const privacyPolicyLinkWrapper = privacyPolicyUrl ? (
+      <a href={privacyPolicyURL()} rel="noreferrer" target="_blank" onClick={stopPropagation} />
+    ) : (
+      <span />
+    );
+
+    if ((tos || tosUrl) && (privacyPolicy || privacyPolicyUrl)) {
+      return (
+        <Translate>
+          I have read, understood and accept the{' '}
+          <Param name="tosLink" wrapper={tosLinkWrapper}>
+            terms of service
+          </Param>{' '}
+          and{' '}
+          <Param name="privacyLink" wrapper={privacyPolicyLinkWrapper}>
+            privacy policy
+          </Param>
+          .
+        </Translate>
+      );
+    } else if (tos || tosUrl) {
+      return (
+        <Translate>
+          I have read, understood and accept the{' '}
+          <Param name="tosLink" wrapper={tosLinkWrapper}>
+            terms of service
+          </Param>
+          .
+        </Translate>
+      );
+    } else if (privacyPolicy || privacyPolicyUrl) {
+      return (
+        <Translate>
+          I have read, understood and accept the{' '}
+          <Param name="privacyLink" wrapper={privacyPolicyLinkWrapper}>
+            privacy policy
+          </Param>
+          .
+        </Translate>
+      );
+    }
   };
 
   return (
@@ -223,6 +283,32 @@ function Signup({
               />
             </Fieldset>
           )}
+          {termsRequireAccept && !!tos && !tosUrl && (
+            <Fieldset legend={Translate.string('Terms of service')}>
+              <div className="field policy editor-output" dangerouslySetInnerHTML={{__html: tos}} />
+            </Fieldset>
+          )}
+          {termsRequireAccept && !!privacyPolicy && !privacyPolicyUrl && (
+            <Fieldset legend={Translate.string('Privacy policy')}>
+              <div
+                className="field policy editor-output"
+                dangerouslySetInnerHTML={{__html: privacyPolicy}}
+              />
+            </Fieldset>
+          )}
+          {termsRequireAccept && !!termsEffectiveDate && (
+            <div className="field">
+              <Translate>Last updated</Translate>: {moment(termsEffectiveDate).format('LL')}
+            </div>
+          )}
+          {termsRequireAccept && (
+            <FinalCheckbox
+              name="accept_terms"
+              required
+              label={<label>{termsAcceptLabel()}</label>}
+            />
+          )}
+
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <FinalSubmitButton
               disabledUntilChange={false}
@@ -248,6 +334,12 @@ function Signup({
 Signup.propTypes = {
   cancelURL: PropTypes.string.isRequired,
   moderated: PropTypes.bool.isRequired,
+  tos: PropTypes.string,
+  tosUrl: PropTypes.string,
+  privacyPolicy: PropTypes.string,
+  privacyPolicyUrl: PropTypes.string,
+  termsRequireAccept: PropTypes.bool,
+  termsEffectiveDate: PropTypes.string,
   initialValues: PropTypes.object.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
   showAccountForm: PropTypes.bool.isRequired,
@@ -261,6 +353,12 @@ Signup.propTypes = {
 };
 
 Signup.defaultProps = {
+  tos: '',
+  tosUrl: '',
+  privacyPolicy: '',
+  privacyPolicyUrl: '',
+  termsRequireAccept: false,
+  termsEffectiveDate: null,
   affiliationMeta: null,
   hasPendingUser: false,
   lockedFields: [],

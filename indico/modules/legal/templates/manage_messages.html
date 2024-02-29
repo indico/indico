@@ -7,12 +7,16 @@
 
 {% block content %}
     {% call simple_form(form, back_button=false) %}
-        {{ form_rows(form, skip=('tos_url', 'tos', 'privacy_policy_url', 'privacy_policy')) }}
-        {% call form_fieldset('Terms & Conditions') %}
+        {{ form_rows(form, skip=('tos_url', 'tos', 'privacy_policy_url', 'privacy_policy',
+                                 'terms_require_accept', 'terms_effective_date')) }}
+        {% call form_fieldset(_('Terms & Conditions')) %}
             {{ form_rows(form, ('tos_url', 'tos')) }}
         {% endcall %}
-        {% call form_fieldset('Privacy Policy') %}
+        {% call form_fieldset(_('Privacy Policy')) %}
             {{ form_rows(form, ('privacy_policy_url', 'privacy_policy')) }}
+        {% endcall %}
+        {% call form_fieldset(_('Required Terms')) %}
+            {{ form_rows(form, ('terms_require_accept', 'terms_effective_date')) }}
         {% endcall %}
     {% endcall %}
 {% endblock %}

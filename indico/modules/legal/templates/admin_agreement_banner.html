@@ -1,0 +1,3 @@
+{% trans link='<a href="%s">'|format(url_for('legal.accept_agreement'))|safe, endlink='</a>'|safe -%}
+    You have not accepted the latest terms. Please {{ link }}review them{{ endlink }} at your earliest convenience.
+{%- endtrans %}

@@ -278,6 +278,12 @@ class User(PersonMixin, db.Model):
         nullable=False,
         default=False
     )
+    #: the date the user has last accepted the terms of service and privacy policy
+    accepted_terms_dt = db.Column(
+        UTCDateTime,
+        nullable=True,
+        default=None
+    )
     #: a unique secret used to generate signed URLs
     signing_secret = db.Column(
         UUID,

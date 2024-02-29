@@ -221,6 +221,10 @@ class RH:
                     'button, reload the page and try again.')
             raise BadRequest(msg)
 
+    def _check_terms(self):
+        from indico.modules.legal import confirm_rh_terms_required
+        return confirm_rh_terms_required()
+
     def _check_event_feature(self):
         from indico.modules.events.features.util import require_feature
         event_id = request.view_args.get('event_id')
@@ -289,6 +293,9 @@ class RH:
         try:
             init_email_queue()
             self._check_csrf()
+            if terms_response := self._check_terms():
+                return terms_response
+
             res = self._do_process()
             signals.core.after_process.send()
 

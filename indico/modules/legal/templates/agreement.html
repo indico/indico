@@ -1,0 +1,34 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset %}
+
+{% block page_class %}fixed-width-standalone-text-page{% endblock %}
+
+{% block content %}
+    {{ form_header(form) }}
+    <p>
+        {% trans %}To continue using the platform, you must agree to the updated terms. Please take a moment to read the agreements before you continue.{% endtrans %}
+    </p>
+    {% if tos and not tos_url %}
+        {% call form_fieldset(_('Terms of Service')) %}
+            <div class="field policy editor-output">
+                {{ tos|sanitize_html }}
+            </div>
+        {% endcall %}
+    {% endif %}
+    {% if privacy_policy and not privacy_policy_url %}
+        {% call form_fieldset(_('Privacy Policy')) %}
+        <div class="field policy editor-output">
+            {{ privacy_policy|sanitize_html }}
+        </div>
+        {% endcall %}
+    {% endif %}
+    <p class="last-updated">
+        {% trans %}Last updated:{% endtrans %} {{ terms_effective_date|format_date(timezone=session.tzinfo) }}
+    </p>
+
+    {{ form_row(form.accept_terms, skip_label=true) }}
+
+    {% call form_footer(form) %}
+        <input class="submit right i-button big highlight" type="submit" value="{% trans %}Confirm{% endtrans %}">
+    {% endcall %}
+{% endblock %}
