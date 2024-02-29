@@ -250,7 +250,6 @@ class Registration(db.Model):
         nullable=False,
         default=False
     )
-
     #: The date/time until which the person can modify their registration
     modification_end_dt = db.Column(
         UTCDateTime,
@@ -424,13 +423,7 @@ class Registration(db.Model):
 
     @property
     def can_be_modified(self):
-        regform = self.registration_form
-
-        if regform.is_modification_allowed(self):
-            if regform.is_modification_open:
-                return True
-            return not self.modification_deadline_passed
-        return False
+        return self.registration_form.is_modification_allowed(self)
 
     @property
     def can_be_withdrawn(self):
