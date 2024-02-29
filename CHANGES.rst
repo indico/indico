@@ -83,7 +83,6 @@ Improvements
 - Support ``~~text~~`` to strike-out text in markdown (:pr:`6166`)
 - Add experimental support for creating Google Wallet tickets (opt-in via :data:`ENABLE_GOOGLE_WALLET`
   ``indico.conf`` setting) (:pr:`6028`, thanks :user:`openprojects`)
-- Grant exceptions and allow individuals to modify registration (:issue:`5264`, thanks :user:`Thanhphan1147`)
 - Add option to exceptionally grant registration modification privileges to some registrants
   (:issue:`5264`, :pr:`6152`, thanks :user:`Thanhphan1147`)
 
