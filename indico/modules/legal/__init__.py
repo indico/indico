@@ -95,6 +95,10 @@ def check_terms_required():
 
 
 def confirm_rh_terms_required():
+    # 404 or similar
+    if not request.endpoint:
+        return
+
     # Run through the common checks
     if not check_terms_required():
         return
@@ -103,8 +107,16 @@ def confirm_rh_terms_required():
     if session.user.is_admin:
         return
 
-    # Certain endpoints need to be passed through.
-    if request.blueprint and request.blueprint in ('assets', 'legal', 'auth', 'core'):
+    # Certain endpoints need to be always allowed
+    if (
+        request.blueprint == 'legal' or
+        request.endpoint.startswith('assets.') or
+        request.endpoint.endswith('.static') or
+        request.endpoint in ('auth.logout', 'core.contact', 'core.change_lang')
+    ):
+        return
+
+    if request.method != 'GET' or request.is_xhr or request.is_json:
         return
 
     # Everything else gets redirected to the terms page
