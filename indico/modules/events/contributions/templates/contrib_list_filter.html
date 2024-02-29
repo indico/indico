@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item) %}
-    {% set filters = filters['items'] %}
+{% macro _render_column_selector(item_id, item, is_static_item=false) %}
+    {% set filters = filters['items'] if is_static_item else filters['fields'] %}
     <div class="label-group list-column">
         <div class="i-label title-wrapper"
              data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
@@ -56,9 +56,17 @@
         <h3>{% trans %}Available filtering options{% endtrans %}</h3>
         <div class="flexrow f-wrap">
             {% for item_id, item in static_items.items() %}
-                {{ _render_column_selector(item_id, item) }}
+                {{ _render_column_selector(item_id, item, is_static_item=true) }}
             {% endfor %}
         </div>
+        {% if contrib_fields %}
+            <h3>{% trans %}Available filters for custom fields{% endtrans %}</h3>
+                    <div class="flexrow f-wrap">
+                {% for field in contrib_fields %}
+                    {{ _render_column_selector(field.id, field, field.filter_choices) }}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
