@@ -30,7 +30,7 @@ from indico.modules.legal import legal_settings
 from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.models.affiliations import Affiliation
-from indico.util.date_time import format_human_timedelta
+from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
@@ -307,6 +307,8 @@ class RHRegister(RH):
         user_data = {k: v for k, v in data.items()
                      if k in {'first_name', 'last_name', 'affiliation', 'affiliation_link', 'address', 'phone'}}
         user_data.update(handler.get_extra_user_data(data))
+        if data.pop('accept_terms', False):
+            user_data['accepted_tos_dt'] = now_utc()
         identity_data = handler.get_identity_data(data)
         settings = {
             'timezone': config.DEFAULT_TIMEZONE if session.timezone == 'LOCAL' else session.timezone,
@@ -320,6 +322,8 @@ class RHRegister(RH):
         email = registration_data['email']
         req = RegistrationRequest.query.filter_by(email=email).first() or RegistrationRequest(email=email)
         req.comment = data['comment']
+        if accepted_tos_dt := registration_data['user_data'].pop('accepted_tos_dt', None):
+            registration_data['user_data']['accepted_tos_dt'] = accepted_tos_dt.isoformat()
         if aff_link := registration_data['user_data'].pop('affiliation_link', None):
             db.session.add(aff_link)  # in case it's newly created
             db.session.flush()
