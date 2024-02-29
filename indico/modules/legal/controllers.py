@@ -48,16 +48,9 @@ class RHAcceptTerms(RH):
             return redirect(url_for_index())
 
         form = create_agreement_form()
-
         if form.validate_on_submit():
-            if form.data['accept_terms']:
+            if form.accept_terms.data:
                 session.user.accepted_tos_dt = now_utc()
+            return redirect(session.pop('legal_agreement_return_path', url_for_index()))
 
-            returnpath = session.pop('legal_agreement_return_path', url_for_index())
-            return redirect(returnpath)
-
-        return WPDisplayAgreement.render_template(
-            'agreement.html',
-            form=form,
-            **legal_settings.get_all()
-        )
+        return WPDisplayAgreement.render_template('agreement.html', form=form, **legal_settings.get_all())
