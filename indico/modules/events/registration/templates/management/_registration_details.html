@@ -325,22 +325,25 @@
                         {% trans %}Allow the participant to modify their registration{% endtrans %}
                     </div>
                     {% trans -%}
-                        You can exceptionally allow this participant to modify their registration.
+                        You can exceptionally allow this participant to modify their registration, regardless of the
+                        modification settings or deadline configured in the registration form.
                     {%- endtrans %}
                 </div>
             {% elif registration.modification_deadline_passed %}
                 <div class="icon icon-edit"></div>
                 <div class="text">
                     <div class="label">
-                        {% trans %}The participant can no longer modify their registration.{% endtrans %}
+                        {% trans %}The participant can no longer exceptionally modify their registration{% endtrans %}
                     </div>
-                    {%- trans %}The modification deadline has passed.{% endtrans -%}
+                    {% trans modification_end_dt=registration.modification_end_dt|format_date(timezone=registration.event.tzinfo) -%}
+                        The specified modification deadline ({{ modification_end_dt }}) has passed.
+                    {% endtrans -%}
                 </div>
             {% else %}
                 <div class="icon icon-edit registration-allow-modification"></div>
                 <div class="text">
                     <div class="label">
-                        {% trans %}The participant can modify their registration{% endtrans %}
+                        {% trans %}The participant can exceptionally modify their registration{% endtrans %}
                     </div>
                     {% trans modification_end_dt=registration.modification_end_dt|format_date(timezone=registration.event.tzinfo) -%}
                         The participant is allowed to modify their registration until: {{ modification_end_dt }}
