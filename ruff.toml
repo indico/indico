@@ -58,7 +58,6 @@ ignore = [
     'S404',    # useless, triggers on *all* subprocess imports
     'S403',    # there's already a warning on using pickle, no need to have one for the import
     'S405',    # we don't use lxml in unsafe ways
-    'S410',    # we don't use lxml in unsafe ways
     'S603',    # useless, triggers on *all* subprocess calls: https://github.com/astral-sh/ruff/issues/4045
     'S607',    # we trust the PATH to be sane
     'B011',    # we don't run python with `-O` (also see S101)
