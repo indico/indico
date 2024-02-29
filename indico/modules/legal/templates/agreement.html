@@ -26,7 +26,7 @@
         {% trans %}Last updated:{% endtrans %} {{ terms_effective_date|format_date(timezone=session.tzinfo) }}
     </p>
 
-    {{form_row(form.accept_terms, skip_label=true)}}
+    {{ form_row(form.accept_terms, skip_label=true) }}
 
     {% call form_footer(form) %}
         <input class="submit right i-button big highlight" type="submit" value="{% trans %}Confirm{% endtrans %}">
