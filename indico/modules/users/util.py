@@ -470,7 +470,6 @@ def anonymize_user(user):
         principal.query.filter(principal.user == user).delete()
 
     user.is_deleted = True
-    db.session.commit()
 
 
 def get_color_for_user_id(user_id: t.Union[int, str]):

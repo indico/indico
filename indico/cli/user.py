@@ -225,16 +225,18 @@ def anonymize(user_id):
 
     This will remove all personal data about the given user including
     their name, affiliation and emails. Note that any data tied to events
-    such registrations will not be deleted.
+    such as registrations or speaker roles will not be deleted.
     """
     if (user := User.get(user_id)) is None:
         click.secho('This user does not exist', fg='red')
         return
     _print_user_info(user)
-    if not click.confirm(click.style('Anonymize this user?', fg='yellow')):
+    if not click.confirm(click.style('Permanently anonymize this user?', fg='yellow')):
         return
 
     anonymize_user(user)
+    db.session.flush()
+    db.session.commit()
     click.secho('Successfully anonymized user', fg='green')
 
 
@@ -256,12 +258,13 @@ def delete(user_id):
 
     try:
         db.session.delete(user)
-        db.session.commit()
+        db.session.flush()
     except IntegrityError as e:
         db.session.rollback()
-        click.secho('Failed to delete user', fg='red')
+        click.secho('Could not delete delete user', fg='red')
         click.echo(e)
     else:
+        db.session.commit()
         click.secho('Successfully deleted user', fg='green')
 
 
