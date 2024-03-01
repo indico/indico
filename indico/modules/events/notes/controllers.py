@@ -18,7 +18,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.notes.schemas import CompiledEventNoteSchema, EventNoteSchema
-from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
+from indico.modules.events.notes.util import can_edit_note, check_note_revision, get_scheduled_notes
 from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.string import sanitize_html
@@ -71,14 +71,16 @@ class RHApiNote(RHManageNoteBase):
 
     @use_kwargs({
         'render_mode': EnumField(RenderMode, load_default=RenderMode.html),
-        'source': fields.String(required=True)
+        'source': fields.String(required=True),
+        'revision': fields.Dict(required=False)
     })
-    def _process_POST(self, render_mode, source):
+    def _process_POST(self, render_mode, source, revision):
         note = EventNote.get_or_create(self.object)
         is_new = note.id is None or note.is_deleted
         is_restored = is_new and note.is_deleted
         note.create_revision(render_mode, source, session.user)
         is_changed = attrs_changed(note, 'current_revision')
+        check_note_revision(note.current_revision_id, revision.get('id'))
         db.session.add(note)
         db.session.flush()
         if is_new:

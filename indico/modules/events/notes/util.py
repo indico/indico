@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload, noload
 from indico.core.db import db
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.web.flask.util import url_for
+from indico.web.util import ExpectedError
 
 
 def build_note_api_data(note):
@@ -86,3 +87,9 @@ def can_edit_note(obj, user):
             return True
         return can_edit_note(obj.contribution, user)
     return False
+
+
+def check_note_revision(current_revision_id, previous_revision_id):
+    """Compare revision IDs to check if the note has been modified."""
+    if current_revision_id != previous_revision_id:
+        raise ExpectedError('The note has been modified in the meantime')
