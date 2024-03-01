@@ -18,6 +18,7 @@ depends_on = None
 
 def upgrade():
     op.add_column('designer_templates', sa.Column('registration_form_id', sa.Integer(), nullable=True), schema='indico')
+    op.create_index(None, 'designer_templates', ['registration_form_id'], schema='indico')
     op.create_foreign_key(None, 'designer_templates', 'forms', ['registration_form_id'], ['id'],
                           source_schema='indico', referent_schema='event_registration')
     op.create_check_constraint('no_regform_if_category', 'designer_templates',
