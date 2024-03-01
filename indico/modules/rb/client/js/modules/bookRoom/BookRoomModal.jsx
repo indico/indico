@@ -631,6 +631,7 @@ class BookRoomModal extends React.Component {
                 </Segment>
                 {renderPluginComponents('rb-booking-form-extra-fields', {
                   room,
+                  disabled: fprops.submitSucceeded || fprops.submitting,
                   onSubmit: item => {
                     this.setState({
                       extraFields: item,
