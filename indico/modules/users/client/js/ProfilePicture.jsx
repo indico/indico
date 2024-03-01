@@ -88,7 +88,7 @@ function CustomPictureUpload({onFileSelected}) {
     multiple: false,
     noClick: true,
     noKeyboard: true,
-    accept: ['.jpg', '.png', '.gif', '.webp'],
+    accept: ['.png', '.jpg', '.jpeg', '.gif', '.webp'],
     disabled: submitting,
   });
 
