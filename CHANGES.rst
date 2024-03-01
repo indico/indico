@@ -96,6 +96,8 @@ Improvements
   (:issue:`6113`, :pr:`6114`, thanks :user:`omegak, unconventionaldotdev`)
 - Store editable list filters in the browser's local storage (:pr:`6192`)
 - Take visibility restrictions into account in the atom feed (:pr:`5472`, thanks :user:`bpedersen2`)
+- Allow linking badge templates to registration forms in order to use custom fields in them
+  (:pr:`6088`)
 
 Bugfixes
 ^^^^^^^^
