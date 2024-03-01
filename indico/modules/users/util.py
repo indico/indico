@@ -24,10 +24,8 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
-from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalPermissionsMixin, PrincipalType
 from indico.core.db.sqlalchemy.util.queries import escape_like
-from indico.core.settings.models.settings import SettingPrincipal
-from indico.modules.attachments.models.principals import AttachmentFolderPrincipal, AttachmentPrincipal
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
@@ -422,12 +420,6 @@ def merge_users(source, target, force=False):
 
 
 def anonymize_user(user):
-    from indico.modules.events.models.principals import EventPrincipal
-    from indico.modules.events.models.settings import EventSettingPrincipal
-    from indico.modules.events.sessions.models.principals import SessionPrincipal
-    from indico.modules.events.tracks.models.principals import TrackPrincipal
-    from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-    from indico.modules.rb.models.principals import RoomPrincipal
 
     user.first_name = '<anonymous>'
     user.last_name = f'<anonymous-{user.id}>'
@@ -460,14 +452,11 @@ def anonymize_user(user):
     for category in categories:
         category.members.remove(user)
 
-    principals = [
-        EventPrincipal, CategoryPrincipal, AttachmentPrincipal, AttachmentFolderPrincipal,
-        BlockingPrincipal, TrackPrincipal, EventSettingPrincipal, SettingPrincipal, RoomPrincipal,
-        SessionPrincipal
-    ]
+    principal_classes = [sc for sc in [*PrincipalMixin.__subclasses__(), *PrincipalPermissionsMixin.__subclasses__()]
+                         if hasattr(sc, 'query')]
 
-    for principal in principals:
-        principal.query.filter(principal.user == user).delete()
+    for cls in principal_classes:
+        cls.query.filter(cls.user == user).delete()
 
     user.is_deleted = True
 
