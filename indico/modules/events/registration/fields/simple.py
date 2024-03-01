@@ -19,6 +19,7 @@ from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
 from indico.util.marshmallow import LowercaseString, UUIDString
+from indico.util.signals import make_interceptable
 from indico.util.string import remove_accents, str_to_ascii, validate_email
 
 
@@ -411,8 +412,12 @@ class PictureField(FileField):
                 raise ValidationError(_('Invalid picture file.'))
             if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
                 raise ValidationError(_('This field only accepts jpg, png, gif and webp picture formats.'))
-            min_picture_size = self.form_item.data.get('min_picture_size')
+            min_picture_size = self._get_min_size()
             if min_picture_size and min(pic.size) < min_picture_size:
                 raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
                                       .format(min_picture_size))
         return _picture_size_and_type
+
+    @make_interceptable
+    def _get_min_size(self):
+        return self.form_item.data.get('min_picture_size')
