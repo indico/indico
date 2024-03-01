@@ -10,7 +10,7 @@ import React, {useCallback, useState} from 'react';
 import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
-import initialEvents from './demo-events';
+import initialValues from './timetable-data';
 import {entryStyleGetter, layoutAlgorithm, processEntries} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
@@ -21,7 +21,7 @@ const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function Timetable() {
-  const [_entries, _columns] = processEntries(initialEvents);
+  const [_entries, _columns] = processEntries(initialValues);
   const [entries, setEntries] = useState(_entries);
   const [columns, setColumns] = useState(_columns);
 
@@ -53,6 +53,11 @@ export default function Timetable() {
     [setEntries]
   );
 
+  const defaultDate = entries.reduce(
+    (min, {start}) => (start < min ? start : min),
+    entries[0].start
+  );
+
   const minHour = entries.reduce((min, {start}) => {
     const hours = start.getHours();
     if (hours > min) {
@@ -72,7 +77,7 @@ export default function Timetable() {
   return (
     <DnDCalendar
       styleName="timetable"
-      defaultDate={new Date(2024, 3, 1)}
+      defaultDate={defaultDate}
       defaultView="day"
       events={entries}
       localizer={localizer}
