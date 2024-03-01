@@ -75,7 +75,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     try {
       resp = await indicoAxios.get(getNoteURL || apiURL);
       resp = camelizeKeys(resp);
-      console.log(resp.data);
+      setCurrentNoteRevision(resp.data);
     } catch (error) {
       handleAxiosError(error);
       return;
@@ -108,44 +108,13 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       setCurrentInput('');
       getUserPreferences();
     }
-  }, [apiURL, getNoteURL]);
-
-  const getCurrentNoteRevision = useCallback(async () => {
-    let resp;
-    try {
-      resp = await indicoAxios.get(apiURL || getNoteURL);
-      console.log('apiURL -> ', apiURL);
-      console.log('getNoteURL -> ', getNoteURL);
-    } catch (e) {
-      handleAxiosError(e);
-      return;
-    }
-    const revisionInfo = {
-      id: resp.data.id,
-      source: resp.data.source,
-      created: resp.data.createdDt,
-      renderMode: resp.data.renderMode,
-    };
-    setCurrentNoteRevision(revisionInfo);
-  }, [apiURL, getNoteURL]);
+  }, [getNoteURL, apiURL, setCurrentNoteRevision]);
 
   const handleSubmit = async ({source}) => {
     // getData is currently unused, keeping it around in case we need to enable lazyValue
     // for the TinyMCE editor widget in case larger notes cause performance issues that
     // can be resolved by only rendering them to an html string at submission time
     const currentValue = source.getData ? source.getData() : source;
-
-    const resp = await indicoAxios.get(apiURL || getNoteURL);
-    const currentNoteRevId = resp.data.id;
-    console.log('(fetch) currentNoteRevId -> ', currentNoteRevId);
-    console.log('(state) currentNoteRevision -> ', currentNoteRevision.id);
-
-    if (currentNoteRevId !== currentNoteRevision) {
-      console.log('compared');
-      console.log('currentNoteRevId -> ', currentNoteRevId);
-      console.log('currentNoteRevision -> ', currentNoteRevision.id);
-      return setNoteConflict(true);
-    }
 
     try {
       if (!currentValue) {
@@ -154,9 +123,15 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
         await indicoAxios.post(apiURL, {
           source: currentValue,
           render_mode: renderMode,
+          revision: currentNoteRevision,
         });
       }
     } catch (e) {
+      if (_.get(e, 'response.status') === 418) {
+        // handle note conflict
+        setNoteConflict(true);
+        return;
+      }
       return handleSubmitError(e);
     }
     setCurrentInput(source);
@@ -179,8 +154,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   useEffect(() => {
     setLoading(true);
     getNote();
-    getCurrentNoteRevision();
-  }, [getNote, getCurrentNoteRevision]);
+  }, [getNote]);
 
   useEffect(() => {
     if (closeAndReload) {
@@ -240,6 +214,8 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           )}
         </FinalModalForm>
       )}
+      {console.log('currentNoteRevision -> ', currentNoteRevision)}
+      {console.log('current revision id -> ', currentNoteRevision?.id)}
       {noteConflict && (
         <NoteConflictModal
           currentNoteSource={currentInput}

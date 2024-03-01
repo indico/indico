@@ -25,21 +25,27 @@ import {Param, Translate} from 'indico/react/i18n';
 
 export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
   const [open, setOpen] = useState(true);
+  console.log('externalNoteSource', externalNoteSource);
 
-  const handleClose = () => {
+  /* const handleClose = () => {
     setOpen(false);
   };
 
+  const handleOpen = () => {
+    setOpen(true);
+  }; */
+
   /*
    * TODO:
-   *  - Render the notes properly (`<div dangerouslySetInnerHTML={{__html: note.html.or.whatever}} />`)
    *  - Add another button to cancel the dialog (close and return back without doing anything?) (need to fix this!)
    *  - Fix saving!!!
+   *  - Actions for the buttons
    */
   return (
     <Modal
       open={open}
-      onClose={handleClose}
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
       size="large"
       style={{minWidth: '65vw'}}
       closeOnEscape={false}
@@ -59,7 +65,13 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
               This note was last edited on{' '}
               <Param
                 name="last_edited_dt"
-                value={moment(externalNoteSource.created).format('L LTS')}
+                value={moment(externalNoteSource.createdDt).format('L LTS')}
+                wrapper={<strong />}
+              />{' '}
+              by{' '}
+              <Param
+                name="note_author"
+                value={externalNoteSource.noteAuthor}
                 wrapper={<strong />}
               />
               {'. '}You can either:
@@ -143,9 +155,9 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
   );
 }
 
+export default NoteConflictModal;
+
 NoteConflictModal.propTypes = {
   currentNoteSource: PropTypes.string.isRequired,
   externalNoteSource: PropTypes.object.isRequired,
 };
-
-export default NoteConflictModal;
