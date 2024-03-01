@@ -81,7 +81,7 @@ class ContributionListGenerator(ListGeneratorBase):
                 .order_by(Contribution.friendly_id)
                 .options(timetable_entry_strategy,
                          joinedload('session'),
-                         joinedload('field_values'),
+                         subqueryload('field_values'),
                          subqueryload('person_links'),
                          db.undefer('subcontribution_count'),
                          db.undefer('attachment_count'),
@@ -120,7 +120,7 @@ class ContributionListGenerator(ListGeneratorBase):
                 if field_values:
                     field_criteria.append(Contribution.field_values.any(db.and_(
                         ContributionFieldValue.contribution_field_id == field_id,
-                        ContributionFieldValue.data.op('#>>')('{}').is_(None)
+                        ContributionFieldValue.data.op('#>>')('{}').in_(field_values)
                     )))
 
                 criteria.append(db.or_(*field_criteria))
