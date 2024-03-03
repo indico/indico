@@ -5,23 +5,27 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.timetable {
+.timetable :global(.rbc-time-view-resources) {
+  border-top: 0;
+
   :global(.rbc-allday-cell),
   :global(.rbc-row-resource) {
     display: none;
   }
 
-  :global(.rbc-time-view-resources) {
-    :global(.rbc-timeslot-group) {
-      min-height: 8em;
-    }
+  :global(.rbc-time-content) {
+    border-top: 0;
+  }
 
-    :global(.rbc-day-slot) {
-      min-width: 25em;
-    }
+  :global(.rbc-timeslot-group) {
+    min-height: 8em;
+  }
 
-    :global(.rbc-event) {
-      outline: none;
-    }
+  :global(.rbc-day-slot) {
+    min-width: 25em;
+  }
+
+  :global(.rbc-event) {
+    outline: none;
   }
 }

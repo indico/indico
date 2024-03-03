@@ -11,6 +11,7 @@ import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
 import initialValues from './timetable-data';
+import Toolbar from './Toolbar';
 import {entryStyleGetter, layoutAlgorithm, processEntries} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
@@ -81,10 +82,8 @@ export default function Timetable() {
       defaultView="day"
       events={entries}
       localizer={localizer}
-      views={{
-        day: true,
-        // week: true,
-      }}
+      views={{day: true}}
+      components={{toolbar: Toolbar}}
       resources={columns}
       onEventDrop={moveEntry}
       onEventResize={resizeEntry}
