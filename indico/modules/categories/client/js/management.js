@@ -365,6 +365,9 @@ import {natSortCompare} from 'indico/utils/sort';
         )
         .format(ids.length),
       actionOn: {
+        categoriesWithoutCategoryManagementRights: {
+          disabled: true,
+        },
         categoriesDescendingFrom: {
           disabled: true,
           ids,
