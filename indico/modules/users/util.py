@@ -460,6 +460,11 @@ def anonymize_user(user):
 
     user.event_roles.clear()
     user.category_roles.clear()
+    user.suggested_categories.order_by(None).delete()
+
+    # Unlink registrations + persons (those hold personal data and are linked by email which no longer matches)
+    user.registrations.update({db.m.Registration.user_id: None})
+    user.event_persons.update({db.m.EventPerson.user_id: None})
 
     principal_classes = [sc for sc in [*PrincipalMixin.__subclasses__(), *PrincipalPermissionsMixin.__subclasses__()]
                          if hasattr(sc, 'query')]
