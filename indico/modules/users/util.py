@@ -436,9 +436,18 @@ def anonymize_user(user):
     user.favorite_events = set()
     user.favorite_categories = set()
     user.identities = set()
+    user.is_admin = False
+
+    # Reset/invalidate any tokens for the user
+    if user.api_key:
+        user.api_key.is_active = False
+    user.reset_signing_secret()
+    user.oauth_app_links.delete()
+    for token in user.personal_tokens:
+        token.revoke()
 
     UserEmail.query.filter(UserEmail.user == user).delete()
-    email = UserEmail(user_id=user.id, email=f'indico-{user.id}@indico.invalid')
+    email = UserEmail(user_id=user.id, email=f'indico-{user.id}@indico.invalid', is_primary=True)
     db.session.add(email)
 
     editables = user.editor_for_editables
