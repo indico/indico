@@ -449,9 +449,8 @@ def anonymize_user(user):
     for reservation in reservations:
         reservation.booked_for_name = user.full_name
 
-    categories = user.category_roles.copy()
-    for category in categories:
-        category.members.remove(user)
+    user.event_roles.clear()
+    user.category_roles.clear()
 
     principal_classes = [sc for sc in [*PrincipalMixin.__subclasses__(), *PrincipalPermissionsMixin.__subclasses__()]
                          if hasattr(sc, 'query')]
