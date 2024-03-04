@@ -8,6 +8,22 @@
 .timetable :global(.rbc-time-view-resources) {
   border-top: 0;
 
+  .parent-entry {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+
+    :global(.rbc-event-label),
+    :global(.rbc-event-content) {
+      display: none;
+    }
+  }
+
+  .child-entry {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+  }
+
   :global(.rbc-allday-cell),
   :global(.rbc-row-resource) {
     display: none;
@@ -21,11 +37,8 @@
     min-height: 8em;
   }
 
-  :global(.rbc-day-slot) {
-    min-width: 25em;
-  }
-
   :global(.rbc-event) {
     outline: none;
+    z-index: 1;
   }
 }

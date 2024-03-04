@@ -6,13 +6,14 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
+import {entryStyleGetter, layoutAlgorithm, tooltipAccessor} from './layout';
 import initialValues from './timetable-data';
 import Toolbar from './Toolbar';
-import {entryStyleGetter, layoutAlgorithm, processEntries} from './util';
+import {processEntries} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 
@@ -26,33 +27,31 @@ export default function Timetable() {
   const [entries, setEntries] = useState(_entries);
   const [columns, setColumns] = useState(_columns);
 
-  const moveEntry = useCallback(
-    ({event: entry, start, end, resourceId}) => {
-      const existing = entries.find(e => e.id === entry.id) || {};
-      const filtered = entries.filter(e => e.id !== entry.id);
-      const newEntries = [...filtered, {...existing, start, end}];
-      const [processedEntries, newColumns] = processEntries(newEntries, {
-        entryId: entry.id,
-        sourceResourceId: existing.resourceId,
-        targetResourceId: resourceId,
-      });
-      setEntries(processedEntries);
-      setColumns(newColumns);
-    },
-    [entries, setEntries, setColumns]
-  );
+  const moveEntry = ({event: entry, start, end, resourceId}) => {
+    const existing = entries.find(e => e.id === entry.id) || {};
+    const filtered = entries.filter(e => e.id !== entry.id);
+    const newEntries = [...filtered, {...existing, start, end}];
+    const [processedEntries, newColumns] = processEntries(newEntries, {
+      entryId: entry.id,
+      sourceResourceId: existing.resourceId,
+      targetResourceId: resourceId,
+    });
+    setEntries(processedEntries);
+    setColumns(newColumns);
+  };
 
-  const resizeEntry = useCallback(
-    ({event, start, end}) => {
-      console.debug('resizeEvent', event, start, end);
-      setEntries(prev => {
-        const existing = prev.find(ev => ev.id === event.id) ?? {};
-        const filtered = prev.filter(ev => ev.id !== event.id);
-        return [...filtered, {...existing, start, end}];
-      });
-    },
-    [setEntries]
-  );
+  const resizeEntry = ({event: entry, start, end}) => {
+    const existing = entries.find(ev => ev.id === entry.id) ?? {};
+    const filtered = entries.filter(ev => ev.id !== entry.id);
+    const newEntries = [...filtered, {...existing, start, end}];
+    const [processedEntries, newColumns] = processEntries(newEntries, {
+      entryId: entry.id,
+      sourceResourceId: existing.resourceId,
+      targetResourceId: existing.resourceId,
+    });
+    setEntries(processedEntries);
+    setColumns(newColumns);
+  };
 
   const defaultDate = entries.reduce(
     (min, {start}) => (start < min ? start : min),
@@ -89,13 +88,13 @@ export default function Timetable() {
       onEventResize={resizeEntry}
       onSelectSlot={(...args) => console.debug('onSelectSlot', ...args)}
       eventPropGetter={entryStyleGetter(entries)}
-      dayLayoutAlgorithm={layoutAlgorithm(entries, columns.length)}
+      dayLayoutAlgorithm={layoutAlgorithm(entries, columns.length, true)}
       allDayMaxRows={0}
       step={5}
       timeslots={6}
       min={new Date(1972, 0, 1, minHour, 0, 0)}
       max={new Date(1972, 0, 1, maxHour, 0, 0)}
-      tooltipAccessor={null}
+      tooltipAccessor={tooltipAccessor(entries)}
       resizable
       selectable
     />
