@@ -1,21 +1,21 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item, is_static_item=false) %}
+{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false) %}
     {% set filters = filters['items'] if is_static_item else filters['fields'] %}
     <div class="label-group list-column">
         <div class="i-label title-wrapper"
              data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
             <div class="title">{{ item.title }}</div>
         </div>
-        {% if item.filter_choices %}
+        {% if filter_choices %}
             <div class="i-label filter">
                 <a class="icon-filter" data-toggle="dropdown"></a>
                 <ul class="i-dropdown" style="display: none">
-                    {% for value, caption in item.filter_choices.items() %}
+                    {% for value, caption in filter_choices.items() %}
                         <li>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field-{{ item_id }}-option-{{ value }}"
-                                   {% if value in filters.get(item_id, []) %} checked {% endif %}>
+                                   {% if value in filters.get(item_id|string, []) %} checked {% endif %}>
                             <label for="field-{{ item_id }}-option-{{ value }}">
                                 {{ caption }}
                             </label>
@@ -56,12 +56,13 @@
         <h3>{% trans %}Available filtering options{% endtrans %}</h3>
         <div class="flexrow f-wrap">
             {% for item_id, item in static_items.items() %}
-                {{ _render_column_selector(item_id, item, is_static_item=true) }}
+                {% set filter_choices = item.get('filter_choices') %}
+                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
             {% endfor %}
         </div>
         {% if contrib_fields %}
             <h3>{% trans %}Available filters for custom fields{% endtrans %}</h3>
-                    <div class="flexrow f-wrap">
+            <div class="flexrow f-wrap">
                 {% for field in contrib_fields %}
                     {{ _render_column_selector(field.id, field, field.filter_choices) }}
                 {% endfor %}
