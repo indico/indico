@@ -162,6 +162,7 @@ class RHContributionListCustomize(RHManageContributionsBase):
     ALLOW_LOCKED = True
 
     def _process_GET(self):
+        print(self.list_generator.list_config['filters'])
         return jsonify_template('events/contributions/contrib_list_filter.html',
                                 filters=self.list_generator.list_config['filters'],
                                 static_items=self.list_generator.static_items,
