@@ -420,7 +420,8 @@ def merge_users(source, target, force=False):
 
 
 def anonymize_user(user):
-
+    """Anonymize a user, removing all their personal data."""
+    signals.users.anonymized.send(user, flushed=False)
     user.first_name = '<anonymous>'
     user.last_name = f'<anonymous-{user.id}>'
     user.title = UserTitle.none
@@ -459,6 +460,8 @@ def anonymize_user(user):
         cls.query.filter(cls.user == user).delete()
 
     user.is_deleted = True
+    db.session.flush()
+    signals.users.anonymized.send(user, flushed=True)
 
 
 def get_color_for_user_id(user_id: t.Union[int, str]):

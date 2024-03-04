@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
+from indico.core import signals
 from indico.core.db import db
 from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.scopes import SCOPES
@@ -235,7 +236,6 @@ def anonymize(user_id):
         return
 
     anonymize_user(user)
-    db.session.flush()
     db.session.commit()
     click.secho('Successfully anonymized user', fg='green')
 
@@ -256,6 +256,8 @@ def delete(user_id):
     if not click.confirm(click.style('Permanently delete this user?', fg='yellow')):
         return
 
+    signals.users.db_deleted.send(user, flushed=False)
+
     try:
         db.session.delete(user)
         db.session.flush()
@@ -264,6 +266,7 @@ def delete(user_id):
         click.secho('Could not delete delete user', fg='red')
         click.echo(e)
     else:
+        signals.users.db_deleted.send(user, flushed=True)
         db.session.commit()
         click.secho('Successfully deleted user', fg='green')
 
