@@ -8,24 +8,14 @@
 import _ from 'lodash';
 
 // TODO: remove second condition when we start using number ids
-export const hasParent = entry => _.isNumber(entry.parent) || entry.parent;
+export const isContribution = entry => _.isNumber(entry.parent) || !!entry.parent;
 
-export const hasChild = (entry, entries) => entries.some(e => e.parent === entry.id);
+export const hasContributions = (block, contribs) => contribs.some(e => e.parent === block.id);
 
 export const getConcurrentEntries = (entry, entries) =>
   entries.filter(e => e.id !== entry.id && e.start < entry.end && e.end > entry.start);
 
 const getColumnId = (entry, topLevelEntries, draggedEntry) => {
-  if (hasParent(entry)) {
-    if (draggedEntry?.entryId === entry.id) {
-      return draggedEntry.targetResourceId;
-    }
-    return getColumnId(
-      topLevelEntries.find(e => e.id === entry.parent),
-      topLevelEntries,
-      draggedEntry
-    );
-  }
   // find all concurrent entries
   const concurrent = getConcurrentEntries(entry, topLevelEntries);
   if (concurrent.length === 0) {
@@ -89,18 +79,58 @@ const getColumnId = (entry, topLevelEntries, draggedEntry) => {
   return entry.resourceId;
 };
 
-export function processEntries(entries, draggedEntry = null) {
-  const topLevelEntries = entries.filter(e => !hasParent(e));
-  const newEntries = entries.map(entry => ({
-    ...entry,
-    resourceId: getColumnId(entry, topLevelEntries, draggedEntry),
+const processSessionBlocks = (sessionBlocks, draggedEntry = null) =>
+  sessionBlocks.map(sessionBlock => ({
+    ...sessionBlock,
+    resourceId: getColumnId(sessionBlock, sessionBlocks, draggedEntry),
+  }));
+
+const processContributions = (contributions, sessionBlocks, draggedEntry = null) =>
+  contributions.map(contrib => ({
+    ...contrib,
+    resourceId:
+      draggedEntry?.entryId === contrib.id
+        ? draggedEntry.targetResourceId
+        : sessionBlocks.find(e => e.id === contrib.parent).resourceId,
     parent:
-      draggedEntry?.entryId === entry.id && hasParent(entry)
-        ? getConcurrentEntries(entry, topLevelEntries).find(
+      draggedEntry?.entryId === contrib.id
+        ? getConcurrentEntries(contrib, sessionBlocks).find(
             e => e.resourceId === draggedEntry.targetResourceId
           )?.id
-        : entry.parent,
+        : contrib.parent,
   }));
-  const numColumns = _.max(newEntries.map(e => e.resourceId)) || 1;
-  return [newEntries, [...Array(numColumns).keys()].map(n => ({id: n + 1}))];
-}
+
+export const processEntries = (sessionBlocks, contributions, draggedEntry = null) => {
+  const newBlocks = processSessionBlocks(sessionBlocks, draggedEntry);
+  return {
+    sessionBlocks: newBlocks,
+    contributions: processContributions(contributions, newBlocks, draggedEntry),
+  };
+};
+
+const updateEntry = (entries, newEntry) => [...entries.filter(e => e.id !== newEntry.id), newEntry];
+
+export const moveEntry = ({sessionBlocks, contributions}, {entryId, start, end, resourceId}) => {
+  const entry =
+    sessionBlocks.find(e => e.id === entryId) || contributions.find(e => e.id === entryId);
+  const isContrib = isContribution(entry);
+  const newEntry = {...entry, start, end};
+  if (
+    isContrib &&
+    !getConcurrentEntries(newEntry, sessionBlocks).some(e => e.resourceId === resourceId)
+  ) {
+    return {sessionBlocks, contributions};
+  }
+  if (!isContrib && hasContributions(entry, contributions)) {
+    // TODO: move all child contributions as well (by entry.start - start)
+  }
+  return processEntries(
+    isContrib ? sessionBlocks : updateEntry(sessionBlocks, newEntry),
+    isContrib ? updateEntry(contributions, newEntry) : contributions,
+    {
+      entryId,
+      sourceResourceId: entry.resourceId,
+      targetResourceId: resourceId || entry.resourceId,
+    }
+  );
+};

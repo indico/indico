@@ -8,9 +8,13 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Navigate} from 'react-big-calendar';
+import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Menu} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+
+import * as actions from './actions';
+import * as selectors from './selectors';
 
 import './Toolbar.module.scss';
 
@@ -18,11 +22,11 @@ const MAX_DAYS = 9;
 const SCROLL_STEP = 3;
 
 export default function Toolbar({date, localizer, onNavigate}) {
+  const dispatch = useDispatch();
+  const compactMode = useSelector(selectors.isCompactModeEnabled);
+  const eventStart = useSelector(selectors.getEventStartDt);
+  const numDays = useSelector(selectors.getEventNumDays);
   const [offset, setOffset] = useState(0);
-  // TODO replace these with a selector
-  const eventStart = new Date(2023, 4, 8);
-  const eventEnd = new Date(2023, 5, 12);
-  const numDays = (eventEnd - eventStart) / (24 * 60 * 60 * 1000) + 1;
 
   return (
     <Menu styleName="toolbar" tabular>
@@ -70,11 +74,22 @@ export default function Toolbar({date, localizer, onNavigate}) {
           />
         </>
       )}
+      <Menu.Item
+        onClick={() => dispatch(actions.toggleCompactMode())}
+        icon={compactMode ? 'plus square outline' : 'minus square outline'}
+        position={numDays <= MAX_DAYS ? 'right' : undefined}
+        styleName="action"
+        title={
+          compactMode
+            ? Translate.string('Show full timetable')
+            : Translate.string('Show compact timetable')
+        }
+      />
       <Dropdown
         icon="add"
-        className={numDays <= MAX_DAYS ? 'right' : undefined}
         styleName="action"
         direction="left"
+        title={Translate.string('Add new')}
         item
       >
         <Dropdown.Menu>
