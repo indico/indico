@@ -7,7 +7,7 @@
 
 import noOverlap from 'react-big-calendar/lib/utils/layout-algorithms/no-overlap';
 
-import {getConcurrentEntries, hasChild, hasParent} from './util';
+import {getConcurrentEntries, hasContributions, isContribution} from './util';
 
 import styles from './Timetable.module.scss';
 
@@ -24,7 +24,7 @@ const makeTranslucent = hex => {
 };
 
 export const entryStyleGetter = entries => entry => {
-  if (hasParent(entry)) {
+  if (isContribution(entry)) {
     const parent = entries.find(e => e.id === entry.parent);
     return {
       style: {
@@ -41,21 +41,14 @@ export const entryStyleGetter = entries => entry => {
       backgroundColor: entry.color?.background,
       borderColor: entry.color?.background,
     },
-    className: hasChild(entry, entries) ? styles['parent-entry'] : undefined,
+    className: hasContributions(entry, entries) ? styles['parent-entry'] : undefined,
   };
-};
-
-export const tooltipAccessor = entries => entry => {
-  if (hasChild(entry, entries)) {
-    return entry.title;
-  }
-  return null;
 };
 
 export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
   noOverlap(props).map(styledEntry => {
     // if it's a child-entry, remove the padding, and make it wider if in compact mode
-    if (hasParent(styledEntry.event)) {
+    if (isContribution(styledEntry.event)) {
       const size = compact
         ? (100 - SESSION_BLOCK_WIDTH) / (100 / styledEntry.size - 1)
         : styledEntry.size;
@@ -78,7 +71,7 @@ export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
       return {...styledEntry, size, style};
     }
     // entries with children are squeezed when in compact mode
-    if (compact && hasChild(styledEntry.event, props.events)) {
+    if (compact && hasContributions(styledEntry.event, props.events)) {
       const style = {
         ...styledEntry.style,
         width: `${SESSION_BLOCK_WIDTH}%`,

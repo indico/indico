@@ -6,14 +6,17 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React, {useState} from 'react';
+import React from 'react';
 import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {entryStyleGetter, layoutAlgorithm, tooltipAccessor} from './layout';
-import initialValues from './timetable-data';
+import {toClasses} from 'indico/react/util';
+
+import * as actions from './actions';
+import {entryStyleGetter, layoutAlgorithm} from './layout';
+import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {processEntries} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 
@@ -23,35 +26,10 @@ const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function Timetable() {
-  const [_entries, _columns] = processEntries(initialValues);
-  const [entries, setEntries] = useState(_entries);
-  const [columns, setColumns] = useState(_columns);
-
-  const moveEntry = ({event: entry, start, end, resourceId}) => {
-    const existing = entries.find(e => e.id === entry.id) || {};
-    const filtered = entries.filter(e => e.id !== entry.id);
-    const newEntries = [...filtered, {...existing, start, end}];
-    const [processedEntries, newColumns] = processEntries(newEntries, {
-      entryId: entry.id,
-      sourceResourceId: existing.resourceId,
-      targetResourceId: resourceId,
-    });
-    setEntries(processedEntries);
-    setColumns(newColumns);
-  };
-
-  const resizeEntry = ({event: entry, start, end}) => {
-    const existing = entries.find(ev => ev.id === entry.id) ?? {};
-    const filtered = entries.filter(ev => ev.id !== entry.id);
-    const newEntries = [...filtered, {...existing, start, end}];
-    const [processedEntries, newColumns] = processEntries(newEntries, {
-      entryId: entry.id,
-      sourceResourceId: existing.resourceId,
-      targetResourceId: existing.resourceId,
-    });
-    setEntries(processedEntries);
-    setColumns(newColumns);
-  };
+  const dispatch = useDispatch();
+  const compactMode = useSelector(selectors.isCompactModeEnabled);
+  const entries = useSelector(selectors.getAllEntries);
+  const numColumns = Math.max(...entries.map(e => e.resourceId)) || 1;
 
   const defaultDate = entries.reduce(
     (min, {start}) => (start < min ? start : min),
@@ -76,25 +54,25 @@ export default function Timetable() {
 
   return (
     <DnDCalendar
-      styleName="timetable"
+      styleName={toClasses({timetable: true, compact: compactMode})}
       defaultDate={defaultDate}
       defaultView="day"
       events={entries}
       localizer={localizer}
       views={{day: true}}
       components={{toolbar: Toolbar}}
-      resources={columns}
-      onEventDrop={moveEntry}
-      onEventResize={resizeEntry}
+      resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
+      onEventDrop={args => dispatch(actions.moveEntry(args.event.id, args))}
+      onEventResize={args => dispatch(actions.resizeEntry(args.event.id, args))}
       onSelectSlot={(...args) => console.debug('onSelectSlot', ...args)}
       eventPropGetter={entryStyleGetter(entries)}
-      dayLayoutAlgorithm={layoutAlgorithm(entries, columns.length, true)}
+      dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, compactMode)}
       allDayMaxRows={0}
       step={5}
       timeslots={6}
       min={new Date(1972, 0, 1, minHour, 0, 0)}
       max={new Date(1972, 0, 1, maxHour, 0, 0)}
-      tooltipAccessor={tooltipAccessor(entries)}
+      tooltipAccessor={null}
       resizable
       selectable
     />

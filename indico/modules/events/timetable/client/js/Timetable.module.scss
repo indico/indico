@@ -5,17 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.timetable :global(.rbc-time-view-resources) {
+@use 'base/palette' as *;
+
+.timetable {
   border-top: 0;
 
   .parent-entry {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-
-    :global(.rbc-event-label),
-    :global(.rbc-event-content) {
-      display: none;
-    }
   }
 
   .child-entry {
@@ -24,8 +21,35 @@
     border-left-width: 0;
   }
 
+  &.compact .parent-entry {
+    overflow: visible;
+
+    :global(.rbc-addons-dnd-resizable) {
+      overflow: visible;
+    }
+
+    :global(.rbc-event-content) {
+      position: absolute;
+      top: -23px;
+      width: 13em;
+      height: 20px;
+      background-color: rgba($light-gray, 0.9);
+      color: $black;
+      padding: 0.3em;
+      border-radius: 5px 5px 0 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &:not(.compact) :global(.rbc-day-slot) {
+    min-width: 25em;
+  }
+
   :global(.rbc-allday-cell),
-  :global(.rbc-row-resource) {
+  :global(.rbc-row-resource),
+  :global(.rbc-event-label) {
     display: none;
   }
 

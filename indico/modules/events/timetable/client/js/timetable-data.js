@@ -7,14 +7,14 @@
 
 import {timetableData} from './sample-data';
 
-const sessions = Object.values(timetableData)
+const sessionBlocks = Object.values(timetableData)
   .map(e => Object.values(e))
   .flat();
-const contribs = sessions
+const contribs = sessionBlocks
   .map(e => (e.entries ? Object.values(e.entries).map(v => ({...v, parent: e.id})) : []))
   .flat();
 
-export default [...sessions, ...contribs].map(e => ({
+export default [...sessionBlocks, ...contribs].map(e => ({
   id: e.id,
   title: e.title,
   start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
