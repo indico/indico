@@ -44,6 +44,7 @@ def _print_user_info(user):
     print(f'  Family name: {user.last_name}')
     print(f'  Email: {user.email}')
     print(f'  Affiliation: {user.affiliation}')
+    print(f'  Last login: {user.last_login_dt.date() if user.last_login_dt else "never"}')
     if flags:
         print(cformat('  Flags: {}'.format(', '.join(flags))))
     print()
