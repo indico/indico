@@ -33,8 +33,10 @@ class VCRoomField(HiddenField):
         if valuelist and valuelist[0].isdigit():
             self.data = VCRoom.get(valuelist[0])
 
-    def _value(self):
-        return [{'id': self.data.id}] if self.data is not None else None
+    def _value(self, for_react=False):
+        if not self.data:
+            return None
+        return [{'id': self.data.id}] if for_react else self.data.id
 
 
 class LinkingWidget(JinjaWidget):

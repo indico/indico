@@ -179,8 +179,10 @@ class AbstractField(QuerySelectField):
                 for key, abstract in super()._get_object_list()
                 if abstract.can_access(session.user)]
 
-    def _value(self):
-        return [self._serialize_abstract(self.data)] if self.data else None
+    def _value(self, for_react=False):
+        if not self.data:
+            return None
+        return [self._serialize_abstract(self.data)] if for_react else self.data.id
 
     def pre_validate(self, form):
         super().pre_validate(form)

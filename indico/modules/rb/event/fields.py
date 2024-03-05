@@ -20,7 +20,7 @@ class LinkedObjectField(Field):
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
         super().__init__(*args, **kwargs)
 
-    def _value(self):
+    def _value(self, for_react=False):
         pass
 
     @property
