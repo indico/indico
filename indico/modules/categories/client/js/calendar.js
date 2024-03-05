@@ -23,6 +23,8 @@ import CalendarLegend from './components/CalendarLegend';
 (function(global) {
   let groupBy = 'category';
   const filteredLegendElements = new Set();
+  const filteredKeywords = new Set();
+  const filteringByKeyword = () => groupBy === 'keywords';
   let closeCalendar = null;
   let ignoreClick = false;
   global.setupCategoryCalendar = function setupCategoryCalendar(
@@ -105,11 +107,22 @@ import CalendarLegend from './components/CalendarLegend';
       },
       events({start, end}, successCallback, failureCallback) {
         function updateCalendar(data) {
-          const attr = {category: 'categoryId', location: 'venueId', room: 'roomId'}[groupBy];
+          const attr = {
+            category: 'categoryId',
+            location: 'venueId',
+            room: 'roomId',
+            keywords: 'keywordId',
+          }[groupBy];
           if (!attr) {
             throw new Error(`Invalid "groupBy": ${groupBy}`);
           }
-          const filteredEvents = data.events.filter(e => !filteredLegendElements.has(e[attr] ?? 0));
+          const filteredEvents = data.events.filter(e => {
+            let result = !filteredLegendElements.has(e[attr] ?? 0);
+            if (filteringByKeyword() && e.keywords.length) {
+              result ||= !e.keywords.every(kw => filteredKeywords.has(kw));
+            }
+            return result;
+          });
           successCallback(filteredEvents);
           const toolbarGroup = $(containerCalendarSelector).find(
             '.fc-toolbar .fc-toolbar-chunk:last-child'
@@ -146,40 +159,46 @@ import CalendarLegend from './components/CalendarLegend';
           const onFilterChanged = filterBy => {
             groupBy = filterBy;
             filteredLegendElements.clear();
+            filteredKeywords.clear();
             calendar.refetchEvents();
           };
-          const onElementSelected = (elementId, checked, elementSubitems, parent) => {
-            const handleSingle = (singleId, singleChecked) => {
+          const onElementSelected = (element, checked, refetch = true) => {
+            const handleSingle = (singleElement, singleChecked) => {
               if (singleChecked) {
-                filteredLegendElements.delete(singleId);
+                filteredLegendElements.delete(singleElement.id);
               } else {
-                filteredLegendElements.add(singleId);
+                filteredLegendElements.add(singleElement.id);
+              }
+              if (element.onClick) {
+                element.onClick(singleChecked, refetch);
               }
             };
-            const handleRecursive = (recursiveId, recursiveSubitems) => {
-              handleSingle(recursiveId, checked);
-              recursiveSubitems.forEach(({id, subitems}) => handleRecursive(id, subitems));
+            const handleRecursive = recursiveElement => {
+              handleSingle(recursiveElement, checked);
+              recursiveElement.subitems.forEach(elem => handleRecursive(elem));
             };
 
             // handle descendents
-            handleRecursive(elementId, elementSubitems);
+            handleRecursive(element);
 
             // handle parent
-            if (parent) {
-              const parentChecked = !parent.subitems.every(({id}) =>
+            if (element.parent) {
+              const parentChecked = !element.parent.subitems.every(({id}) =>
                 filteredLegendElements.has(id)
               );
-              handleSingle(parent.id, parentChecked);
+              handleSingle(element.parent, parentChecked);
             }
 
-            calendar.refetchEvents();
+            if (refetch) {
+              calendar.refetchEvents();
+            }
           };
           const selectAll = () => {
-            items.forEach(({id, subitems}) => onElementSelected(id, true, subitems));
+            items.forEach(e => onElementSelected(e, true, false));
             calendar.refetchEvents();
           };
           const deselectAll = () => {
-            items.forEach(({id, subitems}) => onElementSelected(id, false, subitems));
+            items.forEach(e => onElementSelected(e, false, false));
             calendar.refetchEvents();
           };
           const filterLegendElement = item => {
@@ -195,9 +214,22 @@ import CalendarLegend from './components/CalendarLegend';
               onElementSelected={onElementSelected}
               selectAll={selectAll}
               deselectAll={deselectAll}
+              filterByKeywords={data.allow_keywords}
             />,
             legendContainer
           );
+        }
+
+        function sortItems(items, sortMethod = undefined) {
+          items.sort((a, b) => {
+            if (a.isSpecial) {
+              return -1;
+            } else if (b.isSpecial) {
+              return 1;
+            }
+            return sortMethod ? sortMethod(a.title, b.title) : a.title.localeCompare(b.title);
+          });
+          return items;
         }
 
         function setupLegendByAttribute({
@@ -206,7 +238,7 @@ import CalendarLegend from './components/CalendarLegend';
           attr,
           defaultTitle,
           rootId,
-          rootTitle = undefined,
+          rootTitle,
           sortMethod = undefined,
         }) {
           const itemMap = items.reduce(
@@ -217,8 +249,8 @@ import CalendarLegend from './components/CalendarLegend';
             {}
           );
           const usedItems = new Set();
-          return events
-            .reduce((acc, value) => {
+          return sortItems(
+            events.reduce((acc, value) => {
               const id = value[attr] ?? 0;
               if (usedItems.has(id)) {
                 return acc;
@@ -238,15 +270,9 @@ import CalendarLegend from './components/CalendarLegend';
                   parent: null,
                 },
               ];
-            }, [])
-            .sort((a, b) => {
-              if (a.isSpecial) {
-                return -1;
-              } else if (b.isSpecial) {
-                return 1;
-              }
-              return sortMethod ? sortMethod(a.title, b.title) : a.title.localeCompare(b.title);
-            });
+            }, []),
+            sortMethod
+          );
         }
 
         function setupLegendByRoom(events, locations, rooms) {
@@ -306,6 +332,57 @@ import CalendarLegend from './components/CalendarLegend';
           return [...noRoom, ...Object.values(groupedLocations)];
         }
 
+        function setupLegendByKeywords(events, keywords) {
+          let items = [];
+          const noKeywords = events.filter(e => !e.keywords.length);
+          const manyKeywords = events.filter(e => e.keywords.length > 1);
+          if (noKeywords.length) {
+            items = [
+              ...items,
+              ...setupLegendByAttribute({
+                events: noKeywords,
+                items: keywords,
+                attr: 'keywordId',
+                defaultTitle: Translate.string('No keywords'),
+                rootId: 0,
+              }),
+            ];
+          }
+          if (manyKeywords.length) {
+            items = [
+              ...items,
+              ...setupLegendByAttribute({
+                events: manyKeywords,
+                items: keywords,
+                attr: 'keywordId',
+                defaultTitle: Translate.string('Multiple keywords'),
+                rootId: 1,
+              }),
+            ];
+          }
+          const extraItems = keywords.map(kw => ({
+            title: kw.title,
+            color: kw.color,
+            url: undefined,
+            isSpecial: false,
+            id: kw.id,
+            subitems: [],
+            parent: null,
+            onClick: (checked, refetch = true) => {
+              if (checked) {
+                filteredKeywords.delete(kw.title);
+              } else {
+                filteredKeywords.add(kw.title);
+              }
+
+              if (refetch) {
+                calendar.refetchEvents();
+              }
+            },
+          }));
+          return sortItems([...items, ...extraItems]);
+        }
+
         function updateLegend(data) {
           let items;
           switch (data.group_by) {
@@ -330,6 +407,9 @@ import CalendarLegend from './components/CalendarLegend';
               break;
             case 'room':
               items = setupLegendByRoom(data.events, data.locations, data.rooms);
+              break;
+            case 'keywords':
+              items = setupLegendByKeywords(data.events, data.keywords);
               break;
             default:
               items = [];

@@ -12,7 +12,7 @@
     <script>
         setupSearchDropdownWidget({
             fieldId: {{ field.id | tojson }},
-            defaultValue: {{ (field._value() or []) | tojson }},
+            defaultValue: {{ (field._value(for_react=true) or []) | tojson }},
             minTriggerLength: {{ min_trigger_length | tojson }},
             searchUrl: {{ search_url | tojson }},
             searchMethod: {{ search_method | tojson }},

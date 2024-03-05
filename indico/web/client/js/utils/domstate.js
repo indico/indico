@@ -12,3 +12,5 @@ export const domReady = new Promise(resolve => {
     window.addEventListener('DOMContentLoaded', resolve);
   }
 });
+
+window.domReady = domReady;

@@ -1,0 +1,16 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block title %}
+    {% trans %}Allowed event keywords{% endtrans %}
+{% endblock %}
+
+{% block description %}
+    {% trans %}
+        Define the list of allowed event keywords. An empty list implies any keyword is valid.
+    {% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ simple_form(form, back_button=false) }}
+{% endblock %}

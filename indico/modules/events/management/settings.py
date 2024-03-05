@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.core.settings import SettingsProxy
 from indico.modules.events.settings import EventSettingsProxy
 
 
@@ -21,4 +22,8 @@ privacy_settings = EventSettingsProxy('privacy', {
     'data_controller_email': '',
     'privacy_policy_urls': [],
     'privacy_policy': '',
+})
+
+global_event_settings = SettingsProxy('events', {
+    'allowed_keywords': [],
 })

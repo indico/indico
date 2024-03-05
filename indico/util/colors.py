@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import colorsys
+import functools
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 
@@ -46,6 +47,7 @@ def _rgb_to_hex(rgb):
     return f'#{int(rgb[0] * 255):02x}{int(rgb[1] * 255):02x}{int(rgb[2] * 255):02x}'
 
 
+@functools.cache
 def generate_contrast_colors(seed):
     """Generates a background and text colors with sufficient contrast given a seed."""
     hue = 1.0 / (1.0 + seed % 20)

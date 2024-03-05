@@ -28,6 +28,7 @@ from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import Event, LegacyEventMapping
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import EventReference, ReferenceType
@@ -41,7 +42,7 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
                                      IndicoPasswordField, IndicoProtectionField, IndicoRadioField,
-                                     IndicoSelectMultipleCheckboxField, IndicoTagListField, IndicoTimezoneSelectField,
+                                     IndicoSelectMultipleCheckboxField, IndicoTimezoneSelectField,
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import IndicoLinkListField
@@ -215,7 +216,7 @@ class EventContactInfoForm(IndicoForm):
 
 
 class EventClassificationForm(IndicoForm):
-    keywords = IndicoTagListField(_('Keywords'))
+    # The 'keywords' field is dynamically added when creating the form.
     references = ReferencesField(_('External IDs'), reference_class=EventReference)
     label = QuerySelectField(_('Label'), allow_blank=True, get_label='title')
     label_message = TextAreaField(_('Label message'),
@@ -231,6 +232,12 @@ class EventClassificationForm(IndicoForm):
         if not self.label.query.has_rows():
             del self.label
             del self.label_message
+
+    def validate_keywords(self, field):
+        allowed_keywords = set(global_event_settings.get('allowed_keywords')) | set(field.object_data)
+        keywords = set(field.data)
+        if allowed_keywords and not (keywords <= allowed_keywords):
+            raise ValidationError('Invalid keyword found')
 
 
 class EventPrivacyForm(IndicoForm):

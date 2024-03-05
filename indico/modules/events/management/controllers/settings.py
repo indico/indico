@@ -16,6 +16,7 @@ from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLanguagesForm, EventLocationForm,
                                                     EventPersonsForm)
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
 from indico.modules.events.models.labels import EventLabel
@@ -27,9 +28,11 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_check_if_visible
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.fields import IndicoStrictKeywordsField, IndicoTagListField
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -145,8 +148,16 @@ class RHEditEventContactInfo(RHEditEventDataBase):
 
 
 class RHEditEventClassification(RHEditEventDataBase):
-    form_class = EventClassificationForm
     section_name = 'classification'
+
+    @property
+    def form_class(self):
+        if allowed_keywords := global_event_settings.get('allowed_keywords'):
+            choices = [{'id': kw, 'name': kw} for kw in (set(allowed_keywords) | set(self.event.keywords))]
+            keywords = IndicoStrictKeywordsField(_('Keywords'), choices=choices)
+        else:
+            keywords = IndicoTagListField(_('Keywords'))
+        return type('_EventClassificationForm', (EventClassificationForm,), {'keywords': keywords})
 
 
 class RHEditEventLanguages(RHEditEventDataBase):
