@@ -7,10 +7,11 @@
 
 import {createSelector} from 'reselect';
 
+import {getNumDays} from './util';
+
 export const getStaticData = state => state.staticData;
-
 export const getEntries = state => state.entries;
-
+export const getNavigation = state => state.navigation;
 export const isCompactModeEnabled = state => state.compactMode;
 
 export const getEventStartDt = createSelector(
@@ -26,7 +27,7 @@ export const getEventEndDt = createSelector(
 export const getEventNumDays = createSelector(
   getEventStartDt,
   getEventEndDt,
-  (startDt, endDt) => (endDt - startDt) / (24 * 60 * 60 * 1000) + 1
+  (startDt, endDt) => getNumDays(startDt, endDt) + 1
 );
 
 export const getSessionBlocks = createSelector(
@@ -43,4 +44,14 @@ export const getAllEntries = createSelector(
   getSessionBlocks,
   getContributions,
   (sessionBlocks, contributions) => [...sessionBlocks, ...contributions]
+);
+
+export const getNavbarMaxDays = createSelector(
+  getNavigation,
+  navigation => navigation.numDays
+);
+
+export const getNavbarOffset = createSelector(
+  getNavigation,
+  navigation => navigation.offset
 );
