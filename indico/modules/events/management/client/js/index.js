@@ -20,7 +20,6 @@ import './badges';
 import {AuthorsListButton} from 'indico/modules/events/persons/AuthorsListButton';
 import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
 import {EmailParticipantRolesButton} from 'indico/modules/events/persons/EmailParticipantRolesButton';
-import {EmailSurveyParticipantsButton} from 'indico/modules/events/surveys/EmailSurveyParticipantsButton';
 import {$T} from 'indico/utils/i18n';
 import {natSortCompare} from 'indico/utils/sort';
 
@@ -63,21 +62,6 @@ import {SeriesManagement} from './SeriesManagement';
         previewURL={previewUrl}
         sendURL={sendUrl}
         className="js-requires-selected-row disabled"
-      />,
-      element
-    );
-  };
-
-  global.setupEmailSurveyParticipantsButton = function setupEmailSurveyParticipantsButton(
-    containerSelector
-  ) {
-    const element = document.querySelector(containerSelector);
-    const {eventId, surveyId, surveyActive} = element.dataset;
-    ReactDOM.render(
-      <EmailSurveyParticipantsButton
-        eventId={+eventId}
-        surveyId={+surveyId}
-        surveyActive={surveyActive !== undefined}
       />,
       element
     );
