@@ -18,6 +18,7 @@ import {ConfirmButton} from 'indico/react/components';
 import {handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
+import {injectModal} from 'indico/react/util';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
@@ -37,7 +38,6 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [renderMode, setRenderMode] = useState(undefined);
   const [closeAndReload, setCloseAndReload] = useState(false);
   const [currentNoteRevision, setCurrentNoteRevision] = useState(null);
-  const [noteConflict, setNoteConflict] = useState(false);
 
   const combineNotes = (resp, mode) => {
     if (mode === 'markdown') {
@@ -120,16 +120,25 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       if (!currentValue) {
         await indicoAxios.delete(apiURL);
       } else {
-        await indicoAxios.post(apiURL, {
+        const resp = await indicoAxios.post(apiURL, {
           source: currentValue,
           render_mode: renderMode,
           revision: currentNoteRevision,
         });
+        setCurrentNoteRevision(resp.data);
       }
     } catch (e) {
       if (_.get(e, 'response.status') === 418) {
         // handle note conflict
-        setNoteConflict(true);
+        injectModal(resolveModal => (
+          <NoteConflictModal
+            currentNoteSource={currentValue}
+            externalNoteSource={currentNoteRevision}
+            onClose={() => {
+              resolveModal();
+            }}
+          />
+        ));
         return;
       }
       return handleSubmitError(e);
@@ -216,12 +225,6 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       )}
       {console.log('currentNoteRevision -> ', currentNoteRevision)}
       {console.log('current revision id -> ', currentNoteRevision?.id)}
-      {noteConflict && (
-        <NoteConflictModal
-          currentNoteSource={currentInput}
-          externalNoteSource={currentNoteRevision}
-        />
-      )}
     </>
   );
 }
