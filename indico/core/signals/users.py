@@ -36,6 +36,25 @@ Called when two users are merged. The *sender* is the main user while the merged
 user (i.e. the one being deleted in the merge) is passed via the *source* kwarg.
 ''')
 
+db_deleted = _signals.signal('db-deleted', '''
+Called when a user is being permanently deleted from the DB. The *sender* is the user
+object. Since permanent deletions of users can easily fail due to DB constraints, this
+signal is called once BEFORE the deletion actually happens, and then once again after
+flushing the changes to the database was successful. Each call contains the `flushed`
+kwarg indicating whether the deletion has already been flushed to the database or not.
+When using this signal to remove any external data, you must only perform these changes
+once the deletion was successful, since otherwise you removed data for a user that still
+exists in Indico.
+''')
+
+anonymized = _signals.signal('anonymized', '''
+Called when a user is being anonymized. The *sender* is the user object.
+This signal is called once before the anonymization itself actually happens in case the
+code handling the signal needs to access e.g. the email address of the user and once after
+the changes have been flushed to the database. Each call contains the `flushed` kwarg
+indicating whether the signal is being called before or after flushing the changes.
+''')
+
 email_added = _signals.signal('email-added', '''
 Called when a new email address is added to a user.  The *sender* is
 the user object and the email address is passed in the `email` kwarg.

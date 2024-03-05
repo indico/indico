@@ -310,6 +310,8 @@ class RHProfilePicturePreview(RHUserBase):
     This always uses a fresh picture without any caching.
     """
 
+    flash_user_status = False
+
     @use_kwargs({'source': EnumField(ProfilePictureSource)}, location='view_args')
     def _process(self, source):
         if source == ProfilePictureSource.standard:
@@ -330,7 +332,7 @@ class RHProfilePictureDisplay(RH):
     """Display the user's profile picture."""
 
     def _process_args(self):
-        self.user = User.get_or_404(request.view_args['user_id'], is_deleted=False)
+        self.user = User.get_or_404(request.view_args['user_id'])
 
     def _process(self):
         return send_avatar(self.user)

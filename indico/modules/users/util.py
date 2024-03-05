@@ -24,7 +24,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
-from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalPermissionsMixin, PrincipalType
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
@@ -417,6 +417,63 @@ def merge_users(source, target, force=False):
     db.session.flush()
 
     logger.info('Successfully merged %s into %s', source, target)
+
+
+def anonymize_user(user):
+    """Anonymize a user, removing all their personal data."""
+    signals.users.anonymized.send(user, flushed=False)
+    user.first_name = '<anonymous>'
+    user.last_name = f'<anonymous-{user.id}>'
+    user.title = UserTitle.none
+    user.affiliation = ''
+    user.affiliation_id = None
+    user.phone = ''
+    user.address = ''
+    user.picture = None
+    user.picture_metadata = None
+    user.picture_source = ProfilePictureSource.standard
+    user.favorite_users = set()
+    user.favorite_events = set()
+    user.favorite_categories = set()
+    user.identities = set()
+    user.is_admin = False
+
+    # Reset/invalidate any tokens for the user
+    if user.api_key:
+        user.api_key.is_active = False
+    user.reset_signing_secret()
+    user.oauth_app_links.delete()
+    for token in user.personal_tokens:
+        token.revoke()
+
+    user.secondary_emails.clear()
+    user.email = f'indico-{user.id}@indico.invalid'
+
+    editables = user.editor_for_editables
+    for editable in editables:
+        editable.editor = None
+
+    reservations = user.reservations_booked_for
+    for reservation in reservations:
+        reservation.booked_for_name = user.full_name
+
+    user.event_roles.clear()
+    user.category_roles.clear()
+    user.suggested_categories.order_by(None).delete()
+
+    # Unlink registrations + persons (those hold personal data and are linked by email which no longer matches)
+    user.registrations.update({db.m.Registration.user_id: None})
+    user.event_persons.update({db.m.EventPerson.user_id: None})
+
+    principal_classes = [sc for sc in [*PrincipalMixin.__subclasses__(), *PrincipalPermissionsMixin.__subclasses__()]
+                         if hasattr(sc, 'query')]
+
+    for cls in principal_classes:
+        cls.query.filter(cls.user == user).delete()
+
+    user.is_deleted = True
+    db.session.flush()
+    signals.users.anonymized.send(user, flushed=True)
 
 
 def get_color_for_user_id(user_id: t.Union[int, str]):
