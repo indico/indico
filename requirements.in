@@ -40,7 +40,6 @@ marshmallow-enum
 marshmallow-oneofschema
 marshmallow-sqlalchemy
 marshmallow
-node-semver<0.9  # remove this dependency altogether once there's a new pywebpack release
 packaging
 pillow
 prompt-toolkit

@@ -234,10 +234,6 @@ mdurl==0.1.2
     # via markdown-it-py
 mypy-extensions==1.0.0
     # via typing-inspect
-node-semver==0.8.1
-    # via
-    #   -r requirements.in
-    #   pywebpack
 ordered-set==4.1.0
     # via flask-limiter
 packaging==23.2
@@ -310,7 +306,7 @@ pytz==2023.3.post1
     #   -r requirements.in
     #   flask-babel
     #   icalendar
-pywebpack==1.2.0
+pywebpack==2.0.0
     # via
     #   -r requirements.in
     #   flask-webpackext
