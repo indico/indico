@@ -20,6 +20,7 @@ from indico.modules.events.schemas import AutoLinkerRuleSchema
 from indico.modules.events.settings import autolinker_settings, unlisted_events_settings
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -129,7 +130,7 @@ class RHUpdateEventKeywords(RHAdminBase):
         form = EventKeywordsForm()
         keywords = global_event_settings.get('allowed_keywords')
         if form.validate_on_submit():
-            keywords = sorted({kw.lower() for kw in form.data.get('keywords', [])})
+            keywords = sorted(set(form.data.get('keywords', [])), key=natural_sort_key)
             global_event_settings.set('allowed_keywords', keywords)
             flash(_('Allowed keywords have been saved'), 'success')
             return redirect(url_for('.event_keywords'))

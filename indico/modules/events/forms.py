@@ -76,6 +76,16 @@ class EventLabelForm(IndicoForm):
 class EventKeywordsForm(IndicoForm):
     keywords = IndicoTagListField(_('Keywords'))
 
+    def post_validate(self):
+        # case-insensitive keywords deduplication
+        keywords = []
+        seen_keywords = set()
+        for keyword in self.keywords.data:
+            if keyword.lower() not in seen_keywords:
+                keywords.append(keyword)
+                seen_keywords.add(keyword.lower())
+        self.keywords.data = keywords
+
 
 class EventCreationFormBase(IndicoForm):
     listing = IndicoButtonsBooleanField(_('Listing'), default=True,
