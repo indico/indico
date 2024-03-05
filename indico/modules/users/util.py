@@ -446,9 +446,8 @@ def anonymize_user(user):
     for token in user.personal_tokens:
         token.revoke()
 
-    UserEmail.query.filter(UserEmail.user == user).delete()
-    email = UserEmail(user_id=user.id, email=f'indico-{user.id}@indico.invalid', is_primary=True)
-    db.session.add(email)
+    user.secondary_emails.clear()
+    user.email = f'indico-{user.id}@indico.invalid'
 
     editables = user.editor_for_editables
     for editable in editables:
