@@ -12,24 +12,5 @@
 {% endblock %}
 
 {% block content %}
-    {{ simple_form(form, back_button=false, disabled_until_change=false) }}
-
-    <script>
-        domReady.then(() => {
-            const id = 'keyword-container';
-            const input = document.querySelector('#{{ form.keywords.id }}');
-            const field = input.parentElement;
-            field.id = id;
-            field.classList.add('i-taglist-field');
-            input.remove();
-            new Taggle(id, {
-                tags: {{ keywords|tojson }},
-                allowDuplicates: false,
-                preserveCase: true,
-                saveOnBlur: true,
-                placeholder: '',
-                hiddenInputName: 'keywords',
-            });
-        });
-    </script>
+    {{ simple_form(form, back_button=false) }}
 {% endblock %}

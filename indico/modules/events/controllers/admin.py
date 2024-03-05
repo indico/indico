@@ -127,14 +127,13 @@ class RHUpdateEventKeywords(RHAdminBase):
     """Update event keywords."""
 
     def _process(self):
-        form = EventKeywordsForm()
-        keywords = global_event_settings.get('allowed_keywords')
+        form = EventKeywordsForm(keywords=global_event_settings.get('allowed_keywords'))
         if form.validate_on_submit():
             keywords = sorted(set(form.data.get('keywords', [])), key=natural_sort_key)
             global_event_settings.set('allowed_keywords', keywords)
             flash(_('Allowed keywords have been saved'), 'success')
             return redirect(url_for('.event_keywords'))
-        return WPEventAdmin.render_template('admin/event_keywords.html', 'event_keywords', keywords=keywords, form=form)
+        return WPEventAdmin.render_template('admin/event_keywords.html', 'event_keywords', form=form)
 
 
 class RHEditEventLabel(RHManageEventLabelBase):
