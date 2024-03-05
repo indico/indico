@@ -27,19 +27,11 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
   const [open, setOpen] = useState(true);
   console.log('externalNoteSource', externalNoteSource);
 
-  /* const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-  }; */
-
   /*
    * TODO:
-   *  - Add another button to cancel the dialog (close and return back without doing anything?) (need to fix this!)
-   *  - Fix saving!!!
    *  - Actions for the buttons
+   *  - Fix edge case
+   *  - Test deletion
    */
   return (
     <Modal

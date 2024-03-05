@@ -96,7 +96,7 @@ class RHApiNote(RHManageNoteBase):
             logger.info('Note %s modified by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.change, 'Minutes', 'Updated minutes',
                            session.user, data=note.link_event_log_data)
-        return '', 204
+        return EventNoteSchema().dump(note.current_revision), 200
 
     def _process_DELETE(self):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
@@ -106,7 +106,7 @@ class RHApiNote(RHManageNoteBase):
             logger.info('Note %s deleted by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.negative, 'Minutes', 'Removed minutes',
                            session.user, data=note.link_event_log_data)
-        return '', 204
+        return '', 204  # TODO: Test deletion -> dump note schema here also
 
 
 class RHApiCompileNotes(RHManageNoteBase):
