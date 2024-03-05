@@ -60,7 +60,10 @@ RecipientsField.propTypes = {
 export function EmailSentMessage({count}) {
   return (
     <Message positive>
-      <Translate as={Message.Header}>Your email has been sent.</Translate>
+      <PluralTranslate as={Message.Header} count={count}>
+        <Singular>Your email has been sent.</Singular>
+        <Plural>Your emails have been sent.</Plural>
+      </PluralTranslate>
       <PluralTranslate count={count} as="p">
         <Singular>
           <Param name="count" value={count} /> email has been sent.
