@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import * as actions from './actions';
-import {moveEntry, processEntries} from './util';
+import {moveEntry, processEntries, resizeWindow} from './util';
 
 const preprocessData = data => {
   // TODO remove this preprocessing once the backend returns the data in the correct format
@@ -38,6 +38,16 @@ export default {
         return moveEntry(state, action);
       case actions.RESIZE_ENTRY:
         return moveEntry(state, action);
+      default:
+        return state;
+    }
+  },
+  navigation: (state = {numDays: 2, offset: 0}, action) => {
+    switch (action.type) {
+      case actions.SCROLL_NAVBAR:
+        return {...state, offset: action.offset};
+      case actions.RESIZE_WINDOW:
+        return resizeWindow(state, action);
       default:
         return state;
     }
