@@ -150,7 +150,7 @@ class RHSendSurveyLinks(RHManageSurveyBase):
             num = len(form.recipients.data)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data(flash=True)
-        return jsonify_form(form)
+        return jsonify_form(form, submit=_('Send'))
 
     def _send_emails(self, form, recipients):
         for recipient in recipients:

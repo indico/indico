@@ -6,7 +6,7 @@
     {% if survey.private and survey.state.name in ('active_and_clean', 'active_and_answered') %}
         <div class="action-box highlight">
             <div class="section">
-                <div class="icon icon-lock"></div>
+                <div class="icon icon-lock-center"></div>
                 <div class="text">
                     <div class="label">
                         {%- trans %}The survey is private{% endtrans -%}
@@ -24,7 +24,7 @@
                     {%- endtrans %}
                 </div>
                 <div class="toolbar">
-                    <button class="i-button icon-mail right highlight js-requires-selected-row send-mails-btn"
+                    <button class="i-button icon-mail highlight js-requires-selected-row send-mails-btn"
                             data-href="{{ url_for('surveys.send_links', survey) }}"
                             data-title="{% trans %}Send survey links{% endtrans %}"
                             data-method="POST"
