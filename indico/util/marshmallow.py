@@ -23,6 +23,7 @@ from indico.core.config import config
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.placeholders import get_missing_placeholders
 from indico.util.string import get_format_placeholders, has_relative_links
 from indico.util.user import principal_from_identifier
 
@@ -62,7 +63,7 @@ def no_relative_urls(value):
         raise ValidationError(_('Links and images may not use relative URLs.'))
 
 
-def validate_placeholders(format_string, valid_placeholders, required_placeholders=None):
+def validate_format_placeholders(format_string, valid_placeholders, required_placeholders=None):
     """Validate that a string contains only the correct format placeholders.
 
     This MUST ALWAYS be used when accepting format strings from users or other
@@ -77,6 +78,19 @@ def validate_placeholders(format_string, valid_placeholders, required_placeholde
         raise ValidationError('Missing placeholders: {}'.format(', '.join(missing)))
     if invalid := placeholders - valid_placeholders:
         raise ValidationError('Invalid placeholders: {}'.format(', '.join(invalid)))
+
+
+def make_validate_indico_placeholders(context, /, **kwargs):
+    """Create a marshmallow validator for missing placeholders.
+
+    This uses the generic signal-based placeholder system.
+    """
+    def _validate_indico_placeholders(value):
+        missing = get_missing_placeholders(context, value, **kwargs)
+        if missing:
+            raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
+
+    return _validate_indico_placeholders
 
 
 def file_extension(*exts):
