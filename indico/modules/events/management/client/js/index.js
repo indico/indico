@@ -73,7 +73,6 @@ import {SeriesManagement} from './SeriesManagement';
   ) {
     const element = document.querySelector(containerSelector);
     const {eventId, surveyId, surveyActive} = element.dataset;
-    console.log(surveyActive);
     ReactDOM.render(
       <EmailSurveyParticipantsButton
         eventId={+eventId}
