@@ -175,6 +175,7 @@ export default function RegistrationFormSubmission() {
     >
       {fprops => (
         <form onSubmit={fprops.handleSubmit}>
+          {renderPluginComponents('regformBeforeSections')}
           {sections.map(section => (
             <FormSection key={section.id} {...section} />
           ))}
