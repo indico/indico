@@ -20,7 +20,7 @@ from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.views import WPManageSurvey
 from indico.util.i18n import _, ngettext
-from indico.util.marshmallow import LowercaseString, not_empty
+from indico.util.marshmallow import LowercaseString, make_validate_indico_placeholders, not_empty
 from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -214,7 +214,10 @@ class RHEmailEventSurveyPreview(RHEmailEventSurveyBase):
 class RHAPIEmailEventSurveySend(RHEmailEventSurveyBase):
     @use_kwargs({
         'from_address': fields.String(required=True, validate=not_empty),
-        'body': fields.String(required=True, validate=not_empty),
+        'body': fields.String(required=True, validate=[
+            not_empty,
+            make_validate_indico_placeholders('survey-link-email', event=None, survey=None),
+        ]),
         'subject': fields.String(required=True, validate=not_empty),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
