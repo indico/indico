@@ -6,7 +6,13 @@
 // LICENSE file for more details.
 
 import * as actions from './actions';
-import {moveOrResizeEntry, processEntries, resizeWindow} from './util';
+import {resizeEntry, processEntries, resizeWindow, moveEntry} from './util';
+
+const entryTypeMapping = {
+  Session: 'session',
+  Break: 'break',
+  Contribution: 'contribution',
+};
 
 const preprocessData = data => {
   // TODO remove this preprocessing once the backend returns the data in the correct format
@@ -14,17 +20,19 @@ const preprocessData = data => {
     .map(e => Object.values(e))
     .flat();
   const contribs = sessionBlocks
-    .map(e => (e.entries ? Object.values(e.entries).map(v => ({...v, parent: e.id})) : []))
+    .map(e => (e.entries ? Object.values(e.entries).map(v => ({...v, parentId: e.id})) : []))
     .flat();
   return [sessionBlocks, contribs].map(en =>
     en.map(e => ({
       id: e.id,
+      type: entryTypeMapping[e.entryType],
       title: e.title,
+      slotTitle: e.slotTitle,
       start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
       end: new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
       desc: e.description,
       color: {text: e.textColor, background: e.color},
-      parent: e.parent,
+      parentId: e.parentId,
     }))
   );
 };
@@ -35,9 +43,9 @@ export default {
       case actions.SET_TIMETABLE_DATA:
         return processEntries(...preprocessData(action.data));
       case actions.MOVE_ENTRY:
-        return moveOrResizeEntry(state, action.args);
+        return moveEntry(state, action.args);
       case actions.RESIZE_ENTRY:
-        return moveOrResizeEntry(state, action.args);
+        return resizeEntry(state, action.args);
       default:
         return state;
     }

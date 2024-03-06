@@ -7,83 +7,103 @@
 
 import _ from 'lodash';
 
-// TODO: remove second condition when we start using number ids
-export const isContribution = entry => _.isNumber(entry.parent) || !!entry.parent;
-export const hasContributions = (block, contribs) => contribs.some(e => e.parent === block.id);
-const isChildOf = (contrib, block) => contrib.parent === block.id;
+export const hasContributions = (block, contribs) => contribs.some(e => e.parentId === block.id);
+export const isChildOf = (contrib, block) => contrib.parentId === block.id;
 const isConcurrent = (entry, other) =>
   entry.id !== other.id && entry.start < other.end && entry.end > other.start;
 export const getConcurrentEntries = (entry, entries) => entries.filter(e => isConcurrent(entry, e));
 
-const getColumnId = (entry, topLevelEntries, draggedEntry) => {
+const getColumnId = (block, sessionBlocks, draggedEntry = null) => {
   // find all concurrent entries
-  const concurrent = getConcurrentEntries(entry, topLevelEntries);
+  const concurrent = getConcurrentEntries(block, sessionBlocks);
   if (concurrent.length === 0) {
     return 1;
   }
+  if (draggedEntry) {
+    // if this is the dragged entry, assign it its targeted resource id
+    return draggedEntry.id === block.id ? draggedEntry.targetResourceId : block.resourceId;
+  }
   // if this is the first time we're assigning a resource id, we need check the desired display order
-  if (!draggedEntry) {
-    const [orderedConcurrent, unorderedConcurrent] = _.partition([...concurrent, entry], e =>
-      _.isNumber(e.displayOrder)
+  const [orderedConcurrent, unorderedConcurrent] = _.partition([...concurrent, block], e =>
+    _.isNumber(e.displayOrder)
+  );
+  return _.isNumber(block.displayOrder)
+    ? _.sortBy(orderedConcurrent, 'displayOrder').findIndex(e => e.id === block.id) + 1
+    : _.sortBy(unorderedConcurrent, ['code', 'title']).findIndex(e => e.id === block.id) +
+        orderedConcurrent.length +
+        1;
+};
+
+const updateEntries = (entries, newEntry) =>
+  Array.isArray(newEntry)
+    ? [...entries.filter(e => !newEntry.some(ne => e.id === ne.id)), ...newEntry]
+    : [...entries.filter(e => e.id !== newEntry.id), newEntry];
+
+const resolveBlockConflicts = (sessionBlocks, draggedEntry = null) => {
+  const conflictingBlock = sessionBlocks.find(
+    block =>
+      block.id !== draggedEntry?.id && // we avoid moving the dragged entry
+      getConcurrentEntries(block, sessionBlocks).some(b => b.resourceId === block.resourceId)
+  );
+  if (!conflictingBlock) {
+    return sessionBlocks;
+  }
+  // if there is space on the left, move it there
+  if (
+    conflictingBlock.resourceId > 1 &&
+    !getConcurrentEntries(conflictingBlock, sessionBlocks).some(
+      b => b.resourceId === conflictingBlock.resourceId - 1
+    )
+  ) {
+    return resolveBlockConflicts(
+      updateEntries(sessionBlocks, {
+        ...conflictingBlock,
+        resourceId: conflictingBlock.resourceId - 1,
+      }),
+      draggedEntry
     );
-    return _.isNumber(entry.displayOrder)
-      ? _.sortBy(orderedConcurrent, 'displayOrder').findIndex(e => e.id === entry.id) + 1
-      : _.sortBy(unorderedConcurrent, ['code', 'title']).findIndex(e => e.id === entry.id) +
-          orderedConcurrent.length +
-          1;
   }
-  // if this is the dragged entry, assign it its targeted resource id
-  if (draggedEntry.entryId === entry.id) {
-    return draggedEntry.targetResourceId;
+  // otherwise push it right
+  return resolveBlockConflicts(
+    [
+      ...sessionBlocks.filter(
+        b => b.id !== conflictingBlock.id && b.resourceId <= conflictingBlock.resourceId + 1
+      ),
+      {...conflictingBlock, resourceId: conflictingBlock.resourceId + 1},
+      ...sessionBlocks.filter(b => b.resourceId > conflictingBlock.resourceId + 1),
+    ],
+    draggedEntry
+  );
+};
+
+const removeBlockGaps = sessionBlocks => {
+  const leftGapBlocks = sessionBlocks.filter(
+    block =>
+      block.resourceId > 1 &&
+      !getConcurrentEntries(block, sessionBlocks).some(b => b.resourceId === block.resourceId - 1)
+  );
+  if (leftGapBlocks.length === 0) {
+    return sessionBlocks;
   }
-  const wasPushedRight = e => {
-    const c = e.id === entry.id ? concurrent : getConcurrentEntries(e, topLevelEntries);
-    return (
-      draggedEntry.entryId !== e.id &&
-      draggedEntry.targetResourceId === e.resourceId &&
-      draggedEntry.sourceResourceId >= draggedEntry.targetResourceId &&
-      c.some(ev => ev.id === draggedEntry.entryId || e.resourceId === draggedEntry.sourceResourceId)
-    );
-  };
-  // if moving to the left and the spot is occupied, move it one to the right
-  if (wasPushedRight(entry)) {
-    return draggedEntry.targetResourceId + 1;
-  }
-  // if this entry is concurrent with the dragged entry and is in the same resource, we need to
-  // trade places with the dragged entry
-  if (
-    draggedEntry.targetResourceId === entry.resourceId &&
-    concurrent.some(e => e.id === draggedEntry.entryId)
-  ) {
-    return draggedEntry.sourceResourceId;
-  }
-  // if there are more entries to the left than they can fit, shift it one to the right
-  if (
-    draggedEntry.targetResourceId < entry.resourceId &&
-    draggedEntry.sourceResourceId >= draggedEntry.targetResourceId &&
-    concurrent.some(e => wasPushedRight(e))
-  ) {
-    return entry.resourceId + 1;
-  }
-  // if there are empty spots to the left, move it there
-  const numOccupiedColumnsLeft = new Set(
-    concurrent.filter(e => e.resourceId < entry.resourceId).map(e => e.resourceId)
-  ).size;
-  if (
-    numOccupiedColumnsLeft < entry.resourceId - 1 &&
-    !concurrent.some(e => e.resourceId < entry.resourceId && e.id === draggedEntry.entryId)
-  ) {
-    return numOccupiedColumnsLeft + 1;
-  }
-  // if it is unrelated to the move action, we preserve its current resource id
-  return entry.resourceId;
+  return removeBlockGaps(
+    updateEntries(sessionBlocks, leftGapBlocks.map(b => ({...b, resourceId: b.resourceId - 1})))
+  );
 };
 
 const processSessionBlocks = (sessionBlocks, draggedEntry = null) =>
-  sessionBlocks.map(sessionBlock => ({
-    ...sessionBlock,
-    resourceId: getColumnId(sessionBlock, sessionBlocks, draggedEntry),
-  }));
+  removeBlockGaps(
+    resolveBlockConflicts(
+      // it is important to keep the order of the blocks when resolving conflicts
+      _.sortBy(
+        sessionBlocks.map(sessionBlock => ({
+          ...sessionBlock,
+          resourceId: getColumnId(sessionBlock, sessionBlocks, draggedEntry),
+        })),
+        'resourceId'
+      ),
+      draggedEntry
+    )
+  );
 
 const processContributions = (contributions, sessionBlocks) =>
   contributions.map(contrib => ({
@@ -99,35 +119,44 @@ export const processEntries = (sessionBlocks, contributions, draggedEntry = null
   };
 };
 
-const updateEntry = (entries, newEntry) => [...entries.filter(e => e.id !== newEntry.id), newEntry];
-
-const moveOrResizeBlock = (
-  {sessionBlocks, contributions},
-  {event: block, start, end, resourceId}
-) => {
+const moveBlock = ({sessionBlocks, contributions}, {event: block, start, end, resourceId}) => {
   const newEntry = {...block, start, end};
-  let newContribs = contributions;
-  // if the dragged block has contributions, move them accordingly and stretch it if necessary
-  if (hasContributions(block, contributions)) {
-    const timeDiff = start - block.start;
-    newContribs = contributions.map(c =>
-      isChildOf(c, newEntry)
-        ? {
-            ...c,
-            start: new Date(c.start.getTime() + timeDiff),
-            end: new Date(c.end.getTime() + timeDiff),
-          }
-        : c
-    );
-    newEntry.end = new Date(
+  const timeDiff = start - block.start;
+  // if the dragged block has contributions, move them accordingly
+  const newContribs = contributions.map(c =>
+    isChildOf(c, newEntry)
+      ? {
+          ...c,
+          start: new Date(c.start.getTime() + timeDiff),
+          end: new Date(c.end.getTime() + timeDiff),
+        }
+      : c
+  );
+  return processEntries(updateEntries(sessionBlocks, newEntry), newContribs, {
+    id: block.id,
+    sourceResourceId: block.resourceId,
+    targetResourceId: resourceId,
+  });
+};
+
+const resizeBlock = ({sessionBlocks, contributions}, {event: block, start, end, resourceId}) => {
+  const newEntry = {
+    ...block,
+    start: new Date(
+      Math.min(
+        ...contributions.filter(c => isChildOf(c, block)).map(c => c.start.getTime()),
+        start.getTime()
+      )
+    ),
+    end: new Date(
       Math.max(
-        ...newContribs.filter(c => isChildOf(c, newEntry)).map(c => c.end.getTime()),
+        ...contributions.filter(c => isChildOf(c, block)).map(c => c.end.getTime()),
         end.getTime()
       )
-    );
-  }
-  return processEntries(updateEntry(sessionBlocks, newEntry), newContribs, {
-    entryId: block.id,
+    ),
+  };
+  return processEntries(updateEntries(sessionBlocks, newEntry), contributions, {
+    id: block.id,
     sourceResourceId: block.resourceId,
     targetResourceId: resourceId,
   });
@@ -139,28 +168,56 @@ const moveOrResizeContrib = (
 ) => {
   const newContrib = {...contrib, start, end, resourceId};
   const newParent = getConcurrentEntries(newContrib, sessionBlocks).find(
-    b => b.resourceId === resourceId
+    b => b.resourceId === resourceId && b.type === 'session'
   );
-  // check if its being dragged to outside of a block or a block without enough space
-  if (
-    !newParent ||
-    contributions.some(c => isChildOf(c, newParent) && isConcurrent(c, newContrib)) ||
-    newContrib.start < newParent.start ||
-    newContrib.end > newParent.end
-  ) {
+  // check if it's being dragged to outside of a block or a block without enough space
+  if (!newParent || newContrib.start < newParent.start || newContrib.end > newParent.end) {
     return {sessionBlocks, contributions};
   }
-  newContrib.parent = newParent.id;
+  const newParentContribs = contributions.filter(
+    c => c.id !== contrib.id && isChildOf(c, newParent)
+  );
+  newContrib.parentId = newParent.id;
+  // if it's being dragged on top of a contribution, try to rearange them in order to fit
+  if (newParentContribs.some(c => isConcurrent(c, newContrib))) {
+    const prevContrib = newParentContribs.reduce(
+      (acc, c) => (c.end <= newContrib.start && (!acc || c.end > acc.end) ? c : acc),
+      null
+    );
+    const rearrangedContribs = _.sortBy(
+      newParentContribs.filter(c => c.end > newContrib.start),
+      'start'
+    ).reduce((acc, c) => {
+      const last = acc[acc.length - 1];
+      return [
+        ...acc,
+        {...c, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
+      ];
+    }, [prevContrib, newContrib].filter(c => c));
+    // if they don't fit in the block, don't move anything
+    if (rearrangedContribs[rearrangedContribs.length - 1].end > newParent.end) {
+      return {sessionBlocks, contributions};
+    }
+    return {
+      sessionBlocks,
+      contributions: updateEntries(contributions, rearrangedContribs),
+    };
+  }
   return {
     sessionBlocks,
-    contributions: updateEntry(contributions, newContrib),
+    contributions: updateEntries(contributions, newContrib),
   };
 };
 
-export const moveOrResizeEntry = (entries, args) =>
-  isContribution(args.event)
+export const moveEntry = (entries, args) =>
+  args.event.type === 'contribution'
     ? moveOrResizeContrib(entries, args)
-    : moveOrResizeBlock(entries, args);
+    : moveBlock(entries, args);
+
+export const resizeEntry = (entries, args) =>
+  args.event.type === 'contribution'
+    ? moveOrResizeContrib(entries, args)
+    : resizeBlock(entries, args);
 
 export const getNumDays = (start, end) => Math.floor((end - start) / (24 * 60 * 60 * 1000));
 
