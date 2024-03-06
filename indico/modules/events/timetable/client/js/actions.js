@@ -16,12 +16,12 @@ export function setTimetableData(data) {
   return {type: SET_TIMETABLE_DATA, data};
 }
 
-export function moveEntry(entryId, {start, end, resourceId}) {
-  return {type: MOVE_ENTRY, entryId, start, end, resourceId};
+export function moveEntry(args) {
+  return {type: MOVE_ENTRY, args};
 }
 
-export function resizeEntry(entryId, {start, end}) {
-  return {type: RESIZE_ENTRY, entryId, start, end};
+export function resizeEntry(args) {
+  return {type: RESIZE_ENTRY, args};
 }
 
 export function scrollNavbar(offset) {
