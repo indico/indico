@@ -16,18 +16,31 @@ customElements.define(
   'ind-category-navigator',
   class extends HTMLElement {
     connectedCallback() {
-      const options = {
-        trigger: document.getElementById(this.getAttribute('triggeredby')),
-        categoryId: this.getAttribute('category-id'),
-      };
       ReactDOM.render(
         <categoryNavigator.DialogViewModel
+          categoryId={this.categoryId}
           view={categoryNavigator.DialogView}
-          actionView={NavigateTo}
-          {...options}
         />,
         this
       );
+      this.trigger.addEventListener('click', this.navigate);
     }
+
+    disconnectedCallback() {
+      this.trigger.removeEventListener('click', this.navigate);
+      ReactDOM.unmountComponentAtNode(this);
+    }
+
+    get categoryId() {
+      return this.getAttribute('category-id');
+    }
+
+    get trigger() {
+      return document.getElementById(this.getAttribute('triggeredby'));
+    }
+
+    navigate = () => {
+      window.dispatchEvent(new CustomEvent('open-category-navigator', {detail: NavigateTo}));
+    };
   }
 );

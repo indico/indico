@@ -46,7 +46,7 @@ ErrorView.propTypes = {
   error: PropTypes.object,
 };
 
-function CategorySearchView({searchFieldRef, onSearch}) {
+function CategorySearchView({searchFieldRef, onSearch, onCancelSearch, hasSearchKeyword}) {
   // XXX: We're not using a controlled component for the input. Because a lot of the operations surrounding it are async,
   // we don't want to have to deal with races. Instead, we're going to reset the input manually when the time is right.
 
@@ -59,18 +59,23 @@ function CategorySearchView({searchFieldRef, onSearch}) {
 
   return (
     <form onSubmit={e => e.preventDefault()}>
-      <label className="category-search-field">
-        <span>
-          <Translate>Find a category by keyword:</Translate>
-        </span>
-        <input
-          ref={searchFieldRef}
-          type="search"
-          placeholder={Translate.string('Search all categories...')}
-          aria-describedby="category-search-info"
-          onChange={handleSearch}
-        />
-      </label>
+      <div className="category-search-field" data-has-keyword={hasSearchKeyword}>
+        <label>
+          <span>
+            <Translate>Find a category by keyword:</Translate>
+          </span>
+          <input
+            ref={searchFieldRef}
+            type="text"
+            placeholder={Translate.string('Search all categories...')}
+            aria-describedby="category-search-info"
+            onChange={handleSearch}
+          />
+        </label>
+        <button onClick={onCancelSearch} hidden={!hasSearchKeyword}>
+          <Translate as="span">Clear search results</Translate>
+        </button>
+      </div>
       <p className="category-search-info">
         <Translate>Search results will update as you type.</Translate>
       </p>
@@ -81,6 +86,8 @@ function CategorySearchView({searchFieldRef, onSearch}) {
 CategorySearchView.propTypes = {
   searchFieldRef: PropTypes.object,
   onSearch: PropTypes.func.isRequired,
+  onCancelSearch: PropTypes.func.isRequired,
+  hasSearchKeyword: PropTypes.bool,
 };
 
 function BreadcrumbView({path, onChangeCategory}) {
@@ -90,13 +97,13 @@ function BreadcrumbView({path, onChangeCategory}) {
 
   return (
     <div className="breadcrumbs">
-      <span>{Translate.string('in')}</span>
+      <Translate as="span">in</Translate>
       {path.map(category => (
         <button
           type="button"
           key={category.id}
           onClick={() => onChangeCategory(category.id)}
-          aria-label={Translate.string('View the {title} category', {title: category.title})}
+          aria-label={Translate.string('View the "{title}" category', {title: category.title})}
         >
           {category.title}
         </button>
@@ -163,11 +170,11 @@ function CategoryStatsView({category}) {
           </PluralTranslate>{' '}
           <PluralTranslate count={category.deepCategoryCount}>
             <Singular>
-              Category contains <Param value={category.deepCategoryCount} name="count" />{' '}
+              This category contains <Param value={category.deepCategoryCount} name="count" />{' '}
               subcategory.
             </Singular>
             <Plural>
-              Category contains <Param value={category.deepCategoryCount} name="count" />{' '}
+              This category contains <Param value={category.deepCategoryCount} name="count" />{' '}
               subcategories.
             </Plural>
           </PluralTranslate>
@@ -287,6 +294,7 @@ export function DialogView(props) {
     actionView,
     onChangeCategory,
     onCancelSearch,
+    hasSearchKeyword,
     ...categoryListProps
   } = props;
 
@@ -314,7 +322,14 @@ export function DialogView(props) {
         {closeButton}
       </div>
       <div className="content">
-        {error ? null : <CategorySearchView searchFieldRef={searchFieldRef} onSearch={onSearch} />}
+        {error ? null : (
+          <CategorySearchView
+            searchFieldRef={searchFieldRef}
+            onSearch={onSearch}
+            onCancelSearch={onCancelSearch}
+            hasSearchKeyword={hasSearchKeyword}
+          />
+        )}
         <LoadingView loading={loading}>
           <ErrorView error={error} />
           {searchResults ? (
@@ -347,5 +362,6 @@ DialogView.propTypes = {
   onChangeCategory: PropTypes.func,
   onSearch: PropTypes.func,
   onCancelSearch: PropTypes.func,
+  hasSearchKeyword: PropTypes.bool,
   actionView: PropTypes.elementType,
 };

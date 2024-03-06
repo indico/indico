@@ -118,6 +118,8 @@
 
 #category-nav-dialog {
   @extend %dialog-modal;
+  --dialog-max-height: 80%;
+  --dialog-max-width: 80%;
 
   // FIXME: Move to reset
   p,
@@ -239,11 +241,35 @@
   }
 
   .category-search-field {
+    position: relative;
+  }
+
+  .category-search-field label {
     @extend %input-with-icon;
+
     flex: none;
+  }
+
+  .category-search-field[data-has-keyword='true'] label::after {
+    content: '';
+  }
+
+  .category-search-field[data-has-keyword='false'] label::after {
+    @extend %icon-search;
+  }
+
+  .category-search-field button:not([hidden]) {
+    @extend %button-icon-only;
+
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 var(--control-padding);
 
     &::after {
-      @extend %icon-search;
+      @extend %icon;
+      @extend %icon-close;
     }
   }
 

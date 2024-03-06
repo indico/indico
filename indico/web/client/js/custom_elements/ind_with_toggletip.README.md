@@ -29,7 +29,7 @@ Example:
 Note: When working with React app, you may sometimes observe that the
 toggle tip content does not change. The DOM nodes in the tree may change
 but the old text is still displayed. Alternatively, you may get a
-`DOMException`. This happens because the custom element manupulates the
+`DOMException`. This happens because the custom element manipulates the
 contents of the `[data-tip-content]` element. To work around this, ensure
 that React cleanly replaces the entire custom element with a new one by
 giving the `<ind-with-toggletip>` element a `key` prop. The key should be

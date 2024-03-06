@@ -7,21 +7,30 @@
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
-import ReactDOM from 'react-dom';
 
 import {getCategoryData, getCategorySearchResults} from './api';
 import * as model from './model';
 
-const loadingSpinnerDelay = 1500;
+const loadingSpinnerDelay = 500;
 
-export function DialogViewModel({trigger, categoryId, view: View, actionView, dialogTitle}) {
+export function DialogViewModel({categoryId, view: View, dialogTitle}) {
   const [state, setState] = useState(model.init());
+  const [actionView, setActionView] = useState(null);
   const dialogRef = useRef();
   const searchFieldRef = useRef();
 
   useEffect(() => {
-    trigger.addEventListener('click', openDialog);
-    // eslint-disable-next-line
+    const handleOpenDialog = evt => {
+      setActionView(() => evt.detail);
+      openDialog();
+    };
+
+    window.addEventListener('open-category-navigator', handleOpenDialog);
+
+    return () => {
+      window.removeEventListener('open-category-navigator', handleOpenDialog);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function openDialog() {
@@ -67,13 +76,13 @@ export function DialogViewModel({trigger, categoryId, view: View, actionView, di
 
   function clearSearch() {
     setState(model.clearSearch);
+    if (searchFieldRef.current) {
+      searchFieldRef.current.value = '';
+    }
   }
 
   function loadCategoryData(nextCategoryId) {
     clearSearch();
-    if (searchFieldRef.current) {
-      searchFieldRef.current.value = '';
-    }
     withLoading(model.prepareForLoading, getCategoryData(nextCategoryId)).then(
       response => {
         setState(
@@ -107,7 +116,7 @@ export function DialogViewModel({trigger, categoryId, view: View, actionView, di
     );
   }
 
-  return ReactDOM.createPortal(
+  return (
     <View
       {...state}
       dialogTitle={dialogTitle}
@@ -116,16 +125,14 @@ export function DialogViewModel({trigger, categoryId, view: View, actionView, di
       onChangeCategory={changeCategory}
       onSearch={searchCategories}
       onCancelSearch={clearSearch}
+      hasSearchKeyword={Boolean(state.searchKeyword)}
       actionView={actionView}
-    />,
-    document.body
+    />
   );
 }
 
 DialogViewModel.propTypes = {
-  trigger: PropTypes.object.isRequired,
   categoryId: PropTypes.string.isRequired,
   view: PropTypes.elementType.isRequired,
-  actionView: PropTypes.elementType,
   dialogTitle: PropTypes.string,
 };

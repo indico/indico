@@ -60,9 +60,7 @@ export function updateModelFromError(model) {
 // Search results
 
 export function prepareForSearch(keyword) {
-  return function(model) {
-    return {...model, error: null, searchKeyword: keyword};
-  };
+  return model => ({...model, error: null, searchKeyword: keyword});
 }
 
 export function clearSearch(model) {
@@ -70,12 +68,10 @@ export function clearSearch(model) {
 }
 
 export function updateModelFromSearch(categories) {
-  return function(model) {
-    return {
-      ...model,
-      searchResults: categories.map(createCategoryFromResponse),
-    };
-  };
+  return model => ({
+    ...model,
+    searchResults: categories.map(createCategoryFromResponse),
+  });
 }
 
 export function updateModelFromSearchError(model) {
