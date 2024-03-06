@@ -62,8 +62,8 @@ export default function Timetable() {
       views={{day: true}}
       components={{toolbar: Toolbar}}
       resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
-      onEventDrop={args => dispatch(actions.moveEntry(args.event.id, args))}
-      onEventResize={args => dispatch(actions.resizeEntry(args.event.id, args))}
+      onEventDrop={args => dispatch(actions.moveEntry(args))}
+      onEventResize={args => dispatch(actions.resizeEntry(args))}
       onSelectSlot={(...args) => console.debug('onSelectSlot', ...args)}
       eventPropGetter={entryStyleGetter(entries)}
       dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, compactMode)}

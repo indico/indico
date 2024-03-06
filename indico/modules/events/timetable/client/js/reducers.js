@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import * as actions from './actions';
-import {moveEntry, processEntries, resizeWindow} from './util';
+import {moveOrResizeEntry, processEntries, resizeWindow} from './util';
 
 const preprocessData = data => {
   // TODO remove this preprocessing once the backend returns the data in the correct format
@@ -35,9 +35,9 @@ export default {
       case actions.SET_TIMETABLE_DATA:
         return processEntries(...preprocessData(action.data));
       case actions.MOVE_ENTRY:
-        return moveEntry(state, action);
+        return moveOrResizeEntry(state, action.args);
       case actions.RESIZE_ENTRY:
-        return moveEntry(state, action);
+        return moveOrResizeEntry(state, action.args);
       default:
         return state;
     }

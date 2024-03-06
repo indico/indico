@@ -9,11 +9,11 @@ import _ from 'lodash';
 
 // TODO: remove second condition when we start using number ids
 export const isContribution = entry => _.isNumber(entry.parent) || !!entry.parent;
-
 export const hasContributions = (block, contribs) => contribs.some(e => e.parent === block.id);
-
-export const getConcurrentEntries = (entry, entries) =>
-  entries.filter(e => e.id !== entry.id && e.start < entry.end && e.end > entry.start);
+const isChildOf = (contrib, block) => contrib.parent === block.id;
+const isConcurrent = (entry, other) =>
+  entry.id !== other.id && entry.start < other.end && entry.end > other.start;
+export const getConcurrentEntries = (entry, entries) => entries.filter(e => isConcurrent(entry, e));
 
 const getColumnId = (entry, topLevelEntries, draggedEntry) => {
   // find all concurrent entries
@@ -85,55 +85,82 @@ const processSessionBlocks = (sessionBlocks, draggedEntry = null) =>
     resourceId: getColumnId(sessionBlock, sessionBlocks, draggedEntry),
   }));
 
-const processContributions = (contributions, sessionBlocks, draggedEntry = null) =>
+const processContributions = (contributions, sessionBlocks) =>
   contributions.map(contrib => ({
     ...contrib,
-    resourceId:
-      draggedEntry?.entryId === contrib.id
-        ? draggedEntry.targetResourceId
-        : sessionBlocks.find(e => e.id === contrib.parent).resourceId,
-    parent:
-      draggedEntry?.entryId === contrib.id
-        ? getConcurrentEntries(contrib, sessionBlocks).find(
-            e => e.resourceId === draggedEntry.targetResourceId
-          )?.id
-        : contrib.parent,
+    resourceId: sessionBlocks.find(block => isChildOf(contrib, block)).resourceId,
   }));
 
 export const processEntries = (sessionBlocks, contributions, draggedEntry = null) => {
   const newBlocks = processSessionBlocks(sessionBlocks, draggedEntry);
   return {
     sessionBlocks: newBlocks,
-    contributions: processContributions(contributions, newBlocks, draggedEntry),
+    contributions: processContributions(contributions, newBlocks),
   };
 };
 
 const updateEntry = (entries, newEntry) => [...entries.filter(e => e.id !== newEntry.id), newEntry];
 
-export const moveEntry = ({sessionBlocks, contributions}, {entryId, start, end, resourceId}) => {
-  const entry =
-    sessionBlocks.find(e => e.id === entryId) || contributions.find(e => e.id === entryId);
-  const isContrib = isContribution(entry);
-  const newEntry = {...entry, start, end};
+const moveOrResizeBlock = (
+  {sessionBlocks, contributions},
+  {event: block, start, end, resourceId}
+) => {
+  const newEntry = {...block, start, end};
+  let newContribs = contributions;
+  // if the dragged block has contributions, move them accordingly and stretch it if necessary
+  if (hasContributions(block, contributions)) {
+    const timeDiff = start - block.start;
+    newContribs = contributions.map(c =>
+      isChildOf(c, newEntry)
+        ? {
+            ...c,
+            start: new Date(c.start.getTime() + timeDiff),
+            end: new Date(c.end.getTime() + timeDiff),
+          }
+        : c
+    );
+    newEntry.end = new Date(
+      Math.max(
+        ...newContribs.filter(c => isChildOf(c, newEntry)).map(c => c.end.getTime()),
+        end.getTime()
+      )
+    );
+  }
+  return processEntries(updateEntry(sessionBlocks, newEntry), newContribs, {
+    entryId: block.id,
+    sourceResourceId: block.resourceId,
+    targetResourceId: resourceId,
+  });
+};
+
+const moveOrResizeContrib = (
+  {sessionBlocks, contributions},
+  {event: contrib, start, end, resourceId}
+) => {
+  const newContrib = {...contrib, start, end, resourceId};
+  const newParent = getConcurrentEntries(newContrib, sessionBlocks).find(
+    b => b.resourceId === resourceId
+  );
+  // check if its being dragged to outside of a block or a block without enough space
   if (
-    isContrib &&
-    !getConcurrentEntries(newEntry, sessionBlocks).some(e => e.resourceId === resourceId)
+    !newParent ||
+    contributions.some(c => isChildOf(c, newParent) && isConcurrent(c, newContrib)) ||
+    newContrib.start < newParent.start ||
+    newContrib.end > newParent.end
   ) {
     return {sessionBlocks, contributions};
   }
-  if (!isContrib && hasContributions(entry, contributions)) {
-    // TODO: move all child contributions as well (by entry.start - start)
-  }
-  return processEntries(
-    isContrib ? sessionBlocks : updateEntry(sessionBlocks, newEntry),
-    isContrib ? updateEntry(contributions, newEntry) : contributions,
-    {
-      entryId,
-      sourceResourceId: entry.resourceId,
-      targetResourceId: resourceId || entry.resourceId,
-    }
-  );
+  newContrib.parent = newParent.id;
+  return {
+    sessionBlocks,
+    contributions: updateEntry(contributions, newContrib),
+  };
 };
+
+export const moveOrResizeEntry = (entries, args) =>
+  isContribution(args.event)
+    ? moveOrResizeContrib(entries, args)
+    : moveOrResizeBlock(entries, args);
 
 export const getNumDays = (start, end) => Math.floor((end - start) / (24 * 60 * 60 * 1000));
 
