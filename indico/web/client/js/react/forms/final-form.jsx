@@ -17,6 +17,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {handleAxiosError} from '../../utils/axios';
 
+import {FinalModalFormIdContext} from './context';
 import {handleSubmissionError} from './errors';
 import {FinalUnloadPrompt} from './unload';
 
@@ -150,7 +151,9 @@ export function FinalModalForm({
               className={className}
               onSubmit={fprops.handleSubmit}
             >
-              {_.isFunction(children) ? children(fprops) : children}
+              <FinalModalFormIdContext.Provider value={id}>
+                {_.isFunction(children) ? children(fprops) : children}
+              </FinalModalFormIdContext.Provider>
             </Form>
           </Modal.Content>
           <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>

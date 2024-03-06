@@ -7,7 +7,7 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useContext} from 'react';
 import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
 import {
@@ -22,6 +22,9 @@ import {
   Icon,
 } from 'semantic-ui-react';
 
+import {renderPluginComponents, getPluginObjects} from 'indico/utils/plugins';
+
+import {FinalModalFormIdContext} from './context';
 import formatters from './formatters';
 import parsers from './parsers';
 import validators from './validators';
@@ -337,8 +340,23 @@ ComboDropdownAdapter.defaultProps = {
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
  */
-export function FinalField({name, adapter, component, description, required, onChange, ...rest}) {
+export function FinalField({
+  name,
+  adapter,
+  component,
+  label,
+  description,
+  required,
+  onChange,
+  ...rest
+}) {
+  const finalModalFormId = useContext(FinalModalFormIdContext);
   const extraProps = {};
+
+  if (label) {
+    const customLabel = getPluginObjects(`custom-label-for-${finalModalFormId}-${name}`);
+    extraProps.label = customLabel.length ? customLabel[0] : label;
+  }
 
   if (description) {
     extraProps.children = <p styleName="field-description">{description}</p>;
@@ -361,6 +379,7 @@ export function FinalField({name, adapter, component, description, required, onC
 
   return (
     <>
+      {renderPluginComponents(`before-final-field-${finalModalFormId}-${name}`)}
       <Field name={name} component={adapter} as={component} {...extraProps} {...rest} />
       {onChange && (
         <OnChange name={name}>
@@ -379,6 +398,7 @@ FinalField.propTypes = {
   name: PropTypes.string.isRequired,
   adapter: PropTypes.elementType,
   component: PropTypes.elementType,
+  label: PropTypes.string,
   description: PropTypes.node,
   required: PropTypes.oneOf([true, false, 'no-validator']),
   /** A function that is called with the new and old value whenever the value changes. */
@@ -388,6 +408,7 @@ FinalField.propTypes = {
 FinalField.defaultProps = {
   adapter: FormFieldAdapter,
   component: undefined,
+  label: null,
   description: null,
   required: false,
   onChange: null,
