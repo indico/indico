@@ -7,7 +7,7 @@
 
 import noOverlap from 'react-big-calendar/lib/utils/layout-algorithms/no-overlap';
 
-import {getConcurrentEntries, hasContributions, isContribution} from './util';
+import {getConcurrentEntries, hasContributions, isChildOf} from './util';
 
 import styles from './Timetable.module.scss';
 
@@ -24,13 +24,13 @@ const makeTranslucent = hex => {
 };
 
 export const entryStyleGetter = entries => entry => {
-  if (isContribution(entry)) {
-    const parent = entries.find(e => e.id === entry.parent);
+  if (entry.type === 'contribution') {
+    const parent = entries.find(e => isChildOf(entry, e));
     return {
       style: {
-        color: parent.color?.text,
-        backgroundColor: makeTranslucent(parent.color?.background),
-        borderColor: makeTranslucent(parent.color?.background),
+        color: parent?.color?.text,
+        backgroundColor: makeTranslucent(parent?.color?.background),
+        borderColor: makeTranslucent(parent?.color?.background),
       },
       className: styles['child-entry'],
     };
@@ -48,12 +48,12 @@ export const entryStyleGetter = entries => entry => {
 export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
   noOverlap(props).map(styledEntry => {
     // if it's a child-entry, remove the padding, and make it wider if in compact mode
-    if (isContribution(styledEntry.event)) {
+    if (styledEntry.event.type === 'contribution') {
       const size = compact
         ? (100 - SESSION_BLOCK_WIDTH) / (100 / styledEntry.size - 1)
         : styledEntry.size;
       const left = compact
-        ? SESSION_BLOCK_WIDTH + size * (styledEntry.idx - 1)
+        ? SESSION_BLOCK_WIDTH + size * Math.max(styledEntry.idx - 1, 0)
         : styledEntry.style.left;
       const style = {
         ...styledEntry.style,
@@ -67,7 +67,12 @@ export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
     if (getConcurrentEntries(styledEntry.event, allEntries).length === 0) {
       const size = 100 * numColumns;
       const padding = 10 * (numColumns - 1) - (styledEntry.idx === 0 ? 0 : 3);
-      const style = {...styledEntry.style, width: `calc(${size}% + ${padding}px)`};
+      const style = {
+        ...styledEntry.style,
+        left: 0,
+        width: `calc(${size}% + ${padding}px)`,
+        xOffset: 0,
+      };
       return {...styledEntry, size, style};
     }
     // entries with children are squeezed when in compact mode
