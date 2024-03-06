@@ -18,12 +18,10 @@ export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt
 );
-
 export const getEventEndDt = createSelector(
   getStaticData,
   staticData => staticData.endDt
 );
-
 export const getEventNumDays = createSelector(
   getEventStartDt,
   getEventEndDt,
@@ -34,12 +32,10 @@ export const getSessionBlocks = createSelector(
   getEntries,
   entries => entries.sessionBlocks
 );
-
 export const getContributions = createSelector(
   getEntries,
   entries => entries.contributions
 );
-
 export const getAllEntries = createSelector(
   getSessionBlocks,
   getContributions,
@@ -50,7 +46,6 @@ export const getNavbarMaxDays = createSelector(
   getNavigation,
   navigation => navigation.numDays
 );
-
 export const getNavbarOffset = createSelector(
   getNavigation,
   navigation => navigation.offset
