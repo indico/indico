@@ -23,23 +23,11 @@
 
   &.compact .parent-entry {
     overflow: visible;
+    padding-left: 0;
+    padding-right: 0;
 
     :global(.rbc-addons-dnd-resizable) {
       overflow: visible;
-    }
-
-    :global(.rbc-event-content) {
-      position: absolute;
-      top: -23px;
-      width: 13em;
-      height: 20px;
-      background-color: rgba($light-gray, 0.9);
-      color: $black;
-      padding: 0.3em;
-      border-radius: 5px 5px 0 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
     }
   }
 
@@ -59,6 +47,7 @@
 
   :global(.rbc-timeslot-group) {
     min-height: 8em;
+    border-left: 0;
   }
 
   :global(.rbc-event) {
