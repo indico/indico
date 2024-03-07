@@ -7,6 +7,7 @@
 
 from collections import defaultdict
 from datetime import datetime
+import typing as t
 
 from sqlalchemy import Date, Time
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -549,12 +550,12 @@ class Reservation(db.Model):
     def is_owned_by(self, user):
         return self.created_by_user == user
 
-    def modify(self, data, user, request_data):
+    def modify(self, data, user, extra_fields: t.Dict):
         """Modify an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
         :param user: The :class:`.User` who modifies the booking.
-        :param request_data: full data from the request form
+        :param extra_fields: A dict containing the extra fields data from the form (CreateBookingSchema.extra_fields)
         """
         from indico.modules.rb import rb_settings
 
@@ -623,7 +624,8 @@ class Reservation(db.Model):
                 else:
                     changes[field] = {'old': old, 'new': new, 'converter': converter}
 
-        if not changes:
+        # If extra_fields are present, don't short-circuit the function, because some may have been updated.
+        if not changes and not extra_fields:
             return False
 
         # Create a verbose log entry for the modification
@@ -674,7 +676,7 @@ class Reservation(db.Model):
         if not any(occ.is_valid for occ in self.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
 
-        signals.rb.booking_modified.send(self, changes=changes, data=request_data)
+        signals.rb.booking_modified.send(self, changes=changes, extra_fields=extra_fields)
 
         notify_modification(self, changes)
         return True

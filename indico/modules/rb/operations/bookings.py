@@ -9,6 +9,7 @@ from collections import defaultdict
 from datetime import date, datetime, time
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
+import typing as t
 
 from flask import flash, session
 from pytz import timezone
@@ -395,7 +396,7 @@ def should_split_booking(booking, new_data):
     return is_ongoing_booking and (times_changed or repetition_changed or weekdays_changed)
 
 
-def split_booking(booking, new_booking_data, request_data):
+def split_booking(booking, new_booking_data, extra_fields: t.Dict):
     is_ongoing_booking = booking.start_dt.date() < date.today() < booking.end_dt.date()
     if not is_ongoing_booking:
         return
@@ -425,7 +426,7 @@ def split_booking(booking, new_booking_data, request_data):
             'recurrence_weekdays': booking.recurrence_weekdays,
         }
 
-        booking.modify(old_booking_data, session.user, request_data=request_data)
+        booking.modify(old_booking_data, session.user, extra_fields=extra_fields)
 
     for occurrence_to_cancel in occurrences_to_cancel:
         occurrence_to_cancel.cancel(session.user, silent=True)
