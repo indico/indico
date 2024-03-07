@@ -7,7 +7,6 @@
 
 from collections import defaultdict
 from datetime import datetime
-import typing as t
 
 from sqlalchemy import Date, Time
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -550,7 +549,7 @@ class Reservation(db.Model):
     def is_owned_by(self, user):
         return self.created_by_user == user
 
-    def modify(self, data, user, extra_fields: t.Dict):
+    def modify(self, data, user, extra_fields: dict):
         """Modify an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
