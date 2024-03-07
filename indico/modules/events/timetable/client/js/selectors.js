@@ -12,7 +12,7 @@ import {getNumDays} from './util';
 export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
 export const getNavigation = state => state.navigation;
-export const isCompactModeEnabled = state => state.compactMode;
+export const getDisplayMode = state => state.displayMode;
 
 export const getEventStartDt = createSelector(
   getStaticData,

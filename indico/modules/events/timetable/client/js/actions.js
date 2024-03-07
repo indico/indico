@@ -10,7 +10,7 @@ export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const RESIZE_WINDOW = 'Resize window';
-export const TOGGLE_COMPACT_MODE = 'Toggle compact mode';
+export const SET_DISPLAY_MODE = 'Set display mode';
 
 export function setTimetableData(data) {
   return {type: SET_TIMETABLE_DATA, data};
@@ -32,6 +32,6 @@ export function resizeWindow(newSize, dayIdx) {
   return {type: RESIZE_WINDOW, newSize, dayIdx};
 }
 
-export function toggleCompactMode() {
-  return {type: TOGGLE_COMPACT_MODE};
+export function setDisplayMode(mode) {
+  return {type: SET_DISPLAY_MODE, mode};
 }

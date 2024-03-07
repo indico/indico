@@ -21,14 +21,24 @@ import './Toolbar.module.scss';
 
 const SCROLL_STEP = 3;
 
+const displayModes = {
+  compact: {
+    title: Translate.string('Compact timetable'),
+    icon: 'minus square outline',
+    next: 'full',
+  },
+  full: {title: Translate.string('Full timetable'), icon: 'plus square outline', next: 'compact'},
+};
+
 export default function Toolbar({date, localizer, onNavigate}) {
   const dispatch = useDispatch();
   const ref = useRef(null);
-  const compactMode = useSelector(selectors.isCompactModeEnabled);
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
+  const _displayMode = useSelector(selectors.getDisplayMode);
+  const displayMode = displayModes[_displayMode];
   const currentDayIdx = getNumDays(eventStart, date);
 
   const handleResize = useCallback(() => {
@@ -105,15 +115,11 @@ export default function Toolbar({date, localizer, onNavigate}) {
           </>
         )}
         <Menu.Item
-          onClick={() => dispatch(actions.toggleCompactMode())}
-          icon={compactMode ? 'plus square outline' : 'minus square outline'}
+          onClick={() => dispatch(actions.setDisplayMode(displayMode.next))}
+          icon={displayMode.icon}
           position={numDays <= maxDays ? 'right' : undefined}
           styleName="action"
-          title={
-            compactMode
-              ? Translate.string('Show full timetable')
-              : Translate.string('Show compact timetable')
-          }
+          title={displayMode.title}
         />
         <Dropdown
           icon="add"
@@ -124,8 +130,11 @@ export default function Toolbar({date, localizer, onNavigate}) {
         >
           <Dropdown.Menu>
             <Dropdown.Header content={Translate.string('Add new')} />
-            <Dropdown.Item text={Translate.string('Session block')} icon="clock" />
-            <Dropdown.Item text={Translate.string('Contribution')} icon="file alternate" />
+            <Dropdown.Item
+              text={Translate.string('Session block')}
+              icon="calendar alternate outline"
+            />
+            <Dropdown.Item text={Translate.string('Contribution')} icon="file alternate outline" />
             <Dropdown.Item text={Translate.string('Break')} icon="coffee" />
           </Dropdown.Menu>
         </Dropdown>

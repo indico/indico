@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React from 'react';
+import React, {useState} from 'react';
 import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import {useDispatch, useSelector} from 'react-redux';
@@ -14,6 +14,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {toClasses} from 'indico/react/util';
 
 import * as actions from './actions';
+import EntryPopup from './EntryPopup';
 import {entryStyleGetter, layoutAlgorithm} from './layout';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
@@ -27,13 +28,14 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function Timetable() {
   const dispatch = useDispatch();
-  const compactMode = useSelector(selectors.isCompactModeEnabled);
+  const displayMode = useSelector(selectors.getDisplayMode);
   const entries = useSelector(selectors.getAllEntries);
-  const numColumns = Math.max(...entries.map(e => e.resourceId)) || 1;
-
-  const defaultDate = entries.reduce(
-    (min, {start}) => (start < min ? start : min),
-    entries[0].start
+  const [date, setDate] = useState(
+    entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
+  );
+  const numColumns = Math.max(
+    ...entries.filter(e => e.start.getDate() === date.getDate()).map(e => e.resourceId),
+    1
   );
 
   const minHour = entries.reduce((min, {start}) => {
@@ -54,19 +56,20 @@ export default function Timetable() {
 
   return (
     <DnDCalendar
-      styleName={toClasses({timetable: true, compact: compactMode})}
-      defaultDate={defaultDate}
+      styleName={toClasses({timetable: true, compact: displayMode === 'compact'})}
+      date={date}
       defaultView="day"
       events={entries}
       localizer={localizer}
       views={{day: true}}
-      components={{toolbar: Toolbar}}
+      components={{toolbar: Toolbar, event: EntryPopup}}
       resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
       onEventDrop={args => dispatch(actions.moveEntry(args))}
       onEventResize={args => dispatch(actions.resizeEntry(args))}
       onSelectSlot={(...args) => console.debug('onSelectSlot', ...args)}
+      onNavigate={setDate}
       eventPropGetter={entryStyleGetter(entries)}
-      dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, compactMode)}
+      dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
       allDayMaxRows={0}
       step={5}
       timeslots={6}

@@ -11,7 +11,7 @@ import {getConcurrentEntries, hasContributions, isChildOf} from './util';
 
 import styles from './Timetable.module.scss';
 
-const SESSION_BLOCK_WIDTH = 10;
+const SESSION_BLOCK_WIDTH = 15;
 
 const makeTranslucent = hex => {
   if (!hex) {

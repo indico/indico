@@ -14,16 +14,12 @@ const isConcurrent = (entry, other) =>
 export const getConcurrentEntries = (entry, entries) => entries.filter(e => isConcurrent(entry, e));
 
 const getColumnId = (block, sessionBlocks, draggedEntry = null) => {
-  // find all concurrent entries
-  const concurrent = getConcurrentEntries(block, sessionBlocks);
-  if (concurrent.length === 0) {
-    return 1;
-  }
   if (draggedEntry) {
     // if this is the dragged entry, assign it its targeted resource id
     return draggedEntry.id === block.id ? draggedEntry.targetResourceId : block.resourceId;
   }
   // if this is the first time we're assigning a resource id, we need check the desired display order
+  const concurrent = getConcurrentEntries(block, sessionBlocks);
   const [orderedConcurrent, unorderedConcurrent] = _.partition([...concurrent, block], e =>
     _.isNumber(e.displayOrder)
   );

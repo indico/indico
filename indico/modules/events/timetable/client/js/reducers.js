@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
+
 import * as actions from './actions';
 import {resizeEntry, processEntries, resizeWindow, moveEntry} from './util';
 
@@ -24,15 +26,12 @@ const preprocessData = data => {
     .flat();
   return [sessionBlocks, contribs].map(en =>
     en.map(e => ({
-      id: e.id,
+      ..._.pick(e, ['id', 'title', 'slotTitle', 'code', 'sessionCode', 'description', 'parentId']),
       type: entryTypeMapping[e.entryType],
-      title: e.title,
-      slotTitle: e.slotTitle,
       start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
       end: new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
-      desc: e.description,
+      attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
       color: {text: e.textColor, background: e.color},
-      parentId: e.parentId,
     }))
   );
 };
@@ -60,10 +59,10 @@ export default {
         return state;
     }
   },
-  compactMode: (state = true, action) => {
+  displayMode: (state = 'compact', action) => {
     switch (action.type) {
-      case actions.TOGGLE_COMPACT_MODE:
-        return !state;
+      case actions.SET_DISPLAY_MODE:
+        return action.mode;
       default:
         return state;
     }
