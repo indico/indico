@@ -27,7 +27,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
         staticData: {
           eventId: parseInt(eventInfo.id, 10),
           startDt: new Date(2023, 4, 8),
-          endDt: new Date(2023, 5, 12),
+          endDt: new Date(2023, 4, 12),
         },
       };
       const store = createReduxStore('regform-submission', reducers, initialData);
