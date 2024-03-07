@@ -630,8 +630,8 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         allowed_keywords_set = set(allowed_keywords)
         tz = self.category.display_tzinfo
         for event in event_query:
-            event.keywords = [keyword for keyword in event.keywords if keyword in allowed_keywords_set]
-            for keyword in event.keywords:
+            valid_keywords = [keyword for keyword in event.keywords if keyword in allowed_keywords_set]
+            for keyword in valid_keywords:
                 keyword_id = calculate_keyword_id(keyword)
                 if keyword_id not in keywords:
                     keywords.setdefault(keyword_id, {'id': keyword_id, 'title': keyword,
@@ -651,6 +651,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                           'categoryId': category_id,
                           'venueId': event.own_venue_id,
                           'keywords': event.keywords,
+                          'validKeywords': valid_keywords,
                           'roomId': room.id if room else None}
             if self.group_by == self.GroupBy.category:
                 colors = generate_contrast_colors(category_id)
@@ -660,13 +661,13 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
                 colors = generate_contrast_colors(room.id if room else 0)
             else:
                 # by keywords
-                if not event.keywords:
+                if not valid_keywords:
                     keyword_id = 0
-                elif len(event.keywords) > 1:
+                elif len(valid_keywords) > 1:
                     keyword_id = 1
                 else:
                     # only one keyword
-                    keyword_id = calculate_keyword_id(event.keywords[0])
+                    keyword_id = calculate_keyword_id(valid_keywords[0])
                 event_data['keywordId'] = keyword_id
                 colors = generate_contrast_colors(keyword_id)
             event_data.update({'textColor': f'#{colors.text}', 'color': f'#{colors.background}'})
