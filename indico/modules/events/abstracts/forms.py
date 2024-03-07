@@ -540,7 +540,7 @@ class _SingleChoiceQuerySelectMultipleField(IndicoQuerySelectMultipleField):
     widget = Select()
 
     def iter_choices(self):
-        yield ('__None', self.blank_text, self.data is None)
+        yield ('__None', self.blank_text, self.data is None, {})
         yield from super().iter_choices()
 
     def process_formdata(self, valuelist):

@@ -504,7 +504,7 @@ registration_data:
       countryKey: TT
     - caption: Tunisia
       countryKey: TN
-    - caption: Turkey
+    - caption: "T\xFCrkiye"
       countryKey: TR
     - caption: Turkmenistan
       countryKey: TM

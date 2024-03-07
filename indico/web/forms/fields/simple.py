@@ -44,7 +44,7 @@ class IndicoSelectMultipleCheckboxBooleanField(IndicoSelectMultipleCheckboxField
     def iter_choices(self):
         for value, label in self.choices:
             selected = self.data is not None and self.data.get(self.coerce(value))
-            yield (value, label, selected)
+            yield (value, label, selected, {})
 
 
 class IndicoButtonsBooleanField(BooleanField):

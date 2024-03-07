@@ -24,8 +24,8 @@ def get_requirements(fname):
 
 class BuildWithTranslations(build):
     def _compile_languages(self):
-        from babel.messages import frontend
-        compile_cmd = frontend.compile_catalog(self.distribution)
+        from babel.messages import setuptools_frontend
+        compile_cmd = setuptools_frontend.compile_catalog(self.distribution)
         self.distribution._set_command_options(compile_cmd)
         compile_cmd.finalize_options()
         compile_cmd.run()

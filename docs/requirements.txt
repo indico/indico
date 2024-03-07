@@ -4,16 +4,16 @@
 #
 #    pip-compile --strip-extras docs/requirements.in
 #
-alabaster==0.7.13
+alabaster==0.7.16
     # via sphinx
-babel==2.13.1
+babel==2.14.0
     # via
     #   -r docs/requirements.in
     #   flask-babel
     #   sphinx
 blinker==1.7.0
     # via flask
-certifi==2023.7.22
+certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
@@ -25,17 +25,17 @@ docutils==0.16
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
-flask==3.0.0
+flask==3.0.2
     # via
     #   -r docs/requirements.in
     #   flask-babel
 flask-babel==4.0.0
     # via -r docs/requirements.in
-idna==3.4
+idna==3.6
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==6.8.0
+importlib-metadata==7.0.2
     # via
     #   flask
     #   sphinx
@@ -46,7 +46,7 @@ jinja2==3.1.3
     #   flask
     #   flask-babel
     #   sphinx
-markupsafe==2.1.3
+markupsafe==2.1.5
     # via
     #   jinja2
     #   werkzeug
@@ -54,9 +54,9 @@ packaging==23.2
     # via sphinx
 plantweb==1.2.1
     # via -r docs/requirements.in
-pygments==2.16.1
+pygments==2.17.2
     # via sphinx
-pytz==2023.3.post1
+pytz==2024.1
     # via flask-babel
 requests==2.31.0
     # via
@@ -71,21 +71,16 @@ sphinx==5.3.0
     #   -r docs/requirements.in
     #   sphinx-issues
     #   sphinx-rtd-theme
-    #   sphinxcontrib-applehelp
-    #   sphinxcontrib-devhelp
-    #   sphinxcontrib-htmlhelp
     #   sphinxcontrib-jquery
-    #   sphinxcontrib-qthelp
-    #   sphinxcontrib-serializinghtml
-sphinx-issues==3.0.1
+sphinx-issues==4.0.0
     # via -r docs/requirements.in
-sphinx-rtd-theme==1.3.0
+sphinx-rtd-theme==2.0.0
     # via -r docs/requirements.in
-sphinxcontrib-applehelp==1.0.7
+sphinxcontrib-applehelp==1.0.8
     # via sphinx
-sphinxcontrib-devhelp==1.0.5
+sphinxcontrib-devhelp==1.0.6
     # via sphinx
-sphinxcontrib-htmlhelp==2.0.4
+sphinxcontrib-htmlhelp==2.0.5
     # via sphinx
 sphinxcontrib-jquery==4.1
     # via sphinx-rtd-theme
@@ -93,11 +88,11 @@ sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-mermaid==0.9.2
     # via -r docs/requirements.in
-sphinxcontrib-qthelp==1.0.6
+sphinxcontrib-qthelp==1.0.7
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.9
+sphinxcontrib-serializinghtml==1.1.10
     # via sphinx
-urllib3==2.0.7
+urllib3==2.2.1
     # via requests
 werkzeug==3.0.1
     # via flask

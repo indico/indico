@@ -44,7 +44,7 @@ packaging
 pillow
 prompt-toolkit
 psycopg2
-pycountry
+pycountry!=23.12.11  # annoying warning: https://github.com/pycountry/pycountry/issues/192
 pygments
 pypdf
 python-dateutil
@@ -66,7 +66,7 @@ urllib3<2  # not compatible with centos7 openssl + not yet compatible with botoc
 weasyprint
 webargs
 werkzeug
-wtforms[email]<3.1  # wtforms/wtforms-sqlalchemy#40 is not yet compatible
+wtforms[email]
 wtforms-dateutil
 wtforms-sqlalchemy
 xlsxwriter

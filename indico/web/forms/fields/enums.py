@@ -50,10 +50,10 @@ class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
         if self.sorted:
             items = sorted(items, key=attrgetter('title'))
         if self.none is not None:
-            yield ('__None', self.none, self.data is None)
+            yield ('__None', self.none, self.data is None, {})
         for item in items:
             title = item.title if self.titles is None else self.titles[item]
-            yield (item.name, title, item == self.data)
+            yield (item.name, title, item == self.data, {})
 
 
 class IndicoEnumRadioField(IndicoEnumSelectField):
