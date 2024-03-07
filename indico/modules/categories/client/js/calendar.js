@@ -118,8 +118,8 @@ import CalendarLegend from './components/CalendarLegend';
           }
           const filteredEvents = data.events.filter(e => {
             let result = !filteredLegendElements.has(e[attr] ?? 0);
-            if (filteringByKeyword() && e.keywords.length) {
-              result ||= !e.keywords.every(kw => filteredKeywords.has(kw));
+            if (filteringByKeyword() && e.validKeywords.length) {
+              result ||= !e.validKeywords.every(kw => filteredKeywords.has(kw));
             }
             return result;
           });
@@ -334,8 +334,8 @@ import CalendarLegend from './components/CalendarLegend';
 
         function setupLegendByKeywords(events, keywords) {
           let items = [];
-          const noKeywords = events.filter(e => !e.keywords.length);
-          const manyKeywords = events.filter(e => e.keywords.length > 1);
+          const noKeywords = events.filter(e => !e.validKeywords.length);
+          const manyKeywords = events.filter(e => e.validKeywords.length > 1);
           if (noKeywords.length) {
             items = [
               ...items,
