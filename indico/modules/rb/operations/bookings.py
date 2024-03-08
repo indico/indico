@@ -69,7 +69,7 @@ def group_nonbookable_periods(periods, dates):
 
 def get_existing_room_occurrences(room, start_dt, end_dt, repeat_frequency=RepeatFrequency.NEVER, repeat_interval=None,
                                   allow_overlapping=False, only_accepted=False, skip_booking_id=None):
-    return get_existing_rooms_occurrences([room], start_dt, end_dt, repeat_frequency, repeat_interval,
+    return get_existing_rooms_occurrences([room], start_dt, end_dt, repeat_frequency, repeat_interval, [],
                                           allow_overlapping, only_accepted, skip_booking_id).get(room.id, [])
 
 
