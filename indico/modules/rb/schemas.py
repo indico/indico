@@ -178,6 +178,12 @@ class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
     object = Nested(ReservationLinkedObjectDataSchema)
     start_dt = NaiveDateTime(attribute='reservation_occurrence.start_dt')
 
+    @post_dump(pass_original=True)
+    def _hide_restricted_object(self, data, link, **kwargs):
+        if not link.object.can_access(session.user):
+            data['object'] = None
+        return data
+
     class Meta:
         model = ReservationOccurrenceLink
         fields = ('id', 'type', 'object', 'start_dt')

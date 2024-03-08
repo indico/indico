@@ -290,10 +290,8 @@ class RHBookingLinksData(RHRoomBookingBase):
     """Fetch details of objects linked to a booking."""
 
     @use_kwargs({'booking': ModelField(Reservation, required=True, data_key='booking_id')}, location='view_args')
-    def _process(self, booking):
-        links = [occ.link for occ in booking.occurrences
-                 if occ.link and occ.link.object.can_access(session.user)]
-        return ReservationOccurrenceLinkSchema(many=True).jsonify(links)
+    def _process(self, booking: Reservation):
+        return ReservationOccurrenceLinkSchema(many=True).jsonify(booking.links)
 
 
 class RHBookingEditCalendars(RHBookingBase):

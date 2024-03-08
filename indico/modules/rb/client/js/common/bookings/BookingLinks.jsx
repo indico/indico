@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Message, Icon} from 'semantic-ui-react';
 
-import {PluralTranslate, Singular, Param, Plural} from 'indico/react/i18n';
+import {PluralTranslate, Singular, Param, Plural, Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 
 /**
@@ -34,18 +34,24 @@ export default function BookingLinks({links}) {
             {links.map(link => (
               <li key={link.id}>
                 {toMoment(link.startDt).format('L')}:{' '}
-                <a href={link.object.url} target="_blank" rel="noopener noreferrer">
-                  {link.object.title}
-                </a>
-                {link.type !== 'event' && (
+                {link.object ? (
                   <>
-                    {' '}
-                    (
-                    <a href={link.object.eventURL} target="_blank" rel="noopener noreferrer">
-                      {link.object.eventTitle}
+                    <a href={link.object.url} target="_blank" rel="noopener noreferrer">
+                      {link.object.title}
                     </a>
-                    )
+                    {link.type !== 'event' && (
+                      <>
+                        {' '}
+                        (
+                        <a href={link.object.eventURL} target="_blank" rel="noopener noreferrer">
+                          {link.object.eventTitle}
+                        </a>
+                        )
+                      </>
+                    )}
                   </>
+                ) : (
+                  <Translate as="em">Details hidden - no access</Translate>
                 )}
               </li>
             ))}
