@@ -21,7 +21,6 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
-from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -272,17 +271,6 @@ class Reservation(db.Model):
     @property
     def links(self):
         return [x.link for x in self.occurrences if x.link]
-
-    @property
-    def events(self):
-        events = set()
-        for link in self.links:
-            if link.link_type == LinkType.event:
-                events.add(link.event)
-            elif link.link_type in {LinkType.session, LinkType.session_block, LinkType.contribution,
-                                    LinkType.subcontribution}:
-                events.add(link.object.event)
-        return events
 
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)
