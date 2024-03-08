@@ -39,8 +39,7 @@ export default function LazyBookingLinks({id}) {
     return null;
   }
 
-  const {links} = data;
-  return links ? <BookingLinks links={links} /> : null;
+  return <BookingLinks links={data} />;
 }
 
 LazyBookingLinks.propTypes = {

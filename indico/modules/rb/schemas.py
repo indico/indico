@@ -10,7 +10,7 @@ from operator import itemgetter
 from babel.dates import get_timezone
 from flask import session
 from marshmallow import ValidationError, fields, post_dump, post_load, validate, validates, validates_schema
-from marshmallow.fields import Boolean, Date, DateTime, Function, List, Method, Nested, Number, Pluck, String
+from marshmallow.fields import Boolean, Date, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 from sqlalchemy import func
 
@@ -245,7 +245,6 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
     is_linked_to_objects = Function(lambda booking: bool(booking.links))
-    links = List(Nested(ReservationOccurrenceLinkSchema))
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -254,8 +253,7 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_objects', 'links', 'state', 'external_details_url', 'internal_note',
-                  'recurrence_weekdays')
+                  'is_linked_to_objects', 'state', 'external_details_url', 'internal_note', 'recurrence_weekdays')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -579,7 +577,6 @@ concurrent_pre_bookings_schema = ReservationConcurrentOccurrenceSchema(many=True
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_linked_object_data_schema = ReservationLinkedObjectDataSchema()
-reservation_occurrence_link_schema = ReservationOccurrenceLinkSchema()
 reservation_user_event_schema = ReservationUserEventSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
