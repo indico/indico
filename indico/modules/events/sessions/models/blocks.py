@@ -123,7 +123,9 @@ class SessionBlock(LocationMixin, db.Model):
 
     @property
     def url(self):
-        return url_for('sessions.display_session', self)
+        # There is no block-specific display URL for now, so we use the session's locator
+        # to avoid adding an unused `block_id`` to the query string.
+        return url_for('sessions.display_session', self.session)
 
     def can_manage(self, user, allow_admin=True):
         return self.session.can_manage_blocks(user, allow_admin=allow_admin)
