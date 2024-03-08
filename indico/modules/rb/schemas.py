@@ -176,7 +176,7 @@ class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
     id = Number()
     type = EnumField(LinkType, attribute='link_type')
     object = Nested(ReservationLinkedObjectDataSchema)
-    start_dt = Function(lambda link: NaiveDateTime().get_value(link.reservation_occurrence, 'start_dt'))
+    start_dt = NaiveDateTime(attribute='reservation_occurrence.start_dt')
 
     class Meta:
         model = ReservationOccurrenceLink

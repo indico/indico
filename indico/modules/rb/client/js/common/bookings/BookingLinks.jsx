@@ -10,6 +10,7 @@ import React from 'react';
 import {Message, Icon} from 'semantic-ui-react';
 
 import {PluralTranslate, Singular, Param, Plural} from 'indico/react/i18n';
+import {toMoment} from 'indico/utils/date';
 
 /**
  * `BookingLinks` displays a message informing which objects are linked to
@@ -32,7 +33,7 @@ export default function BookingLinks({links}) {
           <ul style={{paddingInlineStart: '0.5rem'}}>
             {links.map(link => (
               <li key={link.id}>
-                {link.startDt.date}:{' '}
+                {toMoment(link.startDt).format('L')}:{' '}
                 <a href={link.object.url} target="_blank" rel="noopener noreferrer">
                   {link.object.title}
                 </a>
