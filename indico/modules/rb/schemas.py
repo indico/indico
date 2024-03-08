@@ -28,7 +28,8 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceLink
+from indico.modules.rb.models.reservation_occurrences import (ReservationOccurrence, ReservationOccurrenceLink,
+                                                              ReservationOccurrenceState)
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationState
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
@@ -175,8 +176,9 @@ class ReservationUserEventSchema(mm.Schema):
 class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
     id = Number()
     type = EnumField(LinkType, attribute='link_type')
-    object = Nested(ReservationLinkedObjectDataSchema)
+    object = Nested(ReservationLinkedObjectDataSchema, only=('url', 'title', 'event_title', 'event_url'))
     start_dt = NaiveDateTime(attribute='reservation_occurrence.start_dt')
+    state = EnumField(ReservationOccurrenceState, attribute='reservation_occurrence.state')
 
     @post_dump(pass_original=True)
     def _hide_restricted_object(self, data, link, **kwargs):
@@ -186,12 +188,12 @@ class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
 
     class Meta:
         model = ReservationOccurrenceLink
-        fields = ('id', 'type', 'object', 'start_dt')
+        fields = ('id', 'type', 'object', 'start_dt', 'state')
 
 
 class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
-    state = EnumField(ReservationState)
+    state = EnumField(ReservationOccurrenceState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 

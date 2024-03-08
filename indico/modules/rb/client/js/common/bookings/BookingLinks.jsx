@@ -29,11 +29,14 @@ export default function BookingLinks({links}) {
             This booking has <Param name="count" value={links.length} /> linked occurrences:
           </Plural>
         </PluralTranslate>
-        <Message style={{overflowY: 'scroll', maxHeight: '5rem'}}>
+        <Message style={{overflowY: 'auto', maxHeight: '5rem', paddingTop: 0, paddingBottom: 0}}>
           <ul style={{paddingInlineStart: '0.5rem'}}>
             {links.map(link => (
               <li key={link.id}>
-                {toMoment(link.startDt).format('L')}:{' '}
+                <span style={link.state !== 'valid' ? {textDecoration: 'line-through'} : {}}>
+                  {toMoment(link.startDt).format('L')}
+                </span>
+                :{' '}
                 {link.object ? (
                   <>
                     <a href={link.object.url} target="_blank" rel="noopener noreferrer">
