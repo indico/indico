@@ -188,14 +188,10 @@ class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     state = EnumField(ReservationState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
-    # HACK: getattr is used since in BookRoomModal occurrence doesn't yet have a link attribute
-    is_linked_to_object = Function(lambda occurrence: bool(getattr(occurrence, 'link', False)))
-    link = Nested(ReservationOccurrenceLinkSchema)
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state',
-                  'is_linked_to_object', 'link')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state')
 
 
 class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
