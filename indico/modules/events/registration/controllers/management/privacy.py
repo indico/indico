@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import timedelta
-
 from flask import redirect, session
 from flask.helpers import flash
 from marshmallow_enum import EnumField
@@ -16,7 +14,7 @@ from indico.modules.events import EventLogRealm
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import RegistrationPrivacyForm
-from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationVisibility
+from indico.modules.events.registration.models.registrations import RegistrationVisibility
 from indico.modules.events.registration.util import update_registration_consent_to_publish
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.logs.models.entries import LogKind
@@ -29,32 +27,13 @@ from indico.web.flask.util import url_for
 class RHRegistrationPrivacy(RHManageRegFormBase):
     """Change privacy settings of a registration form."""
 
-    def _get_changes(self, participant_visibility, public_visibility, visibility_duration, retention_period,
-                     require_privacy_policy_agreement):
-        log_fields = {
-            'participant_visibility': {'title': 'Visibility to participants'},
-            'public_visibility': {'title': 'Visibility to everyone'},
-            'visibility_duration': {'title': 'Visibility duration', 'default': 'Indefinite'},
-            'retention_period': {'title': 'Retention period', 'default': 'Indefinite'},
-            'require_privacy_policy_agreement': {'title': 'Privacy policy'},
-        }
-
-        changes = {
-            'participant_visibility': (self.regform.publish_registrations_participants,
-                                       PublishRegistrationsMode[participant_visibility]),
-            'public_visibility': (self.regform.publish_registrations_public,
-                                  PublishRegistrationsMode[public_visibility]),
-            'visibility_duration': (self.regform.publish_registrations_duration
-                                    if self.regform.publish_registrations_duration is not None else None,
-                                    visibility_duration if visibility_duration is not None else None),
-            'retention_period': (self.regform.retention_period
-                                 if self.regform.retention_period is not None else None,
-                                 retention_period if retention_period is not None else None),
-            'require_privacy_policy_agreement': (self.regform.require_privacy_policy_agreement,
-                                                 require_privacy_policy_agreement)
-        }
-        changes = {key: (old, new) for key, (old, new) in changes.items() if old != new}
-        return make_diff_log(changes, log_fields)
+    _log_fields = {
+        'publish_registrations_participants': {'title': 'Visibility to participants'},
+        'publish_registrations_public': {'title': 'Visibility to everyone'},
+        'publish_registrations_duration': {'title': 'Visibility duration', 'default': 'Indefinite'},
+        'retention_period': {'title': 'Retention period', 'default': 'Indefinite'},
+        'require_privacy_policy_agreement': {'title': 'Privacy policy'},
+    }
 
     def _process(self):
         form = RegistrationPrivacyForm(
@@ -70,13 +49,9 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
             ]
         )
         if form.validate_on_submit():
-            participant_visibility, public_visibility, visibility_duration = form.visibility.data
-            visibility_duration = timedelta(weeks=visibility_duration) if visibility_duration is not None else None
-            changes = self._get_changes(participant_visibility, public_visibility,
-                                        visibility_duration, form.retention_period.data,
-                                        form.require_privacy_policy_agreement.data)
-            form.populate_obj(self.regform)
+            changes = self.regform.populate_from_dict(form.data, skip={'visibility'})
             db.session.flush()
+            changes = make_diff_log(changes, self._log_fields)
             self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
                            f'Privacy settings for "{self.regform.title}" modified', session.user,
                            data={'Changes': changes})
