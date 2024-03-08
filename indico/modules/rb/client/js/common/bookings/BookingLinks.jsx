@@ -39,11 +39,12 @@ export default function BookingLinks({links}) {
                 </a>
                 {link.type !== 'event' && (
                   <>
-                    {' ('}
+                    {' '}
+                    (
                     <a href={link.object.eventURL} target="_blank" rel="noopener noreferrer">
                       {link.object.eventTitle}
                     </a>
-                    {'}'}
+                    )
                   </>
                 )}
               </li>
