@@ -160,6 +160,6 @@
 {% endblock %}
 
 {% macro booking_details_link(reservation) %}
-    <a href="{{ url_for('rb.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id)) }}"
+    <a href="{{ url_for('rb.booking_link', booking_id=reservation.id) }}"
        title="{% trans %}See reservation details{% endtrans %}" target="_blank">#{{ reservation.id }}</a>
 {% endmacro %}
