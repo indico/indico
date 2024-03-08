@@ -5,7 +5,7 @@
     {% if num_bookings %}
         {% trans strong='<strong>'|safe, endstrong='</strong>'|safe -%}
             Please note that if you delete the event you will lose all the information contained in it,
-            {{ strong }}including {{ num_bookings }} Room Booking Occurrences(s){{ endstrong }} linked to it.
+            {{ strong }}including {{ num_bookings }} Room Booking occurrence(s){{ endstrong }} linked to it.
             This operation is irreversible!
         {%- endtrans %}
     {% else %}

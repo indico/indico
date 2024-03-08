@@ -6,7 +6,7 @@
     {% if num_booking_occurrences %}
         {% trans strong='<strong>'|safe, endstrong='</strong>'|safe -%}
             Please note that if you delete the events you will lose all the information contained in them,
-            {{ strong }}including {{ num_booking_occurrences }} Room Booking Occurrences(s){{ endstrong }}.
+            {{ strong }}including {{ num_booking_occurrences }} Room Booking occurrence(s){{ endstrong }}.
             This operation is irreversible!
         {%- endtrans %}
     {% else %}
