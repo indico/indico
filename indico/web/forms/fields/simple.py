@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import json
+from datetime import timedelta
 
 from markupsafe import escape
 from wtforms import ValidationError
@@ -216,3 +217,10 @@ class IndicoLinkListField(JSONField):
 class IndicoParticipantVisibilityField(JSONField):
     widget = JinjaWidget('forms/participant_visibility_widget.html', single_kwargs=True, single_line=True)
     choices = [(mode.name, mode.title) for mode in PublishRegistrationsMode]
+
+    def populate_obj(self, obj, name):
+        participant_visibility, public_visibility, visibility_duration = self.data
+        visibility_duration = timedelta(weeks=visibility_duration) if visibility_duration is not None else None
+        obj.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
+        obj.publish_registrations_public = PublishRegistrationsMode[public_visibility]
+        obj.publish_registrations_duration = visibility_duration

@@ -75,10 +75,7 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
             changes = self._get_changes(participant_visibility, public_visibility,
                                         visibility_duration, form.retention_period.data,
                                         form.require_privacy_policy_agreement.data)
-            self.regform.publish_registrations_participants = PublishRegistrationsMode[participant_visibility]
-            self.regform.publish_registrations_public = PublishRegistrationsMode[public_visibility]
-            self.regform.publish_registrations_duration = visibility_duration
-            form.populate_obj(self.regform, skip={'visibility'})
+            form.populate_obj(self.regform)
             db.session.flush()
             self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
                            f'Privacy settings for "{self.regform.title}" modified', session.user,
