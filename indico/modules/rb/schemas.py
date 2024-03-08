@@ -409,14 +409,14 @@ class CreateBookingSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     def _check_booking_reason(self, data, **kwargs):
         booking = self.context.get('booking')
-        link_id = booking.link_id if booking else data.get('link_id')
+        has_link = bool(booking.links) if booking else (data.get('link_id') is not None)
         booking_reason = data.get('booking_reason')
         required = rb_settings.get('booking_reason_required')
         validate = False
         if required == BookingReasonRequiredOptions.always:
             validate = True
         elif required == BookingReasonRequiredOptions.not_for_events:
-            validate = link_id is None
+            validate = not has_link
         if validate and not booking_reason:
             raise ValidationError('Booking reason not specified', 'reason')
 
