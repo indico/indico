@@ -205,7 +205,7 @@ class ReservationConcurrentOccurrenceSchema(ReservationOccurrenceSchema):
         exclude = ('reservation',)
 
 
-class ReservationEditLogSchema(UserSchema):
+class ReservationEditLogSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReservationEditLog
         fields = ('id', 'timestamp', 'info', 'user_name')
