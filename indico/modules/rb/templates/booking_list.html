@@ -106,7 +106,7 @@
                             {% set occurrence = link.reservation_occurrence %}
                             {% set reservation = occurrence.reservation %}
                             <tr class="{{ 'disabled' if reservation.is_rejected }}">
-                                <td>
+                                <td style="white-space: nowrap;">
                                     {{ reservation.room.full_name }}
                                     {% if occurrence.is_rejected %}
                                         <span class="icon-disable booking-status"
