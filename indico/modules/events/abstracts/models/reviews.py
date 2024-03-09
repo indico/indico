@@ -196,7 +196,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
         if self.abstract.can_judge(user):
             return True
         else:
-            return self.track.can_convene(user)
+            return self.track.can_convene(user) if self.track else False
 
 
 class AbstractCommentVisibility(RichIntEnum):
