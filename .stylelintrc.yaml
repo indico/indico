@@ -44,7 +44,6 @@ rules:
 
   value-keyword-case: lower
 
-  scss/at-import-no-partial-leading-underscore: true
   scss/at-import-partial-extension: never
   scss/at-function-pattern: ^([a-z][a-z0-9]*)(-[a-z0-9]+)*$
   scss/at-mixin-argumentless-call-parentheses: always
@@ -55,6 +54,7 @@ rules:
   scss/double-slash-comment-whitespace-inside: always
   scss/declaration-nested-properties: never
   scss/dimension-no-non-numeric-values: true
+  scss/load-no-partial-leading-underscore: true
   scss/media-feature-value-dollar-variable:
     - always
     - ignore: [keywords]
