@@ -77,3 +77,5 @@ to be problematic. Here's a list to save some time during the next updates:
   but we have various places where we have only file extensions, so we can't easily update.
 - `react-leaflet`, `react-leaflet-draw` and `react-leaflet-markercluster` are stuck because react-leaflet v3 decided to
   adept some dumb "ethical" license (PaulLeCam/react-leaflet#698) which is not considered a proper Open Source license.
+- `react-markdown`, `react-redux`, `redux`, `redux-thunk` and `reselect` are stuck because react-redux now requires react 18, but react-dates does not support this.
+- `stylelint`, `stylelint-config-recommended-scss` and `stylelint-scss` had a common major version bump, possibly breaking compatibility with `stylelint-prettier` (which we cannot upgrade atm). Should be tested to confirm whether that's indeed the case, but for now it's easier to simply stick with the old version.
