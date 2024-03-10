@@ -1,0 +1,31 @@
+alembic:
+  - changed-files:
+    - any-glob-to-any-file: indico/migrations/versions/*.py
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - package.json
+      - package-lock.json
+      - requirements.in
+      - requirements.txt
+      - requirements.dev.in
+      - requirements.dev.txt
+      - docs/requirements.in
+      - docs/requirements.txt
+
+javascript:
+  - changed-files:
+    - any-glob-to-any-file:
+      - package.json
+      - package-lock.json
+
+python:
+  - changed-files:
+    - any-glob-to-any-file:
+      - requirements.in
+      - requirements.txt
+      - requirements.dev.in
+      - requirements.dev.txt
+      - docs/requirements.in
+      - docs/requirements.txt
