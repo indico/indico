@@ -1,4 +1,4 @@
-"""Link events to reservation occurrences.
+"""Link events to reservation occurrences
 
 Revision ID: b37cbc4bb129
 Revises: e4ac92d27295
