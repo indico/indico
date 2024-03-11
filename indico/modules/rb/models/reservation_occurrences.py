@@ -10,6 +10,7 @@ from math import ceil
 
 from dateutil import rrule
 from sqlalchemy import Date, or_
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager, defaultload
 from sqlalchemy.sql import cast
@@ -17,6 +18,8 @@ from sqlalchemy.sql import cast
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -36,6 +39,32 @@ class ReservationOccurrenceState(IndicoIntEnum):
     rejected = 4
 
 
+class ReservationOccurrenceLink(LinkMixin, db.Model):
+    __tablename__ = 'reservation_occurrence_links'
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls, schema='roombooking')
+
+    allowed_link_types = {LinkType.event, LinkType.contribution, LinkType.session_block}
+    events_backref_name = 'all_room_reservation_occurrence_links'
+    link_backref_name = 'room_reservation_occurrence_links'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    def __repr__(self):
+        return format_repr(self, 'id', _rawtext=self.link_repr)
+
+    # relationship backrefs:
+    # - reservation_occurrence (ReservationOccurrence.link)
+
+
+ReservationOccurrenceLink.register_link_events()
+
+
 class ReservationOccurrence(db.Model):
     __tablename__ = 'reservation_occurrences'
     __table_args__ = (db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
@@ -53,6 +82,12 @@ class ReservationOccurrence(db.Model):
         db.ForeignKey('roombooking.reservations.id'),
         nullable=False,
         primary_key=True
+    )
+    link_id = db.Column(
+        db.Integer,
+        db.ForeignKey('roombooking.reservation_occurrence_links.id'),
+        nullable=True,
+        index=True
     )
     start_dt = db.Column(
         db.DateTime,
@@ -78,6 +113,15 @@ class ReservationOccurrence(db.Model):
     rejection_reason = db.Column(
         db.String,
         nullable=True
+    )
+
+    link = db.relationship(
+        'ReservationOccurrenceLink',
+        lazy=True,
+        backref=db.backref(
+            'reservation_occurrence',
+            uselist=False
+        )
     )
 
     # relationship backrefs:
@@ -204,6 +248,15 @@ class ReservationOccurrence(db.Model):
                 .join(ReservationOccurrence.reservation)
                 .options(contains_eager(ReservationOccurrence.reservation))
                 .options(cls.NO_RESERVATION_USER_STRATEGY))
+
+    @property
+    def linked_object(self):
+        return self.link.object if self.link else None
+
+    @linked_object.setter
+    def linked_object(self, obj):
+        assert self.link is None
+        self.link = ReservationOccurrenceLink(object=obj)
 
     def can_reject(self, user, allow_admin=True):
         if not self.is_valid:

@@ -283,12 +283,12 @@ def get_booking_params_for_event(event):
 
     :param event: `Event` object
     """
+    data = {'params': {'link_type': 'event',
+                       'link_id': event.id,
+                       'text': f'#{event.room.id}' if event.room else None}}
+
+    # Calculate type of booking options
     is_single_day = event.start_dt_local.date() == event.end_dt_local.date()
-    params = {
-        'link_type': 'event',
-        'link_id': event.id,
-        'text': f'#{event.room.id}' if event.room else None,
-    }
     all_times = {day: (_find_first_entry_start_dt(event, day), _find_latest_entry_end_dt(event, day))
                  for day in event.iter_days(tzinfo=event.tzinfo)}
     # if the timetable is empty on a given day, use (start_dt, end_dt) of the event
@@ -296,27 +296,26 @@ def get_booking_params_for_event(event):
                  for day, times in all_times.items()]
     same_times = len({times for (_, times) in all_times}) == 1
 
-    if is_single_day or same_times:
-        params['sd'] = event.start_dt_local.date().isoformat()
-        if event.start_dt_local.time() < event.end_dt_local.time():
-            # if we have suitable times we provide enough data to immediately run a search.
-            # XXX: if filtersAreSet also checked for times we could provide dates/recurrence
-            # as well even when we don't know suitable times.. but that would require extra
-            # code to handle the case of a custom RB interface where no times are used at all
-            params.update({
-                'ed': None if is_single_day else event.end_dt_local.date().isoformat(),
-                'recurrence': 'single' if is_single_day else 'daily',
-                'st': event.start_dt_local.strftime('%H:%M'),
-                'et': event.end_dt_local.strftime('%H:%M'),
-                'number': 1,
-                'interval': 'week',
-            })
-        return {
-            'type': 'same_times',
-            'params': params
-        }
-    else:
-        time_info = sorted(
+    # Generate parameters for all-days bookings
+    all_days_params = {'sd': event.start_dt_local.date().isoformat()}
+    if event.start_dt_local.time() < event.end_dt_local.time():
+        # if we have suitable times we provide enough data to immediately run a search.
+        # XXX: if filtersAreSet also checked for times we could provide dates/recurrence
+        # as well even when we don't know suitable times.. but that would require extra
+        # code to handle the case of a custom RB interface where no times are used at all
+        all_days_params.update({
+            'ed': None if is_single_day else event.end_dt_local.date().isoformat(),
+            'recurrence': 'single' if is_single_day else 'daily',
+            'st': event.start_dt_local.strftime('%H:%M'),
+            'et': event.end_dt_local.strftime('%H:%M'),
+            'number': 1,
+            'interval': 'week',
+        })
+    data['all_days_params'] = all_days_params
+
+    # Generate parameters for per-day bookings
+    if not is_single_day and not same_times:
+        per_day_params = sorted(
             (day, {
                 # if we have a proper start/end time, we provide all args to search
                 'number': 1,
@@ -331,11 +330,9 @@ def get_booking_params_for_event(event):
                 'sd': day.isoformat(),
             }) for day, (start, end) in all_times
         )
-        return {
-            'type': 'mixed_times',
-            'params': params,
-            'time_info': time_info
-        }
+        data['per_day_params'] = per_day_params
+
+    return data
 
 
 def get_prebooking_collisions(reservation):

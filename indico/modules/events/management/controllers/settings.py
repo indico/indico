@@ -61,7 +61,7 @@ class RHEventSettings(RHManageEventBase):
     def _process(self):
         show_booking_warning = False
         if (config.ENABLE_ROOMBOOKING and rb_check_if_visible(session.user)
-                and not self.event.has_ended and self.event.room and not self.event.room_reservation_links):
+                and not self.event.has_ended and self.event.room and not self.event.room_reservation_occurrence_links):
             # Check if any of the managers of the event already have a booking that overlaps with the event datetime
             manager_ids = [p.user.id for p in self.event.acl_entries if p.user]
             has_overlap = (ReservationOccurrence.query

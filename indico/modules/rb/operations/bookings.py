@@ -23,8 +23,8 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceLink
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
@@ -330,11 +330,14 @@ def create_booking_for_event(room_id, event):
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)
         booking_reason = f"Event '{event.title}'"
-        data = {'start_dt': start_dt, 'end_dt': end_dt, 'booked_for_user': event.creator,
-                'booking_reason': booking_reason, 'repeat_frequency': RepeatFrequency.NEVER, 'event_id': event.id}
-        booking = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
-        booking.linked_object = event
-        return booking
+        data = {'event_id': event.id, 'start_dt': start_dt, 'end_dt': end_dt, 'booked_for_user': event.creator,
+                'booking_reason': booking_reason, 'repeat_frequency': RepeatFrequency.NEVER}
+        if start_dt.date() != end_dt.date():
+            data |= {'repeat_frequency': RepeatFrequency.DAY, 'repeat_interval': 1}
+        reservation = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
+        for occurrence in reservation.occurrences:
+            occurrence.linked_object = event
+        return reservation
     except NoReportError:
         flash(_('Booking could not be created. Probably somebody else booked the room in the meantime.'), 'error')
         return None
@@ -459,7 +462,8 @@ def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval, rec
     excluded_categories = rb_settings.get('excluded_categories')
     return (Event.query
             .filter(~Event.is_deleted,
-                    ~Event.room_reservation_links.any(ReservationLink.reservation.has(Reservation.is_accepted)),
+                    Event.room_reservation_occurrence_links.any(
+                        ReservationOccurrenceLink.reservation_occurrence.has(ReservationOccurrence.is_valid)),
                     db.or_(Event.happens_between(server_to_utc(occ.start_dt), server_to_utc(occ.end_dt))
                            for occ in occurrences),
                     Event.timezone == config.DEFAULT_TIMEZONE,

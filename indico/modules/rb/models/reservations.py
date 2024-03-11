@@ -21,8 +21,6 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
-from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
-from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -92,32 +90,6 @@ class ReservationState(IndicoIntEnum):
     accepted = 2
     cancelled = 3
     rejected = 4
-
-
-class ReservationLink(LinkMixin, db.Model):
-    __tablename__ = 'reservation_links'
-
-    @declared_attr
-    def __table_args__(cls):
-        return auto_table_args(cls, schema='roombooking')
-
-    allowed_link_types = {LinkType.event, LinkType.contribution, LinkType.session_block}
-    events_backref_name = 'all_room_reservation_links'
-    link_backref_name = 'room_reservation_links'
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    def __repr__(self):
-        return format_repr(self, 'id', _rawtext=self.link_repr)
-
-    # relationship backrefs:
-    # - reservation (Reservation.link)
-
-
-ReservationLink.register_link_events()
 
 
 class Reservation(db.Model):
@@ -208,12 +180,6 @@ class Reservation(db.Model):
         db.String,
         nullable=True
     )
-    link_id = db.Column(
-        db.Integer,
-        db.ForeignKey('roombooking.reservation_links.id'),
-        nullable=True,
-        index=True
-    )
     end_notification_sent = db.Column(
         db.Boolean,
         nullable=False,
@@ -256,15 +222,6 @@ class Reservation(db.Model):
         backref=db.backref(
             'reservations',
             lazy='dynamic'
-        )
-    )
-
-    link = db.relationship(
-        'ReservationLink',
-        lazy=True,
-        backref=db.backref(
-            'reservation',
-            uselist=False
         )
     )
 
@@ -312,17 +269,8 @@ class Reservation(db.Model):
         return self.repeat_frequency, self.repeat_interval, self.recurrence_weekdays
 
     @property
-    def linked_object(self):
-        return self.link.object if self.link else None
-
-    @linked_object.setter
-    def linked_object(self, obj):
-        assert self.link is None
-        self.link = ReservationLink(object=obj)
-
-    @property
-    def event(self):
-        return self.link.event if self.link else None
+    def links(self):
+        return [x.link for x in self.occurrences if x.link]
 
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)

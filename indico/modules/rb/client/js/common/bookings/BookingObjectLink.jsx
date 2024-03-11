@@ -16,44 +16,35 @@ import {linkDataShape} from '../linking';
 import './BookingObjectLink.module.scss';
 
 /**
- * `BookingObjectLink` displays a message informing if the booking is
- * linked or will be linked to an event, contribution or session block.
+ * `BookingObjectLink` displays a message informing if the booking will
+ * be linked to an event, contribution or session block.
  */
 export default class BookingObjectLink extends React.PureComponent {
   static propTypes = {
     link: linkDataShape.isRequired,
-    /** Whether it is a pending link or the booking is already linked */
-    pending: PropTypes.bool,
     children: PropTypes.any,
   };
 
   static defaultProps = {
-    pending: false,
     children: null,
   };
 
   render() {
     const {
-      pending,
       children,
       link: {type, title, eventURL, eventTitle},
     } = this.props;
-    const pendingMessages = {
+    const messages = {
       event: Translate.string('This booking will be linked to an event:'),
       contribution: Translate.string('This booking will be linked to a contribution:'),
       sessionBlock: Translate.string('This booking will be linked to a session block:'),
-    };
-    const linkedMessages = {
-      event: Translate.string('This booking is linked to an event:'),
-      contribution: Translate.string('This booking is linked to a contribution:'),
-      sessionBlock: Translate.string('This booking is linked to a session block:'),
     };
     return (
       <>
         <Message icon attached={!!children} color="teal">
           <Icon name="linkify" />
           <Message.Content>
-            {pending ? pendingMessages[type] : linkedMessages[type]}
+            {messages[type]}
             <div styleName="object-link">
               {type === 'event' ? (
                 <a href={eventURL} target="_blank" rel="noopener noreferrer">

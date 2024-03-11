@@ -16,7 +16,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable import TimetableEntry
 from indico.modules.rb.event.forms import BookingListForm
-from indico.modules.rb.models.reservations import Reservation, ReservationLink
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceLink
 from indico.modules.rb.util import get_booking_params_for_event, rb_check_if_visible
 from indico.modules.rb.views import WPEventBookingList
 from indico.util.date_time import format_datetime, now_utc
@@ -52,13 +52,13 @@ class RHEventBookingList(RHManageEventBase):
         has_contribs = _contrib_query(self.event).has_rows()
         has_session_blocks = _session_block_query(self.event).has_rows()
 
-        links = (ReservationLink.query.with_parent(self.event)
-                 .options(joinedload('reservation').joinedload('room'),
+        links = (ReservationOccurrenceLink.query.with_parent(self.event)
+                 .options(joinedload('reservation_occurrence').joinedload('reservation').joinedload('room'),
                           joinedload('session_block'),
                           joinedload('contribution'))
-                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled))
-                 .join(Reservation)
-                 .order_by(Reservation.start_dt)
+                 .filter(~ReservationOccurrenceLink.reservation_occurrence.has(ReservationOccurrence.is_cancelled))
+                 .join(ReservationOccurrence)
+                 .order_by(ReservationOccurrence.start_dt)
                  .all())
 
         contribs_data = {c.id: {'start_dt': c.start_dt.isoformat(), 'end_dt': c.end_dt.isoformat()}

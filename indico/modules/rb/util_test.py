@@ -57,19 +57,20 @@ def test_rb_is_admin(create_user, is_admin, is_rb_admin, expected):
     # end time < start time
     (datetime(2019, 8, 16, 16, 0), datetime(2019, 8, 18, 13, 0), {'sd': '2019-08-16'})
 ))
-def test_get_booking_params_for_event_same_times(create_event, dummy_room, start_dt, end_dt, expected_params):
+def test_get_booking_params_for_all_days(create_event, dummy_room, start_dt, end_dt, expected_params):
     start_dt = pytz.utc.localize(start_dt)
     end_dt = pytz.utc.localize(end_dt)
     event = create_event(start_dt=start_dt, end_dt=end_dt, room=dummy_room)
     params = get_booking_params_for_event(event)
     assert params == {
-        'type': 'same_times',
-        'params': dict({
+        'params': {
             'link_id': event.id,
             'link_type': 'event',
             'text': f'#{dummy_room.id}',
-        }, **expected_params)
+        },
+        'all_days_params': expected_params
     }
+    assert 'per_day_params' not in params
 
 
 @pytest.mark.parametrize(('start_time', 'end_time', 'expected_params'), (
@@ -78,8 +79,8 @@ def test_get_booking_params_for_event_same_times(create_event, dummy_room, start
     # end time < start time
     (time(15), time(13), {}),
 ))
-def test_get_booking_params_for_event_multiple_times(create_event, create_contribution, create_entry, dummy_room,
-                                                     start_time, end_time, expected_params):
+def test_get_booking_params_for_each_day(create_event, create_contribution, create_entry, dummy_room,
+                                         start_time, end_time, expected_params):
     start_dt = pytz.utc.localize(datetime.combine(date(2019, 8, 16), start_time))
     end_dt = pytz.utc.localize(datetime.combine(date(2019, 8, 18), end_time))
     event = create_event(start_dt=start_dt, end_dt=end_dt, room=dummy_room)
@@ -90,21 +91,19 @@ def test_get_booking_params_for_event_multiple_times(create_event, create_contri
     create_entry(c2, pytz.utc.localize(datetime(2019, 8, 17, 18, 0)))
     create_entry(c3, pytz.utc.localize(datetime(2019, 8, 17, 19, 0)))
     params = get_booking_params_for_event(event)
-    assert params == {
-        'type': 'mixed_times',
-        'params': {
-            'link_type': 'event',
-            'link_id': event.id,
-            'text': f'#{dummy_room.id}',
-        },
-        'time_info': [
-            (date(2019, 8, 16), {'sd': '2019-08-16', **expected_params}),
-            # this day has timetable entries -> not using the event defaults
-            (date(2019, 8, 17), {'interval': 'week', 'number': 1, 'recurrence': 'single',
-                                 'sd': '2019-08-17', 'st': '09:00', 'et': '20:00'}),
-            (date(2019, 8, 18), {'sd': '2019-08-18', **expected_params})
-        ]
+    assert params['params'] == {
+        'link_type': 'event',
+        'link_id': event.id,
+        'text': f'#{dummy_room.id}',
     }
+    assert params['per_day_params'] == [
+        (date(2019, 8, 16), {'sd': '2019-08-16', **expected_params}),
+        # this day has timetable entries -> not using the event defaults
+        (date(2019, 8, 17), {'interval': 'week', 'number': 1, 'recurrence': 'single',
+                             'sd': '2019-08-17', 'st': '09:00', 'et': '20:00'}),
+        (date(2019, 8, 18), {'sd': '2019-08-18', **expected_params})
+    ]
+    assert 'all_days_params' in params
 
 
 def test_get_booking_params_timezone(create_event):
@@ -113,20 +112,18 @@ def test_get_booking_params_timezone(create_event):
     end_dt = chicago_tz.localize(datetime(2019, 8, 18, 22, 0)).astimezone(pytz.utc)
     event = create_event(start_dt=start_dt, end_dt=end_dt, timezone='America/Chicago')
 
-    assert get_booking_params_for_event(event) == {
-        'type': 'same_times',
-        'params': {
-            'sd': '2019-08-16',
-            'st': '08:00',
-            'ed': '2019-08-18',
-            'et': '22:00',
-            'interval': 'week',
-            'number': 1,
-            'recurrence': 'daily',
-            'link_id': event.id,
-            'link_type': 'event',
-            'text': None
-        }
+    params = get_booking_params_for_event(event)
+    assert dict(params['params'], **params['all_days_params']) == {
+        'sd': '2019-08-16',
+        'st': '08:00',
+        'ed': '2019-08-18',
+        'et': '22:00',
+        'interval': 'week',
+        'number': 1,
+        'recurrence': 'daily',
+        'link_id': event.id,
+        'link_type': 'event',
+        'text': None
     }
 
 

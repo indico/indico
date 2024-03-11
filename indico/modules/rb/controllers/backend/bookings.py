@@ -31,7 +31,7 @@ from indico.modules.rb.operations.bookings import (get_active_bookings, get_book
                                                    get_matching_events, get_room_calendar, get_rooms_availability,
                                                    has_same_slots, should_split_booking, split_booking)
 from indico.modules.rb.operations.suggestions import get_suggestions
-from indico.modules.rb.schemas import (CreateBookingSchema, reservation_details_schema,
+from indico.modules.rb.schemas import (CreateBookingSchema, ReservationOccurrenceLinkSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
 from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
@@ -40,6 +40,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_kwargs, use_rh_args
 from indico.web.flask.util import url_for
@@ -157,7 +158,8 @@ class RHCreateBooking(RHRoomBookingBase):
         obj = get_linked_object(type_, id_)
         if obj is None or not obj.event.can_manage(session.user):
             return
-        booking.linked_object = obj
+        for occurrence in booking.occurrences:
+            occurrence.linked_object = obj
         if link_back:
             obj.inherit_location = False
             obj.room = self.room
@@ -282,6 +284,14 @@ class RHLinkedObjectData(RHRoomBookingBase):
         if not self.linked_object or not self.linked_object.can_access(session.user):
             return jsonify(can_access=False)
         return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object))
+
+
+class RHBookingLinksData(RHRoomBookingBase):
+    """Fetch details of objects linked to a booking."""
+
+    @use_kwargs({'booking': ModelField(Reservation, required=True, data_key='booking_id')}, location='view_args')
+    def _process(self, booking: Reservation):
+        return ReservationOccurrenceLinkSchema(many=True).jsonify(booking.links)
 
 
 class RHBookingEditCalendars(RHBookingBase):

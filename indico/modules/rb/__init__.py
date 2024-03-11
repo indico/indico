@@ -91,7 +91,7 @@ def _topmenu_items(sender, **kwargs):
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
     if config.ENABLE_ROOMBOOKING and event.can_manage(session.user):
-        yield SideMenuItem('room_booking', _('Room booking'), url_for('rb.event_booking_list', event), 50,
+        yield SideMenuItem('room_booking', _('Room bookings'), url_for('rb.event_booking_list', event), 50,
                            icon='location')
 
 
@@ -112,14 +112,14 @@ def _merge_users(target, source, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, user, **kwargs):
-    from indico.modules.rb.models.reservations import Reservation
-    reservation_links = (event.all_room_reservation_links
-                         .join(Reservation)
-                         .filter(~Reservation.is_rejected, ~Reservation.is_cancelled)
-                         .all())
-    for link in reservation_links:
-        if link.reservation.end_dt >= datetime.now():
-            link.reservation.cancel(user or session.user, 'Associated event was deleted')
+    from indico.modules.rb.models.reservations import ReservationOccurrence
+    reservation_occurrence_links = (event.all_room_reservation_occurrence_links
+                                    .join(ReservationOccurrence)
+                                    .filter(~ReservationOccurrence.is_rejected, ~ReservationOccurrence.is_cancelled)
+                                    .all())
+    for link in reservation_occurrence_links:
+        if link.reservation_occurrence.end_dt >= datetime.now():
+            link.reservation_occurrence.cancel(user or session.user, 'Associated event was deleted')
 
 
 class BookPermission(ManagementPermission):

@@ -28,8 +28,9 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink, ReservationState
+from indico.modules.rb.models.reservation_occurrences import (ReservationOccurrence, ReservationOccurrenceLink,
+                                                              ReservationOccurrenceState)
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationState
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
@@ -152,6 +153,7 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
 class ReservationLinkedObjectDataSchema(mm.Schema):
     id = Number()
     title = Method('_get_title')
+    url = Function(lambda obj: obj.url)
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
     own_room_id = Number()
@@ -171,9 +173,27 @@ class ReservationUserEventSchema(mm.Schema):
     end_dt = DateTime()
 
 
+class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
+    id = Number()
+    type = EnumField(LinkType, attribute='link_type')
+    object = Nested(ReservationLinkedObjectDataSchema, only=('url', 'title', 'event_title', 'event_url'))
+    start_dt = NaiveDateTime(attribute='reservation_occurrence.start_dt')
+    state = EnumField(ReservationOccurrenceState, attribute='reservation_occurrence.state')
+
+    @post_dump(pass_original=True)
+    def _hide_restricted_object(self, data, link, **kwargs):
+        if not link.object.can_access(session.user):
+            data['object'] = None
+        return data
+
+    class Meta:
+        model = ReservationOccurrenceLink
+        fields = ('id', 'type', 'object', 'start_dt', 'state')
+
+
 class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
-    state = EnumField(ReservationState)
+    state = EnumField(ReservationOccurrenceState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -217,15 +237,6 @@ class ReservationEditLogSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
-class ReservationLinkSchema(mm.SQLAlchemyAutoSchema):
-    type = EnumField(LinkType, attribute='link_type')
-    id = Function(lambda link: link.object.id)
-
-    class Meta:
-        model = ReservationLink
-        fields = ('type', 'id')
-
-
 class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
@@ -237,8 +248,7 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
     can_reject = Function(lambda booking: booking.can_reject(session.user))
     permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
-    is_linked_to_object = Function(lambda booking: booking.link is not None)
-    link = Nested(ReservationLinkSchema)
+    is_linked_to_objects = Function(lambda booking: bool(booking.links))
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -247,8 +257,7 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'link', 'state', 'external_details_url', 'internal_note',
-                  'recurrence_weekdays')
+                  'is_linked_to_objects', 'state', 'external_details_url', 'internal_note', 'recurrence_weekdays')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -400,14 +409,14 @@ class CreateBookingSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     def _check_booking_reason(self, data, **kwargs):
         booking = self.context.get('booking')
-        link_id = booking.link_id if booking else data.get('link_id')
+        has_link = bool(booking.links) if booking else (data.get('link_id') is not None)
         booking_reason = data.get('booking_reason')
         required = rb_settings.get('booking_reason_required')
         validate = False
         if required == BookingReasonRequiredOptions.always:
             validate = True
         elif required == BookingReasonRequiredOptions.not_for_events:
-            validate = link_id is None
+            validate = not has_link
         if validate and not booking_reason:
             raise ValidationError('Booking reason not specified', 'reason')
 
