@@ -68,11 +68,18 @@ def main():
     index_path = indico_root / 'indico' / 'web' / 'client' / 'js' / 'jquery' / 'index.js'
     index_path_pretty = index_path.relative_to(indico_root)
 
+    replaced = False
+
+    def replacer(_):
+        nonlocal replaced
+        replaced = True
+        return locale_imports
+
     old_index_file = index_path.read_text()
     new_index_file = re.sub(fr'(?<={re.escape(START_MARKER)}\n).*(?=\n{re.escape(END_MARKER)})',
-                            lambda __: locale_imports, old_index_file, flags=re.DOTALL)
+                            replacer, old_index_file, flags=re.DOTALL)
 
-    if new_index_file == old_index_file:
+    if not replaced:
         click.secho(f'Failed to patch {index_path_pretty}', fg='red')
         sys.exit(1)
 
