@@ -43,7 +43,7 @@ jobs:
           mv indico/translations/zh_CN.GB2312 indico/translations/zh_Hans_CN
           indico i18n compile indico --no-check
       - name: Enable moment locales 🕒
-        run: python .github/utils/patch_moment_locales.py
+        run: ./bin/maintenance/patch_moment_locales.py
       - name: Build wheel 🏗
         run: ./bin/maintenance/build-wheel.py indico --add-version-suffix --ignore-unclean
       - uses: actions/upload-artifact@v4
