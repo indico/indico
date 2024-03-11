@@ -6,10 +6,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-"""Patch Indico to include all moment.js locales.
+"""Keep moment.js locales in sync with 'indico/translations'.
 
 This updates the 'indico/web/client/js/jquery/index.js' file to
-include all moment.js locales from 'node_modules/moment/locale'.
+include all moment.js locales corresponding to those in 'indico/translations'.
 """
 
 import difflib
