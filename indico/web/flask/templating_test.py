@@ -127,6 +127,24 @@ def test_template_hooks_markup():
         assert rv == ('&test1\n&amp;test2\n&test3@dummy\n&amp;test4@dummy')
 
 
+def test_template_hooks_complex():
+    def _make_tpl_hook(data):
+        return lambda: data
+
+    with (
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook({'foo': 1}), markup=False),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook({'foo': 2}), markup=False),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook([3]), markup=False),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook([4]), markup=False),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook({5}), markup=False),
+        _register_template_hook_cleanup('test-hook', _make_tpl_hook({6}), markup=False),
+    ):
+        rv = call_template_hook('test-hook', as_list=True)
+        # comparing these objects makes no sense at all, hence the weird order. but like this we
+        # have one test that covers all the "standard" non-standard return values from tpl hooks
+        assert rv == [[3], [4], {'foo': 1}, {'foo': 2}, {5}, {6}]
+
+
 def test_template_hooks():
     def _make_tpl_hook(name=''):
         return lambda: f'test{name}@{current_plugin.name}' if current_plugin else f'test{name}'

@@ -213,7 +213,7 @@ def call_template_hook(*name, **kwargs):
         if snippet.markup:
             value = Markup(value)
         values.append((snippet.priority, value))
-    values.sort()
+    values.sort(key=lambda x: (x[0], str(x[1])))
     if as_list:
         return [x[1] for x in values]
     else:
