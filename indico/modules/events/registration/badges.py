@@ -95,6 +95,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                                                          item['type'] not in image_placeholders))
 
         for item in items:
+            if not tpl_data.layers[item['layer']]:  # if item's layer is not visible
+                continue
+
             if is_regform_field_placeholder(item):
                 from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
                 placeholder = RegistrationFormFieldPlaceholder.from_designer_item(regform, item)
