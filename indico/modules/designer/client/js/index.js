@@ -72,15 +72,25 @@ import {$T} from 'indico/utils/i18n';
     };
   }
 
+  function getFirstVisibleLayerId() {
+    return $('.js-is-layer-visible.icon-eye:button').attr('data-value');
+  }
+
+  function getLastLayerId() {
+    return $('.js-is-layer-visible:button:last').attr('data-value');
+  }
+
   function generateItemId() {
     ++itemIdCounter;
     return itemIdCounter;
   }
 
   function createItem(type) {
+    const firstVisibleLayerId = getFirstVisibleLayerId();
     var item = {
       id: generateItemId(),
       type: type,
+      layer: firstVisibleLayerId ? firstVisibleLayerId : '1',
       x: pixelsPerCm,
       y: initialOffset,
       font_family: 'sans-serif',
@@ -243,6 +253,7 @@ import {$T} from 'indico/utils/i18n';
     $('.element-tools').removeClass('hidden');
     $('.second-row').removeClass('disappear');
     $('.selection-text').html(itemTitles[item.type]);
+    $('#item-layer-selector').val(item.layer);
 
     if (item.type === 'fixed_image') {
       $('.js-remove-img').prop('disabled', !item.image_id);
@@ -382,6 +393,66 @@ import {$T} from 'indico/utils/i18n';
         selectItem(newDiv.find('.designer-item'));
       }
     });
+  }
+
+  function toggleLayerButton($item, state) {
+    $item.toggleClass('icon-eye', state).toggleClass('icon-eye-blocked', !state);
+  }
+
+  function toggleLayerItemsVisibility(layerId) {
+    $('.template-side.front .designer-item').each(function() {
+      const $item = $(this);
+      const itemData = getItemData($item, false);
+      if (itemData.layer === layerId) {
+        if (itemData.selected) {
+          deselectItem($item);
+          $('.element-tools').addClass('hidden');
+        }
+        $item.toggle();
+      }
+    });
+  }
+
+  function removeLayer(layerId) {
+    $('.template-side.front .designer-item').each(function() {
+      const $item = $(this);
+      const itemData = getItemData($item, false);
+      if (itemData.layer === layerId) {
+        if (itemData.selected) {
+          deselectItem($item);
+          $('.element-tools').addClass('hidden');
+        }
+        $item.remove();
+        delete items[itemData.id];
+      }
+    });
+    $('#is-layer' + layerId + '-visible')
+      .parent()
+      .remove();
+    $('#item-layer-selector')
+      .children('[value="' + layerId + '"]')
+      .remove();
+  }
+
+  function addLayer(layerId) {
+    const lastLayerId = getLastLayerId();
+    const $lastLayer = $('#is-layer' + lastLayerId + '-visible').parent();
+    const newLayer = $lastLayer.clone(true);
+    const elemId = 'is-layer' + layerId + '-visible';
+    newLayer
+      .find('button')
+      .attr('id', elemId)
+      .attr('data-value', layerId)
+      .removeClass('icon-eye-blocked')
+      .addClass('icon-eye');
+    newLayer
+      .find('label')
+      .attr('for', elemId)
+      .text(layerId);
+    newLayer.insertAfter($lastLayer);
+    $('#item-layer-selector').append(
+      $('<option>', {value: layerId}).text($T.gettext('Layer {0}').format(layerId))
+    );
   }
 
   function updatePreset(templateWidth, templateHeight) {
@@ -574,6 +645,9 @@ import {$T} from 'indico/utils/i18n';
           selectedItem.width = selectedItem.height;
         }
       },
+      layer: function() {
+        selectedItem.layer = $('#item-layer-selector').val();
+      },
     }[attribute]());
 
     div.replaceWith(selectedItem.toHTML());
@@ -606,6 +680,10 @@ import {$T} from 'indico/utils/i18n';
     if (removeBackSide) {
       backsideTemplateID = null;
     }
+    const layers = {};
+    $('.js-is-layer-visible:button').each(function() {
+      layers[$(this).attr('data-value')] = $(this).hasClass('icon-eye');
+    });
     var templateData = {
       template: {
         width: templateDimensions.realWidth,
@@ -616,6 +694,7 @@ import {$T} from 'indico/utils/i18n';
           itemCopy.font_size = unzoomFont(item.font_size);
           return item;
         }),
+        layers: layers,
       },
       clear_background: !template.background_url,
       title: $('.js-template-name').val(),
@@ -792,10 +871,22 @@ import {$T} from 'indico/utils/i18n';
       .replace(/&amp;/g, '&');
   }
 
+  function initLayers(templateData) {
+    if (templateData && !templateData.layers) {
+      templateData.layers = {'1': true};
+      templateData.items.forEach(function(item) {
+        item.layer = '1';
+      });
+    }
+  }
+
   function displayTemplate(template, isBackside) {
     if (template.data) {
+      initLayers(template.data);
       template.data.items.forEach(function(item) {
-        createItemFromObject(item, isBackside);
+        if (!isBackside || template.data.layers[item.layer]) {
+          createItemFromObject(item, isBackside);
+        }
       });
       displayItems(isBackside);
     }
@@ -807,6 +898,21 @@ import {$T} from 'indico/utils/i18n';
     if (template.background_url) {
       displayBackground(template, isBackside);
     }
+  }
+
+  function displayLayers(template) {
+    if (template.data) {
+      for (const layerId in template.data.layers) {
+        if (layerId !== '1') {
+          addLayer(layerId);
+        }
+        toggleLayerButton($('#is-layer' + layerId + '-visible'), template.data.layers[layerId]);
+        if (!template.data.layers[layerId]) {
+          toggleLayerItemsVisibility(layerId);
+        }
+      }
+    }
+    $('.js-remove-layer').prop('disabled', getLastLayerId() === '1');
   }
 
   function clearBacksideTemplate(template) {
@@ -1071,6 +1177,17 @@ import {$T} from 'indico/utils/i18n';
         setSelectedItemAttribute('text', config);
       });
 
+      $('#item-layer-selector').on('change', function() {
+        setSelectedItemAttribute('layer', config);
+        const selectedLayer = $('#item-layer-selector').val();
+        if (!$('#is-layer' + selectedLayer + '-visible').hasClass('icon-eye')) {
+          const $item = $('.designer-item.selected');
+          deselectItem($item);
+          $item.toggle();
+          $('.element-tools').addClass('hidden');
+        }
+      });
+
       $('.js-preset-tool').on('change', function() {
         var $selectedOption = $(this).find('option:selected');
 
@@ -1127,6 +1244,24 @@ import {$T} from 'indico/utils/i18n';
         $('.js-remove-bg').prop('disabled', !template.background_url);
         $('#bg-position-stretch').prop('checked', template.data.background_position === 'stretch');
         $('#bg-position-center').prop('checked', template.data.background_position === 'center');
+      });
+
+      $('.js-is-layer-visible:button').on('click', function() {
+        toggleLayerButton($(this), !$(this).hasClass('icon-eye'));
+        toggleLayerItemsVisibility($(this).attr('data-value'));
+        $('.insert-element-btn').prop('disabled', !getFirstVisibleLayerId());
+      });
+
+      $('.js-remove-layer').on('click', function() {
+        const lastLayerId = getLastLayerId();
+        removeLayer(lastLayerId);
+        $(this).prop('disabled', lastLayerId === '2');
+      });
+
+      $('.js-add-layer').on('click', function() {
+        const newLayerId = (parseInt(getLastLayerId(), 10) + 1).toString();
+        addLayer(newLayerId);
+        $('.js-remove-layer').prop('disabled', false);
       });
 
       $('.template-side.front').trigger('indico:backgroundChanged');
@@ -1246,6 +1381,7 @@ import {$T} from 'indico/utils/i18n';
     updateRulers(); // creates the initial rulers
     changeTemplateSize(template, backsideTemplate);
     displayTemplate(template);
+    displayLayers(template);
     displayTemplate(backsideTemplate, true);
   };
 })(window);
