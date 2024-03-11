@@ -40,6 +40,7 @@ jobs:
           TX_TOKEN: ${{ secrets.TRANSIFEX_TOKEN }}
         run: |
           ./tx pull --all --force
+          mv indico/translations/zh_CN.GB2312 indico/translations/zh_Hans_CN
           indico i18n compile indico --no-check
       - name: Enable moment locales 🕒
         run: python .github/utils/patch_moment_locales.py
