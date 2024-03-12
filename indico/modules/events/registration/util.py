@@ -849,7 +849,7 @@ def update_regform_item_positions(regform):
             child.position = next(positions if child_active else disabled_positions)
 
 
-def create_invitation(regform, user, email_from, email_subject, email_body, *, skip_moderation, skip_access_check):
+def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check):
     invitation = RegistrationInvitation(
         email=user['email'],
         first_name=user['first_name'],
@@ -860,7 +860,7 @@ def create_invitation(regform, user, email_from, email_subject, email_body, *, s
     )
     regform.invitations.append(invitation)
     db.session.flush()
-    notify_invitation(invitation, email_subject, email_body, email_from)
+    notify_invitation(invitation, email_subject, email_body, email_sender)
     return invitation
 
 
@@ -890,7 +890,7 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     ]
 
 
-def import_invitations_from_csv(regform, fileobj, email_from, email_subject, email_body, *,
+def import_invitations_from_csv(regform, fileobj, email_sender, email_subject, email_body, *,
                                 skip_moderation=True, skip_access_check=True, skip_existing=False, delimiter=','):
     """Import invitations from a CSV file.
 
@@ -928,7 +928,7 @@ def import_invitations_from_csv(regform, fileobj, email_from, email_subject, ema
 
         filtered_records.append(user)
 
-    invitations = [create_invitation(regform, user, email_from, email_subject, email_body,
+    invitations = [create_invitation(regform, user, email_sender, email_subject, email_body,
                                      skip_moderation=skip_moderation, skip_access_check=skip_access_check)
                    for user in filtered_records]
     skipped_records = len(user_records) - len(filtered_records)

@@ -90,7 +90,7 @@ class EmailRolesSendMixin:
         return roles
 
     @use_kwargs({
-        'from_address': fields.String(required=True, validate=not_empty),
+        'sender_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[not_empty, no_relative_urls]),
         'subject': fields.String(required=True, validate=not_empty),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email()), load_default=lambda: []),
@@ -101,10 +101,10 @@ class EmailRolesSendMixin:
             validate=not_empty
         )
     })
-    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender, recipient_roles):
+    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, recipient_roles):
         recipient_roles = frozenset(recipient_roles)
-        if from_address not in self.event.get_allowed_sender_emails():
-            abort(422, messages={'from_address': ['Invalid sender address']})
+        if sender_address not in self.event.get_allowed_sender_emails():
+            abort(422, messages={'sender_address': ['Invalid sender address']})
         count = 0
         for email, kwargs, log_metadata in self.get_recipients(recipient_roles):
             email_body = replace_placeholders('event-persons-email', body, event=self.event,
@@ -115,7 +115,8 @@ class EmailRolesSendMixin:
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email_data = make_email(to_list=email, bcc_list=bcc, from_address=from_address, template=tpl, html=True)
+                email_data = make_email(to_list=email, bcc_list=bcc, sender_address=sender_address,
+                                        template=tpl, html=True)
             send_email(email_data, self.event, self.log_module, log_metadata=log_metadata)
             count += 1
         if not count:

@@ -84,7 +84,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         skip_access_check = form.skip_access_check.data
         if form.validate_on_submit():
             for user in form.users.data:
-                create_invitation(self.regform, user, form.email_from.data, form.email_subject.data,
+                create_invitation(self.regform, user, form.email_sender.data, form.email_subject.data,
                                   form.email_body.data,
                                   skip_moderation=skip_moderation, skip_access_check=skip_access_check)
             num = len(form.users.data)
@@ -99,15 +99,15 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
     """Send a reminder to pending invitees."""
 
     @use_kwargs({
-        'from_address': fields.String(required=True, validate=not_empty),
+        'sender_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[not_empty, no_relative_urls]),
         'subject': fields.String(required=True, validate=not_empty),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
     })
-    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender):
-        if from_address not in self.event.get_allowed_sender_emails():
-            abort(422, messages={'from_address': ['Invalid sender address']})
+    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender):
+        if sender_address not in self.event.get_allowed_sender_emails():
+            abort(422, messages={'sender_address': ['Invalid sender address']})
         invitations = _query_pending_invitations(self.regform)
         for invitation in invitations:
             email_body = replace_placeholders('registration-invitation-reminder-email', body, event=self.event,
@@ -118,7 +118,7 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=invitation.email, bcc_list=bcc, from_address=from_address,
+                email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Registration')
         return jsonify(count=len(invitations))
@@ -186,7 +186,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
             skip_existing = form.skip_existing.data
             delimiter = form.delimiter.data.delimiter
             invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
-                                                               form.email_from.data, form.email_subject.data,
+                                                               form.email_sender.data, form.email_subject.data,
                                                                form.email_body.data,
                                                                skip_moderation=skip_moderation,
                                                                skip_access_check=skip_access_check,

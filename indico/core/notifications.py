@@ -122,7 +122,7 @@ def flush_email_queue():
 
 
 @make_interceptable
-def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
+def make_email(to_list=None, cc_list=None, bcc_list=None, sender_address=None, reply_address=None, attachments=None,
                subject=None, body=None, template=None, html=False):
     """Create an email.
 
@@ -134,7 +134,8 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     :param to_list: The recipient email or a collection of emails
     :param cc_list: The CC email or a collection of emails
     :param bcc_list: The BCC email or a collection of emails
-    :param from_address: The sender address. Defaults to noreply.
+    :param sender_address: The sender address. The `from` address is calculated
+                            using the sender.
     :param reply_address: The reply-to address or a collection of addresses.
                           Defaults to empty.
     :param attachments: A list of attachments. Each attachment can be
@@ -148,6 +149,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
                      ``get_body`` macros.
     :param html: ``True`` if the email body is HTML
     """
+    from indico.core.emails import _get_actual_sender_address
     if template is not None and (subject is not None or body is not None):
         raise ValueError('Only subject/body or template can be passed')
 
@@ -167,11 +169,14 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     cc_list = {cc_list} if isinstance(cc_list, str) else cc_list
     bcc_list = {bcc_list} if isinstance(bcc_list, str) else bcc_list
     reply_address = {reply_address} if (isinstance(reply_address, str) and reply_address) else (reply_address or set())
+    from_address = _get_actual_sender_address(sender_address)
+    if sender_address and from_address != sender_address:
+        reply_address |= {sender_address}
     return {
         'to': set(to_list),
         'cc': set(cc_list),
         'bcc': set(bcc_list),
-        'from': from_address or config.NO_REPLY_EMAIL,
+        'from': from_address,
         'reply_to': set(reply_address),
         'attachments': attachments or [],
         'subject': subject.strip(),

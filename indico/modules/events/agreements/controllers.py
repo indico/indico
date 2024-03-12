@@ -157,7 +157,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
         people = self._get_people()
         email_body = form.body.data
         send_new_agreements(self.event, self.definition.name, people, email_body, form.cc_addresses.data,
-                            form.from_address.data)
+                            form.sender_address.data)
 
 
 class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
@@ -174,7 +174,7 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
         email_body = form.body.data
         agreements = self._get_agreements()
         for agreement in agreements:
-            notify_agreement_reminder(agreement, email_body, form.cc_addresses.data, form.from_address.data)
+            notify_agreement_reminder(agreement, email_body, form.cc_addresses.data, form.sender_address.data)
         flash(_('Reminders sent'), 'success')
 
 
