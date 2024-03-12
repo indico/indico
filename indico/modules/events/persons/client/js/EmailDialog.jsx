@@ -147,8 +147,8 @@ export function EmailDialog({
       {preview && renderPreview()}
       <Form.Field style={{display: preview ? 'none' : 'block'}}>
         <FinalDropdown
-          name="from_address"
-          label={Translate.string('From')}
+          name="sender_address"
+          label={Translate.string('Sender')}
           scrolling
           selection
           options={senders.map(([value, text]) => ({value, text}))}
@@ -187,7 +187,7 @@ export function EmailDialog({
       size="standard"
       header={Translate.string('Send email')}
       initialValues={{
-        from_address: senders[0][0],
+        sender_address: senders[0][0],
         subject: '',
         body: '',
         bcc_addresses: [],
