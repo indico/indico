@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import {domReady} from 'indico/utils/domstate';
-import 'indico/custom_elements/ind_with_tooltip';
 
 domReady.then(() => {
   document.querySelectorAll('template[data-tooltip-for]').forEach(template => {

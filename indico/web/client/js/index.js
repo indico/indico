@@ -16,6 +16,7 @@ import './custom_elements/ind_menu.js';
 import './custom_elements/ind_session_menu.js';
 import './custom_elements/ind_toggle_trigger.js';
 import './custom_elements/ind_with_toggletip.js';
+import './custom_elements/ind_with_tooltip';
 import './custom_elements/ind_tz_form.js';
 
 import './widgets/dynamic-tips.js';

@@ -11,7 +11,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import {Param, Translate} from 'indico/react/i18n';
-import 'indico/custom_elements/ind_with_tooltip';
 
 import './NavigateTo.module.scss';
 

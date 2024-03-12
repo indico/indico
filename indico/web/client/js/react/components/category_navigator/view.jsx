@@ -10,8 +10,6 @@ import React from 'react';
 
 import Dialog from 'indico/react/components/Dialog';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
-import 'indico/custom_elements/ind_with_tooltip';
-import 'indico/custom_elements/ind_with_toggletip';
 
 import './style.scss';
 
