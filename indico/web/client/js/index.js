@@ -19,7 +19,6 @@ import './custom_elements/ind_toggle_trigger.js';
 import './custom_elements/ind_tz_form.js';
 import './custom_elements/ind_with_toggletip.js';
 import './custom_elements/ind_with_tooltip';
-import './widgets/tz_selector.js';
 import './widgets/dynamic-tips.js';
 
 import '../styles/screen.scss';

@@ -113,19 +113,6 @@
   }
 }
 
-%button-clear {
-  border: 0;
-  background: transparent;
-  font: inherit;
-  color: inherit;
-}
-
-%button-icon-only {
-  @extend %button-clear;
-  @extend %flex-inline-center;
-  padding: 0;
-}
-
 %button-surfaceless {
   @extend %button;
   --button-surface-color: transparent;
