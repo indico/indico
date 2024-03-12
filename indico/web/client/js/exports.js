@@ -24,6 +24,7 @@ import * as IndicoReactFormField from 'indico/react/forms/fields';
 import * as IndicoReactI18n from 'indico/react/i18n';
 import * as IndicoReactUtil from 'indico/react/util';
 import * as IndicoUtilsAxios from 'indico/utils/axios';
+import * as IndicoUtilsCase from 'indico/utils/case';
 import * as IndicoUtilsDate from 'indico/utils/date';
 import * as IndicoUtilsPlugins from 'indico/utils/plugins';
 
@@ -46,5 +47,6 @@ window._IndicoReactI18n = IndicoReactI18n;
 window._IndicoReactUtil = IndicoReactUtil;
 window._IndicoUtilsAxios = IndicoUtilsAxios;
 window._IndicoUtilsDate = IndicoUtilsDate;
+window._IndicoUtilsCase = IndicoUtilsCase;
 window._IndicoUtilsPlugins = IndicoUtilsPlugins;
 window._IndicoPrincipalsImperative = IndicoPrincipalsImperative;

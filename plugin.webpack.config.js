@@ -66,6 +66,7 @@ module.exports = env => {
       'indico/react/util': '_IndicoReactUtil',
       'indico/utils/axios': '_IndicoUtilsAxios',
       'indico/utils/date': '_IndicoUtilsDate',
+      'indico/utils/case': '_IndicoUtilsCase',
       'indico/utils/plugins': '_IndicoUtilsPlugins',
       'indico/react/components/principals/imperative': '_IndicoPrincipalsImperative',
     },
