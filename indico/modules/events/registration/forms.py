@@ -584,6 +584,12 @@ class RegistrationPrivacyForm(IndicoForm):
     def publish_registrations_duration(self):
         return timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None else None
 
+    @property
+    def data(self):
+        data = super().data
+        del data['visibility']
+        return data
+
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
         super().__init__(*args, **kwargs)

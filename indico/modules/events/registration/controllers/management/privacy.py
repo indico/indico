@@ -49,7 +49,7 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
             ]
         )
         if form.validate_on_submit():
-            changes = self.regform.populate_from_dict(form.data, skip={'visibility'})
+            changes = self.regform.populate_from_dict(form.data)
             db.session.flush()
             changes = make_diff_log(changes, self._log_fields)
             self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
