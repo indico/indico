@@ -21,7 +21,6 @@ import './custom_elements/ind_with_toggletip.js';
 import './custom_elements/ind_with_tooltip';
 import './custom_elements/ind_tz_form.js';
 import './widgets/dynamic-tips.js';
-import './widgets/tz_selector.js';
 
 import '../styles/screen.scss';
 import '../styles/editor-output.scss';
