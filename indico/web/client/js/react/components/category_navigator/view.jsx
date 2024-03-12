@@ -28,8 +28,9 @@ function LoadingView({loading, children}) {
 }
 
 LoadingView.propTypes = {
-  loading: PropTypes.bool,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]),
+  loading: PropTypes.bool.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)])
+    .isRequired,
 };
 
 function ErrorView({error}) {
@@ -42,6 +43,10 @@ function ErrorView({error}) {
 
 ErrorView.propTypes = {
   error: PropTypes.object,
+};
+
+ErrorView.defaultProps = {
+  error: null,
 };
 
 function CategorySearchView({searchFieldRef, onSearch, onCancelSearch, hasSearchKeyword}) {
@@ -82,10 +87,10 @@ function CategorySearchView({searchFieldRef, onSearch, onCancelSearch, hasSearch
 }
 
 CategorySearchView.propTypes = {
-  searchFieldRef: PropTypes.object,
+  searchFieldRef: PropTypes.object.isRequired,
   onSearch: PropTypes.func.isRequired,
   onCancelSearch: PropTypes.func.isRequired,
-  hasSearchKeyword: PropTypes.bool,
+  hasSearchKeyword: PropTypes.bool.isRequired,
 };
 
 function BreadcrumbView({path, onChangeCategory}) {
@@ -111,8 +116,8 @@ function BreadcrumbView({path, onChangeCategory}) {
 }
 
 BreadcrumbView.propTypes = {
-  path: PropTypes.array,
-  onChangeCategory: PropTypes.func,
+  path: PropTypes.array.isRequired,
+  onChangeCategory: PropTypes.func.isRequired,
 };
 
 function CategoryItemLabelView({category, onChangeCategory}) {
@@ -136,8 +141,12 @@ function CategoryItemLabelView({category, onChangeCategory}) {
 }
 
 CategoryItemLabelView.propTypes = {
-  category: PropTypes.object.isRequired,
+  category: PropTypes.object,
   onChangeCategory: PropTypes.func.isRequired,
+};
+
+CategoryItemLabelView.defaultProps = {
+  category: null,
 };
 
 function CategoryStatsView({category}) {
@@ -183,7 +192,11 @@ function CategoryStatsView({category}) {
 }
 
 CategoryStatsView.propTypes = {
-  category: PropTypes.object.isRequired,
+  category: PropTypes.object,
+};
+
+CategoryStatsView.defaultProps = {
+  category: null,
 };
 
 function CategoryListView({category, subcategories, onChangeCategory, actionView: ActionView}) {
@@ -224,9 +237,14 @@ function CategoryListView({category, subcategories, onChangeCategory, actionView
 
 CategoryListView.propTypes = {
   category: PropTypes.object,
-  subcategories: PropTypes.array,
-  onChangeCategory: PropTypes.func,
+  subcategories: PropTypes.array.isRequired,
+  onChangeCategory: PropTypes.func.isRequired,
   actionView: PropTypes.elementType,
+};
+
+CategoryListView.defaultProps = {
+  category: null,
+  actionView: undefined,
 };
 
 function SearchResultsView({
@@ -272,11 +290,16 @@ function SearchResultsView({
 }
 
 SearchResultsView.propTypes = {
-  searchKeyword: PropTypes.string,
+  searchKeyword: PropTypes.string.isRequired,
   searchResults: PropTypes.array,
-  onChangeCategory: PropTypes.func,
-  onCancelSearch: PropTypes.func,
+  onChangeCategory: PropTypes.func.isRequired,
+  onCancelSearch: PropTypes.func.isRequired,
   actionView: PropTypes.elementType,
+};
+
+SearchResultsView.defaultProps = {
+  searchResults: null,
+  actionView: undefined,
 };
 
 export function DialogView(props) {
@@ -348,18 +371,26 @@ export function DialogView(props) {
 }
 
 DialogView.propTypes = {
-  dialogRef: PropTypes.object,
-  searchFieldRef: PropTypes.object,
+  dialogRef: PropTypes.object.isRequired,
+  searchFieldRef: PropTypes.object.isRequired,
   dialogTitle: PropTypes.string,
   category: PropTypes.object,
-  subcategories: PropTypes.array,
-  searchKeyword: PropTypes.string,
+  subcategories: PropTypes.array.isRequired,
+  searchKeyword: PropTypes.string.isRequired,
   searchResults: PropTypes.array,
   error: PropTypes.object,
-  loading: PropTypes.bool,
-  onChangeCategory: PropTypes.func,
-  onSearch: PropTypes.func,
-  onCancelSearch: PropTypes.func,
-  hasSearchKeyword: PropTypes.bool,
+  loading: PropTypes.bool.isRequired,
+  onChangeCategory: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired,
+  onCancelSearch: PropTypes.func.isRequired,
+  hasSearchKeyword: PropTypes.bool.isRequired,
   actionView: PropTypes.elementType,
+};
+
+DialogView.defaultProps = {
+  dialogTitle: undefined,
+  category: null,
+  searchResults: null,
+  error: null,
+  actionView: undefined,
 };

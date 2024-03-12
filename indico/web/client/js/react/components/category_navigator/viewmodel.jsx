@@ -136,3 +136,7 @@ DialogViewModel.propTypes = {
   view: PropTypes.elementType.isRequired,
   dialogTitle: PropTypes.string,
 };
+
+DialogViewModel.defaultProps = {
+  dialogTitle: undefined,
+};
