@@ -51,10 +51,9 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
         if form.validate_on_submit():
             changes = self.regform.populate_from_dict(form.data)
             db.session.flush()
-            changes = make_diff_log(changes, self._log_fields)
             self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
                            f'Privacy settings for "{self.regform.title}" modified', session.user,
-                           data={'Changes': changes})
+                           data={'Changes': make_diff_log(changes, self._log_fields)})
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.manage_registration_privacy_settings', self.regform))
 
