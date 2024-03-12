@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {TipBase} from 'indico/custom_elements/TipBase';
+import {TipBase} from './TipBase';
 
 const liveRegionUpdateDelay = 100;
 

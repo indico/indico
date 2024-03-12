@@ -48,7 +48,7 @@
     transform: rotateX(-180deg);
   }
 
-  ind-menu > menu :is(li, a) {
+  ind-menu > menu :is(li, li > *, a) {
     width: 100%;
   }
 
