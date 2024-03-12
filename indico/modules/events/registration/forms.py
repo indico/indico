@@ -241,8 +241,8 @@ class RegistrationExceptionalModificationForm(IndicoForm):
 
 class InvitationFormBase(IndicoForm):
     _invitation_fields = ('skip_moderation', 'skip_access_check')
-    _email_fields = ('email_from', 'email_subject', 'email_body')
-    email_from = SelectField(_('From'), [DataRequired()])
+    _email_fields = ('email_sender', 'email_subject', 'email_body')
+    email_sender = SelectField(_('Sender'), [DataRequired()])
     email_subject = StringField(_('Email subject'), [DataRequired()])
     email_body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()],
                                widget=TinyMCEWidget(absolute_urls=True))
@@ -258,7 +258,7 @@ class InvitationFormBase(IndicoForm):
         super().__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
-        self.email_from.choices = list(event.get_allowed_sender_emails().items())
+        self.email_sender.choices = list(event.get_allowed_sender_emails().items())
         self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
 
     def validate_email_body(self, field):
@@ -354,7 +354,7 @@ class ImportInvitationsForm(InvitationFormBase):
 
 
 class EmailRegistrantsForm(IndicoForm):
-    from_address = SelectField(_('From'), [DataRequired()])
+    sender_address = SelectField(_('Sender'), [DataRequired()])
     cc_addresses = EmailListField(_('CC'),
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
@@ -372,7 +372,7 @@ class EmailRegistrantsForm(IndicoForm):
         self.regform = kwargs.pop('regform')
         event = self.regform.event
         super().__init__(*args, **kwargs)
-        self.from_address.choices = list(event.get_allowed_sender_emails().items())
+        self.sender_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
     def validate_body(self, field):

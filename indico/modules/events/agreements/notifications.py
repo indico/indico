@@ -23,18 +23,18 @@ def make_email_template(template, agreement, email_body=None):
 
 
 @email_sender
-def notify_agreement_new(agreement, email_body=None, cc_addresses=None, from_address=None):
+def notify_agreement_new(agreement, email_body=None, cc_addresses=None, sender_address=None):
     with agreement.event.force_event_locale(agreement.user):
         template = make_email_template('events/agreements/emails/agreement_new.html', agreement, email_body)
-        return make_email(agreement.person_email, cc_list=cc_addresses, from_address=from_address,
+        return make_email(agreement.person_email, cc_list=cc_addresses, sender_address=sender_address,
                           template=template, html=True)
 
 
 @email_sender
-def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, from_address=None):
+def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, sender_address=None):
     with agreement.event.force_event_locale(agreement.user):
         template = make_email_template('events/agreements/emails/agreement_reminder.html', agreement, email_body)
-        return make_email(agreement.person_email, cc_list=cc_addresses, from_address=from_address,
+        return make_email(agreement.person_email, cc_list=cc_addresses, sender_address=sender_address,
                           template=template, html=True)
 
 

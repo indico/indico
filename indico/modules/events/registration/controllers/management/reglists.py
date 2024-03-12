@@ -310,7 +310,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                 if PicturePlaceholder.is_in(form.body.data):
                     attachments += registration.get_picture_attachments(personal_data_only=True)
                 email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
-                                   from_address=form.from_address.data, template=template, html=True,
+                                   sender_address=form.sender_address.data, template=template, html=True,
                                    attachments=attachments)
             signals.core.before_notification_send.send('registration-custom-email', email=email,
                                                        registration=registration, form=form)

@@ -208,7 +208,7 @@ class EventReminder(db.Model):
     def _make_email(self, recipient, template, attachments):
         email_params = {
             'to_list': recipient,
-            'from_address': self.reply_to_address,
+            'sender_address': self.reply_to_address,
             'template': template,
             'attachments': attachments
         }

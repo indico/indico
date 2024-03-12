@@ -18,12 +18,12 @@ from indico.util.signals import make_interceptable, values_from_signal
 from indico.web.flask.templating import get_template_module
 
 
-def notify_invitation(invitation, email_subject, email_body, from_address):
+def notify_invitation(invitation, email_subject, email_body, sender_address):
     """Send a notification about a new registration invitation."""
     email_body = replace_placeholders('registration-invitation-email', email_body, invitation=invitation)
     email_subject = replace_placeholders('registration-invitation-email', email_subject, invitation=invitation)
     template = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-    email = make_email(invitation.email, from_address=from_address, template=template, html=True)
+    email = make_email(invitation.email, sender_address=sender_address, template=template, html=True)
     user = session.user if session else None
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
@@ -53,13 +53,14 @@ def _notify_registration(registration, template_name, *, to_managers=False, atta
     to_list = (
         registration.email if not to_managers else registration.registration_form.organizer_notification_recipients
     )
-    from_address = registration.registration_form.notification_sender_address if not to_managers else None
+    sender_address = registration.registration_form.notification_sender_address if not to_managers else None
     with registration.event.force_event_locale(registration.user if not to_managers else None,
                                                allow_session=allow_session_locale):
         tpl = get_template_module(f'events/registration/emails/{template_name}', registration=registration,
                                   attach_rejection_reason=attach_rejection_reason, diff=diff, old_price=old_price,
                                   receipt=receipt)
-        mail = make_email(to_list=to_list, template=tpl, html=True, from_address=from_address, attachments=attachments)
+        mail = make_email(to_list=to_list, template=tpl, html=True, sender_address=sender_address,
+                          attachments=attachments)
     user = session.user if session else None
     signals.core.before_notification_send.send('notify-registration', email=mail, registration=registration,
                                                template_name=template_name, to_managers=to_managers,

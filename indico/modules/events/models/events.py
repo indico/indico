@@ -874,7 +874,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                 address
         :param extra: An email address that is always included, even
                       if it is not in any of the included lists.
-        :return: A dictionary mapping emails to pretty names
+        :return: A dictionary mapping of email pretty names.
+                 e.g Foo <foo@bar.com>: Foo <foo@bar.com>
         """
         emails = {}
         # Contact/Support
@@ -902,7 +903,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if extra:
             emails.setdefault(extra, None)
         # Sanitize and format emails
-        emails = {email.strip().lower(): (f'{name} <{email}>' if name else email)
+        emails = {(f'{name} <{email.strip().lower()}>' if name else email.strip().lower()):
+                  (f'{name} <{email}>' if name else email)
                   for email, name in emails.items()
                   if email and email.strip()}
         own_email = session.user.email if has_request_context() and session.user else None
