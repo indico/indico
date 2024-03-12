@@ -58,7 +58,7 @@ function CategorySearchView({searchFieldRef, onSearch, onCancelSearch, hasSearch
   }
 
   return (
-    <form onSubmit={e => e.preventDefault()}>
+    <>
       <div className="category-search-field" data-has-keyword={hasSearchKeyword}>
         <label>
           <span>
@@ -72,14 +72,14 @@ function CategorySearchView({searchFieldRef, onSearch, onCancelSearch, hasSearch
             onChange={handleSearch}
           />
         </label>
-        <button onClick={onCancelSearch} hidden={!hasSearchKeyword}>
+        <button type="button" onClick={onCancelSearch} hidden={!hasSearchKeyword}>
           <Translate as="span">Clear search results</Translate>
         </button>
       </div>
       <p className="category-search-info">
         <Translate>Search results will update as you type.</Translate>
       </p>
-    </form>
+    </>
   );
 }
 
