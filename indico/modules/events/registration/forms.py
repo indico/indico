@@ -572,6 +572,10 @@ class RegistrationPrivacyForm(IndicoForm):
                                                     description=_('Specify whether users are required to agree to '
                                                                   "the event's privacy policy when registering"))
 
+    def __init__(self, *args, regform, **kwargs):
+        self.regform = regform
+        super().__init__(*args, **kwargs)
+
     @generated_data
     def publish_registrations_participants(self):
         return PublishRegistrationsMode[self.visibility.data[0]]
@@ -589,10 +593,6 @@ class RegistrationPrivacyForm(IndicoForm):
         data = super().data
         del data['visibility']
         return data
-
-    def __init__(self, *args, **kwargs):
-        self.regform = kwargs.pop('regform')
-        super().__init__(*args, **kwargs)
 
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
