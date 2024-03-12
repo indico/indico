@@ -83,8 +83,7 @@ class CategorySettingsProxy(SettingsProxyBase):
         :param category: Category (or its ID)
         :param names: One or more names of settings to delete
         """
-        for name in names:
-            CategorySetting.delete(self.module, *name, category_id=category)
+        CategorySetting.delete(self.module, *names, category_id=category)
         self._flush_cache()
 
     @_category_or_id
