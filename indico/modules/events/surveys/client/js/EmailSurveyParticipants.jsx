@@ -13,8 +13,10 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
-import {handleSubmitError} from 'indico/react/forms';
+import {FinalEmailList} from 'indico/react/components';
+import {FinalCheckbox, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {EmailDialog} from '../../../persons/client/js/EmailDialog';
@@ -62,9 +64,28 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       onClose={onClose}
       senders={senders}
       recipients={recipients}
+      recipientsField={
+        <>
+          <FinalCheckbox
+            name="email_all_participants"
+            label={Translate.string('Send email to all event participants')}
+            toggle
+          />
+          <FinalEmailList
+            name="recipients_addresses"
+            label={Translate.string('Recipients addresses')}
+            description={Translate.string('Send email to every address in this list')}
+          />
+        </>
+      }
       previewURL={emailPreviewURL({event_id: eventId, survey_id: surveyId})}
       placeholders={placeholders}
-      initialFormValues={{subject: defaultSubject, body: defaultBody}}
+      initialFormValues={{
+        subject: defaultSubject,
+        body: defaultBody,
+        recipients_addresses: [],
+        email_all_participants: false,
+      }}
       sentEmailsCount={sentCount}
     />
   );
