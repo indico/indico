@@ -373,6 +373,8 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
+- Convert category navigator to react and improve its accessibility (:issue:`5917`, :pr:`5931`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -401,6 +403,8 @@ Internal Changes
 - Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
 - Add ``<ind-toggle-trigger>`` custom elements for controls that toggle the visibility of another
   element (:pr:`6098`, thanks :user:`foxbunny`)
+- Add ``<ind-with-tooltip>`` and ``<ind-with-toggletip>`` custom elements (:pr:`5931`, thanks
+  :user:`foxbunny`)
 
 
 ----

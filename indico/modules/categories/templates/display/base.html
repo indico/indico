@@ -107,19 +107,11 @@
         </div>
     </div>
 </div>
-<script>
-    $('#navigate-button').on('click', function(evt) {
-        $('<div>').categorynavigator({
-            openInDialog: true,
-            category: {{ category.id }},
-            actionButtonText: $T.gettext('Navigate to'),
-            dialogTitle: $T.gettext('Navigate to a category'),
-            onAction: function(category) {
-                window.location.href = build_url(Indico.Urls.Categories.display, {category_id: category.id});
-            }
-        });
-    });
-</script>
+
+<ind-category-navigator triggeredby="navigate-button"
+                        category-id="{{ category.id }}">
+</ind-category-navigator>
+
 <script type="application/ld+json">
 {{ json_ld|tojson }}
 </script>

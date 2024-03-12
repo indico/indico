@@ -1,0 +1,288 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+@use 'partials/spinner';
+@use 'design_system';
+
+%category-list-item {
+  @extend %flex-split;
+
+  min-height: 3.2em;
+  padding: var(--content-gap-within-inline) var(--content-gap-normal);
+
+  background: var(--background-base);
+  border-left: 3px solid var(--container-separator-color);
+  border-bottom: 1px solid var(--container-separator-color);
+
+  > * {
+    padding: 0.5em;
+  }
+
+  > :first-child::before {
+    @extend %icon;
+    color: var(--text-secondary-color);
+  }
+
+  &[data-haschildren='true'] > :first-child::before {
+    @extend %icon-folder;
+  }
+
+  &[data-haschildren='false'] > :first-child::before {
+    @extend %icon-list;
+  }
+
+  .category-nav-actions {
+    @extend %flex-row;
+    --flex-gap: var(--content-gap-between-groups);
+    flex: 10;
+    min-width: min(100%, 16em);
+
+    > :first-child {
+      flex: 1;
+    }
+  }
+
+  .category-nav-drilldown,
+  .category-nav-list-item-title {
+    flex: 1 1;
+
+    font-size: var(--text-size-rel-l);
+  }
+
+  .category-nav-drilldown {
+    @extend %link-button;
+
+    &:disabled::after {
+      @extend %icon;
+      @extend %icon-shield;
+      color: var(--protected-color);
+    }
+  }
+
+  .category-nav-stats {
+    @extend %flex-row;
+    --flex-wrap: nowrap;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: min(100%, 10em);
+
+    font-size: var(--text-size-rel-s);
+    line-height: 1;
+    color: var(--text-secondary-color);
+
+    > span {
+      @extend %flex-row;
+      --flex-wrap: nowrap;
+      --flex-gap: var(--content-gap-within-inline);
+
+      &::before {
+        @extend %icon;
+      }
+    }
+  }
+
+  .category-nav-stats-events::before {
+    @extend %icon-calendar;
+  }
+
+  .category-nav-stats-subcategories::before {
+    @extend %icon-list;
+  }
+
+  ind-with-toggletip button {
+    @extend %button-icon-only;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      @extend %visually-hidden;
+    }
+
+    &::before {
+      @extend %icon;
+      @extend %icon-question;
+    }
+  }
+}
+
+%category-list-item-highlighted {
+  border-left-color: var(--accent-color);
+}
+
+#category-nav-dialog {
+  @extend %dialog-modal;
+  --dialog-max-height: 80%;
+  --dialog-max-width: min(80%, 60em);
+
+  // FIXME: Move to reset
+  p,
+  h4 {
+    margin: 0;
+  }
+
+  .button-bar button {
+    @extend %button;
+  }
+
+  .breadcrumbs {
+    @extend %flex-row;
+    --flex-gap: var(--content-gap-within-inline);
+
+    font-size: var(--text-size-rel-s);
+
+    button {
+      @extend %link-button;
+
+      &:not(:last-child)::after {
+        content: '»';
+        display: inline-block;
+        margin-left: 0.2em;
+        color: var(--text-secondary-color);
+      }
+    }
+  }
+
+  h3 {
+    @extend %reset-font-and-color;
+    margin: 0; // FIXME: move to reset
+  }
+
+  .category-list-section {
+    header {
+      @extend %category-list-item;
+      @extend %category-list-item-highlighted;
+    }
+
+    li {
+      @extend %category-list-item;
+
+      &:hover,
+      &:focus-within {
+        @extend %category-list-item-highlighted;
+      }
+    }
+  }
+
+  .category-search-results {
+    h3 {
+      @extend %visually-hidden;
+    }
+
+    li {
+      @extend %category-list-item;
+
+      &:hover,
+      &:focus-within {
+        @extend %category-list-item-highlighted;
+      }
+    }
+
+    .category-nav-actions > :first-child {
+      @extend %flex-column;
+      --flex-gap: var(--content-gap-within-inline);
+      align-items: flex-start;
+      flex: 1000;
+    }
+  }
+
+  .categories-loading:not(:empty) {
+    @extend %flex-center;
+    height: 100%;
+
+    span {
+      @extend %spinner;
+    }
+  }
+
+  .category-search-no-results {
+    @extend %flex-center;
+    flex-direction: column;
+    height: 100%;
+    gap: 1em;
+    padding: 2em 1em;
+
+    button {
+      @extend %link-button;
+    }
+  }
+
+  .category-item-label {
+    @extend %flex-row;
+
+    > :first-child {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+
+      &::before {
+        @extend %icon;
+        @extend %icon-shield;
+
+        color: var(--text-disabled-color);
+      }
+    }
+
+    .protected {
+      span {
+        @extend %visually-hidden;
+      }
+
+      &::before {
+        color: var(--protected-color);
+      }
+    }
+  }
+
+  .category-search-field {
+    position: relative;
+  }
+
+  .category-search-field label {
+    @extend %input-with-icon;
+
+    flex: none;
+  }
+
+  .category-search-field[data-has-keyword='true'] label::after {
+    content: '';
+  }
+
+  .category-search-field[data-has-keyword='false'] label::after {
+    @extend %icon-search;
+  }
+
+  .category-search-field button:not([hidden]) {
+    @extend %button-icon-only;
+
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 var(--control-padding);
+
+    &::after {
+      @extend %icon;
+      @extend %icon-close;
+    }
+  }
+
+  .category-search-info {
+    @extend %visually-hidden;
+  }
+
+  .category-list-container {
+    @extend %flex-column;
+    --flex-gap: 0;
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid var(--container-separator-color);
+    background: var(--background-secondary);
+  }
+}

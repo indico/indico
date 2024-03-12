@@ -9,6 +9,7 @@
 @use './layout';
 @use './utils';
 @use './button';
+@use './visibility';
 @use 'partials/icons';
 
 %dialog-modal {
@@ -18,15 +19,18 @@
   --dialog-max-height: 40em;
   --dialog-button-bar-justify: flex-end;
 
-  width: min(var(--dialog-max-width), calc(100vw - 1em));
-  height: min(var(--dialog-max-height), calc(100vh - 2em));
+  width: min(var(--dialog-max-width), calc(100vw - min(5vw, 1em)));
+  height: min(var(--dialog-max-height), calc(100vh - min(5vh, 2em)));
   padding: 0;
+  overflow: hidden;
 
+  background: var(--background-base);
   border: 0;
   box-shadow: var(--modal-control-box-shadow);
 
   > div {
     height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
   }
@@ -53,6 +57,10 @@
     border-radius: 50%;
     font-size: var(--text-size-rel-l);
 
+    span {
+      @extend %visually-hidden;
+    }
+
     &::before {
       @extend %icon;
       @extend %icon-close;
@@ -67,7 +75,7 @@
     @extend %flex-column;
     padding: var(--container-padding);
     min-height: 0;
-    flex: 1;
+    flex: 1 0;
     overflow: auto;
   }
 

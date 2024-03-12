@@ -12,6 +12,7 @@ body {
   --text-inverse-color: var(--background-base);
   --text-disabled-color: #999;
   --text-secondary-color: #6e6e6e;
+  --background-base: #fff;
   --background-secondary: #f7f7f7;
   --surface-default: #e8e8e8;
   --surface-inverse-color: #555;
@@ -76,7 +77,7 @@ body {
 
   // Clickable texts (e.g., link)
   --clickable-text-color: var(--accent-color);
-  --clickable-text-highlight-color: var(--accent-secondary-color);
+  --clickable-text-highlight-color: var(--accent-highlight-color);
   --clickable-text-active-color: var(--active-color);
   --clickable-text-used-color: var(--visited-color);
   --clickable-text-disabled-color: var(--text-disabled-color);
