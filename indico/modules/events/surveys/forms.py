@@ -112,7 +112,7 @@ class ImportQuestionnaireForm(IndicoForm):
 
 
 class InvitationForm(IndicoForm):
-    from_address = SelectField(_('From'), [DataRequired()])
+    sender_address = SelectField(_('Sender'), [DataRequired()])
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
     recipients = EmailListField(_('Recipients'), [DataRequired()], description=_('One email address per line.'))
@@ -122,7 +122,7 @@ class InvitationForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        self.from_address.choices = list(event.get_allowed_sender_emails().items())
+        self.sender_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('survey-link-email', event=None, survey=None)
 
     def is_submitted(self):
