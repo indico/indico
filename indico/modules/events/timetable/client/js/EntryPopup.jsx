@@ -41,7 +41,7 @@ const entrySchema = PropTypes.shape({
   attachmentCount: PropTypes.number,
   displayOrder: PropTypes.number,
   parentId: PropTypes.string, // only for contributions
-  resourceId: PropTypes.number,
+  columnId: PropTypes.number, // set only if parentId is null
 });
 
 const entryIcons = {

@@ -35,6 +35,8 @@ export default function Toolbar({date, localizer, onNavigate}) {
   const ref = useRef(null);
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
+  const canUndo = useSelector(selectors.canUndo);
+  const canRedo = useSelector(selectors.canRedo);
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
   const _displayMode = useSelector(selectors.getDisplayMode);
@@ -67,17 +69,33 @@ export default function Toolbar({date, localizer, onNavigate}) {
   return (
     <div styleName="toolbar" ref={ref}>
       <Menu tabular>
+        <Menu.Item
+          onClick={() => dispatch(actions.undoChange())}
+          disabled={!canUndo}
+          title={Translate.string('Undo change')}
+          icon="undo"
+          styleName="action"
+        />
+        <Menu.Item
+          onClick={() => dispatch(actions.redoChange())}
+          disabled={!canRedo}
+          title={Translate.string('Redo change')}
+          icon="redo"
+          styleName="action"
+        />
         {numDays > maxDays && (
           <>
             <Menu.Item
               onClick={makeScrollHandler(0)}
               disabled={offset === 0}
+              title={Translate.string('Go to start')}
               icon="angle double left"
               styleName="action"
             />
             <Menu.Item
               onClick={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0))}
               disabled={offset === 0}
+              title={Translate.string('Scroll left')}
               icon="angle left"
               styleName="action"
             />
@@ -102,6 +120,7 @@ export default function Toolbar({date, localizer, onNavigate}) {
             <Menu.Item
               onClick={makeScrollHandler(Math.min(offset + SCROLL_STEP, numDays - maxDays))}
               disabled={numDays - offset <= maxDays}
+              title={Translate.string('Scroll right')}
               icon="angle right"
               position="right"
               styleName="action"
@@ -109,6 +128,7 @@ export default function Toolbar({date, localizer, onNavigate}) {
             <Menu.Item
               onClick={makeScrollHandler(numDays - maxDays)}
               disabled={numDays - offset <= maxDays}
+              title={Translate.string('Go to end')}
               icon="angle double right"
               styleName="action"
             />
