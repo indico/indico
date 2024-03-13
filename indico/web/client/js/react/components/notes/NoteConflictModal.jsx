@@ -127,7 +127,11 @@ export function NoteConflictModal({
               />
               <Card raised fluid>
                 <CardContent>
-                  <div dangerouslySetInnerHTML={{__html: currentNote}} className="editor-output" />
+                  <div
+                    dangerouslySetInnerHTML={{__html: currentNote}}
+                    className="editor-output"
+                    styleName="note-content"
+                  />
                 </CardContent>
               </Card>
             </GridColumn>
@@ -151,6 +155,7 @@ export function NoteConflictModal({
                     <div
                       dangerouslySetInnerHTML={{__html: extNote.source}}
                       className="editor-output"
+                      styleName="note-content"
                     />
                   </CardContent>
                 ) : (
