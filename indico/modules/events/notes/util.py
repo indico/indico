@@ -89,7 +89,11 @@ def can_edit_note(obj, user):
     return False
 
 
-def check_note_revision(current_revision_id, previous_revision_id):
+def check_note_revision(note, previous_revision_id):
     """Compare revision IDs to check if the note has been modified."""
-    if current_revision_id != previous_revision_id:
-        raise ExpectedError('The note has been modified in the meantime')
+    from indico.modules.events.notes.schemas import EventNoteSchema
+    if previous_revision_id is None:
+        return None
+    if note.current_revision_id != previous_revision_id:
+        conflicting_note = EventNoteSchema().dump(note.current_revision)
+        raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note)

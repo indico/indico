@@ -110,7 +110,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     }
   }, [getNoteURL, apiURL, setCurrentNoteRevision]);
 
-  const handleSubmit = async ({source}) => {
+  const handleSubmit = async ({source, forceRevision}) => {
     // getData is currently unused, keeping it around in case we need to enable lazyValue
     // for the TinyMCE editor widget in case larger notes cause performance issues that
     // can be resolved by only rendering them to an html string at submission time
@@ -123,22 +123,32 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
         const resp = await indicoAxios.post(apiURL, {
           source: currentValue,
           render_mode: renderMode,
-          revision: currentNoteRevision,
+          revision_id: forceRevision || currentNoteRevision.id,
         });
         setCurrentNoteRevision(resp.data);
       }
     } catch (e) {
       if (_.get(e, 'response.status') === 418) {
         // handle note conflict
-        injectModal(resolveModal => (
-          <NoteConflictModal
-            currentNoteSource={currentValue}
-            externalNoteSource={currentNoteRevision}
-            onClose={() => {
-              resolveModal();
-            }}
-          />
-        ));
+        await new Promise(resolve => {
+          injectModal(resolveModal => (
+            <NoteConflictModal
+              currentNote={currentValue}
+              externalNote={e.response.data.conflict}
+              onClose={() => {
+                resolveModal();
+                resolve();
+              }}
+              setCloseAndReload={setCloseAndReload}
+              overwriteChanges={async () => {
+                handleSubmit({
+                  source: currentValue,
+                  forceRevision: e.response.data.conflict.id,
+                });
+              }}
+            />
+          ));
+        });
         return;
       }
       return handleSubmitError(e);
@@ -223,8 +233,6 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           )}
         </FinalModalForm>
       )}
-      {console.log('currentNoteRevision -> ', currentNoteRevision)}
-      {console.log('current revision id -> ', currentNoteRevision?.id)}
     </>
   );
 }
