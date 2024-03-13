@@ -49,16 +49,5 @@ uwsgi and indico-celery is all you need to do.
 Including a new translation
 ---------------------------
 
-If you are including a new translation, you should also include the moment-js locale in
-``indico/web/client/js/jquery/index.js`` before building::
-
-    // moment.js locales
-    import 'moment/locale/your-locale';
-
-    import 'moment/locale/zh-cn';
-    import 'moment/locale/es';
-    import 'moment/locale/fr';
-    import 'moment/locale/en-gb';
-
-.. note::
-    Put your custom locale first, since ``en-gb`` needs to be the last one as a fallback.
+If you are including a new translation, you should also run ``./bin/maintenance/update_moment_locales.py``
+to update the momentjs locales in ``indico/web/client/js/jquery/index.js`` before building.
