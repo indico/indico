@@ -40,8 +40,8 @@ class SessionsField(RegistrationFormFieldBase):
                     raise ValidationError(_('Please select at least {_min} sessions.').format(_min=_min))
         return _check_number_of_sessions
 
-    def get_friendly_data(self, registration_data):
-        def return_date(block):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
+        def get_date(block):
             return block.start_dt.date().isoformat()
 
         reg_data = registration_data.data
@@ -51,6 +51,6 @@ class SessionsField(RegistrationFormFieldBase):
         blocks = SessionBlock.query.filter(SessionBlock.id.in_(reg_data)).all()
         grouped_blocks = {}
 
-        for date, blocks_in_date in groupby(blocks, key=return_date):
+        for date, blocks_in_date in groupby(blocks, key=get_date):
             grouped_blocks[date] = list(blocks_in_date)
         return grouped_blocks

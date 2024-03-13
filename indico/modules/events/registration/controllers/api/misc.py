@@ -5,9 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from itertools import groupby
+from operator import itemgetter
 
 from indico.modules.events.controllers.base import RHProtectedEventBase
+from indico.util.iterables import group_list
 
 
 class RHAPIRegistrationForms(RHProtectedEventBase):
@@ -16,8 +17,8 @@ class RHAPIRegistrationForms(RHProtectedEventBase):
         return RegistrationFormPrincipalSchema(many=True).jsonify(self.event.registration_forms)
 
 
-class RHAPIEventTimeTable(RHProtectedEventBase):
+class RHAPIEventSessionBlocks(RHProtectedEventBase):
     def _process(self):
-        schema = [{'id': sb.id, 'start_dt': sb.start_dt.strftime('%d-%b-%Y'),
-                   'fullTitle': sb.full_title} for s in self.event.sessions for sb in s.blocks]
-        return {date: list(e) for date, e in groupby(schema, key=lambda x: x['start_dt'])}
+        schema = [{'id': sb.id, 'start_dt': sb.start_dt.astimezone(self.event.tzinfo).date().isoformat(),
+                   'full_title': sb.full_title} for s in self.event.sessions for sb in s.blocks]
+        return group_list(schema, key=itemgetter('start_dt'), sort_by=itemgetter('start_dt'))
