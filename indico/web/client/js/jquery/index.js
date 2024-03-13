@@ -13,18 +13,18 @@ import 'jquery-colorbox/example1/colorbox.css';
 import 'jquery-form';
 
 // moment.js locales
-import 'moment/locale/en-ca';
-import 'moment/locale/it';
 import 'moment/locale/cs';
 import 'moment/locale/de';
-import 'moment/locale/tr';
-import 'moment/locale/mn';
-import 'moment/locale/pl';
-import 'moment/locale/uk';
-import 'moment/locale/zh-cn';
+import 'moment/locale/en-ca';
 import 'moment/locale/es';
 import 'moment/locale/fr';
+import 'moment/locale/it';
+import 'moment/locale/mn';
+import 'moment/locale/pl';
 import 'moment/locale/pt-br';
+import 'moment/locale/tr';
+import 'moment/locale/uk';
+import 'moment/locale/zh-cn';
 // Last imported locale is used as fallback
 import 'moment/locale/en-gb';
 
