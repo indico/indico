@@ -143,6 +143,10 @@ jobs:
         if: success() || failure()
         run: python bin/maintenance/generate_icons.py --ci
 
+      - name: Check moment locales
+        if: success() || failure()
+        run: python bin/maintenance/update_moment_locales.py --ci
+
       - name: Check headers
         if: success() || failure()
         run: |
