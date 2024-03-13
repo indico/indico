@@ -112,6 +112,7 @@ Bugfixes
 - Populate fields such as first and last name from the multipass login provider (e.g. LDAP) during
   sign-up regardless of synchronization settings (:pr:`6182`)
 - Hide redundant affiliations tooltip on the Participant Roles list (:pr:`6201`)
+- Fix CategoryProxySettings on category creation (:pr:`6230`, thanks :user:`jbtwist`)
 
 Accessibility
 ^^^^^^^^^^^^^
