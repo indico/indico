@@ -72,15 +72,15 @@ class RHApiNote(RHManageNoteBase):
     @use_kwargs({
         'render_mode': EnumField(RenderMode, load_default=RenderMode.html),
         'source': fields.String(required=True),
-        'revision': fields.Dict(required=False)
+        'revision_id': fields.Integer(required=False)
     })
-    def _process_POST(self, render_mode, source, revision):
+    def _process_POST(self, render_mode, source, revision_id=None):
         note = EventNote.get_or_create(self.object)
         is_new = note.id is None or note.is_deleted
         is_restored = is_new and note.is_deleted
+        check_note_revision(note, revision_id)
         note.create_revision(render_mode, source, session.user)
         is_changed = attrs_changed(note, 'current_revision')
-        check_note_revision(note.current_revision_id, revision.get('id'))
         db.session.add(note)
         db.session.flush()
         if is_new:
@@ -100,13 +100,14 @@ class RHApiNote(RHManageNoteBase):
 
     def _process_DELETE(self):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        current_note_revision = None if note is None else note.current_revision
         if note is not None:
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
             logger.info('Note %s deleted by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.negative, 'Minutes', 'Removed minutes',
                            session.user, data=note.link_event_log_data)
-        return '', 204  # TODO: Test deletion -> dump note schema here also
+        return EventNoteSchema().dump(current_note_revision), 200
 
 
 class RHApiCompileNotes(RHManageNoteBase):

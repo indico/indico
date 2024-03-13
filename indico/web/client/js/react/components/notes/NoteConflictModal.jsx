@@ -15,6 +15,7 @@ import {
   Modal,
   Button,
   Message,
+  Icon,
   Grid,
   GridRow,
   GridColumn,
@@ -22,21 +23,49 @@ import {
 } from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
+import {camelizeKeys} from 'indico/utils/case';
 
-export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
+import './NoteConflictModal.module.scss';
+
+export function NoteConflictModal({
+  currentNote,
+  externalNote,
+  onClose,
+  setCloseAndReload,
+  overwriteChanges,
+}) {
   const [open, setOpen] = useState(true);
-  console.log('externalNoteSource', externalNoteSource);
 
-  /*
-   * TODO:
-   *  - Actions for the buttons
-   *  - Fix edge case
-   *  - Test deletion
-   */
+  // camelize the externalNoteSource keys
+  const extNote = camelizeKeys(externalNote);
+
+  const renderDummyNote = () => {
+    return (
+      <CardContent className="editor-output">
+        <div styleName="blurred-note" aria-hidden>
+          <h1>Dummy Notes</h1>
+          <p>
+            This is some dummy text that should not be seen - if you can see this text, then please,
+            consider updating/and or adjust your browser settings or file a bug report.
+          </p>
+          <p>Lorem Ipsum</p>
+          <ul>
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Integer molestie lorem at massa</li>
+          </ul>
+        </div>
+      </CardContent>
+    );
+  };
+
   return (
     <Modal
       open={open}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        setOpen(false);
+        onClose();
+      }}
       onOpen={() => setOpen(true)}
       size="large"
       style={{minWidth: '65vw'}}
@@ -50,22 +79,17 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
       <Modal.Content>
         <Message warning>
           <Message.Header>
-            <Translate>This note has been edited by someone else</Translate>
+            <Translate>This note has been modified by someone else</Translate>
           </Message.Header>
           <p>
             <Translate>
-              This note was last edited on{' '}
+              This note was last modified on{' '}
               <Param
-                name="last_edited_dt"
-                value={moment(externalNoteSource.createdDt).format('L LTS')}
+                name="last_modified_dt"
+                value={moment(extNote.createdDt).format('L LTS')}
                 wrapper={<strong />}
               />{' '}
-              by{' '}
-              <Param
-                name="note_author"
-                value={externalNoteSource.noteAuthor}
-                wrapper={<strong />}
-              />
+              by <Param name="note_author" value={extNote.noteAuthor} wrapper={<strong />} />
               {'. '}You can either:
             </Translate>
           </p>
@@ -103,10 +127,7 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
               />
               <Card raised fluid>
                 <CardContent>
-                  <div
-                    dangerouslySetInnerHTML={{__html: currentNoteSource}}
-                    className="editor-output"
-                  />
+                  <div dangerouslySetInnerHTML={{__html: currentNote}} className="editor-output" />
                 </CardContent>
               </Card>
             </GridColumn>
@@ -118,13 +139,23 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
                   'The changes made by someone else since you started editing the note'
                 )}
               />
+              {!extNote.source && (
+                <Message icon styleName="note-deleted-notice">
+                  <Icon name="trash alternate outline" />
+                  <Translate>This note revision has been deleted.</Translate>
+                </Message>
+              )}
               <Card raised fluid>
-                <CardContent>
-                  <div
-                    dangerouslySetInnerHTML={{__html: externalNoteSource.source}}
-                    className="editor-output"
-                  />
-                </CardContent>
+                {extNote.source ? (
+                  <CardContent>
+                    <div
+                      dangerouslySetInnerHTML={{__html: extNote.source}}
+                      className="editor-output"
+                    />
+                  </CardContent>
+                ) : (
+                  renderDummyNote()
+                )}
               </Card>
             </GridColumn>
           </GridRow>
@@ -136,11 +167,22 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
           icon="write"
           labelPosition="left"
           negative
+          onClick={async () => {
+            setOpen(false);
+            onClose();
+            overwriteChanges();
+            setCloseAndReload(true);
+          }}
         />
         <Button
           content={Translate.string('Discard changes')}
           icon="trash alternate outline"
           labelPosition="right"
+          onClick={() => {
+            setOpen(false);
+            onClose();
+            setCloseAndReload(true);
+          }}
         />
       </Modal.Actions>
     </Modal>
@@ -150,6 +192,9 @@ export function NoteConflictModal({currentNoteSource, externalNoteSource}) {
 export default NoteConflictModal;
 
 NoteConflictModal.propTypes = {
-  currentNoteSource: PropTypes.string.isRequired,
-  externalNoteSource: PropTypes.object.isRequired,
+  currentNote: PropTypes.string.isRequired,
+  externalNote: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  setCloseAndReload: PropTypes.func.isRequired,
+  overwriteChanges: PropTypes.func.isRequired,
 };
