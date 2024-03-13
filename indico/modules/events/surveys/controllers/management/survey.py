@@ -171,16 +171,7 @@ class RHSendSurveyLinks(RHManageSurveyBase):
             send_email(email, self.event, 'Surveys')
 
 
-class RHEmailEventSurveyBase(RHManageSurveyBase):
-    """Send emails to event participants."""
-
-    def _process_args(self):
-        RHManageSurveyBase._process_args(self)
-        registrations = Registration.get_all_for_event(self.event)
-        self.recipients = {x.email for x in registrations}
-
-
-class RHAPIEmailEventSurveyMetadata(RHEmailEventSurveyBase):
+class RHAPIEmailEventSurveyMetadata(RHManageSurveyBase):
     def _process(self):
         with self.event.force_event_locale():
             tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)
@@ -189,14 +180,13 @@ class RHAPIEmailEventSurveyMetadata(RHEmailEventSurveyBase):
         placeholders = get_sorted_placeholders('survey-link-email', event=None, survey=self.survey)
         return jsonify({
             'senders': list(self.event.get_allowed_sender_emails().items()),
-            'recipients': sorted(self.recipients),
             'body': body,
             'subject': subject,
             'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
         })
 
 
-class RHEmailEventSurveyPreview(RHEmailEventSurveyBase):
+class RHEmailEventSurveyPreview(RHManageSurveyBase):
     """Preview an email with EventSurvey associated placeholders."""
 
     @use_kwargs({
@@ -211,7 +201,7 @@ class RHEmailEventSurveyPreview(RHEmailEventSurveyBase):
         return jsonify(subject=tpl.get_subject(), body=tpl.get_html_body())
 
 
-class RHAPIEmailEventSurveySend(RHEmailEventSurveyBase):
+class RHAPIEmailEventSurveySend(RHManageSurveyBase):
     @use_kwargs({
         'from_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[
@@ -221,10 +211,19 @@ class RHAPIEmailEventSurveySend(RHEmailEventSurveyBase):
         'subject': fields.String(required=True, validate=not_empty),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
+        'email_all_participants': fields.Bool(load_default=False),
+        'recipients_addresses': fields.List(LowercaseString(validate=validate.Email())),
     })
-    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender):
+    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender,
+                 email_all_participants, recipients_addresses):
         if from_address not in self.event.get_allowed_sender_emails():
             abort(422, messages={'from_address': ['Invalid sender address']})
+        self.recipients = []
+        if email_all_participants:
+            registrations = Registration.get_all_for_event(self.event)
+            [self.recipients.append(x.email) for x in registrations if x not in self.recipients]
+        if recipients_addresses:
+            [self.recipients.append(x) for x in recipients_addresses if x not in self.recipients]
         for recipient in self.recipients:
             email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
             email_subject = replace_placeholders('survey-link-email', subject, event=self.event, survey=self.survey)
