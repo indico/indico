@@ -27,13 +27,7 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
     url: emailMetadataURL({event_id: eventId, survey_id: surveyId}),
     method: 'POST',
   });
-  const {
-    senders = [],
-    recipients = [],
-    subject: defaultSubject,
-    body: defaultBody,
-    placeholders = [],
-  } = data || {};
+  const {senders = [], subject: defaultSubject, body: defaultBody, placeholders = []} = data || {};
 
   const handleSubmit = async data => {
     const requestData = {...data};
@@ -63,7 +57,6 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       onSubmit={handleSubmit}
       onClose={onClose}
       senders={senders}
-      recipients={recipients}
       recipientsField={
         <>
           <FinalCheckbox
