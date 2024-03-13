@@ -127,7 +127,7 @@ class PersonLinkListFieldBase(PrincipalListField):
 
     @property
     def extra_params(self):
-        values = values_from_signal(signals.core.get_field_extra_params.send(self), as_list=True)
+        values = values_from_signal(signals.event.person_link_field_extra_params.send(self), as_list=True)
         return {k: v for d in values for k, v in d.items()}
 
     @no_autoflush
