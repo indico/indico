@@ -80,6 +80,13 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
         email_all_participants: false,
       }}
       sentEmailsCount={sentCount}
+      validate={values => {
+        if (!values.email_all_participants && !values.recipients_addresses.length) {
+          return Translate.string('You must have at least one recipient');
+        } else {
+          return undefined;
+        }
+      }}
     />
   );
 }
