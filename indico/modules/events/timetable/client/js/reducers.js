@@ -37,14 +37,27 @@ const preprocessData = data => {
 };
 
 export default {
-  entries: (state = {sessionBlocks: [], contributions: []}, action) => {
+  entries: (
+    state = {sessionBlocks: [], contributions: [], changes: [], currentChangeIdx: 0},
+    action
+  ) => {
     switch (action.type) {
       case actions.SET_TIMETABLE_DATA:
-        return processEntries(...preprocessData(action.data));
+        return {...state, ...processEntries(...preprocessData(action.data), state.changes)};
       case actions.MOVE_ENTRY:
-        return moveEntry(state, action.args);
+        return {...state, ...moveEntry(state, action.args)};
       case actions.RESIZE_ENTRY:
-        return resizeEntry(state, action.args);
+        return {...state, ...resizeEntry(state, action.args)};
+      case actions.UNDO_CHANGE:
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx - 1,
+        };
+      case actions.REDO_CHANGE:
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+        };
       default:
         return state;
     }

@@ -16,7 +16,7 @@ export const getConcurrentEntries = (entry, entries) => entries.filter(e => isCo
 const getColumnId = (block, sessionBlocks, draggedEntry = null) => {
   if (draggedEntry) {
     // if this is the dragged entry, assign it its targeted resource id
-    return draggedEntry.id === block.id ? draggedEntry.targetResourceId : block.resourceId;
+    return draggedEntry.id === block.id ? draggedEntry.targetcolumnId : block.columnId;
   }
   // if this is the first time we're assigning a resource id, we need check the desired display order
   const concurrent = getConcurrentEntries(block, sessionBlocks);
@@ -30,31 +30,70 @@ const getColumnId = (block, sessionBlocks, draggedEntry = null) => {
         1;
 };
 
-const updateEntries = (entries, newEntry) =>
-  Array.isArray(newEntry)
-    ? [...entries.filter(e => !newEntry.some(ne => e.id === ne.id)), ...newEntry]
-    : [...entries.filter(e => e.id !== newEntry.id), newEntry];
+const updateEntries = (entries, newEntries) => [
+  ...entries.map(e => {
+    const update = newEntries.find(ne => e.id === ne.id);
+    return update ? {...e, ...update} : e;
+  }),
+  ...newEntries.filter(ne => !entries.some(e => e.id === ne.id)),
+];
 
-const resolveBlockConflicts = (sessionBlocks, draggedEntry = null) => {
-  const conflictingBlock = sessionBlocks.find(
+export const applyChanges = (state, entryType = null) => {
+  const {changes, currentChangeIdx, ...entries} = state;
+  const effectiveChanges = _.isNumber(currentChangeIdx)
+    ? changes.slice(0, currentChangeIdx)
+    : changes;
+  const newEntries = Object.entries(entries)
+    .filter(([key, value]) => value && (!entryType || entryType === key))
+    .map(([key, value]) => [
+      key,
+      effectiveChanges.reduce((acc, change) => updateEntries(acc, change[key] || []), value),
+    ]);
+  return entryType ? newEntries[0][1] : Object.fromEntries(newEntries);
+};
+
+const updateLastChange = (changes, newChange) => {
+  const lastChange = changes[changes.length - 1];
+  return [
+    ...changes.slice(0, -1),
+    {
+      sessionBlocks: updateEntries(lastChange?.sessionBlocks || [], newChange.sessionBlocks || []),
+      contributions: updateEntries(lastChange?.contributions || [], newChange.contributions || []),
+    },
+  ];
+};
+
+const addNewChange = (changes, newChange, currentChangeIdx) => [
+  ...changes.slice(0, currentChangeIdx),
+  newChange,
+];
+
+const resolveBlockConflicts = (sessionBlocks, changes, draggedEntry = null) => {
+  const updatedBlocks = applyChanges({sessionBlocks, changes}).sessionBlocks;
+  const conflictingBlock = updatedBlocks.find(
     block =>
       block.id !== draggedEntry?.id && // we avoid moving the dragged entry
-      getConcurrentEntries(block, sessionBlocks).some(b => b.resourceId === block.resourceId)
+      getConcurrentEntries(block, updatedBlocks).some(b => b.columnId === block.columnId)
   );
   if (!conflictingBlock) {
-    return sessionBlocks;
+    return changes;
   }
   // if there is space on the left, move it there
   if (
-    conflictingBlock.resourceId > 1 &&
-    !getConcurrentEntries(conflictingBlock, sessionBlocks).some(
-      b => b.resourceId === conflictingBlock.resourceId - 1
+    conflictingBlock.columnId > 1 &&
+    !getConcurrentEntries(conflictingBlock, updatedBlocks).some(
+      b => b.columnId === conflictingBlock.columnId - 1
     )
   ) {
     return resolveBlockConflicts(
-      updateEntries(sessionBlocks, {
-        ...conflictingBlock,
-        resourceId: conflictingBlock.resourceId - 1,
+      sessionBlocks,
+      updateLastChange(changes, {
+        sessionBlocks: [
+          {
+            id: conflictingBlock.id,
+            columnId: conflictingBlock.columnId - 1,
+          },
+        ],
       }),
       draggedEntry
     );
@@ -63,81 +102,108 @@ const resolveBlockConflicts = (sessionBlocks, draggedEntry = null) => {
   return resolveBlockConflicts(
     [
       ...sessionBlocks.filter(
-        b => b.id !== conflictingBlock.id && b.resourceId <= conflictingBlock.resourceId + 1
+        b => b.id !== conflictingBlock.id && b.columnId <= conflictingBlock.columnId + 1
       ),
-      {...conflictingBlock, resourceId: conflictingBlock.resourceId + 1},
-      ...sessionBlocks.filter(b => b.resourceId > conflictingBlock.resourceId + 1),
+      sessionBlocks.find(b => b.id === conflictingBlock.id),
+      ...sessionBlocks.filter(b => b.columnId > conflictingBlock.columnId + 1),
     ],
+    updateLastChange(changes, {
+      sessionBlocks: [
+        {
+          id: conflictingBlock.id,
+          columnId: conflictingBlock.columnId + 1,
+        },
+      ],
+    }),
     draggedEntry
   );
 };
 
-const removeBlockGaps = sessionBlocks => {
-  const leftGapBlocks = sessionBlocks.filter(
+const removeBlockGaps = (sessionBlocks, changes) => {
+  const updatedBlocks = applyChanges({sessionBlocks, changes}).sessionBlocks;
+  const leftGapBlocks = updatedBlocks.filter(
     block =>
-      block.resourceId > 1 &&
-      !getConcurrentEntries(block, sessionBlocks).some(b => b.resourceId === block.resourceId - 1)
+      block.columnId > 1 &&
+      !getConcurrentEntries(block, updatedBlocks).some(b => b.columnId === block.columnId - 1)
   );
   if (leftGapBlocks.length === 0) {
-    return sessionBlocks;
+    return changes;
   }
   return removeBlockGaps(
-    updateEntries(sessionBlocks, leftGapBlocks.map(b => ({...b, resourceId: b.resourceId - 1})))
+    sessionBlocks,
+    updateLastChange(changes, {
+      sessionBlocks: leftGapBlocks.map(b => ({id: b.id, columnId: b.columnId - 1})),
+    })
   );
 };
 
-const processSessionBlocks = (sessionBlocks, draggedEntry = null) =>
-  removeBlockGaps(
+const processSessionBlocks = (state, draggedEntry = null) => {
+  const {sessionBlocks, changes} = state;
+  const updatedBlocks = applyChanges(state, 'sessionBlocks');
+  return removeBlockGaps(
+    sessionBlocks,
     resolveBlockConflicts(
       // it is important to keep the order of the blocks when resolving conflicts
-      _.sortBy(
-        sessionBlocks.map(sessionBlock => ({
-          ...sessionBlock,
-          resourceId: getColumnId(sessionBlock, sessionBlocks, draggedEntry),
-        })),
-        'resourceId'
-      ),
+      _.sortBy(sessionBlocks, 'columnId'),
+      updateLastChange(changes, {
+        sessionBlocks: updatedBlocks.flatMap(sessionBlock => {
+          const columnId = getColumnId(sessionBlock, updatedBlocks, draggedEntry);
+          return columnId === sessionBlock.columnId ? [] : [{id: sessionBlock.id, columnId}];
+        }),
+      }),
       draggedEntry
     )
   );
+};
 
-const processContributions = (contributions, sessionBlocks) =>
-  contributions.map(contrib => ({
-    ...contrib,
-    resourceId: sessionBlocks.find(block => isChildOf(contrib, block)).resourceId,
-  }));
-
-export const processEntries = (sessionBlocks, contributions, draggedEntry = null) => {
-  const newBlocks = processSessionBlocks(sessionBlocks, draggedEntry);
+export const processEntries = (sessionBlocks, contributions, changes) => {
+  const newBlocks = applyChanges({
+    sessionBlocks,
+    changes: processSessionBlocks({sessionBlocks, changes}),
+  }).sessionBlocks;
   return {
     sessionBlocks: newBlocks,
-    contributions: processContributions(contributions, newBlocks),
+    contributions,
   };
 };
 
-const moveBlock = ({sessionBlocks, contributions}, {event: block, start, end, resourceId}) => {
-  const newEntry = {...block, start, end};
+const moveBlock = (state, {event: block, start, end, resourceId: columnId}) => {
+  const {changes, currentChangeIdx} = state;
+  const newEntry = {id: block.id, start, end};
   const timeDiff = start - block.start;
   // if the dragged block has contributions, move them accordingly
-  const newContribs = contributions.map(c =>
-    isChildOf(c, newEntry)
-      ? {
-          ...c,
-          start: new Date(c.start.getTime() + timeDiff),
-          end: new Date(c.end.getTime() + timeDiff),
-        }
-      : c
-  );
-  return processEntries(updateEntries(sessionBlocks, newEntry), newContribs, {
-    id: block.id,
-    sourceResourceId: block.resourceId,
-    targetResourceId: resourceId,
-  });
+  const newContribs = applyChanges(state, 'contributions')
+    .filter(c => isChildOf(c, newEntry))
+    .map(c => ({
+      id: c.id,
+      start: new Date(c.start.getTime() + timeDiff),
+      end: new Date(c.end.getTime() + timeDiff),
+    }));
+  return {
+    changes: processSessionBlocks(
+      {
+        ...state,
+        changes: addNewChange(
+          changes,
+          {sessionBlocks: [newEntry], contributions: newContribs},
+          currentChangeIdx
+        ),
+      },
+      {
+        id: block.id,
+        sourcecolumnId: block.columnId,
+        targetcolumnId: columnId,
+      }
+    ),
+    currentChangeIdx: currentChangeIdx + 1,
+  };
 };
 
-const resizeBlock = ({sessionBlocks, contributions}, {event: block, start, end, resourceId}) => {
+const resizeBlock = (state, {event: block, start, end, columnId}) => {
+  const {changes, currentChangeIdx} = state;
+  const contributions = applyChanges(state, 'contributions');
   const newEntry = {
-    ...block,
+    id: block.id,
     start: new Date(
       Math.min(
         ...contributions.filter(c => isChildOf(c, block)).map(c => c.start.getTime()),
@@ -151,24 +217,33 @@ const resizeBlock = ({sessionBlocks, contributions}, {event: block, start, end, 
       )
     ),
   };
-  return processEntries(updateEntries(sessionBlocks, newEntry), contributions, {
-    id: block.id,
-    sourceResourceId: block.resourceId,
-    targetResourceId: resourceId,
-  });
+  return {
+    changes: processSessionBlocks(
+      {...state, changes: addNewChange(changes, {sessionBlocks: [newEntry]}, currentChangeIdx)},
+      {
+        id: block.id,
+        sourcecolumnId: block.columnId,
+        targetcolumnId: columnId,
+      }
+    ),
+    currentChangeIdx: currentChangeIdx + 1,
+  };
 };
 
-const moveOrResizeContrib = (
-  {sessionBlocks, contributions},
-  {event: contrib, start, end, resourceId}
-) => {
-  const newContrib = {...contrib, start, end, resourceId};
+const moveOrResizeContrib = (state, {event: contrib, start, end, resourceId: columnId}) => {
+  const {changes, currentChangeIdx} = state;
+  const {sessionBlocks, contributions} = applyChanges(state);
+  const newContrib = {id: contrib.id, start, end, columnId};
   const newParent = getConcurrentEntries(newContrib, sessionBlocks).find(
-    b => b.resourceId === resourceId && b.type === 'session'
+    b => b.columnId === columnId && b.type === 'session'
   );
-  // check if it's being dragged to outside of a block or a block without enough space
-  if (!newParent || newContrib.start < newParent.start || newContrib.end > newParent.end) {
-    return {sessionBlocks, contributions};
+  // check if it's being dragged to outside of a block
+  if (!newParent) {
+    return {}; // TODO: turn this contrib into a top-level contrib
+  }
+  // check if it's being dragged to a block without enough space
+  if (newContrib.start < newParent.start || newContrib.end > newParent.end) {
+    return {};
   }
   const newParentContribs = contributions.filter(
     c => c.id !== contrib.id && isChildOf(c, newParent)
@@ -187,21 +262,21 @@ const moveOrResizeContrib = (
       const last = acc[acc.length - 1];
       return [
         ...acc,
-        {...c, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
+        {id: c.id, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
       ];
     }, [prevContrib, newContrib].filter(c => c));
     // if they don't fit in the block, don't move anything
     if (rearrangedContribs[rearrangedContribs.length - 1].end > newParent.end) {
-      return {sessionBlocks, contributions};
+      return {};
     }
     return {
-      sessionBlocks,
-      contributions: updateEntries(contributions, rearrangedContribs),
+      changes: addNewChange(changes, {contributions: rearrangedContribs}, currentChangeIdx),
+      currentChangeIdx: currentChangeIdx + 1,
     };
   }
   return {
-    sessionBlocks,
-    contributions: updateEntries(contributions, newContrib),
+    changes: addNewChange(changes, {contributions: [newContrib]}, currentChangeIdx),
+    currentChangeIdx: currentChangeIdx + 1,
   };
 };
 

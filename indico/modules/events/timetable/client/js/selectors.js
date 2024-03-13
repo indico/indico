@@ -7,7 +7,7 @@
 
 import {createSelector} from 'reselect';
 
-import {getNumDays} from './util';
+import {applyChanges, getNumDays} from './util';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
@@ -28,18 +28,30 @@ export const getEventNumDays = createSelector(
   (startDt, endDt) => getNumDays(startDt, endDt) + 1
 );
 
-export const getSessionBlocks = createSelector(
+export const getUpdatedEntries = createSelector(
   getEntries,
+  entries => applyChanges(entries)
+);
+export const getSessionBlocks = createSelector(
+  getUpdatedEntries,
   entries => entries.sessionBlocks
 );
 export const getContributions = createSelector(
-  getEntries,
+  getUpdatedEntries,
   entries => entries.contributions
 );
 export const getAllEntries = createSelector(
   getSessionBlocks,
   getContributions,
   (sessionBlocks, contributions) => [...sessionBlocks, ...contributions]
+);
+export const canUndo = createSelector(
+  getEntries,
+  entries => entries.currentChangeIdx > 0
+);
+export const canRedo = createSelector(
+  getEntries,
+  entries => entries.currentChangeIdx < entries.changes.length
 );
 
 export const getNavbarMaxDays = createSelector(

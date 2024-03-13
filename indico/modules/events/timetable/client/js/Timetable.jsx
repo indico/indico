@@ -18,6 +18,7 @@ import EntryPopup from './EntryPopup';
 import {entryStyleGetter, layoutAlgorithm} from './layout';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import {isChildOf} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 
@@ -30,11 +31,12 @@ export default function Timetable() {
   const dispatch = useDispatch();
   const displayMode = useSelector(selectors.getDisplayMode);
   const entries = useSelector(selectors.getAllEntries);
+  const blocks = useSelector(selectors.getSessionBlocks);
   const [date, setDate] = useState(
     entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
   );
   const numColumns = Math.max(
-    ...entries.filter(e => e.start.getDate() === date.getDate()).map(e => e.resourceId),
+    ...entries.filter(e => e.start.getDate() === date.getDate() && e.columnId).map(e => e.columnId),
     1
   );
 
@@ -76,6 +78,7 @@ export default function Timetable() {
       min={new Date(1972, 0, 1, minHour, 0, 0)}
       max={new Date(1972, 0, 1, maxHour, 0, 0)}
       tooltipAccessor={null}
+      resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
       resizable
       selectable
     />
