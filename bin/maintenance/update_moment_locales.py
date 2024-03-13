@@ -57,7 +57,9 @@ def show_diff(old, new, filename):
 
 
 @click.command()
-def main():
+@click.option('--ci', is_flag=True, help='Indicate that the script is running during CI and should use a non-zero '
+                                         'exit code if thefile is not up to date instead of updating it.')
+def main(ci):
     indico_root = Path(__file__).parents[2]
 
     locale_mapping_file = indico_root / 'indico' / 'moment_locales.yaml'
@@ -75,17 +77,26 @@ def main():
         replaced = True
         return locale_imports
 
-    old_index_file = index_path.read_text()
-    new_index_file = re.sub(fr'(?<={re.escape(START_MARKER)}\n).*(?=\n{re.escape(END_MARKER)})',
-                            replacer, old_index_file, flags=re.DOTALL)
+    old_file_content = index_path.read_text()
+    new_file_content = re.sub(fr'(?<={re.escape(START_MARKER)}\n).*(?=\n{re.escape(END_MARKER)})',
+                              replacer, old_file_content, flags=re.DOTALL)
 
     if not replaced:
         click.secho(f'Failed to patch {index_path_pretty}', fg='red')
         sys.exit(1)
 
-    index_path.write_text(new_index_file)
+    if old_file_content == new_file_content:
+        click.secho(f'{index_path_pretty} is up to date', fg='green')
+        sys.exit(0)
+
+    if ci:
+        click.secho(f'{index_path_pretty} is not up to date:', fg='red')
+        show_diff(old_file_content, new_file_content, str(index_path_pretty))
+        sys.exit(1)
+
+    index_path.write_text(new_file_content)
     click.secho(f'Updated {index_path_pretty}:', fg='yellow')
-    show_diff(old_index_file, new_index_file, str(index_path_pretty))
+    show_diff(old_file_content, new_file_content, str(index_path_pretty))
 
 
 if __name__ == '__main__':
