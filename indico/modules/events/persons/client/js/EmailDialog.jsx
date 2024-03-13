@@ -89,6 +89,7 @@ export function EmailDialog({
   recipients,
   recipientsField,
   initialFormValues,
+  validate,
 }) {
   const [preview, setPreview] = useState(null);
 
@@ -202,6 +203,7 @@ export function EmailDialog({
       disabledAfterSubmit
       unloadPrompt
       scrolling
+      validate={validate}
     >
       {({submitSucceeded}) =>
         submitSucceeded ? <EmailSentMessage count={sentEmailsCount} /> : form
@@ -223,6 +225,7 @@ EmailDialog.propTypes = {
   /** React node to render instead of the default <RecipientsField /> component. */
   recipientsField: PropTypes.node,
   initialFormValues: PropTypes.object,
+  validate: PropTypes.func,
 };
 
 EmailDialog.defaultProps = {
@@ -231,4 +234,5 @@ EmailDialog.defaultProps = {
   sentEmailsCount: 0,
   recipients: [],
   recipientsField: null,
+  validate: undefined,
 };
