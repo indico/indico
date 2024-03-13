@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from itertools import groupby
-
 from marshmallow import ValidationError, fields, validate
 
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
@@ -40,17 +38,6 @@ class SessionsField(RegistrationFormFieldBase):
                     raise ValidationError(_('Please select at least {_min} sessions.').format(_min=_min))
         return _check_number_of_sessions
 
-    def get_friendly_data(self, registration_data):
-        def return_date(block):
-            return block.start_dt.date().isoformat()
-
-        reg_data = registration_data.data
-        if not reg_data:
-            return ''
-
-        blocks = SessionBlock.query.filter(SessionBlock.id.in_(reg_data)).all()
-        grouped_blocks = {}
-
-        for date, blocks_in_date in groupby(blocks, key=return_date):
-            grouped_blocks[date] = list(blocks_in_date)
-        return grouped_blocks
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
+        blocks = SessionBlock.query.filter(SessionBlock.id.in_(registration_data.data)).all()
+        return ('; ').join(x.full_title for x in blocks) if for_humans or for_search else blocks

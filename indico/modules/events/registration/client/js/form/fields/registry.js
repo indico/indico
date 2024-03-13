@@ -206,7 +206,7 @@ const fieldRegistry = {
     settingsFormInitialData: timetableSessionsSettingsInitialData,
     noRequired: true,
     hasPrice: false,
-    icon: 'list',
+    icon: 'calendar-day',
     renderAsFieldset: true,
   },
 };

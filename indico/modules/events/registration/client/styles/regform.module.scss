@@ -212,23 +212,11 @@
         display: flex;
         flex-direction: column;
 
-        button {
-          background: none;
-          color: inherit;
-          border: none;
-          padding: 0.5em;
-        }
-
-        dl {
-          max-width: 100%;
-          margin-bottom: 0;
-
-          dd {
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            padding: 0.25rem;
-          }
+        dd {
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          padding: 0.35rem;
         }
       }
 
