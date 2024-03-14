@@ -32,18 +32,18 @@ export const getUpdatedEntries = createSelector(
   getEntries,
   entries => applyChanges(entries)
 );
-export const getSessionBlocks = createSelector(
+export const getBlocks = createSelector(
   getUpdatedEntries,
-  entries => entries.sessionBlocks
+  entries => entries.blocks
 );
-export const getContributions = createSelector(
+export const getChildren = createSelector(
   getUpdatedEntries,
-  entries => entries.contributions
+  entries => entries.children
 );
 export const getAllEntries = createSelector(
-  getSessionBlocks,
-  getContributions,
-  (sessionBlocks, contributions) => [...sessionBlocks, ...contributions]
+  getBlocks,
+  getChildren,
+  (blocks, children) => [...blocks, ...children]
 );
 export const canUndo = createSelector(
   getEntries,

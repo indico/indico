@@ -8,7 +8,7 @@
 import _ from 'lodash';
 
 import * as actions from './actions';
-import {resizeEntry, processEntries, resizeWindow, moveEntry} from './util';
+import {resizeEntry, preprocessEntries, resizeWindow, moveEntry} from './util';
 
 const entryTypeMapping = {
   Session: 'session',
@@ -18,13 +18,13 @@ const entryTypeMapping = {
 
 const preprocessData = data => {
   // TODO remove this preprocessing once the backend returns the data in the correct format
-  const sessionBlocks = Object.values(data)
+  const blocks = Object.values(data)
     .map(e => Object.values(e))
     .flat();
-  const contribs = sessionBlocks
+  const childEntries = blocks
     .map(e => (e.entries ? Object.values(e.entries).map(v => ({...v, parentId: e.id})) : []))
     .flat();
-  return [sessionBlocks, contribs].map(en =>
+  return [blocks, childEntries].map(en =>
     en.map(e => ({
       ..._.pick(e, ['id', 'title', 'slotTitle', 'code', 'sessionCode', 'description', 'parentId']),
       type: entryTypeMapping[e.entryType],
@@ -37,13 +37,10 @@ const preprocessData = data => {
 };
 
 export default {
-  entries: (
-    state = {sessionBlocks: [], contributions: [], changes: [], currentChangeIdx: 0},
-    action
-  ) => {
+  entries: (state = {blocks: [], children: [], changes: [], currentChangeIdx: 0}, action) => {
     switch (action.type) {
       case actions.SET_TIMETABLE_DATA:
-        return {...state, ...processEntries(...preprocessData(action.data), state.changes)};
+        return {...state, ...preprocessEntries(...preprocessData(action.data), state.changes)};
       case actions.MOVE_ENTRY:
         return {...state, ...moveEntry(state, action.args)};
       case actions.RESIZE_ENTRY:
