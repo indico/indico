@@ -31,7 +31,7 @@ export default function Timetable() {
   const dispatch = useDispatch();
   const displayMode = useSelector(selectors.getDisplayMode);
   const entries = useSelector(selectors.getAllEntries);
-  const blocks = useSelector(selectors.getSessionBlocks);
+  const blocks = useSelector(selectors.getBlocks);
   const [date, setDate] = useState(
     entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
   );

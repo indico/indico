@@ -323,7 +323,7 @@ BreakPopupContent.propTypes = popupContentPropTypes;
 
 export default function EntryPopup({event: entry}) {
   const {title, slotTitle, description, code, sessionCode, type} = entry;
-  const contributions = useSelector(selectors.getContributions);
+  const contributions = useSelector(selectors.getChildren);
   const displayMode = useSelector(selectors.getDisplayMode);
   const hasContribs = contributions.some(c => isChildOf(c, entry));
 
