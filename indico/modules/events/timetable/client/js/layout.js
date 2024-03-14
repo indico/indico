@@ -24,7 +24,7 @@ const makeTranslucent = hex => {
 };
 
 export const entryStyleGetter = entries => entry => {
-  if (entry.type === 'contribution') {
+  if (entry.parentId) {
     const parent = entries.find(e => isChildOf(entry, e));
     return {
       style: {
@@ -48,7 +48,7 @@ export const entryStyleGetter = entries => entry => {
 export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
   noOverlap(props).map(styledEntry => {
     // if it's a child-entry, remove the padding, and make it wider if in compact mode
-    if (styledEntry.event.type === 'contribution') {
+    if (styledEntry.event.parentId) {
       const size = compact
         ? (100 - SESSION_BLOCK_WIDTH) / (100 / styledEntry.size - 1)
         : styledEntry.size;

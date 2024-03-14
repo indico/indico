@@ -31,7 +31,7 @@ const preprocessData = data => {
       start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
       end: new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
       attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
-      color: {text: e.textColor, background: e.color},
+      color: e.entryType === 'Contribution' ? undefined : {text: e.textColor, background: e.color},
     }))
   );
 };
