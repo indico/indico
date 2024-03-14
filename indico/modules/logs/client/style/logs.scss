@@ -7,7 +7,7 @@
 
 @use 'base/flex' as *;
 @use 'base/palette' as *;
-@use 'base/typography' as *;
+@use 'base/typography_elements' as *;
 @use 'base/utilities' as *;
 
 @mixin line-style {
@@ -139,7 +139,7 @@
     }
 
     .log-entry-details {
-      @include text-superfluous();
+      @extend .text-superfluous;
 
       display: flex;
       flex: 0.65;

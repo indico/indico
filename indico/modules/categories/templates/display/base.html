@@ -1,7 +1,7 @@
-{% from 'events/management/_create_event_button.html' import create_event_button %}
+{% from 'events/management/_create_event_button.html' import create_event_link %}
 
-<div class="category-container">
-    <div class="category-header flexrow">
+<main id="category-container">
+    <div id="category-header">
         <h1 class="category-title">
             {% block title %}
                 {% if category.title == 'Home' and category.is_root %}
@@ -16,30 +16,35 @@
             {% endblock %}
         </h1>
         {% block cat_toolbar %}
-            <div id="category-toolbar" class="toolbar fixed-height">
-                <div class="group">
-                    <div id="search-box" class="search-box"
-                         data-category="{{ {'id': category.id, 'isRoot': category.is_root, 'title': category.title} | tojson | forceescape }}"
-                         {% if session.user and session.user.is_admin %}data-is-admin{% endif %}
-                    ></div>
-                </div>
+            <div id="search-box" class="search-box"
+                 data-category="{{ {'id': category.id, 'isRoot': category.is_root, 'title': category.title} | tojson | forceescape }}"
+                 {% if session.user and session.user.is_admin %}data-is-admin{% endif %}
+            ></div>
+            <div id="category-toolbar">
                 <div class="group">
                     {% block cat_create_event %}
-                        {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
+                        <ind-menu>
+                            <button id="create-event-button" aria-controls="create-event-menu" aria-expanded="false">
+                                {% trans %}Create event{% endtrans %}
+                            </button>
+                            <menu id="create-event-menu">
+                                <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
+                                <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
+                                <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
+                            </menu>
+                        </ind-menu>
                     {% endblock %}
-                </div>
-                <div class="group">
                     {% block cat_navigate %}
-                        <button id="navigate-button" class="i-button icon-compass2"
-                                title="{% trans %}Navigate categories{% endtrans %}">
-                            {% trans %}Navigate{% endtrans %}
-                        </button>
+                        <ind-with-tooltip>
+                            <button id="navigate-button" aria-label="{% trans %}Navigate categories{% endtrans %}">
+                                {% trans %}Navigate{% endtrans %}
+                                <span data-tip-content>{% trans %}Navigate categories{% endtrans %}</span>
+                            </button>
+                        </ind-with-tooltip>
                     {% endblock %}
-                </div>
-                <div class="group">
                     {% block cat_parent %}
                         {% if not category.is_root %}
-                            <a class="i-button icon-arrow-up" href="{{ category.parent.url }}">
+                            <a id="parent-category-button" href="{{ category.parent.url }}">
                                 {% trans %}Parent category{% endtrans %}
                             </a>
                         {% endif %}
@@ -48,65 +53,73 @@
                         <div id="category-calendar-link" data-category-id="{{ category.id }}"></div>
                     {% endblock %}
                     {% block cat_view_dropdown %}
-                        <button class="i-button icon-eye arrow js-dropdown"
-                                title="{% trans %}View{% endtrans %}"
-                                data-toggle="dropdown"></button>
-                        <ul class="i-dropdown">
-                            {% if category.is_flat_view_enabled and category.children %}
+                        <ind-menu>
+                            <ind-with-tooltip>
+                                <button id="view-button" aria-controls="view-mode-menu">
+                                    <span data-tip-content>{% trans %}View{% endtrans %}</span>
+                                </button>
+                            </ind-with-tooltip>
+                            <menu id="view-mode-menu">
+                                {% if category.is_flat_view_enabled and category.children %}
+                                    <li>
+                                        <a href="{{ url_for('.display', category, flat=1) }}">{% trans %}All category events{% endtrans %}</a>
+                                    </li>
+                                {% endif %}
                                 <li>
-                                    <a href="{{ url_for('.display', category, flat=1) }}">{% trans %}All category events{% endtrans %}</a>
+                                    <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
                                 </li>
-                            {% endif %}
-                            <li>
-                                <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
-                            </li>
-                        </ul>
+                                <li>
+                                    <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('.overview', category, period='week') }}">{% trans %}Week's events{% endtrans %}</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('.calendar', category) }}">{% trans %}Calendar{% endtrans %}</a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('.statistics', category) }}">{% trans %}Category statistics{% endtrans %}</a>
+                                </li>
+                            </menu>
+                        </ind-menu>
                     {% endblock %}
                     {% block cat_manage %}
                         {% if category.can_manage(session.user) %}
-                            <a href="{{ url_for('categories.manage_content', category) }}"
-                               class="i-button icon-edit"
-                               title="{% trans %}Manage category{% endtrans %}"></a>
+                            <ind-with-tooltip>
+                                <a id="category-managment-link" href="{{ url_for('categories.manage_content', category) }}">
+                                    <span data-tip-content>{% trans %}Manage category{% endtrans %}</span>
+                                </a>
+                            </ind-with-tooltip>
+                        {% endif %}
+                    {% endblock %}
+                    {% block cat_user_favorites %}
+                        {% if session.user and not category.is_root %}
+                            <div class="group">
+                                <div id="fav-button" data-category-id="{{ category.id }}"
+                                    {{ 'data-favorited' if category in session.user.favorite_categories }}></div>
+                            </div>
                         {% endif %}
                     {% endblock %}
                 </div>
-                {% block cat_user_favorites %}
-                    {% if session.user and not category.is_root %}
-                        <div class="group">
-                            <div id="fav-button" data-category-id="{{ category.id }}"
-                                 {{ 'data-favorited' if category in session.user.favorite_categories }}></div>
-                        </div>
-                    {% endif %}
-                {% endblock %}
             </div>
         {% endblock %}
     </div>
 
-    {% if self.sidebar() %}
-        <div class="category-sidebar">
-            {%- block sidebar %}{% endblock -%}
-        </div>
-    {% endif %}
-
-    <div class="category-content-wrapper">
+    <div id="category-content-wrapper">
         <div class="category-content">
-            {% include 'flashed_messages.html' %}
-            {% block content %}{% endblock %}
+            <div class="category-content-inner">
+                {% include 'flashed_messages.html' %}
+                {% block content %}{% endblock %}
+            </div>
         </div>
+
+        {% if self.sidebar() %}
+            <div id="category-sidebar">
+                {%- block sidebar %}{% endblock -%}
+            </div>
+        {% endif %}
     </div>
-</div>
+</main>
 
 <ind-category-navigator triggeredby="navigate-button"
                         category-id="{{ category.id }}">

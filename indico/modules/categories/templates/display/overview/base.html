@@ -1,7 +1,7 @@
 {% extends 'layout/management_page.html' %}
 
 {% block side_menu %}
-    <div class="category-overview-side-menu">
+    <div id="category-overview-side-menu">
         <form action="{{ url_for('.overview', category) }}" method="GET" id="category-overview-options">
             <div class="js-datepicker"></div>
             <input type="hidden" id="date" name="date" value="{{ start_dt|format_date(format="yyyy-MM-dd") }}">
@@ -104,7 +104,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="category-overview">
+    <div id="category-overview">
         <div class="title flexrow f-j-center f-a-center">
             <div class="navigation">
                 {% block overview_navigation_left %}{% endblock %}

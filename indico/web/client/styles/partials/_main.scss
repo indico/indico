@@ -38,14 +38,12 @@
     flex: 1 1;
   }
 
-  ind-menu > button::after {
-    @extend %icon;
-    @extend %icon-arrow-down;
-    display: block; // XXX: Required for transform to work
+  ind-menu > menu {
+    @extend %dropdown-menu;
   }
 
-  ind-menu > button[aria-expanded='true']::after {
-    transform: rotateX(-180deg);
+  ind-menu > button {
+    @extend %dropdown-menu-trigger;
   }
 
   ind-menu > menu :is(li, li > *, a) {
@@ -55,6 +53,10 @@
   > menu li {
     list-style: none;
     padding: 0;
+  }
+
+  ind-menu > menu a {
+    @extend %dropdown-menu-item;
   }
 
   li :is(a, button) {
