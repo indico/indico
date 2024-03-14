@@ -5,16 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.note-deleted-notice :global(.icon.trash.alternate.outline) {
-  font-size: 1.5em !important;
-}
-
-.blurred-note {
-  filter: blur(0.5rem) grayscale(1);
-  pointer-events: none;
-  user-select: none;
-}
-
 .note-content {
   max-height: 60vh;
   overflow-y: scroll;

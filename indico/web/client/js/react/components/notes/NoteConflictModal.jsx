@@ -20,6 +20,7 @@ import {
   GridRow,
   GridColumn,
   List,
+  Segment,
 } from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
@@ -39,23 +40,14 @@ export function NoteConflictModal({
   // camelize the externalNoteSource keys
   const extNote = camelizeKeys(externalNote);
 
-  const renderDummyNote = () => {
+  const renderDeletedRevision = () => {
     return (
-      <CardContent className="editor-output">
-        <div styleName="blurred-note" aria-hidden>
-          <h1>Dummy Notes</h1>
-          <p>
-            This is some dummy text that should not be seen - if you can see this text, then please,
-            consider updating/and or adjust your browser settings or file a bug report.
-          </p>
-          <p>Lorem Ipsum</p>
-          <ul>
-            <li>Lorem ipsum dolor sit amet</li>
-            <li>Consectetur adipiscing elit</li>
-            <li>Integer molestie lorem at massa</li>
-          </ul>
-        </div>
-      </CardContent>
+      <Segment placeholder>
+        <Header icon>
+          <Icon name="trash outline alternate" />
+          <Translate>This note revision has been deleted.</Translate>
+        </Header>
+      </Segment>
     );
   };
 
@@ -143,14 +135,8 @@ export function NoteConflictModal({
                   'The changes made by someone else since you started editing the note'
                 )}
               />
-              {!extNote.source && (
-                <Message icon styleName="note-deleted-notice">
-                  <Icon name="trash alternate outline" />
-                  <Translate>This note revision has been deleted.</Translate>
-                </Message>
-              )}
-              <Card raised fluid>
-                {extNote.source ? (
+              {extNote.source ? (
+                <Card raised fluid>
                   <CardContent>
                     <div
                       dangerouslySetInnerHTML={{__html: extNote.source}}
@@ -158,10 +144,10 @@ export function NoteConflictModal({
                       styleName="note-content"
                     />
                   </CardContent>
-                ) : (
-                  renderDummyNote()
-                )}
-              </Card>
+                </Card>
+              ) : (
+                renderDeletedRevision()
+              )}
             </GridColumn>
           </GridRow>
         </Grid>
