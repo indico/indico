@@ -391,6 +391,9 @@ class RHUnLinkDesignerTemplate(RHModifyDesignerTemplateBase):
         regform = self.template.registration_form
         if not regform:
             raise ValueError('This template is not linked to any registration form.')
+        if not self.template.is_unlinkable:
+            raise ValueError('This template cannot be unlinked because it contains '
+                             'placeholders referencing the linked registration form.')
 
         self.template.unlink_regform()
         self.template.event.log(EventLogRealm.event, LogKind.negative, 'Designer',

@@ -106,6 +106,11 @@ def get_badge_format(tpl):
                      frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
 
+def has_regform_field_placeholders(data):
+    """Return `True` if the given template data contains regform field placeholders."""
+    return any(is_regform_field_placeholder(item) for item in data['items'])
+
+
 def remove_regform_field_placeholders(data):
     """Return a copy of the template data with regform field placeholders removed."""
     return data | {

@@ -383,7 +383,8 @@
 }
 
 .not-deletable,
-.not-clonable {
+.not-clonable,
+.not-unlinkable {
   opacity: 0.2;
   cursor: default;
 }

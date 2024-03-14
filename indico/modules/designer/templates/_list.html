@@ -76,17 +76,17 @@
                         {{ tpl.registration_form.title }}
                     </a>
                 </span>
-                <button class="i-button icon-cross icon-only text-color borderless danger"
+                {% set unlinkable = tpl.is_unlinkable %}
+                <button class="i-button icon-cross icon-only text-color borderless danger {{ 'not-unlinkable' if not unlinkable }}"
                         style="padding-left: 0.2em;"
-                        title="{% trans %}Unlink registration form{% endtrans %}"
-                        data-href="{{ url_for('.unlink_regform', tpl) }}"
-                        data-method="PATCH"
-                        data-update="#template-list"
-                        data-confirm="{% trans title=tpl.registration_form.title -%}
-                                            Are you sure you want to unlink the registration form '{{ title }}'?
-                                            Any placeholders specific to that registration form will be removed
-                                            from the template.
-                                      {%- endtrans %}">
+                        {% if unlinkable %}
+                            title="{% trans %}Unlink registration form{% endtrans %}"
+                            data-href="{{ url_for('.unlink_regform', tpl) }}"
+                            data-method="PATCH"
+                            data-update="#template-list"
+                        {% else %}
+                            title="{% trans %}This template cannot be unlinked because it contains placeholders referencing the linked registration form.{% endtrans %}"
+                        {% endif %}>
                 </button>
             {% endif %}
         </td>
