@@ -171,7 +171,6 @@ export function NoteConflictModal({
           content={Translate.string('Overwrite changes')}
           icon="write"
           labelPosition="left"
-          negative
           onClick={async () => {
             setOpen(false);
             onClose();
