@@ -31,7 +31,7 @@ from werkzeug.exceptions import UnprocessableEntity
 
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
@@ -336,4 +336,4 @@ def get_event_attachment_images(event: Event) -> dict[str, Attachment]:
     all_attachments = attached_items.get('files', []).copy()
     for folder in attached_items.get('folders', []):
         all_attachments.extend(folder.attachments)
-    return {att.id: att for att in all_attachments if att.file.is_image}
+    return {att.id: att for att in all_attachments if att.type == AttachmentType.file and att.file.is_image}
