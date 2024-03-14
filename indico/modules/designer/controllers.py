@@ -331,7 +331,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         placeholders = get_nested_placeholder_options(regform=self.template.registration_form)
         return self._render_template('template.html', template=self.template,
                                      placeholders=placeholders,
-                                     image_types=get_image_placeholder_types(),
+                                     image_types=get_image_placeholder_types(self.template.registration_form),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
                                      template_data=template_data, backside_template_data=backside_template_data,
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))

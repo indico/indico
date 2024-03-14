@@ -46,8 +46,8 @@ def get_nested_placeholder_options(regform=None):
     return groups
 
 
-def get_image_placeholder_types():
-    return [name for name, placeholder in get_placeholder_options().items() if placeholder.is_image]
+def get_image_placeholder_types(regform=None):
+    return [name for name, placeholder in get_placeholder_options(regform).items() if placeholder.is_image]
 
 
 def is_regform_field_placeholder(designer_item):

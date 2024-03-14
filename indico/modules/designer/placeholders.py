@@ -422,6 +422,7 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
     def __init__(self, field):
         self.field = field
         self.name = f'field-{field.id}'
+        self.is_image = self.field.input_type == 'picture'
 
     @property
     def description(self):
@@ -435,6 +436,9 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
         return self._render(data)
 
     def _render(self, data):
+        if self.is_image:
+            return self._render_image(data)
+
         friendly_data = data.friendly_data
         if friendly_data is None:
             return ''
@@ -445,6 +449,9 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
             return self._render_accommodation(friendly_data)
         else:
             return friendly_data
+
+    def _render_image(self, data):
+        return Image.open(data.open())
 
     def _render_accommodation(self, friendly_data):
         if friendly_data['is_no_accommodation']:
