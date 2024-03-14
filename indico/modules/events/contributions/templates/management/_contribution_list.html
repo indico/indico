@@ -2,7 +2,7 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons) %}
+{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, contrib_fields) %}
     {% if contribs %}
         {% set has_codes = contribs|selectattr('code')|any %}
         {% set has_types = contribs|selectattr('type')|any %}
@@ -52,6 +52,9 @@
                             <th class="i-table material-column">
                                 {% trans %}Material{% endtrans %}
                             </th>
+                            {% for field in contrib_fields %}
+                                <th class="i-table">{{ field.title }}</th>
+                            {% endfor %}
                             <th class="actions-column hide-if-locked" data-sorter="false">
                                 {# Actions #}
                             </th>
