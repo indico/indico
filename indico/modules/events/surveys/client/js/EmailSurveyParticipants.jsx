@@ -59,15 +59,16 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       senders={senders}
       recipientsField={
         <>
-          <FinalCheckbox
-            name="email_all_participants"
-            label={Translate.string('Send email to all event participants')}
-            toggle
-          />
           <FinalEmailList
             name="recipients_addresses"
             label={Translate.string('Recipients addresses')}
             description={Translate.string('Send email to every address in this list')}
+            hideValidationError="never"
+          />
+          <FinalCheckbox
+            name="email_all_participants"
+            label={Translate.string('Send email to all event participants')}
+            toggle
           />
         </>
       }
@@ -81,8 +82,10 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       }}
       sentEmailsCount={sentCount}
       validate={values => {
+        const errors = {};
         if (!values.email_all_participants && !values.recipients_addresses.length) {
-          return Translate.string('You must have at least one recipient');
+          errors.recipients_addresses = Translate.string('You must choose at least one recipient');
+          return errors;
         } else {
           return undefined;
         }
