@@ -174,6 +174,10 @@ const moveBlock = (state, {event: block, start, end, resourceId: columnId}) => {
   } else if (columnId === block.columnId) {
     return {};
   }
+  // if a contribution with a parent is being moved, remove the parent
+  if (block.parentId) {
+    newEntry.parentId = null;
+  }
   // if the dragged block has contributions, move them accordingly
   const newContribs = applyChanges(state)
     .children.filter(c => isChildOf(c, newEntry))
@@ -217,15 +221,17 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
   });
 };
 
-const moveOrResizeChild = (state, {event: contrib, start, end, resourceId: columnId}) => {
+const moveOrResizeContrib = (state, args) => {
   const {blocks, children} = applyChanges(state);
+  const {event: contrib, start, end, resourceId: columnId} = args;
+
   const newContrib = {id: contrib.id, start, end, columnId};
   const newParent = getConcurrentEntries(newContrib, blocks).find(
     b => b.columnId === columnId && b.type === 'session'
   );
   // check if it's being dragged to outside of a block
   if (!newParent) {
-    return {}; // TODO: turn this contrib into a top-level contrib
+    return moveBlock(state, args);
   }
   // check if it's being dragged to a block without enough space
   if (newContrib.start < newParent.start || newContrib.end > newParent.end) {
@@ -258,11 +264,11 @@ const moveOrResizeChild = (state, {event: contrib, start, end, resourceId: colum
   return addNewChange(state, [newContrib]); // TODO filter out params that havent changed
 };
 
-export const moveEntry = (entries, args) =>
-  args.event.parentId ? moveOrResizeChild(entries, args) : moveBlock(entries, args);
+export const moveEntry = (state, args) =>
+  args.event.type === 'contribution' ? moveOrResizeContrib(state, args) : moveBlock(state, args);
 
-export const resizeEntry = (entries, args) =>
-  args.event.parentId ? moveOrResizeChild(entries, args) : resizeBlock(entries, args);
+export const resizeEntry = (state, args) =>
+  args.event.parentId ? moveOrResizeContrib(state, args) : resizeBlock(state, args);
 
 export const getNumDays = (start, end) => Math.floor((end - start) / (24 * 60 * 60 * 1000));
 
