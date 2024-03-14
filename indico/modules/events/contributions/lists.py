@@ -33,7 +33,10 @@ class ContributionListGenerator(ListGeneratorBase):
 
     def __init__(self, event):
         super().__init__(event)
-        self.default_list_config = {'filters': {'fields': {}, 'items': {}}}
+        self.default_list_config = {
+            'items': (),
+            'filters': {'fields': {}, 'items': {}}
+        }
 
         session_empty = {None: _('No session')}
         track_empty = {None: _('No track')}
@@ -188,9 +191,10 @@ class ContributionListGenerator(ListGeneratorBase):
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
         registered_persons = get_registered_event_persons(self.event)
+        contrib_fields = self.get_all_contribution_fields()
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration, 'selected_entry': selected_entry,
-                'registered_persons': registered_persons}
+                'registered_persons': registered_persons, 'contrib_fields': contrib_fields}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.
