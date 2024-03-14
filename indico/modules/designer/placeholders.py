@@ -453,9 +453,7 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
         arrival = format_date(friendly_data['arrival_date'])  # TODO: include locale
         departure = format_date(friendly_data['departure_date'])
         accommodation = friendly_data['choice']
-        return _('''\
-Arrival: {arrival} · Departure {departure} · Accommodation: {accommodation}
-''').format(arrival=arrival, departure=departure, accommodation=accommodation)
+        return f'{accommodation} ({arrival} - {departure})'
 
     @classmethod
     def from_designer_item(cls, regform, item):
