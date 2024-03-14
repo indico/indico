@@ -223,6 +223,14 @@
                                     </button>
                                 </td>
                                 {{ render_attachment_info(contrib) }}
+                                {% set data = contrib.data_by_field %}
+                                {% for field in contrib_fields %}
+                                    {% set friendly_data = data[field.id].friendly_data if field.id in data else '' %}
+                                    <td class="i-table" data-text="{{ friendly_data }}"
+                                        data-searchable="{{ friendly_data | lower }}">
+                                        {{- friendly_data if friendly_data else '-' -}}
+                                    </td>
+                                {% endfor %}
                                 <td class="i-table actions-column hide-if-locked">
                                     <div class="group right entry-action-buttons vertical-aligner">
                                         <a href="#" class="icon-edit i-link highlight js-dialog-action"
@@ -251,7 +259,7 @@
                                            data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                                            data-method="DELETE"
                                            data-href="{{ url_for('.manage_contrib_rest', contrib) }}"></a>
-                                </div>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
