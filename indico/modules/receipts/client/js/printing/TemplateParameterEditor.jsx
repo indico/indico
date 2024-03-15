@@ -18,8 +18,6 @@ export const getDefaultFieldValue = f => {
     return f.attributes.options[f.attributes.default];
   } else if (f.type === 'checkbox') {
     return f.attributes.value || false;
-  } else if (f.type === 'image') {
-    return null;
   } else {
     return f.attributes.value || '';
   }
