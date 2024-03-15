@@ -72,6 +72,7 @@ def serialize_category_atom(category, url, user, event_filter):
     """
     query = (Event.query
              .filter(Event.category_chain_overlaps(category.id),
+                     Event.is_visible_in(category.id),
                      ~Event.is_deleted,
                      event_filter)
              .options(load_only('id', 'category_id', 'start_dt', 'title', 'description', 'protection_mode',

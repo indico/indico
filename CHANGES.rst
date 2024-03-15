@@ -95,6 +95,7 @@ Improvements
 - Add possibility to link room reservations to multiple events, session blocks and contributions
   (:issue:`6113`, :pr:`6114`, thanks :user:`omegak, unconventionaldotdev`)
 - Store editable list filters in the browser's local storage (:pr:`6192`)
+- Take visibility restrictions into account in the atom feed (:pr:`5472`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
