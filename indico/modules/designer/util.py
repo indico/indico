@@ -150,9 +150,10 @@ def get_printable_event_templates(regform):
 
     A template can be used if it is either not linked to anything or linked to the current registation form.
     """
-    return DesignerTemplate.query.with_parent(regform.event).filter(
-        db.or_(
-            DesignerTemplate.registration_form_id.is_(None),
-            DesignerTemplate.registration_form == regform
-        )
-    ).all()
+    return (
+        DesignerTemplate.query
+        .with_parent(regform.event)
+        .filter(db.or_(DesignerTemplate.registration_form_id.is_(None),
+                       DesignerTemplate.registration_form == regform))
+        .all()
+    )
