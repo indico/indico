@@ -128,30 +128,30 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
         setCurrentNoteRevision(resp.data);
       }
     } catch (e) {
-      if (_.get(e, 'response.status') === 418) {
-        // handle note conflict
-        await new Promise(resolve => {
-          injectModal(resolveModal => (
-            <ConflictModal
-              currentNote={currentValue}
-              externalNote={e.response.data.conflict}
-              onClose={() => {
-                resolveModal();
-                resolve();
-              }}
-              setCloseAndReload={setCloseAndReload}
-              overwriteChanges={async () => {
-                handleSubmit({
-                  source: currentValue,
-                  forceRevision: e.response.data.conflict.id,
-                });
-              }}
-            />
-          ));
-        });
-        return;
+      if (_.get(e, 'response.status') !== 418) {
+        return handleSubmitError(e);
       }
-      return handleSubmitError(e);
+      // handle note conflict
+      await new Promise(resolve => {
+        injectModal(resolveModal => (
+          <ConflictModal
+            currentNote={currentValue}
+            externalNote={e.response.data.conflict}
+            onClose={() => {
+              resolve();
+              resolveModal();
+            }}
+            setCloseAndReload={setCloseAndReload}
+            overwriteChanges={async () => {
+              handleSubmit({
+                source: currentValue,
+                forceRevision: e.response.data.conflict.id,
+              });
+            }}
+          />
+        ));
+      });
+      return;
     }
     setCurrentInput(source);
     setSaved(true);
