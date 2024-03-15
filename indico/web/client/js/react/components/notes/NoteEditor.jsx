@@ -25,7 +25,7 @@ import {camelizeKeys} from 'indico/utils/case';
 import {FinalMarkdownEditor} from '../MarkdownEditor';
 import {FinalTinyMCETextEditor} from '../TinyMCETextEditor';
 
-import {NoteConflictModal} from './NoteConflictModal';
+import {ConflictModal} from './ConflictModal';
 
 import 'react-markdown-editor-lite/lib/index.css';
 
@@ -132,7 +132,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
         // handle note conflict
         await new Promise(resolve => {
           injectModal(resolveModal => (
-            <NoteConflictModal
+            <ConflictModal
               currentNote={currentValue}
               externalNote={e.response.data.conflict}
               onClose={() => {

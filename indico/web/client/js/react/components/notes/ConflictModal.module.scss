@@ -9,3 +9,7 @@
   max-height: 60vh;
   overflow-y: scroll;
 }
+
+.action-buttons :global(.icon::before) {
+  margin-right: 0.25em !important;
+}

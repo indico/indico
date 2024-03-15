@@ -21,14 +21,15 @@ import {
   GridColumn,
   List,
   Segment,
+  ButtonGroup,
 } from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 
-import './NoteConflictModal.module.scss';
+import './ConflictModal.module.scss';
 
-export function NoteConflictModal({
+export function ConflictModal({
   currentNote,
   externalNote,
   onClose,
@@ -45,7 +46,7 @@ export function NoteConflictModal({
       <Segment placeholder>
         <Header icon>
           <Icon name="trash outline alternate" />
-          <Translate>This note revision has been deleted.</Translate>
+          <Translate>These minutes have been deleted.</Translate>
         </Header>
       </Segment>
     );
@@ -60,7 +61,6 @@ export function NoteConflictModal({
       }}
       onOpen={() => setOpen(true)}
       size="large"
-      style={{minWidth: '65vw'}}
       closeOnEscape={false}
       closeOnDimmerClick={false}
       closeIcon
@@ -69,44 +69,47 @@ export function NoteConflictModal({
         <Translate>Conflict Detected</Translate>
       </Modal.Header>
       <Modal.Content>
-        <Message warning>
-          <Message.Header>
-            <Translate>This note has been modified by someone else</Translate>
-          </Message.Header>
-          <p>
-            <Translate>
-              This note was last modified on{' '}
-              <Param
-                name="last_modified_dt"
-                value={moment(extNote.createdDt).format('L LTS')}
-                wrapper={<strong />}
-              />{' '}
-              by <Param name="note_author" value={extNote.noteAuthor} wrapper={<strong />} />
-              {'. '}You can either:
-            </Translate>
-          </p>
-          <List style={{marginTop: '0.3rem'}}>
-            <List.Item>
-              <List.Icon name="write" />
-              <List.Content>
-                <Translate>Overwrite the changes made by the other person</Translate>
-              </List.Content>
-            </List.Item>
-            <List.Item>
-              <List.Icon name="trash alternate outline" />
-              <List.Content>
-                <Translate>Discard your changes</Translate>
-              </List.Content>
-            </List.Item>
-            <List.Item>
-              <List.Icon name="cancel" />
-              <List.Content>
-                <Translate>
-                  Close this message and return to the note without resolving the conflict
-                </Translate>
-              </List.Content>
-            </List.Item>
-          </List>
+        <Message warning icon>
+          <Icon name="random" />
+          <Message.Content>
+            <Message.Header>
+              <Translate>There were changes made by someone else</Translate>
+            </Message.Header>
+            <p>
+              <Translate>
+                These minutes was last modified on{' '}
+                <Param
+                  name="last_modified_dt"
+                  value={moment(extNote.createdDt).format('L LTS')}
+                  wrapper={<strong />}
+                />{' '}
+                by <Param name="note_author" value={extNote.noteAuthor} wrapper={<strong />} />
+                {'. '}You can either:
+              </Translate>
+            </p>
+            <List style={{marginTop: '0.3rem'}}>
+              <List.Item>
+                <List.Icon name="write" />
+                <List.Content>
+                  <Translate>Overwrite the changes made by the other person</Translate>
+                </List.Content>
+              </List.Item>
+              <List.Item>
+                <List.Icon name="trash alternate outline" />
+                <List.Content>
+                  <Translate>Discard your changes</Translate>
+                </List.Content>
+              </List.Item>
+              <List.Item>
+                <List.Icon name="cancel" />
+                <List.Content>
+                  <Translate>
+                    Close this message and continue editing without resolving the conflict
+                  </Translate>
+                </List.Content>
+              </List.Item>
+            </List>
+          </Message.Content>
         </Message>
 
         <Grid divided="vertically" celled="internally">
@@ -115,7 +118,7 @@ export function NoteConflictModal({
               <Header
                 as="h3"
                 content={Translate.string('Your changes')}
-                subheader={Translate.string('The changes you made to the note')}
+                subheader={Translate.string('The changes you are attempting to save')}
               />
               <Card raised fluid>
                 <CardContent>
@@ -132,7 +135,7 @@ export function NoteConflictModal({
                 as="h3"
                 content={Translate.string('Changes made by someone else')}
                 subheader={Translate.string(
-                  'The changes made by someone else since you started editing the note'
+                  'The changes made by someone else since you started editing'
                 )}
               />
               {extNote.source ? (
@@ -153,35 +156,50 @@ export function NoteConflictModal({
         </Grid>
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          content={Translate.string('Overwrite changes')}
-          icon="write"
-          labelPosition="left"
-          onClick={async () => {
-            setOpen(false);
-            onClose();
-            overwriteChanges();
-            setCloseAndReload(true);
-          }}
-        />
-        <Button
-          content={Translate.string('Discard changes')}
-          icon="trash alternate outline"
-          labelPosition="right"
-          onClick={() => {
-            setOpen(false);
-            onClose();
-            setCloseAndReload(true);
-          }}
-        />
+        <ButtonGroup styleName="action-buttons">
+          <Button
+            icon
+            color="red"
+            onClick={async () => {
+              await overwriteChanges();
+              setOpen(false);
+              onClose();
+            }}
+          >
+            <Icon name="write" />
+            <Translate>Overwrite their changes</Translate>
+          </Button>
+          <Button
+            icon
+            color="orange"
+            onClick={() => {
+              setOpen(false);
+              onClose();
+              setCloseAndReload(true);
+            }}
+          >
+            <Icon name="trash alternate outline" />
+            <Translate>Discard my changes</Translate>
+          </Button>
+          <Button
+            icon
+            onClick={() => {
+              setOpen(false);
+              onClose();
+            }}
+          >
+            <Icon name="cancel" />
+            <Translate>Go back to the editor</Translate>
+          </Button>
+        </ButtonGroup>
       </Modal.Actions>
     </Modal>
   );
 }
 
-export default NoteConflictModal;
+export default ConflictModal;
 
-NoteConflictModal.propTypes = {
+ConflictModal.propTypes = {
   currentNote: PropTypes.string.isRequired,
   externalNote: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
