@@ -14,7 +14,7 @@ from flask import flash, jsonify, request, session
 from markupsafe import Markup
 from PIL import Image
 from webargs import fields
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
@@ -26,14 +26,17 @@ from indico.modules.designer.forms import AddTemplateForm, CloneTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import (get_all_templates, get_default_badge_on_category,
+from indico.modules.designer.util import (can_link_to_regform, get_all_templates, get_default_badge_on_category,
                                           get_default_ticket_on_category, get_image_placeholder_types,
-                                          get_inherited_templates, get_nested_placeholder_options,
-                                          get_not_deletable_templates, get_placeholder_options)
+                                          get_inherited_templates, get_linkable_regforms,
+                                          get_nested_placeholder_options, get_not_deletable_templates,
+                                          get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
-from indico.modules.events import Event
+from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.util import check_event_locked
+from indico.modules.logs import LogKind
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
@@ -86,8 +89,13 @@ def _render_template_list(target, event=None):
     default_ticket = get_default_ticket_on_category(target) if isinstance(target, Category) else None
     default_badge = get_default_badge_on_category(target) if isinstance(target, Category) else None
     not_deletable = get_not_deletable_templates(target)
-    return tpl.render_template_list(target.designer_templates, target, event=event, default_ticket=default_ticket,
-                                    default_badge=default_badge, inherited_templates=get_inherited_templates(target),
+    linkable_forms = defaultdict(list)
+    for template in target.designer_templates:
+        linkable_forms[template] = get_linkable_regforms(template)
+
+    return tpl.render_template_list(target.designer_templates, target, linkable_forms, event=event,
+                                    default_ticket=default_ticket, default_badge=default_badge,
+                                    inherited_templates=get_inherited_templates(target),
                                     not_deletable_templates=not_deletable)
 
 
@@ -170,8 +178,13 @@ class TemplateListMixin(TargetFromURLMixin):
         default_badge = get_default_badge_on_category(self.target) if isinstance(self.target, Category) else None
         signals.event.filter_selectable_badges.send(type(self), badge_templates=templates)
         signals.event.filter_selectable_badges.send(type(self), badge_templates=not_deletable)
+        linkable_forms = defaultdict(list)
+        for template in self.target.designer_templates:
+            linkable_forms[template] = get_linkable_regforms(template)
+
         return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
-                                     default_ticket=default_ticket, default_badge=default_badge)
+                                     default_ticket=default_ticket, default_badge=default_badge,
+                                     linkable_forms=linkable_forms)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
@@ -199,6 +212,9 @@ class CloneTemplateMixin(TargetFromURLMixin):
                 new_image.save(f)
             image_item['image_id'] = new_image.id
         new_template.data = data
+
+        if self.template.registration_form:
+            new_template.link_regform(self.template.registration_form)
 
         if self.template.background_image:
             background = self.template.background_image
@@ -312,9 +328,10 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         related_tpls_per_owner = defaultdict(list)
         for bs_tpl in backside_templates:
             related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
+        placeholders = get_nested_placeholder_options(regform=self.template.registration_form)
         return self._render_template('template.html', template=self.template,
-                                     placeholders=get_nested_placeholder_options(),
-                                     image_types=get_image_placeholder_types(),
+                                     placeholders=placeholders,
+                                     image_types=get_image_placeholder_types(self.template.registration_form),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
                                      template_data=template_data, backside_template_data=backside_template_data,
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
@@ -322,7 +339,8 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
-        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options())
+        placeholders = set(get_placeholder_options(regform=self.template.registration_form))
+        invalid_placeholders = {x['type'] for x in data['items']} - placeholders
         if invalid_placeholders:
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
@@ -338,6 +356,51 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                         clear_background=request.json['clear_background'])
         flash(_('Template successfully saved.'), 'success')
         return jsonify_data()
+
+
+class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.template,
+            lambda self: self.regform
+        }
+    }
+
+    def _process_args(self):
+        RHModifyDesignerTemplateBase._process_args(self)
+        regform_id = request.view_args['reg_form_id']
+        self.regform = (RegistrationForm.query
+                        .with_parent(self.template.event)
+                        .filter_by(id=regform_id, is_deleted=False)
+                        .first_or_404())
+
+    def _process(self):
+        if not can_link_to_regform(self.template, self.regform):
+            raise BadRequest('Cannot link to the specified registration form.')
+
+        self.template.link_regform(self.regform)
+        self.template.event.log(EventLogRealm.event, LogKind.positive, 'Designer',
+                                'Badge template linked to registration form', session.user,
+                                data={'Template': self.template.title, 'Registration Form': self.regform.title})
+        flash(_('Template successfully linked.'), 'success')
+        return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
+
+
+class RHUnlinkDesignerTemplate(RHModifyDesignerTemplateBase):
+    def _process(self):
+        regform = self.template.registration_form
+        if not regform:
+            raise BadRequest('This template is not linked to any registration form.')
+        if not self.template.is_unlinkable:
+            raise BadRequest('This template cannot be unlinked because it contains '
+                             'placeholders referencing the linked registration form.')
+
+        self.template.unlink_regform()
+        self.template.event.log(EventLogRealm.event, LogKind.negative, 'Designer',
+                                'Badge template unlinked from registration form', session.user,
+                                data={'Template': self.template.title, 'Registration Form': regform.title})
+        flash(_('Template successfully unlinked.'), 'success')
+        return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
 
 class RHDownloadTemplateImage(BacksideTemplateProtectionMixin, RHModifyDesignerTemplateBase):

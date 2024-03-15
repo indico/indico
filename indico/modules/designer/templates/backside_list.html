@@ -1,15 +1,19 @@
 {% extends 'layout/dialog_base.html' %}
 
-{% macro _render_template_list(templates) %}
+{% macro _render_template_list(templates, current_template) %}
     {% if templates %}
         <div class="i-box just-group-list">
             <div class="i-box-content">
                 <ul class="group-list no-content-before badge-backside-list">
                     {% for tpl in templates | sort(attribute='title') %}
                         {% set different_size = tpl.data.width != width or tpl.data.height != height %}
+                        {% set linked_to_same_regform = not tpl.registration_form or not current_template.registration_form or tpl.registration_form == current_template.registration_form %}
                         <li {% if different_size %}
                                 class="not-selectable-backside"
                                 title="{% trans %}This template has different dimension than your template{% endtrans %}"
+                            {% elif not linked_to_same_regform %}
+                                class="not-selectable-backside"
+                                title="{% trans %}This template is already linked to a different registration form{% endtrans %}"
                             {% endif %}>
                             <a class="backside-template" data-href="{{ url_for('.get_template_data', tpl) }}">
                                 <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
@@ -38,11 +42,11 @@
 {% block content %}
     <section>
         <h3>{% trans %}Inherited templates{% endtrans %}</h3>
-        {{ _render_template_list(inherited_templates) }}
+        {{ _render_template_list(inherited_templates, current_template) }}
     </section>
     <section class="custom-template-list">
         <h3>{% trans %}Custom templates{% endtrans %}</h3>
-        {{ _render_template_list(custom_templates) }}
+        {{ _render_template_list(custom_templates, current_template) }}
     </section>
 
     <script>

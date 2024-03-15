@@ -15,6 +15,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.modules.designer.pdf import DesignerPDFBase
+from indico.modules.designer.util import is_regform_field_placeholder
 from indico.modules.events.registration.settings import DEFAULT_BADGE_SETTINGS
 from indico.util.i18n import _
 from indico.util.placeholders import get_placeholders
@@ -73,6 +74,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         config = self.config
         badge_rect = (pos_x, self.height - pos_y - tpl_data.height_cm * cm,
                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)
+        registration = person['registration']
+        regform = registration.registration_form
 
         if config.dashed_border:
             canvas.saveState()
@@ -92,7 +95,14 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                                                          item['type'] not in image_placeholders))
 
         for item in items:
-            placeholder = placeholders.get(item['type'])
+            if is_regform_field_placeholder(item):
+                from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
+                placeholder = RegistrationFormFieldPlaceholder.from_designer_item(regform, item)
+                if placeholder is None:
+                    # the regform field referenced by the designer item does not exist
+                    continue
+            else:
+                placeholder = placeholders.get(item['type'])
 
             if placeholder:
                 if placeholder.group == 'registrant':
@@ -106,6 +116,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                     text = placeholder.render(person['registration'].event)
                 elif placeholder.group == 'fixed':
                     text = placeholder.render(item)
+                elif placeholder.group == 'regform_fields':
+                    text = placeholder.render(person['registration'])
                 else:
                     raise ValueError(f'Unknown placeholder group: `{placeholder.group}`')
             else:

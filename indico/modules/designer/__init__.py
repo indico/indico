@@ -69,7 +69,7 @@ DEFAULT_CONFIG = {
     TemplateType.poster: {
         'tpl_size': [1050, 1484],  # A4 50 px/cm
         'zoom_factor': 0.5,
-        'disallow_groups': ('registrant',)
+        'disallow_groups': ('registrant', 'regform_fields')
     },
     TemplateType.badge: {
         'tpl_size': [425, 270],  # A4 50 px/cm
@@ -80,12 +80,20 @@ DEFAULT_CONFIG = {
 
 
 @signals.core.get_placeholders.connect_via('designer-fields')
-def _get_notification_placeholders(sender, **kwargs):
+def _get_designer_placeholders(sender, regform=None, **kwargs):
     from indico.modules.designer import placeholders
     for name in placeholders.__all__:
         obj = getattr(placeholders, name)
         if isinstance(obj, type) and issubclass(obj, placeholders.DesignerPlaceholder) and hasattr(obj, 'name'):
             yield obj
+
+    if regform:
+        from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
+        from indico.modules.events.registration.models.items import RegistrationFormItemType
+        for field in regform.active_fields:
+            # Personal data fields are already included in the 'registrant' group
+            if field.type != RegistrationFormItemType.field_pd:
+                yield RegistrationFormFieldPlaceholder(field=field)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

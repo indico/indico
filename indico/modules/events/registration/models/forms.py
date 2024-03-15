@@ -341,6 +341,7 @@ class RegistrationForm(db.Model):
     )
 
     # relationship backrefs:
+    # - designer_templates (DesignerTemplate.registration_form)
     # - in_attachment_acls (AttachmentPrincipal.registration_form)
     # - in_attachment_folder_acls (AttachmentFolderPrincipal.registration_form)
     # - in_contribution_acls (ContributionPrincipal.registration_form)

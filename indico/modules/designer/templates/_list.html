@@ -1,3 +1,11 @@
+{% macro _render_link_regform_button(regform, tpl) %}
+    <a data-href="{{ url_for('designer.link_regform', regform, template_id=tpl.id) }}"
+       data-method="POST"
+       data-update="#template-list">
+        {{ regform.title }}
+    </a>
+{% endmacro %}
+
 {% macro _render_badge_form_button(regform, tpl, format='text', text='') %}
     {% set no_registrations = not regform.registrations|rejectattr('is_deleted')|list %}
     {% set no_registrations_msg %}
@@ -41,7 +49,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_template(tpl, target, inherited=false, event=none, default_ticket=none, default_badge=none,
+{% macro _render_template(tpl, target, linkable_forms, inherited=false, event=none, default_ticket=none, default_badge=none,
                           not_deletable_templates=[]) -%}
     <tr>
         <td class="i-table id-column">
@@ -60,9 +68,46 @@
                 {% endif %}
             {% endif %}
         </td>
+        <td class="flexrow f-a-center">
+            {% if tpl.registration_form %}
+                <span>
+                    {{- pgettext('Designer template linked to registration form', 'Linked to') -}}
+                    <a href="{{ url_for('event_registration.manage_regform', tpl.registration_form) }}">
+                        {{ tpl.registration_form.title }}
+                    </a>
+                </span>
+                {% set unlinkable = tpl.is_unlinkable %}
+                <button class="i-button icon-cross icon-only text-color borderless danger {{ 'not-unlinkable' if not unlinkable }}"
+                        style="padding-left: 0.2em;"
+                        {% if unlinkable %}
+                            title="{% trans %}Unlink registration form{% endtrans %}"
+                            data-href="{{ url_for('.unlink_regform', tpl) }}"
+                            data-method="POST"
+                            data-update="#template-list"
+                        {% else %}
+                            title="{% trans %}This template cannot be unlinked because it contains placeholders referencing the linked registration form.{% endtrans %}"
+                        {% endif %}>
+                </button>
+            {% endif %}
+        </td>
         <td>
             <div class="thin toolbar right">
                 <div class="group">
+                    {% if not tpl.registration_form and linkable_forms[tpl] %}
+                        <button class="i-button icon-quill icon-only highlight text-color js-dropdown borderless"
+                                title="{% trans %}
+                                            Link to a registration form. This will enable you to use all
+                                            registration form fields in the template.
+                                       {% endtrans %}"
+                                data-toggle="dropdown"></button>
+                        <ul class="i-dropdown">
+                            {% for regform in linkable_forms[tpl] %}
+                                <li>
+                                    {{ _render_link_regform_button(regform, tpl) }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                     {% if not event and tpl.type.name == 'badge' and tpl.is_ticket %}
                         {% set inherited_default = default_ticket == tpl and tpl.category != target and
                                 not target.default_ticket_template %}
@@ -156,7 +201,8 @@
                                 data-ajax-dialog>
                         </button>
                     {% elif event %}
-                        {% set single_form = event.registration_forms|first if event.registration_forms|length == 1 %}
+                        {% set single_form = event.registration_forms|first if event.registration_forms|length == 1
+                                             else tpl.registration_form %}
                         {% if single_form %}
                             {{ _render_badge_form_button(single_form, tpl, format='icon') }}
                         {% else %}
@@ -187,7 +233,7 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_ticket=none,
+{% macro render_template_list(templates, target, linkable_forms, inherited_templates=[], event=none, default_ticket=none,
                               default_badge=none, not_deletable_templates=[]) -%}
     {% if inherited_templates %}
         <section>
@@ -195,7 +241,7 @@
             <table class="i-table-widget">
                 <tbody>
                     {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, inherited=true, event=event,
+                        {{ _render_template(tpl, target, linkable_forms, inherited=true, event=event,
                                             default_ticket=default_ticket, default_badge=default_badge,
                                             not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
@@ -219,7 +265,7 @@
             <table class="i-table-widget">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, event=event, default_ticket=default_ticket,
+                        {{ _render_template(tpl, target, linkable_forms, event=event, default_ticket=default_ticket,
                                             default_badge=default_badge,
                                             not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}

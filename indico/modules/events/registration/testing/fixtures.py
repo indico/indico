@@ -15,17 +15,26 @@ from indico.modules.events.registration.util import create_personal_data_fields
 
 
 @pytest.fixture
-def dummy_regform(db, dummy_event):
-    """Create a dummy registration form for the dummy event."""
-    regform = RegistrationForm(id=420, event=dummy_event, title='Registration Form', currency='USD')
-    create_personal_data_fields(regform)
+def create_regform(db):
+    """Return a callable that lets you create a registration form."""
+    def _create_regform(event, title='Registration Form', currency='USD', **kwargs):
+        regform = RegistrationForm(event=event, title=title, currency=currency, **kwargs)
+        create_personal_data_fields(regform)
 
-    # enable all fields
-    for field in regform.sections[0].fields:
-        field.is_enabled = True
-    db.session.add(regform)
-    db.session.flush()
-    return regform
+        # enable all fields
+        for field in regform.sections[0].fields:
+            field.is_enabled = True
+        db.session.add(regform)
+        db.session.flush()
+        return regform
+
+    return _create_regform
+
+
+@pytest.fixture
+def dummy_regform(db, dummy_event, create_regform):
+    """Create a dummy registration form for the dummy event."""
+    return create_regform(dummy_event, id=420)
 
 
 @pytest.fixture

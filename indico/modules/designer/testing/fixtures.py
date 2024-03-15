@@ -23,8 +23,9 @@ DUMMY_BMP_IMAGE = (b'BM\x1e\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x0c\x00'
 
 @pytest.fixture
 def create_dummy_designer_template(db):
-    def _create(event, title, type, data=DEFAULT_TICKET_DATA, **kwargs):
-        template = DesignerTemplate(event=event, title='Default ticket', type=TemplateType.badge, data=data, **kwargs)
+    def _create(title, *, event=None, category=None, type=TemplateType.badge, data=DEFAULT_TICKET_DATA, **kwargs):
+        assert event or category
+        template = DesignerTemplate(title=title, event=event, category=category, type=type, data=data, **kwargs)
         db.session.flush()
         return template
     return _create
@@ -32,7 +33,7 @@ def create_dummy_designer_template(db):
 
 @pytest.fixture
 def dummy_designer_template(dummy_event, create_dummy_designer_template):
-    return create_dummy_designer_template(dummy_event, 'Default ticket', TemplateType.badge)
+    return create_dummy_designer_template('Default ticket', event=dummy_event, type=TemplateType.badge)
 
 
 @pytest.fixture

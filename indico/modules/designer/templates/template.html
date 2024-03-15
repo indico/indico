@@ -342,7 +342,7 @@
                 <div class="flexrow f-a-baseline">
                     <label for="element-list">{% trans %}Insert element:{% endtrans %}</label>
                     <select id="element-list">
-                        {% for group_id, group in placeholders.items() | sort(attribute='1.title') %}
+                        {% for group_id, group in placeholders.items() | sort(attribute='1.position') %}
                             {% if group_id not in config.disallow_groups %}
                                 <optgroup label="{{ group.title }}">
                                     {% for option_id, option in group.options|dictsort(by='value') %}
