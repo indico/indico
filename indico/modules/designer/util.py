@@ -121,12 +121,8 @@ def get_linkable_regforms(template):
     if template.category or template.type == TemplateType.poster or template.registration_form:
         return []
 
-    query = RegistrationForm.query.with_parent(template.event).filter(
-        ~RegistrationForm.is_deleted,
-    )
-
     return [
-        regform for regform in query
+        regform for regform in template.event.registration_forms
         if (  # If the template has a backside, the backside must be linked to the same regform
             template.backside_template is None
             or template.backside_template.registration_form is None
