@@ -8,6 +8,7 @@
 import * as FinalForm from 'final-form';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
+import * as ReactDnd from 'react-dnd';
 import * as ReactDom from 'react-dom';
 import * as ReactFinalForm from 'react-final-form';
 import * as ReactRedux from 'react-redux';
@@ -30,6 +31,7 @@ import * as IndicoUtilsPlugins from 'indico/utils/plugins';
 
 // exports for plugins
 window._IndicoCoreReact = React;
+window._IndicoCoreReactDnd = ReactDnd;
 window._IndicoCoreReactDom = ReactDom;
 window._IndicoCorePropTypes = PropTypes;
 window._IndicoCoreReactRedux = ReactRedux;

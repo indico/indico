@@ -22,10 +22,6 @@
     font-size: 0.8em;
 
     .text {
-      @include ellipsis();
-
-      display: inline-block;
-      max-width: 10em;
       vertical-align: bottom;
     }
   }

@@ -138,6 +138,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
         changes.update(set_custom_fields(abstract, custom_fields_data))
     abstract.modified_dt = now_utc()
     db.session.flush()
+    signals.event.abstract_updated.send(abstract)
     logger.info('Abstract %s modified by %s', abstract, session.user)
     log_fields = {
         'title': 'Title',
@@ -220,6 +221,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
             abstract.accepted_contrib_type = abstract.submitted_contrib_type
         if not abstract.contribution:
             abstract.contribution = create_contribution_from_abstract(abstract, contrib_session)
+            signals.event.abstract_accepted.send(abstract, contribution=abstract.contribution)
         if abstract.accepted_track:
             log_data['Track'] = abstract.accepted_track.title
         if abstract.accepted_contrib_type:

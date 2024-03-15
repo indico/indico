@@ -33,6 +33,7 @@
             nameFormat: {{ field.name_format.name | tojson }},
             sessionUser: Indico.User,
             validateEmailUrl: {{ field.validate_email_url | tojson }},
+            extraParams: {{ field.extra_params | tojson }},
         });
     </script>
 {% endblock %}

@@ -27,6 +27,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import MultipleItemsField
 from indico.web.forms.fields.principals import PrincipalListField
@@ -124,10 +125,16 @@ class PersonLinkListFieldBase(PrincipalListField):
     def validate_email_url(self):
         return url_for('events.check_email', self.object) if self.object else None
 
+    @property
+    def extra_params(self):
+        values = values_from_signal(signals.event.person_link_field_extra_params.send(self), as_list=True)
+        return {k: v for d in values for k, v in d.items()}
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         identifier = data.get('identifier')
+        affiliations_disabled = self.extra_params.get('disable_affiliations', False)
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
         if not self.can_enter_manually and not data.get('type'):
             raise UserValueError('Manually entered persons are not allowed')
@@ -142,11 +149,14 @@ class PersonLinkListFieldBase(PrincipalListField):
                 data['_title'] = UserTitle.none
                 data['affiliation_link'] = None
             if (
+                not affiliations_disabled and
                 (affiliation_data := external_user_data.get('affiliation_data')) and
                 data['affiliation'] == affiliation_data['name']
             ):
                 data['affiliation_link'] = Affiliation.get_or_create_from_data(affiliation_data)
                 data['affiliation'] = data['affiliation_link'].name
+        if not self.has_predefined_affiliations or affiliations_disabled:
+            data['affiliation_link'] = None
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
                                   allow_external=True)
         person_link = None

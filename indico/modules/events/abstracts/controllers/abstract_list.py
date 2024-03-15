@@ -227,7 +227,7 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
         def _get_or_create_person_dict(person):
             person_dict = abstract_persons_dict[person.identifier]
             person_dict['identifier'] = person.identifier
-            person_dict['full_name'] = person.full_name
+            person_dict['full_name'] = person.display_full_name
             person_dict['email'] = person.email
             person_dict['affiliation'] = person.affiliation
             return person_dict
