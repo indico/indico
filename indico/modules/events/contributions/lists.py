@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.fields import ContributionFieldValue
+from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.models.forms import RegistrationForm
@@ -30,12 +30,13 @@ class ContributionListGenerator(ListGeneratorBase):
     endpoint = '.manage_contributions'
     list_link_type = 'contribution'
     check_access = False
+    show_custom_fields = True
 
     def __init__(self, event):
         super().__init__(event)
         self.default_list_config = {
             'items': (),
-            'filters': {'fields': {}, 'items': {}}
+            'filters': {'fields': {}, 'items': {}, 'extra': {}},
         }
 
         session_empty = {None: _('No session')}
@@ -53,17 +54,40 @@ class ContributionListGenerator(ListGeneratorBase):
                      'filter_choices': type_empty | type_choices},
             'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
                                                                 'unscheduled': _('Not scheduled')}},
+        }
+
+        self.list_config = self._get_config()
+        self.extra_filters = {
             'people': {'title': _('People'), 'filter_choices': {'registered': _('Registered'),
                                                                 'not_registered': _('Nobody registered')}},
             'speakers': {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
                                                                     'not_registered': _('Nobody registered')}},
         }
 
-        self.list_config = self._get_config()
+    def _get_static_columns(self, ids):
+        """
+        Retrieve information needed for the header of the static columns.
 
-    def get_all_contribution_fields(self):
+        :return: a list of {'id': ..., 'caption': ...} dicts
+        """
+        return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in self.static_items if id_ in ids]
+
+    def get_all_custom_fields(self):
         """Return the list of contribution fields for the event."""
-        return self.event.contribution_fields.all()
+        return self.event.contribution_fields.all() if self.show_custom_fields else []
+
+    def _get_sorted_custom_fields(self, item_ids):
+        """
+        Return the contribution fields ordered by their position in
+        the abstract form.
+        """
+        if not item_ids or not self.show_custom_fields:
+            return []
+        return (ContributionField.query
+                .with_parent(self.event)
+                .filter(ContributionField.id.in_(item_ids))
+                .order_by(ContributionField.position)
+                .all())
 
     def _get_filters_from_request(self):
         filters = super()._get_filters_from_request()
@@ -110,8 +134,9 @@ class ContributionListGenerator(ListGeneratorBase):
         criteria = []
         field_filters = filters.get('fields')
         item_filters = filters.get('items')
+        extra_filters = filters.get('extra')
 
-        if not (field_filters or item_filters):
+        if not (field_filters or item_filters or extra_filters):
             return query
 
         if field_filters:
@@ -139,27 +164,6 @@ class ContributionListGenerator(ListGeneratorBase):
                 if status_criteria:
                     criteria.append(db.or_(*status_criteria))
 
-            if 'people' in filters['items']:
-                filtered_people = filters['items'].get('people')
-                contrib_query = self._build_registration_query()
-                people_criteria = []
-                if 'registered' in filtered_people:
-                    people_criteria.append(Contribution.id.in_(contrib_query))
-                if 'not_registered' in filtered_people:
-                    people_criteria.append(~Contribution.id.in_(contrib_query))
-                if people_criteria:
-                    criteria.append(db.or_(*people_criteria))
-            if 'speakers' in filters['items']:
-                filtered_people = filters['items'].get('speakers')
-                contrib_query = self._build_registration_query(is_speaker=True)
-                people_criteria = []
-                if 'registered' in filtered_people:
-                    people_criteria.append(Contribution.id.in_(contrib_query))
-                if 'not_registered' in filtered_people:
-                    people_criteria.append(~Contribution.id.in_(contrib_query))
-                if people_criteria:
-                    criteria.append(db.or_(*people_criteria))
-
             filter_cols = {'session': Contribution.session_id,
                            'track': Contribution.track_id,
                            'type': Contribution.type_id}
@@ -174,15 +178,38 @@ class ContributionListGenerator(ListGeneratorBase):
                     column_criteria.append(column.in_(ids - {None}))
                 criteria.append(db.or_(*column_criteria))
 
+        if extra_filters:
+            if 'people' in filters['extra']:
+                filtered_people = filters['extra'].get('people')
+                contrib_query = self._build_registration_query()
+                people_criteria = []
+                if 'registered' in filtered_people:
+                    people_criteria.append(Contribution.id.in_(contrib_query))
+                if 'not_registered' in filtered_people:
+                    people_criteria.append(~Contribution.id.in_(contrib_query))
+                if people_criteria:
+                    criteria.append(db.or_(*people_criteria))
+            if 'speakers' in filters['extra']:
+                filtered_people = filters['extra'].get('speakers')
+                contrib_query = self._build_registration_query(is_speaker=True)
+                people_criteria = []
+                if 'registered' in filtered_people:
+                    people_criteria.append(Contribution.id.in_(contrib_query))
+                if 'not_registered' in filtered_people:
+                    people_criteria.append(~Contribution.id.in_(contrib_query))
+                if people_criteria:
+                    criteria.append(db.or_(*people_criteria))
+
         return query.filter(*criteria)
 
     def get_list_kwargs(self):
         if self.check_access:
             self.event.preload_all_acl_entries()
+        list_config = self._get_config()
         contributions_query = self._build_query()
         total_entries = (sum(1 for c in contributions_query if c.can_access(session.user)) if self.check_access else
                          contributions_query.count())
-        contributions = [c for c in self._filter_list_entries(contributions_query, self.list_config['filters'])
+        contributions = [c for c in self._filter_list_entries(contributions_query, list_config['filters'])
                          if not self.check_access or c.can_access(session.user)]
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
         tracks = [{'id': int(t.id), 'title': t.title_with_group} for t in self.event.tracks]
@@ -191,10 +218,14 @@ class ContributionListGenerator(ListGeneratorBase):
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
         registered_persons = get_registered_event_persons(self.event)
-        contrib_fields = self.get_all_contribution_fields()
+        contrib_fields = self.get_all_custom_fields()
+        dynamic_item_ids, static_item_ids = self._split_item_ids(list_config.get('items', ()), 'dynamic')
+        static_columns = self._get_static_columns(static_item_ids)
+        dynamic_columns = self._get_sorted_custom_fields(dynamic_item_ids)
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration, 'selected_entry': selected_entry,
-                'registered_persons': registered_persons, 'contrib_fields': contrib_fields}
+                'registered_persons': registered_persons, 'contrib_fields': contrib_fields,
+                'static_columns': static_columns, 'dynamic_columns': dynamic_columns}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.

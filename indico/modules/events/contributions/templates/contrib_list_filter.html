@@ -1,11 +1,16 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false) %}
+{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false, clickable=true) %}
     {% set filters = filters['items'] if is_static_item else filters['fields'] %}
     <div class="label-group list-column">
-        <div class="i-label title-wrapper"
+        <div class="i-label {% if clickable %}title-wrapper{% endif %}"
              data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
             <div class="title">{{ item.title }}</div>
+            {% if clickable %}
+                <div class="actions">
+                    <span class="visibility icon-eye"></span>
+                </div>
+            {% endif %}
         </div>
         {% if filter_choices %}
             <div class="i-label filter">
@@ -40,6 +45,12 @@
             </div>
         </div>
         <div class="toolbar">
+            <button class="i-button icon-checkbox-checked arrow left icon-only"
+                    aria-hidden="true" data-toggle="dropdown"></button>
+            <ul class="i-dropdown">
+                <li><a href="#" id="list-filter-select-all">{% trans %}All{% endtrans %}</a></li>
+                <li><a href="#" id="list-filter-select-none">{% trans %}None{% endtrans %}</a></li>
+            </ul>
             <button class="i-button js-reset-btn icon-close warning" type="button">
                 {%- trans %}Clear filters{% endtrans -%}
             </button>
@@ -53,6 +64,8 @@
 </div>
 <form class="list-filter" method="POST">
     <div class="list-filter-content">
+    <input id="visible-items" type="hidden" name="visible_items"
+        value="{{ visible_items | tojson | forceescape }}">
         <h3>{% trans %}Available filtering options{% endtrans %}</h3>
         <div class="flexrow f-wrap">
             {% for item_id, item in static_items.items() %}
@@ -65,6 +78,16 @@
             <div class="flexrow f-wrap">
                 {% for field in contrib_fields %}
                     {{ _render_column_selector(field.id, field, field.filter_choices) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if extra_filters %}
+            <h3>{% trans %}Extra filters{% endtrans %}</h3>
+            <div class="flexrow f-wrap">
+                {% for item_id, item in extra_filters.items() %}
+                    {% set filter_choices = item.get('filter_choices') %}
+                    {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, clickable=false) }}
                 {% endfor %}
             </div>
         {% endif %}

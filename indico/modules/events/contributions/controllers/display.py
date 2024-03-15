@@ -265,7 +265,7 @@ class RHContributionListFilter(RHContributionList):
         return jsonify_template('events/contributions/contrib_list_filter.html',
                                 filters=self.list_generator.list_config['filters'],
                                 static_items=self.list_generator.static_items,
-                                contrib_fields=self.list_generator.get_all_contribution_fields())
+                                contrib_fields=self.list_generator.get_all_custom_fields())
 
     def _process_POST(self):
         self.list_generator.store_configuration()
