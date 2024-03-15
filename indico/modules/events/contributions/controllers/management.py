@@ -162,11 +162,13 @@ class RHContributionListCustomize(RHManageContributionsBase):
     ALLOW_LOCKED = True
 
     def _process_GET(self):
-        print(self.list_generator.list_config['filters'])
+        list_config = self.list_generator._get_config()
         return jsonify_template('events/contributions/contrib_list_filter.html',
+                                visible_items=list_config.get('items', ()),
                                 filters=self.list_generator.list_config['filters'],
                                 static_items=self.list_generator.static_items,
-                                contrib_fields=self.list_generator.get_all_contribution_fields())
+                                contrib_fields=self.list_generator.get_all_custom_fields(),
+                                extra_filters=self.list_generator.extra_filters)
 
     def _process_POST(self):
         self.list_generator.store_configuration()

@@ -2,7 +2,7 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, contrib_fields) %}
+{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, contrib_fields, static_columns, dynamic_columns) %}
     {% if contribs %}
         {% set has_codes = contribs|selectattr('code')|any %}
         {% set has_types = contribs|selectattr('type')|any %}
@@ -35,25 +35,14 @@
                                     {% trans %}Code{% endtrans %}
                                 </th>
                             {% endif %}
-                            {% if has_types %}
-                                <th class="i-table type-column">
-                                    {% trans %}Type{% endtrans %}
-                                </th>
-                            {% endif %}
                             <th class="i-table">
                                 {% trans %}Subcontributions{% endtrans %}
                             </th>
-                            <th class="i-table">
-                                {% trans %}Session{% endtrans %}
-                            </th>
-                            <th class="i-table">
-                                {% trans %}Track{% endtrans %}
-                            </th>
-                            <th class="i-table material-column">
-                                {% trans %}Material{% endtrans %}
-                            </th>
-                            {% for field in contrib_fields %}
-                                <th class="i-table">{{ field.title }}</th>
+                            {% for item in static_columns if item.id != 'description' %}
+                                <th class="i-table" data-sorter="text">{{ item.caption }}</th>
+                            {% endfor %}
+                            {% for item in dynamic_columns %}
+                                <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
                             <th class="actions-column hide-if-locked" data-sorter="false">
                                 {# Actions #}
@@ -160,17 +149,6 @@
                                         </span>
                                     </td>
                                 {% endif %}
-                                {% if has_types %}
-                                    <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
-                                        <span class="vertical-aligner">
-                                            {% if contrib.type -%}
-                                                {{ contrib.type.name }}
-                                            {%- else %}
-                                                {% trans %}n/a{% endtrans %}
-                                            {%- endif %}
-                                        </span>
-                                    </td>
-                                {% endif %}
                                 <td class="i-table" data-text="{{ contrib.subcontribution_count }}">
                                     <a href="#" class="i-label subcontribution-count"
                                        title="{% trans %}Manage subcontributions{% endtrans %}"
@@ -185,52 +163,97 @@
                                         </span>
                                     </a>
                                 </td>
-                                <td class="i-table">
-                                    <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
-                                            style="{{ contrib.session.colors.css if contrib.session }}"
-                                            data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                            data-method="PATCH"
-                                            data-contrib-id="{{ contrib.id }}"
-                                            data-selected-item-id="{{ contrib.session.id or None | tojson }}">
-                                        <span class="label">
-                                            {% if contrib.session %}
-                                                {% trans title=contrib.session.title -%}
-                                                    {{ title }}
-                                                {%- endtrans %}
-                                            {% else %}
-                                                {%- trans %}No session{% endtrans -%}
-                                            {% endif %}
-                                        </span>
-                                        {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                    </button>
-                                </td>
-                                <td class="i-table">
-                                    <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
-                                            data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                            data-method="PATCH"
-                                            data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
-                                        <span class="label">
-                                            {% if contrib.track %}
-                                                {% if contrib.track.track_group %}
-                                                    {{ contrib.track.track_group.title | truncate(9, true, '…') }}:
-                                                {% endif %}
-                                                {{ contrib.track.title }}
-                                            {% else %}
-                                                {% trans %}No track{% endtrans %}
-                                            {% endif %}
-                                        </span>
-                                        {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                    </button>
-                                </td>
-                                {{ render_attachment_info(contrib) }}
+                                {% for item in static_columns %}
+                                    {% if item.id == 'session' %}
+                                        <td class="i-table">
+                                            <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
+                                                    style="{{ contrib.session.colors.css if contrib.session }}"
+                                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                                    data-method="PATCH"
+                                                    data-contrib-id="{{ contrib.id }}"
+                                                    data-selected-item-id="{{ contrib.session.id or None | tojson }}">
+                                                <span class="label">
+                                                    {% if contrib.session %}
+                                                        {% trans title=contrib.session.title -%}
+                                                            {{ title }}
+                                                        {%- endtrans %}
+                                                    {% else %}
+                                                        {%- trans %}No session{% endtrans -%}
+                                                    {% endif %}
+                                                </span>
+                                                {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
+                                            </button>
+                                        </td>
+                                    {% elif item.id == 'track' %}
+                                        <td class="i-table">
+                                            <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
+                                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                                    data-method="PATCH"
+                                                    data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
+                                                <span class="label">
+                                                    {% if contrib.track %}
+                                                        {% if contrib.track.track_group %}
+                                                            {{ contrib.track.track_group.title | truncate(9, true, '…') }}:
+                                                        {% endif %}
+                                                        {{ contrib.track.title }}
+                                                    {% else %}
+                                                        {% trans %}No track{% endtrans %}
+                                                    {% endif %}
+                                                </span>
+                                                {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
+                                            </button>
+                                        </td>
+                                    {% elif item.id == 'type' %}
+                                        <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if contrib.type -%}
+                                                    {{ contrib.type.name }}
+                                                {%- else %}
+                                                    {% trans %}n/a{% endtrans %}
+                                                {%- endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'status' %}
+                                        <td class="i-table type-column" data-text="{{ 'scheduled' if contrib.is_scheduled else 'not-scheduled' }}">
+                                            <span class="vertical-aligner">
+                                                {% if contrib.is_scheduled -%}
+                                                    {% trans %}Scheduled{% endtrans %}
+                                                {%- else %}
+                                                    {% trans %}Not scheduled{% endtrans %}
+                                                {%- endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'people' %}
+                                        <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if contrib.type -%}
+                                                    {{ contrib.type.name }}
+                                                {%- else %}
+                                                    {% trans %}n/a{% endtrans %}
+                                                {%- endif %}
+                                            </span>
+                                        </td>
+                                    {% elif item.id == 'speakers' %}
+                                        <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                                            <span class="vertical-aligner">
+                                                {% if contrib.type -%}
+                                                    {{ contrib.type.name }}
+                                                {%- else %}
+                                                    {% trans %}n/a{% endtrans %}
+                                                {%- endif %}
+                                            </span>
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
                                 {% set data = contrib.data_by_field %}
-                                {% for field in contrib_fields %}
-                                    {% set friendly_data = data[field.id].friendly_data if field.id in data else '' %}
+                                {% for item in dynamic_columns %}
+                                    {% set friendly_data = data[item.id].friendly_data if item.id in data else '' %}
                                     <td class="i-table" data-text="{{ friendly_data }}"
                                         data-searchable="{{ friendly_data | lower }}">
                                         {{- friendly_data if friendly_data else '-' -}}
                                     </td>
                                 {% endfor %}
+                                {{ render_attachment_info(contrib) }}
                                 <td class="i-table actions-column hide-if-locked">
                                     <div class="group right entry-action-buttons vertical-aligner">
                                         <a href="#" class="icon-edit i-link highlight js-dialog-action"
