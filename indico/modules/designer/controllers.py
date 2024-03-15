@@ -14,7 +14,7 @@ from flask import flash, jsonify, request, session
 from markupsafe import Markup
 from PIL import Image
 from webargs import fields
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
@@ -376,7 +376,7 @@ class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
 
     def _process(self):
         if not can_link_to_regform(self.template, self.regform):
-            raise ValueError('Cannot link to the specified registration form.')
+            raise BadRequest('Cannot link to the specified registration form.')
 
         self.template.link_regform(self.regform)
         self.template.event.log(EventLogRealm.event, LogKind.positive, 'Designer',
@@ -390,9 +390,9 @@ class RHUnlinkDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
         regform = self.template.registration_form
         if not regform:
-            raise ValueError('This template is not linked to any registration form.')
+            raise BadRequest('This template is not linked to any registration form.')
         if not self.template.is_unlinkable:
-            raise ValueError('This template cannot be unlinked because it contains '
+            raise BadRequest('This template cannot be unlinked because it contains '
                              'placeholders referencing the linked registration form.')
 
         self.template.unlink_regform()
