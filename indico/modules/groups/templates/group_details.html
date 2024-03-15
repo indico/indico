@@ -1,5 +1,6 @@
 {% extends 'layout/admin_page.html' %}
 {% from 'groups/_group_members.html' import group_members %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}{% trans %}Group Details{% endtrans %}{% endblock %}
 {% block subtitle %}{{ group.name }} ({{ provider_title }}){% endblock %}
@@ -15,11 +16,16 @@
             {% trans %}Delete group{% endtrans %}
         </button>
     {% endif %}
+
     <h3>{% trans %}Group members{% endtrans %}</h3>
     <div id="group-members">
         {% if group.is_local %}
             {# Local groups usually don't have massive amounts of members so we load them immediately #}
             {{ group_members(group) }}
+        {% elif not group.supports_member_list %}
+            {% call message_box('warning') %}
+                {% trans %}The data source of this group does not allow retrieving its member list.{% endtrans %}
+            {% endcall %}
         {% else %}
             <img src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif" title="{% trans %}Loading member list{% endtrans %}">
             <script>
