@@ -14,7 +14,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {toClasses} from 'indico/react/util';
 
 import * as actions from './actions';
-import EntryPopup from './EntryPopup';
+import Entry from './Entry';
+import EntryDetails from './EntryDetails';
 import {entryStyleGetter, layoutAlgorithm} from './layout';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
@@ -32,15 +33,14 @@ export default function Timetable() {
   const displayMode = useSelector(selectors.getDisplayMode);
   const entries = useSelector(selectors.getAllEntries);
   const blocks = useSelector(selectors.getBlocks);
+  const selected = useSelector(selectors.getSelectedEntry);
   const [date, setDate] = useState(
     entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
   );
-  const numColumns = Math.max(
-    ...entries.filter(e => e.start.getDate() === date.getDate() && e.columnId).map(e => e.columnId),
-    1
-  );
+  const currentDateEntries = entries.filter(e => e.start.getDate() === date.getDate());
+  const numColumns = Math.max(...currentDateEntries.map(e => e.columnId).filter(e => e), 1);
 
-  const minHour = entries.reduce((min, {start}) => {
+  const minHour = currentDateEntries.reduce((min, {start}) => {
     const hours = start.getHours();
     if (hours > min) {
       return min;
@@ -48,7 +48,7 @@ export default function Timetable() {
     return start.getMinutes() === 0 ? hours - 1 : hours;
   }, 9);
 
-  const maxHour = entries.reduce((max, {end}) => {
+  const maxHour = currentDateEntries.reduce((max, {end}) => {
     const hours = end.getHours();
     if (hours < max - 1) {
       return max;
@@ -57,30 +57,36 @@ export default function Timetable() {
   }, 17);
 
   return (
-    <DnDCalendar
-      styleName={toClasses({timetable: true, compact: displayMode === 'compact'})}
-      date={date}
-      defaultView="day"
-      events={entries}
-      localizer={localizer}
-      views={{day: true}}
-      components={{toolbar: Toolbar, event: EntryPopup}}
-      resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
-      onEventDrop={args => dispatch(actions.moveEntry(args))}
-      onEventResize={args => dispatch(actions.resizeEntry(args))}
-      onSelectSlot={(...args) => console.debug('onSelectSlot', ...args)}
-      onNavigate={setDate}
-      eventPropGetter={entryStyleGetter(entries)}
-      dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
-      allDayMaxRows={0}
-      step={5}
-      timeslots={6}
-      min={new Date(1972, 0, 1, minHour, 0, 0)}
-      max={new Date(1972, 0, 1, maxHour, 0, 0)}
-      tooltipAccessor={null}
-      resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
-      resizable
-      selectable
-    />
+    <div styleName={toClasses({timetable: true, compact: displayMode === 'compact'})}>
+      <DnDCalendar
+        date={date}
+        defaultView="day"
+        events={entries}
+        localizer={localizer}
+        views={{day: true}}
+        components={{toolbar: Toolbar, event: Entry}}
+        resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
+        onEventDrop={args => dispatch(actions.moveEntry(args))}
+        onEventResize={args => dispatch(actions.resizeEntry(args))}
+        onSelectSlot={(...args) => {
+          dispatch(actions.selectEntry(null));
+          console.debug('onSelectSlot', ...args);
+        }}
+        onSelectEvent={e => dispatch(actions.selectEntry(e))}
+        onNavigate={setDate}
+        eventPropGetter={entryStyleGetter(entries, selected)}
+        dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
+        allDayMaxRows={0}
+        step={5}
+        timeslots={6}
+        min={new Date(1972, 0, 1, minHour, 0, 0)}
+        max={new Date(1972, 0, 1, maxHour, 0, 0)}
+        tooltipAccessor={null}
+        resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
+        resizable
+        selectable
+      />
+      {selected && <EntryDetails />}
+    </div>
   );
 }
