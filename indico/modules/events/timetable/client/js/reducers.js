@@ -8,7 +8,7 @@
 import _ from 'lodash';
 
 import * as actions from './actions';
-import {resizeEntry, preprocessEntries, resizeWindow, moveEntry} from './util';
+import {resizeEntry, preprocessEntries, resizeWindow, moveEntry, changeColor} from './util';
 
 const entryTypeMapping = {
   Session: 'session',
@@ -37,7 +37,10 @@ const preprocessData = data => {
 };
 
 export default {
-  entries: (state = {blocks: [], children: [], changes: [], currentChangeIdx: 0}, action) => {
+  entries: (
+    state = {blocks: [], children: [], changes: [], currentChangeIdx: 0, selectedId: null},
+    action
+  ) => {
     switch (action.type) {
       case actions.SET_TIMETABLE_DATA:
         return {...state, ...preprocessEntries(...preprocessData(action.data), state.changes)};
@@ -45,6 +48,10 @@ export default {
         return {...state, ...moveEntry(state, action.args)};
       case actions.RESIZE_ENTRY:
         return {...state, ...resizeEntry(state, action.args)};
+      case actions.SELECT_ENTRY:
+        return {...state, selectedId: action.entry?.id};
+      case actions.CHANGE_COLOR:
+        return {...state, ...changeColor(state, action.entry, action.color)};
       case actions.UNDO_CHANGE:
         return {
           ...state,

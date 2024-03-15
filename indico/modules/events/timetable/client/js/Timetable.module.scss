@@ -8,17 +8,10 @@
 @use 'base/palette' as *;
 
 .timetable {
-  border-top: 0;
+  display: flex;
 
-  .parent-entry {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .child-entry {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left-width: 0;
+  :global(.rbc-calendar) {
+    flex-grow: 1;
   }
 
   &.compact .parent-entry {
@@ -46,12 +39,35 @@
   }
 
   :global(.rbc-timeslot-group) {
-    min-height: 8em;
     border-left: 0;
+  }
+
+  :global(.rbc-time-slot) {
+    min-height: 0.8em;
   }
 
   :global(.rbc-event) {
     outline: none;
     z-index: 1;
+
+    &.selected {
+      filter: brightness(0.8);
+    }
+
+    &.parent-entry {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &.child-entry {
+      filter: opacity(0.8);
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left-width: 0;
+
+      &.selected {
+        filter: opacity(0.9) brightness(0.95);
+      }
+    }
   }
 }
