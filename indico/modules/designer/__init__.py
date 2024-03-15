@@ -91,8 +91,9 @@ def _get_designer_placeholders(sender, regform=None, **kwargs):
         from indico.modules.designer.placeholders import RegistrationFormFieldPlaceholder
         from indico.modules.events.registration.models.items import RegistrationFormItemType
         for field in regform.active_fields:
-            if field.type != RegistrationFormItemType.field_pd:      # Personal data fields are already included
-                yield RegistrationFormFieldPlaceholder(field=field)  # in the 'registrant' group
+            # Personal data fields are already included in the 'registrant' group
+            if field.type != RegistrationFormItemType.field_pd:
+                yield RegistrationFormFieldPlaceholder(field=field)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
