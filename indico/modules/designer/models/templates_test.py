@@ -12,6 +12,7 @@ pytest_plugins = ('indico.modules.designer.testing.fixtures',
 def test_template_link_to_regform(dummy_regform, dummy_designer_template):
     """Ensure that a template can be linked and unlinked from a registration form."""
     dummy_designer_template.link_regform(dummy_regform)
+    assert dummy_designer_template.registration_form == dummy_regform
 
     original_data = dummy_designer_template.data
     # Add regform field placeholders to the template
@@ -19,8 +20,7 @@ def test_template_link_to_regform(dummy_regform, dummy_designer_template):
     dummy_designer_template.data = dummy_designer_template.data | items
 
     dummy_designer_template.unlink_regform()
-    # Unlinking deletes all items referencing regform fields
-    assert dummy_designer_template.data == original_data
+    assert dummy_designer_template.registration_form is None
 
 
 def test_template_is_unlinkable(dummy_designer_template):
