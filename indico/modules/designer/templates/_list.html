@@ -1,6 +1,6 @@
 {% macro _render_link_regform_button(regform, tpl) %}
     <a data-href="{{ url_for('designer.link_regform', regform, template_id=tpl.id) }}"
-       data-method="PATCH"
+       data-method="POST"
        data-update="#template-list">
         {{ regform.title }}
     </a>
@@ -82,7 +82,7 @@
                         {% if unlinkable %}
                             title="{% trans %}Unlink registration form{% endtrans %}"
                             data-href="{{ url_for('.unlink_regform', tpl) }}"
-                            data-method="PATCH"
+                            data-method="POST"
                             data-update="#template-list"
                         {% else %}
                             title="{% trans %}This template cannot be unlinked because it contains placeholders referencing the linked registration form.{% endtrans %}"

@@ -37,9 +37,9 @@ _bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/
                  'toggle_category_default_badge', RHToggleBadgeDefaultOnCategory, methods=('POST',))
 
 _bp.add_url_rule('/event/<int:event_id>/manage/designer/<int:template_id>/link/<int:reg_form_id>', 'link_regform',
-                 RHLinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('PATCH',))
+                 RHLinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('POST',))
 _bp.add_url_rule('/event/<int:event_id>/manage/designer/<int:template_id>/unlink', 'unlink_regform',
-                 RHUnLinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('PATCH',))
+                 RHUnLinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('POST',))
 
 for object_type in ('event', 'category'):
     if object_type == 'category':
