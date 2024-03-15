@@ -18,3 +18,7 @@
     }
   }
 }
+
+.template-list > section:not(:first-child) {
+  margin-top: 1.5em;
+}

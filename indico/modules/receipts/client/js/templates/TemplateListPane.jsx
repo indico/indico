@@ -74,16 +74,26 @@ function TemplateRow({
         )}
       </td>
       <td className="text-superfluous">
-        {inherited && (
-          <Translate>
-            from category{' '}
-            <Param
-              name="title"
-              value={owner.title}
-              wrapper={<a href={templateListURL(owner.locator)} />}
-            />
-          </Translate>
-        )}
+        {inherited &&
+          ('event_id' in owner.locator ? (
+            <Translate>
+              from event{' '}
+              <Param
+                name="title"
+                value={owner.title}
+                wrapper={<a href={templateListURL(owner.locator)} />}
+              />
+            </Translate>
+          ) : (
+            <Translate>
+              from category{' '}
+              <Param
+                name="title"
+                value={owner.title}
+                wrapper={<a href={templateListURL(owner.locator)} />}
+              />
+            </Translate>
+          ))}
       </td>
       <td styleName="template-actions">
         <div className="thin toolbar right">
@@ -143,13 +153,14 @@ TemplateRow.defaultProps = {
 export default function TemplateListPane({
   ownTemplates,
   inheritedTemplates,
+  otherTemplates,
   defaultTemplates,
   targetLocator,
   dispatch,
 }) {
   const [deletePrompt, setDeletePrompt] = useState(null);
   return (
-    <>
+    <div styleName="template-list">
       <RequestConfirmDelete
         onClose={() => setDeletePrompt(null)}
         requestFunc={deletePrompt?.func || (() => null)}
@@ -180,7 +191,27 @@ export default function TemplateListPane({
           </table>
         </section>
       )}
-      <section className="custom-template-list">
+      {!!otherTemplates.length && (
+        <section>
+          <h3>
+            <Translate>Other templates</Translate>
+          </h3>
+          <table className="i-table-widget">
+            <tbody>
+              {_.sortBy(otherTemplates, 'title').map(tpl => (
+                <TemplateRow
+                  key={tpl.id}
+                  template={tpl}
+                  dispatch={dispatch}
+                  targetLocator={targetLocator}
+                  inherited
+                />
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+      <section>
         <div className="flexrow f-a-center f-j-space-between">
           <h3>
             <Translate>Custom templates</Translate>
@@ -233,13 +264,14 @@ export default function TemplateListPane({
           </div>
         )}
       </section>
-    </>
+    </div>
   );
 }
 
 TemplateListPane.propTypes = {
   ownTemplates: PropTypes.arrayOf(templateSchema).isRequired,
   inheritedTemplates: PropTypes.arrayOf(templateSchema).isRequired,
+  otherTemplates: PropTypes.arrayOf(templateSchema).isRequired,
   defaultTemplates: PropTypes.objectOf(defaultTemplateSchema).isRequired,
   dispatch: PropTypes.func.isRequired,
   targetLocator: targetLocatorSchema.isRequired,

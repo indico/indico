@@ -14,13 +14,14 @@ window.setupReceiptTemplateList = function(
   elem,
   ownTemplates,
   inheritedTemplates,
+  otherTemplates,
   defaultTemplates,
   targetLocator
 ) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
       <TemplateManagement
-        initialState={{ownTemplates, inheritedTemplates}}
+        initialState={{ownTemplates, inheritedTemplates, otherTemplates}}
         defaultTemplates={defaultTemplates}
         targetLocator={targetLocator}
       />,
