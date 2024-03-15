@@ -386,7 +386,7 @@ class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
 
-class RHUnLinkDesignerTemplate(RHModifyDesignerTemplateBase):
+class RHUnlinkDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
         regform = self.template.registration_form
         if not regform:

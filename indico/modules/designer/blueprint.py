@@ -11,7 +11,7 @@ from indico.modules.designer.controllers import (RHAddCategoryTemplate, RHAddEve
                                                  RHLinkDesignerTemplate, RHListBacksideTemplates,
                                                  RHListCategoryTemplates, RHListEventTemplates,
                                                  RHToggleBadgeDefaultOnCategory, RHToggleTicketDefaultOnCategory,
-                                                 RHUnLinkDesignerTemplate, RHUploadBackgroundImage)
+                                                 RHUnlinkDesignerTemplate, RHUploadBackgroundImage)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -39,7 +39,7 @@ _bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/
 _bp.add_url_rule('/event/<int:event_id>/manage/designer/<int:template_id>/link/<int:reg_form_id>', 'link_regform',
                  RHLinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('POST',))
 _bp.add_url_rule('/event/<int:event_id>/manage/designer/<int:template_id>/unlink', 'unlink_regform',
-                 RHUnLinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('POST',))
+                 RHUnlinkDesignerTemplate, defaults={'object_type': 'event'}, methods=('POST',))
 
 for object_type in ('event', 'category'):
     if object_type == 'category':
