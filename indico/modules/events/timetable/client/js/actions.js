@@ -8,6 +8,8 @@
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
+export const SELECT_ENTRY = 'Select entry';
+export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
@@ -24,6 +26,14 @@ export function moveEntry(args) {
 
 export function resizeEntry(args) {
   return {type: RESIZE_ENTRY, args};
+}
+
+export function selectEntry(entry) {
+  return {type: SELECT_ENTRY, entry};
+}
+
+export function changeColor(entry, color) {
+  return {type: CHANGE_COLOR, entry, color};
 }
 
 export function undoChange() {

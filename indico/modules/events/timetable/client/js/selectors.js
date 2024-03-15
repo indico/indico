@@ -45,6 +45,15 @@ export const getAllEntries = createSelector(
   getChildren,
   (blocks, children) => [...blocks, ...children]
 );
+export const getSelectedId = createSelector(
+  getEntries,
+  entries => entries.selectedId
+);
+export const getSelectedEntry = createSelector(
+  getAllEntries,
+  getSelectedId,
+  (entries, id) => id && entries.find(e => e.id === id)
+);
 export const canUndo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx > 0

@@ -7,43 +7,6 @@
 
 @use 'base/palette' as *;
 
-.popup {
-  width: 20em;
-
-  .description {
-    max-height: 6em;
-    overflow-y: auto;
-  }
-
-  .segment-header {
-    display: flex;
-
-    .actions {
-      margin-left: auto;
-      padding-left: 0.5em;
-      display: none;
-      justify-content: space-between;
-      align-items: center;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-
-    :global(.detail) {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-
-  :global(.segment) {
-    &:hover .actions {
-      display: flex;
-    }
-  }
-}
-
 .entry-title {
   height: 100%;
 }

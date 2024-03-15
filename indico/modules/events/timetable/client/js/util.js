@@ -6,6 +6,29 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+
+export const entryColorSchema = PropTypes.shape({
+  text: PropTypes.string,
+  background: PropTypes.string,
+});
+
+export const entrySchema = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['session', 'contribution', 'break']).isRequired,
+  title: PropTypes.string.isRequired,
+  slotTitle: PropTypes.string, // only for sessions
+  description: PropTypes.string,
+  code: PropTypes.string,
+  sessionCode: PropTypes.string, // only for sessions
+  start: PropTypes.instanceOf(Date).isRequired,
+  end: PropTypes.instanceOf(Date).isRequired,
+  color: entryColorSchema,
+  attachmentCount: PropTypes.number,
+  displayOrder: PropTypes.number,
+  parentId: PropTypes.string, // only for contributions
+  columnId: PropTypes.number, // set only if parentId is null
+});
 
 export const hasContributions = (block, contribs) => contribs.some(e => e.parentId === block.id);
 export const isChildOf = (contrib, block) => contrib.parentId === block.id;
@@ -40,13 +63,16 @@ const updateEntries = (entries, newEntries) => [
 
 const mergeChanges = changes => changes.reduce((acc, change) => updateEntries(acc, change), []);
 
-export const applyChanges = ({changes, currentChangeIdx, ...entries}) => {
+export const applyChanges = ({changes, currentChangeIdx, blocks, children}) => {
   const effectiveChanges = _.isNumber(currentChangeIdx)
     ? changes.slice(0, currentChangeIdx)
     : changes;
-  const newEntries = updateEntries(Object.values(entries).flat(), mergeChanges(effectiveChanges));
-  const [blocks, children] = _.partition(newEntries, e => !e.parentId);
-  return {blocks, children};
+  const newEntries = updateEntries(
+    [...(blocks || []), ...(children || [])],
+    mergeChanges(effectiveChanges)
+  );
+  const [newBlocks, newChildren] = _.partition(newEntries, e => !e.parentId);
+  return {blocks: newBlocks, children: newChildren};
 };
 
 const updateLastChange = (changes, newChange) => [
@@ -269,6 +295,8 @@ export const moveEntry = (state, args) =>
 
 export const resizeEntry = (state, args) =>
   args.event.parentId ? moveOrResizeContrib(state, args) : resizeBlock(state, args);
+
+export const changeColor = (state, {id}, color) => addNewChange(state, [{id, color}]);
 
 export const getNumDays = (start, end) => Math.floor((end - start) / (24 * 60 * 60 * 1000));
 

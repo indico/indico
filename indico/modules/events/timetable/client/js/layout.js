@@ -7,32 +7,27 @@
 
 import noOverlap from 'react-big-calendar/lib/utils/layout-algorithms/no-overlap';
 
+import {toClasses} from 'indico/react/util';
+
 import {getConcurrentEntries, hasContributions, isChildOf} from './util';
 
 import styles from './Timetable.module.scss';
 
 const SESSION_BLOCK_WIDTH = 15;
 
-const makeTranslucent = hex => {
-  if (!hex) {
-    return undefined;
-  }
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, 0.8)`;
-};
-
-export const entryStyleGetter = entries => entry => {
+export const entryStyleGetter = (entries, selected) => entry => {
   if (entry.parentId) {
     const parent = entries.find(e => isChildOf(entry, e));
     return {
       style: {
         color: parent?.color?.text,
-        backgroundColor: makeTranslucent(parent?.color?.background),
-        borderColor: makeTranslucent(parent?.color?.background),
+        backgroundColor: parent?.color?.background,
+        borderColor: parent?.color?.background,
       },
-      className: styles['child-entry'],
+      className: toClasses({
+        [styles['child-entry']]: true,
+        [styles.selected]: selected && (selected.id === entry.id || selected.id === parent?.id),
+      }),
     };
   }
   return {
@@ -41,7 +36,10 @@ export const entryStyleGetter = entries => entry => {
       backgroundColor: entry.color?.background,
       borderColor: entry.color?.background,
     },
-    className: hasContributions(entry, entries) ? styles['parent-entry'] : undefined,
+    className: toClasses({
+      [styles['parent-entry']]: hasContributions(entry, entries),
+      [styles.selected]: selected?.id === entry.id,
+    }),
   };
 };
 
