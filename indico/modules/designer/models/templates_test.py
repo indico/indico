@@ -21,3 +21,15 @@ def test_template_link_to_regform(dummy_regform, dummy_designer_template):
     dummy_designer_template.unlink_regform()
     # Unlinking deletes all items referencing regform fields
     assert dummy_designer_template.data == original_data
+
+
+def test_template_is_unlinkable(dummy_designer_template):
+    """`template.is_unlinkable` should be `False` if the template contains custom registration placeholders."""
+    assert dummy_designer_template.is_unlinkable
+
+    original_data = dummy_designer_template.data
+    # Add regform field placeholders to the template
+    items = {'items': [*original_data['items'], {'type': 'field-1'}, {'type': 'field-2'}]}
+    dummy_designer_template.data = dummy_designer_template.data | items
+
+    assert not dummy_designer_template.is_unlinkable
