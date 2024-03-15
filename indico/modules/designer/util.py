@@ -111,13 +111,6 @@ def has_regform_field_placeholders(data):
     return any(is_regform_field_placeholder(item) for item in data['items'])
 
 
-def remove_regform_field_placeholders(data):
-    """Return a copy of the template data with regform field placeholders removed."""
-    return data | {
-        'items': [item for item in data['items'] if not is_regform_field_placeholder(item)]
-    }
-
-
 def can_link_to_regform(template, regform):
     """Return True if the given template can be linked to the given registration form."""
     return regform in get_linkable_regforms(template)
