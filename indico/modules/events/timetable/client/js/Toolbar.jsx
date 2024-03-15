@@ -111,6 +111,7 @@ export default function Toolbar({date, localizer, onNavigate}) {
                 Translate.string('ddd DD/MM', 'momentjs date format for timetable tab headers')
               )}
               onClick={() => onNavigate(Navigate.DATE, d)}
+              onMouseEnter={e => e.buttons === 1 && onNavigate(Navigate.DATE, d)}
               active={n + offset === currentDayIdx}
             />
           );
