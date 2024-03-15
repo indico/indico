@@ -11,7 +11,7 @@ import editableListURL from 'indico-url:event_editing.api_filter_editables_by_fi
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
+import React, {useState, useMemo, useRef} from 'react';
 import {useHistory} from 'react-router-dom';
 import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
 
@@ -72,25 +72,19 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
   };
 
-  const getEditables = useCallback(
-    async _filters => {
-      let response;
-      try {
-        response = await indicoAxios.post(
-          editableListURL({event_id: eventId, type: editableType}),
-          {
-            extensions: _.pickBy(_filters, x => Array.isArray(x)),
-            has_files: _.pickBy(_filters, x => !Array.isArray(x)),
-          }
-        );
-      } catch (e) {
-        handleAxiosError(e);
-        return;
-      }
-      return camelizeKeys(response.data);
-    },
-    [eventId, editableType]
-  );
+  const getEditables = async _filters => {
+    let response;
+    try {
+      response = await indicoAxios.post(editableListURL({event_id: eventId, type: editableType}), {
+        extensions: _.pickBy(_filters, x => Array.isArray(x)),
+        has_files: _.pickBy(_filters, x => !Array.isArray(x)),
+      });
+    } catch (e) {
+      handleAxiosError(e);
+      return;
+    }
+    return camelizeKeys(response.data);
+  };
 
   const filterOptions = useMemo(
     () => [
@@ -135,10 +129,10 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     const filetypesKeyExpr = /^filetypes_(\d+)$/;
     const formatFilterOptions = options => {
       const extOptionExpr = /^has_ext_(.*)$/;
-      const extensionOptions = options.filter(o => extOptionExpr.exec(o));
+      const extensionOptions = Object.keys(options).filter(o => extOptionExpr.exec(o));
       return extensionOptions.length > 0
         ? extensionOptions.map(o => extOptionExpr.exec(o)[1])
-        : !options.includes('has_no_files');
+        : !options.has_no_files;
     };
     const newFilters = Object.keys(activeFilters)
       .filter(f => filetypesKeyExpr.exec(f))
@@ -159,7 +153,8 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
     const filtered = _editables.filter(x =>
       filterOptions.every(
-        ({key, isMatch}) => !activeFilters[key] || !isMatch || isMatch(x, activeFilters[key] || [])
+        ({key, isMatch}) =>
+          !activeFilters[key] || !isMatch || isMatch(x, Object.keys(activeFilters[key] || {}))
       )
     );
     setFilters(activeFilters);
@@ -192,24 +187,14 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      setSelectedEditable(null);
-      setLoading(true);
-      const _editables = await getEditables();
-      setEditables(_editables);
-      _setFilteredSet(new Set(_editables.map(e => e.id)));
-      setLoading(false);
-    })();
-  }, [eventId, editableType, getEditables]);
-
   return (
     <Modal onClose={onClose} closeOnDimmerClick={false} open>
       <Modal.Header>{GetNextEditableTitles[editableType]}</Modal.Header>
       <Modal.Content>
         <div styleName="filetype-list">
           <ListFilter
-            list={editables}
+            name="get-next-editable-filter"
+            list={editables || []}
             filters={filters}
             filterOptions={filterOptions}
             searchableId={e => e.contributionFriendlyId}

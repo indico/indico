@@ -7,12 +7,19 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Icon, Input, Dropdown, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import './ListFilter.module.scss';
+
+const optionSchema = PropTypes.shape({
+  value: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  exclusive: PropTypes.bool,
+  color: PropTypes.string,
+});
 
 const FilterLabel = ({text, options, onClick}) => (
   <Label styleName="filter" className="fluid" color="orange" basic>
@@ -28,11 +35,12 @@ const FilterLabel = ({text, options, onClick}) => (
 
 FilterLabel.propTypes = {
   text: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
+  options: PropTypes.arrayOf(optionSchema).isRequired,
   onClick: PropTypes.func.isRequired,
 };
 
 export default function ListFilter({
+  name,
   list,
   filters: externalFilters,
   searchText: externalSearchText,
@@ -48,10 +56,11 @@ export default function ListFilter({
   const [openSubmenu, setOpenSubmenu] = useState(-1);
   const filters = onChangeFilters ? externalFilters : internalFilters;
   const searchText = onChangeSearchText ? externalSearchText : internalSearchText;
+  const optionsMap = new Map(filterOptions.map(o => [o.key, o]));
 
   const matchFilters = (value, e) =>
     filterOptions.every(
-      ({key, isMatch}) => !value[key] || !isMatch || isMatch(e, value[key] || [])
+      ({key, isMatch}) => !value[key] || !isMatch || isMatch(e, Object.keys(value[key] || {}))
     );
 
   const matchSearch = (value, e) => {
@@ -71,6 +80,7 @@ export default function ListFilter({
   };
 
   const setFilters = value => {
+    localStorage.setItem(name, JSON.stringify(value));
     if (onChangeFilters) {
       onChangeFilters(value);
       return;
@@ -100,27 +110,31 @@ export default function ListFilter({
     onChangeList(new Set(filtered.map(e => e.id)));
   };
 
-  const toggleFilter = (key, option) => {
-    const filter = filterOptions.find(x => x.key === key);
-    const exclusive =
-      filters[key] &&
-      filter.options.find(
-        o => (option === o.value || filters[key].includes(o.value)) && o.exclusive
-      );
-    const options = filters[key] || [];
-    let selected = [...options, option];
-    if (options.includes(option)) {
-      selected = options.filter(x => x !== option);
-    } else if (exclusive) {
-      selected = [option];
-    }
-    if (!selected.length) {
-      const {[key]: __, ...rest} = filters;
-      setFilters(rest);
+  const toggleFilter = (filterKey, optionValue) => {
+    const optionObject = optionsMap.get(filterKey).options.find(x => x.value === optionValue);
+    let selectedOptions = filters[filterKey] || {};
+    if (optionValue in selectedOptions) {
+      if (Object.keys(selectedOptions).length === 1) {
+        const {[filterKey]: __, ...rest} = filters;
+        setFilters(rest);
+        return;
+      }
+      const {[optionValue]: __, ...rest} = selectedOptions;
+      selectedOptions = rest;
+    } else if (optionObject.exclusive) {
+      selectedOptions = {[optionValue]: optionObject};
     } else {
-      setFilters({...filters, [key]: selected});
+      selectedOptions = {...selectedOptions, [optionValue]: optionObject};
     }
+    setFilters({...filters, [filterKey]: selectedOptions});
   };
+
+  // get filters from the local storage
+  useEffect(() => {
+    const storedFilters = JSON.parse(localStorage.getItem(name)) || {};
+    setFilters(_.pickBy(storedFilters, (__, key) => optionsMap.has(key)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div styleName="filters-container">
@@ -137,13 +151,13 @@ export default function ListFilter({
           {Object.keys(filters).length > 0 ? (
             <>
               <div styleName="active-filters">
-                {_.sortBy(filterOptions, 'text')
-                  .filter(({key}) => filters[key])
-                  .map(({key, text, options}) => (
+                {Object.entries(filters)
+                  .sort(([a], [b]) => optionsMap.get(a).text.localeCompare(optionsMap.get(b).text))
+                  .map(([key, filter]) => (
                     <FilterLabel
                       key={key}
-                      text={text}
-                      options={options.filter(o => filters[key].includes(o.value))}
+                      text={optionsMap.get(key).text}
+                      options={Object.values(filter)}
                       onClick={() => {
                         setOpenSubmenu(-1);
                         const {[key]: __, ...rest} = filters;
@@ -182,7 +196,7 @@ export default function ListFilter({
                       value={option}
                       text={text}
                       label={getLabelOpts(color)}
-                      active={filters[key]?.includes(option)}
+                      active={option in (filters[key] || {})}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
                   )
@@ -198,7 +212,7 @@ export default function ListFilter({
                       value={option}
                       text={text}
                       label={getLabelOpts(color)}
-                      active={filters[key]?.includes(option)}
+                      active={option in (filters[key] || {})}
                       onClick={(e, {value}) => toggleFilter(key, value)}
                     />
                   ))}
@@ -227,21 +241,15 @@ export default function ListFilter({
 }
 
 ListFilter.propTypes = {
-  list: PropTypes.array,
-  filters: PropTypes.object,
+  name: PropTypes.string.isRequired,
+  list: PropTypes.array.isRequired,
+  filters: PropTypes.objectOf(PropTypes.objectOf(optionSchema)),
   searchText: PropTypes.string,
   filterOptions: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       text: PropTypes.string.isRequired,
-      options: PropTypes.arrayOf(
-        PropTypes.shape({
-          value: PropTypes.string.isRequired,
-          text: PropTypes.string.isRequired,
-          exclusive: PropTypes.bool,
-          color: PropTypes.string,
-        })
-      ).isRequired,
+      options: PropTypes.arrayOf(optionSchema).isRequired,
       isMatch: PropTypes.func,
     })
   ).isRequired,
@@ -253,7 +261,6 @@ ListFilter.propTypes = {
 };
 
 ListFilter.defaultProps = {
-  list: [],
   filters: undefined,
   searchText: undefined,
   searchableId: undefined,
