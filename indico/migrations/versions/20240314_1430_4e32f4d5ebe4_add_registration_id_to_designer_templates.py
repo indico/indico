@@ -1,8 +1,8 @@
 """Add registration_form_id to designer templates
 
 Revision ID: 4e32f4d5ebe4
-Revises: e4ac92d27295
-Create Date: 2023-12-08 10:42:45.632227
+Revises: b37cbc4bb129
+Create Date: 2024-03-14 10:42:45.632227
 """
 
 import sqlalchemy as sa
