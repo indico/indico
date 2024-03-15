@@ -16,7 +16,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Button, Icon, Label} from 'semantic-ui-react';
+import {Accordion, Button, Icon, Label} from 'semantic-ui-react';
 
 import {RequestConfirmDelete} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
@@ -191,22 +191,37 @@ export default function TemplateListPane({
       )}
       {!!otherTemplates.length && (
         <section>
-          <h3>
-            <Translate>Other templates</Translate>
-          </h3>
-          <table className="i-table-widget">
-            <tbody>
-              {_.sortBy(otherTemplates, 'title').map(tpl => (
-                <TemplateRow
-                  key={tpl.id}
-                  template={tpl}
-                  dispatch={dispatch}
-                  targetLocator={targetLocator}
-                  inherited
-                />
-              ))}
-            </tbody>
-          </table>
+          <Accordion
+            panels={[
+              {
+                key: 'other',
+                title: {
+                  content: (
+                    <h4>
+                      <Translate>Other templates</Translate>
+                    </h4>
+                  ),
+                },
+                content: {
+                  content: (
+                    <table className="i-table-widget">
+                      <tbody>
+                        {_.sortBy(otherTemplates, 'title').map(tpl => (
+                          <TemplateRow
+                            key={tpl.id}
+                            template={tpl}
+                            dispatch={dispatch}
+                            targetLocator={targetLocator}
+                            inherited
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  ),
+                },
+              },
+            ]}
+          />
         </section>
       )}
       <section>

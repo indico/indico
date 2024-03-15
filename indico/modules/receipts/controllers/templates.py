@@ -87,8 +87,9 @@ class ReceiptTemplateMixin(ReceiptAreaMixin):
 
 class TemplateListMixin(ReceiptAreaMixin):
     def _process(self):
-        inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
-        other_templates = ReceiptTemplateDBSchema(many=True).dump(get_other_templates(self.target, session.user))
+        view_only_schema = ReceiptTemplateDBSchema(many=True, only={'id', 'title', 'owner'})
+        inherited_templates = view_only_schema.dump(get_inherited_templates(self.target))
+        other_templates = view_only_schema.dump(get_other_templates(self.target, session.user))
         own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
         view_class = WPEventReceiptTemplates if self.object_type == 'event' else WPCategoryReceiptTemplates
         return view_class.render_template(
