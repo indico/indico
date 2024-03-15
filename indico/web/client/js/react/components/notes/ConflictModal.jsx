@@ -60,7 +60,7 @@ export function ConflictModal({
         onClose();
       }}
       onOpen={() => setOpen(true)}
-      size="large"
+      style={{minWidth: '65vw'}}
       closeOnEscape={false}
       closeOnDimmerClick={false}
       closeIcon
@@ -156,7 +156,7 @@ export function ConflictModal({
         </Grid>
       </Modal.Content>
       <Modal.Actions>
-        <ButtonGroup styleName="action-buttons">
+        <ButtonGroup styleName="action-button-icons">
           <Button
             icon
             color="red"
@@ -164,10 +164,13 @@ export function ConflictModal({
               await overwriteChanges();
               setOpen(false);
               onClose();
+              setCloseAndReload(true);
             }}
           >
             <Icon name="write" />
-            <Translate>Overwrite their changes</Translate>
+            <span styleName="action-button-text">
+              <Translate>Overwrite their changes</Translate>
+            </span>
           </Button>
           <Button
             icon
@@ -179,7 +182,9 @@ export function ConflictModal({
             }}
           >
             <Icon name="trash alternate outline" />
-            <Translate>Discard my changes</Translate>
+            <span styleName="action-button-text">
+              <Translate>Discard my changes</Translate>
+            </span>
           </Button>
           <Button
             icon
@@ -189,7 +194,9 @@ export function ConflictModal({
             }}
           >
             <Icon name="cancel" />
-            <Translate>Go back to the editor</Translate>
+            <span styleName="action-button-text">
+              <Translate>Go back to the editor</Translate>
+            </span>
           </Button>
         </ButtonGroup>
       </Modal.Actions>

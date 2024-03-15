@@ -7,9 +7,13 @@
 
 .note-content {
   max-height: 60vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
-.action-buttons :global(.icon::before) {
-  margin-right: 0.25em !important;
+.action-button-icons :global(.icon::before) {
+  margin-right: 0.25em;
+}
+
+.action-button-text {
+  margin: 0 0.25em;
 }
