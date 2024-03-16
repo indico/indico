@@ -27,6 +27,10 @@ error_cache = make_scoped_cache('errors')
 def render_error(exc, title, message, code, standalone=False):
     _handle_error_cors()
     _save_error(exc, title, message)
+    
+    if isinstance(exc, UnicodeDecodeError):
+        message = "You need to save your CSV file using the UTF-8 encoding."
+
     if _need_json_response():
         return _jsonify_error(exc, title, message, code)
     elif standalone:
