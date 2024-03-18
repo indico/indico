@@ -21,10 +21,12 @@ from indico.util.string import crc32
 
 def create_category(parent, data):
     category = Category(parent=parent)
+    category.populate_from_dict(data, keys=('title',))
     data.setdefault('default_event_themes', parent.default_event_themes)
     data.setdefault('timezone', parent.timezone)
-    category.populate_from_dict(data)
     db.session.add(category)
+    db.session.flush()
+    category.populate_from_dict(data)
     db.session.flush()
     signals.category.created.send(category)
     logger.info('Category %s created by %s', category, session.user)

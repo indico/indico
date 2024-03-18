@@ -9,13 +9,13 @@ from functools import wraps
 
 from indico.core.settings import SettingsProxyBase
 from indico.core.settings.util import get_all_settings, get_setting
-from indico.modules.categories import Category
 from indico.modules.categories.models.settings import CategorySetting
 
 
 def _category_or_id(f):
     @wraps(f)
     def wrapper(self, category, *args, **kwargs):
+        from indico.modules.categories import Category
         if isinstance(category, Category):
             category = category.id
         return f(self, int(category), *args, **kwargs)
