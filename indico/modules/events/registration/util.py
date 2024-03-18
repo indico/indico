@@ -50,7 +50,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import format_date, now_utc
 from indico.util.i18n import _
-from indico.util.signals import values_from_signal
+from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 
@@ -158,6 +158,7 @@ def get_flat_section_positions_setup_data(regform):
     return {'sections': section_data, 'items': item_data}
 
 
+@make_interceptable
 def get_flat_section_submission_data(regform, *, management=False, registration=None):
     section_data = {s.id: camelize_keys(s.own_data) for s in regform.active_sections
                     if management or not s.is_manager_only}
