@@ -253,6 +253,15 @@ class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     timeline_url = fields.String()
 
 
+class EditableWithTagsSchema(EditableBasicSchema):
+    class Meta(EditableBasicSchema.Meta):
+        model = Editable
+        fields = (*EditableBasicSchema.Meta.fields, 'tags')
+
+    tags = fields.List(fields.Nested(EditingTagSchema, only=('id', 'code', 'title', 'color')),
+                       attribute='latest_revision.tags')
+
+
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
@@ -265,7 +274,7 @@ class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
         editable = contribution.get_editable(editable_type)
         if not editable:
             return None
-        return EditableBasicSchema().dump(editable)
+        return EditableWithTagsSchema().dump(editable)
 
 
 class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
