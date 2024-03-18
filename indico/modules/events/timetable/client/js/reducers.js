@@ -8,7 +8,14 @@
 import _ from 'lodash';
 
 import * as actions from './actions';
-import {resizeEntry, preprocessEntries, resizeWindow, moveEntry, changeColor} from './util';
+import {
+  resizeEntry,
+  deleteEntry,
+  preprocessEntries,
+  resizeWindow,
+  moveEntry,
+  changeColor,
+} from './util';
 
 const entryTypeMapping = {
   Session: 'session',
@@ -26,12 +33,22 @@ const preprocessData = data => {
     .flat();
   return [blocks, childEntries].map(en =>
     en.map(e => ({
-      ..._.pick(e, ['id', 'title', 'slotTitle', 'code', 'sessionCode', 'description', 'parentId']),
+      ..._.pick(e, [
+        'id',
+        'title',
+        'slotTitle',
+        'code',
+        'sessionCode',
+        'sessionId',
+        'description',
+        'parentId',
+      ]),
       type: entryTypeMapping[e.entryType],
       start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
       end: new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
       attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
       color: e.entryType === 'Contribution' ? undefined : {text: e.textColor, background: e.color},
+      deleted: false,
     }))
   );
 };
@@ -50,8 +67,10 @@ export default {
         return {...state, ...resizeEntry(state, action.args)};
       case actions.SELECT_ENTRY:
         return {...state, selectedId: action.entry?.id};
+      case actions.DELETE_ENTRY:
+        return {...state, ...deleteEntry(state), selectedId: null};
       case actions.CHANGE_COLOR:
-        return {...state, ...changeColor(state, action.entry, action.color)};
+        return {...state, ...changeColor(state, action.color)};
       case actions.UNDO_CHANGE:
         return {
           ...state,
