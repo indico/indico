@@ -395,7 +395,7 @@ class CreateBookingSchema(mm.Schema):
     link_id = fields.Int()
     link_back = fields.Bool(load_default=False)
     admin_override_enabled = fields.Bool(load_default=False)
-    extra_fields = fields.Dict(load_default={})
+    extra_fields = fields.Dict(load_default=lambda: {})
 
     @validates_schema(skip_on_field_errors=True)
     def validate_dts(self, data, **kwargs):
