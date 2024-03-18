@@ -1,11 +1,11 @@
 # Translations template for indico.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
 # Arturo Diaz Rosemberg <arturo@diazrosemberg.net>, 2012
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
-# Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2021
+# Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2021,2024
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2022
 # rodrigotorrens <rodrigotorrens@gmail.com>, 2011
 # ssice <ssaavedra@gpul.org>, 2020
@@ -13,14 +13,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-21 19:19+0100\n"
+"POT-Creation-Date: 2024-03-18 17:55+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2022\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2021,2024\n"
 "Language-Team: Spanish (Spain) (http://app.transifex.com/indico/indico/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.14.0\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -49,18 +49,18 @@ msgstr "Gestionar material"
 msgid "Building package"
 msgstr "Construyendo el paquete"
 
-#: indico/modules/categories/client/js/calendar.js:41
+#: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
 msgstr "Hoy"
 
-#: indico/modules/categories/client/js/calendar.js:53
+#: indico/modules/categories/client/js/calendar.js:134
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] "{0} evento de larga duración no mostrado"
 msgstr[1] "{0} eventos de larga duración no mostrados"
 msgstr[2] "{0} eventos de larga duración no mostrados"
 
-#: indico/modules/categories/client/js/calendar.js:63
+#: indico/modules/categories/client/js/calendar.js:144
 msgid "Long lasting events"
 msgstr "Eventos de larga duración"
 
@@ -76,7 +76,7 @@ msgstr[1] "{0} eventos"
 msgstr[2] "{0} eventos"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:383
+#: indico/modules/events/management/client/js/index.js:387
 msgid "Undo"
 msgstr "Deshacer"
 
@@ -161,14 +161,14 @@ msgstr[0] "Seleccionar una nueva categoría principal para la categoría"
 msgstr[1] "Seleccionar una nueva categoría principal para las {0} categorías seleccionadas"
 msgstr[2] "Seleccionar una nueva categoría principal para las {0} categorías seleccionadas"
 
-#: indico/modules/categories/client/js/management.js:377
+#: indico/modules/categories/client/js/management.js:380
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Las categoría ya está aquí"
 msgstr[1] "Las categorías seleccionadas ya están aquí"
 msgstr[2] "Las categorías seleccionadas ya están aquí"
 
-#: indico/modules/categories/client/js/management.js:385
+#: indico/modules/categories/client/js/management.js:388
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Esta es la categoría que está intentando mover."
@@ -313,9 +313,9 @@ msgstr "Ocultar vista previa"
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
 msgid_plural "{0} new events will be created."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{0} nuevo evento será creado."
+msgstr[1] "{0} nuevos eventos serán creados."
+msgstr[2] "{0} nuevos eventos serán creados."
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
@@ -329,7 +329,7 @@ msgstr "{0} de {1} mostrados"
 msgid "There are no entries that match your search criteria."
 msgstr "No hay entradas que coincidan con sus criterios de búsqueda."
 
-#: indico/modules/events/management/client/js/index.js:381
+#: indico/modules/events/management/client/js/index.js:385
 msgid "Undoing previous operation..."
 msgstr "Deshaciendo la operación anterior ..."
 
@@ -380,15 +380,15 @@ msgstr "Copiado al portapapeles"
 msgid "Press {0} to copy"
 msgstr "Presione {0} para copiar"
 
-#: indico/web/client/js/jquery/extensions/global.js:259
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new lecture"
 msgstr "Crear nueva presentación"
 
-#: indico/web/client/js/jquery/extensions/global.js:260
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new meeting"
 msgstr "Crear nueva reunión"
 
-#: indico/web/client/js/jquery/extensions/global.js:261
+#: indico/web/client/js/jquery/extensions/global.js:262
 msgid "Create new conference"
 msgstr "Crear nuevo congreso"
 
@@ -552,7 +552,7 @@ msgstr "No es posible para categorías en las que no se pueden crear eventos."
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:47
 msgid "Not possible for categories where you are not a manager"
-msgstr ""
+msgstr "No es posible para categorías en las que no eres administrador"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:53
 msgid "Not possible for categories descending from category \"{0}\""
@@ -627,7 +627,7 @@ msgstr "Borrar búsqueda"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 msgid "You selected category \"{0}\". Are you sure you want to proceed?"
-msgstr ""
+msgstr "Ha seleccionado la categoría \"{0}\". ¿Está seguro de que desea proceder?"
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
@@ -1022,7 +1022,7 @@ msgstr "mover para cambiar el tamaño"
 msgid ""
 "<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
 "applied to blocks after."
-msgstr ""
+msgstr "<kbd class=\"tt-key\">Shift</kbd> está presionado en estos momentos. Los cambios se aplicarán a los bloques posteriores."
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
 msgid "Drop to move block inside session"

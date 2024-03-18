@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2024-03-18 17:55+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: selcuk bilmis <selcukbilmis@gmail.com>, 2021\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.14.0\n"
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
@@ -46,21 +46,17 @@ msgstr "Malzemeyi yönet"
 msgid "Building package"
 msgstr "Paket oluşturuluyor"
 
-#: indico/modules/categories/client/js/calendar.js:24
+#: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
 msgstr "Bugün"
 
-#: indico/modules/categories/client/js/calendar.js:50
-msgid "Events happening on {0}"
-msgstr "{0} tarihinde gerçekleşen etkinlikler"
-
-#: indico/modules/categories/client/js/calendar.js:62
+#: indico/modules/categories/client/js/calendar.js:134
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] "{0} gösterilmeyen uzun süren olaylar "
 msgstr[1] "{0} gösterilmeyen uzun süren etkinlikler"
 
-#: indico/modules/categories/client/js/calendar.js:72
+#: indico/modules/categories/client/js/calendar.js:144
 msgid "Long lasting events"
 msgstr "Uzun süren etkinlikler"
 
@@ -75,7 +71,7 @@ msgstr[0] "{0} olaylar"
 msgstr[1] "{0} etkinlikler"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:383
+#: indico/modules/events/management/client/js/index.js:387
 msgid "Undo"
 msgstr "Geri al"
 
@@ -154,13 +150,13 @@ msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Kategori için yeni kategori üst öğesi seçin"
 msgstr[1] "{0} seçili kategori için yeni kategori üst öğesini seç"
 
-#: indico/modules/categories/client/js/management.js:377
+#: indico/modules/categories/client/js/management.js:380
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Seçilen kategoriler zaten buradalar"
 msgstr[1] "Seçilen kategoriler zaten buradalar"
 
-#: indico/modules/categories/client/js/management.js:385
+#: indico/modules/categories/client/js/management.js:388
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Bu, taşımaya çalıştığınız kategorilerden biridir"
@@ -319,7 +315,7 @@ msgstr " {1} taneden {0} tanesi görüntülendi"
 msgid "There are no entries that match your search criteria."
 msgstr "Arama kriterlerinizle eşleşen hiçbir giriş yok."
 
-#: indico/modules/events/management/client/js/index.js:381
+#: indico/modules/events/management/client/js/index.js:385
 msgid "Undoing previous operation..."
 msgstr "Önceki işlemi geri alıyor..."
 
@@ -328,11 +324,11 @@ msgstr "Önceki işlemi geri alıyor..."
 msgid "Terms and Conditions"
 msgstr "Hüküm ve Koşullar"
 
-#: indico/modules/events/registration/client/js/reglists.js:35
+#: indico/modules/events/registration/client/js/reglists.js:43
 msgid "Email Preview"
 msgstr "E-Posta Ön İzleme"
 
-#: indico/modules/events/registration/client/js/reglists.js:52
+#: indico/modules/events/registration/client/js/reglists.js:60
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "Seçili kaydı silmek istiyor musunuz?"
@@ -369,15 +365,15 @@ msgstr "Panoya kopyalanmıştır"
 msgid "Press {0} to copy"
 msgstr "Kopyalamak için {0} basın"
 
-#: indico/web/client/js/jquery/extensions/global.js:256
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new lecture"
 msgstr "Yeni ders oluştur"
 
-#: indico/web/client/js/jquery/extensions/global.js:257
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new meeting"
 msgstr "Yeni toplantı oluştur"
 
-#: indico/web/client/js/jquery/extensions/global.js:258
+#: indico/web/client/js/jquery/extensions/global.js:262
 msgid "Create new conference"
 msgstr "Yeni konferans oluştur"
 
@@ -403,12 +399,12 @@ msgstr "Kapat"
 msgid "You have unsaved changes that will be lost."
 msgstr "Kaybedilecek kaydedilmemiş değişiklikleriniz var."
 
-#: indico/web/client/js/jquery/utils/declarative.js:256
+#: indico/web/client/js/jquery/utils/declarative.js:265
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "Eylemi onayla"
 
-#: indico/web/client/js/jquery/utils/declarative.js:366
+#: indico/web/client/js/jquery/utils/declarative.js:375
 msgid "Direct link to this item"
 msgstr "Bu öğeye doğrudan bağlantı"
 
@@ -610,8 +606,8 @@ msgid "Clear search"
 msgstr "Aramayı temizle"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
-msgstr "Seçili kategoriniz <em>{0}</em>. İlerlemek istediğinize emin misiniz?"
+msgid "You selected category \"{0}\". Are you sure you want to proceed?"
+msgstr ""
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
@@ -1001,9 +997,9 @@ msgstr "Yeniden boyutlandırmak için taşı"
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
 msgid ""
-"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
-" applied to blocks after."
-msgstr "Şu anda <span class=\"key light\">Shift</span> tuşuna basılıdır. Değişiklikler, öbeklere daha sonra uygulanacaktır."
+"<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
+"applied to blocks after."
+msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
 msgid "Drop to move block inside session"

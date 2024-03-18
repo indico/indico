@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-12-01 00:52+0100\n"
+"POT-Creation-Date: 2024-03-18 17:55+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English (Canada) (http://app.transifex.com/indico/indico/language/en_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.14.0\n"
 "Language: en_CA\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -43,17 +43,17 @@ msgstr ""
 msgid "Building package"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:41
+#: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:53
+#: indico/modules/categories/client/js/calendar.js:134
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/calendar.js:63
+#: indico/modules/categories/client/js/calendar.js:144
 msgid "Long lasting events"
 msgstr ""
 
@@ -68,7 +68,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:383
+#: indico/modules/events/management/client/js/index.js:387
 msgid "Undo"
 msgstr ""
 
@@ -147,13 +147,13 @@ msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:377
+#: indico/modules/categories/client/js/management.js:380
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:385
+#: indico/modules/categories/client/js/management.js:388
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] ""
@@ -312,7 +312,7 @@ msgstr ""
 msgid "There are no entries that match your search criteria."
 msgstr ""
 
-#: indico/modules/events/management/client/js/index.js:381
+#: indico/modules/events/management/client/js/index.js:385
 msgid "Undoing previous operation..."
 msgstr ""
 
@@ -362,15 +362,15 @@ msgstr ""
 msgid "Press {0} to copy"
 msgstr ""
 
-#: indico/web/client/js/jquery/extensions/global.js:259
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new lecture"
 msgstr ""
 
-#: indico/web/client/js/jquery/extensions/global.js:260
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new meeting"
 msgstr ""
 
-#: indico/web/client/js/jquery/extensions/global.js:261
+#: indico/web/client/js/jquery/extensions/global.js:262
 msgid "Create new conference"
 msgstr ""
 
@@ -603,7 +603,7 @@ msgid "Clear search"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
+msgid "You selected category \"{0}\". Are you sure you want to proceed?"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23

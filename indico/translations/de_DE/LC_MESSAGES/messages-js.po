@@ -24,14 +24,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-02-13 23:55+0100\n"
+"POT-Creation-Date: 2024-03-18 17:55+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Thorsten Hindermann, 2024\n"
 "Language-Team: German (Germany) (http://app.transifex.com/indico/indico/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.14.0\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -60,17 +60,17 @@ msgstr "Materialien verwalten"
 msgid "Building package"
 msgstr "Paket wird zusammengestellt"
 
-#: indico/modules/categories/client/js/calendar.js:104
+#: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
 msgstr "Heute"
 
-#: indico/modules/categories/client/js/calendar.js:118
+#: indico/modules/categories/client/js/calendar.js:134
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] "{0} langfristige Veranstaltung wird nicht angezeigt."
 msgstr[1] "{0} langfristige Veranstaltungen werden nicht angezeigt."
 
-#: indico/modules/categories/client/js/calendar.js:128
+#: indico/modules/categories/client/js/calendar.js:144
 msgid "Long lasting events"
 msgstr "Langfristige Veranstaltungen"
 
@@ -85,7 +85,7 @@ msgstr[0] "{0} Veranstaltung"
 msgstr[1] "{0} Veranstaltungen"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:383
+#: indico/modules/events/management/client/js/index.js:387
 msgid "Undo"
 msgstr "Zurücksetzen"
 
@@ -164,13 +164,13 @@ msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] "Neue Kategorie auswählen für die Kategorie"
 msgstr[1] "Neue Kategorie auswählen für {0} ausgewählte Kategorie"
 
-#: indico/modules/categories/client/js/management.js:377
+#: indico/modules/categories/client/js/management.js:380
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Die ausgewählte Kategorie befindet sich schon hier"
 msgstr[1] "Die ausgewählten Kategorien befinden sich schon hier"
 
-#: indico/modules/categories/client/js/management.js:385
+#: indico/modules/categories/client/js/management.js:388
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Dies ist die Kategorie, die Sie verschieben möchten."
@@ -329,7 +329,7 @@ msgstr "{0} von {1} angezeigt"
 msgid "There are no entries that match your search criteria."
 msgstr "Es gibt keine Einträge, die mit den Kriterien übereinstimmen."
 
-#: indico/modules/events/management/client/js/index.js:381
+#: indico/modules/events/management/client/js/index.js:385
 msgid "Undoing previous operation..."
 msgstr "Vorherige Operation wird rückgängig gemacht…"
 

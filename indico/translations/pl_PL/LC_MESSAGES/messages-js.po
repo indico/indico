@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2023 ORGANIZATION
+# Copyright (C) 2024 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -8,20 +8,22 @@
 # Marcin Miłek, 2021-2022
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2018-2019
 # Pedro Lourenço <pedroob221@gmail.com>, 2021
+# rlalik, 2024
 # stopolewicz <stopolewicz@gmail.com>, 2012,2014
+# Tomáš Roun <tomas.roun8@gmail.com>, 2024
 # tuniek <bartosz.dziewit@us.edu.pl>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-20 12:28+0200\n"
+"POT-Creation-Date: 2024-03-18 17:55+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Marcin Miłek, 2021-2022\n"
+"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/indico/indico/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.14.0\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
@@ -50,15 +52,11 @@ msgstr "Zarządzaj materiałem"
 msgid "Building package"
 msgstr "Pakiet jest w trakcie tworzenia"
 
-#: indico/modules/categories/client/js/calendar.js:24
+#: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
 msgstr "Dziś"
 
-#: indico/modules/categories/client/js/calendar.js:50
-msgid "Events happening on {0}"
-msgstr "Wydarzenia o  {0}"
-
-#: indico/modules/categories/client/js/calendar.js:62
+#: indico/modules/categories/client/js/calendar.js:134
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] "{0} nie pokazano długotrwałego wydarzenia"
@@ -66,7 +64,7 @@ msgstr[1] "Nie pokazano długotrwałych wydarzeń {0}"
 msgstr[2] "Nie pokazano długotrwałych wydarzeń {0}"
 msgstr[3] "Nie pokazano długotrwałych wydarzeń {0}"
 
-#: indico/modules/categories/client/js/calendar.js:72
+#: indico/modules/categories/client/js/calendar.js:144
 msgid "Long lasting events"
 msgstr "Długotrwałe wydarzenia"
 
@@ -83,7 +81,7 @@ msgstr[2] "wydarzenia {0}"
 msgstr[3] "wydarzenia {0}"
 
 #: indico/modules/categories/client/js/management.js:57
-#: indico/modules/events/management/client/js/index.js:383
+#: indico/modules/events/management/client/js/index.js:387
 msgid "Undo"
 msgstr "Wycofaj"
 
@@ -169,12 +167,12 @@ msgstr[3] "Przenieś kategorie"
 #: indico/modules/categories/client/js/management.js:361
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
-msgstr[0] "Wybierz kategorię nadrzędną dla {0} wybranej kategorii "
+msgstr[0] "Wybierz kategorię nadrzędną dla wybranej kategorii "
 msgstr[1] "Wybierz kategorię nadrzędną dla {0} wybranych kategorii"
 msgstr[2] "Wybierz kategorię nadrzędną dla {0} wybranych kategorii"
 msgstr[3] "Wybierz kategorię nadrzędną dla {0} wybranych kategorii"
 
-#: indico/modules/categories/client/js/management.js:377
+#: indico/modules/categories/client/js/management.js:380
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] "Wybrana kategoria już tam jest"
@@ -182,7 +180,7 @@ msgstr[1] "Wybrane kategorie już tam są"
 msgstr[2] "Wybrane kategorie już tam są"
 msgstr[3] "Wybrane kategorie już tam są"
 
-#: indico/modules/categories/client/js/management.js:385
+#: indico/modules/categories/client/js/management.js:388
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "To jets kategoria, któą próbujesz przenieść"
@@ -328,10 +326,10 @@ msgstr "Ukryj podgląd"
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
 msgid_plural "{0} new events will be created."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{0} nowe wydarzenie zostanie utworzone."
+msgstr[1] "{0} nowe wydarzenia zostaną utworzone."
+msgstr[2] "{0} nowych wydarzeń zostanie utworzonych."
+msgstr[3] "{0} nowych wydarzeń zostanie utworzonych."
 
 #: indico/modules/events/client/js/layout.js:165
 msgid "Menu Entry Settings"
@@ -345,7 +343,7 @@ msgstr "Pokazano {0} z {1}"
 msgid "There are no entries that match your search criteria."
 msgstr "Brak pozycji spełniających kryteria wyszukiwania."
 
-#: indico/modules/events/management/client/js/index.js:381
+#: indico/modules/events/management/client/js/index.js:385
 msgid "Undoing previous operation..."
 msgstr "Wycofuję poprzednie działanie..."
 
@@ -354,11 +352,11 @@ msgstr "Wycofuję poprzednie działanie..."
 msgid "Terms and Conditions"
 msgstr "Warunki"
 
-#: indico/modules/events/registration/client/js/reglists.js:35
+#: indico/modules/events/registration/client/js/reglists.js:43
 msgid "Email Preview"
 msgstr "Podgląd maila"
 
-#: indico/modules/events/registration/client/js/reglists.js:52
+#: indico/modules/events/registration/client/js/reglists.js:60
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] "Czy chcesz usunąć wybraną rejestrację?"
@@ -397,15 +395,15 @@ msgstr "Skopiowane do schowka"
 msgid "Press {0} to copy"
 msgstr "Naciśnij {0} aby skopiować"
 
-#: indico/web/client/js/jquery/extensions/global.js:256
+#: indico/web/client/js/jquery/extensions/global.js:260
 msgid "Create new lecture"
 msgstr "Utwórz nowy wykład"
 
-#: indico/web/client/js/jquery/extensions/global.js:257
+#: indico/web/client/js/jquery/extensions/global.js:261
 msgid "Create new meeting"
 msgstr "Utwórz nowe spotkanie"
 
-#: indico/web/client/js/jquery/extensions/global.js:258
+#: indico/web/client/js/jquery/extensions/global.js:262
 msgid "Create new conference"
 msgstr "Utwórz nową konferencję"
 
@@ -431,12 +429,12 @@ msgstr "Zamknij"
 msgid "You have unsaved changes that will be lost."
 msgstr "Masz niezapisane zmiany, które stracisz. "
 
-#: indico/web/client/js/jquery/utils/declarative.js:256
+#: indico/web/client/js/jquery/utils/declarative.js:265
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:708
 msgid "Confirm action"
 msgstr "Potwierdź"
 
-#: indico/web/client/js/jquery/utils/declarative.js:366
+#: indico/web/client/js/jquery/utils/declarative.js:375
 msgid "Direct link to this item"
 msgstr "Bezpośredni odnośnik"
 
@@ -648,8 +646,8 @@ msgid "Clear search"
 msgstr "Wyczyść wyszukiwanie"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
-msgid "You selected category <em>{0}</em>. Are you sure you want to proceed?"
-msgstr "Wybrałeś kategorię <em>{0}</em>. Czy chcesz kontynuować?"
+msgid "You selected category \"{0}\". Are you sure you want to proceed?"
+msgstr ""
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
@@ -692,7 +690,7 @@ msgstr "Użyj \"{0}\""
 #: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:29
 msgid "<strong>1</strong> char left"
 msgid_plural "<strong>{0}</strong> chars left"
-msgstr[0] "<strong>{0}</strong> znaków pozostało"
+msgstr[0] "<strong>1</strong> znaków pozostało"
 msgstr[1] "<strong>{0}</strong> znaków pozostało"
 msgstr[2] "<strong>{0}</strong> znaków pozostało"
 msgstr[3] "<strong>{0}</strong> znaków pozostało"
@@ -700,7 +698,7 @@ msgstr[3] "<strong>{0}</strong> znaków pozostało"
 #: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:39
 msgid "<strong>1</strong> word left"
 msgid_plural "<strong>{0}</strong> words left"
-msgstr[0] "<strong>{0}</strong> słów pozostało"
+msgstr[0] "<strong>1</strong> słów pozostało"
 msgstr[1] "<strong>{0}</strong> słów pozostało"
 msgstr[2] "<strong>{0}</strong> słów pozostało"
 msgstr[3] "<strong>{0}</strong> słów pozostało"
@@ -1045,9 +1043,9 @@ msgstr "przenieś, aby zmienić rozmiar"
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
 msgid ""
-"<span class=\"key light\">Shift</span> is currently pressed. Changes will be"
-" applied to blocks after."
-msgstr "<span class=\"key light\">Shift</span> jest wciśnięty. Zmiany zostaną zapisane do bloków później."
+"<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
+"applied to blocks after."
+msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
 msgid "Drop to move block inside session"
