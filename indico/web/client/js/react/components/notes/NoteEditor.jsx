@@ -143,7 +143,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
             }}
             setCloseAndReload={setCloseAndReload}
             overwriteChanges={async () => {
-              handleSubmit({
+              await handleSubmit({
                 source: currentValue,
                 forceRevision: e.response.data.conflict.id,
               });

@@ -72,7 +72,7 @@ class RHApiNote(RHManageNoteBase):
     @use_kwargs({
         'render_mode': EnumField(RenderMode, load_default=RenderMode.html),
         'source': fields.String(required=True),
-        'revision_id': fields.Integer(required=False)
+        'revision_id': fields.Integer(required=False),
     })
     def _process_POST(self, render_mode, source, revision_id=None):
         note = EventNote.get_or_create(self.object)
@@ -96,7 +96,7 @@ class RHApiNote(RHManageNoteBase):
             logger.info('Note %s modified by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.change, 'Minutes', 'Updated minutes',
                            session.user, data=note.link_event_log_data)
-        return EventNoteSchema().dump(note.current_revision), 200
+        return EventNoteSchema().jsonify(note.current_revision)
 
     def _process_DELETE(self):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
@@ -107,7 +107,7 @@ class RHApiNote(RHManageNoteBase):
             logger.info('Note %s deleted by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.negative, 'Minutes', 'Removed minutes',
                            session.user, data=note.link_event_log_data)
-        return EventNoteSchema().dump(current_note_revision), 200
+        return EventNoteSchema().jsonify(current_note_revision)
 
 
 class RHApiCompileNotes(RHManageNoteBase):
