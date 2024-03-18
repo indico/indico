@@ -52,10 +52,11 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
           {
             icon: 'trash',
             title: Translate.string('Delete session block'),
+            onClick: () => dispatch(actions.deleteEntry()),
           },
         ]}
       >
-        <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} dispatch={dispatch} />
+        <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />
       </DetailsSegment>
       <DetailsSegment
         title={Translate.string('Session')}
@@ -89,13 +90,23 @@ function ContributionDetails({entry, uses24HourFormat, dispatch}) {
       actions={[
         {icon: 'edit', title: Translate.string('Edit contribution'), onClick: handleUnimplemented},
         {
-          icon: 'trash',
-          title: Translate.string('Delete contribution'),
+          icon: 'shield',
+          title: Translate.string('Manage contribution protection'),
           onClick: handleUnimplemented,
+        },
+        {
+          icon: 'clone outline',
+          title: Translate.string('Clone contribution'),
+          onClick: handleUnimplemented,
+        },
+        {
+          icon: 'trash',
+          title: Translate.string('Unschedule contribution'),
+          onClick: () => dispatch(actions.deleteEntry()),
         },
       ]}
     >
-      <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} dispatch={dispatch} />
+      <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />
       <AttachmentsDisplay entry={entry} />
     </DetailsSegment>
   );
@@ -109,15 +120,18 @@ function BreakDetails({entry, uses24HourFormat, dispatch}) {
       title={Translate.string('Break')}
       color={entry.color}
       actions={[
+        {icon: 'paint brush', title: Translate.string('Change color'), wrapper: EntryColorPicker},
         {icon: 'edit', title: Translate.string('Edit break'), onClick: handleUnimplemented},
         {
           icon: 'trash',
           title: Translate.string('Delete break'),
-          onClick: handleUnimplemented,
+          onClick: () => dispatch(actions.deleteEntry()),
         },
       ]}
+      entry={entry}
+      dispatch={dispatch}
     >
-      <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} dispatch={dispatch} />
+      <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />
     </DetailsSegment>
   );
 }

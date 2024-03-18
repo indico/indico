@@ -9,8 +9,12 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Button, Grid, Popup} from 'semantic-ui-react';
 
+import {toClasses} from 'indico/react/util';
+
 import * as actions from '../actions';
 import {entrySchema} from '../util';
+
+import './EntryColorPicker.module.scss';
 
 const AVAILABLE_COLORS = [
   [
@@ -47,7 +51,7 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
   const [open, setOpen] = useState(false);
 
   const makePickHandler = color => () => {
-    dispatch(actions.changeColor(entry, color));
+    dispatch(actions.changeColor(color));
     setOpen(false);
   };
 
@@ -69,6 +73,10 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
                     onClick={makePickHandler(color)}
                     style={{color: color.text, backgroundColor: color.background}}
                     icon="paint brush"
+                    styleName={toClasses({
+                      choice: true,
+                      selected: color.background === entry.color.background,
+                    })}
                     circular
                   />
                 </Grid.Column>

@@ -9,6 +9,7 @@ export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
+export const DELETE_ENTRY = 'Delete entry';
 export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
@@ -32,8 +33,12 @@ export function selectEntry(entry) {
   return {type: SELECT_ENTRY, entry};
 }
 
-export function changeColor(entry, color) {
-  return {type: CHANGE_COLOR, entry, color};
+export function deleteEntry() {
+  return {type: DELETE_ENTRY};
+}
+
+export function changeColor(color) {
+  return {type: CHANGE_COLOR, color};
 }
 
 export function undoChange() {
