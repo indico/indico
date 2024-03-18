@@ -61,7 +61,10 @@ const updateEntries = (entries, newEntries) => [
   ...newEntries.filter(ne => !entries.some(e => e.id === ne.id)),
 ];
 
-const mergeChanges = changes => changes.reduce((acc, change) => updateEntries(acc, change), []);
+const mergeChanges = changes =>
+  changes
+    .reduce((acc, change) => updateEntries(acc, change), [])
+    .map(c => (c.deleted ? _.pick(c, ['id', 'deleted']) : c));
 
 export const applyChanges = ({changes, currentChangeIdx, blocks, children}) => {
   const effectiveChanges = _.isNumber(currentChangeIdx)
@@ -70,7 +73,7 @@ export const applyChanges = ({changes, currentChangeIdx, blocks, children}) => {
   const newEntries = updateEntries(
     [...(blocks || []), ...(children || [])],
     mergeChanges(effectiveChanges)
-  );
+  ).filter(e => !e.deleted);
   const [newBlocks, newChildren] = _.partition(newEntries, e => !e.parentId);
   return {blocks: newBlocks, children: newChildren};
 };
@@ -296,7 +299,27 @@ export const moveEntry = (state, args) =>
 export const resizeEntry = (state, args) =>
   args.event.parentId ? moveOrResizeContrib(state, args) : resizeBlock(state, args);
 
-export const changeColor = (state, {id}, color) => addNewChange(state, [{id, color}]);
+export const deleteEntry = state => {
+  const {selectedId, children} = state;
+  const selectionChildren = children.filter(c => c.parentId === selectedId);
+  const change = addNewChange(
+    state,
+    [...selectionChildren, {id: selectedId}].map(({id}) => ({id, deleted: true}))
+  );
+  return children.some(c => c.id === selectedId) ? change : layoutBlocks(change);
+};
+
+export const changeColor = (state, color) => {
+  const {selectedId, blocks} = state;
+  const selectedBlock = blocks.find(b => b.id === selectedId);
+  return addNewChange(
+    state,
+    (_.isNumber(selectedBlock.sessionId)
+      ? blocks.filter(b => b.sessionId === selectedBlock.sessionId)
+      : [selectedBlock]
+    ).map(({id}) => ({id, color}))
+  );
+};
 
 export const getNumDays = (start, end) => Math.floor((end - start) / (24 * 60 * 60 * 1000));
 

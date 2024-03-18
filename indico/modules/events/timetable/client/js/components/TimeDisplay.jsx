@@ -89,8 +89,7 @@ TimeEditForm.propTypes = {
   uses24HourFormat: PropTypes.bool.isRequired,
 };
 
-export default function TimeDisplay({entry, uses24HourFormat, dispatch}) {
-  console.debug(dispatch); // TODO remove
+export default function TimeDisplay({entry, uses24HourFormat}) {
   return (
     <Accordion
       panels={[
@@ -123,5 +122,4 @@ export default function TimeDisplay({entry, uses24HourFormat, dispatch}) {
 TimeDisplay.propTypes = {
   entry: entrySchema.isRequired,
   uses24HourFormat: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
 };
