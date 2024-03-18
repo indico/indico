@@ -216,8 +216,8 @@ function EditableListDisplay({
         options: _.uniqBy(
           contribsWithEditables
             .map(c => c.editable.tags)
-            .filter(x => x)
-            .reduce((pre, cur) => pre.concat(cur)),
+            .filter(x => x.length)
+            .reduce((pre, cur) => pre.concat(cur), []),
           'code'
         ).map(t => ({value: t.code, text: t.code, color: t.color})),
         isMatch: (contrib, selectedOptions) =>
