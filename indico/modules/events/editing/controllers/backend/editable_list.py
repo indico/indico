@@ -45,7 +45,7 @@ class RHEditableList(RHEditableTypeEditorBase):
         RHEditableTypeEditorBase._process_args(self)
         self.contributions = (Contribution.query
                               .with_parent(self.event)
-                              .options(joinedload('editables'))
+                              .options(joinedload('editables').selectinload('revisions').selectinload('tags'))
                               .order_by(Contribution.friendly_id)
                               .all())
 

@@ -258,7 +258,8 @@ class EditableWithTagsSchema(EditableBasicSchema):
         model = Editable
         fields = (*EditableBasicSchema.Meta.fields, 'tags')
 
-    tags = fields.List(fields.Nested(EditingTagSchema), attribute='latest_revision.tags')
+    tags = fields.List(fields.Nested(EditingTagSchema, only=('id', 'code', 'title', 'color')),
+                       attribute='latest_revision.tags')
 
 
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
