@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-02-19 10:15+0100\n"
+"POT-Creation-Date: 2024-03-18 17:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.14.0\n"
 
 #: indico/modules/attachments/client/js/legacy.js:152
 msgid "This file no longer exists. Please reload the page."
@@ -41,17 +41,17 @@ msgstr ""
 msgid "Building package"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:104
+#: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
 msgstr ""
 
-#: indico/modules/categories/client/js/calendar.js:121
+#: indico/modules/categories/client/js/calendar.js:134
 msgid "{0} long-lasting event not shown"
 msgid_plural "{0} long-lasting events not shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/calendar.js:131
+#: indico/modules/categories/client/js/calendar.js:144
 msgid "Long lasting events"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgid_plural "{0} events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:57 indico/modules/events/management/client/js/index.js:383
+#: indico/modules/categories/client/js/management.js:57 indico/modules/events/management/client/js/index.js:387
 msgid "Undo"
 msgstr ""
 
@@ -142,13 +142,13 @@ msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:377
+#: indico/modules/categories/client/js/management.js:380
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/client/js/management.js:385
+#: indico/modules/categories/client/js/management.js:388
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] ""
@@ -293,7 +293,7 @@ msgstr ""
 msgid "There are no entries that match your search criteria."
 msgstr ""
 
-#: indico/modules/events/management/client/js/index.js:381
+#: indico/modules/events/management/client/js/index.js:385
 msgid "Undoing previous operation..."
 msgstr ""
 
