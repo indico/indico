@@ -82,7 +82,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
           }
         }
       }
-      if (remaining < currentDialogThreshold) {
+      if (remaining <= currentDialogThreshold) {
         setDialogCountdown(Math.max(0, remaining));
       } else {
         setExtending(false);
