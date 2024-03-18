@@ -185,6 +185,10 @@ jobs:
         if: success() || failure()
         run: indico i18n check-format-strings
 
+      - name: Check i18n HTML tags
+        if: success() || failure()
+        run: indico i18n check-html-tags
+
       - name: Run eslint
         if: success() || failure()
         run: npx eslint --ext .js --ext .jsx
