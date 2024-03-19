@@ -218,12 +218,12 @@ class RHAPIEmailEventSurveySend(RHManageSurveyBase):
                  email_all_participants, recipients_addresses):
         if from_address not in self.event.get_allowed_sender_emails():
             abort(422, messages={'from_address': ['Invalid sender address']})
-        self.recipients = []
+        self.recipients = set()
         if email_all_participants:
             registrations = Registration.get_all_for_event(self.event)
-            [self.recipients.append(x.email) for x in registrations if x not in self.recipients]
+            self.recipients |= {r.email for r in registrations}
         if recipients_addresses:
-            [self.recipients.append(x) for x in recipients_addresses if x not in self.recipients]
+            self.recipients |= set(recipients_addresses)
         for recipient in self.recipients:
             email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
             email_subject = replace_placeholders('survey-link-email', subject, event=self.event, survey=self.survey)
