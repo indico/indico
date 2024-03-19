@@ -8,6 +8,8 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
+import {Translate} from 'indico/react/i18n';
+
 export const entryColorSchema = PropTypes.shape({
   text: PropTypes.string,
   background: PropTypes.string,
@@ -29,6 +31,26 @@ export const entrySchema = PropTypes.shape({
   parentId: PropTypes.string, // only for contributions
   columnId: PropTypes.number, // set only if parentId is null
 });
+
+export const formatTitle = (title, code) => (code ? `${title} (${code})` : title);
+
+export const entryTypes = {
+  session: {
+    title: Translate.string('Session block'),
+    icon: 'calendar alternate outline',
+    formatTitle: e => `${formatTitle(e.title, e.code)}: ${formatTitle(e.slotTitle, e.sessionCode)}`,
+  },
+  contribution: {
+    title: Translate.string('Contribution'),
+    icon: 'file alternate outline',
+    formatTitle: e => formatTitle(e.title, e.code),
+  },
+  break: {
+    title: Translate.string('Break'),
+    icon: 'coffee',
+    formatTitle: e => formatTitle(e.title, e.code),
+  },
+};
 
 export const hasContributions = (block, contribs) => contribs.some(e => e.parentId === block.id);
 export const isChildOf = (contrib, block) => contrib.parentId === block.id;
@@ -69,9 +91,14 @@ const dirtyMergeChanges = ({changes, currentChangeIdx}) =>
 
 export const mergeChanges = state => {
   const entries = [...state.blocks, ...state.children];
-  return dirtyMergeChanges(state).filter(change => {
-    const entry = entries.find(e => e.id === change.id);
-    return Object.entries(change).some(([k, v]) => !_.isEqual(v, entry[k]));
+  return dirtyMergeChanges(state).flatMap(change => {
+    const old = entries.find(e => e.id === change.id);
+    const cleanChange = Object.fromEntries(
+      Object.entries(change).filter(([k, v]) => !_.isEqual(v, old[k]))
+    );
+    return Object.keys(cleanChange).length > 0
+      ? [{change: cleanChange, old, entry: {...old, ...change}}]
+      : [];
   });
 };
 
@@ -258,11 +285,11 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
 
 const moveOrResizeContrib = (state, args) => {
   const {blocks, children} = applyChanges(state);
-  const {event: contrib, start, end, resourceId: columnId} = args;
+  const {event: contrib, start, end, resourceId} = args;
 
-  const newContrib = {id: contrib.id, start, end, columnId};
+  const newContrib = {id: contrib.id, start, end, columnId: undefined};
   const newParent = getConcurrentEntries(newContrib, blocks).find(
-    b => b.columnId === columnId && b.type === 'session'
+    b => b.columnId === resourceId && b.type === 'session'
   );
   // check if it's being dragged to outside of a block
   if (!newParent) {
@@ -296,7 +323,7 @@ const moveOrResizeContrib = (state, args) => {
     }
     return addNewChange(state, rearrangedContribs);
   }
-  return addNewChange(state, [newContrib]); // TODO filter out params that havent changed
+  return addNewChange(state, [newContrib]);
 };
 
 export const moveEntry = (state, args) =>
