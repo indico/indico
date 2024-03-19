@@ -70,7 +70,8 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
       );
       if (
         remaining < REFRESH_EXPIRY_THRESHOLD &&
-        moment.utc() - expiryRefreshed > REFRESH_EXPIRY_INTERVAL // refresh again if stale
+        moment.utc() - expiryRefreshed > REFRESH_EXPIRY_INTERVAL && // refresh again if stale
+        dialogCountdown > 0 // unless the session expired
       ) {
         setExpiryRefreshed(moment.utc());
         const {expiry: newExpiry, error} = await getCurrentSessionExpiry();
@@ -88,7 +89,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         setExtending(false);
         setDialogCountdown(null);
       }
-    }, [expiry, expiryRefreshed, currentDialogThreshold]),
+    }, [expiry, expiryRefreshed, currentDialogThreshold, dialogCountdown]),
     1000
   );
 
