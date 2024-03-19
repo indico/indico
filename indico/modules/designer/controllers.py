@@ -39,6 +39,7 @@ from indico.modules.events.util import check_event_locked
 from indico.modules.logs import LogKind
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -336,14 +337,14 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                                      template_data=template_data, backside_template_data=backside_template_data,
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
 
-    def _process_POST(self):
+    @use_kwargs({
+        'backside': ModelField(DesignerTemplate, data_key='backside_template_id', load_default=None),
+    })
+    def _process_POST(self, backside):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
-
-        if backside_template_id := request.json.get('backside_template_id'):
-            if backside := DesignerTemplate.get(backside_template_id):
-                self._validate_backside_template(backside)
-
+        if backside:
+            self._validate_backside_template(backside)
         placeholders = set(get_placeholder_options(regform=self.template.registration_form))
         invalid_placeholders = {x['type'] for x in data['items']} - placeholders
         if invalid_placeholders:
