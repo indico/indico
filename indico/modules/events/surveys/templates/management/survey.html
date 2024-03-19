@@ -23,15 +23,6 @@
                         The survey is accessible only by people with this {{ link_start }}link{{ link_end }}
                     {%- endtrans %}
                 </div>
-                <div class="toolbar">
-                    <button class="i-button icon-mail highlight js-requires-selected-row send-mails-btn"
-                            data-href="{{ url_for('surveys.send_links', survey) }}"
-                            data-title="{% trans %}Send survey links{% endtrans %}"
-                            data-method="POST"
-                            data-ajax-dialog>
-                        {%- trans %}Send links{% endtrans -%}
-                    </button>
-                </div>
             </div>
         </div>
     {% endif %}
