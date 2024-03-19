@@ -50,7 +50,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
   const updateExpiry = (newExpiry, broadcast = true) => {
     setExpiry(moment.utc(newExpiry));
     if (broadcast) {
-      sessionExpiryChannel.postMessage(newExpiry);
+      sessionExpiryChannel.postMessage({expiry: newExpiry, fromInit: false});
     }
   };
 
@@ -103,8 +103,12 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         console.log('ignoring new expiry on expired session');
         return;
       }
-      updateExpiry(evt.data, false);
+      const {expiry: newExpiry, fromInit} = evt.data;
+      updateExpiry(newExpiry, false);
       setExpiryRefreshed(moment.utc());
+      if (!fromInit) {
+        setSnoozeThreshold(null);
+      }
       setDismissed(false);
     };
     sessionExpiryChannel.addEventListener('message', handler);
@@ -258,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   const sessionExpiry = root.dataset.sessionExpiry;
   const hardExpiry = root.dataset.hardExpiry !== undefined;
-  sessionExpiryChannel.postMessage(sessionExpiry);
+  sessionExpiryChannel.postMessage({expiry: sessionExpiry, fromInit: true});
   ReactDOM.render(
     <SessionExpiryManager initialExpiry={sessionExpiry} hardExpiry={hardExpiry} />,
     root
