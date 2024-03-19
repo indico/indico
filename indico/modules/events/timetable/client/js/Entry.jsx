@@ -9,12 +9,12 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 
 import * as selectors from './selectors';
-import {entrySchema, isChildOf} from './util';
+import {entrySchema, entryTypes, isChildOf} from './util';
 
 import './Entry.module.scss';
 
 export default function Entry({event: entry}) {
-  const {title, slotTitle, code} = entry;
+  const {type, title} = entry;
   const contributions = useSelector(selectors.getChildren);
   const displayMode = useSelector(selectors.getDisplayMode);
   const hasContribs = contributions.some(c => isChildOf(c, entry));
@@ -23,11 +23,7 @@ export default function Entry({event: entry}) {
     <>
       {displayMode === 'compact' && hasContribs && <div styleName="compact-title">{title}</div>}
       <div styleName="entry-title">
-        {(displayMode !== 'compact' || !hasContribs) && [
-          title,
-          slotTitle && `: ${slotTitle}`,
-          code && ` (${code})`,
-        ]}
+        {(displayMode !== 'compact' || !hasContribs) && entryTypes[type].formatTitle(entry)}
       </div>
     </>
   );

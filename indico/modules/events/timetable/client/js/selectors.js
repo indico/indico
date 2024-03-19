@@ -66,10 +66,6 @@ export const getMergedChanges = createSelector(
   getEntries,
   entries => mergeChanges(entries)
 );
-export const canSave = createSelector(
-  getMergedChanges,
-  changes => changes.length > 0
-);
 
 export const getNavbarMaxDays = createSelector(
   getNavigation,

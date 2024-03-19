@@ -9,12 +9,14 @@ import _ from 'lodash';
 
 import * as actions from './actions';
 import {
+  applyChanges,
   resizeEntry,
   deleteEntry,
   preprocessEntries,
   resizeWindow,
   moveEntry,
   changeColor,
+  mergeChanges,
 } from './util';
 
 const entryTypeMapping = {
@@ -80,6 +82,14 @@ export default {
         return {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
+        };
+      case actions.SAVE_CHANGES:
+        console.log('[UNIMPLEMENTED] Saving changes:', mergeChanges(state));
+        return {
+          ...state,
+          ...applyChanges(state),
+          changes: [],
+          currentChangeIdx: 0,
         };
       default:
         return state;

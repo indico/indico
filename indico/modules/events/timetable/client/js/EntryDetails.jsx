@@ -18,7 +18,7 @@ import DetailsSegment from './components/DetailsSegment';
 import EntryColorPicker from './components/EntryColorPicker';
 import TimeDisplay from './components/TimeDisplay';
 import * as selectors from './selectors';
-import {entrySchema, handleUnimplemented, isChildOf} from './util';
+import {entrySchema, formatTitle, handleUnimplemented, isChildOf} from './util';
 
 import './EntryDetails.module.scss';
 
@@ -27,8 +27,6 @@ const entryIcons = {
   contribution: 'file alternate outline',
   break: 'coffee',
 };
-
-const formatTitle = (title, code) => (code ? `${title} (${code})` : title);
 
 const detailsPropTypes = {
   entry: entrySchema.isRequired,
