@@ -82,10 +82,8 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       }}
       sentEmailsCount={sentCount}
       validate={values => {
-        const errors = {};
         if (!values.email_all_participants && !values.recipients_addresses.length) {
-          errors.recipients_addresses = Translate.string('You must choose at least one recipient');
-          return errors;
+          return {recipients_addresses: Translate.string('You must choose at least one recipient')};
         } else {
           return undefined;
         }
