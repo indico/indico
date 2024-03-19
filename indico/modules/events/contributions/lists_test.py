@@ -44,7 +44,7 @@ def test_filter_contrib_entries(app, dummy_event, create_user, create_contributi
     # Filter contributions with registered users
     with app.test_request_context():
         list_gen = ContributionListGenerator(dummy_event)
-        list_gen.list_config['filters'] = {'items': {'people': {'registered'}}}
+        list_gen.list_config['filters'] = {'extra': {'people': {'registered'}}}
         result = list_gen.get_list_kwargs()
     assert result['contribs'] == [
         registered_speaker_contribution,
@@ -54,7 +54,7 @@ def test_filter_contrib_entries(app, dummy_event, create_user, create_contributi
     ]
 
     # Filter contributions with registered speakers
-    list_gen.list_config['filters'] = {'items': {'speakers': {'registered'}}}
+    list_gen.list_config['filters'] = {'extra': {'speakers': {'registered'}}}
     with app.test_request_context():
         result = list_gen.get_list_kwargs()
     assert result['contribs'] == [
@@ -64,7 +64,7 @@ def test_filter_contrib_entries(app, dummy_event, create_user, create_contributi
     ]
 
     # Filter contributions with unregistered speakers and registered users
-    list_gen.list_config['filters'] = {'items': {'speakers': {'not_registered'}, 'people': {'registered'}}}
+    list_gen.list_config['filters'] = {'extra': {'speakers': {'not_registered'}, 'people': {'registered'}}}
     with app.test_request_context():
         result = list_gen.get_list_kwargs()
     assert result['contribs'] == [

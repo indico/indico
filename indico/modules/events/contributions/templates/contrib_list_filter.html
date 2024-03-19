@@ -3,8 +3,9 @@
 {% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false, clickable=true) %}
     {% set filters = filters['items'] if is_static_item else filters['fields'] %}
     <div class="label-group list-column">
-        <div class="i-label {% if clickable %}title-wrapper{% endif %}"
-             data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}">
+        <div class="i-label title-wrapper"
+             data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}"
+             {% if not clickable %}data-only-filter{% endif %}>
             <div class="title">{{ item.title }}</div>
             {% if clickable %}
                 <div class="actions">
