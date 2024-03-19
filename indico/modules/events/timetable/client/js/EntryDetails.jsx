@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Header, Icon} from 'semantic-ui-react';
+import {Accordion, Divider, Header, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -18,7 +18,7 @@ import DetailsSegment from './components/DetailsSegment';
 import EntryColorPicker from './components/EntryColorPicker';
 import TimeDisplay from './components/TimeDisplay';
 import * as selectors from './selectors';
-import {entrySchema} from './util';
+import {entrySchema, handleUnimplemented, isChildOf} from './util';
 
 import './EntryDetails.module.scss';
 
@@ -36,9 +36,52 @@ const detailsPropTypes = {
   dispatch: PropTypes.func.isRequired,
 };
 
-// TODO remove
-// eslint-disable-next-line no-alert
-export const handleUnimplemented = () => alert('desole, ça marche pas encore :(');
+function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
+  const children = useSelector(selectors.getChildren);
+  const contribs = children.filter(c => isChildOf(c, entry));
+
+  if (contribs.length === 0) {
+    return (
+      <p>
+        <Translate as="strong">Contributions</Translate>: <Icon name="file alternate outline" />
+        <Translate as="em">None</Translate>
+      </p>
+    );
+  }
+
+  return (
+    <Accordion
+      panels={[
+        {
+          key: 'contribs',
+          title: {
+            content: (
+              <>
+                <Translate as="strong">Contributions</Translate>:{' '}
+                <Icon name="file alternate outline" />
+                {contribs.length}
+              </>
+            ),
+            icon: null,
+          },
+          content: {
+            content: contribs.map(contrib => (
+              <ContributionDetails
+                key={contrib.id}
+                entry={contrib}
+                uses24HourFormat={uses24HourFormat}
+                dispatch={dispatch}
+                showTitle
+              />
+            )),
+          },
+        },
+      ]}
+    />
+  );
+}
+
+ContributionsDisplay.propTypes = detailsPropTypes;
 
 function SessionDetails({entry, uses24HourFormat, dispatch}) {
   const {title, slotTitle, code, color} = entry;
@@ -52,11 +95,17 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
           {
             icon: 'trash',
             title: Translate.string('Delete session block'),
-            onClick: () => dispatch(actions.deleteEntry()),
+            onClick: () => dispatch(actions.deleteEntry(entry)),
           },
         ]}
       >
         <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />
+        <Divider />
+        <ContributionsDisplay
+          entry={entry}
+          uses24HourFormat={uses24HourFormat}
+          dispatch={dispatch}
+        />
       </DetailsSegment>
       <DetailsSegment
         title={Translate.string('Session')}
@@ -82,7 +131,7 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
 
 SessionDetails.propTypes = detailsPropTypes;
 
-function ContributionDetails({entry, uses24HourFormat, dispatch}) {
+function ContributionDetails({entry, uses24HourFormat, dispatch, showTitle}) {
   return (
     <DetailsSegment
       title={Translate.string('Contribution')}
@@ -102,17 +151,29 @@ function ContributionDetails({entry, uses24HourFormat, dispatch}) {
         {
           icon: 'trash',
           title: Translate.string('Unschedule contribution'),
-          onClick: () => dispatch(actions.deleteEntry()),
+          onClick: () => dispatch(actions.deleteEntry(entry)),
         },
       ]}
     >
+      {showTitle && (
+        <div>
+          <Translate as="strong">Title</Translate>: {entry.title}
+        </div>
+      )}
       <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />
       <AttachmentsDisplay entry={entry} />
     </DetailsSegment>
   );
 }
 
-ContributionDetails.propTypes = detailsPropTypes;
+ContributionDetails.propTypes = {
+  ...detailsPropTypes,
+  showTitle: PropTypes.bool,
+};
+
+ContributionDetails.defaultProps = {
+  showTitle: false,
+};
 
 function BreakDetails({entry, uses24HourFormat, dispatch}) {
   return (
@@ -125,7 +186,7 @@ function BreakDetails({entry, uses24HourFormat, dispatch}) {
         {
           icon: 'trash',
           title: Translate.string('Delete break'),
-          onClick: () => dispatch(actions.deleteEntry()),
+          onClick: () => dispatch(actions.deleteEntry(entry)),
         },
       ]}
       entry={entry}
@@ -153,28 +214,30 @@ export default function EntryDetails() {
   }[type];
 
   return (
-    <div styleName="details">
-      <Icon
-        name="close"
-        color="black"
-        className="right"
-        onClick={() => dispatch(actions.selectEntry(null))}
-        title={Translate.string('Close details')}
-        link
-      />
-      <Header
-        size="small"
-        color="blue"
-        icon={entryIcons[type]}
-        content={formatTitle(title, code)}
-        subheader={formatTitle(slotTitle, sessionCode)}
-      />
-      {description && <div styleName="description">{description}</div>}
-      <PopupContentComponent
-        entry={entry}
-        uses24HourFormat={uses24HourFormat}
-        dispatch={dispatch}
-      />
+    <div styleName="details-container">
+      <div styleName="content">
+        <Icon
+          name="close"
+          color="black"
+          className="right"
+          onClick={() => dispatch(actions.selectEntry(null))}
+          title={Translate.string('Close details')}
+          link
+        />
+        <Header
+          size="small"
+          color="blue"
+          icon={entryIcons[type]}
+          content={formatTitle(title, code)}
+          subheader={formatTitle(slotTitle, sessionCode)}
+        />
+        {description && <div styleName="description">{description}</div>}
+        <PopupContentComponent
+          entry={entry}
+          uses24HourFormat={uses24HourFormat}
+          dispatch={dispatch}
+        />
+      </div>
     </div>
   );
 }

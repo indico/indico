@@ -68,7 +68,7 @@ export default {
       case actions.SELECT_ENTRY:
         return {...state, selectedId: action.entry?.id};
       case actions.DELETE_ENTRY:
-        return {...state, ...deleteEntry(state), selectedId: null};
+        return {...state, ...deleteEntry(state, action.entry), selectedId: null};
       case actions.CHANGE_COLOR:
         return {...state, ...changeColor(state, action.color)};
       case actions.UNDO_CHANGE:
