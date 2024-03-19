@@ -28,7 +28,7 @@
 }
 
 :global(.segment) {
-  &:hover .segment-header:global(.ui.label) .actions {
+  &:hover > .segment-header:global(.ui.label) .actions {
     display: flex;
   }
 }

@@ -15,20 +15,29 @@ import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
-import {getNumDays} from './util';
+import {getNumDays, handleUnimplemented} from './util';
 
 import './Toolbar.module.scss';
 
 const SCROLL_STEP = 3;
 
-const displayModes = {
-  compact: {
-    title: Translate.string('Compact timetable'),
+const displayModes = [
+  {
+    name: 'compact',
+    title: Translate.string('Compact', 'timetable display mode'),
     icon: 'minus square outline',
-    next: 'full',
   },
-  full: {title: Translate.string('Full timetable'), icon: 'plus square outline', next: 'compact'},
-};
+  {
+    name: 'full',
+    title: Translate.string('Full', 'timetable display mode'),
+    icon: 'plus square outline',
+  },
+  {
+    name: 'blocks',
+    title: Translate.string('Blocks', 'timetable display mode'),
+    icon: 'block layout',
+  },
+];
 
 export default function Toolbar({date, localizer, onNavigate}) {
   const dispatch = useDispatch();
@@ -37,10 +46,10 @@ export default function Toolbar({date, localizer, onNavigate}) {
   const numDays = useSelector(selectors.getEventNumDays);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
+  const canSave = useSelector(selectors.canSave);
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
-  const _displayMode = useSelector(selectors.getDisplayMode);
-  const displayMode = displayModes[_displayMode];
+  const displayMode = useSelector(selectors.getDisplayMode);
   const currentDayIdx = getNumDays(eventStart, date);
 
   const handleResize = useCallback(() => {
@@ -135,12 +144,21 @@ export default function Toolbar({date, localizer, onNavigate}) {
             />
           </>
         )}
-        <Menu.Item
-          onClick={() => dispatch(actions.setDisplayMode(displayMode.next))}
-          icon={displayMode.icon}
-          position={numDays <= maxDays ? 'right' : undefined}
+        <Dropdown
+          icon="columns"
           styleName="action"
-          title={displayMode.title}
+          className={numDays <= maxDays ? 'right' : undefined}
+          direction="left"
+          title={Translate.string('Display mode')}
+          value={displayMode}
+          options={displayModes.map(({name, title, icon}) => ({
+            key: name,
+            value: name,
+            text: title,
+            icon,
+            onClick: () => dispatch(actions.setDisplayMode(name)),
+          }))}
+          item
         />
         <Dropdown
           icon="add"
@@ -154,11 +172,28 @@ export default function Toolbar({date, localizer, onNavigate}) {
             <Dropdown.Item
               text={Translate.string('Session block')}
               icon="calendar alternate outline"
+              onClick={handleUnimplemented}
             />
-            <Dropdown.Item text={Translate.string('Contribution')} icon="file alternate outline" />
-            <Dropdown.Item text={Translate.string('Break')} icon="coffee" />
+            <Dropdown.Item
+              text={Translate.string('Contribution')}
+              icon="file alternate outline"
+              onClick={handleUnimplemented}
+            />
+            <Dropdown.Item
+              text={Translate.string('Break')}
+              icon="coffee"
+              onClick={handleUnimplemented}
+            />
           </Dropdown.Menu>
         </Dropdown>
+        <Menu.Item
+          onClick={handleUnimplemented}
+          content={Translate.string('Save')}
+          title={Translate.string('Review and save changes')}
+          style={{textTransform: 'uppercase', fontWeight: 'bold'}}
+          icon={canSave ? {name: 'exclamation triangle', color: 'red'} : undefined}
+          disabled={!canSave}
+        />
       </Menu>
     </div>
   );

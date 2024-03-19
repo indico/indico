@@ -7,7 +7,7 @@
 
 import {createSelector} from 'reselect';
 
-import {applyChanges, getNumDays} from './util';
+import {applyChanges, getNumDays, mergeChanges} from './util';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
@@ -61,6 +61,14 @@ export const canUndo = createSelector(
 export const canRedo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx < entries.changes.length
+);
+export const getMergedChanges = createSelector(
+  getEntries,
+  entries => mergeChanges(entries)
+);
+export const canSave = createSelector(
+  getMergedChanges,
+  changes => changes.length > 0
 );
 
 export const getNavbarMaxDays = createSelector(

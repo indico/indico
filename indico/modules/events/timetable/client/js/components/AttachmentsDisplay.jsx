@@ -10,8 +10,7 @@ import {Icon} from 'semantic-ui-react';
 
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import {handleUnimplemented} from '../EntryDetails';
-import {entrySchema} from '../util';
+import {entrySchema, handleUnimplemented} from '../util';
 
 export default function AttachmentsDisplay({entry}) {
   const {attachmentCount} = entry;

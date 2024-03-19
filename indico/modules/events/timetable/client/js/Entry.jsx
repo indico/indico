@@ -23,7 +23,7 @@ export default function Entry({event: entry}) {
     <>
       {displayMode === 'compact' && hasContribs && <div styleName="compact-title">{title}</div>}
       <div styleName="entry-title">
-        {(displayMode === 'full' || !hasContribs) && [
+        {(displayMode !== 'compact' || !hasContribs) && [
           title,
           slotTitle && `: ${slotTitle}`,
           code && ` (${code})`,

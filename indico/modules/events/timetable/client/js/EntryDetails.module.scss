@@ -7,12 +7,17 @@
 
 @use 'base/palette' as *;
 
-.details {
+.details-container {
   margin: 1em;
   padding: 1em;
   width: 25em;
   flex-shrink: 0;
   border-left: 1px solid $separator-color;
+
+  .content {
+    position: sticky;
+    top: 3em;
+  }
 
   .description {
     max-height: 6em;
