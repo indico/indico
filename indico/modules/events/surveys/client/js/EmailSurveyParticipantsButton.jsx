@@ -21,10 +21,8 @@ export function EmailSurveyParticipantsButton({eventId, surveyId, surveyActive})
         type="button"
         className="i-button icon-mail"
         disabled={!surveyActive}
-        onClick={evt => {
-          if (!evt.target.classList.contains('disabled')) {
-            setOpen(true);
-          }
+        onClick={() => {
+          setOpen(true);
         }}
       >
         <Translate>Email</Translate>
