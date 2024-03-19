@@ -339,6 +339,11 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
+
+        if backside_template_id := request.json.get('backside_template_id'):
+            if backside := DesignerTemplate.get(backside_template_id):
+                self._validate_backside_template(backside)
+
         placeholders = set(get_placeholder_options(regform=self.template.registration_form))
         invalid_placeholders = {x['type'] for x in data['items']} - placeholders
         if invalid_placeholders:
@@ -356,6 +361,35 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                         clear_background=request.json['clear_background'])
         flash(_('Template successfully saved.'), 'success')
         return jsonify_data()
+
+    def _validate_backside_template(self, backside_template):
+        """Verify if the given template can be used as a backside for the current template.
+
+        A template can be used as a backside if:
+            - frontside != backside
+            - backside does't already have its own backside
+            - it has the same size as the frontside
+            - the templates are linked to the same registration form or
+              at least one template is not linked to any registration form
+        """
+        same_size = (
+            self.template.data['width'] == backside_template.data['width'] and
+            self.template.data['height'] == backside_template.data['height']
+        )
+
+        linked_to_same_regform = (
+            not self.template.registration_form or
+            not backside_template.registration_form or
+            self.template.registration_form == backside_template.registration_form
+        )
+
+        if (
+            self.template == backside_template or
+            backside_template.backside_template or
+            not same_size or
+            not linked_to_same_regform
+        ):
+            raise BadRequest('Incompatible backside template')
 
 
 class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
