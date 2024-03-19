@@ -218,14 +218,13 @@ class ContributionListGenerator(ListGeneratorBase):
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
         registered_persons = get_registered_event_persons(self.event)
-        contrib_fields = self.get_all_custom_fields()
         dynamic_item_ids, static_item_ids = self._split_item_ids(list_config.get('items', ()), 'dynamic')
         static_columns = self._get_static_columns(static_item_ids)
         dynamic_columns = self._get_sorted_custom_fields(dynamic_item_ids)
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration, 'selected_entry': selected_entry,
-                'registered_persons': registered_persons, 'contrib_fields': contrib_fields,
-                'static_columns': static_columns, 'dynamic_columns': dynamic_columns}
+                'registered_persons': registered_persons, 'static_columns': static_columns,
+                'dynamic_columns': dynamic_columns}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.
