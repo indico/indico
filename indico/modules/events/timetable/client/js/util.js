@@ -61,21 +61,27 @@ const updateEntries = (entries, newEntries) => [
   ...newEntries.filter(ne => !entries.some(e => e.id === ne.id)),
 ];
 
-const mergeChanges = changes =>
+const dirtyMergeChanges = ({changes, currentChangeIdx}) =>
   changes
+    .slice(0, currentChangeIdx)
     .reduce((acc, change) => updateEntries(acc, change), [])
     .map(c => (c.deleted ? _.pick(c, ['id', 'deleted']) : c));
 
-export const applyChanges = ({changes, currentChangeIdx, blocks, children}) => {
-  const effectiveChanges = _.isNumber(currentChangeIdx)
-    ? changes.slice(0, currentChangeIdx)
-    : changes;
+export const mergeChanges = state => {
+  const entries = [...state.blocks, ...state.children];
+  return dirtyMergeChanges(state).filter(change => {
+    const entry = entries.find(e => e.id === change.id);
+    return Object.entries(change).some(([k, v]) => !_.isEqual(v, entry[k]));
+  });
+};
+
+export const applyChanges = state => {
   const newEntries = updateEntries(
-    [...(blocks || []), ...(children || [])],
-    mergeChanges(effectiveChanges)
+    [...(state.blocks || []), ...(state.children || [])],
+    dirtyMergeChanges(state)
   ).filter(e => !e.deleted);
-  const [newBlocks, newChildren] = _.partition(newEntries, e => !e.parentId);
-  return {blocks: newBlocks, children: newChildren};
+  const [blocks, children] = _.partition(newEntries, e => !e.parentId);
+  return {blocks, children};
 };
 
 const updateLastChange = (changes, newChange) => [
@@ -299,14 +305,14 @@ export const moveEntry = (state, args) =>
 export const resizeEntry = (state, args) =>
   args.event.parentId ? moveOrResizeContrib(state, args) : resizeBlock(state, args);
 
-export const deleteEntry = state => {
-  const {selectedId, children} = state;
-  const selectionChildren = children.filter(c => c.parentId === selectedId);
-  const change = addNewChange(
-    state,
-    [...selectionChildren, {id: selectedId}].map(({id}) => ({id, deleted: true}))
+export const deleteEntry = (state, entry) => {
+  if (entry.parentId) {
+    return addNewChange(state, [{id: entry.id, deleted: true}]);
+  }
+  const contribs = state.children.filter(c => isChildOf(c, entry));
+  return layoutBlocks(
+    addNewChange(state, [...contribs, entry].map(({id}) => ({id, deleted: true})))
   );
-  return children.some(c => c.id === selectedId) ? change : layoutBlocks(change);
 };
 
 export const changeColor = (state, color) => {
@@ -331,3 +337,7 @@ export const resizeWindow = ({offset}, {newSize, dayIdx}) => {
     offset: numDaysOutOfBounds > 0 ? offset + numDaysOutOfBounds : offset,
   };
 };
+
+// TODO remove
+// eslint-disable-next-line no-alert
+export const handleUnimplemented = () => alert('desole, ça marche pas encore :(');

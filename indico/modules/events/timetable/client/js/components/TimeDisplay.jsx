@@ -16,8 +16,7 @@ import {Accordion, Form, Icon} from 'semantic-ui-react';
 import {FinalCheckbox, FinalField, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {handleUnimplemented} from '../EntryDetails';
-import {entrySchema} from '../util';
+import {entrySchema, handleUnimplemented} from '../util';
 
 function TimePickerField({value, onChange, uses24HourFormat}) {
   return (

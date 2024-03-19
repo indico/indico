@@ -12,6 +12,7 @@
 
   :global(.rbc-calendar) {
     flex-grow: 1;
+    min-width: 0;
   }
 
   &.compact .parent-entry {
@@ -24,8 +25,17 @@
     }
   }
 
-  &:not(.compact) :global(.rbc-day-slot) {
+  &.full :global(.rbc-day-slot) {
     min-width: 25em;
+  }
+
+  &.blocks :global(.rbc-day-slot) {
+    min-width: 0;
+  }
+
+  &:not(.blocks) .parent-entry {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
 
   :global(.rbc-allday-cell),
@@ -52,11 +62,6 @@
 
     &.selected {
       filter: brightness(0.8);
-    }
-
-    &.parent-entry {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
     }
 
     &.child-entry {

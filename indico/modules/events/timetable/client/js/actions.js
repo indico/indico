@@ -33,8 +33,8 @@ export function selectEntry(entry) {
   return {type: SELECT_ENTRY, entry};
 }
 
-export function deleteEntry() {
-  return {type: DELETE_ENTRY};
+export function deleteEntry(entry) {
+  return {type: DELETE_ENTRY, entry};
 }
 
 export function changeColor(color) {

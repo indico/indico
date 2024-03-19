@@ -5,11 +5,26 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.toolbar :global(.ui.menu) {
-  margin-bottom: 0;
+@use 'base/palette' as *;
 
-  .action {
-    padding-left: 0.7em;
-    padding-right: 0.7em;
+.toolbar {
+  position: sticky;
+  top: 0;
+  padding-top: 1.5em;
+  margin-top: -1.5em;
+  background-color: $white;
+  z-index: 100;
+
+  :global(.ui.menu) {
+    margin-bottom: 0;
+
+    .action {
+      padding-left: 0.7em;
+      padding-right: 0.7em;
+
+      :global(.divider.text) {
+        display: none;
+      }
+    }
   }
 }

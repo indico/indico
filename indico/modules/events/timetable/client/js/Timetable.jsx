@@ -11,8 +11,6 @@ import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {toClasses} from 'indico/react/util';
-
 import * as actions from './actions';
 import Entry from './Entry';
 import EntryDetails from './EntryDetails';
@@ -57,11 +55,11 @@ export default function Timetable() {
   }, 17);
 
   return (
-    <div styleName={toClasses({timetable: true, compact: displayMode === 'compact'})}>
+    <div styleName={`timetable ${displayMode}`}>
       <DnDCalendar
         date={date}
         defaultView="day"
-        events={entries}
+        events={displayMode === 'blocks' ? blocks : entries}
         localizer={localizer}
         views={{day: true}}
         components={{toolbar: Toolbar, event: Entry}}
