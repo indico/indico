@@ -13,6 +13,7 @@
   :global(.rbc-calendar) {
     flex-grow: 1;
     min-width: 0;
+    height: auto;
   }
 
   &.compact .parent-entry {

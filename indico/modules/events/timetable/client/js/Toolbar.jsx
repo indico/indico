@@ -14,8 +14,9 @@ import {Dropdown, Menu} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import SaveButton from './components/SaveButton';
 import * as selectors from './selectors';
-import {getNumDays, handleUnimplemented} from './util';
+import {entryTypes, getNumDays, handleUnimplemented} from './util';
 
 import './Toolbar.module.scss';
 
@@ -46,7 +47,6 @@ export default function Toolbar({date, localizer, onNavigate}) {
   const numDays = useSelector(selectors.getEventNumDays);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
-  const canSave = useSelector(selectors.canSave);
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
@@ -169,31 +169,17 @@ export default function Toolbar({date, localizer, onNavigate}) {
         >
           <Dropdown.Menu>
             <Dropdown.Header content={Translate.string('Add new')} />
-            <Dropdown.Item
-              text={Translate.string('Session block')}
-              icon="calendar alternate outline"
-              onClick={handleUnimplemented}
-            />
-            <Dropdown.Item
-              text={Translate.string('Contribution')}
-              icon="file alternate outline"
-              onClick={handleUnimplemented}
-            />
-            <Dropdown.Item
-              text={Translate.string('Break')}
-              icon="coffee"
-              onClick={handleUnimplemented}
-            />
+            {['session', 'contribution', 'break'].map(type => (
+              <Dropdown.Item
+                key={type}
+                text={entryTypes[type].title}
+                icon={entryTypes[type].icon}
+                onClick={handleUnimplemented}
+              />
+            ))}
           </Dropdown.Menu>
         </Dropdown>
-        <Menu.Item
-          onClick={handleUnimplemented}
-          content={Translate.string('Save')}
-          title={Translate.string('Review and save changes')}
-          style={{textTransform: 'uppercase', fontWeight: 'bold'}}
-          icon={canSave ? {name: 'exclamation triangle', color: 'red'} : undefined}
-          disabled={!canSave}
-        />
+        <SaveButton as={Menu.Item} styleName="save-button" />
       </Menu>
     </div>
   );

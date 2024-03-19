@@ -47,18 +47,21 @@ export default function DetailsSegment({
   title,
   subtitle,
   color,
+  icon,
   actions,
   children,
   entry,
   dispatch,
+  ...rest
 }) {
   return (
-    <Segment style={{borderColor: color?.background}}>
+    <Segment style={{borderColor: color?.background}} {...rest}>
       <Label
         style={{backgroundColor: color?.background, color: color?.text}}
         styleName="segment-header"
         attached="top"
       >
+        {icon && <Icon name={icon} />}
         <Translate>{title}</Translate>
         {subtitle && <Label.Detail>{subtitle}</Label.Detail>}
         <div styleName="actions">
@@ -85,7 +88,8 @@ DetailsSegment.propTypes = {
   title: PropTypes.string.isRequired,
   subtitle: PropTypes.string,
   color: entryColorSchema,
-  actions: PropTypes.arrayOf(PropTypes.shape(actionShape)).isRequired,
+  icon: PropTypes.string,
+  actions: PropTypes.arrayOf(PropTypes.shape(actionShape)),
   children: PropTypes.node.isRequired,
   entry: entrySchema,
   dispatch: PropTypes.func,
@@ -93,6 +97,8 @@ DetailsSegment.propTypes = {
 
 DetailsSegment.defaultProps = {
   subtitle: '',
+  icon: null,
+  actions: [],
   color: {},
   entry: null,
   dispatch: () => {},
