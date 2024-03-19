@@ -21,8 +21,13 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 const sessionExpiryChannel = new BroadcastChannel('indico-session-expiry');
 
-const REFRESH_EXPIRY_THRESHOLD = 1500; // TODO lower this
-const SHOW_DIALOG_THRESHOLD = 1295; // TODO lower this
+// TODO lower these
+const REFRESH_EXPIRY_THRESHOLD = 1500;
+const THRESHOLDS = [
+  1295, // initial
+  1275, // first snooze
+  1250, // second snooze - afterwards the snooze option will be replaced with dismiss
+];
 const REFRESH_EXPIRY_INTERVAL = 60000;
 
 const getTimeLeft = expiry => Math.max(0, Math.floor((expiry - moment.utc()) / 1000));
@@ -45,7 +50,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
   const [dialogCountdown, setDialogCountdown] = useState(null);
   const [extending, setExtending] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [snoozeThreshold, setSnoozeThreshold] = useState(null);
+  const [snoozeLevel, setSnoozeLevel] = useState(0);
 
   const updateExpiry = (newExpiry, broadcast = true) => {
     setExpiry(moment.utc(newExpiry));
@@ -54,7 +59,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
     }
   };
 
-  const currentDialogThreshold = snoozeThreshold || SHOW_DIALOG_THRESHOLD;
+  const currentDialogThreshold = THRESHOLDS[snoozeLevel];
 
   useInterval(
     useCallback(async () => {
@@ -66,7 +71,9 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         'show threshold',
         currentDialogThreshold,
         'data age',
-        (moment.utc() - expiryRefreshed) / 1000
+        (moment.utc() - expiryRefreshed) / 1000,
+        'snooze level',
+        snoozeLevel
       );
       if (
         remaining < REFRESH_EXPIRY_THRESHOLD &&
@@ -89,7 +96,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         setExtending(false);
         setDialogCountdown(null);
       }
-    }, [expiry, expiryRefreshed, currentDialogThreshold, dialogCountdown]),
+    }, [expiry, expiryRefreshed, currentDialogThreshold, dialogCountdown, snoozeLevel]),
     1000
   );
 
@@ -108,13 +115,15 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
       updateExpiry(newExpiry, false);
       setExpiryRefreshed(moment.utc());
       if (!fromInit) {
-        setSnoozeThreshold(null);
+        setSnoozeLevel(0);
       }
+      const newRemaining = Math.max(0, getTimeLeft(moment.utc(newExpiry)));
+      setDialogCountdown(newRemaining < currentDialogThreshold ? newRemaining : null);
       setDismissed(false);
     };
     sessionExpiryChannel.addEventListener('message', handler);
     return () => sessionExpiryChannel.removeEventListener('message', handler);
-  }, [dialogCountdown]);
+  }, [dialogCountdown, currentDialogThreshold]);
 
   const handleExtend = async () => {
     setExtending(true);
@@ -124,7 +133,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
     console.log('new expiry after refresh', newExpiry, getTimeLeft(moment.utc(newExpiry)));
     updateExpiry(newExpiry);
     setDialogCountdown(null); // do not wait for next interval to close
-    setSnoozeThreshold(null);
+    setSnoozeLevel(0);
     setExtending(false);
   };
 
@@ -137,7 +146,8 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
     // we do not broadcast snooze to other tabs on purpose since people may just want to finish
     // something in one tab, but not necessarily in another one (where they may end up refreshing
     // or logging in again)
-    setSnoozeThreshold(Math.ceil(dialogCountdown / 2));
+    const currentSnoozeIndex = THRESHOLDS.findLastIndex(t => dialogCountdown <= t);
+    setSnoozeLevel(currentSnoozeIndex + 1);
     setDialogCountdown(null); // do not wait for next interval to close
   };
 
@@ -182,6 +192,8 @@ function SessionExpiryCountdownBody({
   hardExpiry,
 }) {
   const expired = remaining === 0;
+  const maxSnoozeReached = remaining <= THRESHOLDS[THRESHOLDS.length - 1];
+  const canDismiss = expired || maxSnoozeReached;
   return (
     <>
       <Modal.Header>
@@ -209,15 +221,29 @@ function SessionExpiryCountdownBody({
               </p>
             </>
           ) : hardExpiry ? (
-            <Translate>
-              Your session will expire soon and you need to log in again to renew it if you wish to
-              continue using Indico.
-            </Translate>
+            <>
+              <Translate as="p">
+                Your session will expire soon and you need to log in again to renew it if you wish
+                to continue using Indico.
+              </Translate>
+              {canDismiss && (
+                <Translate as="p">
+                  If you dismiss this message, it will not show up until your session expired.
+                </Translate>
+              )}
+            </>
           ) : (
-            <Translate>
-              Click on the "Refresh" button if you wish to continue using Indico or you will be
-              logged out.
-            </Translate>
+            <>
+              <Translate as="p">
+                Click on the "Refresh" button if you wish to continue using Indico or you will be
+                logged out.
+              </Translate>
+              {canDismiss && (
+                <Translate as="p">
+                  If you dismiss this message, it will not show up until your session expired.
+                </Translate>
+              )}
+            </>
           )}
           {!expired && <center className="ui large header">{remaining}</center>}
         </>
@@ -232,7 +258,7 @@ function SessionExpiryCountdownBody({
             <Translate>Refresh</Translate>
           </Button>
         )}
-        {expired ? (
+        {canDismiss ? (
           <Button onClick={onDismiss}>
             <Translate>Dismiss</Translate>
           </Button>
