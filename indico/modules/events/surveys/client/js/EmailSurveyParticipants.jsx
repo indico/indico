@@ -94,6 +94,6 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
 
 EmailSurveyParticipants.propTypes = {
   eventId: PropTypes.number.isRequired,
-  onClose: PropTypes.func.isRequired,
   surveyId: PropTypes.number.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
