@@ -228,7 +228,8 @@ function SessionExpiryCountdownBody({
               </Translate>
               {canDismiss && (
                 <Translate as="p">
-                  If you dismiss this message, it will not show up until your session expired.
+                  If you dismiss this message, it will not show up until after your session has
+                  expired
                 </Translate>
               )}
             </>
