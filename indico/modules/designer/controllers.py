@@ -39,6 +39,7 @@ from indico.modules.events.util import check_event_locked
 from indico.modules.logs import LogKind
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -336,9 +337,14 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                                      template_data=template_data, backside_template_data=backside_template_data,
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
 
-    def _process_POST(self):
+    @use_kwargs({
+        'backside': ModelField(DesignerTemplate, data_key='backside_template_id', load_default=None),
+    })
+    def _process_POST(self, backside):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
+        if backside:
+            self._validate_backside_template(backside)
         placeholders = set(get_placeholder_options(regform=self.template.registration_form))
         invalid_placeholders = {x['type'] for x in data['items']} - placeholders
         if invalid_placeholders:
@@ -351,11 +357,40 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             if image_item['image_id'] not in template_images:
                 raise UserValueError(_('The image file does not belong to this template'))
         update_template(self.template, title=request.json['title'], data=data,
-                        backside_template_id=request.json['backside_template_id'],
+                        backside_template_id=request.json.get('backside_template_id'),
                         is_clonable=request.json['is_clonable'],
                         clear_background=request.json['clear_background'])
         flash(_('Template successfully saved.'), 'success')
         return jsonify_data()
+
+    def _validate_backside_template(self, backside_template):
+        """Verify if the given template can be used as a backside for the current template.
+
+        A template can be used as a backside if:
+            - frontside != backside
+            - backside does't already have its own backside
+            - it has the same size as the frontside
+            - the templates are linked to the same registration form or
+              at least one template is not linked to any registration form
+        """
+        same_size = (
+            self.template.data['width'] == backside_template.data['width'] and
+            self.template.data['height'] == backside_template.data['height']
+        )
+
+        linked_to_same_regform = (
+            not self.template.registration_form or
+            not backside_template.registration_form or
+            self.template.registration_form == backside_template.registration_form
+        )
+
+        if (
+            self.template == backside_template or
+            backside_template.backside_template or
+            not same_size or
+            not linked_to_same_regform
+        ):
+            raise BadRequest('Incompatible backside template')
 
 
 class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
