@@ -21,14 +21,23 @@ import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 const sessionExpiryChannel = new BroadcastChannel('indico-session-expiry');
 
-// TODO lower these
-const REFRESH_EXPIRY_THRESHOLD = 1500;
-const THRESHOLDS = [
-  1295, // initial
-  1275, // first snooze
-  1250, // second snooze - afterwards the snooze option will be replaced with dismiss
-];
+// Enable to get useful debug output in the console. It's recommended to set a session
+// lifetime of 1300 in indico.conf when using debug mode.
+const DEBUG = false;
+
 const REFRESH_EXPIRY_INTERVAL = 60000;
+const REFRESH_EXPIRY_THRESHOLD = DEBUG ? 1500 : 600;
+const THRESHOLDS = DEBUG
+  ? [
+      1200, // initial
+      600, // first snooze
+      30, // second snooze - afterwards the snooze option will be replaced with dismiss
+    ]
+  : [
+      300, // initial
+      120, // first snooze
+      15, // second snooze - afterwards the snooze option will be replaced with dismiss
+    ];
 
 const getTimeLeft = expiry => Math.max(0, Math.floor((expiry - moment.utc()) / 1000));
 const getCurrentSessionExpiry = async (silent = true) => {
@@ -42,6 +51,11 @@ const getCurrentSessionExpiry = async (silent = true) => {
     return {error: true, expiry: null};
   }
   return {error: false, expiry: response.data.session_expiry};
+};
+const debug = (...args) => {
+  if (DEBUG) {
+    console.debug(...args);
+  }
 };
 
 function SessionExpiryManager({initialExpiry, hardExpiry}) {
@@ -64,8 +78,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
   useInterval(
     useCallback(async () => {
       const remaining = getTimeLeft(expiry);
-      // TODO remove console log
-      console.log(
+      debug(
         'expiry',
         remaining,
         'show threshold',
@@ -73,8 +86,11 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         'data age',
         (moment.utc() - expiryRefreshed) / 1000,
         'snooze level',
-        snoozeLevel
+        snoozeLevel,
+        'dismissed',
+        dismissed
       );
+
       if (
         remaining < REFRESH_EXPIRY_THRESHOLD &&
         moment.utc() - expiryRefreshed > REFRESH_EXPIRY_INTERVAL && // refresh again if stale
@@ -83,8 +99,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         setExpiryRefreshed(moment.utc());
         const {expiry: newExpiry, error} = await getCurrentSessionExpiry();
         if (!error) {
-          // TODO remove console log
-          console.log('new expiry', newExpiry);
+          debug('new expiry', newExpiry);
           if (newExpiry) {
             updateExpiry(newExpiry, false);
           }
@@ -96,19 +111,17 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
         setExtending(false);
         setDialogCountdown(null);
       }
-    }, [expiry, expiryRefreshed, currentDialogThreshold, dialogCountdown, snoozeLevel]),
+    }, [expiry, expiryRefreshed, currentDialogThreshold, dialogCountdown, snoozeLevel, dismissed]),
     1000
   );
 
   useEffect(() => {
     const handler = evt => {
-      // TODO remove console log
-      console.log('received new expiry', evt.data, dialogCountdown);
+      debug('received new expiry', evt.data);
       if (dialogCountdown === 0) {
         // the session is gone, and with it the CSRF token... and syncing a new one between tabs
         // is way too much complexity, so we just require a new login everywhere
-        // TODO remove console log
-        console.log('ignoring new expiry on expired session');
+        debug('ignoring new expiry on expired session');
         return;
       }
       const {expiry: newExpiry, fromInit} = evt.data;
@@ -129,8 +142,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
     setExtending(true);
     await indicoAxios.post(sessionRefreshURL());
     const {expiry: newExpiry} = await getCurrentSessionExpiry(false);
-    // TODO remove console log
-    console.log('new expiry after refresh', newExpiry, getTimeLeft(moment.utc(newExpiry)));
+    debug('new expiry after refresh', newExpiry, getTimeLeft(moment.utc(newExpiry)));
     updateExpiry(newExpiry);
     setDialogCountdown(null); // do not wait for next interval to close
     setSnoozeLevel(0);
@@ -160,8 +172,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
     return null;
   }
 
-  // TODO remove console log
-  console.log('rendered time', dialogCountdown);
+  debug('showing modal with countdown', dialogCountdown);
   return (
     <Modal
       size="tiny"
