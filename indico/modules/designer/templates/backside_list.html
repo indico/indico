@@ -13,7 +13,7 @@
                                 title="{% trans %}This template has different dimension than your template{% endtrans %}"
                             {% elif not linked_to_same_regform %}
                                 class="not-selectable-backside"
-                                title="{% trans %}This template is already linked to a different registration form{% endtrans %}"
+                                title="{% trans %}This template is linked to a different registration form{% endtrans %}"
                             {% endif %}>
                             <a class="backside-template" data-href="{{ url_for('.get_template_data', tpl) }}">
                                 <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
