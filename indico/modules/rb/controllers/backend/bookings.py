@@ -20,6 +20,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
+from indico.modules.events import Event
 from indico.modules.events.util import track_location_changes
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
@@ -38,7 +39,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
                                     group_by_occurrence_date, is_booking_start_within_grace_period,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
-from indico.util.date_time import now_utc, utc_to_server
+from indico.util.date_time import now_utc, server_to_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -419,6 +420,31 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.occurrence.cancel(session.user)
+        return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
+
+
+class RHBookingOccurrenceLinkActions(RHBookingBase):
+    """Links a Reservation occurrence to an event."""
+
+    def _process_args(self):
+        RHBookingBase._process_args(self)
+        date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
+        self.occurrence = self.booking.occurrences.filter(ReservationOccurrence.date == date).one()
+        self.event = Event.query.filter_by(id=request.view_args['event_id'], is_deleted=False).first_or_404()
+
+    def _check_access(self):
+        RHBookingBase._check_access(self)
+        if self.occurrence.link is not None:
+            raise Forbidden('Booking occurrence is already linked')
+        if not self.occurrence.can_link(session.user):
+            raise Forbidden('This user cannot link the event')
+        if not (self.event.start_dt <= server_to_utc(self.occurrence.start_dt) <= self.event.end_dt and
+                self.event.start_dt <= server_to_utc(self.occurrence.end_dt) <= self.event.end_dt):
+            raise Forbidden('You cannot link this event during these dates')
+
+    def _process(self):
+        self.occurrence.linked_object = self.event
+        db.session.flush()
         return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
 
 

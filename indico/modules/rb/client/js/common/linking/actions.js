@@ -45,6 +45,8 @@ export function setObjectFromURL(queryString) {
       eventTitle: data.eventTitle,
       ownRoomId: data.ownRoomId,
       ownRoomName: data.ownRoomName,
+      startDt: data.startDt,
+      endDt: data.endDt,
     });
   };
 }

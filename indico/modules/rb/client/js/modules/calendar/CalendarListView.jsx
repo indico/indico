@@ -12,8 +12,9 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import LazyScroll from 'redux-lazy-scroll';
-import {Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-react';
+import {Button, Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-react';
 
+import * as linkingSelectors from 'indico/modules/rb/common/linking/selectors';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 
@@ -35,8 +36,10 @@ class CalendarListView extends React.Component {
     roomFilters: PropTypes.object.isRequired,
     calendarFilters: PropTypes.object.isRequired,
     datePicker: PropTypes.object.isRequired,
+    linkData: PropTypes.object.isRequired,
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
+      linkBookingOccurrence: PropTypes.func.isRequired,
       fetchActiveBookings: PropTypes.func.isRequired,
       clearActiveBookings: PropTypes.func.isRequired,
     }).isRequired,
@@ -59,7 +62,6 @@ class CalendarListView extends React.Component {
       datePicker: {selectedDate, mode},
       roomFilters,
       calendarFilters,
-      actions: {fetchActiveBookings, clearActiveBookings},
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
@@ -70,8 +72,7 @@ class CalendarListView extends React.Component {
       roomFiltersChanged ||
       calendarFiltersChanged
     ) {
-      clearActiveBookings();
-      fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged);
+      this.refetchActiveBookings(roomFiltersChanged);
     }
   }
 
@@ -82,6 +83,14 @@ class CalendarListView extends React.Component {
     clearActiveBookings();
   }
 
+  refetchActiveBookings(roomFiltersChanged) {
+    const {
+      actions: {fetchActiveBookings, clearActiveBookings},
+    } = this.props;
+    clearActiveBookings();
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged);
+  }
+
   fetchMoreBookings = () => {
     const {
       actions: {fetchActiveBookings},
@@ -89,7 +98,7 @@ class CalendarListView extends React.Component {
     fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
   };
 
-  renderDayBookings = (day, bookings) => {
+  renderDayBookings = (day, bookings, linkData) => {
     if (!bookings.length) {
       return null;
     }
@@ -101,26 +110,58 @@ class CalendarListView extends React.Component {
           {moment(day, 'YYYY-MM-DD').format('dddd, LL')}
         </Header>
         <Card.Group itemsPerRow={4} stackable styleName="day-cards-container">
-          {bookings.map(this.renderBooking)}
+          {bookings.map(booking => this.renderBooking(booking, day, linkData))}
         </Card.Group>
         <Divider hidden />
       </div>
     );
   };
 
-  renderBooking = booking => {
+  renderLink = (booking, day, linkData, linkBookingOccurrence) => {
+    if (linkData) {
+      const {reservation} = booking;
+      const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
+      const datesMatch =
+        moment(booking.startDt).isBetween(...boundaries) &&
+        moment(booking.endDt).isBetween(...boundaries);
+      const linkBtn = (
+        <Button
+          icon={<Icon name="linkify" />}
+          primary
+          disabled={!!booking.link || !datesMatch}
+          size="small"
+          circular
+          onClick={() =>
+            linkBookingOccurrence(reservation.id, day, linkData.id, () =>
+              this.refetchActiveBookings(false)
+            )
+          }
+        />
+      );
+      return (
+        <div style={{position: 'absolute', top: '5px', right: '5px'}}>
+          <Popup trigger={linkBtn} position="bottom center">
+            <Translate>
+              Link to <Param name="bookedFor" value={linkData.title} />
+            </Translate>
+          </Popup>
+        </div>
+      );
+    }
+  };
+
+  renderBooking = (booking, day, linkData) => {
     const {
-      actions: {openBookingDetails},
+      actions: {openBookingDetails, linkBookingOccurrence},
     } = this.props;
     const {reservation} = booking;
     const {room, isAccepted} = reservation;
     const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
-
     return (
-      <Card styleName="booking-card" key={key} onClick={() => openBookingDetails(reservation.id)}>
-        <Card.Content>
+      <Card styleName="booking-card" key={key}>
+        <Card.Content onClick={() => openBookingDetails(reservation.id)}>
           <Card.Header>
             {!isAccepted && (
               <Popup
@@ -146,13 +187,28 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
+          {booking.link && (
+            <TooltipIfTruncated>
+              <div styleName="booking-booked-for">
+                <Translate>
+                  Linked to{' '}
+                  <Param
+                    name="linkedTo"
+                    value={booking.link.object.title}
+                    wrapper={<a href={booking.link.object.url} target="_blank" rel="noreferrer" />}
+                  />
+                </Translate>
+              </div>
+            </TooltipIfTruncated>
+          )}
+          {this.renderLink(booking, day, linkData, linkBookingOccurrence)}
         </Card.Content>
       </Card>
     );
   };
 
   render() {
-    const {bookings, rowsLeft, isFetchingActiveBookings} = this.props;
+    const {bookings, rowsLeft, isFetchingActiveBookings, linkData} = this.props;
     const sortedEntries = _.sortBy(Object.entries(bookings), item => item[0]);
     const hasData = Object.keys(sortedEntries).length !== 0;
 
@@ -164,7 +220,7 @@ class CalendarListView extends React.Component {
             loadMore={this.fetchMoreBookings}
             isFetching={isFetchingActiveBookings}
           >
-            {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
+            {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData, linkData))}
             {isFetchingActiveBookings && (
               <CardPlaceholder.Group
                 count={ACTIVE_BOOKINGS_LIMIT}
@@ -192,11 +248,13 @@ export default connect(
     roomFilters: calendarSelectors.getRoomFilters(state),
     calendarFilters: calendarSelectors.getCalendarFilters(state),
     datePicker: calendarSelectors.getDatePickerInfo(state),
+    linkData: linkingSelectors.getLinkObject(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
       {
         openBookingDetails: bookingsActions.openBookingDetails,
+        linkBookingOccurrence: bookingsActions.linkBookingOccurrence,
         fetchActiveBookings: calendarActions.fetchActiveBookings,
         clearActiveBookings: calendarActions.clearActiveBookings,
       },
