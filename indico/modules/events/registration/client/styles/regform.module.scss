@@ -105,6 +105,14 @@
       overflow-wrap: anywhere;
     }
 
+    :global(.field.error) .boolean-field {
+      :global(.ui.button:not(.active):not(:hover)) {
+        background-color: #fff6f6;
+        color: $dark-red;
+        outline: 1px solid $red;
+      }
+    }
+
     .field {
       margin-bottom: 3px;
 
