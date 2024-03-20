@@ -163,7 +163,14 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
   // TODO remove console log
   console.log('rendered time', dialogCountdown);
   return (
-    <Modal size="tiny" closeIcon={false} closeOnDimmerClick={false} closeOnEscape={false} open>
+    <Modal
+      size="tiny"
+      closeIcon={false}
+      closeOnDimmerClick={false}
+      closeOnEscape={false}
+      dimmer="blurring"
+      open
+    >
       <SessionExpiryCountdownBody
         remaining={dialogCountdown}
         onRefresh={handleExtend}
