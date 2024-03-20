@@ -99,7 +99,6 @@ Improvements
 - Allow linking badge templates to registration forms in order to use custom fields in them
   (:pr:`6088`)
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
-- Improve editing notifications emails (:issue:`6027`, :pr:`6042`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
 
