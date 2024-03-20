@@ -43,6 +43,9 @@ def get_nested_placeholder_options(regform=None):
     groups = {group_id: group | {'options': {}} for group_id, group in GROUPS.items()}
     for name, placeholder in get_placeholder_options(regform=regform).items():
         groups[placeholder.group]['options'][name] = str(placeholder.description)
+    if not groups['regform_fields']['options']:
+        # remove empty group from unlinked regform
+        del groups['regform_fields']
     return groups
 
 
