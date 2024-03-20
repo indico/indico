@@ -9,6 +9,6 @@ import 'core-js/es';
 import setup from './setup';
 import 'indico/modules/core/impersonation';
 import 'indico/modules/core/top_bars';
-import 'indico/modules/core/session_expiry_new';
+import 'indico/modules/core/session_expiry';
 
 setup();
