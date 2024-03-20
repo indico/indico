@@ -49,8 +49,4 @@ class SessionsField(RegistrationFormFieldBase):
             return ''
 
         blocks = SessionBlock.query.filter(SessionBlock.id.in_(reg_data)).all()
-        grouped_blocks = {}
-
-        for date, blocks_in_date in groupby(blocks, key=get_date):
-            grouped_blocks[date] = list(blocks_in_date)
-        return grouped_blocks
+        return {date: list(blocks) for date, blocks in groupby(blocks, key=get_date)}

@@ -8,9 +8,11 @@
 import timeTableURL from 'indico-url:event_registration.api_event_timetable';
 
 import PropTypes from 'prop-types';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Checkbox, Form} from 'semantic-ui-react';
+import {Checkbox, Form, Accordion, Icon} from 'semantic-ui-react';
+
+import '../../../../../../rb/client/js/modules/roomList/filters/EquipmentForm.module.scss';
 
 import {
   FinalCheckbox,
@@ -44,6 +46,17 @@ function TimetableSessionsComponent({
     onChange(newValue);
   }
 
+  function formatDate(date) {
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      weekday: 'short',
+    };
+    const dt = new Date(date);
+    return dt.toLocaleDateString(undefined, options);
+  }
+
   const minMsg = minimum > 0 ? `at least ${minimum}` : ``;
   const and = minimum > 0 && maximum > 0 ? ` and ` : ``;
   const maxMsg = maximum > 0 ? `no more than ${maximum}` : ``;
@@ -66,10 +79,10 @@ function TimetableSessionsComponent({
             index={index}
             name={name}
             data={sessionData[date]}
-            label={date}
+            label={formatDate(date)}
             allowFullDays={allowFullDays}
             display={display}
-            key={`session-block-${sessionData[date].id}`}
+            key={`session-block-${date}`}
             handleValueChange={handleValueChange}
             onChange={onChange}
             props={props}
@@ -82,7 +95,15 @@ function TimetableSessionsComponent({
 TimetableSessionsComponent.propTypes = {
   value: PropTypes.arrayOf(PropTypes.number).isRequired,
   name: PropTypes.string.isRequired,
-  sessionData: PropTypes.object,
+  sessionData: PropTypes.objectOf(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        full_title: PropTypes.string.isRequired,
+        id: PropTypes.number.isRequired,
+        start_dt: PropTypes.string.isRequired,
+      })
+    )
+  ),
   onChange: PropTypes.func.isRequired,
   allowFullDays: PropTypes.bool.isRequired,
   display: PropTypes.string.isRequired,
@@ -103,13 +124,16 @@ function SessionBlockHeader({
   handleValueChange,
   onChange,
 }) {
-  const [isChecked, setIsChecked] = useState(false);
-  const [isIndeterminate, setIsIndeterminate] = useState(false);
+  const childrenIds = data.map(e => e.id);
+  const isChecked = childrenIds.reduce((acum, id) => {
+    return acum && value.includes(id);
+  }, true);
+  const isIndeterminate = childrenIds.reduce((acum, id) => {
+    return acum || value.includes(id);
+  }, false);
   const [isExpanded, setIsExpanded] = useState(display === 'expanded');
 
-  const arrowLabel = isExpanded ? '▼' : '▶';
   const isExpandedClass = isExpanded ? '' : 'hidden';
-  const childrenIds = data.map(e => e.id);
 
   function handleHeaderClick() {
     setIsExpanded(!isExpanded);
@@ -123,35 +147,22 @@ function SessionBlockHeader({
     onChange(newValue);
   }
 
-  useEffect(() => {
-    setIsChecked(() =>
-      childrenIds.reduce((acum, id) => {
-        return acum && value.includes(id);
-      }, true)
-    );
-    setIsIndeterminate(() =>
-      childrenIds.reduce((acum, id) => {
-        return acum || value.includes(id);
-      }, false)
-    );
-  }, [value]);
-
   return (
-    <dl>
-      <h3 className="ui-state-default">
-        <button onClick={handleHeaderClick} className="arrow" type="button">
-          {arrowLabel}
-        </button>
-        <Checkbox
-          checked={isChecked}
-          onChange={handleHeaderChange}
-          indeterminate={isIndeterminate && !isChecked}
-          disabled={!allowFullDays}
-          label={`${label}`}
-        />
-      </h3>
+    <>
+      <Accordion styleName="equipment-accordion" className="ui-state-default">
+        <Accordion.Title active={isExpanded} index={0} onClick={handleHeaderClick}>
+          <Icon name="dropdown" />
+          <Checkbox
+            checked={isChecked}
+            onChange={handleHeaderChange}
+            indeterminate={isIndeterminate && !isChecked}
+            disabled={!allowFullDays}
+            label={label}
+          />
+        </Accordion.Title>
+      </Accordion>
       {data
-        ?.map(item => camelizeKeys(item))
+        .map(item => camelizeKeys(item))
         .map(({fullTitle, id}) => (
           <dd className="grouped-fields" key={`session-block-checkbox-${id}`}>
             <Checkbox
@@ -163,7 +174,7 @@ function SessionBlockHeader({
             />
           </dd>
         ))}
-    </dl>
+    </>
   );
 }
 

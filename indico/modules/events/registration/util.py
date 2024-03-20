@@ -549,6 +549,10 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
                 key = unique_col('{} ({})'.format(item.title, 'Departure'), item.id)
                 departure_date = data[item.id].friendly_data.get('departure_date') if item.id in data else None
                 registration_dict[key] = format_date(departure_date) if departure_date else ''
+            elif item.input_type == 'sessions':
+                for value in data[item.id].friendly_data.values():
+                    _data = '; '.join(v.full_title for v in value)
+                registration_dict[key] = _data
             else:
                 registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
         for name, (title, fn) in special_item_mapping.items():

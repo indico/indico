@@ -97,7 +97,7 @@
                 <li>{{ item }}</li>
             {%- endfor %}
         </ul>
-    {% elif field.input_type == 'sessions' and friendly_data%}
+    {% elif field.input_type == 'sessions' and friendly_data %}
         {% for key, value in friendly_data.items() -%}
             <dl>
                 <dt>{{key}}</dt>
