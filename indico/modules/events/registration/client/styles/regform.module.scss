@@ -105,11 +105,17 @@
       overflow-wrap: anywhere;
     }
 
-    :global(.field.error) .boolean-field {
-      :global(.ui.button:not(.active):not(:hover)) {
+    :global(.field.error) .boolean-field :global(.ui.buttons) {
+      :global(.ui.button) {
         background-color: #fff6f6;
         color: $dark-red;
         outline: 1px solid $red;
+      }
+
+      :global(.ui.button:hover) {
+        background-color: $light-red;
+        color: $pastel-red;
+        outline: 1px solid $dark-red;
       }
     }
 
