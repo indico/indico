@@ -259,11 +259,12 @@ function SessionExpiryCountdownBody({
             <Translate>Refresh</Translate>
           </Button>
         )}
-        {canDismiss ? (
+        {canDismiss && (
           <Button onClick={onDismiss}>
             <Translate>Dismiss</Translate>
           </Button>
-        ) : (
+        )}
+        {!canDismiss && hardExpiry && (
           <Button onClick={onSnooze} disabled={inProgress}>
             <Translate>Snooze</Translate>
           </Button>
