@@ -19,6 +19,12 @@
                     <div class="toolbar">
                         {% set past_title = _('Event has already finished') %}
                         {% set all_days_params = dict(event_rb_params.params, **event_rb_params.all_days_params) %}
+                        <a href="{{ url_for('rb.roombooking', path='calendar', view='list', date=all_days_params['sd'], link_type='event', link_id=all_days_params['link_id']) }}"
+                           target="_blank"
+                           class="i-button highlight {{ 'disabled' if is_past_event }}"
+                           title="{{ past_title if is_past_event }}">
+                            {%- trans %}Link to booking{% endtrans -%}
+                        </a>
                         {% if 'per_day_params' in event_rb_params %}
                             <button type="button"
                                     class="i-button highlight js-dropdown arrow"

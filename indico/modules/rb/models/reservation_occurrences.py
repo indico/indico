@@ -263,6 +263,12 @@ class ReservationOccurrence(db.Model):
             return False
         return self.reservation.can_reject(user, allow_admin=allow_admin)
 
+    def can_link(self, user, allow_admin=True):
+        if not self.is_valid:
+            return False
+        return self.reservation.is_booked_for(user) or self.reservation.is_owned_by(user) or (
+            allow_admin and rb_is_admin(user))
+
     def can_cancel(self, user, allow_admin=True):
         if user is None:
             return False
