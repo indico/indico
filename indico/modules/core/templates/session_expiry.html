@@ -1,0 +1,8 @@
+{% macro setup_session_expiry() %}
+    {% set session_expiry = session.get('_expires') %}
+    {% if session.user and session_expiry %}
+        <div id="session-expiry-root"
+             data-session-expiry="{{ session['_expires'] | server_to_utc }}"
+             {% if session._hard_expiry %}data-hard-expiry{% endif %}></div>
+    {% endif %}
+{% endmacro %}

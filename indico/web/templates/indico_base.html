@@ -1,4 +1,6 @@
 {#- Base template for indico pages (standard "indico look") -#}
+{%- from 'core/session_expiry.html' import setup_session_expiry -%}
+
 <!DOCTYPE html>
 
 <html lang="{{ current_locale.language }}"
@@ -67,6 +69,7 @@
         #}
         {{ body|safe }}
     {% endblock %}
+    {{ setup_session_expiry() }}
 </body>
 </html>
 {%- set req_stats = get_request_stats() %}
