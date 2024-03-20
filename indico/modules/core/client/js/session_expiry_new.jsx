@@ -86,7 +86,7 @@ function SessionExpiryManager({initialExpiry, hardExpiry}) {
           // TODO remove console log
           console.log('new expiry', newExpiry);
           if (newExpiry) {
-            updateExpiry(newExpiry);
+            updateExpiry(newExpiry, false);
           }
         }
       }
