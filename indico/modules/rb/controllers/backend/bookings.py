@@ -351,7 +351,7 @@ class RHUpdateBooking(RHBookingBase):
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
                 self.booking.reset_approval(session.user)
         else:
-            new_booking = split_booking(self.booking, new_booking_data, extra_fields=args.get('extra_fields', {}))
+            new_booking = split_booking(self.booking, new_booking_data, extra_fields=args['extra_fields'])
             additional_booking_attrs['new_booking_id'] = new_booking.id
 
         db.session.flush()
