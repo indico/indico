@@ -552,9 +552,9 @@ class Reservation(db.Model):
     def modify(self, data, user, extra_fields: dict):
         """Modify an existing reservation.
 
-        :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
+        :param data: A dict containing the booking data, usually from a :class:`CreateBookingSchema` instance
         :param user: The :class:`.User` who modifies the booking.
-        :param extra_fields: A dict containing the extra fields data from the form (CreateBookingSchema.extra_fields)
+        :param extra_fields: A dict containing the extra fields data from the schema
         """
         from indico.modules.rb import rb_settings
 
