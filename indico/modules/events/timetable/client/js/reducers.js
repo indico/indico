@@ -62,7 +62,7 @@ export default {
   ) => {
     switch (action.type) {
       case actions.SET_TIMETABLE_DATA:
-        return {...state, ...preprocessEntries(...preprocessData(action.data), state.changes)};
+        return {...state, ...preprocessEntries(...preprocessData(action.data))};
       case actions.MOVE_ENTRY:
         return {...state, ...moveEntry(state, action.args)};
       case actions.RESIZE_ENTRY:
