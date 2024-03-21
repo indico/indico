@@ -210,10 +210,11 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       ...basicDetails
     } = changedValues;
     try {
+      let response;
       if (isNewRoom) {
         const payload = {...basicDetails};
         payload.location_id = locationId;
-        const response = await indicoAxios.post(roomsURL(), payload);
+        response = await indicoAxios.post(roomsURL(), payload);
         setNewRoomId(response.data.id);
       } else if (!_.isEmpty(basicDetails)) {
         await indicoAxios.patch(roomURL({room_id: roomId}), basicDetails);
@@ -229,7 +230,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       if (bookableHours || nonbookablePeriods) {
         const availability = {bookableHours, nonbookablePeriods};
         await indicoAxios.post(
-          updateRoomAvailabilityURL({room_id: roomId}),
+          updateRoomAvailabilityURL({room_id: isNewRoom ? response.data.id : roomId}),
           snakifyKeys(availability)
         );
       }
