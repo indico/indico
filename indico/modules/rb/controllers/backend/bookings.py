@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import typing as t
 import uuid
 from datetime import date, datetime, time
 
@@ -344,7 +343,6 @@ class RHUpdateBooking(RHBookingBase):
 
         check_repeat_frequency(self.booking.repeat_frequency, new_booking_data['repeat_frequency'])
 
-        new_booking: t.Optional[Reservation] = None
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)
