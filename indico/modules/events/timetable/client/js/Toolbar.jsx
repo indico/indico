@@ -14,9 +14,10 @@ import {Dropdown, Menu} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import NewEntryDropdown from './components/NewEntryDropdown';
 import SaveButton from './components/SaveButton';
 import * as selectors from './selectors';
-import {entryTypes, getNumDays, handleUnimplemented} from './util';
+import {getNumDays} from './util';
 
 import './Toolbar.module.scss';
 
@@ -160,25 +161,13 @@ export default function Toolbar({date, localizer, onNavigate}) {
           }))}
           item
         />
-        <Dropdown
+        <NewEntryDropdown
           icon="add"
           styleName="action"
           direction="left"
           title={Translate.string('Add new')}
           item
-        >
-          <Dropdown.Menu>
-            <Dropdown.Header content={Translate.string('Add new')} />
-            {['session', 'contribution', 'break'].map(type => (
-              <Dropdown.Item
-                key={type}
-                text={entryTypes[type].title}
-                icon={entryTypes[type].icon}
-                onClick={handleUnimplemented}
-              />
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
+        />
         <SaveButton as={Menu.Item} styleName="save-button" />
       </Menu>
     </div>

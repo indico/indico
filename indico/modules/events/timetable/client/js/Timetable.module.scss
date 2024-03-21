@@ -39,6 +39,12 @@
     border-bottom-right-radius: 0;
   }
 
+  .placeholder-entry {
+    overflow: visible;
+    background-color: rgba($dark-gray, 0.8);
+    border-color: $light-black;
+  }
+
   :global(.rbc-allday-cell),
   :global(.rbc-row-resource),
   :global(.rbc-event-label) {

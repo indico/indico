@@ -8,6 +8,7 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 
+import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
 import {entrySchema, entryTypes, isChildOf} from './util';
 
@@ -17,8 +18,12 @@ export default function Entry({event: entry}) {
   const {type, title} = entry;
   const contributions = useSelector(selectors.getChildren);
   const displayMode = useSelector(selectors.getDisplayMode);
-  const hasContribs = contributions.some(c => isChildOf(c, entry));
 
+  if (type === 'placeholder') {
+    return <NewEntryDropdown icon={null} open />;
+  }
+
+  const hasContribs = contributions.some(c => isChildOf(c, entry));
   return (
     <>
       {displayMode === 'compact' && hasContribs && <div styleName="compact-title">{title}</div>}

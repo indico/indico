@@ -38,9 +38,9 @@ export const entryTypes = {
 
 export const entrySchema = PropTypes.shape({
   id: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(Object.keys(entryTypes)).isRequired,
-  title: PropTypes.string.isRequired,
-  slotTitle: PropTypes.string, // only for sessions
+  type: PropTypes.oneOf([...Object.keys(entryTypes), 'placeholder']).isRequired,
+  title: PropTypes.string, // required for all types except placeholder
+  slotTitle: PropTypes.string, // only for sessions (required then)
   description: PropTypes.string,
   code: PropTypes.string,
   sessionCode: PropTypes.string, // only for sessions

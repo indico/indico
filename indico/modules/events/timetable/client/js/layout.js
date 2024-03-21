@@ -38,6 +38,7 @@ export const entryStyleGetter = (entries, selected) => entry => {
     },
     className: toClasses({
       [styles['parent-entry']]: hasContributions(entry, entries),
+      [styles['placeholder-entry']]: entry.type === 'placeholder',
       [styles.selected]: selected?.id === entry.id,
     }),
   };
