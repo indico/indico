@@ -250,6 +250,10 @@ class EventPrivacyForm(IndicoForm):
                                                             'notices.'))
     privacy_policy = TextAreaField(_('Text'), widget=TinyMCEWidget(),
                                    description=_('Only used if no URL is provided'))
+    hide_participants_from_other_forms = (
+        BooleanField(_('Hide participants from other forms'), widget=SwitchWidget(),
+                     description=_('If a participant has consented to be shown to other participants, only show them to'
+                                   ' participants registered in the same registration form.')))
 
     def validate_privacy_policy(self, field):
         if self.privacy_policy_urls.data and self.privacy_policy.data:
