@@ -16,7 +16,7 @@ import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/
 
 import * as actions from '../actions';
 import * as selectors from '../selectors';
-import {entryColorSchema, entrySchema, entryTypes, isChildOf} from '../util';
+import {entryColorSchema, entrySchema, entryTypes, getNumDays, isChildOf} from '../util';
 
 import DetailsSegment from './DetailsSegment';
 
@@ -37,7 +37,7 @@ DiffLabel.propTypes = {
 };
 
 const renderDateDiff = (oldValue, newValue) => {
-  const diff = moment(newValue).diff(moment(oldValue), 'days');
+  const diff = getNumDays(oldValue, newValue);
   return (
     <DiffLabel diff={diff}>
       <PluralTranslate count={Math.abs(diff)}>

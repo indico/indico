@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
@@ -13,23 +14,6 @@ import {Translate} from 'indico/react/i18n';
 export const entryColorSchema = PropTypes.shape({
   text: PropTypes.string,
   background: PropTypes.string,
-});
-
-export const entrySchema = PropTypes.shape({
-  id: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(['session', 'contribution', 'break']).isRequired,
-  title: PropTypes.string.isRequired,
-  slotTitle: PropTypes.string, // only for sessions
-  description: PropTypes.string,
-  code: PropTypes.string,
-  sessionCode: PropTypes.string, // only for sessions
-  start: PropTypes.instanceOf(Date).isRequired,
-  end: PropTypes.instanceOf(Date).isRequired,
-  color: entryColorSchema,
-  attachmentCount: PropTypes.number,
-  displayOrder: PropTypes.number,
-  parentId: PropTypes.string, // only for contributions
-  columnId: PropTypes.number, // set only if parentId is null
 });
 
 export const formatTitle = (title, code) => (code ? `${title} (${code})` : title);
@@ -52,18 +36,37 @@ export const entryTypes = {
   },
 };
 
+export const entrySchema = PropTypes.shape({
+  id: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(Object.keys(entryTypes)).isRequired,
+  title: PropTypes.string.isRequired,
+  slotTitle: PropTypes.string, // only for sessions
+  description: PropTypes.string,
+  code: PropTypes.string,
+  sessionCode: PropTypes.string, // only for sessions
+  start: PropTypes.instanceOf(Date).isRequired,
+  end: PropTypes.instanceOf(Date).isRequired,
+  color: entryColorSchema,
+  attachmentCount: PropTypes.number,
+  displayOrder: PropTypes.number,
+  parentId: PropTypes.string, // only for contributions
+  columnId: PropTypes.number, // set only if parentId is null
+});
+
 export const hasContributions = (block, contribs) => contribs.some(e => e.parentId === block.id);
 export const isChildOf = (contrib, block) => contrib.parentId === block.id;
 const isConcurrent = (entry, other) =>
   entry.id !== other.id && entry.start < other.end && entry.end > other.start;
 export const getConcurrentEntries = (entry, entries) => entries.filter(e => isConcurrent(entry, e));
 
-const getColumnId = (block, blocks, draggedEntry = null) => {
-  if (draggedEntry) {
-    // if this is the dragged entry, assign it its targeted resource id
-    return draggedEntry.id === block.id ? draggedEntry.targetcolumnId : block.columnId;
-  }
-  // if this is the first time we're assigning a resource id, we need check the desired display order
+/**
+ * Calculates the column ID for a given block (top-level entry) based on the desired display order.
+ * Intended to only be run when loading the entries for the first time.
+ * @param {object} block Block to be assigned a column ID
+ * @param {array} blocks All blocks
+ * @returns {number} Column ID
+ */
+const getColumnId = (block, blocks) => {
   const concurrent = getConcurrentEntries(block, blocks);
   const [orderedConcurrent, unorderedConcurrent] = _.partition([...concurrent, block], e =>
     _.isNumber(e.displayOrder)
@@ -75,6 +78,14 @@ const getColumnId = (block, blocks, draggedEntry = null) => {
         1;
 };
 
+/**
+ * Updates an entries list with a list of new entries. Entries which are already present are
+ * updated, while new entries are appended to the end. Partial-entries (such as changes) are
+ * also supported, as long as the id attribute is present.
+ * @param {array} entries Entries array
+ * @param {array} newEntries New entries
+ * @returns {array} Updated entries array
+ */
 const updateEntries = (entries, newEntries) => [
   ...entries.map(e => {
     const update = newEntries.find(ne => e.id === ne.id);
@@ -83,12 +94,23 @@ const updateEntries = (entries, newEntries) => [
   ...newEntries.filter(ne => !entries.some(e => e.id === ne.id)),
 ];
 
+/**
+ * Merges the changes in the changes array onto a single change list.
+ * @param {object} state State of the timetable
+ * @returns {array} Merged change list
+ */
 const dirtyMergeChanges = ({changes, currentChangeIdx}) =>
   changes
     .slice(0, currentChangeIdx)
     .reduce((acc, change) => updateEntries(acc, change), [])
     .map(c => (c.deleted ? _.pick(c, ['id', 'deleted']) : c));
 
+/**
+ * Merges the changes in the changes array onto a single change list, stripped of empty-changes and
+ * unchanged values.
+ * @param {object} state State of the timetable
+ * @returns {array} Merged changes as an object of the change, old entry and updated entry
+ */
 export const mergeChanges = state => {
   const entries = [...state.blocks, ...state.children];
   return dirtyMergeChanges(state).flatMap(change => {
@@ -102,6 +124,11 @@ export const mergeChanges = state => {
   });
 };
 
+/**
+ * Applies the changes in the changes array to the timetable's entries
+ * @param {object} state State of the timetable
+ * @returns {object} {blocks, children} Updated blocks and child-entries
+ */
 export const applyChanges = state => {
   const newEntries = updateEntries(
     [...(state.blocks || []), ...(state.children || [])],
@@ -111,19 +138,40 @@ export const applyChanges = state => {
   return {blocks, children};
 };
 
+/**
+ * Updates the last entry of the changes array with a new change.
+ * @param {array} changes Changes array
+ * @param {object} newChange New change
+ * @returns {array} Updated changes array
+ */
 const updateLastChange = (changes, newChange) => [
   ...changes.slice(0, -1),
   updateEntries(changes[changes.length - 1] || [], newChange),
 ];
 
+/**
+ * Adds a change to the change array and increments the current change index.
+ * @param {object} state State of the timetable
+ * @param {object} newChange New change
+ * @returns {object} The state with an updated changes array and an incremented currentChangeIdx
+ */
 const addNewChange = ({changes, currentChangeIdx, ...entries}, newChange) => ({
   ...entries,
   changes: [...changes.slice(0, currentChangeIdx), newChange],
   currentChangeIdx: currentChangeIdx + 1,
 });
 
-const resolveBlockConflicts = (state, draggedEntry = null) => {
-  const {blocks, changes} = state;
+/**
+ * Resolves any block conflicts (parallel top-level entries in the same column) by recursively
+ * shifting all conflicting blocks with left-empty-space to the left, or otherwise to the right.
+ * Child-entries are left untouched. Expects all blocks to have an assigned column.
+ * @param {object} state State of the timetable
+ * @param {object} draggedEntry Entry which was subject to the move/resize event, if applicable
+ * @param {number} recursionCount Recursion count
+ * @returns {array} Updated changes array
+ */
+const resolveBlockConflicts = (state, draggedEntry = null, recursionCount = 0) => {
+  const {changes} = state;
   const updatedBlocks = applyChanges(state).blocks;
   const conflictingBlock = updatedBlocks.find(
     block =>
@@ -133,100 +181,131 @@ const resolveBlockConflicts = (state, draggedEntry = null) => {
   if (!conflictingBlock) {
     return changes;
   }
-  // if there is space on the left, move it there
-  if (
-    conflictingBlock.columnId > 1 &&
-    !getConcurrentEntries(conflictingBlock, updatedBlocks).some(
-      b => b.columnId === conflictingBlock.columnId - 1
-    )
-  ) {
-    return resolveBlockConflicts(
-      {
-        ...state,
-        changes: updateLastChange(changes, [
-          {
-            id: conflictingBlock.id,
-            columnId: conflictingBlock.columnId - 1,
-          },
-        ]),
-      },
-      draggedEntry
-    );
+  if (recursionCount > updatedBlocks.length) {
+    console.error('resolveBlockConflicts: recursion limit exceeded', conflictingBlock);
+    return changes;
   }
-  // otherwise push it right
+  const {id, columnId} = conflictingBlock;
+  const shift =
+    columnId > 1 &&
+    !getConcurrentEntries(conflictingBlock, updatedBlocks).some(b => b.columnId === columnId - 1)
+      ? -1
+      : 1;
   return resolveBlockConflicts(
-    {
-      ...state,
-      blocks: [
-        ...blocks.filter(
-          b => b.id !== conflictingBlock.id && b.columnId <= conflictingBlock.columnId + 1
-        ),
-        blocks.find(b => b.id === conflictingBlock.id),
-        ...blocks.filter(b => b.columnId > conflictingBlock.columnId + 1),
-      ],
-      changes: updateLastChange(changes, [
-        {
-          id: conflictingBlock.id,
-          columnId: conflictingBlock.columnId + 1,
-        },
-      ]),
-    },
-    draggedEntry
+    {...state, changes: updateLastChange(changes, [{id, columnId: columnId + shift}])},
+    draggedEntry,
+    recursionCount + 1
   );
 };
 
-const removeBlockGaps = state => {
+/**
+ * Removes any empty columns between parallel blocks (top-level entries) by recursively shifting all
+ * blocks with left-empty-space to the left. Child-entries are left untouched. Expects all blocks to
+ * have an assigned column.
+ * @param {object} state State of the timetable
+ * @param {string} ignoreId Id of a block to ignore
+ * @param {number} recursionCount Recursion count
+ * @returns {array} Updated changes array
+ */
+const removeBlockGaps = (state, ignoreId = null, recursionCount = 0) => {
+  const {changes} = state;
   const {blocks} = applyChanges(state);
   const leftGapBlocks = blocks.filter(
     block =>
       block.columnId > 1 &&
-      !getConcurrentEntries(block, blocks).some(b => b.columnId === block.columnId - 1)
+      block.id !== ignoreId &&
+      !getConcurrentEntries(block, blocks).some(
+        b => b.columnId === block.columnId - 1 && b.id !== ignoreId
+      )
   );
   if (leftGapBlocks.length === 0) {
-    return state.changes;
+    return changes;
   }
-  return removeBlockGaps({
-    ...state,
-    changes: updateLastChange(
-      state.changes,
-      leftGapBlocks.map(b => ({id: b.id, columnId: b.columnId - 1}))
-    ),
-  });
+  if (recursionCount > blocks.length) {
+    console.error('removeBlockGaps: recursion limit exceeded', leftGapBlocks);
+    return changes;
+  }
+  return removeBlockGaps(
+    {
+      ...state,
+      changes: updateLastChange(
+        changes,
+        leftGapBlocks.map(b => ({id: b.id, columnId: b.columnId - 1}))
+      ),
+    },
+    ignoreId,
+    recursionCount + 1
+  );
 };
 
+/**
+ * Performs the sorting of the entries onto the correct columns.
+ * Starts by resolving block conflicts, and then removes any gaps between blocks. Child-entries are
+ * left untouched.
+ * @param {object} state State of the timetable
+ * @param {object} draggedEntry Entry which was subject to the move/resize event, if applicable
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and currentChangeIdx
+ */
 const layoutBlocks = (state, draggedEntry = null) => {
-  const {blocks, changes, currentChangeIdx} = state;
-  const updatedBlocks = applyChanges(state).blocks;
+  let blocks = applyChanges(state).blocks;
+  let changes = state.changes;
+  // if the dragged entry is a block we do a pre-layout of the blocks before inserting it again
+  if (draggedEntry && blocks.some(({id}) => id === draggedEntry.id)) {
+    changes = removeBlockGaps(state, draggedEntry.id);
+    blocks = applyChanges({...state, changes}).blocks;
+  }
   // make sure all blocks have the correct column ID
-  const columnChanges = updateLastChange(
+  changes = updateLastChange(
     changes,
-    updatedBlocks.flatMap(block => {
-      const columnId = getColumnId(block, updatedBlocks, draggedEntry);
-      return columnId === block.columnId ? [] : [{id: block.id, columnId}];
+    blocks.flatMap(block => {
+      if (!draggedEntry) {
+        return block.columnId ? [] : [{id: block.id, columnId: getColumnId(block, blocks)}];
+      }
+      const {id, targetcolumnId: columnId} = draggedEntry;
+      // if this is the dragged entry, assign it its targeted resource id
+      if (id === block.id) {
+        return [{id, columnId}];
+      }
+      // to preserve the order when resolving conflicts, we move everything right of the
+      // dragged block one column to the right, and let removeBlockGaps compress it back
+      return block.columnId > columnId ? [{id: block.id, columnId: block.columnId + 1}] : [];
     })
   );
   // resolve conflicts between blocks in the same column
-  const conflictChanges = resolveBlockConflicts(
+  changes = resolveBlockConflicts(
     {
       ...state,
-      // it is important to keep the order of the blocks when resolving conflicts
-      blocks: _.sortBy(blocks, 'columnId'),
-      changes: columnChanges,
+      changes,
     },
     draggedEntry
   );
   // remove any leftover gaps between blocks
   return {
-    changes: removeBlockGaps({...state, changes: conflictChanges}),
-    currentChangeIdx,
+    changes: removeBlockGaps({...state, changes}),
+    currentChangeIdx: state.currentChangeIdx,
   };
 };
 
-export const preprocessEntries = (blocks, children, changes) => ({
-  blocks: applyChanges({blocks, ...layoutBlocks({blocks, changes})}).blocks,
+/**
+ * Performs the initial sorting of the entries onto the correct columns.
+ * Same sorting as layoutBlocks, but saves the changes onto the blocks and children arrays directly
+ * instead of polluting the changes array.
+ * @param {array} blocks Blocks (top-level-entries) to be sorted
+ * @param {array} children Child-entries to be sorted
+ * @returns {object} {blocks, children} Sorted blocks and children
+ */
+export const preprocessEntries = (blocks, children) => ({
+  blocks: applyChanges({blocks, ...layoutBlocks({blocks, changes: []})}).blocks,
   children,
 });
 
+/**
+ * Moves a block (session, break or top-level contribution)
+ * @param {object} state State of the timetable
+ * @param {object} args {event, start, end, resourceId} Arguments from the move event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 const moveBlock = (state, {event: block, start, end, resourceId: columnId}) => {
   const newEntry = {id: block.id};
   const timeDiff = start - block.start;
@@ -255,6 +334,13 @@ const moveBlock = (state, {event: block, start, end, resourceId: columnId}) => {
   });
 };
 
+/**
+ * Resizes a block (session, break or top-level contribution)
+ * @param {object} state State of the timetable
+ * @param {object} args {event, start, end, resourceId} Arguments from the resize event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) => {
   const {children} = applyChanges(state);
   const newEntry = {id: block.id};
@@ -283,55 +369,99 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
   });
 };
 
+/**
+ * Rearranges contributions in a block in order to fit a new contribution
+ * @param {object} parent Block to be rearranged
+ * @param {array} parentContribs Contributions in the block
+ * @param {object} contrib Contribution to be inserted
+ * @returns {array|boolean} Rearranged contributions or false if they don't fit in the block
+ */
+const rearrangeContribs = (parent, parentContribs, contrib) => {
+  const prevContrib = parentContribs.reduce(
+    (acc, c) => (c.end <= contrib.start && (!acc || c.end > acc.end) ? c : acc),
+    null
+  );
+  const rearrangedContribs = _.sortBy(
+    parentContribs.filter(c => c.end > contrib.start),
+    'start'
+  ).reduce((acc, c) => {
+    const last = acc[acc.length - 1];
+    return [
+      ...acc,
+      {id: c.id, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
+    ];
+  }, [prevContrib, contrib].filter(c => c));
+  // check if the contribs fit in the block
+  if (rearrangedContribs[rearrangedContribs.length - 1].end > parent.end) {
+    return false;
+  }
+  return rearrangedContribs;
+};
+
+/**
+ * Moves or resizes a contribution
+ * @param {object} state State of the timetable
+ * @param {object} args {event, start, end, resourceId} Arguments from the move/resize event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 const moveOrResizeContrib = (state, args) => {
   const {blocks, children} = applyChanges(state);
   const {event: contrib, start, end, resourceId} = args;
 
   const newContrib = {id: contrib.id, start, end, columnId: undefined};
-  const newParent = getConcurrentEntries(newContrib, blocks).find(
+  const parent = getConcurrentEntries(newContrib, blocks).find(
     b => b.columnId === resourceId && b.type === 'session'
   );
-  // check if it's being dragged to outside of a block
-  if (!newParent) {
+  // check if it's being dragged to outside of a block or to a block without enough space
+  if (!parent || newContrib.start < parent.start || newContrib.end > parent.end) {
     return moveBlock(state, args);
   }
-  // check if it's being dragged to a block without enough space
-  if (newContrib.start < newParent.start || newContrib.end > newParent.end) {
-    return {};
-  }
-  const newParentContribs = children.filter(c => c.id !== contrib.id && isChildOf(c, newParent));
-  newContrib.parentId = newParent.id;
+  const parentContribs = children.filter(c => c.id !== contrib.id && isChildOf(c, parent));
+  newContrib.parentId = parent.id;
   // if it's being dragged on top of a contribution, try to rearange them in order to fit
-  if (newParentContribs.some(c => isConcurrent(c, newContrib))) {
-    const prevContrib = newParentContribs.reduce(
-      (acc, c) => (c.end <= newContrib.start && (!acc || c.end > acc.end) ? c : acc),
-      null
-    );
-    const rearrangedContribs = _.sortBy(
-      newParentContribs.filter(c => c.end > newContrib.start),
-      'start'
-    ).reduce((acc, c) => {
-      const last = acc[acc.length - 1];
-      return [
-        ...acc,
-        {id: c.id, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
-      ];
-    }, [prevContrib, newContrib].filter(c => c));
-    // if they don't fit in the block, don't move anything
-    if (rearrangedContribs[rearrangedContribs.length - 1].end > newParent.end) {
-      return {};
-    }
-    return addNewChange(state, rearrangedContribs);
+  const newContribs = parentContribs.some(c => isConcurrent(c, newContrib))
+    ? rearrangeContribs(parent, parentContribs, newContrib)
+    : [newContrib];
+  // if they don't fit in the block, instead turn the contrib into a separate block
+  if (!newContribs) {
+    return moveBlock(state, args);
   }
-  return addNewChange(state, [newContrib]);
+  const newChanges = addNewChange(state, newContribs);
+  // if the contrib used to be a block, it might have left a gap when moved
+  if (!contrib.parentId) {
+    return {changes: removeBlockGaps(newChanges), currentChangeIdx: newChanges.currentChangeIdx};
+  }
+  return newChanges;
 };
 
+/**
+ * Moves an entry.
+ * @param {object} state State of the timetable
+ * @param {object} args {event, start, end, resourceId} Arguments from the move event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 export const moveEntry = (state, args) =>
   args.event.type === 'contribution' ? moveOrResizeContrib(state, args) : moveBlock(state, args);
 
+/**
+ * Resizes an entry
+ * @param {object} state State of the timetable
+ * @param {object} args {event, start, end, resourceId} Arguments from the resize event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 export const resizeEntry = (state, args) =>
   args.event.parentId ? moveOrResizeContrib(state, args) : resizeBlock(state, args);
 
+/**
+ * Deletes an entry
+ * @param {object} state State of the timetable
+ * @param {object} entry Entry to be deleted
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 export const deleteEntry = (state, entry) => {
   if (entry.parentId) {
     return addNewChange(state, [{id: entry.id, deleted: true}]);
@@ -342,6 +472,13 @@ export const deleteEntry = (state, entry) => {
   );
 };
 
+/**
+ * Changes the color of the selected block (of type session or break)
+ * @param {object} state State of the timetable
+ * @param {object} color New color
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
 export const changeColor = (state, color) => {
   const {selectedId, blocks} = state;
   const selectedBlock = blocks.find(b => b.id === selectedId);
@@ -354,8 +491,21 @@ export const changeColor = (state, color) => {
   );
 };
 
-export const getNumDays = (start, end) => Math.floor((end - start) / (24 * 60 * 60 * 1000));
+/**
+ * Get the number of days between two dates
+ * @param {Date} start Starting date
+ * @param {Date} end Ending date
+ * @returns {number} Number of days between two dates
+ */
+export const getNumDays = (start, end) => moment(end).diff(moment(start), 'days');
 
+/**
+ * Calculates the updates to the state of the navbar after a window resize event
+ * @param {object} state State of the navbar
+ * @param {object} action {newSize, dayIdx} New window size and selected day's index
+ * @returns {object} {numDays, offset} Number of days that fit on the toolbar and offset necessary
+ * to make the selected day visible
+ */
 export const resizeWindow = ({offset}, {newSize, dayIdx}) => {
   const newNumDays = Math.max(Math.floor((newSize - 210) / 110), 2);
   const numDaysOutOfBounds = dayIdx - newNumDays - offset + 1;
