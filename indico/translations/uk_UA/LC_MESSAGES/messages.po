@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-18 17:55+0100\n"
+"POT-Creation-Date: 2024-03-21 18:26+0100\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Andrii Verbytskyi <andrii.verbytskyi@mpp.mpg.de>, 2019-2021,2023-2024\n"
 "Language-Team: Ukrainian (Ukraine) (http://app.transifex.com/indico/indico/language/uk_UA/)\n"
@@ -829,7 +829,7 @@ msgid "Announcement"
 msgstr "Сповіщення"
 
 #: indico/modules/announcement/controllers.py:24
-#: indico/modules/core/controllers.py:107
+#: indico/modules/core/controllers.py:108
 #: indico/modules/events/controllers/admin.py:167
 #: indico/modules/news/controllers.py:70
 #: indico/modules/receipts/controllers/admin.py:26
@@ -1801,72 +1801,72 @@ msgstr "Акаунти"
 msgid "You need to change your password"
 msgstr "Ви повинні змінити ваш пароль"
 
-#: indico/modules/auth/controllers.py:146
+#: indico/modules/auth/controllers.py:147
 msgid ""
 "We have sent you a verification email. Please check your mailbox within the "
 "next hour and open the link in that email."
 msgstr "Вам було надіслано лист-підтвердження. Будь ласка, перевірте вашу електронну скриньку протягом наступної години та відкрийте посилання з листа. "
 
-#: indico/modules/auth/controllers.py:178
+#: indico/modules/auth/controllers.py:179
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the login."
 msgstr "Ви підтвердили адресу електронної пошти і можете увійти."
 
-#: indico/modules/auth/controllers.py:194
+#: indico/modules/auth/controllers.py:195
 msgid "The validation email has already been sent."
 msgstr "Лист-підтвердження надіслано. "
 
-#: indico/modules/auth/controllers.py:262
+#: indico/modules/auth/controllers.py:263
 msgid ""
 "You may change your email address after finishing the registration process."
 msgstr "Ви можете змінити адресу електронної пошти після завершення реєстрації."
 
-#: indico/modules/auth/controllers.py:264
+#: indico/modules/auth/controllers.py:265
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the registration."
 msgstr "Ви підтвердили адресу електронної пошти і можете продовжити реєстрацію."
 
-#: indico/modules/auth/controllers.py:285
+#: indico/modules/auth/controllers.py:286
 msgid "Too many signup attempts. Please wait {}"
 msgstr "Забагато спроб входу. Будь ласка зачекайте ."
 
-#: indico/modules/auth/controllers.py:335
+#: indico/modules/auth/controllers.py:336
 msgid ""
 "Your registration request has been received. We will send you an email once "
 "it has been processed."
 msgstr "Запит на реєстрацію отримано. Після його обробки вам буде надіслано електронного листа. "
 
-#: indico/modules/auth/controllers.py:342
+#: indico/modules/auth/controllers.py:343
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
 msgstr "Реєстрація в Indico пройшла успішно. Подальші налаштування та більше інформації — у <a href=\"{url}\">вашому профілі</a>. "
 
-#: indico/modules/auth/controllers.py:364
+#: indico/modules/auth/controllers.py:365
 msgid "Local account added successfully"
 msgstr "Локальний акаунт успішно додано"
 
-#: indico/modules/auth/controllers.py:372
+#: indico/modules/auth/controllers.py:373
 msgid "Your local account credentials have been updated successfully"
 msgstr "Облікові дані вашого локального акаунту успішно оновлено"
 
-#: indico/modules/auth/controllers.py:409
+#: indico/modules/auth/controllers.py:410
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr "{provider} ({identifier}) було успішно видалено з ваших акаунтів"
 
-#: indico/modules/auth/controllers.py:620
-#: indico/modules/auth/controllers.py:622 indico/util/marshmallow.py:57
+#: indico/modules/auth/controllers.py:621
+#: indico/modules/auth/controllers.py:623 indico/util/marshmallow.py:57
 msgid "This field cannot be empty."
 msgstr "Це поле не має бути пустим."
 
-#: indico/modules/auth/controllers.py:704 indico/modules/auth/forms.py:34
+#: indico/modules/auth/controllers.py:705 indico/modules/auth/forms.py:34
 #: indico/modules/auth/forms.py:87
 msgid "This username is already in use."
 msgstr "Цей логін вже використовується."
 
-#: indico/modules/auth/controllers.py:782
+#: indico/modules/auth/controllers.py:783
 msgid "Your password has been changed successfully."
 msgstr "Пароль успішно оновлено."
 
@@ -3636,7 +3636,7 @@ msgstr "Неправильна відповідь"
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:307
+#: indico/modules/core/controllers.py:308
 msgid "All your token-based links have been invalidated"
 msgstr "Всі посилання з токенами було відмінено"
 
@@ -3784,15 +3784,15 @@ msgstr "Лише лицева частина"
 msgid "Posters/Badges"
 msgstr "Постери/Бейджі"
 
-#: indico/modules/designer/controllers.py:230
+#: indico/modules/designer/controllers.py:231
 msgid "Created copy of template '{}'"
 msgstr "Створено копію шаблону “{}”"
 
-#: indico/modules/designer/controllers.py:234
+#: indico/modules/designer/controllers.py:235
 msgid "Go to category"
 msgstr "Перейти до категорії"
 
-#: indico/modules/designer/controllers.py:245
+#: indico/modules/designer/controllers.py:246
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
 #: indico/modules/events/management/forms.py:411
 #: indico/modules/events/management/templates/_action_menu.html:135
@@ -3800,31 +3800,31 @@ msgstr "Перейти до категорії"
 msgid "Clone"
 msgstr "Створити копію "
 
-#: indico/modules/designer/controllers.py:265
+#: indico/modules/designer/controllers.py:266
 msgid "Added new template '{}'"
 msgstr "Додано новий шаблон “{}”"
 
-#: indico/modules/designer/controllers.py:350
+#: indico/modules/designer/controllers.py:356
 msgid "A Fixed Image element must contain an image"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:352
+#: indico/modules/designer/controllers.py:358
 msgid "The image file does not belong to this template"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:357
+#: indico/modules/designer/controllers.py:363
 msgid "Template successfully saved."
 msgstr "Шаблон успішно збережено. "
 
-#: indico/modules/designer/controllers.py:385
+#: indico/modules/designer/controllers.py:420
 msgid "Template successfully linked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:402
+#: indico/modules/designer/controllers.py:437
 msgid "Template successfully unlinked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:442
+#: indico/modules/designer/controllers.py:477
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
@@ -3833,7 +3833,7 @@ msgstr[1] "{count} зображень завантажено"
 msgstr[2] "{count} зображень завантажено"
 msgstr[3] "{count} зображень завантажено"
 
-#: indico/modules/designer/controllers.py:463
+#: indico/modules/designer/controllers.py:498
 msgid "The template has been deleted"
 msgstr "Шаблон видалено"
 
@@ -4178,7 +4178,7 @@ msgid "This template has different dimension than your template"
 msgstr "Цей шаблон має розміри, відмінні від вашого шаблону"
 
 #: indico/modules/designer/templates/backside_list.html:16
-msgid "This template is already linked to a different registration form"
+msgid "This template is linked to a different registration form"
 msgstr ""
 
 #: indico/modules/designer/templates/backside_list.html:36
@@ -13047,17 +13047,17 @@ msgstr "Рядок {}: адреси електронної пошти не ун�
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "Рядок {}: адреса електронної пошти належить  тому ж  користувача як і в рядку {}"
 
-#: indico/modules/events/registration/util.py:858
-#: indico/modules/events/registration/util.py:891
+#: indico/modules/events/registration/util.py:859
+#: indico/modules/events/registration/util.py:892
 msgid "Row {}: a registration with this email already exists"
 msgstr "Рядок {}: цю адресу електронної пошти уже зареєстровано"
 
-#: indico/modules/events/registration/util.py:862
-#: indico/modules/events/registration/util.py:897
+#: indico/modules/events/registration/util.py:863
+#: indico/modules/events/registration/util.py:898
 msgid "Row {}: a registration for this user already exists"
 msgstr "Рядок {}:  реєстрація для цього користувача вже існує"
 
-#: indico/modules/events/registration/util.py:902
+#: indico/modules/events/registration/util.py:903
 msgid "Row {}: an invitation for this user already exists"
 msgstr ""
 

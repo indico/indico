@@ -33,7 +33,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-18 17:55+0100\n"
+"POT-Creation-Date: 2024-03-21 18:26+0100\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Thorsten Hindermann, 2023-2024\n"
 "Language-Team: German (Germany) (http://app.transifex.com/indico/indico/language/de_DE/)\n"
@@ -831,7 +831,7 @@ msgid "Announcement"
 msgstr "Ankündigung"
 
 #: indico/modules/announcement/controllers.py:24
-#: indico/modules/core/controllers.py:107
+#: indico/modules/core/controllers.py:108
 #: indico/modules/events/controllers/admin.py:167
 #: indico/modules/news/controllers.py:70
 #: indico/modules/receipts/controllers/admin.py:26
@@ -1795,72 +1795,72 @@ msgstr "Konten"
 msgid "You need to change your password"
 msgstr "Sie müssen ihr Passwort ändern"
 
-#: indico/modules/auth/controllers.py:146
+#: indico/modules/auth/controllers.py:147
 msgid ""
 "We have sent you a verification email. Please check your mailbox within the "
 "next hour and open the link in that email."
 msgstr "Wir haben Ihnen eine Bestätigungsmail gesendet. Bitte prüfen Sie Ihren Posteingang innerhalb der nächsten Stunden und klicken Sie auf den Link in der E-Mail."
 
-#: indico/modules/auth/controllers.py:178
+#: indico/modules/auth/controllers.py:179
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the login."
 msgstr "Sie haben Ihre E-Mail-Adresse bestätigt, und können mit dem Anmelden fortfahren."
 
-#: indico/modules/auth/controllers.py:194
+#: indico/modules/auth/controllers.py:195
 msgid "The validation email has already been sent."
 msgstr "Die Bestätigungs E-Mail wurde bereits verschickt."
 
-#: indico/modules/auth/controllers.py:262
+#: indico/modules/auth/controllers.py:263
 msgid ""
 "You may change your email address after finishing the registration process."
 msgstr "Sie können Ihre E-Mail-Adresse nach Abschluss des Anmeldevorgangs ändern."
 
-#: indico/modules/auth/controllers.py:264
+#: indico/modules/auth/controllers.py:265
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the registration."
 msgstr "Sie haben Ihre E-Mail-Adresse erfolgreich bestätigt und können nun mit der Registrierung fortfahren."
 
-#: indico/modules/auth/controllers.py:285
+#: indico/modules/auth/controllers.py:286
 msgid "Too many signup attempts. Please wait {}"
 msgstr "Zu viele Anmeldeversuche. Bitte warten {}"
 
-#: indico/modules/auth/controllers.py:335
+#: indico/modules/auth/controllers.py:336
 msgid ""
 "Your registration request has been received. We will send you an email once "
 "it has been processed."
 msgstr "Wir haben Ihre Registrierungsanfrage erhalten. Wir werden Ihnen eine E-Mail schicken, sobald sie bearbeitet wurde."
 
-#: indico/modules/auth/controllers.py:342
+#: indico/modules/auth/controllers.py:343
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
 msgstr "Sie haben erfolgreich Ihr Indico-Profil erstellt. Prüfen Sie <a href=\"{url}\">Ihr Profil</a> für weitere Details und Einstellungen."
 
-#: indico/modules/auth/controllers.py:364
+#: indico/modules/auth/controllers.py:365
 msgid "Local account added successfully"
 msgstr "Lokales Nutzerkonto erfolgreich hinzugefügt."
 
-#: indico/modules/auth/controllers.py:372
+#: indico/modules/auth/controllers.py:373
 msgid "Your local account credentials have been updated successfully"
 msgstr "Ihre lokalen Zugangsdaten wurden erfolgreich aktualisiert"
 
-#: indico/modules/auth/controllers.py:409
+#: indico/modules/auth/controllers.py:410
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr "{provider} ({identifier}) erfolgreich von Ihrem Konto entfernt"
 
-#: indico/modules/auth/controllers.py:620
-#: indico/modules/auth/controllers.py:622 indico/util/marshmallow.py:57
+#: indico/modules/auth/controllers.py:621
+#: indico/modules/auth/controllers.py:623 indico/util/marshmallow.py:57
 msgid "This field cannot be empty."
 msgstr "Dieses Feld darf nicht leer sein"
 
-#: indico/modules/auth/controllers.py:704 indico/modules/auth/forms.py:34
+#: indico/modules/auth/controllers.py:705 indico/modules/auth/forms.py:34
 #: indico/modules/auth/forms.py:87
 msgid "This username is already in use."
 msgstr "Dieser Benutzername ist schon vergeben."
 
-#: indico/modules/auth/controllers.py:782
+#: indico/modules/auth/controllers.py:783
 msgid "Your password has been changed successfully."
 msgstr "Ihr Passwort wurde erfolgreich geändert."
 
@@ -2548,63 +2548,63 @@ msgstr "Liste von E-Mail-Adressen, die eine Benachrichtigung erhalten, wenn eine
 
 #: indico/modules/categories/forms.py:82
 msgid "Configuration"
-msgstr ""
+msgstr "Konfiguration"
 
 #: indico/modules/categories/forms.py:83
 msgid ""
 "The Google Wallet configuration is, by default, inherited from the parent "
 "category. You can also explicitly disable it or provide your own "
 "configuration instead."
-msgstr ""
+msgstr "Die Google Wallet-Konfiguration wird standardmäßig von der übergeordneten Kategorie geerbt. Sie können es auch explizit deaktivieren oder stattdessen Ihre eigene Konfiguration angeben."
 
 #: indico/modules/categories/forms.py:87
 msgid "Google Credentials"
-msgstr ""
+msgstr "Google-Anmeldeinformationen"
 
 #: indico/modules/categories/forms.py:93
 msgid "JSON key credentials for the Google Service Account"
-msgstr ""
+msgstr "Anmeldeinformationen für den JSON-Schlüssel für das Google-Dienstkonto"
 
 #: indico/modules/categories/forms.py:94
 msgid "Issuer Name"
-msgstr ""
+msgstr "Name des Ausstellers"
 
 #: indico/modules/categories/forms.py:98
 msgid ""
 "Issuer name that will appear in the Google Wallet ticket top header. Google "
 "recommends a maximum length of 20 chars to ensure readability on all "
 "devices."
-msgstr ""
+msgstr "Name des Ausstellers, der in der oberen Kopfzeile des Google Wallet-Tickets angezeigt wird. Google empfiehlt eine maximale Länge von 20 Zeichen, um die Lesbarkeit auf allen Geräten zu gewährleisten."
 
 #: indico/modules/categories/forms.py:101
 msgid "Issuer ID"
-msgstr ""
+msgstr "Aussteller-ID"
 
 #: indico/modules/categories/forms.py:105
 msgid ""
 "Issuer ID assigned in the \"Google Pay & Wallet\" console. The same Issuer "
 "ID must never be used on more than one Indico server. Changing it will also "
 "break updates to any existing tickets."
-msgstr ""
+msgstr "Aussteller-ID, die in der \"Google Pay & Wallet\"-Konsole zugewiesen wird. Dieselbe Issuer-ID darf niemals auf mehr als einem Indico-Server verwendet werden. Wenn Sie sie ändern, werden auch die Aktualisierungen aller vorhandenen Tickets unterbrochen."
 
 #: indico/modules/categories/forms.py:143
 msgid "The credentials could not be loaded."
-msgstr ""
+msgstr "Die Anmeldeinformationen konnten nicht geladen werden."
 
 #: indico/modules/categories/forms.py:148
 msgid ""
 "The credentials are invalid or have no access to the Google Wallet API."
-msgstr ""
+msgstr "Die Anmeldedaten sind ungültig oder haben keinen Zugriff auf die Google Wallet API."
 
 #: indico/modules/categories/forms.py:153
 msgid ""
 "There was an error validating your credentials. Contact your Indico "
 "administrator for details."
-msgstr ""
+msgstr "Bei der Überprüfung Ihrer Anmeldeinformationen ist ein Fehler aufgetreten. Wenden Sie sich an Ihren Indico-Administrator, um weitere Informationen zu erhalten."
 
 #: indico/modules/categories/forms.py:158
 msgid "The Issuer ID is invalid or not linked to your credentials."
-msgstr ""
+msgstr "Die Aussteller-ID ist ungültig oder nicht mit Ihren Anmeldeinformationen verknüpft."
 
 #: indico/modules/categories/forms.py:178
 msgid ""
@@ -2988,19 +2988,19 @@ msgstr "Uneingeschränkt"
 
 #: indico/modules/categories/models/categories.py:68
 msgid "Disabled: Ignore any inherited configuration"
-msgstr ""
+msgstr "Deaktiviert: Ignorieren Sie alle geerbten Konfigurationen"
 
 #: indico/modules/categories/models/categories.py:69
 msgid "Enabled: Use configuration from this category"
-msgstr ""
+msgstr "Enabled: Use configuration from this category"
 
 #: indico/modules/categories/models/categories.py:70
 msgid "Inheriting: Use configuration from parent category"
-msgstr ""
+msgstr "Vererben: Konfiguration aus übergeordneter Kategorie verwenden"
 
 #: indico/modules/categories/models/categories.py:80
 msgid "Inheriting: Disabled (not configured on any parent category)"
-msgstr ""
+msgstr "Vererben: Konfiguration aus übergeordneter Kategorie verwenden"
 
 #: indico/modules/categories/templates/category_statistics.html:8
 msgid "Category page"
@@ -3473,7 +3473,7 @@ msgstr "Löschen"
 #: indico/modules/categories/templates/management/settings.html:32
 #: indico/modules/events/registration/templates/display/conference_home.html:22
 msgid "Google Wallet"
-msgstr ""
+msgstr "Google Wallet"
 
 #: indico/modules/categories/templates/management/settings.html:36
 msgid "Event Header"
@@ -3608,7 +3608,7 @@ msgstr "Falsche Antwort"
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:307
+#: indico/modules/core/controllers.py:308
 msgid "All your token-based links have been invalidated"
 msgstr "Alle token-basierten Links wurden ungültig gemacht."
 
@@ -3756,15 +3756,15 @@ msgstr "Nur Vorderseite"
 msgid "Posters/Badges"
 msgstr "Poster/Namensschilder"
 
-#: indico/modules/designer/controllers.py:230
+#: indico/modules/designer/controllers.py:231
 msgid "Created copy of template '{}'"
 msgstr "Kopie von Vorlage '{}' erstellt"
 
-#: indico/modules/designer/controllers.py:234
+#: indico/modules/designer/controllers.py:235
 msgid "Go to category"
 msgstr "Gehe zu Kategorie"
 
-#: indico/modules/designer/controllers.py:245
+#: indico/modules/designer/controllers.py:246
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
 #: indico/modules/events/management/forms.py:411
 #: indico/modules/events/management/templates/_action_menu.html:135
@@ -3772,38 +3772,38 @@ msgstr "Gehe zu Kategorie"
 msgid "Clone"
 msgstr "Klonen"
 
-#: indico/modules/designer/controllers.py:265
+#: indico/modules/designer/controllers.py:266
 msgid "Added new template '{}'"
 msgstr "Neue Vorlage '{}' hinzugefügt"
 
-#: indico/modules/designer/controllers.py:350
+#: indico/modules/designer/controllers.py:356
 msgid "A Fixed Image element must contain an image"
 msgstr "Ein Fixed Image-Element muss ein Bild enthalten"
 
-#: indico/modules/designer/controllers.py:352
+#: indico/modules/designer/controllers.py:358
 msgid "The image file does not belong to this template"
 msgstr "Die Bilddatei gehört nicht zu dieser Vorlage"
 
-#: indico/modules/designer/controllers.py:357
+#: indico/modules/designer/controllers.py:363
 msgid "Template successfully saved."
 msgstr "Template erfolgreich gespeichert."
 
-#: indico/modules/designer/controllers.py:385
+#: indico/modules/designer/controllers.py:420
 msgid "Template successfully linked."
-msgstr ""
+msgstr "Vorlage erfolgreich verknüpft."
 
-#: indico/modules/designer/controllers.py:402
+#: indico/modules/designer/controllers.py:437
 msgid "Template successfully unlinked."
-msgstr ""
+msgstr "Die Verknüpfung der Vorlage wurde erfolgreich aufgehoben."
 
-#: indico/modules/designer/controllers.py:442
+#: indico/modules/designer/controllers.py:477
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
 msgstr[0] "Das Bild wurde hochgeladen"
 msgstr[1] "{count} Bilder wurden hochgeladen"
 
-#: indico/modules/designer/controllers.py:463
+#: indico/modules/designer/controllers.py:498
 msgid "The template has been deleted"
 msgstr "Die Vorlage wurde gelöscht"
 
@@ -3834,11 +3834,11 @@ msgstr "Daten fixiert"
 
 #: indico/modules/designer/placeholders.py:39
 msgid "Common Registrant Data"
-msgstr ""
+msgstr "Gemeinsame Registrantendaten"
 
 #: indico/modules/designer/placeholders.py:40
 msgid "Custom Registrant Data"
-msgstr ""
+msgstr "Benutzerdefinierte Registrantendaten"
 
 #: indico/modules/designer/placeholders.py:101
 #: indico/modules/events/layout/templates/layout_conference.html:66
@@ -3999,7 +3999,7 @@ msgstr "Festes Bild"
 
 #: indico/modules/designer/placeholders.py:458
 msgid "No accommodation"
-msgstr ""
+msgstr "Keine Unterkunft"
 
 #: indico/modules/designer/templates/_list.html:12
 msgid "Registration Form has no registrations"
@@ -4023,23 +4023,23 @@ msgstr "von Kategorie \"%(title)s\""
 #: indico/modules/designer/templates/_list.html:74
 msgctxt "Designer template linked to registration form"
 msgid "Linked to"
-msgstr ""
+msgstr "Verknüpft mit"
 
 #: indico/modules/designer/templates/_list.html:83
 msgid "Unlink registration form"
-msgstr ""
+msgstr "Verknüpfung des Anmeldeformulars aufheben"
 
 #: indico/modules/designer/templates/_list.html:88
 msgid ""
 "This template cannot be unlinked because it contains placeholders "
 "referencing the linked registration form."
-msgstr ""
+msgstr "Die Verknüpfung dieser Vorlage kann nicht aufgehoben werden, da sie Platzhalter enthält, die auf das verknüpfte Anmeldeformular verweisen."
 
 #: indico/modules/designer/templates/_list.html:98
 msgid ""
 "Link to a registration form. This will enable you to use all registration "
 "form fields in the template."
-msgstr ""
+msgstr "Link zu einem Anmeldeformular. Auf diese Weise können Sie alle Felder des Registrierungsformulars in der Vorlage verwenden."
 
 #: indico/modules/designer/templates/_list.html:120
 msgid "This is the inherited default ticket template"
@@ -4148,7 +4148,7 @@ msgid "This template has different dimension than your template"
 msgstr "Diese Vorlage hat andere Ausmaße als Ihre Vorlage"
 
 #: indico/modules/designer/templates/backside_list.html:16
-msgid "This template is already linked to a different registration form"
+msgid "This template is linked to a different registration form"
 msgstr ""
 
 #: indico/modules/designer/templates/backside_list.html:36
@@ -4427,7 +4427,7 @@ msgstr "Veranstaltungs-Labels"
 
 #: indico/modules/events/__init__.py:147
 msgid "Event Keywords"
-msgstr ""
+msgstr "Schlüsselwörter für Veranstaltungen"
 
 #: indico/modules/events/__init__.py:149
 #: indico/modules/events/templates/admin/unlisted_events.html:5
@@ -8555,7 +8555,7 @@ msgstr "Veranstaltungs-Label „{}“ erfolgreich erstellt"
 
 #: indico/modules/events/controllers/admin.py:134
 msgid "Allowed keywords have been saved"
-msgstr ""
+msgstr "Erlaubte Schlüsselwörter wurden gespeichert"
 
 #: indico/modules/events/controllers/admin.py:146
 msgid "Event label '{}' successfully updated"
@@ -10125,7 +10125,7 @@ msgid ""
 "venue/room or address, but not both. For the ticket in Google Wallet to "
 "display information about the event's physical location you need to fill in "
 "both fields."
-msgstr ""
+msgstr "Google Wallet-Tickets sind in diesem Fall aktiviert und Sie haben einen Veranstaltungsort/Raum oder eine Adresse angegeben, aber nicht beides. Damit das Ticket in Google Wallet Informationen über den physischen Standort der Veranstaltung anzeigt, müssen Sie beide Felder ausfüllen."
 
 #: indico/modules/events/management/templates/_settings.html:137
 msgid "Edit speakers"
@@ -10268,7 +10268,7 @@ msgid ""
 "Please note that if you delete the event you will lose all the information "
 "contained in it, %(strong)sincluding %(num_bookings)s Room Booking "
 "occurrence(s)%(endstrong)s linked to it. This operation is irreversible!"
-msgstr ""
+msgstr "Bitte beachten Sie, dass Sie, wenn Sie die Veranstaltung löschen, %(strong)salle %(num_bookings)sdarin enthaltenen Informationen verlieren%(endstrong)s, einschließlich der damit verbundenen Raumbuchungen. Dieser Vorgang ist irreversibel!"
 
 #: indico/modules/events/management/templates/delete_event.html:12
 msgid ""
@@ -10293,7 +10293,7 @@ msgid ""
 "Please note that if you delete the events you will lose all the information "
 "contained in them, %(strong)sincluding %(num_booking_occurrences)s Room "
 "Booking occurrence(s)%(endstrong)s. This operation is irreversible!"
-msgstr ""
+msgstr "Bitte beachten Sie, dass Sie beim Löschen der Veranstaltungen alle darin enthaltenen Informationen verlieren, %(strong)seinschließlich%(num_booking_occurrences)s der Vorkommen%(endstrong)s der Raumbuchung. Dieser Vorgang ist irreversibel!"
 
 #: indico/modules/events/management/templates/delete_events.html:13
 msgid ""
@@ -12484,7 +12484,7 @@ msgstr "Deadline bis wann Registrierungsdaten geändert werden können (standard
 
 #: indico/modules/events/registration/forms.py:190
 msgid "Deadline until which registration information can be modified"
-msgstr ""
+msgstr "Frist, bis zu der die Registrierungsinformationen geändert werden können"
 
 #: indico/modules/events/registration/forms.py:202
 msgid "Email subject"
@@ -12616,13 +12616,13 @@ msgstr "Erstellt Tickets für Registrierungen in diesem Registrierungsformular."
 
 #: indico/modules/events/registration/forms.py:320
 msgid "Export to Google Wallet"
-msgstr ""
+msgstr "In Google Wallet exportieren"
 
 #: indico/modules/events/registration/forms.py:323
 msgid ""
 "Allow users to export their ticket to Google Wallet. This currently does not"
 " support tickets for accompanying persons."
-msgstr ""
+msgstr "Erlauben Sie Nutzern, ihr Ticket in Google Wallet zu exportieren. Tickets für Begleitpersonen werden derzeit nicht unterstützt."
 
 #: indico/modules/events/registration/forms.py:326
 msgid "Send with an e-mail"
@@ -12862,7 +12862,7 @@ msgstr "Ob Benutzer über die veröffentlichte Quittung benachrichtigt werden so
 #: indico/modules/events/registration/google_wallet.py:53
 #: indico/modules/events/registration/google_wallet.py:57
 msgid "Could not generate ticket"
-msgstr ""
+msgstr "Ticket konnte nicht generiert werden"
 
 #: indico/modules/events/registration/lists.py:39
 msgid "Registration Date"
@@ -12939,17 +12939,17 @@ msgstr "Zeile {}: E-Mail-Adresse ist nicht eindeutig"
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "Zeile {}: Die E-Mail-Adresse gehört demselben Benutzer wie in Zeile {}"
 
-#: indico/modules/events/registration/util.py:858
-#: indico/modules/events/registration/util.py:891
+#: indico/modules/events/registration/util.py:859
+#: indico/modules/events/registration/util.py:892
 msgid "Row {}: a registration with this email already exists"
 msgstr "Zeile {}: Eine Registrierung mit dieser E-Mail existiert bereits"
 
-#: indico/modules/events/registration/util.py:862
-#: indico/modules/events/registration/util.py:897
+#: indico/modules/events/registration/util.py:863
+#: indico/modules/events/registration/util.py:898
 msgid "Row {}: a registration for this user already exists"
 msgstr "Zeile {}: Eine Registrierung für diesen Benutzer existiert bereits"
 
-#: indico/modules/events/registration/util.py:902
+#: indico/modules/events/registration/util.py:903
 msgid "Row {}: an invitation for this user already exists"
 msgstr "Zeile {}: Eine Einladung für diesen Benutzer existiert bereits"
 
@@ -13137,7 +13137,7 @@ msgstr "Die Registrierung wurde zurückgezogen"
 
 #: indico/modules/events/registration/controllers/management/reglists.py:734
 msgid "Deadline for registration modification has been scheduled"
-msgstr ""
+msgstr "Frist für die Änderung der Registrierung wurde festgelegt"
 
 #: indico/modules/events/registration/controllers/management/reglists.py:760
 msgid "This registration cannot be marked as checked-in"
@@ -13538,7 +13538,7 @@ msgstr "Ticket für das %(title)sAnmeldeformular herunterladen"
 #: indico/modules/events/registration/templates/display/conference_home.html:21
 #, python-format
 msgid "Add ticket for the '%(title)s' registration form to Google Wallet"
-msgstr ""
+msgstr "Ticket für das Registrierungsformular '%(title)s' zu Google Wallet hinzufügen"
 
 #: indico/modules/events/registration/templates/display/conference_home.html:52
 msgid ""
@@ -13786,7 +13786,7 @@ msgstr "Bitte gehen Sie weiter zum Checkout"
 #, python-format
 msgid ""
 "You are allowed to modify your registration until: %(modification_end_dt)s"
-msgstr ""
+msgstr "Sie können Ihre Registrierung ändern, bis: %(modification_end_dt)s"
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:67
 msgid "The modification period is over"
@@ -13818,7 +13818,7 @@ msgstr "Die Registrierung kann nicht mehr zurückgezogen werden. Bitte einen Org
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:98
 msgid "Save to Google Wallet"
-msgstr ""
+msgstr "In Google Wallet speichern"
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:122
 #: indico/modules/legal/templates/tos_footer.html:2
@@ -14373,39 +14373,39 @@ msgstr "Sind Sie sicher, dass Sie diese Anmeldung zurücksetzen möchten? Dies l
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:325
 msgid "Allow the participant to modify their registration"
-msgstr ""
+msgstr "Erlauben Sie dem Teilnehmer, seine Registrierung zu ändern"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:327
 msgid ""
 "You can exceptionally allow this participant to modify their registration, "
 "regardless of the modification settings or deadline configured in the "
 "registration form."
-msgstr ""
+msgstr "Sie können diesem Teilnehmer ausnahmsweise erlauben, seine Anmeldung zu ändern, unabhängig von den Änderungseinstellungen oder der im Anmeldeformular konfigurierten Frist."
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:336
 msgid "The participant can no longer exceptionally modify their registration"
-msgstr ""
+msgstr "Der Teilnehmer kann seine Anmeldung nicht mehr ausnahmsweise ändern"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:338
 #, python-format
 msgid ""
 "The specified modification deadline (%(modification_end_dt)s) has passed."
-msgstr ""
+msgstr "Die angegebene Änderungsfrist (%(modification_end_dt)s) ist verstrichen."
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:346
 msgid "The participant can exceptionally modify their registration"
-msgstr ""
+msgstr "Der Teilnehmer kann seine Anmeldung ausnahmsweise ändern"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:348
 #, python-format
 msgid ""
 "The participant is allowed to modify their registration until: "
 "%(modification_end_dt)s"
-msgstr ""
+msgstr "Der Teilnehmer ist berechtigt, seine Anmeldung zu ändern, bis: %(modification_end_dt)s"
 
 #: indico/modules/events/registration/templates/management/_registration_details.html:359
 msgid "Set the modification deadline"
-msgstr ""
+msgstr "Festlegen der Änderungsfrist"
 
 #: indico/modules/events/registration/templates/management/_reglist.html:11
 #, python-format
@@ -16794,13 +16794,13 @@ msgstr "Beispiel"
 
 #: indico/modules/events/templates/admin/event_keywords.html:5
 msgid "Allowed event keywords"
-msgstr ""
+msgstr "Zulässige Ereignisschlüsselwörter"
 
 #: indico/modules/events/templates/admin/event_keywords.html:9
 msgid ""
 "Define the list of allowed event keywords. An empty list implies any keyword"
 " is valid."
-msgstr ""
+msgstr "Definieren Sie die Liste der zulässigen Ereignisschlüsselwörter. Eine leere Liste impliziert, dass ein beliebiges Schlüsselwort gültig ist."
 
 #: indico/modules/events/templates/admin/event_labels.html:7
 msgid "Existing event labels"
@@ -17846,7 +17846,7 @@ msgstr "Wollen Sie wirklich diese Gruppe löschen?"
 #: indico/modules/groups/templates/group_details.html:27
 msgid ""
 "The data source of this group does not allow retrieving its member list."
-msgstr ""
+msgstr "Die Datenquelle dieser Gruppe lässt das Abrufen der Mitgliederliste nicht zu."
 
 #: indico/modules/groups/templates/group_details.html:30
 msgid "Loading member list"
@@ -17912,33 +17912,33 @@ msgstr "Rechtliche Hinweise"
 
 #: indico/modules/legal/forms.py:34
 msgid "Accept terms of service & privacy policy"
-msgstr ""
+msgstr "Akzeptieren Sie die Nutzungsbedingungen und die Datenschutzrichtlinie"
 
 #: indico/modules/legal/forms.py:35
 msgid ""
 "I have read, understood and accept the {tos_link_start}terms of "
 "service{tos_link_end} and {pp_link_start}privacy policy{pp_link_end}."
-msgstr ""
+msgstr "Ich habe die {tos_link_start}Nutzungsbedingungen{tos_link_end} und die {pp_link_start}Datenschutzrichtlinie{pp_link_end} gelesen, verstanden und akzeptiere sie."
 
 #: indico/modules/legal/forms.py:38
 msgid "Accept terms of service"
-msgstr ""
+msgstr "Akzeptieren Sie die Nutzungsbedingungen"
 
 #: indico/modules/legal/forms.py:39
 msgid ""
 "I have read, understood and accept the {tos_link_start}terms of "
 "service{tos_link_end}."
-msgstr ""
+msgstr "Ich habe die {tos_link_start}Nutzungsbedingungen{tos_link_end} gelesen, verstanden und akzeptiere sie"
 
 #: indico/modules/legal/forms.py:42
 msgid "Accept privacy policy"
-msgstr ""
+msgstr "Akzeptieren Sie die Datenschutzerklärung"
 
 #: indico/modules/legal/forms.py:43
 msgid ""
 "I have read, understood and accept the {pp_link_start}privacy "
 "policy{pp_link_end}."
-msgstr ""
+msgstr "Ich habe die {pp_link_start}Datenschutzerklärung{pp_link_end} gelesen, verstanden und akzeptiere sie."
 
 #: indico/modules/legal/forms.py:52
 msgid "Network-protected information disclaimer"
@@ -17958,17 +17958,17 @@ msgstr "Die URL zu einer externen Seite mit der Datenschutzerklärung"
 
 #: indico/modules/legal/forms.py:63
 msgid "Require accepting terms"
-msgstr ""
+msgstr "Akzeptieren von Bedingungen erforderlich"
 
 #: indico/modules/legal/forms.py:64
 msgid ""
 "When a user creates a profile or if the terms effective date has changed, "
 "require the user to confirm accepting the terms."
-msgstr ""
+msgstr "Wenn ein Benutzer ein Profil erstellt oder wenn sich das Datum des Inkrafttretens der Bedingungen geändert hat, fordern Sie den Benutzer auf, die Annahme der Bedingungen zu bestätigen."
 
 #: indico/modules/legal/forms.py:67
 msgid "Terms effective date"
-msgstr ""
+msgstr "Datum  des Inkrafttretens der Bedingungen"
 
 #: indico/modules/legal/forms.py:69
 msgid ""
@@ -17976,13 +17976,13 @@ msgid ""
 "accepted the terms prior will be re-prompted on this date. If unset, "
 "existing users will not be prompted to accept the terms. Do this only as a "
 "temporary measure."
-msgstr ""
+msgstr "Das Datum, an dem die Bedingungen in Kraft treten, in der Zeitzone des Servers. Benutzer, die die Bedingungen zuvor akzeptiert haben, werden an diesem Datum erneut aufgefordert. Wenn diese Option deaktiviert ist, werden vorhandene Benutzer nicht aufgefordert, die Bedingungen zu akzeptieren. Tun Sie dies nur als vorübergehende Maßnahme."
 
 #: indico/modules/legal/forms.py:82
 msgid ""
 "Requiring to accept terms requires a privacy policy and/or terms of service "
 "to be set."
-msgstr ""
+msgstr "Die Anforderung, Bedingungen zu akzeptieren, erfordert die Festlegung einer Datenschutzrichtlinie und/oder Nutzungsbedingungen."
 
 #: indico/modules/legal/templates/tos.html:5 indico/modules/legal/views.py:24
 msgid "Terms and Conditions"
@@ -18001,25 +18001,25 @@ msgstr "Datenschutzerklärung"
 msgid ""
 "You have not accepted the latest terms. Please %(link)sreview "
 "them%(endlink)s at your earliest convenience."
-msgstr ""
+msgstr "Sie haben die neuesten Bedingungen nicht akzeptiert. Bitte %(link)s überprüfen Sie diese %(endlink)s so schnell wie möglich."
 
 #: indico/modules/legal/templates/agreement.html:9
 msgid ""
 "To continue using the platform, you must agree to the updated terms. Please "
 "take a moment to read the agreements before you continue."
-msgstr ""
+msgstr "Um die Plattform weiterhin nutzen zu können, müssen Sie den aktualisierten Bedingungen zustimmen. Bitte nehmen Sie sich einen Moment Zeit, um die Vereinbarungen zu lesen, bevor Sie fortfahren."
 
 #: indico/modules/legal/templates/agreement.html:12
 msgid "Terms of Service"
-msgstr ""
+msgstr "Nutzungsbedingungen"
 
 #: indico/modules/legal/templates/agreement.html:26
 msgid "Last updated:"
-msgstr ""
+msgstr "Letzte Aktualisierung:"
 
 #: indico/modules/legal/templates/agreement.html:32
 msgid "Confirm"
-msgstr ""
+msgstr "Bestätigen"
 
 #: indico/modules/legal/templates/manage_messages.html:5
 msgid "Legal and disclaimer messages"
@@ -18027,11 +18027,11 @@ msgstr "Rechtliche Hinweise"
 
 #: indico/modules/legal/templates/manage_messages.html:12
 msgid "Terms & Conditions"
-msgstr ""
+msgstr "Allgemeine Geschäftsbedingungen"
 
 #: indico/modules/legal/templates/manage_messages.html:18
 msgid "Required Terms"
-msgstr ""
+msgstr "Erforderliche Bedingungen"
 
 #: indico/modules/logs/models/entries.py:22 indico/web/views.py:265
 #: indico/web/views.py:322
@@ -18539,7 +18539,7 @@ msgstr "Raumreservierung"
 #: indico/modules/rb/__init__.py:94
 #: indico/modules/rb/templates/booking_list.html:5
 msgid "Room bookings"
-msgstr ""
+msgstr "Raumbuchungen"
 
 #: indico/modules/rb/__init__.py:127
 msgid "Book"
@@ -18716,7 +18716,7 @@ msgstr "Verlinkt zu"
 
 #: indico/modules/rb/templates/booking_list.html:101
 msgid "Reservation"
-msgstr ""
+msgstr "Reservierung"
 
 #: indico/modules/rb/templates/booking_list.html:113
 msgid "Rejected:"
@@ -18724,7 +18724,7 @@ msgstr "Abgelehnt:"
 
 #: indico/modules/rb/templates/booking_list.html:116
 msgid "Awaiting approval"
-msgstr ""
+msgstr "Warten auf Genehmigung"
 
 #: indico/modules/rb/templates/booking_list.html:149
 msgid "There are no room bookings for this event yet."
@@ -18732,7 +18732,7 @@ msgstr "Es gibt noch keine Raumbuchungen für diese Veranstaltung."
 
 #: indico/modules/rb/templates/booking_list.html:164
 msgid "See reservation details"
-msgstr ""
+msgstr "Siehe Reservierungsdetails"
 
 #: indico/modules/rb/templates/emails/email_footer.txt:4
 msgid "Best regards,"

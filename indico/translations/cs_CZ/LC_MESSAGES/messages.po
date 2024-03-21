@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-18 17:55+0100\n"
+"POT-Creation-Date: 2024-03-21 18:26+0100\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Vlada Trestik, 2024\n"
 "Language-Team: Czech (Czech Republic) (http://app.transifex.com/indico/indico/language/cs_CZ/)\n"
@@ -832,7 +832,7 @@ msgid "Announcement"
 msgstr "Oznámení"
 
 #: indico/modules/announcement/controllers.py:24
-#: indico/modules/core/controllers.py:107
+#: indico/modules/core/controllers.py:108
 #: indico/modules/events/controllers/admin.py:167
 #: indico/modules/news/controllers.py:70
 #: indico/modules/receipts/controllers/admin.py:26
@@ -1804,72 +1804,72 @@ msgstr "Účty"
 msgid "You need to change your password"
 msgstr "Musíte změnit vaše heslo"
 
-#: indico/modules/auth/controllers.py:146
+#: indico/modules/auth/controllers.py:147
 msgid ""
 "We have sent you a verification email. Please check your mailbox within the "
 "next hour and open the link in that email."
 msgstr "Poslali jsme Vám ověřovací e-mail. Prosím zkontrolujte si během následující hodiny poštu a klikněte na odkaz v tomto e-mailu. "
 
-#: indico/modules/auth/controllers.py:178
+#: indico/modules/auth/controllers.py:179
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the login."
 msgstr "Úspěšně jste ověřili svou e-mailovou adresu a můžete nyní pokračovat s přihlašováním."
 
-#: indico/modules/auth/controllers.py:194
+#: indico/modules/auth/controllers.py:195
 msgid "The validation email has already been sent."
 msgstr "Ověřovácí e-mail již byl odeslán."
 
-#: indico/modules/auth/controllers.py:262
+#: indico/modules/auth/controllers.py:263
 msgid ""
 "You may change your email address after finishing the registration process."
 msgstr "Svou e-mailovou adresu můžete změnit po dokončení procesu registrace."
 
-#: indico/modules/auth/controllers.py:264
+#: indico/modules/auth/controllers.py:265
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the registration."
 msgstr "Úspěšně jste ověřili svou e-mailovou adresu a můžete nyní pokračovat s registrací."
 
-#: indico/modules/auth/controllers.py:285
+#: indico/modules/auth/controllers.py:286
 msgid "Too many signup attempts. Please wait {}"
 msgstr ""
 
-#: indico/modules/auth/controllers.py:335
+#: indico/modules/auth/controllers.py:336
 msgid ""
 "Your registration request has been received. We will send you an email once "
 "it has been processed."
 msgstr "Obdrželi jsme Vaši žádost o registraci. Jakmile bude zpracována, pošleme Vám email."
 
-#: indico/modules/auth/controllers.py:342
+#: indico/modules/auth/controllers.py:343
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
 msgstr "Podařilo se Vám úspěšně registrovat do Indica. Chcete-li, <a href=\"{url}\">ve Vašem profilu</a> najdete další podrobnosti a nastavení."
 
-#: indico/modules/auth/controllers.py:364
+#: indico/modules/auth/controllers.py:365
 msgid "Local account added successfully"
 msgstr "Místní účet byl úspěšně přidán"
 
-#: indico/modules/auth/controllers.py:372
+#: indico/modules/auth/controllers.py:373
 msgid "Your local account credentials have been updated successfully"
 msgstr "Vlastnosti Vašeho místního účtu byly úspěšně upraveny"
 
-#: indico/modules/auth/controllers.py:409
+#: indico/modules/auth/controllers.py:410
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr "{provider} ({identifier}) byly úspěšně odstraněny z vašeho účtu. "
 
-#: indico/modules/auth/controllers.py:620
-#: indico/modules/auth/controllers.py:622 indico/util/marshmallow.py:57
+#: indico/modules/auth/controllers.py:621
+#: indico/modules/auth/controllers.py:623 indico/util/marshmallow.py:57
 msgid "This field cannot be empty."
 msgstr "Toto pole nemůže zůstat prázdné."
 
-#: indico/modules/auth/controllers.py:704 indico/modules/auth/forms.py:34
+#: indico/modules/auth/controllers.py:705 indico/modules/auth/forms.py:34
 #: indico/modules/auth/forms.py:87
 msgid "This username is already in use."
 msgstr "Toto uživatelské jméno je již používáno."
 
-#: indico/modules/auth/controllers.py:782
+#: indico/modules/auth/controllers.py:783
 msgid "Your password has been changed successfully."
 msgstr "Vaše heslo se změnilo."
 
@@ -3639,7 +3639,7 @@ msgstr "Špatná odpověď"
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:307
+#: indico/modules/core/controllers.py:308
 msgid "All your token-based links have been invalidated"
 msgstr "Všechny odkazy využívající tokeny byli zneplatněny. "
 
@@ -3787,15 +3787,15 @@ msgstr "Pouze přední strana"
 msgid "Posters/Badges"
 msgstr "Lístky/jmenovky"
 
-#: indico/modules/designer/controllers.py:230
+#: indico/modules/designer/controllers.py:231
 msgid "Created copy of template '{}'"
 msgstr "Vztvořena kopie šablony '{}'"
 
-#: indico/modules/designer/controllers.py:234
+#: indico/modules/designer/controllers.py:235
 msgid "Go to category"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:245
+#: indico/modules/designer/controllers.py:246
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
 #: indico/modules/events/management/forms.py:411
 #: indico/modules/events/management/templates/_action_menu.html:135
@@ -3803,31 +3803,31 @@ msgstr ""
 msgid "Clone"
 msgstr "Klonovat"
 
-#: indico/modules/designer/controllers.py:265
+#: indico/modules/designer/controllers.py:266
 msgid "Added new template '{}'"
 msgstr "Přidána nová šablona '{}'"
 
-#: indico/modules/designer/controllers.py:350
+#: indico/modules/designer/controllers.py:356
 msgid "A Fixed Image element must contain an image"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:352
+#: indico/modules/designer/controllers.py:358
 msgid "The image file does not belong to this template"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:357
+#: indico/modules/designer/controllers.py:363
 msgid "Template successfully saved."
 msgstr "Šablona úspěšně uložena."
 
-#: indico/modules/designer/controllers.py:385
+#: indico/modules/designer/controllers.py:420
 msgid "Template successfully linked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:402
+#: indico/modules/designer/controllers.py:437
 msgid "Template successfully unlinked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:442
+#: indico/modules/designer/controllers.py:477
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
@@ -3836,7 +3836,7 @@ msgstr[1] "Byly nahrány {count} snímky"
 msgstr[2] "Bylo nahráno {count} snímků"
 msgstr[3] "Bylo nahráno {count} snímků"
 
-#: indico/modules/designer/controllers.py:463
+#: indico/modules/designer/controllers.py:498
 msgid "The template has been deleted"
 msgstr "Šablona byla vymazána"
 
@@ -4181,7 +4181,7 @@ msgid "This template has different dimension than your template"
 msgstr "Tato šablona má jiné rozměry než vaše šablona"
 
 #: indico/modules/designer/templates/backside_list.html:16
-msgid "This template is already linked to a different registration form"
+msgid "This template is linked to a different registration form"
 msgstr ""
 
 #: indico/modules/designer/templates/backside_list.html:36
@@ -13050,17 +13050,17 @@ msgstr "Řádka {}: e-mailová adresa není jedinečná"
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "Řádek {}: e-mailová adresa patří stejnému uživateli jako na řádku {}"
 
-#: indico/modules/events/registration/util.py:858
-#: indico/modules/events/registration/util.py:891
+#: indico/modules/events/registration/util.py:859
+#: indico/modules/events/registration/util.py:892
 msgid "Row {}: a registration with this email already exists"
 msgstr "Řádek {}: registrace s touto e-mailovou adresou již existuje"
 
-#: indico/modules/events/registration/util.py:862
-#: indico/modules/events/registration/util.py:897
+#: indico/modules/events/registration/util.py:863
+#: indico/modules/events/registration/util.py:898
 msgid "Row {}: a registration for this user already exists"
 msgstr "Řádek {}: tento uživatel je již registrován"
 
-#: indico/modules/events/registration/util.py:902
+#: indico/modules/events/registration/util.py:903
 msgid "Row {}: an invitation for this user already exists"
 msgstr "Řádek {}: pozvánka pro tohoto uživatele již existuje"
 

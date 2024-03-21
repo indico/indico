@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-18 17:55+0100\n"
+"POT-Creation-Date: 2024-03-21 18:26+0100\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021-2024\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/indico/indico/language/pl_PL/)\n"
@@ -832,7 +832,7 @@ msgid "Announcement"
 msgstr "Ogłoszenie"
 
 #: indico/modules/announcement/controllers.py:24
-#: indico/modules/core/controllers.py:107
+#: indico/modules/core/controllers.py:108
 #: indico/modules/events/controllers/admin.py:167
 #: indico/modules/news/controllers.py:70
 #: indico/modules/receipts/controllers/admin.py:26
@@ -1804,72 +1804,72 @@ msgstr "Konta"
 msgid "You need to change your password"
 msgstr "Musisz zmienić swoje hasło"
 
-#: indico/modules/auth/controllers.py:146
+#: indico/modules/auth/controllers.py:147
 msgid ""
 "We have sent you a verification email. Please check your mailbox within the "
 "next hour and open the link in that email."
 msgstr "Wysłaliśmy Ci e-mail weryfikujący. Sprawdź w swojej skrzynce w ciągu najbliższej godziny i otwórz link zawarty w tym e-mailu."
 
-#: indico/modules/auth/controllers.py:178
+#: indico/modules/auth/controllers.py:179
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the login."
 msgstr "Potwierdziłeś swój adres e-mail i możesz kontynuować logowanie."
 
-#: indico/modules/auth/controllers.py:194
+#: indico/modules/auth/controllers.py:195
 msgid "The validation email has already been sent."
 msgstr "Sprawdzający e-mail został wysłany."
 
-#: indico/modules/auth/controllers.py:262
+#: indico/modules/auth/controllers.py:263
 msgid ""
 "You may change your email address after finishing the registration process."
 msgstr "Możesz zmienić swój adres e-mail po zakończeniu procesu rejestracji."
 
-#: indico/modules/auth/controllers.py:264
+#: indico/modules/auth/controllers.py:265
 msgid ""
 "You have successfully validated your email address and can now proceed with "
 "the registration."
 msgstr "Potwierdziłeś swój adres e-mail, więc możesz kontynuować rejestrację."
 
-#: indico/modules/auth/controllers.py:285
+#: indico/modules/auth/controllers.py:286
 msgid "Too many signup attempts. Please wait {}"
 msgstr ""
 
-#: indico/modules/auth/controllers.py:335
+#: indico/modules/auth/controllers.py:336
 msgid ""
 "Your registration request has been received. We will send you an email once "
 "it has been processed."
 msgstr "Otrzymaliśmy Twój wniosek o rejestrację. Wyślemy Ci e-maila po przetworzeniu tego wniosku."
 
-#: indico/modules/auth/controllers.py:342
+#: indico/modules/auth/controllers.py:343
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
 msgstr "Twój profil Indico został zarejestrowany. Sprawdź <a href=\"{url}\">Twój profil</a>, gdzie znajdziesz dalsze szczegóły i ustawienia."
 
-#: indico/modules/auth/controllers.py:364
+#: indico/modules/auth/controllers.py:365
 msgid "Local account added successfully"
 msgstr "Dodano lokalne konto"
 
-#: indico/modules/auth/controllers.py:372
+#: indico/modules/auth/controllers.py:373
 msgid "Your local account credentials have been updated successfully"
 msgstr "Twoje dane uwierzytelniające lokalnego konta zostały załadowane"
 
-#: indico/modules/auth/controllers.py:409
+#: indico/modules/auth/controllers.py:410
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr "{provider} ({identifier}) został usunięty z Twojego konta"
 
-#: indico/modules/auth/controllers.py:620
-#: indico/modules/auth/controllers.py:622 indico/util/marshmallow.py:57
+#: indico/modules/auth/controllers.py:621
+#: indico/modules/auth/controllers.py:623 indico/util/marshmallow.py:57
 msgid "This field cannot be empty."
 msgstr "To pole nie może być puste"
 
-#: indico/modules/auth/controllers.py:704 indico/modules/auth/forms.py:34
+#: indico/modules/auth/controllers.py:705 indico/modules/auth/forms.py:34
 #: indico/modules/auth/forms.py:87
 msgid "This username is already in use."
 msgstr "Ta nazwa użytkownika jest już wykorzystana."
 
-#: indico/modules/auth/controllers.py:782
+#: indico/modules/auth/controllers.py:783
 msgid "Your password has been changed successfully."
 msgstr "Twoje hasło zostało zmienione."
 
@@ -2153,7 +2153,7 @@ msgstr "Utwórz nowy profil Indico"
 #: indico/modules/auth/templates/register_verify.html:15
 msgid ""
 "To create a new Indico profile you first need to verify your email address."
-msgstr "Aby utworzyć nowy profil Indico, musisz najpierw sprawdzić swój adres e-mail."
+msgstr "Aby utworzyć nowy profil Indico, najpierw musisz zweryfikować swój adres e-mail."
 
 #: indico/modules/auth/templates/reset_password.html:6
 msgid "Reset your Indico password"
@@ -2559,7 +2559,7 @@ msgstr "Lista adresów e-mail, na które zostaną wysłane powiadomienia o utwor
 
 #: indico/modules/categories/forms.py:82
 msgid "Configuration"
-msgstr ""
+msgstr "Konfiguracja"
 
 #: indico/modules/categories/forms.py:83
 msgid ""
@@ -3639,7 +3639,7 @@ msgstr "Błędna odpowiedź"
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
-#: indico/modules/core/controllers.py:307
+#: indico/modules/core/controllers.py:308
 msgid "All your token-based links have been invalidated"
 msgstr "Unieważniono wszystkie Twoje linki wykorzystujące tokeny"
 
@@ -3787,15 +3787,15 @@ msgstr "Tylko przód"
 msgid "Posters/Badges"
 msgstr "Postery/Plakietki"
 
-#: indico/modules/designer/controllers.py:230
+#: indico/modules/designer/controllers.py:231
 msgid "Created copy of template '{}'"
 msgstr "Utworzono kopię szablonu '{}'"
 
-#: indico/modules/designer/controllers.py:234
+#: indico/modules/designer/controllers.py:235
 msgid "Go to category"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:245
+#: indico/modules/designer/controllers.py:246
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
 #: indico/modules/events/management/forms.py:411
 #: indico/modules/events/management/templates/_action_menu.html:135
@@ -3803,31 +3803,31 @@ msgstr ""
 msgid "Clone"
 msgstr "Sklonuj"
 
-#: indico/modules/designer/controllers.py:265
+#: indico/modules/designer/controllers.py:266
 msgid "Added new template '{}'"
 msgstr "Dodano nowy szablon '{}'"
 
-#: indico/modules/designer/controllers.py:350
+#: indico/modules/designer/controllers.py:356
 msgid "A Fixed Image element must contain an image"
 msgstr "Stały obraz musi zawierać obraz"
 
-#: indico/modules/designer/controllers.py:352
+#: indico/modules/designer/controllers.py:358
 msgid "The image file does not belong to this template"
 msgstr "Plik obrazu nie należy do tego szablonu"
 
-#: indico/modules/designer/controllers.py:357
+#: indico/modules/designer/controllers.py:363
 msgid "Template successfully saved."
 msgstr "Szablon został zapisany"
 
-#: indico/modules/designer/controllers.py:385
+#: indico/modules/designer/controllers.py:420
 msgid "Template successfully linked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:402
+#: indico/modules/designer/controllers.py:437
 msgid "Template successfully unlinked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:442
+#: indico/modules/designer/controllers.py:477
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
@@ -3836,7 +3836,7 @@ msgstr[1] "Załadowano {count} ilustracje"
 msgstr[2] "załadowano {count} ilustracji"
 msgstr[3] "załadowano {count} ilustracji"
 
-#: indico/modules/designer/controllers.py:463
+#: indico/modules/designer/controllers.py:498
 msgid "The template has been deleted"
 msgstr "Ten szablon został usunięty"
 
@@ -4181,7 +4181,7 @@ msgid "This template has different dimension than your template"
 msgstr "Ten szablon ma inny rozmiar od Twojego."
 
 #: indico/modules/designer/templates/backside_list.html:16
-msgid "This template is already linked to a different registration form"
+msgid "This template is linked to a different registration form"
 msgstr ""
 
 #: indico/modules/designer/templates/backside_list.html:36
@@ -12100,7 +12100,7 @@ msgstr "Zostałeś dodany z pewnymi uprawnieniami do wydarzenia %(strong)s{event
 
 #: indico/modules/events/persons/templates/emails/invitation.html:11
 msgid "To use those privileges, you need to create a new Indico profile."
-msgstr "Aby skorzystać z tych uprawnień, należy stworzyć nowy profil Indico."
+msgstr "Aby skorzystać z tych uprawnień, należy utworzyć nowy profil Indico."
 
 #: indico/modules/events/persons/templates/emails/invitation.html:12
 msgid "You can do so at the following URL:"
@@ -13050,17 +13050,17 @@ msgstr "Wiersz {}: adres e-mail nie jest unikatowy"
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "Wiersz {}: adres e-mail należy do tego samego użytkownika, co w wierszu {}"
 
-#: indico/modules/events/registration/util.py:858
-#: indico/modules/events/registration/util.py:891
+#: indico/modules/events/registration/util.py:859
+#: indico/modules/events/registration/util.py:892
 msgid "Row {}: a registration with this email already exists"
 msgstr "Wiersz {}: rejestracja dla tego e-maila już istnieje"
 
-#: indico/modules/events/registration/util.py:862
-#: indico/modules/events/registration/util.py:897
+#: indico/modules/events/registration/util.py:863
+#: indico/modules/events/registration/util.py:898
 msgid "Row {}: a registration for this user already exists"
 msgstr "Wiersz {}: rejestracja dla tego użytkownika już istnieje"
 
-#: indico/modules/events/registration/util.py:902
+#: indico/modules/events/registration/util.py:903
 msgid "Row {}: an invitation for this user already exists"
 msgstr "Wiersz {}: zaproszenie dla tego użytkownika już istnieje"
 
