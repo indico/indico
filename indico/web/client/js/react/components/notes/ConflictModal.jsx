@@ -43,10 +43,10 @@ export function ConflictModal({
 
   const renderDeletedRevision = () => {
     return (
-      <Segment placeholder>
+      <Segment placeholder styleName="revision-deleted">
         <Header icon>
           <Icon name="trash outline alternate" />
-          <Translate>These minutes have been deleted.</Translate>
+          <Translate>This content has been deleted.</Translate>
         </Header>
       </Segment>
     );
@@ -61,6 +61,7 @@ export function ConflictModal({
       }}
       onOpen={() => setOpen(true)}
       style={{minWidth: '65vw'}}
+      size="large"
       closeOnEscape={false}
       closeOnDimmerClick={false}
       closeIcon
@@ -125,7 +126,7 @@ export function ConflictModal({
                   <div
                     dangerouslySetInnerHTML={{__html: currentNote}}
                     className="editor-output"
-                    styleName="note-content"
+                    styleName="conflict-content"
                   />
                 </CardContent>
               </Card>
@@ -144,7 +145,7 @@ export function ConflictModal({
                     <div
                       dangerouslySetInnerHTML={{__html: extNote.source}}
                       className="editor-output"
-                      styleName="note-content"
+                      styleName="conflict-content"
                     />
                   </CardContent>
                 </Card>

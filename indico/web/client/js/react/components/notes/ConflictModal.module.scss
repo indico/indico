@@ -5,9 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.note-content {
-  max-height: 60vh;
+.conflict-content {
+  height: 50vh;
+  max-height: 50vh;
   overflow-y: auto;
+}
+
+.revision-deleted {
+  height: 52.5vh;
 }
 
 .action-button-icons :global(.icon::before) {
