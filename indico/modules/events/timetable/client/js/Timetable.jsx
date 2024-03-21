@@ -35,6 +35,7 @@ export default function Timetable() {
   const [date, setDate] = useState(
     entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
   );
+  const [placeholderEntry, setPlaceholderEntry] = useState(null);
   const currentDateEntries = entries.filter(e => e.start.getDate() === date.getDate());
   const numColumns = Math.max(...currentDateEntries.map(e => e.columnId).filter(e => e), 1);
 
@@ -59,16 +60,26 @@ export default function Timetable() {
       <DnDCalendar
         date={date}
         defaultView="day"
-        events={displayMode === 'blocks' ? blocks : entries}
+        events={[...(displayMode === 'blocks' ? blocks : entries), placeholderEntry]}
         localizer={localizer}
         views={{day: true}}
         components={{toolbar: Toolbar, event: Entry}}
         resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
         onEventDrop={args => dispatch(actions.moveEntry(args))}
         onEventResize={args => dispatch(actions.resizeEntry(args))}
-        onSelectSlot={(...args) => {
+        onSelectSlot={({bounds, start, end, resourceId}) => {
           dispatch(actions.selectEntry(null));
-          console.debug('onSelectSlot', ...args);
+          if (!bounds) {
+            setPlaceholderEntry(null);
+            return;
+          }
+          setPlaceholderEntry({
+            id: 'placeholder',
+            type: 'placeholder',
+            start,
+            end,
+            columnId: resourceId,
+          });
         }}
         onSelectEvent={e => dispatch(actions.selectEntry(e))}
         onNavigate={setDate}
@@ -81,6 +92,8 @@ export default function Timetable() {
         max={new Date(1972, 0, 1, maxHour, 0, 0)}
         tooltipAccessor={null}
         resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
+        draggableAccessor={e => e.type !== 'placeholder'}
+        resizableAccessor={e => e.type !== 'placeholder'}
         resizable
         selectable
       />
