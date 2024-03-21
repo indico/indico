@@ -47,11 +47,11 @@ def test_ongoing_bookings_are_not_split(create_reservation, start_dt, end_dt):
     assert split_booking(reservation, {}) is None
 
 
-def past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
+def test_past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
     from indico.modules.rb.operations.bookings import split_booking
 
-    start_dt = datetime.today().replace(hour=8, minutes=30) - timedelta(days=2)
-    end_dt = datetime.today().replace(hour=17, minutes=30) + timedelta(days=4)
+    start_dt = datetime.today().replace(hour=8, minute=30) - timedelta(days=2)
+    end_dt = datetime.today().replace(hour=17, minute=30) + timedelta(days=4)
     reservation = create_reservation(start_dt=start_dt, end_dt=end_dt, repeat_frequency=RepeatFrequency.DAY)
     new_reservation = split_booking(reservation, {
         'booking_reason': 'test reason',
