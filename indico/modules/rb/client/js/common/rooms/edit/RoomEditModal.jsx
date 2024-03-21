@@ -215,7 +215,6 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         const payload = {...basicDetails};
         payload.location_id = locationId;
         response = await indicoAxios.post(roomsURL(), payload);
-        setNewRoomId(response.data.id);
       } else if (!_.isEmpty(basicDetails)) {
         await indicoAxios.patch(roomURL({room_id: roomId}), basicDetails);
       }
@@ -238,6 +237,8 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       if (!isNewRoom) {
         setWasEverUpdated(true);
         fetchRoomData();
+      } else {
+        setNewRoomId(response.data.id);
       }
     } catch (e) {
       return handleSubmitError(e);
