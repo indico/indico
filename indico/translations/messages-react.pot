@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-03-24 17:55+0100\n"
+"POT-Creation-Date: 2024-03-24 18:26+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -157,7 +157,7 @@ msgstr ""
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx:90
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:535
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:171
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:362
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:131
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:56
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:147
@@ -370,6 +370,65 @@ msgstr ""
 
 #: indico/modules/core/client/js/impersonation.js:33
 msgid "Login as..."
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:219
+msgid "Your session expired"
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:221
+msgid "Your current session is about to expire"
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:229
+msgid ""
+"Your session has expired and you have been logged out. Please log in again "
+"if you wish to continue using Indico."
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:235
+msgid ""
+"If you need to save anything, you can also dismiss this message, but any "
+"operations on the current page will fail until you manually log in again."
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:243
+msgid ""
+"Your session will expire soon and you need to log in again to renew it if "
+"you wish to continue using Indico."
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:248
+msgid ""
+"If you dismiss this message, it will not show up until after your session "
+"has expired"
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:256
+msgid ""
+"Click on the \"Refresh\" button if you wish to continue using Indico or you "
+"will be logged out."
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:261
+msgid "If you dismiss this message, it will not show up until your session expired."
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:273
+msgid "Login again"
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:277
+msgid "Refresh"
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:282
+#: indico/web/client/js/react/errors/component.jsx:156
+msgid "Dismiss"
+msgstr ""
+
+#: indico/modules/core/client/js/session_expiry.jsx:287
+msgid "Snooze"
 msgstr ""
 
 #: indico/modules/events/abstracts/client/js/boa.jsx:54
@@ -1007,7 +1066,7 @@ msgid "Revision has been replaced"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:83
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:371
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:373
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx:106
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:316
@@ -2122,7 +2181,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:758
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:257
 #: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:86
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:360
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:362
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
@@ -3573,31 +3632,31 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:276
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:278
 msgid "Both latitude and longitude need to be set (or omitted)."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:299
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:301
 msgid "Add Room"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:299
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:301
 msgid "Edit Room Details"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:303
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:305
 msgid "Room has been successfully created."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:313
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:315
 msgid "Room has been successfully updated."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:323
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:325
 msgid "Room could not be updated."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:330
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:332
 msgid "Reset form"
 msgstr ""
 
@@ -6177,10 +6236,6 @@ msgstr ""
 
 #: indico/web/client/js/react/errors/component.jsx:154
 msgid "Dismiss (show next error)"
-msgstr ""
-
-#: indico/web/client/js/react/errors/component.jsx:156
-msgid "Dismiss"
 msgstr ""
 
 #: indico/web/client/js/react/forms/final-form.jsx:114
