@@ -151,12 +151,12 @@ class RHAPIEmailEventSurveyMetadata(RHManageSurveyBase):
             tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)
             body = tpl.get_html_body()
             subject = tpl.get_subject()
-        placeholders = get_sorted_placeholders('survey-link-email', event=None, survey=self.survey)
+        placeholders = get_sorted_placeholders('survey-link-email')
         return jsonify({
             'senders': list(self.event.get_allowed_sender_emails().items()),
             'body': body,
             'subject': subject,
-            'placeholders': [p.serialize(event=None, person=None) for p in placeholders],
+            'placeholders': [p.serialize() for p in placeholders],
         })
 
 
@@ -180,7 +180,7 @@ class RHAPIEmailEventSurveySend(RHManageSurveyBase):
         'from_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[
             not_empty,
-            make_validate_indico_placeholders('survey-link-email', event=None, survey=None),
+            make_validate_indico_placeholders('survey-link-email'),
         ]),
         'subject': fields.String(required=True, validate=not_empty),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
