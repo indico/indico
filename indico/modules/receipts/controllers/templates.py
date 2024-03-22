@@ -156,7 +156,8 @@ class RHPreviewTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
         # Just some dummy data to test the template
         html = compile_jinja_code(self.template.html, get_dummy_preview_data(self.template.custom_fields))
         pdf_data = create_pdf(self.target, [html], self.template.css)
-        return send_file('receipt.pdf', pdf_data, 'application/pdf')
+        filename = self.template.default_filename or 'preview.pdf'
+        return send_file(filename, pdf_data, 'application/pdf')
 
 
 class RHLivePreview(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
