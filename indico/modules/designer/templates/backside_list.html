@@ -10,7 +10,7 @@
                         {% set linked_to_same_regform = not tpl.registration_form or not current_template.registration_form or tpl.registration_form == current_template.registration_form %}
                         <li {% if different_size %}
                                 class="not-selectable-backside"
-                                title="{% trans %}This template has different dimension than your template{% endtrans %}"
+                                title="{% trans %}This template has different dimensions than your template{% endtrans %}"
                             {% elif not linked_to_same_regform %}
                                 class="not-selectable-backside"
                                 title="{% trans %}This template is linked to a different registration form{% endtrans %}"
