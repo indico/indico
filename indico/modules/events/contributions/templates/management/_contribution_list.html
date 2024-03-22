@@ -44,6 +44,9 @@
                             {% for item in dynamic_columns %}
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
+                            <th class="i-table material-column">
+                                {% trans %}Material{% endtrans %}
+                            </th>
                             <th class="actions-column hide-if-locked" data-sorter="false">
                                 {# Actions #}
                             </th>
