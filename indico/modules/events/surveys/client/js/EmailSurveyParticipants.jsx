@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import emailMetadataURL from 'indico-url:surveys.manage_email_event_survey_metadata';
-import emailPreviewURL from 'indico-url:surveys.manage_email_event_survey_preview';
-import emailSendURL from 'indico-url:surveys.manage_email_event_survey_send';
+import emailMetadataURL from 'indico-url:surveys.email_survey_metadata';
+import emailPreviewURL from 'indico-url:surveys.email_survey_preview';
+import emailSendURL from 'indico-url:surveys.email_survey_send';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
