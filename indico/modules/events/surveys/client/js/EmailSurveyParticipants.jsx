@@ -84,8 +84,6 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
       validate={values => {
         if (!values.email_all_participants && !values.recipients_addresses.length) {
           return {recipients_addresses: Translate.string('You must choose at least one recipient')};
-        } else {
-          return undefined;
         }
       }}
     />
