@@ -1,53 +1,34 @@
 Apache
 ======
 
-.. warning::
-
-    CentOS 8 with Apache is **not supported**, as some important packages
-    (mod_xsendfile and mod_proxy_uwsgi) are not (yet?) available for
-    CentOS 8 in first-party repos. Once they are in EPEL, there is a
-    good chance this guide will work as expected.
-
-
 1. Enable EPEL
 --------------
 
 .. code-block:: shell
 
-    yum install -y epel-release
-
-.. note::
-
-    If you use CC7, EPEL is already enabled and this step is not necessary
+    dnf install -y epel-release
+    dnf config-manager --set-enabled crb
 
 
 2. Install Packages
 -------------------
 
-If you are on CentOS 7, edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add
-``exclude=postgresql*`` to the ``[base]`` and ``[updates]`` sections, as
-described in the `PostgreSQL wiki`_ and then run these commands:
+Run these commands to use the upstream Postgres package repository:
 
 .. code-block:: shell
 
-    yum install -y centos-release-scl
-    yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-
-If you are on CentOS 8, run this instead:
-
-.. code-block:: shell
-
-    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     dnf -qy module disable postgresql
-    yum config-manager --set-enabled powertools
+
+Now install all the required packages:
 
 .. code-block:: shell
 
-    yum install -y postgresql13 postgresql13-server postgresql13-libs postgresql13-devel postgresql13-contrib
-    yum install -y git gcc make redis httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
-    yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel tar
-    /usr/pgsql-13/bin/postgresql-13-setup initdb
-    systemctl start postgresql-13.service redis.service
+    dnf install -y postgresql16 postgresql16-server postgresql16-libs postgresql16-devel postgresql16-contrib
+    dnf install -y git gcc make redis httpd mod_ssl mod_xsendfile
+    dnf install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel tar pango
+    /usr/pgsql-16/bin/postgresql-16-setup initdb
+    systemctl start postgresql-16.service redis.service
 
 
 3. Create a Database
@@ -84,7 +65,8 @@ most cases.
 
     processes = 4
     enable-threads = true
-    socket = 127.0.0.1:8008
+    chmod-socket = 770
+    socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
 
@@ -183,7 +165,7 @@ We also need a systemd unit to start uWSGI.
         Alias /robots.txt /opt/indico/web/static/robots.txt
 
         SetEnv UWSGI_SCHEME https
-        ProxyPass / uwsgi://127.0.0.1:8008/
+        ProxyPass / unix:/opt/indico/web/uwsgi.sock|uwsgi://localhost/
 
         <Directory /opt/indico>
             AllowOverride None
@@ -266,6 +248,9 @@ should be handled.
     (typetransition unconfined_service_t usr_t sock_file "uwsgi.sock" httpd_sys_rw_content_t)
     (filecon "/opt/indico/web/uwsgi\.sock" socket (system_u object_r httpd_sys_rw_content_t ((s0)(s0))))
 
+    ; let apache connect to uwsgi
+    (allow httpd_t unconfined_service_t (unix_stream_socket (connectto)))
+
     ; set proper types for our log dirs
     (filecon "/opt/indico/log(/.*)?" any (system_u object_r indico_log_t ((s0)(s0))))
     (filecon "/opt/indico/log/apache(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
@@ -326,15 +311,12 @@ Python features.
 
     source ~/.bashrc
 
-You are now ready to install Python 3.9:
-
-Run ``pyenv install --list | egrep '^\s*3\.9\.'`` to check for the latest available version and
-then install it and set it as the active Python version (replace ``x`` in both lines).
+You are now ready to install Python 3.12:
 
 .. code-block:: shell
 
-    pyenv install 3.9.x
-    pyenv global 3.9.x
+    pyenv install 3.12
+    pyenv global 3.12
 
 This may take a while since pyenv needs to compile the specified Python version. Once done, you
 may want to use ``python -V`` to confirm that you are indeed using the version you just installed.
@@ -345,9 +327,9 @@ You are now ready to install Indico:
 
     python -m venv --upgrade-deps --prompt indico ~/.venv
     source ~/.venv/bin/activate
-    export PATH="$PATH:/usr/pgsql-13/bin"
+    export PATH="$PATH:/usr/pgsql-16/bin"
     echo 'source ~/.venv/bin/activate' >> ~/.bashrc
-    pip install wheel
+    pip install setuptools wheel
     pip install uwsgi
     pip install indico
 
@@ -399,7 +381,7 @@ server is rebooted:
 .. code-block:: shell
 
     systemctl restart httpd.service indico-celery.service indico-uwsgi.service
-    systemctl enable httpd.service postgresql-13.service redis.service indico-celery.service indico-uwsgi.service
+    systemctl enable httpd.service postgresql-16.service redis.service indico-celery.service indico-uwsgi.service
 
 
 11. Open the Firewall
@@ -412,8 +394,8 @@ server is rebooted:
 
 .. note::
 
-    This is only needed if you use CC7 as CentOS 7/8 have no firewall enabled
-    by default
+    This is only needed on some specific releases based on Alma/Rocky, so if you
+    use a plain Alma/Rocky image, you can skip it.
 
 
 12. Optional: Get a Certificate from Let's Encrypt
@@ -426,9 +408,9 @@ to renew it automatically:
 
 .. code-block:: shell
 
-    yum install -y python-certbot-apache
-    certbot --apache --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
-    rm -rf /etc/ssl/indico
+    dnf install -y certbot python3-certbot-apache
+    certbot --apache --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -f /etc/ssl/indico/indico.*
     systemctl start certbot-renew.timer
     systemctl enable certbot-renew.timer
 

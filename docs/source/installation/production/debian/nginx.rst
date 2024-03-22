@@ -12,12 +12,13 @@ much more recent versions.
 .. code-block:: shell
 
     apt install -y lsb-release wget curl gnupg
-    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-    echo "deb http://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-    wget --quiet -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/pgdg-archive-keyring.gpg
+    wget --quiet -O - https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/pgdg-archive-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" > /etc/apt/preferences.d/99nginx
     apt update
-    apt install -y --install-recommends postgresql-13 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server
+    apt install -y --install-recommends postgresql-16 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server git libpango1.0-dev
 
 
 If you use Debian, run this command:
@@ -31,7 +32,7 @@ If you use Ubuntu, run this instead:
 
 .. code-block:: shell
 
-    apt install -y libjpeg-turbo8-dev zlib1g-dev
+    apt install -y libjpeg-turbo8-dev
 
 Afterwards, make sure the services you just installed are running:
 
@@ -313,15 +314,12 @@ Python features.
 
     source ~/.bashrc
 
-You are now ready to install Python 3.9:
-
-Run ``pyenv install --list | egrep '^\s*3\.9\.'`` to check for the latest available version and
-then install it and set it as the active Python version (replace ``x`` in both lines).
+You are now ready to install Python 3.12:
 
 .. code-block:: shell
 
-    pyenv install 3.9.x
-    pyenv global 3.9.x
+    pyenv install 3.12
+    pyenv global 3.12
 
 This may take a while since pyenv needs to compile the specified Python version. Once done, you
 may want to use ``python -V`` to confirm that you are indeed using the version you just installed.
@@ -333,7 +331,7 @@ You are now ready to install Indico:
     python -m venv --upgrade-deps --prompt indico ~/.venv
     source ~/.venv/bin/activate
     echo 'source ~/.venv/bin/activate' >> ~/.bashrc
-    pip install wheel
+    pip install setuptools wheel
     pip install uwsgi
     pip install indico
 
@@ -390,22 +388,6 @@ server is rebooted:
 9. Optional: Get a Certificate from Let's Encrypt
 -------------------------------------------------
 
-.. note::
-
-    You need to use at least Debian 9 (Stretch) to use certbot.
-    If you are still using Debian 8 (Jessie), consider updating
-    or install certbot from backports.
-
-
-If you use Ubuntu, install the certbot PPA:
-
-.. code-block:: shell
-
-    apt install -y software-properties-common
-    add-apt-repository -y ppa:certbot/certbot
-    apt update
-
-
 To avoid ugly TLS warnings in your browsers, the easiest option is to
 get a free certificate from Let's Encrypt. We also enable the cronjob
 to renew it automatically:
@@ -413,9 +395,9 @@ to renew it automatically:
 
 .. code-block:: shell
 
-    apt install -y python-certbot-nginx
-    certbot --nginx --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
-    rm -rf /etc/ssl/indico
+    apt install -y certbot python3-certbot-nginx
+    certbot --nginx --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -f /etc/ssl/indico/indico.*
     systemctl start certbot.timer
     systemctl enable certbot.timer
 
