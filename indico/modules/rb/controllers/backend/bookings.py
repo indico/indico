@@ -426,9 +426,11 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
 class RHBookingOccurrenceLinkActions(RHBookingBase):
     """Links a Reservation occurrence to an event."""
 
-    def _process_args(self):
+    @use_kwargs({
+        'date': fields.Date(required=True),
+    }, location='view_args')
+    def _process_args(self, date):
         RHBookingBase._process_args(self)
-        date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
         self.occurrence = self.booking.occurrences.filter_by(date=date).one()
         self.event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
 
