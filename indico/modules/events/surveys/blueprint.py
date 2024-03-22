@@ -31,11 +31,11 @@ from indico.web.flask.wrappers import IndicoBlueprint
 _bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_template_folder='events/surveys',
                       url_prefix='/event/<int:event_id>', event_feature='surveys')
 
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/metadata', 'manage_email_event_survey_metadata',
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/metadata', 'email_survey_metadata',
                  RHAPIEmailEventSurveyMetadata, methods=('POST',))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/preview', 'manage_email_event_survey_preview',
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/preview', 'email_survey_preview',
                  RHEmailEventSurveyPreview, methods=('POST',))
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/send', 'manage_email_event_survey_send',
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/send', 'email_survey_send',
                  RHAPIEmailEventSurveySend, methods=('POST',))
 
 # survey display/submission
