@@ -371,41 +371,36 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
 
 /**
  * Rearranges contributions in a block in order to fit a new contribution
- * @param {object} parent Block to be rearranged
- * @param {array} parentContribs Contributions in the block
+ * @param {array} contribs Contributions to be rearranged
  * @param {object} contrib Contribution to be inserted
  * @returns {array|boolean} Rearranged contributions or false if they don't fit in the block
  */
-const rearrangeContribs = (parent, parentContribs, contrib) => {
-  const prevContrib = parentContribs.reduce(
+const rearrangeContribs = (contribs, contrib) => {
+  const prevContrib = contribs.reduce(
     (acc, c) => (c.end <= contrib.start && (!acc || c.end > acc.end) ? c : acc),
     null
   );
-  const rearrangedContribs = _.sortBy(
-    parentContribs.filter(c => c.end > contrib.start),
-    'start'
-  ).reduce((acc, c) => {
-    const last = acc[acc.length - 1];
-    return [
-      ...acc,
-      {id: c.id, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
-    ];
-  }, [prevContrib, contrib].filter(c => c));
-  // check if the contribs fit in the block
-  if (rearrangedContribs[rearrangedContribs.length - 1].end > parent.end) {
-    return false;
-  }
+  const rearrangedContribs = _.sortBy(contribs.filter(c => c.end > contrib.start), 'start').reduce(
+    (acc, c) => {
+      const last = acc[acc.length - 1];
+      return [
+        ...acc,
+        {id: c.id, start: last.end, end: new Date(last.end.getTime() + (c.end - c.start))},
+      ];
+    },
+    [prevContrib, contrib].filter(c => c)
+  );
   return rearrangedContribs;
 };
 
 /**
- * Moves or resizes a contribution
+ * Moves a contribution
  * @param {object} state State of the timetable
- * @param {object} args {event, start, end, resourceId} Arguments from the move/resize event
+ * @param {object} args {event, start, end, resourceId} Arguments from the move event
  * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
  * currentChangeIdx
  */
-const moveOrResizeContrib = (state, args) => {
+const moveContrib = (state, args) => {
   const {blocks, children} = applyChanges(state);
   const {event: contrib, start, end, resourceId} = args;
 
@@ -421,10 +416,10 @@ const moveOrResizeContrib = (state, args) => {
   newContrib.parentId = parent.id;
   // if it's being dragged on top of a contribution, try to rearange them in order to fit
   const newContribs = parentContribs.some(c => isConcurrent(c, newContrib))
-    ? rearrangeContribs(parent, parentContribs, newContrib)
+    ? rearrangeContribs(parentContribs, newContrib)
     : [newContrib];
   // if they don't fit in the block, instead turn the contrib into a separate block
-  if (!newContribs) {
+  if (newContribs[newContribs.length - 1].end > parent.end) {
     return moveBlock(state, args);
   }
   const newChanges = addNewChange(state, newContribs);
@@ -436,6 +431,41 @@ const moveOrResizeContrib = (state, args) => {
 };
 
 /**
+ * Resizes a child-entry
+ * @param {object} state State of the timetable
+ * @param {object} args {event, start, end, resourceId} Arguments from the resize event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
+const resizeChild = (state, args) => {
+  const {blocks, children} = applyChanges(state);
+  const {event: child, start, end} = args;
+
+  const newContrib = {id: child.id, start, end};
+  const parent = blocks.find(b => isChildOf(child, b));
+  const parentContribs = children.filter(c => c.id !== child.id && isChildOf(c, parent));
+  const hasCollisions = parentContribs.some(c => isConcurrent(c, newContrib));
+  // if the resizing was done upwards and there's a collision, don't make changes
+  if (hasCollisions && start < child.start) {
+    return {};
+  }
+  // otherwise if there are collisions, try to rearange them in order to fit
+  const newContribs = hasCollisions ? rearrangeContribs(parentContribs, newContrib) : [newContrib];
+  // if they don't fit in the block, extend the block
+  const lastContrib = newContribs[newContribs.length - 1];
+  if (lastContrib.end > parent.end) {
+    return layoutBlocks(
+      addNewChange(state, [...newContribs, {id: parent.id, end: lastContrib.end}])
+    );
+  } else if (newContribs[0].start < parent.start) {
+    return layoutBlocks(
+      addNewChange(state, [...newContribs, {id: parent.id, start: newContribs[0].start}])
+    );
+  }
+  return addNewChange(state, newContribs);
+};
+
+/**
  * Moves an entry.
  * @param {object} state State of the timetable
  * @param {object} args {event, start, end, resourceId} Arguments from the move event
@@ -443,7 +473,7 @@ const moveOrResizeContrib = (state, args) => {
  * currentChangeIdx
  */
 export const moveEntry = (state, args) =>
-  args.event.type === 'contribution' ? moveOrResizeContrib(state, args) : moveBlock(state, args);
+  args.event.type === 'contribution' ? moveContrib(state, args) : moveBlock(state, args);
 
 /**
  * Resizes an entry
@@ -453,7 +483,7 @@ export const moveEntry = (state, args) =>
  * currentChangeIdx
  */
 export const resizeEntry = (state, args) =>
-  args.event.parentId ? moveOrResizeContrib(state, args) : resizeBlock(state, args);
+  args.event.parentId ? resizeChild(state, args) : resizeBlock(state, args);
 
 /**
  * Deletes an entry
