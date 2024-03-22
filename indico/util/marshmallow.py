@@ -86,8 +86,7 @@ def make_validate_indico_placeholders(context, /, **kwargs):
     This uses the generic signal-based placeholder system.
     """
     def _validate_indico_placeholders(value):
-        missing = get_missing_placeholders(context, value, **kwargs)
-        if missing:
+        if missing := get_missing_placeholders(context, value, **kwargs):
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 
     return _validate_indico_placeholders
