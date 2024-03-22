@@ -103,7 +103,7 @@ class SurveysPermission(ManagementPermission):
 
 
 @signals.core.get_placeholders.connect_via('survey-link-email')
-def _get_placeholders(sender, event, survey, **kwargs):
+def _get_placeholders(sender, event=None, survey=None, **kwargs):
     from indico.modules.events import placeholders as event_placeholders
     from indico.modules.events.surveys import placeholders as survey_placeholders
 
