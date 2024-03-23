@@ -1,0 +1,22 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div>
+        <input type="hidden" name="{{ field.name }}" id="{{ field.id }}"
+               {% if field._value() is not none %} value="{{ field._value() }}"{% endif %}
+        >
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        setupNewMarkDownEditor({
+            fieldId: {{ field.id | tojson }},
+            {#required: {{ input_args.required | default(false) | tojson }},#}
+            {#disabled: {{ input_args.disabled | default(false) | tojson }},#}
+            renderMode: {{ render_mode | tojson }},
+            imageUploadURL: {{ field.get_form().editor_upload_url | default(none) | tojson }},
+            height: {{ height | default('50vh') | tojson }},
+        });
+    </script>
+{% endblock %}
