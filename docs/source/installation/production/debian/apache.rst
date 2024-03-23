@@ -4,7 +4,7 @@ Apache
 1. Install Packages
 -------------------
 
-PostgreSQL is installed from its upstream repos to get a much more recent version.
+PostgreSQL is installed from its upstream repos to get a more recent version.
 
 .. code-block:: shell
 

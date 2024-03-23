@@ -6,17 +6,13 @@ nginx
 1. Install Packages
 -------------------
 
-PostgreSQL and nginx are installed from their upstream repos to get
-much more recent versions.
+PostgreSQL is installed from its upstream repos to get a more recent version.
 
 .. code-block:: shell
 
     apt install -y lsb-release wget curl gnupg
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/pgdg-archive-keyring.gpg
-    wget --quiet -O - https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/pgdg-archive-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
-    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" > /etc/apt/preferences.d/99nginx
     apt update
     apt install -y --install-recommends postgresql-16 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server git libpango1.0-dev
 
@@ -70,13 +66,13 @@ most cases.
     cat > /etc/uwsgi-indico.ini <<'EOF'
     [uwsgi]
     uid = indico
-    gid = nginx
+    gid = www-data
     umask = 027
 
     processes = 4
     enable-threads = true
     chmod-socket = 770
-    chown-socket = indico:nginx
+    chown-socket = indico:www-data
     socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
@@ -117,7 +113,7 @@ We also need a systemd unit to start uWSGI.
     Restart=always
     SyslogIdentifier=indico-uwsgi
     User=indico
-    Group=nginx
+    Group=www-data
     UMask=0027
     Type=notify
     NotifyAccess=all
@@ -278,7 +274,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Restart=always
     SyslogIdentifier=indico-celery
     User=indico
-    Group=nginx
+    Group=www-data
     UMask=0027
     Type=simple
     KillMode=mixed
@@ -295,7 +291,7 @@ Now create a user that will be used to run Indico and switch to it:
 
 .. code-block:: shell
 
-    useradd -rm -g nginx -d /opt/indico -s /bin/bash indico
+    useradd -rm -g www-data -d /opt/indico -s /bin/bash indico
     su - indico
 
 The first thing to do is installing pyenv - we use it to install the latest Python version
