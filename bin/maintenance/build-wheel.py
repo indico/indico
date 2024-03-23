@@ -92,7 +92,7 @@ def compile_catalogs():
         return
     info('compiling translations')
     try:
-        subprocess.check_output([sys.executable, 'setup.py', 'compile_catalog', '-d', path],
+        subprocess.check_output([sys.executable, 'setup.py', 'compile_catalog', '-d', path, '-f'],
                                 stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('compile_catalog failed', verbose_msg=exc.output)
