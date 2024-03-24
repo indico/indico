@@ -3,8 +3,8 @@
 {% block html %}
     <div>
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}"
-               {% if field._value() is not none %} value="{{ field._value() }}"{% endif %}
-        >
+               {% if field._value() is not none %} value="{{ field._value() }}"{% endif %}>
+        <div id="descriptionWidget-{{ field.id }}"></div>
     </div>
 {% endblock %}
 
@@ -12,8 +12,8 @@
     <script>
         setupNewMarkDownEditor({
             fieldId: {{ field.id | tojson }},
-            {#required: {{ input_args.required | default(false) | tojson }},#}
-            {#disabled: {{ input_args.disabled | default(false) | tojson }},#}
+            required: {{ required | default(false) | tojson }},
+            disabled: {{ disabled | default(false) | tojson }},
             renderMode: {{ render_mode | tojson }},
             imageUploadURL: {{ field.get_form().editor_upload_url | default(none) | tojson }},
             height: {{ height | default('50vh') | tojson }},

@@ -58,13 +58,15 @@ CLONE_REPEAT_CHOICES = (
 
 class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
-    description = TextAreaField(_('Description'), widget=DescriptionWidget(render_mode='markdown', height=350))
+    description = TextAreaField(_('Description'))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
     def __init__(self, *args, event, **kwargs):
         self.event = event
         self.editor_upload_url = url_for('attachments.upload_editor', event)
         super().__init__(*args, **kwargs)
+        render_mode = 'markdown' if session.user.settings.get('use_markdown_for_description') else 'html'
+        self.description.widget = DescriptionWidget(render_mode=render_mode)
         prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
                                           'is not case sensitive.').format(prefix)
