@@ -20,11 +20,12 @@ import WTFDescriptionField from "indico/react/components/WTFDescriptionField";
   height
   }) {
   const field = document.getElementById(fieldId);
+  const div = $(`#descriptionWidget-${fieldId}`);
   const currentInput = field.value
   ReactDOM.render(
     <WTFDescriptionField fieldId={fieldId} required={required} disabled={disabled} renderMode={renderMode}
-                         imageUploadURL={imageUploadURL} height={height} currentInput={currentInput}/>,
-    document.getElementById(fieldId)
+                         imageUploadURL={imageUploadURL} height={height} currentInput={currentInput} />,
+    div[0]
   );
 };
 })(window);

@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React from 'react';
+import {Form} from 'semantic-ui-react';
 
-import {FinalMarkdownEditor, FinalTinyMCETextEditor} from 'indico/react/components';
+import {MarkdownEditor, TinyMCETextEditor} from 'indico/react/components';
 
 export default function WTFDescriptionField({
   fieldId,
@@ -20,32 +21,36 @@ export default function WTFDescriptionField({
   currentInput,
 }) {
   // const field = useMemo(() => document.getElementById(`${fieldId}`), [fieldId]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   return (
-    <>
+    <Form.Field>
       {renderMode === 'markdown' && (
-        <FinalMarkdownEditor
+        <MarkdownEditor
           name={fieldId}
           imageUploadURL={imageUploadURL}
           height={height}
           required={required}
           disabled={disabled}
+          value={currentInput}
         />
       )}
       {renderMode === 'html' && (
-        <FinalTinyMCETextEditor
+        <TinyMCETextEditor
           name={fieldId}
-          loading={loading}
+          // loading={loading}
           value={currentInput}
           parse={v => v}
           config={{images: true, imageUploadURL, fullScreen: false}}
           height={height}
           required={required}
           disabled={disabled}
+          onBlur={() => undefined}
+          onChange={() => undefined}
+          onFocus={() => undefined}
         />
       )}
-    </>
+    </Form.Field>
   );
 }
 

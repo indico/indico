@@ -76,7 +76,10 @@ class UserPreferencesForm(IndicoForm):
         _('Markdown editor for minutes'),
         widget=SwitchWidget(),
         description=_('Use Markdown editor instead of HTML editor when editing the minutes of a meeting.'))
-
+    use_markdown_for_description = BooleanField(
+        _('Markdown editor for event description'),
+        widget=SwitchWidget(),
+        description=_('Use Markdown editor instead of HTML editor when editing the description of an event.'))
     mastodon_server_url = StringField(
         _('Preferred Mastodon server'),
         validators=[MastodonServer(), Optional()],
