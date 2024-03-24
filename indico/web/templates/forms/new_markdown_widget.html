@@ -3,8 +3,8 @@
 {% block html %}
     <div>
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}"
-               {% if field._value() is not none %} value="{{ field._value() }}"{% endif %}
-        >
+               {% if field._value() is not none %} value="{{ field._value() }}"{% endif %}>
+        <div id="descriptionWidget-{{ field.id }}"></div>
     </div>
 {% endblock %}
 
