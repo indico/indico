@@ -177,9 +177,7 @@
                                                     data-selected-item-id="{{ contrib.session.id or None | tojson }}">
                                                 <span class="label">
                                                     {% if contrib.session %}
-                                                        {% trans title=contrib.session.title -%}
-                                                            {{ title }}
-                                                        {%- endtrans %}
+                                                        {{ contrib.session.title }}
                                                     {% else %}
                                                         {%- trans %}No session{% endtrans -%}
                                                     {% endif %}
@@ -223,26 +221,6 @@
                                                     {% trans %}Scheduled{% endtrans %}
                                                 {%- else %}
                                                     {% trans %}Not scheduled{% endtrans %}
-                                                {%- endif %}
-                                            </span>
-                                        </td>
-                                    {% elif item.id == 'people' %}
-                                        <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
-                                            <span class="vertical-aligner">
-                                                {% if contrib.type -%}
-                                                    {{ contrib.type.name }}
-                                                {%- else %}
-                                                    {% trans %}n/a{% endtrans %}
-                                                {%- endif %}
-                                            </span>
-                                        </td>
-                                    {% elif item.id == 'speakers' %}
-                                        <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
-                                            <span class="vertical-aligner">
-                                                {% if contrib.type -%}
-                                                    {{ contrib.type.name }}
-                                                {%- else %}
-                                                    {% trans %}n/a{% endtrans %}
                                                 {%- endif %}
                                             </span>
                                         </td>
