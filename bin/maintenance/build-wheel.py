@@ -10,6 +10,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from contextlib import contextmanager
 from datetime import datetime
 from distutils.log import ERROR, set_threshold
@@ -204,13 +205,18 @@ def _chdir(path):
         os.chdir(cwd)
 
 
+def _get_build_time():
+    timestamp = int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))
+    return datetime.fromtimestamp(timestamp)
+
+
 @contextmanager
 def _patch_version(add_version_suffix, file_name, search, replace):
     if not add_version_suffix:
         yield
         return
     rev = subprocess.check_output(['git', 'rev-parse', '--short=10', 'HEAD'], text=True).strip()
-    suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d%H%M'), rev)
+    suffix = '+{}.{}'.format(_get_build_time().strftime('%Y%m%d%H%M'), rev)
     info('adding version suffix: ' + suffix, unimportant=True)
     with open(file_name, 'r+') as f:
         old_content = f.read()
