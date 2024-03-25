@@ -8,6 +8,7 @@
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -125,10 +126,18 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     def _is_checkin_visible(reg):
         return reg.registration_form.publish_checkin_enabled and reg.checked_in
 
+    def _picture_url(self, reg, field_data_id=None):
+        if not field_data_id:  # by default, return url for main picture
+            field_data_id = reg.picture_data.field_data_id if reg.picture_data else None
+        return url_for('event_registration.participant_picture', reg, field_data_id=field_data_id) \
+            if field_data_id else ''
+
     def _merged_participant_list_table(self):
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
-            columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
+            columns = [{'text': personal_data.get(column_name, '')}
+                       if column_name != 'picture' else {'text': self._picture_url(reg), 'is_picture': True}
+                       for column_name in column_names]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
         def _deduplicate_reg_data(reg_data_iter):
@@ -160,11 +169,13 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'num_participants': query.count()}
 
     def _participant_list_table(self, regform):
-        def _process_registration(reg, column_ids, active_fields):
+        def _process_registration(reg, column_ids, active_fields, picture_ids):
             data_by_field = reg.data_by_field
 
-            def _content(column_id):
+            def _content(column_id, is_picture):
                 if column_id in data_by_field:
+                    if is_picture:
+                        return self._picture_url(reg, data_by_field[column_id].field_data_id)
                     return data_by_field[column_id].get_friendly_data(for_humans=True)
                 elif (column_id in active_fields and active_fields[column_id].personal_data_type is not None and
                         active_fields[column_id].personal_data_type.column is not None):
@@ -182,10 +193,13 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 else:
                     return None
 
-            columns = [{'text': _content(column_id), 'sort_key': _sort_key_date(column_id)} for column_id in column_ids]
+            columns = [{'text': _content(column_id, column_id in picture_ids), 'sort_key': _sort_key_date(column_id),
+                       'is_picture': column_id in picture_ids} for column_id in column_ids]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
         active_fields = {field.id: field for field in regform.active_fields}
+        picture_ids = [id for id, field in active_fields.items()
+                       if field.field_impl.name == 'picture']
         column_ids = [column_id
                       for column_id in registration_settings.get_participant_list_columns(self.event, regform)
                       if column_id in active_fields]
@@ -198,7 +212,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
         is_participant = self.event.is_user_registered(session.user)
-        registrations = [_process_registration(reg, column_ids, active_fields) for reg in query
+        registrations = [_process_registration(reg, column_ids, active_fields, picture_ids) for reg in query
                          if reg.is_publishable(is_participant)]
         return {'headers': headers,
                 'rows': registrations,
@@ -566,3 +580,65 @@ class RHRegistrationDownloadPicture(RHRegistrationFormRegistrationBase):
 
     def _process(self):
         return self.field_data.send()
+
+
+class RHParticipantListPictureDownload(RHParticipantList):
+    normalize_url_spec = {
+        'args': {
+            'field_data_id': lambda self: self.data.field_data_id
+        },
+        'locators': {
+            lambda self: self.registration
+        }
+    }
+
+    def _check_access(self):
+        RHParticipantList._check_access(self)
+        if registration_settings.get(self.event, 'merge_registration_forms'):
+            if 'picture' not in registration_settings.get(self.event, 'participant_list_columns'):
+                raise Forbidden
+            if not self.data.field_data.field.personal_data_type:
+                # only main picture from personal data is in merged form
+                raise Forbidden
+        else:
+            participant_list_form_columns = registration_settings.get(self.event, 'participant_list_form_columns')
+            if (self.data.field_data.field_id not in
+                    participant_list_form_columns[str(request.view_args['reg_form_id'])]):
+                raise Forbidden
+        is_participant = self.registration.event.is_user_registered(session.user)
+        if not self.registration.is_publishable(is_participant):
+            raise Forbidden
+
+    def _process_args(self):
+        RHParticipantList._process_args(self)
+        try:
+            self.data = (RegistrationData.query
+                         .filter(RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                 RegistrationData.registration_id == request.view_args['registration_id'],
+                                 RegistrationFormItem.input_type == 'picture',
+                                 Registration.event_id == request.view_args['event_id'],
+                                 Registration.registration_form_id == request.view_args['reg_form_id'],
+                                 ~Registration.is_deleted,
+                                 ~RegistrationForm.is_deleted)
+                         .join(RegistrationData.field_data)
+                         .join(RegistrationFormFieldData.field)
+                         .join(RegistrationData.registration)
+                         .join(Registration.registration_form)
+                         .options((joinedload('registration').load_only(Registration.id,
+                                                                        Registration.consent_to_publish,
+                                                                        Registration.participant_hidden,
+                                                                        Registration.state,
+                                                                        Registration.is_deleted))
+                                  .joinedload('registration_form')
+                                  .load_only(RegistrationForm.id,
+                                             RegistrationForm.publish_registrations_participants,
+                                             RegistrationForm.publish_registrations_public,
+                                             RegistrationForm.publish_registrations_duration),
+                                  lazyload('*'))
+                         .one())
+        except NoResultFound:
+            raise BadRequest
+        self.registration = self.data.registration
+
+    def _process(self):
+        return self.data.send()
