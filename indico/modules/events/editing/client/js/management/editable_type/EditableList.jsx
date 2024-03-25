@@ -169,11 +169,16 @@ function EditableListDisplay({
           },
           {
             value: 'accepted_submitter',
-            text: Translate.string('Accepted by submitter'),
+            text: Translate.string('Accepted by submitter', 'Editable'),
             exclusive: true,
             color: 'olive',
           },
-          {value: 'rejected', text: Translate.string('Rejected'), exclusive: true, color: 'black'},
+          {
+            value: 'rejected',
+            text: Translate.string('Rejected', 'Editable'),
+            exclusive: true,
+            color: 'black',
+          },
           {
             value: 'needs_submitter_changes',
             text: Translate.string('Needs submitter changes'),

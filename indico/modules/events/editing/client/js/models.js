@@ -54,11 +54,11 @@ export const EditableTypeTitles = {
 export const editableTypeOrder = ['paper', 'slides', 'poster'];
 
 export const EditableStatus = {
-  replaced: Translate.string('Replaced'),
+  replaced: Translate.string('Replaced', 'Editable'),
   needs_submitter_confirmation: Translate.string('Needs submitter confirmation'),
   rejected: Translate.string('Rejected'),
-  accepted_submitter: Translate.string('Accepted by submitter'),
-  accepted: Translate.string('Accepted'),
+  accepted_submitter: Translate.string('Accepted by submitter', 'Editable'),
+  accepted: Translate.string('Accepted', 'Editable'),
   needs_submitter_changes: Translate.string('Needs submitter changes'),
   not_submitted: Translate.string('Not submitted'),
   ready_for_review: Translate.string('Ready for review'),
