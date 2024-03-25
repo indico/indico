@@ -12,6 +12,7 @@ import dateutil
 from flask import jsonify, request, session
 from marshmallow import fields, validate
 from marshmallow_enum import EnumField
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
@@ -431,7 +432,7 @@ class RHBookingOccurrenceLinkActions(RHBookingBase):
     }, location='view_args')
     def _process_args(self, date):
         RHBookingBase._process_args(self)
-        self.occurrence = self.booking.occurrences.filter_by(date=date).one()
+        self.occurrence = self.booking.occurrences.filter_by(date=date).options(joinedload('link')).one()
         self.event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
 
     def _check_access(self):
