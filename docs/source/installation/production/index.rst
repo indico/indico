@@ -8,5 +8,5 @@ Production
 .. toctree::
     :maxdepth: 1
 
-    AlmaLinux / RockyLinux 9 <centos/index.rst>
-    Debian / Ubuntu <debian/index.rst>
+    AlmaLinux / RockyLinux 9 <rpm/index.rst>
+    Debian / Ubuntu <deb/index.rst>

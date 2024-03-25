@@ -429,7 +429,7 @@ Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
 Indico can generate PDF files in various places.
 
 
-.. _centos-apache-shib:
+.. _rpm-apache-shib:
 
 Optional: Shibboleth
 --------------------

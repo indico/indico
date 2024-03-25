@@ -208,11 +208,14 @@ sphinx==7.2.6
     #   -r requirements.dev.in
     #   sphinx-autobuild
     #   sphinx-issues
+    #   sphinx-reredirects
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
 sphinx-autobuild==2024.2.4
     # via -r requirements.dev.in
 sphinx-issues==4.0.0
+    # via -r requirements.dev.in
+sphinx-reredirects==0.1.3
     # via -r requirements.dev.in
 sphinx-rtd-theme==2.0.0
     # via -r requirements.dev.in

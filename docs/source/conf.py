@@ -49,7 +49,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxcontrib.jquery',
               'sphinxcontrib.mermaid',
               'exec_directive',
-              'indico_uml_directive']
+              'indico_uml_directive',
+              'sphinx_reredirects']
 
 # sphinx-issues config
 issues_github_path = 'indico/indico'
@@ -246,3 +247,12 @@ skinparam classStereotypeFontSize 1'''
 
 mermaid_version = '10.2.3'
 mermaid_verbose = True
+
+redirects = {
+    'installation/production/centos': '../rpm',
+    'installation/production/debian': '../deb',
+    'installation/production/centos/apache': '../../rpm/apache',
+    'installation/production/centos/nginx': '../../rpm/nginx',
+    'installation/production/debian/apache': '../../deb/apache',
+    'installation/production/debian/nginx': '../../deb/nginx',
+}
