@@ -8,17 +8,29 @@ as the *Book of Abstracts* and the PDF versions of contributions.  If
 you do not need these features, you can skip this part of the documentation
 and avoid installing LaTeX altogether.
 
-Since Indico requires quite a few LaTeX packages which are not always]
+Since Indico requires quite a few LaTeX packages which are not always
 installed by default when using the texlive packages of the various
 linux distributions, we recommend installing it manually.
+
+.. note::
+
+    If you know what you're doing, feel free to try using your distribution's "full"
+    texlive package (often named ``texlive-full``, ``texlive-scheme-full``, or similar)
+    instead of using the texlive installer.
+
+    However, e.g. on Alma9 there are some LaTeX packages missing which Indico needs.
+    A possible workaround for this (which works fine) is using the packages from
+    Fedora 34, but this is not straightforward at all.
 
 First of all, you will need to install some dependencies so that all TeX
 formats are generated successfully upon TeXLive installation.
 
 .. code-block:: shell
 
-    yum install fontconfig ghostscript     # CentOS / CC7
-    apt install libfontconfig1 ghostscript # Debian / Ubuntu
+    # If you use Alma or Rocky:
+    dnf install perl ghostscript fontconfig wget
+    # If you use Debian or Ubuntu:
+    apt install perl ghostscript libfontconfig1
 
 You are now ready to install TeXLive. The following commands should work
 fine to install everything you need.
