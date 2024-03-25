@@ -440,8 +440,8 @@ The ``shibboleth`` authentication/identity providers are available by
 default, but due to how the protocol works you need to use the Apache
 webserver to use SAML atuhentication provider.
 
-You can find guides on how to set it up for :ref:`CentOS <rpm-apache-shib>`
-and :ref:`Debian <deb-apache-shib>`.
+You can find guides on how to set it up for :ref:`Alma/Rocky Linux <rpm-apache-shib>`
+and :ref:`Debian/Ubuntu <deb-apache-shib>`.
 
 If you also have an LDAP server, it may be a good idea to use the
 ``shibboleth`` authentication provider and connect it to an ``ldap``

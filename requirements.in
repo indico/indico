@@ -62,7 +62,7 @@ sqlalchemy<2  # major upgrade
 terminaltables
 translitcodec
 ua-parser
-urllib3<2  # not compatible with centos7 openssl + not yet compatible with botocore (s3 plugin)
+urllib3<2  # not yet compatible with botocore (s3 plugin)
 weasyprint
 webargs
 werkzeug
