@@ -35,7 +35,7 @@ class ContributionListGenerator(ListGeneratorBase):
     def __init__(self, event):
         super().__init__(event)
         self.default_list_config = {
-            'items': (),
+            'items': ('session', 'track'),
             'filters': {'fields': {}, 'items': {}, 'extra': {}},
         }
 
@@ -65,8 +65,7 @@ class ContributionListGenerator(ListGeneratorBase):
         }
 
     def _get_static_columns(self, ids):
-        """
-        Retrieve information needed for the header of the static columns.
+        """Retrieve information needed for the header of the static columns.
 
         :return: a list of {'id': ..., 'caption': ...} dicts
         """
