@@ -46,10 +46,16 @@
             </td>
         {% endif %}
         {% for column in registration.columns %}
-            <td class="i-table"
-                {% if column.sort_key %} data-text="{{ column.sort_key }}"{% endif %}>
-                {{ column.text }}
-            </td>
+            {% if column.is_picture  %}
+                <td class="picture">
+                    <img src="{{ column.text }}" height="64px">
+                </td>
+            {% else %}
+                <td class="i-table"
+                    {% if column.sort_key %} data-text="{{ column.sort_key }}"{% endif %}>
+                    {{ column.text }}
+                </td>
+            {% endif %}
         {% endfor %}
 {% endmacro %}
 
