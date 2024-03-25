@@ -164,12 +164,30 @@
                 </div>
             {% endif %}
         </div>
+        <div class="designer-tools-row js-hide-on-flip">
+            <div class="tool">
+                <span class="f-self-stretch">{% trans %}Layer visibility{% endtrans %}</span>
+            </div>
+            <div class="tool">
+                <label for="is-layer1-visible">1</label>
+                <button class="i-button icon-eye only-icon borderless js-is-layer-visible" id="is-layer1-visible" data-value="1"></button>
+            </div>
+            <div class="toolbar">
+                <button class="i-button icon-remove icon-only js-remove-layer" title="{% trans %}Remove last layer{% endtrans %}" disabled></button>
+                <button class="i-button icon-plus icon-only js-add-layer" title="{% trans %}Add new layer{% endtrans %}"></button>
+            </div>
+        </div>
         <div class="designer-tools-row second-row disappear">
             <div class="element-tools hidden">
                 <div class="tool">
                     <span class="selection-text f-self-stretch"></span>
                     <button class="js-remove-element i-button icon-remove icon-only text-color subtle"
                             title="{% trans %}Remove element{% endtrans %}"></button>
+                </div>
+                <div class="tool">
+                    <select id='item-layer-selector' class="js-layer-tool" data-attr="layer">
+                        <option value="1">{% trans %}Layer 1{% endtrans %}</option>
+                    </select>
                 </div>
                 <div class="tool font-tools">
                     <i class="icon-font-size" title="{% trans %}Font dimensions{% endtrans %}"></i>
