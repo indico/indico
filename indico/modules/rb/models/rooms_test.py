@@ -162,28 +162,17 @@ def test_find_with_attribute(dummy_room, create_room, create_room_attribute):
     assert set(Room.find_with_attribute('foo')) == expected
 
 
-def test_get_with_data_errors():
-    with pytest.raises(ValueError):
-        Room.get_with_data(foo='bar')
-
-
 @pytest.mark.parametrize('only_active', (True, False))
-def test_get_with_data(db, create_room, create_equipment_type, only_active):
-    eq = create_equipment_type('eq')
-
+def test_get_with_data(db, create_room, only_active):
     rooms = {
-        'inactive': {'room': create_room(is_deleted=True), 'equipment': []},
-        'no_eq': {'room': create_room(), 'equipment': []},
-        'all_eq': {'room': create_room(), 'equipment': [eq]}
+        'inactive': {'room': create_room(is_deleted=True)},
+        'active': {'room': create_room()},
     }
     room_types = {room_data['room']: type_ for type_, room_data in rooms.items()}
-    for room in rooms.values():
-        room['room'].available_equipment = room['equipment']
     db.session.flush()
     results = list(Room.get_with_data(only_active=only_active))
     assert len(results) == len(rooms) - only_active
-    for row in results:
-        room = row.pop('room')
+    for room in results:
         room_type = room_types[room]
         if room_type == 'inactive':
             assert not only_active

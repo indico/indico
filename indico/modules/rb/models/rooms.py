@@ -14,14 +14,13 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager, joinedload, load_only
 
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
-from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
+from indico.modules.rb.models.equipment import RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -398,35 +397,17 @@ class Room(ProtectionManagersMixin, db.Model):
                 .all())
 
     @staticmethod
-    def get_with_data(*args, **kwargs):
+    def get_with_data(only_active=True, filters=None):
         from indico.modules.rb.models.locations import Location
 
-        only_active = kwargs.pop('only_active', True)
-        filters = kwargs.pop('filters', None)
-        order = kwargs.pop('order', [Location.name, Room.building, Room.floor, Room.number, Room.verbose_name])
-        if kwargs:
-            raise ValueError(f'Unexpected kwargs: {kwargs}')
-
-        query = Room.query
-        entities = [Room]
-
-        if 'equipment' in args:
-            entities.append(static_array.array_agg(EquipmentType.name))
-            query = query.outerjoin(RoomEquipmentAssociation).outerjoin(EquipmentType)
-
-        query = (query.with_entities(*entities)
-                 .outerjoin(Location, Location.id == Room.location_id)
-                 .group_by(Location.name, Room.id))
-
+        query = Room.query.outerjoin(Location, Location.id == Room.location_id)
         if only_active:
             query = query.filter(~Room.is_deleted)
         if filters:  # pragma: no cover
             query = query.filter(*filters)
-        if order:  # pragma: no cover
-            query = query.order_by(*order)
 
-        keys = ('room', *args)
-        return (dict(zip(keys, row if args else [row])) for row in query)
+        query = query.order_by(Location.name, Room.building, Room.floor, Room.number, Room.verbose_name)
+        return query.all()
 
     @staticmethod
     def filter_available(start_dt, end_dt, repetition, include_blockings=True,
