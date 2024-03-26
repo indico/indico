@@ -412,21 +412,7 @@ server is rebooted:
     systemctl enable nginx.service postgresql-16.service redis.service indico-celery.service indico-uwsgi.service
 
 
-11. Open the Firewall
----------------------
-
-.. code-block:: shell
-
-    firewall-cmd --permanent --add-port 443/tcp --add-port 80/tcp
-    firewall-cmd --reload
-
-.. note::
-
-    This is only needed on some specific releases based on Alma/Rocky, so if you
-    use a plain Alma/Rocky image, you can skip it.
-
-
-12. Optional: Get a Certificate from Let's Encrypt
+11. Optional: Get a Certificate from Let's Encrypt
 --------------------------------------------------
 
 To avoid ugly TLS warnings in your browsers, the easiest option is to
@@ -443,14 +429,14 @@ to renew it automatically:
     systemctl enable certbot-renew.timer
 
 
-13. Create an Indico user
+12. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
-14. Install TeXLive
+13. Install TeXLive
 -------------------
 
 Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
