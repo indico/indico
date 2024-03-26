@@ -7,7 +7,7 @@
 
 # XXX: This script will be executed standalone, outside the indico virtualenv.
 # It must not use anything that's not part of the standard library of Python
-# 3.9.6 (since that's the lowest version from which it may get executed).
+# 3.12.2 (since that's the lowest version from which it may get executed).
 
 import itertools
 import os

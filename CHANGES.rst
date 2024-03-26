@@ -149,6 +149,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
+- Support and require Python 3.12 - older Python versions are **no longer supported**
+  (:pr:`5978`, :pr:`6249`)
 - Use (dart-)sass instead of the deprecated node-sass/libsass for CSS compilation
   (:pr:`5734`)
 - Add ``event.is_field_data_locked`` signal, allowing plugins to lock registration form
@@ -162,7 +164,6 @@ Internal Changes
   on ``selection.json`` (:pr:`5986`, thanks :user:`foxbunny`)
 - Pass form class arguments to ``core.add_form_fields`` signal handlers (:pr:`6020`, thanks
   :user:`vtran99`)
-- Support Python 3.12 (:pr:`5978`)
 - Remove watchman reloader support, use watchfiles instead (:pr:`5978`)
 - Improve ``indico i18n`` CLI to support plugin-related i18n operations (:issue:`5906`, :pr:`5961`,
   thanks :user:`SegiNyn`)

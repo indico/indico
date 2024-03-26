@@ -4,7 +4,7 @@
 # Interesting post on max line length:
 # http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
 
-PYUPGRADE_CMD='pyupgrade --py39-plus --keep-percent-format'
+PYUPGRADE_CMD='pyupgrade --py312-plus --keep-percent-format'
 FLAKE8_CMD='flake8'
 RUFF_CMD='ruff check'
 ESLINT_CMD='npx eslint'
