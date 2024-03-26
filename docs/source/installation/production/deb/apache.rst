@@ -399,8 +399,8 @@ it in Indico:
 
 .. code-block:: shell
 
-    apt install -y libapache2-mod-shib2
-    a2enmod shib2
+    apt install -y libapache2-mod-shib
+    a2enmod shib
 
 2. Configure Shibboleth
 ^^^^^^^^^^^^^^^^^^^^^^^

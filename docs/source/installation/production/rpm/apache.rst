@@ -440,42 +440,30 @@ it in Indico:
 1. Install Shibboleth
 ^^^^^^^^^^^^^^^^^^^^^
 
-Add the Shibboleth yum repository:
-
-.. note::
-
-    If you use CC7, Shibboleth is already available and there is no
-    need to add the repo manually.
-
-If you use CentOS 7:
+Add the Shibboleth repository:
 
 .. code-block:: shell
 
-    curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=CentOS_7'
-
-If you use CentOS 8:
-
-.. code-block:: shell
-
-    curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=CentOS_8'
+    curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=rockylinux9'
 
 Now install Shibboleth itself.  When prompted to accept the GPG key
-of the Shibboleth yum repo, confirm the prompt.
+of the Shibboleth repo, confirm the prompt.
 
 .. code-block:: shell
 
     setsebool httpd_can_network_connect 1
-    yum install -y shibboleth xmltooling-schemas opensaml-schemas
+    dnf install -y shibboleth xmltooling-schemas opensaml-schemas
 
 2. Configure Shibboleth
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 This is outside the scope of this documentation and depends on your
-environment (Shibboleth, SAML, ADFS, etc).  Please contact whoever
-runs your SSO infrastructure if you need assistance.
+environment (Shibboleth, ADFS, etc).  Please contact whoever runs your
+SSO infrastructure if you need assistance.
 
 3. Enable Shibboleth in Apache
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Add the following code to your ``/etc/httpd/conf.d/indico.conf`` right
 before the ``AliasMatch`` lines:
 
