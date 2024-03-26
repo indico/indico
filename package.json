@@ -87,7 +87,7 @@
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-lazy-scroll": "^0.1.1",
-    "redux-router-querystring": "^0.0.11",
+    "redux-router-querystring": "^0.1.0",
     "redux-thunk": "^2.4.1",
     "reselect": "^4.1.6",
     "sanitize-html": "^2.7.3",
