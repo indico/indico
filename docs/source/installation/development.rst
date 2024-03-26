@@ -13,9 +13,9 @@ requires NodeJS to be present. You can find information on how to install NodeJS
 Do not use the default NodeJS packages from your Linux distribution as they are usually outdated or come with
 an outdated npm version.
 
-Since only few Linux distributions include Python 3.9 in their package managers, we recommend installing
-`pyenv <https://github.com/pyenv/pyenv-installer>`_ and then install the latest Python 3.9 version using
-``pyenv install 3.9.9`` (adapt this command in case a newer version is available).
+Since only the latest Linux distributions include Python 3.12 in their package managers, we recommend installing
+`pyenv <https://github.com/pyenv/pyenv-installer>`_ and then install the latest Python 3.12 version using
+``pyenv install 3.12``.
 
 .. tip::
 
@@ -28,7 +28,7 @@ CentOS/Fedora
 
 .. code-block:: shell
 
-    yum install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
+    dnf install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
         libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
         postgresql postgresql-server postgresql-contrib libpq-devel
     systemctl start redis.service postgresql.service
@@ -74,14 +74,13 @@ developers keep all their code inside a ``dev`` or ``code`` dir. We will assume 
 We will need a virtualenv where to run Indico::
 
     cd ~/dev/indico
-    pyenv local 3.9.9
+    pyenv local 3.12
     python -m venv env
 
 .. note::
 
     After setting the version with pyenv, it's a good idea to use ``python -V`` to ensure you are really running that
-    particular Python version; depending on the shell you may need to restart your shell first. In case you installed
-    a newer version than 3.9.9 earlier, adapt the pyenv command accordingly.
+    particular Python version; depending on the shell you may need to restart your shell first.
 
 
 .. _cloning:
@@ -216,7 +215,7 @@ static files as well.
 
 You should obviously install nginx first::
 
-    sudo yum install nginx  # centos/fedora
+    sudo dnf install nginx  # alma/rocky/fedora
     sudo apt install nginx  # debian/ubuntu
     brew install nginx      # macOS
 
