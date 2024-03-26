@@ -8,7 +8,9 @@
 from sqlalchemy.orm import joinedload, noload
 
 from indico.core.db import db
+from indico.modules.events.settings import autolinker_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.util.string import AutoLinkExtension, HTMLLinker, render_markdown
 from indico.web.flask.util import url_for
 from indico.web.util import ExpectedError
 
@@ -89,15 +91,32 @@ def can_edit_note(obj, user):
     return False
 
 
-def check_note_revision(note, previous_revision_id):
+def check_note_revision(note, previous_revision_id, render_mode, source):
     """Compare revision IDs to check if the note has been modified."""
     from indico.modules.events.notes.schemas import EventNoteSchema
     if previous_revision_id is None:
         if note.current_revision_id and not note.is_deleted:
             conflicting_note = EventNoteSchema().dump(note.current_revision)
-            raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note)
+            raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note,
+                                html=render_source_mode(render_mode, source))
         return
 
     if note.current_revision_id != previous_revision_id:
         conflicting_note = EventNoteSchema().dump(note.current_revision)
-        raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note)
+        raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note,
+                            html=render_source_mode(render_mode, source))
+
+
+def render_source_mode(mode, source):
+    """Renders the source content in the given mode."""
+    from indico.core.db.sqlalchemy.descriptions import RenderMode
+
+    autolinker_rules = autolinker_settings.get('rules')
+
+    if mode == RenderMode.html:
+        return HTMLLinker(autolinker_rules).process(source)
+
+    if mode == RenderMode.markdown:
+        return render_markdown(source, extensions=('nl2br', AutoLinkExtension(autolinker_rules)))
+
+    raise ValueError(f'Invalid render mode: {mode}')

@@ -132,25 +132,19 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
         return handleSubmitError(e);
       }
       // handle note conflict
-      await new Promise(resolve => {
-        injectModal(resolveModal => (
-          <ConflictModal
-            currentNote={currentValue}
-            externalNote={e.response.data.conflict}
-            onClose={() => {
-              resolve();
-              resolveModal();
-            }}
-            setCloseAndReload={setCloseAndReload}
-            overwriteChanges={async () => {
-              await handleSubmit({
-                source: currentValue,
-                forceRevision: e.response.data.conflict.id,
-              });
-            }}
-          />
-        ));
-      });
+      const resolution = await injectModal(resolve => (
+        <ConflictModal noteData={e.response.data} onClose={action => resolve(action)} />
+      ));
+      console.log(resolution);
+      if (resolution === 'overwrite') {
+        return await handleSubmit({
+          source: currentValue,
+          forceRevision: e.response.data.conflict.id,
+        });
+      } else if (resolution === 'discard') {
+        setRenderMode(e.response.data.conflict.render_mode);
+        setCurrentInput(e.response.data.conflict.source);
+      }
       return;
     }
     setCurrentInput(source);

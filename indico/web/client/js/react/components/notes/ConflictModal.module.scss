@@ -15,6 +15,11 @@
   height: 52.5vh;
 }
 
+.last-modified-text {
+  color: inherit;
+  border-bottom: 1px dotted;
+}
+
 .action-button-icons :global(.icon::before) {
   margin-right: 0.25em;
 }

@@ -78,7 +78,7 @@ class RHApiNote(RHManageNoteBase):
         note = EventNote.get_or_create(self.object)
         is_new = note.id is None or note.is_deleted
         is_restored = is_new and note.is_deleted
-        check_note_revision(note, revision_id)
+        check_note_revision(note, revision_id, render_mode, source)
         note.create_revision(render_mode, source, session.user)
         is_changed = attrs_changed(note, 'current_revision')
         db.session.add(note)
