@@ -34,11 +34,11 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     __table_args__ = (db.Index(None, 'contribution_id', unique=True,
                                postgresql_where=db.text(f'state = {PaperRevisionState.accepted}')),
                       db.UniqueConstraint('contribution_id', 'submitted_dt'),
-                      db.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'
+                      db.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'  # noqa: UP032
                                          .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
                                                  PaperRevisionState.to_be_corrected),
                                          name='judge_if_judged'),
-                      db.CheckConstraint('(state IN ({}, {}, {})) = (judgment_dt IS NOT NULL)'
+                      db.CheckConstraint('(state IN ({}, {}, {})) = (judgment_dt IS NOT NULL)'  # noqa: UP032
                                          .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
                                                  PaperRevisionState.to_be_corrected),
                                          name='judgment_dt_if_judged'),

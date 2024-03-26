@@ -611,9 +611,9 @@ class SetupWizard:
         config_link_path = os.path.expanduser('~/.indico.conf')
         if not dev:
             create_config_link = _confirm('Create symlink?', default=True,
-                                          help='By creating a symlink to indico.conf in {}, you can run '
-                                               'indico without having to set the INDICO_CONFIG '
-                                               'environment variable'.format(config_link_path))
+                                          help=f'By creating a symlink to indico.conf in {config_link_path}, you can '
+                                               'run indico without having to set the INDICO_CONFIG environment '
+                                               'variable')
         else:
             create_config_link = False
 

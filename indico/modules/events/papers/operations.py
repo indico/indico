@@ -144,7 +144,7 @@ def create_paper_revision(paper, submitter, files):
     notify_paper_revision_submission(revision)
     logger.info('Paper revision %r submitted by %r', revision, session.user)
     paper.event.log(EventLogRealm.reviewing, LogKind.positive, 'Papers',
-                    'Paper revision {} submitted for contribution {} ({})'
+                    'Paper revision {} submitted for contribution {} ({})'  # noqa: UP032
                     .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
     return revision
 

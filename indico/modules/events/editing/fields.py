@@ -58,8 +58,9 @@ class EditingFilesField(Dict):
                 filenames = {os.path.splitext(f.filename)[0] for f in files}
                 filename_template = file_type.filename_template.replace('{code}', self.contrib.code)
                 if not all(fnmatch.fnmatch(filename, filename_template) for filename in filenames):
-                    raise ValidationError("Some files don't conform to the filename template '{}'"
-                                          .format(file_type.filename_template))
+                    raise ValidationError(
+                        f"Some files do not conform to the filename template '{file_type.filename_template}'"
+                    )
 
             # ensure each file is only used in one type
             duplicates = set(files) & seen

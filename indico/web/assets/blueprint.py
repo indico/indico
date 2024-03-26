@@ -97,8 +97,10 @@ def _get_i18n_locale(locale_name, react=False):
 
     react_suffix = '-react' if react else ''
     try:
-        cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}{}_{}_{}.js'.format(
-            locale_name, react_suffix, indico.__version__, config.hash))
+        cache_file = os.path.join(
+            config.CACHE_DIR,
+            f'assets_i18n_{locale_name}{react_suffix}_{indico.__version__}_{config.hash}.js'
+        )
     except UnicodeEncodeError:
         raise NotFound
 

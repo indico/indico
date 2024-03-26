@@ -536,15 +536,18 @@ class PrincipalPermissionsMixin(PrincipalMixin):
         if cls.allow_networks:
             # you can match a network acl entry without being logged in.
             # we never want that for anything but simple read access
-            checks.append(db.CheckConstraint('type != {} OR (NOT full_access AND array_length(permissions, 1) IS NULL)'
-                                             .format(PrincipalType.network),
-                                             'networks_read_only'))
+            checks.append(db.CheckConstraint(
+                f'type != {PrincipalType.network} OR (NOT full_access AND array_length(permissions, 1) IS NULL)',
+                'networks_read_only'
+            ))
         if cls.allow_registration_forms:
             # many events allow everyone to register, letting people give themselves
             # management access by registering would be bad so we only allow read access
-            checks.append(db.CheckConstraint('type != {} OR (NOT full_access AND array_length(permissions, 1) IS NULL)'
-                                             .format(PrincipalType.registration_form),
-                                             'registration_form_read_only'))
+            checks.append(db.CheckConstraint(
+                f'type != {PrincipalType.registration_form} OR '
+                '(NOT full_access AND array_length(permissions, 1) IS NULL)',
+                'registration_form_read_only'
+            ))
         return tuple(checks)
 
     read_access = db.Column(
@@ -593,8 +596,8 @@ class PrincipalPermissionsMixin(PrincipalMixin):
         current_permissions = set(self.permissions) & valid_permissions
         if permission == 'ANY':
             return bool(current_permissions)
-        assert permission in valid_permissions, "invalid permission '{}' for object '{}'".format(permission,
-                                                                                                 self.principal_for_obj)
+        assert permission in valid_permissions, \
+            f"invalid permission '{permission}' for object '{self.principal_for_obj}'"
         return permission in current_permissions
 
     @has_management_permission.expression

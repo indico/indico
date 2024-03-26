@@ -101,7 +101,7 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
         result = [{'id': session_block.id,
                    'friendly_id': session_block.session.friendly_id,
                    'title': session_block.full_title,
-                   'full_title': '#{}: {} ({})'.format(
+                   'full_title': '#{}: {} ({})'.format(  # noqa: UP032
                        session_block.session.friendly_id, session_block.full_title,
                        format_datetime(session_block.timetable_entry.start_dt))}
                   for session_block in query]

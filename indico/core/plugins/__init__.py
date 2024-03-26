@@ -121,8 +121,8 @@ class IndicoPlugin(Plugin):
                     and '__tablename__' not in model.__dict__):
                 continue
             if not schema.startswith('plugin_'):
-                raise Exception("Plugin '{}' added a model which is not in a plugin schema ('{}' in '{}')"
-                                .format(self.name, model.__name__, schema))
+                raise Exception(f"Plugin '{self.name}' added a model which is not in a plugin schema "
+                                "('{model.__name__}' in '{schema}')")
 
     def connect(self, signal, receiver, **connect_kwargs):
         connect_kwargs['weak'] = False

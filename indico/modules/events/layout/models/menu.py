@@ -210,7 +210,7 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
     __tablename__ = 'menu_entries'
     __table_args__ = (
         db.CheckConstraint(
-            '(type IN ({type.internal_link.value}, {type.plugin_link.value}) AND name IS NOT NULL) OR '
+            '(type IN ({type.internal_link.value}, {type.plugin_link.value}) AND name IS NOT NULL) OR '  # noqa: UP032
             '(type NOT IN ({type.internal_link.value}, {type.plugin_link.value}) and name IS NULL)'
             .format(type=MenuEntryType),
             'valid_name'),
@@ -226,7 +226,7 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
             f' (type != {MenuEntryType.plugin_link.value} AND plugin IS NULL)',
             'valid_plugin'),
         db.CheckConstraint(
-            '(type = {type.separator.value} AND title IS NULL) OR'
+            '(type = {type.separator.value} AND title IS NULL) OR'  # noqa: UP032
             ' (type IN ({type.user_link.value}, {type.page.value}) AND title IS NOT NULL) OR'
             ' (type NOT IN ({type.separator.value}, {type.user_link.value}, {type.page.value}))'
             .format(type=MenuEntryType),
@@ -234,9 +234,13 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
         db.CheckConstraint(
             "title != ''",
             'title_not_empty'),
-        db.Index(None, 'event_id', 'name', unique=True,
-                 postgresql_where=db.text('(type = {type.internal_link.value} OR type = {type.plugin_link.value})'
-                                          .format(type=MenuEntryType))),
+        db.Index(
+            None, 'event_id', 'name', unique=True,
+            postgresql_where=db.text(
+                '(type = {type.internal_link.value} OR type = {type.plugin_link.value})'  # noqa: UP032
+                .format(type=MenuEntryType)
+            )
+        ),
         {'schema': 'events'}
     )
 

@@ -21,4 +21,6 @@ def _greatest_default(element, compiler, **kw):
 @compiles(greatest, 'postgresql')
 def _greatest_case(element, compiler, **kw):
     arg1, arg2 = list(element.clauses)
-    return 'CASE WHEN {0} > {1} THEN {0} ELSE {1} END'.format(compiler.process(arg1), compiler.process(arg2))
+    arg1 = compiler.process(arg1)
+    arg2 = compiler.process(arg2)
+    return f'CASE WHEN {arg1} > {arg2} THEN {arg1} ELSE {arg2} END'

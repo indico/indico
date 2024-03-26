@@ -328,14 +328,12 @@ class VCRoomEventAssociation(db.Model):
         vc_room = self.vc_room
         if delete_all:
             for assoc in vc_room.events[:]:
-                Logger.get('modules.vc').info('Detaching videoconference {} from event {} ({})'.format(
-                    vc_room, assoc.event, assoc.link_object)
-                )
+                Logger.get('modules.vc').info('Detaching videoconference %s from event %s (%s)',
+                                              vc_room, assoc.event, assoc.link_object)
                 vc_room.events.remove(assoc)
         else:
-            Logger.get('modules.vc').info('Detaching videoconference {} from event {} ({})'.format(
-                vc_room, self.event, self.link_object)
-            )
+            Logger.get('modules.vc').info('Detaching videoconference %s from event %s (%s)',
+                                          vc_room, self.event, self.link_object)
             vc_room.events.remove(self)
         db.session.flush()
         if vc_room.plugin and not vc_room.events:

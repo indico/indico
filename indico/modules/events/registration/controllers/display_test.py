@@ -91,7 +91,7 @@ def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
         smtp,
         required=True,
         count=1,
-        subject='[Indico] Registration withdrawn for {}: {} {}'.format(
+        subject='[Indico] Registration withdrawn for {}: {} {}'.format(  # noqa: UP032
             dummy_regform.event.title, dummy_user.first_name, dummy_user.last_name
         ),
         to='mgr@example.test',

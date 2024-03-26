@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.util.string import format_repr
 
 
 class _LegacyLinkMixin:
@@ -95,7 +96,7 @@ class LegacyAttachmentFolderMapping(_LegacyLinkMixin, db.Model):
     )
 
     def __repr__(self):
-        return f'<LegacyAttachmentFolderMapping({self.folder}, material_id={self.material_id}, {self.link_repr})>'
+        return format_repr(self, 'material_id', 'folder_id', _rawtext=self.link_repr)
 
 
 class LegacyAttachmentMapping(_LegacyLinkMixin, db.Model):
@@ -134,6 +135,4 @@ class LegacyAttachmentMapping(_LegacyLinkMixin, db.Model):
     )
 
     def __repr__(self):
-        return '<LegacyAttachmentMapping({}, material_id={}, resource_id={}, {})>'.format(
-            self.attachment, self.material_id, self.resource_id, self.link_repr
-        )
+        return format_repr(self, 'material_id', 'resource_id', 'attachment_id', _rawtext=self.link_repr)

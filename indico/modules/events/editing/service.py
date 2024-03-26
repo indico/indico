@@ -142,12 +142,9 @@ def service_handle_new_editable(editable, user):
         'endpoints': _get_revision_endpoints(revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
+    identifier = _get_event_identifier(editable.event)
+    path = f'/event/{identifier}/editable/{editable.type.name}/{editable.contribution_id}'
     try:
-        path = '/event/{}/editable/{}/{}'.format(
-            _get_event_identifier(editable.event),
-            editable.type.name,
-            editable.contribution_id,
-        )
         resp = requests.put(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
         resp = ServiceCreateEditableResultSchema().load(resp.json()) if resp.text else {}
@@ -167,13 +164,9 @@ def service_handle_review_editable(editable, user, action, parent_revision, new_
         'endpoints': _get_revision_endpoints(new_revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
+    identifier = _get_event_identifier(editable.event)
+    path = f'/event/{identifier}/editable/{editable.type.name}/{editable.contribution_id}/{new_revision.id}'
     try:
-        path = '/event/{}/editable/{}/{}/{}'.format(
-            _get_event_identifier(editable.event),
-            editable.type.name,
-            editable.contribution_id,
-            new_revision.id
-        )
         resp = requests.post(_build_url(editable.event, path), headers=_get_headers(editable.event),
                              json=data)
         resp.raise_for_status()
@@ -209,13 +202,8 @@ def service_get_custom_actions(editable, revision, user):
         'revision': EditingRevisionSignedSchema().dump(revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
-
-    path = '/event/{}/editable/{}/{}/{}/actions'.format(
-        _get_event_identifier(editable.event),
-        editable.type.name,
-        editable.contribution_id,
-        revision.id
-    )
+    identifier = _get_event_identifier(editable.event)
+    path = f'/event/{identifier}/editable/{editable.type.name}/{editable.contribution_id}/{revision.id}/actions'
     try:
         resp = requests.post(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
@@ -232,13 +220,9 @@ def service_handle_custom_action(editable, revision, user, action):
         'endpoints': _get_revision_endpoints(revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
     }
+    identifier = _get_event_identifier(editable.event)
+    path = f'/event/{identifier}/editable/{editable.type.name}/{editable.contribution_id}/{revision.id}/action'
     try:
-        path = '/event/{}/editable/{}/{}/{}/action'.format(
-            _get_event_identifier(editable.event),
-            editable.type.name,
-            editable.contribution_id,
-            revision.id
-        )
         resp = requests.post(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
         resp = ServiceActionResultSchema().load(resp.json())

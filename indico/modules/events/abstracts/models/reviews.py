@@ -37,13 +37,20 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     marshmallow_aliases = {'_comment': 'comment'}
 
     __tablename__ = 'abstract_reviews'
-    __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
-                      db.CheckConstraint('proposed_action = {} OR (proposed_contribution_type_id IS NULL)'
-                                         .format(AbstractAction.accept), name='prop_contrib_id_only_accepted'),
-                      db.CheckConstraint('(proposed_action IN ({}, {})) = (proposed_related_abstract_id IS NOT NULL)'
-                                         .format(AbstractAction.mark_as_duplicate, AbstractAction.merge),
-                                         name='prop_abstract_id_only_duplicate_merge'),
-                      {'schema': 'event_abstracts'})
+    __table_args__ = (
+        db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
+        db.CheckConstraint(
+            f'proposed_action = {AbstractAction.accept} OR (proposed_contribution_type_id IS NULL)',
+            name='prop_contrib_id_only_accepted',
+        ),
+        db.CheckConstraint(
+            '(proposed_action IN ({}, {})) = (proposed_related_abstract_id IS NOT NULL)'.format(  # noqa: UP032
+                AbstractAction.mark_as_duplicate, AbstractAction.merge
+            ),
+            name='prop_abstract_id_only_duplicate_merge',
+        ),
+        {'schema': 'event_abstracts'},
+    )
 
     id = db.Column(
         db.Integer,

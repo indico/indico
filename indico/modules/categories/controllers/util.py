@@ -48,8 +48,9 @@ def make_format_event_date_func(category):
         if start_dt.year != end_dt.year:
             return f'{format_date(start_dt, timezone=tzinfo)} - {format_date(end_dt, timezone=tzinfo)}'
         elif (start_dt.month != end_dt.month) or (start_dt.day != end_dt.day):
-            return '{} - {}'.format(format_skeleton(start_dt, day_month, timezone=tzinfo),
-                                    format_skeleton(end_dt, day_month, timezone=tzinfo))
+            start = format_skeleton(start_dt, day_month, timezone=tzinfo)
+            end = format_skeleton(end_dt, day_month, timezone=tzinfo)
+            return f'{start} - {end}'
         else:
             return format_skeleton(start_dt, day_month, timezone=tzinfo)
 

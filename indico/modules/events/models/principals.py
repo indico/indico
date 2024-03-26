@@ -27,8 +27,9 @@ class EventPrincipal(PrincipalPermissionsMixin, db.Model):
     @declared_attr
     def __table_args__(cls):
         permissions = "ARRAY['paper_editing', 'slides_editing', 'poster_editing']"
-        condition = 'type NOT IN ({}, {}) OR (NOT (permissions::text[] && {}))'.format(
-            PrincipalType.local_group, PrincipalType.multipass_group, permissions
+        condition = (
+            f'type NOT IN ({PrincipalType.local_group}, {PrincipalType.multipass_group}) OR '
+            f'(NOT (permissions::text[] && {permissions}))'
         )
         group_perm_constraint = db.CheckConstraint(condition, 'disallow_group_editor_permissions')
         return (group_perm_constraint, *auto_table_args(cls, schema='events'))

@@ -121,8 +121,8 @@ class RH:
                             getattr(x, 'normalize_url_spec', None) is not RH.normalize_url_spec)),
                        None)
             if cls is not None:
-                raise Exception('Normalization rule of {} in {} is overwritten by base RH. Put mixins with class-level '
-                                'attributes on the left of the base class'.format(cls, self.__class__))
+                raise Exception(f'Normalization rule of {cls} in {type(self)} is overwritten by base RH. '
+                                'Put mixins with class-level attributes on the left of the base class')
         if not self.normalize_url_spec or not any(self.normalize_url_spec.values()):
             return
         spec = {

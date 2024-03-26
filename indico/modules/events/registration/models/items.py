@@ -157,17 +157,17 @@ class RegistrationFormItem(db.Model):
 
     __tablename__ = 'form_items'
     __table_args__ = (
-        db.CheckConstraint('(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))'
+        db.CheckConstraint('(input_type IS NULL) = (type NOT IN ({t.field}, {t.field_pd}))'  # noqa: UP032
                            .format(t=RegistrationFormItemType),
                            name='valid_input'),
         db.CheckConstraint(f'NOT is_manager_only OR type = {RegistrationFormItemType.section}',
                            name='valid_manager_only'),
-        db.CheckConstraint('(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)'
+        db.CheckConstraint('(type IN ({t.section}, {t.section_pd})) = (parent_id IS NULL)'  # noqa: UP032
                            .format(t=RegistrationFormItemType),
                            name='top_level_sections'),
         db.CheckConstraint(f'(type != {RegistrationFormItemType.field_pd}) = (personal_data_type IS NULL)',
                            name='pd_field_type'),
-        db.CheckConstraint('NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))'
+        db.CheckConstraint('NOT is_deleted OR (type NOT IN ({t.section_pd}, {t.field_pd}))'  # noqa: UP032
                            .format(t=RegistrationFormItemType),
                            name='pd_not_deleted'),
         db.CheckConstraint(f'is_enabled OR type != {RegistrationFormItemType.section_pd}',
@@ -178,7 +178,7 @@ class RegistrationFormItem(db.Model):
         db.CheckConstraint(f'is_required OR type != {RegistrationFormItemType.field_pd} OR personal_data_type NOT IN '
                            f'({PersonalDataType.email}, {PersonalDataType.first_name}, {PersonalDataType.last_name})',
                            name='pd_field_required'),
-        db.CheckConstraint('current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})'
+        db.CheckConstraint('current_data_id IS NULL OR type IN ({t.field}, {t.field_pd})'  # noqa: UP032
                            .format(t=RegistrationFormItemType),
                            name='current_data_id_only_field'),
         db.CheckConstraint('retention_period IS NULL OR '

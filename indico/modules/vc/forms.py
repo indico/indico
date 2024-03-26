@@ -93,7 +93,7 @@ class VCRoomLinkFormBase(IndicoForm):
         blocks = (SessionBlock.query
                   .filter(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
                   .all())
-        block_choices = [(block.id, '{} ({})'.format(block.full_title,
+        block_choices = [(block.id, '{} ({})'.format(block.full_title,  # noqa: UP032
                                                      format_datetime(block.start_dt, timezone=self.event.tzinfo)))
                          for block in sorted(blocks, key=attrgetter('full_title', 'start_dt'))]
         self.contribution.choices = [('', _('Please select a contribution')), *contrib_choices]

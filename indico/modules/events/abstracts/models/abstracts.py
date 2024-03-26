@@ -93,11 +93,11 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                                             name='merged_into_id_only_merged'),
                          db.CheckConstraint(f'(state = {AbstractState.duplicate}) = (duplicate_of_id IS NOT NULL)',
                                             name='duplicate_of_id_only_duplicate'),
-                         db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judge_id IS NOT NULL)'
+                         db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judge_id IS NOT NULL)'  # noqa: UP032
                                             .format(AbstractState.accepted, AbstractState.rejected,
                                                     AbstractState.merged, AbstractState.duplicate),
                                             name='judge_if_judged'),
-                         db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judgment_dt IS NOT NULL)'
+                         db.CheckConstraint('(state IN ({}, {}, {}, {})) = (judgment_dt IS NOT NULL)'  # noqa: UP032
                                             .format(AbstractState.accepted, AbstractState.rejected,
                                                     AbstractState.merged, AbstractState.duplicate),
                                             name='judgment_dt_if_judged'),
