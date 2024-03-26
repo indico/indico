@@ -7,7 +7,6 @@
 
 import os
 import re
-import typing as t
 from datetime import datetime, time, timedelta
 from uuid import UUID
 
@@ -476,7 +475,7 @@ class NoneRemovingList(fields.List):
 class UUIDString(fields.UUID):
     """A UUID field that returns the UUID as a string instead of a native UUID."""
 
-    def _deserialize(self, value, attr, data, **kwargs) -> t.Optional[str]:
+    def _deserialize(self, value, attr, data, **kwargs) -> str | None:
         rv = self._validated(value)
         return str(rv) if isinstance(rv, UUID) else rv
 
@@ -484,7 +483,7 @@ class UUIDString(fields.UUID):
 class LowercaseString(fields.String):
     """A String field that converts it value to lowercase."""
 
-    def _deserialize(self, value, attr, data, **kwargs) -> t.Optional[str]:
+    def _deserialize(self, value, attr, data, **kwargs) -> str | None:
         return super()._deserialize(value, attr, data, **kwargs).lower()
 
 

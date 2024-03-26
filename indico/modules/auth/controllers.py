@@ -182,7 +182,7 @@ class RHLinkAccount(RH):
 
         if self.must_choose_email:
             form = SelectEmailForm()
-            form.email.choices = list(zip(self.emails, self.emails))
+            form.email.choices = list(zip(self.emails, self.emails, strict=True))
         else:
             form = IndicoForm()
 

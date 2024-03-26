@@ -76,7 +76,7 @@ def bool_matrix(template, mask=None, expect=None):
             raise ValueError('cannot combine ! with mask')
         if len(mask) != len(template):
             raise ValueError('mask length differs from template length')
-        if any(x != '.' and y != '.' for x, y in zip(template, mask)):
+        if any(x != '.' and y != '.' for x, y in zip(template, mask, strict=True)):
             raise ValueError('mask cannot have a value for a fixed column')
     else:
         mask = '.' * len(template)

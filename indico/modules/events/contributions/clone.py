@@ -108,12 +108,12 @@ class ContributionCloner(EventCloner):
         """
         event = contribution.event
         cloner = cls(event)
-        cloner._event_role_map = dict(zip(event.roles, event.roles))
-        cloner._person_map = dict(zip(event.persons, event.persons))
+        cloner._event_role_map = dict(zip(event.roles, event.roles, strict=True))
+        cloner._person_map = dict(zip(event.persons, event.persons, strict=True))
         cloner._session_map = {contribution.session: contribution.session}
         cloner._session_block_map = {contribution.session_block: contribution.session_block}
         cloner._contrib_type_map = {contribution.type: contribution.type}
-        cloner._contrib_field_map = dict(zip(event.contribution_fields, event.contribution_fields))
+        cloner._contrib_field_map = dict(zip(event.contribution_fields, event.contribution_fields, strict=True))
         cloner._contrib_map = {}
         cloner._subcontrib_map = {}
         new_contribution = cloner._create_new_contribution(event, contribution,

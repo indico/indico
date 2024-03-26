@@ -81,7 +81,7 @@ class UserPreferencesForm(IndicoForm):
         locales = [(code, f'{name} ({territory})' if territory else name)
                    for code, (name, territory, __) in get_all_locales().items()]
         self.lang.choices = sorted(locales, key=itemgetter(1))
-        self.timezone.choices = list(zip(common_timezones, common_timezones))
+        self.timezone.choices = list(zip(common_timezones, common_timezones, strict=True))
         if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
             self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
 

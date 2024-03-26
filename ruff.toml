@@ -1,4 +1,4 @@
-target-version = 'py39'
+target-version = 'py312'
 line-length = 120
 extend-exclude = ['docs', 'htmlcov', '*.egg-info', 'indico.conf']
 
@@ -46,6 +46,7 @@ ignore = [
     'RUF015',  # not always more readable, and we don't do it for huge lists
     'RUF022',  # autofix messes up out formatting instead of just sorting
     'RUF027',  # also triggers on i18n functions -> too noisy for now
+    'UP038',   # it looks kind of weird and it slower than a tuple
     'D205',    # too many docstrings which have no summary line
     'D301',    # https://github.com/astral-sh/ruff/issues/8696
     'D1',      # we have way too many missing docstrings :(

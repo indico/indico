@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from flask import session
@@ -18,7 +18,7 @@ from indico.modules.auth import process_identity
 @pytest.mark.usefixtures('db')
 def test_process_identity_sets_hard_expiry(app):
     """Test that hard expiry is set on the session object if it is present in the multipass data."""
-    dt_now = datetime.now(timezone.utc)
+    dt_now = datetime.now(UTC)
     identity_info = IdentityInfo(
         provider=StaticIdentityProvider(
             multipass=Multipass(), name='static', settings={}

@@ -64,7 +64,7 @@ def get_all_tables(db):
     """Return a dict containing all tables grouped by schema."""
     inspector = inspect(db.engine)
     schemas = sorted(set(inspector.get_schema_names()) - {'information_schema'})
-    return dict(zip(schemas, (inspector.get_table_names(schema=schema) for schema in schemas)))
+    return dict(zip(schemas, (inspector.get_table_names(schema=schema) for schema in schemas), strict=True))
 
 
 def delete_all_tables(db):

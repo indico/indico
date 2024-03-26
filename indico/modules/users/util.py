@@ -7,7 +7,6 @@
 
 import hashlib
 import os
-import typing as t
 from collections import defaultdict
 from datetime import datetime
 from io import BytesIO
@@ -476,7 +475,7 @@ def anonymize_user(user):
     signals.users.anonymized.send(user, flushed=True)
 
 
-def get_color_for_user_id(user_id: t.Union[int, str]):
+def get_color_for_user_id(user_id: int | str):
     """Calculate a unique color for a user based on their id.
 
     :param user_id: the user ID (int), or otherwise a string (external search results)
@@ -525,7 +524,7 @@ def set_user_avatar(user, avatar, filename, lastmod=None):
     }
 
 
-def send_default_avatar(user: t.Union[User, str, None]):
+def send_default_avatar(user: User | str | None):
     """Send a user's default avatar as an SVG.
 
     :param user: A `User` object, string (external search results, registrations) or `None` (blank avatar)

@@ -633,7 +633,7 @@ class RichMarkup(Markup):
 
     __slots__ = ('_linker', '_preformatted')
 
-    def __new__(cls, content: str = '', preformatted: t.Optional[bool] = None):
+    def __new__(cls, content: str = '', preformatted: bool | None = None):
         obj = Markup.__new__(cls, content)
         if preformatted is None:
             tmp = content.lower()

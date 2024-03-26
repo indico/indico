@@ -63,7 +63,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             raise BadRequest(_('The template dimensions are too large for the page size you selected'))
 
         # Print a badge for each registration
-        for person, (x, y) in zip(self.persons, self._iter_position(canvas, n_horizontal, n_vertical)):
+        for person, (x, y) in zip(self.persons, self._iter_position(canvas, n_horizontal, n_vertical), strict=False):
             self._draw_badge(canvas, person, self.template, self.tpl_data, x * cm, y * cm)
 
     def _draw_badge(self, canvas, person, template, tpl_data, pos_x, pos_y):
@@ -142,7 +142,7 @@ class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):
         n_horizontal = 1
         n_vertical = 1
 
-        for person, (x, y) in zip(self.persons, self._iter_position(canvas, n_horizontal, n_vertical)):
+        for person, (x, y) in zip(self.persons, self._iter_position(canvas, n_horizontal, n_vertical), strict=False):
             self._draw_badge(canvas, person, self.template, self.tpl_data, x * cm, y * cm)
             if self.tpl_data.width > self.tpl_data.height:
                 canvas.translate(self.width, self.height)
@@ -194,7 +194,7 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
         if page_used:
             badges_mix += ([None] * (per_page - page_used)) + badges_mix[-page_used:]
 
-        positioned_badges = zip(badges_mix, self._iter_position(canvas, n_horizontal, n_vertical))
+        positioned_badges = zip(badges_mix, self._iter_position(canvas, n_horizontal, n_vertical), strict=False)
         for i, (person, (x, y)) in enumerate(positioned_badges):
             if person is None:
                 # blank item for an incomplete last page
