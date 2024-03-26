@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import sys
 from enum import Enum
 
 
@@ -22,16 +21,6 @@ class _IndicoEnumMixin:
             return cls[name]
         except KeyError:
             return default
-
-    # Python 3.11 up to 3.11.4 switched from by-value to by-name serialization of enums,
-    # causing the tests for event exporting (to yaml) to fail. This has been reverted in
-    # the 3.11 branch (https://github.com/python/cpython/pull/105348), so likely 3.11.5
-    # will no longer need the fix below.
-    # Once released, we can possibly use package metadata to explicitly exclude older 3.11
-    # releases or just keep the code below around forever
-    if (3, 11, 0) <= sys.version_info[:3] <= (3, 11, 4):
-        def __reduce_ex__(self, proto):
-            return self.__class__, (self._value_,)
 
     @classmethod
     def serialize(cls):

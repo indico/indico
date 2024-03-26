@@ -9,6 +9,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+# ruff: noqa: FURB101, A001
+
 import ast
 import os
 import re
@@ -118,7 +120,7 @@ autodoc_default_flags = ['show-inheritance']
 
 # Intersphinx urls
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.9/', None),
+    'python': ('https://docs.python.org/3.12/', None),
     'celery': ('http://docs.celeryproject.org/en/stable/', None),
 }
 
