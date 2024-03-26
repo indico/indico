@@ -7,7 +7,7 @@
 
 import moment from 'moment/moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -29,17 +29,9 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import './ConflictModal.module.scss';
 
-export function ConflictModal({
-  currentNote,
-  externalNote,
-  onClose,
-  setCloseAndReload,
-  overwriteChanges,
-}) {
-  const [open, setOpen] = useState(true);
-
-  // camelize the externalNoteSource keys
-  const extNote = camelizeKeys(externalNote);
+export function ConflictModal({noteData, onClose}) {
+  // camelize the noteData keys
+  const note = camelizeKeys(noteData);
 
   const renderDeletedRevision = () => {
     return (
@@ -52,16 +44,19 @@ export function ConflictModal({
     );
   };
 
+  const renderLastModifiedDt = dt => {
+    return (
+      <span title={moment(dt).format('L LTS')} styleName="last-modified-text">
+        {moment(dt).fromNow()}
+      </span>
+    );
+  };
+
   return (
     <Modal
-      open={open}
-      onClose={() => {
-        setOpen(false);
-        onClose();
-      }}
-      onOpen={() => setOpen(true)}
+      open
+      onClose={() => onClose(null)}
       style={{minWidth: '65vw'}}
-      size="large"
       closeOnEscape={false}
       closeOnDimmerClick={false}
       closeIcon
@@ -78,27 +73,32 @@ export function ConflictModal({
             </Message.Header>
             <p>
               <Translate>
-                These minutes was last modified on{' '}
+                These minutes were last modified{' '}
                 <Param
                   name="last_modified_dt"
-                  value={moment(extNote.createdDt).format('L LTS')}
+                  value={renderLastModifiedDt(note.conflict.createdDt)}
                   wrapper={<strong />}
                 />{' '}
-                by <Param name="note_author" value={extNote.noteAuthor} wrapper={<strong />} />
+                by{' '}
+                <Param name="note_author" value={note.conflict.noteAuthor} wrapper={<strong />} />
                 {'. '}You can either:
               </Translate>
             </p>
-            <List style={{marginTop: '0.3rem'}}>
+            <List style={{marginTop: 0}}>
               <List.Item>
                 <List.Icon name="write" />
                 <List.Content>
-                  <Translate>Overwrite the changes made by the other person</Translate>
+                  <Translate>
+                    Overwrite the changes made by the other person with your changes
+                  </Translate>
                 </List.Content>
               </List.Item>
               <List.Item>
                 <List.Icon name="trash alternate outline" />
                 <List.Content>
-                  <Translate>Discard your changes</Translate>
+                  <Translate>
+                    Discard your changes and keep the changes made by the other person
+                  </Translate>
                 </List.Content>
               </List.Item>
               <List.Item>
@@ -124,7 +124,7 @@ export function ConflictModal({
               <Card raised fluid>
                 <CardContent>
                   <div
-                    dangerouslySetInnerHTML={{__html: currentNote}}
+                    dangerouslySetInnerHTML={{__html: note.html}}
                     className="editor-output"
                     styleName="conflict-content"
                   />
@@ -139,11 +139,11 @@ export function ConflictModal({
                   'The changes made by someone else since you started editing'
                 )}
               />
-              {extNote.source ? (
+              {note.conflict.source ? (
                 <Card raised fluid>
                   <CardContent>
                     <div
-                      dangerouslySetInnerHTML={{__html: extNote.source}}
+                      dangerouslySetInnerHTML={{__html: note.conflict.source}}
                       className="editor-output"
                       styleName="conflict-content"
                     />
@@ -158,42 +158,19 @@ export function ConflictModal({
       </Modal.Content>
       <Modal.Actions>
         <ButtonGroup styleName="action-button-icons">
-          <Button
-            icon
-            color="red"
-            onClick={async () => {
-              await overwriteChanges();
-              setOpen(false);
-              onClose();
-              setCloseAndReload(true);
-            }}
-          >
+          <Button icon color="red" onClick={() => onClose('overwrite')}>
             <Icon name="write" />
             <span styleName="action-button-text">
               <Translate>Overwrite their changes</Translate>
             </span>
           </Button>
-          <Button
-            icon
-            color="orange"
-            onClick={() => {
-              setOpen(false);
-              onClose();
-              setCloseAndReload(true);
-            }}
-          >
+          <Button icon color="orange" onClick={() => onClose('discard')}>
             <Icon name="trash alternate outline" />
             <span styleName="action-button-text">
               <Translate>Discard my changes</Translate>
             </span>
           </Button>
-          <Button
-            icon
-            onClick={() => {
-              setOpen(false);
-              onClose();
-            }}
-          >
+          <Button icon onClick={() => onClose(null)}>
             <Icon name="cancel" />
             <span styleName="action-button-text">
               <Translate>Go back to the editor</Translate>
@@ -208,9 +185,6 @@ export function ConflictModal({
 export default ConflictModal;
 
 ConflictModal.propTypes = {
-  currentNote: PropTypes.string.isRequired,
-  externalNote: PropTypes.object.isRequired,
+  noteData: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  setCloseAndReload: PropTypes.func.isRequired,
-  overwriteChanges: PropTypes.func.isRequired,
 };
