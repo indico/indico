@@ -74,7 +74,7 @@ class RoomHook(RoomBookingHookBase):
         reservations = None
         if self._detail == 'reservations':
             reservations = OrderedMultiDict(_export_reservations(self, True, False, [
-                Reservation.room_id.in_(x['room'].id for x in rooms_data)
+                Reservation.room_id.in_(x.id for x in rooms_data)
             ]))
 
         for result in rooms_data:
