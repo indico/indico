@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import addDefaultTemplateURL from 'indico-url:receipts.add_default_template';
 import addTemplatePageURL from 'indico-url:receipts.add_template_page';
 import cloneTemplateURL from 'indico-url:receipts.clone_template';
 import deleteTemplateURL from 'indico-url:receipts.delete_template';
@@ -16,13 +17,13 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Button, Icon, Label} from 'semantic-ui-react';
+import {Dropdown, Icon, Label} from 'semantic-ui-react';
 
 import {RequestConfirmDelete} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-import {targetLocatorSchema, templateSchema} from './util';
+import {defaultTemplateSchema, targetLocatorSchema, templateSchema} from './util';
 
 import './TemplateListPane.module.scss';
 
@@ -142,6 +143,7 @@ TemplateRow.defaultProps = {
 export default function TemplateListPane({
   ownTemplates,
   inheritedTemplates,
+  defaultTemplates,
   targetLocator,
   dispatch,
 }) {
@@ -183,16 +185,33 @@ export default function TemplateListPane({
           <h3>
             <Translate>Custom templates</Translate>
           </h3>
-          <Link to={addTemplatePageURL(targetLocator)}>
-            <Button
-              primary
-              size="mini"
-              title={Translate.string('Add a new blank receipt/certificate template')}
-            >
-              <Icon name="plus" />
-              <Translate>Add new</Translate>
-            </Button>
-          </Link>
+          <Dropdown
+            button
+            labeled
+            title={Translate.string('Add a new template')}
+            icon="plus"
+            text={Translate.string('Add new')}
+            className="mini primary icon"
+            direction="left"
+          >
+            <Dropdown.Menu>
+              {_.sortBy(Object.entries(defaultTemplates), ([, t]) => t.title).map(
+                ([name, {title, version}]) => (
+                  <Dropdown.Item
+                    key={name}
+                    as={Link}
+                    to={addDefaultTemplateURL({...targetLocator, template_name: name})}
+                    text={`${title} (v${version})`}
+                  />
+                )
+              )}
+              <Dropdown.Item
+                as={Link}
+                to={addTemplatePageURL(targetLocator)}
+                text={Translate.string('Blank template')}
+              />
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
         {ownTemplates.length ? (
           <table className="i-table-widget">
@@ -221,6 +240,7 @@ export default function TemplateListPane({
 TemplateListPane.propTypes = {
   ownTemplates: PropTypes.arrayOf(templateSchema).isRequired,
   inheritedTemplates: PropTypes.arrayOf(templateSchema).isRequired,
+  defaultTemplates: PropTypes.objectOf(defaultTemplateSchema).isRequired,
   dispatch: PropTypes.func.isRequired,
   targetLocator: targetLocatorSchema.isRequired,
 };

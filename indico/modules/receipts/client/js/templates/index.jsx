@@ -10,10 +10,20 @@ import ReactDOM from 'react-dom';
 
 import Router from './TemplateManagement';
 
-window.setupReceiptTemplateList = function(elem, ownTemplates, inheritedTemplates, targetLocator) {
+window.setupReceiptTemplateList = function(
+  elem,
+  ownTemplates,
+  inheritedTemplates,
+  defaultTemplates,
+  targetLocator
+) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-      <Router initialState={{ownTemplates, inheritedTemplates}} targetLocator={targetLocator} />,
+      <Router
+        initialState={{ownTemplates, inheritedTemplates}}
+        defaultTemplates={defaultTemplates}
+        targetLocator={targetLocator}
+      />,
       elem
     );
   });

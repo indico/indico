@@ -1,0 +1,141 @@
+@page {
+  margin: 3cm;
+
+  @bottom-center {
+    color: #a9a;
+    content: 'Printed by Indico';
+    font-size: 9pt;
+  }
+}
+
+html {
+  color: #14213d;
+  font-family: sans-serif;
+  font-size: 11pt;
+  line-height: 1.6;
+}
+
+body {
+  margin: 0;
+}
+
+aside {
+  display: flex;
+  margin: 2em 0 4em;
+  width: 100%;
+}
+
+aside#title {
+  flex: 2;
+  align-items: center;
+}
+
+aside#title div.title {
+  flex: 2;
+}
+
+aside#addresses {
+  justify-content: space-between;
+}
+
+aside img {
+  max-width: 5cm;
+  max-height: 5cm;
+  margin-left: 0.5cm;
+}
+
+address {
+  display: block;
+  white-space: pre-line;
+}
+
+h1 {
+  color: #18597d;
+  font-size: 40pt;
+  margin: 0;
+}
+
+aside address#from {
+  color: #a9a;
+  flex: 1;
+}
+
+aside address#to {
+  text-align: right;
+  flex: 1;
+}
+
+dl#information {
+  position: absolute;
+  right: 0;
+  text-align: right;
+  top: 0;
+}
+
+dt,
+dd {
+  display: inline;
+  margin: 0;
+}
+
+dt {
+  color: #a9a;
+}
+
+dt::before {
+  content: '';
+  display: block;
+}
+
+dt::after {
+  content: ':';
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+tr.total {
+  padding-top: 5cm;
+}
+
+tr.total td {
+  margin-top: 2cm;
+  padding-top: 0.25cm;
+  border-top: 0.2mm solid #a9a;
+}
+
+th {
+  border-bottom: 0.2mm solid #a9a;
+  color: #a9a;
+  font-size: 10pt;
+  font-weight: 400;
+  padding-bottom: 0.25cm;
+  text-transform: uppercase;
+}
+
+td {
+  padding-top: 2mm;
+}
+
+td:last-of-type {
+  color: #18597d;
+  font-weight: bold;
+  text-align: right;
+}
+
+th,
+td {
+  text-align: center;
+}
+
+th:first-of-type,
+td:first-of-type {
+  text-align: left;
+}
+
+th:last-of-type,
+td:last-of-type {
+  text-align: right;
+}

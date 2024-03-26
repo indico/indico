@@ -1,0 +1,40 @@
+custom_fields:
+  - name: address_from
+    type: textarea
+    attributes:
+      label: Organizer Address
+
+  - name: address_to_override
+    type: textarea
+    attributes:
+      label: Override participant address
+
+  - name: venue
+    type: input
+    attributes:
+      label: Venue
+
+  - name: fee_category
+    type: input
+    attributes:
+      label: Fee category
+
+  - name: receipt_number
+    type: input
+    attributes:
+      label: Receipt number
+
+  - name: add_logo
+    type: checkbox
+    attributes:
+      label: Add logo?
+
+  - name: add_url
+    type: checkbox
+    attributes:
+      label: Add event URL?
+
+  - name: add_affiliation
+    type: checkbox
+    attributes:
+      label: Add registrant affiliation?

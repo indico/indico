@@ -24,6 +24,10 @@ def _dispatch(event_rh, category_rh):
 
 _bp = IndicoBlueprint('receipts', __name__, template_folder='templates', virtual_template_folder='receipts')
 
+# Global endpoints
+_bp.add_url_rule('/receipts/default-templates/<template_name>', 'get_default_template',
+                 templates.RHGetDefaultTemplate)
+
 # Global admin endpoints
 _bp.add_url_rule('/admin/receipts/', 'admin_settings', admin.RHGlobalReceiptsSettings, methods=('GET', 'POST'))
 
@@ -40,6 +44,8 @@ for object_type in ('event', 'category'):
     # Template management pages (same RHs/backend, display routing is done in react)
     _bp.add_url_rule(f'{prefix}/', 'template_list', _management_page, defaults=defaults)
     _bp.add_url_rule(f'{prefix}/add', 'add_template_page', _management_page, defaults=defaults)
+    _bp.add_url_rule(f'{prefix}/add/<template_name>', 'add_default_template', _management_page,
+                     defaults=defaults)
     _bp.add_url_rule(f'{prefix}/<int:template_id>/', 'template', _management_page, defaults=defaults)
     # Add a new template
     _bp.add_url_rule(f'{prefix}/add', 'add_template', templates.RHAddTemplate, defaults=defaults, methods=('POST',))

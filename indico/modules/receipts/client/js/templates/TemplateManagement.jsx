@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import addDefaultTemplateURL from 'indico-url:receipts.add_default_template';
 import addTemplateURL from 'indico-url:receipts.add_template';
 import editTemplateURL from 'indico-url:receipts.edit_template';
+import getDefaultTemplateURL from 'indico-url:receipts.get_default_template';
 import templateURL from 'indico-url:receipts.template';
 import templateListURL from 'indico-url:receipts.template_list';
 
@@ -17,13 +19,14 @@ import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import {Message} from 'semantic-ui-react';
 
 import {ManagementPageBackButton} from 'indico/react/components';
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {routerPathFromFlask, useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios} from 'indico/utils/axios';
 
 import TemplateListPane from './TemplateListPane';
 import TemplatePane from './TemplatePane';
-import {templateSchema} from './util';
+import {defaultTemplateSchema, templateSchema} from './util';
 
 const targetLocatorSchema = PropTypes.shape({
   event_id: PropTypes.number,
@@ -96,8 +99,12 @@ EditTemplatePane.propTypes = {
   templates: PropTypes.arrayOf(templateSchema).isRequired,
 };
 
-function NewTemplatePane({dispatch, targetLocator}) {
+function NewTemplatePane({dispatch, targetLocator, defaultTemplate}) {
   const history = useHistory();
+  const {data: defaultTemplateData, loading} = useIndicoAxios(
+    {url: defaultTemplate && getDefaultTemplateURL({template_name: defaultTemplate})},
+    {manual: !defaultTemplate}
+  );
 
   const createTemplate = async data => {
     try {
@@ -117,7 +124,13 @@ function NewTemplatePane({dispatch, targetLocator}) {
   return (
     <>
       <ManagementPageBackButton url={templateListURL(targetLocator)} />
-      <TemplatePane onSubmit={createTemplate} targetLocator={targetLocator} add />
+      <TemplatePane
+        onSubmit={createTemplate}
+        targetLocator={targetLocator}
+        template={defaultTemplateData || undefined}
+        loading={loading}
+        add
+      />
     </>
   );
 }
@@ -125,9 +138,14 @@ function NewTemplatePane({dispatch, targetLocator}) {
 NewTemplatePane.propTypes = {
   dispatch: PropTypes.func.isRequired,
   targetLocator: targetLocatorSchema.isRequired,
+  defaultTemplate: PropTypes.string,
 };
 
-export default function ReceiptTemplateManagement({initialState, targetLocator}) {
+NewTemplatePane.defaultProps = {
+  defaultTemplate: '',
+};
+
+export default function ReceiptTemplateManagement({initialState, defaultTemplates, targetLocator}) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const targetIdParams = Object.keys(targetLocator);
 
@@ -154,6 +172,21 @@ export default function ReceiptTemplateManagement({initialState, targetLocator})
           />
           <Route
             exact
+            path={routerPathFromFlask(addDefaultTemplateURL, [...targetIdParams, 'template_name'])}
+            render={({
+              match: {
+                params: {template_name: templateName},
+              },
+            }) => (
+              <NewTemplatePane
+                dispatch={dispatch}
+                targetLocator={targetLocator}
+                defaultTemplate={templateName}
+              />
+            )}
+          />
+          <Route
+            exact
             path={[routerPathFromFlask(templateURL, [...targetIdParams, 'template_id'])]}
             render={() => (
               <EditTemplatePane
@@ -167,7 +200,12 @@ export default function ReceiptTemplateManagement({initialState, targetLocator})
             exact
             path={routerPathFromFlask(templateListURL, targetIdParams)}
             render={() => (
-              <TemplateListPane dispatch={dispatch} targetLocator={targetLocator} {...state} />
+              <TemplateListPane
+                dispatch={dispatch}
+                defaultTemplates={defaultTemplates}
+                targetLocator={targetLocator}
+                {...state}
+              />
             )}
           />
         </Switch>
@@ -181,5 +219,6 @@ ReceiptTemplateManagement.propTypes = {
     ownTemplates: PropTypes.arrayOf(templateSchema),
     inheritedTemplates: PropTypes.arrayOf(templateSchema),
   }).isRequired,
+  defaultTemplates: PropTypes.objectOf(defaultTemplateSchema).isRequired,
   targetLocator: targetLocatorSchema.isRequired,
 };
