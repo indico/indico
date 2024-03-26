@@ -8,7 +8,6 @@
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -611,33 +610,30 @@ class RHParticipantListPictureDownload(RHParticipantList):
 
     def _process_args(self):
         RHParticipantList._process_args(self)
-        try:
-            self.data = (RegistrationData.query
-                         .filter(RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                 RegistrationData.registration_id == request.view_args['registration_id'],
-                                 RegistrationFormItem.input_type == 'picture',
-                                 Registration.event_id == request.view_args['event_id'],
-                                 Registration.registration_form_id == request.view_args['reg_form_id'],
-                                 ~Registration.is_deleted,
-                                 ~RegistrationForm.is_deleted)
-                         .join(RegistrationData.field_data)
-                         .join(RegistrationFormFieldData.field)
-                         .join(RegistrationData.registration)
-                         .join(Registration.registration_form)
-                         .options((joinedload('registration').load_only(Registration.id,
-                                                                        Registration.consent_to_publish,
-                                                                        Registration.participant_hidden,
-                                                                        Registration.state,
-                                                                        Registration.is_deleted))
-                                  .joinedload('registration_form')
-                                  .load_only(RegistrationForm.id,
-                                             RegistrationForm.publish_registrations_participants,
-                                             RegistrationForm.publish_registrations_public,
-                                             RegistrationForm.publish_registrations_duration),
-                                  lazyload('*'))
-                         .one())
-        except NoResultFound:
-            raise BadRequest
+        self.data = (RegistrationData.query
+                     .filter(RegistrationData.field_data_id == request.view_args['field_data_id'],
+                             RegistrationData.registration_id == request.view_args['registration_id'],
+                             RegistrationFormItem.input_type == 'picture',
+                             Registration.event_id == request.view_args['event_id'],
+                             Registration.registration_form_id == request.view_args['reg_form_id'],
+                             ~Registration.is_deleted,
+                             ~RegistrationForm.is_deleted)
+                     .join(RegistrationData.field_data)
+                     .join(RegistrationFormFieldData.field)
+                     .join(RegistrationData.registration)
+                     .join(Registration.registration_form)
+                     .options((joinedload('registration').load_only(Registration.id,
+                                                                    Registration.consent_to_publish,
+                                                                    Registration.participant_hidden,
+                                                                    Registration.state,
+                                                                    Registration.is_deleted))
+                              .joinedload('registration_form')
+                              .load_only(RegistrationForm.id,
+                                         RegistrationForm.publish_registrations_participants,
+                                         RegistrationForm.publish_registrations_public,
+                                         RegistrationForm.publish_registrations_duration),
+                              lazyload('*'))
+                     .one())
         self.registration = self.data.registration
 
     def _process(self):
