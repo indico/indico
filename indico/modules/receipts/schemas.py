@@ -173,7 +173,7 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
     personal_data = fields.Nested(PersonalDataSchema, required=True)
     transaction = fields.Nested(TransactionSchema, required=True, allow_none=True)
 
-    def get_attribute(self, obj: t.Union[Registration, dict], attr: str, default: t.Any):
+    def get_attribute(self, obj: Registration | dict, attr: str, default: t.Any):
         # Unfortunately marshmallow has no nice way to specify that a value is coming from a method
         # on the object, so we have to hack into the attribute lookup logic for this purpose...
         if isinstance(obj, dict):
@@ -191,7 +191,7 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
 
         return super().get_attribute(obj, attr, default)
 
-    def _dump_field_data(self, registration: t.Union[Registration, dict]):
+    def _dump_field_data(self, registration: Registration | dict):
         if isinstance(registration, dict):
             # Dummy preview data loaded from YAML
             return registration['field_data']

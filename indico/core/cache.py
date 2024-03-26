@@ -58,7 +58,7 @@ class IndicoRedisCache(RedisCache):
         return [CachedNone.unwrap(val, default) for val in super().get_many(*keys)]
 
     def get_dict(self, *keys, default=None):
-        return dict(zip(keys, self.get_many(*keys, default=default)))
+        return dict(zip(keys, self.get_many(*keys, default=default), strict=True))
 
     @classmethod
     def factory(cls, app, config, args, kwargs):
@@ -101,7 +101,7 @@ class ScopedCache:
         raise NotImplementedError('Clearing scoped caches is not supported')
 
     def get_dict(self, *keys, default=None):
-        return dict(zip(keys, self.get_many(*keys, default=default)))
+        return dict(zip(keys, self.get_many(*keys, default=default), strict=True))
 
     def get_many(self, *keys, default=None):
         keys = [self._scoped(key) for key in keys]
@@ -210,7 +210,7 @@ class IndicoCache(Cache):
                 raise
             logkeys = ', '.join(map(repr, keys))
             _logger.exception('get_dict(%s) failed', logkeys)
-            return dict(zip(keys, [default] * len(keys)))
+            return dict.fromkeys(keys, default)
 
 
 def make_scoped_cache(scope):

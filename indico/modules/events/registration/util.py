@@ -90,7 +90,7 @@ def import_user_records_from_csv(fileobj, columns):
         if len(columns) != len(values):
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
                                  .format(row_num))
-        record = dict(zip(columns, values))
+        record = dict(zip(columns, values, strict=True))
 
         if not record['email']:
             raise UserValueError(_('Row {}: missing e-mail address').format(row_num))

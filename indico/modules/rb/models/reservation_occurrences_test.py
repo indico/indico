@@ -69,7 +69,7 @@ def test_date(dummy_occurrence):
 def test_create_series_for_reservation(dummy_reservation):
     occurrences = ReservationOccurrence.iter_create_occurrences(
         start=dummy_reservation.start_dt, end=dummy_reservation.end_dt, repetition=dummy_reservation.repetition)
-    for occ1, occ2 in zip(dummy_reservation.occurrences, occurrences):
+    for occ1, occ2 in zip(dummy_reservation.occurrences, occurrences, strict=True):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
         assert occ1.is_cancelled == dummy_reservation.is_cancelled
@@ -79,7 +79,7 @@ def test_create_series_for_reservation(dummy_reservation):
 
 def test_create_series(creation_params):
     for occ1, occ2 in zip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
-                          ReservationOccurrence.create_series(**creation_params)):
+                          ReservationOccurrence.create_series(**creation_params), strict=True):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
 

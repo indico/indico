@@ -67,4 +67,4 @@ class SUIColorPickerField(SelectField):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.choices = list(zip(get_sui_colors(), get_sui_colors()))
+        self.choices = list(zip(get_sui_colors(), get_sui_colors(), strict=True))

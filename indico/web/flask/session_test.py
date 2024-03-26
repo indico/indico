@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
@@ -28,7 +28,7 @@ def test_get_storage_lifetime_with_hard_expiry(app, freeze_time):
     The returned value should always be the minimum of the hard expiry and the
     app's permanent/temporary session lifetime.
     """
-    dt_now = datetime.now(timezone.utc)
+    dt_now = datetime.now(UTC)
     freeze_time(dt_now)
     session = IndicoSession()
     session.hard_expiry = dt_now + timedelta(days=2)
@@ -56,7 +56,7 @@ def test_get_storage_lifetime_with_hard_expiry(app, freeze_time):
 def test_save_session_with_hard_expiry(app):
     """Test that a session with a hard expiry sets the cookie expiry to the hard expiry."""
     session = IndicoSession()
-    expiry = datetime.now(timezone.utc) + timedelta(days=2)
+    expiry = datetime.now(UTC) + timedelta(days=2)
     session.hard_expiry = expiry
     resp_mock = Mock(spec_set=Response)
 

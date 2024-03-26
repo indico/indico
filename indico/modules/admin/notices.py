@@ -9,7 +9,6 @@ import dataclasses
 import operator
 import platform
 import re
-import typing as t
 from enum import Enum
 
 import requests
@@ -46,9 +45,9 @@ class NoticeSeverity(str, Enum):
 
 @dataclass(frozen=True)
 class SystemNoticeCriteria:
-    python_version: t.Optional[str] = None
-    postgres_version: t.Optional[str] = None
-    indico_version: t.Optional[str] = None
+    python_version: str | None = None
+    postgres_version: str | None = None
+    indico_version: str | None = None
 
 
 @dataclass(frozen=True)

@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import typing as t
 from datetime import timedelta
 from email import message
 from email.mime.base import MIMEBase
@@ -45,12 +44,12 @@ class CalendarScope(IndicoEnum):
 
 
 def generate_basic_component(
-    entity: t.Union[Event, Session, Contribution],
-    uid: t.Optional[str] = None,
-    url: t.Optional[str] = None,
-    title: t.Optional[str] = None,
-    description: t.Optional[str] = None,
-    organizer: t.Optional[tuple[str, str]] = None
+    entity: Event | Session | Contribution,
+    uid: str | None = None,
+    url: str | None = None,
+    title: str | None = None,
+    description: str | None = None,
+    organizer: tuple[str, str] | None = None
 ):
     """Generate an iCalendar component with basic common properties.
 
@@ -118,9 +117,9 @@ def generate_basic_component(
 
 def generate_event_component(
     event: Event,
-    user: t.Optional[User] = None,
-    organizer: t.Optional[tuple[str, str]] = None,
-    skip_access_check: t.Optional[bool] = False,
+    user: User | None = None,
+    organizer: tuple[str, str] | None = None,
+    skip_access_check: bool | None = False,
 ):
     """Generate an event icalendar component from an Indico event."""
     uid = f'indico-event-{event.id}@{urlsplit(config.BASE_URL).hostname}'
@@ -161,12 +160,12 @@ def generate_event_component(
 
 def event_to_ical(
     event: Event,
-    user: t.Optional[User] = None,
-    scope: t.Optional[str] = None,
+    user: User | None = None,
+    scope: str | None = None,
     *,
     skip_access_check: bool = False,
-    method: t.Optional[str] = None,
-    organizer: t.Optional[tuple[str, str]] = None
+    method: str | None = None,
+    organizer: tuple[str, str] | None = None
 ):
     """Serialize an event into an ical.
 
@@ -183,12 +182,12 @@ def event_to_ical(
 
 def events_to_ical(
     events: list[Event],
-    user: t.Optional[User] = None,
-    scope: t.Optional[str] = None,
+    user: User | None = None,
+    scope: str | None = None,
     *,
     skip_access_check: bool = False,
-    method: t.Optional[str] = None,
-    organizer: t.Optional[tuple[str, str]] = None
+    method: str | None = None,
+    organizer: tuple[str, str] | None = None
 ):
     """Serialize multiple events into an ical.
 

@@ -93,7 +93,7 @@ class SilentUndefined(Undefined):
     __html__ = _fail_with_undefined_error
 
 
-def get_all_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
+def get_all_templates(obj: Event | Category) -> set[ReceiptTemplate]:
     """Get all templates usable by an event/category."""
     category = (obj.category or Category.get_root()) if isinstance(obj, Event) else obj
     return set(ReceiptTemplate.query.filter(~ReceiptTemplate.is_deleted,
@@ -118,7 +118,7 @@ def has_any_receipts(regform: RegistrationForm) -> bool:
             .has_rows())
 
 
-def get_inherited_templates(obj: t.Union[Event, Category]) -> set[ReceiptTemplate]:
+def get_inherited_templates(obj: Event | Category) -> set[ReceiptTemplate]:
     """Get all templates inherited by a given event/category."""
     return get_all_templates(obj) - set(obj.receipt_templates)
 
@@ -267,7 +267,7 @@ def _get_default_value(field):
     return field['attributes'].get('value', '')
 
 
-def get_dummy_preview_data(custom_fields: dict, custom_fields_values: t.Optional[dict] = None) -> dict:
+def get_dummy_preview_data(custom_fields: dict, custom_fields_values: dict | None = None) -> dict:
     """Get dummy preview data for rendering a document template.
 
     Most document templates are written inthe context of a category, so it is not

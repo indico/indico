@@ -9,7 +9,7 @@ import functools
 import pickle
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import yaml
@@ -186,7 +186,7 @@ class IndicoSessionInterface(SessionInterface):
             session_lifetime = self.temporary_session_lifetime
 
         if session.hard_expiry:
-            hard_lifetime = session.hard_expiry - datetime.now(timezone.utc)
+            hard_lifetime = session.hard_expiry - datetime.now(UTC)
             if not session_lifetime:
                 # if we have `SESSION_LIFETIME = 0` ("browser session"), the `min()` logic below
                 # would not work properly because 0 generally means 'no expiry'

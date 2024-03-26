@@ -46,7 +46,7 @@ def _add_to_context_multi(namespace, info, elements, names=None, doc=None, color
         return
     if not names:
         names = [x.__name__ for x in elements]
-    for name, element in zip(names, elements):
+    for name, element in zip(names, elements, strict=True):
         namespace[name] = element
     if doc:
         info.append(cformat('+ %%{white!}{}:%%{reset} %%{%s}{}' % color).format(doc, ', '.join(names)))
@@ -68,7 +68,7 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
 
     items = [(_get_module(obj), get_name(obj), obj) for obj in objects]
     for module, mod_items in itertools.groupby(sorted(items, key=itemgetter(0, 1)), key=itemgetter(0)):
-        names, elements = list(zip(*((x[1], x[2]) for x in mod_items)))
+        names, elements = list(zip(*((x[1], x[2]) for x in mod_items), strict=True))
         _add_to_context_multi(namespace, info, elements, names, doc=module, color=color)
 
 
