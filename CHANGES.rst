@@ -119,6 +119,8 @@ Bugfixes
 - Populate fields such as first and last name from the multipass login provider (e.g. LDAP) during
   sign-up regardless of synchronization settings (:pr:`6182`)
 - Hide redundant affiliations tooltip on the Participant Roles list (:pr:`6201`)
+- Correctly highlight required "yes/no" registration form field as invalid (:issue:`6109`,
+  :pr:`6242`)
 
 Accessibility
 ^^^^^^^^^^^^^
