@@ -394,6 +394,67 @@ const rearrangeContribs = (contribs, contrib) => {
 };
 
 /**
+ * Rearranges contributions in a block in order to fit a new contribution after one of the contributions
+ * has been resized in either direction.
+ * @param {array} contribs Contributions to be rearranged
+ * @param {object} contrib Contribution to be inserted
+ * @param {object} oldContrib The old contribution that was resized
+ * @returns {array} Changes to the contributions
+ */
+const rearrangeContribsAfterResize = (contribs, contrib, oldContrib) => {
+  const contribsBefore = contribs.filter(c => c.end <= oldContrib.start);
+  const contribsAfter = contribs.filter(c => c.start >= oldContrib.end);
+
+  return [...moveUp(contribsBefore, contrib), contrib, ...moveDown(contribsAfter, contrib)];
+};
+
+/**
+ * Moves contributions that come before newContrib up in order to fit newContrib if necessary
+ * @param {array} contribsBefore Contributions to be rearranged
+ * @param {object} newContrib Contribution to be inserted
+ * @returns {array} Changes to the contributions
+ */
+function moveUp(contribsBefore, newContrib) {
+  const changes = [newContrib];
+  for (const contrib of [...contribsBefore].reverse()) {
+    if (changes.at(-1).start < contrib.end) {
+      const diff = changes.at(-1).start - contrib.end;
+      changes.push({
+        id: contrib.id,
+        start: new Date(contrib.start.getTime() + diff),
+        end: new Date(contrib.end.getTime() + diff),
+      });
+    } else {
+      changes.push(contrib);
+    }
+  }
+  return changes.slice(1).reverse();
+}
+
+/**
+ * Moves contributions that come after newContrib down in order to fit newContrib if necessary
+ * @param {array} contribsBefore Contributions to be rearranged
+ * @param {object} newContrib Contribution to be inserted
+ * @returns {array} Changes to the contributions
+ */
+function moveDown(contribsAfter, newContrib) {
+  const changes = [newContrib];
+  for (const contrib of contribsAfter) {
+    if (changes.at(-1).end > contrib.start) {
+      const diff = changes.at(-1).end - contrib.start;
+      changes.push({
+        id: contrib.id,
+        start: new Date(contrib.start.getTime() + diff),
+        end: new Date(contrib.end.getTime() + diff),
+      });
+    } else {
+      changes.push(contrib);
+    }
+  }
+  return changes.slice(1);
+}
+
+/**
  * Moves a contribution
  * @param {object} state State of the timetable
  * @param {object} args {event, start, end, resourceId} Arguments from the move event
@@ -445,17 +506,16 @@ const resizeChild = (state, args) => {
   const parent = blocks.find(b => isChildOf(child, b));
   const parentContribs = children.filter(c => c.id !== child.id && isChildOf(c, parent));
   const hasCollisions = parentContribs.some(c => isConcurrent(c, newContrib));
-  // if the resizing was done upwards and there's a collision, don't make changes
-  if (hasCollisions && start < child.start) {
-    return {};
-  }
-  // otherwise if there are collisions, try to rearange them in order to fit
-  const newContribs = hasCollisions ? rearrangeContribs(parentContribs, newContrib) : [newContrib];
+
+  // there are collisions, try to rearange them in order to fit
+  const newContribs = hasCollisions
+    ? rearrangeContribsAfterResize(parentContribs, newContrib, child)
+    : [newContrib];
+
   // if they don't fit in the block, extend the block
-  const lastContrib = newContribs[newContribs.length - 1];
-  if (lastContrib.end > parent.end) {
+  if (newContribs.at(-1).end > parent.end) {
     return layoutBlocks(
-      addNewChange(state, [...newContribs, {id: parent.id, end: lastContrib.end}])
+      addNewChange(state, [...newContribs, {id: parent.id, end: newContribs.at(-1).end}])
     );
   } else if (newContribs[0].start < parent.start) {
     return layoutBlocks(
