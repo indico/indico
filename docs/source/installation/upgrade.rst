@@ -10,6 +10,14 @@ user-facing downtime.
     When upgrading a production system it is highly recommended to
     create a database backup before starting.
 
+.. important::
+
+    If you are upgrading from Indico v3.2.x or older to v3.3 or newer, make sure to
+    fully read and udnerstand the :ref:`Upgrading from 3.x to 3.3 <upgrade-3-to-33>`
+    guide before starting with any of the upgrade steps below.
+
+.. _upgrade-3-to-3:
+
 Upgrading between 3.x versions
 ------------------------------
 
@@ -26,19 +34,29 @@ Now switch to the *indico* user and activate the virtualenv:
     su - indico
     source ~/.venv/bin/activate
 
-If you are on CentOS, update your PATH to avoid errors in case the new
+If you use Alma/Rocky, update your PATH to avoid errors in case the new
 Indico version needs to install an updated version of the PostgreSQL client
-library (psycopg2):
+library (psycopg2). If you use a different Postgres version, you need to
+adapt the command accordingly:
 
 .. code-block:: shell
 
-    export PATH="$PATH:/usr/pgsql-13/bin"
+    export PATH="$PATH:/usr/pgsql-16/bin"
+
+.. _upgrade-3-to-3-indico:
 
 You are now ready to install the latest version of Indico:
+
+.. hint::
+
+    Are you upgrading from Indico v3.2.x or older to v3.3 or newer? Then you have
+    to jump to the :ref:`Upgrading from 3.x to 3.3 <upgrade-3-to-33>` guide now!
 
 .. code-block:: shell
 
     pip install -U indico
+
+.. _upgrade-3-to-3-plugins:
 
 If you installed the official plugins, update them too:
 
@@ -86,13 +104,66 @@ Also start the Celery worker again (once again, as *root*):
     systemctl start indico-celery.service
 
 
+.. _upgrade-3-to-33:
+
+Upgrading from 3.x to 3.3
+-------------------------
+
+When updating to Indico v3.3 you need to perform some extra steps since the required Python
+version has been raised from Python 3.9 to Python 3.12.
+
+.. attention::
+
+    If you are still using **CentOS 7** (or 8), you are required to **update your operating
+    system** to version **9** - your system is not only too old, but also going end-of-life
+    in the middle of 2024. Since CentOS no longer exists in its original form, we recommend
+    using **AlmaLinux 9** or **Rocky Linux 9**. You can find guides on the internet on how
+    to do such an upgrade in-place (we never tried this!), but it is almost certainly easier
+    to just use a new VM and migrate your Indico installations to that one.
+
+    If you are using an older **Debian** (Buster or Bullseye) or **Ubuntu** (Focal) release,
+    switching to the latest one is also highly recommended - we no longer test on older releases,
+    and things may be broken. Upgrading in-place is possible, but our same advice applies here:
+    We never tried this and cannot help you with it; migrating to a new VM is almost certainly
+    the easier and safer option.
+
+    Please also read the :ref:`2.x to 3.x <upgrade-2-to-3>` guide below which explains how to
+    migrate your Indico data to a new system.
+
+The general :ref:`upgrade guide between 3.x versions <upgrade-3-to-3>` above still applies,
+you just need to perform some additional steps. Anything below assumes you are on a supported
+Linux distribution (or know exactly what you're doing).
+
+Before the :ref:`Indico upgrade step <upgrade-3-to-3-indico>` (``pip install -U indico``),
+you need to install the required Python version:
+
+.. code-block:: shell
+
+    indico setup upgrade-python --force-version 3.12
+
+Confirm both the warning about the requested version not being within the spec (which is based
+on the previous Indico version) and the warning about having to re-install packages with :kbd:`Y`.
+
+Now you just need to install the *setuptools* package and then continue with installing the
+new Indico version and updating the symlink for the static assets:
+
+.. code-block:: shell
+
+    pip install setuptools
+    pip install -U indico
+    indico setup create-symlinks ~/web/
+
+You can now resume the regular upgrade guide :ref:`right after the <upgrade-3-to-3-plugins>`
+``pip install -U indico`` step.
+
+.. _upgrade-2-to-3:
 
 Upgrading from 2.x to 3.x
 -------------------------
 
 The upgrade from 2.x to 3.x is a major change since Indico now requires
-Python 3. We also strongly recommend upgrading your database to PostgreSQL 13
-or newer.
+Python 3. We also strongly recommend upgrading your database to PostgreSQL 16
+or newer (PostgreSQL 13 is the minimum required version we still test with).
 
 .. note::
 
@@ -110,10 +181,10 @@ Linux distribution.
 
 .. note::
 
-    If you are using CentOS, staying with CentOS 7 is recommended as CentOS 8
-    actually has a much earlier end-of-life date (end of 2021) than CentOS 7
-    (mid 2024), and running Indico with Apache on CentOS 8 is currently not
-    supported.
+    In case you are using CentOS 7, please note that CentOS 7 is soon reaching its
+    end-of-life date (mid 2024), and Indico v3.3 is no longer compatible with this
+    very old distribution. Please use Alma/Rocky 9, or the latest Debian/Ubuntu LTS
+    release instead.
 
 When following the :ref:`production installation guide <install-prod>`, there
 are a few places where you need to do something differently:
