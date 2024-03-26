@@ -1,5 +1,5 @@
-AlmaLinux / RockyLinux 9
-========================
+AlmaLinux / RockyLinux
+======================
 
 .. include:: _intro.rst
 
