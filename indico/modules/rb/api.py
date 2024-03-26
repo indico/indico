@@ -259,17 +259,17 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
         yield result['reservation'].room_id, _serializable_reservation(result, include_rooms)
 
 
-def _serializable_room(room_data, reservations=None):
-    """Serializable room data.
+def _serializable_room(room, reservations=None):
+    """Serializable room.
 
-    :param room_data: Room data
+    :param room: Room
     :param reservations: MultiDict mapping for room id => reservations
     """
     from indico.modules.rb.schemas import RoomLegacyAPISchema
-    data = RoomLegacyAPISchema().dump(room_data['room'])
+    data = RoomLegacyAPISchema().dump(room)
     data['_type'] = 'Room'
     if reservations is not None:
-        data['reservations'] = reservations.getlist(room_data['room'].id)
+        data['reservations'] = reservations.getlist(room.id)
     return data
 
 
