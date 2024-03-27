@@ -122,8 +122,8 @@ class CalendarListView extends React.Component {
       const {reservation} = booking;
       const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
       const datesMatch =
-        moment(booking.startDt).isBetween(...boundaries) &&
-        moment(booking.endDt).isBetween(...boundaries);
+        moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
+        moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
       const linkBtn = (
         <Button
           icon={<Icon name="linkify" />}
