@@ -181,13 +181,13 @@ function EditableListDisplay({
           },
           {
             value: 'needs_submitter_changes',
-            text: Translate.string('Needs submitter changes'),
+            text: Translate.string('Needs submitter changes', 'Editable'),
             exclusive: true,
             color: 'red',
           },
           {
             value: 'needs_submitter_confirmation',
-            text: Translate.string('Needs submitter confirmation'),
+            text: Translate.string('Needs submitter confirmation', 'Editable'),
             exclusive: true,
             color: 'yellow',
           },
