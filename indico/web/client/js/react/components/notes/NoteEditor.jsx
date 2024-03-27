@@ -135,7 +135,6 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       const resolution = await injectModal(resolve => (
         <ConflictModal noteData={e.response.data} onClose={action => resolve(action)} />
       ));
-      console.log(resolution);
       if (resolution === 'overwrite') {
         return await handleSubmit({
           source: currentValue,
