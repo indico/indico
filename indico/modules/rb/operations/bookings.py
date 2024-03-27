@@ -425,7 +425,7 @@ def split_booking(booking, new_booking_data, extra_fields: dict):
             'recurrence_weekdays': booking.recurrence_weekdays,
         }
 
-        # Set extra_fields to None to avoid modifying the old bookings
+        # Set extra_fields to None to avoid modifying the old booking
         booking.modify(old_booking_data, session.user, extra_fields=None)
 
     for occurrence_to_cancel in occurrences_to_cancel:
@@ -434,7 +434,7 @@ def split_booking(booking, new_booking_data, extra_fields: dict):
     prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
     resv = Reservation.create_from_data(
         room,
-        dict(new_booking_data, start_dt=new_start_dt, extra_fields=extra_fields),
+        new_booking_data | {'start_dt': new_start_dt, 'extra_fields': extra_fields},
         session.user,
         prebook=prebook,
         ignore_admin=True,

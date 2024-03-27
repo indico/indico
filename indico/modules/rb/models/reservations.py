@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import typing as t
 from collections import defaultdict
 from datetime import datetime
 
@@ -550,7 +549,7 @@ class Reservation(db.Model):
     def is_owned_by(self, user):
         return self.created_by_user == user
 
-    def modify(self, data, user, extra_fields: t.Optional[dict]):
+    def modify(self, data, user, extra_fields: dict | None):
         """Modify an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`CreateBookingSchema` instance
