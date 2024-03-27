@@ -23,8 +23,8 @@ Since only the latest Linux distributions include Python 3.12 in their package m
     met. There's a good chance that you need to install some additional system packages beyond those listed below, and using
     this tool will tell you what exactly you need.
 
-CentOS/Fedora
-+++++++++++++
+RPM-based distributions (Alma, Rocky, Fedora)
++++++++++++++++++++++++++++++++++++++++++++++
 
 .. code-block:: shell
 
