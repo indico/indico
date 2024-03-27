@@ -7,7 +7,7 @@
 
 from collections import namedtuple
 from io import BytesIO
-from operator import attrgetter, itemgetter
+from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
@@ -896,7 +896,12 @@ class RHUserSearch(RHProtected):
     def _process(self, exact, external, favorites_first, **criteria):
         matches = search_users(exact=exact, include_pending=True, external=external, **criteria)
         self.externals = {}
-        results = sorted((self._serialize_entry(entry) for entry in matches), key=itemgetter('full_name', 'email'))
+
+        def _sort_key(entry):
+            exact_match_keys = [entry[k].lower() != v.lower() for k, v in criteria.items()] if not exact else []
+            return *exact_match_keys, entry['full_name'], entry['email']
+
+        results = sorted((self._serialize_entry(entry) for entry in matches), key=_sort_key)
         if favorites_first:
             favorites = {u.id for u in session.user.favorite_users}
             results.sort(key=lambda x: x['id'] not in favorites)
