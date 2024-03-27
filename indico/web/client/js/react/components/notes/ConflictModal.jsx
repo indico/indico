@@ -73,14 +73,13 @@ export function ConflictModal({noteData, onClose}) {
             </Message.Header>
             <p>
               <Translate>
-                These minutes were last modified{' '}
+                Last modified:{' '}
                 <Param
-                  name="last_modified_dt"
+                  name="relative_time"
                   value={renderLastModifiedDt(note.conflict.createdDt)}
                   wrapper={<strong />}
                 />{' '}
-                by{' '}
-                <Param name="note_author" value={note.conflict.noteAuthor} wrapper={<strong />} />
+                by <Param name="author" value={note.conflict.noteAuthor} wrapper={<strong />} />
                 {'. '}You can either:
               </Translate>
             </p>
