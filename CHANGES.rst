@@ -121,6 +121,7 @@ Bugfixes
 - Hide redundant affiliations tooltip on the Participant Roles list (:pr:`6201`)
 - Correctly highlight required "yes/no" registration form field as invalid (:issue:`6109`,
   :pr:`6242`)
+- Include comments in the Paper Peer Reviewing JSON export (:pr:`6253`)
 
 Accessibility
 ^^^^^^^^^^^^^
