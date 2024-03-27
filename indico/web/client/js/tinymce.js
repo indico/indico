@@ -174,6 +174,8 @@ export const getConfig = (
         .filter(x => x)
         .join(' '),
   entity_encoding: 'raw',
+  convert_unsafe_embeds: true,
+  sandbox_iframes: true,
   relative_urls: false, // kind of misleading: this just ensures domain-relative URLs
   remove_script_host: !forceAbsoluteURLs, // this ensures fully absolute (`https://....`) URLs
   end_container_on_empty_block: true,
