@@ -32,6 +32,7 @@ import './ConflictModal.module.scss';
 export function ConflictModal({noteData, onClose}) {
   // camelize the noteData keys
   const note = camelizeKeys(noteData);
+  console.log(note);
 
   const renderDeletedRevision = () => {
     return (
@@ -181,8 +182,6 @@ export function ConflictModal({noteData, onClose}) {
     </Modal>
   );
 }
-
-export default ConflictModal;
 
 ConflictModal.propTypes = {
   noteData: PropTypes.object.isRequired,
