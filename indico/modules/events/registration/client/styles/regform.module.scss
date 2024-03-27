@@ -208,6 +208,18 @@
         }
       }
 
+      .timetablesessions-field {
+        display: flex;
+        flex-direction: column;
+
+        dd {
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          padding: 0.35rem;
+        }
+      }
+
       .country-dropdown {
         max-width: 500px;
       }

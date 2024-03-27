@@ -1034,6 +1034,16 @@ class RegistrantToPDF(PDFBase):
             elif item.input_type == 'multi_choice' and item.id in data:
                 multi_choice_data = ', '.join(data[item.id].friendly_data)
                 _print_row(item.title, multi_choice_data)
+            elif item.input_type == 'sessions':
+                value = data[item.id].friendly_data if item.id in data else ''
+                if value == '':
+                    _print_row(item.title, value)
+                else:
+                    session_blocks = ''
+                    for k, v in value.items():
+                        session_block = ', '.join(x.full_title for x in v)
+                        session_blocks = session_blocks + f'{k}: {session_block}'
+                    _print_row(item.title, session_blocks)
             elif item.is_section:
                 _print_section(item.title)
             elif item.personal_data_type in (PersonalDataType.title, PersonalDataType.first_name,
