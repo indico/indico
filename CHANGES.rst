@@ -139,6 +139,7 @@ Improvements
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
+- Avoid conflicts with concurrent edit of minutes (:issue:`3410`, :pr:`6193`)
 
 Bugfixes
 ^^^^^^^^
