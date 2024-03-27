@@ -43,7 +43,7 @@ Postgres extensions (which can only be done by the Postgres superuser)
     su - postgres -c 'createdb -O indico indico'
     su - postgres -c 'psql indico -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"'
 
-.. warning::
+.. important::
 
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
