@@ -425,7 +425,8 @@ def split_booking(booking, new_booking_data, extra_fields: dict):
             'recurrence_weekdays': booking.recurrence_weekdays,
         }
 
-        booking.modify(old_booking_data, session.user, extra_fields=extra_fields)
+        # Set extra_fields to None to avoid modifying the old bookings
+        booking.modify(old_booking_data, session.user, extra_fields=None)
 
     for occurrence_to_cancel in occurrences_to_cancel:
         occurrence_to_cancel.cancel(session.user, silent=True)
