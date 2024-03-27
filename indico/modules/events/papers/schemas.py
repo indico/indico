@@ -173,14 +173,6 @@ class PaperReviewDumpSchema(PaperReviewSchema):
         exclude = [f for f in PaperReviewSchema.Meta.fields if f.startswith('can_')]
 
 
-class PaperRevisionDumpSchema(PaperRevisionSchema):
-    class Meta(PaperRevisionSchema.Meta):
-        fields = (*PaperRevisionSchema.Meta.fields, 'reviews')
-        exclude = ('reviewer_data',)
-
-    reviews = List(Nested(PaperReviewDumpSchema))
-
-
 class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
     user = Nested(UserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
@@ -193,6 +185,20 @@ class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
         model = PaperReviewComment
         fields = ('id', 'user', 'text', 'html', 'visibility', 'created_dt', 'modified_dt', 'modified_by', 'can_edit',
                   'can_view')
+
+
+class PaperReviewCommentDumpSchema(PaperReviewCommentSchema):
+    class Meta(PaperReviewCommentSchema.Meta):
+        exclude = ('can_edit', 'can_view')
+
+
+class PaperRevisionDumpSchema(PaperRevisionSchema):
+    class Meta(PaperRevisionSchema.Meta):
+        fields = (*PaperRevisionSchema.Meta.fields, 'reviews', 'comments')
+        exclude = ('reviewer_data',)
+
+    reviews = List(Nested(PaperReviewDumpSchema))
+    comments = List(Nested(PaperReviewCommentDumpSchema))
 
 
 class PaperSchema(mm.Schema):
