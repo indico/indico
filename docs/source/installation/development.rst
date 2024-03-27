@@ -30,7 +30,7 @@ RPM-based distributions (Alma, Rocky, Fedora)
 
     dnf install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
         libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
-        postgresql postgresql-server postgresql-contrib libpq-devel
+        postgresql postgresql-server postgresql-contrib libpq-devel pango
     systemctl start redis.service postgresql.service
 
 
@@ -40,7 +40,7 @@ Debian/Ubuntu
 .. code-block:: shell
 
     apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
-        libyaml-dev build-essential redis-server postgresql libpq-dev
+        libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
 
 Then on Debian::
 
@@ -56,7 +56,7 @@ macOS
 
 We recommend that you use `Homebrew <https://brew.sh/>`_::
 
-    brew install redis libjpeg libffi pcre libyaml postgresql
+    brew install redis libjpeg libffi pcre libyaml postgresql pango
     brew services start postgresql
     brew services start redis
 
