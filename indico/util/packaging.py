@@ -5,9 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import os
 import sys
 from importlib.util import find_spec
+from pathlib import Path
 
 import pkg_resources
 
@@ -17,8 +17,9 @@ def package_is_editable(package):
     # based on pip.dist_is_editable
     dist = pkg_resources.get_distribution(package)
     for path_item in sys.path:
-        egg_link = os.path.join(path_item, dist.project_name + '.egg-link')
-        if os.path.isfile(egg_link):
+        if (Path(path_item) / f'{dist.project_name}.egg-link').is_file():
+            return True
+        if any(Path(path_item).glob(f'__editable__.{dist.project_name}-*.pth')):
             return True
     return False
 
