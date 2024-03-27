@@ -6,6 +6,9 @@ build:
     python: '3.12'
     nodejs: '20'
   jobs:
+    pre_install:
+      # RTD python versions are usually behind a bit...
+      - sed -i -E "/^python_requires = /d" setup.cfg
     post_install:
       - npm install -g @mermaid-js/mermaid-cli
 
