@@ -32,14 +32,14 @@ Major Features
   identifiers associated with a user will be removed from Indico, whilst only
   keeping the data that is required for Indico to function properly, in an
   anonymized manner. This operation can only be performed by Indico system
-  administrators through the indico command-line interface.
+  administrators through the ``indico`` command-line interface.
 - Administrators now have the option to require users to accept the Terms of Use
   during signup and after the terms have been updated.
 - Event managers can require participants to accept the event's Privacy Policy
   when registering.
 - Event tickets can now be added to Google Wallet using the new experimental Google
-  Wallet integration. You can enable this feature using the
-  :data:`ENABLE_GOOGLE_WALLET` ``indico.conf`` setting.
+  Wallet integration. You can enable this feature using the :data:`ENABLE_GOOGLE_WALLET`
+  config setting and then configure it on the category level.
 - The category calendar view has been improved with new week/day views and new
   filtering options for category, venue, room or keywords.
 - Managers can now change the registration fee for selected registrations in
