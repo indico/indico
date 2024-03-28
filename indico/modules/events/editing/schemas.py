@@ -246,11 +246,15 @@ class EditableDumpSchema(EditableSchema):
 class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count')
+        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count', 'submitter_acceptance')
 
     state = EnumField(EditableState)
     editor = fields.Nested(EditingUserSchema)
     timeline_url = fields.String()
+    submitter_acceptance = fields.Method('_get_submitter_acceptance')
+
+    def _get_submitter_acceptance(self, editable):
+        return editable.latest_revision.type == RevisionType.changes_acceptance
 
 
 class EditableWithTagsSchema(EditableBasicSchema):
