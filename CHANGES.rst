@@ -160,6 +160,8 @@ Bugfixes
 - Correctly highlight required "yes/no" registration form field as invalid (:issue:`6109`,
   :pr:`6242`)
 - Include comments in the Paper Peer Reviewing JSON export (:pr:`6253`)
+- Fail with a nicer error message when trying to upload a non-UTF8 CSV file (:issue:`6085`,
+  :pr:`6259`)
 
 Accessibility
 ^^^^^^^^^^^^^
