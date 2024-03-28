@@ -124,7 +124,7 @@ class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
         template.log(template.log_realm, LogKind.positive, 'Templates',
                      f'Document template "{template.title}" created',
                      user=session.user, data={'HTML': html, 'CSS': css, 'YAML': yaml})
-        return jsonify(ReceiptTemplateDBSchema().dump(template))
+        return ReceiptTemplateDBSchema().jsonify(template)
 
 
 class RHDeleteTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
@@ -228,22 +228,27 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
         db.session.flush()
         new_tpl.log(new_tpl.log_realm, LogKind.positive, 'Templates', f'Document template "{new_tpl.title}" created',
                     user=session.user, data={'Cloned from': self.template.title})
-        return jsonify(ReceiptTemplateDBSchema().dump(new_tpl))
+        return ReceiptTemplateDBSchema().jsonify(new_tpl)
 
 
 class RHGetDefaultTemplate(RHProtected):
     """Get a template from a default template."""
 
+    def _check_access(self):
+        RHProtected._check_access(self)
+        if not can_user_manage_receipt_templates(session.user):
+            raise Forbidden
+
     def _process(self):
         name = request.view_args['template_name']
         metadata_file = next((f for f in DEFAULT_TEMPLATES_DIR.glob('*.yaml') if f.stem == name), None)
         if metadata_file is None:
-            raise NotFound('Temnplate does not exist')
+            raise NotFound('Template does not exist')
         tpl_data = yaml.safe_load(metadata_file.read_text())
         tpl_data['title'] = f'{tpl_data["title"]} (v{tpl_data["version"]})'
         del tpl_data['version']
-        template_dir = next(f for f in DEFAULT_TEMPLATES_DIR.iterdir() if f.is_dir() and f.name == name)
+        template_dir = DEFAULT_TEMPLATES_DIR / metadata_file.stem
         tpl_data['html'] = (template_dir / 'template.html').read_text()
         tpl_data['css'] = (template_dir / 'theme.css').read_text()
         tpl_data['yaml'] = (template_dir / 'metadata.yaml').read_text()
-        return jsonify(ReceiptTemplateAPISchema().dump(tpl_data))
+        return ReceiptTemplateAPISchema().jsonify(tpl_data)

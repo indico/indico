@@ -24,17 +24,17 @@ custom_fields:
     attributes:
       label: Receipt number
 
-  - name: add_logo
-    type: checkbox
+  - name: logo
+    type: image
     attributes:
-      label: Add logo?
+      label: Logo
 
   - name: add_url
     type: checkbox
     attributes:
-      label: Add event URL?
+      label: Add event URL
 
   - name: add_affiliation
     type: checkbox
     attributes:
-      label: Add registrant affiliation?
+      label: Add registrant affiliation

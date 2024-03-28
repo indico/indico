@@ -1,6 +1,5 @@
 {% set personal_data = registration.personal_data %}
 {% set txn = registration.transaction %}
-{% set card_fee = none %}
 
 <h1>Receipt</h1>
 
@@ -30,8 +29,8 @@
   </div>
 
   <!-- Logo -->
-  {% if custom_fields.add_logo %}
-    <img src="event://logo">
+  {% if custom_fields.logo %}
+    <img src="{{ custom_fields.logo }}">
   {% endif %}
 </aside>
 
@@ -94,15 +93,9 @@
       </tr>
     {% endfor %}
     <tr class="total">
-        <td><strong>{% if card_fee %}Subtotal{% else %}Total{% endif %}</strong></td>
+        <td><strong>Total</strong></td>
         <td>{{ registration.total_price|format_currency(registration.currency) }}</td>
     </tr>
-    {% if card_fee and card_fee.price %}
-      <tr>
-        <td>Payment method fee ({{ card_fee.brand }})</td>
-        <td>{{ card_fee.formatted_price }}</td>
-      </tr>
-    {% endif %}
     {% if txn and txn.status == 'successful' and txn.provider != '_manual' %}
       <tr class="total">
         <td><strong>Total paid</strong></td>

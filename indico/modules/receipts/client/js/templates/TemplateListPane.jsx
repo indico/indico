@@ -195,6 +195,11 @@ export default function TemplateListPane({
             direction="left"
           >
             <Dropdown.Menu>
+              <Dropdown.Item
+                as={Link}
+                to={addTemplatePageURL(targetLocator)}
+                text={Translate.string('Blank template')}
+              />
               {_.sortBy(Object.entries(defaultTemplates), ([, t]) => t.title).map(
                 ([name, {title, version}]) => (
                   <Dropdown.Item
@@ -205,11 +210,6 @@ export default function TemplateListPane({
                   />
                 )
               )}
-              <Dropdown.Item
-                as={Link}
-                to={addTemplatePageURL(targetLocator)}
-                text={Translate.string('Blank template')}
-              />
             </Dropdown.Menu>
           </Dropdown>
         </div>

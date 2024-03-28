@@ -6,6 +6,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import sys
 from pathlib import Path
 
 import click
@@ -17,7 +18,9 @@ from indico.web.flask.app import make_app
 def _main(name, template_id, target):
     from indico.modules.receipts.models.templates import ReceiptTemplate
     from indico.modules.receipts.schemas import ReceiptTemplateDBSchema
-    template = ReceiptTemplate.get(template_id)
+    if not (template := ReceiptTemplate.get(template_id)):
+        click.secho('This template does not exist', fg='red')
+        sys.exit(1)
     data = ReceiptTemplateDBSchema(only=('title', 'default_filename')).dump(template)
 
     metadata_file = target / f'{name}.yaml'
@@ -38,11 +41,11 @@ def _main(name, template_id, target):
 @click.command()
 @click.argument('name')
 @click.argument('template_id', type=int)
-@click.option('-t', '--target', type=click.Path(), default='indico/modules/receipts/default_templates',
+@click.option('-t', '--target', type=click.Path(path_type=Path), default='indico/modules/receipts/default_templates',
               help='Output directory for the template files')
 def main(name, template_id, target):
     with make_app().app_context():
-        _main(name, template_id, Path(target))
+        _main(name, template_id, target)
 
 
 if __name__ == '__main__':

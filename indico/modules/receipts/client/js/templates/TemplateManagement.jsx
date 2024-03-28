@@ -145,7 +145,7 @@ NewTemplatePane.defaultProps = {
   defaultTemplate: '',
 };
 
-export default function ReceiptTemplateManagement({initialState, defaultTemplates, targetLocator}) {
+export default function TemplateManagement({initialState, defaultTemplates, targetLocator}) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const targetIdParams = Object.keys(targetLocator);
 
@@ -214,7 +214,7 @@ export default function ReceiptTemplateManagement({initialState, defaultTemplate
   );
 }
 
-ReceiptTemplateManagement.propTypes = {
+TemplateManagement.propTypes = {
   initialState: PropTypes.shape({
     ownTemplates: PropTypes.arrayOf(templateSchema),
     inheritedTemplates: PropTypes.arrayOf(templateSchema),

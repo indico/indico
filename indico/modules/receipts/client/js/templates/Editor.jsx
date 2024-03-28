@@ -98,6 +98,7 @@ export default function Editor({
               name="title"
               label={Translate.string('Title')}
               type="text"
+              disabled={loading}
               required
               rows={24}
             />
@@ -108,6 +109,7 @@ export default function Editor({
               componentLabel="-{n}.pdf"
               labelPosition="right"
               format={formatters.slugify}
+              disabled={loading}
               formatOnBlur
             />
           </Form.Group>

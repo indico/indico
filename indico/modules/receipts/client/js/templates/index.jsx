@@ -8,7 +8,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Router from './TemplateManagement';
+import TemplateManagement from './TemplateManagement';
 
 window.setupReceiptTemplateList = function(
   elem,
@@ -19,7 +19,7 @@ window.setupReceiptTemplateList = function(
 ) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-      <Router
+      <TemplateManagement
         initialState={{ownTemplates, inheritedTemplates}}
         defaultTemplates={defaultTemplates}
         targetLocator={targetLocator}
