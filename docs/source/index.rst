@@ -79,6 +79,17 @@ HTTP API
     HTTP API <http-api/index.rst>
 
 
+Translating Indico
+++++++++++++++++++
+
+.. include:: translations/_intro.rst
+
+.. toctree::
+    :maxdepth: 2
+
+    translations/index.rst
+
+
 API reference
 +++++++++++++
 
