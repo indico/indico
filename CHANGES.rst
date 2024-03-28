@@ -23,8 +23,9 @@ Major Features
   (Progressive Web App). Please note that the old Check-in app has been
   deprecated and is not compatible with the new version of Indico. The new app
   can be found `here <https://checkin.getindico.io/>`_.
-- Badges and tickets can now be generated individually for each accompanying
-  person of a registrant.
+- A new badge/ticket setting has been added which, when enabled, makes it
+  possible to print badges and/or tickets for accompanying persons in addition
+  to the main registrant.
 - Users can now export all their data stored in Indico. This includes personal
   data and any data they are linked to such as registrations, minutes and files
   uploaded to Indico.
