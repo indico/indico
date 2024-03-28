@@ -12,6 +12,7 @@ from pathlib import Path
 import click
 import yaml
 
+from indico.util.string import normalize_linebreaks
 from indico.web.flask.app import make_app
 
 
@@ -32,10 +33,10 @@ def _main(name, template_id, target):
     template_path = target / name
     template_path.mkdir(parents=True, exist_ok=True)
 
-    metadata_file.write_text(yaml.dump(data))
-    (template_path / 'template.html').write_text(template.html)
-    (template_path / 'theme.css').write_text(template.css)
-    (template_path / 'metadata.yaml').write_text(template.yaml)
+    metadata_file.write_text(normalize_linebreaks(yaml.dump(data)))
+    (template_path / 'template.html').write_text(normalize_linebreaks(template.html))
+    (template_path / 'theme.css').write_text(normalize_linebreaks(template.css))
+    (template_path / 'metadata.yaml').write_text(normalize_linebreaks(template.yaml))
 
 
 @click.command()

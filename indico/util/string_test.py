@@ -13,8 +13,9 @@ import pytest
 
 from indico.util.string import (AutoLinkExtension, HTMLLinker, camelize, camelize_keys, crc32, format_email_with_name,
                                 format_repr, has_relative_links, html_to_plaintext, make_unique_token,
-                                normalize_phone_number, render_markdown, sanitize_email, sanitize_for_platypus,
-                                sanitize_html, seems_html, slugify, snakify, snakify_keys, strip_tags, text_to_repr)
+                                normalize_linebreaks, normalize_phone_number, render_markdown, sanitize_email,
+                                sanitize_for_platypus, sanitize_html, seems_html, slugify, snakify, snakify_keys,
+                                strip_tags, text_to_repr)
 
 
 def test_seems_html():
@@ -328,3 +329,14 @@ def test_html_linker(input, output):
 ))
 def test_markdown_linker(input, output):
     assert render_markdown(input, extensions=('nl2br', AutoLinkExtension(LINKER_RULES))) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('hello world', 'hello world'),
+    ('hello\nworld', 'hello\nworld'),
+    ('hello\r\nworld', 'hello\nworld'),
+    ('hello\rworld', 'hello\nworld'),
+    ('hello\n\nworld', 'hello\n\nworld'),
+))
+def test_normalize_linebreaks(input, output):
+    assert normalize_linebreaks(input) == output
