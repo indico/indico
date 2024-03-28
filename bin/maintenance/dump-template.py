@@ -21,7 +21,7 @@ def _normalize(string):
     return normalize_linebreaks(string).rstrip('\n') + '\n'
 
 
-def _main(name, template_id, target):
+def _main(name, template_id, keep_version, target):
     from indico.modules.receipts.models.templates import ReceiptTemplate
     from indico.modules.receipts.schemas import ReceiptTemplateDBSchema
     if not (template := ReceiptTemplate.get(template_id)):
@@ -32,9 +32,11 @@ def _main(name, template_id, target):
     metadata_file = target / f'{name}.yaml'
     if metadata_file.exists():
         existing_data = yaml.safe_load(metadata_file.read_text())
-        existing_version = existing_data.get('version', 0)
-        data['version'] = existing_version + 1
-        data['title'] = re.sub(rf' \(v{existing_version}\)$', '', data['title'])
+        version = existing_data.get('version', 0)
+        data['title'] = re.sub(rf' \(v{version}\)$', '', data['title'])
+        if not keep_version:
+            version += 1
+        data['version'] = version
     else:
         data['version'] = 1
     template_path = target / name
@@ -49,11 +51,12 @@ def _main(name, template_id, target):
 @click.command()
 @click.argument('name')
 @click.argument('template_id', type=int)
+@click.option('-k', '--keep-version', is_flag=True, help='Do not bump the template version')
 @click.option('-t', '--target', type=click.Path(path_type=Path), default='indico/modules/receipts/default_templates',
               help='Output directory for the template files')
-def main(name, template_id, target):
+def main(name, template_id, keep_version, target):
     with make_app().app_context():
-        _main(name, template_id, target)
+        _main(name, template_id, keep_version, target)
 
 
 if __name__ == '__main__':
