@@ -344,9 +344,11 @@ class BookingEdit extends React.Component {
       room_id: roomId,
       user,
       reason: reason || undefined,
-      extra_fields: extraFields,
       internal_note: internalNote,
     };
+    if (extraFields !== null) {
+      params.extra_fields = extraFields;
+    }
     if (isAdminOverrideEnabled) {
       params.admin_override_enabled = true;
     }
