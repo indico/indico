@@ -23,7 +23,7 @@ Major Features
   (Progressive Web App). Please note that the old Check-in app has been
   deprecated and is not compatible with the new version of Indico.
 - Badges and tickets can now be generated individually for each accompanying
-  person.
+  person of a registrant.
 - Users can now export all their data stored in Indico. This includes personal
   data and any data they are linked to such as registrations, minutes and files
   uploaded to Indico.
@@ -36,11 +36,11 @@ Major Features
   during signup and after the terms have been updated.
 - Event managers can require participants to accept the event's Privacy Policy
   when registering.
-- Events can now be added to Google Wallet using the new experimental Google
+- Event tickets can now be added to Google Wallet using the new experimental Google
   Wallet integration. You can enable this feature using the
   :data:`ENABLE_GOOGLE_WALLET` ``indico.conf`` setting.
-- Improved category calendar with week/day views and new filtering options for
-  category, venue, room or keywords.
+- The category calendar view has been improved with new week/day views and new
+  filtering options for category, venue, room or keywords.
 - Managers can now change the registration fee for selected registrations in
   bulk.
 - Lots of new accessibility improvements, including improved keyboard navigation,
