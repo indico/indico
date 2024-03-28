@@ -27,6 +27,11 @@ Major Features
 - Users can now export all their data stored in Indico. This includes personal
   data and any data they are linked to such as registrations, minutes and files
   uploaded to Indico.
+- Users can now be anonymized in Indico; this means that all personal
+  identifiers associated with a user will be removed from Indico, whilst only
+  keeping the data that is required for Indico to function properly, in an
+  anonymized manner. This operation can only be performed by Indico system
+  administrators through the indico command-line interface.
 - Administrators now have the option to require users to accept the Terms of Use
   during signup and after the terms have been updated.
 - Events can now be added to Google Wallet using the new experimental Google
