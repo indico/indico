@@ -112,7 +112,7 @@ export function ConflictModal({noteData, onClose}) {
           </Message.Content>
         </Message>
 
-        <Grid divided="vertically" celled="internally">
+        <Grid celled="internally">
           <GridRow columns={2}>
             <GridColumn>
               <Header
@@ -130,7 +130,7 @@ export function ConflictModal({noteData, onClose}) {
                 </CardContent>
               </Card>
             </GridColumn>
-            <GridColumn>
+            <GridColumn styleName="column-divider">
               <Header
                 as="h3"
                 content={Translate.string('Changes made by someone else')}

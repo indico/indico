@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .conflict-content {
   height: 50vh;
   max-height: 50vh;
@@ -15,8 +17,12 @@
   height: 52.5vh;
 }
 
+.column-divider {
+  box-shadow: none !important;
+  border-left: 1px solid $raincloud-gray;
+}
+
 .last-modified-text {
-  color: inherit;
   border-bottom: 1px dotted;
 }
 
