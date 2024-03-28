@@ -1,5 +1,5 @@
-CentOS / CC7
-============
+AlmaLinux / RockyLinux
+======================
 
 .. include:: _intro.rst
 

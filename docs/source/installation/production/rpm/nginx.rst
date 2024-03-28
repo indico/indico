@@ -3,48 +3,41 @@ nginx
 
 .. include:: ../_sso_note.rst
 
-1. Install Packages
+1. Enable EPEL
+--------------
+
+.. code-block:: shell
+
+    dnf install -y epel-release
+    dnf config-manager --set-enabled crb
+
+
+2. Install Packages
 -------------------
 
-PostgreSQL and nginx are installed from their upstream repos to get
-much more recent versions.
+Run these commands to use the upstream Postgres package repository:
 
 .. code-block:: shell
 
-    apt install -y lsb-release wget curl gnupg
-    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-    echo "deb http://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-    wget --quiet -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
-    apt update
-    apt install -y --install-recommends postgresql-13 libpq-dev nginx libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server
+    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    dnf -qy module disable postgresql
 
-
-If you use Debian, run this command:
+Now install all the required packages:
 
 .. code-block:: shell
 
-    apt install -y libjpeg62-turbo-dev
+    dnf install -y postgresql16 postgresql16-server postgresql16-libs postgresql16-devel postgresql16-contrib
+    dnf install -y git gcc make redis nginx
+    dnf install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel tar pango
+    /usr/pgsql-16/bin/postgresql-16-setup initdb
+    systemctl start postgresql-16.service redis.service
 
 
-If you use Ubuntu, run this instead:
-
-.. code-block:: shell
-
-    apt install -y libjpeg-turbo8-dev zlib1g-dev
-
-Afterwards, make sure the services you just installed are running:
-
-.. code-block:: shell
-
-    systemctl start postgresql.service redis-server.service
-
-
-2. Create a Database
+3. Create a Database
 --------------------
 
-Let's create a user and database for indico and enable the necessary Postgres
-extensions (which can only be done by the Postgres superuser).
+We create a user and database for indico and enable the necessary
+Postgres extensions (which can only be done by the Postgres superuser)
 
 .. code-block:: shell
 
@@ -52,13 +45,13 @@ extensions (which can only be done by the Postgres superuser).
     su - postgres -c 'createdb -O indico indico'
     su - postgres -c 'psql indico -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"'
 
-.. warning::
+.. important::
 
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
 
-3. Configure uWSGI & nginx
+4. Configure uWSGI & nginx
 --------------------------
 
 The default uWSGI and nginx configuration files should work fine in
@@ -75,7 +68,6 @@ most cases.
     processes = 4
     enable-threads = true
     chmod-socket = 770
-    chown-socket = indico:nginx
     socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
@@ -127,7 +119,6 @@ We also need a systemd unit to start uWSGI.
     [Install]
     WantedBy=multi-user.target
     EOF
-
 
 .. note::
 
@@ -203,7 +194,7 @@ We also need a systemd unit to start uWSGI.
     EOF
 
 
-4. Create a TLS Certificate
+5. Create a TLS Certificate
 ---------------------------
 
 First, create the folders for the certificate/key and set restrictive
@@ -260,7 +251,42 @@ commercial certification authority or get a free one from
     nginx from starting.
 
 
-5. Install Indico
+6. Configure SELinux
+--------------------
+
+Indico works fine with SELinux enabled, but you need to load a custom
+SELinux module to tell SELinux about Indico's files and how they
+should be handled.
+
+.. code-block:: shell
+
+    cat > /tmp/indico.cil <<'EOF'
+    ; define custom type that logrotate can access
+    (type indico_log_t)
+    (typeattributeset file_type (indico_log_t))
+    (typeattributeset logfile (indico_log_t))
+    (roletype object_r indico_log_t)
+
+    ; allow logrotate to reload systemd services
+    (allow logrotate_t init_t (service (start)))
+    (allow logrotate_t policykit_t (dbus (send_msg)))
+    (allow policykit_t logrotate_t (dbus (send_msg)))
+
+    ; make sure the uwsgi socket is writable by the webserver
+    (typetransition unconfined_service_t usr_t sock_file "uwsgi.sock" httpd_sys_rw_content_t)
+    (filecon "/opt/indico/web/uwsgi\.sock" socket (system_u object_r httpd_sys_rw_content_t ((s0)(s0))))
+
+    ; let nginx connect to uwsgi
+    (allow httpd_t unconfined_service_t (unix_stream_socket (connectto)))
+
+    ; set proper types for our log dirs
+    (filecon "/opt/indico/log(/.*)?" any (system_u object_r indico_log_t ((s0)(s0))))
+    (filecon "/opt/indico/log/nginx(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
+    EOF
+    semodule -i /tmp/indico.cil
+
+
+7. Install Indico
 -----------------
 
 Celery runs as a background daemon. Add a systemd unit file for it:
@@ -313,15 +339,12 @@ Python features.
 
     source ~/.bashrc
 
-You are now ready to install Python 3.9:
-
-Run ``pyenv install --list | egrep '^\s*3\.9\.'`` to check for the latest available version and
-then install it and set it as the active Python version (replace ``x`` in both lines).
+You are now ready to install Python 3.12:
 
 .. code-block:: shell
 
-    pyenv install 3.9.x
-    pyenv global 3.9.x
+    pyenv install 3.12
+    pyenv global 3.12
 
 This may take a while since pyenv needs to compile the specified Python version. Once done, you
 may want to use ``python -V`` to confirm that you are indeed using the version you just installed.
@@ -332,13 +355,14 @@ You are now ready to install Indico:
 
     python -m venv --upgrade-deps --prompt indico ~/.venv
     source ~/.venv/bin/activate
+    export PATH="$PATH:/usr/pgsql-16/bin"
     echo 'source ~/.venv/bin/activate' >> ~/.bashrc
-    pip install wheel
+    pip install setuptools wheel
     pip install uwsgi
     pip install indico
 
 
-6. Configure Indico
+8. Configure Indico
 -------------------
 
 Once Indico is installed, you can run the configuration wizard.  You can
@@ -361,13 +385,14 @@ Now finish setting up the directory structure and permissions:
     chmod 710 ~/ ~/archive ~/cache ~/log ~/tmp
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/nginx
+    restorecon -R ~/
     echo -e "\nSTATIC_FILE_METHOD = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
 
 
-7. Create database schema
+9. Create database schema
 -------------------------
 
-Finally, you can create the database schema and switch back to *root*:
+Finally you can create the database schema and switch back to *root*:
 
 .. code-block:: shell
 
@@ -375,8 +400,8 @@ Finally, you can create the database schema and switch back to *root*:
     exit
 
 
-8. Launch Indico
-----------------
+10. Launch Indico
+-----------------
 
 You can now start Indico and set it up to start automatically when the
 server is rebooted:
@@ -384,27 +409,11 @@ server is rebooted:
 .. code-block:: shell
 
     systemctl restart nginx.service indico-celery.service indico-uwsgi.service
-    systemctl enable nginx.service postgresql.service redis-server.service indico-celery.service indico-uwsgi.service
+    systemctl enable nginx.service postgresql-16.service redis.service indico-celery.service indico-uwsgi.service
 
 
-9. Optional: Get a Certificate from Let's Encrypt
--------------------------------------------------
-
-.. note::
-
-    You need to use at least Debian 9 (Stretch) to use certbot.
-    If you are still using Debian 8 (Jessie), consider updating
-    or install certbot from backports.
-
-
-If you use Ubuntu, install the certbot PPA:
-
-.. code-block:: shell
-
-    apt install -y software-properties-common
-    add-apt-repository -y ppa:certbot/certbot
-    apt update
-
+11. Optional: Get a Certificate from Let's Encrypt
+--------------------------------------------------
 
 To avoid ugly TLS warnings in your browsers, the easiest option is to
 get a free certificate from Let's Encrypt. We also enable the cronjob
@@ -413,21 +422,21 @@ to renew it automatically:
 
 .. code-block:: shell
 
-    apt install -y python-certbot-nginx
-    certbot --nginx --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
-    rm -rf /etc/ssl/indico
-    systemctl start certbot.timer
-    systemctl enable certbot.timer
+    dnf install -y certbot python3-certbot-nginx
+    certbot --nginx --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -f /etc/ssl/indico/indico.*
+    systemctl start certbot-renew.timer
+    systemctl enable certbot-renew.timer
 
 
-10. Create an Indico user
+12. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
-11. Install TeXLive
+13. Install TeXLive
 -------------------
 
 Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so

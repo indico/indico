@@ -1,49 +1,34 @@
-nginx
-=====
-
-.. include:: ../_sso_note.rst
+Apache
+======
 
 1. Enable EPEL
 --------------
 
 .. code-block:: shell
 
-    yum install -y epel-release
-
-.. note::
-
-    If you use CC7, EPEL is already enabled and this step is not necessary
+    dnf install -y epel-release
+    dnf config-manager --set-enabled crb
 
 
 2. Install Packages
 -------------------
 
-If you are on CentOS 7, edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add
-``exclude=postgresql*`` to the ``[base]`` and ``[updates]`` sections, as
-described in the `PostgreSQL wiki`_ and then run these commands:
+Run these commands to use the upstream Postgres package repository:
 
 .. code-block:: shell
 
-    yum install -y centos-release-scl
-    yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-
-If you are on CentOS 8, run this instead:
-
-.. code-block:: shell
-
-    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     dnf -qy module disable postgresql
-    yum config-manager --set-enabled powertools
 
 Now install all the required packages:
 
 .. code-block:: shell
 
-    yum install -y postgresql13 postgresql13-server postgresql13-libs postgresql13-devel postgresql13-contrib
-    yum install -y git gcc make redis nginx
-    yum install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel tar
-    /usr/pgsql-13/bin/postgresql-13-setup initdb
-    systemctl start postgresql-13.service redis.service
+    dnf install -y postgresql16 postgresql16-server postgresql16-libs postgresql16-devel postgresql16-contrib
+    dnf install -y git gcc make redis httpd mod_ssl mod_xsendfile
+    dnf install -y libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel findutils libuuid-devel tar pango
+    /usr/pgsql-16/bin/postgresql-16-setup initdb
+    systemctl start postgresql-16.service redis.service
 
 
 3. Create a Database
@@ -58,16 +43,16 @@ Postgres extensions (which can only be done by the Postgres superuser)
     su - postgres -c 'createdb -O indico indico'
     su - postgres -c 'psql indico -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"'
 
-.. warning::
+.. important::
 
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
 
-4. Configure uWSGI & nginx
---------------------------
+4. Configure uWSGI & Apache
+---------------------------
 
-The default uWSGI and nginx configuration files should work fine in
+The default uWSGI and Apache configuration files should work fine in
 most cases.
 
 .. code-block:: shell
@@ -75,7 +60,7 @@ most cases.
     cat > /etc/uwsgi-indico.ini <<'EOF'
     [uwsgi]
     uid = indico
-    gid = nginx
+    gid = apache
     umask = 027
 
     processes = 4
@@ -121,7 +106,7 @@ We also need a systemd unit to start uWSGI.
     Restart=always
     SyslogIdentifier=indico-uwsgi
     User=indico
-    Group=nginx
+    Group=apache
     UMask=0027
     Type=notify
     NotifyAccess=all
@@ -135,76 +120,66 @@ We also need a systemd unit to start uWSGI.
 
 .. note::
 
-    Replace ``YOURHOSTNAME`` in the next file with the hostname on which
+    Replace ``YOURHOSTNAME`` in the next files with the hostname on which
     your Indico instance should be available, e.g. ``indico.yourdomain.com``
 
 
 .. code-block:: shell
 
-    cat > /etc/nginx/conf.d/indico.conf <<'EOF'
-    server {
-      listen 80;
-      listen [::]:80;
-      server_name YOURHOSTNAME;
-      return 301 https://$server_name$request_uri;
-    }
-
-    server {
-      listen       *:443 ssl http2;
-      listen       [::]:443 ssl http2 default ipv6only=on;
-      server_name  YOURHOSTNAME;
-
-      ssl_certificate           /etc/ssl/indico/indico.crt;
-      ssl_certificate_key       /etc/ssl/indico/indico.key;
-      ssl_dhparam               /etc/ssl/indico/ffdhe2048;
-
-      ssl_session_timeout       1d;
-      ssl_session_cache         shared:SSL:10m;
-      ssl_session_tickets       off;
-      ssl_protocols             TLSv1.2 TLSv1.3;
-      ssl_ciphers               ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-      ssl_prefer_server_ciphers off;
-
-      access_log            /opt/indico/log/nginx/access.log combined;
-      error_log             /opt/indico/log/nginx/error.log;
-
-      if ($host != $server_name) {
-        rewrite ^/(.*) https://$server_name/$1 permanent;
-      }
-
-      location /.xsf/indico/ {
-        internal;
-        alias /opt/indico/;
-      }
-
-      location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
-        alias /opt/indico/web/static/$1$2/$3.$5;
-        access_log off;
-      }
-
-      location ~ ^/(css|dist|images|fonts)/(.*)$ {
-        alias /opt/indico/web/static/$1/$2;
-        access_log off;
-      }
-
-      location /robots.txt {
-        alias /opt/indico/web/static/robots.txt;
-        access_log off;
-      }
-
-      location / {
-        root /var/empty/nginx;
-        include /etc/nginx/uwsgi_params;
-        uwsgi_pass unix:/opt/indico/web/uwsgi.sock;
-        uwsgi_param UWSGI_SCHEME $scheme;
-        uwsgi_read_timeout 15m;
-        uwsgi_buffers 32 32k;
-        uwsgi_busy_buffers_size 128k;
-        uwsgi_hide_header X-Sendfile;
-        client_max_body_size 1G;
-      }
-    }
+    cat > /etc/httpd/conf.d/indico-sslredir.conf <<'EOF'
+    <VirtualHost *:80>
+        ServerName YOURHOSTNAME
+        RewriteEngine On
+        RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+    </VirtualHost>
     EOF
+
+    cat > /etc/httpd/conf.d/indico.conf <<'EOF'
+    <VirtualHost *:443>
+        ServerName YOURHOSTNAME
+        DocumentRoot "/var/empty/apache"
+
+        SSLEngine               on
+        SSLCertificateFile      /etc/ssl/indico/indico.crt
+        SSLCertificateChainFile /etc/ssl/indico/indico.crt
+        SSLCertificateKeyFile   /etc/ssl/indico/indico.key
+
+        SSLProtocol             all -SSLv3 -TLSv1 -TLSv1.1
+        SSLCipherSuite          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        SSLHonorCipherOrder     off
+        SSLSessionTickets       off
+
+        XSendFile on
+        XSendFilePath /opt/indico
+        CustomLog /opt/indico/log/apache/access.log combined
+        ErrorLog /opt/indico/log/apache/error.log
+        LogLevel error
+        ServerSignature Off
+
+        <If "%{HTTP_HOST} != 'YOURHOSTNAME'">
+            Redirect 301 / https://YOURHOSTNAME/
+        </If>
+
+        AliasMatch "^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$" "/opt/indico/web/static/$1$2/$3.$5"
+        AliasMatch "^/(css|dist|images|fonts)/(.*)$" "/opt/indico/web/static/$1/$2"
+        Alias /robots.txt /opt/indico/web/static/robots.txt
+
+        SetEnv UWSGI_SCHEME https
+        ProxyPass / unix:/opt/indico/web/uwsgi.sock|uwsgi://localhost/
+
+        <Directory /opt/indico>
+            AllowOverride None
+            Require all granted
+        </Directory>
+    </VirtualHost>
+    EOF
+
+
+Now enable the uwsgi proxy module in apache:
+
+.. code-block:: shell
+
+    echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
 
 
 5. Create a TLS Certificate
@@ -218,22 +193,6 @@ permissions on them:
     mkdir /etc/ssl/indico
     chown root:root /etc/ssl/indico/
     chmod 700 /etc/ssl/indico
-
-We also use a strong set of pre-generated DH params (ffdhe2048 from RFC7919)
-as suggested in Mozilla's TLS config recommendations:
-
-.. code-block:: shell
-
-    cat > /etc/ssl/indico/ffdhe2048 <<'EOF'
-    -----BEGIN DH PARAMETERS-----
-    MIIBCAKCAQEA//////////+t+FRYortKmq/cViAnPTzx2LnFg84tNpWp4TZBFGQz
-    +8yTnc4kmz75fS/jY2MMddj2gbICrsRhetPfHtXV/WVhJDP1H18GbtCFY2VVPe0a
-    87VXE15/V8k1mE8McODmi3fipona8+/och3xWKE2rec1MKzKT0g6eXq8CrGCsyT7
-    YdEIqUuyyOP7uWrat2DX9GgdT0Kj3jlN9K5W7edjcrsZCwenyO4KbXCeAvzhzffi
-    7MA0BM0oNC9hkXL+nOmFg/+OTxIy7vKBg8P+OxtMb61zO7X8vC7CIAXFjvGDfRaD
-    ssbzSibBsu/6iGtCOGEoXJf//////////wIBAg==
-    -----END DH PARAMETERS-----
-    EOF
 
 If you are just trying out Indico you can simply use a self-signed
 certificate (your browser will show a warning which you will have
@@ -259,9 +218,9 @@ commercial certification authority or get a free one from
 .. note::
 
     There's an optional step later in this guide to get a certificate
-    from Let's Encrypt. We can't do it right now since the nginx
+    from Let's Encrypt. We can't do it right now since the Apache
     config references a directory yet to be created, which prevents
-    nginx from starting.
+    Apache from starting.
 
 
 6. Configure SELinux
@@ -289,9 +248,12 @@ should be handled.
     (typetransition unconfined_service_t usr_t sock_file "uwsgi.sock" httpd_sys_rw_content_t)
     (filecon "/opt/indico/web/uwsgi\.sock" socket (system_u object_r httpd_sys_rw_content_t ((s0)(s0))))
 
+    ; let apache connect to uwsgi
+    (allow httpd_t unconfined_service_t (unix_stream_socket (connectto)))
+
     ; set proper types for our log dirs
     (filecon "/opt/indico/log(/.*)?" any (system_u object_r indico_log_t ((s0)(s0))))
-    (filecon "/opt/indico/log/nginx(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
+    (filecon "/opt/indico/log/apache(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
     EOF
     semodule -i /tmp/indico.cil
 
@@ -313,7 +275,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Restart=always
     SyslogIdentifier=indico-celery
     User=indico
-    Group=nginx
+    Group=apache
     UMask=0027
     Type=simple
     KillMode=mixed
@@ -330,7 +292,7 @@ Now create a user that will be used to run Indico and switch to it:
 
 .. code-block:: shell
 
-    useradd -rm -g nginx -d /opt/indico -s /bin/bash indico
+    useradd -rm -g apache -d /opt/indico -s /bin/bash indico
     su - indico
 
 The first thing to do is installing pyenv - we use it to install the latest Python version
@@ -349,15 +311,12 @@ Python features.
 
     source ~/.bashrc
 
-You are now ready to install Python 3.9:
-
-Run ``pyenv install --list | egrep '^\s*3\.9\.'`` to check for the latest available version and
-then install it and set it as the active Python version (replace ``x`` in both lines).
+You are now ready to install Python 3.12:
 
 .. code-block:: shell
 
-    pyenv install 3.9.x
-    pyenv global 3.9.x
+    pyenv install 3.12
+    pyenv global 3.12
 
 This may take a while since pyenv needs to compile the specified Python version. Once done, you
 may want to use ``python -V`` to confirm that you are indeed using the version you just installed.
@@ -368,9 +327,9 @@ You are now ready to install Indico:
 
     python -m venv --upgrade-deps --prompt indico ~/.venv
     source ~/.venv/bin/activate
-    export PATH="$PATH:/usr/pgsql-13/bin"
+    export PATH="$PATH:/usr/pgsql-16/bin"
     echo 'source ~/.venv/bin/activate' >> ~/.bashrc
-    pip install wheel
+    pip install setuptools wheel
     pip install uwsgi
     pip install indico
 
@@ -393,13 +352,13 @@ Now finish setting up the directory structure and permissions:
 
 .. code-block:: shell
 
-    mkdir ~/log/nginx
+    mkdir ~/log/apache
     chmod go-rwx ~/* ~/.[^.]*
     chmod 710 ~/ ~/archive ~/cache ~/log ~/tmp
     chmod 750 ~/web ~/.venv
-    chmod g+w ~/log/nginx
+    chmod g+w ~/log/apache
     restorecon -R ~/
-    echo -e "\nSTATIC_FILE_METHOD = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
+    echo -e "\nSTATIC_FILE_METHOD = 'xsendfile'" >> ~/etc/indico.conf
 
 
 9. Create database schema
@@ -421,25 +380,11 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart nginx.service indico-celery.service indico-uwsgi.service
-    systemctl enable nginx.service postgresql-13.service redis.service indico-celery.service indico-uwsgi.service
+    systemctl restart httpd.service indico-celery.service indico-uwsgi.service
+    systemctl enable httpd.service postgresql-16.service redis.service indico-celery.service indico-uwsgi.service
 
 
-11. Open the Firewall
----------------------
-
-.. code-block:: shell
-
-    firewall-cmd --permanent --add-port 443/tcp --add-port 80/tcp
-    firewall-cmd --reload
-
-.. note::
-
-    This is only needed if you use CC7 as CentOS 7/8 have no firewall enabled
-    by default
-
-
-12. Optional: Get a Certificate from Let's Encrypt
+11. Optional: Get a Certificate from Let's Encrypt
 --------------------------------------------------
 
 To avoid ugly TLS warnings in your browsers, the easiest option is to
@@ -449,25 +394,79 @@ to renew it automatically:
 
 .. code-block:: shell
 
-    yum install -y python-certbot-nginx
-    certbot --nginx --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
-    rm -rf /etc/ssl/indico
+    dnf install -y certbot python3-certbot-apache
+    certbot --apache --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -f /etc/ssl/indico/indico.*
     systemctl start certbot-renew.timer
     systemctl enable certbot-renew.timer
 
 
-13. Create an Indico user
+12. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
-14. Install TeXLive
+13. Install TeXLive
 -------------------
 
 Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
 Indico can generate PDF files in various places.
+
+
+.. _rpm-apache-shib:
+
+Optional: Shibboleth
+--------------------
+
+If your organization uses Shibboleth/SAML-based SSO, follow these steps to use
+it in Indico:
+
+1. Install Shibboleth
+^^^^^^^^^^^^^^^^^^^^^
+
+Add the Shibboleth repository:
+
+.. code-block:: shell
+
+    curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=rockylinux9'
+
+Now install Shibboleth itself.  When prompted to accept the GPG key
+of the Shibboleth repo, confirm the prompt.
+
+.. code-block:: shell
+
+    setsebool httpd_can_network_connect 1
+    dnf install -y shibboleth xmltooling-schemas opensaml-schemas
+
+2. Configure Shibboleth
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This is outside the scope of this documentation and depends on your
+environment (Shibboleth, ADFS, etc).  Please contact whoever runs your
+SSO infrastructure if you need assistance.
+
+3. Enable Shibboleth in Apache
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add the following code to your ``/etc/httpd/conf.d/indico.conf`` right
+before the ``AliasMatch`` lines:
+
+.. code-block:: apache
+
+    <LocationMatch "^(/Shibboleth\.sso|/login/shib-sso/shibboleth)">
+        AuthType shibboleth
+        ShibRequestSetting requireSession 1
+        ShibExportAssertion Off
+        Require valid-user
+    </LocationMatch>
+
+
+4. Enable Shibboleth in Indico
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_sso_indico.rst
 
 
 .. _PostgreSQL wiki: https://wiki.postgresql.org/wiki/YUM_Installation#Configure_your_YUM_repository

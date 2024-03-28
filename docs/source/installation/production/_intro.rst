@@ -1,5 +1,5 @@
-We provide guides to install Indico on CentOS and Debian systems.
-While other distributions are not officially supported, they should
+We provide guides to install Indico on Alma/Rocky Linux and Debian/Ubuntu
+systems. While other distributions are not officially supported, they should
 work fine, but the installation steps (especially package names) may
 need some slight adjustments.
 
