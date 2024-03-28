@@ -138,11 +138,11 @@ export function ConflictModal({noteData, onClose}) {
                   'The changes made by someone else since you started editing'
                 )}
               />
-              {note.conflict.source ? (
+              {note.conflict.html ? (
                 <Card raised fluid>
                   <CardContent>
                     <div
-                      dangerouslySetInnerHTML={{__html: note.conflict.source}}
+                      dangerouslySetInnerHTML={{__html: note.conflict.html}}
                       className="editor-output"
                       styleName="conflict-content"
                     />
