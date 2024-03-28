@@ -15,7 +15,9 @@ from markupsafe import Markup
 from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
+from indico.core.errors import UserValueError
 from indico.util.date_time import format_datetime
+from indico.util.i18n import _
 from indico.web.flask.util import send_file
 
 
@@ -60,6 +62,8 @@ def csv_text_io_wrapper(buf):
     w = TextIOWrapper(buf, encoding='utf-8-sig', newline='')
     try:
         yield w
+    except UnicodeDecodeError:
+        raise UserValueError(_('The CSV file must be saved in UTF-8 encoding'))
     finally:
         w.detach()
 
