@@ -11,12 +11,19 @@ In order to use (partially) existing translations from Transifex or to contribut
 translations, you need to register with the
 `Indico project on the Transifex platform <https://www.transifex.com/indico/>`_.
 
+If, instead, you are interested in contributing translations, we have a
+:ref:`separate guide <translations>` just for that.
+
 Additional Translations
 =======================
 
 This is a guide to set up an Indico instance with a new language.
 It is useful for translators to verify how the translation looks in production
 or for administrators who just want to lurk at the incubated translation embryos.
+
+You may also use the translation `demo instance
+<https://localization-demo.getindico.io>`_ to check out both official and
+unofficial translations.
 
 Alternatively, you may use this guide to expose a translation we do not officially support,
 in your production version.
@@ -105,38 +112,6 @@ So if by any reason it doesn't work for you, feel free to :ref:`ask us <contact>
 .. |zh_Hant_TW| replace:: ``zh_Hant_TW``
 .. _zh_Hant_TW: https://www.localeplanet.com/icu/zh-Hant-TW/index.html
 
-
-Contributing
-============
-
-As a **translator**, you should have a good knowledge of the Indico functions
-(from the user side at least). Then you can subscribe to the abovementioned
-`Transifex site for Indico <https://www.transifex.com/indico/>`_
-and request membership of one of the translation teams. You should also contact
-the coordinators; some languages have specific coordinators assigned.
-They may point you to places, where work is needed and which rules have
-been agreed for the translations.
-
-The glossary is usually of big help to obtain a uniform translation of all
-technical terms. Use it!
-
-As a **programmer** or **developer**, you will have to be aware of the needs and
-difficulties of translation work.
-A `Wiki page for Internationalisation <https://github.com/indico/indico/wiki/Internationalisation>`_
-is available from github (slightly outdated and we should eventually move it to this documentation).
-It describes the interface between translating and programming and some conventions to be followed.
-Everyone involved in translating or programming Indico should have read it before starting the work.
-
-Whenever translators spot difficult code (forgotten pluralization, typos), they
-should do their best to avoid double (or rather: multiple) work to their fellow translators.
-What is a problem for their translation, usually will be a problem for all translations.
-Don't hesitate to open an issue or pull request on `GitHub <https://github.com/indico/indico>`_.
-Repair first, then translate (and be aware that after repair, the translation has to be made
-again for all languages).
-
-.. note::
-
-    The codebase also contains legacy code, which may not follow all rules.
 
 File Organisation
 =================

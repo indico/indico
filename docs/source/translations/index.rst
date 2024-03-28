@@ -147,7 +147,7 @@ underneath.
 See your translations live
 --------------------------
 
-We have a `test instance <https://localization-demo.getindico.io>`_ where you
+We have a `demo instance <https://localization-demo.getindico.io>`_ where you
 can try out your translations. All languages, including unofficial ones, are
 available there. We update the latest translations from Transifex automatically
 every 6 hours.
