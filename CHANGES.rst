@@ -21,7 +21,8 @@ Major Features
   template.
 - The existing Indico Check-in app has been completely rewritten as a PWA
   (Progressive Web App). Please note that the old Check-in app has been
-  deprecated and is not compatible with the new version of Indico.
+  deprecated and is not compatible with the new version of Indico. The new app
+  can be found `here <https://checkin.getindico.io/>`_.
 - Badges and tickets can now be generated individually for each accompanying
   person of a registrant.
 - Users can now export all their data stored in Indico. This includes personal
