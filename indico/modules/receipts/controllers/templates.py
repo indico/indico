@@ -35,7 +35,10 @@ from indico.web.rh import RHProtected
 
 
 TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
-DEFAULT_TEMPLATES_DIR = Path(current_app.root_path) / 'modules' / 'receipts' / 'default_templates'
+
+
+def _get_default_templates_dir():
+    return Path(current_app.root_path) / 'modules' / 'receipts' / 'default_templates'
 
 
 class ReceiptAreaMixin:
@@ -89,7 +92,8 @@ class TemplateListMixin(ReceiptAreaMixin):
     def _process(self):
         inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
         own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
-        default_templates = {f.stem: yaml.safe_load(f.read_text()) for f in DEFAULT_TEMPLATES_DIR.glob('*.yaml')}
+        default_templates_dir = _get_default_templates_dir()
+        default_templates = {f.stem: yaml.safe_load(f.read_text()) for f in default_templates_dir.glob('*.yaml')}
         view_class = WPEventReceiptTemplates if self.object_type == 'event' else WPCategoryReceiptTemplates
         return view_class.render_template(
             'list.html', self.target, 'receipts',
@@ -241,13 +245,14 @@ class RHGetDefaultTemplate(RHProtected):
 
     def _process(self):
         name = request.view_args['template_name']
-        metadata_file = next((f for f in DEFAULT_TEMPLATES_DIR.glob('*.yaml') if f.stem == name), None)
+        default_templates_dir = _get_default_templates_dir()
+        metadata_file = next((f for f in default_templates_dir.glob('*.yaml') if f.stem == name), None)
         if metadata_file is None:
             raise NotFound('Template does not exist')
         tpl_data = yaml.safe_load(metadata_file.read_text())
         tpl_data['title'] = f'{tpl_data["title"]} (v{tpl_data["version"]})'
         del tpl_data['version']
-        template_dir = DEFAULT_TEMPLATES_DIR / metadata_file.stem
+        template_dir = default_templates_dir / metadata_file.stem
         tpl_data['html'] = (template_dir / 'template.html').read_text()
         tpl_data['css'] = (template_dir / 'theme.css').read_text()
         tpl_data['yaml'] = (template_dir / 'metadata.yaml').read_text()
