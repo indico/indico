@@ -413,7 +413,9 @@ def split_booking(booking, new_booking_data, extra_fields: dict):
         new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), new_booking_data['start_dt'].time())
         cancelled_dates = [occ.start_dt.date() for occ in occurrences if occ.is_cancelled]
         rejected_occs = {occ.start_dt.date(): occ.rejection_reason for occ in occurrences if occ.is_rejected}
-        new_end_dt = datetime.combine(occurrences_to_cancel[-1].start_dt.date(), new_booking_data['end_dt'].time())
+
+        # End the old booking with the last occurrence that has already happened
+        new_end_dt = [occ for occ in occurrences if occ.start_dt < datetime.now()][-1].end_dt
 
         old_booking_data = {
             'booking_reason': booking.booking_reason,
