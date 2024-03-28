@@ -10,7 +10,44 @@ Version 3.3
 Major Features
 ^^^^^^^^^^^^^^
 
-- Nothing so far
+- A new "Document Templates" module was added which supports the generation of
+  fully customizable PDF documents for event participants such as receipts and
+  certificates of attendance.
+- The Room Booking module now supports recurring bookings that repeat on
+  specific weekdays. For example, a room can be booked every Monday and
+  Wednesday over a set period of time.
+- Badge and ticket templates can now be linked to a registration form. This
+  makes it possible to reference custom registration fields when creating the
+  template.
+- The existing Indico Check-in app has been completely rewritten as a PWA
+  (Progressive Web App). Please note that the old Check-in app has been
+  deprecated and is not compatible with the new version of Indico. The new app
+  can be found `here <https://checkin.getindico.io/>`_.
+- A new badge/ticket setting has been added which, when enabled, makes it
+  possible to print badges and/or tickets for accompanying persons in addition
+  to the main registrant.
+- Users can now export all their data stored in Indico. This includes personal
+  data and any data they are linked to such as registrations, minutes and files
+  uploaded to Indico.
+- Users can now be anonymized in Indico; this means that all personal
+  identifiers associated with a user will be removed from Indico, whilst only
+  keeping the data that is required for Indico to function properly, in an
+  anonymized manner. This operation can only be performed by Indico system
+  administrators through the ``indico`` command-line interface.
+- Administrators now have the option to require users to accept the Terms of Use
+  during signup and after the terms have been updated.
+- Event managers can require participants to accept the event's Privacy Policy
+  when registering.
+- Event tickets can now be added to Google Wallet using the new experimental Google
+  Wallet integration. You can enable this feature using the :data:`ENABLE_GOOGLE_WALLET`
+  config setting and then configure it on the category level.
+- The category calendar view has been improved with new week/day views and new
+  filtering options for category, venue, room or keywords.
+- Managers can now change the registration fee for selected registrations in
+  bulk.
+- Lots of new accessibility improvements, including improved keyboard navigation,
+  better color contrast, and better screen reader support.
+
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
