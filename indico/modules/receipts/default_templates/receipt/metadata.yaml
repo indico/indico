@@ -3,38 +3,57 @@ custom_fields:
     type: textarea
     attributes:
       label: Organizer Address
+      description: |
+        The address of the entity who is issuing this receipt.
 
   - name: address_to_override
     type: textarea
     attributes:
       label: Override participant address
+      description: |
+        A custom address to use instead of the participant's address from
+        their registration.
 
   - name: venue
     type: input
     attributes:
       label: Venue
+      description: |
+        A custom venue name instead of the event's venue.
 
   - name: fee_category
     type: input
     attributes:
       label: Fee category
+      description: |
+        A custom type of registration fee like "Early Bird", shown in parentheses
+        behind the "Registration fee" text.
 
   - name: receipt_number
     type: input
     attributes:
       label: Receipt number
+      description: |
+        A custom receipt number instead of the auto-generated one.
 
   - name: logo
     type: image
     attributes:
       label: Logo
+      description: |
+        A logo image to be shown on the receipt.
 
   - name: add_url
     type: checkbox
     attributes:
       label: Add event URL
+      description: |
+        Whether to include the URL of the event on the receipt.
 
   - name: add_affiliation
     type: checkbox
     attributes:
       label: Add registrant affiliation
+      description: |
+        Whether to include the affiliation of the registrant between their name
+        and address.

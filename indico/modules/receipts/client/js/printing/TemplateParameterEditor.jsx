@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Accordion, Form} from 'semantic-ui-react';
+import {Accordion, Checkbox, Dropdown, Form, Input, TextArea} from 'semantic-ui-react';
 
 import {useIndicoAxios} from 'indico/react/hooks';
 
@@ -37,56 +37,73 @@ function CustomField({
   fetchImages,
   loadingImages,
 }) {
+  const id = `receipt-custom-${name}`;
   if (type === 'input') {
     return (
-      <Form.Input
-        label={attributes.label}
-        name={name}
-        value={value}
-        required={validations.required}
-        onChange={(_, {value: v}) => onChange(v)}
-      />
+      <Form.Field required={validations.required}>
+        <label htmlFor={id}>{attributes.label}</label>
+        <Input
+          name={name}
+          id={id}
+          value={value}
+          required={validations.required}
+          onChange={(_, {value: v}) => onChange(v)}
+        />
+        {attributes.description && <p className="field-description">{attributes.description}</p>}
+      </Form.Field>
     );
   } else if (type === 'textarea') {
     return (
-      <Form.TextArea
-        label={attributes.label}
-        name={name}
-        value={value}
-        required={validations.required}
-        onChange={(_, {value: v}) => onChange(v)}
-      />
+      <Form.Field required={validations.required}>
+        <label htmlFor={id}>{attributes.label}</label>
+        <TextArea
+          name={name}
+          id={id}
+          value={value}
+          required={validations.required}
+          onChange={(_, {value: v}) => onChange(v)}
+        />
+        {attributes.description && <p className="field-description">{attributes.description}</p>}
+      </Form.Field>
     );
   } else if (type === 'dropdown') {
     return (
-      <Form.Dropdown
-        label={attributes.label}
-        name={name}
-        options={attributes.options.map(o => ({value: o, key: o, text: o}))}
-        value={value}
-        selection
-        required={validations.required}
-        selectOnNavigation={false}
-        selectOnBlur={false}
-        clearable={!validations.required}
-        onChange={(_, {value: v}) => onChange(v)}
-      />
+      <Form.Field required={validations.required}>
+        <label htmlFor={id}>{attributes.label}</label>
+        <Dropdown
+          name={name}
+          id={id}
+          options={attributes.options.map(o => ({value: o, key: o, text: o}))}
+          value={value}
+          selection
+          required={validations.required}
+          selectOnNavigation={false}
+          selectOnBlur={false}
+          clearable={!validations.required}
+          onChange={(_, {value: v}) => onChange(v)}
+        />
+        {attributes.description && <p className="field-description">{attributes.description}</p>}
+      </Form.Field>
     );
   } else if (type === 'checkbox') {
     return (
-      <Form.Checkbox
-        label={attributes.label}
-        name={name}
-        onChange={(_, {checked}) => onChange(checked)}
-        checked={value}
-        required={validations.required}
-      />
+      <Form.Field required={validations.required}>
+        <Checkbox
+          label={attributes.label}
+          name={name}
+          onChange={(_, {checked}) => onChange(checked)}
+          checked={value}
+          required={validations.required}
+        />
+        {attributes.description && <p className="field-description">{attributes.description}</p>}
+      </Form.Field>
     );
   } else if (type === 'image') {
     return (
       <EventImageSelectField
         label={attributes.label}
         name={name}
+        description={attributes.description}
         value={value}
         required={validations.required}
         loading={loadingImages}
@@ -152,7 +169,7 @@ export default function TemplateParameterEditor({
           key: 'template-params',
           title,
           content: {
-            content: customFields.map(({name, type, attributes, validations = {}}) => (
+            content: customFields.map(({name, description, type, attributes, validations = {}}) => (
               <CustomField
                 key={name}
                 type={type}
@@ -161,6 +178,7 @@ export default function TemplateParameterEditor({
                   onChange({...value, [name]: v});
                 }}
                 name={name}
+                description={description}
                 attributes={attributes}
                 validations={validations}
                 eventImages={eventImages}

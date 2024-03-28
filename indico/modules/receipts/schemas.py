@@ -28,13 +28,16 @@ class OwnerDataSchema(mm.Schema):
     locator = fields.Dict()
 
 
-class _CheckboxAttributesSchema(mm.Schema):
+class _AttributesSchemaBase(mm.Schema):
+    label = fields.String(required=True)
+    description = fields.String(load_default='')
+
+
+class _CheckboxAttributesSchema(_AttributesSchemaBase):
     value = fields.Bool()
-    label = fields.String(required=True)
 
 
-class _DropdownAttributesSchema(mm.Schema):
-    label = fields.String(required=True)
+class _DropdownAttributesSchema(_AttributesSchemaBase):
     options = fields.List(fields.String())
     default = fields.Int(validate=validate.Range(0), strict=True)
 
@@ -44,18 +47,16 @@ class _DropdownAttributesSchema(mm.Schema):
             raise ValidationError('The provided value is out of range')
 
 
-class _InputAttributesSchema(mm.Schema):
+class _InputAttributesSchema(_AttributesSchemaBase):
     value = fields.String()
-    label = fields.String(required=True)
 
 
-class _TextareaAttributesSchema(mm.Schema):
+class _TextareaAttributesSchema(_AttributesSchemaBase):
     value = fields.String()
-    label = fields.String(required=True)
 
 
-class _ImageAttributesSchema(mm.Schema):
-    label = fields.String(required=True)
+class _ImageAttributesSchema(_AttributesSchemaBase):
+    pass
 
 
 class CustomFieldAttributesSchema(OneOfSchema):

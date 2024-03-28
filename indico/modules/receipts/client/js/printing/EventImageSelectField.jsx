@@ -8,6 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
+  Dropdown,
   Form,
   Header,
   HeaderContent,
@@ -66,6 +67,7 @@ EventImageOption.propTypes = imageShape;
 export default function EventImageSelectField({
   name,
   label,
+  description,
   value,
   required,
   loading,
@@ -75,42 +77,53 @@ export default function EventImageSelectField({
 }) {
   return (
     <Form.Group styleName="image-select-field">
-      <Form.Dropdown
-        label={label}
-        name={name}
-        options={eventImages.map(image => ({
-          key: image.identifier,
-          value: image.identifier,
-          text: image.filename,
-          disabled: !image.preview,
-          content: <EventImageOption {...image} />,
-        }))}
-        placeholder={Translate.string('Select an image from the event')}
-        noResultsMessage={
-          loading
-            ? Translate.string('Loading images...')
-            : Translate.string('No images were found in this event.')
-        }
-        value={value}
-        required={required}
-        loading={loading}
-        selectOnNavigation={false}
-        selectOnBlur={false}
-        clearable={!required}
-        onChange={(_, {value: v}) => onChange(v)}
-        selection
-        search
-        width={16}
-      />
-      {onRefresh && (
-        <Popup
-          content={Translate.string('Get new images')}
-          trigger={
-            <Icon name="sync" color="grey" onClick={onRefresh} disabled={loading} link={!loading} />
-          }
-          disabled={loading}
-        />
-      )}
+      <Form.Field required={required}>
+        <label>{label}</label>
+        <div>
+          <Dropdown
+            name={name}
+            options={eventImages.map(image => ({
+              key: image.identifier,
+              value: image.identifier,
+              text: image.filename,
+              disabled: !image.preview,
+              content: <EventImageOption {...image} />,
+            }))}
+            placeholder={Translate.string('Select an image from the event')}
+            noResultsMessage={
+              loading
+                ? Translate.string('Loading images...')
+                : Translate.string('No images were found in this event.')
+            }
+            value={value}
+            required={required}
+            loading={loading}
+            selectOnNavigation={false}
+            selectOnBlur={false}
+            clearable={!required}
+            onChange={(_, {value: v}) => onChange(v)}
+            selection
+            search
+            width={16}
+          />{' '}
+          {onRefresh && (
+            <Popup
+              content={Translate.string('Get new images')}
+              trigger={
+                <Icon
+                  name="sync"
+                  color="grey"
+                  onClick={onRefresh}
+                  disabled={loading}
+                  link={!loading}
+                />
+              }
+              disabled={loading}
+            />
+          )}
+        </div>
+        {description && <p className="field-description">{description}</p>}
+      </Form.Field>
     </Form.Group>
   );
 }
@@ -118,6 +131,7 @@ export default function EventImageSelectField({
 EventImageSelectField.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
   value: PropTypes.string,
   required: PropTypes.bool,
   loading: PropTypes.bool,
