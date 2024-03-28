@@ -41,7 +41,7 @@
         {% if contrib.speakers -%}
             <div class="speaker-list icon-user" data-searchable="{{ contrib.speakers|lower }}">
                 {{ render_users(contrib.speakers|sort(attribute='display_order_key'),
-                                span_class='speaker-item-inline') }}
+                                span_class='speaker-item-inline', title=contrib.event.show_titles) }}
             </div>
         {%- endif %}
         {% if contrib.start_dt_display -%}
