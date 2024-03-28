@@ -10,7 +10,35 @@ Version 3.3
 Major Features
 ^^^^^^^^^^^^^^
 
-- Nothing so far
+- A new "Document Templates" module was added which supports the generation of
+  fully customizable PDF documents for event participants such as receipts and
+  certificates of attendance.
+- The Room Booking module now supports recurring bookings that repeat on
+  specific weekdays. For example, a room can be booked every Monday and
+  Wednesday over a set period of time.
+- Badge and ticket templates can now be linked to a registration form. This
+  makes it possible to reference custom registration fields when creating the
+  template.
+- The existing Indico Check-in app has been completely rewritten as a PWA
+  (Progressive Web App). Please note that the old Check-in app has been
+  deprecated and is not compatible with the new version of Indico.
+- Badges and tickets can now be generated individually for each accompanying
+  person.
+- Users can now export all their data stored in Indico. This includes personal
+  data and any data they are linked to such as registrations, minutes and files
+  uploaded to Indico.
+- Administrators now have the option to require users to accept the Terms of Use
+  during signup and after the terms have been updated.
+- Events can now be added to Google Wallet using the new experimental Google
+  Wallet integration. You can enable this feature using the
+  :data:`ENABLE_GOOGLE_WALLET` ``indico.conf`` setting.
+- Improved category calendar with week/day views and new filtering options for
+  category, venue, room or keywords.
+- Managers can now change the registration fee for selected registrations in
+  bulk.
+- Lots of new accessibility improvements, including improved keyboard navigation,
+  better color contrast, and better screen reader support.
+
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
