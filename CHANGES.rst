@@ -34,6 +34,8 @@ Major Features
   administrators through the indico command-line interface.
 - Administrators now have the option to require users to accept the Terms of Use
   during signup and after the terms have been updated.
+- Event managers can require participants to accept the event's Privacy Policy
+  when registering.
 - Events can now be added to Google Wallet using the new experimental Google
   Wallet integration. You can enable this feature using the
   :data:`ENABLE_GOOGLE_WALLET` ``indico.conf`` setting.
