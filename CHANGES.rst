@@ -54,7 +54,8 @@ Improvements
 - Stop overwhelmingly showing past events in the 'Events at hand' section in the user dashboard
   (:pr:`6049`)
 - Add document templates to generate PDF receipts, certificates, and similar documents for
-  event participants (:pr:`5123`, :pr:`6078`, :pr:`6250`)
+  event participants (:issue:`751`, :issue:`5060`, :issue:`6246`, :pr:`5123`, :pr:`6078`,
+  :pr:`6250`)
 - Show which persons are external in the user search dialog (:pr:`6074`)
 - Add feature for users to export all data linked to them (:pr:`5757`)
 - Add Outlook online calendar button to share widget (:issue:`6075`, :pr:`6077`)
