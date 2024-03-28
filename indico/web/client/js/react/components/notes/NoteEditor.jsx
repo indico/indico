@@ -115,7 +115,6 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     // for the TinyMCE editor widget in case larger notes cause performance issues that
     // can be resolved by only rendering them to an html string at submission time
     const currentValue = source.getData ? source.getData() : source;
-
     try {
       if (!currentValue) {
         await indicoAxios.delete(apiURL);
