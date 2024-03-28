@@ -712,3 +712,7 @@ def format_email_with_name(name, address):
         quotes = '"'
     name = escapesre.sub(r'\\\g<0>', name)
     return f'{quotes}{name}{quotes} <{address}>'
+
+
+def normalize_linebreaks(string, *, _normre=re.compile(r'(\r\n|\r)')):
+    return _normre.sub('\n', string)

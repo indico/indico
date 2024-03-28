@@ -1,0 +1,106 @@
+{% set personal_data = registration.personal_data %}
+{% set txn = registration.transaction %}
+
+<h1>Receipt</h1>
+
+<aside id="title">
+  <div class="title">
+    <!-- Title -->
+    <h2>{{ event.title }}</h2>
+    <!-- Date(s) -->
+    {% if event.start_dt.date() != event.end_dt.date() %}
+      {{ event.start_dt | format_date('dd MMM') }}
+      -
+      {{ event.end_dt | format_date('dd MMM') }}
+    {% else %}
+      {{ event.start_dt | format_date('dd MMM YYYY') }}
+    {% endif %}
+
+    <!-- Venue -->
+    {% if custom_fields.venue %}
+      - {{ custom_fields.venue }}
+    {% elif event.venue_name %}
+      - {{ event.venue_name }}
+    {% endif %}
+
+    {% if custom_fields.add_url %}
+      <p>{{ event.url }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Logo -->
+  {% if custom_fields.logo %}
+    <img src="{{ custom_fields.logo }}">
+  {% endif %}
+</aside>
+
+<aside id="addresses">
+  <!-- Address of organizer -->
+  <address id="from">
+    {{ custom_fields.address_from }}
+  </address>
+
+  <!-- Address of participant -->
+  <address id="to">
+    <strong>{{ personal_data.first_name }} {{ personal_data.last_name }}</strong>
+    {%- if custom_fields.add_affiliation %}
+      {{ personal_data.affiliation }}
+    {%- endif %}
+    {%- if custom_fields.address_to_override %}
+      {{ custom_fields.address_to_override }}
+    {% elif personal_data.address %}
+      {{ personal_data.address }}
+      {{ personal_data.country }}
+    {% else %}
+      {{ personal_data.country }}
+    {% endif %}
+  </address>
+</aside>
+
+<!-- Receipt number and date -->
+<dl id="information">
+  {% set today = now_utc() %}
+  <dt>Number</dt>
+  <dd>
+    {% if custom_fields.receipt_number %}
+      {{ custom_fields.receipt_number }}
+    {% else %}
+      {{ today | format_datetime('YMMddHHMM')}}/{{ registration.friendly_id }}
+    {% endif %}
+  </dd>
+  <dt>Date</dt>
+  <dd>{{ today | format_date }}</dd>
+</dl>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if registration.base_price %}
+      <tr>
+        <td>Registration fee {% if custom_fields.fee_category %}({{ custom_fields.fee_category }}){% endif %}</td>
+        <td>{{ registration.base_price|format_currency(registration.currency) }}</td>
+      </tr>
+    {% endif %}
+    {% for field in registration.field_data if field.actual_price %}
+      <tr>
+        <td>{{ field.title }}{% if field.friendly_value %} ({{ field.friendly_value }}){% endif %}</td>
+        <td>{{ field.actual_price|format_currency(registration.currency) }}</td>
+      </tr>
+    {% endfor %}
+    <tr class="total">
+        <td><strong>Total</strong></td>
+        <td>{{ registration.total_price|format_currency(registration.currency) }}</td>
+    </tr>
+    {% if txn and txn.status == 'successful' and txn.provider != '_manual' %}
+      <tr class="total">
+        <td><strong>Total paid</strong></td>
+        <td>{{ txn.amount|format_currency(txn.currency) }}</td>
+      </tr>
+    {% endif %}
+  </tbody>
+</table>

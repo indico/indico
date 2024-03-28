@@ -24,3 +24,8 @@ export const templateSchema = PropTypes.shape({
     locator: PropTypes.object,
   }),
 });
+
+export const defaultTemplateSchema = PropTypes.shape({
+  title: PropTypes.string.isRequired,
+  version: PropTypes.number.isRequired,
+});

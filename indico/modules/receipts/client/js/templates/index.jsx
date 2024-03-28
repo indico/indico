@@ -8,12 +8,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Router from './TemplateManagement';
+import TemplateManagement from './TemplateManagement';
 
-window.setupReceiptTemplateList = function(elem, ownTemplates, inheritedTemplates, targetLocator) {
+window.setupReceiptTemplateList = function(
+  elem,
+  ownTemplates,
+  inheritedTemplates,
+  defaultTemplates,
+  targetLocator
+) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-      <Router initialState={{ownTemplates, inheritedTemplates}} targetLocator={targetLocator} />,
+      <TemplateManagement
+        initialState={{ownTemplates, inheritedTemplates}}
+        defaultTemplates={defaultTemplates}
+        targetLocator={targetLocator}
+      />,
       elem
     );
   });

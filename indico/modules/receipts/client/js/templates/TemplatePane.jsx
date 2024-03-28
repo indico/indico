@@ -10,7 +10,7 @@ import templateLivePreviewURL from 'indico-url:receipts.template_live_preview';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Grid, Header, Icon, Segment} from 'semantic-ui-react';
 
 import {ManagementPageSubTitle} from 'indico/react/components';
@@ -20,11 +20,22 @@ import Editor from './Editor';
 import Previewer from './Previewer';
 import {targetLocatorSchema, templateSchema} from './util';
 
-export default function TemplatePane({template, onSubmit, targetLocator, editorHeight, add}) {
-  const [data, setData] = useState({
-    title: template.title,
-    ..._.pick(template, ['html', 'css', 'yaml']),
-  });
+export default function TemplatePane({
+  template,
+  onSubmit,
+  targetLocator,
+  editorHeight,
+  add,
+  loading,
+}) {
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    setData({
+      title: template.title,
+      ..._.pick(template, ['html', 'css', 'yaml']),
+    });
+  }, [template]);
 
   return (
     <>
@@ -44,6 +55,8 @@ export default function TemplatePane({template, onSubmit, targetLocator, editorH
               editorHeight={editorHeight}
               targetLocator={targetLocator}
               onChange={setData}
+              loading={loading}
+              add={add}
             />
           </Grid.Column>
           <Grid.Column>
@@ -74,10 +87,12 @@ TemplatePane.propTypes = {
   targetLocator: targetLocatorSchema.isRequired,
   editorHeight: PropTypes.number,
   add: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 TemplatePane.defaultProps = {
   template: {html: '', css: '', yaml: ''},
   editorHeight: 800,
   add: false,
+  loading: false,
 };

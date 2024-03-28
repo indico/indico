@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
 import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {Link} from 'react-router-dom';
-import {Button, Form, Message} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Loader, Message, Segment} from 'semantic-ui-react';
 
 import {
   FinalField,
@@ -52,7 +52,15 @@ const FILES = {
   },
 };
 
-export default function Editor({template, onChange, onSubmit, editorHeight, targetLocator}) {
+export default function Editor({
+  template,
+  onChange,
+  onSubmit,
+  editorHeight,
+  targetLocator,
+  loading,
+  add,
+}) {
   const [currentFileExt, setFileExt] = useState('html');
   const codeValues = _.pick(template, ['html', 'css', 'yaml']);
   const editorRef = useRef(null);
@@ -90,6 +98,7 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
               name="title"
               label={Translate.string('Title')}
               type="text"
+              disabled={loading}
               required
               rows={24}
             />
@@ -100,6 +109,7 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
               componentLabel="-{n}.pdf"
               labelPosition="right"
               format={formatters.slugify}
+              disabled={loading}
               formatOnBlur
             />
           </Form.Group>
@@ -128,26 +138,34 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
                     target={<div style={{height: `${editorHeight}px`, width: '100%'}} />}
                     open={fileExt === currentFileExt}
                   >
-                    <MonacoEditor
-                      height={`${editorHeight}px`}
-                      theme="vs-dark"
-                      path={FILES[fileExt].fileName}
-                      defaultLanguage={FILES[fileExt].syntax}
-                      value={input.value}
-                      onChange={value => {
-                        onChange({...values, [fileExt]: value});
-                        input.onChange(value);
-                      }}
-                      onMount={(editor, monaco) => {
-                        editorRef.current = editor;
-                        editor.addCommand(
-                          // eslint-disable-next-line no-bitwise
-                          monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-                          handleSubmit
-                        );
-                      }}
-                      options={{minimap: {enabled: false}}}
-                    />
+                    {loading ? (
+                      <Segment style={{height: `${editorHeight}px`}} styleName="loading-segment">
+                        <Dimmer active>
+                          <Loader />
+                        </Dimmer>
+                      </Segment>
+                    ) : (
+                      <MonacoEditor
+                        height={`${editorHeight}px`}
+                        theme="vs-dark"
+                        path={FILES[fileExt].fileName}
+                        defaultLanguage={FILES[fileExt].syntax}
+                        value={input.value}
+                        onChange={value => {
+                          onChange({...values, [fileExt]: value});
+                          input.onChange(value);
+                        }}
+                        onMount={(editor, monaco) => {
+                          editorRef.current = editor;
+                          editor.addCommand(
+                            // eslint-disable-next-line no-bitwise
+                            monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+                            handleSubmit
+                          );
+                        }}
+                        options={{minimap: {enabled: false}}}
+                      />
+                    )}
                   </Nexus>
                   <Message error visible={!!meta.submitError}>
                     {meta.submitError}
@@ -157,7 +175,7 @@ export default function Editor({template, onChange, onSubmit, editorHeight, targ
             </FinalField>
           ))}
           <Form.Group styleName="buttons">
-            <FinalSubmitButton label={Translate.string('Save')} />
+            <FinalSubmitButton label={Translate.string('Save')} disabledUntilChange={!add} />
             <Link to={templateListURL(targetLocator)} className="ui button">
               <Translate>Cancel</Translate>
             </Link>
@@ -174,4 +192,11 @@ Editor.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   editorHeight: PropTypes.number.isRequired,
   targetLocator: targetLocatorSchema.isRequired,
+  loading: PropTypes.bool,
+  add: PropTypes.bool,
+};
+
+Editor.defaultProps = {
+  loading: false,
+  add: false,
 };

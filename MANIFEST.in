@@ -3,6 +3,7 @@ recursive-include indico *.html *.txt *.js *.yaml *.tex *.svg
 exclude indico/logging.yaml
 
 graft indico/core/plugins/alembic/
+graft indico/modules/receipts/default_templates/
 graft indico/migrations/
 graft indico/translations/
 graft indico/web/static
@@ -11,5 +12,5 @@ prune indico/htdocs
 prune indico/**/htmlcov
 include indico/legacy/pdfinterface/texmf.cnf
 
-global-exclude *.pyc __pycache__ .keep
+global-exclude *.pyc __pycache__ .keep .no-header
 include indico/migrations/versions/.keep

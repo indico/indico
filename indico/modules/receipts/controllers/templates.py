@@ -7,10 +7,12 @@
 
 import base64
 import re
+from pathlib import Path
 
-from flask import g, jsonify, request, session
+import yaml
+from flask import current_app, g, jsonify, request, session
 from marshmallow import fields, validate
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.categories.controllers.management import RHManageCategoryBase
@@ -33,6 +35,10 @@ from indico.web.rh import RHProtected
 
 
 TITLE_ENUM_RE = re.compile(r'^(.*) \((\d+)\)$')
+
+
+def _get_default_templates_dir():
+    return Path(current_app.root_path) / 'modules' / 'receipts' / 'default_templates'
 
 
 class ReceiptAreaMixin:
@@ -86,12 +92,15 @@ class TemplateListMixin(ReceiptAreaMixin):
     def _process(self):
         inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
         own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
+        default_templates_dir = _get_default_templates_dir()
+        default_templates = {f.stem: yaml.safe_load(f.read_text()) for f in default_templates_dir.glob('*.yaml')}
         view_class = WPEventReceiptTemplates if self.object_type == 'event' else WPCategoryReceiptTemplates
         return view_class.render_template(
             'list.html', self.target, 'receipts',
             target=self.target,
             inherited_templates=inherited_templates,
             own_templates=own_templates,
+            default_templates=default_templates,
             target_locator=self.target.locator
         )
 
@@ -119,7 +128,7 @@ class RHAddTemplate(ReceiptAreaMixin, RHReceiptTemplatesManagementBase):
         template.log(template.log_realm, LogKind.positive, 'Templates',
                      f'Document template "{template.title}" created',
                      user=session.user, data={'HTML': html, 'CSS': css, 'YAML': yaml})
-        return jsonify(ReceiptTemplateDBSchema().dump(template))
+        return ReceiptTemplateDBSchema().jsonify(template)
 
 
 class RHDeleteTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
@@ -223,4 +232,28 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
         db.session.flush()
         new_tpl.log(new_tpl.log_realm, LogKind.positive, 'Templates', f'Document template "{new_tpl.title}" created',
                     user=session.user, data={'Cloned from': self.template.title})
-        return jsonify(ReceiptTemplateDBSchema().dump(new_tpl))
+        return ReceiptTemplateDBSchema().jsonify(new_tpl)
+
+
+class RHGetDefaultTemplate(RHProtected):
+    """Get a template from a default template."""
+
+    def _check_access(self):
+        RHProtected._check_access(self)
+        if not can_user_manage_receipt_templates(session.user):
+            raise Forbidden
+
+    def _process(self):
+        name = request.view_args['template_name']
+        default_templates_dir = _get_default_templates_dir()
+        metadata_file = next((f for f in default_templates_dir.glob('*.yaml') if f.stem == name), None)
+        if metadata_file is None:
+            raise NotFound('Template does not exist')
+        tpl_data = yaml.safe_load(metadata_file.read_text())
+        tpl_data['title'] = f'{tpl_data["title"]} (v{tpl_data["version"]})'
+        del tpl_data['version']
+        template_dir = default_templates_dir / metadata_file.stem
+        tpl_data['html'] = (template_dir / 'template.html').read_text()
+        tpl_data['css'] = (template_dir / 'theme.css').read_text()
+        tpl_data['yaml'] = (template_dir / 'metadata.yaml').read_text()
+        return ReceiptTemplateAPISchema().jsonify(tpl_data)
