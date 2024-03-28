@@ -57,7 +57,7 @@ from indico.util.i18n import _, force_locale
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
-from indico.util.string import make_unique_token
+from indico.util.string import make_unique_token, remove_accents
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -899,7 +899,11 @@ class RHUserSearch(RHProtected):
 
         def _sort_key(entry):
             exact_match_keys = [entry[k].lower() != v.lower() for k, v in criteria.items()] if not exact else []
-            return *exact_match_keys, entry['full_name'], entry['email']
+            unaccent_exact_match_keys = [
+                remove_accents(entry[k].lower()) != remove_accents(v.lower())
+                for k, v in criteria.items()
+            ] if not exact else []
+            return *exact_match_keys, *unaccent_exact_match_keys, entry['full_name'], entry['email']
 
         results = sorted((self._serialize_entry(entry) for entry in matches), key=_sort_key)
         if favorites_first:
