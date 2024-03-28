@@ -327,7 +327,7 @@ class Reservation(db.Model):
         reservation.end_dt = occurrences[-1].end_dt
 
         db.session.flush()
-        signals.rb.booking_created.send(reservation)
+        signals.rb.booking_created.send(reservation, data=data)
         notify_creation(reservation)
         return reservation
 
@@ -549,11 +549,12 @@ class Reservation(db.Model):
     def is_owned_by(self, user):
         return self.created_by_user == user
 
-    def modify(self, data, user):
+    def modify(self, data, user, extra_fields: dict | None):
         """Modify an existing reservation.
 
-        :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
+        :param data: A dict containing the booking data, usually from a :class:`CreateBookingSchema` instance
         :param user: The :class:`.User` who modifies the booking.
+        :param extra_fields: A dict containing the extra fields data from the schema
         """
         from indico.modules.rb import rb_settings
 
@@ -622,7 +623,8 @@ class Reservation(db.Model):
                 else:
                     changes[field] = {'old': old, 'new': new, 'converter': converter}
 
-        if not changes:
+        # If extra_fields are present, don't short-circuit the function, because some may have been updated.
+        if not changes and not extra_fields:
             return False
 
         # Create a verbose log entry for the modification
@@ -673,7 +675,7 @@ class Reservation(db.Model):
         if not any(occ.is_valid for occ in self.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
 
-        signals.rb.booking_modified.send(self, changes=changes)
+        signals.rb.booking_modified.send(self, changes=changes, extra_fields=extra_fields)
 
         notify_modification(self, changes)
         return True

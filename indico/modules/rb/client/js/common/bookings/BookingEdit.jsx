@@ -15,6 +15,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Button, Checkbox, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
 
+import {FinalField} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -77,6 +78,7 @@ class BookingEdit extends React.Component {
       willBookingSplit: false,
       calendars: null,
       timelineError: null,
+      extraFields: null,
     };
   }
 
@@ -121,6 +123,7 @@ class BookingEdit extends React.Component {
       user: bookedForUser.identifier,
       reason: bookingReason,
       internalNote,
+      extraFieldsChanged: false,
     };
   }
 
@@ -215,7 +218,14 @@ class BookingEdit extends React.Component {
                 booking={booking}
                 formProps={fprops}
                 onBookingPeriodChange={this.updateBookingCalendar}
+                onExtraFieldsChange={extraFields => {
+                  this.setState({extraFields});
+                  // mark form as dirty so the submit button becomes available, since currently
+                  // extra fields from plugins are not integrated w/ final-form
+                  fprops.form.change('extraFieldsChanged', true);
+                }}
               />
+              <FinalField name="extraFieldsChanged" component={() => null} />
             </Grid.Column>
             <Grid.Column stretched={!timelineError}>
               {timelineError ? (
@@ -324,6 +334,7 @@ class BookingEdit extends React.Component {
       isAdminOverrideEnabled,
     } = this.props;
     const [repeatFrequency, repeatInterval] = serializeRecurrenceInfo(recurrence);
+    const {extraFields} = this.state;
     const params = {
       start_dt: `${startDate} ${startTime}`,
       end_dt: `${endDate ? endDate : startDate} ${endTime}`,
@@ -335,6 +346,9 @@ class BookingEdit extends React.Component {
       reason: reason || undefined,
       internal_note: internalNote,
     };
+    if (extraFields !== null) {
+      params.extra_fields = extraFields;
+    }
     if (isAdminOverrideEnabled) {
       params.admin_override_enabled = true;
     }

@@ -211,6 +211,7 @@ Internal Changes
 - Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
+- Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
 
 
 ----

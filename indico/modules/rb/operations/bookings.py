@@ -395,7 +395,7 @@ def should_split_booking(booking, new_data):
     return is_ongoing_booking and (times_changed or repetition_changed or weekdays_changed)
 
 
-def split_booking(booking, new_booking_data):
+def split_booking(booking, new_booking_data, extra_fields: dict):
     is_ongoing_booking = booking.start_dt.date() < date.today() < booking.end_dt.date()
     if not is_ongoing_booking:
         return
@@ -425,14 +425,21 @@ def split_booking(booking, new_booking_data):
             'recurrence_weekdays': booking.recurrence_weekdays,
         }
 
-        booking.modify(old_booking_data, session.user)
+        # Set extra_fields to None to avoid modifying the old booking
+        booking.modify(old_booking_data, session.user, extra_fields=None)
 
     for occurrence_to_cancel in occurrences_to_cancel:
         occurrence_to_cancel.cancel(session.user, silent=True)
 
     prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
-    resv = Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
-                                        prebook=prebook, ignore_admin=True, force_internal_note=True)
+    resv = Reservation.create_from_data(
+        room,
+        new_booking_data | {'start_dt': new_start_dt, 'extra_fields': extra_fields},
+        session.user,
+        prebook=prebook,
+        ignore_admin=True,
+        force_internal_note=True,
+    )
     for new_occ in resv.occurrences:
         new_occ_start = new_occ.start_dt.date()
         if new_occ_start in cancelled_dates:

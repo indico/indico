@@ -346,12 +346,12 @@ class RHUpdateBooking(RHBookingBase):
         additional_booking_attrs = {}
         if not should_split_booking(self.booking, new_booking_data):
             has_slot_changed = not has_same_slots(self.booking, new_booking_data)
-            self.booking.modify(new_booking_data, session.user)
+            self.booking.modify(new_booking_data, session.user, extra_fields=args['extra_fields'])
             if (has_slot_changed and not room.can_book(session.user, allow_admin=False) and
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
                 self.booking.reset_approval(session.user)
         else:
-            new_booking = split_booking(self.booking, new_booking_data)
+            new_booking = split_booking(self.booking, new_booking_data, extra_fields=args['extra_fields'])
             additional_booking_attrs['new_booking_id'] = new_booking.id
 
         db.session.flush()

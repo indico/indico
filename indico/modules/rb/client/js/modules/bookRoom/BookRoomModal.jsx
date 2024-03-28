@@ -28,6 +28,7 @@ import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid, serializeTime} from 'indico/utils/date';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {openModal} from '../../actions';
 import {BookingObjectLink} from '../../common/bookings';
@@ -114,6 +115,7 @@ class BookRoomModal extends React.Component {
     bookingConflictsVisible: false,
     booking: null,
     selectedEvent: null,
+    extraFields: null,
   };
 
   componentDidMount() {
@@ -241,6 +243,8 @@ class BookRoomModal extends React.Component {
       data.linkType = _.snakeCase(link.type);
       data.linkId = link.id;
     }
+    const {extraFields} = this.state;
+    data.extraFields = extraFields;
     const rv = await createBooking(data, this.props);
     if (rv.error) {
       return rv.error;
@@ -625,6 +629,15 @@ class BookRoomModal extends React.Component {
                     required={requireReason}
                   />
                 </Segment>
+                {renderPluginComponents('rb-booking-form-extra-fields', {
+                  room,
+                  disabled: fprops.submitSucceeded || fprops.submitting,
+                  onSubmit: item => {
+                    this.setState({
+                      extraFields: item,
+                    });
+                  },
+                })}
                 {!link &&
                   !fprops.submitSucceeded &&
                   this.renderRelatedEventsDropdown(
@@ -707,7 +720,7 @@ class BookRoomModal extends React.Component {
           validate={values => validate(values, requireReason)}
           decorators={[formDecorator]}
           render={renderModalContent}
-          initialValues={{user: null, linkBack}}
+          initialValues={{user: null, linkBack, extraFields: null}}
           subscription={{
             submitSucceeded: true,
             submitError: true,
@@ -745,7 +758,7 @@ export default connect(
         fetchRelatedEvents: actions.fetchRelatedEvents,
         resetRelatedEvents: actions.resetRelatedEvents,
         createBooking: (data, props) => {
-          const {reason, internalNote, usage, user, linkType, linkId, linkBack} = data;
+          const {reason, internalNote, usage, user, linkType, linkId, linkBack, extraFields} = data;
           const {
             bookingData: {recurrence, dates, recurrenceWeekdays, timeSlot, isPrebooking},
             room,
@@ -766,6 +779,7 @@ export default connect(
               linkId,
               linkBack,
               isPrebooking,
+              extraFields,
             },
             isAdminOverrideEnabled
           );

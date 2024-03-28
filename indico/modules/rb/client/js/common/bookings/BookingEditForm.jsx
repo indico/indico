@@ -27,6 +27,7 @@ import {
 import {FavoritesProvider} from 'indico/react/hooks';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {selectors as configSelectors} from '../../common/config';
 import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
@@ -42,6 +43,7 @@ class BookingEditForm extends React.Component {
     booking: PropTypes.object.isRequired,
     formProps: PropTypes.object.isRequired,
     onBookingPeriodChange: PropTypes.func,
+    onExtraFieldsChange: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
     bookingReasonRequired: PropTypes.string.isRequired,
   };
@@ -49,6 +51,7 @@ class BookingEditForm extends React.Component {
   static defaultProps = {
     onBookingPeriodChange: () => {},
     hideOptions: {},
+    onExtraFieldsChange: () => null,
   };
 
   showApprovalWarning = (dirtyFields, initialValues, values) => {
@@ -159,15 +162,18 @@ class BookingEditForm extends React.Component {
   render() {
     const {
       user: sessionUser,
-      booking: {bookedForUser, startDt, endDt, room, isAccepted, repetition, link},
+      booking,
       onBookingPeriodChange,
       formProps,
       hideOptions,
       bookingReasonRequired,
+      onExtraFieldsChange,
     } = this.props;
+    const {bookedForUser, startDt, endDt, room, isAccepted, repetition, link} = booking;
     const {
       values: {dates, recurrence, timeSlot, usage},
       submitSucceeded,
+      submitting,
       form,
       handleSubmit,
     } = formProps;
@@ -384,6 +390,12 @@ class BookingEditForm extends React.Component {
             disabled={submitSucceeded}
           />
         </Segment>
+        {renderPluginComponents('rb-booking-form-extra-fields', {
+          room,
+          booking,
+          disabled: submitSucceeded || submitting,
+          onSubmit: item => onExtraFieldsChange(item),
+        })}
 
         {room.canUserViewInternalNotes && (
           <Segment inverted styleName="internal-notes-segment">

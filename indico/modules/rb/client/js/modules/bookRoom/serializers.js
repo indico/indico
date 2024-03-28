@@ -29,4 +29,5 @@ export const ajax = {
   link_type: ({linkType}) => linkType,
   link_id: ({linkId}) => linkId,
   link_back: ({linkBack}) => linkBack,
+  extra_fields: ({extraFields}) => extraFields,
 };

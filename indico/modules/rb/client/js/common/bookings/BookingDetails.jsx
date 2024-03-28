@@ -33,6 +33,7 @@ import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {toMoment, serializeDate} from 'indico/utils/date';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {openModal} from '../../actions';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
@@ -833,38 +834,34 @@ class BookingDetails extends React.Component {
 
   render() {
     const {error, occurrencesVisible} = this.state;
+    const {onClose, editButton, bookingStateChangeInProgress, booking} = this.props;
     const {
-      onClose,
-      editButton,
-      bookingStateChangeInProgress,
-      booking: {
-        id,
-        startDt,
-        endDt,
-        occurrences,
-        dateRange,
-        repetition,
-        room,
-        bookedForUser,
-        bookingReason,
-        internalNote,
-        editLogs,
-        createdDt,
-        createdByUser,
-        isCancelled,
-        isRejected,
-        canDelete,
-        canCancel,
-        canReject,
-        canAccept,
-        canEdit,
-        isAccepted,
-        newBookingId,
-        isLinkedToObjects,
-        externalDetailsURL,
-        recurrenceWeekdays,
-      },
-    } = this.props;
+      id,
+      startDt,
+      endDt,
+      occurrences,
+      dateRange,
+      repetition,
+      room,
+      bookedForUser,
+      bookingReason,
+      internalNote,
+      editLogs,
+      createdDt,
+      createdByUser,
+      isCancelled,
+      isRejected,
+      canDelete,
+      canCancel,
+      canReject,
+      canAccept,
+      canEdit,
+      isAccepted,
+      newBookingId,
+      isLinkedToObjects,
+      externalDetailsURL,
+      recurrenceWeekdays,
+    } = booking;
     const dates = {startDate: startDt, endDate: endDt};
     const times = {
       startTime: moment(startDt).format('HH:mm'),
@@ -911,6 +908,7 @@ class BookingDetails extends React.Component {
                   occurrenceCount={occurrenceCount}
                   recurrenceWeekdays={recurrenceWeekdays}
                 />
+                {renderPluginComponents('rb-booking-detail-extra-fields', {booking})}
               </Grid.Column>
               <Grid.Column>
                 <>
