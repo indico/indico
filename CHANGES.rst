@@ -139,6 +139,7 @@ Improvements
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
+- Add dialog to contact event participants about a survey (:issue:`6069`, :pr:`6144`)
 
 Bugfixes
 ^^^^^^^^

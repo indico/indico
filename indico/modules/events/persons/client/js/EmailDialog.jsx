@@ -60,7 +60,10 @@ RecipientsField.propTypes = {
 export function EmailSentMessage({count}) {
   return (
     <Message positive>
-      <Translate as={Message.Header}>Your email has been sent.</Translate>
+      <PluralTranslate as={Message.Header} count={count}>
+        <Singular>Your email has been sent.</Singular>
+        <Plural>Your emails have been sent.</Plural>
+      </PluralTranslate>
       <PluralTranslate count={count} as="p">
         <Singular>
           <Param name="count" value={count} /> email has been sent.
@@ -86,6 +89,7 @@ export function EmailDialog({
   recipients,
   recipientsField,
   initialFormValues,
+  validate,
 }) {
   const [preview, setPreview] = useState(null);
 
@@ -199,6 +203,7 @@ export function EmailDialog({
       disabledAfterSubmit
       unloadPrompt
       scrolling
+      validate={validate}
     >
       {({submitSucceeded}) =>
         submitSucceeded ? <EmailSentMessage count={sentEmailsCount} /> : form
@@ -220,6 +225,7 @@ EmailDialog.propTypes = {
   /** React node to render instead of the default <RecipientsField /> component. */
   recipientsField: PropTypes.node,
   initialFormValues: PropTypes.object,
+  validate: PropTypes.func,
 };
 
 EmailDialog.defaultProps = {
@@ -228,4 +234,5 @@ EmailDialog.defaultProps = {
   sentEmailsCount: 0,
   recipients: [],
   recipientsField: null,
+  validate: undefined,
 };

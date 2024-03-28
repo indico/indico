@@ -7,19 +7,17 @@
 
 from datetime import time
 
-from flask import request
 from markupsafe import escape
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms.fields import BooleanField, IntegerField, StringField, TextAreaField
 from wtforms.validators import DataRequired, NumberRange, Optional
 
 from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.util.i18n import _
-from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField
-from indico.web.forms.validators import HiddenUnless, LinkedDateTime, NoRelativeURLs, UsedIf, ValidationError
-from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf, ValidationError
+from indico.web.forms.widgets import SwitchWidget
 
 
 class SurveyForm(IndicoForm):
@@ -109,26 +107,3 @@ class ImportQuestionnaireForm(IndicoForm):
                           accepted_file_types='application/json,.json',
                           description=_('Choose a previously exported survey content to import. '
                                         'Existing sections will be preserved.'))
-
-
-class InvitationForm(IndicoForm):
-    from_address = SelectField(_('From'), [DataRequired()])
-    subject = StringField(_('Subject'), [DataRequired()])
-    body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
-    recipients = EmailListField(_('Recipients'), [DataRequired()], description=_('One email address per line.'))
-    copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget())
-    submitted = HiddenField()
-
-    def __init__(self, *args, **kwargs):
-        event = kwargs.pop('event')
-        super().__init__(*args, **kwargs)
-        self.from_address.choices = list(event.get_allowed_sender_emails().items())
-        self.body.description = render_placeholder_info('survey-link-email', event=None, survey=None)
-
-    def is_submitted(self):
-        return super().is_submitted() and 'submitted' in request.form
-
-    def validate_body(self, field):
-        missing = get_missing_placeholders('survey-link-email', field.data, event=None, survey=None)
-        if missing:
-            raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))

@@ -5,18 +5,24 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, redirect, session
+from flask import flash, jsonify, redirect, session
+from marshmallow import fields
+from webargs import validate
+from webargs.flaskparser import abort
 
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
-from indico.modules.events.surveys.forms import InvitationForm, ScheduleSurveyForm, SurveyForm
+from indico.modules.events.surveys.forms import ScheduleSurveyForm, SurveyForm
 from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.views import WPManageSurvey
-from indico.util.i18n import _, ngettext
-from indico.util.placeholders import replace_placeholders
+from indico.util.i18n import _
+from indico.util.marshmallow import LowercaseString, make_validate_indico_placeholders, no_relative_urls, not_empty
+from indico.util.placeholders import get_sorted_placeholders, replace_placeholders
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -139,27 +145,68 @@ class RHOpenSurvey(RHManageSurveyBase):
         return redirect(url_for('.manage_survey', self.survey))
 
 
-class RHSendSurveyLinks(RHManageSurveyBase):
-    """Send emails with URL of the survey."""
-
+class RHAPIEmailEventSurveyMetadata(RHManageSurveyBase):
     def _process(self):
-        tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)
-        form = InvitationForm(body=tpl.get_html_body(), subject=tpl.get_subject(), event=self.event)
-        if form.validate_on_submit():
-            self._send_emails(form, form.recipients.data)
-            num = len(form.recipients.data)
-            flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
-            return jsonify_data(flash=True)
-        return jsonify_form(form, submit=_('Send'))
+        with self.event.force_event_locale():
+            tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)
+            body = tpl.get_html_body()
+            subject = tpl.get_subject()
+        placeholders = get_sorted_placeholders('survey-link-email')
+        return jsonify({
+            'senders': list(self.event.get_allowed_sender_emails().items()),
+            'body': body,
+            'subject': subject,
+            'placeholders': [p.serialize() for p in placeholders],
+        })
 
-    def _send_emails(self, form, recipients):
-        for recipient in recipients:
-            email_body = replace_placeholders('survey-link-email', form.body.data, event=self.event,
-                                              survey=self.survey)
-            email_subject = replace_placeholders('survey-link-email', form.subject.data, event=self.event,
-                                                 survey=self.survey)
-            tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-            bcc = [session.user.email] if form.copy_for_sender.data else []
-            email = make_email(to_list=recipient, bcc_list=bcc, from_address=form.from_address.data,
-                               template=tpl, html=True)
+
+class RHEmailEventSurveyPreview(RHManageSurveyBase):
+    """Preview an email with EventSurvey associated placeholders."""
+
+    @use_kwargs({
+        'body': fields.String(required=True),
+        'subject': fields.String(required=True),
+    })
+    def _process(self, body, subject):
+        email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
+        email_subject = replace_placeholders('survey-link-email', subject, event=self.event, survey=self.survey)
+        tpl = get_template_module('events/persons/emails/custom_email.html', email_subject=email_subject,
+                                  email_body=email_body)
+        return jsonify(subject=tpl.get_subject(), body=tpl.get_html_body())
+
+
+class RHAPIEmailEventSurveySend(RHManageSurveyBase):
+    @use_kwargs({
+        'from_address': fields.String(required=True, validate=not_empty),
+        'body': fields.String(required=True, validate=[
+            not_empty,
+            no_relative_urls,
+            make_validate_indico_placeholders('survey-link-email'),
+        ]),
+        'subject': fields.String(required=True, validate=not_empty),
+        'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
+        'copy_for_sender': fields.Bool(load_default=False),
+        'email_all_participants': fields.Bool(load_default=False),
+        'recipients_addresses': fields.List(LowercaseString(validate=validate.Email())),
+    })
+    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender,
+                 email_all_participants, recipients_addresses):
+        if from_address not in self.event.get_allowed_sender_emails():
+            abort(422, messages={'from_address': ['Invalid sender address']})
+        self.recipients = set()
+        if email_all_participants:
+            registrations = Registration.get_all_for_event(self.event)
+            self.recipients |= {r.email for r in registrations}
+        if recipients_addresses:
+            self.recipients |= set(recipients_addresses)
+        for recipient in self.recipients:
+            email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
+            email_subject = replace_placeholders('survey-link-email', subject, event=self.event, survey=self.survey)
+            bcc = {session.user.email} if copy_for_sender else set()
+            bcc.update(bcc_addresses)
+            with self.event.force_event_locale():
+                tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
+                email = make_email(to_list=recipient, bcc_list=bcc, from_address=from_address,
+                                   template=tpl, html=True)
             send_email(email, self.event, 'Surveys')
+        return jsonify(count=len(self.recipients))

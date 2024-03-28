@@ -8,7 +8,7 @@
 from markupsafe import Markup, escape
 
 from indico.util.i18n import _
-from indico.util.placeholders import Placeholder
+from indico.util.placeholders import ParametrizedPlaceholder, Placeholder
 from indico.web.flask.util import url_for
 
 
@@ -21,12 +21,17 @@ class SurveyTitlePlaceholder(Placeholder):
         return survey.title
 
 
-class SurveyLinkPlaceholder(Placeholder):
+class SurveyLinkPlaceholder(ParametrizedPlaceholder):
     name = 'survey_link'
-    description = _('Link to the survey')
+    param_friendly_name = 'link title'
     required = True
 
     @classmethod
-    def render(cls, event, survey, **kwargs):
+    def render(cls, param, survey, **kwargs):
         url = url_for('.display_survey_form', survey, survey.locator.token, _external=True)
-        return Markup(f'<a href="{url}" title="{escape(survey.title)}">{url}</a>')
+        return Markup(f'<a href="{url}" title="{escape(survey.title)}">{param or url}</a>')
+
+    @classmethod
+    def iter_param_info(cls, **kwargs):
+        yield None, _('Link to the survey')
+        yield 'custom-text', _('Custom link text instead of the full URL')
