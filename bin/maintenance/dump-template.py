@@ -6,6 +6,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
 import sys
 from pathlib import Path
 
@@ -14,6 +15,10 @@ import yaml
 
 from indico.util.string import normalize_linebreaks
 from indico.web.flask.app import make_app
+
+
+def _normalize(string):
+    return normalize_linebreaks(string).rstrip('\n') + '\n'
 
 
 def _main(name, template_id, target):
@@ -27,16 +32,18 @@ def _main(name, template_id, target):
     metadata_file = target / f'{name}.yaml'
     if metadata_file.exists():
         existing_data = yaml.safe_load(metadata_file.read_text())
-        data['version'] = existing_data.get('version', 0) + 1
+        existing_version = existing_data.get('version', 0)
+        data['version'] = existing_version + 1
+        data['title'] = re.sub(rf' \(v{existing_version}\)$', '', data['title'])
     else:
         data['version'] = 1
     template_path = target / name
     template_path.mkdir(parents=True, exist_ok=True)
 
-    metadata_file.write_text(normalize_linebreaks(yaml.dump(data)))
-    (template_path / 'template.html').write_text(normalize_linebreaks(template.html))
-    (template_path / 'theme.css').write_text(normalize_linebreaks(template.css))
-    (template_path / 'metadata.yaml').write_text(normalize_linebreaks(template.yaml))
+    metadata_file.write_text(_normalize(yaml.dump(data)))
+    (template_path / 'template.html').write_text(_normalize(template.html))
+    (template_path / 'theme.css').write_text(_normalize(template.css))
+    (template_path / 'metadata.yaml').write_text(_normalize(template.yaml))
 
 
 @click.command()
