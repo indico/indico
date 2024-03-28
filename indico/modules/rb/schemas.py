@@ -158,6 +158,8 @@ class ReservationLinkedObjectDataSchema(mm.Schema):
     event_url = Function(lambda obj: obj.event.url)
     own_room_id = Number()
     own_room_name = Function(lambda obj: (obj.own_room.name if obj.own_room else obj.own_room_name) or None)
+    start_dt = DateTime()
+    end_dt = DateTime()
 
     def _get_title(self, obj):
         if isinstance(obj, SessionBlock):
@@ -176,7 +178,8 @@ class ReservationUserEventSchema(mm.Schema):
 class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
     id = Number()
     type = EnumField(LinkType, attribute='link_type')
-    object = Nested(ReservationLinkedObjectDataSchema, only=('url', 'title', 'event_title', 'event_url'))
+    object = Nested(ReservationLinkedObjectDataSchema,
+                    only=('url', 'title', 'event_title', 'event_url', 'start_dt', 'end_dt'))
     start_dt = NaiveDateTime(attribute='reservation_occurrence.start_dt')
     state = EnumField(ReservationOccurrenceState, attribute='reservation_occurrence.state')
 
@@ -193,13 +196,14 @@ class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
 
 class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
+    link = Nested(ReservationOccurrenceLinkSchema)
     state = EnumField(ReservationOccurrenceState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state', 'link')
 
 
 class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
