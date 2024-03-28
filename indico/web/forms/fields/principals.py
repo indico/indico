@@ -49,7 +49,7 @@ def serialize_principal(principal):
 class PrincipalListField(HiddenField):
     """A field that lets you select a list of principals.
 
-    Principals are users or other objects represending users such as
+    Principals are users or other objects representing users such as
     groups or roles that can be added to ACLs.
 
     :param allow_external_users: If "search users with no indico account"
