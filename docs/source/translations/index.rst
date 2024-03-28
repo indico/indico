@@ -175,8 +175,9 @@ Tips for better translations
 Reporting issues
 ----------------
 
-If you spot any issues with the translations such as missing pluralization,
+If you spot any issues with the source messages such as missing pluralization,
 missing context or typos, please let us know either in the `forum
 <https://talk.getindico.io/>`_ or by opening an issue on `GitHub
-<https://github.com/indico/indico>`_. By reporting such issues, you will save
-time to your fellow translators!
+<https://github.com/indico/indico>`_ (issues with the translated messages can be
+fixed directly in Transifex, no need to open an issue in that case). By
+reporting such issues, you will save time to your fellow translators!
