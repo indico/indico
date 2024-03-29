@@ -15,7 +15,7 @@ from indico.core.marshmallow import mm
 from indico.modules.events.roles.forms import ImportMembersCSVForm
 from indico.modules.logs.models.entries import LogKind
 from indico.modules.users import User
-from indico.modules.users.schemas import UserSchema
+from indico.modules.users.schemas import BasicUserSchema
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import csv_text_io_wrapper, send_csv
 from indico.util.string import validate_email
@@ -98,7 +98,7 @@ class RoleSchema(mm.Schema):
     name = fields.String()
     code = fields.String()
     color = fields.String()
-    members = fields.List(fields.Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email')))
+    members = fields.List(fields.Nested(BasicUserSchema, only=('id', 'identifier', 'full_name', 'email')))
 
 
 class RolesAPIMixin:
