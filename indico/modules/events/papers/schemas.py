@@ -22,7 +22,7 @@ from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.reviews import PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.util import is_type_reviewing_possible
-from indico.modules.users.schemas import UserSchema
+from indico.modules.users.schemas import BasicUserSchema
 from indico.util.i18n import orig_string
 from indico.util.mimetypes import icon_from_mimetype
 from indico.web.flask.util import url_for
@@ -96,8 +96,8 @@ class PaperReviewTypeSchema(mm.Schema):
 
 
 class PaperRevisionSchema(mm.SQLAlchemyAutoSchema):
-    submitter = Nested(UserSchema)
-    judge = Nested(UserSchema)
+    submitter = Nested(BasicUserSchema)
+    judge = Nested(BasicUserSchema)
     spotlight_file = Nested(PaperFileSchema)
     files = List(Nested(PaperFileSchema))
     state = EnumField(PaperRevisionState)
@@ -149,7 +149,7 @@ class PaperRatingSchema(mm.SQLAlchemyAutoSchema):
 
 class PaperReviewSchema(mm.SQLAlchemyAutoSchema):
     score = Decimal(places=2, as_string=True)
-    user = Nested(UserSchema)
+    user = Nested(BasicUserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
     proposed_action = Nested(PaperAction)
     ratings = Nested(PaperRatingSchema, many=True)
@@ -174,9 +174,9 @@ class PaperReviewDumpSchema(PaperReviewSchema):
 
 
 class PaperReviewCommentSchema(mm.SQLAlchemyAutoSchema):
-    user = Nested(UserSchema)
+    user = Nested(BasicUserSchema)
     visibility = Nested(PaperCommentVisibilitySchema)
-    modified_by = Nested(UserSchema)
+    modified_by = Nested(BasicUserSchema)
     html = Function(lambda comment: escape(comment.text))
     can_edit = Function(lambda comment, ctx: comment.can_edit(ctx.get('user')))
     can_view = Function(lambda comment, ctx: comment.can_view(ctx.get('user')))

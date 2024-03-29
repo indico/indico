@@ -16,15 +16,15 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.contributions.schemas import ContributionFieldValueSchema, contribution_type_schema_basic
 from indico.modules.events.tracks.schemas import track_schema_basic
-from indico.modules.users.schemas import AffiliationSchema, UserSchema
+from indico.modules.users.schemas import AffiliationSchema, BasicUserSchema
 
 
 _basic_abstract_fields = ('id', 'friendly_id', 'title')
 
 
 class AbstractCommentSchema(mm.SQLAlchemyAutoSchema):
-    user = Nested(UserSchema)
-    modified_by = Nested(UserSchema)
+    user = Nested(BasicUserSchema)
+    modified_by = Nested(BasicUserSchema)
 
     class Meta:
         model = AbstractComment
@@ -47,7 +47,7 @@ class AbstractReviewRatingSchema(mm.SQLAlchemyAutoSchema):
 
 class AbstractReviewSchema(mm.SQLAlchemyAutoSchema):
     track = Nested(track_schema_basic)
-    user = Nested(UserSchema)
+    user = Nested(BasicUserSchema)
     proposed_related_abstract = Nested('AbstractSchema', only=_basic_abstract_fields)
     proposed_contrib_type = Nested(contribution_type_schema_basic, attribute='proposed_contribution_type')
     proposed_tracks = Nested(track_schema_basic, many=True)
@@ -70,9 +70,9 @@ class AbstractPersonLinkSchema(mm.SQLAlchemyAutoSchema):
 
 
 class AbstractSchema(mm.SQLAlchemyAutoSchema):
-    submitter = Nested(UserSchema)
-    judge = Nested(UserSchema)
-    modified_by = Nested(UserSchema)
+    submitter = Nested(BasicUserSchema)
+    judge = Nested(BasicUserSchema)
+    modified_by = Nested(BasicUserSchema)
     duplicate_of = Nested(lambda: AbstractSchema, only=_basic_abstract_fields)
     merged_into = Nested(lambda: AbstractSchema, only=_basic_abstract_fields)
     submitted_contrib_type = Nested(contribution_type_schema_basic)

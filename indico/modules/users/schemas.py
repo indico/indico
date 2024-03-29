@@ -29,6 +29,16 @@ class AffiliationSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
+class BasicAffiliationSchema(AffiliationSchema):
+    """
+    A schema containing basic information about a predefined affiliation that
+    is intended to be used in exports.
+    """
+
+    class Meta(AffiliationSchema.Meta):
+        fields = ('id', 'name', 'street', 'postcode', 'city', 'country_code')
+
+
 class UserSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = User
@@ -38,6 +48,19 @@ class UserSchema(mm.SQLAlchemyAutoSchema):
     affiliation_id = fields.Integer(load_default=None, dump_only=True)
     affiliation_meta = fields.Nested(AffiliationSchema, attribute='affiliation_link', dump_only=True)
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
+
+
+class BasicUserSchema(UserSchema):
+    """
+    A schema containing basic information about the user that can be safely
+    exposed to event organizers.
+    """
+
+    affiliation_meta = fields.Nested(BasicAffiliationSchema, attribute='affiliation_link', dump_only=True)
+
+    class Meta(UserSchema.Meta):
+        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'affiliation_meta',
+                  'full_name', 'title', 'avatar_url')
 
 
 class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
