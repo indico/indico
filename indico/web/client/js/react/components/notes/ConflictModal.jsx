@@ -7,7 +7,7 @@
 
 import moment from 'moment/moment';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef} from 'react';
 import {
   Card,
   CardContent,
@@ -33,6 +33,10 @@ export function ConflictModal({noteData, onClose}) {
   // camelize the noteData keys
   const note = camelizeKeys(noteData);
 
+  // refs to the current and conflict output elements for syncing scroll
+  const currentChangesRef = useRef();
+  const conflictChangesRef = useRef();
+
   const renderDeletedRevision = () => {
     return (
       <Segment placeholder styleName="revision-deleted">
@@ -50,6 +54,11 @@ export function ConflictModal({noteData, onClose}) {
         {moment(dt).fromNow()}
       </span>
     );
+  };
+
+  const syncScroll = scroll => {
+    currentChangesRef.current.scrollTop = scroll.target.scrollTop;
+    conflictChangesRef.current.scrollTop = scroll.target.scrollTop;
   };
 
   return (
@@ -126,6 +135,8 @@ export function ConflictModal({noteData, onClose}) {
                     dangerouslySetInnerHTML={{__html: note.html}}
                     className="editor-output"
                     styleName="conflict-content"
+                    ref={currentChangesRef}
+                    onScroll={syncScroll}
                   />
                 </CardContent>
               </Card>
@@ -145,6 +156,8 @@ export function ConflictModal({noteData, onClose}) {
                       dangerouslySetInnerHTML={{__html: note.conflict.html}}
                       className="editor-output"
                       styleName="conflict-content"
+                      ref={conflictChangesRef}
+                      onScroll={syncScroll}
                     />
                   </CardContent>
                 </Card>
