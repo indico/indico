@@ -24,6 +24,10 @@ jobs:
           cache-dependency-path: |
             requirements.txt
             requirements.dev.txt
+      - name: Install build deps 🔧
+        run: |
+          sudo apt-get install libpq-dev
+          pip install --user -U pip setuptools wheel
       - name: Check version 🔍
         run: python .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
       - name: Extract changelog 📜
@@ -32,11 +36,8 @@ jobs:
         name: Setup Node
         with:
           node-version: 18.x
-      - name: Install build deps 🔧
-        run: |
-          sudo apt-get install libpq-dev
-          pip install --user -U pip setuptools wheel
-          pip install --user -e '.[dev]'
+      - name: Install Indico + Python deps 🔧
+        run: pip install --user -e '.[dev]'
       - name: Install npm deps ☕
         run: npm ci
       - name: Build wheel 🏗
