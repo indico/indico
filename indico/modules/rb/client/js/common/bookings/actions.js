@@ -108,7 +108,15 @@ export function linkBookingOccurrence(bookingId, date, eventId, onSuccess, param
         params
       ),
     BOOKING_OCCURRENCE_LINK_CHANGE_REQUEST,
-    [BOOKING_OCCURRENCE_LINK_UPDATED, BOOKING_OCCURRENCE_LINK_CHANGE_SUCCESS, onSuccess],
+    [
+      BOOKING_OCCURRENCE_LINK_UPDATED,
+      () => {
+        if (onSuccess) {
+          onSuccess();
+        }
+        return {type: BOOKING_OCCURRENCE_LINK_CHANGE_SUCCESS};
+      },
+    ],
     BOOKING_OCCURRENCE_LINK_CHANGE_ERROR
   );
 }
