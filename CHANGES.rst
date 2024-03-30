@@ -5,7 +5,7 @@ Changelog
 Version 3.3
 -----------
 
-*Unreleased*
+*Released on March 30, 2024*
 
 Major Features
 ^^^^^^^^^^^^^^
