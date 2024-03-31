@@ -8,7 +8,7 @@
 # The code in here is taken almost verbatim from `django.core.mail.message`,
 # which is licensed under the three-clause BSD license and is originally
 # available on the following URL:
-# https://github.com/django/django/blob/stable/3.1.x/django/core/mail/message.py
+# https://github.com/django/django/blob/425b26092f/django/core/mail/message.py
 # Credits of the original code go to the Django Software Foundation
 # and their contributors.
 
@@ -50,7 +50,7 @@ class BadHeaderError(ValueError):
     pass
 
 
-# Header names that contain structured address data (RFC #5322)
+# Header names that contain structured address data (RFC 5322).
 ADDRESS_HEADERS = {
     'from',
     'sender',
@@ -111,6 +111,8 @@ def sanitize_address(addr, encoding):
             domain = token.domain or ''
     else:
         nm, address = addr
+        if '@' not in address:
+            raise ValueError(f'Invalid address "{address}"')
         localpart, domain = address.rsplit('@', 1)
 
     address_parts = nm + localpart + domain
@@ -180,7 +182,8 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def set_payload(self, payload, charset=None):
         if charset == 'utf-8' and not isinstance(charset, Charset.Charset):
             has_long_lines = any(
-                len(line.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
+                len(line.encode(errors='surrogateescape'))
+                > RFC5322_EMAIL_LINE_LENGTH_LIMIT
                 for line in payload.splitlines()
             )
             # Quoted-Printable encoding has the side effect of shortening long
@@ -324,11 +327,15 @@ class EmailMessage:
         mimetype to DEFAULT_ATTACHMENT_MIME_TYPE and don't decode the content.
         """
         if isinstance(filename, MIMEBase):
-            assert content is None
-            assert mimetype is None
+            if content is not None or mimetype is not None:
+                raise ValueError(
+                    'content and mimetype must not be given when a MIMEBase '
+                    'instance is provided.'
+                )
             self.attachments.append(filename)
+        elif content is None:
+            raise ValueError('content must be provided.')
         else:
-            assert content is not None
             mimetype = (
                 mimetype
                 or mimetypes.guess_type(filename)[0]
@@ -392,8 +399,8 @@ class EmailMessage:
             encoding = self.encoding or DEFAULT_CHARSET
             attachment = SafeMIMEText(content, subtype, encoding)
         elif basetype == 'message' and subtype == 'rfc822':
-            # Bug #18967: per RFC2046 s5.2.1, message/rfc822 attachments
-            # must not be base64 encoded.
+            # Bug #18967: Per RFC 2046 Section 5.2.1, message/rfc822
+            # attachments must not be base64 encoded.
             if isinstance(content, EmailMessage):
                 # convert content into an email.Message first
                 content = content.message()
@@ -482,8 +489,8 @@ class EmailMultiAlternatives(EmailMessage):
 
     def attach_alternative(self, content, mimetype):
         """Attach an alternative content representation."""
-        assert content is not None
-        assert mimetype is not None
+        if content is None or mimetype is None:
+            raise ValueError('Both content and mimetype must be provided.')
         self.alternatives.append((content, mimetype))
 
     def _create_message(self, msg):
