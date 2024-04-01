@@ -11,7 +11,7 @@
 # The code in here is taken almost verbatim from `django.core.mail`,
 # which is licensed under the three-clause BSD license and is originally
 # available on the following URL:
-# https://github.com/django/django/blob/stable/2.2.x/django/core/mail/__init__.py
+# https://github.com/django/django/blob/425b26092f/django/core/mail/__init__.py
 # Credits of the original code go to the Django Software Foundation
 # and their contributors.
 

@@ -7,20 +7,10 @@ Version 3.3.1
 
 *Unreleased*
 
-Improvements
-^^^^^^^^^^^^
-
-- Nothing so far :(
-
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
-
-Internal Changes
-^^^^^^^^^^^^^^^^
-
-- Nothing so far
+- Fix sending emails when using TLS (:data:`SMTP_USE_TLS`) (:pr:`6261`)
 
 
 Version 3.3
