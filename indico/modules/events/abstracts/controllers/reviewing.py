@@ -196,8 +196,7 @@ class RHSubmitAbstractComment(RHAbstractBase):
                 recipients.add(entry.user)
         if visibility >= AbstractCommentVisibility.contributors:
             recipients.add(self.abstract.submitter)
-            for comment in self.abstract.comments:
-                recipients.add(comment.user)
+            recipients.update(comment.user for comment in self.abstract.comments)
         return recipients
 
     def _send_notification(self, recipients, comment):
