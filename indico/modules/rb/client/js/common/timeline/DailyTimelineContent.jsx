@@ -215,8 +215,8 @@ export default class DailyTimelineContent extends React.Component {
               <span styleName="timeline-label-text">
                 {short12hTimes
                   ? moment({hours: hourSeries[n]})
-                      .format('hA')
-                      .replace('M', '')
+                      .format('ha')
+                      .replace('m', '')
                   : moment({hours: hourSeries[n]}).format('LT')}
               </span>
             </div>
