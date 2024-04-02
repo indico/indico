@@ -45,7 +45,7 @@ export default class DailyTimelineContent extends React.Component {
     booking: PropTypes.object,
     gutterAllowed: PropTypes.bool,
     hideRecurrence: PropTypes.bool,
-    trim12hTimes: PropTypes.bool,
+    trim12hMins: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -69,7 +69,7 @@ export default class DailyTimelineContent extends React.Component {
     booking: null,
     gutterAllowed: false,
     hideRecurrence: false,
-    trim12hTimes: false,
+    trim12hMins: false,
   };
 
   state = {
@@ -198,9 +198,9 @@ export default class DailyTimelineContent extends React.Component {
   };
 
   renderDefaultHeader = (hourSpan, hourSeries, hasActions) => {
-    const {hourStep, longLabel, trim12hTimes} = this.props;
+    const {hourStep, longLabel, trim12hMins} = this.props;
     const labelWidth = longLabel ? 200 : 150;
-    const short12hTimes = !localeUses24HourTime(moment.locale().replace('_', '-')) && trim12hTimes;
+    const short12hTimes = !localeUses24HourTime(moment.locale().replace('_', '-')) && trim12hMins;
 
     return (
       <>
@@ -214,9 +214,7 @@ export default class DailyTimelineContent extends React.Component {
             >
               <span styleName="timeline-label-text">
                 {short12hTimes
-                  ? moment({hours: hourSeries[n]})
-                      .format('ha')
-                      .replace('m', '')
+                  ? moment({hours: hourSeries[n]}).format('hA')
                   : moment({hours: hourSeries[n]}).format('LT')}
               </span>
             </div>
