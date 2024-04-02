@@ -17,6 +17,8 @@ Bugfixes
 
 - Fix adding additional event keywords when some keywords have already been set
   (:pr:`6264`, thanks :user:`SegiNyn`)
+- Fix overlapping times in some room booking timelines when using a locale with
+  a 12-hour time format (:pr:`6263`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

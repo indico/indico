@@ -241,6 +241,7 @@ function RoomDetails({
             <DailyTimelineContent
               rows={availability.map(rowSerializer)}
               onClickReservation={onClickReservation}
+              trim12hMins
             />
           </Responsive.Tablet>
           <RoomStats roomId={room.id} />

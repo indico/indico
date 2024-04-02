@@ -331,6 +331,7 @@ class BookingDetails extends React.Component {
         booking={booking}
         rowActions={{occurrence: true}}
         hideRecurrence
+        trim12hMins
       />
     );
   };

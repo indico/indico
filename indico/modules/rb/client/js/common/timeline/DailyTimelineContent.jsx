@@ -17,7 +17,7 @@ import {Icon, Message, Popup, Placeholder} from 'semantic-ui-react';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
-import {toMoment} from 'indico/utils/date';
+import {toMoment, localeUses24HourTime} from 'indico/utils/date';
 
 import EditableTimelineItem from './EditableTimelineItem';
 import RowActionsDropdown from './RowActionsDropdown';
@@ -45,6 +45,7 @@ export default class DailyTimelineContent extends React.Component {
     booking: PropTypes.object,
     gutterAllowed: PropTypes.bool,
     hideRecurrence: PropTypes.bool,
+    trim12hMins: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -68,6 +69,7 @@ export default class DailyTimelineContent extends React.Component {
     booking: null,
     gutterAllowed: false,
     hideRecurrence: false,
+    trim12hMins: false,
   };
 
   state = {
@@ -196,8 +198,9 @@ export default class DailyTimelineContent extends React.Component {
   };
 
   renderDefaultHeader = (hourSpan, hourSeries, hasActions) => {
-    const {hourStep, longLabel} = this.props;
+    const {hourStep, longLabel, trim12hMins} = this.props;
     const labelWidth = longLabel ? 200 : 150;
+    const short12hTimes = !localeUses24HourTime(moment.locale().replace('_', '-')) && trim12hMins;
 
     return (
       <>
@@ -210,7 +213,7 @@ export default class DailyTimelineContent extends React.Component {
               style={{position: 'absolute', left: `${(i / hourSpan) * 100}%`}}
             >
               <span styleName="timeline-label-text">
-                {moment({hours: hourSeries[n]}).format('LT')}
+                {moment({hours: hourSeries[n]}).format(short12hTimes ? 'hA' : 'LT')}
               </span>
             </div>
           ))}
