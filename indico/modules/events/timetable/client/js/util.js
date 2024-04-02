@@ -11,6 +11,8 @@ import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
+const CONTRIB_DEFAULT_DURATION = 20; // in minutes
+
 export const entryColorSchema = PropTypes.shape({
   text: PropTypes.string,
   background: PropTypes.string,
@@ -133,9 +135,10 @@ export const applyChanges = state => {
   const newEntries = updateEntries(
     [...(state.blocks || []), ...(state.children || [])],
     dirtyMergeChanges(state)
-  ).filter(e => !e.deleted);
-  const [blocks, children] = _.partition(newEntries, e => !e.parentId);
-  return {blocks, children};
+  );
+  const [unscheduled, scheduled] = _.partition(newEntries, 'deleted');
+  const [children, blocks] = _.partition(scheduled, 'parentId');
+  return {blocks, children, unscheduled};
 };
 
 /**
@@ -307,12 +310,9 @@ export const preprocessEntries = (blocks, children) => ({
  * currentChangeIdx
  */
 const moveBlock = (state, {event: block, start, end, resourceId: columnId}) => {
-  const newEntry = {id: block.id};
+  const newEntry = {id: block.id, start, end, deleted: false};
   const timeDiff = start - block.start;
-  if (timeDiff !== 0) {
-    newEntry.start = start;
-    newEntry.end = end;
-  } else if (columnId === block.columnId) {
+  if (timeDiff === 0 && columnId === block.columnId) {
     return {};
   }
   // if a contribution with a parent is being moved, remove the parent
@@ -404,7 +404,7 @@ const moveContrib = (state, args) => {
   const {blocks, children} = applyChanges(state);
   const {event: contrib, start, end, resourceId} = args;
 
-  const newContrib = {id: contrib.id, start, end, columnId: undefined};
+  const newContrib = {id: contrib.id, start, end, columnId: undefined, deleted: false};
   const parent = getConcurrentEntries(newContrib, blocks).find(
     b => b.columnId === resourceId && b.type === 'session'
   );
@@ -500,6 +500,24 @@ export const deleteEntry = (state, entry) => {
   return layoutBlocks(
     addNewChange(state, [...contribs, entry].map(({id}) => ({id, deleted: true})))
   );
+};
+
+/**
+ * Schedules a contribution
+ * @param {object} state State of the timetable
+ * @param {object} contrib Contribution to be scheduled
+ * @param {object} args {start, end, resource} Arguments from the schedule event
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
+export const scheduleContrib = (state, contrib, {start, end, resource}) => {
+  console.debug('scheduleContrib', state, contrib, {start, end, resource});
+  return moveContrib(state, {
+    start,
+    end: new Date(start.getTime() + CONTRIB_DEFAULT_DURATION * 60000),
+    event: contrib,
+    resourceId: resource,
+  });
 };
 
 /**

@@ -40,6 +40,10 @@ export const getChildren = createSelector(
   getUpdatedEntries,
   entries => entries.children
 );
+export const getUnscheduled = createSelector(
+  getUpdatedEntries,
+  entries => entries.unscheduled
+);
 export const getAllEntries = createSelector(
   getBlocks,
   getChildren,
@@ -65,6 +69,11 @@ export const canRedo = createSelector(
 export const getMergedChanges = createSelector(
   getEntries,
   entries => mergeChanges(entries)
+);
+export const getDraggedContrib = createSelector(
+  getEntries,
+  getUnscheduled,
+  (entries, contribs) => contribs.find(c => c.id === entries.draggedId)
 );
 
 export const getNavbarMaxDays = createSelector(

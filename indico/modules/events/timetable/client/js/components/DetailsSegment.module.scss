@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/utilities' as *;
+
 .segment-header:global(.ui.label) {
   display: flex;
 
@@ -27,8 +29,17 @@
   }
 }
 
-:global(.segment) {
+:global(.ui.segment) {
   &:hover > .segment-header:global(.ui.label) .actions {
     display: flex;
+  }
+
+  &[draggable] > .segment-header {
+    @include icon-before('icon-drag-indicator');
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
   }
 }

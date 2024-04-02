@@ -134,7 +134,7 @@ const changeParams = {
 
 function Change({param, oldValue, newValue}) {
   const changeParam = changeParams[param];
-  if (!changeParam || !oldValue || !newValue) {
+  if (!changeParam) {
     // TODO remove this check when fully implemented
     console.error('you forgot to implement this one!', param, oldValue, newValue);
     return null;

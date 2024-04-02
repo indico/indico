@@ -89,6 +89,8 @@ TimeEditForm.propTypes = {
 };
 
 export default function TimeDisplay({entry, uses24HourFormat}) {
+  const startTime = moment(entry.start).format('HH:mm');
+  const endTime = moment(entry.end).format('HH:mm');
   return (
     <Accordion
       panels={[
@@ -97,7 +99,9 @@ export default function TimeDisplay({entry, uses24HourFormat}) {
           title: {
             content: (
               <>
-                {moment(entry.start).format('HH:mm')} - {moment(entry.end).format('HH:mm')}
+                {entry.deleted
+                  ? Translate.string('Not yet scheduled')
+                  : `${startTime} - ${endTime}`}
                 <Icon
                   name="pencil"
                   color="grey"
