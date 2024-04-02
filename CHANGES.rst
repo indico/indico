@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix adding additional event keywords when some keywords have already been set
+  (:pr:`6264`, thanks :user:`SegiNyn`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
