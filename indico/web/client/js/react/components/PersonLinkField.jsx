@@ -14,6 +14,7 @@ import {Button, Segment, List, Label, Icon, Popup, Ref} from 'semantic-ui-react'
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
+import {FinalField} from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import {snakifyKeys} from 'indico/utils/case';
@@ -25,6 +26,15 @@ import PersonDetailsModal from './PersonDetailsModal';
 import {PrincipalItem} from './principals/items';
 
 import './PersonLinkField.module.scss';
+
+const roleSchema = PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.string,
+  active: PropTypes.bool,
+  default: PropTypes.bool,
+  section: PropTypes.bool,
+});
 
 const PersonListItem = ({
   person,
@@ -95,7 +105,7 @@ const PersonListItem = ({
 
 PersonListItem.propTypes = {
   person: PropTypes.object.isRequired,
-  roles: PropTypes.array.isRequired,
+  roles: PropTypes.arrayOf(roleSchema).isRequired,
   onDelete: PropTypes.func,
   canDelete: PropTypes.bool,
   onEdit: PropTypes.func.isRequired,
@@ -430,7 +440,7 @@ PersonLinkField.propTypes = {
   emptyMessage: PropTypes.string,
   sessionUser: PropTypes.object,
   eventId: PropTypes.number,
-  roles: PropTypes.array,
+  roles: PropTypes.arrayOf(roleSchema),
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
@@ -454,6 +464,14 @@ PersonLinkField.defaultProps = {
   nameFormat: '',
   validateEmailUrl: null,
   extraParams: {},
+};
+
+export function FinalPersonLinkField({name, ...rest}) {
+  return <FinalField name={name} component={PersonLinkField} {...rest} />;
+}
+
+FinalPersonLinkField.propTypes = {
+  name: PropTypes.string.isRequired,
 };
 
 export function WTFPersonLinkField({
@@ -533,7 +551,7 @@ WTFPersonLinkField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   defaultValue: PropTypes.array,
   eventId: PropTypes.number,
-  roles: PropTypes.array,
+  roles: PropTypes.arrayOf(roleSchema),
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
