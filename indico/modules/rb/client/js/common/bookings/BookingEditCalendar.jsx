@@ -174,6 +174,7 @@ class BookingEditCalendar extends React.Component {
               isLoading={isLoading}
               fixedHeight={currentBooking.dateRange.length > 0 ? '100%' : null}
               hideRecurrence
+              trim12hMins
             />
           </div>
           {newBooking && (
@@ -193,6 +194,7 @@ class BookingEditCalendar extends React.Component {
                 }}
                 fixedHeight={newBooking.dateRange.length > 0 ? '100%' : null}
                 hideRecurrence
+                trim12hMins
               />
             </div>
           )}
