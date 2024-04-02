@@ -10,10 +10,6 @@
     {% if show_draft_warning %}
         {{ render_draft_mode_warning(event) }}
     {% endif %}
-    <div id="timetable-container"
-         data-timetable-data="{{ timetable_data | tojson | forceescape }}"
-         data-event-info="{{ event_info | tojson | forceescape }}"
-         data-custom-links="{{ custom_links | tojson | forceescape }}"></div>
     <script>
         setupTimetable();
     </script>
