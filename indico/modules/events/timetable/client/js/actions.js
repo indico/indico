@@ -10,6 +10,8 @@ export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DELETE_ENTRY = 'Delete entry';
+export const DRAG_UNSCHEDULED_CONTRIB = 'Drag unscheduled contribution';
+export const SCHEDULE_CONTRIB = 'Schedule contribution';
 export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
@@ -36,6 +38,14 @@ export function selectEntry(entry) {
 
 export function deleteEntry(entry) {
   return {type: DELETE_ENTRY, entry};
+}
+
+export function dragUnscheduledContrib(contribId) {
+  return {type: DRAG_UNSCHEDULED_CONTRIB, contribId};
+}
+
+export function scheduleContrib(contrib, args) {
+  return {type: SCHEDULE_CONTRIB, contrib, args};
 }
 
 export function changeColor(color) {

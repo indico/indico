@@ -17,6 +17,7 @@ import EntryDetails from './EntryDetails';
 import {entryStyleGetter, layoutAlgorithm} from './layout';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
+import UnscheduledContributions from './UnscheduledContributions';
 import {isChildOf} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
@@ -32,6 +33,7 @@ export default function Timetable() {
   const entries = useSelector(selectors.getAllEntries);
   const blocks = useSelector(selectors.getBlocks);
   const selected = useSelector(selectors.getSelectedEntry);
+  const draggedContrib = useSelector(selectors.getDraggedContrib);
   const [date, setDate] = useState(
     entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
   );
@@ -57,6 +59,7 @@ export default function Timetable() {
 
   return (
     <div styleName={`timetable ${displayMode}`}>
+      <UnscheduledContributions />
       <DnDCalendar
         date={date}
         defaultView="day"
@@ -82,6 +85,7 @@ export default function Timetable() {
           });
         }}
         onSelectEvent={e => dispatch(actions.selectEntry(e))}
+        onDropFromOutside={args => dispatch(actions.scheduleContrib(draggedContrib, args))}
         onNavigate={setDate}
         eventPropGetter={entryStyleGetter(entries, selected)}
         dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
