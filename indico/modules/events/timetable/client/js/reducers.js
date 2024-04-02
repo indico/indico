@@ -12,6 +12,7 @@ import {
   applyChanges,
   resizeEntry,
   deleteEntry,
+  scheduleContrib,
   preprocessEntries,
   resizeWindow,
   moveEntry,
@@ -57,7 +58,15 @@ const preprocessData = data => {
 
 export default {
   entries: (
-    state = {blocks: [], children: [], changes: [], currentChangeIdx: 0, selectedId: null},
+    state = {
+      blocks: [],
+      children: [],
+      unscheduled: [],
+      changes: [],
+      currentChangeIdx: 0,
+      selectedId: null,
+      draggedId: null,
+    },
     action
   ) => {
     switch (action.type) {
@@ -71,6 +80,10 @@ export default {
         return {...state, selectedId: action.entry?.id};
       case actions.DELETE_ENTRY:
         return {...state, ...deleteEntry(state, action.entry), selectedId: null};
+      case actions.DRAG_UNSCHEDULED_CONTRIB:
+        return {...state, draggedId: action.contribId};
+      case actions.SCHEDULE_CONTRIB:
+        return {...state, ...scheduleContrib(state, action.contrib, action.args), draggedId: null};
       case actions.CHANGE_COLOR:
         return {...state, ...changeColor(state, action.color)};
       case actions.UNDO_CHANGE:

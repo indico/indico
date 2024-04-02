@@ -129,29 +129,33 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
 
 SessionDetails.propTypes = detailsPropTypes;
 
-function ContributionDetails({entry, uses24HourFormat, dispatch, showTitle}) {
+export function ContributionDetails({entry, uses24HourFormat, dispatch, showTitle, ...rest}) {
+  const contribActions = [
+    {icon: 'edit', title: Translate.string('Edit contribution'), onClick: handleUnimplemented},
+    {
+      icon: 'shield',
+      title: Translate.string('Manage contribution protection'),
+      onClick: handleUnimplemented,
+    },
+    {
+      icon: 'clone outline',
+      title: Translate.string('Clone contribution'),
+      onClick: handleUnimplemented,
+    },
+  ];
+  if (!entry.deleted) {
+    contribActions.push({
+      icon: 'trash',
+      title: Translate.string('Unschedule contribution'),
+      onClick: () => dispatch(actions.deleteEntry(entry)),
+    });
+  }
   return (
     <DetailsSegment
       title={Translate.string('Contribution')}
       color={entry.color}
-      actions={[
-        {icon: 'edit', title: Translate.string('Edit contribution'), onClick: handleUnimplemented},
-        {
-          icon: 'shield',
-          title: Translate.string('Manage contribution protection'),
-          onClick: handleUnimplemented,
-        },
-        {
-          icon: 'clone outline',
-          title: Translate.string('Clone contribution'),
-          onClick: handleUnimplemented,
-        },
-        {
-          icon: 'trash',
-          title: Translate.string('Unschedule contribution'),
-          onClick: () => dispatch(actions.deleteEntry(entry)),
-        },
-      ]}
+      actions={contribActions}
+      {...rest}
     >
       {showTitle && (
         <div>
