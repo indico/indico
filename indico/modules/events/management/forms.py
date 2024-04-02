@@ -234,9 +234,9 @@ class EventClassificationForm(IndicoForm):
             del self.label_message
 
     def validate_keywords(self, field):
-        allowed_keywords = set(global_event_settings.get('allowed_keywords')) | set(field.object_data)
+        allowed_keywords = set(global_event_settings.get('allowed_keywords'))
         keywords = set(field.data)
-        if allowed_keywords and not (keywords <= allowed_keywords):
+        if allowed_keywords and not (keywords <= (allowed_keywords | set(field.object_data))):
             raise ValidationError('Invalid keyword found')
 
 
