@@ -30,6 +30,7 @@ import './PersonLinkField.module.scss';
 const roleSchema = PropTypes.shape({
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  plural: PropTypes.string,
   icon: PropTypes.string,
   active: PropTypes.bool,
   default: PropTypes.bool,
@@ -472,6 +473,86 @@ export function FinalPersonLinkField({name, ...rest}) {
 
 FinalPersonLinkField.propTypes = {
   name: PropTypes.string.isRequired,
+};
+
+export function FinalAbstractPersonLinkField({allowSpeakers, ...rest}) {
+  const roles = [
+    {
+      name: 'primary',
+      label: Translate.string('Author'),
+      plural: Translate.string('Authors'),
+      section: true,
+      default: true,
+    },
+    {
+      name: 'secondary',
+      label: Translate.string('Co-author'),
+      plural: Translate.string('Co-authors'),
+      section: true,
+    },
+  ];
+  if (allowSpeakers) {
+    roles.push({name: 'speaker', label: Translate.string('Speaker'), icon: 'microphone'});
+  }
+  return <FinalPersonLinkField roles={[]} {...rest} />;
+}
+
+FinalAbstractPersonLinkField.propTypes = {
+  ...FinalPersonLinkField.propTypes,
+  allowSpeakers: PropTypes.bool,
+};
+
+FinalAbstractPersonLinkField.defaultProps = {
+  allowSpeakers: false,
+};
+
+export function FinalContributionPersonLinkField({
+  allowAuthors,
+  allowSubmitters,
+  defaultIsSubmitter,
+  ...rest
+}) {
+  const roles = [
+    {name: 'speaker', label: Translate.string('Speaker'), icon: 'microphone', default: true},
+  ];
+  if (allowSubmitters) {
+    roles.push({
+      name: 'submitter',
+      label: Translate.string('Submitter'),
+      icon: 'paperclip',
+      default: defaultIsSubmitter,
+    });
+  }
+  if (allowAuthors) {
+    roles.push(
+      {
+        name: 'primary',
+        label: Translate.string('Author'),
+        plural: Translate.string('Authors'),
+        section: true,
+      },
+      {
+        name: 'secondary',
+        label: Translate.string('Co-author'),
+        plural: Translate.string('Co-authors'),
+        section: true,
+      }
+    );
+  }
+  return <FinalPersonLinkField roles={roles} {...rest} />;
+}
+
+FinalContributionPersonLinkField.propTypes = {
+  ...FinalPersonLinkField.propTypes,
+  allowAuthors: PropTypes.bool,
+  allowSubmitters: PropTypes.bool,
+  defaultIsSubmitter: PropTypes.bool,
+};
+
+FinalContributionPersonLinkField.defaultProps = {
+  allowAuthors: false,
+  allowSubmitters: false,
+  defaultIsSubmitter: false,
 };
 
 export function WTFPersonLinkField({
