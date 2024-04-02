@@ -213,9 +213,7 @@ export default class DailyTimelineContent extends React.Component {
               style={{position: 'absolute', left: `${(i / hourSpan) * 100}%`}}
             >
               <span styleName="timeline-label-text">
-                {short12hTimes
-                  ? moment({hours: hourSeries[n]}).format('hA')
-                  : moment({hours: hourSeries[n]}).format('LT')}
+                {moment({hours: hourSeries[n]}).format(short12hTimes ? 'hA' : 'LT')}
               </span>
             </div>
           ))}
