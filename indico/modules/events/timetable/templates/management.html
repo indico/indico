@@ -10,6 +10,10 @@
     {% if show_draft_warning %}
         {{ render_draft_mode_warning(event) }}
     {% endif %}
+    <h1>Timetable Dialogs</h1>
+    <div id="session-form-container" style="min-height: 50px;"></div>
+    <div id="block-form-container" style="min-height: 50px;"></div>
+    <div id="contrib-form-container" style="min-height: 50px;"></div>
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
          data-event-info="{{ event_info | tojson | forceescape }}"

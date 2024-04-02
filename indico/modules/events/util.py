@@ -26,6 +26,7 @@ from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
 from indico.core.config import config
+from indico.core.db import db
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories.models.roles import CategoryRole
@@ -34,13 +35,15 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.layout import theme_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.models.settings import EventSetting
 from indico.modules.events.models.static_list_links import StaticListLink
+from indico.modules.events.persons import persons_settings
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
@@ -48,10 +51,13 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.networks import IPNetworkGroup
 from indico.modules.users import User
+from indico.modules.users.models.affiliations import Affiliation
+from indico.modules.users.models.users import NameFormat
 from indico.util.caching import memoize_request
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.util.iterables import materialize_iterable
+from indico.util.signals import values_from_signal
 from indico.util.string import strip_tags
 from indico.util.user import principal_from_identifier
 from indico.web.flask.util import send_file, url_for
@@ -187,6 +193,22 @@ def get_random_color(event):
     used_colors = {s.colors for s in event.sessions} | {b.colors for b in breaks}
     unused_colors = set(get_colors()) - used_colors
     return random.choice(tuple(unused_colors) or get_colors())
+
+
+def get_person_link_field_params(event=None):
+    name_format = layout_settings.get(event, 'name_format') if event else None
+    if name_format is None and session.user:
+        name_format = session.user.settings.get('name_format')
+    extra_params = values_from_signal(signals.event.person_link_field_extra_params.send(), as_list=True)
+    return {
+        'allow_authors': event.type_ == EventType.conference if event else False,
+        'has_predefined_affiliations': Affiliation.query.filter(~Affiliation.is_deleted).has_rows(),
+        'can_enter_manually': (not event or event.can_manage(session.user) or
+                               not persons_settings.get(event, 'disallow_custom_persons')),
+        'default_search_external': event is not None and persons_settings.get(event, 'default_search_external'),
+        'name_format': (name_format and name_format.name) or NameFormat.first_last.name,
+        'extra_params': {k: v for d in extra_params for k, v in d.items()},
+    }
 
 
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, permission=None):
@@ -763,6 +785,10 @@ def format_log_ref(ref):
     return f'{ref.reference_type.name}:{ref.value}'
 
 
+def format_log_contrib_field_value(value):
+    return value.data
+
+
 def _get_venue_room_name(data):
     venue_name = data['venue'].name if data.get('venue') else data.get('venue_name', '')
     room_name = data['room'].full_name if data.get('room') else data.get('room_name', '')
@@ -798,3 +824,7 @@ def split_log_location_changes(changes: dict) -> dict:
 
 def format_log_person(data):
     return f'{data.full_name} <{data.email}>' if data.email else data.full_name
+
+
+def get_all_reference_types():
+    return ReferenceType.query.order_by(db.func.lower(ReferenceType.name)).all()
