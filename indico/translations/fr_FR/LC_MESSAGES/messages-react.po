@@ -10,7 +10,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-03-24 18:26+0100\n"
+"POT-Creation-Date: 2024-03-24 11:07+0100\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2024\n"
 "Language-Team: French (France) (https://app.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -25,17 +25,22 @@ msgid ""
 "I have read, understood and accept the {tosLink}terms of service{/tosLink} "
 "and {privacyLink}privacy policy{/privacyLink}."
 msgstr ""
+"J'ai lu, compris et accepte les {tosLink}conditions d'utilisation{/tosLink} "
+"et {privacyLink}la politique de confidentialité{/privacyLink}."
 
 #: indico/modules/auth/client/js/signup.jsx:109
 msgid ""
 "I have read, understood and accept the {tosLink}terms of service{/tosLink}."
 msgstr ""
+"J'ai lu, compris et accepte les {tosLink}conditions d'utilisation{/tosLink}."
 
 #: indico/modules/auth/client/js/signup.jsx:119
 msgid ""
 "I have read, understood and accept the {privacyLink}privacy "
 "policy{/privacyLink}."
 msgstr ""
+"J'ai lu, compris et accepte la {privacyLink}politique de "
+"confidentialité{/privacyLink}."
 
 #: indico/modules/auth/client/js/signup.jsx:143
 msgid "Passwords must match"
@@ -141,7 +146,7 @@ msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx:287
 msgid "Terms of service"
-msgstr ""
+msgstr "Conditions d'utilisation"
 
 #: indico/modules/auth/client/js/signup.jsx:292
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:57
@@ -150,7 +155,7 @@ msgstr "Politique de confidentialité"
 
 #: indico/modules/auth/client/js/signup.jsx:301
 msgid "Last updated"
-msgstr ""
+msgstr "Dernière mise à jour"
 
 #: indico/modules/auth/client/js/signup.jsx:317
 msgid "Submit registration request"
@@ -220,11 +225,11 @@ msgstr "Pas de salle"
 
 #: indico/modules/categories/client/js/calendar.js:346
 msgid "No keywords"
-msgstr ""
+msgstr "Pas de mot-clé"
 
 #: indico/modules/categories/client/js/calendar.js:358
 msgid "Multiple keywords"
-msgstr ""
+msgstr "Mots-clés multiples"
 
 #: indico/modules/categories/client/js/calendar.js:394
 msgid "No category"
@@ -397,54 +402,67 @@ msgstr "Se connecter comme..."
 
 #: indico/modules/core/client/js/session_expiry.jsx:219
 msgid "Your session expired"
-msgstr ""
+msgstr "Votre session a expiré"
 
 #: indico/modules/core/client/js/session_expiry.jsx:221
 msgid "Your current session is about to expire"
-msgstr ""
+msgstr "Votre session actuelle va bientôt expirer"
 
 #: indico/modules/core/client/js/session_expiry.jsx:229
 msgid ""
 "Your session has expired and you have been logged out. Please log in again "
 "if you wish to continue using Indico."
 msgstr ""
+"Votre session a expiré et vous avez été déconnecté(e). Veuillez vous "
+"connecter de nouveau si vous souhaitez continuer à utiliser Indico."
 
 #: indico/modules/core/client/js/session_expiry.jsx:235
 msgid ""
 "If you need to save anything, you can also dismiss this message, but any "
 "operations on the current page will fail until you manually log in again."
 msgstr ""
+"Si vous devez sauvegarder quelque chose vous pouvez fermer ce message, mais "
+"toute opération sur cette page échouera jusqu'à ce que vous vous connectiez "
+"de nouveau."
 
 #: indico/modules/core/client/js/session_expiry.jsx:243
 msgid ""
 "Your session will expire soon and you need to log in again to renew it if "
 "you wish to continue using Indico."
 msgstr ""
+"Votre session va bientôt expirer et vous devez vous reconnecter pour la "
+"renouveler si vous souhaitez continuer à utiliser Indico."
 
 #: indico/modules/core/client/js/session_expiry.jsx:248
 msgid ""
 "If you dismiss this message, it will not show up until after your session "
 "has expired"
 msgstr ""
+"Si vous fermez ce message, it ne réapparaitra pas jusqu'à ce que votre "
+"session ait expiré"
 
 #: indico/modules/core/client/js/session_expiry.jsx:256
 msgid ""
 "Click on the \"Refresh\" button if you wish to continue using Indico or you "
 "will be logged out."
 msgstr ""
+"Veuillez cliquer sur le bouton \"Rafraichir\" si vous souhaitez continuer à "
+"utiliser Indico ou vous serez déconnecté."
 
 #: indico/modules/core/client/js/session_expiry.jsx:261
 msgid ""
 "If you dismiss this message, it will not show up until your session expired."
 msgstr ""
+"Si vous fermez ce message, il ne réapparaitra pas jusqu'à ce que votre "
+"session ait expiré."
 
 #: indico/modules/core/client/js/session_expiry.jsx:273
 msgid "Login again"
-msgstr ""
+msgstr "Se connecter de nouveau"
 
 #: indico/modules/core/client/js/session_expiry.jsx:277
 msgid "Refresh"
-msgstr ""
+msgstr "Rafraîchir"
 
 #: indico/modules/core/client/js/session_expiry.jsx:282
 #: indico/web/client/js/react/errors/component.jsx:156
@@ -453,7 +471,7 @@ msgstr "Ignorer"
 
 #: indico/modules/core/client/js/session_expiry.jsx:287
 msgid "Snooze"
-msgstr ""
+msgstr "Répéter"
 
 #: indico/modules/events/abstracts/client/js/boa.jsx:54
 msgid "Manage custom PDF"
@@ -3122,6 +3140,8 @@ msgid ""
 "Specify how long user-provided data for this field will be preserved in the "
 "database."
 msgstr ""
+"Veuillez spécifier la durée de rétention dans la base de donnée des données "
+"fournies par les utilisateurs pour ce champ."
 
 #: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:175
 msgid ""
@@ -3608,13 +3628,13 @@ msgstr "Veuillez choisir au moins une salle."
 #: indico/modules/rb/client/js/common/bookings/BookingLinks.jsx:24
 msgid "This booking has {count} linked occurrence:"
 msgid_plural "This booking has {count} linked occurrences:"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Cette réservation a {count} occurrence liée."
+msgstr[1] "Cette réservation a {count} occurrences liées."
+msgstr[2] "Cette réservation a {count} occurrences liées."
 
 #: indico/modules/rb/client/js/common/bookings/BookingLinks.jsx:57
 msgid "Details hidden - no access"
-msgstr ""
+msgstr "Détails cachés - pas d'accès"
 
 #: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:38
 msgid "This booking will be linked to an event:"
