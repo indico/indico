@@ -17,6 +17,8 @@ Bugfixes
 
 - Fix adding additional event keywords when some keywords have already been set
   (:pr:`6264`, thanks :user:`SegiNyn`)
+- Fix the time display in the room details dialog when a 12 hour locale
+  is used (:pr:`6263`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
