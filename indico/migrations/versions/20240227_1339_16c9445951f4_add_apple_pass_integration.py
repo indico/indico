@@ -35,7 +35,6 @@ def upgrade():
                                           server_default='{}'), schema='categories')
     op.add_column('forms', sa.Column('ticket_apple_pass', sa.Boolean(), nullable=False,
                                      server_default='false'), schema='event_registration')
-    # This will be needed for the implementation of Apple Pass updates
     op.add_column('registrations', sa.Column('apple_pass_serial', sa.String(), server_default='', nullable=False),
                   schema='event_registration')
     op.alter_column('forms', 'ticket_apple_pass', server_default=None, schema='event_registration')
