@@ -573,16 +573,6 @@ class RegistrationPrivacyForm(IndicoForm):
     require_privacy_policy_agreement = BooleanField(_('Privacy policy'), widget=SwitchWidget(),
                                                     description=_('Specify whether users are required to agree to '
                                                                   "the event's privacy policy when registering"))
-    test_hidden = BooleanField(_('TEST HIDDEN'), widget=SwitchWidget(),
-                               validators=[HiddenUnless('visibility',
-                                           value=['show_all', 'hide_all', None], composite=True)],
-                               description=_('Test hiddenUnless with value [show_all, hide_all, None]'))
-    test_hidden_inverted = BooleanField(_('TEST HIDDEN INVERTED'), widget=SwitchWidget(),
-                                        validators=[HiddenUnless('visibility',
-                                                    value=[None, 'show_with_consent', None],
-                                                    composite=True, inverted=True)],
-                                        description=_('Test hiddenUnless inverted with value '
-                                                      '[None, show_with_consent, None]'))
 
     def __init__(self, *args, regform, **kwargs):
         self.regform = regform
