@@ -7,9 +7,8 @@
 
 from functools import partial
 
-from cryptography import x509
+from cryptography import hazmat, x509
 from cryptography.exceptions import UnsupportedAlgorithm
-from cryptography.hazmat.primitives import serialization
 from flask import request
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
@@ -206,7 +205,7 @@ class CategorySettingsForm(IndicoForm):
 
     def validate_apple_pass_key(self, field):
         try:
-            serialization.load_pem_private_key(field.data.encode(), password=None)
+            hazmat.primitives.serialization.load_pem_private_key(field.data.encode(), password=None)
         except ValueError:
             raise ValidationError(_('The provided Private.key is malformed.'))
         except TypeError:
@@ -223,7 +222,8 @@ class CategorySettingsForm(IndicoForm):
         if self.apple_pass_key.errors:
             return True
         try:
-            serialization.load_pem_private_key(self.apple_pass_key.data.encode(), password=field.data.encode())
+            hazmat.primitives.serialization.load_pem_private_key(self.apple_pass_key.data.encode(),
+                                                                 password=field.data.encode())
             return True
         except ValueError:
             raise ValidationError(_('The provided password is incorrect.'))
