@@ -46,18 +46,46 @@ class HiddenUnless:
     :param preserve_data: If True, a disabled field will keep whatever
                           ``object_data`` it had before (i.e. data set
                           via `FormDefaults`).
+    :param inverted: If True, the mechanism is inverted:
+                     the hide happens when the field doesn't have the value.
+    :param composite: The field is composed of a list of other fields in the form,
+                      the single value of composite field is a list.
+                      Note: Require to trigger change event on the parent field for each
+                      change of the child field.
     """
 
     field_flags = {'initially_hidden': True}
 
-    def __init__(self, field, value=None, preserve_data=False):
+    def __init__(self, field, value=None, preserve_data=False, inverted=False, composite=False):
         self.field = field
-        self.value = value if value is None or isinstance(value, (set, list, tuple)) else {value}
+        self.value = value if value is None or isinstance(value, (set, list, tuple)) else [value]
+        if composite and value and not isinstance(value, list):
+            raise ValidationError(_('Composite field value must be a list'))
+        if composite:
+            for i in range(len(value)):
+                self.value[i] = value[i] if value[i] is None or isinstance(value[i], (set, list, tuple)) else [value[i]]
         self.preserve_data = preserve_data
+        self.inverted = inverted
+        self.composite = composite
 
     def __call__(self, form, field):
+        def _match_criteria(v, values):
+            if not self.composite:
+                return v in values
+            # composite field: v is a list
+            if len(values) != len(v):
+                raise ValidationError(_('Length of value does not match length of composite field'))
+            i = 0
+            while i < len(v):
+                if values[i] is not None and v[i] not in values[i]:
+                    return False
+                i += 1
+            return True
+
         value = form[self.field].data
-        active = (value and self.value is None) or (self.value is not None and value in self.value)
+        active = ((value and self.value is None) or (self.value is not None and _match_criteria(value, self.value)))
+        if self.inverted:
+            active = not active
 
         if not active:
             field.errors[:] = []
