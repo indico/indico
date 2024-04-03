@@ -397,21 +397,21 @@ Database
 .. data:: SQLALCHEMY_POOL_SIZE
 
     This setting configures SQLAlchemy's connection pool.
-    For details, check the `Flask-SQLAlchemy documentation`_.
+    For details, check the `SQLAlchemy connection pool documentation`_.
 
     Default: ``5``
 
 .. data:: SQLALCHEMY_POOL_RECYCLE
 
     This setting configures SQLAlchemy's connection pool.
-    For details, check the `Flask-SQLAlchemy documentation`_.
+    For details, check the `SQLAlchemy connection pool documentation`_.
 
     Default: ``120``
 
 .. data:: SQLALCHEMY_POOL_TIMEOUT
 
     This setting configures SQLAlchemy's connection pool.
-    For details, check the `Flask-SQLAlchemy documentation`_.
+    For details, check the `SQLAlchemy connection pool documentation`_.
 
     Default: ``10``
 
@@ -925,7 +925,7 @@ System
     Default: ``socket.getfqdn()``
 
 
-.. _Flask-SQLAlchemy documentation: https://flask-sqlalchemy.readthedocs.io/en/stable/config/#configuration-keys
+.. _SQLAlchemy connection pool documentation: https://docs.sqlalchemy.org/en/14/core/pooling.html
 .. _Sentry: https://sentry.io
 .. _Celery documentation on brokers: https://celery.readthedocs.io/en/stable/getting-started/brokers/index.html
 .. _Celery documentation on periodic tasks: https://celery.readthedocs.io/en/stable/userguide/periodic-tasks.html#available-fields
