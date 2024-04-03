@@ -199,14 +199,14 @@ class CategorySettingsForm(IndicoForm):
 
     def validate_apple_pass_certificate(self, field):
         try:
-            x509.load_pem_x509_certificate(field.data.encode('UTF-8'))
+            x509.load_pem_x509_certificate(field.data.encode())
             return True
         except ValueError:
             raise ValidationError(_('The provided Certificate.pem is malformed.'))
 
     def validate_apple_pass_key(self, field):
         try:
-            serialization.load_pem_private_key(field.data.encode('UTF-8'), password=None)
+            serialization.load_pem_private_key(field.data.encode(), password=None)
         except ValueError:
             raise ValidationError(_('The provided Private.key is malformed.'))
         except TypeError:
@@ -223,8 +223,7 @@ class CategorySettingsForm(IndicoForm):
         if self.apple_pass_key.errors:
             return True
         try:
-            serialization.load_pem_private_key(self.apple_pass_key.data.encode('UTF-8'),
-                                               password=field.data.encode('UTF-8'))
+            serialization.load_pem_private_key(self.apple_pass_key.data.encode(), password=field.data.encode())
             return True
         except ValueError:
             raise ValidationError(_('The provided password is incorrect.'))
