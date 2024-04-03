@@ -594,8 +594,6 @@ class RegistrationPrivacyForm(IndicoForm):
     def data(self):
         data = super().data
         del data['visibility']
-        del data['test_hidden']
-        del data['test_hidden_inverted']
         return data
 
     def validate_visibility(self, field):

@@ -60,7 +60,7 @@ class HiddenUnless:
         self.field = field
         self.value = value if value is None or isinstance(value, (set, list, tuple)) else [value]
         if composite and value and not isinstance(value, list):
-            raise ValidationError(_('Composite field value must be a list'))
+            raise ValueError('Composite field value must be a list')
         if composite:
             for i in range(len(value)):
                 self.value[i] = value[i] if value[i] is None or isinstance(value[i], (set, list, tuple)) else [value[i]]
@@ -74,7 +74,7 @@ class HiddenUnless:
                 return v in values
             # composite field: v is a list
             if len(values) != len(v):
-                raise ValidationError(_('Length of value does not match length of composite field'))
+                raise ValueError('Length of value does not match length of composite field')
             i = 0
             while i < len(v):
                 if values[i] is not None and v[i] not in values[i]:
