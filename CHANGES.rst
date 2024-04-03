@@ -23,7 +23,8 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Allow plugins to fully replace the data in a ticket QR code with a custom string
+  instead of just modifying/extending the JSON dict (:pr:`6266`)
 
 
 Version 3.3.1

@@ -716,8 +716,15 @@ def get_ticket_qr_code_data(person):
     if is_accompanying:
         data['i'].append(_base64_encode_uuid(person_id))
 
-    signals.event.registration.generate_ticket_qr_code.send(registration, person=person, ticket_data=data)
-    return data
+    sig_rvs = values_from_signal(signals.event.registration.generate_ticket_qr_code.send(registration, person=person,
+                                                                                         ticket_data=data),
+                                 as_list=True)
+    if not sig_rvs:
+        return data
+    elif len(sig_rvs) == 1:
+        return sig_rvs[0]
+    else:
+        raise RuntimeError('Multiple values returned by `generate_ticket_qr_code` signal')
 
 
 def _base64_encode_uuid(uid):
@@ -736,7 +743,8 @@ def generate_ticket_qr_code(person):
         border=1
     )
     data = get_ticket_qr_code_data(person)
-    qr.add_data(json.dumps(data, separators=(',', ':')))
+    qr_data = json.dumps(data, separators=(',', ':')) if not isinstance(data, str) else data
+    qr.add_data(qr_data)
     qr.make(fit=True)
     return qr.make_image()._img
 
