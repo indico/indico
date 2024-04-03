@@ -56,7 +56,10 @@ Called when a registration form is edited. The `sender` is the
 
 generate_ticket_qr_code = _signals.signal('generate-ticket-qr-code', '''
 Called when generating the QR code for a ticket. The data included in the QR code is passed
-in the `ticket_data` kwarg and may be modified.
+in the `ticket_data` kwarg and may be modified. The signal may also return a string which
+will then replace the original QR code content. When doing this, be aware that only one
+plugin may return such a value, and that e.g. like the official check-in app will no longer
+work.
 ''')
 
 registration_form_deleted = _signals.signal('registration-form-deleted', '''
