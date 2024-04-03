@@ -903,6 +903,12 @@ System
 
     Default: ``False``
 
+.. data:: ENABLE_APPLE_PASS
+
+    Whether to enable the Apple Pass integration for event tickets.
+
+    Default: ``False``
+
 .. data:: PLUGINS
 
     The list of :ref:`Indico plugins <installation-plugins>` to enable.
