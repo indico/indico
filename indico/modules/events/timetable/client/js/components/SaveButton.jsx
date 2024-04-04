@@ -62,20 +62,12 @@ const renderTimeDiff = (oldValue, newValue) => {
   );
 };
 
+const renderDuration = duration =>
+  PluralTranslate.string('{duration} minute', '{duration} minutes', duration, {duration});
+
 const renderDurationDiff = (oldValue, newValue) => {
   const diff = newValue - oldValue;
-  return (
-    <DiffLabel diff={diff}>
-      <PluralTranslate count={Math.abs(diff)}>
-        <Singular>
-          <Param name="count" value={Math.abs(diff)} /> minute
-        </Singular>
-        <Plural>
-          <Param name="count" value={Math.abs(diff)} /> minutes
-        </Plural>
-      </PluralTranslate>
-    </DiffLabel>
-  );
+  return <DiffLabel diff={diff}>{renderDuration(Math.abs(diff))}</DiffLabel>;
 };
 
 const changeParams = {
@@ -91,7 +83,7 @@ const changeParams = {
   },
   duration: {
     title: Translate.string('Duration'),
-    renderValue: value => value,
+    renderValue: renderDuration,
     renderDiff: renderDurationDiff,
   },
   color: {
@@ -133,6 +125,7 @@ const changeParams = {
 };
 
 function Change({param, oldValue, newValue}) {
+  console.debug('Change', param, oldValue, newValue);
   const changeParam = changeParams[param];
   if (!changeParam) {
     // TODO remove this check when fully implemented
@@ -163,6 +156,25 @@ Change.propTypes = {
   newValue: PropTypes.any.isRequired,
 };
 
+/**
+ * Split date, time changes, and duration into separate changes.
+ * @param {object} old old entry
+ * @param {object} entry new entry
+ * @returns {array} change entries
+ */
+const processDateTimeChanges = (old, entry) => {
+  const dateTimeChange = {oldValue: old.start, newValue: entry.start};
+  const durationChange = {
+    oldValue: moment(old.end).diff(moment(old.start), 'minutes'),
+    newValue: moment(entry.end).diff(moment(entry.start), 'minutes'),
+  };
+  return [
+    entry.start.toDateString() !== old.start.toDateString() && ['startDate', dateTimeChange],
+    entry.start.toTimeString() !== old.start.toTimeString() && ['startTime', dateTimeChange],
+    durationChange.oldValue !== durationChange.newValue && ['duration', durationChange],
+  ].filter(x => x);
+};
+
 function EntryChangeList({change, old, entry, color, children, ...rest}) {
   const blocks = useSelector(selectors.getBlocks);
   const {title, icon, formatTitle} = entryTypes[entry.type];
@@ -171,19 +183,15 @@ function EntryChangeList({change, old, entry, color, children, ...rest}) {
       <List divided>
         {Object.entries(change)
           .flatMap(([key, value]) => {
-            const newValue = {oldValue: old[key], newValue: value};
+            const newChange = {oldValue: old[key], newValue: value};
             switch (key) {
               case 'start':
-                // we split date and time changes into separate keys
-                return [
-                  value.toDateString() !== old[key].toDateString() && [`${key}Date`, newValue],
-                  value.toTimeString() !== old[key].toTimeString() && [`${key}Time`, newValue],
-                ].filter(x => x);
               case 'end':
-                // let's replace it with the duration instead
-                newValue.oldValue = moment(old.end).diff(moment(old.start), 'minutes');
-                newValue.newValue = moment(value).diff(moment(entry.start), 'minutes');
-                return newValue.oldValue === newValue.newValue ? [] : [['duration', newValue]];
+                // ensure that this is only ran once
+                if (key === 'end' && 'start' in change) {
+                  return [];
+                }
+                return processDateTimeChanges(old, entry);
               case 'parentId':
                 return [
                   [
@@ -195,9 +203,9 @@ function EntryChangeList({change, old, entry, color, children, ...rest}) {
                   ],
                 ];
               case 'columnId':
-                return Object.values(newValue).every(x => x) ? [[key, newValue]] : [];
+                return Object.values(newChange).every(x => x) ? [[key, newChange]] : [];
               default:
-                return [[key, newValue]];
+                return [[key, newChange]];
             }
           })
           .map(([key, value]) => (
@@ -281,12 +289,15 @@ export default function SaveButton({as: Component, ...rest}) {
       />
       <Component
         onClick={() => setOpen(true)}
-        content={Translate.string('Save')}
         title={Translate.string('Review and save changes')}
-        icon={changes.length > 0 && {name: 'exclamation triangle', color: 'red'}}
         disabled={changes.length === 0}
         {...rest}
-      />
+      >
+        <Translate>Save</Translate>
+        {changes.length > 0 && (
+          <Label color="red" size="mini" content={changes.length} circular floating />
+        )}
+      </Component>
     </>
   );
 }

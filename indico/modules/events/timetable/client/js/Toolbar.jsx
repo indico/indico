@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {Navigate} from 'react-big-calendar';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Menu} from 'semantic-ui-react';
+import {Dropdown, Icon, Label, Menu} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -46,11 +46,13 @@ export default function Toolbar({date, localizer, onNavigate}) {
   const ref = useRef(null);
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
+  const numUnscheduled = useSelector(selectors.getNumUnscheduled);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
+  const showUnscheduled = useSelector(selectors.showUnscheduled);
   const currentDayIdx = getNumDays(eventStart, date);
 
   const handleResize = useCallback(() => {
@@ -79,6 +81,30 @@ export default function Toolbar({date, localizer, onNavigate}) {
   return (
     <div styleName="toolbar" ref={ref}>
       <Menu tabular>
+        <Menu.Item
+          onClick={() => dispatch(actions.toggleShowUnscheduled())}
+          disabled={!showUnscheduled && numUnscheduled === 0}
+          title={
+            showUnscheduled
+              ? Translate.string('Hide unscheduled contributions')
+              : Translate.string('Show unscheduled contributions')
+          }
+          styleName="action"
+        >
+          <Icon.Group>
+            <Icon name="file alternate outline" />
+            <Icon name={showUnscheduled ? 'eye slash' : 'eye'} corner="bottom right" />
+            {!showUnscheduled && (
+              <Label
+                color={numUnscheduled ? 'red' : null}
+                size="mini"
+                content={numUnscheduled}
+                floating
+                circular
+              />
+            )}
+          </Icon.Group>
+        </Menu.Item>
         <Menu.Item
           onClick={() => dispatch(actions.undoChange())}
           disabled={!canUndo}

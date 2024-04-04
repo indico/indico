@@ -85,7 +85,13 @@ export default function Timetable() {
           });
         }}
         onSelectEvent={e => dispatch(actions.selectEntry(e))}
-        onDropFromOutside={args => dispatch(actions.scheduleContrib(draggedContrib, args))}
+        onDropFromOutside={args => {
+          if (!draggedContrib) {
+            return;
+          }
+          dispatch(actions.scheduleContrib(draggedContrib, args));
+          setPlaceholderEntry(null);
+        }}
         onNavigate={setDate}
         eventPropGetter={entryStyleGetter(entries, selected)}
         dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
