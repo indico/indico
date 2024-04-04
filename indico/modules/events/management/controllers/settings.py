@@ -93,8 +93,10 @@ class RHEventSettings(RHManageEventBase):
                                                show_draft_warning=should_show_draft_warning(self.event),
                                                has_reference_types=has_reference_types,
                                                has_event_labels=has_event_labels,
-                                               wallet_location_warning=_show_google_wallet_location_warning(self.event),
-                                               pass_location_warning=_show_apple_pass_location_warning(self.event))
+                                               google_wallet_location_warning=_show_google_wallet_location_warning(
+                                                   self.event),
+                                               apple_pass_location_warning=_show_apple_pass_location_warning(
+                                                   self.event))
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -109,10 +111,11 @@ class RHEditEventDataBase(RHManageEventBase):
         assert self.section_name
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
-        wallet_location_warning = _show_google_wallet_location_warning(self.event)
-        pass_location_warning = _show_apple_pass_location_warning(self.event)
-        return tpl.render_event_settings(self.event, has_reference_types, has_event_labels, wallet_location_warning,
-                                         pass_location_warning, section=self.section_name, with_container=False)
+        google_wallet_location_warning = _show_google_wallet_location_warning(self.event)
+        apple_pass_location_warning = _show_apple_pass_location_warning(self.event)
+        return tpl.render_event_settings(self.event, has_reference_types, has_event_labels,
+                                         google_wallet_location_warning, apple_pass_location_warning,
+                                         section=self.section_name, with_container=False)
 
     def jsonify_success(self):
         return jsonify_data(settings_box=self.render_settings_box(),

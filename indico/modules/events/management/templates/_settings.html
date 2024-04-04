@@ -121,7 +121,7 @@
             </dl>
         {% endblock %}
 
-        {% if wallet_location_warning or pass_location_warning %}
+        {% if google_wallet_location_warning or apple_pass_location_warning %}
             <br>
             {% call message_box('warning') %}
                 {% trans ticket_names=ticket_names|join(' and ')%}
@@ -280,7 +280,7 @@
 {% endmacro %}
 
 
-{% macro render_event_settings(event, has_reference_types, has_event_labels, wallet_location_warning, pass_location_warning, section=none, with_container=true) %}
+{% macro render_event_settings(event, has_reference_types, has_event_labels, google_wallet_location_warning, apple_pass_location_warning, section=none, with_container=true) %}
     {% if section is none or section == 'data' %}
         {{ render_section_data(event, with_container=with_container) }}
     {% endif %}
@@ -288,7 +288,7 @@
         {{ render_section_dates(event, with_container=with_container) }}
     {% endif %}
     {% if section is none or section == 'location' %}
-        {{ render_section_location(event, wallet_location_warning, pass_location_warning, with_container=with_container) }}
+        {{ render_section_location(event, google_wallet_location_warning, apple_pass_location_warning, with_container=with_container) }}
     {% endif %}
     {% if section is none or section == 'persons' %}
         {{ render_section_persons(event, with_container=with_container) }}
