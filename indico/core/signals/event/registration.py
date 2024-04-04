@@ -146,7 +146,7 @@ Wallet API.
 ''')
 
 apple_pass_ticket_object = _signals.signal('apple-pass-ticket-object', '''
-Called when ticket object for an Apple Pass has been generated. The `sender` is the
+Called when a ticket object for an Apple Pass has been generated. The `sender` is the
 `Event` object, the `obj` kwarg contains the Ticket object.
 ''')
 
