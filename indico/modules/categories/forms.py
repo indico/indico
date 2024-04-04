@@ -219,7 +219,6 @@ class CategorySettingsForm(IndicoForm):
             raise ValidationError(_('The private key is invalid.'))
 
     def validate_apple_pass_password(self, field):
-        # Do not check the password if the Private.key is malformed.
         if self.apple_pass_key.errors:
             return True
         try:
