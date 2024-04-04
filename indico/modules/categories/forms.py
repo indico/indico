@@ -16,6 +16,7 @@ from wtforms.widgets import TextArea
 
 from indico.core.config import config
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
+from indico.modules.categories import logger
 from indico.modules.categories.models.categories import (Category, EventCreationMode, EventMessageMode,
                                                          InheritableConfigMode)
 from indico.modules.categories.models.roles import CategoryRole
@@ -213,8 +214,9 @@ class CategorySettingsForm(IndicoForm):
             # Is there a better way to check it?
             return True
         except UnsupportedAlgorithm:
-            raise ValidationError(_('The provided Private.key type is not supported by the system. '
-                                    'Please contact support.'))
+            logger.warning('The provided Google Wallet private key type for category %s is not supported.',
+                           self.category.id)
+            raise ValidationError(_('The private key is invalid.'))
 
     def validate_apple_pass_password(self, field):
         # Do not check the password if the Private.key is malformed.
