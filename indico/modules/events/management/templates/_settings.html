@@ -102,7 +102,7 @@
 {% endmacro %}
 
 
-{% macro render_section_location(event, wallet_location_warning, pass_location_warning, with_container=true) %}
+{% macro render_section_location(event, google_wallet_location_warning, apple_pass_location_warning, with_container=true) %}
     {% call render_section(event, 'location', 'icon-location', '.edit_location', _('Edit event location'),
                            with_container=with_container) %}
         {% block render_location_data scoped %}
