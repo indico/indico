@@ -25,7 +25,6 @@ logger = Logger.get('events.registration.apple_pass')
 
 
 class IndicoPass(Pass):
-
     def _createSignature(self, manifest, certificate, key, wwdr_certificate, password):  # noqa: N802
         """Creates a signature (DER encoded) of the manifest.
 
