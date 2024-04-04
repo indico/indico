@@ -542,7 +542,7 @@ class RHTicketApplePass(RHTicketDownload):
 
     def _process(self):
         if not (apple_pass := self.registration.generate_ticket_apple_pass()):
-            raise NotFound('Apple Pass tickets are not available')
+            raise NotFound('Ticket for Apple Wallet is not available')
         filename = secure_filename(f'{self.event.title}-Ticket.pkpass', 'apple_pass.pkpass')
         return send_file(filename, apple_pass, mimetype='application/vnd.apple.pkpass', no_cache=True)
 
