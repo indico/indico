@@ -120,13 +120,13 @@ class ApplePassManager:
         temp = tempfile.NamedTemporaryFile(prefix='apple_pass_', dir=config.TEMP_DIR, delete=False)
         registration.apple_pass_serial = passfile.serialNumber  # Save ticket serial for updates
         try:
-            ret = passfile.create(self.cert, self.settings['apple_pass_key'], wwdr_path,
-                                  self.settings['apple_pass_password'],
-                                  zip_file=os.path.join(config.TEMP_DIR, temp.name))
+            pkpass = passfile.create(self.cert, self.settings['apple_pass_key'], wwdr_path,
+                                     self.settings['apple_pass_password'],
+                                     zip_file=os.path.join(config.TEMP_DIR, temp.name))
         except ValueError as exc:
             logger.warning('Could not create Apple Pass ticket: %s', exc)
             raise
-        return ret
+        return pkpass
         # TBD: For some reason the ticket creation on the fly returns an error: the download does not complete...
         # return passfile.create(self.cert, self.settings['apple_pass_key'], wwdr_path,
         # self.settings['apple_pass_password'])
