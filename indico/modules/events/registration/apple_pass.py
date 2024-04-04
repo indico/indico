@@ -81,7 +81,7 @@ class ApplePassManager:
         ticket.addBackField('back-ticket-number', f'#{registration.friendly_id}', _('Ticket number'))
         ticket.addBackField('back-event-date', event_date, _('Date'))
         ticket.addBackField('back-registration-email', registration.email, _('Email'))
-        ticket.addBackField('back-event-url', f'<a href="{self.event.external_url}">Indico event page</a>', _('Link'))
+        ticket.addBackField('back-event-url', f'<a href="{self.event.external_url}">Event page</a>', _('Link'))
         reg_url = url_for('event_registration.display_regform', registration.locator.uuid, _external=True)
         ticket.addBackField('back-registration-details', f'<a href="{reg_url}">Registration details</a>', _('Link'))
 
