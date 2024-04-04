@@ -75,11 +75,8 @@ class HiddenUnless:
             # composite field: v is a list
             if len(values) != len(v):
                 raise ValueError('Length of value does not match length of composite field')
-            i = 0
-            while i < len(v):
-                if values[i] is not None and v[i] not in values[i]:
-                    return False
-                i += 1
+            if any(i for i in range(len(v)) if values[i] and v[i] not in values[i]):
+                return False
             return True
 
         value = form[self.field].data
