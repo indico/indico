@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
+// TODO get this from the server - contribution_settings.get('default_duration')
 const CONTRIB_DEFAULT_DURATION = 20; // in minutes
 
 export const entryColorSchema = PropTypes.shape({
@@ -36,11 +37,12 @@ export const entryTypes = {
     icon: 'coffee',
     formatTitle: e => formatTitle(e.title, e.code),
   },
+  placeholder: {},
 };
 
 export const entrySchema = PropTypes.shape({
   id: PropTypes.string.isRequired,
-  type: PropTypes.oneOf([...Object.keys(entryTypes), 'placeholder']).isRequired,
+  type: PropTypes.oneOf(Object.keys(entryTypes)).isRequired,
   title: PropTypes.string, // required for all types except placeholder
   slotTitle: PropTypes.string, // only for sessions (required then)
   description: PropTypes.string,
@@ -375,7 +377,7 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
  * @param {object} contrib Contribution to be inserted
  * @returns {array|boolean} Rearranged contributions or false if they don't fit in the block
  */
-const rearrangeContribs = (contribs, contrib) => {
+const rearrangeContribsAfterMove = (contribs, contrib) => {
   const prevContrib = contribs.reduce(
     (acc, c) => (c.end <= contrib.start && (!acc || c.end > acc.end) ? c : acc),
     null
@@ -392,68 +394,6 @@ const rearrangeContribs = (contribs, contrib) => {
   );
   return rearrangedContribs;
 };
-
-/**
- * Rearranges contributions in a block in order to fit a new contribution after one of the contributions
- * has been resized in either direction.
- * @param {array} contribs Contributions to be rearranged
- * @param {object} contrib Contribution to be inserted
- * @param {object} oldContrib The old contribution that was resized
- * @returns {array} Changes to the contributions
- */
-const rearrangeContribsAfterResize = (contribs, contrib, oldContrib) => {
-  contribs = _.sortBy(contribs, 'start'); // contribs are not guaranteed to be sorted
-  const contribsBefore = contribs.filter(c => c.end <= oldContrib.start);
-  const contribsAfter = contribs.filter(c => c.start >= oldContrib.end);
-
-  return [...moveUp(contribsBefore, contrib), contrib, ...moveDown(contribsAfter, contrib)];
-};
-
-/**
- * Moves contributions that come before newContrib up in order to fit newContrib if necessary
- * @param {array} contribsBefore Contributions to be rearranged
- * @param {object} newContrib Contribution to be inserted
- * @returns {array} Changes to the contributions
- */
-function moveUp(contribsBefore, newContrib) {
-  const changes = [newContrib];
-  for (const contrib of [...contribsBefore].reverse()) {
-    if (changes.at(-1).start < contrib.end) {
-      const diff = changes.at(-1).start - contrib.end;
-      changes.push({
-        id: contrib.id,
-        start: new Date(contrib.start.getTime() + diff),
-        end: new Date(contrib.end.getTime() + diff),
-      });
-    } else {
-      changes.push(contrib);
-    }
-  }
-  return changes.slice(1).reverse();
-}
-
-/**
- * Moves contributions that come after newContrib down in order to fit newContrib if necessary
- * @param {array} contribsBefore Contributions to be rearranged
- * @param {object} newContrib Contribution to be inserted
- * @returns {array} Changes to the contributions
- */
-function moveDown(contribsAfter, newContrib) {
-  const changes = [newContrib];
-  for (const contrib of contribsAfter) {
-    if (changes.at(-1).end > contrib.start) {
-      const diff = changes.at(-1).end - contrib.start;
-      changes.push({
-        id: contrib.id,
-        start: new Date(contrib.start.getTime() + diff),
-        end: new Date(contrib.end.getTime() + diff),
-      });
-    } else {
-      changes.push(contrib);
-    }
-  }
-  return changes.slice(1);
-}
 
 /**
  * Moves a contribution
@@ -478,7 +418,7 @@ const moveContrib = (state, args) => {
   newContrib.parentId = parent.id;
   // if it's being dragged on top of a contribution, try to rearange them in order to fit
   const newContribs = parentContribs.some(c => isConcurrent(c, newContrib))
-    ? rearrangeContribs(parentContribs, newContrib)
+    ? rearrangeContribsAfterMove(parentContribs, newContrib)
     : [newContrib];
   // if they don't fit in the block, instead turn the contrib into a separate block
   if (newContribs[newContribs.length - 1].end > parent.end) {
@@ -490,6 +430,68 @@ const moveContrib = (state, args) => {
     return {changes: removeBlockGaps(newChanges), currentChangeIdx: newChanges.currentChangeIdx};
   }
   return newChanges;
+};
+
+/**
+ * Moves contributions that come before newContrib up in order to fit newContrib if necessary
+ * @param {array} contribsBefore Contributions to be rearranged
+ * @param {object} newContrib Contribution to be inserted
+ * @returns {array} Changes to the contributions, ordered by start date
+ */
+const moveUp = (contribsBefore, newContrib) => {
+  const changes = [newContrib];
+  for (const contrib of [...contribsBefore].reverse()) {
+    if (changes.at(-1).start < contrib.end) {
+      const diff = changes.at(-1).start - contrib.end;
+      changes.push({
+        id: contrib.id,
+        start: new Date(contrib.start.getTime() + diff),
+        end: new Date(contrib.end.getTime() + diff),
+      });
+    } else {
+      changes.push(contrib);
+    }
+  }
+  return changes.slice(1).reverse();
+};
+
+/**
+ * Moves contributions that come after newContrib down in order to fit newContrib if necessary
+ * @param {array} contribsBefore Contributions to be rearranged
+ * @param {object} newContrib Contribution to be inserted
+ * @returns {array} Changes to the contributions, ordered by start date
+ */
+const moveDown = (contribsAfter, newContrib) => {
+  const changes = [newContrib];
+  for (const contrib of contribsAfter) {
+    if (changes.at(-1).end > contrib.start) {
+      const diff = changes.at(-1).end - contrib.start;
+      changes.push({
+        id: contrib.id,
+        start: new Date(contrib.start.getTime() + diff),
+        end: new Date(contrib.end.getTime() + diff),
+      });
+    } else {
+      changes.push(contrib);
+    }
+  }
+  return changes.slice(1);
+};
+
+/**
+ * Rearranges contributions in a block in order to fit a new contribution after one of the contributions
+ * has been resized in either direction.
+ * @param {array} contribs Contributions to be rearranged
+ * @param {object} contrib Contribution to be inserted
+ * @param {object} oldContrib The old contribution that was resized
+ * @returns {array} Changes to the contributions, ordered by start date
+ */
+const rearrangeContribsAfterResize = (contribs, contrib, oldContrib) => {
+  contribs = _.sortBy(contribs, 'start'); // contribs are not guaranteed to be sorted
+  const contribsBefore = contribs.filter(c => c.end <= oldContrib.start);
+  const contribsAfter = contribs.filter(c => c.start >= oldContrib.end);
+
+  return [...moveUp(contribsBefore, contrib), contrib, ...moveDown(contribsAfter, contrib)];
 };
 
 /**

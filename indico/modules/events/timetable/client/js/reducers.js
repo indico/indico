@@ -118,10 +118,12 @@ export default {
         return state;
     }
   },
-  displayMode: (state = 'compact', action) => {
+  display: (state = {mode: 'compact', showUnscheduled: false}, action) => {
     switch (action.type) {
       case actions.SET_DISPLAY_MODE:
-        return action.mode;
+        return {...state, mode: action.mode};
+      case actions.TOGGLE_SHOW_UNSCHEDULED:
+        return {...state, showUnscheduled: !state.showUnscheduled};
       default:
         return state;
     }

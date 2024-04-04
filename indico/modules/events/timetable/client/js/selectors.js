@@ -12,7 +12,7 @@ import {applyChanges, getNumDays, mergeChanges} from './util';
 export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
 export const getNavigation = state => state.navigation;
-export const getDisplayMode = state => state.displayMode;
+export const getDisplay = state => state.display;
 
 export const getEventStartDt = createSelector(
   getStaticData,
@@ -43,6 +43,10 @@ export const getChildren = createSelector(
 export const getUnscheduled = createSelector(
   getUpdatedEntries,
   entries => entries.unscheduled
+);
+export const getNumUnscheduled = createSelector(
+  getUnscheduled,
+  unscheduled => unscheduled.length
 );
 export const getAllEntries = createSelector(
   getBlocks,
@@ -83,4 +87,13 @@ export const getNavbarMaxDays = createSelector(
 export const getNavbarOffset = createSelector(
   getNavigation,
   navigation => navigation.offset
+);
+
+export const getDisplayMode = createSelector(
+  getDisplay,
+  display => display.mode
+);
+export const showUnscheduled = createSelector(
+  getDisplay,
+  display => display.showUnscheduled
 );
