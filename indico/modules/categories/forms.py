@@ -124,7 +124,7 @@ class CategorySettingsForm(IndicoForm):
                                    [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
                                                  preserve_data=True), DataRequired()],
                                    description=_('Content of the Private.key file.'))
-    apple_pass_password = IndicoPasswordField(_('Password for the Private.key'),
+    apple_pass_password = IndicoPasswordField(_('Password for the private key'),
                                               [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
                                                             preserve_data=True), DataRequired()],
                                               description=_('Password used to decrypt the Private.key file.'))
