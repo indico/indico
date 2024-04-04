@@ -37,14 +37,14 @@ from indico.web.forms.fields import IndicoStrictKeywordsField, IndicoTagListFiel
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
-def _show_wallet_location_warning(event):
+def _show_google_wallet_location_warning(event):
     if bool(event.address) == event.has_location_info:
         return False
     return (RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_google_wallet).has_rows()
             and event.category.google_wallet_mode == InheritableConfigMode.enabled)
 
 
-def _show_pass_location_warning(event):
+def _show_apple_pass_location_warning(event):
     if bool(event.address) == event.has_location_info:
         return False
     return (RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_apple_pass).has_rows()
@@ -93,8 +93,8 @@ class RHEventSettings(RHManageEventBase):
                                                show_draft_warning=should_show_draft_warning(self.event),
                                                has_reference_types=has_reference_types,
                                                has_event_labels=has_event_labels,
-                                               wallet_location_warning=_show_wallet_location_warning(self.event),
-                                               pass_location_warning=_show_pass_location_warning(self.event))
+                                               wallet_location_warning=_show_google_wallet_location_warning(self.event),
+                                               pass_location_warning=_show_apple_pass_location_warning(self.event))
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -109,8 +109,8 @@ class RHEditEventDataBase(RHManageEventBase):
         assert self.section_name
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
-        wallet_location_warning = _show_wallet_location_warning(self.event)
-        pass_location_warning = _show_pass_location_warning(self.event)
+        wallet_location_warning = _show_google_wallet_location_warning(self.event)
+        pass_location_warning = _show_apple_pass_location_warning(self.event)
         return tpl.render_event_settings(self.event, has_reference_types, has_event_labels, wallet_location_warning,
                                          pass_location_warning, section=self.section_name, with_container=False)
 
