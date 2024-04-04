@@ -402,6 +402,7 @@ const rearrangeContribs = (contribs, contrib) => {
  * @returns {array} Changes to the contributions
  */
 const rearrangeContribsAfterResize = (contribs, contrib, oldContrib) => {
+  contribs = _.sortBy(contribs, 'start'); // contribs are not guaranteed to be sorted
   const contribsBefore = contribs.filter(c => c.end <= oldContrib.start);
   const contribsAfter = contribs.filter(c => c.start >= oldContrib.end);
 
