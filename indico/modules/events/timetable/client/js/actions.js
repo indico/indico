@@ -19,6 +19,7 @@ export const SAVE_CHANGES = 'Save changes';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
+export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 
 export function setTimetableData(data) {
   return {type: SET_TIMETABLE_DATA, data};
@@ -74,4 +75,8 @@ export function resizeWindow(newSize, dayIdx) {
 
 export function setDisplayMode(mode) {
   return {type: SET_DISPLAY_MODE, mode};
+}
+
+export function toggleShowUnscheduled() {
+  return {type: TOGGLE_SHOW_UNSCHEDULED};
 }
