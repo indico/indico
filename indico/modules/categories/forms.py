@@ -220,7 +220,6 @@ class CategorySettingsForm(IndicoForm):
 
     def validate_apple_pass_password(self, field):
         # Do not check the password if the Private.key is malformed.
-        # @validates_schema(skip_on_field_errors=True) seems not to be working :(
         if self.apple_pass_key.errors:
             return True
         try:
