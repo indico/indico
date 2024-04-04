@@ -104,8 +104,8 @@ class ApplePassManager:
         passfile.barcode = Barcode(message=json.dumps(qr_data, separators=(',', ':')), format=BarcodeFormat.QR)
 
         # Including the icon and logo is necessary for the passbook to be valid.
-        logo_path = config.ABSOLUTE_PASS_LOGO_PATH if config.ABSOLUTE_PASS_LOGO_PATH else (
-            os.path.join(self.static_path, 'images', 'logo_indico_small.png'))
+        logo_path = (config.ABSOLUTE_PASS_LOGO_PATH if config.ABSOLUTE_PASS_LOGO_PATH
+                     else (os.path.join(self.static_path, 'images', 'logo_indico_small.png')))
         passfile.addFile('icon.png', open(logo_path, 'rb'))  # noqa: SIM115
         passfile.addFile('logo.png', open(logo_path, 'rb'))  # noqa: SIM115
 
