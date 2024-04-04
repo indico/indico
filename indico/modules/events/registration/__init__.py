@@ -252,7 +252,7 @@ def _patch_google_wallet_class(event, changes, **kwargs):
     wallet_fields = {'title', 'start_dt', 'end_dt', 'location_data'}
     if set(changes) & wallet_fields and GoogleWalletManager.event_uses_google_wallet_tickets(event):
         gwm = GoogleWalletManager(event)
-        if gwm.configured:
+        if gwm.is_configured:
             gwm.patch_ticket_class()
 
 
@@ -267,5 +267,5 @@ def _patch_google_wallet_ticket(registration, change, **kwargs):
         registration.registration_form.ticket_google_wallet
     ):
         gwm = GoogleWalletManager(registration.event)
-        if gwm.configured:
+        if gwm.is_configured:
             gwm.patch_ticket_object(registration)

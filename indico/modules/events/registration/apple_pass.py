@@ -59,7 +59,7 @@ class ApplePassManager:
         self.static_path = os.path.join(current_app.root_path, 'web', 'static')
 
     @property
-    def configured(self):
+    def is_configured(self):
         return config.ENABLE_APPLE_PASS and self.settings is not None
 
     def build_ticket_object(self, registration):
@@ -73,10 +73,10 @@ class ApplePassManager:
                           if self.event.room_name and self.event.venue_name
                           else (self.event.venue_name or self.event.room_name))
             ticket.addSecondaryField('event-venue', venue_name, 'Venue')
+            ticket.addBackField('back-event-venue', venue_name, 'Venue')
         ticket.addAuxiliaryField('registration-name', registration.full_name, 'Name')
         ticket.addAuxiliaryField('registration-email', registration.email, 'Email')
         ticket.addBackField('back-registration-name', registration.full_name, 'Name')
-        ticket.addBackField('back-event-venue', venue_name, 'Venue')
         ticket.addBackField('back-ticket-number', f'#{registration.friendly_id}', 'Ticket number')
         ticket.addBackField('back-event-date', event_date, 'Date')
         ticket.addBackField('back-registration-email', registration.email, 'Email')

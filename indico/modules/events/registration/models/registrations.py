@@ -778,7 +778,7 @@ class Registration(db.Model):
         if not self.registration_form.ticket_google_wallet:
             return None
         gwm = GoogleWalletManager(self.event)
-        if gwm.configured:
+        if gwm.is_configured:
             return gwm.get_ticket_link(self)
 
     def generate_ticket_apple_pass(self):
@@ -786,7 +786,7 @@ class Registration(db.Model):
         if not self.registration_form.ticket_apple_pass:
             return None
         gwm = ApplePassManager(self.event)
-        if gwm.configured:
+        if gwm.is_configured:
             return gwm.get_ticket(self)
 
 

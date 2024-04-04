@@ -82,7 +82,7 @@ class GoogleWalletManager:
         return credentials, http_client
 
     @property
-    def configured(self):
+    def is_configured(self):
         return config.ENABLE_GOOGLE_WALLET and self.settings is not None
 
     @property
