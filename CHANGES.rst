@@ -19,6 +19,7 @@ Bugfixes
   (:pr:`6264`, thanks :user:`SegiNyn`)
 - Fix overlapping times in some room booking timelines when using a locale with
   a 12-hour time format (:pr:`6263`)
+- Add setuptools to runtime requirements (for ``pkg_resources``). (:pr:`6271`, thanks :user:`maxnoe`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
