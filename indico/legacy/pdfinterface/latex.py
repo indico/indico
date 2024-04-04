@@ -9,12 +9,12 @@ import codecs
 import os
 import subprocess
 import tempfile
+from importlib.resources import files, as_file
 from io import BytesIO
 from operator import attrgetter
 from zipfile import ZipFile
 
 import markdown
-import pkg_resources
 from flask import session
 from flask.helpers import get_root_path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
@@ -195,9 +195,8 @@ class LatexRunner:
         with codecs.open(source_filename, 'wb', encoding='utf-8') as f:
             f.write(source)
 
-        distribution = pkg_resources.get_distribution('indico-fonts')
-        font_dir = os.path.join(distribution.location, 'indico_fonts')
-        os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
+        with as_file(files('indico_fonts')) as font_dir:
+            os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
         return source_filename, target_filename
 
     def run(self, template_name, **kwargs):

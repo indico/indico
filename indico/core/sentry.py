@@ -8,11 +8,11 @@
 import logging
 import re
 from urllib.parse import parse_qs, urlsplit, urlunsplit
+from importlib.metadata import entry_points
 
 import requests
 import sentry_sdk
 from flask import request
-from pkg_resources import iter_entry_points
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.pure_eval import PureEvalIntegration
@@ -29,7 +29,11 @@ logger = Logger.get('sentry')
 
 
 def init_sentry(app):
-    plugin_packages = {ep.module_name.split('.')[0] for ep in iter_entry_points('indico.plugins')}
+    plugin_packages = {
+        ep.value.split(':')[0].split('.')[0]
+        for ep in entry_points(group='indico.plugins')
+    }
+
     ignore_logger('indico.flask')
     sentry_sdk.init(
         dsn=config.SENTRY_DSN,

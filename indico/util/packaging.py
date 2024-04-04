@@ -7,19 +7,18 @@
 
 import sys
 from importlib.util import find_spec
+from importlib.metadata import distribution
 from pathlib import Path
-
-import pkg_resources
 
 
 def package_is_editable(package):
     """Check whether the Python package is installed in 'editable' mode."""
     # based on pip.dist_is_editable
-    dist = pkg_resources.get_distribution(package)
+    dist = distribution(package)
     for path_item in sys.path:
-        if (Path(path_item) / f'{dist.project_name}.egg-link').is_file():
+        if (Path(path_item) / f'{dist.name}.egg-link').is_file():
             return True
-        if any(Path(path_item).glob(f'__editable__.{dist.project_name}-*.pth')):
+        if any(Path(path_item).glob(f'__editable__.{dist.name}-*.pth')):
             return True
     return False
 
