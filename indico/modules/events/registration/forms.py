@@ -326,8 +326,8 @@ class TicketsForm(IndicoForm):
                                         description=_('Allow users to export their ticket to Google Wallet. '
                                                       'This currently does not support tickets for accompanying '
                                                       'persons.'))
-    ticket_apple_pass = BooleanField(_('Export to Apple Pass'), [HiddenUnless('tickets_enabled',
-                                                                              preserve_data=True)],
+    ticket_apple_pass = BooleanField(_('Export to Apple Wallet'), [HiddenUnless('tickets_enabled',
+                                                                                preserve_data=True)],
                                      widget=SwitchWidget(),
                                      description=_('Allow users to export their ticket to Apple Pass. '
                                                    'This currently does not support tickets for accompanying persons.'))
