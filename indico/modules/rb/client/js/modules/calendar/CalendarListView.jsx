@@ -124,22 +124,25 @@ class CalendarListView extends React.Component {
       const datesMatch =
         moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
         moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+      if (!!booking.link || !datesMatch) {
+        return;
+      }
       const linkBtn = (
         <Button
           icon={<Icon name="linkify" />}
           primary
-          disabled={!!booking.link || !datesMatch}
           size="small"
           circular
-          onClick={() =>
+          onClick={e => {
+            e.stopPropagation();
             linkBookingOccurrence(reservation.id, day, linkData.id, () =>
               this.refetchActiveBookings(false)
-            )
-          }
+            );
+          }}
         />
       );
       return (
-        <div style={{position: 'absolute', top: '5px', right: '5px'}}>
+        <div style={{position: 'absolute', top: '35%', right: '5px'}}>
           <Popup trigger={linkBtn} position="bottom center">
             <Translate>
               Link to <Param name="bookedFor" value={linkData.title} />
@@ -160,8 +163,8 @@ class CalendarListView extends React.Component {
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
     return (
-      <Card styleName="booking-card" key={key}>
-        <Card.Content onClick={() => openBookingDetails(reservation.id)}>
+      <Card styleName="booking-card" key={key} onClick={() => openBookingDetails(reservation.id)}>
+        <Card.Content>
           <Card.Header>
             {!isAccepted && (
               <Popup
@@ -201,8 +204,8 @@ class CalendarListView extends React.Component {
               </div>
             </TooltipIfTruncated>
           )}
-          {this.renderLink(booking, day, linkData, linkBookingOccurrence)}
         </Card.Content>
+        {this.renderLink(booking, day, linkData, linkBookingOccurrence)}
       </Card>
     );
   };
