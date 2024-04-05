@@ -10,5 +10,10 @@
     {% if show_draft_warning %}
         {{ render_draft_mode_warning(event) }}
     {% endif %}
+    <h1>Timetable Dialogs</h1>
+    <div id="timetable-container" style="min-height: 50px;"></div>
+    <script>
+        setupTimetable();
+    </script>
     {{ render_timetable(timetable_data, event_info, management=true, custom_links=custom_links) }}
 {% endblock %}
