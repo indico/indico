@@ -71,7 +71,6 @@ class ApplePassManager:
         self.event = event
         self.settings = self.event.category.effective_apple_pass_config if not self.event.is_unlisted else None
         self.cert = None
-        self.static_path = os.path.join(current_app.root_path, 'web', 'static')
 
     @property
     def is_configured(self):
@@ -128,8 +127,7 @@ class ApplePassManager:
 
     def get_ticket(self, registration) -> str:
         passfile = self.build_pass_object(registration)
-        # TBD: do we provide the wwdr.pem or we let users to provide it? if so, how?
-        wwdr_path = os.path.join(self.static_path, 'certificates', 'wwdr.pem')
+        wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'apple-wwdr.pem')
         # Create and output the Passbook file (.pkpass)
         temp = tempfile.NamedTemporaryFile(prefix='apple_pass_', dir=config.TEMP_DIR, delete=False)
         registration.apple_pass_serial = passfile.serialNumber  # Save ticket serial for updates
