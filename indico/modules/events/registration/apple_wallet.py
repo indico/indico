@@ -9,6 +9,7 @@ import os
 import tempfile
 from pathlib import Path
 
+import requests
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import pkcs7
@@ -26,6 +27,19 @@ logger = Logger.get('events.registration.apple_pass')
 
 
 class IndicoPass(Pass):
+    def add_file_from_url(self, name, url):
+        try:
+            response = requests.get(url)
+            self._files[name] = response.content
+        except (requests.HTTPError, requests.ConnectionError):
+            self.add_default_images(names=[name])
+
+    def add_default_images(self, names=('icon.png', 'logo.png')):
+        path = os.path.join(current_app.root_path, 'web', 'static')
+        logo_path = os.path.join(path, 'images', 'logo_indico_small.png')
+        for name in names:
+            self._files[name] = Path(logo_path).read_bytes()
+
     def _createSignature(self, manifest, certificate, key, wwdr_certificate, password):  # noqa: N802
         """Creates a signature (DER encoded) of the manifest.
 
@@ -104,11 +118,11 @@ class ApplePassManager:
         passfile.barcode = Barcode(message=json.dumps(qr_data, separators=(',', ':')), format=BarcodeFormat.QR)
 
         # Including the icon and logo is necessary for the passbook to be valid.
-        logo_path = (config.ABSOLUTE_PASS_LOGO_PATH if config.ABSOLUTE_PASS_LOGO_PATH
-                     else (os.path.join(self.static_path, 'images', 'logo_indico_small.png')))
-        passfile.addFile('icon.png', open(logo_path, 'rb'))  # noqa: SIM115
-        passfile.addFile('logo.png', open(logo_path, 'rb'))  # noqa: SIM115
-
+        if config.WALLET_LOGO_URL:
+            passfile.add_file_from_url('icon.png', config.ABSOLUTE_WALLET_LOGO_URL)
+            passfile.add_file_from_url('logo.png', config.ABSOLUTE_WALLET_LOGO_URL)
+        else:
+            passfile.add_default_images()
         signals.event.registration.apple_pass_object.send(self.event, obj=passfile)
         return passfile
 
