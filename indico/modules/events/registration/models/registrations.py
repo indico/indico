@@ -27,7 +27,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
-from indico.modules.events.registration.apple_pass import ApplePassManager
+from indico.modules.events.registration.apple_wallet import ApplePassManager
 from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.users.models.users import format_display_full_name
