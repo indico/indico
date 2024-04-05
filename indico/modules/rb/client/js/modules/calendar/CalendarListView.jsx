@@ -12,7 +12,17 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import LazyScroll from 'redux-lazy-scroll';
-import {Button, Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-react';
+import {
+  Button,
+  Card,
+  Confirm,
+  Divider,
+  Header,
+  Icon,
+  Label,
+  Message,
+  Popup,
+} from 'semantic-ui-react';
 
 import * as linkingSelectors from 'indico/modules/rb/common/linking/selectors';
 import {TooltipIfTruncated} from 'indico/react/components';
@@ -43,6 +53,10 @@ class CalendarListView extends React.Component {
       fetchActiveBookings: PropTypes.func.isRequired,
       clearActiveBookings: PropTypes.func.isRequired,
     }).isRequired,
+  };
+
+  state = {
+    linkingConfirmOpen: false,
   };
 
   componentDidMount() {
@@ -119,6 +133,7 @@ class CalendarListView extends React.Component {
 
   renderLink = (booking, day, linkData, linkBookingOccurrence) => {
     if (linkData) {
+      const {linkingConfirmOpen} = this.state;
       const {reservation} = booking;
       const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
       const datesMatch =
@@ -135,20 +150,47 @@ class CalendarListView extends React.Component {
           circular
           onClick={e => {
             e.stopPropagation();
-            linkBookingOccurrence(reservation.id, day, linkData.id, () =>
-              this.refetchActiveBookings(false)
-            );
+            this.setState({linkingConfirmOpen: true});
           }}
         />
       );
       return (
-        <div style={{position: 'absolute', top: '35%', right: '5px'}}>
-          <Popup trigger={linkBtn} position="bottom center">
-            <Translate>
-              Link to <Param name="bookedFor" value={linkData.title} />
-            </Translate>
-          </Popup>
-        </div>
+        <>
+          <Confirm
+            size="mini"
+            header={Translate.string('Link event')}
+            open={linkingConfirmOpen}
+            content={Translate.string('Are you sure you want to link this event?')}
+            closeOnDimmerClick
+            closeOnEscape
+            onClose={e => {
+              e.stopPropagation();
+              this.setState({linkingConfirmOpen: false});
+            }}
+            onConfirm={e => {
+              e.stopPropagation();
+              this.setState({linkingConfirmOpen: false});
+              linkBookingOccurrence(reservation.id, day, linkData.id, () =>
+                this.refetchActiveBookings(false)
+              );
+            }}
+            onCancel={e => {
+              e.stopPropagation();
+              this.setState({linkingConfirmOpen: false});
+            }}
+            onOpen={e => e.stopPropagation()}
+            cancelButton={<Button content={Translate.string('Cancel')} />}
+            confirmButton={<Button content={Translate.string('Link')} />}
+            closeIcon
+          />
+          <div style={{position: 'absolute', top: '35%', right: '5px'}}>
+            <Popup trigger={linkBtn} position="bottom center">
+              <Translate>
+                Link to <Param name="bookedFor" value={linkData.title} />
+              </Translate>
+            </Popup>
+          </div>
+        </>
       );
     }
   };
