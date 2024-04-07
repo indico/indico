@@ -37,7 +37,7 @@ from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import LowercaseString, UUIDString
+from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
@@ -265,7 +265,7 @@ class RHRegistrationFormCheckEmail(InvitationMixin, RHRegistrationFormBase):
     ALLOW_PROTECTED_EVENT = True
 
     @use_kwargs({
-        'email': LowercaseString(required=True),
+        'email': LowercaseString(required=True, validate=not_empty),
         'update': UUIDString(load_default=None),
         'management': fields.Bool(load_default=False),
     }, location='query')
