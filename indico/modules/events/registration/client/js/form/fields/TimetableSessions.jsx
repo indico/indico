@@ -7,12 +7,12 @@
 
 import timeTableURL from 'indico-url:event_registration.api_event_timetable';
 
+import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Checkbox, Form, Accordion, Icon} from 'semantic-ui-react';
-
-import '../../../../../../rb/client/js/modules/roomList/filters/EquipmentForm.module.scss';
 
 import {
   FinalCheckbox,
@@ -22,12 +22,18 @@ import {
   validators as v,
 } from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate, PluralTranslate} from 'indico/react/i18n';
-import {camelizeKeys} from 'indico/utils/case';
-import {$T} from 'indico/utils/i18n';
+import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
 import {getStaticData} from '../selectors';
+
+const sessionDataSchema = PropTypes.arrayOf(
+  PropTypes.shape({
+    fullTitle: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+    startDt: PropTypes.string.isRequired,
+  })
+);
 
 function TimetableSessionsComponent({
   value,
@@ -42,6 +48,8 @@ function TimetableSessionsComponent({
   maximum,
   ...props
 }) {
+  const [expandedHeaders, setExpandedHeaders] = useState([]);
+
   const markTouched = () => {
     onFocus();
     onBlur();
@@ -50,39 +58,40 @@ function TimetableSessionsComponent({
   function handleValueChange(e, data) {
     markTouched();
     const id = data.value;
-    const newValue = value.includes(id) ? value.filter(el => el !== id) : [...value, id];
+    const newValue = _.xor(value, [id]);
     onChange(newValue);
   }
 
-  function formatDate(date) {
-    const options = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      weekday: 'short',
-    };
-    const dt = new Date(date);
-    return dt.toLocaleDateString(undefined, options);
+  function handleHeaderClick(e, accordion) {
+    if (expandedHeaders.includes(accordion.index)) {
+      setExpandedHeaders(expandedHeaders.filter(el => el !== accordion.index));
+    } else {
+      setExpandedHeaders([...expandedHeaders, accordion.index]);
+    }
   }
 
-  const currentSelectionMsg = $T.gettext('You selected {0} session blocks.').format(value.length);
+  useEffect(() => {
+    setExpandedHeaders(
+      sessionData && display === 'expanded' ? [...Array(_.keys(sessionData).length).keys()] : []
+    );
+  }, [sessionData, display]);
 
   return (
     <Form.Group styleName="timetablesessions-field">
-      <strong>{currentSelectionMsg}</strong>
       {sessionData &&
-        Object.keys(sessionData)?.map((date, index) => (
+        Object.keys(sessionData).map((date, index) => (
           <SessionBlockHeader
             value={value}
             index={index}
             name={name}
             data={sessionData[date]}
-            label={formatDate(date)}
+            label={moment(date).format('dddd ll')}
+            isExpanded={expandedHeaders.includes(index)}
             allowFullDays={allowFullDays}
-            display={display}
-            key={`session-block-${date}`}
+            key={date}
             handleValueChange={handleValueChange}
             onChange={onChange}
+            onClick={handleHeaderClick}
             props={props}
           />
         ))}
@@ -93,15 +102,7 @@ function TimetableSessionsComponent({
 TimetableSessionsComponent.propTypes = {
   value: PropTypes.arrayOf(PropTypes.number).isRequired,
   name: PropTypes.string.isRequired,
-  sessionData: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        full_title: PropTypes.string.isRequired,
-        id: PropTypes.number.isRequired,
-        start_dt: PropTypes.string.isRequired,
-      })
-    )
-  ),
+  sessionData: PropTypes.objectOf(sessionDataSchema),
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
@@ -118,73 +119,79 @@ TimetableSessionsComponent.defaultProps = {
 
 function SessionBlockHeader({
   value,
+  index,
   data,
   label,
+  isExpanded,
   allowFullDays,
-  display,
   handleValueChange,
   onChange,
+  onClick,
 }) {
   const childrenIds = data.map(e => e.id);
-  const isChecked = childrenIds.reduce((acum, id) => {
-    return acum && value.includes(id);
-  }, true);
-  const isIndeterminate = childrenIds.reduce((acum, id) => {
-    return acum || value.includes(id);
-  }, false);
-  const [isExpanded, setIsExpanded] = useState(display === 'expanded');
+  const isAllChecked = childrenIds.every(id => value.includes(id));
+  const isAnyChecked = childrenIds.some(id => value.includes(id));
+  const selectedBlocks = value.filter(element => childrenIds.includes(element)).length;
 
-  const isExpandedClass = isExpanded ? '' : 'hidden';
-
-  function handleHeaderClick() {
-    setIsExpanded(!isExpanded);
-  }
-
-  function handleHeaderChange() {
+  function handleHeaderChange(e) {
+    e.stopPropagation();
     const newValue =
-      isChecked || isIndeterminate
+      isAllChecked || isAnyChecked
         ? value.filter(element => !childrenIds.includes(element))
         : [...value, ...childrenIds];
     onChange(newValue);
   }
 
   return (
-    <>
-      <Accordion styleName="equipment-accordion" className="ui-state-default">
-        <Accordion.Title active={isExpanded} index={0} onClick={handleHeaderClick}>
-          <Icon name="dropdown" />
-          <Checkbox
-            checked={isChecked}
-            onChange={handleHeaderChange}
-            indeterminate={isIndeterminate && !isChecked}
-            disabled={!allowFullDays}
-            label={label}
-          />
-        </Accordion.Title>
-      </Accordion>
-      {data.map(({fullTitle, id}) => (
-        <dd className="grouped-fields" key={id}>
-          <Checkbox
-            value={id}
-            onChange={handleValueChange}
-            checked={value.includes(id)}
-            label={fullTitle}
-            className={isExpandedClass}
-          />
-        </dd>
-      ))}
-    </>
+    <Accordion styled exclusive={false}>
+      <Accordion.Title active={isExpanded} index={index} onClick={onClick}>
+        <Icon name="dropdown" />
+        <Checkbox
+          checked={isAllChecked}
+          onChange={handleHeaderChange}
+          indeterminate={isAnyChecked && !isAllChecked}
+          disabled={!allowFullDays}
+          label={label}
+        />
+        <span>
+          <PluralTranslate count={selectedBlocks}>
+            <Singular>
+              (
+              <Param name="selectedBlocks" value={selectedBlocks} /> block selected)
+            </Singular>
+            <Plural>
+              (
+              <Param name="selectedBlocks" value={selectedBlocks} /> blocks selected)
+            </Plural>
+          </PluralTranslate>
+        </span>
+      </Accordion.Title>
+      <Accordion.Content active={isExpanded}>
+        {data.map(({fullTitle, id}) => (
+          <dd className="grouped-fields" key={id}>
+            <Checkbox
+              value={id}
+              onChange={handleValueChange}
+              checked={value.includes(id)}
+              label={fullTitle}
+            />
+          </dd>
+        ))}
+      </Accordion.Content>
+    </Accordion>
   );
 }
 
 SessionBlockHeader.propTypes = {
   value: PropTypes.arrayOf(PropTypes.number).isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  index: PropTypes.number.isRequired,
+  data: sessionDataSchema.isRequired,
   label: PropTypes.string.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
   allowFullDays: PropTypes.bool.isRequired,
-  display: PropTypes.string.isRequired,
   handleValueChange: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default function TimetableSessionsInput({
@@ -198,13 +205,35 @@ export default function TimetableSessionsInput({
   maximum,
 }) {
   const {eventId} = useSelector(getStaticData);
-  const {data: sessionData} = camelizeKeys(
-    useIndicoAxios({url: timeTableURL({event_id: eventId})})
+  const {data: sessionData} = useIndicoAxios(
+    {url: timeTableURL({event_id: eventId})},
+    {camelize: true}
   );
+  let validationMsg;
 
-  const minMsg = minimum > 0 ? `at least ${minimum}` : ``;
-  const and = minimum > 0 && maximum > 0 ? ` and ` : ``;
-  const maxMsg = maximum > 0 ? `no more than ${maximum}` : ``;
+  if (minimum > 0 && maximum > 0) {
+    validationMsg = PluralTranslate.string(
+      'Please select at least {minimum} and no more than {maximum} session block',
+      'Please select at least {minimum} and no more than {maximum} session blocks',
+      minimum,
+      maximum,
+      {minimum, maximum}
+    );
+  } else if (minimum > 0) {
+    validationMsg = PluralTranslate.string(
+      'Please select at least {minimum} session block',
+      'Please select at least {minimum} session blocks',
+      minimum,
+      {minimum}
+    );
+  } else {
+    validationMsg = PluralTranslate.string(
+      'Please select no more than ${maximum} session block',
+      'Please select no more than ${maximum} session blocks',
+      maximum,
+      {maximum}
+    );
+  }
 
   return (
     <FinalField
@@ -220,12 +249,7 @@ export default function TimetableSessionsInput({
       sessionData={sessionData}
       validate={value => {
         if (value.length < minimum || value.length > maximum) {
-          return PluralTranslate.string(
-            'Please select {0}{1}{2} session block.',
-            'Please select {0}{1}{2} session blocks.',
-            maximum,
-            {0: minMsg, 1: and, 2: maxMsg}
-          );
+          return validationMsg;
         }
       }}
     />
@@ -256,15 +280,19 @@ export function TimetableSessionsSettings() {
     <>
       <Form.Group inline>
         <label>{Translate.string('Default display for sessions')}</label>
-        <FinalRadio name="display" label={Translate.string('Expanded.')} value="expanded" />
-        <FinalRadio name="display" label={Translate.string('Collapsed.')} value="collapsed" />
+        <FinalRadio name="display" label={Translate.string('Expanded dropdown')} value="expanded" />
+        <FinalRadio
+          name="display"
+          label={Translate.string('Collapsed dropdown')}
+          value="collapsed"
+        />
       </Form.Group>
 
       <FinalCheckbox name="allowFullDays" label={Translate.string('Allow selecting full days.')} />
       <FinalInput
         name="minimum"
         type="number"
-        label={Translate.string('Minimum selection')}
+        label={Translate.string('Minimum number of choices')}
         placeholder={String(TimetableSessionsInput.defaultProps.minimum)}
         step="1"
         min="0"
@@ -276,7 +304,7 @@ export function TimetableSessionsSettings() {
       <FinalInput
         name="maximum"
         type="number"
-        label={Translate.string('Maximum selection')}
+        label={Translate.string('Maximum number of choices')}
         placeholder={Translate.string('No Maximum')}
         step="1"
         min="0"

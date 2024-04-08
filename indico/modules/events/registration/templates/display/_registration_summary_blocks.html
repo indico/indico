@@ -92,16 +92,10 @@
                 <strong>Accommodation:</strong> {{ accommodation }}
             {%- endtrans %}
         </div>
-    {% elif field.input_type == 'multi_choice' and friendly_data %}
+    {% elif field.input_type in ('multi_choice', 'sessions') and friendly_data %}
         <ul>
             {% for item in friendly_data -%}
                 <li>{{ item }}</li>
-            {%- endfor %}
-        </ul>
-    {% elif field.input_type == 'sessions' and friendly_data %}
-        <ul>
-            {% for item in friendly_data -%}
-                <li>{{ item.full_title }}</li>
             {%- endfor %}
         </ul>
     {% elif field.input_type == 'file' and friendly_data and from_management %}
