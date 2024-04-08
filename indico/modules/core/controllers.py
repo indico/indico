@@ -295,7 +295,7 @@ class RHSignURL(RH):
                                                params)
             else:
                 url = url_for(endpoint, _external=True, **params)
-        except BuildError as exc:
+        except (BuildError, ValueError) as exc:
             # if building fails for a valid endpoint we can be pretty sure that it's due to
             # some required params missing
             abort(422, messages={'params': [str(exc)]})
