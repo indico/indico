@@ -451,7 +451,8 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
             return friendly_data
 
     def _render_image(self, data):
-        return Image.open(data.open())
+        if data.storage_file_id is not None:
+            return Image.open(data.open())
 
     def _render_accommodation(self, friendly_data):
         if friendly_data['is_no_accommodation']:

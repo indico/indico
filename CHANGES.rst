@@ -19,6 +19,8 @@ Bugfixes
   (:pr:`6264`, thanks :user:`SegiNyn`)
 - Fix overlapping times in some room booking timelines when using a locale with
   a 12-hour time format (:pr:`6263`)
+- Fix error when printing badges referencing a linked regform picture field that
+  contains no picture (:pr:`6276`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
