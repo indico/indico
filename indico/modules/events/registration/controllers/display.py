@@ -4,6 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
