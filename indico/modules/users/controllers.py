@@ -898,6 +898,8 @@ class RHUserSearch(RHProtected):
         self.externals = {}
 
         def _sort_key(entry):
+            # Sort results by providing exact matches first, initially considering accents, and
+            # then without considering accents.
             exact_match_keys = [entry[k].lower() != v.lower() for k, v in criteria.items()]
             unaccent_exact_match_keys = [
                 remove_accents(entry[k].lower()) != remove_accents(v.lower())
