@@ -26,7 +26,8 @@ class ReminderForm(IndicoForm):
                                      choices=[('relative', _('Relative to the event start time')),
                                               ('absolute', _('Fixed date/time')),
                                               ('now', _('Send immediately'))])
-    relative_delta = TimeDeltaField(_('Offset'), [HiddenUnless('schedule_type', 'relative'), DataRequired()])
+    relative_delta = TimeDeltaField(_('Offset'), [HiddenUnless('schedule_type', 'relative'), DataRequired()],
+                                    units=('weeks', 'days', 'hours'))
     absolute_dt = IndicoDateTimeField(_('Date'), [HiddenUnless('schedule_type', 'absolute'), DataRequired(),
                                                   DateTimeRange()])
     # Recipients

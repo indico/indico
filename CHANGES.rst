@@ -21,6 +21,7 @@ Bugfixes
   a 12-hour time format (:pr:`6263`)
 - Fix error when printing badges referencing a linked regform picture field that
   contains no picture (:pr:`6276`)
+- Fix error when creating a reminder for exactly one week before the event (:pr:`6283`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
