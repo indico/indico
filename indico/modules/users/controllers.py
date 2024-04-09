@@ -898,11 +898,11 @@ class RHUserSearch(RHProtected):
         self.externals = {}
 
         def _sort_key(entry):
-            exact_match_keys = [entry[k].lower() != v.lower() for k, v in criteria.items()] if not exact else []
+            exact_match_keys = [entry[k].lower() != v.lower() for k, v in criteria.items()]
             unaccent_exact_match_keys = [
                 remove_accents(entry[k].lower()) != remove_accents(v.lower())
                 for k, v in criteria.items()
-            ] if not exact else []
+            ]
             return *exact_match_keys, *unaccent_exact_match_keys, entry['full_name'], entry['email']
 
         results = sorted((self._serialize_entry(entry) for entry in matches), key=_sort_key)
