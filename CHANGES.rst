@@ -22,6 +22,7 @@ Bugfixes
 - Fix error when printing badges referencing a linked regform picture field that
   contains no picture (:pr:`6276`)
 - Fix error when creating a reminder for exactly one week before the event (:pr:`6283`)
+- Fix error when unassigning the editor of an editable that has no editor (:pr:`6284`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
