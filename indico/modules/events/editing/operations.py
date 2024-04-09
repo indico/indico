@@ -148,7 +148,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                    type=revision_type,
                                    files=_make_editable_files(revision.editable, files) if files else [],
                                    comment=comment,
-                                   tags=tags)
+                                   tags=set(tags))
     if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
         _ensure_publishable_files(new_revision)
     revision.editable.revisions.append(new_revision)
@@ -156,7 +156,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
         update_revision = new_revision
         new_revision = EditingRevision(user=editor,
                                        type=RevisionType.acceptance,
-                                       tags=tags)
+                                       tags=set(tags))
         revision.editable.revisions.append(new_revision)
         db.session.flush()
         notify_editor_judgment(update_revision, revision.user, action)
