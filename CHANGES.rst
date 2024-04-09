@@ -23,6 +23,7 @@ Bugfixes
   contains no picture (:pr:`6276`)
 - Fix error when creating a reminder for exactly one week before the event (:pr:`6283`)
 - Fix error when unassigning the editor of an editable that has no editor (:pr:`6284`)
+- Fix error when judging an editable from the list of editables (:pr:`6284`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
