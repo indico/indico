@@ -410,7 +410,8 @@ def assign_editor(editable, editor):
 
 
 def unassign_editor(editable):
-    editor = editable.editor
+    if not (editor := editable.editor):
+        return
     editable.editor = None
     logger.info('Editor %r has been unassigned from %r', editor, editable)
     log_data = {
