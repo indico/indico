@@ -13,7 +13,7 @@ user-facing downtime.
 .. important::
 
     If you are upgrading from Indico v3.2.x or older to v3.3 or newer, make sure to
-    fully read and udnerstand the :ref:`Upgrading from 3.x to 3.3 <upgrade-3-to-33>`
+    fully read and understand the :ref:`Upgrading from 3.x to 3.3 <upgrade-3-to-33>`
     guide before starting with any of the upgrade steps below.
 
 .. _upgrade-3-to-3:
