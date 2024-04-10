@@ -301,7 +301,7 @@ def sanitize_for_platypus(text):
 def has_relative_links(html_text):
     doc = html.fromstring(html_text)
     return any(
-        (data := urlsplit(link)) and (not data.scheme or not data.netloc)
+        (data := urlsplit(link)) and data.scheme != 'mailto' and (not data.scheme or not data.netloc)
         for el, attrib, link, _pos in doc.iterlinks()
         if (el.tag, attrib) in {('a', 'href'), ('img', 'src')}
     )

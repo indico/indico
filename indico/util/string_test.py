@@ -287,6 +287,7 @@ def test_sanitize_html_escaped_quotes(input, output):
     ('<a href="//example.com/foo">test</a><img src="//example.com/bar">', True),
     ('<a href="foo">test</a><img src="bar">', True),
     ('<a href="https://example.com/foo">test</a><img src="https://example.com/bar">', False),
+    ('<a href="mailto:foobar@example.com">test</a>', False),
 ))
 def test_has_relative_links(input, expected):
     assert has_relative_links(input) == expected
