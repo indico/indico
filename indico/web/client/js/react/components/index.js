@@ -30,6 +30,7 @@ export {default as Carousel} from './Carousel';
 export {default as ScrollButton} from './ScrollButton';
 export {default as StickyWithScrollBack} from './StickyWithScrollBack';
 export {default as EmailListField, FinalEmailList} from './EmailListField';
+export {default as LocationField, FinalLocationField} from './LocationField';
 export {default as PlaceholderInfo} from './PlaceholderInfo';
 export {default as PopoverDropdownMenu} from './PopoverDropdownMenu';
 export {default as ResponsivePopup} from './ResponsivePopup';
