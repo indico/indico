@@ -494,7 +494,7 @@ export function FinalAbstractPersonLinkField({allowSpeakers, ...rest}) {
   if (allowSpeakers) {
     roles.push({name: 'speaker', label: Translate.string('Speaker'), icon: 'microphone'});
   }
-  return <FinalPersonLinkField roles={[]} {...rest} />;
+  return <FinalPersonLinkField roles={roles} {...rest} />;
 }
 
 FinalAbstractPersonLinkField.propTypes = {
