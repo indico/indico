@@ -91,7 +91,6 @@ SessionColorPicker.defaultProps = {
 };
 
 function SessionColorPickerAdapter({input, ...rest}) {
-  console.debug('SessionBlockColorPickerAdapter', input, rest);
   return (
     <FormFieldAdapter
       input={input}
