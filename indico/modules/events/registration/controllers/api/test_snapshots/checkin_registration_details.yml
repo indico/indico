@@ -9,6 +9,7 @@ full_name: Guinea Pig
 id: <id>
 is_paid: false
 occupied_slots: 1
+payment_date: null
 price: 0
 regform_id: <id>
 registration_data:
