@@ -1,0 +1,38 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+@use 'base/borders' as *;
+@use 'base/typography' as *;
+
+.actions {
+  position: absolute;
+  top: -1.5em;
+  right: 0;
+}
+
+.extra-options-field {
+  @include font-family-monospace();
+}
+
+:global(.ui.form .fields).form-actions {
+  margin: 0 1em;
+}
+
+pre {
+  @include default-border-radius();
+  font-style: normal;
+  font-size: 0.9em;
+  border: 1px solid $pastel-gray;
+  background: $light-gray;
+  padding: 1em;
+}
+
+// fix for SUI issues
+:global(.ui.styled.accordion .content .ui.list .item .content) {
+  padding: 0;
+}
