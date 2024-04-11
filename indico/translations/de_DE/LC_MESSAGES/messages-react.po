@@ -21,7 +21,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-03-24 18:26+0100\n"
+"POT-Creation-Date: 2024-03-24 11:07+0100\n"
 "Last-Translator: Thorsten Hindermann, 2024\n"
 "Language-Team: German (Germany) (https://app.transifex.com/indico/teams/6478/de_DE/)\n"
 "MIME-Version: 1.0\n"
@@ -414,54 +414,67 @@ msgstr "Login als..."
 
 #: indico/modules/core/client/js/session_expiry.jsx:219
 msgid "Your session expired"
-msgstr ""
+msgstr "Ihre Sitzung ist abgelaufen"
 
 #: indico/modules/core/client/js/session_expiry.jsx:221
 msgid "Your current session is about to expire"
-msgstr ""
+msgstr "Ihre aktuelle Sitzung läuft demnächst ab"
 
 #: indico/modules/core/client/js/session_expiry.jsx:229
 msgid ""
 "Your session has expired and you have been logged out. Please log in again "
 "if you wish to continue using Indico."
 msgstr ""
+"Ihre Sitzung ist abgelaufen und Sie wurden abgemeldet. Bitte loggen Sie sich"
+" erneut ein, wenn Sie Indico weiterhin nutzen möchten."
 
 #: indico/modules/core/client/js/session_expiry.jsx:235
 msgid ""
 "If you need to save anything, you can also dismiss this message, but any "
 "operations on the current page will fail until you manually log in again."
 msgstr ""
+"Wenn Sie etwas speichern müssen, können Sie diese Meldung auch schließen, "
+"aber alle Vorgänge auf der aktuellen Seite schlagen fehl, bis Sie sich "
+"erneut manuell anmelden."
 
 #: indico/modules/core/client/js/session_expiry.jsx:243
 msgid ""
 "Your session will expire soon and you need to log in again to renew it if "
 "you wish to continue using Indico."
 msgstr ""
+"Ihre Sitzung läuft bald ab und Sie müssen sich erneut anmelden, um sie zu "
+"erneuern, wenn Sie Indico weiterhin nutzen möchten."
 
 #: indico/modules/core/client/js/session_expiry.jsx:248
 msgid ""
 "If you dismiss this message, it will not show up until after your session "
 "has expired"
 msgstr ""
+"Wenn Sie diese Meldung schließen, wird sie erst nach Ablauf der Sitzung "
+"angezeigt"
 
 #: indico/modules/core/client/js/session_expiry.jsx:256
 msgid ""
 "Click on the \"Refresh\" button if you wish to continue using Indico or you "
 "will be logged out."
 msgstr ""
+"Klicken Sie auf die Schaltfläche \"Aktualisieren\", wenn Sie Indico "
+"weiterhin nutzen möchten, oder Sie werden ausgeloggt."
 
 #: indico/modules/core/client/js/session_expiry.jsx:261
 msgid ""
 "If you dismiss this message, it will not show up until your session expired."
 msgstr ""
+"Wenn Sie diese Meldung schließen, wird sie erst angezeigt, wenn Ihre Sitzung"
+" abgelaufen ist."
 
 #: indico/modules/core/client/js/session_expiry.jsx:273
 msgid "Login again"
-msgstr ""
+msgstr "Melden Sie sich erneut an"
 
 #: indico/modules/core/client/js/session_expiry.jsx:277
 msgid "Refresh"
-msgstr ""
+msgstr "Auffrischen"
 
 #: indico/modules/core/client/js/session_expiry.jsx:282
 #: indico/web/client/js/react/errors/component.jsx:156
@@ -470,7 +483,7 @@ msgstr "Verwerfren"
 
 #: indico/modules/core/client/js/session_expiry.jsx:287
 msgid "Snooze"
-msgstr ""
+msgstr "Dösen"
 
 #: indico/modules/events/abstracts/client/js/boa.jsx:54
 msgid "Manage custom PDF"
