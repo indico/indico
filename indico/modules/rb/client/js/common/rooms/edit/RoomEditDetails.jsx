@@ -45,7 +45,11 @@ export default function RoomEditDetails({active, favoriteUsersController}) {
         />
         <FinalInput fluid name="division" label={Translate.string('Division')} />
       </Form.Group>
-      <FinalTextArea name="comments" label={Translate.string('Comments')} />
+      <FinalTextArea
+        name="comments"
+        label={Translate.string('Comments')}
+        description={Translate.string('You may use Markdown for formatting.')}
+      />
     </Tab.Pane>
   );
 }
