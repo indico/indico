@@ -138,7 +138,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
 
     def get_validators(self, existing_registration):
         def _check_number_of_places(new_data):
-            if not new_data or not hasattr(new_data, '__iter__'):
+            if not new_data:
                 return True
             old_data = None
             if existing_registration:
