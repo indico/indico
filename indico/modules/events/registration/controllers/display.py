@@ -529,7 +529,7 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
-class RHTicketGoogleWallet(RHTicketDownload):
+class RHTicketGoogleWalletDownload(RHTicketDownload):
     """Redirect to the Google Wallet page for a registration ticket."""
 
     def _process(self):
@@ -538,7 +538,7 @@ class RHTicketGoogleWallet(RHTicketDownload):
         return redirect(url)
 
 
-class RHTicketApplePass(RHTicketDownload):
+class RHTicketAppleWalletDownload(RHTicketDownload):
     """Download Apple Pass registration ticket."""
 
     def _process(self):
