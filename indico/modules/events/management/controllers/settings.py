@@ -44,7 +44,7 @@ def _show_google_wallet_location_warning(event):
             and event.category.google_wallet_mode == InheritableConfigMode.enabled)
 
 
-def _show_apple_pass_location_warning(event):
+def _show_apple_wallet_location_warning(event):
     if bool(event.address) == event.has_location_info:
         return False
     return (RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_apple_pass).has_rows()
@@ -95,7 +95,7 @@ class RHEventSettings(RHManageEventBase):
                                                has_event_labels=has_event_labels,
                                                google_wallet_location_warning=_show_google_wallet_location_warning(
                                                    self.event),
-                                               apple_pass_location_warning=_show_apple_pass_location_warning(
+                                               apple_pass_location_warning=_show_apple_wallet_location_warning(
                                                    self.event))
 
 
@@ -112,7 +112,7 @@ class RHEditEventDataBase(RHManageEventBase):
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
         google_wallet_location_warning = _show_google_wallet_location_warning(self.event)
-        apple_pass_location_warning = _show_apple_pass_location_warning(self.event)
+        apple_pass_location_warning = _show_apple_wallet_location_warning(self.event)
         return tpl.render_event_settings(self.event, has_reference_types, has_event_labels,
                                          google_wallet_location_warning, apple_pass_location_warning,
                                          section=self.section_name, with_container=False)
