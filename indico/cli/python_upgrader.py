@@ -39,7 +39,8 @@ class PythonUpgrader:
             symlinks=True,
             upgrade=upgrade,
             with_pip=True,
-            upgrade_deps=True
+            upgrade_deps=True,
+            prompt='indico',
         )
         builder.create(self.venv_path)
         subprocess.run([str(self.venv_path / 'bin' / 'pip'), 'install', '-U', 'wheel'], check=True)
