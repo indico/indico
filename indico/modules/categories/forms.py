@@ -133,10 +133,10 @@ class CategorySettingsForm(IndicoForm):
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
         self.category = category
-        self._validate_google_wallet()
-        self._validate_apple_pass()
+        self._set_google_wallet_fields()
+        self._set_apple_wallet_fields()
 
-    def _validate_google_wallet(self):
+    def _set_google_wallet_fields(self):
         if not config.ENABLE_GOOGLE_WALLET:
             for field in list(self):
                 if field.name.startswith('google_wallet_'):
@@ -147,7 +147,7 @@ class CategorySettingsForm(IndicoForm):
         else:
             self.google_wallet_mode.skip = {InheritableConfigMode.inheriting}
 
-    def _validate_apple_pass(self):
+    def _set_apple_wallet_fields(self):
         if not config.ENABLE_APPLE_WALLET:
             for field in list(self):
                 if field.name.startswith('apple_pass_'):
