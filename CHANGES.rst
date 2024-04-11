@@ -25,6 +25,8 @@ Bugfixes
 - Fix error when unassigning the editor of an editable that has no editor (:pr:`6284`)
 - Fix error when judging an editable from the list of editables (:pr:`6284`)
 - Fix validation error when using a ``mailto:`` link in an email body (:pr:`6286`)
+- Clear the flags indicating that registrations or a registration form field have been
+  purged when cloning an event (:pr:`6288`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
