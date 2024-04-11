@@ -4,51 +4,14 @@
     {%- set url = event.short_external_url -%}
 
     {% if show_social %}
-        <div class="social-share">
-            <h2>{% trans %}Share this page{% endtrans %}</h2>
-            <h4>{% trans %}Direct link{% endtrans %}</h4>
-            <a href="{{ url }}"
-               class="js-copy-to-clipboard direct-link"
-               title="{% trans %}Copy link to clipboard{% endtrans %}"
-               data-clipboard-text="{{ url }}"
-               data-clipboard-action="copy">
-                {{- url -}}
-            </a>
-            <div>
-                <h4>{% trans %}Social networks{% endtrans %}</h4>
-                <div class="social-site">
-                    <a href="https://twitter.com/intent/tweet?text={{ event.title }} ({{ event.start_dt | format_datetime(format='d MMMM YYYY') }}) · Indico {{ url }}" target="_blank">
-                        <button class="twitter-btn">
-                            <i class="twitter-btn-icon">
-                                <img src="{{ url_for('assets.image', filename='twitter-bird.svg') }}" alt="" border="0">
-                            </i>
-                            <span class="twitter-btn-text">
-                                {% trans %}Tweet{% endtrans %}
-                            </span>
-                        </button>
-                    </a>
-                </div>
-            </div>
-            <div>
-                <h4>{% trans %}Calendaring{% endtrans %}</h4>
-            </div>
-            <div class="social-site">
-                <a href="https://www.google.com/calendar/event?{{ google_calendar_params|urlencode }}" target="_blank">
-                    <img src="{{ url_for('assets.image', filename='google_calendar.gif') }}" alt="" border="0">
-                </a>
-                <a href="https://outlook.office.com/calendar/deeplink/compose?{{ outlook_calendar_params|urlencode }}" target="_blank">
-                    <img src="{{ url_for('assets.image', filename='outlook_calendar.png') }}" alt="" border="0">
-                </a>
-            </div>
-        </div>
-
-        <div class="social-button-container f-j-end"
-             data-url="{{ url }}"
-             data-dark-theme="{{ dark|tojson|forceescape }}">
-            <img src="{{ indico_config.IMAGES_BASE_URL }}/social-share.svg"
-                 class="social-button"
-                 alt="{% trans %}Social Networks{% endtrans %}"
-                 title="{% trans %}Social Networks{% endtrans %}">
-        </div>
+        <ind-share-widget
+            event-name="{{ event.title }}"
+            event-start-dt="{{ event.start_dt | format_datetime(format='d MMMM YYYY') }}"
+            event-url="{{ url }}"
+            share-icon="{{ url_for('assets.image', filename='social-share.svg') }}"
+            google-cal-params="{{ google_calendar_params|urlencode }}"
+            outlook-cal-params="{{ outlook_calendar_params|urlencode }}"
+        >
+        </ind-share-widget>
     {% endif %}
 {% endblock %}

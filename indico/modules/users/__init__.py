@@ -39,6 +39,7 @@ user_settings = UserSettingsProxy('users', {
     'use_markdown_for_minutes': False,
     'synced_fields': None,  # None to synchronize all fields, empty set to not synchronize
     'suggest_categories': False,  # whether the user should receive category suggestions
+    'preferred_mastodon_server_url': None,
 }, converters={
     'name_format': EnumConverter(NameFormat),
 })

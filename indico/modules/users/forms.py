@@ -9,11 +9,12 @@ from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set
 from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
-from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
+from wtforms.validators import URL, DataRequired, Email, NumberRange, ValidationError
 
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
+from indico.modules.core.settings import social_settings
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
@@ -75,6 +76,12 @@ class UserPreferencesForm(IndicoForm):
         widget=SwitchWidget(),
         description=_('Use Markdown editor instead of HTML editor when editing the minutes of a meeting.'))
 
+    preferred_mastodon_server_url = StringField(
+        _('Preferred Mastodon server'),
+        validators=[URL(require_tld=True)],
+        description=_('The URL of the Mastodon server you prefer to use for sharing links to meetings '
+                      '(e.g. https://mastodon.social).'))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -84,6 +91,9 @@ class UserPreferencesForm(IndicoForm):
         self.timezone.choices = list(zip(common_timezones, common_timezones, strict=True))
         if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
             self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
+
+        if not social_settings.get('enabled'):
+            del self.preferred_mastodon_server_url
 
 
 class UserEmailsForm(IndicoForm):

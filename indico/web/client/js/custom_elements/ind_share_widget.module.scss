@@ -1,0 +1,58 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.share-widget {
+  cursor: pointer;
+  filter: opacity(0.6);
+  animation: fadeIn 3s;
+
+  &:hover {
+    filter: none;
+  }
+}
+
+.show {
+  filter: none;
+}
+
+.header-text {
+  font-size: 1.4em !important;
+  margin: -2.8px 100px 8.5px !important;
+}
+
+.share-section-header {
+  margin: 10px 0 10px 0 !important;
+  font-size: 1.15em !important;
+
+  .icon {
+    font-size: inherit !important;
+  }
+
+  .title {
+    padding-left: 5px !important;
+  }
+}
+
+.share-button {
+  width: 100%;
+
+  img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  span {
+    vertical-align: middle;
+  }
+}
+
+.share-button-column {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+}

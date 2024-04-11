@@ -84,6 +84,7 @@ def generate_user_file(user=None):
             'address': user.address,
             'phone': user.phone,
             'type': user.principal_type.name,  # always 'user'
+            'mastodon_server_url': user.settings.get('preferred_mastodon_server_url') or None,
         }
     return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 
