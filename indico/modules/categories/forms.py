@@ -148,7 +148,7 @@ class CategorySettingsForm(IndicoForm):
             self.google_wallet_mode.skip = {InheritableConfigMode.inheriting}
 
     def _validate_apple_pass(self):
-        if not config.ENABLE_APPLE_PASS:
+        if not config.ENABLE_APPLE_WALLET:
             for field in list(self):
                 if field.name.startswith('apple_pass_'):
                     delattr(self, field.name)
@@ -236,7 +236,7 @@ class CategorySettingsForm(IndicoForm):
 
     @generated_data
     def apple_pass_settings(self):
-        if not config.ENABLE_APPLE_PASS:
+        if not config.ENABLE_APPLE_WALLET:
             return self.category.apple_pass_settings
         return {k: getattr(self, k).data for k in self.APPLE_PASS_JSON_FIELDS}
 

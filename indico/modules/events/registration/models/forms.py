@@ -578,7 +578,7 @@ class RegistrationForm(db.Model):
 
     @property
     def is_apple_pass_configured(self):
-        if not config.ENABLE_APPLE_PASS or self.event.is_unlisted:
+        if not config.ENABLE_APPLE_WALLET or self.event.is_unlisted:
             return False
         return self.event.category.effective_apple_pass_config is not None
 

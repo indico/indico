@@ -48,7 +48,7 @@ DEFAULTS = {
     'DEFAULT_TIMEZONE': 'UTC',
     'DISABLE_CELERY_CHECK': None,
     'EMAIL_BACKEND': 'indico.vendor.django_mail.backends.smtp.EmailBackend',
-    'ENABLE_APPLE_PASS': False,
+    'ENABLE_APPLE_WALLET': False,
     'ENABLE_GOOGLE_WALLET': False,
     'ENABLE_ROOMBOOKING': False,
     'EXPERIMENTAL_EDITING_SERVICE': False,

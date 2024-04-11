@@ -903,7 +903,7 @@ System
 
     Default: ``False``
 
-.. data:: ENABLE_APPLE_PASS
+.. data:: ENABLE_APPLE_WALLET
 
     Whether to enable the Apple Pass integration for event tickets.
 

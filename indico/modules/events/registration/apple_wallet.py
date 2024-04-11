@@ -75,7 +75,7 @@ class ApplePassManager:
 
     @property
     def is_configured(self):
-        return config.ENABLE_APPLE_PASS and self.settings is not None
+        return config.ENABLE_APPLE_WALLET and self.settings is not None
 
     def build_ticket_object(self, registration):
         from indico.modules.categories.controllers.util import make_format_event_date_func
