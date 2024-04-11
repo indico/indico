@@ -209,14 +209,14 @@ class CategorySettingsForm(IndicoForm):
             hazmat.primitives.serialization.load_pem_private_key(field.data.encode(), password=None)
         except ValueError:
             raise ValidationError(_('The provided Private.key is malformed.'))
-        except TypeError:
-            # This is because I provided an empty pass, just to check the Private.key is not malformed.
-            # Is there a better way to check it?
-            return True
         except UnsupportedAlgorithm:
             logger.warning('The provided Google Wallet private key type for category %s is not supported.',
                            self.category.id)
             raise ValidationError(_('The private key is invalid.'))
+        except TypeError:
+            # TypeError is raised when no password is provided for the encrypted key,
+            # which we don't need to decrypt to check that it's malformed.
+            return True
 
     def validate_apple_pass_password(self, field):
         if self.apple_pass_key.errors:
