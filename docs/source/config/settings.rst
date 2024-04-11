@@ -332,17 +332,10 @@ Customization
 
 .. data:: WALLET_LOGO_URL
 
-    The URL to a custom logo used in Google Wallet tickets.  If unset, a compact
-    version of the default Indico logo is used.  The URL must publicly accessible
-    from the Internet and changes typically do not affect existing tickets.
-
-    Default: ``None``
-
-.. data:: ABSOLUTE_PASS_LOGO_PATH
-
-    The PATH to a custom logo used in Apple Pass tickets.  If unset, a compact
-    version of the default Indico logo is used.  The PATH must accessible on the filesystem
-    from the user that is running the Indico service and changes typically do not affect existing tickets.
+    The URL to a custom logo used in Google Wallet and Apple Wallet tickets.
+    If unset, a compact version of the default Indico logo is used.
+    The URL must publicly accessible from the Internet and changes typically
+    do not affect existing tickets.
 
     Default: ``None``
 
