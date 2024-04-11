@@ -39,7 +39,7 @@ class RegistrationFormCloner(EventCloner):
         # if the registration cloner is also enabled, we have to keep
         # all revisions since they are likely to be in use
         clone_all_revisions = 'registrations' in cloners
-        attrs = get_attrs_to_clone(RegistrationForm, skip={'start_dt', 'end_dt', 'modification_end_dt'})
+        attrs = get_attrs_to_clone(RegistrationForm, skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged'})
         self._field_data_map = {}
         self._form_map = {}
         for old_form in self.old_event.registration_forms:
@@ -57,7 +57,7 @@ class RegistrationFormCloner(EventCloner):
 
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
-        items_attrs = get_attrs_to_clone(RegistrationFormSection)
+        items_attrs = get_attrs_to_clone(RegistrationFormSection, skip={'is_purged'})
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
             for old_item in old_section.children:
