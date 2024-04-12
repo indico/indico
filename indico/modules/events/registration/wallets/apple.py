@@ -49,7 +49,7 @@ class IndicoPass(Pass):
         """
         # if the certificate has already been converted to Byte, just use it as is.
         cert = x509.load_pem_x509_certificate(certificate.encode()) if isinstance(certificate, str) else certificate
-        private_key = serialization.load_pem_private_key(key.encode(), password=password.encode())
+        private_key = serialization.load_pem_private_key(key.encode(), password=password.encode() if password else None)
         wwdr_cert = x509.load_pem_x509_certificate(Path(wwdr_certificate).read_bytes())
         options = [pkcs7.PKCS7Options.DetachedSignature]
         return (

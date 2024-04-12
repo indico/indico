@@ -126,7 +126,7 @@ class CategorySettingsForm(IndicoForm):
                                      description=_('Content of the Private.key file.'))
     apple_wallet_password = IndicoPasswordField(_('Password for the private key'),
                                                 [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
-                                                              preserve_data=True), DataRequired()],
+                                                              preserve_data=False)],
                                                 description=_('Password used to decrypt the Private.key file.'))
 
     def __init__(self, *args, category, **kwargs):

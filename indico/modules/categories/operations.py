@@ -89,7 +89,7 @@ def _format_wallet_credentials(credentials):
 def _log_category_update(category, changes, extra_log_fields):
     extra_fields = {'google_wallet_settings': ('google_wallet_credentials', 'google_wallet_issuer_name',
                                                'google_wallet_issuer_id'),
-                    'apple_wallet_settings': ('apple_wallet_certificate', 'apple_wallet_key', 'apple_wallet_password')}
+                    'apple_wallet_settings': ('apple_wallet_certificate', 'apple_wallet_key')}
     for extra_field in extra_fields:
         if settings := changes.pop(extra_field, None):
             for key in extra_fields[extra_field]:
@@ -120,7 +120,6 @@ def _log_category_update(category, changes, extra_log_fields):
         'apple_wallet_mode': 'Apple Pass mode',
         'apple_wallet_certificate': {'title': 'Apple Pass certificate', 'type': 'string'},
         'apple_wallet_key': {'title': 'Apple Pass private key', 'type': 'string'},
-        'apple_wallet_password': {'title': 'Apple Pass certificate password', 'type': 'string'},
         **(extra_log_fields or {})
     }
     if changes:
