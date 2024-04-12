@@ -113,22 +113,21 @@ class CategorySettingsForm(IndicoForm):
                                                         'Indico server. Changing it will also break updates to '
                                                         'any existing tickets.'))
     apple_wallet_mode = IndicoEnumSelectField(_('Configuration'), enum=InheritableConfigMode,
-                                            description=_('The Apple Pass configuration is, by default, '
-                                                          'inherited from the parent category. You can also '
-                                                          'explicitly disable it or provide your own configuration '
-                                                          'instead.'))
+                                              description=_('The Apple Pass configuration is, by default, '
+                                                            'inherited from the parent category. You can also '
+                                                            'explicitly disable it or provide your own configuration '
+                                                            'instead.'))
     apple_wallet_certificate = TextAreaField(_('Certificate.pem'),
-                                           [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
-                                                         preserve_data=True), DataRequired()],
-                                           description=_('Content of the Certificate.pem file.'))
-    apple_wallet_key = TextAreaField(_('Private.key'),
-                                   [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
-                                                 preserve_data=True), DataRequired()],
-                                   description=_('Content of the Private.key file.'))
+                                             [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                                           preserve_data=True), DataRequired()],
+                                             description=_('Content of the Certificate.pem file.'))
+    apple_wallet_key = TextAreaField(_('Private.key'), [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                                                     preserve_data=True), DataRequired()],
+                                     description=_('Content of the Private.key file.'))
     apple_wallet_password = IndicoPasswordField(_('Password for the private key'),
-                                              [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
-                                                            preserve_data=True), DataRequired()],
-                                              description=_('Password used to decrypt the Private.key file.'))
+                                                [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                                              preserve_data=True), DataRequired()],
+                                                description=_('Password used to decrypt the Private.key file.'))
 
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
