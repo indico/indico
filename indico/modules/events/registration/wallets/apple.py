@@ -127,7 +127,8 @@ class ApplePassManager:
 
     def get_ticket(self, registration) -> str:
         passfile = self.build_pass_object(registration)
-        wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'apple-wwdr.pem')
+        wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'wallets',
+                                 'apple-wwdr.pem')
         # Create and output the Passbook file (.pkpass)
         temp = tempfile.NamedTemporaryFile(prefix='apple_pass_', dir=config.TEMP_DIR, delete=False)
         registration.apple_pass_serial = passfile.serialNumber  # Save ticket serial for updates
