@@ -156,12 +156,10 @@ function SessionBlockHeader({
         <span>
           <PluralTranslate count={selectedBlocks}>
             <Singular>
-              (
-              <Param name="selectedBlocks" value={selectedBlocks} /> block selected)
+              (<Param name="selectedBlocks" value={selectedBlocks} /> block selected)
             </Singular>
             <Plural>
-              (
-              <Param name="selectedBlocks" value={selectedBlocks} /> blocks selected)
+              (<Param name="selectedBlocks" value={selectedBlocks} /> blocks selected)
             </Plural>
           </PluralTranslate>
         </span>
@@ -215,7 +213,6 @@ export default function TimetableSessionsInput({
     validationMsg = PluralTranslate.string(
       'Please select at least {minimum} and no more than {maximum} session block',
       'Please select at least {minimum} and no more than {maximum} session blocks',
-      minimum,
       maximum,
       {minimum, maximum}
     );
@@ -228,8 +225,8 @@ export default function TimetableSessionsInput({
     );
   } else {
     validationMsg = PluralTranslate.string(
-      'Please select no more than ${maximum} session block',
-      'Please select no more than ${maximum} session blocks',
+      'Please select no more than {maximum} session block',
+      'Please select no more than {maximum} session blocks',
       maximum,
       {maximum}
     );

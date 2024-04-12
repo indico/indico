@@ -7,7 +7,9 @@
 
 from marshmallow import ValidationError, fields, validate
 
+from indico.core.db.sqlalchemy import db
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
+from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.util.i18n import _
 
@@ -27,6 +29,11 @@ class SessionsField(RegistrationFormFieldBase):
     def default_value(self):
         return []
 
+    @property
+    def filter_choices(self):
+        sessions_ids = [s.id for s in self.form_item.registration_form.event.sessions]
+        return {str(s.id): s.full_title for s in SessionBlock.query.filter(SessionBlock.session_id.in_(sessions_ids))}
+
     def get_validators(self, existing_registration):
         def _check_number_of_sessions(new_data):
             _min = self.view_data.get('minimum')
@@ -40,4 +47,9 @@ class SessionsField(RegistrationFormFieldBase):
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         blocks = SessionBlock.query.filter(SessionBlock.id.in_(registration_data.data)).all()
-        return ('; ').join(x.full_title for x in blocks) if for_humans or for_search else blocks
+        formatted_blocks = [b.full_title for b in blocks]
+        return ('; ').join(x.full_title for x in blocks) if for_humans or for_search else formatted_blocks
+
+    def create_sql_filter(self, data_list):
+        data_list = str([int(e) for e in data_list])
+        return RegistrationData.data.op('@>')(db.func.jsonb(data_list))

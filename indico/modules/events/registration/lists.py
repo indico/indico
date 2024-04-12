@@ -145,7 +145,8 @@ class RegistrationListGenerator(ListGeneratorBase):
     def _get_filters_from_request(self):
         filters = super()._get_filters_from_request()
         for field in self.regform.form_items:
-            if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox'}:
+            if field.is_field and field.input_type in {'single_choice', 'multi_choice', 'country', 'bool', 'checkbox',
+                                                       'sessions'}:
                 options = request.form.getlist(f'field_{field.id}')
                 if options:
                     filters['fields'][str(field.id)] = options
