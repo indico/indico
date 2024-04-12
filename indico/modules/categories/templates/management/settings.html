@@ -34,8 +34,8 @@
             {% endcall %}
         {% endif %}
         {% if indico_config.ENABLE_APPLE_WALLET %}
-            {% call form_fieldset(_('Apple Pass')) %}
-                {{ form_rows(form, fields=form.APPLE_PASS_FIELDS) }}
+            {% call form_fieldset(_('Apple Wallet')) %}
+                {{ form_rows(form, fields=form.APPLE_WALLET_FIELDS) }}
             {% endcall %}
         {% endif %}
         {% call form_fieldset(_('Event Header')) %}
