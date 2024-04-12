@@ -10,7 +10,8 @@ from datetime import datetime, timedelta
 import pytest
 from pytz import timezone
 
-from indico.util.date_time import as_utc, format_human_timedelta, format_skeleton, iterdays, strftime_all_years
+from indico.util.date_time import (_adjust_skeleton, as_utc, format_human_timedelta, format_skeleton, iterdays,
+                                   strftime_all_years)
 
 
 @pytest.mark.parametrize(('delta', 'granularity', 'expected'), (
@@ -68,6 +69,16 @@ iterdays_test_data = (
                          iterdays_test_data)
 def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expected):
     assert len(list(iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist))) == expected
+
+
+@pytest.mark.parametrize(('skeleton', 'format', 'expected'), (
+    ('MMM', 'M', 'M'),  # Cannot expand numeric fields to alphabetic ones
+    ('ss', 's', 's'),  # Hours, minutes and seconds should never be expanded
+    ('MMdd', 'Md', 'MMdd'),  # Expand numeric fields
+    ('MMMMdddd', 'MMMddd', 'MMMMdddd')  # Expand alphabetic fields
+))
+def test__adjust_skeleton_skeleton(skeleton, format, expected):
+    assert _adjust_skeleton(format, skeleton) == expected
 
 
 @pytest.mark.parametrize(('skeleton', 'expected'), (
