@@ -47,8 +47,8 @@ def _show_google_wallet_location_warning(event):
 def _show_apple_wallet_location_warning(event):
     if bool(event.address) == event.has_location_info:
         return False
-    return (RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_apple_pass).has_rows()
-            and event.category.apple_pass_mode == InheritableConfigMode.enabled)
+    return (RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_apple_wallet).has_rows()
+            and event.category.apple_wallet_mode == InheritableConfigMode.enabled)
 
 
 class RHEventSettings(RHManageEventBase):

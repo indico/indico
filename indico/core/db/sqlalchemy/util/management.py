@@ -121,7 +121,7 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
             click.secho('Creating root category', fg='green')
         cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public,
                        google_wallet_mode=InheritableConfigMode.disabled,
-                       apple_pass_mode=InheritableConfigMode.disabled)
+                       apple_wallet_mode=InheritableConfigMode.disabled)
         db.session.add(cat)
         db.session.flush()
         if verbose:

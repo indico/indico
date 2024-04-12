@@ -46,8 +46,8 @@ class CategorySettingsForm(IndicoForm):
     GOOGLE_WALLET_FIELDS = ('google_wallet_mode', 'google_wallet_credentials', 'google_wallet_issuer_name',
                             'google_wallet_issuer_id')
     GOOGLE_WALLET_JSON_FIELDS = ('google_wallet_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
-    APPLE_PASS_FIELDS = ('apple_pass_mode', 'apple_pass_certificate', 'apple_pass_key', 'apple_pass_password')
-    APPLE_PASS_JSON_FIELDS = ('apple_pass_certificate', 'apple_pass_key', 'apple_pass_password')
+    APPLE_WALLET_FIELDS = ('apple_wallet_mode', 'apple_wallet_certificate', 'apple_wallet_key', 'apple_wallet_password')
+    APPLE_WALLET_JSON_FIELDS = ('apple_wallet_certificate', 'apple_wallet_key', 'apple_wallet_password')
 
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
@@ -112,21 +112,21 @@ class CategorySettingsForm(IndicoForm):
                                                         'The same Issuer ID must never be used on more than one '
                                                         'Indico server. Changing it will also break updates to '
                                                         'any existing tickets.'))
-    apple_pass_mode = IndicoEnumSelectField(_('Configuration'), enum=InheritableConfigMode,
+    apple_wallet_mode = IndicoEnumSelectField(_('Configuration'), enum=InheritableConfigMode,
                                             description=_('The Apple Pass configuration is, by default, '
                                                           'inherited from the parent category. You can also '
                                                           'explicitly disable it or provide your own configuration '
                                                           'instead.'))
-    apple_pass_certificate = TextAreaField(_('Certificate.pem'),
-                                           [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
+    apple_wallet_certificate = TextAreaField(_('Certificate.pem'),
+                                           [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
                                                          preserve_data=True), DataRequired()],
                                            description=_('Content of the Certificate.pem file.'))
-    apple_pass_key = TextAreaField(_('Private.key'),
-                                   [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
+    apple_wallet_key = TextAreaField(_('Private.key'),
+                                   [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
                                                  preserve_data=True), DataRequired()],
                                    description=_('Content of the Private.key file.'))
-    apple_pass_password = IndicoPasswordField(_('Password for the private key'),
-                                              [HiddenUnless('apple_pass_mode', InheritableConfigMode.enabled,
+    apple_wallet_password = IndicoPasswordField(_('Password for the private key'),
+                                              [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
                                                             preserve_data=True), DataRequired()],
                                               description=_('Password used to decrypt the Private.key file.'))
 
@@ -150,13 +150,13 @@ class CategorySettingsForm(IndicoForm):
     def _set_apple_wallet_fields(self):
         if not config.ENABLE_APPLE_WALLET:
             for field in list(self):
-                if field.name.startswith('apple_pass_'):
+                if field.name.startswith('apple_wallet_'):
                     delattr(self, field.name)
         elif self.category.parent:
-            parent_configured = self.category.parent.effective_apple_pass_config is not None
-            self.apple_pass_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
+            parent_configured = self.category.parent.effective_apple_wallet_config is not None
+            self.apple_wallet_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
         else:
-            self.apple_pass_mode.skip = {InheritableConfigMode.inheriting}
+            self.apple_wallet_mode.skip = {InheritableConfigMode.inheriting}
 
     def validate(self, extra_validators=None):
         form_valid = super().validate(extra_validators=extra_validators)
@@ -197,14 +197,14 @@ class CategorySettingsForm(IndicoForm):
 
         return form_valid
 
-    def validate_apple_pass_certificate(self, field):
+    def validate_apple_wallet_certificate(self, field):
         try:
             x509.load_pem_x509_certificate(field.data.encode())
             return True
         except ValueError:
             raise ValidationError(_('The provided Certificate.pem is malformed.'))
 
-    def validate_apple_pass_key(self, field):
+    def validate_apple_wallet_key(self, field):
         try:
             hazmat.primitives.serialization.load_pem_private_key(field.data.encode(), password=None)
         except ValueError:
@@ -218,11 +218,11 @@ class CategorySettingsForm(IndicoForm):
             # which we don't need to decrypt to check that it's malformed.
             return True
 
-    def validate_apple_pass_password(self, field):
-        if self.apple_pass_key.errors:
+    def validate_apple_wallet_password(self, field):
+        if self.apple_wallet_key.errors:
             return True
         try:
-            hazmat.primitives.serialization.load_pem_private_key(self.apple_pass_key.data.encode(),
+            hazmat.primitives.serialization.load_pem_private_key(self.apple_wallet_key.data.encode(),
                                                                  password=field.data.encode())
             return True
         except ValueError:
@@ -235,15 +235,15 @@ class CategorySettingsForm(IndicoForm):
         return {k: getattr(self, k).data for k in self.GOOGLE_WALLET_JSON_FIELDS}
 
     @generated_data
-    def apple_pass_settings(self):
+    def apple_wallet_settings(self):
         if not config.ENABLE_APPLE_WALLET:
-            return self.category.apple_pass_settings
-        return {k: getattr(self, k).data for k in self.APPLE_PASS_JSON_FIELDS}
+            return self.category.apple_wallet_settings
+        return {k: getattr(self, k).data for k in self.APPLE_WALLET_JSON_FIELDS}
 
     @property
     def data(self):
         return {k: v for k, v in super().data.items() if not (k in self.GOOGLE_WALLET_JSON_FIELDS or
-                                                              k in self.APPLE_PASS_JSON_FIELDS)}
+                                                              k in self.APPLE_WALLET_JSON_FIELDS)}
 
 
 class CategoryIconForm(IndicoForm):

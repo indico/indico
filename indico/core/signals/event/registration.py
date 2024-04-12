@@ -145,12 +145,12 @@ Called when data for a Google Wallet ticket object has been generated. The `send
 Wallet API.
 ''')
 
-apple_pass_ticket_object = _signals.signal('apple-pass-ticket-object', '''
+apple_wallet_ticket_object = _signals.signal('apple-pass-ticket-object', '''
 Called when a ticket object for an Apple Pass has been generated. The `sender` is the
 `Event` object, the `obj` kwarg contains the Ticket object.
 ''')
 
-apple_pass_object = _signals.signal('apple-pass-object', '''
+apple_wallet_object = _signals.signal('apple-pass-object', '''
 Called when the Pass object for an Apple Pass has been generated. The `sender` is the
 `Event` object, the `obj` kwarg contains the Pass object.
 ''')

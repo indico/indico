@@ -69,7 +69,7 @@ class AppleWalletManager:
 
     def __init__(self, event):
         self.event = event
-        self.settings = self.event.category.effective_apple_pass_config if not self.event.is_unlisted else None
+        self.settings = self.event.category.effective_apple_wallet_config if not self.event.is_unlisted else None
         self.cert = None
 
     @property
@@ -99,14 +99,14 @@ class AppleWalletManager:
         ticket.addBackField('back-registration-details', f'<a href="{reg_url}">{_("Registration details")}</a>',
                             _('Link'))
 
-        signals.event.registration.apple_pass_ticket_object.send(self.event, obj=ticket)
+        signals.event.registration.apple_wallet_ticket_object.send(self.event, obj=ticket)
         return ticket
 
     def build_pass_object(self, registration):
         from indico.modules.events.registration.util import get_persons, get_ticket_qr_code_data
 
         # Extract Certificate details from certificate.pem itself
-        self.cert = x509.load_pem_x509_certificate(self.settings['apple_pass_certificate'].encode())
+        self.cert = x509.load_pem_x509_certificate(self.settings['apple_wallet_certificate'].encode())
         cert_details = {d.split('=')[0]: d.split('=')[1] for d in self.cert.subject.rfc4514_string().split(',')}
         passfile = IndicoPass(self.build_ticket_object(registration), passTypeIdentifier=cert_details['UID'],
                               organizationName=cert_details['O'], teamIdentifier=cert_details['OU'])
@@ -123,7 +123,7 @@ class AppleWalletManager:
             passfile.add_file_from_url('logo.png', config.ABSOLUTE_WALLET_LOGO_URL)
         else:
             passfile.add_default_images()
-        signals.event.registration.apple_pass_object.send(self.event, obj=passfile)
+        signals.event.registration.apple_wallet_object.send(self.event, obj=passfile)
         return passfile
 
     def get_ticket(self, registration) -> str:
@@ -131,17 +131,17 @@ class AppleWalletManager:
         wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'wallets',
                                  'apple-wwdr.pem')
         # Create and output the Passbook file (.pkpass)
-        temp = tempfile.NamedTemporaryFile(prefix='apple_pass_', dir=config.TEMP_DIR, delete=False)
-        registration.apple_pass_serial = passfile.serialNumber  # Save ticket serial for updates
+        temp = tempfile.NamedTemporaryFile(prefix='apple_wallet_', dir=config.TEMP_DIR, delete=False)
+        registration.apple_wallet_serial = passfile.serialNumber  # Save ticket serial for updates
         try:
-            pkpass = passfile.create(self.cert, self.settings['apple_pass_key'], wwdr_path,
-                                     self.settings['apple_pass_password'],
+            pkpass = passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
+                                     self.settings['apple_wallet_password'],
                                      zip_file=os.path.join(config.TEMP_DIR, temp.name))
         except ValueError as exc:
             logger.warning('Could not create Apple Pass ticket: %s', exc)
             raise
         return pkpass
         # TBD: For some reason the ticket creation on the fly returns an error: the download does not complete...
-        # return passfile.create(self.cert, self.settings['apple_pass_key'], wwdr_path,
-        # self.settings['apple_pass_password'])
+        # return passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
+        # self.settings['apple_wallet_password'])
         # TBD: Add Celery task to delete up to 2 days ago generated files?

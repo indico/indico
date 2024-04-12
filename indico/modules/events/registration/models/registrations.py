@@ -306,7 +306,7 @@ class Registration(db.Model):
         )
     )
     #: The serial number assigned to latest Apple Pass: needed for sending updates.
-    apple_pass_serial = db.Column(
+    apple_wallet_serial = db.Column(
         db.String,
         nullable=False,
         default='',
@@ -781,9 +781,9 @@ class Registration(db.Model):
         if gwm.is_configured:
             return gwm.get_ticket_link(self)
 
-    def generate_ticket_apple_pass(self):
+    def generate_ticket_apple_wallet(self):
         """Return link to Google Wallet ticket display."""
-        if not self.registration_form.ticket_apple_pass:
+        if not self.registration_form.ticket_apple_wallet:
             return None
         gwm = AppleWalletManager(self.event)
         if gwm.is_configured:

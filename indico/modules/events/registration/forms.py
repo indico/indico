@@ -326,7 +326,7 @@ class TicketsForm(IndicoForm):
                                         description=_('Allow users to export their ticket to Google Wallet. '
                                                       'This currently does not support tickets for accompanying '
                                                       'persons.'))
-    ticket_apple_pass = BooleanField(_('Export to Apple Wallet'), [HiddenUnless('tickets_enabled',
+    ticket_apple_wallet = BooleanField(_('Export to Apple Wallet'), [HiddenUnless('tickets_enabled',
                                                                                 preserve_data=True)],
                                      widget=SwitchWidget(),
                                      description=_('Allow users to export their ticket to Apple Wallet. '
@@ -369,8 +369,8 @@ class TicketsForm(IndicoForm):
         self.ticket_template_id.choices = badge_templates
         if not regform.is_google_wallet_configured:
             del self.ticket_google_wallet
-        if not regform.is_apple_pass_configured:
-            del self.ticket_apple_pass
+        if not regform.is_apple_wallet_configured:
+            del self.ticket_apple_wallet
 
 
 class ParticipantsDisplayForm(IndicoForm):

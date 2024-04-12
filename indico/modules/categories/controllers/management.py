@@ -111,7 +111,7 @@ class RHManageCategorySettings(RHManageCategoryBase):
         if config.ENABLE_GOOGLE_WALLET:
             kwargs |= self.category.google_wallet_settings
         if config.ENABLE_APPLE_WALLET:
-            kwargs |= self.category.apple_pass_settings
+            kwargs |= self.category.apple_wallet_settings
         defaults = FormDefaults(self.category, **kwargs)
         form = CategorySettingsForm(obj=defaults, category=self.category)
         icon_form = CategoryIconForm(obj=self.category)
