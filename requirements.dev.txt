@@ -80,7 +80,7 @@ greenlet==3.0.3
     # via
     #   -c requirements.txt
     #   sqlalchemy
-idna==3.6
+idna==3.7
     # via
     #   -c requirements.txt
     #   anyio

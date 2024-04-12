@@ -31,7 +31,7 @@ flask==3.0.2
     #   flask-babel
 flask-babel==4.0.0
     # via -r docs/requirements.in
-idna==3.6
+idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
