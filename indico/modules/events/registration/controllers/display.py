@@ -125,7 +125,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     def _is_checkin_visible(reg):
         return reg.registration_form.publish_checkin_enabled and reg.checked_in
 
-    def _merged_participant_list_table(self):
+    def _merged_participant_list_table(self, user, hide_participants_from_other_forms):
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
             columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
@@ -150,16 +150,17 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
                  .signal_query('merged-participant-list-publishable-registrations', event=self.event))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
-                                                     for reg in query if reg.is_publishable(is_participant)),
+                                                     for reg in query
+                                                     if reg.is_publishable(user,
+                                                                           hide_participants_from_other_forms)),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
                 'num_participants': query.count()}
 
-    def _participant_list_table(self, regform):
+    def _participant_list_table(self, regform, user, hide_participants_from_other_forms):
         def _process_registration(reg, column_ids, active_fields):
             data_by_field = reg.data_by_field
 
@@ -197,9 +198,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in query
-                         if reg.is_publishable(is_participant)]
+                         if reg.is_publishable(user, hide_participants_from_other_forms)]
         return {'headers': headers,
                 'rows': registrations,
                 'title': regform.title,
@@ -213,8 +213,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
+        hide_participants_from_other_forms = self.event.hide_participants_from_other_forms
         if registration_settings.get(self.event, 'merge_registration_forms'):
-            tables = [self._merged_participant_list_table()]
+            tables = [self._merged_participant_list_table(session.user, hide_participants_from_other_forms)]
         else:
             tables = []
             regforms_dict = {regform.id: regform for regform in regforms}
@@ -225,7 +226,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     # The settings might reference forms that are not available
                     # anymore (publishing was disabled, etc.)
                     continue
-                tables.append(self._participant_list_table(regform))
+                tables.append(self._participant_list_table(regform, session.user, hide_participants_from_other_forms))
             # There might be forms that have not been sorted by the user yet
             tables.extend(map(self._participant_list_table, regforms_dict.values()))
 
