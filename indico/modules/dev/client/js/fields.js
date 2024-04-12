@@ -92,7 +92,7 @@ const getFields = () => {
       component: FinalLocationField,
       initialValue: {},
       editAddress: true,
-      allowLocationInheritance: true,
+      parent: {title: 'A Conference', type: 'Event'},
     },
     {title: 'Session color picker', component: FinalSessionColorPicker, initialValue: {}},
   ];
