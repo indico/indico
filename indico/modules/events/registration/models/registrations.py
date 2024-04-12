@@ -28,7 +28,7 @@ from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.wallets.apple import ApplePassManager
+from indico.modules.events.registration.wallets.apple import AppleWalletManager
 from indico.modules.events.registration.wallets.google import GoogleWalletManager
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
@@ -785,7 +785,7 @@ class Registration(db.Model):
         """Return link to Google Wallet ticket display."""
         if not self.registration_form.ticket_apple_pass:
             return None
-        gwm = ApplePassManager(self.event)
+        gwm = AppleWalletManager(self.event)
         if gwm.is_configured:
             return gwm.get_ticket(self)
 
