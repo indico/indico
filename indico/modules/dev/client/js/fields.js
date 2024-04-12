@@ -27,6 +27,7 @@ import {
   FinalPersonLinkField,
 } from 'indico/react/components/PersonLinkField';
 import {FinalRating} from 'indico/react/components/ReviewRating';
+import {FinalTimePicker} from 'indico/react/forms/fields';
 
 const getFields = () => {
   const personLinkFieldExtraOptions = {
@@ -128,6 +129,7 @@ const getFields = () => {
       initialValue: [],
       placeholder: 'Please enter a keyword',
     },
+    {title: 'Time picker', component: FinalTimePicker},
   ];
 };
 
