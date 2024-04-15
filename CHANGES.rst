@@ -29,6 +29,7 @@ Bugfixes
   purged when cloning an event (:pr:`6288`)
 - Use English locale when formatting dates for room booking log entries (:pr:`6295`)
 - Fix date validation in room booking failing in certain timezones
+- Add a custom exception if hostname contains port number. (:pr:`6297`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
