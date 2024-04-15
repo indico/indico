@@ -11,9 +11,11 @@
         {{ render_draft_mode_warning(event) }}
     {% endif %}
     <h1>Timetable Dialogs</h1>
-    <div id="timetable-container" style="min-height: 50px;"></div>
+    <div id="session-form-container" style="min-height: 50px;"></div>
+    <div id="block-form-container" style="min-height: 50px;"></div>
     <script>
-        setupTimetable();
+        setupSessionForm();
+        setupBlockForm();
     </script>
     {{ render_timetable(timetable_data, event_info, management=true, custom_links=custom_links) }}
 {% endblock %}
