@@ -57,8 +57,19 @@ export default class SingleDatePicker extends React.Component {
   render() {
     const {focused} = this.state;
     const {disabledDate} = this.props;
-    const yearsInterval = getPluginObjects('datePickerInterval');
-    const {yearsBefore, yearsAfter} = yearsInterval.length ? yearsInterval[0] : this.props;
+    let {yearsBefore, yearsAfter} = this.props;
+    const pluginFunc = getPluginObjects('getDatePickerYearsRange');
+    if (pluginFunc.length && typeof pluginFunc[0] === 'function') {
+      const pluginData = pluginFunc[0](this.props);
+      yearsBefore =
+        pluginData.yearsBefore !== 'undefined' && pluginData.yearsBefore > 0
+          ? pluginData.yearsBefore
+          : yearsBefore;
+      yearsAfter =
+        pluginData.yearsAfter !== 'undefined' && pluginData.yearsAfter > 0
+          ? pluginData.yearsAfter
+          : yearsAfter;
+    }
     const filteredProps = Object.entries(this.props)
       .filter(([name]) => {
         return !PROP_BLACKLIST.has(name);
