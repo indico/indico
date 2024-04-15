@@ -31,7 +31,7 @@ from indico.modules.rb.notifications.reservations import (notify_cancellation, n
 from indico.modules.rb.util import format_weekdays, get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.enum import IndicoIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, force_locale
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
@@ -632,8 +632,9 @@ class Reservation(db.Model):
         for field, change in changes.items():
             field_title = field_names.get(field, field)
             converter = change['converter']
-            old = converter(change['old'])
-            new = converter(change['new'])
+            with force_locale(None):
+                old = converter(change['old'])
+                new = converter(change['new'])
             if not old:
                 log.append(f"The {field_title} was set to '{new}'")
             elif not new:
