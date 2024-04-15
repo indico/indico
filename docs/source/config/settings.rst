@@ -898,7 +898,7 @@ System
 
 .. data:: ENABLE_APPLE_WALLET
 
-    Whether to enable the Apple Pass integration for event tickets.
+    Whether to enable the Apple Wallet integration for event tickets.
 
     Default: ``False``
 
