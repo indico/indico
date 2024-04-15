@@ -28,6 +28,7 @@ Bugfixes
 - Clear the flags indicating that registrations or a registration form field have been
   purged when cloning an event (:pr:`6288`)
 - Use English locale when formatting dates for room booking log entries (:pr:`6295`)
+- Fix date validation in room booking failing in certain timezones
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
