@@ -242,7 +242,7 @@ sqlalchemy==1.4.52
     #   sqlbag
 sqlbag==0.1.1617247075
     # via migra
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via -r requirements.dev.in
 tokenize-rt==5.2.0
     # via pyupgrade
