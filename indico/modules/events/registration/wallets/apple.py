@@ -141,7 +141,4 @@ class AppleWalletManager:
             logger.warning('Could not create Apple Pass ticket: %s', exc)
             raise
         return pkpass
-        # TBD: For some reason the ticket creation on the fly returns an error: the download does not complete...
-        # return passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
-        # self.settings['apple_wallet_password'])
         # TBD: Add Celery task to delete up to 2 days ago generated files?
