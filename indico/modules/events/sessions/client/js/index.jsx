@@ -5,9 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import 'indico/modules/events/util/types_dialog';
 
 import './session_display';
+import SessionBlockForm from './SessionBlockForm';
+import SessionForm from './SessionForm';
 
 (function(global) {
   function setupTableSorter() {
@@ -154,4 +159,18 @@ import './session_display';
       });
     });
   }
+
+  global.setupSessionForm = function setupSessionForm() {
+    const root = document.querySelector('#session-form-container');
+    if (root) {
+      ReactDOM.render(<SessionForm />, root);
+    }
+  };
+
+  global.setupBlockForm = function setupBlockForm() {
+    const root = document.querySelector('#block-form-container');
+    if (root) {
+      ReactDOM.render(<SessionBlockForm />, root);
+    }
+  };
 })(window);
