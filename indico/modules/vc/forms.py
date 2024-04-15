@@ -36,7 +36,7 @@ class VCRoomField(HiddenField):
     def _value(self, for_react=False):
         if not self.data:
             return None
-        return [{'id': self.data.id}] if for_react else self.data.id
+        return [{'id': self.data.id, 'name': self.data.name}] if for_react else self.data.id
 
 
 class LinkingWidget(JinjaWidget):

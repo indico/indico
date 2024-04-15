@@ -148,10 +148,31 @@ export function SearchDropdown({
       } finally {
         setLoading(false);
       }
-
-      setOptions(transformOptions(response.data));
+      if (!preload && multiple) {
+        if (response.data.length !== 0) {
+          const id = response.data[0][valueField];
+          setOptions(prevOptions => {
+            const prevKeys = prevOptions.map(opt => opt.key);
+            if (prevKeys.includes(id)) {
+              return prevOptions;
+            }
+            return [...prevOptions, ...transformOptions(response.data)];
+          });
+        }
+      } else {
+        setOptions(transformOptions(response.data));
+      }
     },
-    [searchUrl, searchMethod, searchPayload, transformOptions, debounce]
+    [
+      searchUrl,
+      searchPayload,
+      preload,
+      multiple,
+      debounce,
+      searchMethod,
+      valueField,
+      transformOptions,
+    ]
   );
 
   useEffect(() => {
@@ -159,10 +180,13 @@ export function SearchDropdown({
       setOptions(transformOptions(optionsFromProps));
       return;
     }
+    if (!preload && defaultValue.length !== 0) {
+      setOptions(prevOptions => [...prevOptions, ...transformOptions(defaultValue)]);
+    }
     if (preload) {
       fetchData();
     }
-  }, [preload, fetchData, optionsFromProps, transformOptions]);
+  }, [preload, fetchData, optionsFromProps, transformOptions, defaultValue]);
 
   const onChange = (evt, {value: newValue}) => {
     setSearchQuery('');
