@@ -125,7 +125,7 @@ def delete_contribution(contrib):
     signals.event.contribution_deleted.send(contrib)
     logger.info('Contribution %s deleted by %s', contrib, session.user)
     contrib.log(EventLogRealm.management, LogKind.negative, 'Contributions',
-                f'Contribution "{contrib.title}" has been deleted', session.user)
+                f'Contribution {contrib.verbose_title} has been deleted', session.user)
 
 
 def create_subcontribution(contrib, data):
