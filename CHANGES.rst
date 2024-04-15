@@ -27,6 +27,7 @@ Bugfixes
 - Fix validation error when using a ``mailto:`` link in an email body (:pr:`6286`)
 - Clear the flags indicating that registrations or a registration form field have been
   purged when cloning an event (:pr:`6288`)
+- Use English locale when formatting dates for room booking log entries (:pr:`6295`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
