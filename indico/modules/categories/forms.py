@@ -159,40 +159,42 @@ class CategorySettingsForm(IndicoForm):
 
     def validate(self, extra_validators=None):
         form_valid = super().validate(extra_validators=extra_validators)
-        if config.ENABLE_GOOGLE_WALLET:
-            enabled = self.google_wallet_mode.data == InheritableConfigMode.enabled
-            credentials = self.google_wallet_credentials.data
-            issuer_id = self.google_wallet_issuer_id.data
+        if not config.ENABLE_GOOGLE_WALLET:
+            return form_valid
 
-            if (
-                credentials and
-                enabled and (
-                    self.category.google_wallet_settings.get('google_wallet_credentials') != credentials or
-                    self.category.google_wallet_settings.get('google_wallet_issuer_id') != issuer_id
+        enabled = self.google_wallet_mode.data == InheritableConfigMode.enabled
+        credentials = self.google_wallet_credentials.data
+        issuer_id = self.google_wallet_issuer_id.data
+
+        if (
+            credentials and
+            enabled and (
+                self.category.google_wallet_settings.get('google_wallet_credentials') != credentials or
+                self.category.google_wallet_settings.get('google_wallet_issuer_id') != issuer_id
+            )
+        ):
+            res = GoogleWalletManager.verify_credentials(credentials, issuer_id)
+            if res == GoogleCredentialValidationResult.invalid:
+                self.google_wallet_credentials.errors.append(
+                    _('The credentials could not be loaded.')
                 )
-            ):
-                res = GoogleWalletManager.verify_credentials(credentials, issuer_id)
-                if res == GoogleCredentialValidationResult.invalid:
-                    self.google_wallet_credentials.errors.append(
-                        _('The credentials could not be loaded.')
-                    )
-                    return False
-                elif res == GoogleCredentialValidationResult.refused:
-                    self.google_wallet_credentials.errors.append(
-                        _('The credentials are invalid or have no access to the Google Wallet API.')
-                    )
-                    return False
-                elif res == GoogleCredentialValidationResult.failed:
-                    self.google_wallet_credentials.errors.append(
-                        _('There was an error validating your credentials. Contact your Indico administrator for '
-                          'details.')
-                    )
-                    return False
-                elif res == GoogleCredentialValidationResult.bad_issuer:
-                    self.google_wallet_issuer_id.errors.append(
-                        _('The Issuer ID is invalid or not linked to your credentials.')
-                    )
-                    return False
+                return False
+            elif res == GoogleCredentialValidationResult.refused:
+                self.google_wallet_credentials.errors.append(
+                    _('The credentials are invalid or have no access to the Google Wallet API.')
+                )
+                return False
+            elif res == GoogleCredentialValidationResult.failed:
+                self.google_wallet_credentials.errors.append(
+                    _('There was an error validating your credentials. Contact your Indico administrator for '
+                      'details.')
+                )
+                return False
+            elif res == GoogleCredentialValidationResult.bad_issuer:
+                self.google_wallet_issuer_id.errors.append(
+                    _('The Issuer ID is invalid or not linked to your credentials.')
+                )
+                return False
 
         return form_valid
 
