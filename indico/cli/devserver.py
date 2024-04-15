@@ -32,6 +32,8 @@ def run_watchfiles():
 
 
 def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from):
+    if ':' in host and host.count(':') > 2:
+        raise ValueError('<your-hostname> should not contain port number. Pass port number using -p argument.')
     if port is None:
         port = 8443 if ssl else 8000
 
