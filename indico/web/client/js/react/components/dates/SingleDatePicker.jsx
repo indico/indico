@@ -13,6 +13,7 @@ import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
 
 import {FinalField} from 'indico/react/forms';
 import {serializeDate, toMoment} from 'indico/utils/date';
+import {getPluginObjects} from 'indico/utils/plugins';
 
 import {renderMonthElement, responsiveReactDates} from './util';
 
@@ -55,7 +56,18 @@ export default class SingleDatePicker extends React.Component {
 
   render() {
     const {focused} = this.state;
-    const {disabledDate, yearsBefore, yearsAfter} = this.props;
+    const {disabledDate} = this.props;
+    let {yearsBefore, yearsAfter} = this.props;
+    const pluginFunc = getPluginObjects('getDatePickerYearsRange');
+    if (pluginFunc.length && typeof pluginFunc[0] === 'function') {
+      const pluginData = pluginFunc[0](this.props);
+      if (pluginData.yearsBefore !== undefined && pluginData.yearsBefore >= 0) {
+        yearsBefore = pluginData.yearsBefore;
+      }
+      if (pluginData.yearsAfter !== undefined && pluginData.yearsAfter >= 0) {
+        yearsAfter = pluginData.yearsAfter;
+      }
+    }
     const filteredProps = Object.entries(this.props)
       .filter(([name]) => {
         return !PROP_BLACKLIST.has(name);
