@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as get_version
 from urllib.parse import urljoin, urlsplit
 
 import requests
@@ -170,7 +171,7 @@ class RHVersionCheck(RHAdminBase):
             return None
         if current_version is None:
             try:
-                current_version = version(distribution)
+                current_version = get_version(distribution)
             except PackageNotFoundError:
                 return None
         current_version = Version(current_version)
