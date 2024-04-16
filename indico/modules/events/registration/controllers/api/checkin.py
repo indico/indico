@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import request
-from sqlalchemy.orm import selectinload, undefer
+from sqlalchemy.orm import joinedload, selectinload, undefer
 from webargs import fields
 from werkzeug.exceptions import NotFound
 
@@ -75,6 +75,7 @@ class RHCheckinAPIRegistrations(RHCheckinAPIRegFormBase):
                          .filter(~Registration.is_deleted)
                          .options(selectinload('data').joinedload('field_data'),
                                   selectinload('tags'),
+                                  joinedload('transaction'),
                                   undefer('occupied_slots'))
                          .all())
         return CheckinRegistrationSchema(many=True, exclude=('registration_data',)).jsonify(registrations)
@@ -94,6 +95,10 @@ class RHCheckinAPIRegistration(RHCheckinAPIRegFormBase):
         registration_id = request.view_args['registration_id']
         self.registration = (Registration.query
                              .with_parent(self.regform)
+                             .options(selectinload('data').joinedload('field_data'),
+                                      selectinload('tags'),
+                                      joinedload('transaction'),
+                                      undefer('occupied_slots'))
                              .filter_by(id=registration_id, is_deleted=False)
                              .first_or_404())
 
