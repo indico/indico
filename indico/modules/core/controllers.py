@@ -5,12 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as get_version
 from urllib.parse import urljoin, urlsplit
 
 import requests
 from flask import current_app, flash, jsonify, redirect, request, session
 from packaging.version import Version
-from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
 from webargs import fields
 from webargs.flaskparser import abort
@@ -170,8 +171,8 @@ class RHVersionCheck(RHAdminBase):
             return None
         if current_version is None:
             try:
-                current_version = get_distribution(distribution).version
-            except DistributionNotFound:
+                current_version = get_version(distribution)
+            except PackageNotFoundError:
                 return None
         current_version = Version(current_version)
         if current_version.is_prerelease:

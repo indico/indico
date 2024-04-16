@@ -11,6 +11,7 @@ import shutil
 import socket
 import subprocess
 import sys
+from importlib.metadata import entry_points
 from operator import attrgetter
 from pathlib import Path
 from smtplib import SMTP
@@ -21,7 +22,6 @@ from click import wrap_text
 from flask.helpers import get_root_path
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-from pkg_resources import iter_entry_points
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import PathCompleter, WordCompleter
 from prompt_toolkit.styles import Style
@@ -181,7 +181,7 @@ def list_plugins():
     """List the available Indico plugins."""
     import_all_models()
     table_data = [['Name', 'Title']]
-    for ep in sorted(iter_entry_points('indico.plugins'), key=attrgetter('name')):
+    for ep in sorted(entry_points(group='indico.plugins'), key=attrgetter('name')):
         plugin = ep.load()
         table_data.append([ep.name, plugin.title])
     table = AsciiTable(table_data, cformat('%{white!}Available Plugins%{reset}'))

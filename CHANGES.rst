@@ -35,6 +35,8 @@ Internal Changes
 
 - Allow plugins to fully replace the data in a ticket QR code with a custom string
   instead of just modifying/extending the JSON dict (:pr:`6266`)
+- Replace deprecated ``pkg_resources`` with ``importlib`` from standard library
+  (:issue:`6272`, :pr:`6273`, thanks :user:`maxnoe`)
 
 
 Version 3.3.1
