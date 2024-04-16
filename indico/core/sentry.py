@@ -7,8 +7,8 @@
 
 import logging
 import re
-from urllib.parse import parse_qs, urlsplit, urlunsplit
 from importlib.metadata import entry_points
+from urllib.parse import parse_qs, urlsplit, urlunsplit
 
 import requests
 import sentry_sdk

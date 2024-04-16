@@ -9,7 +9,8 @@ import codecs
 import os
 import subprocess
 import tempfile
-from importlib.resources import files, as_file
+from importlib.resources import as_file
+from importlib.resources import files as res_files
 from io import BytesIO
 from operator import attrgetter
 from zipfile import ZipFile
@@ -195,7 +196,7 @@ class LatexRunner:
         with codecs.open(source_filename, 'wb', encoding='utf-8') as f:
             f.write(source)
 
-        with as_file(files('indico_fonts')) as font_dir:
+        with as_file(res_files('indico_fonts')) as font_dir:
             os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
         return source_filename, target_filename
 

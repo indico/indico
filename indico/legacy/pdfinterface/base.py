@@ -10,7 +10,7 @@
 import math
 import os
 import xml.sax.saxutils as saxutils
-from importlib.resources import files, as_file
+from importlib.resources import as_file, files
 from io import BytesIO
 
 from PIL import Image as PILImage

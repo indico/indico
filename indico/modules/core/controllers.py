@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 from urllib.parse import urljoin, urlsplit
 
 import requests
