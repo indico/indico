@@ -10,7 +10,7 @@ Version 3.3.2
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Use more verbose page titles in management/admin areas (:pr:`6300`)
 
 Bugfixes
 ^^^^^^^^

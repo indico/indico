@@ -9,6 +9,7 @@ from indico.modules.events.models.events import EventType
 from indico.util.string import strip_tags
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.flask.templating import get_template_module
+from indico.web.menu import get_menu_item
 from indico.web.views import WPDecorated, WPJinjaMixin, render_header
 
 
@@ -44,8 +45,9 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
         self.title = strip_tags(self.event.title)
+        self.active_menu_item = active_menu_item or self.sidemenu_option
         kwargs['base_layout_params'] = {
-            'active_menu_item': active_menu_item or self.sidemenu_option,
+            'active_menu_item': self.active_menu_item,
             'event_types': [(et.name, et.title) for et in EventType]
         }
         WPDecorated.__init__(self, rh, **kwargs)
@@ -58,6 +60,13 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
 
     def _get_breadcrumbs(self):
         return render_breadcrumbs(event=self.event, management=self.MANAGEMENT)
+
+    @property
+    def _extra_title_parts(self):
+        title_parts = super()._extra_title_parts
+        if menu_item := get_menu_item('event-management-sidemenu', self.active_menu_item, event=self.event):
+            return (*title_parts, menu_item.title)
+        return title_parts
 
 
 class WPEventSettings(WPEventManagement):
