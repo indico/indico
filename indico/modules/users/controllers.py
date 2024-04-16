@@ -7,7 +7,7 @@
 
 from collections import namedtuple
 from io import BytesIO
-from operator import attrgetter, itemgetter
+from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
@@ -57,7 +57,7 @@ from indico.util.i18n import _, force_locale
 from indico.util.images import square
 from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
 from indico.util.signals import values_from_signal
-from indico.util.string import make_unique_token
+from indico.util.string import make_unique_token, remove_accents
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -896,7 +896,18 @@ class RHUserSearch(RHProtected):
     def _process(self, exact, external, favorites_first, **criteria):
         matches = search_users(exact=exact, include_pending=True, external=external, **criteria)
         self.externals = {}
-        results = sorted((self._serialize_entry(entry) for entry in matches), key=itemgetter('full_name', 'email'))
+
+        def _sort_key(entry):
+            # Sort results by providing exact matches first, initially considering accents, and
+            # then without considering accents.
+            exact_match_keys = [entry[k].lower() != v.lower() for k, v in criteria.items()]
+            unaccent_exact_match_keys = [
+                remove_accents(entry[k].lower()) != remove_accents(v.lower())
+                for k, v in criteria.items()
+            ]
+            return *exact_match_keys, *unaccent_exact_match_keys, entry['full_name'], entry['email']
+
+        results = sorted((self._serialize_entry(entry) for entry in matches), key=_sort_key)
         if favorites_first:
             favorites = {u.id for u in session.user.favorite_users}
             results.sort(key=lambda x: x['id'] not in favorites)

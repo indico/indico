@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Use more verbose page titles in management/admin areas (:pr:`6300`)
+- Prioritize exact matches when searching for users (:pr:`6254`)
 
 Bugfixes
 ^^^^^^^^
