@@ -13,6 +13,7 @@ from captcha.image import ImageCaptcha
 from flask import session
 from marshmallow import ValidationError, fields
 from wtforms.fields import StringField
+from wtforms.validators import DataRequired
 from wtforms.validators import ValidationError as WTFValidationError
 
 from indico.core.plugins import plugin_engine
@@ -59,8 +60,11 @@ class WTFCaptchaField(StringField):
 
     widget = JinjaWidget('forms/captcha_widget.html', single_kwargs=True)
 
-    def __init__(self, label=None, *args, **kwargs):
-        super().__init__(label or _('CAPTCHA'), *args, **kwargs)
+    def __init__(self, label=None, validators=None, *args, **kwargs):
+        validators = validators or []
+        if not any(isinstance(x, DataRequired) for x in validators):
+            validators.append(DataRequired())
+        super().__init__(label or _('CAPTCHA'), validators, *args, **kwargs)
 
     @property
     def captcha_settings(self):
