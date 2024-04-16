@@ -222,7 +222,7 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/receipts/<int:file_id>/<filen
                  display.RHReceiptDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/ticket/google-wallet', 'ticket_google_wallet',
                  display.RHTicketGoogleWalletDownload)
-_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket/apple-pass', 'ticket_apple_wallet',
+_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket/apple-wallet', 'ticket_apple_wallet',
                  display.RHTicketAppleWalletDownload)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/avatar', 'registration_avatar',
                  display.RHRegistrationAvatar)

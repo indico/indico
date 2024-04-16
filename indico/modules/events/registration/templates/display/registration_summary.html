@@ -98,9 +98,9 @@
                             {% trans %}Save to Google Wallet{% endtrans %}
                         </a>
                     {% endif %}
-                    {% if registration.registration_form.is_apple_pass_available %}
-                        <a href="{{ url_for('.ticket_apple_pass', registration.locator.registrant) }}" class="i-button accept icon-ticket">
-                            {% trans %}Save to Apple Pass{% endtrans %}
+                    {% if registration.registration_form.is_apple_wallet_available %}
+                        <a href="{{ url_for('.ticket_apple_wallet', registration.locator.registrant) }}" class="i-button accept icon-ticket">
+                            {% trans %}Save to Apple Wallet{% endtrans %}
                         </a>
                     {% endif %}
                     <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
