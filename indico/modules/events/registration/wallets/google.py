@@ -72,7 +72,7 @@ class GoogleWalletManager:
 
     def _load_credentials(self):
         """Load Google credentials and setup authenticated HTTP client."""
-        if not self.configured:
+        if not self.is_configured:
             return None, None
         credentials = Credentials.from_service_account_info(
             self.settings['google_wallet_credentials'],
