@@ -13,6 +13,7 @@ from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.flask.util import url_for
+from indico.web.menu import get_menu_item
 from indico.web.views import WPDecorated, WPJinjaMixin, render_header
 
 
@@ -80,7 +81,7 @@ class WPCategoryManagement(WPCategory):
     bundles = ('module_categories.management.js',)
 
     def __init__(self, rh, category, active_menu_item, **kwargs):
-        kwargs['active_menu_item'] = active_menu_item
+        kwargs['active_menu_item'] = self.active_menu_item = active_menu_item
         WPCategory.__init__(self, rh, category, **kwargs)
 
     def _get_header(self):
@@ -99,3 +100,10 @@ class WPCategoryManagement(WPCategory):
             return ''
         return render_breadcrumbs(category=self.category, management=True,
                                   category_url_factory=self._get_parent_category_breadcrumb_url)
+
+    @property
+    def _extra_title_parts(self):
+        title_parts = super()._extra_title_parts
+        if menu_item := get_menu_item('category-management-sidemenu', self.active_menu_item, category=self.category):
+            return (*title_parts, menu_item.title)
+        return title_parts
