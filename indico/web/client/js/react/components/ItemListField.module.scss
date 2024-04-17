@@ -10,12 +10,12 @@
 @use 'base/borders' as *;
 @use 'base/utilities' as *;
 
-.choices-table-wrapper {
+.items-table-wrapper {
   max-height: 40vh;
   overflow-y: auto;
 }
 
-.choices-table {
+.items-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1em;
@@ -38,9 +38,14 @@
 
   thead {
     th {
-      @include border-bottom();
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: white;
+      box-shadow: inset 0 -1px $default-border-color; // normal borders don't work with sticky
       padding-bottom: 4px;
       vertical-align: top;
+      text-align: left;
     }
 
     td {
