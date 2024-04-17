@@ -9,12 +9,10 @@ aiosmtpd==1.4.5
 alabaster==0.7.16
     # via sphinx
 anyio==4.3.0
-    # via watchfiles
-async-timeout==4.0.3
     # via
-    #   -c requirements.txt
-    #   redis
-atpublic==4.0
+    #   starlette
+    #   watchfiles
+atpublic==4.1.0
     # via aiosmtpd
 attrs==23.2.0
     # via
@@ -28,7 +26,7 @@ blinker==1.7.0
     # via
     #   -c requirements.txt
     #   flask
-build==1.1.1
+build==1.2.1
     # via
     #   -r requirements.dev.in
     #   pip-tools
@@ -48,13 +46,14 @@ click==8.1.7
     #   pip-tools
     #   pyquotes
     #   unbeheader
+    #   uvicorn
 colorama==0.4.6
     # via sphinx-autobuild
 colorclass==2.2.2
     # via
     #   -c requirements.txt
     #   unbeheader
-coverage==7.4.3
+coverage==7.4.4
     # via pytest-cov
 docutils==0.20.1
     # via
@@ -68,7 +67,7 @@ flake8==7.0.0
     #   pep8-naming
 flake8-quotes==3.4.0
     # via -r requirements.dev.in
-flask==3.0.2
+flask==3.0.3
     # via
     #   -c requirements.txt
     #   flask-url-map-serializer
@@ -80,6 +79,8 @@ greenlet==3.0.3
     # via
     #   -c requirements.txt
     #   sqlalchemy
+h11==0.14.0
+    # via uvicorn
 idna==3.7
     # via
     #   -c requirements.txt
@@ -91,7 +92,7 @@ iniconfig==2.0.0
     # via pytest
 isort==5.13.2
     # via -r requirements.dev.in
-itsdangerous==2.1.2
+itsdangerous==2.2.0
     # via
     #   -c requirements.txt
     #   flask
@@ -100,8 +101,6 @@ jinja2==3.1.3
     #   -c requirements.txt
     #   flask
     #   sphinx
-livereload==2.6.3
-    # via sphinx-autobuild
 markupsafe==2.1.5
     # via
     #   -c requirements.txt
@@ -113,14 +112,14 @@ migra==3.0.1663481299
     # via -r requirements.dev.in
 mirakuru==2.5.2
     # via pytest-redis
-packaging==23.2
+packaging==24.0
     # via
     #   -c requirements.txt
     #   build
     #   pytest
     #   sphinx
     #   sqlbag
-parso==0.8.3
+parso==0.8.4
     # via
     #   -c requirements.txt
     #   pyquotes
@@ -151,18 +150,18 @@ pyproject-hooks==1.0.0
     #   pip-tools
 pyquotes==1.0.0
     # via -r requirements.dev.in
-pytest==8.0.2
+pytest==8.1.1
     # via
     #   -r requirements.dev.in
     #   pytest-cov
     #   pytest-mock
     #   pytest-redis
     #   pytest-snapshot
-pytest-cov==4.1.0
+pytest-cov==5.0.0
     # via -r requirements.dev.in
 pytest-localserver==0.8.1
     # via -r requirements.dev.in
-pytest-mock==3.12.0
+pytest-mock==3.14.0
     # via -r requirements.dev.in
 pytest-redis==3.0.2
     # via -r requirements.dev.in
@@ -172,13 +171,13 @@ python-dateutil==2.9.0.post0
     # via
     #   -c requirements.txt
     #   freezegun
-pyupgrade==3.15.1
+pyupgrade==3.15.2
     # via -r requirements.dev.in
 pyyaml==6.0.1
     # via
     #   -c requirements.txt
     #   unbeheader
-redis==5.0.2
+redis==5.0.3
     # via
     #   -c requirements.txt
     #   pytest-redis
@@ -194,7 +193,6 @@ schemainspect==3.1.1663587362
 six==1.16.0
     # via
     #   -c requirements.txt
-    #   livereload
     #   migra
     #   plantweb
     #   python-dateutil
@@ -203,7 +201,7 @@ sniffio==1.3.1
     # via anyio
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.2.6
+sphinx==7.3.5
     # via
     #   -r requirements.dev.in
     #   sphinx-autobuild
@@ -211,9 +209,9 @@ sphinx==7.2.6
     #   sphinx-reredirects
     #   sphinx-rtd-theme
     #   sphinxcontrib-jquery
-sphinx-autobuild==2024.2.4
+sphinx-autobuild==2024.4.16
     # via -r requirements.dev.in
-sphinx-issues==4.0.0
+sphinx-issues==4.1.0
     # via -r requirements.dev.in
 sphinx-reredirects==0.1.3
     # via -r requirements.dev.in
@@ -244,24 +242,30 @@ sqlbag==0.1.1617247075
     # via migra
 sqlparse==0.5.0
     # via -r requirements.dev.in
+starlette==0.37.2
+    # via sphinx-autobuild
 tokenize-rt==5.2.0
     # via pyupgrade
-tornado==6.4
-    # via livereload
 unbeheader==1.3.0
     # via -r requirements.dev.in
 urllib3==1.26.18
     # via
     #   -c requirements.txt
     #   requests
+uvicorn==0.29.0
+    # via sphinx-autobuild
 watchfiles==0.21.0
-    # via -r requirements.dev.in
-werkzeug==3.0.1
+    # via
+    #   -r requirements.dev.in
+    #   sphinx-autobuild
+websockets==12.0
+    # via sphinx-autobuild
+werkzeug==3.0.2
     # via
     #   -c requirements.txt
     #   flask
     #   pytest-localserver
-wheel==0.42.0
+wheel==0.43.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
