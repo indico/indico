@@ -129,8 +129,15 @@ def cleanup(temp, cache, verbose, dry_run, min_age):
     cleanup_cmd(temp, cache, min_age=min_age, dry_run=dry_run, verbose=(verbose or dry_run))
 
 
+def validate_host(ctx, param, value):
+    if ':' in value and value.count(':') > 2:
+        raise click.BadParameter('<your-hostname> should not contain port number. Pass port number using -p argument.')
+    return value
+
+
 @cli.command(with_appcontext=False)
-@click.option('--host', '-h', default='127.0.0.1', metavar='HOST', help='The ip/host to bind to.')
+@click.option('--host', '-h', default='127.0.0.1', metavar='HOST', help='The ip/host to bind to.', 
+              callback=validate_host)
 @click.option('--port', '-p', default=None, type=int, metavar='PORT', help='The port to bind to.')
 @click.option('--url', '-u', default=None, metavar='URL',
               help='The URL used to access indico. Defaults to `http(s)://host:port`')
