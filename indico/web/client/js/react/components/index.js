@@ -36,6 +36,7 @@ export {default as PlaceholderInfo} from './PlaceholderInfo';
 export {default as PopoverDropdownMenu} from './PopoverDropdownMenu';
 export {default as ResponsivePopup} from './ResponsivePopup';
 export {default as ListFilter} from './ListFilter';
+export {default as ItemListField, FinalItemListField} from './ItemListField';
 export {default as MathJax} from './MathJax';
 export {default as FileSubmission} from './files/FileSubmission';
 export {default as FinalPictureManager} from './pictures/PictureManager';
