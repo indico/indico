@@ -32,7 +32,6 @@ def run_watchfiles():
 
 
 def run_server(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from):
-
     if port is None:
         port = 8443 if ssl else 8000
 

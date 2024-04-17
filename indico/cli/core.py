@@ -136,7 +136,7 @@ def validate_host(ctx, param, value):
 
 
 @cli.command(with_appcontext=False)
-@click.option('--host', '-h', default='127.0.0.1', metavar='HOST', help='The ip/host to bind to.', 
+@click.option('--host', '-h', default='127.0.0.1', metavar='HOST', help='The ip/host to bind to.',
               callback=validate_host)
 @click.option('--port', '-p', default=None, type=int, metavar='PORT', help='The port to bind to.')
 @click.option('--url', '-u', default=None, metavar='URL',
