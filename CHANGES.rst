@@ -12,6 +12,8 @@ Improvements
 
 - Use more verbose page titles in management/admin areas (:pr:`6300`)
 - Prioritize exact matches when searching for users (:pr:`6254`)
+- Show document templates from non-parent categories and other events for cloning
+  as long as the user has management access (:pr:`6232`)
 
 Bugfixes
 ^^^^^^^^
