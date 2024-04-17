@@ -11,6 +11,7 @@ import {
   FinalDatePeriod,
   FinalEmailList,
   FinalLocationField,
+  FinalItemListField,
   FinalPictureManager,
   FinalSessionColorPicker,
   FinalSingleDatePicker,
@@ -95,6 +96,17 @@ const getFields = () => {
       parent: {title: 'A Conference', type: 'Event'},
     },
     {title: 'Session color picker', component: FinalSessionColorPicker, initialValue: {}},
+    {
+      title: 'Item list field',
+      component: FinalItemListField,
+      initialValue: [],
+      itemShape: [
+        {name: 'name', title: 'Name', fieldProps: {type: 'text'}},
+        {name: 'value', title: 'Value', fieldProps: {type: 'text'}},
+      ],
+      sortable: false,
+      canDisableItem: true,
+    },
   ];
 };
 
