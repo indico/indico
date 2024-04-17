@@ -18,3 +18,14 @@
     }
   }
 }
+
+.template-list {
+  & > section:not(:first-child) {
+    margin-top: 1.5em;
+  }
+
+  :global(.ui.accordion > .title) h4 {
+    display: inline-block;
+    margin-top: 0;
+  }
+}

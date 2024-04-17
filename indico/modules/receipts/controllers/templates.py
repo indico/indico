@@ -26,7 +26,7 @@ from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.schemas import ReceiptTemplateAPISchema, ReceiptTemplateDBSchema, ReceiptTplMetadataSchema
 from indico.modules.receipts.util import (TemplateStackEntry, can_user_manage_receipt_templates, compile_jinja_code,
                                           create_pdf, get_dummy_preview_data, get_inherited_templates,
-                                          get_preview_placeholders)
+                                          get_other_templates, get_preview_placeholders)
 from indico.modules.receipts.views import WPCategoryReceiptTemplates, WPEventReceiptTemplates
 from indico.util.marshmallow import YAML
 from indico.web.args import use_args, use_kwargs
@@ -82,6 +82,9 @@ class ReceiptTemplateMixin(ReceiptAreaMixin):
         # Check that template belongs to this event or a category that is a parent
         if self.template.owner == self.target:
             return
+        # If the user can manage the template owner, no need to check further
+        if self.template.owner.can_manage(session.user):
+            return
         category_chain = self.target.chain_ids if isinstance(self.target, Category) else self.target.category_chain
         valid_category_ids = category_chain or [Category.get_root().id]
         if self.template.owner.id not in valid_category_ids:
@@ -90,7 +93,9 @@ class ReceiptTemplateMixin(ReceiptAreaMixin):
 
 class TemplateListMixin(ReceiptAreaMixin):
     def _process(self):
-        inherited_templates = ReceiptTemplateDBSchema(many=True).dump(get_inherited_templates(self.target))
+        view_only_schema = ReceiptTemplateDBSchema(many=True, only={'id', 'title', 'owner'})
+        inherited_templates = view_only_schema.dump(get_inherited_templates(self.target))
+        other_templates = view_only_schema.dump(get_other_templates(self.target, session.user))
         own_templates = ReceiptTemplateDBSchema(many=True).dump(self.target.receipt_templates)
         default_templates_dir = _get_default_templates_dir()
         default_templates = {f.stem: yaml.safe_load(f.read_text()) for f in default_templates_dir.glob('*.yaml')}
@@ -99,6 +104,7 @@ class TemplateListMixin(ReceiptAreaMixin):
             'list.html', self.target, 'receipts',
             target=self.target,
             inherited_templates=inherited_templates,
+            other_templates=other_templates,
             own_templates=own_templates,
             default_templates=default_templates,
             target_locator=self.target.locator

@@ -123,6 +123,16 @@ def get_inherited_templates(obj: Event | Category) -> set[ReceiptTemplate]:
     return get_all_templates(obj) - set(obj.receipt_templates)
 
 
+def get_other_templates(obj: Event | Category, user) -> set[ReceiptTemplate]:
+    """Get all templates not owned or inherited by a given event/category."""
+    # XXX the can_manage check here causes some amount of query spam, but this is acceptable because
+    # - usually only admins have access to manage templates (where access checks are short-circuited)
+    # - the total amount of templates in an indico instance is usually not too high
+    return ({t for t in ReceiptTemplate.query.filter_by(is_deleted=False) if t.owner.can_manage(user)}
+            - get_all_templates(obj)
+            - set(obj.receipt_templates))
+
+
 def _format_currency(amount, currency, locale=None):
     # XXX same logic as in render_price - should probably use the event language in both places!
     locale = session.lang or 'en_GB'

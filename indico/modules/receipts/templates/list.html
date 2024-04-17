@@ -19,6 +19,7 @@
             document.querySelector('#template-list'),
             {{ own_templates | tojson }},
             {{ inherited_templates | tojson }},
+            {{ other_templates | tojson }},
             {{ default_templates | tojson }},
             {{ target_locator | tojson }}
         );
