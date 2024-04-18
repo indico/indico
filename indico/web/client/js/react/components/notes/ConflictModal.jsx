@@ -30,7 +30,6 @@ import {camelizeKeys} from 'indico/utils/case';
 import './ConflictModal.module.scss';
 
 export function ConflictModal({noteData, onClose}) {
-  // camelize the noteData keys
   const note = camelizeKeys(noteData);
 
   // refs to the current and conflict output elements for syncing scroll
