@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import createDecorator from 'final-form-calculate';
-import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
@@ -43,7 +42,6 @@ export function Choices({
       name: 'caption',
       title: Translate.string('Caption'),
       fieldProps: item => ({
-        type: 'text',
         placeholder: item.isNoAccommodation ? Translate.string('No accommodation') : undefined,
       }),
     },
@@ -102,9 +100,9 @@ export function Choices({
         canRemoveItem={item => !item.isNoAccommodation}
         onFocus={onFocus}
         onBlur={onBlur}
-        generateNewItemId={() => `new:${nanoid()}`}
         canDisableItem
         sortable
+        scrollable
       />
       {forAccommodation && (
         <p
