@@ -43,7 +43,7 @@ export function EmailParticipantRolesButton({
     <>
       {!triggerSelector && (
         <Button onClick={() => setOpen(true)} disabled={!(roleId || persons.length)} {...rest}>
-          <Translate>Send emails</Translate>
+          <Translate>Send email</Translate>
         </Button>
       )}
       {open && (

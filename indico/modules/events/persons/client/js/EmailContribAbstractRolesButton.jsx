@@ -36,7 +36,7 @@ export function EmailContribAbstractRolesButton({
           }
         }}
       >
-        <Translate>Email</Translate>
+        <Translate>Send email</Translate>
       </button>
       {open && (
         <EmailContribAbstractRoles
