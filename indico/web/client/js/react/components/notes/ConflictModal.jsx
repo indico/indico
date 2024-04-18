@@ -36,17 +36,6 @@ export function ConflictModal({noteData, onClose}) {
   const currentChangesRef = useRef();
   const conflictChangesRef = useRef();
 
-  const renderDeletedRevision = () => {
-    return (
-      <Segment placeholder styleName="revision-deleted">
-        <Header icon>
-          <Icon name="trash outline alternate" />
-          <Translate>This content has been deleted.</Translate>
-        </Header>
-      </Segment>
-    );
-  };
-
   const renderLastModifiedDt = dt => {
     return (
       <span title={moment(dt).format('L LTS')} styleName="last-modified-text">
@@ -161,7 +150,12 @@ export function ConflictModal({noteData, onClose}) {
                   </CardContent>
                 </Card>
               ) : (
-                renderDeletedRevision()
+                <Segment placeholder styleName="revision-deleted">
+                  <Header icon>
+                    <Icon name="trash outline alternate" />
+                    <Translate>This content has been deleted.</Translate>
+                  </Header>
+                </Segment>
               )}
             </GridColumn>
           </GridRow>
