@@ -72,7 +72,7 @@ class RHApiNote(RHManageNoteBase):
     @use_kwargs({
         'render_mode': EnumField(RenderMode, load_default=RenderMode.html),
         'source': fields.String(required=True),
-        'revision_id': fields.Integer(required=False),
+        'revision_id': fields.Integer(),
     })
     def _process_POST(self, render_mode, source, revision_id=None):
         note = EventNote.get_or_create(self.object)
