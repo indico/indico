@@ -135,7 +135,7 @@ def get_category_view_params(category, now, is_flat=False):
     has_hidden_events = bool(hidden_event_ids)
 
     if not session.user and future_event_count:
-        json_ld_events = json_ld_events + future_event_query.all()
+        json_ld_events += future_event_query.all()
 
     show_future_events = bool(category.id in session.get('fetch_future_events_in', set()) or
                               (session.user and session.user.settings.get('show_future_events', False)))

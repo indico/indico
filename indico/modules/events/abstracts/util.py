@@ -88,7 +88,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
                                    lambda x: x.submitted_contrib_type.name if x.submitted_contrib_type else None),
         'score': ('Score', lambda x: round(x.score, 1) if x.score is not None else None),
         'submitted_dt': ('Submission date', lambda x: x.submitted_dt),
-        'modified_dt': ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''),
+        'modified_dt': ('Modification date', lambda x: x.modified_dt or ''),
         'description': ('Content', lambda x: x.description),
         'submission_comment': ('Submission comment', lambda x: x.submission_comment),
     }

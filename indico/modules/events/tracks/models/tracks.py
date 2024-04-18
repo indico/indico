@@ -115,7 +115,7 @@ class Track(DescriptionMixin, ProtectionManagersMixin, db.Model):
 
     @property
     def short_title(self):
-        return self.code if self.code else self.title
+        return self.code or self.title
 
     @property
     def full_title(self):

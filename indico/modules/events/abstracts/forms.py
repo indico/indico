@@ -561,7 +561,7 @@ class _SingleChoiceQuerySelectMultipleFieldGrouped(_SingleChoiceQuerySelectMulti
         super().__init__(*args, **kwargs)
 
     def get_grouped_choices(self):
-        return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)
+        return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)  # noqa: FURB118
 
     def iter_choices(self):
         yield ('__None', self.blank_text, self.data is None, None, None)
@@ -595,7 +595,7 @@ class _MultiChoiceQuerySelectMultipleFieldGrouped(IndicoQuerySelectMultipleField
         super().__init__(*args, **kwargs)
 
     def get_grouped_choices(self):
-        return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)
+        return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)  # noqa: FURB118
 
     def iter_choices(self):
         for pk, obj in self._get_object_list():

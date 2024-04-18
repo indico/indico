@@ -77,8 +77,9 @@ def to_moment(locale):
 
 
 @click.command(help=USAGE)
-@click.option('--output', '-o', type=click.Path(), default='indico/moment_locales.yaml', help='Output file')
-def generate(output):
+@click.option('--output', '-o', type=click.Path(path_type=Path), default='indico/moment_locales.yaml',
+              help='Output file')
+def generate(output: Path):
     canonical = load_canonical_locales()
     moment = load_moment_locales()
     moment_version = get_moment_version()
@@ -97,10 +98,9 @@ def generate(output):
     click.secho('Unmatched moment locales:', fg='yellow')
     click.echo(json.dumps(unmatched_locales, indent=2))
 
-    with open(output, 'w') as f:
-        header = HEADER.format(unmatched_locales=unmatched_locales, moment_version=moment_version)
-        locales = yaml.safe_dump(table)
-        f.write(header + locales)
+    header = HEADER.format(unmatched_locales=unmatched_locales, moment_version=moment_version)
+    locales = yaml.safe_dump(table)
+    output.write_text(header + locales)
 
 
 if __name__ == '__main__':

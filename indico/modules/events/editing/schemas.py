@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import re
+from operator import itemgetter
 
 from markupsafe import escape
 from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
@@ -468,7 +469,7 @@ class ServiceUserSchema(mm.SQLAlchemyAutoSchema):
         event = self.context['editable'].event
         event_roles, category_roles = get_all_user_roles(event, user)
         roles = RoleSchema(many=True).dump(event_roles | category_roles)
-        return sorted(roles, key=lambda r: (r['source'], r['code']))
+        return sorted(roles, key=itemgetter('source', 'code'))
 
 
 class ServiceCreateEditableResultSchema(mm.Schema):

@@ -221,8 +221,7 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
         for match in matches:
             if m := TITLE_ENUM_RE.match(match.title):
                 index = int(m.group(2))
-                if index > max_index:
-                    max_index = index
+                max_index = max(index, max_index)
 
         new_title = f'{base_title} ({max_index + 1})' if max_index else f'{base_title} (1)'
 

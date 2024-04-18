@@ -198,4 +198,4 @@ class PermissionsField(JSONField):
         return {k: all_permissions[k].friendly_name for k in set(all_permissions) - set(visible_permissions)}
 
     def _value(self):
-        return self.data if self.data else []
+        return self.data or []

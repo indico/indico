@@ -145,7 +145,7 @@ class DesignerTemplate(db.Model):
 
     @hybrid_property
     def owner(self):
-        return self.event if self.event else self.category
+        return self.event or self.category
 
     @owner.comparator
     def owner(cls):

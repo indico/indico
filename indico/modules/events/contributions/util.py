@@ -104,10 +104,10 @@ def sort_contribs(contribs, sort_by):
     elif sort_by == BOASortField.session_board_number:
         key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '', c.board_number)
     elif sort_by == BOASortField.schedule_board_number:
-        key_func = lambda c: (c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
+        key_func = lambda c: (c.start_dt is None, c.start_dt, c.board_number or '')
     elif sort_by == BOASortField.session_schedule_board:
         key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '',
-                              c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
+                              c.start_dt is None, c.start_dt, c.board_number or '')
     elif sort_by == BOASortField.id:
         key_func = attrgetter('friendly_id')
     elif sort_by == BOASortField.title:

@@ -165,7 +165,7 @@ class RHCloneEvent(RHManageEventBase):
 
         if prev_form and not prev_form.validate():
             form = prev_form
-            step = step - 1
+            step -= 1
 
         if step > 4:
             # last step - perform actual cloning
@@ -236,7 +236,7 @@ class RHImportFromEvent(RHManageEventBase):
 
         if prev_form and not prev_form.validate():
             form = prev_form
-            step = step - 1
+            step -= 1
 
         elif step > 2:
             # last step - perform actual cloning

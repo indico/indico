@@ -88,7 +88,7 @@ class LinkMixin:
         args = tuple(_make_checks(cls.allowed_link_types))
         if cls.unique_links:
             extra_criteria = [cls.unique_links] if isinstance(cls.unique_links, str) else None
-            args = args + tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
+            args += tuple(_make_uniques(cls.allowed_link_types, extra_criteria))
         return args
 
     @classmethod

@@ -9,6 +9,7 @@ import json
 import os
 import subprocess
 from distutils.command.build import build
+from pathlib import Path
 
 from setuptools import setup
 
@@ -32,15 +33,14 @@ class BuildWithTranslations(build):
 
     def _compile_languages_react(self):
         for locale in os.listdir('indico/translations'):
-            po_file = os.path.join('indico/translations', locale, 'LC_MESSAGES', 'messages-react.po')
-            json_file = os.path.join('indico/translations', locale, 'LC_MESSAGES', 'messages-react.json')
-            if not os.path.exists(po_file):
+            po_file = Path('indico/translations') / locale / 'LC_MESSAGES' / 'messages-react.po'
+            json_file = Path('indico/translations') / locale / 'LC_MESSAGES' / 'messages-react.json'
+            if not po_file.exists():
                 continue
             with open(os.devnull, 'w') as devnull:
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], stderr=devnull)
             json.loads(output)  # just to be sure the JSON is valid
-            with open(json_file, 'wb') as f:
-                f.write(output)
+            json_file.write_bytes(output)
 
     def run(self):
         self._compile_languages()

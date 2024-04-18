@@ -39,7 +39,7 @@ class LogRecordStreamHandler(StreamRequestHandler):
             size = struct.unpack(b'>L', chunk)[0]
             chunk = self.connection.recv(size)
             while len(chunk) < size:
-                chunk = chunk + self.connection.recv(size - len(chunk))
+                chunk += self.connection.recv(size - len(chunk))
             obj = pickle.loads(chunk)  # noqa: S301
             self.handle_log(obj)
 

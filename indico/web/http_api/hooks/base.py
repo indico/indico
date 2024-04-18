@@ -75,14 +75,14 @@ class HTTPAPIHook:
         return None, None
 
     @staticmethod
-    def register(cls):
+    def register(hook_cls):
         """Register a hook.
 
         To use it, simply decorate the hook class with this method.
         """
-        assert cls.RE is not None
-        HTTPAPIHook.HOOK_LIST.append(cls)
-        return cls
+        assert hook_cls.RE is not None
+        HTTPAPIHook.HOOK_LIST.append(hook_cls)
+        return hook_cls
 
     @classmethod
     def _matchPath(cls, path):
