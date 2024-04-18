@@ -18,11 +18,14 @@ import {ConfirmButton} from 'indico/react/components';
 import {handleSubmitError} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
+import {injectModal} from 'indico/react/util';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {FinalMarkdownEditor} from '../MarkdownEditor';
 import {FinalTinyMCETextEditor} from '../TinyMCETextEditor';
+
+import {ConflictModal} from './ConflictModal';
 
 import 'react-markdown-editor-lite/lib/index.css';
 
@@ -31,9 +34,10 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [loading, setLoading] = useState(false);
   const [allowWithoutChange, setAllowWithoutChange] = useState(false);
   const [converting, setConverting] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [shouldReloadPage, setShouldReloadPage] = useState(false);
   const [renderMode, setRenderMode] = useState(undefined);
   const [closeAndReload, setCloseAndReload] = useState(false);
+  const [currentNoteRevision, setCurrentNoteRevision] = useState(null);
 
   const combineNotes = (resp, mode) => {
     if (mode === 'markdown') {
@@ -71,6 +75,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
     try {
       resp = await indicoAxios.get(getNoteURL || apiURL);
       resp = camelizeKeys(resp);
+      setCurrentNoteRevision(resp.data);
     } catch (error) {
       handleAxiosError(error);
       return;
@@ -103,9 +108,9 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       setCurrentInput('');
       getUserPreferences();
     }
-  }, [apiURL, getNoteURL]);
+  }, [getNoteURL, apiURL, setCurrentNoteRevision]);
 
-  const handleSubmit = async ({source}) => {
+  const handleSubmit = async ({source, forceRevision}) => {
     // getData is currently unused, keeping it around in case we need to enable lazyValue
     // for the TinyMCE editor widget in case larger notes cause performance issues that
     // can be resolved by only rendering them to an html string at submission time
@@ -114,16 +119,37 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       if (!currentValue) {
         await indicoAxios.delete(apiURL);
       } else {
-        await indicoAxios.post(apiURL, {
+        const resp = await indicoAxios.post(apiURL, {
           source: currentValue,
           render_mode: renderMode,
+          revision_id: forceRevision || currentNoteRevision.id,
         });
+        setCurrentNoteRevision(resp.data);
       }
     } catch (e) {
-      return handleSubmitError(e);
+      if (_.get(e, 'response.status') !== 418) {
+        return handleSubmitError(e);
+      }
+      // handle note conflict
+      const conflictData = camelizeKeys(e.response.data);
+      const resolution = await injectModal(resolve => (
+        <ConflictModal data={conflictData} onClose={action => resolve(action)} />
+      ));
+      setShouldReloadPage(true); // we know something changed outside -> reload page on dialog close
+      if (resolution === 'overwrite') {
+        return await handleSubmit({
+          source: currentValue,
+          forceRevision: e.response.data.conflict.id,
+        });
+      } else if (resolution === 'discard') {
+        setRenderMode(e.response.data.conflict.render_mode);
+        setCurrentInput(e.response.data.conflict.source);
+        setCurrentNoteRevision(conflictData.conflict);
+      }
+      return;
     }
     setCurrentInput(source);
-    setSaved(true);
+    setShouldReloadPage(true);
   };
 
   const convertToHTML = markdownSource => async () => {
@@ -163,7 +189,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           style={{minWidth: '65vw'}}
           size="large"
           initialValues={{source: currentInput}}
-          onClose={() => (saved ? setCloseAndReload(true) : closeModal(false))}
+          onClose={() => (shouldReloadPage ? setCloseAndReload(true) : closeModal(false))}
           onSubmit={handleSubmit}
           disabledUntilChange={!allowWithoutChange}
           unloadPrompt

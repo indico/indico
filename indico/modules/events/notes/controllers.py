@@ -18,7 +18,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.notes.schemas import CompiledEventNoteSchema, EventNoteSchema
-from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
+from indico.modules.events.notes.util import can_edit_note, check_note_revision, get_scheduled_notes
 from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.string import sanitize_html
@@ -71,12 +71,14 @@ class RHApiNote(RHManageNoteBase):
 
     @use_kwargs({
         'render_mode': EnumField(RenderMode, load_default=RenderMode.html),
-        'source': fields.String(required=True)
+        'source': fields.String(required=True),
+        'revision_id': fields.Integer(),
     })
-    def _process_POST(self, render_mode, source):
+    def _process_POST(self, render_mode, source, revision_id=None):
         note = EventNote.get_or_create(self.object)
         is_new = note.id is None or note.is_deleted
         is_restored = is_new and note.is_deleted
+        check_note_revision(note, revision_id, render_mode, source)
         note.create_revision(render_mode, source, session.user)
         is_changed = attrs_changed(note, 'current_revision')
         db.session.add(note)
@@ -94,17 +96,18 @@ class RHApiNote(RHManageNoteBase):
             logger.info('Note %s modified by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.change, 'Minutes', 'Updated minutes',
                            session.user, data=note.link_event_log_data)
-        return '', 204
+        return EventNoteSchema().jsonify(note.current_revision)
 
     def _process_DELETE(self):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
+        current_note_revision = None if note is None else note.current_revision
         if note is not None:
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
             logger.info('Note %s deleted by %s', note, session.user)
             self.event.log(EventLogRealm.participants, LogKind.negative, 'Minutes', 'Removed minutes',
                            session.user, data=note.link_event_log_data)
-        return '', 204
+        return EventNoteSchema().jsonify(current_note_revision)
 
 
 class RHApiCompileNotes(RHManageNoteBase):

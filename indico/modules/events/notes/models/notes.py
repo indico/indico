@@ -19,11 +19,11 @@ from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.searchable import fts_matches, make_fts_index
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.settings import autolinker_settings
+from indico.modules.events.notes.util import render_note
 from indico.util.date_time import now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
-from indico.util.string import AutoLinkExtension, HTMLLinker, render_markdown, text_to_repr
+from indico.util.string import text_to_repr
 
 
 class EventNote(LinkMixin, db.Model):
@@ -254,14 +254,7 @@ def _render_revision(attr, target, value, *unused):
     if source is None or render_mode is None:
         return
 
-    autolinker_rules = autolinker_settings.get('rules')
-
-    if render_mode == RenderMode.html:
-        target.html = HTMLLinker(autolinker_rules).process(source)
-    elif render_mode == RenderMode.markdown:
-        target.html = render_markdown(source, extensions=('nl2br', AutoLinkExtension(autolinker_rules)))
-    else:  # pragma: no cover
-        raise ValueError(f'Invalid render mode: {render_mode}')
+    target.html = render_note(source, render_mode)
 
 
 listen(EventNoteRevision.render_mode, 'set', partial(_render_revision, 'render_mode'))
