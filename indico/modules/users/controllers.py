@@ -34,6 +34,7 @@ from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
+from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
@@ -433,6 +434,21 @@ class RHUserPreferences(RHUserBase):
 class RHUserPreferencesMarkdownAPI(RHUserBase):
     def _process(self):
         return jsonify(self.user.settings.get('use_markdown_for_minutes'))
+
+
+class RHUserPreferencesMastodonServer(RHUserBase):
+    @use_kwargs({
+        'server_url': fields.String(
+            validate=validate_with_message(lambda x: not x or x.startswith('https://'),
+                reason=_('Invalid Mastodon server URL'))
+        )
+    })
+    def _process_PATCH(self, server_url):
+        if not social_settings.get('enabled'):
+            raise Forbidden('The social share widget is not enabled.')
+
+        self.user.settings.set('mastodon_server_url', server_url)
+        return '', 204
 
 
 class RHUserFavorites(RHUserBase):

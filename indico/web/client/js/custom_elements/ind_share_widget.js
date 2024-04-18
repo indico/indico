@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
+
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
@@ -17,9 +19,11 @@ import {
   Icon,
   Grid,
   GridColumn,
+  Message,
 } from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import './ind_share_widget.module.scss';
 
 const copyToClipboard = url => {
@@ -43,13 +47,13 @@ const copyToClipboard = url => {
 const calendarButtons = (googleCalParams, outlookCalParams) => {
   const calendars = [
     {
-      name: Translate.string('Google Calendar'),
+      name: 'Google Calendar',
       logo: `${Indico.Urls.ImagesBase}/google_cal.svg`,
       url: 'https://www.google.com/calendar/render?',
       params: googleCalParams,
     },
     {
-      name: Translate.string('Outlook'),
+      name: 'Outlook',
       logo: `${Indico.Urls.ImagesBase}/outlook.svg`,
       url: 'https://outlook.office.com/calendar/deeplink/compose?',
       color: 'blue',
@@ -69,8 +73,8 @@ const calendarButtons = (googleCalParams, outlookCalParams) => {
             color={calendar.color}
             styleName="share-button"
           >
-            <img src={calendar.logo} alt={calendar.name} />
-            <span>{calendar.name}</span>
+            <img src={calendar.logo} alt={Translate.string(calendar.name)} />
+            <Translate as="span">{calendar.name}</Translate>
           </Button>
         </GridColumn>
       ))}
@@ -81,34 +85,98 @@ const calendarButtons = (googleCalParams, outlookCalParams) => {
 const socialButtons = text => {
   const networks = [
     {
-      name: Translate.string('Mastodon'),
+      name: 'Mastodon',
       logo: `${Indico.Urls.ImagesBase}/mastodon.svg`,
-      url: `${Indico.User.mastodon_server_url}/share?text=${text}`,
+      url: `${Indico.User.mastodonServerURL}/share?text=${text}`,
       color: 'violet',
     },
     {
-      name: Translate.string('Twitter'),
+      name: 'Twitter',
       logo: `${Indico.Urls.ImagesBase}/twitter.svg`,
       url: `https://twitter.com/intent/tweet?text=${text}`,
       color: 'blue',
     },
   ];
 
+  const setPreferredMastodonServer = serverURL => async () => {
+    try {
+      await indicoAxios.patch(userPreferencesMastodonServer(), {server_url: serverURL});
+      console.log('Mastodon server URL saved');
+    } catch (error) {
+      handleAxiosError(error);
+      console.log('Error saving Mastodon server URL');
+    }
+  };
+
+  const emptyMastodonServerPopup = () => (
+    <Popup.Content>
+      <Message icon info styleName="empty-mastodon-server-notice">
+        <Icon name="wrench" />
+        <Translate>
+          You have not added a preferred Mastodon server on your profile yet. Please add one below.
+        </Translate>
+      </Message>
+      <Input
+        label={
+          <Button
+            icon="save"
+            positive
+            onClick={() => {
+              // TODO: Use FinalForm for this
+              const mastodonServerURL = document.getElementById('mastodon-server-url').value;
+              setPreferredMastodonServer(mastodonServerURL);
+            }}
+            content={Translate.string('Save')}
+          />
+        }
+        id="mastodon-server-url"
+        required
+        labelPosition="right"
+        placeholder="https://mastodon.social"
+        fluid
+      />
+    </Popup.Content>
+  );
+
+  const isMastodonConfigured = Indico.User.mastodonServerURL;
+
   return (
     <Grid columns={2} stretched>
       {networks.map(network => (
         <GridColumn key={network.name} styleName="share-button-column">
-          <Button
-            as="a"
-            href={network.url}
-            target="_blank"
-            basic
-            color={network.color}
-            styleName="share-button"
-          >
-            <img src={network.logo} alt={network.name} />
-            <span>{network.name}</span>
-          </Button>
+          {!isMastodonConfigured && network.name === 'Mastodon' ? (
+            <Popup
+              wide
+              pinned
+              position="top right"
+              trigger={
+                <Button
+                  basic
+                  color={network.color}
+                  styleName="share-button"
+                  onClick={e => e.preventDefault()}
+                >
+                  <img src={network.logo} alt={Translate.string(network.name)} />
+                  <Translate as="span">{network.name}</Translate>
+                </Button>
+              }
+              on="click"
+            >
+              {emptyMastodonServerPopup()}
+            </Popup>
+          ) : (
+            <Button
+              as="a"
+              href={network.url}
+              target="_blank"
+              basic
+              color={network.color}
+              styleName="share-button"
+            >
+              <img src={network.logo} alt={Translate.string(network.name)} />
+              <span>{network.name}</span>
+            </Button>
+          )}
         </GridColumn>
       ))}
     </Grid>
@@ -124,6 +192,7 @@ function ShareWidget({
   outlookCalParams,
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  console.log('isPopupOpen:', isPopupOpen);
   return (
     <Popup
       trigger={

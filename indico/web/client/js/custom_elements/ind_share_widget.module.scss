@@ -37,22 +37,26 @@
   }
 }
 
-.share-button {
-  width: 100%;
-
-  img {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    vertical-align: middle;
-  }
-
-  span {
-    vertical-align: middle;
-  }
-}
-
 .share-button-column {
   padding-top: 0.75rem !important;
   padding-bottom: 0.75rem !important;
+
+  .share-button {
+    width: 100%;
+
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    span {
+      vertical-align: middle;
+    }
+  }
+}
+
+.empty-mastodon-server-notice :global(.icon.wrench) {
+  font-size: 1.5em !important;
 }

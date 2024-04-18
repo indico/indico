@@ -17,9 +17,10 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
                                               RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesAPI,
                                               RHUserFavoritesCategoryAPI, RHUserFavoritesEventAPI, RHUserPreferences,
-                                              RHUserPreferencesMarkdownAPI, RHUsersAdmin, RHUsersAdminCreate,
-                                              RHUsersAdminMerge, RHUsersAdminMergeCheck, RHUsersAdminSettings,
-                                              RHUserSearch, RHUserSearchInfo, RHUserSuggestionsRemove)
+                                              RHUserPreferencesMarkdownAPI, RHUserPreferencesMastodonServer,
+                                              RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
+                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
+                                              RHUserSearchInfo, RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -59,6 +60,8 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
                      'profile_picture_preview', RHProfilePicturePreview)
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/api/preferences/markdown', 'user_preferences_markdown_api', RHUserPreferencesMarkdownAPI)
+    _bp.add_url_rule('/api/preferences/mastodon_server', 'user_preferences_mastodon_server',
+                     RHUserPreferencesMastodonServer, methods=('PATCH',))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/api/favorites/users', 'favorites_api', RHUserFavoritesAPI)
     _bp.add_url_rule('/api/favorites/users/<int:fav_user_id>', 'favorites_api', RHUserFavoritesAPI,
