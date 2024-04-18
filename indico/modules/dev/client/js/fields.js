@@ -17,6 +17,7 @@ import {
   FinalSingleDatePicker,
   FinalSingleFileManager,
   FinalTinyMCETextEditor,
+  FinalReferencesField,
 } from 'indico/react/components';
 import {FinalMarkdownEditor} from 'indico/react/components/MarkdownEditor';
 import {
@@ -106,6 +107,12 @@ const getFields = () => {
       ],
       sortable: false,
       canDisableItem: true,
+    },
+    {
+      title: 'References field',
+      component: FinalReferencesField,
+      initialValue: [],
+      referenceTypes: [{id: 1, name: 'Type 1'}, {id: 2, name: 'Type 2'}, {id: 3, name: 'Type 3'}],
     },
   ];
 };
