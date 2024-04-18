@@ -98,25 +98,21 @@ def check_note_revision(note, previous_revision_id, render_mode, source):
         if note.current_revision_id and not note.is_deleted:
             conflicting_note = EventNoteSchema().dump(note.current_revision)
             raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note,
-                                html=render_source_mode(render_mode, source))
+                                html=render_note(source, render_mode))
         return
 
     if note.current_revision_id != previous_revision_id:
         conflicting_note = EventNoteSchema().dump(note.current_revision)
         raise ExpectedError('The note has been modified in the meantime', conflict=conflicting_note,
-                            html=render_source_mode(render_mode, source))
+                            html=render_note(source, render_mode))
 
 
-def render_source_mode(mode, source):
-    """Renders the source content in the given mode."""
+def render_note(source, mode):
+    """Render a note from source using the specified render mode."""
     from indico.core.db.sqlalchemy.descriptions import RenderMode
-
     autolinker_rules = autolinker_settings.get('rules')
-
     if mode == RenderMode.html:
         return HTMLLinker(autolinker_rules).process(source)
-
     if mode == RenderMode.markdown:
         return render_markdown(source, extensions=('nl2br', AutoLinkExtension(autolinker_rules)))
-
     raise ValueError(f'Invalid render mode: {mode}')
