@@ -34,7 +34,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
   const [loading, setLoading] = useState(false);
   const [allowWithoutChange, setAllowWithoutChange] = useState(false);
   const [converting, setConverting] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [shouldReloadPage, setShouldReloadPage] = useState(false);
   const [renderMode, setRenderMode] = useState(undefined);
   const [closeAndReload, setCloseAndReload] = useState(false);
   const [currentNoteRevision, setCurrentNoteRevision] = useState(null);
@@ -135,6 +135,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       const resolution = await injectModal(resolve => (
         <ConflictModal data={conflictData} onClose={action => resolve(action)} />
       ));
+      setShouldReloadPage(true); // we know something changed outside -> reload page on dialog close
       if (resolution === 'overwrite') {
         return await handleSubmit({
           source: currentValue,
@@ -148,7 +149,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       return;
     }
     setCurrentInput(source);
-    setSaved(true);
+    setShouldReloadPage(true);
   };
 
   const convertToHTML = markdownSource => async () => {
@@ -188,7 +189,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
           style={{minWidth: '65vw'}}
           size="large"
           initialValues={{source: currentInput}}
-          onClose={() => (saved ? setCloseAndReload(true) : closeModal(false))}
+          onClose={() => (shouldReloadPage ? setCloseAndReload(true) : closeModal(false))}
           onSubmit={handleSubmit}
           disabledUntilChange={!allowWithoutChange}
           unloadPrompt
