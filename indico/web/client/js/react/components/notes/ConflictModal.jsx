@@ -25,13 +25,10 @@ import {
 } from 'semantic-ui-react';
 
 import {Param, Translate} from 'indico/react/i18n';
-import {camelizeKeys} from 'indico/utils/case';
 
 import './ConflictModal.module.scss';
 
-export function ConflictModal({noteData, onClose}) {
-  const note = camelizeKeys(noteData);
-
+export function ConflictModal({data, onClose}) {
   // refs to the current and conflict output elements for syncing scroll
   const currentChangesRef = useRef();
   const conflictChangesRef = useRef();
@@ -73,10 +70,10 @@ export function ConflictModal({noteData, onClose}) {
                 Last modified:{' '}
                 <Param
                   name="relative_time"
-                  value={renderLastModifiedDt(note.conflict.createdDt)}
+                  value={renderLastModifiedDt(data.conflict.createdDt)}
                   wrapper={<strong />}
                 />{' '}
-                by <Param name="author" value={note.conflict.noteAuthor} wrapper={<strong />} />
+                by <Param name="author" value={data.conflict.noteAuthor} wrapper={<strong />} />
                 {'. '}You can either:
               </Translate>
             </p>
@@ -120,7 +117,7 @@ export function ConflictModal({noteData, onClose}) {
               <Card raised fluid>
                 <CardContent>
                   <div
-                    dangerouslySetInnerHTML={{__html: note.html}}
+                    dangerouslySetInnerHTML={{__html: data.html}}
                     className="editor-output"
                     styleName="conflict-content"
                     ref={currentChangesRef}
@@ -137,11 +134,11 @@ export function ConflictModal({noteData, onClose}) {
                   'The changes made by someone else since you started editing'
                 )}
               />
-              {note.conflict.html ? (
+              {data.conflict.html ? (
                 <Card raised fluid>
                   <CardContent>
                     <div
-                      dangerouslySetInnerHTML={{__html: note.conflict.html}}
+                      dangerouslySetInnerHTML={{__html: data.conflict.html}}
                       className="editor-output"
                       styleName="conflict-content"
                       ref={conflictChangesRef}
@@ -188,6 +185,9 @@ export function ConflictModal({noteData, onClose}) {
 }
 
 ConflictModal.propTypes = {
-  noteData: PropTypes.object.isRequired,
+  data: PropTypes.shape({
+    conflict: PropTypes.object.isRequired,
+    html: PropTypes.string.isRequired,
+  }).isRequired,
   onClose: PropTypes.func.isRequired,
 };

@@ -131,8 +131,9 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
         return handleSubmitError(e);
       }
       // handle note conflict
+      const conflictData = camelizeKeys(e.response.data);
       const resolution = await injectModal(resolve => (
-        <ConflictModal noteData={e.response.data} onClose={action => resolve(action)} />
+        <ConflictModal data={conflictData} onClose={action => resolve(action)} />
       ));
       if (resolution === 'overwrite') {
         return await handleSubmit({
@@ -142,6 +143,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       } else if (resolution === 'discard') {
         setRenderMode(e.response.data.conflict.render_mode);
         setCurrentInput(e.response.data.conflict.source);
+        setCurrentNoteRevision(conflictData.conflict);
       }
       return;
     }
