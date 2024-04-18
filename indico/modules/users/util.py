@@ -107,7 +107,7 @@ def get_suggested_categories(user):
     return res
 
 
-def get_linked_events(user, dt, limit=None, load_also=()):
+def get_linked_events(user, dt=None, limit=None, load_also=()):
     """Get the linked events and the user's roles in them.
 
     :param user: A `User`

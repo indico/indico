@@ -71,14 +71,13 @@ IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_
 UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'avatar_url', 'user'})
 
 
-def get_events_in_categories(category_ids, user, limit=10):
+def get_events_in_categories(category_ids, user, from_, limit=10):
     """Get all the user-accessible events in a given set of categories."""
     tz = session.tzinfo
-    today = now_utc(False).astimezone(tz).date()
     query = (Event.query
              .filter(~Event.is_deleted,
                      Event.category_chain_overlaps(category_ids),
-                     Event.start_dt.astimezone(session.tzinfo) >= today)
+                     Event.start_dt.astimezone(session.tzinfo) >= from_.astimezone(tz).date())
              .options(joinedload('category').load_only('id', 'title'),
                       joinedload('series'),
                       joinedload('label'),
@@ -137,7 +136,7 @@ class RHUserDashboard(RHUserBase):
         categories_events = []
         if categories:
             category_ids = {c['categ'].id for c in categories.values()}
-            categories_events = get_events_in_categories(category_ids, self.user)
+            categories_events = get_events_in_categories(category_ids, self.user, now_utc(False))
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
         linked_events = [(event, {'management': bool(roles & self.management_roles),
                                   'reviewing': bool(roles & self.reviewer_roles),
@@ -159,9 +158,9 @@ class RHExportDashboardICS(RHProtected):
         return session.user
 
     @use_kwargs({
-        'from_': HumanizedDate(data_key='from', load_default=lambda: now_utc(False) - relativedelta(weeks=1)),
+        'from_': HumanizedDate(data_key='from', load_default=None),
         'include': fields.List(fields.Str(), load_default=lambda: {'linked', 'categories'}),
-        'limit': fields.Integer(load_default=100, validate=lambda v: 0 < v <= 500)
+        'limit': fields.Integer(load_default=250, validate=lambda v: 0 < v <= 500)
     }, location='query')
     def _process(self, from_, include, limit):
         user = self._get_user()
@@ -177,7 +176,8 @@ class RHExportDashboardICS(RHProtected):
 
         if 'categories' in include and (categories := get_related_categories(user)):
             category_ids = {c['categ'].id for c in categories.values()}
-            all_events |= set(get_events_in_categories(category_ids, user, limit=limit))
+            cats_from = from_ or (now_utc(False) - relativedelta(months=2, hour=0, minute=0, second=0))
+            all_events |= set(get_events_in_categories(category_ids, user, cats_from, limit=limit))
 
         all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
 
