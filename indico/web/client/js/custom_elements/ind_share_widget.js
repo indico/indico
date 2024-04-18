@@ -82,7 +82,7 @@ const calendarButtons = (googleCalParams, outlookCalParams) => {
   );
 };
 
-const socialButtons = text => {
+const socialButtons = (text, setMastodonOpen) => {
   const networks = [
     {
       name: 'Mastodon',
@@ -149,6 +149,8 @@ const socialButtons = text => {
               wide
               pinned
               position="top right"
+              onOpen={() => setMastodonOpen(true)}
+              onClose={() => setMastodonOpen(false)}
               trigger={
                 <Button
                   basic
@@ -192,6 +194,7 @@ function ShareWidget({
   outlookCalParams,
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isMastodonOpen, setMastodonOpen] = useState(false);
   console.log('isPopupOpen:', isPopupOpen);
   return (
     <Popup
@@ -226,14 +229,15 @@ function ShareWidget({
               <Translate>Share on social media</Translate>
             </HeaderContent>
           </Header>
-          {socialButtons(`${eventName} (${eventStartDt}) · Indico (${eventUrl})`)}
+          {socialButtons(`${eventName} (${eventStartDt}) · Indico (${eventUrl})`, setMastodonOpen)}
         </>
       }
       on="click"
       onOpen={() => setIsPopupOpen(true)}
-      onClose={() => setIsPopupOpen(false)}
+      onClose={() => !isMastodonOpen && setIsPopupOpen(false)}
       position="top right"
       pinned
+      open={isPopupOpen}
       wide="very"
       style={{width: '450px'}}
     />
