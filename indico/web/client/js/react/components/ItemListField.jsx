@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
-import {Button, Ref} from 'semantic-ui-react';
+import {Button, Form, Ref} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -72,6 +72,7 @@ function Item({
               onChange={makeOnChange(name)}
               onFocus={onFocus}
               onBlur={onBlur}
+              type={as ? undefined : 'text'}
               {...extraProps}
             />
           </td>
@@ -161,11 +162,11 @@ export default function ItemListField({
   itemShape,
   sortable,
   disabled,
+  scrollable,
   canDisableItem,
   canRemoveItem,
   isItemEnabledKey,
   idKey,
-  generateNewItemId,
   ...rest
 }) {
   const makeOnDelete = index => () => onChange(value.filter((__, idx) => index !== idx));
@@ -186,7 +187,7 @@ export default function ItemListField({
       newItem[isItemEnabledKey] = true;
     }
     if (!(idKey in newItem)) {
-      newItem[idKey] = generateNewItemId ? generateNewItemId() : nanoid();
+      newItem[idKey] = `new:${nanoid()}`;
     }
     onChange([...value, newItem]);
   };
@@ -234,11 +235,14 @@ export default function ItemListField({
   return (
     <>
       {sortable ? (
-        <SortableWrapper styleName="items-table-wrapper" accept="item-list-field-item">
+        <SortableWrapper
+          styleName={scrollable ? 'items-table-wrapper' : undefined}
+          accept="item-list-field-item"
+        >
           {itemsTable}
         </SortableWrapper>
       ) : (
-        <div styleName="items-table-wrapper">{itemsTable}</div>
+        <div styleName={scrollable ? 'items-table-wrapper' : undefined}>{itemsTable}</div>
       )}
       <Button type="button" onClick={handleAdd} disabled={disabled}>
         <Translate>Add new</Translate>
@@ -253,21 +257,21 @@ ItemListField.propTypes = {
   itemShape: PropTypes.arrayOf(itemValueShapeSchema).isRequired,
   disabled: PropTypes.bool,
   sortable: PropTypes.bool,
+  scrollable: PropTypes.bool,
   canDisableItem: PropTypes.bool,
   canRemoveItem: PropTypes.func,
   isItemEnabledKey: PropTypes.string,
   idKey: PropTypes.string,
-  generateNewItemId: PropTypes.func,
 };
 
 ItemListField.defaultProps = {
   disabled: false,
   sortable: false,
+  scrollable: false,
   canDisableItem: false,
   canRemoveItem: () => true,
   isItemEnabledKey: 'enabled',
   idKey: 'id',
-  generateNewItemId: null,
 };
 
 export function FinalItemListField(props) {
@@ -283,4 +287,33 @@ FinalItemListField.propTypes = {
 
 FinalItemListField.defaultProps = {
   sortable: false,
+};
+
+export function FinalReferencesField({name, referenceTypes, ...rest}) {
+  return (
+    <FinalItemListField
+      name={name}
+      itemShape={[
+        {
+          name: 'type',
+          title: Translate.string('Type'),
+          as: Form.Select,
+          fieldProps: (item, onChange) => ({
+            options: referenceTypes.map(r => ({key: r.id, value: r.id, text: r.name})),
+            onChange: (__, {value}) => onChange('type', value),
+            required: true,
+          }),
+        },
+        {name: 'value', title: Translate.string('Value'), fieldProps: {required: true}},
+      ]}
+      {...rest}
+    />
+  );
+}
+
+FinalReferencesField.propTypes = {
+  name: PropTypes.string.isRequired,
+  referenceTypes: PropTypes.arrayOf(
+    PropTypes.shape({id: PropTypes.number.isRequired, name: PropTypes.string.isRequired})
+  ).isRequired,
 };
