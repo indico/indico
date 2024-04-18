@@ -184,7 +184,7 @@ class RHPersonsBase(RHManageEventBase):
             for role in event_user_roles[event_person.user]:
                 event_user_roles_data[f'custom_{role.id}'] = {'name': role.name, 'code': role.code, 'css': role.css}
             event_user_roles_data = dict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
-            data['roles'] = data['roles'] | event_user_roles_data
+            data['roles'] |= event_user_roles_data
 
             event_person_users.add(event_person.user)
 
@@ -211,7 +211,7 @@ class RHPersonsBase(RHManageEventBase):
         for reg in regs:
             internal_role_users[reg.user.email]['registrations'].append(reg)
 
-        persons = persons | internal_role_users
+        persons |= internal_role_users
         # Some EventPersons will have no built-in roles since they were connected to deleted things
         builtin_roles = set(BUILTIN_ROLES)
         for person in persons:

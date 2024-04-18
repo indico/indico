@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import os
+from pathlib import Path
 
 from flask import Response, current_app, redirect, request, send_from_directory
 from werkzeug.exceptions import NotFound
@@ -56,12 +57,11 @@ def js_vars_global():
 
     Useful for server-wide config options, URLs, etc...
     """
-    cache_file = os.path.join(config.CACHE_DIR, f'assets_global_{indico.__version__}_{config.hash}.js')
+    cache_file = Path(config.CACHE_DIR) / f'assets_global_{indico.__version__}_{config.hash}.js'
 
-    if config.DEBUG or not os.path.exists(cache_file):
+    if config.DEBUG or not cache_file.exists():
         data = generate_global_file()
-        with open(cache_file, 'w') as f:
-            f.write(data)
+        cache_file.write_text(data)
 
     return send_file('global.js', cache_file, mimetype='application/javascript', conditional=True)
 
@@ -97,19 +97,17 @@ def _get_i18n_locale(locale_name, react=False):
 
     react_suffix = '-react' if react else ''
     try:
-        cache_file = os.path.join(
-            config.CACHE_DIR,
-            f'assets_i18n_{locale_name}{react_suffix}_{indico.__version__}_{config.hash}.js'
+        cache_file = (
+            Path(config.CACHE_DIR) / f'assets_i18n_{locale_name}{react_suffix}_{indico.__version__}_{config.hash}.js'
         )
     except UnicodeEncodeError:
         raise NotFound
 
-    if config.DEBUG or not os.path.exists(cache_file):
+    if config.DEBUG or not cache_file.exists():
         i18n_data = generate_i18n_file(locale_name, react=react)
         if i18n_data is None:
             raise NotFound
-        with open(cache_file, 'w') as f:
-            f.write('window.{} = {};'.format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
+        cache_file.write_text('window.{} = {};'.format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
     return send_file(f'{locale_name}{react_suffix}.js', cache_file, mimetype='application/javascript',
                      conditional=True)

@@ -594,7 +594,7 @@ class RHUserEmailsSetPrimary(RHUserBase):
                 update_gravatars.delay(self.user)
             flash(_('Your primary email was updated successfully.'), 'success')
             if 'email' in self.user.synced_fields:
-                self.user.synced_fields = self.user.synced_fields - {'email'}
+                self.user.synced_fields -= {'email'}
                 flash(_('Email address synchronization has been disabled since you manually changed your primary'
                         ' email address.'), 'warning')
         return redirect(url_for('.user_emails'))

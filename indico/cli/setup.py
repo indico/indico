@@ -671,8 +671,7 @@ class SetupWizard:
             os.mkdir(path)
 
         _echo(cformat('%{magenta}Creating %{magenta!}{}%{reset}%{magenta}').format(self.config_path))
-        with open(self.config_path, 'w') as f:
-            f.write(config + '\n')
+        Path(self.config_path).write_text(f'{config}\n')
 
         package_root = get_root_path('indico')
         _copy(os.path.normpath(os.path.join(package_root, 'logging.yaml.sample')),

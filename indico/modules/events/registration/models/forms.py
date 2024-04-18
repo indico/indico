@@ -401,7 +401,7 @@ class RegistrationForm(db.Model):
 
     @hybrid_property
     def is_modification_open(self):
-        end_dt = self.modification_end_dt if self.modification_end_dt else self.end_dt
+        end_dt = self.modification_end_dt or self.end_dt
         return now_utc() <= end_dt if end_dt else True
 
     @is_modification_open.expression

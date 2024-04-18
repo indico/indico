@@ -34,7 +34,7 @@ def fts_matches(column, search_string, *, exact=False):
     crit = db.func.to_tsvector('simple', column).match(preprocess_ts_string(search_string),
                                                        postgresql_regconfig='simple')
     if exact:
-        crit = crit & column.ilike(escape_like(search_string))
+        crit &= column.ilike(escape_like(search_string))
     return crit
 
 

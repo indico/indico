@@ -200,7 +200,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
     def clone_template(self, target=None):
         title = f'{self.template.title} (copy)'
-        target_dict = target if target else self.target_dict
+        target_dict = target or self.target_dict
         new_template = DesignerTemplate(title=title, type=self.template.type, **target_dict)
 
         data = deepcopy(self.template.data)

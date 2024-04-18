@@ -9,7 +9,7 @@ import dataclasses
 import operator
 import platform
 import re
-from enum import Enum
+from enum import StrEnum, auto
 
 import requests
 import yaml
@@ -37,10 +37,10 @@ logger = Logger.get('notices')
 notices_cache = make_scoped_cache('notices')
 
 
-class NoticeSeverity(str, Enum):
-    highlight = 'highlight'
-    warning = 'warning'
-    error = 'error'
+class NoticeSeverity(StrEnum):
+    highlight = auto()
+    warning = auto()
+    error = auto()
 
 
 @dataclass(frozen=True)

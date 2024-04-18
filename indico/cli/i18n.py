@@ -177,17 +177,17 @@ def _validate_all_plugins_dir(ctx, param, value):
     return plugin_dirs
 
 
-def _get_translations_dir(path):
+def _get_translations_dir(path) -> Path:
     if translation_dir := list(Path(path).glob('*/translations')):
         return translation_dir[0]
     return None
 
 
-def _get_messages(path, resource_name):
+def _get_messages(path, resource_name) -> Path | None:
     if resource_name not in ('messages.pot', 'messages-js.pot', 'messages-react.pot'):
         return None
     if translations_dir := _get_translations_dir(path):
-        return os.path.join(translations_dir, resource_name)
+        return translations_dir / resource_name
     return None
 
 
@@ -205,7 +205,7 @@ def _get_messages_react_pot(path):
 
 def find_indico_packages(path, prefix=''):
     yield prefix
-    prefix = prefix + '.'
+    prefix += '.'
     for __, name, ispkg in walk_packages(path, prefix):
         if ispkg:
             yield name
@@ -286,15 +286,14 @@ def compile_catalog_react(directory=INDICO_DIR, locale=''):
     locales = [locale] if locale else os.listdir(translations_dir)
     try:
         for loc in locales:
-            po_file = os.path.join(translations_dir, loc, 'LC_MESSAGES', 'messages-react.po')
-            json_file = os.path.join(translations_dir, loc, 'LC_MESSAGES', 'messages-react.json')
-            if not os.path.exists(po_file):
+            po_file = translations_dir / loc / 'LC_MESSAGES' / 'messages-react.po'
+            json_file = translations_dir / loc / 'LC_MESSAGES' / 'messages-react.json'
+            if not po_file.exists():
                 continue
             with _chdir(INDICO_DIR):
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
             json.loads(output)  # just to be sure the JSON is valid
-            with open(json_file, 'w') as f:
-                f.write(output)
+            json_file.write_text(output)
     except subprocess.CalledProcessError as err:
         click.secho('Error: ' + err, fg='red', bold=True, err=True)
 
@@ -318,8 +317,7 @@ def extract_messages_react(directory=INDICO_DIR):
     with _chdir(INDICO_DIR):
         output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', *paths],
                                          env=dict(os.environ, FORCE_COLOR='1'))
-    with open(_get_messages_react_pot(directory), 'wb') as f:
-        f.write(output)
+    _get_messages_react_pot(directory).write_bytes(output)
 
 
 def po_file_empty(path):

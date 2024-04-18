@@ -270,7 +270,7 @@ class TimetableEntry(db.Model):
         assert start_dt < self.start_dt
         extension = self.start_dt - start_dt
         self.start_dt = start_dt
-        self.duration = self.duration + extension
+        self.duration += extension
 
     def extend_end_dt(self, end_dt):
         diff = end_dt - self.end_dt
