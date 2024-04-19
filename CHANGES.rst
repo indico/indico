@@ -5,7 +5,7 @@ Changelog
 Version 3.3.2
 -------------
 
-*Unreleased*
+*Released on April 19, 2024*
 
 Improvements
 ^^^^^^^^^^^^
