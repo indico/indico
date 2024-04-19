@@ -18,6 +18,7 @@ export {default as IButton} from './IButton';
 export {default as MessageBox} from './MessageBox';
 export {default as Modal} from './Modal';
 export {default as Paginator} from './Paginator';
+export {default as CollapsibleContainer} from './CollapsibleContainer';
 export {default as TooltipIfTruncated} from './TooltipIfTruncated';
 export {default as SessionBlockColorPicker, FinalSessionColorPicker} from './SessionColorPicker';
 export {default as SingleDatePicker, FinalSingleDatePicker} from './dates/SingleDatePicker';

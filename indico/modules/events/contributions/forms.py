@@ -34,6 +34,7 @@ from indico.web.forms.validators import DateTimeRange, HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
 
+# TODO: delete this
 class ContributionForm(IndicoForm):
     _submitter_editable_fields = ('title', 'description', 'person_link_data')
     title = StringField(_('Title'), [DataRequired()])

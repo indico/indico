@@ -30,6 +30,7 @@ export default function SessionForm() {
           onSubmit={() => {}}
           onClose={() => setModalOpen(false)}
           initialValues={{location_data: {use_default: true}, colors: {}}}
+          size="small"
         >
           <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
           {eventType === 'conference' && (
