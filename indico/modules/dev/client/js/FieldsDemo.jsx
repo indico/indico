@@ -27,7 +27,7 @@ import getFields from './fields';
 
 import './FieldsDemo.module.scss';
 
-function FieldDemo({title, component: Component, initialValue, ...extraOptions}) {
+function FieldDemo({title, component: Component, initialValue, placeholder, ...extraOptions}) {
   const [showOptions, setShowOptions] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [output, setOutput] = useState(null);
@@ -37,8 +37,9 @@ function FieldDemo({title, component: Component, initialValue, ...extraOptions})
       initialValuesEqual={_.isEqual}
       initialValues={{
         field: initialValue,
-        options: JSON.stringify(extraOptions, null, 2),
         label: 'Field',
+        placeholder,
+        options: JSON.stringify(extraOptions, null, 2),
       }}
       subscription={{
         validating: true,
@@ -56,6 +57,8 @@ function FieldDemo({title, component: Component, initialValue, ...extraOptions})
                   Field options
                 </Header>
                 <FinalInput name="label" label="Label" />
+                <FinalTextArea name="description" label="Description" />
+                {placeholder && <FinalInput name="placeholder" label="Placeholder" />}
                 <FinalCheckbox name="disabled" label="Disabled" />
                 <FinalCheckbox name="required" label="Required" />
                 {Object.keys(extraOptions).length > 0 && (
@@ -99,15 +102,26 @@ function FieldDemo({title, component: Component, initialValue, ...extraOptions})
             </Rail>
           )}
           <FormSpy subscription={{values: true}}>
-            {({values: {label, disabled, required, options}}) => {
+            {({
+              values: {
+                label,
+                description,
+                disabled,
+                required,
+                placeholder: placeholderValue,
+                options,
+              },
+            }) => {
               try {
                 return (
                   <Segment raised>
                     <Component
                       name="field"
                       label={label}
+                      description={description}
                       disabled={disabled}
                       required={required}
+                      placeholder={placeholderValue}
                       {...JSON.parse(options)}
                     />
                   </Segment>
@@ -165,10 +179,12 @@ FieldDemo.propTypes = {
   title: PropTypes.string.isRequired,
   component: PropTypes.elementType.isRequired,
   initialValue: PropTypes.any,
+  placeholder: PropTypes.string,
 };
 
 FieldDemo.defaultProps = {
   initialValue: null,
+  placeholder: null,
 };
 
 export default function FieldsDemo() {
