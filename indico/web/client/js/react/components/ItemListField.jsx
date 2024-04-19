@@ -274,24 +274,24 @@ ItemListField.defaultProps = {
   idKey: 'id',
 };
 
-export function FinalItemListField(props) {
+export function FinalItemList(props) {
   const {sortable} = props;
   const finalField = <FinalField component={ItemListField} isEqual={_.isEqual} {...props} />;
   return sortable ? <DndProvider backend={HTML5Backend}>{finalField}</DndProvider> : finalField;
 }
 
-FinalItemListField.propTypes = {
+FinalItemList.propTypes = {
   name: PropTypes.string.isRequired,
   sortable: PropTypes.bool,
 };
 
-FinalItemListField.defaultProps = {
+FinalItemList.defaultProps = {
   sortable: false,
 };
 
-export function FinalReferencesField({name, referenceTypes, ...rest}) {
+export function FinalReferences({name, referenceTypes, ...rest}) {
   return (
-    <FinalItemListField
+    <FinalItemList
       name={name}
       itemShape={[
         {
@@ -311,7 +311,7 @@ export function FinalReferencesField({name, referenceTypes, ...rest}) {
   );
 }
 
-FinalReferencesField.propTypes = {
+FinalReferences.propTypes = {
   name: PropTypes.string.isRequired,
   referenceTypes: PropTypes.arrayOf(
     PropTypes.shape({id: PropTypes.number.isRequired, name: PropTypes.string.isRequired})
