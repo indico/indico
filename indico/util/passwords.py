@@ -66,7 +66,7 @@ class SHA256Token:
     def __repr__(self):
         return f'<SHA256Token({self.hash})>'
 
-    def __str__(self):  # noqa: PLE0307
+    def __str__(self):
         raise RuntimeError('Hashed tokens have no string representation')
 
     @staticmethod
