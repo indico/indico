@@ -11,13 +11,14 @@ import {
   FinalDatePeriod,
   FinalEmailList,
   FinalLocationField,
-  FinalItemListField,
+  FinalItemList,
   FinalPictureManager,
   FinalSessionColorPicker,
   FinalSingleDatePicker,
   FinalSingleFileManager,
   FinalTinyMCETextEditor,
-  FinalReferencesField,
+  FinalReferences,
+  FinalTagList,
 } from 'indico/react/components';
 import {FinalMarkdownEditor} from 'indico/react/components/MarkdownEditor';
 import {
@@ -99,7 +100,7 @@ const getFields = () => {
     {title: 'Session color picker', component: FinalSessionColorPicker, initialValue: {}},
     {
       title: 'Item list field',
-      component: FinalItemListField,
+      component: FinalItemList,
       initialValue: [],
       itemShape: [
         {name: 'name', title: 'Name', fieldProps: {type: 'text'}},
@@ -110,9 +111,15 @@ const getFields = () => {
     },
     {
       title: 'References field',
-      component: FinalReferencesField,
+      component: FinalReferences,
       initialValue: [],
       referenceTypes: [{id: 1, name: 'Type 1'}, {id: 2, name: 'Type 2'}, {id: 3, name: 'Type 3'}],
+    },
+    {
+      title: 'Tag list',
+      component: FinalTagList,
+      initialValue: [],
+      placeholder: 'Please enter a keyword',
     },
   ];
 };
