@@ -26,6 +26,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
+import ContributionForm from './ContributionForm';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 
@@ -52,6 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 (function(global) {
+  global.setupContributionForm = function setupContributionForm() {
+    const root = document.querySelector('#contrib-form-container');
+    if (root) {
+      ReactDOM.render(<ContributionForm />, root);
+    }
+  };
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
     const editableSubmissionButton = document.querySelector('#editable-submission-button');
     if (!editableSubmissionButton) {

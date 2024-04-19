@@ -24,11 +24,12 @@ export default function SessionBlockForm() {
       <Button onClick={() => setModalOpen(true)}>Open Block Form</Button>
       {modalOpen && (
         <FinalModalForm
-          id="session-form"
+          id="session-block-form"
           header={Translate.string('Edit block ???')}
           onSubmit={() => {}}
           onClose={() => setModalOpen(false)}
           initialValues={{person_links: [], location_data: {use_default: true}}}
+          size="small"
         >
           <FinalInput
             name="title"
