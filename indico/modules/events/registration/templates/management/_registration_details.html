@@ -169,7 +169,7 @@
     {% set can_reset = registration.registration_form.moderation_enabled and not registration.is_paid %}
     {% set ticket_template = registration.registration_form.get_ticket_template() %}
     {% set can_get_ticket = registration.registration_form.tickets_enabled and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
-    {% set can_get_document = true %}
+    {% set can_get_document = registration.registration_form.has_templates() %}
     {% if can_reset or can_get_ticket or can_get_document %}
         <div class="toolbar">
             {% if can_reset %}

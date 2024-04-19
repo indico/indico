@@ -600,6 +600,11 @@ class RegistrationForm(db.Model):
         """Log with prefilled metadata for the regform."""
         return self.event.log(*args, meta={'registration_form_id': self.id}, **kwargs)
 
+    def has_templates(self):
+        """Check if event has templates for the documents."""
+        from indico.modules.receipts.util import has_any_templates
+        return has_any_templates(self.event)
+
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():
