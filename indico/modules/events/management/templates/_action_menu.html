@@ -127,19 +127,21 @@
                    </a>
                 {% endif %}
 
-                <div class="group">
-                    <button class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
-                       data-href="{{ url_for('event_management.clone', event) }}"
-                       data-title="{% trans %}Clone Event{% endtrans %}"
-                       data-ajax-dialog>
-                        {% trans %}Clone{% endtrans %}
-                    </button>
-                    {% if clones %}
-                        <a id="event-action-menu-clones-target" class="i-button label clickable arrow">
-                            {{- clones|length -}}
-                        </a>
-                    {% endif %}
-                </div>
+                {% block event_clone_actions scoped %}
+                    <div class="group">
+                        <button class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
+                                data-href="{{ url_for('event_management.clone', event) }}"
+                                data-title="{% trans %}Clone Event{% endtrans %}"
+                                data-ajax-dialog>
+                            {% trans %}Clone{% endtrans %}
+                        </button>
+                        {% if clones %}
+                            <a id="event-action-menu-clones-target" class="i-button label clickable arrow">
+                                {{- clones|length -}}
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endblock %}
 
                 <button id="event-action-menu-actions-target" class="i-button icon-settings i-button arrow"
                    title="{% trans %}Event actions{% endtrans %}"></button>
