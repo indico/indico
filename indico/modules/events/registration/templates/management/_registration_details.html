@@ -183,7 +183,7 @@
             {% if can_get_document %}
                 <a href="#" class="i-button accept icon-agreement"
                 data-callback="printReceipts"
-                data-params='{"registration_id":["{{registration.id}}"], "event_id":{{registration.registration_form.event.id}}}'>
+                data-params="{{ {'registration_id': ['registration.id'], 'event_id': registration.registration_form.event.id} | tojson | forceescape }}">
                     {% trans %}Get document{% endtrans %}
                 </a>
             {% endif %}
