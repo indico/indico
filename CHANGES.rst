@@ -10,7 +10,7 @@ Version 3.3.3
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add dialog to contact event participants about a survey (:issue:`6069`, :pr:`6144`)
 
 Bugfixes
 ^^^^^^^^

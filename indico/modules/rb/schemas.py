@@ -40,7 +40,7 @@ from indico.modules.rb.util import WEEKDAYS, rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import (ModelList, NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList,
-                                     not_empty, validate_placeholders)
+                                     not_empty, validate_format_placeholders)
 from indico.util.string import natural_sort_key
 
 
@@ -477,13 +477,13 @@ class LocationArgs(mm.Schema):
 
     @validates('room_name_format')
     def _check_room_name_format_placeholders(self, room_name_format, **kwargs):
-        validate_placeholders(room_name_format, {'site', 'building', 'floor', 'number'}, {'number'})
+        validate_format_placeholders(room_name_format, {'site', 'building', 'floor', 'number'}, {'number'})
 
     @validates('map_url_template')
     def _check_map_url_template_placeholders(self, map_url_template, **kwargs):
         if not map_url_template:
             return
-        validate_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
+        validate_format_placeholders(map_url_template, {'id', 'building', 'floor', 'number', 'lat', 'lng'})
 
 
 class FeatureArgs(mm.Schema):

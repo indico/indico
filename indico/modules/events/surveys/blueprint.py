@@ -19,15 +19,24 @@ from indico.modules.events.surveys.controllers.management.questionnaire import (
 from indico.modules.events.surveys.controllers.management.results import (RHDeleteSubmissions, RHDisplaySubmission,
                                                                           RHExportSubmissionsCSV,
                                                                           RHExportSubmissionsExcel, RHSurveyResults)
-from indico.modules.events.surveys.controllers.management.survey import (RHCloseSurvey, RHCreateSurvey, RHDeleteSurvey,
-                                                                         RHEditSurvey, RHManageSurvey, RHManageSurveys,
-                                                                         RHOpenSurvey, RHScheduleSurvey,
-                                                                         RHSendSurveyLinks)
+from indico.modules.events.surveys.controllers.management.survey import (RHAPIEmailEventSurveyMetadata,
+                                                                         RHAPIEmailEventSurveySend, RHCloseSurvey,
+                                                                         RHCreateSurvey, RHDeleteSurvey, RHEditSurvey,
+                                                                         RHEmailEventSurveyPreview, RHManageSurvey,
+                                                                         RHManageSurveys, RHOpenSurvey,
+                                                                         RHScheduleSurvey)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_template_folder='events/surveys',
                       url_prefix='/event/<int:event_id>', event_feature='surveys')
+
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/metadata', 'email_survey_metadata',
+                 RHAPIEmailEventSurveyMetadata, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/preview', 'email_survey_preview',
+                 RHEmailEventSurveyPreview, methods=('POST',))
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/email/send', 'email_survey_send',
+                 RHAPIEmailEventSurveySend, methods=('POST',))
 
 # survey display/submission
 _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)
@@ -55,7 +64,6 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions', 'delete_submissi
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>', 'display_submission',
                  RHDisplaySubmission)
-_bp.add_url_rule('/manage/surveys/<int:survey_id>/send-links', 'send_links', RHSendSurveyLinks, methods=('POST',))
 
 # Survey questionnaire management
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)

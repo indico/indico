@@ -58,7 +58,9 @@ export function FormFieldAdapter({
   //   ...and the field has not been modified since the failed submission
   let errorMessage = null;
   let hasValidationError = false;
-  if (touched && error && (dirty || required)) {
+  if (error && hideValidationError === 'never') {
+    errorMessage = error;
+  } else if (touched && error && (dirty || required)) {
     if (!hideValidationError) {
       errorMessage = error;
     } else if (hideValidationError === 'message') {
@@ -130,7 +132,7 @@ FormFieldAdapter.propTypes = {
   disabled: PropTypes.bool,
   input: PropTypes.object.isRequired,
   required: PropTypes.bool,
-  hideValidationError: PropTypes.oneOf([true, false, 'message']),
+  hideValidationError: PropTypes.oneOf([true, false, 'message', 'never']),
   hideErrorWhileActive: PropTypes.bool,
   undefinedValue: PropTypes.any,
   label: PropTypes.string,

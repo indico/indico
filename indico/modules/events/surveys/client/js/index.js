@@ -9,6 +9,11 @@
           setupQuestionnaireSorter:false */
 
 import {BarChart, PieChart} from 'chartist';
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import {EmailSurveyParticipantsButton} from './EmailSurveyParticipantsButton';
+
 import 'chartist/dist/index.css';
 
 (function(global) {
@@ -290,5 +295,20 @@ import 'chartist/dist/index.css';
         $this.toggleClass('empty', !$this.find('li:not(.empty-msg)').length);
       },
     });
+  };
+
+  global.setupEmailSurveyParticipantsButton = function setupEmailSurveyParticipantsButton(
+    containerSelector
+  ) {
+    const element = document.querySelector(containerSelector);
+    const {eventId, surveyId, surveyActive} = element.dataset;
+    ReactDOM.render(
+      <EmailSurveyParticipantsButton
+        eventId={+eventId}
+        surveyId={+surveyId}
+        surveyActive={surveyActive !== undefined}
+      />,
+      element
+    );
   };
 })(window);
