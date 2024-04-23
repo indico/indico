@@ -74,6 +74,9 @@ UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'avata
 def get_events_in_categories(category_ids, user, from_, limit=10):
     """Get all the user-accessible events in a given set of categories."""
     tz = session.tzinfo
+    # Find events (past and future) which are closest to the current time
+    time_delta = now_utc(False) - Event.start_dt
+    absolute_time_delta = db.func.abs(db.func.extract('epoch', time_delta))
     query = (Event.query
              .filter(~Event.is_deleted,
                      Event.category_chain_overlaps(category_ids),
@@ -85,7 +88,7 @@ def get_events_in_categories(category_ids, user, from_, limit=10):
                       load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
                                 'protection_mode', 'series_id', 'series_pos', 'series_count',
                                 'label_id', 'label_message'))
-             .order_by(Event.start_dt, Event.id))
+             .order_by(absolute_time_delta, Event.id))
     return get_n_matching(query, limit, lambda x: x.can_access(user))
 
 
@@ -163,6 +166,7 @@ class RHExportDashboardICS(RHProtected):
         'limit': fields.Integer(load_default=250, validate=lambda v: 0 < v <= 500)
     }, location='query')
     def _process(self, from_, include, limit):
+        now = now_utc(False)
         user = self._get_user()
         all_events = set()
 
@@ -176,10 +180,10 @@ class RHExportDashboardICS(RHProtected):
 
         if 'categories' in include and (categories := get_related_categories(user)):
             category_ids = {c['categ'].id for c in categories.values()}
-            cats_from = from_ or (now_utc(False) - relativedelta(months=2, hour=0, minute=0, second=0))
-            all_events |= set(get_events_in_categories(category_ids, user, cats_from, limit=limit))
+            cats_from = from_ or (now - relativedelta(months=2, hour=0, minute=0, second=0))
+            all_events |= set(get_events_in_categories(category_ids, user, cats_from, limit=limit*10))
 
-        all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
+        all_events = sorted(all_events, key=lambda e: (abs(now - e.start_dt), e.id))[:limit]
 
         response = {'results': [serialize_event_for_ical(event) for event in all_events]}
         serializer = Serializer.create('ics')

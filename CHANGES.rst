@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix the dashboard iCal export returning old events instead of recent ones when the
+  maximum number of events to include is reached (:pr:`6312`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
