@@ -19,7 +19,15 @@ import {toMoment} from 'indico/utils/date';
 
 import '../../../styles/regform.module.scss';
 
-function DateInputComponent({id, value, onChange, disabled, required, dateFormat, timeFormat}) {
+export function DateInputComponent({
+  id,
+  value,
+  onChange,
+  disabled,
+  required,
+  dateFormat,
+  timeFormat,
+}) {
   const dateValue = value.split('T')[0];
   const timeValue = value.includes('T') ? value.split('T')[1] : '';
 
