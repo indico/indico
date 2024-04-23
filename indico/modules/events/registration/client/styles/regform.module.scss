@@ -239,6 +239,11 @@
         align-items: center;
         margin-bottom: 0;
 
+        :global(.field),
+        ind-combobox {
+          width: 100%;
+        }
+
         .dropdown-text {
           display: flex;
           align-items: center;
@@ -280,7 +285,8 @@
       textarea,
       input[type='email'],
       input[type='file'],
-      input[type='text'] {
+      input[type='text'],
+      ind-combobox {
         max-width: 500px;
       }
 

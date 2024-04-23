@@ -1,0 +1,80 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+@use 'design_system';
+
+ind-combobox {
+  display: inline-block;
+  position: relative;
+
+  .ui.form & [role='combobox'], // This selector is a quick fix to override the existing styles
+  [role='combobox'] {
+    padding-right: 2em;
+  }
+
+  [role='combobox'][aria-expanded='true'] {
+    // Quick hack due to high specificicity of the underlying styles
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  &::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    position: absolute;
+    top: 50%;
+    right: 0.5em;
+
+    font-size: 1.2em;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  &:has([aria-expanded='true'])::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  [aria-selected='true'] {
+    background: var(--control-alt-clickable-surface-color);
+    color: var(--control-alt-text-color);
+    outline: medium;
+  }
+
+  [role='combobox']:not([aria-expanded='true']) + [role='listbox'],
+  [role='listbox']:not(:has(:not([hidden]))) {
+    display: none;
+  }
+
+  [role='listbox'] {
+    position: absolute;
+    background: white;
+    z-index: 1;
+    min-width: 100%;
+    max-height: min(75vh, 10em);
+    overflow-y: auto;
+
+    border: 1px solid #85b7d9; // color from semantic UI
+    border-top: 0;
+    border-bottom-left-radius: 0.28571429rem; // value from semantic UI
+    border-bottom-right-radius: 0.28571429rem; // value from semantic UI
+    box-shadow: var(--control-raised-shadow);
+  }
+
+  [role='option'] {
+    list-style: none;
+    padding: 0.6em 0.4em;
+
+    &:not([aria-selected='true']) {
+      cursor: pointer;
+    }
+
+    &:not([aria-selected='true']):hover {
+      background: var(--control-clickable-surface-color);
+    }
+  }
+}
