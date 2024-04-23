@@ -143,7 +143,7 @@ class CalendarListView extends React.Component {
       const datesMatch =
         moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
         moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
-      if (!!booking.link || !datesMatch) {
+      if (booking.linkId || !datesMatch) {
         return;
       }
       const linkBtn = (
@@ -236,17 +236,10 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
-          {booking.link && (
+          {booking.linkId && (
             <TooltipIfTruncated>
               <div styleName="booking-booked-for">
-                <Translate>
-                  Linked to{' '}
-                  <Param
-                    name="linkedTo"
-                    value={booking.link.object.title}
-                    wrapper={<a href={booking.link.object.url} target="_blank" rel="noreferrer" />}
-                  />
-                </Translate>
+                <Translate>Already linked</Translate>
               </div>
             </TooltipIfTruncated>
           )}

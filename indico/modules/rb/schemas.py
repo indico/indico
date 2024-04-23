@@ -196,14 +196,14 @@ class ReservationOccurrenceLinkSchema(mm.SQLAlchemyAutoSchema):
 
 class ReservationOccurrenceSchema(mm.SQLAlchemyAutoSchema):
     reservation = Nested(ReservationSchema)
-    link = Nested(ReservationOccurrenceLinkSchema)
+    link_id = Number()
     state = EnumField(ReservationOccurrenceState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state', 'link')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state', 'link_id')
 
 
 class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
