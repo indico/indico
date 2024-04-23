@@ -77,17 +77,24 @@ def get_events_in_categories(category_ids, user, from_, limit=10):
     # Find events (past and future) which are closest to the current time
     time_delta = now_utc(False) - Event.start_dt
     absolute_time_delta = db.func.abs(db.func.extract('epoch', time_delta))
+    _room_strategy = joinedload('own_room')
+    _room_strategy.raiseload('*')
+    _room_strategy.joinedload('location').load_only('id', 'room_name_format')
+    _room_strategy.load_only('id', 'location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
     query = (Event.query
              .filter(~Event.is_deleted,
                      Event.category_chain_overlaps(category_ids),
                      Event.start_dt.astimezone(session.tzinfo) >= from_.astimezone(tz).date())
-             .options(joinedload('category').load_only('id', 'title'),
+             .options(joinedload('category').load_only('id', 'title', 'protection_mode'),
                       joinedload('series'),
                       joinedload('label'),
+                      _room_strategy,
+                      joinedload('own_venue').load_only('id', 'name'),
                       subqueryload('acl_entries'),
                       load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
                                 'protection_mode', 'series_id', 'series_pos', 'series_count',
-                                'label_id', 'label_message'))
+                                'label_id', 'label_message', 'description', 'own_room_id', 'own_venue_id',
+                                'own_room_name', 'own_venue_name'))
              .order_by(absolute_time_delta, Event.id))
     return get_n_matching(query, limit, lambda x: x.can_access(user))
 
@@ -171,11 +178,19 @@ class RHExportDashboardICS(RHProtected):
         all_events = set()
 
         if 'linked' in include:
+            _room_strategy = joinedload('own_room')
+            _room_strategy.raiseload('*')
+            _room_strategy.joinedload('location').load_only('id', 'room_name_format')
+            _room_strategy.load_only('id', 'location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
             all_events |= set(get_linked_events(
                 user,
                 from_,
                 limit=limit,
-                load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
+                load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name'),
+                extra_options=(
+                    _room_strategy,
+                    joinedload('own_venue').load_only('id', 'name'),
+                )
             ))
 
         if 'categories' in include and (categories := get_related_categories(user)):
