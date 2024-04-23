@@ -30,13 +30,9 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
   const {senders = [], subject: defaultSubject, body: defaultBody, placeholders = []} = data || {};
 
   const handleSubmit = async data => {
-    const requestData = {...data};
     let resp;
     try {
-      resp = await indicoAxios.post(
-        emailSendURL({event_id: eventId, survey_id: surveyId}),
-        requestData
-      );
+      resp = await indicoAxios.post(emailSendURL({event_id: eventId, survey_id: surveyId}), data);
     } catch (err) {
       return handleSubmitError(err);
     }
