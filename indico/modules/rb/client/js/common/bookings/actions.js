@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import fetchBookingDetailsURL from 'indico-url:rb.booking_details';
-import bookingOccurrenceLinkActionsURL from 'indico-url:rb.booking_occurrence_link_actions';
+import bookingOccurrenceLinkStateActionsURL from 'indico-url:rb.booking_occurrence_link_state_actions';
 import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_state_actions';
 import bookingStateActionsURL from 'indico-url:rb.booking_state_actions';
 import bookingDeleteURL from 'indico-url:rb.delete_booking';
@@ -104,7 +104,7 @@ export function linkBookingOccurrence(bookingId, date, eventId, onSuccess, param
   return ajaxAction(
     () =>
       indicoAxios.post(
-        bookingOccurrenceLinkActionsURL({booking_id: bookingId, date, event_id: eventId}),
+        bookingOccurrenceLinkStateActionsURL({booking_id: bookingId, date, event_id: eventId}),
         params
       ),
     BOOKING_OCCURRENCE_LINK_CHANGE_REQUEST,

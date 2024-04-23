@@ -46,13 +46,17 @@ class CalendarListView extends React.Component {
     roomFilters: PropTypes.object.isRequired,
     calendarFilters: PropTypes.object.isRequired,
     datePicker: PropTypes.object.isRequired,
-    linkData: PropTypes.object.isRequired,
+    linkData: PropTypes.object,
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
       linkBookingOccurrence: PropTypes.func.isRequired,
       fetchActiveBookings: PropTypes.func.isRequired,
       clearActiveBookings: PropTypes.func.isRequired,
     }).isRequired,
+  };
+
+  static defaultProps = {
+    linkData: null,
   };
 
   state = {
