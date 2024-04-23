@@ -1,13 +1,19 @@
 {% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
 
 {% macro render_badge_print_settings_form(form, submit=_('Download PDF'), fields=none, templates=none, registrations=()) %}
-    {% set fields = fields or ('save_values', 'dashed_border', 'page_size', 'page_orientation', 'page_layout') %}
+    {% if not fields %}
+        {% set fields = (
+            (none, ['template']),
+            (_('Page configuration'), ['save_values', 'dashed_border', 'page_size', 'page_orientation', 'page_layout'])
+        ) %}
+    {% endif %}
     {% call simple_form(form, form_header_kwargs={'id': 'badge-settings-form'}, back=_('Cancel'),
                         submit=submit, disabled_until_change=false, disable_if_locked=false) %}
-        {{ form_rows(form, fields=('template',)) }}
-        {% call form_fieldset(_('Page configuration')) %}
-            {{ form_rows(form, fields=fields) }}
-        {% endcall %}
+        {% for legend, fieldset in fields %}
+            {% call form_fieldset(legend, render_as_fieldset=(legend is not none)) %}
+                {{ form_rows(form, fields=fieldset) }}
+            {% endcall %}
+        {% endfor %}
 
         <div class="flexrow margin-editor f-j-center">
             <div class="flexcol f-a-center">
