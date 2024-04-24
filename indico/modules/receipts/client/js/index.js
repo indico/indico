@@ -19,7 +19,7 @@ window.printReceipts = function({
   injectModal(resolve => (
     <PrintReceiptsModal
       onClose={generated => {
-        if( generated && reloadAfter ) {
+        if (generated && reloadAfter) {
           location.reload();
         } else {
           resolve();
