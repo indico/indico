@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from html2text import HTML2Text
+
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.editing.schemas import EditingConfirmationAction
 from indico.web.flask.templating import get_template_module
@@ -25,6 +27,8 @@ def notify_comment(comment):
     editor = editable.editor
     submitter = next((r.user for r in editable.revisions[::-1] if r.is_submitter_revision), None)
     author = comment.user
+    ht = HTML2Text(bodywidth=0)
+    ht.pad_tables = True
     if comment.internal:
         # internal comments notify the editor and anyone who commented + can see internal comments
         recipients = _get_commenting_users(revision, check_internal_access=True) | {editor}
@@ -48,7 +52,7 @@ def notify_comment(comment):
                                       timeline_url=editable.external_timeline_url,
                                       recipient_name=recipient.first_name,
                                       contribution=editable.contribution,
-                                      text=comment.text)
+                                      text=ht.handle(comment.text))
             email = make_email(recipient.email, template=tpl)
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
