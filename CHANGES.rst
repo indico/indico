@@ -32,7 +32,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far :(
+- Improve country input accessibility (:pr:`6551`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -466,6 +466,7 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
+- Improve single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
