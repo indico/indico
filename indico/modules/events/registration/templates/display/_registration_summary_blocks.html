@@ -143,12 +143,24 @@
 
 {% macro render_receipts_list(registration, from_management=false) %}
     {% set receipts = registration.receipt_files if from_management else registration.published_receipts %}
-    {% if receipts %}
+    {% set can_get_document = registration.registration_form.has_templates() %}
+    {% if receipts or can_get_document %}
         <div class="regform-done">
             <div class="i-box-header">
-                <div class="i-box-title">
-                    {% trans %}Documents{% endtrans %}
-                </div>
+                {% if receipts %}
+                    <div class="i-box-title">
+                        {% trans %}Documents{% endtrans %}
+                    </div>
+                {% endif %}
+                {% if can_get_document %}
+                    <a href="#" class="i-button accept icon-agreement"
+                        data-callback="printReceipts"
+                        data-params="{{ {'registration_id': [registration.id|string],
+                                         'event_id': registration.registration_form.event.id,
+                                         'reload_after': true} | tojson | forceescape }}">
+                        {% trans %}Generate document{% endtrans %}
+                    </a>
+                {% endif %}
             </div>
             <div class="i-box-content">
                 <table class="registration-info">

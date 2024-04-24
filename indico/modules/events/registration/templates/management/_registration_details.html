@@ -169,8 +169,7 @@
     {% set can_reset = registration.registration_form.moderation_enabled and not registration.is_paid %}
     {% set ticket_template = registration.registration_form.get_ticket_template() %}
     {% set can_get_ticket = registration.registration_form.tickets_enabled and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
-    {% set can_get_document = registration.registration_form.has_templates() %}
-    {% if can_reset or can_get_ticket or can_get_document %}
+    {% if can_reset or can_get_ticket %}
         <div class="toolbar">
             {% if can_reset %}
                 {{ _render_reset_registration_button(registration, _('Reset approval')) }}
@@ -178,13 +177,6 @@
             {% if can_get_ticket %}
                 <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                     {% trans %}Get ticket{% endtrans %}
-                </a>
-            {% endif %}
-            {% if can_get_document %}
-                <a href="#" class="i-button accept icon-agreement"
-                data-callback="printReceipts"
-                data-params="{{ {'registration_id': [registration.id|string], 'event_id': registration.registration_form.event.id} | tojson | forceescape }}">
-                    {% trans %}Get document{% endtrans %}
                 </a>
             {% endif %}
         </div>
