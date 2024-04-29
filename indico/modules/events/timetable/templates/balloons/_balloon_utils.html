@@ -24,15 +24,17 @@
                 {{ tt_entry.end_dt | format_time(timezone=tz) -}}
             </dd>
         {% endif %}
-        {% if obj.venue_name %}
-            <dt><i class='icon-location'></i></dt>
-            <dd>
-                <div>{{ obj.room_name }} ({{ obj.venue_name }})</div>
-                {% if obj.address %}
-                    <div class="address">{{ obj.address }}</div>
-                {% endif %}
-            </dd>
-        {% endif %}
+        {% block venue_info_balloon scoped %}
+            {% if obj.venue_name %}
+                <dt><i class='icon-location'></i></dt>
+                <dd>
+                    <div>{{ obj.room_name }} ({{ obj.venue_name }})</div>
+                    {% if obj.address %}
+                        <div class="address">{{ obj.address }}</div>
+                    {% endif %}
+                </dd>
+            {% endif %}
+        {% endblock %}
     </dl>
 {% endmacro %}
 

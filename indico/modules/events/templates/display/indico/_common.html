@@ -30,25 +30,27 @@
 {% macro render_location(item, parent=none, class='item-location', header=false) -%}
     {% set show_venue = not parent or (parent.venue_name != item.venue_name) %}
     {% set show_room = item.room_name != '' %}
-    {% if show_venue or show_room %}
-        <span class="location-info {{ class }}"
-              data-qtip-html=".qtip-hidden-content"
-              data-qtip-opts='{"hide": {"fixed": true, "delay": 500}}'>
-            <i class="icon-location {{ 'header-data' if header }}"></i>
-            <span class="text">
-                {%- if show_venue and show_room -%}
-                    {{ item.room_name }}{% if item.venue_name %} ({{ item.venue_name }}){% endif %}
-                {%- elif show_venue -%}
-                    {{ item.venue_name }}
-                {%- else -%}
-                    {{ item.room_name }}
-                {%- endif -%}
+    {% block render_location scoped %}
+        {% if show_venue or show_room %}
+            <span class="location-info {{ class }}"
+                data-qtip-html=".qtip-hidden-content"
+                data-qtip-opts='{"hide": {"fixed": true, "delay": 500}}'>
+                <i class="icon-location {{ 'header-data' if header }}"></i>
+                <span class="text">
+                    {%- if show_venue and show_room -%}
+                        {{ item.room_name }}{% if item.venue_name %} ({{ item.venue_name }}){% endif %}
+                    {%- elif show_venue -%}
+                        {{ item.venue_name }}
+                    {%- else -%}
+                        {{ item.room_name }}
+                    {%- endif -%}
+                </span>
             </span>
-        </span>
-        <span class="qtip-hidden-content">
-            {{ _render_location_tip(item) }}
-        </span>
-    {% endif %}
+            <span class="qtip-hidden-content">
+                {{ _render_location_tip(item) }}
+            </span>
+        {% endif %}
+    {% endblock %}
 {%- endmacro %}
 
 {% macro render_user_data(user_data, show_title=true) -%}

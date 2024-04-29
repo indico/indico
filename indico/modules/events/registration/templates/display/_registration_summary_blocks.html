@@ -1,4 +1,5 @@
 {% macro render_registration_info(registration, from_management=false) %}
+    {{ template_hook('before-render-registration-info', registration=registration, from_management=from_management) }}
     {% for section in registration.sections_with_answered_fields if (from_management or
                                                                      (not section.is_manager_only and not section.is_deleted)) -%}
         <tr class="regform-done-title">

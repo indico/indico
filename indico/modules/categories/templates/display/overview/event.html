@@ -17,6 +17,7 @@
             {% else %}
                 {{ event.start_dt|format_time(format='HH:mm', timezone=timezone) }}
             {% endif %}
+            {{ template_hook('event-overview-extras', event=event) }}
         <td class="title">
             <a class="js-mathjax" href="{{ event.url }}">{{ event.title }}</a>
             <span class="details">
