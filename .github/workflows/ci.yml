@@ -209,7 +209,7 @@ jobs:
       # https://github.com/actions/toolkit/issues/457
       - name: Get list of changed files
         if: github.event_name == 'pull_request' && (success() || failure())
-        uses: umani/changed-files@v4.1.0
+        uses: umani/changed-files@v4.2.0
         with:
           repo-token: ${{ github.token }}
           result-encoding: json
