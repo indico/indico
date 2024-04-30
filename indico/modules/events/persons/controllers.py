@@ -7,6 +7,7 @@
 
 import itertools
 from collections import defaultdict
+from operator import itemgetter
 
 from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
@@ -244,7 +245,11 @@ class RHPersonsList(RHPersonsBase):
                                    .options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
-        person_list = sorted(persons.values(), key=lambda x: x['person'].display_full_name.lower())
+        person_list = list(persons.values())
+        # XXX: This is an optimization to avoid loading the whole list onto memory while sorting
+        persons_indexes = sorted([(i, x['person'].display_full_name.lower()) for i, x in enumerate(person_list)],
+                                 key=itemgetter(1))
+        person_list = [person_list[i] for i, __ in persons_indexes]
 
         num_no_account = 0
         for principal in itertools.chain(event_principal_query, contrib_principal_query, session_principal_query):
