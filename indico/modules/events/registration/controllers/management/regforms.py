@@ -7,6 +7,7 @@
 
 from datetime import timedelta
 from operator import itemgetter
+from uuid import uuid4
 
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
@@ -224,6 +225,8 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
     def _process(self):
         form = RegistrationFormEditForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
         if form.validate_on_submit():
+            if form.data.get('is_hidden', False) and not self.regform.uuid:
+                self.regform.uuid = str(uuid4())
             form.populate_obj(self.regform)
             db.session.flush()
             signals.event.registration_form_edited.send(self.regform)

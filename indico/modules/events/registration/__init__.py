@@ -71,7 +71,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 def _inject_regform_announcement(event, **kwargs):
     from indico.modules.events.registration.util import get_event_regforms, get_registrations_with_tickets
     if event.has_feature('registration'):
-        all_regforms = get_event_regforms(event, session.user)
+        all_regforms = get_event_regforms(event, session.user, include_hidden=False)
         user_registrations = sum(regform[1] for regform in all_regforms)
         open_and_registered_regforms = [regform[0] for regform in all_regforms if regform[0].is_open or regform[1]]
         if open_and_registered_regforms:

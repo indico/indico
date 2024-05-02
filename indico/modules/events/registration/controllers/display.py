@@ -92,6 +92,8 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
                 raise NotFound
         else:
             self.registration = self.regform.get_registration(user=session.user) if session.user else None
+            if self.regform.is_hidden and self.regform.uuid != request.args.get('form_token'):
+                raise NotFound
         if self.REGISTRATION_REQUIRED and not self.registration:
             raise Forbidden
 
