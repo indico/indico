@@ -24,7 +24,7 @@ import {getStaticData} from '../selectors';
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function PictureInput({htmlName, disabled, isRequired, minPictureSize}) {
+export default function PictureInput({htmlName, htmlId, disabled, isRequired, minPictureSize}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const initialPictureDetails = fileData ? fileData[htmlName] || null : null;
   const isManagement = useSelector(getManagement);
@@ -51,7 +51,7 @@ export default function PictureInput({htmlName, disabled, isRequired, minPicture
   const previewUrlParams = initialPictureDetails ? initialPictureDetails.locator : null;
 
   return (
-    <div styleName="file-field">
+    <div styleName="file-field" id={htmlId}>
       <FinalPictureManager
         name={htmlName}
         disabled={disabled}
@@ -66,6 +66,7 @@ export default function PictureInput({htmlName, disabled, isRequired, minPicture
 }
 
 PictureInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
