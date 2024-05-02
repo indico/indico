@@ -23,6 +23,7 @@ from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
 from indico.modules.events import Event
 from indico.modules.events.util import track_location_changes
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import search_room_args
@@ -450,6 +451,11 @@ class RHBookingOccurrenceLink(RHBookingBase):
 
     def _process(self):
         self.occurrence.linked_object = self.event
+        self.event.log(EventLogRealm.management, LogKind.other, 'Room Booking', 'Booking occurrence linked',
+                       session.user,
+                       data={'Reservation ID': self.booking.id,
+                             'Occurrence start': self.occurrence.start_dt.astimezone(self.event.tzinfo).isoformat(),
+                             'Occurrence end': self.occurrence.end_dt.astimezone(self.event.tzinfo).isoformat()})
         db.session.flush()
         return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
 
