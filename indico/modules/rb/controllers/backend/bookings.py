@@ -439,11 +439,11 @@ class RHBookingOccurrenceLink(RHBookingBase):
     def _check_access(self):
         RHBookingBase._check_access(self)
         if self.occurrence.link is not None:
-            raise Forbidden('Booking occurrence is already linked')
+            raise Forbidden('This booking occurrence is already linked')
         if not self.occurrence.can_link(session.user):
-            raise Forbidden('This user cannot link the event')
-        if not overlaps([self.event.start_dt, self.event.end_dt],
-                        [server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)],
+            raise Forbidden('You cannot create this link')
+        if not overlaps((self.event.start_dt, self.event.end_dt),
+                        (server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)),
                         inclusive=True):
             raise Forbidden('You cannot link this event during these dates')
         if not self.event.can_manage(session.user):
