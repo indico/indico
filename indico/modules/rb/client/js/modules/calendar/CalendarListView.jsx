@@ -60,7 +60,7 @@ class CalendarListView extends React.Component {
   };
 
   state = {
-    linkingConfirmOpen: false,
+    linkingConfirm: null,
   };
 
   componentDidMount() {
@@ -137,7 +137,7 @@ class CalendarListView extends React.Component {
 
   renderLink = (booking, day, linkData, linkBookingOccurrence) => {
     if (linkData) {
-      const {linkingConfirmOpen} = this.state;
+      const {linkingConfirm} = this.state;
       const {reservation} = booking;
       const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
       const datesMatch =
@@ -154,7 +154,9 @@ class CalendarListView extends React.Component {
           circular
           onClick={e => {
             e.stopPropagation();
-            this.setState({linkingConfirmOpen: true});
+            this.setState({
+              linkingConfirm: {reservationId: reservation.id, day, linkId: linkData.id},
+            });
           }}
         />
       );
@@ -163,24 +165,27 @@ class CalendarListView extends React.Component {
           <Confirm
             size="mini"
             header={Translate.string('Link event')}
-            open={linkingConfirmOpen}
+            open={
+              linkingConfirm &&
+              (linkingConfirm.reservationId === reservation.id && linkingConfirm.day === day)
+            }
             content={Translate.string('Are you sure you want to link this event?')}
             closeOnDimmerClick
             closeOnEscape
             onClose={e => {
               e.stopPropagation();
-              this.setState({linkingConfirmOpen: false});
+              this.setState({linkingConfirm: null});
             }}
             onConfirm={e => {
               e.stopPropagation();
-              this.setState({linkingConfirmOpen: false});
+              this.setState({linkingConfirm: null});
               linkBookingOccurrence(reservation.id, day, linkData.id, () =>
                 this.refetchActiveBookings(false)
               );
             }}
             onCancel={e => {
               e.stopPropagation();
-              this.setState({linkingConfirmOpen: false});
+              this.setState({linkingConfirm: null});
             }}
             onOpen={e => e.stopPropagation()}
             cancelButton={<Button content={Translate.string('Cancel')} />}
