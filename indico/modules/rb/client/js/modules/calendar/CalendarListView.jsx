@@ -143,74 +143,74 @@ class CalendarListView extends React.Component {
       isAdminOverrideEnabled,
       actions: {linkBookingOccurrence},
     } = this.props;
-    if (linkData) {
-      const {linkingConfirm} = this.state;
-      const {reservation} = booking;
-      const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
-      const datesMatch =
-        moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
-        moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
-      const canLink =
-        isAdminOverrideEnabled || reservation.bookedBySelf || reservation.bookedForSelf;
-      if (booking.linkId || !datesMatch || !canLink) {
-        return;
-      }
-      const linkBtn = (
-        <Button
-          icon={<Icon name="linkify" />}
-          primary
-          size="small"
-          circular
-          onClick={e => {
-            e.stopPropagation();
-            this.setState({
-              linkingConfirm: {reservationId: reservation.id, day, linkId: linkData.id},
-            });
-          }}
-        />
-      );
-      return (
-        <>
-          <Confirm
-            size="mini"
-            header={Translate.string('Link event')}
-            open={
-              linkingConfirm &&
-              (linkingConfirm.reservationId === reservation.id && linkingConfirm.day === day)
-            }
-            content={Translate.string('Are you sure you want to link this event?')}
-            closeOnDimmerClick
-            closeOnEscape
-            onClose={e => {
-              e.stopPropagation();
-              this.setState({linkingConfirm: null});
-            }}
-            onConfirm={e => {
-              e.stopPropagation();
-              this.setState({linkingConfirm: null});
-              linkBookingOccurrence(reservation.id, day, linkData.id, isAdminOverrideEnabled, () =>
-                this.refetchActiveBookings(false)
-              );
-            }}
-            onCancel={e => {
-              e.stopPropagation();
-              this.setState({linkingConfirm: null});
-            }}
-            onOpen={e => e.stopPropagation()}
-            cancelButton={<Button content={Translate.string('Cancel')} />}
-            confirmButton={<Button content={Translate.string('Link')} />}
-            closeIcon
-          />
-          <div style={{position: 'absolute', top: '35%', right: '5px'}}>
-            <Popup trigger={linkBtn} position="bottom center">
-              <Translate>
-                Link to <Param name="bookedFor" wrapper={<strong />} value={linkData.title} />
-              </Translate>
-            </Popup>
-          </div>
-        </>
-      );
+    if (!linkData) {
+      return;
     }
+    const {linkingConfirm} = this.state;
+    const {reservation} = booking;
+    const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
+    const datesMatch =
+      moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
+      moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+    const canLink = isAdminOverrideEnabled || reservation.bookedBySelf || reservation.bookedForSelf;
+    if (booking.linkId || !datesMatch || !canLink) {
+      return;
+    }
+    const linkBtn = (
+      <Button
+        icon={<Icon name="linkify" />}
+        primary
+        size="small"
+        circular
+        onClick={e => {
+          e.stopPropagation();
+          this.setState({
+            linkingConfirm: {reservationId: reservation.id, day, linkId: linkData.id},
+          });
+        }}
+      />
+    );
+    return (
+      <>
+        <Confirm
+          size="mini"
+          header={Translate.string('Link event')}
+          open={
+            linkingConfirm &&
+            (linkingConfirm.reservationId === reservation.id && linkingConfirm.day === day)
+          }
+          content={Translate.string('Are you sure you want to link this event?')}
+          closeOnDimmerClick
+          closeOnEscape
+          onClose={e => {
+            e.stopPropagation();
+            this.setState({linkingConfirm: null});
+          }}
+          onConfirm={e => {
+            e.stopPropagation();
+            this.setState({linkingConfirm: null});
+            linkBookingOccurrence(reservation.id, day, linkData.id, isAdminOverrideEnabled, () =>
+              this.refetchActiveBookings(false)
+            );
+          }}
+          onCancel={e => {
+            e.stopPropagation();
+            this.setState({linkingConfirm: null});
+          }}
+          onOpen={e => e.stopPropagation()}
+          cancelButton={<Button content={Translate.string('Cancel')} />}
+          confirmButton={<Button content={Translate.string('Link')} />}
+          closeIcon
+        />
+        <div style={{position: 'absolute', top: '35%', right: '5px'}}>
+          <Popup trigger={linkBtn} position="bottom center">
+            <Translate>
+              Link to <Param name="bookedFor" wrapper={<strong />} value={linkData.title} />
+            </Translate>
+          </Popup>
+        </div>
+      </>
+    );
   };
 
   renderBooking = (booking, day) => {
