@@ -126,9 +126,11 @@ def group_by_occurrence_date(occurrences, sort_by=None):
     return group_list(occurrences, key=key, sort_by=sort_by)
 
 
-def serialize_occurrences(data):
-    from indico.modules.rb.schemas import reservation_occurrences_schema
-    return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in data.items()}
+def serialize_occurrences(data, *, schema=None):
+    if schema is None:
+        from indico.modules.rb.schemas import reservation_occurrences_schema
+        schema = reservation_occurrences_schema
+    return {dt.isoformat(): schema.dump(data) for dt, data in data.items()}
 
 
 def serialize_blockings(data):

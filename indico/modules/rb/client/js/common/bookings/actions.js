@@ -100,12 +100,17 @@ export function changeBookingOccurrenceState(id, date, action, params = {}) {
   );
 }
 
-export function linkBookingOccurrence(bookingId, date, eventId, onSuccess, params = {}) {
+export function linkBookingOccurrence(bookingId, date, eventId, isAdminOverrideEnabled, onSuccess) {
+  const params = {};
+  if (isAdminOverrideEnabled) {
+    params.admin_override_enabled = true;
+  }
   return ajaxAction(
     () =>
       indicoAxios.post(
         bookingOccurrenceLinkURL({booking_id: bookingId, date, event_id: eventId}),
-        params
+        null,
+        {params}
       ),
     BOOKING_OCCURRENCE_LINK_CHANGE_REQUEST,
     [

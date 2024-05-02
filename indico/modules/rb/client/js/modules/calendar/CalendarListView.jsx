@@ -24,11 +24,12 @@ import {
   Popup,
 } from 'semantic-ui-react';
 
-import * as linkingSelectors from 'indico/modules/rb/common/linking/selectors';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {actions as bookingsActions} from '../../common/bookings';
+import {selectors as linkingSelectors} from '../../common/linking';
+import {selectors as userSelectors} from '../../common/user';
 import CardPlaceholder from '../../components/CardPlaceholder';
 
 import * as calendarActions from './actions';
@@ -47,6 +48,7 @@ class CalendarListView extends React.Component {
     calendarFilters: PropTypes.object.isRequired,
     datePicker: PropTypes.object.isRequired,
     linkData: PropTypes.object,
+    isAdminOverrideEnabled: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
       linkBookingOccurrence: PropTypes.func.isRequired,
@@ -116,7 +118,7 @@ class CalendarListView extends React.Component {
     fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, false);
   };
 
-  renderDayBookings = (day, bookings, linkData) => {
+  renderDayBookings = (day, bookings) => {
     if (!bookings.length) {
       return null;
     }
@@ -128,14 +130,19 @@ class CalendarListView extends React.Component {
           {moment(day, 'YYYY-MM-DD').format('dddd, LL')}
         </Header>
         <Card.Group itemsPerRow={4} stackable styleName="day-cards-container">
-          {bookings.map(booking => this.renderBooking(booking, day, linkData))}
+          {bookings.map(booking => this.renderBooking(booking, day))}
         </Card.Group>
         <Divider hidden />
       </div>
     );
   };
 
-  renderLink = (booking, day, linkData, linkBookingOccurrence) => {
+  renderLink = (booking, day) => {
+    const {
+      linkData,
+      isAdminOverrideEnabled,
+      actions: {linkBookingOccurrence},
+    } = this.props;
     if (linkData) {
       const {linkingConfirm} = this.state;
       const {reservation} = booking;
@@ -143,7 +150,9 @@ class CalendarListView extends React.Component {
       const datesMatch =
         moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
         moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
-      if (booking.linkId || !datesMatch) {
+      const canLink =
+        isAdminOverrideEnabled || reservation.bookedBySelf || reservation.bookedForSelf;
+      if (booking.linkId || !datesMatch || !canLink) {
         return;
       }
       const linkBtn = (
@@ -179,7 +188,7 @@ class CalendarListView extends React.Component {
             onConfirm={e => {
               e.stopPropagation();
               this.setState({linkingConfirm: null});
-              linkBookingOccurrence(reservation.id, day, linkData.id, () =>
+              linkBookingOccurrence(reservation.id, day, linkData.id, isAdminOverrideEnabled, () =>
                 this.refetchActiveBookings(false)
               );
             }}
@@ -195,7 +204,7 @@ class CalendarListView extends React.Component {
           <div style={{position: 'absolute', top: '35%', right: '5px'}}>
             <Popup trigger={linkBtn} position="bottom center">
               <Translate>
-                Link to <Param name="bookedFor" value={linkData.title} />
+                Link to <Param name="bookedFor" wrapper={<strong />} value={linkData.title} />
               </Translate>
             </Popup>
           </div>
@@ -204,9 +213,9 @@ class CalendarListView extends React.Component {
     }
   };
 
-  renderBooking = (booking, day, linkData) => {
+  renderBooking = (booking, day) => {
     const {
-      actions: {openBookingDetails, linkBookingOccurrence},
+      actions: {openBookingDetails},
     } = this.props;
     const {reservation} = booking;
     const {room, isAccepted} = reservation;
@@ -249,13 +258,13 @@ class CalendarListView extends React.Component {
             </TooltipIfTruncated>
           )}
         </Card.Content>
-        {this.renderLink(booking, day, linkData, linkBookingOccurrence)}
+        {this.renderLink(booking, day)}
       </Card>
     );
   };
 
   render() {
-    const {bookings, rowsLeft, isFetchingActiveBookings, linkData} = this.props;
+    const {bookings, rowsLeft, isFetchingActiveBookings} = this.props;
     const sortedEntries = _.sortBy(Object.entries(bookings), item => item[0]);
     const hasData = Object.keys(sortedEntries).length !== 0;
 
@@ -267,7 +276,7 @@ class CalendarListView extends React.Component {
             loadMore={this.fetchMoreBookings}
             isFetching={isFetchingActiveBookings}
           >
-            {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData, linkData))}
+            {sortedEntries.map(bookingsData => this.renderDayBookings(...bookingsData))}
             {isFetchingActiveBookings && (
               <CardPlaceholder.Group
                 count={ACTIVE_BOOKINGS_LIMIT}
@@ -296,6 +305,7 @@ export default connect(
     calendarFilters: calendarSelectors.getCalendarFilters(state),
     datePicker: calendarSelectors.getDatePickerInfo(state),
     linkData: linkingSelectors.getLinkObject(state),
+    isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
