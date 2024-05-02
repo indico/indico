@@ -90,7 +90,7 @@ function AccommodationInputComponent({
 
   return (
     <div styleName="accommodation-field">
-      <table styleName="choice-table" role="presentation">
+      <table styleName="choice-table" role="presentation" id={id}>
         <tbody>
           {choices
             .filter(c => c.isEnabled || !c.isNoAccommodation)

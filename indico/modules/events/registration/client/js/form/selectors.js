@@ -8,6 +8,8 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
+import {Translate} from 'indico/react/i18n';
+
 export const getStaticData = state => state.staticData;
 
 export const getFlatSections = state => state.sections;
@@ -66,4 +68,23 @@ export const getNestedSections = createSelector(
       ...section,
       items: sectionFields.get(section.id),
     }))
+);
+
+export const getFieldLabelLookup = createSelector(
+  getItems,
+  items => {
+    const lookup = new Map();
+    for (const formField of Object.values(items)) {
+      lookup.set(formField.htmlName, {
+        label: formField.title,
+        id: `input-${formField.id}`,
+      });
+    }
+    // Include the "Captcha" field which isn't part of reg form registry
+    lookup.set('captcha', {
+      label: Translate.string('Captcha'),
+      id: 'input-captcha',
+    });
+    return lookup;
+  }
 );

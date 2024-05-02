@@ -21,6 +21,7 @@ import {PlacesLeft} from './PlacesLeftLabel';
 import '../../../styles/regform.module.scss';
 
 function BooleanInputComponent({
+  id,
   fieldId,
   value,
   onChange,
@@ -44,8 +45,9 @@ function BooleanInputComponent({
 
   return (
     <div styleName="boolean-field">
-      <Button.Group>
+      <Button.Group id={id}>
         <Button
+          id={`${id}-0`}
           type="button"
           active={!isPurged && value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
@@ -54,6 +56,7 @@ function BooleanInputComponent({
           <Translate>Yes</Translate>
         </Button>
         <Button
+          id={`${id}-1`}
           type="button"
           active={!isPurged && value === false}
           disabled={disabled}
@@ -77,6 +80,7 @@ function BooleanInputComponent({
 }
 
 BooleanInputComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   fieldId: PropTypes.number.isRequired,
   value: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
@@ -94,6 +98,7 @@ BooleanInputComponent.defaultProps = {
 
 export default function BooleanInput({
   fieldId,
+  htmlId,
   htmlName,
   disabled,
   isRequired,
@@ -110,6 +115,7 @@ export default function BooleanInput({
 
   return (
     <FinalField
+      id={htmlId}
       fieldId={fieldId}
       name={htmlName}
       component={BooleanInputComponent}
@@ -127,6 +133,7 @@ export default function BooleanInput({
 
 BooleanInput.propTypes = {
   fieldId: PropTypes.number.isRequired,
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
