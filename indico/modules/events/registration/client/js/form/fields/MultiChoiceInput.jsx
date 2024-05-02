@@ -73,7 +73,7 @@ function MultiChoiceInputComponent({
   const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
 
   return (
-    <table styleName="choice-table" role="presentation">
+    <table styleName="choice-table" role="presentation" id={id}>
       <tbody>
         {choices.map((choice, index) => {
           return (
