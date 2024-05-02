@@ -76,7 +76,7 @@ _bp.add_url_rule('/api/bookings/mine', 'my_bookings', bookings.RHMyUpcomingBooki
 _bp.add_url_rule('/api/bookings/<int:booking_id>/<date>/<any(reject,cancel):action>',
                  'booking_occurrence_state_actions', bookings.RHBookingOccurrenceStateActions, methods=('POST',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>/<date>/link/<int:event_id>',
-                 'booking_occurrence_link_state_actions', bookings.RHBookingOccurrenceLinkStateActions,
+                 'booking_occurrence_link', bookings.RHBookingOccurrenceLink,
                  methods=('POST',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>/links', 'booking_links_data', bookings.RHBookingLinksData)
 _bp.add_url_rule('/api/bookings/export', 'export_bookings', bookings.RHBookingExport, methods=('POST',))

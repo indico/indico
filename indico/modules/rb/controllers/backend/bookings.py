@@ -424,8 +424,8 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
         return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
 
 
-class RHBookingOccurrenceLinkStateActions(RHBookingBase):
-    """Links a Reservation occurrence to an event."""
+class RHBookingOccurrenceLink(RHBookingBase):
+    """Link a reservation occurrence to an event."""
 
     @use_kwargs({
         'date': fields.Date(required=True),
