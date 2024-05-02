@@ -55,3 +55,8 @@ export const getNestedSections = createSelector(
       items: sectionFields.get(section.id),
     }))
 );
+
+export const getFlatFieldList = createSelector(
+  getItems,
+  Object.values
+);
