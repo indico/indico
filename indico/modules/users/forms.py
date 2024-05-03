@@ -76,7 +76,7 @@ class UserPreferencesForm(IndicoForm):
         widget=SwitchWidget(),
         description=_('Use Markdown editor instead of HTML editor when editing the minutes of a meeting.'))
 
-    preferred_mastodon_server_url = StringField(
+    mastodon_server_url = StringField(
         _('Preferred Mastodon server'),
         validators=[URL(require_tld=True)],
         description=_('The URL of the Mastodon server you prefer to use for sharing links to meetings '
@@ -93,7 +93,7 @@ class UserPreferencesForm(IndicoForm):
             self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
 
         if not social_settings.get('enabled'):
-            del self.preferred_mastodon_server_url
+            del self.mastodon_server_url
 
 
 class UserEmailsForm(IndicoForm):

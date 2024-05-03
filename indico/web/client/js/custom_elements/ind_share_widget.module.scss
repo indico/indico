@@ -45,6 +45,8 @@
       height: 20px;
       margin-right: 5px;
       vertical-align: middle;
+      user-select: none;
+      pointer-events: none;
     }
 
     span {
@@ -53,6 +55,6 @@
   }
 }
 
-.empty-mastodon-server-notice :global(.icon.wrench) {
+.empty-mastodon-server-notice :global(.icon.star) {
   font-size: 1.5em !important;
 }

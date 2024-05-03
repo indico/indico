@@ -10,6 +10,7 @@ import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mas
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
+import {Form as FinalForm, Field} from 'react-final-form';
 import {
   Header,
   HeaderContent,
@@ -127,9 +128,6 @@ SocialButton.defaultProps = {
 };
 
 function SetupMastodonServer({setMastodonOpen, button}) {
-  console.log('setMastodonOpen? ', setMastodonOpen);
-  console.log('button? ', button);
-
   if (Indico.User.mastodonServerURL) {
     return button;
   }
@@ -146,30 +144,52 @@ function SetupMastodonServer({setMastodonOpen, button}) {
     >
       <Popup.Content>
         <Message icon info styleName="empty-mastodon-server-notice">
-          <Icon name="wrench" />
+          <Icon name="star" />
           <Translate>
             You have not added a preferred Mastodon server on your profile yet. Please add one
             below.
           </Translate>
         </Message>
-        <Input
-          label={
-            <Button
-              icon="save"
-              positive
-              onClick={() => {
-                // TODO: Use FinalForm for this
-                const mastodonServerURL = document.getElementById('mastodon-server-url').value;
-                // setPreferredMastodonServer(mastodonServerURL);
-              }}
-              content={Translate.string('Save')}
-            />
-          }
-          id="mastodon-server-url"
-          required
-          labelPosition="right"
-          placeholder="https://mastodon.social"
-          fluid
+        <FinalForm
+          onSubmit={async ({mastodonServerURL}) => {
+            let resp;
+            try {
+              resp = await indicoAxios.patch(userPreferencesMastodonServer(), {
+                server_url: mastodonServerURL,
+              });
+            } catch (error) {
+              setMastodonOpen(true);
+              handleAxiosError(error);
+              return resp;
+            }
+            setMastodonOpen(false);
+            Indico.User.mastodonServerURL = mastodonServerURL;
+          }}
+          render={({handleSubmit}) => (
+            <form onSubmit={handleSubmit}>
+              <Field
+                name="mastodonServerURL"
+                render={({input}) => (
+                  <Input
+                    label={
+                      <Button
+                        icon="save"
+                        positive
+                        type="submit"
+                        content={Translate.string('Save')}
+                      />
+                    }
+                    id="mastodon-server-url"
+                    required
+                    labelPosition="right"
+                    placeholder="https://mastodon.social"
+                    fluid
+                    {...input}
+                  />
+                )}
+              />
+            </form>
+          )}
         />
       </Popup.Content>
     </Popup>
@@ -198,6 +218,8 @@ function ShareWidget({
           src={shareIcon}
           styleName={isPopupOpen ? 'share-widget show' : 'share-widget'}
           tabIndex={0}
+          aria-label={Translate.string('Share this page')}
+          aria-modal
         />
       }
       content={
@@ -230,7 +252,6 @@ function ShareWidget({
           </Header>
           <Grid columns={2} stretched>
             <GridColumn styleName="share-button-column">
-              {console.log('isOpen? ', isMastodonOpen)}
               <SocialButton
                 name="Mastodon"
                 logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}

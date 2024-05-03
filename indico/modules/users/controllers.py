@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadSignature
 from markupsafe import Markup, escape
-from marshmallow import fields
+from marshmallow import ValidationError, fields
 from marshmallow_enum import EnumField
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, subqueryload
@@ -67,7 +67,7 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
 from indico.web.rh import RH, RHProtected, allow_signed_url
-from indico.web.util import is_legacy_signed_url_valid, jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import ExpectedError, is_legacy_signed_url_valid, jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
@@ -437,10 +437,16 @@ class RHUserPreferencesMarkdownAPI(RHUserBase):
 
 
 class RHUserPreferencesMastodonServer(RHUserBase):
+    def _validate_server_url(self):
+        try:
+            validate.URL(require_tld=True, schemes=('http', 'https'))(self)
+        except ValidationError:
+            raise ExpectedError(_('Invalid Mastodon server address.'))
+        return self
+
     @use_kwargs({
         'server_url': fields.String(
-            validate=validate_with_message(lambda x: not x or x.startswith('https://'),
-                reason=_('Invalid Mastodon server URL'))
+            validate=_validate_server_url,
         )
     })
     def _process_PATCH(self, server_url):
