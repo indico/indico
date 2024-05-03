@@ -454,6 +454,11 @@ class CreateMultipleRegistrationsForm(IndicoForm):
 
 
 class BadgeSettingsForm(IndicoForm):
+    _fieldsets = (
+        (None, ('template',)),
+        (_('Page configuration'), ('save_values', 'dashed_border', 'page_size', 'page_orientation', 'page_layout'))
+    )
+
     template = SelectField(_('Template'))
     save_values = BooleanField(_('Save values for next time'), widget=SwitchWidget(),
                                description=_('Save these values in the event settings'))
