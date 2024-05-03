@@ -11,6 +11,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Add dialog to contact event participants about a survey (:issue:`6069`, :pr:`6144`)
+- Allow linking existing room booking occurrences to an event (:pr:`6243`, thanks
+  :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

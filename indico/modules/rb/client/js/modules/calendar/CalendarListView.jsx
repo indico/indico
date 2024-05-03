@@ -12,12 +12,24 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import LazyScroll from 'redux-lazy-scroll';
-import {Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-react';
+import {
+  Button,
+  Card,
+  Confirm,
+  Divider,
+  Header,
+  Icon,
+  Label,
+  Message,
+  Popup,
+} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {actions as bookingsActions} from '../../common/bookings';
+import {selectors as linkingSelectors} from '../../common/linking';
+import {selectors as userSelectors} from '../../common/user';
 import CardPlaceholder from '../../components/CardPlaceholder';
 
 import * as calendarActions from './actions';
@@ -35,11 +47,22 @@ class CalendarListView extends React.Component {
     roomFilters: PropTypes.object.isRequired,
     calendarFilters: PropTypes.object.isRequired,
     datePicker: PropTypes.object.isRequired,
+    linkData: PropTypes.object,
+    isAdminOverrideEnabled: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
       openBookingDetails: PropTypes.func.isRequired,
+      linkBookingOccurrence: PropTypes.func.isRequired,
       fetchActiveBookings: PropTypes.func.isRequired,
       clearActiveBookings: PropTypes.func.isRequired,
     }).isRequired,
+  };
+
+  static defaultProps = {
+    linkData: null,
+  };
+
+  state = {
+    linkingConfirm: null,
   };
 
   componentDidMount() {
@@ -59,7 +82,6 @@ class CalendarListView extends React.Component {
       datePicker: {selectedDate, mode},
       roomFilters,
       calendarFilters,
-      actions: {fetchActiveBookings, clearActiveBookings},
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
@@ -70,8 +92,7 @@ class CalendarListView extends React.Component {
       roomFiltersChanged ||
       calendarFiltersChanged
     ) {
-      clearActiveBookings();
-      fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged);
+      this.refetchActiveBookings(roomFiltersChanged);
     }
   }
 
@@ -80,6 +101,14 @@ class CalendarListView extends React.Component {
       actions: {clearActiveBookings},
     } = this.props;
     clearActiveBookings();
+  }
+
+  refetchActiveBookings(roomFiltersChanged) {
+    const {
+      actions: {fetchActiveBookings, clearActiveBookings},
+    } = this.props;
+    clearActiveBookings();
+    fetchActiveBookings(ACTIVE_BOOKINGS_LIMIT, roomFiltersChanged);
   }
 
   fetchMoreBookings = () => {
@@ -101,14 +130,90 @@ class CalendarListView extends React.Component {
           {moment(day, 'YYYY-MM-DD').format('dddd, LL')}
         </Header>
         <Card.Group itemsPerRow={4} stackable styleName="day-cards-container">
-          {bookings.map(this.renderBooking)}
+          {bookings.map(booking => this.renderBooking(booking, day))}
         </Card.Group>
         <Divider hidden />
       </div>
     );
   };
 
-  renderBooking = booking => {
+  renderLink = (booking, day) => {
+    const {
+      linkData,
+      isAdminOverrideEnabled,
+      actions: {linkBookingOccurrence},
+    } = this.props;
+    if (!linkData) {
+      return;
+    }
+    const {linkingConfirm} = this.state;
+    const {reservation} = booking;
+    const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
+    const datesMatch =
+      moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
+      moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+    const canLink = isAdminOverrideEnabled || reservation.bookedBySelf || reservation.bookedForSelf;
+    if (booking.linkId || !datesMatch || !canLink) {
+      return;
+    }
+    const linkBtn = (
+      <Button
+        icon={<Icon name="linkify" />}
+        primary
+        size="small"
+        circular
+        onClick={e => {
+          e.stopPropagation();
+          this.setState({
+            linkingConfirm: {reservationId: reservation.id, day, linkId: linkData.id},
+          });
+        }}
+      />
+    );
+    return (
+      <>
+        <Confirm
+          size="mini"
+          header={Translate.string('Link event')}
+          open={
+            linkingConfirm &&
+            (linkingConfirm.reservationId === reservation.id && linkingConfirm.day === day)
+          }
+          content={Translate.string('Are you sure you want to link this event?')}
+          closeOnDimmerClick
+          closeOnEscape
+          onClose={e => {
+            e.stopPropagation();
+            this.setState({linkingConfirm: null});
+          }}
+          onConfirm={e => {
+            e.stopPropagation();
+            this.setState({linkingConfirm: null});
+            linkBookingOccurrence(reservation.id, day, linkData.id, isAdminOverrideEnabled, () =>
+              this.refetchActiveBookings(false)
+            );
+          }}
+          onCancel={e => {
+            e.stopPropagation();
+            this.setState({linkingConfirm: null});
+          }}
+          onOpen={e => e.stopPropagation()}
+          cancelButton={<Button content={Translate.string('Cancel')} />}
+          confirmButton={<Button content={Translate.string('Link')} />}
+          closeIcon
+        />
+        <div style={{position: 'absolute', top: '35%', right: '5px'}}>
+          <Popup trigger={linkBtn} position="bottom center">
+            <Translate>
+              Link to <Param name="bookedFor" wrapper={<strong />} value={linkData.title} />
+            </Translate>
+          </Popup>
+        </div>
+      </>
+    );
+  };
+
+  renderBooking = (booking, day) => {
     const {
       actions: {openBookingDetails},
     } = this.props;
@@ -117,7 +222,6 @@ class CalendarListView extends React.Component {
     const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
-
     return (
       <Card styleName="booking-card" key={key} onClick={() => openBookingDetails(reservation.id)}>
         <Card.Content>
@@ -146,7 +250,15 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
+          {booking.linkId && (
+            <TooltipIfTruncated>
+              <div styleName="booking-booked-for">
+                <Translate>Already linked</Translate>
+              </div>
+            </TooltipIfTruncated>
+          )}
         </Card.Content>
+        {this.renderLink(booking, day)}
       </Card>
     );
   };
@@ -192,11 +304,14 @@ export default connect(
     roomFilters: calendarSelectors.getRoomFilters(state),
     calendarFilters: calendarSelectors.getCalendarFilters(state),
     datePicker: calendarSelectors.getDatePickerInfo(state),
+    linkData: linkingSelectors.getLinkObject(state),
+    isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
       {
         openBookingDetails: bookingsActions.openBookingDetails,
+        linkBookingOccurrence: bookingsActions.linkBookingOccurrence,
         fetchActiveBookings: calendarActions.fetchActiveBookings,
         clearActiveBookings: calendarActions.clearActiveBookings,
       },

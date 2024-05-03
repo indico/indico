@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import fetchBookingDetailsURL from 'indico-url:rb.booking_details';
+import bookingOccurrenceLinkURL from 'indico-url:rb.booking_occurrence_link';
 import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_state_actions';
 import bookingStateActionsURL from 'indico-url:rb.booking_state_actions';
 import bookingDeleteURL from 'indico-url:rb.delete_booking';
@@ -42,6 +43,13 @@ export const BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS =
 export const BOOKING_OCCURRENCE_STATE_CHANGE_ERROR =
   'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_ERROR';
 export const BOOKING_OCCURRENCE_STATE_UPDATED = 'bookings/BOOKING_OCCURRENCE_STATE_UPDATED';
+
+export const BOOKING_OCCURRENCE_LINK_CHANGE_REQUEST =
+  'bookings/BOOKING_OCCURRENCE_LINK_CHANGE_REQUEST';
+export const BOOKING_OCCURRENCE_LINK_CHANGE_SUCCESS =
+  'bookings/BOOKING_OCCURRENCE_LINK_CHANGE_SUCCESS';
+export const BOOKING_OCCURRENCE_LINK_CHANGE_ERROR = 'bookings/BOOKING_OCCURRENCE_LINK_CHANGE_ERROR';
+export const BOOKING_OCCURRENCE_LINK_UPDATED = 'bookings/BOOKING_OCCURRENCE_LINK_UPDATED';
 
 export function fetchBookingDetails(id) {
   return ajaxAction(
@@ -89,5 +97,31 @@ export function changeBookingOccurrenceState(id, date, action, params = {}) {
     BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST,
     [BOOKING_OCCURRENCE_STATE_UPDATED, BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS],
     BOOKING_OCCURRENCE_STATE_CHANGE_ERROR
+  );
+}
+
+export function linkBookingOccurrence(bookingId, date, eventId, isAdminOverrideEnabled, onSuccess) {
+  const params = {};
+  if (isAdminOverrideEnabled) {
+    params.admin_override_enabled = true;
+  }
+  return ajaxAction(
+    () =>
+      indicoAxios.post(
+        bookingOccurrenceLinkURL({booking_id: bookingId, date, event_id: eventId}),
+        null,
+        {params}
+      ),
+    BOOKING_OCCURRENCE_LINK_CHANGE_REQUEST,
+    [
+      BOOKING_OCCURRENCE_LINK_UPDATED,
+      () => {
+        if (onSuccess) {
+          onSuccess();
+        }
+        return {type: BOOKING_OCCURRENCE_LINK_CHANGE_SUCCESS};
+      },
+    ],
+    BOOKING_OCCURRENCE_LINK_CHANGE_ERROR
   );
 }

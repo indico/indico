@@ -430,6 +430,25 @@ def test_can_reject(create_reservation, dummy_user, state):
     assert occ.can_reject(dummy_user) == occ.is_valid
 
 
+def test_can_link(create_reservation, create_user, dummy_user):
+    reservation = create_reservation(start_dt=date.today() - relativedelta(days=1, hour=8),
+                                     end_dt=date.today() + relativedelta(days=1, hour=17),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    occ = reservation.occurrences[-1]
+    occ.state = ReservationOccurrenceState.cancelled
+    assert not occ.can_link(dummy_user)
+
+    occ.state = ReservationOccurrenceState.valid
+    assert occ.can_link(dummy_user)
+
+    admin = create_user(123, rb_admin=True)
+    assert occ.can_link(admin)
+    assert not occ.can_link(admin, allow_admin=False)
+
+    other_user = create_user(124)
+    assert not occ.can_link(other_user)
+
+
 def test_can_cancel(create_reservation, dummy_user, freeze_time):
     reservation = create_reservation(start_dt=date.today() - relativedelta(days=1, hour=8),
                                      end_dt=date.today() + relativedelta(days=1, hour=17),

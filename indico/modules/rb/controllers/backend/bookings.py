@@ -12,7 +12,8 @@ import dateutil
 from flask import jsonify, request, session
 from marshmallow import fields, validate
 from marshmallow_enum import EnumField
-from werkzeug.exceptions import Forbidden, NotFound
+from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.cache import make_scoped_cache
@@ -20,7 +21,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
+from indico.modules.events import Event
 from indico.modules.events.util import track_location_changes
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import search_room_args
@@ -33,12 +36,12 @@ from indico.modules.rb.operations.bookings import (get_active_bookings, get_book
 from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (CreateBookingSchema, ReservationOccurrenceLinkSchema, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
-                                       reservation_user_event_schema)
+                                       reservation_occurrences_schema_with_ownership, reservation_user_event_schema)
 from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check_repeat_frequency,
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
                                     group_by_occurrence_date, is_booking_start_within_grace_period,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
-from indico.util.date_time import now_utc, utc_to_server
+from indico.util.date_time import now_utc, overlaps, server_to_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -132,7 +135,8 @@ class RHActiveBookings(RHRoomBookingBase):
                                                   room_ids=room_ids,
                                                   booked_for_user=booked_for_user,
                                                   text=text)
-        return jsonify(bookings=serialize_occurrences(bookings), rows_left=rows_left)
+        return jsonify(bookings=serialize_occurrences(bookings, schema=reservation_occurrences_schema_with_ownership),
+                       rows_left=rows_left)
 
 
 class RHCreateBooking(RHRoomBookingBase):
@@ -419,6 +423,45 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.occurrence.cancel(session.user)
+        return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
+
+
+class RHBookingOccurrenceLink(RHBookingBase):
+    """Link a reservation occurrence to an event."""
+
+    @use_kwargs({
+        'date': fields.Date(required=True),
+    }, location='view_args')
+    @use_kwargs({
+        'admin_override_enabled': fields.Bool(load_default=False),
+    }, location='query')
+    def _process_args(self, date, admin_override_enabled):
+        RHBookingBase._process_args(self)
+        self.occurrence = self.booking.occurrences.filter_by(date=date).options(joinedload('link')).one()
+        self.event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
+        self.admin_override_enabled = admin_override_enabled
+        if self.occurrence.link is not None:
+            raise BadRequest('This booking occurrence is already linked')
+        if not overlaps((self.event.start_dt, self.event.end_dt),
+                        (server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)),
+                        inclusive=True):
+            raise BadRequest('The event and booking occurrence times do not overlap')
+
+    def _check_access(self):
+        RHBookingBase._check_access(self)
+        if not self.occurrence.can_link(session.user, allow_admin=self.admin_override_enabled):
+            raise Forbidden('You cannot create this link')
+        if not self.event.can_manage(session.user):
+            raise Forbidden('You cannot manage this event')
+
+    def _process(self):
+        self.occurrence.linked_object = self.event
+        self.event.log(EventLogRealm.management, LogKind.other, 'Room Booking', 'Booking occurrence linked',
+                       session.user,
+                       data={'Reservation ID': self.booking.id,
+                             'Occurrence start': self.occurrence.start_dt.astimezone(self.event.tzinfo).isoformat(),
+                             'Occurrence end': self.occurrence.end_dt.astimezone(self.event.tzinfo).isoformat()})
+        db.session.flush()
         return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
 
 

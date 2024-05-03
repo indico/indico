@@ -30,6 +30,8 @@ export default (state = initialState, action) => {
         eventTitle: action.eventTitle,
         ownRoomId: action.ownRoomId,
         ownRoomName: action.ownRoomName,
+        startDt: action.startDt,
+        endDt: action.endDt,
       };
     case linkingActions.CLEAR_OBJECT:
     case bookRoomActions.CREATE_BOOKING_SUCCESS:
