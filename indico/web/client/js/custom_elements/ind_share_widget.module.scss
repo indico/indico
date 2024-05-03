@@ -8,7 +8,6 @@
 .share-widget {
   cursor: pointer;
   filter: opacity(0.6);
-  animation: fadeIn 3s;
 
   &:hover {
     filter: none;
@@ -38,9 +37,6 @@
 }
 
 .share-button-column {
-  padding-top: 0.75rem !important;
-  padding-bottom: 0.75rem !important;
-
   .share-button {
     width: 100%;
 
