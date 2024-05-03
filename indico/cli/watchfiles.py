@@ -7,10 +7,14 @@
 
 import atexit
 import functools
+import importlib
 import os
+import re
 import subprocess
 import sys
 import time
+from collections import ChainMap
+from itertools import chain
 from pathlib import Path
 
 import click
@@ -66,6 +70,16 @@ class IndicoFilter(DefaultFilter):
         return super().__call__(change, path)
 
 
+def _get_editable_package_dirs():
+    # XXX not using `ast` to parse the import from the pth file since it's way easier with a simple regex
+    mappings = [
+        importlib.import_module(m.group(1)).MAPPING
+        for f in list(chain.from_iterable(Path(p).glob('__editable__.*.pth') for p in sys.path))
+        if (m := re.search(r'import (__editable___\S+_finder)', f.read_text()))
+    ]
+    return {Path(x).parent for x in set(ChainMap(*mappings).values())}
+
+
 class Watchfiles:
     def __init__(self):
         self._proc = None
@@ -74,7 +88,8 @@ class Watchfiles:
 
     def run(self):
         indico_root_path = Path(get_root_path('indico')).parent
-        paths = {Path(os.path.realpath(p)) for p in _find_watchdog_paths(set(), set()) if os.path.exists(p)}
+        editable_paths = _get_editable_package_dirs()
+        paths = {Path(os.path.realpath(p)) for p in _find_watchdog_paths(editable_paths, set()) if os.path.exists(p)}
         if env_config_string := os.environ.get('INDICO_CONFIG'):
             env_config = Path(env_config_string).expanduser()
             if env_config.parent.exists():
