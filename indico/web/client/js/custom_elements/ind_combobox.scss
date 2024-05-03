@@ -17,6 +17,10 @@ ind-combobox {
     padding-right: 2em;
   }
 
+  .ui.form &:has(button[value='clear']:not([hidden])) [role='combobox'] {
+    padding-right: 4.5em;
+  }
+
   [role='combobox'][aria-expanded='true'] {
     // Quick hack due to high specificicity of the underlying styles
     border-bottom-left-radius: 0 !important;
@@ -53,7 +57,7 @@ ind-combobox {
   [role='listbox'] {
     position: absolute;
     background: white;
-    z-index: 1;
+    z-index: 10;
     min-width: 100%;
     max-height: min(75vh, 10em);
     overflow-y: auto;
@@ -75,6 +79,29 @@ ind-combobox {
 
     &:not([aria-selected='true']):hover {
       background: var(--control-clickable-surface-color);
+    }
+  }
+
+  button[value='clear']:not([hidden]) {
+    @extend %button-clear;
+    @extend %flex-inline-center;
+    position: absolute;
+    top: 50%;
+    right: 2em;
+    width: 1.5em;
+    aspect-ratio: 1;
+    padding: 0;
+
+    transform: translateY(-50%);
+
+    &::after {
+      @extend %icon;
+      @extend %icon-close;
+      font-size: 115%;
+    }
+
+    span {
+      @extend %visually-hidden;
     }
   }
 }
