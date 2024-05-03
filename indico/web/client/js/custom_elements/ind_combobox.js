@@ -32,6 +32,7 @@ customElements.define(
     connectedCallback() {
       const listbox = this.querySelector('[role=listbox]');
       const input = this.querySelector('input');
+      const clearButton = this.querySelector('button[value=clear]');
 
       // Copy the input's own label as the label of the completion list.
       // This label is only spoken out when user uses the cursor key to
@@ -46,7 +47,6 @@ customElements.define(
       listbox.id = `${this.#comboId}-list`;
       input.setAttribute('aria-haspopup', true);
       input.setAttribute('aria-controls', listbox.id);
-      input.setAttribute('aria-autocomplete', 'both');
 
       // Since the end goal is to enter one of the provided items, we do not
       // expect spelling to be an issue. We also do not want the screen reader
@@ -58,10 +58,15 @@ customElements.define(
       // point to them when they are selected using arrow keys.
       for (let i = 0, option; (option = listbox.children[i]); i++) {
         option.id = `${this.#comboId}-option-${i + 1}`;
+        if (!option.dataset.value) {
+          option.dataset.value = option.textContent;
+        }
         if (option.dataset.value === input.value) {
           selectOption(option);
         }
       }
+
+      toggleClearButton();
 
       // Event handlers
 
@@ -81,43 +86,70 @@ customElements.define(
         const option = evt.target.closest('[role=option]:not([aria-selected=true])');
         if (option) {
           selectOption(option);
+          toggleClearButton(true);
           dispatchInternalInputEvent();
         }
       });
 
       input.addEventListener('blur', closeListbox);
 
-      // Perform the inline autocomplete
+      // Perform the inline autocomplete/search
       input.addEventListener('input', evt => {
-        const value = input.value;
-        const charactersWereAdded = !evt.inputType.startsWith('delete');
-        let autocompleteAlreadySet = false;
-        let numOptions = 0;
-
         deselectCurrentSelection();
+
+        const useAutocomplete = input.getAttribute('aria-autocomplete') === 'both';
+        const charactersWereAdded = !evt.inputType?.startsWith('delete'); // Manually triggered events don't have `evt.inputType`.
+        const filterKeyword = input.value;
+        const filterKeywordLC = filterKeyword.toLowerCase();
+        let topRank = 0;
+        let topCandidate;
+        let candidateCount = 0;
 
         for (const option of listbox.children) {
           const optionValue = option.dataset.value;
-          const hasMatch = optionValue.toLowerCase().startsWith(value.toLowerCase());
+          const optionValueLC = optionValue.toLowerCase();
 
-          // Filter out options that did not match the value
-          option.hidden = value && !hasMatch;
-          numOptions += !option.hidden;
+          // We use the option rank to determine the most likely candidate.
+          // This is not used for sorting the candidates. Candidates retain
+          // their original sort order.
+          let optionRank = 0;
 
-          // If no option has been selected yet, select an option that matches
-          // the filter keyword. We only do this if characters were added
-          // because otherwise it would be impossible to delete characters.
-          if (charactersWereAdded && !autocompleteAlreadySet && hasMatch) {
-            selectOption(option);
-            moveVirtualCursorToOption();
-            // Select the portion of the input text that is ahead of the user-inputted filter keyword
-            // (this presents the type-ahead autocomplete)
-            selectInputText(value.length);
-            autocompleteAlreadySet = true;
+          if (filterKeyword) {
+            // Skip if no filter keyword
+            // Exact initial match
+            optionRank += optionValue.startsWith(filterKeyword) * 1000;
+            // Case-insensitive initial match
+            optionRank += optionValueLC.startsWith(filterKeywordLC) * 100;
+            if (!useAutocomplete) {
+              // Case-insensitive match anywhere in the string
+              optionRank += optionValueLC.includes(filterKeywordLC);
+              // Exact match anywhere in the string
+              optionRank += optionValue.includes(filterKeyword) * 10;
+            }
+          }
+
+          option.hidden = filterKeyword && !optionRank;
+          if (!option.hidden) {
+            candidateCount++;
+          }
+
+          if (optionRank > topRank) {
+            topRank = optionRank;
+            topCandidate = option;
           }
         }
 
-        toggleListbox(numOptions > 0);
+        const shouldAutocomplete = useAutocomplete && charactersWereAdded && topCandidate;
+        if (shouldAutocomplete) {
+          selectOption(topCandidate);
+          moveVirtualCursorToOption();
+          // Select the portion of the input text that is ahead of the user-inputted filter keyword
+          // (this presents the type-ahead autocomplete)
+          selectInputText(filterKeyword.length);
+        }
+
+        toggleListbox(candidateCount > 0);
+        toggleClearButton();
       });
 
       // Keyboard actions
@@ -133,6 +165,7 @@ customElements.define(
               break;
             }
             selectOptionViaKeyboard(findNextSelectableOption());
+            toggleClearButton(true);
             dispatchInternalInputEvent();
             break;
           case 'ArrowUp':
@@ -142,6 +175,7 @@ customElements.define(
               break;
             }
             selectOptionViaKeyboard(findPreviousSelectableOption());
+            toggleClearButton(true);
             dispatchInternalInputEvent();
             break;
 
@@ -163,7 +197,22 @@ customElements.define(
         }
       });
 
+      clearButton?.addEventListener('click', () => {
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+      });
+
       // Functions
+
+      function toggleClearButton(show = !!input.value) {
+        if (!clearButton) {
+          return;
+        }
+        clearButton.hidden = !show;
+        if (!show) {
+          input.focus();
+        }
+      }
 
       function dispatchInternalInputEvent() {
         input.dispatchEvent(new Event('change', {bubbles: true}));
@@ -202,7 +251,7 @@ customElements.define(
       }
 
       function moveVirtualCursorToOption(option) {
-        // Omit the $option to remove selection
+        // Omit the option to remove selection
         input.setAttribute('aria-activedescendant', option?.id || '');
       }
 

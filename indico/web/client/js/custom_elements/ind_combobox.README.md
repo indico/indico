@@ -1,10 +1,14 @@
 This element controls combobox form controls with inline autocompletion.
 
 Inline combobox controls are inputs that will show available options that match
-the user input as the user types. The first available option (if any) will be
-automatically inserted into the input, and the text following what was already
-typed will be selected so that the typing can continue unhindered on the next
-keystroke.
+the user input as the user types.
+
+The combobox operates in two modes depending on whether the `aria-autocomplete`
+attribute is set on the input. When `aria-autocomplete` is set to `both`, then
+the first available option (if any) will be automatically inserted into the
+input, and the text following what was already typed will be selected so that
+the typing can continue unhindered on the next keystroke. Otherwise, the list
+is simplly filtered based on the keyword.
 
 NOTE: This document describes the usage of the `<ind-combobox>` custom element.
 In React, the `Combobox` component should be used instead, which provides a
@@ -14,10 +18,11 @@ integrating native components into React applications.
 Please note that a combobox is not the same as a select list. Because a combobox
 is a glorified text field, the values used in the combobox must be
 human-readable. This is different from the select lists where the value and the
-label associated with the value are not necessarily the same. This means that, if
-you are mapping human-readable labels to some internal values, you will need to do
-some translation. You can see an example of a React component that translates
-between human-readable and internal values in the `SingleChoiceInput` component.
+label associated with the value are not necessarily the same. This means that,
+if you are mapping human-readable labels to some internal values, you will need
+to do some translation. You can see an example of a React component that
+translates between human-readable and internal values in the `SingleChoiceInput`
+component.
 
 All event handling is done on the `<input>` element. When the user is typing,
 the 'input' event is triggered as usual. When the selection is made using arrow
@@ -60,3 +65,9 @@ The option label can contain any markup. However, it is generally best to avoid
 presenting overly complex information in options, as the user may attempt to
 quickly scan the options using a screen reader, and having too much information
 can be time-consuming.
+
+An optional button to clear the input can be added to the widget. To do this,
+add a `<button value="clear">` element with appropriate label into the
+`<ind-combobox>` element. Usually it is placed at the end, after the listbox.
+There is no need to instrument this button as that is taken care of by
+`<ind-combobox>` itself.
