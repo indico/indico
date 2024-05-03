@@ -13,7 +13,7 @@ from flask import jsonify, request, session
 from marshmallow import fields, validate
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.cache import make_scoped_cache
@@ -440,17 +440,17 @@ class RHBookingOccurrenceLink(RHBookingBase):
         self.occurrence = self.booking.occurrences.filter_by(date=date).options(joinedload('link')).one()
         self.event = Event.get_or_404(request.view_args['event_id'], is_deleted=False)
         self.admin_override_enabled = admin_override_enabled
-
-    def _check_access(self):
-        RHBookingBase._check_access(self)
         if self.occurrence.link is not None:
-            raise Forbidden('This booking occurrence is already linked')
-        if not self.occurrence.can_link(session.user, allow_admin=self.admin_override_enabled):
-            raise Forbidden('You cannot create this link')
+            raise BadRequest('This booking occurrence is already linked')
         if not overlaps((self.event.start_dt, self.event.end_dt),
                         (server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)),
                         inclusive=True):
-            raise Forbidden('You cannot link this event during these dates')
+            raise BadRequest('The event and booking occurrence times do not overlap')
+
+    def _check_access(self):
+        RHBookingBase._check_access(self)
+        if not self.occurrence.can_link(session.user, allow_admin=self.admin_override_enabled):
+            raise Forbidden('You cannot create this link')
         if not self.event.can_manage(session.user):
             raise Forbidden('You cannot manage this event')
 
