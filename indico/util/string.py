@@ -281,6 +281,18 @@ def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **k
         return result
 
 
+def html_to_markdown(html):
+    """Convert basic HTML to Markdown.
+
+    This util is meant for cases like comments where the text is generally written
+    in Markdown, but can also contain basic HTML tags, and needs to be used in a
+    plaintext context (e.g. text/plain email notification).
+    """
+    ht = HTML2Text(bodywidth=0)
+    ht.pad_tables = True
+    return ht.handle(html)
+
+
 def sanitize_for_platypus(text):
     """Sanitize HTML to be used in platypus."""
     from indico.core.config import config

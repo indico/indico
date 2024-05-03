@@ -7,6 +7,7 @@
 
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.editing.schemas import EditingConfirmationAction
+from indico.util.string import html_to_markdown
 from indico.web.flask.templating import get_template_module
 
 
@@ -48,7 +49,7 @@ def notify_comment(comment):
                                       timeline_url=editable.external_timeline_url,
                                       recipient_name=recipient.first_name,
                                       contribution=editable.contribution,
-                                      text=comment.text)
+                                      text=html_to_markdown(comment.text))
             email = make_email(recipient.email, template=tpl)
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
