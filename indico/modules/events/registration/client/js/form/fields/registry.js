@@ -201,8 +201,16 @@ export function getFieldRegistry() {
   const pluginFields = Object.fromEntries(
     getPluginObjects('regformCustomFields').map(({name, ...rest}) => [name, rest])
   );
-  if (Object.keys(pluginFields).some(x => !x.startsWith('ext__'))) {
-    throw new Error('Field names from plugins must begin with `ext__`');
+  if (
+    Object.entries(pluginFields).some(
+      ([name, data]) =>
+        !name.startsWith('ext__') && !(data.unsafeOverrideField && fieldRegistry[name])
+    )
+  ) {
+    throw new Error(
+      'Field names from plugins must begin with `ext__` or match an existing field name and set ' +
+        'the `unsafeOverrideField` property to true'
+    );
   }
   return {...fieldRegistry, ...pluginFields};
 }
