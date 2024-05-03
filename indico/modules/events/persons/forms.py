@@ -21,8 +21,8 @@ class ManagePersonListsForm(IndicoForm):
                                            description=_('If enabled, searching people for speakers/authors will '
                                                          'include those with no Indico account by default.'))
     show_titles = BooleanField(_('Show titles'), widget=SwitchWidget(),
-                               description=_('If disabled, the title of a person will be hidden everywhere in the event'
-                                             'display pages.'))
+                               description=_('When disabled, the titles of persons participating in the event will not '
+                                             'be displayed in public areas.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
