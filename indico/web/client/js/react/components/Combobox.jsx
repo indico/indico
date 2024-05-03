@@ -10,6 +10,7 @@ import React, {useRef} from 'react';
 
 import 'indico/custom_elements/ind_combobox';
 import {useNativeEvent} from 'indico/react/hooks';
+import {Translate} from 'indico/react/i18n';
 
 export default function Combobox({options, value, onChange, ...inputProps}) {
   const uncontrolledInputProps = {...inputProps, defaultValue: value};
@@ -38,6 +39,9 @@ export default function Combobox({options, value, onChange, ...inputProps}) {
           );
         })}
       </ul>
+      <button type="button" value="clear">
+        <Translate as="span">Clear the combobox</Translate>
+      </button>
     </ind-combobox>
   );
 }
