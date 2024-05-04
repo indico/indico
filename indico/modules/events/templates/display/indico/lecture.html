@@ -43,7 +43,7 @@
             {% if chairpersons %}
                 <h2>
                     {% trans %}by{% endtrans %}
-                    {{ render_users(chairpersons|sort(attribute='display_order_key'), span_class='author', title=true) }}
+                    {{ render_users(chairpersons|sort(attribute='display_order_key'), span_class='author', title=event.show_titles) }}
                 </h2>
             {% endif %}
             <div class="details">

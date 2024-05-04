@@ -42,7 +42,7 @@
             {% if conveners %}
                 <div class="convener-list">
                     <span class="label">{{ ngettext("Convener", "Conveners", conveners|length) }}</span>:
-                    {{ render_users(conveners|sort(attribute='display_order_key')) -}}
+                    {{ render_users(conveners|sort(attribute='display_order_key'), title=event.show_titles) -}}
                 </div>
             {% endif %}
 
