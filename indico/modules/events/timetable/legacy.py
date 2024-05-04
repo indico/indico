@@ -289,7 +289,7 @@ class TimetableSerializer:
                 'affiliation': person_link.affiliation,
                 'emailHash': md5(person.email.encode()).hexdigest() if person.email else None,
                 'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
-                                                  abbrev_first_name=False, show_title=True),
+                                                  abbrev_first_name=False, show_title=person.event.show_titles),
                 'displayOrderKey': person_link.display_order_key}
         if self.can_manage_event:
             data['email'] = person.email
