@@ -81,9 +81,8 @@ class RegistrationFormEditForm(IndicoForm):
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
-    private_form = BooleanField(_('Private form'), widget=SwitchWidget(),
-                                description=_('The registration form will not be publicly displayed on '
-                                              'the event page'))
+    private = BooleanField(_('Private form'), widget=SwitchWidget(),
+                           description=_('The registration form will not be publicly displayed on the event page'))
     base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999999.99), Optional(),
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
@@ -119,8 +118,6 @@ class RegistrationFormEditForm(IndicoForm):
         self.event = kwargs.pop('event')
         self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
-        if request.method == 'GET':
-            self.private_form.data = self.regform.private
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
@@ -129,16 +126,6 @@ class RegistrationFormEditForm(IndicoForm):
     def _set_currencies(self):
         currencies = [(c['code'], f'{c["code"]} ({c["name"]})') for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
-
-    @property
-    def data(self):
-        data = super().data
-        del data['private_form']
-        return data
-
-    @generated_data
-    def private(self):
-        return self.private_form.data
 
 
 class RegistrationFormCreateForm(IndicoForm):
