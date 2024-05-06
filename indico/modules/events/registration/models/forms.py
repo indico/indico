@@ -5,13 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from uuid import UUID
+import uuid
 
 from babel.numbers import format_currency
 from flask import session
 from sqlalchemy import orm, select
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.dialects.postgresql import UUID as SQL_UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
@@ -175,16 +174,17 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether to hide the registration form from the event page
-    is_hidden = db.Column(
+    #: Whether the registration form is only for selected users
+    private = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
     uuid = db.Column(
-        SQL_UUID,
+        UUID,
         unique=True,
-        nullable=True
+        nullable=False,
+        default=lambda: str(uuid.uuid4())
     )
     #: The base fee users have to pay when registering
     base_price = db.Column(
@@ -444,8 +444,8 @@ class RegistrationForm(db.Model):
 
     @locator.token
     def locator(self):
-        """A locator that adds the UUID if the form is hidden."""
-        token = self.uuid if self.is_hidden else None
+        """A locator that adds the UUID if the form is private."""
+        token = self.uuid if self.private else None
         return dict(self.locator, form_token=token)
 
     @property
@@ -547,7 +547,7 @@ class RegistrationForm(db.Model):
             return user.registrations.filter_by(registration_form=self).filter(~Registration.is_deleted).first()
         if uuid:
             try:
-                UUID(hex=uuid)
+                uuid.UUID(hex=uuid)
             except ValueError:
                 raise BadRequest('Malformed registration token')
             return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(~Registration.is_deleted).first()

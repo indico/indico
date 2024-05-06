@@ -18,14 +18,26 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('forms', sa.Column('is_hidden', sa.Boolean(), nullable=False,
+    op.add_column('forms', sa.Column('private', sa.Boolean(), nullable=False,
                   server_default='false'), schema='event_registration')
-    op.alter_column('forms', 'is_hidden', server_default=None,
+    op.alter_column('forms', 'private', server_default=None,
                     schema='event_registration')
-    op.add_column('forms', sa.Column('uuid', postgresql.UUID(), nullable=True),
-                  schema='event_registration')
+    op.add_column(
+        'forms',
+        sa.Column(
+            'uuid',
+            postgresql.UUID(),
+            nullable=False,
+            server_default=sa.text('''
+                uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13)
+                placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)''')
+        ),
+        schema='event_registration'
+    )
+    op.alter_column('forms', 'uuid', server_default=None,
+                    schema='event_registration')
 
 
 def downgrade():
     op.drop_column('forms', 'uuid', schema='event_registration')
-    op.drop_column('forms', 'is_hidden', schema='event_registration')
+    op.drop_column('forms', 'private', schema='event_registration')

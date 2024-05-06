@@ -31,7 +31,6 @@ from indico.modules.events.registration.models.registrations import PublishRegis
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
-from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.colors import SUIColorPickerField
@@ -82,9 +81,9 @@ class RegistrationFormEditForm(IndicoForm):
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
-    hide_registration_form = BooleanField(_('Hide registration form'), widget=SwitchWidget(),
-                                          description=_('This registration form will not be publicly displayed on '
-                                                        'the event page'))
+    private_form = BooleanField(_('Private form'), widget=SwitchWidget(),
+                                description=_('The registration form will not be publicly displayed on '
+                                              'the event page'))
     base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999999.99), Optional(),
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
@@ -121,13 +120,7 @@ class RegistrationFormEditForm(IndicoForm):
         self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
         if request.method == 'GET':
-            self.hide_registration_form.data = self.regform.is_hidden
-            if self.regform.is_hidden:
-                link = (f'<a href="{url_for('.display_regform', self.regform,
-                                            self.regform.locator.token, _external=True)}" '
-                        f'title="Registration form url">link</a>')
-                self.hide_registration_form.description = _('This registration form is hidden. '
-                                                            'To register, use {link}').format(link=link)
+            self.private_form.data = self.regform.private
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
@@ -140,12 +133,12 @@ class RegistrationFormEditForm(IndicoForm):
     @property
     def data(self):
         data = super().data
-        del data['hide_registration_form']
+        del data['private_form']
         return data
 
     @generated_data
-    def is_hidden(self):
-        return self.hide_registration_form.data
+    def private(self):
+        return self.private_form.data
 
 
 class RegistrationFormCreateForm(IndicoForm):

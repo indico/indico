@@ -749,7 +749,7 @@ def generate_ticket_qr_code(person):
     return qr.make_image()._img
 
 
-def get_event_regforms(event, user, with_registrations=False, only_in_acl=False, include_hidden=True):
+def get_event_regforms(event, user, with_registrations=False, only_in_acl=False):
     """Get registration forms with information about user registrations.
 
     :param event: the `Event` to get registration forms for
@@ -759,7 +759,6 @@ def get_event_regforms(event, user, with_registrations=False, only_in_acl=False,
                                whether they have one
     :param only_in_acl: Whether to include only registration forms
                         that are in the event's ACL
-    :param include_hidden: Whether to include hidden registration forms
     """
     if not user:
         registered_user = db.literal(None if with_registrations else False)
@@ -773,8 +772,6 @@ def get_event_regforms(event, user, with_registrations=False, only_in_acl=False,
              .order_by(db.func.lower(RegistrationForm.title)))
     if only_in_acl:
         query = query.filter(RegistrationForm.in_event_acls.any(event=event))
-    if not include_hidden:
-        query = query.filter(~RegistrationForm.is_hidden)
     if with_registrations:
         user_criterion = (Registration.user == user) if user else False
         query = query.outerjoin(Registration, db.and_(Registration.registration_form_id == RegistrationForm.id,
@@ -797,14 +794,13 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
             - All registration forms which are scheduled, open or registered.
             - A dict mapping all registration forms to the user's registration if they have one.
     """
-    all_regforms = get_event_regforms(event, user, with_registrations=True, only_in_acl=only_in_acl,
-                                      include_hidden=False)
+    all_regforms = get_event_regforms(event, user, with_registrations=True, only_in_acl=only_in_acl)
     if include_scheduled:
         displayed_regforms = [regform for regform, registration in all_regforms
-                              if regform.is_scheduled or registration]
+                              if (regform.is_scheduled and not regform.private) or registration]
     else:
         displayed_regforms = [regform for regform, registration in all_regforms
-                              if regform.is_open or registration]
+                              if (regform.is_open and not regform.private) or registration]
     return displayed_regforms, dict(all_regforms)
 
 
