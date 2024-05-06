@@ -168,7 +168,8 @@ class RHContributionListCustomize(RHManageContributionsBase):
                                 filters=self.list_generator.list_config['filters'],
                                 static_items=self.list_generator.static_items,
                                 contrib_fields=self.list_generator.get_all_custom_fields(),
-                                extra_filters=self.list_generator.extra_filters)
+                                extra_filters=self.list_generator.extra_filters,
+                                has_types=bool(self.event.contribution_types.all()))
 
     def _process_POST(self):
         self.list_generator.store_configuration()

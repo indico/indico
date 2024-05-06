@@ -35,7 +35,7 @@ class ContributionListGenerator(ListGeneratorBase):
     def __init__(self, event):
         super().__init__(event)
         self.default_list_config = {
-            'items': ('session', 'track'),
+            'items': ('type', 'session', 'track'),
             'filters': {'fields': {}, 'items': {}, 'extra': {}},
         }
 
@@ -46,12 +46,12 @@ class ContributionListGenerator(ListGeneratorBase):
         track_choices = {str(t.id): t.title for t in sorted(self.event.tracks, key=attrgetter('title'))}
         type_choices = {str(t.id): t.name for t in sorted(self.event.contribution_types, key=attrgetter('name'))}
         self.static_items = {
+            'type': {'title': _('Type'),
+                     'filter_choices': type_empty | type_choices},
             'session': {'title': _('Session'),
                         'filter_choices': session_empty | session_choices},
             'track': {'title': _('Track'),
                       'filter_choices': track_empty | track_choices},
-            'type': {'title': _('Type'),
-                     'filter_choices': type_empty | type_choices},
             'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
                                                                 'unscheduled': _('Not scheduled')}},
         }
@@ -220,10 +220,11 @@ class ContributionListGenerator(ListGeneratorBase):
         dynamic_item_ids, static_item_ids = self._split_item_ids(list_config.get('items', ()), 'dynamic')
         static_columns = self._get_static_columns(static_item_ids)
         dynamic_columns = self._get_sorted_custom_fields(dynamic_item_ids)
+        has_types = bool(self.event.contribution_types.all())
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration, 'selected_entry': selected_entry,
                 'registered_persons': registered_persons, 'static_columns': static_columns,
-                'dynamic_columns': dynamic_columns}
+                'dynamic_columns': dynamic_columns, 'has_types': has_types}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.
@@ -259,7 +260,7 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
 
     def __init__(self, event):
         super().__init__(event)
-        del self.static_items['speakers']
+        del self.extra_filters['speakers']
 
     def render_contribution_list(self):
         """Render the contribution list template components.

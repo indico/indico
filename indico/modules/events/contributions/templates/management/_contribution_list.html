@@ -2,10 +2,9 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns) %}
+{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types) %}
     {% if contribs %}
         {% set has_codes = contribs|selectattr('code')|any %}
-        {% set has_types = contribs|selectattr('type')|any %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <div class="js-list-table-wrapper">
@@ -38,7 +37,7 @@
                             <th class="i-table">
                                 {% trans %}Subcontributions{% endtrans %}
                             </th>
-                            {% for item in static_columns if item.id != 'description' %}
+                            {% for item in static_columns if has_types or item.id != 'type' %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
                             {% for item in dynamic_columns %}
@@ -204,7 +203,7 @@
                                                 {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
                                             </button>
                                         </td>
-                                    {% elif item.id == 'type' %}
+                                    {% elif item.id == 'type' and has_types %}
                                         <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
                                             <span class="vertical-aligner">
                                                 {% if contrib.type -%}
