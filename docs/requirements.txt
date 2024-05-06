@@ -37,7 +37,7 @@ imagesize==1.4.1
     # via sphinx
 itsdangerous==2.2.0
     # via flask
-jinja2==3.1.3
+jinja2==3.1.4
     # via
     #   flask
     #   flask-babel
@@ -93,5 +93,5 @@ sphinxcontrib-serializinghtml==1.1.10
     # via sphinx
 urllib3==2.2.1
     # via requests
-werkzeug==3.0.2
+werkzeug==3.0.3
     # via flask

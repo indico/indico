@@ -112,6 +112,7 @@ def _make_wsgi_app(info, url, evalex_whitelist, proxy):
     url_data = urlsplit(url)
     app = DispatchingApp(_load_app)
     app = DebuggedIndico(app, evalex_whitelist)
+    app.trusted_hosts = [url_data.netloc]
     app = _make_indico_dispatcher(app, url_data.path)
     if proxy:
         app = ProxyFix(app, x_for=1, x_proto=1, x_host=1)
