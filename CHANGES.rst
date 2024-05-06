@@ -13,6 +13,8 @@ Improvements
 - Add dialog to contact event participants about a survey (:issue:`6069`, :pr:`6144`)
 - Allow linking existing room booking occurrences to an event (:pr:`6243`, thanks
   :user:`Moliholy, unconventionaldotdev`)
+- Support including a picture (from a registration's picture field) in the conference
+  participant list (:pr:`6228`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
