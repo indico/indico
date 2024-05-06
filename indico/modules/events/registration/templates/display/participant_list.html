@@ -46,9 +46,13 @@
             </td>
         {% endif %}
         {% for column in registration.columns %}
-            {% if column.is_picture  %}
+            {% if column.is_picture %}
                 <td class="picture">
-                    <img src="{{ column.text }}" height="64px">
+                    {% if column.text %}
+                        <img src="{{ column.text }}" height="64px">
+                    {% else %}
+                        <div style="height: 64px;"></div>
+                    {% endif %}
                 </td>
             {% else %}
                 <td class="i-table"

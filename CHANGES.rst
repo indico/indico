@@ -13,6 +13,8 @@ Improvements
 - Add dialog to contact event participants about a survey (:issue:`6069`, :pr:`6144`)
 - Allow linking existing room booking occurrences to an event (:pr:`6243`, thanks
   :user:`Moliholy, unconventionaldotdev`)
+- Support including a picture (from a registration's picture field) in the conference
+  participant list (:pr:`6228`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
@@ -217,8 +219,6 @@ Improvements
 - Allow filtering the list of editables by tags (:issue:`6195`, :pr:`6197`)
 - Warn users with a dialog before their session expires and let them extend it (:pr:`6026`,
   thanks :user:`SegiNyn`)
-- Add the option to include the picture of a registration in the conference participant list
-  (:pr:`6228`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^

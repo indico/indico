@@ -448,8 +448,9 @@ class Registration(db.Model):
     @property
     def picture_data(self):
         """Return the picture data in personal data."""
-        rdata = [d for d in self.data if d.field_data.field.personal_data_type == PersonalDataType.picture]
-        return rdata[0] if rdata and rdata[0].filename else None
+        rdata = next((d for d in self.data if d.field_data.field.personal_data_type == PersonalDataType.picture), None)
+        if rdata and rdata.storage_file_id is not None:
+            return rdata
 
     @property
     def billable_data(self):
