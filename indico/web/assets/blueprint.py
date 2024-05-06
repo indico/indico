@@ -124,7 +124,7 @@ def static_custom(folder, filename):
 
 @assets_blueprint.route('!/favicon.ico')
 def favicon():
-    return redirect(url_for('.image', filename='indico.ico'))
+    return redirect(config.FAVICON_URL or url_for('.image', filename='indico.ico'))
 
 
 @assets_blueprint.route('/avatar/<name>.svg')
