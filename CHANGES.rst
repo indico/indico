@@ -15,6 +15,8 @@ Improvements
   :user:`Moliholy, unconventionaldotdev`)
 - Support including a picture (from a registration's picture field) in the conference
   participant list (:pr:`6228`, thanks :user:`vtran99`)
+- Add :data:`FAVICON_URL` config option to set a custom URL for the favicon (:pr:`6323`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

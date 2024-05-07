@@ -309,6 +309,13 @@ Customization
 
     Default: ``'https://learn.getindico.io'``
 
+.. data:: FAVICON_URL
+
+    The URL to a custom favicon.  If unset, the default monochrome Indico favicon is
+    used.
+
+    Default: ``None``
+
 .. data:: LOGO_URL
 
     The URL to a custom logo.  If unset, the default monochrome Indico logo is
