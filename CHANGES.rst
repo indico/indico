@@ -21,6 +21,8 @@ Bugfixes
 
 - Fix the dashboard iCal export returning old events instead of recent ones when the
   maximum number of events to include is reached (:pr:`6312`)
+- Fix an error when using the Checkin API to get registration details for a registration
+  that includes labels (:pr:`6326`) 
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
