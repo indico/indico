@@ -7,6 +7,7 @@
 
 import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mastodon_server';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
@@ -128,6 +129,7 @@ SocialButton.defaultProps = {
 };
 
 function SetupMastodonServer({setMastodonOpen, button}) {
+  const [error, setError] = useState(false);
   if (Indico.User.mastodonServerURL) {
     return button;
   }
@@ -138,7 +140,10 @@ function SetupMastodonServer({setMastodonOpen, button}) {
       pinned
       position="top right"
       onOpen={() => setMastodonOpen(true)}
-      onClose={() => setMastodonOpen(false)}
+      onClose={() => {
+        setError(false);
+        setMastodonOpen(false);
+      }}
       trigger={button}
       on="click"
     >
@@ -152,15 +157,17 @@ function SetupMastodonServer({setMastodonOpen, button}) {
         </Message>
         <FinalForm
           onSubmit={async ({mastodonServerURL}) => {
-            let resp;
             try {
-              resp = await indicoAxios.patch(userPreferencesMastodonServer(), {
+              await indicoAxios.patch(userPreferencesMastodonServer(), {
                 server_url: mastodonServerURL,
               });
-            } catch (error) {
-              setMastodonOpen(true);
-              handleAxiosError(error);
-              return resp;
+              setError(null);
+            } catch (e) {
+              if (_.get(e, 'response.status') !== 418) {
+                return handleAxiosError(e);
+              }
+              setError(e.response.data.message);
+              return;
             }
             setMastodonOpen(false);
             Indico.User.mastodonServerURL = mastodonServerURL;
@@ -171,6 +178,7 @@ function SetupMastodonServer({setMastodonOpen, button}) {
                 name="mastodonServerURL"
                 render={({input}) => (
                   <Input
+                    error={!!error}
                     label={
                       <Button
                         icon="save"
@@ -188,6 +196,12 @@ function SetupMastodonServer({setMastodonOpen, button}) {
                   />
                 )}
               />
+              {error && (
+                <div styleName="error-message">
+                  <Icon name="times" />
+                  {error}
+                </div>
+              )}
             </form>
           )}
         />
@@ -251,33 +265,29 @@ function ShareWidget({
             </HeaderContent>
           </Header>
           <Grid columns={2} stretched>
-            <GridColumn styleName="share-button-column">
-              <SocialButton
-                name="Mastodon"
-                logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
-                color="violet"
-                render={button => (
-                  <SetupMastodonServer button={button} setMastodonOpen={setMastodonOpen} />
-                )}
-                button
-                buttonProps={{
-                  as: 'a',
-                  target: '_blank',
-                  href: Indico.User.mastodonServerURL
-                    ? `${Indico.User.mastodonServerURL}/share?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`
-                    : null,
-                }}
-              />
-            </GridColumn>
-            <GridColumn styleName="share-button-column">
-              <SocialButton
-                name="Twitter"
-                logo={`${Indico.Urls.ImagesBase}/twitter.svg`}
-                url={`https://twitter.com/intent/tweet?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`}
-                color="blue"
-                render={button => button}
-              />
-            </GridColumn>
+            <SocialButton
+              name="Mastodon"
+              logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
+              color="violet"
+              render={button => (
+                <SetupMastodonServer button={button} setMastodonOpen={setMastodonOpen} />
+              )}
+              button
+              buttonProps={{
+                as: 'a',
+                target: '_blank',
+                href: Indico.User.mastodonServerURL
+                  ? `${Indico.User.mastodonServerURL}/share?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`
+                  : null,
+              }}
+            />
+            <SocialButton
+              name="Twitter"
+              logo={`${Indico.Urls.ImagesBase}/twitter.svg`}
+              url={`https://twitter.com/intent/tweet?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`}
+              color="blue"
+              render={button => button}
+            />
           </Grid>
         </>
       }

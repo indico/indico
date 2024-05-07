@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .share-widget {
   cursor: pointer;
   filter: opacity(0.6);
@@ -37,6 +39,9 @@
 }
 
 .share-button-column {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+
   .share-button {
     width: 100%;
 
@@ -57,4 +62,9 @@
 
 .empty-mastodon-server-notice :global(.icon.star) {
   font-size: 1.5em !important;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: $dark-red;
 }
