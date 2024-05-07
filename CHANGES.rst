@@ -23,6 +23,8 @@ Bugfixes
   maximum number of events to include is reached (:pr:`6312`)
 - Fix an error in the Check-in app API wben retrieving details for a registration form
   that includes static labels (:pr:`6326`)
+- Fix action buttons being pushed outside the content area in the survey editor in case
+  of very long survey option titles (:pr:`6325`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
