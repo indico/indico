@@ -346,7 +346,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 
   span.checkbox-label {
-    white-space: nowrap;
+    display: flex;
   }
 }
 

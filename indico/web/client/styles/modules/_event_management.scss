@@ -670,6 +670,10 @@ form.horizontal .clone-event-dialog-content {
   }
 }
 
+.clone-event-dialog-content #form-group-selected_items .form-field {
+  width: 100%;
+}
+
 .clone-event-dialog-content ul.steps {
   margin-bottom: 30px;
 }
