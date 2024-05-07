@@ -449,7 +449,7 @@ class RHUserPreferencesMastodonServer(RHUserBase):
             validate=_validate_server_url,
         )
     })
-    def _process_PATCH(self, server_url):
+    def _process_POST(self, server_url):
         if not social_settings.get('enabled'):
             raise Forbidden('The social share widget is not enabled.')
 

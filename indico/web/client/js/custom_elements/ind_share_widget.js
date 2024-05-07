@@ -158,7 +158,7 @@ function SetupMastodonServer({setMastodonOpen, button}) {
         <FinalForm
           onSubmit={async ({mastodonServerURL}) => {
             try {
-              await indicoAxios.patch(userPreferencesMastodonServer(), {
+              await indicoAxios.post(userPreferencesMastodonServer(), {
                 server_url: mastodonServerURL,
               });
               setError(null);
@@ -187,7 +187,6 @@ function SetupMastodonServer({setMastodonOpen, button}) {
                         content={Translate.string('Save')}
                       />
                     }
-                    id="mastodon-server-url"
                     required
                     labelPosition="right"
                     placeholder="https://mastodon.social"
