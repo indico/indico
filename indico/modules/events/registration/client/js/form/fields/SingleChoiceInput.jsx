@@ -8,7 +8,7 @@
 import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
@@ -100,8 +100,12 @@ function SingleChoiceDropdown({
   ]);
 
   const handleChange = evt => {
-    const selected = choices.find(c => c.caption === evt.target.value);
-    onChange(selected ? {[selected.id]: 1} : {});
+    if (!evt.target.value) {
+      onChange({});
+      return;
+    }
+    const selectedChoice = choices.find(c => c.caption === evt.target.value);
+    onChange(selectedChoice ? {[selectedChoice.id]: 1} : {'': -1});
   };
 
   return (
@@ -361,6 +365,27 @@ export default function SingleChoiceInput({
   placesUsed,
 }) {
   const existingValue = useSelector(state => getFieldValue(state, fieldId)) || {};
+
+  const optionSet = useMemo(() => new Set(choices.map(choice => choice.id)), [choices]);
+
+  function validate(value) {
+    const noValue = !value || !Object.keys(value).length;
+    if (isRequired && noValue) {
+      return Translate.string('This field is required');
+    }
+
+    if (noValue) {
+      // When there is no value but the field is not required, it's a pass
+      return;
+    }
+
+    for (const key in value) {
+      if (!optionSet.has(key)) {
+        return Translate.string('Please select one of the provided choices');
+      }
+    }
+  }
+
   return (
     <FinalField
       id={htmlId}
@@ -369,11 +394,7 @@ export default function SingleChoiceInput({
       format={v => v || {}}
       required={isRequired}
       isRequired={isRequired}
-      validate={v =>
-        isRequired && (!v || !Object.keys(v).length)
-          ? Translate.string('This field is required.')
-          : undefined
-      }
+      validate={validate}
       disabled={disabled}
       isPurged={isPurged}
       itemType={itemType}
