@@ -40,7 +40,7 @@ export default function FormErrorList() {
     // Check for misbehaving fields. This is for developers.
     if (!field) {
       console.warn(
-        `FormErrorList: Field ${fieldName} is not registered with the final form and will not be shown in the erorr list`
+        `FormErrorList: Field ${fieldName} is not registered with the final form and will not be shown in the error list`
       );
       continue;
     }
