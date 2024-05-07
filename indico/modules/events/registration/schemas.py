@@ -105,6 +105,10 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
             }
 
         for field in fields:
+            if field['inputType'] == 'label':
+                # Do not include labels in the response
+                continue
+
             section = data[field['sectionId']]
             field_data = {
                 'id': field['id'],
