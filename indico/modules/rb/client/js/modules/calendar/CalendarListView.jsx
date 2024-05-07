@@ -215,6 +215,7 @@ class CalendarListView extends React.Component {
 
   renderBooking = (booking, day) => {
     const {
+      linkData,
       actions: {openBookingDetails},
     } = this.props;
     const {reservation} = booking;
@@ -250,7 +251,7 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
-          {booking.linkId && (
+          {linkData && !!booking.linkId && (
             <TooltipIfTruncated>
               <div styleName="booking-booked-for">
                 <Translate>Already linked</Translate>
