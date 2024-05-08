@@ -128,7 +128,7 @@ SocialButton.defaultProps = {
   buttonProps: {},
 };
 
-function SetupMastodonServer({setMastodonOpen, button}) {
+function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
   const [error, setError] = useState(false);
   if (Indico.User.mastodonServerURL) {
     return button;
@@ -169,8 +169,9 @@ function SetupMastodonServer({setMastodonOpen, button}) {
               setError(e.response.data.message);
               return;
             }
-            setMastodonOpen(false);
             Indico.User.mastodonServerURL = mastodonServerURL;
+            window.open(`${Indico.User.mastodonServerURL}/share?text=${urlParams}`, '_blank');
+            setMastodonOpen(false);
           }}
           render={({handleSubmit}) => (
             <form onSubmit={handleSubmit}>
@@ -212,6 +213,11 @@ function SetupMastodonServer({setMastodonOpen, button}) {
 SetupMastodonServer.propTypes = {
   setMastodonOpen: PropTypes.func.isRequired,
   button: PropTypes.element.isRequired,
+  urlParams: PropTypes.string.isRequired,
+};
+
+const shareUrlText = (eventName, eventStartDt, eventUrl) => {
+  return `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
 };
 
 function ShareWidget({
@@ -264,22 +270,43 @@ function ShareWidget({
             </HeaderContent>
           </Header>
           <Grid columns={2} stretched>
-            <SocialButton
-              name="Mastodon"
-              logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
-              color="violet"
-              render={button => (
-                <SetupMastodonServer button={button} setMastodonOpen={setMastodonOpen} />
-              )}
-              button
-              buttonProps={{
-                as: 'a',
-                target: '_blank',
-                href: Indico.User.mastodonServerURL
-                  ? `${Indico.User.mastodonServerURL}/share?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`
-                  : null,
-              }}
-            />
+            {!_.isEmpty(Indico.User) ? (
+              <SocialButton
+                name="Mastodon"
+                logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
+                color="violet"
+                render={button => (
+                  <SetupMastodonServer
+                    button={button}
+                    setMastodonOpen={setMastodonOpen}
+                    urlParams={shareUrlText(eventName, eventStartDt, eventUrl)}
+                  />
+                )}
+                button
+                buttonProps={{
+                  as: 'a',
+                  target: '_blank',
+                  href: Indico.User.mastodonServerURL
+                    ? `${Indico.User.mastodonServerURL}/share?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`
+                    : null,
+                }}
+              />
+            ) : (
+              <SocialButton
+                name="Mastodon"
+                logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
+                color="grey"
+                render={button => (
+                  <Popup
+                    trigger={button}
+                    content={Translate.string('Please login to share on Mastodon')}
+                    position="top right"
+                    wide
+                  />
+                )}
+                button
+              />
+            )}
             <SocialButton
               name="Twitter"
               logo={`${Indico.Urls.ImagesBase}/twitter.svg`}
