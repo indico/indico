@@ -9,7 +9,7 @@ from flask import render_template
 from markupsafe import Markup
 
 from indico.core import signals
-from indico.util.signals import named_objects_from_signal
+from indico.util.signals import make_interceptable, named_objects_from_signal
 from indico.util.string import format_repr
 
 
@@ -126,6 +126,7 @@ class TopMenuItem:
         return format_repr(self, 'name', 'title', 'url')
 
 
+@make_interceptable
 def build_menu_structure(menu_id, active_item=None, **kwargs):
     """Build a menu (list of entries) with sections/items.
 
