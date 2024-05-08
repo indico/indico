@@ -30,11 +30,11 @@ class VCPluginMixin:
     default_settings: dict[str, t.Any] = {'notification_emails': []}
     acl_settings: set = {'acl', 'managers'}
     #: the :class:`IndicoForm` to use for the videoconference room form
-    vc_room_form: t.Optional[IndicoForm] = None
+    vc_room_form: IndicoForm | None = None
     #: the :class:`IndicoForm` to use for the videoconference room attach form
-    vc_room_attach_form: t.Optional[IndicoForm] = None
+    vc_room_attach_form: IndicoForm | None = None
     #: the readable name of the VC plugin
-    friendly_name: t.Optional[str] = None
+    friendly_name: str | None = None
 
     def init(self):
         super().init()
@@ -180,7 +180,8 @@ class VCPluginMixin:
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
 
-    def update_data_association(self, event, vc_room, event_vc_room, data):
+    def update_data_association(self, event: Event, vc_room: VCRoom, event_vc_room: VCRoomEventAssociation, data: dict):
+        """Update the `VCRoomEventAssociation`'s linked object based on the data coming from the UI form."""
         contribution_id = data.pop('contribution')
         block_id = data.pop('block')
         link_type = VCRoomLinkType[data.pop('linking')]
@@ -196,7 +197,7 @@ class VCPluginMixin:
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
-    def update_data_vc_room(self, vc_room, data, is_new=False):
+    def update_data_vc_room(self, vc_room: VCRoom, data: dict, is_new=False):
         if 'name' in data:
             vc_room.name = data.pop('name')
 
@@ -209,18 +210,17 @@ class VCPluginMixin:
     def delete_room(self, vc_room: VCRoom, event: Event):
         raise NotImplementedError('Plugin must implement delete_room()')
 
-    def detach_room(self, event_vc_room: VCRoomEventAssociation, vc_room: VCRoom, event: Event):
+    def detach_room(self, vc_room: VCRoom, event_vc_room: VCRoomEventAssociation, event: Event):
         pass
 
-    def clone_room(self, old_event_vc_room, link_object):
-        """Clone the room, returning a new :class:`VCRoomEventAssociation`.
+    def clone_room(self, old_event_vc_room: VCRoomEventAssociation, link_object: Event | Contribution | SessionBlock):
+        """Clone the room association, returning a new :class:`VCRoomEventAssociation`.
 
         :param old_event_vc_room: the original :class:`VCRoomEventAssociation`
         :param link_object: the new object the association will be tied to
         :return: the new :class:`VCRoomEventAssociation`
         """
-        return VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data,
-                                      link_object=link_object)
+        return VCRoomEventAssociation(show=old_event_vc_room.show, data=old_event_vc_room.data, link_object=link_object)
 
     def can_manage_vc_rooms(self, user, event):
         """Check if a user can manage vc rooms on an event."""
