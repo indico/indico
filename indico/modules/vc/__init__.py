@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import typing as t
-
 from flask import flash, has_request_context, render_template, session
 
 from indico.core import signals
@@ -75,11 +73,18 @@ def _extend_event_menu(sender, **kwargs):
 
 @signals.event.contribution_deleted.connect
 @signals.event.session_block_deleted.connect
-def _link_object_deleted(obj: t.Union[Contribution, SessionBlock], **kwargs):
+def _link_object_deleted(obj: Contribution | SessionBlock, **kwargs):
     assocs = list(obj.vc_room_associations)
     for event_vc_room in assocs:
         # tie the room to the event instead
+        signals.vc.detached_vc_room.send(event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event)
+
+        old_link = event_vc_room.link_object
         event_vc_room.link_object = obj.event
+
+        signals.vc.attached_vc_room.send(
+            event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event, data={}, old_link=old_link
+        )
 
     n_objects = len(assocs)
     if not n_objects:
