@@ -30,6 +30,8 @@ def upgrade():
         SET user_id = mm.current_user_id
         FROM merge_map mm
         WHERE mm.user_id = eml.user_id AND mm.current_user_id != eml.user_id;
+
+        DROP TABLE merge_map;
     ''')
 
 

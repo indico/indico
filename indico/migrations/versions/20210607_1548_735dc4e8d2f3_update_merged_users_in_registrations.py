@@ -41,6 +41,8 @@ def upgrade():
             JOIN merge_map mm2 ON (mm2.user_id = r3.user_id AND mm2.current_user_id = mm.current_user_id)
             WHERE r3.registration_form_id = r.registration_form_id AND mm2.user_id != r.user_id
         );
+
+        DROP TABLE merge_map;
     ''')
 
 
