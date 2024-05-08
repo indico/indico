@@ -5,35 +5,20 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useMemo} from 'react';
-import {useForm} from 'react-final-form';
+import React from 'react';
+import {useFormState} from 'react-final-form';
 import {useSelector} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 
-import {getFlatFieldList} from './selectors';
+import {getFieldLabelLookup} from './selectors';
 import './FormErrorList.module.scss';
 
 export default function FormErrorList() {
-  const formFieldList = useSelector(getFlatFieldList);
-  const fieldLabelLookup = useMemo(() => {
-    const lookup = new Map();
-    for (const formField of formFieldList) {
-      lookup.set(formField.htmlName, {
-        label: formField.title,
-        id: `input-${formField.id}`,
-      });
-    }
-    lookup.set('captcha', {
-      label: Translate.string('Captcha'),
-      id: 'input-captcha',
-    });
-    return lookup;
-  }, [formFieldList]);
+  const fieldLabelLookup = useSelector(getFieldLabelLookup);
+  const {errors} = useFormState({errors: true});
 
-  const {errors} = useForm().getState();
   const fieldsWithErrors = [];
-
   for (const fieldName in errors) {
     const field = fieldLabelLookup.get(fieldName);
 
@@ -45,7 +30,7 @@ export default function FormErrorList() {
       continue;
     }
 
-    fieldsWithErrors.push({label: field.label, id: field.id, message: errors[fieldName]});
+    fieldsWithErrors.push({...field, message: errors[fieldName]});
   }
 
   function focusField(evt) {
