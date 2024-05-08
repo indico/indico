@@ -40,15 +40,15 @@ class SessionsField(RegistrationFormFieldBase):
             _max = self.view_data.get('maximum')
             if _max is not None and _min is not None:
                 if _max != 0 and len(new_data) > _max:
-                    raise ValidationError(_('Please select no more than {_max} sessions.').format(_max=_max))
+                    raise ValidationError(_('Please select no more than {max} sessions.').format(max=_max))
                 if _min != 0 and len(new_data) < _min:
-                    raise ValidationError(_('Please select at least {_min} sessions.').format(_min=_min))
+                    raise ValidationError(_('Please select at least {min} sessions.').format(min=_min))
         return _check_number_of_sessions
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         blocks = SessionBlock.query.filter(SessionBlock.id.in_(registration_data.data)).all()
-        formatted_blocks = [b.full_title for b in blocks]
-        return ('; ').join(x.full_title for x in blocks) if for_humans or for_search else formatted_blocks
+        formatted_blocks = [b.full_title for b in blocks] if blocks else None
+        return '; '.join(x.full_title for x in blocks) if for_humans or for_search else formatted_blocks
 
     def create_sql_filter(self, data_list):
         data_list = str([int(e) for e in data_list])

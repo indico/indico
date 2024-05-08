@@ -211,6 +211,8 @@
       .timetablesessions-field {
         display: flex;
         flex-direction: column;
+        margin: 0;
+        max-width: 500px;
 
         dd {
           list-style: none;

@@ -12,7 +12,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Checkbox, Form, Accordion, Icon} from 'semantic-ui-react';
+import {Checkbox, Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
 
 import {
   FinalCheckbox,
@@ -78,23 +78,25 @@ function TimetableSessionsComponent({
 
   return (
     <Form.Group styleName="timetablesessions-field">
-      {sessionData &&
-        Object.keys(sessionData).map((date, index) => (
-          <SessionBlockHeader
-            value={value}
-            index={index}
-            name={name}
-            data={sessionData[date]}
-            label={moment(date).format('dddd ll')}
-            isExpanded={expandedHeaders.includes(index)}
-            allowFullDays={allowFullDays}
-            key={date}
-            handleValueChange={handleValueChange}
-            onChange={onChange}
-            onClick={handleHeaderClick}
-            props={props}
-          />
-        ))}
+      <Accordion styled exclusive={false}>
+        {sessionData &&
+          Object.keys(sessionData).map((date, index) => (
+            <SessionBlockHeader
+              value={value}
+              index={index}
+              name={name}
+              data={sessionData[date]}
+              label={moment(date).format('dddd ll')}
+              isExpanded={expandedHeaders.includes(index)}
+              allowFullDays={allowFullDays}
+              key={date}
+              handleValueChange={handleValueChange}
+              onChange={onChange}
+              onClick={handleHeaderClick}
+              props={props}
+            />
+          ))}
+      </Accordion>
     </Form.Group>
   );
 }
@@ -143,8 +145,8 @@ function SessionBlockHeader({
   }
 
   return (
-    <Accordion styled exclusive={false}>
-      <Accordion.Title active={isExpanded} index={index} onClick={onClick}>
+    <>
+      <AccordionTitle active={isExpanded} index={index} onClick={onClick}>
         <Icon name="dropdown" />
         <Checkbox
           checked={isAllChecked}
@@ -163,8 +165,8 @@ function SessionBlockHeader({
             </Plural>
           </PluralTranslate>
         </span>
-      </Accordion.Title>
-      <Accordion.Content active={isExpanded}>
+      </AccordionTitle>
+      <AccordionContent active={isExpanded}>
         {data.map(({fullTitle, id}) => (
           <dd className="grouped-fields" key={id}>
             <Checkbox
@@ -175,8 +177,8 @@ function SessionBlockHeader({
             />
           </dd>
         ))}
-      </Accordion.Content>
-    </Accordion>
+      </AccordionContent>
+    </>
   );
 }
 
@@ -223,7 +225,7 @@ export default function TimetableSessionsInput({
       minimum,
       {minimum}
     );
-  } else {
+  } else if (maximum > 0) {
     validationMsg = PluralTranslate.string(
       'Please select no more than {maximum} session block',
       'Please select no more than {maximum} session blocks',
@@ -290,7 +292,7 @@ export function TimetableSessionsSettings() {
         name="minimum"
         type="number"
         label={Translate.string('Minimum number of choices')}
-        placeholder={String(TimetableSessionsInput.defaultProps.minimum)}
+        placeholder={Translate.string('No Minimum')}
         step="1"
         min="0"
         validate={v.optional(v.min(0))}
