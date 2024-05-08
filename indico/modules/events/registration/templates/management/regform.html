@@ -1,29 +1,31 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block content %}
-    {% if regform.private %}
-        <div class="action-box highlight">
-            <div class="section">
-                <div class="icon icon-lock-center"></div>
-                <div class="text">
-                    <div class="label">
-                        {%- trans %}This form is private{% endtrans -%}
+    {% block regform_private %}
+        {% if regform.private %}
+            <div class="action-box highlight">
+                <div class="section">
+                    <div class="icon icon-lock-center"></div>
+                    <div class="text">
+                        <div class="label">
+                            {%- trans %}This form is private{% endtrans -%}
+                        </div>
+                        {% set link_start %}
+                            <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=True) }}"
+                               class="js-copy-to-clipboard"
+                               title="{% trans %}Copy link to clipboard{% endtrans %}"
+                               data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=True) }}"
+                               data-clipboard-action="copy">
+                        {% endset %}
+                        {% set link_end = '</a>'|safe %}
+                        {% trans -%}
+                            The registration form is only accessible via this {{ link_start }}link{{ link_end }}
+                        {%- endtrans %}
                     </div>
-                    {% set link_start %}
-                        <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=True) }}"
-                           class="js-copy-to-clipboard"
-                           title="{% trans %}Copy link to clipboard{% endtrans %}"
-                           data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=True) }}"
-                           data-clipboard-action="copy">
-                    {% endset %}
-                    {% set link_end = '</a>'|safe %}
-                    {% trans -%}
-                        The registration form is only accessible via this {{ link_start }}link{{ link_end }}
-                    {%- endtrans %}
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    {% endblock %}
 
     {% if regform.is_purged %}
         {%- call message_box('error', fixed_width=true) -%}
