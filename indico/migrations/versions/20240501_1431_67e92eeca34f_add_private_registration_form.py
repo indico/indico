@@ -1,4 +1,4 @@
-"""Add hide registration form
+"""Add private registration form
 
 Revision ID: 67e92eeca34f
 Revises: 4e32f4d5ebe4

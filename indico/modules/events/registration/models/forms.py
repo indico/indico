@@ -5,12 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import uuid
+from uuid import UUID, uuid4
 
 from babel.numbers import format_currency
 from flask import session
 from sqlalchemy import orm, select
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import UUID as pg_UUID  # noqa: N811
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
@@ -181,10 +182,10 @@ class RegistrationForm(db.Model):
         default=False
     )
     uuid = db.Column(
-        UUID,
+        pg_UUID,
         unique=True,
         nullable=False,
-        default=lambda: str(uuid.uuid4())
+        default=lambda: str(uuid4())
     )
     #: The base fee users have to pay when registering
     base_price = db.Column(
@@ -547,7 +548,7 @@ class RegistrationForm(db.Model):
             return user.registrations.filter_by(registration_form=self).filter(~Registration.is_deleted).first()
         if uuid:
             try:
-                uuid.UUID(hex=uuid)
+                UUID(hex=uuid)
             except ValueError:
                 raise BadRequest('Malformed registration token')
             return Registration.query.with_parent(self).filter_by(uuid=uuid).filter(~Registration.is_deleted).first()

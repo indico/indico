@@ -39,7 +39,8 @@ class RegistrationFormCloner(EventCloner):
         # if the registration cloner is also enabled, we have to keep
         # all revisions since they are likely to be in use
         clone_all_revisions = 'registrations' in cloners
-        attrs = get_attrs_to_clone(RegistrationForm, skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged'})
+        attrs = get_attrs_to_clone(RegistrationForm,
+                                   skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid'})
         self._field_data_map = {}
         self._form_map = {}
         for old_form in self.old_event.registration_forms:
