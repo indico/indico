@@ -47,11 +47,12 @@
 
 
 {% macro render_regdata(regdata) %}
-    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
+    {%- set type = regdata.field_data.field.input_type -%}
+    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; {%- if type != 'picture' -%} white-space: pre-wrap; {%- endif -%} word-break: break-all; padding-left: 20px; box-sizing: border-box;">
         {%- set friendly_data = regdata.friendly_data -%}
-        {%- set type = regdata.field_data.field.input_type -%}
+        {%- set html_name = regdata.field_data.field.html_field_name -%}
         <span>
-            {{- render_friendly_data(friendly_data, type) -}}
+            {{- render_friendly_data(friendly_data, type, html_name) -}}
         </span>
         {%- if regdata.price -%}
             {{- render_price(regdata) -}}
@@ -63,12 +64,13 @@
 {% macro render_modified_regdata(regdata, diff) %}
     <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
         {%- set type = regdata.field_data.field.input_type -%}
+        {%- set html_name = regdata.field_data.field.html_field_name -%}
         {%- set old = diff.old -%}
         {%- set new = diff.new -%}
-        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type) -%}
-        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type) -%}
+        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type, html_name) -%}
+        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type, html_name) -%}
         <span>
-            {%- if old_friendly_data -%}
+            {%- if old_friendly_data and type != 'picture' -%}
                 <s style="margin-right: 5px;">{{ old_friendly_data }}</s>
             {%- endif -%}
             {%- if new_friendly_data -%}
@@ -87,13 +89,15 @@
 {% endmacro %}
 
 
-{% macro render_friendly_data(friendly_data, type) %}
+{% macro render_friendly_data(friendly_data, type, html_name) %}
     {%- if type == 'accommodation' and friendly_data -%}
         {{- render_accommodation(friendly_data) -}}
     {%- elif type == 'multi_choice' -%}
         {{- render_multichoice(friendly_data) -}}
     {%- elif type == 'sessions' -%}
         {{- render_sessions(friendly_data) -}}
+    {%- elif type == 'picture' and friendly_data -%}
+        {{- render_picture(friendly_data, html_name) -}}
     {%- else -%}
         {{- friendly_data -}}
     {%- endif -%}
@@ -115,8 +119,15 @@
     {{- friendly_data | join(', ') -}}
 {% endmacro %}
 
+
 {% macro render_sessions(friendly_data) %}
     {{- friendly_data | join('<br>'|safe) -}}
+{% endmacro %}
+
+
+{% macro render_picture(friendly_data, html_name) %}
+    <img alt="Registrant picture" src="cid:{{- html_name -}}-{{- friendly_data -}}"
+         style="max-height: 250px; max-width: 250px; white-space: normal; padding-bottom: 10px; object-fit: cover;">
 {% endmacro %}
 
 

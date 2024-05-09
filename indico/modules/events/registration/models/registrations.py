@@ -627,6 +627,17 @@ class Registration(db.Model):
         if rdata and rdata.storage_file_id is not None:
             return rdata
 
+    def get_picture_attachments(self):
+        picture_attachements = []
+        for data in self.data:
+            if data.field_data.field.is_active and data.field_data.field.field_impl.name == 'picture':
+                if data and data.storage_file_id:
+                    with data.open() as f:
+                        attachment = (f'{data.field_data.field.html_field_name}-{data.friendly_data}',
+                                      f.read(), data.content_type)
+                        picture_attachements.append(attachment)
+        return picture_attachements
+
     def _render_price(self, price):
         locale = 'en_GB'
         if has_request_context():
