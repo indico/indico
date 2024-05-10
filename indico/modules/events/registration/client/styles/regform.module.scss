@@ -227,6 +227,10 @@
         }
       }
 
+      label:hover::before {
+        border-color: #d4d4d5;
+      }
+
       .country-dropdown {
         max-width: 500px;
       }
