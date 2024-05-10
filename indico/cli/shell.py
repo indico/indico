@@ -36,9 +36,9 @@ def _add_to_context(namespace, info, element, name=None, doc=None, color='green'
         name = element.__name__
     namespace[name] = element
     if doc:
-        info.append(cformat('+ %%{%s}{}%%{white!} ({})' % color).format(name, doc))
+        info.append(cformat('+ %%{%s}{}%%{white!} ({})' % color).format(name, doc))  # noqa: UP031
     else:
-        info.append(cformat('+ %%{%s}{}' % color).format(name))
+        info.append(cformat('+ %%{%s}{}' % color).format(name))  # noqa: UP031
 
 
 def _add_to_context_multi(namespace, info, elements, names=None, doc=None, color='green'):
@@ -49,9 +49,9 @@ def _add_to_context_multi(namespace, info, elements, names=None, doc=None, color
     for name, element in zip(names, elements, strict=True):
         namespace[name] = element
     if doc:
-        info.append(cformat('+ %%{white!}{}:%%{reset} %%{%s}{}' % color).format(doc, ', '.join(names)))
+        info.append(cformat('+ %%{white!}{}:%%{reset} %%{%s}{}' % color).format(doc, ', '.join(names)))  # noqa: UP031
     else:
-        info.append(cformat('+ %%{%s}{}' % color).format(', '.join(names)))
+        info.append(cformat('+ %%{%s}{}' % color).format(', '.join(names)))  # noqa: UP031
 
 
 def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name__'), color='cyan'):

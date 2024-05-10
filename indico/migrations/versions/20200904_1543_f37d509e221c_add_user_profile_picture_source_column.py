@@ -39,7 +39,7 @@ def upgrade():
         UPDATE users.users
         SET picture_metadata = picture_metadata || '{"lastmod": "%s"}'::jsonb
         WHERE picture_source = 3 AND NOT (picture_metadata ? 'lastmod')
-    ''' % http_date(now_utc()))  # noqa: S608
+    ''' % http_date(now_utc()))  # noqa: S608, UP031
 
 
 def downgrade():

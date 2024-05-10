@@ -269,7 +269,7 @@ def check_registration_email(regform, email, registration=None, management=False
             user_registration=user_registration, email_registration=email_registration),
         as_list=True)
     if extra_checks:
-        return sorted(extra_checks, key=lambda x: ['error', 'warning', 'ok'].index(x['status']))[0]
+        return min(extra_checks, key=lambda x: ['error', 'warning', 'ok'].index(x['status']))
     if registration is not None:
         if email_registration and email_registration != registration:
             return {'status': 'error', 'conflict': 'email-already-registered'}

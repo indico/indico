@@ -193,13 +193,13 @@ class StaticEventCreator:
         for contrib in self.event.contributions:
             if not contrib.can_access(None):
                 continue
-            self._add_material(contrib, '%s-contribution' % contrib.friendly_id)
+            self._add_material(contrib, f'{contrib.friendly_id}-contribution')
             for sc in contrib.subcontributions:
-                self._add_material(sc, '%s-subcontribution' % sc.friendly_id)
+                self._add_material(sc, f'{sc.friendly_id}-subcontribution')
         for session_ in self.event.sessions:
             if not session_.can_access(None):
                 continue
-            self._add_material(session_, '%s-session' % session_.friendly_id)
+            self._add_material(session_, f'{session_.friendly_id}-session')
 
     def _add_material(self, target, type_):
         for folder in AttachmentFolder.get_for_linked_object(target, preload_event=True):

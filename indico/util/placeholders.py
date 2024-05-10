@@ -37,11 +37,11 @@ class Placeholder:
     @classproperty
     @classmethod
     def friendly_name(cls):
-        return '{%s}' % cls.name
+        return '{%s}' % cls.name  # noqa: UP031
 
     @classmethod
     def get_regex(cls, **kwargs):
-        return re.compile(r'\{%s}' % re.escape(cls.name))
+        return re.compile(r'\{%s}' % re.escape(cls.name))  # noqa: UP031
 
     @classmethod
     def replace(cls, text, escape_html=True, **kwargs):

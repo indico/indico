@@ -80,7 +80,7 @@ def make_view_func(obj):
                 return obj().process()
         else:
             # Some class we didn't expect.
-            raise ValueError('Unexpected view func class: %r' % obj)
+            raise ValueError(f'Unexpected view func class: {obj!r}')
 
         wrapper.__name__ = obj.__name__
         wrapper.__doc__ = obj.__doc__
@@ -95,7 +95,7 @@ def make_view_func(obj):
         return obj
     else:
         # If you ever get this error you should probably feel bad. :)
-        raise ValueError('Unexpected view func: %r' % obj)
+        raise ValueError(f'Unexpected view func: {obj!r}')
 
 
 @memoize
@@ -149,7 +149,7 @@ def url_for(endpoint, *targets, **values):
                 locator.update(get_locator(target))
         intersection = set(locator.keys()) & set(values.keys())
         if intersection:
-            raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
+            raise ValueError('url_for kwargs collide with locator: {}'.format(', '.join(intersection)))
         values.update(locator)
 
     for key, value in values.items():
@@ -273,7 +273,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     except OSError:
         if not current_app.debug:
             raise
-        raise NotFound('File not found: %s' % path_or_fd)
+        raise NotFound(f'File not found: {path_or_fd}')
     if safe:
         rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
     # if the request is conditional, then caching shouldn't be disabled

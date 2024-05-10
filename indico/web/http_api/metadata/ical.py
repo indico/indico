@@ -24,7 +24,8 @@ class vRecur(ical.vRecur):  # noqa: N801
 
     def ical(self):
         # SequenceTypes
-        result = ['FREQ=%s' % self.types['FREQ'](self['FREQ']).ical()]
+        freq = self.types['FREQ'](self['FREQ']).ical()
+        result = [f'FREQ={freq}']
         for key, vals in self.items():
             if key == 'FREQ':
                 continue

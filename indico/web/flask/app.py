@@ -175,7 +175,7 @@ def configure_xsendfile(app, method):
             raise ValueError('STATIC_FILE_METHOD args must be a dict containing at least one mapping')
         app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
     else:
-        raise ValueError('Invalid static file method: %s' % method)
+        raise ValueError(f'Invalid static file method: {method}')
 
 
 def _get_indico_version():

@@ -252,7 +252,7 @@ class DataFetcher:
             try:
                 return ('ctx', datetime.strptime(dateTime, '%Y-%m-%d'))
             except ValueError:
-                raise ArgumentParseError("Impossible to parse '%s'" % dateTime)
+                raise ArgumentParseError(f"Impossible to parse '{dateTime}'")
 
     @classmethod
     def _getDateTime(cls, ctx, dateTime, tz, aux=None):

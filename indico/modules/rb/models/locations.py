@@ -50,7 +50,7 @@ class Location(db.Model):
         placeholders = ['building', 'floor', 'number', 'site']
         return re.sub(
             r'%(\d)\$s',
-            lambda m: '{%s}' % placeholders[int(m.group(1)) - 1],
+            lambda m: '{%s}' % placeholders[int(m.group(1)) - 1],  # noqa: UP031
             self._room_name_format
         )
 

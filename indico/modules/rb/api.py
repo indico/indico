@@ -60,7 +60,7 @@ class RoomHook(RoomBookingHookBase):
         self._location = self._pathParams['location']
         self._ids = list(map(int, self._pathParams['idlist'].split('-')))
         if self._detail not in {'rooms', 'reservations'}:
-            raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
+            raise HTTPAPIError(f'Invalid detail level: {self._detail}', 400)
 
     def export_room(self, user):
         loc = Location.query.filter_by(name=self._location, is_deleted=False).first()
@@ -326,7 +326,7 @@ def _ical_serialize_reservation(cal, data, now):
     end_dt_utc = datetime.combine(data['startDT'].date(), data['endDT'].timetz()).astimezone(pytz.utc)
 
     event = icalendar.Event()
-    event.add('uid', 'indico-resv-%s@cern.ch' % data['id'])
+    event.add('uid', 'indico-resv-{}@cern.ch'.format(data['id']))
     event.add('dtstamp', now)
     event.add('dtstart', start_dt_utc)
     event.add('dtend', end_dt_utc)

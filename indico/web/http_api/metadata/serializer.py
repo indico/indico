@@ -37,7 +37,7 @@ class Serializer:
         if serializer:
             return serializer(query_params, **kwargs)
         else:
-            raise Exception("Serializer for '%s' does not exist!" % dformat)
+            raise Exception(f"Serializer for '{dformat}' does not exist!")
 
     def getMIMEType(self):
         return self._mime

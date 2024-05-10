@@ -41,7 +41,7 @@ def _ip_network(address, strict=True):
     except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
         pass
 
-    raise ValueError('%r does not appear to be an IPv4 or IPv6 network' % address)
+    raise ValueError(f'{address!r} does not appear to be an IPv4 or IPv6 network')
 
 
 class PyIPNetwork(TypeDecorator):
