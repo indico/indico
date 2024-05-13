@@ -30,6 +30,7 @@ customElements.define(
     }
 
     connectedCallback() {
+      const this_ = this;
       const listbox = this.querySelector('[role=listbox]');
       const input = this.querySelector('input');
       const clearButton = this.querySelector('button[value=clear]');
@@ -47,6 +48,7 @@ customElements.define(
       listbox.id = `${this.#comboId}-list`;
       input.setAttribute('aria-haspopup', true);
       input.setAttribute('aria-controls', listbox.id);
+      this.toggleAttribute('clearable', clearButton);
 
       // Since the end goal is to enter one of the provided items, we do not
       // expect spelling to be an issue. We also do not want the screen reader
@@ -221,6 +223,8 @@ customElements.define(
       function toggleListbox(isOpen) {
         // The list box visibility is controlled using CSS based on aria-expanded on the input
         input.setAttribute('aria-expanded', isOpen);
+        listbox.hiudden = !isOpen;
+        this_.toggleAttribute('open', isOpen);
         listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
       }
 
