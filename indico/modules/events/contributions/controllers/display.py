@@ -267,7 +267,7 @@ class RHContributionListFilter(RHContributionList):
                                 visible_items=list_config.get('items', ()),
                                 filters=self.list_generator.list_config['filters'],
                                 static_items=self.list_generator.static_items,
-                                contrib_fields=self.list_generator.get_all_custom_fields(),
+                                contrib_fields=[],
                                 extra_filters=self.list_generator.extra_filters,
                                 has_types=self.event.contribution_types.has_rows())
 
