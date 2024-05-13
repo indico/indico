@@ -182,13 +182,13 @@
                 <div class="group" id="filter-statistics">
                     {{ render_filter_statistics(contribs|length, total_entries, total_duration) }}
                 </div>
-                <button class="i-button icon-filter js-dialog-action"
+                <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
                         data-href="{{ url_for('.customize_contrib_list', event) }}"
                         data-title="{% trans %}Contribution list configuration{% endtrans %}"
                         data-dialog-classes="list-filter-dialog"
                         data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                         data-ajax-dialog>
-                    {%- trans %}Filters{% endtrans -%}
+                    {%- trans %}Customize list{% endtrans -%}
                 </button>
                 <button class="i-button icon-link js-static-url"
                         data-href="{{ url_for('.generate_static_url', event) }}"
