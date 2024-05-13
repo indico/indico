@@ -167,13 +167,13 @@ function SessionBlockHeader({
         </span>
       </AccordionTitle>
       <AccordionContent active={isExpanded}>
-        {data.map(({fullTitle, id}) => (
+        {data.map(({fullTitle, startTime, id}) => (
           <dd className="grouped-fields" key={id}>
             <Checkbox
               value={id}
               onChange={handleValueChange}
               checked={value.includes(id)}
-              label={fullTitle}
+              label={`${fullTitle}-${startTime}`}
             />
           </dd>
         ))}

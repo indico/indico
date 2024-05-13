@@ -22,6 +22,7 @@ class RHAPIRegistrationForms(RHProtectedEventBase):
 class RHAPIEventSessionBlocks(RHProtectedEventBase):
     def _process(self):
         schema = [{'id': sb.id, 'start_dt': sb.start_dt.astimezone(self.event.tzinfo).date().isoformat(),
+                   'start_time': sb.start_dt.astimezone(self.event.tzinfo).strftime('%H:%M:%S'),
                    'full_title': sb.full_title} for s in self.event.sessions for sb in s.blocks if
                   s.can_access(session.user)]
         return group_list(schema, key=itemgetter('start_dt'), sort_by=itemgetter('start_dt'))

@@ -46,8 +46,10 @@ class SessionsField(RegistrationFormFieldBase):
         return _check_number_of_sessions
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
+        tzinfo = registration_data.registration.event.tzinfo
         blocks = SessionBlock.query.filter(SessionBlock.id.in_(registration_data.data)).all()
-        formatted_blocks = [b.full_title for b in blocks] if blocks else None
+        formatted_blocks = [f'{b.full_title}-{b.start_dt.astimezone(tzinfo).strftime("%H:%M:%S")}'
+                            for b in blocks] if blocks else None
         return '; '.join(x.full_title for x in blocks) if for_humans or for_search else formatted_blocks
 
     def create_sql_filter(self, data_list):
