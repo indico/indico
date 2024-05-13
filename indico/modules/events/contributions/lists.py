@@ -52,8 +52,6 @@ class ContributionListGenerator(ListGeneratorBase):
                         'filter_choices': session_empty | session_choices},
             'track': {'title': _('Track'),
                       'filter_choices': track_empty | track_choices},
-            'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
-                                                                'unscheduled': _('Not scheduled')}},
         }
 
         self.list_config = self._get_config()
@@ -62,6 +60,8 @@ class ContributionListGenerator(ListGeneratorBase):
                                                                 'not_registered': _('Nobody registered')}},
             'speakers': {'title': _('Speakers'), 'filter_choices': {'registered': _('Registered'),
                                                                     'not_registered': _('Nobody registered')}},
+            'status': {'title': _('Status'), 'filter_choices': {'scheduled': _('Scheduled'),
+                                                                'unscheduled': _('Not scheduled')}},
         }
 
     def _get_static_columns(self, ids):
@@ -153,16 +153,6 @@ class ContributionListGenerator(ListGeneratorBase):
                 criteria.append(db.or_(*field_criteria))
 
         if item_filters:
-            if 'status' in filters['items']:
-                filtered_statuses = filters['items']['status']
-                status_criteria = []
-                if 'scheduled' in filtered_statuses:
-                    status_criteria.append(Contribution.is_scheduled)
-                if 'unscheduled' in filtered_statuses:
-                    status_criteria.append(~Contribution.is_scheduled)
-                if status_criteria:
-                    criteria.append(db.or_(*status_criteria))
-
             filter_cols = {'session': Contribution.session_id,
                            'track': Contribution.track_id,
                            'type': Contribution.type_id}
@@ -178,6 +168,15 @@ class ContributionListGenerator(ListGeneratorBase):
                 criteria.append(db.or_(*column_criteria))
 
         if extra_filters:
+            if 'status' in filters['extra']:
+                filtered_statuses = filters['extra']['status']
+                status_criteria = []
+                if 'scheduled' in filtered_statuses:
+                    status_criteria.append(Contribution.is_scheduled)
+                if 'unscheduled' in filtered_statuses:
+                    status_criteria.append(~Contribution.is_scheduled)
+                if status_criteria:
+                    criteria.append(db.or_(*status_criteria))
             if 'people' in filters['extra']:
                 filtered_people = filters['extra'].get('people')
                 contrib_query = self._build_registration_query()
