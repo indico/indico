@@ -17,7 +17,7 @@ ind-combobox {
     padding-right: 2em;
   }
 
-  .ui.form &:has(button[value='clear']:not([hidden])) [role='combobox'] {
+  .ui.form &[clearable] [role='combobox'] {
     padding-right: 4.5em;
   }
 
@@ -39,7 +39,7 @@ ind-combobox {
     pointer-events: none;
   }
 
-  &:has([aria-expanded='true'])::after {
+  &[open]::after {
     transform: translateY(-50%) rotate(180deg);
   }
 
@@ -49,12 +49,11 @@ ind-combobox {
     outline: medium;
   }
 
-  [role='combobox']:not([aria-expanded='true']) + [role='listbox'],
-  [role='listbox']:not(:has(:not([hidden]))) {
+  &:not([open]) [role='listbox'] {
     display: none;
   }
 
-  [role='listbox'] {
+  &[open] [role='listbox'] {
     position: absolute;
     background: white;
     z-index: 10;
