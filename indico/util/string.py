@@ -333,17 +333,13 @@ def validate_email(email, *, check_dns=True):
 
     This checks both if it looks valid and if it has valid
     MX (or A/AAAA) records.
+
+    :return: ``True`` for a valid email address, otherwise ``False``
     """
-    testing = 'PYTEST_CURRENT_TEST' in os.environ
-    try:
-        email_validator.validate_email(email, check_deliverability=check_dns, test_environment=testing)
-    except email_validator.EmailNotValidError:
-        return False
-    else:
-        return True
+    return validate_email_verbose(email, check_dns=check_dns) is None
 
 
-def validate_email_verbose(email):
+def validate_email_verbose(email, *, check_dns=True):
     """Validate the given email address.
 
     This checks both if it looks valid and if it has valid
@@ -353,8 +349,9 @@ def validate_email_verbose(email):
              ``'undeliverable'`` depending on whether the email address has
              syntax errors or dns validation failed.
     """
+    testing = 'PYTEST_CURRENT_TEST' in os.environ
     try:
-        email_validator.validate_email(email)
+        email_validator.validate_email(email, check_deliverability=check_dns, test_environment=testing)
     except email_validator.EmailUndeliverableError:
         return 'undeliverable'
     except email_validator.EmailNotValidError:
