@@ -622,6 +622,7 @@ class Registration(db.Model):
         return personal_data
 
     def get_personal_data_picture(self):
+        """Return the picture data in personal data."""
         rdata = next((d for d in self.data if d.field_data.field.personal_data_type == PersonalDataType.picture), None)
         if rdata and rdata.storage_file_id is not None:
             return rdata
