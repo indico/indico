@@ -133,9 +133,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
     def _merged_participant_list_table(self):
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
-            columns = [{'text': personal_data.get(column_name, '')}
-                       if column_name != 'picture' else {'text': self._get_picture_url(reg, reg.picture_data),
-                                                         'is_picture': True}
+            columns = [{'text': personal_data.get(column_name, '')} if column_name != 'picture'
+                       else {'text': self._get_picture_url(reg, reg.get_personal_data_picture()), 'is_picture': True}
                        for column_name in column_names]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
