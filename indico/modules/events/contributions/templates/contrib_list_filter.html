@@ -77,7 +77,7 @@
         <div class="flexrow f-wrap">
             {% for item_id, item in static_items.items() if has_types or item_id != 'type' %}
                 {% set filter_choices = item.get('filter_choices') %}
-                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}
+                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, clickable=management) }}
             {% endfor %}
         </div>
         {% if contrib_fields %}
