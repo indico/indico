@@ -34,6 +34,8 @@
 }
 
 .form-item {
+  --max-form-item-width: 36em;
+
   display: flex;
   margin-top: 10px;
   padding-top: 3px;
@@ -101,7 +103,7 @@
     }
 
     .label {
-      max-width: 500px;
+      max-width: var(--max-form-item-width);
       overflow-wrap: anywhere;
     }
 
@@ -165,7 +167,7 @@
         flex-direction: column;
 
         ul {
-          max-width: 500px;
+          max-width: var(--max-form-item-width);
           padding-left: 1.5rem;
 
           li {
@@ -232,15 +234,16 @@
       }
 
       .country-dropdown {
-        max-width: 500px;
+        max-width: var(--max-form-item-width);
       }
 
       .single-choice-dropdown {
         align-items: center;
         margin-bottom: 0;
 
-        :global(.field),
+        :global(.field):first-child,
         ind-combobox {
+          max-width: var(--max-form-item-width);
           width: 100%;
         }
 
@@ -287,7 +290,7 @@
       input[type='file'],
       input[type='text'],
       ind-combobox {
-        max-width: 500px;
+        max-width: var(--max-form-item-width);
       }
 
       input[type='tel'],
@@ -297,7 +300,7 @@
     }
 
     > .description {
-      max-width: 500px;
+      max-width: var(--max-form-item-width);
       padding-left: 2px;
       text-align: justify;
       font-style: italic;
