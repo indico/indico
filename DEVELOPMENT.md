@@ -34,12 +34,17 @@ database both to ensure your alembic revision is correct and that your own datab
 
 
 ## Updating Python dependencies
-We use [pip-tools](https://github.com/jazzband/pip-tools) to manage our requirements.txt files. To update the pinned
-dependencies, use `pip-compile -U` for regular dependencies and then `pip-compile -U requirements.dev.in` for dev
-dependencies. Afterwards, check the diff for the requirements.txt files and consult each package's changelog for
-important changes in case of direct dependencies that aren't just patch releases. Once that's done, you MUST install
-Indico with `pip install -e '.[dev]'` and ensure nothing is broken (depending on what changed, make sure to test affected
-parts manually).
+We use [uv](https://github.com/astral-sh/uv) to manage our `requirements.txt` files. To update the pinned
+dependencies, use `./bin/maintenance/compile-python-deps.py -U`; if you just want to update a specific dependency
+that's also possible (`-P packagename`). Afterwards, check the diff for the requirements.txt files and consult
+each package's changelog for important changes in case of direct dependencies that aren't just patch releases.
+Once that's done, you MUST install Indico with `pip install -e '.[dev]'` and ensure nothing is broken (depending on
+what changed, make sure to test affected parts manually).
+
+Adding new Python dependencies is done in a similar way: Add them to the correct `requirements.in` file, and then run
+`./bin/maintenance/compile-python-deps.py` to generate the `requirements.txt` files. DO NOT upgrade deps while adding
+a new one, if whatever you add depends on a newer version of an existing dependency try to update only that one, or
+open a separate PR to do the dependency updates first.
 
 
 ## JS dependencies
