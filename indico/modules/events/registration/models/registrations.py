@@ -9,6 +9,7 @@ import itertools
 import posixpath
 import time
 from decimal import Decimal
+from email.mime.image import MIMEImage
 from uuid import uuid4
 
 from babel.numbers import format_currency
@@ -628,13 +629,15 @@ class Registration(db.Model):
             return rdata
 
     def get_picture_attachments(self):
+        """Returns a list of registration pictures as MimeImage attachments."""
         picture_attachements = []
         for data in self.data:
             if data.field_data.field.is_active and data.field_data.field.field_impl.name == 'picture':
                 if data and data.storage_file_id:
                     with data.open() as f:
-                        attachment = (f'{data.field_data.field.html_field_name}-{data.friendly_data}',
-                                      f.read(), data.content_type)
+                        attachment = MIMEImage(f.read())
+                        filename = f'{data.field_data.field.html_field_name}-{data.friendly_data}'
+                        attachment.add_header('Content-ID', f'<{filename}>')
                         picture_attachements.append(attachment)
         return picture_attachements
 

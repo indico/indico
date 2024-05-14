@@ -62,8 +62,8 @@
 
 
 {% macro render_modified_regdata(regdata, diff) %}
-    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
-        {%- set type = regdata.field_data.field.input_type -%}
+    {%- set type = regdata.field_data.field.input_type -%}
+    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; {%- if type != 'picture' -%} white-space: pre-wrap; {%- endif -%} word-break: break-all; padding-left: 20px; box-sizing: border-box;">
         {%- set html_name = regdata.field_data.field.html_field_name -%}
         {%- set old = diff.old -%}
         {%- set new = diff.new -%}
@@ -74,7 +74,7 @@
                 <s style="margin-right: 5px;">{{ old_friendly_data }}</s>
             {%- endif -%}
             {%- if new_friendly_data -%}
-                <span style="background-color: yellow;">{{ new_friendly_data }}</span>
+                <span {%- if type != 'picture' -%}style="background-color: yellow;"{%- endif -%}>{{ new_friendly_data }}</span>
             {%- endif -%}
         </span>
         {%- if old.price != new.price -%}

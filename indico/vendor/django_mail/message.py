@@ -428,7 +428,6 @@ class EmailMessage:
                 filename.encode('ascii')
             except UnicodeEncodeError:
                 filename = ('utf-8', '', filename)
-            attachment.add_header('Content-ID', filename)
             attachment.add_header(
                 'Content-Disposition', 'attachment', filename=filename
             )
