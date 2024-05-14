@@ -21,6 +21,7 @@
         <div class="icon {{ icon }}"></div>
         <div class="text">
             {{ caller() }}
+            {{ template_hook('event-settings-section-extra', event=event, name=name) }}
         </div>
         <div class="toolbar">
             <button class="i-button borderless text-color icon-only icon-edit hide-if-locked"
@@ -60,7 +61,6 @@
                     {% endif %}
                 {% endcall %}
             </dd>
-            {{ template_hook('extra-event-section-data', event=event) }}
         </dl>
     {% endcall %}
 {% endmacro %}
