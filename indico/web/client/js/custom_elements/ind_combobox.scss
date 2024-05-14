@@ -95,8 +95,8 @@ ind-combobox {
 
     &::after {
       @extend %icon;
-      @extend %icon-close;
-      font-size: 115%;
+      @extend %icon-cross;
+      font-size: 87.5%;
     }
 
     span {
