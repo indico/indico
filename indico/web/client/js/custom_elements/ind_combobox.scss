@@ -71,13 +71,14 @@ ind-combobox {
   [role='option'] {
     list-style: none;
     padding: 0.6em 0.4em;
+    color: var(--text-color);
 
     &:not([aria-selected='true']) {
       cursor: pointer;
     }
 
     &:not([aria-selected='true']):hover {
-      background: var(--control-clickable-surface-color);
+      background: var(--control-clickable-surface-focus-color);
     }
   }
 
