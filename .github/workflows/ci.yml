@@ -2,7 +2,7 @@ name: CI
 
 env:
   TZ: Europe/Zurich
-  PYTHON_VERSION_312: '3.12.2'
+  PYTHON_VERSION_312: '3.12.3'
 
 on:
   push:
