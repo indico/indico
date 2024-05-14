@@ -9,7 +9,7 @@ import userPreferencesMastodonServer from 'indico-url:users.user_preferences_mas
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {
@@ -130,6 +130,14 @@ SocialButton.defaultProps = {
 
 function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
   const [error, setError] = useState(false);
+  const [serverURL, setServerURL] = useState(null);
+
+  useEffect(() => {
+    if (serverURL) {
+      Indico.User.mastodonServerURL = serverURL;
+    }
+  }, [serverURL]);
+
   if (Indico.User.mastodonServerURL) {
     return button;
   }
@@ -148,63 +156,85 @@ function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
       on="click"
     >
       <Popup.Content>
-        <Message icon info styleName="empty-mastodon-server-notice">
-          <Icon name="star" />
-          <Translate>
-            You have not added a preferred Mastodon server on your profile yet. Please add one
-            below.
-          </Translate>
-        </Message>
-        <FinalForm
-          onSubmit={async ({mastodonServerURL}) => {
-            try {
-              await indicoAxios.post(userPreferencesMastodonServer(), {
-                server_url: mastodonServerURL,
-              });
-              setError(null);
-            } catch (e) {
-              if (_.get(e, 'response.status') !== 418) {
-                return handleAxiosError(e);
-              }
-              setError(e.response.data.message);
-              return;
-            }
-            Indico.User.mastodonServerURL = mastodonServerURL;
-            window.open(`${Indico.User.mastodonServerURL}/share?text=${urlParams}`, '_blank');
-            setMastodonOpen(false);
-          }}
-          render={({handleSubmit}) => (
-            <form onSubmit={handleSubmit}>
-              <Field
-                name="mastodonServerURL"
-                render={({input}) => (
-                  <Input
-                    error={!!error}
-                    label={
-                      <Button
-                        icon="save"
-                        positive
-                        type="submit"
-                        content={Translate.string('Save')}
+        {!serverURL ? (
+          <>
+            <Message icon info styleName="empty-mastodon-server-notice">
+              <Icon name="star" />
+              <Translate>
+                You have not added a preferred Mastodon server on your profile yet. Please add one
+                below.
+              </Translate>
+            </Message>
+            <FinalForm
+              onSubmit={async ({mastodonServerURL}) => {
+                try {
+                  await indicoAxios.post(userPreferencesMastodonServer(), {
+                    server_url: mastodonServerURL,
+                  });
+                  setError(null);
+                } catch (e) {
+                  if (_.get(e, 'response.status') !== 418) {
+                    return handleAxiosError(e);
+                  }
+                  setError(e.response.data.message);
+                  return;
+                }
+                setServerURL(mastodonServerURL);
+              }}
+              render={({handleSubmit}) => (
+                <form onSubmit={handleSubmit}>
+                  <Field
+                    name="mastodonServerURL"
+                    render={({input}) => (
+                      <Input
+                        error={!!error}
+                        label={
+                          <Button
+                            icon="save"
+                            positive
+                            type="submit"
+                            content={Translate.string('Save')}
+                          />
+                        }
+                        required
+                        labelPosition="right"
+                        placeholder="https://mastodon.social"
+                        fluid
+                        {...input}
                       />
-                    }
-                    required
-                    labelPosition="right"
-                    placeholder="https://mastodon.social"
-                    fluid
-                    {...input}
+                    )}
                   />
-                )}
-              />
-              {error && (
-                <div styleName="error-message">
-                  <Icon name="times" />
-                  {error}
-                </div>
+                  {error && (
+                    <div styleName="error-message">
+                      <Icon name="times" />
+                      {error}
+                    </div>
+                  )}
+                </form>
               )}
-            </form>
-          )}
-        />
+            />
+          </>
+        ) : (
+          <>
+            <Message icon positive styleName="saved-mastodon-server-notice">
+              <Icon name="check circle outline" />
+              <Translate>
+                Preferred Mastodon server added! You can now share this event below.
+              </Translate>
+            </Message>
+
+            <Button
+              as="a"
+              target="_blank"
+              href={`${serverURL}/share?text=${urlParams}`}
+              icon="share square"
+              content={Translate.string('Share on Mastodon')}
+              positive
+              fluid
+              onClick={() => setMastodonOpen(false)}
+            />
+          </>
+        )}
       </Popup.Content>
     </Popup>
   );

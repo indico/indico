@@ -64,6 +64,10 @@
   font-size: 1.5em !important;
 }
 
+.saved-mastodon-server-notice :global(.icon.check.circle.outline) {
+  font-size: 1.5em !important;
+}
+
 .error-message {
   margin-top: 10px;
   color: $dark-red;

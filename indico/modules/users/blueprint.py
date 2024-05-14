@@ -60,7 +60,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
                      'profile_picture_preview', RHProfilePicturePreview)
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/api/preferences/markdown', 'user_preferences_markdown_api', RHUserPreferencesMarkdownAPI)
-    _bp.add_url_rule('/api/preferences/mastodon_server', 'user_preferences_mastodon_server',
+    _bp.add_url_rule('/api/preferences/mastodon', 'user_preferences_mastodon_server',
                      RHUserPreferencesMastodonServer, methods=('POST',))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/api/favorites/users', 'favorites_api', RHUserFavoritesAPI)
