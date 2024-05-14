@@ -21,6 +21,7 @@
         <div class="icon {{ icon }}"></div>
         <div class="text">
             {{ caller() }}
+            {{ template_hook('event-settings-section-extra', event=event, section=name) }}
         </div>
         <div class="toolbar">
             <button class="i-button borderless text-color icon-only icon-edit hide-if-locked"
@@ -104,19 +105,21 @@
 {% macro render_section_location(event, wallet_location_warning, with_container=true) %}
     {% call render_section(event, 'location', 'icon-location', '.edit_location', _('Edit event location'),
                            with_container=with_container) %}
-        <dl class="i-data-list">
-            <dt>{% trans %}Room{% endtrans %}</dt>
-            <dd>{{ with_default(event.room_name) }}</dd>
+        {% block render_location_data scoped %}
+            <dl class="i-data-list">
+                <dt>{% trans %}Room{% endtrans %}</dt>
+                <dd>{{ with_default(event.room_name) }}</dd>
 
-            <dt>{% trans %}Venue{% endtrans %}</dt>
-            <dd>{{ with_default(event.venue_name) }}</dd>
+                <dt>{% trans %}Venue{% endtrans %}</dt>
+                <dd>{{ with_default(event.venue_name) }}</dd>
 
-            <dt>{% trans %}Address{% endtrans %}</dt>
-            <dd>{{ with_default(event.address|replace('\n', '<br>'|safe)) }}</dd>
+                <dt>{% trans %}Address{% endtrans %}</dt>
+                <dd>{{ with_default(event.address|replace('\n', '<br>'|safe)) }}</dd>
 
-            <dt>{% trans %}Map URL{% endtrans %}</dt>
-            <dd class="break-word">{{ with_default(event.map_url) }}</dd>
-        </dl>
+                <dt>{% trans %}Map URL{% endtrans %}</dt>
+                <dd class="break-word">{{ with_default(event.map_url) }}</dd>
+            </dl>
+        {% endblock %}
 
         {% if wallet_location_warning %}
             <br>

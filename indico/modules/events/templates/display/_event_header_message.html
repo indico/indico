@@ -1,6 +1,7 @@
 {% from 'message_box.html' import message_box %}
 
 {% macro render_event_header_msg(event, meeting=true) %}
+    {{ template_hook('extra-event-header-msg', event=event) }}
     {% set category = event.category %}
     {% if category and category.event_message_mode.name != 'disabled' and category.event_message %}
         {%- call message_box(category.event_message_mode.name, classes=('event-message' if meeting)) -%}

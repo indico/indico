@@ -1,14 +1,16 @@
 {% macro create_event_button(category, classes="", text="", with_tooltip=true) %}
-    <a href="" class="{{ classes }} i-button arrow js-dropdown"
-       {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
-       data-toggle="dropdown">
-        {{- text -}}
-    </a>
-    <ul class="i-dropdown">
-        <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
-        <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
-        <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
-    </ul>
+    {% block create_event_button scoped %}
+        <a href="" class="{{ classes }} i-button arrow js-dropdown"
+           {% if with_tooltip %}title="{% trans %}Create event{% endtrans %}"{% endif %}
+           data-toggle="dropdown">
+            {{- text -}}
+        </a>
+        <ul class="i-dropdown">
+            <li>{{ create_event_link(category, 'lecture', _('Lecture')) }}</li>
+            <li>{{ create_event_link(category, 'meeting', _('Meeting')) }}</li>
+            <li>{{ create_event_link(category, 'conference', _('Conference')) }}</li>
+        </ul>
+    {% endblock %}
 {% endmacro %}
 
 {% macro create_event_link(category, type, text) -%}
