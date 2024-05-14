@@ -20,7 +20,6 @@ class SessionsField(RegistrationFormFieldBase):
     mm_field_args = (fields.Integer,)
     setup_schema_fields = {
         'display': fields.String(load_default='expanded'),
-        'allow_full_days': fields.Boolean(load_default=False),
         'minimum': fields.Integer(load_default=0, validate=validate.Range(0)),
         'maximum': fields.Integer(load_default=0, validate=validate.Range(0)),
     }
@@ -48,8 +47,11 @@ class SessionsField(RegistrationFormFieldBase):
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         tzinfo = registration_data.registration.event.tzinfo
         blocks = SessionBlock.query.filter(SessionBlock.id.in_(registration_data.data)).all()
-        formatted_blocks = [f'{b.full_title}-{b.start_dt.astimezone(tzinfo).strftime("%H:%M:%S")}'
+        formatted_blocks = [f'{b.start_dt.astimezone(tzinfo).strftime("%H:%M")} - '
+                            f'{b.end_dt.astimezone(tzinfo).strftime("%H:%M")} - '
+                            f'{b.full_title}'
                             for b in blocks] if blocks else None
+
         return '; '.join(x.full_title for x in blocks) if for_humans or for_search else formatted_blocks
 
     def create_sql_filter(self, data_list):

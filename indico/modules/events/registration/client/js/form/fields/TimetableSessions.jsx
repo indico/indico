@@ -14,13 +14,7 @@ import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Checkbox, Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
 
-import {
-  FinalCheckbox,
-  FinalRadio,
-  FinalField,
-  FinalInput,
-  validators as v,
-} from 'indico/react/forms';
+import {FinalRadio, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
@@ -42,7 +36,6 @@ function TimetableSessionsComponent({
   onChange,
   onFocus,
   onBlur,
-  allowFullDays,
   display,
   minimum,
   maximum,
@@ -88,7 +81,6 @@ function TimetableSessionsComponent({
               data={sessionData[date]}
               label={moment(date).format('dddd ll')}
               isExpanded={expandedHeaders.includes(index)}
-              allowFullDays={allowFullDays}
               key={date}
               handleValueChange={handleValueChange}
               onChange={onChange}
@@ -108,7 +100,6 @@ TimetableSessionsComponent.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
-  allowFullDays: PropTypes.bool.isRequired,
   display: PropTypes.oneOf(['expanded', 'collapsed']),
   maximum: PropTypes.number.isRequired,
   minimum: PropTypes.number.isRequired,
@@ -125,7 +116,6 @@ function SessionBlockHeader({
   data,
   label,
   isExpanded,
-  allowFullDays,
   handleValueChange,
   onChange,
   onClick,
@@ -152,7 +142,6 @@ function SessionBlockHeader({
           checked={isAllChecked}
           onChange={handleHeaderChange}
           indeterminate={isAnyChecked && !isAllChecked}
-          disabled={!allowFullDays}
           label={label}
         />
         <span>
@@ -167,13 +156,13 @@ function SessionBlockHeader({
         </span>
       </AccordionTitle>
       <AccordionContent active={isExpanded}>
-        {data.map(({fullTitle, startTime, id}) => (
+        {data.map(({startTime, endTime, fullTitle, id}) => (
           <dd className="grouped-fields" key={id}>
             <Checkbox
               value={id}
               onChange={handleValueChange}
               checked={value.includes(id)}
-              label={`${fullTitle}-${startTime}`}
+              label={`${startTime} - ${endTime} - ${fullTitle}`}
             />
           </dd>
         ))}
@@ -188,7 +177,6 @@ SessionBlockHeader.propTypes = {
   data: sessionDataSchema.isRequired,
   label: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool.isRequired,
-  allowFullDays: PropTypes.bool.isRequired,
   handleValueChange: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   onClick: PropTypes.func.isRequired,
@@ -199,7 +187,6 @@ export default function TimetableSessionsInput({
   htmlName,
   disabled,
   isRequired,
-  allowFullDays,
   display,
   minimum,
   maximum,
@@ -209,30 +196,19 @@ export default function TimetableSessionsInput({
     {url: timeTableURL({event_id: eventId})},
     {camelize: true}
   );
-  let validationMsg;
 
-  if (minimum > 0 && maximum > 0) {
-    validationMsg = PluralTranslate.string(
-      'Please select at least {minimum} and no more than {maximum} session block',
-      'Please select at least {minimum} and no more than {maximum} session blocks',
-      maximum,
-      {minimum, maximum}
-    );
-  } else if (minimum > 0) {
-    validationMsg = PluralTranslate.string(
-      'Please select at least {minimum} session block',
-      'Please select at least {minimum} session blocks',
-      minimum,
-      {minimum}
-    );
-  } else if (maximum > 0) {
-    validationMsg = PluralTranslate.string(
-      'Please select no more than {maximum} session block',
-      'Please select no more than {maximum} session blocks',
-      maximum,
-      {maximum}
-    );
-  }
+  const minMsg = PluralTranslate.string(
+    'Please select at least {minimum} session block',
+    'Please select at least {minimum} session blocks',
+    minimum,
+    {minimum}
+  );
+  const maxMsg = PluralTranslate.string(
+    'Please select no more than {maximum} session block',
+    'Please select no more than {maximum} session blocks',
+    maximum,
+    {maximum}
+  );
 
   return (
     <FinalField
@@ -241,14 +217,15 @@ export default function TimetableSessionsInput({
       component={TimetableSessionsComponent}
       disabled={disabled}
       required={isRequired}
-      allowFullDays={allowFullDays}
       display={display}
       minimum={minimum}
       maximum={maximum}
       sessionData={sessionData}
       validate={value => {
-        if (value.length < minimum || value.length > maximum) {
-          return validationMsg;
+        if (minimum !== 0 && value.length < minimum) {
+          return minMsg;
+        } else if (maximum !== 0 && value.length > maximum) {
+          return maxMsg;
         }
       }}
     />
@@ -261,7 +238,6 @@ TimetableSessionsInput.propTypes = {
   isRequired: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
   display: PropTypes.string,
-  allowFullDays: PropTypes.bool,
   minimum: PropTypes.number,
   maximum: PropTypes.number,
 };
@@ -269,7 +245,6 @@ TimetableSessionsInput.propTypes = {
 TimetableSessionsInput.defaultProps = {
   disabled: false,
   display: 'expanded',
-  allowFullDays: false,
   minimum: 0,
   maximum: 0,
 };
@@ -287,7 +262,6 @@ export function TimetableSessionsSettings() {
         />
       </Form.Group>
 
-      <FinalCheckbox name="allowFullDays" label={Translate.string('Allow selecting full days.')} />
       <FinalInput
         name="minimum"
         type="number"
@@ -318,7 +292,6 @@ export function TimetableSessionsSettings() {
 
 export const timetableSessionsSettingsInitialData = {
   display: 'expanded',
-  allowFullDays: false,
   minimum: 0,
   maximum: 0,
 };
