@@ -50,31 +50,33 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get install libpq-dev
 
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
       - name: Create virtualenv
         run: |
-          python${{ matrix.python }} -m venv .venv
+          uv venv --python ${{ matrix.python }} --seed .venv
           source .venv/bin/activate
-          pip install -U pip setuptools wheel
 
       - name: Activate virtualenv for later steps
         run: |
           echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
-      - name: Get pip cache dir
-        id: pip-cache
-        run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+      - name: Get uv cache dir
+        id: uv-cache
+        run: echo "dir=$(uv cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Cache pip
+      - name: Cache uv
         uses: actions/cache@v4
         with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: pip|${{ runner.os }}|${{ matrix.python }}|${{ hashFiles('requirements*.txt') }}
+          path: ${{ steps.uv-cache.outputs.dir }}
+          key: uv|${{ runner.os }}|${{ matrix.python }}|${{ hashFiles('requirements*.txt') }}
 
       - name: Install python dependencies
         run: |
-          pip install -r requirements.dev.txt
-          pip install -r requirements.txt
+          uv pip install -r requirements.dev.txt
+          uv pip install -r requirements.txt
 
       - name: Install node dependencies
         if: steps.cache-npm.outputs.cache-hit != 'true'
@@ -108,6 +110,9 @@ jobs:
         with:
           node-version: 18.x
 
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
       - name: Download environment
         uses: actions/download-artifact@v4
         with:
@@ -123,7 +128,7 @@ jobs:
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
       - name: Install Indico
-        run: pip install -e .
+        run: uv pip install -e .
       # END common steps
 
       - name: Check import sorting
@@ -258,6 +263,9 @@ jobs:
         with:
           node-version: 18.x
 
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
       - name: Download environment
         uses: actions/download-artifact@v4
         with:
@@ -273,7 +281,7 @@ jobs:
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
       - name: Install Indico
-        run: pip install -e .
+        run: uv pip install -e .
       # END common steps
 
       - name: Install redis
@@ -314,6 +322,9 @@ jobs:
         with:
           node-version: 18.x
 
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
       - name: Download environment
         uses: actions/download-artifact@v4
         with:
@@ -329,7 +340,7 @@ jobs:
           echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
       - name: Install Indico
-        run: pip install -e .
+        run: uv pip install -e .
       # END common steps
 
       - name: Run jest tests
