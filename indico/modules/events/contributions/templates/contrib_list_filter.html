@@ -1,13 +1,6 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
-{% macro _render_column_selector(item_id, item, filter_choices, is_static_item=false, is_extra=false, clickable=true) %}
-    {% if is_static_item %}
-        {% set filters = filters['items'] %}
-    {% elif is_extra %}
-        {% set filters = filters['extra'] %}
-    {% else %}
-        {% set filters = filters['fields'] %}
-    {% endif %}
+{% macro _render_column_selector(item_id, item, filter_choices, active_filters, clickable=true) %}
     <div class="label-group list-column">
         <div class="i-label title-wrapper"
              data-id="{{ item.personal_data_type.name if item.personal_data_type else item_id }}"
@@ -27,7 +20,7 @@
                         <li>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field-{{ item_id }}-option-{{ value }}"
-                                   {% if value in filters.get(item_id|string, []) %} checked {% endif %}>
+                                   {% if value in active_filters.get(item_id|string, []) %} checked {% endif %}>
                             <label for="field-{{ item_id }}-option-{{ value }}">
                                 {{ caption }}
                             </label>
@@ -77,14 +70,14 @@
         <div class="flexrow f-wrap">
             {% for item_id, item in static_items.items() if has_types or item_id != 'type' %}
                 {% set filter_choices = item.get('filter_choices') %}
-                {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true, clickable=management) }}
+                {{ _render_column_selector(item_id, item, filter_choices, active_filters=filters.get('items', {}), clickable=management) }}
             {% endfor %}
         </div>
         {% if contrib_fields %}
             <h3>{% trans %}Available filters for custom fields{% endtrans %}</h3>
             <div class="flexrow f-wrap">
                 {% for field in contrib_fields %}
-                    {{ _render_column_selector(field.id, field, field.filter_choices) }}
+                    {{ _render_column_selector(field.id, field, field.filter_choices, active_filters=filters.get('fields', {})) }}
                 {% endfor %}
             </div>
         {% endif %}
@@ -94,7 +87,7 @@
             <div class="flexrow f-wrap">
                 {% for item_id, item in extra_filters.items() %}
                     {% set filter_choices = item.get('filter_choices') %}
-                    {{ _render_column_selector(item_id, item, filter_choices, is_extra=true, clickable=false) }}
+                    {{ _render_column_selector(item_id, item, filter_choices, active_filters=filters.get('extra', {}), clickable=false) }}
                 {% endfor %}
             </div>
         {% endif %}
