@@ -480,6 +480,10 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
     def submitters(self):
         return {person_link for person_link in self.person_links if person_link.is_submitter}
 
+    @property
+    def data_by_field(self):
+        return {value.contribution_field_id: value for value in self.field_values}
+
     @locator_property
     def locator(self):
         return dict(self.event.locator, contrib_id=self.id)

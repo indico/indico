@@ -17,6 +17,8 @@ Improvements
   participant list (:pr:`6228`, thanks :user:`vtran99`)
 - Add :data:`FAVICON_URL` config option to set a custom URL for the favicon (:pr:`6323`,
   thanks :user:`SegiNyn`)
+- Allow filtering the contribution list in the management area by custom fields
+  (:issue:`6213`, :pr:`6214`)
 
 Bugfixes
 ^^^^^^^^

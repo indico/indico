@@ -262,9 +262,15 @@ class RHContributionListFilter(RHContributionList):
         return RH._process(self)
 
     def _process_GET(self):
+        list_config = self.list_generator._get_config()
         return jsonify_template('events/contributions/contrib_list_filter.html',
+                                visible_items=list_config.get('items', ()),
                                 filters=self.list_generator.list_config['filters'],
-                                static_items=self.list_generator.static_items)
+                                static_items=self.list_generator.static_items,
+                                contrib_fields=[],
+                                extra_filters=self.list_generator.extra_filters,
+                                has_types=self.event.contribution_types.has_rows(),
+                                management=False)
 
     def _process_POST(self):
         self.list_generator.store_configuration()
