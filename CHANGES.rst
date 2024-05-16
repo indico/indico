@@ -19,6 +19,8 @@ Improvements
   thanks :user:`SegiNyn`)
 - Allow filtering the contribution list in the management area by custom fields
   (:issue:`6213`, :pr:`6214`)
+- Show "go to timeline" button in the contribution page to everyone who can see the its
+  editables' timelines (:pr:`6344`)
 
 Bugfixes
 ^^^^^^^^
