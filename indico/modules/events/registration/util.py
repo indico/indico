@@ -870,8 +870,10 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
         if user and user.id in registered_user_ids:
             raise UserValueError(_('Row {}: a registration for this user already exists').format(row_num))
 
-    return [create_registration(regform, data, notify_user=notify_users, skip_moderation=skip_moderation)
-            for data in user_records]
+    return [
+        create_registration(regform, data, management=True, notify_user=notify_users, skip_moderation=skip_moderation)
+        for data in user_records
+    ]
 
 
 def import_invitations_from_csv(regform, fileobj, email_from, email_subject, email_body, *,
