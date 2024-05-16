@@ -642,6 +642,9 @@ class RHManageSubmitterEdits(EditEventSettingsMixin, RHManageContributionsBase):
     log_module = 'Contributions'
     log_message = 'Submitter privileges updated'
     log_fields = {'submitters_can_edit': 'Edit basic fields',
+                  'submitters_can_edit_title': 'Edit title',
+                  'submitters_can_edit_description': 'Edit description',
+                  'submitters_can_edit_persons': 'Edit persons',
                   'submitters_can_edit_custom': 'Edit custom fields'}
 
 
