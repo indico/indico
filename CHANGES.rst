@@ -32,6 +32,8 @@ Improvements
 - Add a new event management permission that grants access only to the contributions
   module (:pr:`6348`)
 - Add bulk JSON export option in management contribution list (:pr:`6370`)
+- Make the default roles of the contribution person link list field more similar to the
+  abstract person link list field when there is a linked abstract (:pr:`6342`)
 
 Bugfixes
 ^^^^^^^^
