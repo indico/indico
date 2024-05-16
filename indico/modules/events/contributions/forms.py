@@ -209,7 +209,19 @@ class AllowSubmitterEditsForm(IndicoForm):
     submitters_can_edit = BooleanField(_('Edit (basic)'), widget=SwitchWidget(),
                                        description=_('Allows submitters to edit basic information of their '
                                                      'contribution (title, description, speakers and authors)'))
-    submitters_can_edit_custom = BooleanField(_('Edit (custom)'), [HiddenUnless('submitters_can_edit')],
+    submitters_can_edit_title = BooleanField(_('Edit title'), [HiddenUnless('submitters_can_edit')],
+                                             widget=SwitchWidget(),
+                                             description=_('Allows submitters to edit the title of their '
+                                                           'contributions'))
+    submitters_can_edit_description = BooleanField(_('Edit description'), [HiddenUnless('submitters_can_edit')],
+                                                   widget=SwitchWidget(),
+                                                   description=_('Allows submitters to edit the description of their '
+                                                                 'contributions'))
+    submitters_can_edit_persons = BooleanField(_('Edit speakers and authors'), [HiddenUnless('submitters_can_edit')],
+                                               widget=SwitchWidget(),
+                                               description=_('Allows submitters to edit the speakers and authors of '
+                                                             'their contributions'))
+    submitters_can_edit_custom = BooleanField(_('Edit custom fields'), [HiddenUnless('submitters_can_edit')],
                                               widget=SwitchWidget(),
                                               description=_('Allows submitters to edit user-editable custom fields '
                                                             'of their contributions as well'))
