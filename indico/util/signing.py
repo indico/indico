@@ -12,11 +12,15 @@ from werkzeug.local import LocalProxy
 
 #: An *itsdangerous*-based serializer that can be used to pass small
 #: amounts of data through untrusted channels such as a verification
-#: email.
+#: email. It includes the generation time so validity can be limited.
 #: :type: :class:`~itsdangerous.URLSafeTimedSerializer`
-secure_serializer = LocalProxy(lambda: URLSafeTimedSerializer(current_app.config['SECRET_KEY'], b'indico'))
+secure_serializer: URLSafeTimedSerializer = LocalProxy(
+    lambda: URLSafeTimedSerializer(current_app.config['SECRET_KEY'], b'indico')
+)
 
 #: An *itsdangerous*-based serializer that can be used to pass small
-#: amounts of data through url.
+#: amounts of data through untrusted channels such as URLs.
 #: :type: :class:`~itsdangerous.URLSafeSerializer`
-static_secure_serializer = LocalProxy(lambda: URLSafeSerializer(current_app.config['SECRET_KEY'], b'indico'))
+static_secure_serializer: URLSafeSerializer = LocalProxy(
+    lambda: URLSafeSerializer(current_app.config['SECRET_KEY'], b'indico')
+)

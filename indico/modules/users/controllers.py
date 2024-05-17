@@ -356,8 +356,9 @@ class RHProfilePictureDisplay(RH):
     def _process_args(self):
         self.user = User.get_or_404(request.view_args['user_id'])
         try:
-            if (self.user.id !=
-                    static_secure_serializer.loads(request.view_args['slug'], salt='user_profile_picture_display')):
+            sig_user_id = static_secure_serializer.loads(request.view_args['signature'],
+                                                         salt='user-profile-picture-display')
+            if self.user.id != sig_user_id:
                 raise NotFound
         except BadSignature:
             raise NotFound

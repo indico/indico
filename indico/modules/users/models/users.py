@@ -597,8 +597,9 @@ class User(PersonMixin, db.Model):
             return url_for('assets.image', filename='robot.svg')
         elif self.id is None:
             return get_avatar_url_from_name(self.first_name)
-        slug = static_secure_serializer.dumps(self.id, salt='user_profile_picture_display')
-        return url_for('users.user_profile_picture_display', self, slug=slug)
+        slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
+        signature = static_secure_serializer.dumps(self.id, salt='user-profile-picture-display')
+        return url_for('users.user_profile_picture_display', self, slug=slug, signature=signature)
 
     def __contains__(self, user):
         """Convenience method for `user in user_or_group`."""

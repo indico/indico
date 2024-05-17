@@ -33,7 +33,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Use unguessable URLs for user avatar pictures (:pr:`6346`, thanks :user:`vtran99`)
 
 
 Version 3.3.2
