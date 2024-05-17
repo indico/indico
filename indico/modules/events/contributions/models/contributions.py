@@ -529,6 +529,11 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
     def has_published_editables(self):
         return any(e.published_revision_id is not None for e in self.enabled_editables)
 
+    def can_see_any_editables(self, user):
+        if not user:
+            return False
+        return any(e.can_see_timeline(user) for e in self.enabled_editables)
+
     @property
     def slug(self):
         return slugify(self.friendly_id, self.title, maxlen=30)

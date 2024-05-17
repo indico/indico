@@ -45,31 +45,36 @@
     {% set can_submit = contribution.can_submit_proceedings(session.user) %}
     {% set enabled_editables = contribution.enabled_editables %}
     {% set has_enabled_types = enabled_editables|length > 0 %}
+    {% set can_see_timeline = contribution.can_see_any_editables(session.user) %}
+    {% set show_submit_btn = can_submit and can_create_editable %}
+    {% set show_goto_timeline = (can_submit or can_see_timeline) and has_enabled_types %}
 
-    {% if can_submit and (has_enabled_types or can_create_editable) %}
+    {% if show_submit_btn or show_goto_timeline %}
         <section>
             <div class="header">
                 <div class="header-row">
                     <h2>{% trans %}Editing{% endtrans %}</h2>
                 </div>
             </div>
-            {% if has_enabled_types %}
+            {% if show_goto_timeline %}
                 <div class="action-box">
                     {% for editable in enabled_editables -%}
-                        <div class="section f-j-space-between">
-                            <div class="i-tag {{ editable.state.css_class }}">
-                                {{ editable.type.title }}: {{ editable.state.title }}
+                        {% if editable.can_see_timeline(session.user) %}
+                            <div class="section f-j-space-between">
+                                <div class="i-tag {{ editable.state.css_class }}">
+                                    {{ editable.type.title }}: {{ editable.state.title }}
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('event_editing.editable', editable) }}">
+                                        {%- trans %}Go to timeline{% endtrans -%}
+                                    </a>
+                                </div>
                             </div>
-                            <div>
-                                <a href="{{ url_for('event_editing.editable', editable) }}">
-                                    {%- trans %}Go to timeline{% endtrans -%}
-                                </a>
-                            </div>
-                        </div>
+                        {% endif %}
                     {%- endfor %}
                 </div>
             {% endif %}
-            {% if can_create_editable %}
+            {% if show_submit_btn %}
                 <div class="action-box highlight" style="margin-top: 10px;">
                     <div class="section flexrow">
                         <div class="icon icon-file"></div>
