@@ -35,6 +35,7 @@ from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _, force_locale
 from indico.util.locators import locator_property
+from indico.util.signing import static_secure_serializer
 from indico.util.string import format_full_name, format_repr, validate_email
 from indico.web.flask.util import url_for
 
@@ -597,7 +598,8 @@ class User(PersonMixin, db.Model):
         elif self.id is None:
             return get_avatar_url_from_name(self.first_name)
         slug = self.picture_metadata['hash'] if self.picture_metadata else 'default'
-        return url_for('users.user_profile_picture_display', self, slug=slug)
+        signature = static_secure_serializer.dumps(self.id, salt='user-profile-picture-display')
+        return url_for('users.user_profile_picture_display', self, slug=slug, signature=signature)
 
     def __contains__(self, user):
         """Convenience method for `user in user_or_group`."""
