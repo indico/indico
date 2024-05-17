@@ -41,17 +41,11 @@
 {% endmacro %}
 
 {% macro render_editables_section(contribution) %}
-    {% set ns = namespace(can_see_timeline=false) %}
     {% set can_create_editable = contribution.allowed_types_for_editable|length > 0 %}
     {% set can_submit = contribution.can_submit_proceedings(session.user) %}
     {% set enabled_editables = contribution.enabled_editables %}
     {% set has_enabled_types = enabled_editables|length > 0 %}
-    {% for editable in enabled_editables %}
-        {% if editable.can_see_timeline(session.user) %}
-            {% set ns.can_see_timeline = true %}
-        {% endif %}
-    {% endfor %}
-    {% set can_see_timeline = ns.can_see_timeline %}
+    {% set can_see_timeline = contribution.can_see_any_editables(session.user) %}
     {% set show_submit_btn = can_submit and can_create_editable %}
     {% set show_goto_timeline = (can_submit or can_see_timeline) and has_enabled_types %}
 
