@@ -59,7 +59,8 @@ class RHContributionDisplayBase(RHDisplayEventBase):
     }
 
     def _can_view_unpublished(self):
-        return self.event.can_manage(session.user) or self.contrib.is_user_associated(session.user)
+        return (self.event.can_manage(session.user, permission='contributions') or
+                self.contrib.is_user_associated(session.user))
 
     def _check_access(self):
         if not self.contrib.can_access(session.user):
@@ -79,7 +80,7 @@ class RHDisplayProtectionBase(RHDisplayEventBase):
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
-        can_manage = self.event.can_manage(session.user)
+        can_manage = self.event.can_manage(session.user, permission='contributions')
         if not published and not can_manage and not has_contributions_with_user_as_submitter(self.event, session.user):
             raise NotFound(_('The contributions of this event have not been published yet.'))
 
@@ -152,7 +153,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                    .one())
         if self.event.type_ == EventType.meeting:
             return redirect(url_for('events.display', self.event, _anchor=contrib.slug))
-        can_manage = self.event.can_manage(session.user)
+        can_manage = self.event.can_manage(session.user, permission='contributions')
         owns_abstract = contrib.abstract.user_owns(session.user) if contrib.abstract else None
         field_values = filter_field_values(contrib.field_values, can_manage, owns_abstract)
         return self.view_class.render_template('display/contribution_display.html', self.event,
@@ -168,7 +169,7 @@ class RHContributionJSON(RHContributionDisplayBase):
 
     def _process(self):
         from indico.modules.events.contributions.schemas import FullContributionSchema
-        can_manage = self.contrib.can_manage(session.user)
+        can_manage = self.contrib.can_manage(session.user, permission='contributions')
         return FullContributionSchema(context={
             'hide_restricted_data': not can_manage,
             'user_can_manage': can_manage,
@@ -298,7 +299,7 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
             RHDisplayEventBase._check_access(self)
             raise Forbidden
         published = contribution_settings.get(self.event, 'published')
-        if (not published and not self.event.can_manage(session.user)
+        if (not published and not self.event.can_manage(session.user, permission='contributions')
                 and not self.subcontrib.is_user_associated(session.user)):
             raise NotFound(_('The contributions of this event have not been published yet.'))
 

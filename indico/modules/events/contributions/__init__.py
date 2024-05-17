@@ -16,7 +16,7 @@ from indico.core.settings.converters import TimedeltaConverter
 from indico.modules.events.contributions.contrib_fields import get_contrib_field_types
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
-from indico.modules.events.models.events import EventType
+from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
@@ -28,7 +28,7 @@ logger = Logger.get('events.contributions')
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user):
+    if not event.can_manage(session.user, permission='contributions'):
         return
     if event.type == 'conference':
         return SideMenuItem('contributions', _('Contributions'), url_for('contributions.manage_contributions', event),
@@ -85,9 +85,21 @@ def _check_permissions(app, **kwargs):
     check_permissions(Contribution)
 
 
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_event_management_permissions(sender, **kwargs):
+    return ContributionsPermission
+
+
 @signals.acl.get_management_permissions.connect_via(Contribution)
-def _get_management_permissions(sender, **kwargs):
+def _get_contrib_management_permissions(sender, **kwargs):
     return SubmitterPermission
+
+
+class ContributionsPermission(ManagementPermission):
+    name = 'contributions'
+    friendly_name = _('Contributions')
+    description = _('Grants management rights for contributions.')
+    user_selectable = True
 
 
 class SubmitterPermission(ManagementPermission):
@@ -95,6 +107,12 @@ class SubmitterPermission(ManagementPermission):
     friendly_name = _('Submission')
     description = _('Grants management rights for materials and minutes.')
     user_selectable = True
+
+
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if event.can_manage(session.user, permission='contributions'):
+        return url_for('contributions.manage_contributions', event)
 
 
 @signals.event.sidemenu.connect
@@ -109,7 +127,7 @@ def _extend_event_menu(sender, **kwargs):
 
     def _visible_list_of_contributions(event):
         published = contribution_settings.get(event, 'published')
-        can_manage = event.can_manage(session.user)
+        can_manage = event.can_manage(session.user, permission='contributions')
         return (published or can_manage) and Contribution.query.filter(Contribution.event == event).has_rows()
 
     yield MenuEntryData(title=_('My Contributions'), name='my_contributions', visible=_visible_my_contributions,

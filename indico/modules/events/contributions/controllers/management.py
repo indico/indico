@@ -87,6 +87,8 @@ def _render_subcontribution_list(contrib):
 class RHManageContributionsBase(RHManageEventBase):
     """Base class for all contributions management RHs."""
 
+    PERMISSION = 'contributions'
+
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.list_generator = ContributionListGenerator(event=self.event)
