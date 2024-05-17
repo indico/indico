@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from flask import current_app
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer
 from werkzeug.local import LocalProxy
 
 
@@ -15,3 +15,8 @@ from werkzeug.local import LocalProxy
 #: email.
 #: :type: :class:`~itsdangerous.URLSafeTimedSerializer`
 secure_serializer = LocalProxy(lambda: URLSafeTimedSerializer(current_app.config['SECRET_KEY'], b'indico'))
+
+#: An *itsdangerous*-based serializer that can be used to pass small
+#: amounts of data through url.
+#: :type: :class:`~itsdangerous.URLSafeSerializer`
+static_secure_serializer = LocalProxy(lambda: URLSafeSerializer(current_app.config['SECRET_KEY'], b'indico'))
