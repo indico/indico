@@ -526,6 +526,12 @@ class RHRegistrationAvatar(RHDisplayEventBase):
                                                                    'picture_source', 'picture_metadata', 'picture'))
                              .one())
 
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        is_participant = self.registration.event.is_user_registered(session.user)
+        if not self.registration.is_publishable(is_participant):
+            raise Forbidden('Participant is not published')
+
     def _process(self):
         if self.registration.user:
             return send_avatar(self.registration.user)
