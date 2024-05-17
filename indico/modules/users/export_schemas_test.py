@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+from itsdangerous import URLSafeSerializer
 
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
@@ -36,6 +37,12 @@ def _assert_yaml_snapshot(snapshot, data, name):
 def freeze_time_for_snapshots(freeze_time):
     """Ensure the tests use the same time as the saved snapshots."""
     freeze_time(datetime(2022, 5, 22, 12, 0, 0))
+
+
+@pytest.fixture(autouse=True)
+def static_signature(mocker):
+    """Ensure signed URLs do not change between test runs."""
+    mocker.patch.object(URLSafeSerializer, 'dumps').return_value = 'signature'
 
 
 def test_data_export_request_schema(db, dummy_user):
