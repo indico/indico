@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, Popup, Progress, Segment} from 'semantic-ui-react';
+import {Icon, Message, Popup, Progress} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -26,13 +26,13 @@ export default function Uploads({uploads}) {
           position="right center"
           content={Translate.string('An error occurred while uploading this file')}
           trigger={
-            <Segment styleName="uploading-file-row">
+            <Message styleName="uploading-file-row" color={failed ? 'red' : undefined}>
               <Icon loading={!failed} name={failed ? 'exclamation' : 'spinner'} />
-              <span styleName="file-state" className={failed ? 'error' : 'uploading'}>
+              <span styleName="file-state" className={failed ? undefined : 'uploading'}>
                 {name}
               </span>
               {!failed && <Progress percent={percent} attached="bottom" color="blue" />}
-            </Segment>
+            </Message>
           }
         />
       ))}
