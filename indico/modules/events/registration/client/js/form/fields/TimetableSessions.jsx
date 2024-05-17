@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import timeTableURL from 'indico-url:event_registration.api_event_timetable';
+import timeTableURL from 'indico-url:event_registration.api_session_blocks';
 
 import _ from 'lodash';
 import moment from 'moment';
@@ -14,12 +14,13 @@ import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Checkbox, Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
 
-import {FinalRadio, FinalField, FinalInput, validators as v} from 'indico/react/forms';
+import {FinalDropdown, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
-import '../../../styles/regform.module.scss';
 import {getStaticData} from '../selectors';
+
+import '../../../styles/regform.module.scss';
 
 const sessionDataSchema = PropTypes.arrayOf(
   PropTypes.shape({
@@ -120,13 +121,13 @@ function SessionBlockHeader({
   onChange,
   onClick,
 }) {
-  const childrenIds = data.map(e => e.id);
+  const childrenIds = data.map(x => x.id);
   const isAllChecked = childrenIds.every(id => value.includes(id));
   const isAnyChecked = childrenIds.some(id => value.includes(id));
   const selectedBlocks = value.filter(element => childrenIds.includes(element)).length;
 
-  function handleHeaderChange(e) {
-    e.stopPropagation();
+  function handleHeaderChange(evt) {
+    evt.stopPropagation();
     const newValue =
       isAllChecked || isAnyChecked
         ? value.filter(element => !childrenIds.includes(element))
@@ -145,12 +146,13 @@ function SessionBlockHeader({
           label={label}
         />
         <span>
+          (
           <PluralTranslate count={selectedBlocks}>
             <Singular>
-              (<Param name="selectedBlocks" value={selectedBlocks} /> block selected)
+              <Param name="selectedBlocks" value={selectedBlocks} /> block selected)
             </Singular>
             <Plural>
-              (<Param name="selectedBlocks" value={selectedBlocks} /> blocks selected)
+              <Param name="selectedBlocks" value={selectedBlocks} /> blocks selected)
             </Plural>
           </PluralTranslate>
         </span>
@@ -252,21 +254,22 @@ TimetableSessionsInput.defaultProps = {
 export function TimetableSessionsSettings() {
   return (
     <>
-      <Form.Group inline>
-        <label>{Translate.string('Default display for sessions')}</label>
-        <FinalRadio name="display" label={Translate.string('Expanded dropdown')} value="expanded" />
-        <FinalRadio
-          name="display"
-          label={Translate.string('Collapsed dropdown')}
-          value="collapsed"
-        />
-      </Form.Group>
+      <FinalDropdown
+        name="display"
+        label={Translate.string('Default display for sessions')}
+        options={[
+          {key: 'expanded', value: 'expanded', text: Translate.string('Expanded dropdown')},
+          {key: 'collapsed', value: 'collapsed', text: Translate.string('Collapsed dropdown')},
+        ]}
+        selection
+        required
+      />
 
       <FinalInput
         name="minimum"
         type="number"
         label={Translate.string('Minimum number of choices')}
-        placeholder={Translate.string('No Minimum')}
+        placeholder={Translate.string('No minimum')}
         step="1"
         min="0"
         validate={v.optional(v.min(0))}
@@ -278,7 +281,7 @@ export function TimetableSessionsSettings() {
         name="maximum"
         type="number"
         label={Translate.string('Maximum number of choices')}
-        placeholder={Translate.string('No Maximum')}
+        placeholder={Translate.string('No maximum')}
         step="1"
         min="0"
         validate={v.optional(v.min(0))}
@@ -295,3 +298,13 @@ export const timetableSessionsSettingsInitialData = {
   minimum: 0,
   maximum: 0,
 };
+
+export function sessionsSettingsFormValidator({minimum, maximum}) {
+  if (minimum && maximum && minimum > maximum) {
+    const msg = Translate.string('The minimum value cannot be greater than the maximum value.');
+    return {
+      minimum: msg,
+      maximum: msg,
+    };
+  }
+}

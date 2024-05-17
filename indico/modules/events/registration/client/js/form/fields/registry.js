@@ -46,6 +46,7 @@ import TextInput, {TextSettings, textSettingsFormValidator} from './TextInput';
 import TimetableSessionsInput, {
   TimetableSessionsSettings,
   timetableSessionsSettingsInitialData,
+  sessionsSettingsFormValidator,
 } from './TimetableSessions';
 
 /*
@@ -204,6 +205,7 @@ const fieldRegistry = {
     inputComponent: TimetableSessionsInput,
     settingsComponent: TimetableSessionsSettings,
     settingsFormInitialData: timetableSessionsSettingsInitialData,
+    settingsFormValidator: sessionsSettingsFormValidator,
     noRequired: true,
     hasPrice: false,
     icon: 'calendar-day',

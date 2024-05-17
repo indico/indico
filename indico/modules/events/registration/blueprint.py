@@ -232,7 +232,7 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/<int:registration_id>/partici
 
 # API
 _bp.add_url_rule('/api/registration-forms', 'api_registration_forms', api_misc.RHAPIRegistrationForms)
-_bp.add_url_rule('/api/timetable', 'api_event_timetable', api_misc.RHAPIEventSessionBlocks)
+_bp.add_url_rule('/api/registration/session-blocks', 'api_session_blocks', api_misc.RHAPIEventSessionBlocks)
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/tags/assign', 'api_registration_tags_assign',
                  tags.RHAPIRegistrationTagsAssign, methods=('POST',))
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/privacy/consent', 'api_registration_change_consent',

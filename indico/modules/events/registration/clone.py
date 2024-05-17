@@ -148,7 +148,7 @@ class RegistrationCloner(EventCloner):
                     mapped_sessions_data = []
                     # If timetable is not cloned, assign an empty array to this field.
                     if session_blocks_map:
-                        mapped_sessions_data = [next((session_blocks_map.get(session).id
+                        mapped_sessions_data = [next((session_blocks_map['session'].id
                                                 for session in session_blocks_map if session.id == _id), None)
                                                 for _id in new_registration_data.data]
                     new_registration_data.data = mapped_sessions_data

@@ -92,6 +92,8 @@
         {{- render_accommodation(friendly_data) -}}
     {%- elif type == 'multi_choice' -%}
         {{- render_multichoice(friendly_data) -}}
+    {%- elif type == 'sessions' -%}
+        {{- render_sessions(friendly_data) -}}
     {%- else -%}
         {{- friendly_data -}}
     {%- endif -%}
@@ -111,6 +113,10 @@
 
 {% macro render_multichoice(friendly_data) %}
     {{- friendly_data | join(', ') -}}
+{% endmacro %}
+
+{% macro render_sessions(friendly_data) %}
+    {{- friendly_data | join('; ') -}}
 {% endmacro %}
 
 
