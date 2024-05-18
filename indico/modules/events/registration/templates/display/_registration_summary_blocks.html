@@ -153,6 +153,9 @@
                     </div>
                 {% endif %}
                 {% if can_get_document %}
+                    <div class="i-box-title">
+                        {% trans %}There is no document yet{% endtrans %}
+                    </div>
                     <a href="#" class="i-button accept icon-agreement"
                         data-callback="printReceipts"
                         data-params="{{ {'registration_id': [registration.id|string],
