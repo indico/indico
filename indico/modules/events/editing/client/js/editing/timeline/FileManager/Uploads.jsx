@@ -26,9 +26,9 @@ export default function Uploads({uploads}) {
           position="right center"
           content={Translate.string('An error occurred while uploading this file')}
           trigger={
-            <Message styleName="uploading-file-row" color={failed ? 'red' : undefined}>
+            <Message styleName="uploading-file-row" negative={failed}>
               <Icon loading={!failed} name={failed ? 'exclamation' : 'spinner'} />
-              <span styleName="file-state" className={failed ? undefined : 'uploading'}>
+              <span styleName="file-state" className={failed ? 'error' : 'uploading'}>
                 {name}
               </span>
               {!failed && <Progress percent={percent} attached="bottom" color="blue" />}
