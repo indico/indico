@@ -181,10 +181,10 @@ function FileType({
               }
               trigger={
                 <Message
-                  color="red"
                   onDismiss={() => {
                     dispatch(actions.removeInvalidFilename(fileType.id, invalidFile));
                   }}
+                  negative
                 >
                   <Icon name="ban" />
                   {invalidFile}
