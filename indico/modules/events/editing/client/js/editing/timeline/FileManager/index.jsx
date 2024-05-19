@@ -166,10 +166,10 @@ function FileType({
       </h3>
       <FileRequirements fileType={fileType} />
       <FileList files={files} fileType={fileType} uploadURL={uploadURL} />
-      {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
-      {!_.isEmpty(fileType.invalidFiles) && (
-        <div style={{paddingBottom: '1em'}}>
-          {fileType.invalidFiles.map(invalidFile => (
+      <div styleName="box-list">
+        {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
+        {!_.isEmpty(fileType.invalidFiles) &&
+          fileType.invalidFiles.map(invalidFile => (
             <Popup
               position="right center"
               key={`${invalidFile}-${Date.now()}`}
@@ -184,33 +184,33 @@ function FileType({
                   onDismiss={() => {
                     dispatch(actions.removeInvalidFilename(fileType.id, invalidFile));
                   }}
+                  negative
                 >
-                  <Icon name="ban" color="orange" />
+                  <Icon name="ban" />
                   {invalidFile}
                 </Message>
               }
             />
           ))}
+        <div styleName="outer-dropzone">
+          {uploadableFiles && uploadableFiles.length > 0 && (
+            <Dropdown
+              className="primary"
+              style={{marginBottom: '1em'}}
+              text={Translate.string('Use an existing file')}
+              options={uploadableFiles.map((uf, i) => ({
+                text: uf.filename,
+                value: i,
+                disabled: files.some(f => f.id === uf.id),
+              }))}
+              onChange={onChangeDropdown}
+              selectOnNavigation={false}
+              selectOnBlur={false}
+              value={null}
+            />
+          )}
+          <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
         </div>
-      )}
-      <div styleName="outer-dropzone">
-        {uploadableFiles && uploadableFiles.length > 0 && (
-          <Dropdown
-            className="primary"
-            style={{marginBottom: '1em'}}
-            text={Translate.string('Use an existing file')}
-            options={uploadableFiles.map((uf, i) => ({
-              text: uf.filename,
-              value: i,
-              disabled: files.some(f => f.id === uf.id),
-            }))}
-            onChange={onChangeDropdown}
-            selectOnNavigation={false}
-            selectOnBlur={false}
-            value={null}
-          />
-        )}
-        <Dropzone dropzoneRef={ref} fileType={fileType} files={files} uploadURL={uploadURL} />
       </div>
     </div>
   );

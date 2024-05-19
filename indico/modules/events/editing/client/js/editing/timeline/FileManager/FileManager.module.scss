@@ -57,6 +57,16 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .box-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+
+      :global(.ui.message) {
+        margin: 0;
+      }
+    }
   }
 
   .file-type h3 {
@@ -132,7 +142,6 @@
 
 .uploading-file-list {
   @extend .file-list;
-  padding-bottom: 1em;
 
   .uploading-file-row {
     display: flex;
