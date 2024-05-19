@@ -278,6 +278,8 @@ def reset_editable(revision):
     was_published = editable.published_revision is not None
     editable.published_revision = None
     db.session.flush()
+    if editable.valid_revisions[-2].type == RevisionType.needs_submitter_confirmation:
+        editable.valid_revisions[-2].is_undone = True
     revision.is_undone = True
     new_revision = EditingRevision(user=editable.editor, type=RevisionType.reset)
     editable.revisions.append(new_revision)
