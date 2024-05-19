@@ -99,6 +99,9 @@ export const revisionStates = {
   [RevisionType.replacement]: {
     any: Translate.string('Revision has been replaced'),
   },
+  [RevisionType.reset]: {
+    any: Translate.string("This editable's state has been reset"),
+  },
 };
 
 function getRevisionHeader(revisions, revision) {

@@ -17,6 +17,16 @@ export const RevisionType = {
   acceptance: 'acceptance',
   rejection: 'rejection',
   replacement: 'replacement',
+  reset: 'reset',
+};
+
+export const EditableState = {
+  new: 'new',
+  ready_for_review: 'ready_for_review',
+  needs_submitter_confirmation: 'needs_submitter_confirmation',
+  needs_submitter_changes: 'needs_submitter_changes',
+  accepted: 'accepted',
+  rejected: 'rejected',
 };
 
 export const RevisionTypeStates = {
@@ -29,6 +39,7 @@ export const RevisionTypeStates = {
   [RevisionType.acceptance]: 'accepted',
   [RevisionType.rejection]: 'rejected',
   [RevisionType.replacement]: 'replaced',
+  [RevisionType.reset]: 'ready_for_review',
 };
 
 export const EditingReviewAction = {
@@ -54,14 +65,12 @@ export const EditableTypeTitles = {
 export const editableTypeOrder = ['paper', 'slides', 'poster'];
 
 export const EditableStatus = {
-  replaced: Translate.string('Replaced'),
-  needs_submitter_confirmation: Translate.string('Needs submitter confirmation'),
-  rejected: Translate.string('Rejected'),
-  accepted: Translate.string('Accepted'),
-  needs_submitter_changes: Translate.string('Needs submitter changes'),
-  not_submitted: Translate.string('Not submitted'),
-  ready_for_review: Translate.string('Ready for review'),
-  new: Translate.string('New'),
+  [EditableState.new]: Translate.string('New'),
+  [EditableState.ready_for_review]: Translate.string('Ready for review'),
+  [EditableState.needs_submitter_confirmation]: Translate.string('Needs submitter confirmation'),
+  [EditableState.accepted]: Translate.string('Accepted'),
+  [EditableState.needs_submitter_changes]: Translate.string('Needs submitter changes'),
+  [EditableState.rejected]: Translate.string('Rejected'),
 };
 
 export const EditableEditingTitles = {

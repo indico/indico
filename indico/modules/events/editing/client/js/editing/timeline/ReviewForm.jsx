@@ -29,6 +29,7 @@ import {
   getDetails,
   getStaticData,
   canReviewLastRevision,
+  getLastRevisionWithFiles,
 } from './selectors';
 import {blockPropTypes} from './util';
 
@@ -64,6 +65,7 @@ const judgmentOptions = [
 export default function ReviewForm({block}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
+  const lastRevisionWithFiles = useSelector(getLastRevisionWithFiles);
   const canJudge = useSelector(canJudgeLastRevision);
   const canReview = useSelector(canReviewLastRevision);
   const {canPerformSubmitterActions, contribution, editor} = useSelector(getDetails);
@@ -108,7 +110,7 @@ export default function ReviewForm({block}) {
             contributionId={contribution.id}
             contributionCode={contribution.code}
             fileTypes={{[editableType]: fileTypes}}
-            uploadableFiles={lastRevision.files}
+            uploadableFiles={lastRevisionWithFiles.files}
             text={Translate.string('Submit files')}
             onSubmit={onSubmit}
           />

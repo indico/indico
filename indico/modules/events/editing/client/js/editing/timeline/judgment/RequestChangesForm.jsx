@@ -20,13 +20,20 @@ import {Translate} from 'indico/react/i18n';
 import {EditingReviewAction} from '../../../models';
 import {reviewEditable} from '../actions';
 import {FinalFileManager} from '../FileManager';
-import {getFileTypes, getLastRevision, getNonSystemTags, getStaticData} from '../selectors';
+import {
+  getFileTypes,
+  getLastRevision,
+  getLastRevisionWithFiles,
+  getNonSystemTags,
+  getStaticData,
+} from '../selectors';
 
 import FinalTagInput from './TagInput';
 
 export default function RequestChangesForm({setLoading, onSuccess}) {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
+  const lastRevisionWithFiles = useSelector(getLastRevisionWithFiles);
   const staticData = useSelector(getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const fileTypes = useSelector(getFileTypes);
@@ -84,7 +91,7 @@ export default function RequestChangesForm({setLoading, onSuccess}) {
             <FinalFileManager
               name="files"
               fileTypes={fileTypes}
-              files={lastRevision.files}
+              files={lastRevisionWithFiles.files}
               uploadURL={uploadURL({
                 event_id: eventId,
                 contrib_id: contributionId,

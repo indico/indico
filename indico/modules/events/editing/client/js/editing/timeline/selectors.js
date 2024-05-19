@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import {createSelector} from 'reselect';
 
-import {RevisionType} from '../../models';
+import {EditableState, RevisionType} from '../../models';
 
 export const getDetails = state => (state.timeline ? state.timeline.details : null);
 export const getNewDetails = state => (state.timeline ? state.timeline.newDetails : null);
@@ -18,6 +18,10 @@ export const isTimelineOutdated = createSelector(
   getDetails,
   getNewDetails,
   (details, newDetails) => newDetails !== null && !_.isEqual(details, newDetails)
+);
+export const getEditableState = createSelector(
+  getDetails,
+  details => details?.state
 );
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(
@@ -41,7 +45,7 @@ export const getLastTimelineBlockWithFiles = createSelector(
 );
 export const getValidRevisions = createSelector(
   getDetails,
-  details => details && details.revisions.filter(({isUndone}) => !isUndone)
+  details => details?.revisions.filter(({isUndone}) => !isUndone)
 );
 export const getLastRevision = createSelector(
   getValidRevisions,
@@ -61,12 +65,8 @@ export const canReviewLastRevision = createSelector(
   lastRevision => lastRevision && lastRevision.type.name === RevisionType.ready_for_review
 );
 export const needsSubmitterChanges = createSelector(
-  getLastRevision,
-  lastRevision =>
-    lastRevision &&
-    [RevisionType.changes_rejection, RevisionType.needs_submitter_changes].includes(
-      lastRevision.type.name
-    )
+  getEditableState,
+  state => state?.name === EditableState.needs_submitter_changes
 );
 export const needsSubmitterConfirmation = createSelector(
   getLastRevision,
@@ -106,37 +106,37 @@ export const getPublishableFileTypes = createSelector(
 
 export const hasPublishableFiles = createSelector(
   getPublishableFileTypes,
-  getValidTimelineBlocks,
-  (publishableFileTypes, blocks) => {
-    const usedFileTypes = new Set(blocks[blocks.length - 1].files.map(f => f.fileType));
+  getLastRevisionWithFiles,
+  (publishableFileTypes, revision) => {
+    const usedFileTypes = new Set(revision.files.map(f => f.fileType));
     return publishableFileTypes.some(ft => usedFileTypes.has(ft.id));
   }
 );
 
 export const canPerformSubmitterActions = createSelector(
   getDetails,
-  details => details && details.canPerformSubmitterActions
+  details => details?.canPerformSubmitterActions
 );
 
 export const canPerformEditorActions = createSelector(
   getDetails,
-  details => details && details.canPerformEditorActions
+  details => details?.canPerformEditorActions
 );
 
 export const canDeleteEditable = createSelector(
   getDetails,
-  details => details && details.canDelete
+  details => details?.canDelete
 );
 
 export const editingEnabled = createSelector(
   getDetails,
-  details => details && details.editingEnabled
+  details => details?.editingEnabled
 );
 
 export const canJudgeLastRevision = createSelector(
-  getLastRevision,
+  getEditableState,
   canPerformEditorActions,
-  (lastRevision, allowed) => lastRevision.type.name === RevisionType.ready_for_review && allowed
+  (state, allowed) => allowed && state?.name === EditableState.ready_for_review
 );
 
 export const canEditLastRevision = createSelector(
@@ -145,6 +145,7 @@ export const canEditLastRevision = createSelector(
   (latestRevision, allowed) =>
     allowed &&
     latestRevision &&
-    !latestRevision.isUndone &&
-    ![RevisionType.new, RevisionType.ready_for_review].includes(latestRevision.type.name)
+    ![RevisionType.new, RevisionType.ready_for_review, RevisionType.reset].includes(
+      latestRevision.type.name
+    )
 );

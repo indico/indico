@@ -489,3 +489,4 @@ class ServiceActionResultSchema(mm.Schema):
     comments = fields.List(fields.Nested(ReviewCommentSchema))
     tags = fields.List(fields.Int())
     redirect = fields.String()
+    reset = fields.Boolean()

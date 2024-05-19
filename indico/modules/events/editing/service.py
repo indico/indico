@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.modules.events.editing import logger
 from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.models.revisions import RevisionType
-from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision
+from indico.modules.events.editing.operations import create_revision_comment, publish_editable_revision, reset_editable
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingRevisionSignedSchema,
                                                    ServiceActionResultSchema, ServiceActionSchema,
                                                    ServiceCreateEditableResultSchema, ServiceReviewEditableSchema,
@@ -229,24 +229,21 @@ def service_handle_custom_action(editable, revision, user, action):
         _log_service_error(exc, 'Calling listener for triggering custom action failed')
         raise ServiceRequestFailed(exc)
 
-    db.session.expire(revision)
-    db.session.expire(editable)
-    # if the revision got undone, we're done
-    if revision.is_undone:
-        return resp
-
-    if revision.type == RevisionType.acceptance:
-        publish = resp.get('publish')
-        if publish:
-            publish_editable_revision(revision)
-        elif publish is False:
-            revision.editable.published_revision = None
     if 'tags' in resp:
         resp_tag_ids = set(map(int, resp['tags']))
         revision.tags = {tag for tag in editable.event.editing_tags if tag.id in resp_tag_ids}
     for comment in resp.get('comments', []):
         create_revision_comment(revision, User.get_system_user(), comment['text'], internal=comment['internal'])
     db.session.flush()
+
+    if resp.get('reset'):
+        reset_editable(revision)
+    elif revision.type == RevisionType.acceptance:
+        publish = resp.get('publish')
+        if publish:
+            publish_editable_revision(revision)
+        elif publish is False:
+            revision.editable.published_revision = None
     return resp
 
 
