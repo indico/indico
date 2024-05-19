@@ -33,6 +33,7 @@ Bugfixes
   of very long survey option titles (:pr:`6325`)
 - Only allow accessing avatars for published registrations (:pr:`6347`)
 - Fix error when trying to import data from an unlisted event (:issue:`6350`, :pr:`6351`)
+- Show results from the Get Next Editable search on top of the list (:pr:`6353`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
