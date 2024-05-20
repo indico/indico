@@ -58,7 +58,7 @@ function CommentModal({onSubmit, onClose}) {
         required
       />
       <FinalCheckbox
-        label={Translate.string('Restrict visibility of this comment to other editors')}
+        label={Translate.string('Restrict visibility of this comment to other editors only')}
         name="internal"
         toggle
       />

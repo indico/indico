@@ -59,7 +59,9 @@ export default function CommentForm({onSubmit, onToggleExpand, initialValues, ex
               <>
                 {canCreateInternalComments && (
                   <FinalCheckbox
-                    label={Translate.string('Restrict visibility of this comment to other editors')}
+                    label={Translate.string(
+                      'Restrict visibility of this comment to other editors only'
+                    )}
                     name="internal"
                     toggle
                   />
