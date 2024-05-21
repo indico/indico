@@ -36,10 +36,10 @@ class IndicoPass(Pass):
             self.add_default_images(names=[name])
 
     def add_default_images(self, names=('icon.png', 'logo.png')):
-        path = os.path.join(current_app.root_path, 'web', 'static')
-        logo_path = os.path.join(path, 'images', 'logo_indico_small.png')
+        logo_path = Path(current_app.root_path) / 'web' / 'static' / 'images' / 'logo_indico_small.png'
+        logo_data = logo_path.read_bytes()
         for name in names:
-            self._files[name] = Path(logo_path).read_bytes()
+            self._files[name] = logo_data
 
     def _createSignature(self, manifest, certificate, key, wwdr_certificate, password):  # noqa: N802
         """Creates a signature (DER encoded) of the manifest.
