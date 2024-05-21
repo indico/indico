@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import copy
 import json
 import os
 import random
@@ -772,15 +773,20 @@ def _format_location(data):
         return None
 
 
-def split_log_location_changes(changes):
-    location_changes = changes.pop('location_data', None)
-    if location_changes is None:
-        return
+def split_log_location_changes(changes: dict) -> dict:
+    """Re-process change dict to include readable location information (for logging)."""
+    res = copy.copy(changes)
+
+    if (location_changes := res.get('location_data')) is None:
+        return res
+
     if location_changes[0]['address'] != location_changes[1]['address']:
-        changes['address'] = (location_changes[0]['address'], location_changes[1]['address'])
+        res['address'] = (location_changes[0]['address'], location_changes[1]['address'])
     venue_room_changes = (_get_venue_room_name(location_changes[0]), _get_venue_room_name(location_changes[1]))
     if venue_room_changes[0] != venue_room_changes[1]:
-        changes['venue_room'] = list(map(_format_location, venue_room_changes))
+        res['venue_room'] = list(map(_format_location, venue_room_changes))
+
+    return res
 
 
 def format_log_person(data):
