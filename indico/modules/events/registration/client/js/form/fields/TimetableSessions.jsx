@@ -10,7 +10,7 @@ import sessionBlocksURL from 'indico-url:event_registration.api_session_blocks';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Checkbox, Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
 
@@ -34,7 +34,7 @@ function TimetableSessionsComponent({
   value,
   name,
   sessionData,
-  onChange,
+  onChange: _onChange,
   onFocus,
   onBlur,
   collapseDays,
@@ -44,27 +44,43 @@ function TimetableSessionsComponent({
 }) {
   const [expandedHeaders, setExpandedHeaders] = useState({});
 
-  const markTouched = () => {
-    onFocus();
-    onBlur();
-  };
-
-  function handleValueChange(e, data) {
-    markTouched();
-    const id = data.value;
-    const newValue = _.xor(value, [id]);
-    onChange(newValue);
-  }
-
-  const handleHeaderClick = date => () => {
-    setExpandedHeaders({...expandedHeaders, [date]: !expandedHeaders[date]});
-  };
-
   useEffect(() => {
     setExpandedHeaders(
       Object.fromEntries(Object.keys(sessionData || {}).map(date => [date, !collapseDays]))
     );
   }, [sessionData, collapseDays]);
+
+  const validBlockIds = useMemo(() => {
+    if (!sessionData) {
+      return [];
+    }
+    return new Set(
+      Object.values(sessionData)
+        .flat()
+        .map(x => x.id)
+    );
+  }, [sessionData]);
+
+  const markTouched = () => {
+    onFocus();
+    onBlur();
+  };
+
+  const onChange = val => {
+    // remove any invalid IDs (deleted session blocks)
+    _onChange(val.filter(x => validBlockIds.has(x)));
+  };
+
+  const handleValueChange = (e, data) => {
+    markTouched();
+    const id = data.value;
+    const newValue = _.xor(value, [id]);
+    onChange(newValue);
+  };
+
+  const handleHeaderClick = date => () => {
+    setExpandedHeaders({...expandedHeaders, [date]: !expandedHeaders[date]});
+  };
 
   return (
     <Form.Group styleName="timetablesessions-field">

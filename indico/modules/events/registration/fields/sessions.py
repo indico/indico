@@ -60,6 +60,9 @@ class SessionsField(RegistrationFormFieldBase):
                 old_selection = set(old_data.data)
             event = self.form_item.registration_form.event
             blocks = SessionBlock.query.filter(SessionBlock.id.in_(new_data)).all()
+            # disallow referencing invalid session blocks
+            if len(blocks) != len(new_data):
+                raise ValidationError('Cannot select session blocks which do not exist')
             # disallow any session blocks from other events
             if not all(sb.event == event for sb in blocks):
                 raise ValidationError('Cannot select session blocks from another event')
