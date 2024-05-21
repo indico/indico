@@ -145,13 +145,25 @@ class RegistrationCloner(EventCloner):
                         new_registration_data.save(fd)
                 # Assigns the mapped session blocks for cloned event to the cloned registration.
                 if new_registration_data.field_data.field.input_type == 'sessions':
-                    mapped_sessions_data = []
-                    # If timetable is not cloned, assign an empty array to this field.
-                    if session_blocks_map:
-                        mapped_sessions_data = [next((session_blocks_map['session'].id
-                                                for session in session_blocks_map if session.id == _id), None)
-                                                for _id in new_registration_data.data]
-                    new_registration_data.data = mapped_sessions_data
+                    if not session_blocks_map:
+                        # If timetable/sessions are not cloned, we cannot preserve data in this field as
+                        # it would reference Ids from the old event
+                        new_registration_data.data = []
+                    else:
+                        new_registration_data.data = [
+                            new_block_id
+                            for old_block_id in new_registration_data.data
+                            if (
+                                new_block_id := next(
+                                    (
+                                        session_blocks_map[block].id
+                                        for block in session_blocks_map
+                                        if block.id == old_block_id
+                                    ),
+                                    None,
+                                )
+                            )
+                        ]
             db.session.flush()
             signals.event.registration_state_updated.send(new_registration, previous_state=None)
 
