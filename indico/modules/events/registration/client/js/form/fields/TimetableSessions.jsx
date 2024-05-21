@@ -14,7 +14,7 @@ import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {Checkbox, Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
 
-import {FinalDropdown, FinalField, FinalInput, validators as v} from 'indico/react/forms';
+import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
@@ -37,7 +37,7 @@ function TimetableSessionsComponent({
   onChange,
   onFocus,
   onBlur,
-  display,
+  collapseDays,
   minimum,
   maximum,
   ...props
@@ -66,9 +66,9 @@ function TimetableSessionsComponent({
 
   useEffect(() => {
     setExpandedHeaders(
-      sessionData && display === 'expanded' ? [...Array(_.keys(sessionData).length).keys()] : []
+      sessionData && !collapseDays ? [...Array(_.keys(sessionData).length).keys()] : []
     );
-  }, [sessionData, display]);
+  }, [sessionData, collapseDays]);
 
   return (
     <Form.Group styleName="timetablesessions-field">
@@ -101,14 +101,13 @@ TimetableSessionsComponent.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
-  display: PropTypes.oneOf(['expanded', 'collapsed']),
+  collapseDays: PropTypes.bool.isRequired,
   maximum: PropTypes.number.isRequired,
   minimum: PropTypes.number.isRequired,
 };
 
 TimetableSessionsComponent.defaultProps = {
   sessionData: {},
-  display: 'expanded',
 };
 
 function SessionBlockHeader({
@@ -189,7 +188,7 @@ export default function TimetableSessionsInput({
   htmlName,
   disabled,
   isRequired,
-  display,
+  collapseDays,
   minimum,
   maximum,
 }) {
@@ -219,7 +218,7 @@ export default function TimetableSessionsInput({
       component={TimetableSessionsComponent}
       disabled={disabled}
       required={isRequired}
-      display={display}
+      collapseDays={collapseDays}
       minimum={minimum}
       maximum={maximum}
       sessionData={sessionData}
@@ -239,14 +238,14 @@ TimetableSessionsInput.propTypes = {
   htmlName: PropTypes.string.isRequired,
   isRequired: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
-  display: PropTypes.string,
+  collapseDays: PropTypes.bool,
   minimum: PropTypes.number,
   maximum: PropTypes.number,
 };
 
 TimetableSessionsInput.defaultProps = {
   disabled: false,
-  display: 'expanded',
+  collapseDays: false,
   minimum: 0,
   maximum: 0,
 };
@@ -254,17 +253,7 @@ TimetableSessionsInput.defaultProps = {
 export function TimetableSessionsSettings() {
   return (
     <>
-      <FinalDropdown
-        name="display"
-        label={Translate.string('Default display for sessions')}
-        options={[
-          {key: 'expanded', value: 'expanded', text: Translate.string('Expanded dropdown')},
-          {key: 'collapsed', value: 'collapsed', text: Translate.string('Collapsed dropdown')},
-        ]}
-        selection
-        required
-      />
-
+      <FinalCheckbox name="collapseDays" label={Translate.string('Collapse days')} toggle />
       <FinalInput
         name="minimum"
         type="number"
@@ -294,7 +283,7 @@ export function TimetableSessionsSettings() {
 }
 
 export const timetableSessionsSettingsInitialData = {
-  display: 'expanded',
+  collapse_days: false,
   minimum: 0,
   maximum: 0,
 };

@@ -22,7 +22,7 @@ from indico.util.i18n import _
 class SessionsFieldDataSchema(mm.Schema):
     minimum = fields.Integer(load_default=0, validate=validate.Range(0))
     maximum = fields.Integer(load_default=0, validate=validate.Range(0))
-    display = fields.String(load_default='expanded', validate=validate.OneOf(['expanded', 'collapsed']))
+    collapse_days = fields.Bool(load_default=False)
 
     @validates_schema(skip_on_field_errors=True)
     def validate_min_max(self, data, **kwargs):
