@@ -73,7 +73,7 @@ class AppleWalletManager:
         self.cert = None
 
     def _get_wallet_serial(self, registration):
-        return registration.apple_wallet_serial if registration.apple_wallet_serial else registration.ticket_uuid
+        return registration.apple_wallet_serial or registration.ticket_uuid
 
     @property
     def is_configured(self):
