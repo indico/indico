@@ -134,9 +134,9 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
     _assert_yaml_snapshot(snapshot, data, 'subcontribution_export_schema.yml')
 
 
-@pytest.mark.usefixtures('dummy_receipt_file')
-def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
+def test_registration_export_schema(snapshot, create_receipt_file, dummy_reg_with_file_field, dummy_event_template):
     from indico.modules.users.export_schemas import RegistrationExportSchema
+    create_receipt_file(dummy_reg_with_file_field, dummy_event_template)
 
     data = RegistrationExportSchema().dump(dummy_reg_with_file_field)
     _assert_yaml_snapshot(snapshot, data, 'registration_export_schema.yml')
@@ -214,10 +214,13 @@ def test_empty_user_data_export_schema(snapshot, dummy_user):
 
 @pytest.mark.parametrize('include_files', (False, True), ids=('without_files', 'with_files'))
 @pytest.mark.usefixtures('dummy_reservation', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
-                         'dummy_reg_with_file_field', 'dummy_editing_revision_file', 'dummy_receipt_file')
+                         'dummy_reg_with_file_field', 'dummy_editing_revision_file')
 def test_user_data_export_schema(request, snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
-                                 dummy_subcontribution, dummy_event_person, dummy_room, include_files):
+                                 dummy_subcontribution, dummy_event_person, dummy_room, include_files,
+                                 create_receipt_file, dummy_reg_with_file_field, dummy_event_template):
     from indico.modules.users.export_schemas import UserDataExportSchema
+
+    create_receipt_file(dummy_reg_with_file_field, dummy_event_template)
 
     setup_settings(dummy_user.settings)
     setup_personal_data(dummy_user, dummy_event, dummy_category)

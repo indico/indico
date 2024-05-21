@@ -168,7 +168,11 @@ registrations:
   is_deleted: false
   last_name: Pig
   price: '0'
-  receipt_files: []
+  receipt_files:
+  - file_id: <id>
+    filename: test.pdf
+    is_deleted: false
+    url: http://localhost/files/ac90c95e-573a-46aa-a2d3-88a46ac8855e/download?token=ImFjOTBjOTVlNTczYTQ2YWFhMmQzODhhNDZhYzg4NTVlIg.YoolwA.k8SDJQx12quTdsn9uyxsFSY-Crw
   rejection_reason: ''
   state: complete
   submitted_dt: <timestamp>
