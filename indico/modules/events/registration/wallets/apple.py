@@ -32,7 +32,7 @@ class IndicoPass(Pass):
         try:
             response = requests.get(url)
             self._files[name] = response.content
-        except (requests.HTTPError, requests.ConnectionError):
+        except requests.RequestException:
             self.add_default_images(names=[name])
 
     def add_default_images(self, names=('icon.png', 'logo.png')):
