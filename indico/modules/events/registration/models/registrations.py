@@ -782,7 +782,7 @@ class Registration(db.Model):
             return gwm.get_ticket_link(self)
 
     def generate_ticket_apple_wallet(self):
-        """Return link to Google Wallet ticket display."""
+        """Download ticket in Passbook / Apple Wallet format."""
         if not self.registration_form.ticket_apple_wallet:
             return None
         gwm = AppleWalletManager(self.event)
