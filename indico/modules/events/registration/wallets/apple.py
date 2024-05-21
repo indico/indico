@@ -134,10 +134,5 @@ class AppleWalletManager:
         temp = BytesIO()
         temp.seek(0)
         registration.apple_wallet_serial = passfile.serialNumber  # Save ticket serial for updates
-        try:
-            pkpass = passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
-                                     self.settings['apple_wallet_password'], zip_file=temp)
-        except ValueError as exc:
-            logger.warning('Could not create Apple Pass ticket: %s', exc)
-            raise
-        return pkpass
+        return passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
+                               self.settings['apple_wallet_password'], zip_file=temp)
