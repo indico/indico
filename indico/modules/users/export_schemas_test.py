@@ -134,6 +134,7 @@ def test_subcontribution_export_schema(snapshot, db, dummy_user, dummy_subcontri
     _assert_yaml_snapshot(snapshot, data, 'subcontribution_export_schema.yml')
 
 
+@pytest.mark.usefixtures('dummy_receipt_file')
 def test_registration_export_schema(snapshot, dummy_reg_with_file_field):
     from indico.modules.users.export_schemas import RegistrationExportSchema
 
@@ -213,7 +214,7 @@ def test_empty_user_data_export_schema(snapshot, dummy_user):
 
 @pytest.mark.parametrize('include_files', (False, True), ids=('without_files', 'with_files'))
 @pytest.mark.usefixtures('dummy_reservation', 'dummy_attachment', 'dummy_abstract_file', 'dummy_paper_file',
-                         'dummy_reg_with_file_field', 'dummy_editing_revision_file')
+                         'dummy_reg_with_file_field', 'dummy_editing_revision_file', 'dummy_receipt_file')
 def test_user_data_export_schema(request, snapshot, db, dummy_user, dummy_category, dummy_event, dummy_contribution,
                                  dummy_subcontribution, dummy_event_person, dummy_room, include_files):
     from indico.modules.users.export_schemas import UserDataExportSchema
