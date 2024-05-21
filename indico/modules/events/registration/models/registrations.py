@@ -785,9 +785,9 @@ class Registration(db.Model):
         """Download ticket in Passbook / Apple Wallet format."""
         if not self.registration_form.ticket_apple_wallet:
             return None
-        gwm = AppleWalletManager(self.event)
-        if gwm.is_configured:
-            return gwm.get_ticket(self)
+        awm = AppleWalletManager(self.event)
+        if awm.is_configured:
+            return awm.get_ticket(self)
 
 
 class RegistrationData(StoredFileMixin, db.Model):
