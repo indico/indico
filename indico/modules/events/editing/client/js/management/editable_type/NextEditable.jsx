@@ -163,7 +163,14 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
 
   const filteredEditables = useMemo(
     () =>
-      editables?.map(e => ({...e, canAssignSelf: filteredSet.has(e.id) ? e.canAssignSelf : false})),
+      _.orderBy(
+        editables?.map(e => ({
+          ...e,
+          canAssignSelf: filteredSet.has(e.id) ? e.canAssignSelf : false,
+        })) || [],
+        'canAssignSelf',
+        'desc'
+      ),
     [editables, filteredSet]
   );
 
