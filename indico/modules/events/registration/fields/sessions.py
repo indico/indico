@@ -7,7 +7,6 @@
 
 import json
 
-import flask
 from flask import session
 from marshmallow import ValidationError, fields, validate, validates_schema
 
@@ -57,7 +56,7 @@ class SessionsField(RegistrationFormFieldBase):
                     raise ValidationError(_('Please select at least {min} sessions.').format(min=_min))
 
         def _check_session_block_is_valid(new_data):
-            event = flask.g.rh.event
+            event = self.form_item.registration_form.event
             if not all(s.can_access(session.user)
                        for s in SessionBlock.query.join(Session).filter(SessionBlock.session_id == Session.id,
                                                                         Session.event_id == event.id,
