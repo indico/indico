@@ -13,6 +13,9 @@ from indico.modules.files.models.files import File
 from indico.modules.receipts.models.files import ReceiptFile
 
 
+pytest_plugins = 'indico.modules.receipts.controllers.access_test'
+
+
 @pytest.fixture
 def dummy_receipt_file(db, dummy_event_template, dummy_reg):
     file = File(filename='test.pdf', content_type='application/pdf')

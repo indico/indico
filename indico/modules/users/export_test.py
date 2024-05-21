@@ -21,8 +21,8 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.files.models.files import File
 from indico.modules.users.export import (build_storage_path, convert_to_yaml, export_user_data, get_abstracts,
                                          get_attachments, get_contributions, get_editables, get_old_requests,
-                                         get_papers, get_registration_files, get_subcontributions, options_to_fields,
-                                         serialize_user_data)
+                                         get_papers, get_registration_documents, get_registration_files,
+                                         get_subcontributions, options_to_fields, serialize_user_data)
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
 from indico.util.date_time import now_utc
 
@@ -205,8 +205,10 @@ def test_get_registration_files(dummy_user):
 
 
 @pytest.mark.usefixtures('dummy_receipt_file')
-def test_get_registration_documents(dummy_receipt_file):
-    print(dummy_receipt_file)
+def test_get_registration_documents(dummy_user):
+    files = get_registration_documents(dummy_user)
+    assert len(files) == 1
+    assert files[0].file.filename == 'test.pdf'
 
 
 def test_get_get_attachments(db, dummy_user, create_user, dummy_event, create_attachment):
