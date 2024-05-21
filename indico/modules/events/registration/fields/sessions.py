@@ -46,13 +46,13 @@ class SessionsField(RegistrationFormFieldBase):
 
     def get_validators(self, existing_registration):
         def _check_number_of_sessions(new_data):
-            _min = self.view_data.get('minimum')
-            _max = self.view_data.get('maximum')
-            if _max is not None and _min is not None:
-                if _max != 0 and len(new_data) > _max:
-                    raise ValidationError(_('Please select no more than {max} sessions.').format(max=_max))
-                if _min != 0 and len(new_data) < _min:
-                    raise ValidationError(_('Please select at least {min} sessions.').format(min=_min))
+            min_ = self.form_item.data.get('minimum')
+            max_ = self.form_item.data.get('maximum')
+            if max_ is not None and min_ is not None:
+                if max_ != 0 and len(new_data) > max_:
+                    raise ValidationError(_('Please select no more than {max} sessions.').format(max=max_))
+                if min_ != 0 and len(new_data) < min_:
+                    raise ValidationError(_('Please select at least {min} sessions.').format(min=min_))
 
         def _check_session_block_is_valid(new_data):
             old_selection = set()
