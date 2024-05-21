@@ -10,6 +10,13 @@
 .file-display-wrapper {
   display: flex;
   flex-direction: column;
+
+  &.outdated {
+    padding: 0.5em;
+    background-image: repeating-linear-gradient(-45deg, $pastel-gray 0 2px, $white 3px 15px);
+    border: 1px solid $pastel-gray;
+    border-radius: 0.2em;
+  }
 }
 
 .file-display {

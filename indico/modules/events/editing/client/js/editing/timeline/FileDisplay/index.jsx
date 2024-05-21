@@ -11,8 +11,10 @@ import {Button, Icon, Label, Popup} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {toClasses} from 'indico/react/util';
 
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
+
 import './FileDisplay.module.scss';
 
 function FileListDisplay({files}) {
@@ -74,9 +76,14 @@ FileTypeDisplay.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-export default function FileDisplay({downloadURL, fileTypes, files, tags}) {
+export default function FileDisplay({downloadURL, fileTypes, files, tags, outdated}) {
   return (
-    <div styleName="file-display-wrapper">
+    <div
+      styleName={toClasses({
+        'file-display-wrapper': true,
+        'outdated': outdated && files.length > 0,
+      })}
+    >
       {files.length !== 0 && (
         <div styleName="file-display">
           {mapFileTypes(fileTypes, files).map(fileType => (
@@ -122,4 +129,9 @@ FileDisplay.propTypes = {
       verboseTitle: PropTypes.string.isRequired,
     })
   ).isRequired,
+  outdated: PropTypes.bool,
+};
+
+FileDisplay.defaultProps = {
+  outdated: false,
 };
