@@ -30,6 +30,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.static.models.static import StaticSite
 from indico.modules.events.surveys.schemas import SurveySubmissionSchema
 from indico.modules.rb.models.rooms import Room
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users import User
 from indico.modules.users.export import (build_storage_path, get_abstracts, get_attachments, get_contributions,
                                          get_editables, get_note_revisions, get_papers, get_registrations,
@@ -127,6 +128,16 @@ class RegistrationFileExportSchema(Schema):
     _archive_path = fields.Function(lambda file: build_storage_path(file))
 
 
+class ReceiptFileExportSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ReceiptFile
+        fields = ('file_id', 'is_deleted', 'filename', 'url', '_archive_path')
+
+    filename = fields.String(attribute='file.filename')
+    url = fields.String(attribute='file.signed_download_url')
+    _archive_path = fields.Function(lambda file: build_storage_path(file))
+
+
 class RegistrationDataExportSchema(Schema):
     title = fields.Function(lambda data: data.field_data.field.title)
     description = fields.Function(lambda data: data.field_data.field.description)
@@ -161,17 +172,22 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
         model = Registration
         fields = ('id', 'url', 'event_id', 'event_title', 'event_url', 'state', 'currency', 'price', 'submitted_dt',
                   'email', 'first_name', 'last_name', 'is_deleted', 'checked_in', 'checked_in_dt', 'rejection_reason',
-                  'consent_to_publish', 'created_by_manager', 'fields')
+                  'consent_to_publish', 'created_by_manager', 'fields', 'receipt_files')
 
     price = fields.Decimal(as_string=True)
     url = fields.Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
     event_title = fields.Function(lambda reg: reg.event.title)
     event_url = fields.Function(lambda reg: url_for('events.display', reg.event, _external=True))
+    receipt_files = fields.Method('_serialize_receipt_files')
     fields = fields.Method('_serialize_data')
 
     def _serialize_data(self, registration):
         registration_data = [data for data in registration.data if not data.field_data.field.parent.is_manager_only]
         return RegistrationDataExportSchema(many=True).dump(registration_data)
+
+    def _serialize_receipt_files(self, registration):
+        registration_documents = list(registration.receipt_files)
+        return ReceiptFileExportSchema(many=True).dump(registration_documents)
 
 
 class SubContributionExportSchema(mm.SQLAlchemyAutoSchema):
