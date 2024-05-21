@@ -7,7 +7,7 @@
 
 import json
 import os
-import tempfile
+from io import BytesIO
 from pathlib import Path
 
 import requests
@@ -131,14 +131,13 @@ class AppleWalletManager:
         wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'wallets',
                                  'apple-wwdr.pem')
         # Create and output the Passbook file (.pkpass)
-        temp = tempfile.NamedTemporaryFile(prefix='apple_wallet_', dir=config.TEMP_DIR, delete=False)
+        temp = BytesIO()
+        temp.seek(0)
         registration.apple_wallet_serial = passfile.serialNumber  # Save ticket serial for updates
         try:
             pkpass = passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
-                                     self.settings['apple_wallet_password'],
-                                     zip_file=os.path.join(config.TEMP_DIR, temp.name))
+                                     self.settings['apple_wallet_password'], zip_file=temp)
         except ValueError as exc:
             logger.warning('Could not create Apple Pass ticket: %s', exc)
             raise
         return pkpass
-        # TBD: Add Celery task to delete up to 2 days ago generated files?
