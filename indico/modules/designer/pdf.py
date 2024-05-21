@@ -45,7 +45,7 @@ ALIGNMENTS = {
 PIXELS_CM = 50
 FONT_SIZE_RE = re.compile(r'(\d+)(pt)?')
 
-TplData = namedtuple('TplData', ['width', 'height', 'items', 'background_position', 'width_cm', 'height_cm'])
+TplData = namedtuple('TplData', ['width', 'height', 'items', 'background_position', 'width_cm', 'height_cm', 'layers'])
 
 
 def _extract_font_size(text):
@@ -67,6 +67,11 @@ class DesignerPDFBase:
         setTTFonts()
 
     def _process_tpl_data(self, tpl_data):
+        # ensure layers for existing templates
+        if 'layers' not in tpl_data:
+            tpl_data['layers'] = {'1': True}
+            for item in tpl_data['items']:
+                item['layer'] = '1'
         return TplData(width_cm=(float(tpl_data['width']) / PIXELS_CM),
                        height_cm=(float(tpl_data['height']) / PIXELS_CM),
                        **tpl_data)
