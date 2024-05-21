@@ -72,6 +72,9 @@ class AppleWalletManager:
         self.settings = self.event.category.effective_apple_wallet_config if not self.event.is_unlisted else None
         self.cert = None
 
+    def _get_wallet_serial(self, registration):
+        return registration.apple_wallet_serial if registration.apple_wallet_serial else registration.ticket_uuid
+
     @property
     def is_configured(self):
         return config.ENABLE_APPLE_WALLET and self.settings is not None
@@ -113,7 +116,7 @@ class AppleWalletManager:
         passfile.logoText = cert_details['O']  # Add Organization name at the top
         passfile.backgroundColor = '#007cac'
         passfile.foregroundColor = passfile.labelColor = '#ffffff'
-        passfile.serialNumber = registration.ticket_uuid
+        passfile.serialNumber = registration.apple_wallet_serial
         qr_data = get_ticket_qr_code_data(get_persons([registration])[0])
         passfile.barcode = Barcode(message=json.dumps(qr_data, separators=(',', ':')), format=BarcodeFormat.QR)
 
@@ -127,12 +130,12 @@ class AppleWalletManager:
         return passfile
 
     def get_ticket(self, registration) -> str:
+        registration.apple_wallet_serial = self._get_wallet_serial(registration)  # Save ticket serial for updates
         passfile = self.build_pass_object(registration)
         wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'wallets',
                                  'apple-wwdr.pem')
         # Create and output the Passbook file (.pkpass)
         temp = BytesIO()
         temp.seek(0)
-        registration.apple_wallet_serial = passfile.serialNumber  # Save ticket serial for updates
         return passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
                                self.settings['apple_wallet_password'], zip_file=temp)
