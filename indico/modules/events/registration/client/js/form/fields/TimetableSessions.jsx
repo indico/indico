@@ -42,7 +42,7 @@ function TimetableSessionsComponent({
   maximum,
   ...props
 }) {
-  const [expandedHeaders, setExpandedHeaders] = useState([]);
+  const [expandedHeaders, setExpandedHeaders] = useState({});
 
   const markTouched = () => {
     onFocus();
@@ -56,17 +56,13 @@ function TimetableSessionsComponent({
     onChange(newValue);
   }
 
-  function handleHeaderClick(e, accordion) {
-    if (expandedHeaders.includes(accordion.index)) {
-      setExpandedHeaders(expandedHeaders.filter(el => el !== accordion.index));
-    } else {
-      setExpandedHeaders([...expandedHeaders, accordion.index]);
-    }
-  }
+  const handleHeaderClick = date => () => {
+    setExpandedHeaders({...expandedHeaders, [date]: !expandedHeaders[date]});
+  };
 
   useEffect(() => {
     setExpandedHeaders(
-      sessionData && !collapseDays ? [...Array(_.keys(sessionData).length).keys()] : []
+      Object.fromEntries(Object.keys(sessionData || {}).map(date => [date, !collapseDays]))
     );
   }, [sessionData, collapseDays]);
 
@@ -81,11 +77,11 @@ function TimetableSessionsComponent({
               name={name}
               data={sessionData[date]}
               label={moment(date).format('dddd ll')}
-              isExpanded={expandedHeaders.includes(index)}
+              isExpanded={expandedHeaders[date] ?? false}
               key={date}
               handleValueChange={handleValueChange}
               onChange={onChange}
-              onClick={handleHeaderClick}
+              onClick={handleHeaderClick(date)}
               props={props}
             />
           ))}
