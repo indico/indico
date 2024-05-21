@@ -204,6 +204,11 @@ def test_get_registration_files(dummy_user):
     assert files[0].filename == 'registration_upload.txt'
 
 
+@pytest.mark.usefixtures('dummy_receipt_file')
+def test_get_registration_documents(dummy_receipt_file):
+    print(dummy_receipt_file)
+
+
 def test_get_get_attachments(db, dummy_user, create_user, dummy_event, create_attachment):
     attachments = get_attachments(dummy_user)
     assert not attachments
