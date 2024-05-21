@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import timeTableURL from 'indico-url:event_registration.api_session_blocks';
+import sessionBlocksURL from 'indico-url:event_registration.api_session_blocks';
 
 import _ from 'lodash';
 import moment from 'moment';
@@ -195,7 +195,7 @@ export default function TimetableSessionsInput({
 }) {
   const {eventId} = useSelector(getStaticData);
   const {data: sessionData} = useIndicoAxios(
-    {url: timeTableURL({event_id: eventId})},
+    {url: sessionBlocksURL({event_id: eventId})},
     {camelize: true}
   );
 
