@@ -74,7 +74,7 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
 
 
 @no_autoflush
-def update_contribution(contrib: Contribution, contrib_data, custom_fields_data=None):
+def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields_data=None):
     """Update a contribution.
 
     :param contrib: The `Contribution` to update
@@ -250,7 +250,7 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
             'convert': lambda changes: [x.name if x else None for x in changes]
         },
     }
-    split_log_location_changes(changes)
+    changes = split_log_location_changes(changes)
     if not visible_person_link_changes:
         # Don't log a person link change with no visible changes (changes
         # on an existing link or reordering). It would look quite weird in
