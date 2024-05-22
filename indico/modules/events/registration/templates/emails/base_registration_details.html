@@ -116,7 +116,7 @@
 {% endmacro %}
 
 {% macro render_sessions(friendly_data) %}
-    {{- friendly_data | join('; ') -}}
+    {{- friendly_data | join('<br>'|safe) -}}
 {% endmacro %}
 
 
