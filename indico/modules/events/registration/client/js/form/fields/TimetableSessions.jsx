@@ -24,9 +24,10 @@ import '../../../styles/regform.module.scss';
 
 const sessionDataSchema = PropTypes.arrayOf(
   PropTypes.shape({
-    fullTitle: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
-    startDt: PropTypes.string.isRequired,
+    fullTitle: PropTypes.string.isRequired,
+    startTime: PropTypes.string.isRequired,
+    endTime: PropTypes.string.isRequired,
   })
 );
 

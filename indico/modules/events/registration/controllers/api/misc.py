@@ -33,7 +33,7 @@ class RHAPIEventSessionBlocks(RHProtectedEventBase):
         res = [
             {
                 'id': sb.id,
-                'start_dt': sb.start_dt.astimezone(self.event.tzinfo).date().isoformat(),
+                'start_date': sb.start_dt.astimezone(self.event.tzinfo).date().isoformat(),
                 'start_time': sb.start_dt.astimezone(self.event.tzinfo).strftime('%H:%M'),
                 'end_time': sb.end_dt.astimezone(self.event.tzinfo).strftime('%H:%M'),
                 'full_title': sb.full_title,
@@ -41,4 +41,4 @@ class RHAPIEventSessionBlocks(RHProtectedEventBase):
             for sb in blocks
             if sb.can_access(session.user)
         ]
-        return group_list(res, key=itemgetter('start_dt'), sort_by=itemgetter('start_dt'))
+        return group_list(res, key=itemgetter('start_date'), sort_by=itemgetter('start_date'))
