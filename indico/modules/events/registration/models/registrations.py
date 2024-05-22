@@ -636,8 +636,7 @@ class Registration(db.Model):
                 if data and data.storage_file_id:
                     with data.open() as f:
                         attachment = MIMEImage(f.read())
-                        filename = f'{data.field_data.field.html_field_name}-{data.friendly_data}'
-                        attachment.add_header('Content-ID', f'<{filename}>')
+                        attachment.add_header('Content-ID', f'<{data.attachment_cid}>')
                         picture_attachements.append(attachment)
         return picture_attachements
 
@@ -837,6 +836,15 @@ class RegistrationData(StoredFileMixin, db.Model):
             raise Exception('The file locator is only available if there is a file.')
         return dict(self.registration.locator.registrant, registration_id=self.registration.id,
                     field_data_id=self.field_data_id, filename=self.filename)
+
+    @property
+    def attachment_cid(self):
+        """A Content-ID suitable for email attachments.
+
+        This is meant for registration data that's linked to a picture file so it
+        can be attached to a notification email and referenced inside that email.
+        """
+        return f'picture-{self.registration_id}-{self.field_data_id}'
 
     @property
     def friendly_data(self):

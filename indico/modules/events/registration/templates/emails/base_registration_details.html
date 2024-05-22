@@ -52,7 +52,7 @@
         {%- set friendly_data = regdata.friendly_data -%}
         {%- set html_name = regdata.field_data.field.html_field_name -%}
         <span>
-            {{- render_friendly_data(friendly_data, type, html_name) -}}
+            {{- render_friendly_data(friendly_data, type, regdata) -}}
         </span>
         {%- if regdata.price -%}
             {{- render_price(regdata) -}}
@@ -67,8 +67,8 @@
         {%- set html_name = regdata.field_data.field.html_field_name -%}
         {%- set old = diff.old -%}
         {%- set new = diff.new -%}
-        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type, html_name) -%}
-        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type, html_name) -%}
+        {%- set old_friendly_data = render_friendly_data(old.friendly_data, type, regdata) -%}
+        {%- set new_friendly_data = render_friendly_data(new.friendly_data, type, regdata) -%}
         <span>
             {%- if old_friendly_data and type != 'picture' -%}
                 <s style="margin-right: 5px;">{{ old_friendly_data }}</s>
@@ -89,7 +89,7 @@
 {% endmacro %}
 
 
-{% macro render_friendly_data(friendly_data, type, html_name) %}
+{% macro render_friendly_data(friendly_data, type, raw_data) %}
     {%- if type == 'accommodation' and friendly_data -%}
         {{- render_accommodation(friendly_data) -}}
     {%- elif type == 'multi_choice' -%}
@@ -97,7 +97,7 @@
     {%- elif type == 'sessions' -%}
         {{- render_sessions(friendly_data) -}}
     {%- elif type == 'picture' and friendly_data -%}
-        {{- render_picture(friendly_data, html_name) -}}
+        {{- render_picture(friendly_data, raw_data) -}}
     {%- else -%}
         {{- friendly_data -}}
     {%- endif -%}
@@ -125,8 +125,8 @@
 {% endmacro %}
 
 
-{% macro render_picture(friendly_data, html_name) %}
-    <img alt="Registrant picture" src="cid:{{- html_name -}}-{{- friendly_data -}}"
+{% macro render_picture(friendly_data, raw_data) %}
+    <img alt="Registrant picture" src="cid:{{- raw_data.attachment_cid -}}"
          style="max-height: 250px; max-width: 250px; white-space: normal; padding-bottom: 10px; object-fit: cover;">
 {% endmacro %}
 
