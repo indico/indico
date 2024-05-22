@@ -126,7 +126,7 @@
 
 
 {% macro render_picture(friendly_data, raw_data) %}
-    <img alt="Registrant picture" src="cid:{{- raw_data.attachment_cid -}}"
+    <img alt="{% trans %}Registrant picture{% endtrans %}" src="cid:{{ raw_data.attachment_cid }}"
          style="max-height: 250px; max-width: 250px; white-space: normal; padding-bottom: 10px; object-fit: cover;">
 {% endmacro %}
 
