@@ -9,12 +9,14 @@ import json
 
 from flask import session
 from marshmallow import ValidationError, fields, validate, validates_schema
+from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import _
 
 
@@ -29,6 +31,16 @@ class SessionsFieldDataSchema(mm.Schema):
             raise ValidationError('Maximum value must be less than minimum value.', 'maximum')
 
 
+def _format_block(block, tzinfo):
+    return ' - '.join(
+        [
+            block.start_dt.astimezone(tzinfo).strftime('%H:%M'),
+            block.end_dt.astimezone(tzinfo).strftime('%H:%M'),
+            block.full_title,
+        ]
+    )
+
+
 class SessionsField(RegistrationFormFieldBase):
     name = 'sessions'
     mm_field_class = fields.List
@@ -41,8 +53,14 @@ class SessionsField(RegistrationFormFieldBase):
 
     @property
     def filter_choices(self):
-        sessions_ids = [s.id for s in self.form_item.registration_form.event.sessions]
-        return {str(s.id): s.full_title for s in SessionBlock.query.filter(SessionBlock.session_id.in_(sessions_ids))}
+        event = self.form_item.registration_form.event
+        session_blocks = (SessionBlock.query
+                          .join(Session)
+                          .filter(Session.event == event,
+                                  ~Session.is_deleted)
+                          .options(joinedload(SessionBlock.timetable_entry).raiseload('*'))
+                          .all())
+        return {str(b.id): _format_block(b, event.tzinfo) for b in session_blocks}
 
     def get_validators(self, existing_registration):
         def _check_number_of_sessions(new_data):
@@ -71,19 +89,13 @@ class SessionsField(RegistrationFormFieldBase):
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         tzinfo = registration_data.registration.event.tzinfo
-        blocks = SessionBlock.query.filter(SessionBlock.id.in_(registration_data.data)).all()
+        blocks = (SessionBlock.query
+                  .filter(SessionBlock.id.in_(registration_data.data))
+                  .options(joinedload(SessionBlock.timetable_entry).raiseload('*'))
+                  .all())
         if for_humans or for_search:
             return '; '.join(b.full_title for b in blocks)
-        return [
-            ' - '.join(
-                [
-                    b.start_dt.astimezone(tzinfo).strftime('%H:%M'),
-                    b.end_dt.astimezone(tzinfo).strftime('%H:%M'),
-                    b.full_title
-                ]
-            )
-            for b in blocks
-        ]
+        return [_format_block(b, tzinfo) for b in blocks]
 
     def create_sql_filter(self, data_list):
         data_list = json.dumps(list(map(int, data_list)))
