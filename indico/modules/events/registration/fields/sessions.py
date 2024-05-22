@@ -17,6 +17,7 @@ from indico.modules.events.registration.fields.base import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
+from indico.util.date_time import format_interval
 from indico.util.i18n import _
 
 
@@ -32,13 +33,8 @@ class SessionsFieldDataSchema(mm.Schema):
 
 
 def _format_block(block, tzinfo):
-    return ' - '.join(
-        [
-            block.start_dt.astimezone(tzinfo).strftime('%H:%M'),
-            block.end_dt.astimezone(tzinfo).strftime('%H:%M'),
-            block.full_title,
-        ]
-    )
+    interval = format_interval(block.start_dt.astimezone(tzinfo), block.end_dt.astimezone(tzinfo), 'Hm')
+    return f'{interval} - {block.full_title}'
 
 
 class SessionsField(RegistrationFormFieldBase):

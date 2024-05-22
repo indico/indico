@@ -26,8 +26,7 @@ const sessionDataSchema = PropTypes.arrayOf(
   PropTypes.shape({
     id: PropTypes.number.isRequired,
     fullTitle: PropTypes.string.isRequired,
-    startTime: PropTypes.string.isRequired,
-    endTime: PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
   })
 );
 
@@ -170,13 +169,13 @@ function SessionBlockHeader({
         </span>
       </AccordionTitle>
       <AccordionContent active={isExpanded}>
-        {data.map(({startTime, endTime, fullTitle, id}) => (
+        {data.map(({time, fullTitle, id}) => (
           <dd className="grouped-fields" key={id}>
             <Checkbox
               value={id}
               onChange={handleValueChange}
               checked={value.includes(id)}
-              label={`${startTime} - ${endTime} - ${fullTitle}`}
+              label={`${time} - ${fullTitle}`}
             />
           </dd>
         ))}
