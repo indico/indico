@@ -55,9 +55,6 @@ class SessionsField(RegistrationFormFieldBase):
                     raise ValidationError(_('Please select at least {min} sessions.').format(min=min_))
 
         def _check_session_block_is_valid(new_data):
-            old_selection = set()
-            if existing_registration and (old_data := existing_registration.data_by_field.get(self.form_item.id)):
-                old_selection = set(old_data.data)
             event = self.form_item.registration_form.event
             blocks = SessionBlock.query.filter(SessionBlock.id.in_(new_data)).all()
             # disallow referencing invalid session blocks
@@ -66,8 +63,8 @@ class SessionsField(RegistrationFormFieldBase):
             # disallow any session blocks from other events
             if not all(sb.event == event for sb in blocks):
                 raise ValidationError('Cannot select session blocks from another event')
-            # ensure the user can access the session unless it was already selected before
-            if not all(sb.can_access(session.user) or sb.id in old_selection for sb in blocks):
+            # ensure the user can access the session
+            if not all(sb.can_access(session.user) for sb in blocks):
                 raise ValidationError('Cannot select session blocks not accessible to you')
 
         return [_check_number_of_sessions, _check_session_block_is_valid]
