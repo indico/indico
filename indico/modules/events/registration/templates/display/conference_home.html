@@ -27,8 +27,8 @@
                         <li>
                             <a href="{{ url_for('event_registration.ticket_apple_wallet', regform) }}"
                                class="icon-ticket"
-                               title="{% trans title=regform.title -%}Download ticket for the '{{ title }}' registration form for Apple Pass{%- endtrans %}">
-                                {% trans %}Apple Pass{% endtrans %} - {{ regform.title }}
+                               title="{% trans title=regform.title -%}Download ticket for the '{{ title }}' registration form for Apple Pass/Passbook{%- endtrans %}">
+                                {% trans %}Apple Pass/Passbook{% endtrans %} - {{ regform.title }}
                             </a>
                         </li>
                     {% endif %}
