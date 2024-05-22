@@ -74,7 +74,7 @@
                 <s style="margin-right: 5px;">{{ old_friendly_data }}</s>
             {%- endif -%}
             {%- if new_friendly_data -%}
-                <span {%- if type != 'picture' -%}style="background-color: yellow;"{%- endif -%}>{{ new_friendly_data }}</span>
+                <span {% if type != 'picture' %}style="background-color: yellow;"{% endif %}>{{ new_friendly_data }}</span>
             {%- endif -%}
         </span>
         {%- if old.price != new.price -%}
