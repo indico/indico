@@ -18,6 +18,7 @@ import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/rea
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
+import {getManagement} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
@@ -205,8 +206,9 @@ export default function TimetableSessionsInput({
   maximum,
 }) {
   const {eventId} = useSelector(getStaticData);
+  const management = useSelector(getManagement);
   const {data: sessionData} = useIndicoAxios(
-    {url: sessionBlocksURL({event_id: eventId})},
+    {url: sessionBlocksURL({event_id: eventId, force_event_tz: management})},
     {camelize: true}
   );
 

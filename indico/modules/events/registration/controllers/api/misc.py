@@ -8,6 +8,7 @@
 from operator import itemgetter
 
 from flask import session
+from marshmallow import fields
 from sqlalchemy.orm import joinedload
 
 from indico.modules.events.controllers.base import RHProtectedEventBase
@@ -15,6 +16,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.date_time import format_interval
 from indico.util.iterables import group_list
+from indico.web.args import use_kwargs
 
 
 class RHAPIRegistrationForms(RHProtectedEventBase):
@@ -24,14 +26,17 @@ class RHAPIRegistrationForms(RHProtectedEventBase):
 
 
 class RHAPIEventSessionBlocks(RHProtectedEventBase):
-    def _process(self):
+    @use_kwargs({
+        'force_event_tz': fields.Boolean(load_default=False),
+    }, location='query')
+    def _process(self, force_event_tz):
+        tzinfo = self.event.tzinfo if force_event_tz else self.event.display_tzinfo
         blocks = (SessionBlock.query
                   .join(Session)
                   .filter(Session.event == self.event,
                           ~Session.is_deleted)
                   .options(joinedload(SessionBlock.timetable_entry).raiseload('*'))
                   .all())
-        tzinfo = self.event.tzinfo
         res = [
             {
                 'id': sb.id,

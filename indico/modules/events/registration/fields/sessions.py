@@ -7,12 +7,13 @@
 
 import json
 
-from flask import session
+from flask import g, session
 from marshmallow import ValidationError, fields, validate, validates_schema
 from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db
 from indico.core.marshmallow import mm
+from indico.modules.events.registration.controllers.display import RHRegistrationForm
 from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -84,7 +85,10 @@ class SessionsField(RegistrationFormFieldBase):
         return [_check_number_of_sessions, _check_session_block_is_valid]
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
-        tzinfo = registration_data.registration.event.tzinfo
+        event = registration_data.registration.event
+        # this is a bit ugly, but we need to use the user's timezone if it's in an end-user area,
+        # while using the event's timezone if it's in a management area...
+        tzinfo = event.display_tzinfo if isinstance(g.rh, RHRegistrationForm) else event.tzinfo
         blocks = (SessionBlock.query
                   .filter(SessionBlock.id.in_(registration_data.data))
                   .options(joinedload(SessionBlock.timetable_entry).raiseload('*'))
