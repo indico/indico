@@ -9,6 +9,7 @@ import itertools
 import posixpath
 import time
 from decimal import Decimal
+from email.mime.image import MIMEImage
 from uuid import uuid4
 
 from babel.numbers import format_currency
@@ -627,6 +628,22 @@ class Registration(db.Model):
         if rdata and rdata.storage_file_id is not None:
             return rdata
 
+    def get_picture_attachments(self):
+        """Return a list of registration pictures as `MimeImage` attachments."""
+        picture_attachements = []
+        for data in self.data:
+            if not data.field_data.field.is_active or data.field_data.field.input_type != 'picture':
+                continue
+            if data.field_data.field.parent.is_manager_only:
+                continue
+            if data.storage_file_id is None:
+                continue
+            with data.open() as f:
+                attachment = MIMEImage(f.read())
+            attachment.add_header('Content-ID', f'<{data.attachment_cid}>')
+            picture_attachements.append(attachment)
+        return picture_attachements
+
     def _render_price(self, price):
         locale = 'en_GB'
         if has_request_context():
@@ -823,6 +840,15 @@ class RegistrationData(StoredFileMixin, db.Model):
             raise Exception('The file locator is only available if there is a file.')
         return dict(self.registration.locator.registrant, registration_id=self.registration.id,
                     field_data_id=self.field_data_id, filename=self.filename)
+
+    @property
+    def attachment_cid(self):
+        """A Content-ID suitable for email attachments.
+
+        This is meant for registration data that's linked to a picture file so it
+        can be attached to a notification email and referenced inside that email.
+        """
+        return f'picture-{self.registration_id}-{self.field_data_id}'
 
     @property
     def friendly_data(self):

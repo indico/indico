@@ -36,6 +36,8 @@ Bugfixes
 - Only allow accessing avatars for published registrations (:pr:`6347`)
 - Fix error when trying to import data from an unlisted event (:issue:`6350`, :pr:`6351`)
 - Show results from the Get Next Editable search on top of the list (:pr:`6353`)
+- Attach registration pictures and display them inline when sending email notifications
+  instead of just showing their filename (:pr:`6336`, thanks :user:`SegiNyn`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
