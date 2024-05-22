@@ -148,6 +148,12 @@
                                                 {{- data[item.id].friendly_data | join(', ') }}
                                             {%- endif %}
                                         </td>
+                                    {% elif item.id in data and data[item.id].field_data.field.input_type == 'sessions' %}
+                                        <td class="i-table" data-text="{{ search_value }}">
+                                            {%- if item.id in data and data[item.id].friendly_data != None %}
+                                                {{- data[item.id].friendly_data | join('; ') }}
+                                            {%- endif %}
+                                        </td>
                                     {% else %}
                                         <td class="i-table" data-text="{{ search_value }}">
                                             {%- if item.id in data and data[item.id].friendly_data %}

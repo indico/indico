@@ -19,6 +19,7 @@ def get_field_types():
 def _get_fields(sender, **kwargs):
     from .accompanying import AccompanyingPersonsField
     from .choices import AccommodationField, MultiChoiceField, SingleChoiceField
+    from .sessions import SessionsField
     from .simple import (BooleanField, CheckboxField, CountryField, DateField, EmailField, FileField, NumberField,
                          PhoneField, PictureField, TextAreaField, TextField)
     yield AccommodationField
@@ -36,6 +37,7 @@ def _get_fields(sender, **kwargs):
     yield TextAreaField
     yield TextField
     yield PictureField
+    yield SessionsField
 
 
 @signals.core.app_created.connect

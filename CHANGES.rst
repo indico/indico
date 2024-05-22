@@ -21,6 +21,8 @@ Improvements
   (:issue:`6213`, :pr:`6214`)
 - Show "Go to timeline" button on the contribution page to everyone who can see the
   timeline of one of its editables instead of just submitters (:pr:`6344`)
+- Add a new "Timetable Sessions" registration form field type which allows selecting
+  session blocks from the event (:pr:`6184`, thanks :user:`jbtwist`)
 
 Bugfixes
 ^^^^^^^^

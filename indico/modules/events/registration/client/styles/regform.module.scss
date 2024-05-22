@@ -208,6 +208,29 @@
         }
       }
 
+      .timetablesessions-field {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        max-width: 500px;
+
+        dd {
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          padding: 0.35rem;
+        }
+
+        span {
+          margin-left: 1.8em;
+          color: rgba(0, 0, 0, 0.4);
+        }
+      }
+
+      label:hover::before {
+        border-color: #d4d4d5;
+      }
+
       .country-dropdown {
         max-width: 500px;
       }

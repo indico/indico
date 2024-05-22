@@ -88,6 +88,7 @@ class RegistrationCloner(EventCloner):
     name = 'registrations'
     friendly_name = _('Registrations')
     requires = {'registration_forms'}
+    uses = {'sessions'}
 
     @property
     def is_visible(self):
@@ -110,8 +111,9 @@ class RegistrationCloner(EventCloner):
             self._delete_orphaned_registrations(new_event)
         form_map = shared_data['registration_forms']['form_map']
         field_data_map = shared_data['registration_forms']['field_data_map']
+        block_map = shared_data['sessions']['session_block_map'] if 'sessions' in shared_data else None
         for old_form, new_form in form_map.items():
-            self._clone_registrations(old_form, new_form, field_data_map)
+            self._clone_registrations(old_form, new_form, field_data_map, block_map)
         self._synchronize_registration_friendly_id(new_event)
         db.session.flush()
 
@@ -120,7 +122,7 @@ class RegistrationCloner(EventCloner):
                 .filter(RegistrationForm.registrations.any(Registration.is_active))
                 .has_rows())
 
-    def _clone_registrations(self, old_form, new_form, field_data_map):
+    def _clone_registrations(self, old_form, new_form, field_data_map, session_blocks_map=None):
         registration_attrs = get_attrs_to_clone(Registration, skip={
             'uuid',
             'ticket_uuid',
@@ -141,6 +143,27 @@ class RegistrationCloner(EventCloner):
                 if old_registration_data.storage_file_id is not None:
                     with old_registration_data.open() as fd:
                         new_registration_data.save(fd)
+                # Assigns the mapped session blocks for cloned event to the cloned registration.
+                if new_registration_data.field_data.field.input_type == 'sessions':
+                    if not session_blocks_map:
+                        # If timetable/sessions are not cloned, we cannot preserve data in this field as
+                        # it would reference Ids from the old event
+                        new_registration_data.data = []
+                    else:
+                        new_registration_data.data = [
+                            new_block_id
+                            for old_block_id in new_registration_data.data
+                            if (
+                                new_block_id := next(
+                                    (
+                                        session_blocks_map[block].id
+                                        for block in session_blocks_map
+                                        if block.id == old_block_id
+                                    ),
+                                    None,
+                                )
+                            )
+                        ]
             db.session.flush()
             signals.event.registration_state_updated.send(new_registration, previous_state=None)
 

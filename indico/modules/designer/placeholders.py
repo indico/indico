@@ -443,7 +443,7 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
         if friendly_data is None:
             return ''
 
-        if self.field.input_type == 'multi_choice':
+        if self.field.input_type in ('multi_choice', 'sessions'):
             return ' · '.join(friendly_data)
         elif self.field.input_type == 'accommodation':
             return self._render_accommodation(friendly_data)
