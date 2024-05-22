@@ -110,7 +110,7 @@ class AppleWalletManager:
 
         # Extract Certificate details from certificate.pem itself
         self.cert = x509.load_pem_x509_certificate(self.settings['apple_wallet_certificate'].encode())
-        cert_details = {d.split('=')[0]: d.split('=')[1] for d in self.cert.subject.rfc4514_string().split(',')}
+        cert_details = dict(x.split('=', 1) for x in self.cert.subject.rfc4514_string().split(','))
         passfile = IndicoPass(self.build_ticket_object(registration), passTypeIdentifier=cert_details['UID'],
                               organizationName=cert_details['O'], teamIdentifier=cert_details['OU'])
         passfile.logoText = cert_details['O']  # Add Organization name at the top
