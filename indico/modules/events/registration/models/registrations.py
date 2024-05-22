@@ -629,15 +629,15 @@ class Registration(db.Model):
             return rdata
 
     def get_picture_attachments(self):
-        """Returns a list of registration pictures as MimeImage attachments."""
+        """Return a list of registration pictures as `MimeImage` attachments."""
         picture_attachements = []
         for data in self.data:
-            if data.field_data.field.is_active and data.field_data.field.field_impl.name == 'picture':
+            if data.field_data.field.is_active and data.field_data.field.input_type == 'picture':
                 if data and data.storage_file_id:
                     with data.open() as f:
                         attachment = MIMEImage(f.read())
-                        attachment.add_header('Content-ID', f'<{data.attachment_cid}>')
-                        picture_attachements.append(attachment)
+                    attachment.add_header('Content-ID', f'<{data.attachment_cid}>')
+                    picture_attachements.append(attachment)
         return picture_attachements
 
     def _render_price(self, price):
