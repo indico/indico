@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-04-24 00:20+0200\n"
+"POT-Creation-Date: 2024-05-24 17:48+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -102,7 +102,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx:279
-#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:68
+#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:70
 #: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:29
 #: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:49
 #: indico/modules/events/management/client/js/EventMove.jsx:158
@@ -142,14 +142,14 @@ msgstr ""
 #: indico/modules/auth/client/js/signup.jsx:324
 #: indico/modules/events/abstracts/client/js/boa.jsx:146
 #: indico/modules/events/editing/client/js/editing/EditableSubmissionButton.jsx:108
-#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:71
+#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:73
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:110
 #: indico/modules/events/editing/client/js/editing/timeline/CustomActions.jsx:80
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewComment.jsx:58
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:81
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:253
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:708
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:223
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:230
 #: indico/modules/events/management/client/js/EventMove.jsx:180
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
@@ -163,6 +163,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:147
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:312
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:201
 #: indico/modules/receipts/client/js/printing/print.jsx:82
 #: indico/modules/receipts/client/js/templates/Editor.jsx:180
 #: indico/web/client/js/react/components/RequestConfirm.jsx:92
@@ -736,7 +737,7 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx:62
 #: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx:61
-msgid "Restrict visibility of this comment to other editors"
+msgid "Restrict visibility of this comment to other editors only"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/CommentItem.jsx:55
@@ -843,7 +844,7 @@ msgstr ""
 msgid "This file does not conform to the filename template {template}"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:201
+#: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:200
 msgid "Use an existing file"
 msgstr ""
 
@@ -1310,7 +1311,7 @@ msgid "Rev."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:345
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:274
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:281
 msgid "n/a"
 msgstr ""
 
@@ -1319,7 +1320,7 @@ msgid "Assign"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:555
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:226
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:233
 msgid "Assign to myself"
 msgstr ""
 
@@ -1477,7 +1478,7 @@ msgstr ""
 msgid "has no files"
 msgstr ""
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:289
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:296
 msgid "There are no editables available."
 msgstr ""
 
@@ -2216,7 +2217,7 @@ msgid "Send emails to these roles"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/EmailContribAbstractRolesButton.jsx:39
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:184
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:188
 #: indico/modules/events/persons/client/js/EmailParticipantRolesButton.jsx:46
 msgid "Send email"
 msgstr ""
@@ -2237,59 +2238,61 @@ msgstr ""
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx:63
 msgid "Your email has been sent."
-msgstr ""
+msgid_plural "Your emails have been sent."
+msgstr[0] ""
+msgstr[1] ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:64
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:67
 msgid "{count} email has been sent."
 msgid_plural "{count} emails have been sent."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:106
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:110
 msgid "Preview"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:106
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:110
 msgid "Edit"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:116
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:120
 msgid "This preview is only shown for a single recipient."
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:119
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:123
 msgid ""
 "When sending the emails, each recipient will receive an email customized "
 "with their personal data."
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:125
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:153
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:129
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:157
 msgid "Subject"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:129
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:156
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:133
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:160
 msgid "Email body"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:147
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:151
 msgid "From"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:168
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:172
 msgid "BCC addresses"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:169
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:173
 msgid "Send a copy of each email to every address in this list"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:173
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:177
 msgid "Send a copy of each email to my mailbox"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/EmailDialog.jsx:196
+#: indico/modules/events/persons/client/js/EmailDialog.jsx:200
 msgid "Send"
 msgstr ""
 
@@ -2306,7 +2309,8 @@ msgid "This person is not a speaker"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/PersonList.jsx:132
-#: indico/modules/events/registration/client/js/form/fields/registry.js:144
+#: indico/modules/events/registration/client/js/form/fields/registry.js:149
+#: indico/modules/events/surveys/client/js/EmailSurveyParticipantsButton.jsx:26
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:161
 msgid "Email"
 msgstr ""
@@ -2493,6 +2497,7 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/AccompanyingPersonsInput.jsx:284
 #: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:125
 #: indico/modules/events/registration/client/js/form/fields/TextInput.jsx:80
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:287
 msgid "No maximum"
 msgstr ""
 
@@ -2516,7 +2521,7 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:158
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:169
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:95
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:254
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:262
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:173
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:30
 #: indico/modules/users/client/js/PersonalDataForm.jsx:85
@@ -2608,23 +2613,23 @@ msgstr ""
 msgid "Default to affiliation country"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:111
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:119
 msgid "The provided date is invalid."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:235
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:243
 msgid "12 hours"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:236
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:244
 msgid "24 hours"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:242
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:250
 msgid "Date format"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:252
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:260
 msgid "Time format"
 msgstr ""
 
@@ -2690,6 +2695,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:262
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:286
 msgid "Maximum number of choices"
 msgstr ""
 
@@ -2711,6 +2717,7 @@ msgid "Maximum"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/NumberInput.jsx:139
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:307
 msgid "The minimum value cannot be greater than the maximum value."
 msgstr ""
 
@@ -2781,66 +2788,100 @@ msgstr ""
 msgid "The minimum length cannot be greater than the maximum length."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:72
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:162
+msgid "{selectedBlocks} block selected)"
+msgid_plural "{selectedBlocks} blocks selected)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:215
+msgid "Please select at least {minimum} session block"
+msgid_plural "Please select at least {minimum} session blocks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:221
+msgid "Please select no more than {maximum} session block"
+msgid_plural "Please select no more than {maximum} session blocks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:270
+msgid "Collapse days"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:274
+msgid "Minimum number of choices"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx:275
+msgid "No minimum"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:77
 msgid "Label"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:81
+#: indico/modules/events/registration/client/js/form/fields/registry.js:86
 msgid "Text field"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:88
+#: indico/modules/events/registration/client/js/form/fields/registry.js:93
 msgid "Text area"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:94
+#: indico/modules/events/registration/client/js/form/fields/registry.js:99
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:50
 msgid "Number"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:102
+#: indico/modules/events/registration/client/js/form/fields/registry.js:107
 msgid "Checkbox"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:111
+#: indico/modules/events/registration/client/js/form/fields/registry.js:116
 #: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:103
 msgid "Date"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:119
+#: indico/modules/events/registration/client/js/form/fields/registry.js:124
 msgid "Yes/No"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:127
+#: indico/modules/events/registration/client/js/form/fields/registry.js:132
 msgid "Phone"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:132
+#: indico/modules/events/registration/client/js/form/fields/registry.js:137
 msgid "Country"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:138
+#: indico/modules/events/registration/client/js/form/fields/registry.js:143
 msgid "File"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:149
+#: indico/modules/events/registration/client/js/form/fields/registry.js:154
 msgid "Single Choice"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:159
+#: indico/modules/events/registration/client/js/form/fields/registry.js:164
 msgid "Multiple Choice"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:169
+#: indico/modules/events/registration/client/js/form/fields/registry.js:174
 msgid "Accommodation"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:182
+#: indico/modules/events/registration/client/js/form/fields/registry.js:187
 msgid "Accompanying Persons"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:193
+#: indico/modules/events/registration/client/js/form/fields/registry.js:198
 msgid "Picture"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js:204
+msgid "Timetable Sessions"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx:38
@@ -3020,6 +3061,22 @@ msgstr ""
 
 #: indico/modules/events/sessions/client/js/session_display.jsx:26
 msgid "Detailed timetable"
+msgstr ""
+
+#: indico/modules/events/surveys/client/js/EmailSurveyParticipants.jsx:60
+msgid "Recipients addresses"
+msgstr ""
+
+#: indico/modules/events/surveys/client/js/EmailSurveyParticipants.jsx:61
+msgid "Send email to every address in this list"
+msgstr ""
+
+#: indico/modules/events/surveys/client/js/EmailSurveyParticipants.jsx:66
+msgid "Send email to all event participants"
+msgstr ""
+
+#: indico/modules/events/surveys/client/js/EmailSurveyParticipants.jsx:82
+msgid "You must choose at least one recipient"
 msgstr ""
 
 #: indico/modules/logs/client/js/components/EventLog.jsx:28
@@ -4947,15 +5004,35 @@ msgstr ""
 msgid "Show a list of all upcoming bookings"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:128
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:177
+msgid "Link event"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:182
+msgid "Are you sure you want to link this event?"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:202
+msgid "Link"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:207
+msgid "Link to {bookedFor}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:233
 msgid "This booking is pending confirmation by the room owner"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:144
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:249
 msgid "Booked for {bookedFor}"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:179
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:257
+msgid "Already linked"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:292
 msgid "There are no bookings matching the criteria."
 msgstr ""
 
@@ -5689,7 +5766,7 @@ msgid ""
 msgstr ""
 
 #: indico/web/client/js/react/components/ICSCalendarLink.jsx:217
-#: indico/web/client/js/react/components/WTFSearchDropdown.jsx:244
+#: indico/web/client/js/react/components/WTFSearchDropdown.jsx:268
 msgid "Loading…"
 msgstr ""
 
@@ -5904,13 +5981,13 @@ msgid ""
 "regardless of the participants' consent."
 msgstr ""
 
-#: indico/web/client/js/react/components/WTFSearchDropdown.jsx:206
+#: indico/web/client/js/react/components/WTFSearchDropdown.jsx:230
 msgid "Search requires at least {count} character or an id prefixed with #"
 msgid_plural "Search requires at least {count} characters or an id prefixed with #"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/react/components/WTFSearchDropdown.jsx:217
+#: indico/web/client/js/react/components/WTFSearchDropdown.jsx:241
 msgid "Search requires at least {count} character"
 msgid_plural "Search requires at least {count} characters"
 msgstr[0] ""
