@@ -23,6 +23,7 @@ Improvements
   timeline of one of its editables instead of just submitters (:pr:`6344`)
 - Add a new "Timetable Sessions" registration form field type which allows selecting
   session blocks from the event (:pr:`6184`, thanks :user:`jbtwist`)
+- Link the event title to the event in registration emails (:pr:`6358`)
 
 Bugfixes
 ^^^^^^^^

@@ -16,29 +16,31 @@
 {%- endblock %}
 
 {% block registration_header_text -%}
+    {%- set link %}<a href="{{ event.external_url }}"><strong>{% endset -%}
+    {%- set endlink %}</a></strong>{% endset -%}
     {% if registration.state.name == 'complete' -%}
         {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
-            Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            Your registration for the event {{ link }}{{ title }}{{ endlink }} {{ at_time }}
             is now {{ strong }}complete{{ endstrong }}.
         {%- endtrans %}
     {%- elif registration.state.name == 'pending' -%}
         {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
-            Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            Your registration for the event {{ link }}{{ title }}{{ endlink }} {{ at_time }}
             is now {{ strong }}pending{{ endstrong }}.
         {%- endtrans %}
     {%- elif registration.state.name == 'rejected' -%}
         {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
-            Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            Your registration for the event {{ link }}{{ title }}{{ endlink }} {{ at_time }}
             is now {{ strong }}rejected{{ endstrong }}.
         {%- endtrans %}
     {%- elif registration.state.name == 'withdrawn' -%}
         {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
-            Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            Your registration for the event {{ link }}{{ title }}{{ endlink }} {{ at_time }}
             is now {{ strong }}withdrawn{{ endstrong }}.
         {%- endtrans %}
     {%- else -%}
         {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
-            Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
+            Your registration for the event {{ link }}{{ title }}{{ endlink }} {{ at_time }}
             is now {{ strong }}unpaid{{ endstrong }}.
         {%- endtrans %}
     {%- endif %}

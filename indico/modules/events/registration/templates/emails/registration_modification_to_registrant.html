@@ -5,7 +5,9 @@
 {%- endblock %}
 
 {% block registration_header_text -%}
-    {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+    {%- set strong %}<a href="{{ event.external_url }}"><strong>{% endset -%}
+    {%- set endstrong %}</a></strong>{% endset -%}
+    {% trans title=event.title, at_time=render_registration_info() -%}
         Your registration for the event {{ strong }}{{ title }}{{ endstrong }}{{ at_time }} has been modified.
     {%- endtrans %}
     {{ render_text_pending() }}

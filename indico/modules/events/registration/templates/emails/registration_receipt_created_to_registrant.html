@@ -6,8 +6,10 @@
 {%- endblock %}
 
 {% block registration_header_text -%}
+    {%- set strong %}<a href="{{ event.external_url }}"><strong>{% endset -%}
+    {%- set endstrong %}</a></strong>{% endset -%}
     {% if receipt.is_published -%}
-        {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+        {% trans title=event.title, at_time=render_registration_info() -%}
             A document regarding your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
             has been made available to you:
         {%- endtrans %}
@@ -17,7 +19,7 @@
             </li>
         </ul>
     {%- else -%}
-        {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+        {% trans title=event.title, at_time=render_registration_info() -%}
             A document regarding your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
             has been made available to you and sent to you as an attachment.
         {%- endtrans %}

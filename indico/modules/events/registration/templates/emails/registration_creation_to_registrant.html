@@ -9,8 +9,10 @@
     {% set event = registration.registration_form.event %}
     <p>{% trans name=registration.full_name %}Dear {{ name }},{% endtrans %}</p>
     <p>
+        {%- set strong %}<a href="{{ event.external_url }}"><strong>{% endset -%}
+        {%- set endstrong %}</a></strong>{% endset -%}
         {% block registration_header_text %}
-            {% trans title=event.title, strong='<strong>'|safe, endstrong='</strong>'|safe, at_time=render_registration_info() -%}
+            {% trans title=event.title, at_time=render_registration_info() -%}
                 Thank you! Your registration for the event {{ strong }}{{ title }}{{ endstrong }} {{ at_time }}
                 has been received.
             {%- endtrans %}
