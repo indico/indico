@@ -52,6 +52,7 @@ Bugfixes
 - Fix editable list filter storage being shared between different editable types and
   events (:pr:`6359`)
 - Fix UI breaking when performing bulk actions via the list of editables (:pr:`6369`)
+- Include registration documents in user data export (:issue:`6331`, :pr:`6338`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
