@@ -88,7 +88,7 @@ class SessionsField(RegistrationFormFieldBase):
         event = registration_data.registration.event
         # this is a bit ugly, but we need to use the user's timezone if it's in an end-user area,
         # while using the event's timezone if it's in a management area...
-        tzinfo = event.display_tzinfo if isinstance(g.rh, RHRegistrationForm) else event.tzinfo
+        tzinfo = event.display_tzinfo if isinstance(getattr(g, 'rh', None), RHRegistrationForm) else event.tzinfo
         blocks = (SessionBlock.query
                   .filter(SessionBlock.id.in_(registration_data.data))
                   .options(joinedload(SessionBlock.timetable_entry).raiseload('*'))
