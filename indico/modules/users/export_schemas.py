@@ -178,16 +178,12 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
     url = fields.Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
     event_title = fields.Function(lambda reg: reg.event.title)
     event_url = fields.Function(lambda reg: url_for('events.display', reg.event, _external=True))
-    receipt_files = fields.Method('_serialize_receipt_files')
+    receipt_files = fields.List(fields.Nested(ReceiptFileExportSchema))
     fields = fields.Method('_serialize_data')
 
     def _serialize_data(self, registration):
         registration_data = [data for data in registration.data if not data.field_data.field.parent.is_manager_only]
         return RegistrationDataExportSchema(many=True).dump(registration_data)
-
-    def _serialize_receipt_files(self, registration):
-        registration_documents = list(registration.receipt_files)
-        return ReceiptFileExportSchema(many=True).dump(registration_documents)
 
 
 class SubContributionExportSchema(mm.SQLAlchemyAutoSchema):
