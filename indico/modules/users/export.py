@@ -180,7 +180,8 @@ def get_registration_documents(user):
     return (ReceiptFile.query
             .join(Registration)
             .filter(Registration.user == user,
-                    ReceiptFile.file_id.isnot(None))
+                    ReceiptFile.file_id.isnot(None),
+                    ReceiptFile.is_published)
             .all())
 
 

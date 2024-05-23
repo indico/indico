@@ -204,10 +204,12 @@ def test_get_registration_files(dummy_user):
     assert files[0].filename == 'registration_upload.txt'
 
 
-@pytest.mark.usefixtures('dummy_receipt_file')
-def test_get_registration_documents(dummy_user):
+def test_get_registration_documents(dummy_user, create_receipt_file, dummy_reg, dummy_event_template):
+    create_receipt_file(dummy_reg, dummy_event_template)
+    create_receipt_file(dummy_reg, dummy_event_template, published=False)
     files = get_registration_documents(dummy_user)
     assert len(files) == 1
+    assert files[0].is_published
     assert files[0].file.filename == 'test.pdf'
 
 

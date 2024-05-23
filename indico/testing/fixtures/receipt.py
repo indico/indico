@@ -19,10 +19,13 @@ pytest_plugins = 'indico.modules.receipts.controllers.access_test'
 @pytest.fixture
 def create_receipt_file(db):
     """Return a callable that lets you create a registration form."""
-    def _create_receipt_file(registration, event_template, **kwargs):
+    def _create_receipt_file(registration, event_template, published=True, **kwargs):
         file = File(filename='test.pdf', content_type='application/pdf', **kwargs)
         file.save(('test',), BytesIO(b'hello world'))
-        receipt_file = ReceiptFile(registration=registration, template=event_template, file=file)
+        receipt_file = ReceiptFile(registration=registration,
+                                   template=event_template,
+                                   is_published=published,
+                                   file=file)
         db.session.flush()
         return receipt_file
 
