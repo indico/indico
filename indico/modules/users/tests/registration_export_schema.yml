@@ -28,7 +28,6 @@ receipt_files:
   file_id: <id>
   filename: test.pdf
   is_deleted: false
-  url: http://localhost/files/a43b38d5-6242-4c66-86e1-305ec4401e46/download?token=ImE0M2IzOGQ1NjI0MjRjNjY4NmUxMzA1ZWM0NDAxZTQ2Ig.YoolwA.BQXj3dZmGvf3eRAYvxR26yRVqaM
 rejection_reason: ''
 state: complete
 submitted_dt: <timestamp>

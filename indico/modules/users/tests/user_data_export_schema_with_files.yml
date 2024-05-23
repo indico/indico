@@ -177,7 +177,6 @@ registrations:
     file_id: <id>
     filename: test.pdf
     is_deleted: false
-    url: http://localhost/files/d5b652c4-f253-465a-bfff-fa6349f21bac/download?token=ImQ1YjY1MmM0ZjI1MzQ2NWFiZmZmZmE2MzQ5ZjIxYmFjIg.YoolwA.S7mNdeQEfMAQNoZ1sT7TA9cFTaU
   rejection_reason: ''
   state: complete
   submitted_dt: <timestamp>

@@ -131,7 +131,7 @@ class RegistrationFileExportSchema(Schema):
 class ReceiptFileExportSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ReceiptFile
-        fields = ('file_id', 'is_deleted', 'filename', 'url', '_archive_path')
+        fields = ('file_id', 'is_deleted', 'filename', '_archive_path')
 
     filename = fields.String(attribute='file.filename')
     url = fields.String(attribute='file.signed_download_url')
