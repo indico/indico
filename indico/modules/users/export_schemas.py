@@ -172,13 +172,13 @@ class RegistrationExportSchema(mm.SQLAlchemyAutoSchema):
         model = Registration
         fields = ('id', 'url', 'event_id', 'event_title', 'event_url', 'state', 'currency', 'price', 'submitted_dt',
                   'email', 'first_name', 'last_name', 'is_deleted', 'checked_in', 'checked_in_dt', 'rejection_reason',
-                  'consent_to_publish', 'created_by_manager', 'fields', 'documents')
+                  'consent_to_publish', 'created_by_manager', 'fields', 'receipt_files')
 
     price = fields.Decimal(as_string=True)
     url = fields.Function(lambda reg: url_for('event_registration.registration_details', reg, _external=True))
     event_title = fields.Function(lambda reg: reg.event.title)
     event_url = fields.Function(lambda reg: url_for('events.display', reg.event, _external=True))
-    documents = fields.List(fields.Nested(ReceiptFileExportSchema))
+    documents = fields.List(fields.Nested(ReceiptFileExportSchema), attribute='receipt_files')
     fields = fields.Method('_serialize_data')
 
     def _serialize_data(self, registration):

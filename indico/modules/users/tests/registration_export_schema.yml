@@ -23,6 +23,8 @@ id: <id>
 is_deleted: false
 last_name: Pig
 price: '0'
+receipt_files:
+- 0
 rejection_reason: ''
 state: complete
 submitted_dt: <timestamp>
