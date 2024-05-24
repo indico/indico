@@ -47,29 +47,23 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
         <Button.Group>
           <Button
             styleName="cropper-action-btn"
-            icon
-            float="left"
+            icon="sync"
             type="button"
+            content={Translate.string('Rotate')}
             onClick={() => {
               if (cropperRef.current.cropper) {
                 cropperRef.current.cropper.rotate(90);
               }
             }}
-          >
-            <Translate>Rotate</Translate>
-            <Icon name="sync" />
-          </Button>
+          />
           <Button
             type="button"
-            float="left"
             styleName="cropper-action-btn"
-            icon
+            icon="check"
             primary
+            content={Translate.string('Done')}
             onClick={onCrop}
-          >
-            <Translate>Done</Translate>
-            <Icon name="check" />
-          </Button>
+          />
         </Button.Group>
       </div>
     </div>
