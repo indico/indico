@@ -312,8 +312,8 @@ def build_storage_path(file):
         path = f'{event.id}_{event.title}'
     elif isinstance(file, ReceiptFile):
         event = file.registration.event
-        prefix = 'documents'
-        path = f'{event.id}_{event.title}'
+        prefix = 'registrations'
+        path = f'documents/{event.id}_{event.title}'
     elif isinstance(file, AttachmentFile):
         prefix = 'attachments'
         path = ''
