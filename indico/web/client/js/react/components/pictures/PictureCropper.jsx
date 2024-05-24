@@ -49,7 +49,6 @@ export function PictureCropper({cropperRef, src, onCrop, backAction, minCropSize
             styleName="cropper-action-btn"
             icon
             float="left"
-            primary
             type="button"
             onClick={() => {
               if (cropperRef.current.cropper) {
