@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -33,8 +34,8 @@ const LinkBar = ({visible, clear, data}) => {
   if (!visible) {
     return null;
   }
-
-  const {type, title, eventURL, eventTitle} = data;
+  const fmtDate = date => moment(date).format('Do MMMM ha');
+  const {type, title, eventURL, eventTitle, startDt, endDt} = data;
   return (
     <header styleName="link-bar">
       <Icon name="info circle" />
@@ -42,7 +43,7 @@ const LinkBar = ({visible, clear, data}) => {
         {messages[type]}{' '}
         {type === 'event' ? (
           <a href={eventURL} target="_blank" rel="noopener noreferrer">
-            <em>{title}</em>
+            <em>{`${title} (${fmtDate(startDt)} - ${fmtDate(endDt)})`}</em>
           </a>
         ) : (
           <span>
