@@ -12,6 +12,7 @@ import {bindActionCreators} from 'redux';
 import {Icon, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {serializeDateTimeRange} from 'indico/utils/date';
 
 import * as linkingActions from './actions';
 import {linkDataShape} from './props';
@@ -33,8 +34,7 @@ const LinkBar = ({visible, clear, data}) => {
   if (!visible) {
     return null;
   }
-
-  const {type, title, eventURL, eventTitle} = data;
+  const {type, title, eventURL, eventTitle, startDt, endDt} = data;
   return (
     <header styleName="link-bar">
       <Icon name="info circle" />
@@ -42,7 +42,7 @@ const LinkBar = ({visible, clear, data}) => {
         {messages[type]}{' '}
         {type === 'event' ? (
           <a href={eventURL} target="_blank" rel="noopener noreferrer">
-            <em>{title}</em>
+            <em>{`${title} (${serializeDateTimeRange(startDt, endDt)})`}</em>
           </a>
         ) : (
           <span>
