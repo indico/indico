@@ -167,7 +167,7 @@ class App extends React.Component {
           </header>
           <AdminOverrideBar />
           <AdminOverrideShortcut />
-          <LinkBar />
+          {!isInitializing && <LinkBar />}
           {this.renderContent()}
           <Dimmer.Dimmable>
             <Dimmer active={isInitializing} page>
