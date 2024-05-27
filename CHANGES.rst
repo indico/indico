@@ -24,6 +24,8 @@ Improvements
 - Add a new "Timetable Sessions" registration form field type which allows selecting
   session blocks from the event (:pr:`6184`, thanks :user:`jbtwist`)
 - Link the event title to the event in registration emails (:pr:`6358`)
+- Add the option to make registration forms private so they can only be accessed using
+  a secret link (:pr:`6321`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
