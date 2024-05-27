@@ -11,10 +11,10 @@
                             {%- trans %}This form is private{% endtrans -%}
                         </div>
                         {% set link_start %}
-                            <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=True) }}"
+                            <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
                                class="js-copy-to-clipboard"
                                title="{% trans %}Copy link to clipboard{% endtrans %}"
-                               data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=True) }}"
+                               data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
                                data-clipboard-action="copy">
                         {% endset %}
                         {% set link_end = '</a>'|safe %}
