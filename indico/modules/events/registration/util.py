@@ -787,7 +787,6 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
     :param user: A `User`
     :param include_scheduled: Whether to include scheduled
                               but not open registration forms
-    :param include_hidden: Whether to include hidden registration forms
     :param only_in_acl: Whether to include only registration forms
                         that are in the event's ACL
     :return: A tuple, which includes:
