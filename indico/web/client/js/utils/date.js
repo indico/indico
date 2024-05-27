@@ -152,9 +152,9 @@ export function localeUses24HourTime(locale) {
 
 export function serializeDateTimeRange(startDt, endDt) {
   const startDate = serializeDate(startDt, 'LL');
-  const startTime = serializeTime(startDt);
+  const startTime = serializeTime(startDt, 'LT');
   const endDate = serializeDate(endDt, 'LL');
-  const endTime = serializeTime(endDt);
+  const endTime = serializeTime(endDt, 'LT');
 
   return moment(startDt).isSame(moment(endDt), 'day')
     ? `${startDate} ${startTime} - ${endTime}`
