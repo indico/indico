@@ -43,6 +43,13 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
 
 
+class ForbiddenPrivateRegistrationForm(Forbidden):
+    """
+    Indicate that access to the registration form is forbidden because
+    it's private and no (valid) ``form_token`` has been provided.
+    """
+
+
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):
     #: Whether to allow access for users who cannot access the event itself.
     ALLOW_PROTECTED_EVENT = False
@@ -92,15 +99,18 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
                 raise NotFound
         else:
             self.registration = self.regform.get_registration(user=session.user) if session.user else None
-            if (not self.registration and
-                    self.regform.private and self.regform.uuid != request.args.get('form_token')):
-                raise NotFound
         if self.REGISTRATION_REQUIRED and not self.registration:
             raise Forbidden
 
     def _check_access(self):
         if not self.token:
             RHRegistrationFormBase._check_access(self)
+        if (
+            not self.registration
+            and self.regform.private
+            and self.regform.uuid != request.args.get('form_token')
+        ):
+            raise ForbiddenPrivateRegistrationForm(_('This registration form is private'))
 
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
@@ -320,6 +330,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     def _check_access(self):
         try:
             RHRegistrationFormRegistrationBase._check_access(self)
+        except ForbiddenPrivateRegistrationForm:
+            if not self.invitation:
+                raise
         except Forbidden:
             if not self.invitation or not self.invitation.skip_access_check:
                 raise
