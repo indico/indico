@@ -63,6 +63,9 @@ class RegistrationFormEditForm(IndicoForm):
                                description=_('How registrants can get in touch with somebody for extra information'))
     moderation_enabled = BooleanField(_('Moderated'), widget=SwitchWidget(),
                                       description=_('If enabled, registrations require manager approval'))
+    private = BooleanField(_('Private'), widget=SwitchWidget(),
+                           description=_('The registration form will not be publicly displayed on the event page. '
+                                         'Only people with the secret link will be able to register.'))
     require_login = BooleanField(_('Only logged-in users'), widget=SwitchWidget(),
                                  description=_('Users must be logged in to register'))
     require_user = BooleanField(_('Registrant must have account'), widget=SwitchWidget(),
@@ -81,8 +84,6 @@ class RegistrationFormEditForm(IndicoForm):
                                                             'the event page'))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_('Check-in status will be shown publicly on the event page'))
-    private = BooleanField(_('Private form'), widget=SwitchWidget(),
-                           description=_('The registration form will not be publicly displayed on the event page'))
     base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999999.99), Optional(),
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
