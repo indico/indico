@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -13,6 +12,7 @@ import {bindActionCreators} from 'redux';
 import {Icon, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {serializeDateTimeRange} from 'indico/utils/date';
 
 import * as linkingActions from './actions';
 import {linkDataShape} from './props';
@@ -34,7 +34,6 @@ const LinkBar = ({visible, clear, data}) => {
   if (!visible) {
     return null;
   }
-  const fmtDate = date => moment(date).format('Do MMMM HH:mm');
   const {type, title, eventURL, eventTitle, startDt, endDt} = data;
   return (
     <header styleName="link-bar">
@@ -43,7 +42,7 @@ const LinkBar = ({visible, clear, data}) => {
         {messages[type]}{' '}
         {type === 'event' ? (
           <a href={eventURL} target="_blank" rel="noopener noreferrer">
-            <em>{`${title} (${fmtDate(startDt)} - ${fmtDate(endDt)})`}</em>
+            <em>{`${title} (${serializeDateTimeRange(startDt, endDt)})`}</em>
           </a>
         ) : (
           <span>
