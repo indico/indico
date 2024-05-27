@@ -34,7 +34,7 @@ const LinkBar = ({visible, clear, data}) => {
   if (!visible) {
     return null;
   }
-  const fmtDate = date => moment(date).format('Do MMMM ha');
+  const fmtDate = date => moment(date).format('Do MMMM HH:mm');
   const {type, title, eventURL, eventTitle, startDt, endDt} = data;
   return (
     <header styleName="link-bar">
