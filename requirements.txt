@@ -313,7 +313,7 @@ referencing==0.34.0
     #   jsonschema-specifications
 reportlab==4.1.0
     # via -r requirements.in
-requests==2.32.1
+requests==2.32.2
     # via -r requirements.in
 rich==13.7.1
     # via flask-limiter
