@@ -88,7 +88,7 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
             and self.regform.private
             and self.regform.uuid != request.args.get('form_token')
         ):
-            raise ForbiddenPrivateRegistrationForm(_('This registration form is private'))
+            raise ForbiddenPrivateRegistrationForm(_('This registration form is private.'))
 
     def _check_restricted_event_access(self):
         return self.regform.in_event_acls.filter_by(event_id=self.event.id).has_rows()
