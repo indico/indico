@@ -71,7 +71,9 @@ class AppleWalletManager:
         self.cert = None
 
     def _get_wallet_serial(self, registration):
-        return registration.apple_wallet_serial or registration.ticket_uuid
+        if not registration.apple_wallet_serial:
+            registration.apple_wallet_serial = registration.ticket_uuid
+        return registration.apple_wallet_serial
 
     @property
     def is_configured(self):
@@ -114,7 +116,7 @@ class AppleWalletManager:
         passfile.logoText = cert_details['O']  # Add Organization name at the top
         passfile.backgroundColor = '#007cac'
         passfile.foregroundColor = passfile.labelColor = '#ffffff'
-        passfile.serialNumber = registration.apple_wallet_serial
+        passfile.serialNumber = self._get_wallet_serial(registration)
         qr_data = get_ticket_qr_code_data(get_persons([registration])[0])
         passfile.barcode = Barcode(message=json.dumps(qr_data, separators=(',', ':')), format=BarcodeFormat.QR)
 
@@ -128,7 +130,6 @@ class AppleWalletManager:
         return passfile
 
     def get_ticket(self, registration) -> str:
-        registration.apple_wallet_serial = self._get_wallet_serial(registration)  # Save ticket serial for updates
         passfile = self.build_pass_object(registration)
         wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'wallets',
                                  'apple-wwdr.pem')
