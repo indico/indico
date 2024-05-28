@@ -86,13 +86,17 @@ def _format_wallet_credentials(credentials):
     return repr({**credentials, 'private_key': f'<hidden:{keyhash}>'})
 
 
+def _format_secret(secret):
+    return f'<hidden:{crc32(secret)}>' if secret else ''
+
+
 def _log_category_update(category, changes, extra_log_fields):
     extra_fields = {'google_wallet_settings': ('google_wallet_credentials', 'google_wallet_issuer_name',
                                                'google_wallet_issuer_id'),
-                    'apple_wallet_settings': ('apple_wallet_certificate', 'apple_wallet_key')}
-    for extra_field in extra_fields:
-        if settings := changes.pop(extra_field, None):
-            for key in extra_fields[extra_field]:
+                    'apple_wallet_settings': ('apple_wallet_certificate', 'apple_wallet_key', 'apple_wallet_password')}
+    for extra_field_name, extra_field_keys in extra_fields.items():
+        if settings := changes.pop(extra_field_name, None):
+            for key in extra_field_keys:
                 old = settings[0].get(key)
                 new = settings[1].get(key)
                 if old != new:
@@ -117,9 +121,18 @@ def _log_category_update(category, changes, extra_log_fields):
             'type': 'text',
             'convert': lambda changes: [_format_wallet_credentials(x) for x in changes],
         },
-        'apple_wallet_mode': 'Apple Pass mode',
-        'apple_wallet_certificate': {'title': 'Apple Pass certificate', 'type': 'string'},
-        'apple_wallet_key': {'title': 'Apple Pass private key', 'type': 'string'},
+        'apple_wallet_mode': 'Apple Wallet mode',
+        'apple_wallet_certificate': {'title': 'Apple Wallet certificate', 'type': 'text'},
+        'apple_wallet_key': {
+            'title': 'Apple Wallet private key',
+            'type': 'string',
+            'convert': lambda changes: [_format_secret(x) for x in changes]
+        },
+        'apple_wallet_password': {
+            'title': 'Apple Wallet passphrase',
+            'type': 'string',
+            'convert': lambda changes: [_format_secret(x) for x in changes]
+        },
         **(extra_log_fields or {})
     }
     if changes:
