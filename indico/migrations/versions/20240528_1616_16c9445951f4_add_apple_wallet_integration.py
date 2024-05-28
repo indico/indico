@@ -1,7 +1,7 @@
 """Add Apple Wallet integration
 
 Revision ID: 16c9445951f4
-Revises: 4e32f4d5ebe4
+Revises: 67e92eeca34f
 Create Date: 2024-04-04 13:39:03.735267
 """
 
@@ -16,7 +16,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 
 # revision identifiers, used by Alembic.
 revision = '16c9445951f4'
-down_revision = '4e32f4d5ebe4'
+down_revision = '67e92eeca34f'
 branch_labels = None
 depends_on = None
 
