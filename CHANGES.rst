@@ -26,6 +26,9 @@ Improvements
 - Link the event title to the event in registration emails (:pr:`6358`)
 - Add the option to make registration forms private so they can only be accessed using
   a secret link (:pr:`6321`, thanks :user:`vtran99`)
+- Add experimental support for creating Apple Wallet (Passbook / pkpass) tickets
+  (opt-in via :data:`ENABLE_APPLE_WALLET` ``indico.conf`` setting) (:pr:`6248`, thanks
+  :user:`openprojects`)
 
 Bugfixes
 ^^^^^^^^
