@@ -33,8 +33,8 @@ def upgrade():
         ),
         schema='event_registration'
     )
-    op.alter_column('forms', 'uuid', server_default=None,
-                    schema='event_registration')
+    op.alter_column('forms', 'uuid', server_default=None, schema='event_registration')
+    op.create_unique_constraint(None, 'forms', ['uuid'], schema='event_registration')
 
 
 def downgrade():
