@@ -73,7 +73,8 @@ def _inject_regform_announcement(event, **kwargs):
     if event.has_feature('registration'):
         all_regforms = get_event_regforms(event, session.user)
         user_registrations = sum(regform[1] for regform in all_regforms)
-        open_and_registered_regforms = [regform[0] for regform in all_regforms if regform[0].is_open or regform[1]]
+        open_and_registered_regforms = [regform[0] for regform in all_regforms
+                                        if (regform[0].is_open and not regform[0].private) or regform[1]]
         if open_and_registered_regforms:
             return render_template('events/registration/display/conference_home.html',
                                    regforms=open_and_registered_regforms, event=event,
@@ -108,7 +109,7 @@ def _extend_event_menu(sender, **kwargs):
             return False
         if not event.can_access(session.user) and not (event.has_regform_in_acl and event.public_regform_access):
             return False
-        if any(form.is_scheduled for form in event.registration_forms):
+        if any(form.is_scheduled and not form.private for form in event.registration_forms):
             return True
         if not session.user:
             return False

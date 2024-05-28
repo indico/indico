@@ -43,6 +43,13 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
 
 
+class ForbiddenPrivateRegistrationForm(Forbidden):
+    """
+    Indicate that access to the registration form is forbidden because
+    it's private and no (valid) ``form_token`` has been provided.
+    """
+
+
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):
     #: Whether to allow access for users who cannot access the event itself.
     ALLOW_PROTECTED_EVENT = False
@@ -73,6 +80,15 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
     def _process_args(self):
         RHRegistrationFormDisplayBase._process_args(self)
         RegistrationFormMixin._process_args(self)
+
+    def _check_access(self):
+        RHRegistrationFormDisplayBase._check_access(self)
+        if (
+            not getattr(self, 'registration', None)
+            and self.regform.private
+            and self.regform.uuid != request.args.get('form_token')
+        ):
+            raise ForbiddenPrivateRegistrationForm(_('This registration form is private.'))
 
     def _check_restricted_event_access(self):
         return self.regform.in_event_acls.filter_by(event_id=self.event.id).has_rows()
@@ -292,7 +308,11 @@ class RHRegistrationFormCheckEmail(InvitationMixin, RHRegistrationFormBase):
 
     def _check_access(self):
         if not self.existing_registration and not (self.invitation and self.invitation.skip_access_check):
-            RHRegistrationFormBase._check_access(self)
+            try:
+                RHRegistrationFormBase._check_access(self)
+            except ForbiddenPrivateRegistrationForm:
+                if not self.invitation:
+                    raise
 
     def _process(self):
         if self.update:
@@ -317,6 +337,9 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     def _check_access(self):
         try:
             RHRegistrationFormRegistrationBase._check_access(self)
+        except ForbiddenPrivateRegistrationForm:
+            if not self.invitation:
+                raise
         except Forbidden:
             if not self.invitation or not self.invitation.skip_access_check:
                 raise
@@ -377,7 +400,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                captcha_settings=get_captcha_settings())
 
 
-class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):
+class RHUploadRegistrationFile(UploadFileMixin, InvitationMixin, RHRegistrationFormBase):
     """
     Upload a file from a registration form.
 
@@ -386,16 +409,26 @@ class RHUploadRegistrationFile(UploadFileMixin, RHRegistrationFormBase):
     Only this uuid is then sent when the regform is submitted.
     """
 
+    ALLOW_PROTECTED_EVENT = True
+
     @use_kwargs({
         'token': UUIDString(load_default=None),
     }, location='query')
     def _process_args(self, token):
         RHRegistrationFormBase._process_args(self)
+        InvitationMixin._process_args(self)
         self.existing_registration = self.regform.get_registration(uuid=token) if token else None
 
     def _check_access(self):
         if not self.existing_registration:
-            RHRegistrationFormBase._check_access(self)
+            try:
+                RHRegistrationFormBase._check_access(self)
+            except ForbiddenPrivateRegistrationForm:
+                if not self.invitation:
+                    raise
+            except Forbidden:
+                if not self.invitation or not self.invitation.skip_access_check:
+                    raise
 
     def get_file_context(self):
         return 'event', self.event.id, 'regform', self.regform.id, 'registration'
@@ -458,6 +491,8 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
     def _check_access(self):
         try:
             RHRegistrationFormBase._check_access(self)
+        except ForbiddenPrivateRegistrationForm:
+            pass
         except Forbidden:
             if not self.invitation.skip_access_check:
                 raise

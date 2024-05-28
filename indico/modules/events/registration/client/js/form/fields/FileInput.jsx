@@ -8,7 +8,7 @@
 import uploadFileURL from 'indico-url:event_registration.upload_registration_file';
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {FinalSingleFileManager} from 'indico/react/components';
@@ -22,6 +22,11 @@ import './FileInput.module.scss';
 export default function FileInput({htmlName, disabled, isRequired}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
+  const [invitationToken, formToken] = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return [params.get('invitation'), params.get('form_token')];
+  }, []);
+
   const initialFileDetails = isUpdateMode ? fileData[htmlName] || null : null;
 
   const urlParams = {
@@ -30,6 +35,12 @@ export default function FileInput({htmlName, disabled, isRequired}) {
   };
   if (registrationUuid) {
     urlParams.token = registrationUuid;
+  }
+  if (invitationToken) {
+    urlParams.invitation = invitationToken;
+  }
+  if (formToken) {
+    urlParams.form_token = formToken;
   }
 
   return (

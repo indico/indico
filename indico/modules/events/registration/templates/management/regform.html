@@ -1,6 +1,33 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block content %}
+    {% block regform_private %}
+        {% if regform.private %}
+            <div class="action-box highlight">
+                <div class="section">
+                    <div class="icon icon-lock-center"></div>
+                    <div class="text">
+                        <div class="label">
+                            {%- trans %}This form is private{% endtrans -%}
+                        </div>
+                        {% trans -%}
+                            Share the secret link or send invitations to anyone you want to register.
+                        {%- endtrans %}
+                    </div>
+                    <div class="toolbar">
+                        <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
+                           class="js-copy-to-clipboard i-button highlight icon-copy"
+                           title="{% trans %}Copy link to clipboard{% endtrans %}"
+                           data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
+                           data-clipboard-action="copy">
+                            {% trans %}Copy secret link{% endtrans %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endblock %}
+
     {% if regform.is_purged %}
         {%- call message_box('error', fixed_width=true) -%}
             {% trans %}Registrations have been deleted due to an expired retention period.{% endtrans %}

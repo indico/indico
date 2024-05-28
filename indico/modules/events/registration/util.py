@@ -796,10 +796,10 @@ def get_event_regforms_registrations(event, user, include_scheduled=True, only_i
     all_regforms = get_event_regforms(event, user, with_registrations=True, only_in_acl=only_in_acl)
     if include_scheduled:
         displayed_regforms = [regform for regform, registration in all_regforms
-                              if regform.is_scheduled or registration]
+                              if (regform.is_scheduled and not regform.private) or registration]
     else:
         displayed_regforms = [regform for regform, registration in all_regforms
-                              if regform.is_open or registration]
+                              if (regform.is_open and not regform.private) or registration]
     return displayed_regforms, dict(all_regforms)
 
 

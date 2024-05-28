@@ -5,12 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from babel.numbers import format_currency
 from flask import session
 from sqlalchemy import orm, select
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import UUID as pg_UUID  # noqa: N811
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, subqueryload
@@ -28,6 +29,7 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
+from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
@@ -172,6 +174,18 @@ class RegistrationForm(db.Model):
         db.Boolean,
         nullable=False,
         default=False
+    )
+    #: Whether the registration form is only for selected users
+    private = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    uuid = db.Column(
+        pg_UUID,
+        unique=True,
+        nullable=False,
+        default=lambda: str(uuid4())
     )
     #: The base fee users have to pay when registering
     base_price = db.Column(
@@ -425,9 +439,15 @@ class RegistrationForm(db.Model):
     def is_scheduled(cls):
         return ~cls.is_deleted & cls.start_dt.isnot(None)
 
-    @property
+    @locator_property
     def locator(self):
         return dict(self.event.locator, reg_form_id=self.id)
+
+    @locator.token
+    def locator(self):
+        """A locator that adds the UUID if the form is private."""
+        token = self.uuid if self.private else None
+        return dict(self.locator, form_token=token)
 
     @property
     def active_fields(self):

@@ -63,6 +63,9 @@ class RegistrationFormEditForm(IndicoForm):
                                description=_('How registrants can get in touch with somebody for extra information'))
     moderation_enabled = BooleanField(_('Moderated'), widget=SwitchWidget(),
                                       description=_('If enabled, registrations require manager approval'))
+    private = BooleanField(_('Private'), widget=SwitchWidget(),
+                           description=_('The registration form will not be publicly displayed on the event page. '
+                                         'Only people with the secret link or an invitation will be able to register.'))
     require_login = BooleanField(_('Only logged-in users'), widget=SwitchWidget(),
                                  description=_('Users must be logged in to register'))
     require_user = BooleanField(_('Registrant must have account'), widget=SwitchWidget(),
