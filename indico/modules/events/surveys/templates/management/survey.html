@@ -11,17 +11,18 @@
                     <div class="label">
                         {%- trans %}The survey is private{% endtrans -%}
                     </div>
-                    {% set link_start %}
-                        <a href="{{ url_for('.display_survey_form', survey, survey.locator.token, _external=True) }}"
-                           class="js-copy-to-clipboard"
-                           title="{% trans %}Copy link to clipboard{% endtrans %}"
-                           data-clipboard-text="{{ url_for('.display_survey_form', survey, survey.locator.token, _external=True) }}"
-                           data-clipboard-action="copy">
-                    {% endset %}
-                    {% set link_end = '</a>'|safe %}
                     {% trans -%}
-                        The survey is accessible only by people with this {{ link_start }}link{{ link_end }}
+                        Share the secret link with anyone you want to submit a response.
                     {%- endtrans %}
+                </div>
+                <div class="toolbar">
+                    <a href="{{ url_for('.display_survey_form', survey, survey.locator.token, _external=true) }}"
+                       class="js-copy-to-clipboard i-button highlight icon-copy"
+                       title="{% trans %}Copy link to clipboard{% endtrans %}"
+                       data-clipboard-text="{{ url_for('.display_survey_form', survey, survey.locator.token, _external=true) }}"
+                       data-clipboard-action="copy">
+                        {% trans %}Copy secret link{% endtrans %}
+                    </a>
                 </div>
             </div>
         </div>

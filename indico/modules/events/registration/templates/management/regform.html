@@ -10,17 +10,18 @@
                         <div class="label">
                             {%- trans %}This form is private{% endtrans -%}
                         </div>
-                        {% set link_start %}
-                            <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
-                               class="js-copy-to-clipboard"
-                               title="{% trans %}Copy link to clipboard{% endtrans %}"
-                               data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
-                               data-clipboard-action="copy">
-                        {% endset %}
-                        {% set link_end = '</a>'|safe %}
                         {% trans -%}
-                            The registration form is only accessible via this {{ link_start }}link{{ link_end }}.
+                            Share the secret link or send invitations to anyone you want to register.
                         {%- endtrans %}
+                    </div>
+                    <div class="toolbar">
+                        <a href="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
+                           class="js-copy-to-clipboard i-button highlight icon-copy"
+                           title="{% trans %}Copy link to clipboard{% endtrans %}"
+                           data-clipboard-text="{{ url_for('.display_regform', regform, regform.locator.token, _external=true) }}"
+                           data-clipboard-action="copy">
+                            {% trans %}Copy secret link{% endtrans %}
+                        </a>
                     </div>
                 </div>
             </div>
