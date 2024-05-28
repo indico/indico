@@ -7,7 +7,6 @@
 
 import json
 import os
-from io import BytesIO
 from pathlib import Path
 
 import requests
@@ -135,7 +134,7 @@ class AppleWalletManager:
         wwdr_path = os.path.join(current_app.root_path, 'modules', 'events', 'registration', 'wallets',
                                  'apple-wwdr.pem')
         # Create and output the Passbook file (.pkpass)
-        temp = BytesIO()
-        temp.seek(0)
-        return passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
-                               self.settings['apple_wallet_password'], zip_file=temp)
+        zip_file = passfile.create(self.cert, self.settings['apple_wallet_key'], wwdr_path,
+                                   self.settings['apple_wallet_password'])
+        zip_file.seek(0)
+        return zip_file
