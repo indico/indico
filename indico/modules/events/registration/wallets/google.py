@@ -28,7 +28,7 @@ from indico.web.flask.util import url_for
 API_BASE_URL = 'https://walletobjects.googleapis.com/walletobjects/v1'
 API_CLASS_URL = f'{API_BASE_URL}/eventTicketClass'
 API_OBJECT_URL = f'{API_BASE_URL}/eventTicketObject'
-logger = Logger.get('events.registration.google_wallet')
+logger = Logger.get('events.registration.wallets.google')
 
 
 class GoogleCredentialValidationResult(Enum):

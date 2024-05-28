@@ -23,7 +23,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
-logger = Logger.get('events.registration.apple_wallet')
+logger = Logger.get('events.registration.wallets.apple')
 
 
 class IndicoPass(Pass):
