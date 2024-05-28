@@ -117,17 +117,19 @@ class CategorySettingsForm(IndicoForm):
                                                             'inherited from the parent category. You can also '
                                                             'explicitly disable it or provide your own configuration '
                                                             'instead.'))
-    apple_wallet_certificate = TextAreaField(_('Certificate.pem'),
+    apple_wallet_certificate = TextAreaField(_('Certificate'),
                                              [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
                                                            preserve_data=True), DataRequired()],
-                                             description=_('Content of the Certificate.pem file.'))
-    apple_wallet_key = TextAreaField(_('Private.key'), [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                             description=_('Your certificate in PEM format'))
+    apple_wallet_key = TextAreaField(_('Private Key'), [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
                                                                      preserve_data=True), DataRequired()],
-                                     description=_('Content of the Private.key file.'))
-    apple_wallet_password = IndicoPasswordField(_('Password for the private key'),
+                                     description=_('Your private key in PEM format'))
+    apple_wallet_password = IndicoPasswordField(_('Passphrase'),
                                                 [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
                                                               preserve_data=False)],
-                                                description=_('Password used to decrypt the Private.key file.'))
+                                                toggle=True,
+                                                description=_('The passphrase used to decrypt the private key. Leave '
+                                                              'this empty if the private key is not encrypted.'))
 
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
@@ -201,31 +203,36 @@ class CategorySettingsForm(IndicoForm):
     def validate_apple_wallet_certificate(self, field):
         try:
             x509.load_pem_x509_certificate(field.data.encode())
-            return True
+            return
         except ValueError:
-            raise ValidationError(_('The provided Certificate.pem is malformed.'))
+            raise ValidationError(_('The provided certificate is malformed.'))
 
     def validate_apple_wallet_key(self, field):
         try:
             hazmat.primitives.serialization.load_pem_private_key(field.data.encode(), password=None)
         except ValueError:
-            raise ValidationError(_('The provided Private.key is malformed.'))
-        except UnsupportedAlgorithm:
-            logger.warning('The provided Google Wallet private key type for category %s is not supported.',
-                           self.category.id)
+            raise ValidationError(_('The private key is malformed.'))
+        except UnsupportedAlgorithm as exc:
+            logger.warning('Unsupported private key in category %d: %s',
+                           self.category.id, exc)
             raise ValidationError(_('The private key is invalid.'))
         except TypeError:
-            # TypeError is raised when no password is provided for the encrypted key,
-            # which we don't need to decrypt to check that it's malformed.
-            return True
+            # TypeError is raised when no password is provided for an encrypted key (or vice versa),
+            # but for the check here we do not need to decrypt the key anyway
+            pass
 
     def validate_apple_wallet_password(self, field):
         if self.apple_wallet_key.errors:
-            return True
+            return
+        password = field.data.encode() or None
         try:
             hazmat.primitives.serialization.load_pem_private_key(self.apple_wallet_key.data.encode(),
-                                                                 password=field.data.encode())
-            return True
+                                                                 password=password)
+        except TypeError:
+            if password:
+                raise ValidationError(_('The provided key is not encrypted, do not specify a password.'))
+            else:
+                raise ValidationError(_('The provided key is encrypted, you must specify the password to decrypt it.'))
         except ValueError:
             raise ValidationError(_('The provided password is incorrect.'))
 
