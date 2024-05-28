@@ -539,7 +539,7 @@ class RHTicketGoogleWalletDownload(RHTicketDownload):
 
 
 class RHTicketAppleWalletDownload(RHTicketDownload):
-    """Download Apple Pass registration ticket."""
+    """Download Apple Wallet (pkpass) registration ticket."""
 
     def _process(self):
         if not (apple_wallet := self.registration.generate_ticket_apple_wallet()):

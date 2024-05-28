@@ -113,7 +113,7 @@ class CategorySettingsForm(IndicoForm):
                                                         'Indico server. Changing it will also break updates to '
                                                         'any existing tickets.'))
     apple_wallet_mode = IndicoEnumSelectField(_('Configuration'), enum=InheritableConfigMode,
-                                              description=_('The Apple Pass configuration is, by default, '
+                                              description=_('The Apple Wallet configuration is, by default, '
                                                             'inherited from the parent category. You can also '
                                                             'explicitly disable it or provide your own configuration '
                                                             'instead.'))

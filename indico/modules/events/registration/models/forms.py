@@ -251,7 +251,7 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether to allow exporting tickets to Apple Pass
+    #: Whether to allow exporting tickets to Apple Wallet
     ticket_apple_wallet = db.Column(
         db.Boolean,
         nullable=False,

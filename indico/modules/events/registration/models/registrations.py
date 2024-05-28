@@ -305,7 +305,7 @@ class Registration(db.Model):
             lazy=False
         )
     )
-    #: The serial number assigned to latest Apple Pass: needed for sending updates.
+    #: The serial number assigned to the Apple Wallet pass
     apple_wallet_serial = db.Column(
         db.String,
         nullable=False,

@@ -60,9 +60,9 @@ class IndicoPass(Pass):
 
 
 class AppleWalletManager:
-    """Apple Pass ticketing manager.
+    """Apple Wallet ticketing manager.
 
-    This class handles the integration with the Apple Pass ticketing API.
+    This class handles the integration with the Apple Wallet ticketing API.
     """
 
     def __init__(self, event):
