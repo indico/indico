@@ -213,8 +213,7 @@ class CategorySettingsForm(IndicoForm):
         except ValueError:
             raise ValidationError(_('The private key is malformed.'))
         except UnsupportedAlgorithm as exc:
-            logger.warning('Unsupported private key in category %d: %s',
-                           self.category.id, exc)
+            logger.warning('Unsupported private key in category %d: %s', self.category.id, exc)
             raise ValidationError(_('The private key is invalid.'))
         except TypeError:
             # TypeError is raised when no password is provided for an encrypted key (or vice versa),
