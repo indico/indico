@@ -28,13 +28,13 @@ class _InheritableConfigMode(int, Enum):
 
 
 def upgrade():
+    op.add_column('forms', sa.Column('ticket_apple_wallet', sa.Boolean(), nullable=False,
+                                     server_default='false'), schema='event_registration')
     op.add_column('categories', sa.Column('apple_wallet_mode', PyIntEnum(_InheritableConfigMode), nullable=False,
                                           server_default=str(_InheritableConfigMode.inheriting.value)),
                   schema='categories')
     op.add_column('categories', sa.Column('apple_wallet_settings', postgresql.JSONB(), nullable=False,
                                           server_default='{}'), schema='categories')
-    op.add_column('forms', sa.Column('ticket_apple_wallet', sa.Boolean(), nullable=False,
-                                     server_default='false'), schema='event_registration')
     op.add_column('registrations', sa.Column('apple_wallet_serial', sa.String(), server_default='', nullable=False),
                   schema='event_registration')
     op.alter_column('forms', 'ticket_apple_wallet', server_default=None, schema='event_registration')
