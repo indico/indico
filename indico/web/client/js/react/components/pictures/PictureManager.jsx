@@ -250,8 +250,8 @@ const PictureManager = ({
       });
     };
     let rejected = false;
+    const img = await loadImage(imageSrc);
     if (minPictureSize && minPictureSize !== 0) {
-      const img = await loadImage(imageSrc);
       if (Math.min(img.naturalWidth, img.naturalHeight) < minPictureSize) {
         setCustomFileRejections({
           code: 'min-size',
