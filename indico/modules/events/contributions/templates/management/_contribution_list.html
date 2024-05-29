@@ -168,40 +168,55 @@
                                 {% for item in static_columns %}
                                     {% if item.id == 'session' %}
                                         <td class="i-table">
-                                            <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
-                                                    style="{{ contrib.session.colors.css if contrib.session }}"
-                                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                                    data-method="PATCH"
-                                                    data-contrib-id="{{ contrib.id }}"
-                                                    data-selected-item-id="{{ contrib.session.id or None | tojson }}">
-                                                <span class="label">
-                                                    {% if contrib.session %}
-                                                        {{ contrib.session.title }}
-                                                    {% else %}
-                                                        {%- trans %}No session{% endtrans -%}
-                                                    {% endif %}
-                                                </span>
-                                                {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                            </button>
+                                            {% if event.can_manage(session.user) %}
+                                                <button class="i-button {{ 'session-item-picker' if not event.is_locked else 'disabled' }}"
+                                                        style="{{ contrib.session.colors.css if contrib.session }}"
+                                                        data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                                        data-method="PATCH"
+                                                        data-contrib-id="{{ contrib.id }}"
+                                                        data-selected-item-id="{{ contrib.session.id or None | tojson }}">
+                                                    <span class="label">
+                                                        {% if contrib.session %}
+                                                            {{ contrib.session.title }}
+                                                        {% else %}
+                                                            {%- trans %}No session{% endtrans -%}
+                                                        {% endif %}
+                                                    </span>
+                                                    {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
+                                                </button>
+                                            {% elif contrib.session %}
+                                                {{ contrib.session.title }}
+                                            {% else %}
+                                                {%- trans %}No session{% endtrans -%}
+                                            {% endif %}
                                         </td>
                                     {% elif item.id == 'track' %}
                                         <td class="i-table">
-                                            <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
-                                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
-                                                    data-method="PATCH"
-                                                    data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
-                                                <span class="label">
-                                                    {% if contrib.track %}
-                                                        {% if contrib.track.track_group %}
-                                                            {{ contrib.track.track_group.title | truncate(9, true, '…') }}:
+                                            {% if event.can_manage(session.user) %}
+                                                <button class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
+                                                        data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
+                                                        data-method="PATCH"
+                                                        data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">
+                                                    <span class="label">
+                                                        {% if contrib.track %}
+                                                            {% if contrib.track.track_group %}
+                                                                {{ contrib.track.track_group.title | truncate(9, true, '…') }}:
+                                                            {% endif %}
+                                                            {{ contrib.track.title }}
+                                                        {% else %}
+                                                            {% trans %}No track{% endtrans %}
                                                         {% endif %}
-                                                        {{ contrib.track.title }}
-                                                    {% else %}
-                                                        {% trans %}No track{% endtrans %}
-                                                    {% endif %}
-                                                </span>
-                                                {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
-                                            </button>
+                                                    </span>
+                                                    {% if not event.is_locked %}<span class="icon-arrow-down"></span>{% endif %}
+                                                </button>
+                                            {% elif contrib.track %}
+                                                {% if contrib.track.track_group %}
+                                                    {{ contrib.track.track_group.title }}:
+                                                {% endif %}
+                                                {{ contrib.track.title }}
+                                            {% else %}
+                                                {% trans %}No track{% endtrans %}
+                                            {% endif %}
                                         </td>
                                     {% elif item.id == 'type' and has_types %}
                                         <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">

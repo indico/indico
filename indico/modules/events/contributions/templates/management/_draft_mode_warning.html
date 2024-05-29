@@ -1,4 +1,4 @@
-{% macro render_draft_mode_warning(event) %}
+{% macro render_draft_mode_warning(event, can_publish=true) %}
     <div id="draft-mode-warning" class="action-box warning draft-mode">
         <div class="section">
             <div class="icon icon-edit"></div>
@@ -13,9 +13,11 @@
             </div>
         </div>
 
-        <script>
-            // Render PublicationModal into #draft-mode-warning-button
-            setupDraftModeWarning();
-        </script>
+        {% if can_publish %}
+            <script>
+                // Render PublicationModal into #draft-mode-warning-button
+                setupDraftModeWarning();
+            </script>
+        {% endif %}
     </div>
 {% endmacro %}

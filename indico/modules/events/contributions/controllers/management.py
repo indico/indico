@@ -289,6 +289,8 @@ class RHContributionREST(RHManageContributionBase):
         updates = {}
         if set(data.keys()) > {'session_id', 'track_id'}:
             raise BadRequest
+        if not self.event.can_manage(session.user):
+            raise Forbidden
         if 'session_id' in data:
             updates.update(self._get_contribution_session_updates(data['session_id']))
         if 'track_id' in data:
@@ -608,6 +610,9 @@ class RHManageSubmitterEdits(EditEventSettingsMixin, RHManageContributionsBase):
 
 class RHManageContributionPublicationREST(RHManageContributionsBase):
     """Manage contribution publication setting."""
+
+    # Publishing and unpublishing contribution requires full management permissions
+    PERMISSION = None
 
     def _process_GET(self):
         return jsonify(contribution_settings.get(self.event, 'published'))
