@@ -232,6 +232,7 @@ settings:
   force_language: false
   force_timezone: false
   lang: en_US
+  mastodon_server_url: null
   name_format: first_last_upper
   show_future_events: false
   show_past_events: false

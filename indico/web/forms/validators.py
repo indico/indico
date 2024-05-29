@@ -14,6 +14,7 @@ from indico.util.date_time import as_utc, format_date, format_datetime, format_h
 from indico.util.i18n import _, ngettext
 from indico.util.passwords import validate_secure_password
 from indico.util.string import has_relative_links, is_valid_mail
+from indico.web.util import check_url_has_no_path
 
 
 class UsedIf:
@@ -419,3 +420,15 @@ class NoRelativeURLs:
     def __call__(self, form, field):
         if field.data and has_relative_links(field.data):
             raise ValidationError(_('Links and images may not use relative URLs.'))
+
+
+class NoPathInURL:
+    """Ensure that a URL field is valid and has no path component.
+
+    This checks that a URL has either http or https scheme and no path
+    component (e.g. https://foo.bar is valid, but https://foo.bar/baz is not).
+    """
+
+    def __call__(self, form, field):
+        if field.data and not check_url_has_no_path(field.data):
+            raise ValidationError(_('Invalid URL.'))

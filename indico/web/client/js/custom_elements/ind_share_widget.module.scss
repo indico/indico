@@ -20,9 +20,14 @@
   filter: none;
 }
 
-.header-text {
-  font-size: 1.4em !important;
-  margin: -2.8px 100px 8.5px !important;
+.share-header-title {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 5px 0 5px 0;
+
+  .icon {
+    margin-right: 5px;
+  }
 }
 
 .share-section-header {

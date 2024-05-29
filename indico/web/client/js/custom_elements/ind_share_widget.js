@@ -28,14 +28,25 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import './ind_share_widget.module.scss';
 
-function CopyToClipboard({eventUrl}) {
+function CopyToClipboard({eventUrl, setCopied, isCopied}) {
+  useEffect(() => {
+    if (isCopied) {
+      const timer = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isCopied, setCopied]);
+
   return (
     <Input
       label={
         <Button
-          icon="copy"
-          onClick={() => navigator.clipboard.writeText(eventUrl)}
-          content={Translate.string('Copy Link')}
+          icon={isCopied ? 'check' : 'copy'}
+          positive={isCopied}
+          onClick={() => {
+            navigator.clipboard.writeText(eventUrl);
+            setCopied(true);
+          }}
+          content={isCopied ? Translate.string('Copied!') : Translate.string('Copy Link')}
         />
       }
       labelPosition="right"
@@ -48,18 +59,20 @@ function CopyToClipboard({eventUrl}) {
 
 CopyToClipboard.propTypes = {
   eventUrl: PropTypes.string.isRequired,
+  setCopied: PropTypes.func.isRequired,
+  isCopied: PropTypes.bool.isRequired,
 };
 
 function CalendarButtons({googleCalParams, outlookCalParams}) {
   const calendars = [
     {
-      name: 'Google Calendar',
+      name: Translate.string('Google Calendar'),
       logo: `${Indico.Urls.ImagesBase}/google_cal.svg`,
       url: 'https://www.google.com/calendar/render?',
       params: googleCalParams,
     },
     {
-      name: 'Outlook',
+      name: Translate.string('Outlook'),
       logo: `${Indico.Urls.ImagesBase}/outlook.svg`,
       url: 'https://outlook.office.com/calendar/deeplink/compose?',
       color: 'blue',
@@ -73,13 +86,13 @@ function CalendarButtons({googleCalParams, outlookCalParams}) {
         <GridColumn key={calendar.name} styleName="share-button-column">
           <Button
             as="a"
-            href={calendar.url + calendar.params}
+            href={`${calendar.url}${calendar.params}`}
             target="_blank"
             basic
             color={calendar.color}
             styleName="share-button"
           >
-            <img src={calendar.logo} alt={Translate.string(calendar.name)} />
+            <img src={calendar.logo} alt={calendar.name} />
             <Translate as="span">{calendar.name}</Translate>
           </Button>
         </GridColumn>
@@ -93,42 +106,73 @@ CalendarButtons.propTypes = {
   outlookCalParams: PropTypes.string.isRequired,
 };
 
-function SocialButton({name, logo, url, color, render, button, buttonProps}) {
-  const buttonElement = button ? (
-    <Button basic color={color} styleName="share-button" {...buttonProps}>
-      <img src={logo} alt={Translate.string(name)} />
-      <span>{name}</span>
-    </Button>
-  ) : (
-    <Button as="a" href={url} target="_blank" basic color={color} styleName="share-button">
-      <img src={logo} alt={Translate.string(name)} />
-      <span>{name}</span>
-    </Button>
-  );
+function TwitterButton({shareText}) {
   return (
     <GridColumn styleName="share-button-column">
-      {render ? render(buttonElement) : buttonElement}
+      <Button
+        as="a"
+        href={`https://twitter.com/intent/tweet?text=${shareText}`}
+        target="_blank"
+        basic
+        color="blue"
+        styleName="share-button"
+      >
+        <img src={`${Indico.Urls.ImagesBase}/twitter.svg`} alt={Translate.string('Twitter')} />
+        <Translate>Twitter</Translate>
+      </Button>
     </GridColumn>
   );
 }
 
-SocialButton.propTypes = {
-  name: PropTypes.string.isRequired,
-  logo: PropTypes.string.isRequired,
-  url: PropTypes.string,
-  color: PropTypes.string.isRequired,
-  render: PropTypes.func.isRequired,
-  button: PropTypes.bool,
-  buttonProps: PropTypes.object,
+TwitterButton.propTypes = {
+  shareText: PropTypes.string.isRequired,
 };
 
-SocialButton.defaultProps = {
-  url: null,
-  button: false,
-  buttonProps: {},
+function MastodonButton({shareText, setMastodonOpen}) {
+  const href = Indico.User.mastodonServerURL
+    ? `${Indico.User.mastodonServerURL}/share?text=${shareText}`
+    : null;
+  const isLoggedIn = !_.isEmpty(Indico.User);
+  const button = (
+    <Button
+      basic
+      color={isLoggedIn ? 'violet' : 'grey'}
+      styleName="share-button"
+      as="a"
+      target="_blank"
+      href={href}
+    >
+      <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt={Translate.string('Mastodon')} />
+      <Translate>Mastodon</Translate>
+    </Button>
+  );
+
+  return (
+    <GridColumn styleName="share-button-column">
+      {isLoggedIn ? (
+        <SetupMastodonServer
+          button={button}
+          setMastodonOpen={setMastodonOpen}
+          shareText={shareText}
+        />
+      ) : (
+        <Popup
+          trigger={button}
+          content={Translate.string('Please login to share on Mastodon')}
+          position="top right"
+          wide
+        />
+      )}
+    </GridColumn>
+  );
+}
+
+MastodonButton.propTypes = {
+  shareText: PropTypes.string.isRequired,
+  setMastodonOpen: PropTypes.func.isRequired,
 };
 
-function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
+function SetupMastodonServer({setMastodonOpen, button, shareText}) {
   const [error, setError] = useState(false);
   const [serverURL, setServerURL] = useState(null);
 
@@ -171,7 +215,7 @@ function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
                   await indicoAxios.post(userPreferencesMastodonServer(), {
                     server_url: mastodonServerURL,
                   });
-                  setError(null);
+                  setError(false);
                 } catch (e) {
                   if (_.get(e, 'response.status') !== 418) {
                     return handleAxiosError(e);
@@ -226,7 +270,7 @@ function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
             <Button
               as="a"
               target="_blank"
-              href={`${serverURL}/share?text=${urlParams}`}
+              href={`${serverURL}/share?text=${shareText}`}
               icon="share square"
               content={Translate.string('Share on Mastodon')}
               positive
@@ -243,11 +287,7 @@ function SetupMastodonServer({setMastodonOpen, button, urlParams}) {
 SetupMastodonServer.propTypes = {
   setMastodonOpen: PropTypes.func.isRequired,
   button: PropTypes.element.isRequired,
-  urlParams: PropTypes.string.isRequired,
-};
-
-const shareUrlText = (eventName, eventStartDt, eventUrl) => {
-  return `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
+  shareText: PropTypes.string.isRequired,
 };
 
 function ShareWidget({
@@ -260,6 +300,8 @@ function ShareWidget({
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMastodonOpen, setMastodonOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const shareText = `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
   return (
     <Popup
       trigger={
@@ -273,19 +315,17 @@ function ShareWidget({
       }
       content={
         <>
-          <Header
-            size="huge"
-            icon="share alternate"
-            content={Translate.string('Share this page')}
-            styleName="header-text"
-          />
+          <div styleName="share-header-title">
+            <Icon name="share alternate" styleName="icon" />
+            <Translate as="strong">Share this page</Translate>
+          </div>
           <Header size="tiny" styleName="share-section-header">
             <Icon name="linkify" styleName="icon" />
             <HeaderContent styleName="title">
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <CopyToClipboard eventUrl={eventUrl} />
+          <CopyToClipboard eventUrl={eventUrl} setCopied={setIsCopied} isCopied={isCopied} />
           <Header size="tiny" styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
@@ -300,50 +340,8 @@ function ShareWidget({
             </HeaderContent>
           </Header>
           <Grid columns={2} stretched>
-            {!_.isEmpty(Indico.User) ? (
-              <SocialButton
-                name="Mastodon"
-                logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
-                color="violet"
-                render={button => (
-                  <SetupMastodonServer
-                    button={button}
-                    setMastodonOpen={setMastodonOpen}
-                    urlParams={shareUrlText(eventName, eventStartDt, eventUrl)}
-                  />
-                )}
-                button
-                buttonProps={{
-                  as: 'a',
-                  target: '_blank',
-                  href: Indico.User.mastodonServerURL
-                    ? `${Indico.User.mastodonServerURL}/share?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`
-                    : null,
-                }}
-              />
-            ) : (
-              <SocialButton
-                name="Mastodon"
-                logo={`${Indico.Urls.ImagesBase}/mastodon.svg`}
-                color="grey"
-                render={button => (
-                  <Popup
-                    trigger={button}
-                    content={Translate.string('Please login to share on Mastodon')}
-                    position="top right"
-                    wide
-                  />
-                )}
-                button
-              />
-            )}
-            <SocialButton
-              name="Twitter"
-              logo={`${Indico.Urls.ImagesBase}/twitter.svg`}
-              url={`https://twitter.com/intent/tweet?text=${eventName} (${eventStartDt}) · Indico (${eventUrl})`}
-              color="blue"
-              render={button => button}
-            />
+            <MastodonButton shareText={shareText} setMastodonOpen={setMastodonOpen} />
+            <TwitterButton shareText={shareText} />
           </Grid>
         </>
       }
@@ -358,6 +356,15 @@ function ShareWidget({
     />
   );
 }
+
+ShareWidget.propTypes = {
+  eventName: PropTypes.string.isRequired,
+  eventStartDt: PropTypes.string.isRequired,
+  eventUrl: PropTypes.string.isRequired,
+  shareIcon: PropTypes.string.isRequired,
+  googleCalParams: PropTypes.string.isRequired,
+  outlookCalParams: PropTypes.string.isRequired,
+};
 
 customElements.define(
   'ind-share-widget',
@@ -381,12 +388,3 @@ customElements.define(
     }
   }
 );
-
-ShareWidget.propTypes = {
-  eventName: PropTypes.string.isRequired,
-  eventStartDt: PropTypes.string.isRequired,
-  eventUrl: PropTypes.string.isRequired,
-  shareIcon: PropTypes.string.isRequired,
-  googleCalParams: PropTypes.string.isRequired,
-  outlookCalParams: PropTypes.string.isRequired,
-};

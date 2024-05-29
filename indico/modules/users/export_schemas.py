@@ -380,7 +380,7 @@ class SettingsExportSchema(Schema):
         fields = ('add_ical_alerts', 'add_ical_alerts_mins', 'force_language', 'force_timezone',
                   'lang', 'name_format', 'show_future_events', 'show_past_events',
                   'suggest_categories', 'synced_fields', 'timezone', 'use_markdown_for_minutes',
-                  'use_previewer_pdf')
+                  'use_previewer_pdf', 'mastodon_server_url')
 
     name_format = fields.Function(lambda settings: NameFormat(settings['name_format']).name)
 
