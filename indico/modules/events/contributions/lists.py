@@ -143,6 +143,21 @@ class ContributionListGenerator(ListGeneratorBase):
                 field_values = set(field_values)
 
                 field_criteria = []
+                if None in field_values:
+                    # Handle the case when there is no value in
+                    # 'Contribution.field_values' matching the 'field_id'.
+                    # This can happen when custom fields are added after the
+                    # contribution had already been created or when the field is left
+                    # empty.
+                    # In these cases, we still want to show the contributions.
+                    field_values.discard(None)
+                    field_criteria += [
+                        ~Contribution.field_values.any(ContributionFieldValue.contribution_field_id == field_id),
+                        Contribution.field_values.any(db.and_(
+                            ContributionFieldValue.contribution_field_id == field_id,
+                            ContributionFieldValue.data.op('#>>')('{}').is_(None)
+                        ))
+                    ]
 
                 if field_values:
                     field_criteria.append(Contribution.field_values.any(db.and_(
