@@ -46,6 +46,7 @@ Bugfixes
   instead of just showing their filename (:pr:`6336`, thanks :user:`SegiNyn`)
 - Fix editable list filter storage being shared between different editable types and
   events (:pr:`6359`)
+- Fix UI breaking when performing bulk actions via the list of editables (:pr:`6369`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
