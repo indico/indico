@@ -6,7 +6,7 @@
 
 <div class="action-box {{ class_mapping[registration.state.name] }}">
     <div class="section">
-        {% set reg_form = registration.registration_form %}
+        {% set regform = registration.registration_form %}
         <div class="icon icon-quill"></div>
         <div class="text">
             {% if registration.state.name == 'complete' %}
@@ -49,7 +49,7 @@
                     {%- trans %}Proceed to checkout{% endtrans -%}
                 </a>.
             {% endif %}
-            {% if registration.can_be_modified and not reg_form.is_modification_open %}
+            {% if registration.can_be_modified and not regform.is_modification_open %}
                 <div class="text">
                     {% trans modification_end_dt=registration.modification_end_dt|format_date(timezone=registration.event.tzinfo) -%}
                         You are allowed to modify your registration until: {{ modification_end_dt }}
@@ -58,17 +58,17 @@
             {% endif %}
         </div>
         <div class="toolbar">
-            {% if registration.is_active and (reg_form.modification_mode.name != 'not_allowed' or
+            {% if registration.is_active and (regform.modification_mode.name != 'not_allowed' or
                                               not registration.modification_deadline_passed) %}
                 <div class="group">
                     <a href="{{ url_for('.edit_registration_display', registration.locator.registrant) }}"
                        class="i-button icon-edit {% if not registration.can_be_modified %}disabled{% endif %}"
                         {% if not registration.can_be_modified %}
-                            {% if not reg_form.is_modification_open -%}
+                            {% if not regform.is_modification_open -%}
                                 title="{% trans %}The modification period is over{% endtrans %}"
-                            {%- elif reg_form.modification_mode.name == 'allowed_until_payment' -%}
+                            {%- elif regform.modification_mode.name == 'allowed_until_payment' -%}
                                 title="{% trans %}Modifications are not allowed after payment{% endtrans %}"
-                            {%- elif reg_form.modification_mode.name == 'allowed_until_approved' -%}
+                            {%- elif regform.modification_mode.name == 'allowed_until_approved' -%}
                                 title="{% trans %}Modifications are not allowed once approved{% endtrans %}"
                             {%- endif %}
                         {% endif %}>
@@ -90,41 +90,41 @@
                     {% endif %}
                 </div>
             {% endif %}
-            {% set ticket_template = reg_form.get_ticket_template() %}
-            {% if registration.state.name == 'complete' and reg_form.tickets_enabled and
-                  reg_form.ticket_on_summary_page and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
+            {% set ticket_template = regform.get_ticket_template() %}
+            {% if registration.state.name == 'complete' and regform.tickets_enabled and
+                  regform.ticket_on_summary_page and (not ticket_template.is_ticket or not registration.is_ticket_blocked) %}
                 <div class="group">
                     <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}
                     </a>
-                    {% if reg_form.is_google_wallet_available and reg_form.is_apple_wallet_available %}
+                    {% if regform.is_google_wallet_available and regform.is_apple_wallet_available %}
                         <button class="i-button icon-file-download js-dropdown arrow" data-toggle="dropdown">
                             {%- trans %}Add to Wallet{% endtrans -%}
                         </button>
                         <ul class="i-dropdown">
-                            {% if reg_form.is_google_wallet_available %}
+                            {% if regform.is_google_wallet_available %}
                                 <li>
-                                    <a href="{{ url_for('event_registration.ticket_google_wallet', reg_form) }}">
+                                    <a href="{{ url_for('event_registration.ticket_google_wallet', regform) }}">
                                         {% trans %}Google Wallet{% endtrans %}
                                     </a>
                                 </li>
                             {% endif %}
-                            {% if reg_form.is_apple_wallet_available %}
+                            {% if regform.is_apple_wallet_available %}
                                 <li>
-                                    <a href="{{ url_for('event_registration.ticket_apple_wallet', reg_form) }}">
+                                    <a href="{{ url_for('event_registration.ticket_apple_wallet', regform) }}">
                                         {% trans %}Apple Wallet/Passbook{% endtrans %}
                                     </a>
                                 </li>
                             {% endif %}
                         </ul>
                     {% else %}
-                        {% if reg_form.is_google_wallet_available %}
+                        {% if regform.is_google_wallet_available %}
                             <a href="{{ url_for('.ticket_google_wallet', registration.locator.registrant) }}"
                                class="i-button accept icon-ticket">
                                 {% trans %}Save to Google Wallet{% endtrans %}
                             </a>
                         {% endif %}
-                        {% if reg_form.is_apple_wallet_available %}
+                        {% if regform.is_apple_wallet_available %}
                             <a href="{{ url_for('.ticket_apple_wallet', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                                 {% trans %}Save to Apple Wallet/Passbook{% endtrans %}
                             </a>
