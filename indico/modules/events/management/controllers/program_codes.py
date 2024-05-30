@@ -134,6 +134,7 @@ class RHAssignProgramCodesSessionBlocks(RHAssignProgramCodesBase):
 
 
 class RHAssignProgramCodesContributions(RHAssignProgramCodesBase):
+    PERMISSION = 'contributions'
     object_type = 'contributions'
     hidden_post_field = 'contribution_id'
 

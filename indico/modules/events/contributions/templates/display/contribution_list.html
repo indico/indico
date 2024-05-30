@@ -10,7 +10,7 @@
 
 {% block content -%}
     {% if not published %}
-        {{ render_draft_mode_warning(event) }}
+        {{ render_draft_mode_warning(event, can_publish=event.can_manage(session.user)) }}
     {% endif %}
     {% if total_entries %}
         <div class="toolbar f-j-end space-after">

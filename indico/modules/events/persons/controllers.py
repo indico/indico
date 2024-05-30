@@ -267,6 +267,8 @@ class RHPersonsList(RHPersonsBase):
 class RHEmailEventPersonsBase(RHManageEventBase):
     """Send emails to selected EventPersons."""
 
+    PERMISSION = 'contributions'
+
     @use_kwargs({
         'role_id': fields.List(fields.Integer(), load_default=lambda: []),
         'persons': fields.List(fields.String(), load_default=lambda: []),

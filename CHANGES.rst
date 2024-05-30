@@ -29,6 +29,8 @@ Improvements
 - Add experimental support for creating Apple Wallet (Passbook / pkpass) tickets
   (opt-in via :data:`ENABLE_APPLE_WALLET` ``indico.conf`` setting) (:pr:`6248`, thanks
   :user:`openprojects`)
+- Add a new event management permission that grants access only to the contributions
+  module (:pr:`6348`)
 
 Bugfixes
 ^^^^^^^^

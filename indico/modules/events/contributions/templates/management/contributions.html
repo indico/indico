@@ -211,7 +211,9 @@
 
         setupAuthorsListButton('#email-authors-container');
         setupEmailContribAbstractRoles('#email-contrib-roles-container');
-        setupContributionConfig();
+        {% if event.can_manage(session.user) %}
+            setupContributionConfig();
+        {% endif %}
         setupContributionList({
             createSessionURL: {{ url_for('sessions.create_session', event) | tojson }},
             createTrackURL: {{ url_for('tracks.create_track', event) | tojson }},

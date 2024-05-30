@@ -146,7 +146,7 @@
 {%- endblock %}
 
 {% block content -%}
-    {%- if not published and contribution.event.can_manage(session.user) and not contribution.is_user_associated(session.user) -%}
+    {%- if not published and contribution.event.can_manage(session.user, permission='contributions') and not contribution.is_user_associated(session.user) -%}
         {% call message_box('warning') -%}
             {% trans %}
                 The contributions of this event have not been published yet. You can only access
