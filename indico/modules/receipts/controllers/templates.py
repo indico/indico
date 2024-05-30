@@ -213,17 +213,22 @@ class RHCloneTemplate(ReceiptTemplateMixin, RHReceiptTemplatesManagementBase):
 
         # look for all occurrences which start with the same "base title"
         matches = {tpl for tpl in self.target.receipt_templates if tpl.title.startswith(base_title)}
-        # if we're cloning an inherited template, we don't need to exclude it from the matches (it's not there anyway)
-        if self.target == self.template.owner:
-            matches.remove(self.template)
 
         # figure out which has the highest "index" (the number between parenthesis)
+        found = False
         for match in matches:
             if m := TITLE_ENUM_RE.match(match.title):
+                found = True
                 index = int(m.group(2))
                 max_index = max(index, max_index)
+            elif match.title == base_title:
+                found = True
 
-        new_title = f'{base_title} ({max_index + 1})' if max_index else f'{base_title} (1)'
+        if found:
+            new_title = f'{base_title} ({max_index + 1})' if max_index else f'{base_title} (1)'
+        else:
+            # if we have no exact conflicts nor indexed titles, just keep the base title
+            new_title = base_title
 
         new_tpl = ReceiptTemplate(
             title=new_title,
