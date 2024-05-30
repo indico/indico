@@ -137,7 +137,7 @@ def service_get_status(event):
 def service_handle_new_editable(editable, user):
     revision = editable.latest_revision
     data = {
-        'editable': EditableBasicSchema().dump(editable),
+        'editable': EditableBasicSchema(exclude=['tags']).dump(editable),
         'revision': EditingRevisionSignedSchema().dump(revision),
         'endpoints': _get_revision_endpoints(revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
@@ -148,7 +148,6 @@ def service_handle_new_editable(editable, user):
         resp = requests.put(_build_url(editable.event, path), headers=_get_headers(editable.event), json=data)
         resp.raise_for_status()
         resp = ServiceCreateEditableResultSchema().load(resp.json()) if resp.text else {}
-
         if resp.get('ready_for_review'):
             editable.revisions[0].type = RevisionType.ready_for_review
             db.session.flush()
