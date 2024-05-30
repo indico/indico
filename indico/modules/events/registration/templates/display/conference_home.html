@@ -11,7 +11,7 @@
                         <a href="{{ url_for('event_registration.ticket_download', regform) }}"
                            class="icon-file-pdf"
                            title="{% trans title=regform.title -%}Download ticket for the '{{ title }}' registration form{%- endtrans %}">
-                            PDF - {{ regform.title }}
+                            {{ regform.title }} - PDF
                         </a>
                     </li>
                     {% if regform.is_google_wallet_available %}
@@ -19,7 +19,16 @@
                             <a href="{{ url_for('event_registration.ticket_google_wallet', regform) }}"
                                class="icon-ticket"
                                title="{% trans title=regform.title -%}Add ticket for the '{{ title }}' registration form to Google Wallet{%- endtrans %}">
-                                {% trans %}Google Wallet{% endtrans %} - {{ regform.title }}
+                                {{ regform.title }} - {% trans %}Google Wallet{% endtrans %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if regform.is_apple_wallet_available %}
+                        <li>
+                            <a href="{{ url_for('event_registration.ticket_apple_wallet', regform) }}"
+                               class="icon-ticket"
+                               title="{% trans title=regform.title -%}Download ticket for the '{{ title }}' registration form for Apple Wallet/Passbook{%- endtrans %}">
+                                {{ regform.title }} - {% trans %}Apple Pass/Passbook{% endtrans %}
                             </a>
                         </li>
                     {% endif %}

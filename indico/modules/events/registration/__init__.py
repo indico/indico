@@ -16,9 +16,9 @@ from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.events.models.events import EventType
-from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.logging import connect_log_signals
 from indico.modules.events.registration.settings import RegistrationSettingsProxy
+from indico.modules.events.registration.wallets.google import GoogleWalletManager
 from indico.util.i18n import _, ngettext
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import template_hook
@@ -252,7 +252,7 @@ def _patch_google_wallet_class(event, changes, **kwargs):
     wallet_fields = {'title', 'start_dt', 'end_dt', 'location_data'}
     if set(changes) & wallet_fields and GoogleWalletManager.event_uses_google_wallet_tickets(event):
         gwm = GoogleWalletManager(event)
-        if gwm.configured:
+        if gwm.is_configured:
             gwm.patch_ticket_class()
 
 
@@ -267,5 +267,5 @@ def _patch_google_wallet_ticket(registration, change, **kwargs):
         registration.registration_form.ticket_google_wallet
     ):
         gwm = GoogleWalletManager(registration.event)
-        if gwm.configured:
+        if gwm.is_configured:
             gwm.patch_ticket_object(registration)

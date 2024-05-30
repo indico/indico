@@ -27,8 +27,9 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
-from indico.modules.events.registration.google_wallet import GoogleWalletManager
 from indico.modules.events.registration.models.items import PersonalDataType
+from indico.modules.events.registration.wallets.apple import AppleWalletManager
+from indico.modules.events.registration.wallets.google import GoogleWalletManager
 from indico.modules.users.models.users import format_display_full_name
 from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
@@ -304,7 +305,12 @@ class Registration(db.Model):
             lazy=False
         )
     )
-
+    #: The serial number assigned to the Apple Wallet pass
+    apple_wallet_serial = db.Column(
+        db.String,
+        nullable=False,
+        default='',
+    )
     # relationship backrefs:
     # - invitation (RegistrationInvitation.registration)
     # - legacy_mapping (LegacyRegistrationMapping.registration)
@@ -772,8 +778,16 @@ class Registration(db.Model):
         if not self.registration_form.ticket_google_wallet:
             return None
         gwm = GoogleWalletManager(self.event)
-        if gwm.configured:
+        if gwm.is_configured:
             return gwm.get_ticket_link(self)
+
+    def generate_ticket_apple_wallet(self):
+        """Download ticket in Passbook / Apple Wallet format."""
+        if not self.registration_form.ticket_apple_wallet:
+            return None
+        awm = AppleWalletManager(self.event)
+        if awm.is_configured:
+            return awm.get_ticket(self)
 
 
 class RegistrationData(StoredFileMixin, db.Model):

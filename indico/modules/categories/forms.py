@@ -7,13 +7,16 @@
 
 from functools import partial
 
+from cryptography import hazmat, x509
+from cryptography.exceptions import UnsupportedAlgorithm
 from flask import request
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 from wtforms.widgets import TextArea
 
 from indico.core.config import config
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
+from indico.modules.categories import logger
 from indico.modules.categories.models.categories import (Category, EventCreationMode, EventMessageMode,
                                                          InheritableConfigMode)
 from indico.modules.categories.models.roles import CategoryRole
@@ -21,15 +24,15 @@ from indico.modules.categories.util import get_image_data, get_visibility_option
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
-from indico.modules.events.registration.google_wallet import GoogleCredentialValidationResult, GoogleWalletManager
+from indico.modules.events.registration.wallets.google import GoogleCredentialValidationResult, GoogleWalletManager
 from indico.modules.networks import IPNetworkGroup
 from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.colors import get_role_colors
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenFieldList, IndicoEnumSelectField,
-                                     IndicoMarkdownField, IndicoProtectionField, IndicoSinglePalettePickerField,
-                                     IndicoTimezoneSelectField, MultipleItemsField)
+                                     IndicoMarkdownField, IndicoPasswordField, IndicoProtectionField,
+                                     IndicoSinglePalettePickerField, IndicoTimezoneSelectField, MultipleItemsField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import JSONField
 from indico.web.forms.validators import HiddenUnless
@@ -43,6 +46,9 @@ class CategorySettingsForm(IndicoForm):
     GOOGLE_WALLET_FIELDS = ('google_wallet_mode', 'google_wallet_credentials', 'google_wallet_issuer_name',
                             'google_wallet_issuer_id')
     GOOGLE_WALLET_JSON_FIELDS = ('google_wallet_credentials', 'google_wallet_issuer_name', 'google_wallet_issuer_id')
+    APPLE_WALLET_FIELDS = ('apple_wallet_mode', 'apple_wallet_certificate', 'apple_wallet_key', 'apple_wallet_password')
+    APPLE_WALLET_JSON_FIELDS = ('apple_wallet_certificate', 'apple_wallet_key', 'apple_wallet_password')
+
     EVENT_HEADER_FIELDS = ('event_message_mode', 'event_message')
 
     title = StringField(_('Title'), [DataRequired()])
@@ -106,23 +112,55 @@ class CategorySettingsForm(IndicoForm):
                                                         'The same Issuer ID must never be used on more than one '
                                                         'Indico server. Changing it will also break updates to '
                                                         'any existing tickets.'))
+    apple_wallet_mode = IndicoEnumSelectField(_('Configuration'), enum=InheritableConfigMode,
+                                              description=_('The Apple Wallet configuration is, by default, '
+                                                            'inherited from the parent category. You can also '
+                                                            'explicitly disable it or provide your own configuration '
+                                                            'instead.'))
+    apple_wallet_certificate = TextAreaField(_('Certificate'),
+                                             [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                                           preserve_data=True), DataRequired()],
+                                             description=_('Your certificate in PEM format'))
+    apple_wallet_key = TextAreaField(_('Private Key'), [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                                                     preserve_data=True), DataRequired()],
+                                     description=_('Your private key in PEM format'))
+    apple_wallet_password = IndicoPasswordField(_('Passphrase'),
+                                                [HiddenUnless('apple_wallet_mode', InheritableConfigMode.enabled,
+                                                              preserve_data=False)],
+                                                toggle=True,
+                                                description=_('The passphrase used to decrypt the private key. Leave '
+                                                              'this empty if the private key is not encrypted.'))
 
     def __init__(self, *args, category, **kwargs):
         super().__init__(*args, **kwargs)
         self.category = category
+        self._set_google_wallet_fields()
+        self._set_apple_wallet_fields()
+
+    def _set_google_wallet_fields(self):
         if not config.ENABLE_GOOGLE_WALLET:
             for field in list(self):
                 if field.name.startswith('google_wallet_'):
                     delattr(self, field.name)
-        elif category.parent:
-            parent_configured = category.parent.effective_google_wallet_config is not None
+        elif self.category.parent:
+            parent_configured = self.category.parent.effective_google_wallet_config is not None
             self.google_wallet_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
         else:
             self.google_wallet_mode.skip = {InheritableConfigMode.inheriting}
 
+    def _set_apple_wallet_fields(self):
+        if not config.ENABLE_APPLE_WALLET:
+            for field in list(self):
+                if field.name.startswith('apple_wallet_'):
+                    delattr(self, field.name)
+        elif self.category.parent:
+            parent_configured = self.category.parent.effective_apple_wallet_config is not None
+            self.apple_wallet_mode.titles = InheritableConfigMode.get_form_field_titles(parent_configured)
+        else:
+            self.apple_wallet_mode.skip = {InheritableConfigMode.inheriting}
+
     def validate(self, extra_validators=None):
         form_valid = super().validate(extra_validators=extra_validators)
-
         if not config.ENABLE_GOOGLE_WALLET:
             return form_valid
 
@@ -150,7 +188,8 @@ class CategorySettingsForm(IndicoForm):
                 return False
             elif res == GoogleCredentialValidationResult.failed:
                 self.google_wallet_credentials.errors.append(
-                    _('There was an error validating your credentials. Contact your Indico administrator for details.')
+                    _('There was an error validating your credentials. Contact your Indico administrator for '
+                      'details.')
                 )
                 return False
             elif res == GoogleCredentialValidationResult.bad_issuer:
@@ -161,15 +200,57 @@ class CategorySettingsForm(IndicoForm):
 
         return form_valid
 
+    def validate_apple_wallet_certificate(self, field):
+        try:
+            x509.load_pem_x509_certificate(field.data.encode())
+            return
+        except ValueError:
+            raise ValidationError(_('The provided certificate is malformed.'))
+
+    def validate_apple_wallet_key(self, field):
+        try:
+            hazmat.primitives.serialization.load_pem_private_key(field.data.encode(), password=None)
+        except ValueError:
+            raise ValidationError(_('The private key is malformed.'))
+        except UnsupportedAlgorithm as exc:
+            logger.warning('Unsupported private key in category %d: %s', self.category.id, exc)
+            raise ValidationError(_('The private key is invalid.'))
+        except TypeError:
+            # TypeError is raised when no password is provided for an encrypted key (or vice versa),
+            # but for the check here we do not need to decrypt the key anyway
+            pass
+
+    def validate_apple_wallet_password(self, field):
+        if self.apple_wallet_key.errors:
+            return
+        password = field.data.encode() or None
+        try:
+            hazmat.primitives.serialization.load_pem_private_key(self.apple_wallet_key.data.encode(),
+                                                                 password=password)
+        except TypeError:
+            if password:
+                raise ValidationError(_('The provided key is not encrypted, do not specify a password.'))
+            else:
+                raise ValidationError(_('The provided key is encrypted, you must specify the password to decrypt it.'))
+        except ValueError:
+            raise ValidationError(_('The provided password is incorrect.'))
+
     @generated_data
     def google_wallet_settings(self):
         if not config.ENABLE_GOOGLE_WALLET:
             return self.category.google_wallet_settings
         return {k: getattr(self, k).data for k in self.GOOGLE_WALLET_JSON_FIELDS}
 
+    @generated_data
+    def apple_wallet_settings(self):
+        if not config.ENABLE_APPLE_WALLET:
+            return self.category.apple_wallet_settings
+        return {k: getattr(self, k).data for k in self.APPLE_WALLET_JSON_FIELDS}
+
     @property
     def data(self):
-        return {k: v for k, v in super().data.items() if k not in self.GOOGLE_WALLET_JSON_FIELDS}
+        return {k: v for k, v in super().data.items() if not (k in self.GOOGLE_WALLET_JSON_FIELDS or
+                                                              k in self.APPLE_WALLET_JSON_FIELDS)}
 
 
 class CategoryIconForm(IndicoForm):

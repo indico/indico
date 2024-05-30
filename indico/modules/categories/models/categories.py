@@ -103,10 +103,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                                    'root_not_inheriting'),
                 db.CheckConstraint(f'(id != 0) OR (google_wallet_mode != {InheritableConfigMode.inheriting})',
                                    'root_not_inheriting_gw_mode'),
+                db.CheckConstraint(f'(id != 0) OR (apple_wallet_mode != {InheritableConfigMode.inheriting})',
+                                   'root_not_inheriting_ap_mode'),
                 db.CheckConstraint('visibility IS NULL OR visibility > 0', 'valid_visibility'),
                 db.CheckConstraint(f'(google_wallet_mode != {InheritableConfigMode.enabled}) OR '
                                    "(google_wallet_settings != '{}'::jsonb)",
                                    'gw_configured_if_enabled'),
+                db.CheckConstraint(f'(apple_wallet_mode != {InheritableConfigMode.enabled}) OR '
+                                   "(apple_wallet_settings != '{}'::jsonb)",
+                                   'ap_configured_if_enabled'),
+
                 {'schema': 'categories'})
 
     @declared_attr
@@ -208,6 +214,16 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         default=InheritableConfigMode.inheriting,
     )
     google_wallet_settings = db.Column(
+        JSONB,
+        nullable=False,
+        default={}
+    )
+    apple_wallet_mode = db.Column(
+        PyIntEnum(InheritableConfigMode),
+        nullable=False,
+        default=InheritableConfigMode.inheriting,
+    )
+    apple_wallet_settings = db.Column(
         JSONB,
         nullable=False,
         default={}
@@ -498,6 +514,20 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                      .where(cat_alias.parent_id == cte_query.c.id))
         return cte_query.union_all(rec_query)
 
+    @classmethod
+    def get_apple_wallet_config_cte(cls):
+        cat_alias: Category = db.aliased(cls)
+        cte_query = (select([cat_alias.id, cat_alias.apple_wallet_mode, cat_alias.apple_wallet_settings])
+                     .where(cat_alias.parent_id.is_(None))
+                     .cte(recursive=True))
+        rec_query = (select([cat_alias.id,
+                             db.case({InheritableConfigMode.inheriting.value: cte_query.c.apple_wallet_mode},
+                                     else_=cat_alias.apple_wallet_mode, value=cat_alias.apple_wallet_mode),
+                             db.case({InheritableConfigMode.inheriting.value: cte_query.c.apple_wallet_settings},
+                                     else_=cat_alias.apple_wallet_settings, value=cat_alias.apple_wallet_mode)])
+                     .where(cat_alias.parent_id == cte_query.c.id))
+        return cte_query.union_all(rec_query)
+
     @property
     def deep_children_query(self):
         """Get a query object for all subcategories.
@@ -679,6 +709,15 @@ def _mappers_configured():
                              value=cte.c.google_wallet_mode)])
              .where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery())
     Category.effective_google_wallet_config = column_property(query, deferred=True, expire_on_flush=False)
+
+    # Category.effective_apple_wallet_config -- the effective apple pass config
+    # of the category, even if it's inheriting it from its parent category
+    cte = Category.get_apple_wallet_config_cte()
+    query = (select([db.case({InheritableConfigMode.disabled: None},
+                             else_=cte.c.apple_wallet_settings,
+                             value=cte.c.apple_wallet_mode)])
+             .where(cte.c.id == Category.id).correlate_except(cte).scalar_subquery())
+    Category.effective_apple_wallet_config = column_property(query, deferred=True, expire_on_flush=False)
 
     # Category.effective_icon_data -- the effective icon data of the category,
     # either set on the category itself or inherited from it

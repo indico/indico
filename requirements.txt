@@ -333,6 +333,7 @@ six==1.16.0
     #   bleach
     #   html5lib
     #   python-dateutil
+    #   wallet-py3k
 speaklater==1.3
     # via -r requirements.in
 sqlalchemy==1.4.52
@@ -381,6 +382,8 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
+wallet-py3k==0.0.4
+    # via -r requirements.in
 wcwidth==0.2.13
     # via prompt-toolkit
 weasyprint==61.2

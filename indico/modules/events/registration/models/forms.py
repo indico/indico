@@ -251,6 +251,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether to allow exporting tickets to Apple Wallet
+    ticket_apple_wallet = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether to send tickets by e-mail
     ticket_on_email = db.Column(
         db.Boolean,
@@ -569,6 +575,16 @@ class RegistrationForm(db.Model):
     @property
     def is_google_wallet_available(self):
         return self.ticket_google_wallet and self.is_google_wallet_configured
+
+    @property
+    def is_apple_wallet_configured(self):
+        if not config.ENABLE_APPLE_WALLET or self.event.is_unlisted:
+            return False
+        return self.event.category.effective_apple_wallet_config is not None
+
+    @property
+    def is_apple_wallet_available(self):
+        return self.ticket_apple_wallet and self.is_apple_wallet_configured
 
     def render_base_price(self):
         return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')

@@ -14,3 +14,4 @@ include indico/legacy/pdfinterface/texmf.cnf
 
 global-exclude *.pyc __pycache__ .keep .no-header
 include indico/migrations/versions/.keep
+include indico/modules/events/registration/wallets/apple-wwdr.pem

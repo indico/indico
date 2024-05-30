@@ -12,6 +12,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
+from indico.modules.categories.models.categories import InheritableConfigMode
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLanguagesForm, EventLocationForm,
@@ -36,10 +37,11 @@ from indico.web.forms.fields import IndicoStrictKeywordsField, IndicoTagListFiel
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
-def _show_wallet_location_warning(event):
+def _show_google_wallet_location_warning(event):
     if bool(event.address) == event.has_location_info:
         return False
-    return RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_google_wallet).has_rows()
+    return (RegistrationForm.query.with_parent(event).filter(RegistrationForm.ticket_google_wallet).has_rows()
+            and event.category.google_wallet_mode == InheritableConfigMode.enabled)
 
 
 class RHEventSettings(RHManageEventBase):
@@ -84,7 +86,8 @@ class RHEventSettings(RHManageEventBase):
                                                show_draft_warning=should_show_draft_warning(self.event),
                                                has_reference_types=has_reference_types,
                                                has_event_labels=has_event_labels,
-                                               wallet_location_warning=_show_wallet_location_warning(self.event))
+                                               google_wallet_location_warning=_show_google_wallet_location_warning(
+                                                   self.event))
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -99,8 +102,9 @@ class RHEditEventDataBase(RHManageEventBase):
         assert self.section_name
         has_reference_types = ReferenceType.query.has_rows()
         has_event_labels = EventLabel.query.has_rows()
-        wallet_location_warning = _show_wallet_location_warning(self.event)
-        return tpl.render_event_settings(self.event, has_reference_types, has_event_labels, wallet_location_warning,
+        google_wallet_location_warning = _show_google_wallet_location_warning(self.event)
+        return tpl.render_event_settings(self.event, has_reference_types, has_event_labels,
+                                         google_wallet_location_warning,
                                          section=self.section_name, with_container=False)
 
     def jsonify_success(self):

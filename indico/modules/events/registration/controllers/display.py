@@ -529,13 +529,23 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
-class RHTicketGoogleWallet(RHTicketDownload):
+class RHTicketGoogleWalletDownload(RHTicketDownload):
     """Redirect to the Google Wallet page for a registration ticket."""
 
     def _process(self):
         if not (url := self.registration.generate_ticket_google_wallet_url()):
             raise NotFound('Google Wallet tickets are not available')
         return redirect(url)
+
+
+class RHTicketAppleWalletDownload(RHTicketDownload):
+    """Download Apple Wallet (pkpass) registration ticket."""
+
+    def _process(self):
+        if not (apple_wallet := self.registration.generate_ticket_apple_wallet()):
+            raise NotFound('Ticket for Apple Wallet is not available')
+        filename = secure_filename(f'{self.event.title}-Ticket.pkpass', 'apple_wallet.pkpass')
+        return send_file(filename, apple_wallet, mimetype='application/vnd.apple.pkpass', no_cache=True)
 
 
 class RHRegistrationAvatar(RHDisplayEventBase):

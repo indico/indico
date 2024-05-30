@@ -332,9 +332,10 @@ Customization
 
 .. data:: WALLET_LOGO_URL
 
-    The URL to a custom logo used in Google Wallet tickets.  If unset, a compact
-    version of the default Indico logo is used.  The URL must publicly accessible
-    from the Internet and changes typically do not affect existing tickets.
+    The URL to a custom logo used in Google Wallet and Apple Wallet tickets.
+    If unset, a compact version of the default Indico logo is used.
+    The URL must publicly accessible from the Internet and changes typically
+    do not affect existing tickets.
 
     Default: ``None``
 
@@ -892,6 +893,12 @@ System
 .. data:: ENABLE_GOOGLE_WALLET
 
     Whether to enable the Google Wallet integration for event tickets.
+
+    Default: ``False``
+
+.. data:: ENABLE_APPLE_WALLET
+
+    Whether to enable the Apple Wallet integration for event tickets.
 
     Default: ``False``
 

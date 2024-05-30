@@ -28,7 +28,7 @@ from indico.web.flask.util import url_for
 API_BASE_URL = 'https://walletobjects.googleapis.com/walletobjects/v1'
 API_CLASS_URL = f'{API_BASE_URL}/eventTicketClass'
 API_OBJECT_URL = f'{API_BASE_URL}/eventTicketObject'
-logger = Logger.get('events.registration.google_wallet')
+logger = Logger.get('events.registration.wallets.google')
 
 
 class GoogleCredentialValidationResult(Enum):
@@ -72,7 +72,7 @@ class GoogleWalletManager:
 
     def _load_credentials(self):
         """Load Google credentials and setup authenticated HTTP client."""
-        if not self.configured:
+        if not self.is_configured:
             return None, None
         credentials = Credentials.from_service_account_info(
             self.settings['google_wallet_credentials'],
@@ -82,7 +82,7 @@ class GoogleWalletManager:
         return credentials, http_client
 
     @property
-    def configured(self):
+    def is_configured(self):
         return config.ENABLE_GOOGLE_WALLET and self.settings is not None
 
     @property

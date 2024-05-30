@@ -63,6 +63,7 @@ terminaltables
 translitcodec
 ua-parser
 urllib3<2  # not yet compatible with botocore (s3 plugin)
+wallet-py3k
 weasyprint
 webargs
 werkzeug
