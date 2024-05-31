@@ -31,6 +31,7 @@ Improvements
   :user:`openprojects`)
 - Add a new event management permission that grants access only to the contributions
   module (:pr:`6348`)
+- Add bulk JSON export option in management contribution list (:pr:`6370`)
 
 Bugfixes
 ^^^^^^^^

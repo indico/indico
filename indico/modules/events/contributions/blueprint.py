@@ -29,14 +29,16 @@ _bp.add_url_rule('/manage/contributions/person-list', 'person_list', management.
                  methods=('POST',))
 _bp.add_url_rule('/manage/contributions/material-package', 'material_package',
                  management.RHContributionsMaterialPackage, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/contributions.json', 'contributions_json_export',
+                 management.RHContributionsExportJSON, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/contributions.csv', 'contributions_csv_export',
-                 management.RHContributionsExportCSV, methods=('POST',))
+                 management.RHContributionsExportCSV, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/contributions.xlsx', 'contributions_excel_export',
-                 management.RHContributionsExportExcel, methods=('POST',))
+                 management.RHContributionsExportExcel, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/contributions.pdf', 'contributions_pdf_export',
-                 management.RHContributionsExportPDF, methods=('POST',))
+                 management.RHContributionsExportPDF, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/contributions.zip', 'contributions_tex_export',
-                 management.RHContributionsExportTeX, methods=('POST',))
+                 management.RHContributionsExportTeX, methods=('GET', 'POST'))
 
 # Emailing (management)
 _bp.add_url_rule('/manage/contributions/api/email-roles/metadata', 'api_email_contrib_roles_metadata',
