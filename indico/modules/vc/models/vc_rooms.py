@@ -23,6 +23,7 @@ from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoIntEnum
+from indico.util.string import format_repr
 
 
 class VCRoomLinkType(IndicoIntEnum):
@@ -313,7 +314,7 @@ class VCRoomEventAssociation(db.Model):
         return _LinkObjectComparator(cls)
 
     def __repr__(self):
-        return f'<VCRoomEventAssociation({self.event_id}, {self.vc_room})>'
+        return format_repr(self, 'id', 'link_object', 'vc_room')
 
     @classmethod
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
