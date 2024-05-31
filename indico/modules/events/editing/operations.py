@@ -150,9 +150,9 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                    files=_make_editable_files(revision.editable, files) if files else [],
                                    comment=comment,
                                    tags=set(tags))
-    revision.editable.revisions.append(new_revision)
     if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
         _ensure_publishable_files(new_revision)
+    revision.editable.revisions.append(new_revision)
     # XXX: all of the submitters of the contribution should be notified here
     submitter = revision.editable.revisions[0].user
     if action == EditingReviewAction.update_accept:
