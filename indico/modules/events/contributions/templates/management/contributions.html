@@ -141,6 +141,10 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#" class="icon-file-css js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_json_export', event) }}">JSON</a>
+                        </li>
+                        <li>
                             <a href="#" class="icon-file-text js-submit-form js-enable-if-checked disabled"
                                data-href="{{ url_for('.contributions_tex_export', event) }}">
                                 {%- trans %}LaTeX{% endtrans -%}

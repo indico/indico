@@ -10,7 +10,7 @@ from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request, session
 from marshmallow import fields
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import joinedload, subqueryload, undefer
 from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -130,13 +130,28 @@ class RHManageSubContributionBase(RHManageContributionBase):
 class RHManageContributionsActionsBase(RHManageContributionsBase):
     """Base class for classes performing actions on event contributions."""
 
+    _allow_get_all = False
+    _contrib_query_options = ()
+
+    @property
+    def _contribution_query(self):
+        query = Contribution.query.with_parent(self.event)
+        if self._contrib_query_options:
+            query = query.options(*self._contrib_query_options)
+        return query
+
     @use_kwargs({
         'contribution_ids': fields.List(fields.Int(), data_key='contribution_id', load_default=lambda: [])
     })
     def _process_args(self, contribution_ids):
         RHManageContributionsBase._process_args(self)
         self.contrib_ids = contribution_ids
-        self.contribs = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(self.contrib_ids)).all()
+        query = self._contribution_query
+        if request.method == 'POST' or not self._allow_get_all:
+            # if it's POST we filter by abstract ids; otherwise we assume
+            # the user wants everything (e.g. API-like usage via personal token)
+            query = query.filter(Contribution.id.in_(contribution_ids))
+        self.contribs = query.all()
 
 
 class RHManageSubContributionsActionsBase(RHManageContributionBase):
@@ -470,12 +485,14 @@ class RHContributionUpdateDuration(RHManageContributionBase):
 
 class RHManageContributionsExportActionsBase(RHManageContributionsActionsBase):
     ALLOW_LOCKED = True
+    _allow_get_all = True
 
     def _process_args(self):
         RHManageContributionsActionsBase._process_args(self)
         # some PDF export options do not sort the contribution list so we keep
         # the order in which they were displayed when the user selected them
-        self.contribs.sort(key=lambda c: self.contrib_ids.index(c.id))
+        if self.contrib_ids:
+            self.contribs.sort(key=lambda c: self.contrib_ids.index(c.id))
 
 
 class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, AttachmentPackageGeneratorMixin):
@@ -490,6 +507,22 @@ class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, Att
             flash(_('The selected contributions do not have any materials.'), 'warning')
             return redirect(url_for('.manage_contributions', self.event))
         return self._generate_zip_file(attachments, name_suffix=self.event.id)
+
+
+class RHContributionsExportJSON(RHManageContributionsExportActionsBase):
+    """Export list of contributions to JSON."""
+
+    _contrib_query_options = (subqueryload('field_values'),
+                              subqueryload('person_links'),
+                              joinedload('type'),
+                              joinedload('session_block'),
+                              joinedload('timetable_entry').lazyload('*'))
+
+    def _process(self):
+        from indico.modules.events.contributions.schemas import FullContributionSchema
+        resp = FullContributionSchema(many=True).jsonify(sorted(self.contribs, key=attrgetter('friendly_id')))
+        resp.headers['Content-Disposition'] = 'attachment; filename="contributions.json"'
+        return resp
 
 
 class RHContributionsExportCSV(RHManageContributionsExportActionsBase):
