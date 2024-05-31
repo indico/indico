@@ -439,9 +439,7 @@ class RHUserPreferencesMarkdownAPI(RHUserBase):
 
 class RHUserPreferencesMastodonServer(RHUserBase):
     @use_kwargs({
-        'server_url': fields.String(
-            required=True,
-        )
+        'server_url': fields.String(required=True),
     })
     def _process_POST(self, server_url):
         if not social_settings.get('enabled'):

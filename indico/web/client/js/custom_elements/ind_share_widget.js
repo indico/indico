@@ -11,7 +11,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {Form as FinalForm} from 'react-final-form';
 import {
   Header,
   HeaderContent,
@@ -24,8 +24,10 @@ import {
   Message,
 } from 'semantic-ui-react';
 
+import {FinalInput, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
+
 import './ind_share_widget.module.scss';
 
 function CopyToClipboard({eventUrl, setCopied, isCopied}) {
@@ -173,7 +175,6 @@ MastodonButton.propTypes = {
 };
 
 function SetupMastodonServer({setMastodonOpen, button, shareText}) {
-  const [error, setError] = useState(false);
   const [serverURL, setServerURL] = useState(null);
 
   useEffect(() => {
@@ -193,7 +194,6 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
       position="top right"
       onOpen={() => setMastodonOpen(true)}
       onClose={() => {
-        setError(false);
         setMastodonOpen(false);
       }}
       trigger={button}
@@ -210,53 +210,58 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
               </Translate>
             </Message>
             <FinalForm
-              onSubmit={async ({mastodonServerURL}) => {
+              onSubmit={async data => {
                 try {
-                  await indicoAxios.post(userPreferencesMastodonServer(), {
-                    server_url: mastodonServerURL,
-                  });
-                  setError(false);
+                  await indicoAxios.post(userPreferencesMastodonServer(), data);
                 } catch (e) {
-                  if (_.get(e, 'response.status') !== 418) {
-                    return handleAxiosError(e);
-                  }
-                  setError(e.response.data.message);
-                  return;
+                  return handleSubmitError(e);
                 }
-                setServerURL(mastodonServerURL);
+                setServerURL(data.server_url);
               }}
-              render={({handleSubmit}) => (
+              subscription={{
+                pristine: true,
+                submitting: true,
+                submitError: true,
+                submitFailed: true,
+                dirtySinceLastSubmit: true,
+              }}
+            >
+              {({
+                handleSubmit,
+                pristine,
+                submitting,
+                submitError,
+                submitFailed,
+                dirtySinceLastSubmit,
+              }) => (
                 <form onSubmit={handleSubmit}>
-                  <Field
-                    name="mastodonServerURL"
-                    render={({input}) => (
-                      <Input
-                        error={!!error}
-                        label={
-                          <Button
-                            icon="save"
-                            positive
-                            type="submit"
-                            content={Translate.string('Save')}
-                          />
-                        }
-                        required
-                        labelPosition="right"
-                        placeholder="https://mastodon.social"
-                        fluid
-                        {...input}
+                  <FinalInput
+                    name="server_url"
+                    required
+                    labelPosition="right"
+                    placeholder="https://mastodon.social"
+                    fluid
+                    error={!!submitError && !dirtySinceLastSubmit}
+                    componentLabel={
+                      <Button
+                        icon="save"
+                        positive
+                        type="submit"
+                        disabled={pristine || submitting || (submitFailed && !dirtySinceLastSubmit)}
+                        loading={submitting}
+                        content={Translate.string('Save')}
                       />
-                    )}
+                    }
                   />
-                  {error && (
+                  {submitError && !dirtySinceLastSubmit && (
                     <div styleName="error-message">
                       <Icon name="times" />
-                      {error}
+                      {submitError}
                     </div>
                   )}
                 </form>
               )}
-            />
+            </FinalForm>
           </>
         ) : (
           <>
