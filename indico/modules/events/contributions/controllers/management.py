@@ -487,6 +487,14 @@ class RHManageContributionsExportActionsBase(RHManageContributionsActionsBase):
     ALLOW_LOCKED = True
     _allow_get_all = True
 
+    _contrib_query_options = (subqueryload('field_values'),
+                              subqueryload('person_links'),
+                              joinedload('track').joinedload('track_group'),
+                              joinedload('type'),
+                              joinedload('session_block'),
+                              joinedload('timetable_entry').lazyload('*'),
+                              undefer('is_scheduled'))
+
     def _process_args(self):
         RHManageContributionsActionsBase._process_args(self)
         # some PDF export options do not sort the contribution list so we keep
@@ -511,12 +519,6 @@ class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, Att
 
 class RHContributionsExportJSON(RHManageContributionsExportActionsBase):
     """Export list of contributions to JSON."""
-
-    _contrib_query_options = (subqueryload('field_values'),
-                              subqueryload('person_links'),
-                              joinedload('type'),
-                              joinedload('session_block'),
-                              joinedload('timetable_entry').lazyload('*'))
 
     def _process(self):
         from indico.modules.events.contributions.schemas import FullContributionSchema

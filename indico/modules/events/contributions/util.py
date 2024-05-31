@@ -162,7 +162,7 @@ def generate_spreadsheet_from_contributions(contributions):
         if has_board_number:
             contrib_data['Board number'] = c.board_number
 
-        attached_items = get_attached_items(c)
+        attached_items = get_attached_items(c, preload_event=(len(contributions) > 10))
         attachments = [att.absolute_download_url for att in attached_items.get('files', [])]
         attachments.extend(attachment.absolute_download_url
                            for folder in attached_items.get('folders', [])
