@@ -169,7 +169,7 @@ class RHContributionJSON(RHContributionDisplayBase):
 
     def _process(self):
         from indico.modules.events.contributions.schemas import FullContributionSchema
-        can_manage = self.contrib.can_manage(session.user, permission='contributions')
+        can_manage = self.contrib.can_manage(session.user)
         return FullContributionSchema(context={
             'hide_restricted_data': not can_manage,
             'user_can_manage': can_manage,
