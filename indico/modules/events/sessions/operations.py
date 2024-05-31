@@ -54,12 +54,15 @@ def update_session(event_session, data):
 
 def delete_session(event_session):
     """Delete session from the event."""
+    signals.event.session_deleted.send(event_session)
     event_session.is_deleted = True
-    for contribution in event_session.contributions[:]:
-        contribution.session = None
+
     for block in list(event_session.blocks):
         delete_session_block(block, delete_empty_session=False, log=False)
-    signals.event.session_deleted.send(event_session)
+
+    for contribution in event_session.contributions[:]:
+        contribution.session = None
+
     event_session.event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
                             f'Session "{event_session.title}" has been deleted', session.user,
                             meta={'session_id': event_session.id})
