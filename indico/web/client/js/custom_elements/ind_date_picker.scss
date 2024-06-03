@@ -1,0 +1,211 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+@use 'partials/sui_debt';
+
+ind-date-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  align-items: flex-start;
+  position: relative;
+
+  > input {
+    padding-right: 2.5em;
+  }
+
+  > button {
+    @extend %text-size-reset;
+    @extend %button-icon-only;
+
+    position: absolute;
+    right: 0.2em;
+    top: 0.2em;
+    width: 2em;
+    aspect-ratio: 1;
+  }
+
+  > button::before {
+    @extend %icon;
+    @extend %icon-calendar;
+  }
+
+  > button span {
+    @extend %visually-hidden;
+  }
+
+  .date-format {
+    @extend %visually-hidden;
+  }
+}
+
+ind-calendar {
+  @extend %text-size-reset;
+
+  dialog[open],
+  &[data-position-check] dialog {
+    position: absolute;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    padding: 0.5em;
+    margin: 0;
+    z-index: 10;
+
+    border: 0;
+  }
+
+  dialog[open] {
+    bottom: var(--dialog-bottom);
+
+    box-shadow: var(--control-raised-shadow);
+  }
+
+  &[data-position-check] dialog {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .controls,
+  .month-year {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .controls > button {
+    @extend %button-icon-only;
+    flex: none;
+    width: 2em;
+
+    &::before {
+      @extend %icon;
+    }
+
+    > span {
+      @extend %visually-hidden;
+    }
+  }
+
+  .controls [value='previous-year']::before {
+    @extend %icon-first;
+  }
+
+  .controls [value='previous-month']::before {
+    @extend %icon-prev;
+  }
+
+  .controls [value='next-month']::before {
+    @extend %icon-next;
+  }
+
+  .controls [value='next-year']::before {
+    @extend %icon-last;
+  }
+
+  .controls .month-year {
+    width: 10em;
+  }
+
+  .month-year {
+    select,
+    input[type='number'] {
+      @include sui_debt.field-override() {
+        padding: 0.5em;
+        border-radius: var(--control-border-radius);
+        border-color: var(--control-border-color);
+        -webkit-appearance: auto;
+
+        &:focus-visible {
+          outline: revert;
+          -webkit-appearance: auto;
+        }
+
+        // Override for _input.scss select:-foz-focusring
+        &:-moz-focusring {
+          color: unset !important;
+          text-shadow: unset !important;
+          outline: revert;
+        }
+      }
+
+      @include sui_debt.field-error-override() {
+        border-color: var(--control-border-color);
+        background: transparent;
+        color: inherit;
+        -webkit-appearance: auto;
+
+        &:focus-visible {
+          outline: solid;
+          -webkit-appearance: auto;
+        }
+      }
+    }
+  }
+
+  [role='listbox'],
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 0.2em;
+    width: 100%;
+  }
+
+  [role='listbox'] {
+    aspect-ratio: 7/6; // 7 cells across x 6 rows
+  }
+
+  .weekdays span {
+    @extend %flex-inline-center;
+    aspect-ratio: 1;
+  }
+
+  [role='listbox'] button {
+    aspect-ratio: 1;
+
+    background-color: transparent;
+    border: none;
+
+    &:hover {
+      background-color: var(--surface-highlight-color);
+    }
+  }
+
+  [role='listbox'] :is([data-range-start], [data-range-end], [data-range]) {
+    background-color: var(--surface-accent-secondary-color);
+  }
+
+  [role='listbox'] [data-range-end] {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  [role='listbox'] [data-range-start] {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  [role='listbox'] [data-range] {
+    border-radius: 0;
+  }
+
+  [role='listbox'] [aria-selected] {
+    background-color: var(--surface-accent-color);
+    color: var(--text-inverse-color);
+  }
+
+  button[disabled] {
+    opacity: 0.5;
+  }
+
+  [data-current-month='false'] {
+    background-color: #fff;
+    color: #ddd;
+  }
+}

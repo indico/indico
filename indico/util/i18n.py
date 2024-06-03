@@ -119,6 +119,7 @@ def smart_func(func_name, plugin_name=None):
         else:
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
+
     if plugin_name is _use_context:
         _wrap.__name__ = f'<smart {func_name}>'
     else:
@@ -177,6 +178,11 @@ class IndicoLocale(Locale):
     def weekday(self, daynum, short=True):
         """Return the week day given the index."""
         return self.days['format']['abbreviated' if short else 'wide'][daynum]
+
+    @property
+    def html_locale(self):
+        """Return locale in HTML-compatible way (e.g., en-US instead of en_US)."""
+        return f'{self.language}-{self.territory}'
 
     @cached_property
     def time_formats(self):

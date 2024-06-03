@@ -1,0 +1,20 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+// Module that makes SUI overrides easy to track down. All SUI overrides should go here.
+
+@mixin field-override {
+  .ui.form & {
+    @content;
+  }
+}
+
+@mixin field-error-override {
+  .ui.form .field.error & {
+    @content;
+  }
+}

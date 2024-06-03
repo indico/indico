@@ -15,6 +15,7 @@ body {
   --surface-default: #e8e8e8;
   --surface-inverse-color: #555;
   --surface-accent-color: var(--accent-color);
+  --surface-accent-secondary-color: #cee8f5;
   --surface-highlight-color: #c4c4c4;
   --surface-highlight-inverse-color: var(--text-secondary-color);
   --surface-disabled-color: #f9f9f9;
@@ -58,6 +59,7 @@ body {
   --control-border: var(--control-border-width) solid var(--control-border-color);
   --control-padding: 0.5em;
   --control-internal-gap: 0.2em;
+  --control-raised-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.3);
 
   // Clickable texts (e.g., link)
   --clickable-text-color: var(--accent-color);

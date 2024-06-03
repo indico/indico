@@ -5,6 +5,7 @@
 
 <html lang="{{ current_locale.language }}"
       prefix="og: http://ogp.me/ns#"
+      data-canonical-locale="{{ current_locale.html_locale }}"
       data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
 <head>
     <title>
