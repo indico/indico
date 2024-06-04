@@ -41,12 +41,13 @@ const confirmOptions = [
 export default function UpdateFilesForm({setLoading}) {
   const [confirmationType, setConfirmationType] = useState('confirm');
   const lastRevision = useSelector(selectors.getLastRevision);
+  const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const fileTypes = useSelector(selectors.getFileTypes);
   const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
   const dispatch = useDispatch();
-  const files = getFilesFromRevision(fileTypes, lastRevision);
+  const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
   const option = confirmOptions.find(x => x.value === confirmationType);
   const tagOptions = useSelector(selectors.getNonSystemTags);
 
@@ -87,7 +88,7 @@ export default function UpdateFilesForm({setLoading}) {
             <FinalFileManager
               name="files"
               fileTypes={fileTypes}
-              files={lastRevision.files}
+              files={lastRevisionWithFiles.files}
               uploadURL={uploadURL({
                 event_id: eventId,
                 contrib_id: contributionId,

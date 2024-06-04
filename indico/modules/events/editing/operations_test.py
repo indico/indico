@@ -41,7 +41,7 @@ def test_cannot_undo_review_old_rev(db, dummy_contribution, dummy_user):
     (RevisionType.needs_submitter_confirmation, True),
     (RevisionType.acceptance, True),
     (RevisionType.rejection, True),
-    (RevisionType.reset, True),
+    (RevisionType.reset, False),
 ))
 def test_can_undo_review(db, dummy_contribution, dummy_user, type, ok):
     from indico.modules.events.editing.operations import InvalidEditableState, undo_review
@@ -58,11 +58,8 @@ def test_can_undo_review(db, dummy_contribution, dummy_user, type, ok):
         assert not rev.is_undone
 
     db.session.expire(editable)  # so a deleted revision shows up in the relationship
-    if type == RevisionType.reset:
-        assert len(editable.revisions) == 1
-    else:
-        assert len(editable.revisions) == 2
-    if ok or type == RevisionType.reset:
+    assert len(editable.revisions) == 2
+    if ok:
         assert len(editable.valid_revisions) == 1
     else:
         assert len(editable.valid_revisions) == 2

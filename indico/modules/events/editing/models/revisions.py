@@ -113,8 +113,6 @@ class EditingRevision(RenderModeMixin, db.Model):
         lazy=True,
         backref=db.backref(
             'revisions',
-            primaryjoin=('(EditingRevision.editable_id == Editable.id) & '
-                         f'(EditingRevision.type != {RevisionType.reset})'),
             lazy=True,
             order_by=created_dt,
             cascade='all, delete-orphan'
