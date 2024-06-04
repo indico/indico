@@ -10,8 +10,6 @@ from zipfile import ZipFile
 
 import pytest
 
-from indico.modules.files.models.files import File
-from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
 
@@ -31,15 +29,6 @@ def dummy_category_template(db, dummy_category):
     tpl = ReceiptTemplate(title='Dummy', category=dummy_category, html='Test')
     db.session.flush()
     return tpl
-
-
-@pytest.fixture
-def dummy_receipt_file(db, dummy_event_template, dummy_reg):
-    file = File(filename='test.pdf', content_type='application/pdf')
-    file.save(('test',), BytesIO(b'hello world'))
-    receipt_file = ReceiptFile(registration=dummy_reg, template=dummy_event_template, file=file)
-    db.session.flush()
-    return receipt_file
 
 
 @pytest.mark.parametrize('owner_type', ('event', 'category'))

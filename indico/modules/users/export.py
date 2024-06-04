@@ -31,6 +31,7 @@ from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.files.models.files import File
+from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users import logger
 from indico.modules.users.models.export import DataExportOptions, DataExportRequest, DataExportRequestState
 from indico.util.date_time import now_utc
@@ -153,6 +154,7 @@ def get_user_files(export_request):
 
     if DataExportOptions.registrations in options:
         yield from get_registration_files(user)
+        yield from get_registration_documents(user)
 
 
 def get_registrations(user):
@@ -170,6 +172,16 @@ def get_registration_files(user):
             .join(Registration)
             .filter(Registration.user == user,
                     RegistrationData.filename.isnot(None))
+            .all())
+
+
+def get_registration_documents(user):
+    """Get all documents generated for a registration."""
+    return (ReceiptFile.query
+            .join(Registration)
+            .filter(Registration.user == user,
+                    ReceiptFile.file_id.isnot(None),
+                    ReceiptFile.is_published)
             .all())
 
 
@@ -298,6 +310,10 @@ def build_storage_path(file):
         event = file.registration.event
         prefix = 'registrations'
         path = f'{event.id}_{event.title}'
+    elif isinstance(file, ReceiptFile):
+        event = file.registration.event
+        prefix = 'registrations'
+        path = f'{event.id}_{event.title}/documents'
     elif isinstance(file, AttachmentFile):
         prefix = 'attachments'
         path = ''
