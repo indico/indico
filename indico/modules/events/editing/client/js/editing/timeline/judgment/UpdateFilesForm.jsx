@@ -47,7 +47,7 @@ export default function UpdateFilesForm({setLoading}) {
   const fileTypes = useSelector(selectors.getFileTypes);
   const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
   const dispatch = useDispatch();
-  const files = getFilesFromRevision(fileTypes, lastRevision);
+  const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
   const option = confirmOptions.find(x => x.value === confirmationType);
   const tagOptions = useSelector(selectors.getNonSystemTags);
 
