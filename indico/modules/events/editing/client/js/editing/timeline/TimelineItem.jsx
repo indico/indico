@@ -43,13 +43,14 @@ export default function TimelineItem({block, index}) {
   const {fileTypes} = useSelector(selectors.getStaticData);
   const isLastBlock = lastTimelineBlock.id === block.id;
   const isLastValidBlock = lastValidTimelineBlock.id === block.id;
+  const isLastTimelineBlockWithFiles = lastTimelineBlockWithFiles.id === block.id;
   const canEdit = isLastValidBlock && canEditLastRevision;
   const hasContent =
     block.commentHtml ||
     !!block.files.length ||
     !!block.tags.length ||
     !!block.customActions.length;
-  const isAlwaysVisible = isLastValidBlock || lastTimelineBlockWithFiles.id === block.id;
+  const isAlwaysVisible = isLastValidBlock || isLastTimelineBlockWithFiles;
   const [visibilityToggle, setVisibilityToggle] = useState(false);
   const visible = visibilityToggle || isAlwaysVisible;
   const user = block.type.name === RevisionType.replacement ? INDICO_BOT_USER : block.user;
@@ -124,6 +125,7 @@ export default function TimelineItem({block, index}) {
                   files={block.files}
                   downloadURL={block.downloadFilesURL}
                   tags={block.tags}
+                  outdated={!isLastTimelineBlockWithFiles}
                 />
                 {canPerformSubmitterActions && needsSubmitterConfirmation && isLastValidBlock && (
                   <ChangesConfirmation />

@@ -30,7 +30,6 @@ function TagInput({onChange, value, placeholder, options}) {
     <Dropdown
       placeholder={placeholder}
       styleName="tag-input"
-      upward={false}
       fluid
       multiple
       search
