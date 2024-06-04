@@ -48,7 +48,7 @@
   padding-bottom: 10px !important;
 
   .share-button {
-    width: 100%;
+    margin-right: 0;
 
     img {
       width: 20px;
@@ -63,6 +63,12 @@
       vertical-align: middle;
     }
   }
+}
+
+.mastodon-button {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .empty-mastodon-server-notice :global(.icon.star) {

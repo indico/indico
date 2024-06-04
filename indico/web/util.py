@@ -437,18 +437,15 @@ def get_request_user():
     return user, source
 
 
-def check_url_has_no_path(url):
-    """Checks that a given URL is valid and has no path.
+def strip_path_from_url(url):
+    """Strip away the path from a given URL.
 
-    Returns False if the URL does not begin with http or https,
-    or if it has a path component (e.g. `https://example.com/foo`).
+    (e.g. https://foo.bar/baz?a -> https://foo.bar)
     """
     url = urlsplit(url, allow_fragments=False)
 
-    if url.scheme not in ('http', 'https'):
-        return False
-
-    if url.path:
-        return False
+    if not url.netloc:
+        # return the original URL if it's not a valid URL
+        return url.geturl()
 
     return urlunsplit(url._replace(path='', query=''))

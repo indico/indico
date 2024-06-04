@@ -8,6 +8,7 @@
 from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter
+from urllib.parse import urlsplit, urlunsplit
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
@@ -49,9 +50,9 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
-                                       get_related_categories, get_suggested_categories, get_unlisted_events,
-                                       get_user_titles, merge_users, search_users, send_avatar, serialize_user,
-                                       set_user_avatar)
+                                       get_mastodon_server_name, get_related_categories, get_suggested_categories,
+                                       get_unlisted_events, get_user_titles, merge_users, search_users, send_avatar,
+                                       serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
@@ -67,8 +68,8 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
 from indico.web.rh import RH, RHProtected, allow_signed_url
-from indico.web.util import (ExpectedError, check_url_has_no_path, is_legacy_signed_url_valid, jsonify_data,
-                             jsonify_form, jsonify_template)
+from indico.web.util import (ExpectedError, is_legacy_signed_url_valid, jsonify_data, jsonify_form, jsonify_template,
+                             strip_path_from_url)
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
@@ -427,6 +428,13 @@ class RHUserPreferences(RHUserBase):
             session.lang = self.user.settings.get('lang')
             session.timezone = (self.user.settings.get('timezone') if self.user.settings.get('force_timezone')
                                 else 'LOCAL')
+
+            server_info = get_mastodon_server_name(self.user.settings.get('mastodon_server_url'))
+            if server_info is not None:
+                self.user.settings.set('mastodon_server_name', server_info['name'])
+            else:
+                self.user.settings.delete('mastodon_server_name')
+
             flash(_('Preferences saved'), 'success')
             return redirect(url_for('.user_preferences'))
         return WPUser.render_template('preferences.html', 'preferences', user=self.user, form=form)
@@ -445,11 +453,18 @@ class RHUserPreferencesMastodonServer(RHUserBase):
         if not social_settings.get('enabled'):
             raise Forbidden('The social share widget is not enabled.')
 
-        url = check_url_has_no_path(server_url)
-        if not url:
-            raise ExpectedError(_('Invalid Mastodon server URL'))
+        url = urlsplit(server_url)
+        if url.scheme not in ('http', 'https'):
+            raise ExpectedError(_('Invalid URL'))
+        url = strip_path_from_url(urlunsplit(url))
+
+        server_info = get_mastodon_server_name(url)
+        if not server_info:
+            raise ExpectedError(_('Invalid Mastodon server URL.'))
+
         self.user.settings.set('mastodon_server_url', url)
-        return '', 204
+        self.user.settings.set('mastodon_server_name', server_info['name'])
+        return jsonify({'name': server_info['name'], 'url': url})
 
 
 class RHUserFavorites(RHUserBase):

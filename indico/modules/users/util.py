@@ -33,6 +33,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.fs import secure_filename
@@ -40,6 +41,7 @@ from indico.util.i18n import _
 from indico.util.signals import make_interceptable
 from indico.util.string import crc32, remove_accents
 from indico.web.flask.util import send_file, url_for
+from indico.web.util import strip_path_from_url
 
 
 # colors for user-specific avatar bubbles
@@ -557,3 +559,21 @@ def send_avatar(user):
 def get_avatar_url_from_name(first_name):
     first_char = first_name[0] if first_name else None
     return url_for('assets.avatar', name=first_char)
+
+
+@memoize_request
+def get_mastodon_server_name(url):
+    """Query a Mastodon server for its name."""
+    if not (server_url := strip_path_from_url(url)):
+        return None
+
+    try:
+        resp = requests.get(f'{server_url}/api/v2/instance')
+        resp.raise_for_status()
+    except requests.RequestException:
+        return None
+
+    data = resp.json()
+    return {
+        'name': data['title'],
+    }

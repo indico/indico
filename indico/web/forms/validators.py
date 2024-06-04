@@ -7,14 +7,15 @@
 
 import re
 from datetime import date, timedelta
+from urllib.parse import urlsplit, urlunsplit
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
+from indico.modules.users.util import get_mastodon_server_name
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.passwords import validate_secure_password
 from indico.util.string import has_relative_links, is_valid_mail
-from indico.web.util import check_url_has_no_path
 
 
 class UsedIf:
@@ -422,13 +423,15 @@ class NoRelativeURLs:
             raise ValidationError(_('Links and images may not use relative URLs.'))
 
 
-class NoPathInURL:
-    """Ensure that a URL field is valid and has no path component.
-
-    This checks that a URL has either http or https scheme and no path
-    component (e.g. https://foo.bar is valid, but https://foo.bar/baz is not).
-    """
+class MastodonServer:
+    """Check that a given URL is a valid Mastodon server URL."""
 
     def __call__(self, form, field):
-        if field.data and not check_url_has_no_path(field.data):
-            raise ValidationError(_('Invalid URL.'))
+        if field.data:
+            url = urlsplit(field.data)
+            if url.scheme not in ('http', 'https'):
+                raise ValidationError(_('Invalid URL.'))
+            url = urlunsplit(url)
+
+            if not get_mastodon_server_name(url):
+                raise ValidationError(_('Invalid Mastodon server URL.'))

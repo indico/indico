@@ -30,13 +30,14 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import './ind_share_widget.module.scss';
 
-function CopyToClipboard({eventUrl, setCopied, isCopied}) {
+function CopyToClipboard({eventUrl}) {
+  const [isCopied, setCopied] = useState(false);
   useEffect(() => {
     if (isCopied) {
       const timer = setTimeout(() => setCopied(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [isCopied, setCopied]);
+  }, [isCopied]);
 
   return (
     <Input
@@ -61,8 +62,6 @@ function CopyToClipboard({eventUrl, setCopied, isCopied}) {
 
 CopyToClipboard.propTypes = {
   eventUrl: PropTypes.string.isRequired,
-  setCopied: PropTypes.func.isRequired,
-  isCopied: PropTypes.bool.isRequired,
 };
 
 function CalendarButtons({googleCalParams, outlookCalParams}) {
@@ -95,7 +94,7 @@ function CalendarButtons({googleCalParams, outlookCalParams}) {
             styleName="share-button"
           >
             <img src={calendar.logo} alt={calendar.name} />
-            <Translate as="span">{calendar.name}</Translate>
+            <span>{calendar.name}</span>
           </Button>
         </GridColumn>
       ))}
@@ -120,7 +119,7 @@ function TwitterButton({shareText}) {
         styleName="share-button"
       >
         <img src={`${Indico.Urls.ImagesBase}/twitter.svg`} alt={Translate.string('Twitter')} />
-        <Translate>Twitter</Translate>
+        <Translate as="span">Twitter</Translate>
       </Button>
     </GridColumn>
   );
@@ -135,17 +134,25 @@ function MastodonButton({shareText, setMastodonOpen}) {
     ? `${Indico.User.mastodonServerURL}/share?text=${shareText}`
     : null;
   const isLoggedIn = !_.isEmpty(Indico.User);
+  const hasMastodonServer = !_.isEmpty(Indico.User.mastodonServerName);
   const button = (
     <Button
       basic
       color={isLoggedIn ? 'violet' : 'grey'}
-      styleName="share-button"
+      styleName="share-button mastodon-button"
       as="a"
       target="_blank"
       href={href}
+      title={
+        isLoggedIn && hasMastodonServer
+          ? `${Indico.User.mastodonServerName} (${Indico.User.mastodonServerURL})`
+          : null
+      }
     >
       <img src={`${Indico.Urls.ImagesBase}/mastodon.svg`} alt={Translate.string('Mastodon')} />
-      <Translate>Mastodon</Translate>
+      <span>
+        {hasMastodonServer ? Indico.User.mastodonServerName : Translate.string('Mastodon')}
+      </span>
     </Button>
   );
 
@@ -176,14 +183,19 @@ MastodonButton.propTypes = {
 
 function SetupMastodonServer({setMastodonOpen, button, shareText}) {
   const [serverURL, setServerURL] = useState(null);
+  const [mastodonServerName, setMastodonServerName] = useState(null);
 
   useEffect(() => {
     if (serverURL) {
       Indico.User.mastodonServerURL = serverURL;
     }
-  }, [serverURL]);
 
-  if (Indico.User.mastodonServerURL) {
+    if (mastodonServerName) {
+      Indico.User.mastodonServerName = mastodonServerName;
+    }
+  }, [serverURL, mastodonServerName]);
+
+  if (Indico.User.mastodonServerURL && Indico.User.mastodonServerName) {
     return button;
   }
 
@@ -211,12 +223,14 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
             </Message>
             <FinalForm
               onSubmit={async data => {
+                let resp;
                 try {
-                  await indicoAxios.post(userPreferencesMastodonServer(), data);
+                  resp = await indicoAxios.post(userPreferencesMastodonServer(), data);
                 } catch (e) {
                   return handleSubmitError(e);
                 }
-                setServerURL(data.server_url);
+                setServerURL(resp.data.url);
+                setMastodonServerName(resp.data.name);
               }}
               subscription={{
                 pristine: true,
@@ -277,7 +291,9 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
               target="_blank"
               href={`${serverURL}/share?text=${shareText}`}
               icon="share square"
-              content={Translate.string('Share on Mastodon')}
+              content={Translate.string('Share on {mastodonServerName}', {
+                mastodonServerName,
+              })}
               positive
               fluid
               onClick={() => setMastodonOpen(false)}
@@ -305,7 +321,6 @@ function ShareWidget({
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMastodonOpen, setMastodonOpen] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const shareText = `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
   return (
     <Popup
@@ -324,21 +339,21 @@ function ShareWidget({
             <Icon name="share alternate" styleName="icon" />
             <Translate as="strong">Share this page</Translate>
           </div>
-          <Header size="tiny" styleName="share-section-header">
+          <Header styleName="share-section-header">
             <Icon name="linkify" styleName="icon" />
             <HeaderContent styleName="title">
               <Translate>Direct link</Translate>
             </HeaderContent>
           </Header>
-          <CopyToClipboard eventUrl={eventUrl} setCopied={setIsCopied} isCopied={isCopied} />
-          <Header size="tiny" styleName="share-section-header">
+          <CopyToClipboard eventUrl={eventUrl} />
+          <Header styleName="share-section-header">
             <Icon name="calendar alternate outline" styleName="icon" />
             <HeaderContent styleName="title">
               <Translate>Add to calendar</Translate>
             </HeaderContent>
           </Header>
           <CalendarButtons googleCalParams={googleCalParams} outlookCalParams={outlookCalParams} />
-          <Header size="tiny" styleName="share-section-header">
+          <Header styleName="share-section-header">
             <Icon name="share square" styleName="icon" />
             <HeaderContent styleName="title">
               <Translate>Share on social media</Translate>

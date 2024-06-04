@@ -14,7 +14,6 @@ from wtforms.validators import DataRequired, Email, NumberRange, Optional, Valid
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
-from indico.modules.core.settings import social_settings
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
@@ -23,8 +22,9 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoEnumSelectField, IndicoSelectMultipleCheckboxField, MultiStringField,
                                      PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, NoPathInURL
+from indico.web.forms.validators import HiddenUnless, MastodonServer
 from indico.web.forms.widgets import SwitchWidget
+from indico.web.util import strip_path_from_url
 
 
 class UserPreferencesForm(IndicoForm):
@@ -78,7 +78,8 @@ class UserPreferencesForm(IndicoForm):
 
     mastodon_server_url = StringField(
         _('Preferred Mastodon server'),
-        validators=[NoPathInURL(), Optional()],
+        validators=[MastodonServer(), Optional()],
+        filters=[lambda x: strip_path_from_url(x) if x else x],
         description=_('URL of the Mastodon server you prefer to use for sharing links to events/meetings '
                       '(e.g. https://mastodon.social).'))
 
@@ -91,9 +92,6 @@ class UserPreferencesForm(IndicoForm):
         self.timezone.choices = list(zip(common_timezones, common_timezones, strict=True))
         if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
             self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
-
-        if not social_settings.get('enabled'):
-            del self.mastodon_server_url
 
 
 class UserEmailsForm(IndicoForm):
