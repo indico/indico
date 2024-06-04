@@ -69,6 +69,11 @@ class ContributionForm(IndicoForm):
         self.type.query = self.event.contribution_types
         if self.event.type != 'conference':
             self.person_link_data.label.text = _('Speakers')
+        # if there is a linked abstract, we use the same defaults as the AbstractPersonLinkListField
+        elif self.contrib and self.contrib.abstract:
+            self.person_link_data.default_is_author = True
+            self.person_link_data.default_is_speaker = False
+            self.person_link_data.default_is_submitter = False
         if not self.type.query.count():
             del self.type
         if not to_schedule and (self.contrib is None or not self.contrib.is_scheduled):

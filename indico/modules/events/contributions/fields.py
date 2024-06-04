@@ -24,13 +24,14 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
 
     @property
     def roles(self):
-        roles = [{'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone', 'default': True}]
+        roles = [{'name': 'speaker', 'label': _('Speaker'), 'icon': 'microphone', 'default': self.default_is_speaker}]
         if self.allow_submitters:
             roles.append({'name': 'submitter', 'label': _('Submitter'), 'icon': 'paperclip',
                           'default': self.default_is_submitter})
         if self.allow_authors:
             roles += [
-                {'name': 'primary', 'label': _('Author'), 'plural': _('Authors'), 'section': True},
+                {'name': 'primary', 'label': _('Author'), 'plural': _('Authors'), 'section': True,
+                 'default': self.default_is_author},
                 {'name': 'secondary', 'label': _('Co-author'), 'plural': _('Co-authors'), 'section': True},
             ]
         return roles
@@ -38,6 +39,8 @@ class ContributionPersonLinkListField(PersonLinkListFieldBase):
     def __init__(self, *args, **kwargs):
         self.allow_authors = kwargs.pop('allow_authors', kwargs['_form'].event.type == 'conference')
         self.allow_submitters = kwargs.pop('allow_submitters', True)
+        self.default_is_author = kwargs.pop('default_is_author', False)
+        self.default_is_speaker = kwargs.pop('default_is_speaker', True)
         self.default_is_submitter = kwargs.pop('default_is_submitter', True)
         self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
