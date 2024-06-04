@@ -126,7 +126,7 @@ class AppleWalletManager:
             passfile.add_file_from_url('logo.png', config.ABSOLUTE_WALLET_LOGO_URL)
         else:
             passfile.add_default_images()
-        signals.event.registration.apple_wallet_object.send(self.event, obj=passfile)
+        signals.event.registration.apple_wallet_object.send(registration, obj=passfile)
         return passfile
 
     def get_ticket(self, registration) -> str:

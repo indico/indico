@@ -152,5 +152,5 @@ Called when a ticket object for an Apple Wallet has been generated. The `sender`
 
 apple_wallet_object = _signals.signal('apple-wallet-object', '''
 Called when the Pass object for an Apple Wallet has been generated. The `sender` is the
-`Event` object, the `obj` kwarg contains the Pass object.
+`Registration` object, the `obj` kwarg contains the Pass object.
 ''')
