@@ -11,6 +11,7 @@ import React from 'react';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {FinalField} from '../../forms';
 
@@ -164,6 +165,7 @@ const PrincipalListField = props => {
               )}
             </>
           )}
+          {renderPluginComponents('setManagersButton', {disabled})}
         </Button.Group>
       )}
     </>
