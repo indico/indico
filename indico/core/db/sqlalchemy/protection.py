@@ -521,11 +521,14 @@ class ProtectionManagersMixin(ProtectionMixin):
                                        old_data=old_data, quiet=quiet)
         return entry
 
-    def get_manager_list(self, recursive=False, include_groups=True):
+    def get_manager_list(self, recursive=False, include_groups=True, permission=None, explicit=False):
+        if recursive and (permission or explicit):
+            raise ValueError('recursive and permission/explicit are mutually exclusive')
         managers = {
             x.principal
             for x in self.acl_entries
-            if x.has_management_permission() and (include_groups or x.type == PrincipalType.user)
+            if (x.has_management_permission(permission=permission, explicit=explicit) and
+                (include_groups or x.type == PrincipalType.user))
         }
         if recursive and self.protection_parent:
             managers.update(self.protection_parent.get_manager_list(recursive=True, include_groups=include_groups))

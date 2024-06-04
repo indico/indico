@@ -54,20 +54,21 @@ def notify_comment(comment):
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
-def notify_editor_judgment(revision, submitter, action):
+def notify_editor_judgment(revision, submitters, action):
     """Notify the submitter about a judgment made by an editor."""
     editable = revision.editable
-    editor_name = revision.user.first_name if editable.can_see_editor_names(submitter) else None
-    with submitter.force_user_locale():
-        tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
-                                  editor_name=editor_name,
-                                  timeline_url=editable.external_timeline_url,
-                                  recipient_name=submitter.first_name,
-                                  contribution=editable.contribution,
-                                  action=action.value,
-                                  text=revision.comment)
-        email = make_email(submitter.email, template=tpl)
-    send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
+    for submitter in submitters:
+        editor_name = revision.user.first_name if editable.can_see_editor_names(submitter) else None
+        with submitter.force_user_locale():
+            tpl = get_template_module('events/editing/emails/editor_judgment_notification.txt',
+                                      editor_name=editor_name,
+                                      timeline_url=editable.external_timeline_url,
+                                      recipient_name=submitter.first_name,
+                                      contribution=editable.contribution,
+                                      action=action.value,
+                                      text=revision.comment)
+            email = make_email(submitter.email, template=tpl)
+        send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 
 
 def notify_submitter_upload(revision):

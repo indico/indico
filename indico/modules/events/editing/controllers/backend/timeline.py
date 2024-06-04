@@ -154,10 +154,8 @@ class RHTriggerExtraRevisionAction(RHContributionEditableRevisionBase):
         'action': fields.String(required=True)
     })
     def _process(self, action):
-        print(self.revision, action, self.revision.editable.latest_revision)
         ensure_latest_revision(self.revision)
         resp = service_handle_custom_action(self.editable, self.revision, session.user, action)
-        print('there')
         return jsonify(redirect=resp.get('redirect'))
 
 
