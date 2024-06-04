@@ -3,6 +3,11 @@ checked_in_dt: null
 consent_to_publish: nobody
 created_by_manager: false
 currency: USD
+documents:
+- _archive_path: registrations/0_dummy0/documents/0_test.pdf
+  file_id: <id>
+  filename: test.pdf
+  is_deleted: false
 email: 1337@example.test
 event_id: <id>
 event_title: dummy#0
@@ -23,8 +28,6 @@ id: <id>
 is_deleted: false
 last_name: Pig
 price: '0'
-receipt_files:
-- 0
 rejection_reason: ''
 state: complete
 submitted_dt: <timestamp>

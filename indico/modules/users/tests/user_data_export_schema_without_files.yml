@@ -149,6 +149,10 @@ registrations:
   consent_to_publish: nobody
   created_by_manager: false
   currency: USD
+  documents:
+  - file_id: <id>
+    filename: test.pdf
+    is_deleted: false
   email: 1337@example.test
   event_id: <id>
   event_title: dummy#0
@@ -168,8 +172,6 @@ registrations:
   is_deleted: false
   last_name: Pig
   price: '0'
-  receipt_files:
-  - 0
   rejection_reason: ''
   state: complete
   submitted_dt: <timestamp>
