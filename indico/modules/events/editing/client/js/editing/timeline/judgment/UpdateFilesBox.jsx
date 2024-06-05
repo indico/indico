@@ -7,31 +7,26 @@
 
 import uploadURL from 'indico-url:event_editing.api_upload';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Message} from 'semantic-ui-react';
 
-import {FinalTextArea} from 'indico/react/forms';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
 import {FinalFileManager} from '../FileManager';
 import * as selectors from '../selectors';
 
-import FinalTagInput from './TagInput';
-
-import './JudgmentBox.module.scss';
-
-export default function UpdateFilesForm() {
+export default function UpdateFilesBox({visible, mustChange}) {
   const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const fileTypes = useSelector(selectors.getFileTypes);
   const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
-  const tagOptions = useSelector(selectors.getNonSystemTags);
 
   return (
-    <>
+    <div style={{display: visible ? 'block' : 'none'}}>
       <FinalFileManager
         name="files"
         fileTypes={fileTypes}
@@ -41,7 +36,7 @@ export default function UpdateFilesForm() {
           contrib_id: contributionId,
           type: editableType,
         })}
-        mustChange
+        mustChange={mustChange}
       />
       <Field name="files" subscription={{value: true}}>
         {({input: {value: currentFiles}}) => {
@@ -50,7 +45,7 @@ export default function UpdateFilesForm() {
           }
           return (
             <>
-              <Message styleName="publishable-warning" visible warning>
+              <Message style={{marginTop: 0}} visible warning>
                 <PluralTranslate count={publishableFileTypes.length}>
                   <Singular>
                     There are no publishable files. Please upload a{' '}
@@ -81,14 +76,11 @@ export default function UpdateFilesForm() {
           );
         }}
       </Field>
-      <FinalTextArea
-        name="comment"
-        placeholder={Translate.string('Leave a comment...')}
-        required
-        hideValidationError
-        autoFocus
-      />
-      <FinalTagInput name="tags" options={tagOptions} />
-    </>
+    </div>
   );
 }
+
+UpdateFilesBox.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  mustChange: PropTypes.bool.isRequired,
+};

@@ -13,9 +13,9 @@ import {Translate} from 'indico/react/i18n';
 
 import JudgmentDropdownItems from './JudgmentDropdownItems';
 
-import './JudgmentBox.module.scss';
+import './JudgmentBoxHeader.module.scss';
 
-export default function JudgmentBox({judgmentType, setJudgmentType, options, loading}) {
+export default function JudgmentBoxHeader({judgmentType, setJudgmentType, options, loading}) {
   const option = options.find(x => x.value === judgmentType);
 
   return (
@@ -54,7 +54,7 @@ export default function JudgmentBox({judgmentType, setJudgmentType, options, loa
   );
 }
 
-JudgmentBox.propTypes = {
+JudgmentBoxHeader.propTypes = {
   judgmentType: PropTypes.string.isRequired,
   setJudgmentType: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(

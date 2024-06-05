@@ -48,12 +48,10 @@ describe('timeline selectors', () => {
     expect(result[0].header).toStrictEqual(undefined);
     expect(result[0].items).toStrictEqual([expect.objectContaining({text: 'revision replaced'})]);
     expect(result[1].id).toBe(2);
-    expect(result[1].header).toStrictEqual(revisionStates[RevisionType.replacement].any);
+    expect(result[1].header).toStrictEqual(revisionStates[RevisionType.replacement]);
     expect(result[1].items).toStrictEqual([]);
     expect(result[2].id).toBe(3);
-    expect(result[2].header).toStrictEqual(
-      revisionStates[RevisionType.needs_submitter_changes].any
-    );
+    expect(result[2].header).toStrictEqual(revisionStates[RevisionType.needs_submitter_changes]);
     expect(result[2].items).toStrictEqual([]);
   });
 
@@ -99,12 +97,12 @@ describe('timeline selectors', () => {
     expect(result[0].items).toStrictEqual([]);
     expect(result[1].id).toBe(2);
     expect(result[1].header).toStrictEqual(
-      revisionStates[RevisionType.needs_submitter_confirmation].any(result[1])
+      revisionStates[RevisionType.needs_submitter_confirmation](result[1])
     );
     expect(result[1].commentHtml).toBe('hey');
     expect(result[1].items).toStrictEqual([]);
     expect(result[2].id).toBe(3);
-    expect(result[2].header).toStrictEqual(revisionStates[RevisionType.changes_rejection].any);
+    expect(result[2].header).toStrictEqual(revisionStates[RevisionType.changes_rejection]);
     expect(result[2].items).toStrictEqual([]);
     expect(result[3].id).toBe(4);
     expect(result[3].items).toHaveLength(0);
@@ -172,7 +170,7 @@ describe('timeline selectors', () => {
     expect(result[0].header).toStrictEqual(undefined);
     expect(result[0].items).toStrictEqual([expect.objectContaining({text: 'first comment'})]);
     expect(result[1].id).toBe(2);
-    expect(result[1].header).toStrictEqual(revisionStates[RevisionType.replacement].any);
+    expect(result[1].header).toStrictEqual(revisionStates[RevisionType.replacement]);
     expect(result[1].items).toStrictEqual([
       expect.objectContaining({text: 'my test comment'}),
       expect.objectContaining({text: 'done'}),
