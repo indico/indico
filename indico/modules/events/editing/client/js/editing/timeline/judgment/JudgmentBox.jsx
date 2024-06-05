@@ -6,79 +6,57 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {Button, Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import {EditingReviewAction} from '../../../models';
-import {blockPropTypes} from '../util';
-
-import AcceptRejectForm from './AcceptRejectForm';
 import JudgmentDropdownItems from './JudgmentDropdownItems';
-import RequestChangesForm from './RequestChangesForm';
-import UpdateFilesForm from './UpdateFilesForm';
 
 import './JudgmentBox.module.scss';
 
-export default function JudgmentBox({block, onClose, judgmentType: _judgmentType, options}) {
-  const [judgmentType, setJudgmentType] = useState(_judgmentType);
-  const [loading, setLoading] = useState(false);
+export default function JudgmentBox({judgmentType, setJudgmentType, options, loading}) {
   const option = options.find(x => x.value === judgmentType);
 
   return (
-    <>
-      <div styleName="choice-bar">
-        <h3>
-          <Translate>Your decision</Translate>
-        </h3>
-        <div>
-          <Dropdown
-            value={judgmentType}
-            trigger={
-              <Dropdown.Text className="text">
-                <div
-                  className={`ui empty circular ${option.color} label`}
-                  style={{marginRight: '0.5em', verticalAlign: '-10%'}}
-                />
-                {option.text}
-              </Dropdown.Text>
-            }
-            direction="left"
-            disabled={loading}
-            button
-            floating
-          >
-            <Dropdown.Menu>
-              <JudgmentDropdownItems
-                options={options}
-                judgmentType={judgmentType}
-                setJudgmentType={setJudgmentType}
+    <div styleName="choice-bar">
+      <h3>
+        <Translate>Your decision</Translate>
+      </h3>
+      <div>
+        <Dropdown
+          value={judgmentType}
+          trigger={
+            <Dropdown.Text className="text">
+              <div
+                className={`ui empty circular ${option.color} label`}
+                style={{marginRight: '0.5em', verticalAlign: '-10%'}}
               />
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button icon="delete" disabled={loading} onClick={onClose} />
-        </div>
+              {option.text}
+            </Dropdown.Text>
+          }
+          direction="left"
+          disabled={loading}
+          button
+          floating
+        >
+          <Dropdown.Menu>
+            <JudgmentDropdownItems
+              options={options}
+              judgmentType={judgmentType}
+              setJudgmentType={setJudgmentType}
+            />
+          </Dropdown.Menu>
+        </Dropdown>
+        <Button icon="delete" disabled={loading} onClick={() => setJudgmentType(null)} />
       </div>
-      {[EditingReviewAction.accept, EditingReviewAction.reject].includes(judgmentType) && (
-        <AcceptRejectForm
-          block={block}
-          action={judgmentType}
-          setLoading={setLoading}
-          onSuccess={onClose}
-        />
-      )}
-      {judgmentType === EditingReviewAction.update && <UpdateFilesForm setLoading={setLoading} />}
-      {judgmentType === EditingReviewAction.requestUpdate && (
-        <RequestChangesForm setLoading={setLoading} onSuccess={onClose} />
-      )}
-    </>
+    </div>
   );
 }
 
 JudgmentBox.propTypes = {
-  block: PropTypes.shape(blockPropTypes).isRequired,
   judgmentType: PropTypes.string.isRequired,
+  setJudgmentType: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string,
@@ -87,9 +65,5 @@ JudgmentBox.propTypes = {
       color: PropTypes.string,
     })
   ).isRequired,
-  onClose: PropTypes.func,
-};
-
-JudgmentBox.defaultProps = {
-  onClose: null,
+  loading: PropTypes.bool.isRequired,
 };

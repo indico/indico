@@ -7,166 +7,88 @@
 
 import uploadURL from 'indico-url:event_editing.api_upload';
 
-import _ from 'lodash';
-import PropTypes from 'prop-types';
-import React, {useState} from 'react';
-import {Field, Form as FinalForm} from 'react-final-form';
-import {useDispatch, useSelector} from 'react-redux';
-import {Form, Dropdown, Button, Message} from 'semantic-ui-react';
+import React from 'react';
+import {Field} from 'react-final-form';
+import {useSelector} from 'react-redux';
+import {Message} from 'semantic-ui-react';
 
-import {FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {FinalTextArea} from 'indico/react/forms';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
-import {EditingReviewAction} from '../../../models';
-import {reviewEditable} from '../actions';
 import {FinalFileManager} from '../FileManager';
-import {getFilesFromRevision} from '../FileManager/util';
 import * as selectors from '../selectors';
 
 import FinalTagInput from './TagInput';
 
 import './JudgmentBox.module.scss';
 
-const confirmOptions = [
-  {
-    value: 'confirm',
-    text: Translate.string('Confirm'),
-  },
-  {
-    value: 'confirm_and_approve',
-    text: Translate.string('Confirm & Approve'),
-  },
-];
-
-export default function UpdateFilesForm({setLoading}) {
-  const [confirmationType, setConfirmationType] = useState('confirm');
-  const lastRevision = useSelector(selectors.getLastRevision);
+export default function UpdateFilesForm() {
   const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
   const fileTypes = useSelector(selectors.getFileTypes);
   const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
-  const dispatch = useDispatch();
-  const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
-  const option = confirmOptions.find(x => x.value === confirmationType);
   const tagOptions = useSelector(selectors.getNonSystemTags);
 
-  const submitReview = async formData => {
-    setLoading(true);
-    const rv = await dispatch(
-      reviewEditable(lastRevision, {
-        ...formData,
-        action:
-          confirmationType === 'confirm_and_approve'
-            ? EditingReviewAction.update_accept
-            : EditingReviewAction.update,
-      })
-    );
-    if (rv.error) {
-      setLoading(false);
-      return rv.error;
-    }
-  };
-
   return (
-    <FinalForm
-      initialValues={{
-        comment: '',
-        tags: lastRevision.tags
-          .filter(t => !t.system)
-          .map(t => t.id)
-          .sort(),
-        files,
-      }}
-      initialValuesEqual={_.isEqual}
-      subscription={{}}
-      onSubmit={submitReview}
-    >
-      {({handleSubmit}) => (
-        <>
-          <Form id="judgment-form" onSubmit={handleSubmit}>
-            <FinalFileManager
-              name="files"
-              fileTypes={fileTypes}
-              files={lastRevisionWithFiles.files}
-              uploadURL={uploadURL({
-                event_id: eventId,
-                contrib_id: contributionId,
-                type: editableType,
-              })}
-              mustChange
-            />
-            <Field name="files" subscription={{value: true}}>
-              {({input: {value: currentFiles}}) => {
-                if (publishableFileTypes.some(fileType => fileType.id in currentFiles)) {
-                  return null;
-                }
-                return (
-                  <>
-                    <Message styleName="publishable-warning" visible warning>
-                      <PluralTranslate count={publishableFileTypes.length}>
-                        <Singular>
-                          There are no publishable files. Please upload a{' '}
-                          <Param
-                            name="types"
-                            wrapper={<strong />}
-                            value={publishableFileTypes.map(ft => ft.name).join(', ')}
-                          />{' '}
-                          file.
-                        </Singular>
-                        <Plural>
-                          There are no publishable files. Please upload a file in at least one of
-                          the following types:{' '}
-                          <Param
-                            name="types"
-                            wrapper={<strong />}
-                            value={publishableFileTypes.map(ft => ft.name).join(', ')}
-                          />
-                        </Plural>
-                      </PluralTranslate>
-                    </Message>
-                    <Field
-                      name="_nopublishables"
-                      validate={() => Translate.string('There is no publishable file uploaded.')}
-                      render={() => null}
+    <>
+      <FinalFileManager
+        name="files"
+        fileTypes={fileTypes}
+        files={lastRevisionWithFiles.files}
+        uploadURL={uploadURL({
+          event_id: eventId,
+          contrib_id: contributionId,
+          type: editableType,
+        })}
+        mustChange
+      />
+      <Field name="files" subscription={{value: true}}>
+        {({input: {value: currentFiles}}) => {
+          if (publishableFileTypes.some(fileType => fileType.id in currentFiles)) {
+            return null;
+          }
+          return (
+            <>
+              <Message styleName="publishable-warning" visible warning>
+                <PluralTranslate count={publishableFileTypes.length}>
+                  <Singular>
+                    There are no publishable files. Please upload a{' '}
+                    <Param
+                      name="types"
+                      wrapper={<strong />}
+                      value={publishableFileTypes.map(ft => ft.name).join(', ')}
+                    />{' '}
+                    file.
+                  </Singular>
+                  <Plural>
+                    There are no publishable files. Please upload a file in at least one of the
+                    following types:{' '}
+                    <Param
+                      name="types"
+                      wrapper={<strong />}
+                      value={publishableFileTypes.map(ft => ft.name).join(', ')}
                     />
-                  </>
-                );
-              }}
-            </Field>
-            <FinalTextArea
-              name="comment"
-              placeholder={Translate.string('Leave a comment...')}
-              required
-              hideValidationError
-              autoFocus
-            />
-            <FinalTagInput name="tags" options={tagOptions} />
-          </Form>
-          <div styleName="judgment-submit-button">
-            <Button.Group color="blue">
-              <FinalSubmitButton form="judgment-form" label={option.text}>
-                {disabled => (
-                  <Dropdown
-                    className="icon"
-                    button
-                    floating
-                    disabled={disabled}
-                    options={confirmOptions}
-                    onChange={(e, data) => setConfirmationType(data.value)}
-                    // eslint-disable-next-line react/jsx-no-useless-fragment
-                    trigger={<React.Fragment />}
-                  />
-                )}
-              </FinalSubmitButton>
-            </Button.Group>
-          </div>
-        </>
-      )}
-    </FinalForm>
+                  </Plural>
+                </PluralTranslate>
+              </Message>
+              <Field
+                name="_nopublishables"
+                validate={() => Translate.string('There is no publishable file uploaded.')}
+                render={() => null}
+              />
+            </>
+          );
+        }}
+      </Field>
+      <FinalTextArea
+        name="comment"
+        placeholder={Translate.string('Leave a comment...')}
+        required
+        hideValidationError
+        autoFocus
+      />
+      <FinalTagInput name="tags" options={tagOptions} />
+    </>
   );
 }
-
-UpdateFilesForm.propTypes = {
-  setLoading: PropTypes.func.isRequired,
-};

@@ -221,8 +221,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     @use_kwargs(ReviewEditableArgs)
     def _process_POST(self, action, comment):
         argmap = {'tags': EditingTagsField(self.event, load_default=lambda: set())}
-        if action in (EditingReviewAction.update, EditingReviewAction.update_accept,
-                      EditingReviewAction.request_update):
+        if action in {EditingReviewAction.update, EditingReviewAction.accept, EditingReviewAction.request_update}:
             argmap['files'] = EditingFilesField(self.event, self.contrib, self.editable_type, allow_claimed_files=True,
                                                 required=(action != EditingReviewAction.request_update))
         args = parser.parse(argmap, unknown=EXCLUDE)

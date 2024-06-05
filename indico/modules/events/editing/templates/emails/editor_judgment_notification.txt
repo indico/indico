@@ -9,13 +9,15 @@
 
 {% block body_text -%}
 {% if action == 'accept' -%}
-    {% trans %}{{ name }} has accepted an editable you are submitter of.{% endtrans %}
+    {% if has_files %}
+        {% trans %}{{ name }} has changed and accepted an editable you are submitter of.{% endtrans %}
+    {% else %}
+        {% trans %}{{ name }} has accepted an editable you are submitter of.{% endtrans %}
+    {% endif %}
 {%- elif action == 'reject' -%}
     {% trans %}{{ name }} has rejected an editable you are submitter of.{% endtrans %}
 {%- elif action == 'update' -%}
     {% trans %}{{ name }} has made changes to an editable you are submitter of.{% endtrans %}
-{%- elif action == 'update_accept' -%}
-    {% trans %}{{ name }} has changed and accepted an editable you are submitter of.{% endtrans %}
 {%- elif action == 'request_update' -%}
     {% trans %}{{ name }} has requested changes to an editable you are submitter of.{% endtrans %}
 {%- endif %}

@@ -7,22 +7,28 @@
 
 import submitRevisionURL from 'indico-url:event_editing.api_create_submitter_revision';
 
-import PropTypes from 'prop-types';
+import _ from 'lodash';
 import React, {useState} from 'react';
+import {Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown} from 'semantic-ui-react';
+import {Dropdown, Form} from 'semantic-ui-react';
 
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
+import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {EditingReviewAction} from '../../models';
 
-import {createRevisionComment} from './actions';
+import {createRevisionComment, reviewEditable} from './actions';
 import CommentForm from './CommentForm';
+import {getFilesFromRevision} from './FileManager/util';
+import AcceptRejectForm from './judgment/AcceptRejectForm';
 import JudgmentBox from './judgment/JudgmentBox';
 import JudgmentDropdownItems from './judgment/JudgmentDropdownItems';
+import RequestChangesForm from './judgment/RequestChangesForm';
+import UpdateFilesForm from './judgment/UpdateFilesForm';
 import {
   getLastRevision,
   canJudgeLastRevision,
@@ -31,7 +37,6 @@ import {
   canReviewLastRevision,
   getLastRevisionWithFiles,
 } from './selectors';
-import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
 
@@ -62,7 +67,7 @@ const judgmentOptions = [
   },
 ];
 
-export default function ReviewForm({block}) {
+export default function ReviewForm() {
   const dispatch = useDispatch();
   const lastRevision = useSelector(getLastRevision);
   const lastRevisionWithFiles = useSelector(getLastRevisionWithFiles);
@@ -77,6 +82,8 @@ export default function ReviewForm({block}) {
 
   const [commentFormVisible, setCommentFormVisible] = useState(false);
   const [judgmentType, setJudgmentType] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
 
   const createComment = async (formData, form) => {
     const rv = await dispatch(createRevisionComment(lastRevision.createCommentURL, formData));
@@ -86,7 +93,7 @@ export default function ReviewForm({block}) {
     setTimeout(() => form.reset(), 0);
   };
 
-  const onSubmit = (type, formData) =>
+  const handleSubmission = (type, formData) =>
     indicoAxios.post(
       submitRevisionURL({
         event_id: eventId,
@@ -112,7 +119,7 @@ export default function ReviewForm({block}) {
             fileTypes={{[editableType]: fileTypes}}
             uploadableFiles={lastRevisionWithFiles.files}
             text={Translate.string('Submit files')}
-            onSubmit={onSubmit}
+            onSubmit={handleSubmission}
           />
         </>
       )}
@@ -137,6 +144,16 @@ export default function ReviewForm({block}) {
     </div>
   );
 
+  const handleReview = async formData => {
+    setLoading(true);
+    const rv = await dispatch(reviewEditable(lastRevision, {...formData, action: judgmentType}));
+    setLoading(false);
+    if (rv.error) {
+      return rv.error;
+    }
+    setJudgmentType(null); // TODO check if necessary
+  };
+
   return (
     <div className="i-timeline-item review-timeline-input">
       <UserAvatar user={currentUser} />
@@ -144,20 +161,50 @@ export default function ReviewForm({block}) {
         <div className="i-box-footer" style={{overflow: 'visible'}}>
           {judgmentType ? (
             <JudgmentBox
-              block={block}
               judgmentType={judgmentType}
-              onClose={() => setJudgmentType(null)}
+              setJudgmentType={setJudgmentType}
               options={judgmentOptions}
+              loading={loading}
             />
           ) : (
             judgmentForm
           )}
+          <FinalForm
+            initialValues={{
+              comment: '',
+              tags: lastRevision.tags
+                .filter(t => !t.system)
+                .map(t => t.id)
+                .sort(),
+              files,
+            }}
+            initialValuesEqual={_.isEqual}
+            subscription={{}}
+            onSubmit={handleReview}
+          >
+            {({handleSubmit}) => (
+              <>
+                <Form id="judgment-form" onSubmit={handleSubmit}>
+                  {[EditingReviewAction.accept, EditingReviewAction.reject].includes(
+                    judgmentType
+                  ) && <AcceptRejectForm action={judgmentType} />}
+                  {judgmentType === EditingReviewAction.update && <UpdateFilesForm />}
+                  {judgmentType === EditingReviewAction.requestUpdate && <RequestChangesForm />}
+                </Form>
+                {judgmentType && (
+                  <div styleName="judgment-submit-button">
+                    <FinalSubmitButton
+                      form="judgment-form"
+                      label={Translate.string('Confirm')}
+                      disabledUntilChange={judgmentType !== EditingReviewAction.accept}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </FinalForm>
         </div>
       </div>
     </div>
   );
 }
-
-ReviewForm.propTypes = {
-  block: PropTypes.shape(blockPropTypes).isRequired,
-};

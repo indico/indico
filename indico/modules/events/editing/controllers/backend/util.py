@@ -26,7 +26,7 @@ def review_and_publish_editable(revision, action, comment, tags=frozenset(), fil
             publish = resp.get('publish', True)
         except ServiceRequestFailed:
             raise ServiceUnavailable(_('Failed processing review, please try again later.'))
-    if publish and action in (EditingReviewAction.accept, EditingReviewAction.update_accept):
+    if publish and action == EditingReviewAction.accept:
         publish_editable_revision(new_revision or revision)
 
 
