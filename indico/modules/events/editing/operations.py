@@ -153,7 +153,8 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     revision.editable.revisions.append(new_revision)
     if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
         _ensure_publishable_files(new_revision)
-    submitters = revision.editable.contribution.get_manager_list(permission='submit', explicit=True)
+    submitters = revision.editable.contribution.get_manager_list(include_groups=False, permission='submit',
+                                                                 explicit=True)
     if action == EditingReviewAction.update_accept:
         update_revision = new_revision
         new_revision = EditingRevision(user=editor,
