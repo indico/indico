@@ -97,7 +97,7 @@
         </div>
         <div class="speaker-list">
             {{ render_users(contribution.speakers|sort(attribute='display_order_key'),
-                            span_class='speaker-item icon-user', separator='') }}
+                            span_class='speaker-item icon-user', separator='', title=contribution.event.show_titles) }}
         </div>
     </section>
 {% endmacro %}

@@ -47,7 +47,7 @@
                     </div>
                     <div class="speaker-list icon-user" data-searchable="{{ abstract.speakers|map(attribute='name')|join(', ')|lower }}">
                         {{ render_users(abstract.speakers|sort(attribute='display_order_key'),
-                                        span_class='speaker-item-inline') }}
+                                        span_class='speaker-item-inline', title=abstract.event.show_titles) }}
                     </div>
                     <div class="contrib-time icon-time">
                         {% set dt = abstract.modified_dt or abstract.submitted_dt %}
