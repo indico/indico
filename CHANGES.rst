@@ -34,6 +34,8 @@ Improvements
 - Add bulk JSON export option in management contribution list (:pr:`6370`)
 - Make the default roles of the contribution person link list field more similar to the
   abstract person link list field when there is a linked abstract (:pr:`6342`)
+- Add option to hide person titles throughout the event (:issue:`038`, :pr:`6104`, thanks
+  :user:`vasantvohra`)
 
 Bugfixes
 ^^^^^^^^
