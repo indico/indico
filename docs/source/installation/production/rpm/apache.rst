@@ -408,11 +408,11 @@ Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
-13. Install TeXLive
--------------------
+13. Set up PDF Document Generation
+----------------------------------
 
-Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
-Indico can generate PDF files in various places.
+Follow the :ref:`PDF generation guide <pdf_generation>` to setup PDF document
+generation in Indico.
 
 
 .. _rpm-apache-shib:

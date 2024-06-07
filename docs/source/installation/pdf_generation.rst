@@ -1,7 +1,28 @@
-.. _latex:
+.. _pdf_generation:
+
+PDF Generation
+==============
+
+WeasyPrint
+----------
+
+Indico uses `WeasyPrint <weasyprint_>`_ to generate PDF files from `Document
+templates <DT_>`_. WeasyPrint generally works out of the box and does not
+require any setup.
+
+.. note::
+
+    WeasyPrint uses fonts installed on the system to render the PDFs. If you are
+    generating documents containing character sets like CJK (Chinese, Japanese,
+    Korean), make sure to install the necessary fonts. Note that, the exact
+    procedure to install new fonts depends on the distribution.
+
+.. _weasyprint: https://github.com/Kozea/WeasyPrint
+.. _DT: https://learn.getindico.io/document_templates/about/
 
 LaTeX
-=====
+-----
+.. _latex:
 
 Indico uses LaTeX (xelatex to be exact) to generate some PDF files such
 as the *Book of Abstracts* and the PDF versions of contributions.  If
