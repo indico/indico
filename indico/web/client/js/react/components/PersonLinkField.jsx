@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import validateEmailURL from 'indico-url:events.check_email';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
@@ -244,7 +246,7 @@ PersonLinkSection.defaultProps = {
 };
 
 function PersonLinkField({
-  value: persons,
+  value: _persons,
   onChange,
   eventId,
   sessionUser,
@@ -256,7 +258,6 @@ function PersonLinkField({
   canEnterManually,
   defaultSearchExternal,
   nameFormat,
-  validateEmailUrl,
   extraParams,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
@@ -265,7 +266,6 @@ function PersonLinkField({
   const sections = roles.filter(x => x.section);
   const sectionKeys = new Set(sections.map(x => x.name));
   const othersCondition = p => !p.roles || !p.roles.find(r => sectionKeys.has(r));
-  const others = persons.filter(othersCondition);
 
   const onClose = () => {
     setSelected(null);
@@ -299,6 +299,9 @@ function PersonLinkField({
       ? `${formattedLastName}, ${formattedFirstName}`
       : `${formattedFirstName} ${formattedLastName}`;
   };
+
+  const persons = _persons.map(p => ({name: formatName(p), ...p}));
+  const others = persons.filter(othersCondition);
 
   const onAdd = values => {
     const existing = persons.filter(p => !!p.email).map(p => p.email);
@@ -416,7 +419,7 @@ function PersonLinkField({
               person={persons[selected]}
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
-              validateEmailUrl={validateEmailUrl}
+              validateEmailUrl={eventId && validateEmailURL({event_id: eventId})}
               extraParams={extraParams}
             />
           )}
@@ -448,7 +451,6 @@ PersonLinkField.propTypes = {
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
   nameFormat: PropTypes.string,
-  validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
 };
 
@@ -463,11 +465,11 @@ PersonLinkField.defaultProps = {
   canEnterManually: true,
   defaultSearchExternal: false,
   nameFormat: '',
-  validateEmailUrl: null,
   extraParams: {},
 };
 
 export function FinalPersonLinkField({name, ...rest}) {
+  // TODO make autosort work here
   return <FinalField name={name} component={PersonLinkField} {...rest} />;
 }
 
@@ -550,9 +552,9 @@ FinalContributionPersonLinkField.propTypes = {
 };
 
 FinalContributionPersonLinkField.defaultProps = {
-  allowAuthors: false,
-  allowSubmitters: false,
-  defaultIsSubmitter: false,
+  allowAuthors: true,
+  allowSubmitters: true,
+  defaultIsSubmitter: true,
 };
 
 export function WTFPersonLinkField({
