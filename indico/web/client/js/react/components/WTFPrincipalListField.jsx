@@ -50,6 +50,7 @@ export default function WTFPrincipalListField({
 
   return (
     <PrincipalListField
+      fieldId={fieldId}
       favoriteUsersController={favoriteUsersController}
       disabled={disabled}
       onChange={onChangePrincipal}
