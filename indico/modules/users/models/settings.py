@@ -127,7 +127,7 @@ class UserSettingsProxy(SettingsProxyBase):
         """
         for name in names:
             self._check_name(name)
-        UserSetting.delete(self.module, names, **user)
+        UserSetting.delete(self.module, *names, **user)
         self._flush_cache()
 
     @user_or_id
