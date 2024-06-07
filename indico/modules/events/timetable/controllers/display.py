@@ -158,7 +158,7 @@ class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
 
 def create_pdf(html, css, event) -> BytesIO:
     css_url_fetcher = sandboxed_url_fetcher(event)
-    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_logo=True)
+    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
 
     css = CSS(string=css, url_fetcher=css_url_fetcher)
     documents = [
