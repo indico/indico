@@ -55,7 +55,7 @@ qrcode
 redis[hiredis]
 reportlab
 requests
-sentry-sdk[flask,celery,sqlalchemy,pure_eval]
+sentry-sdk[flask,celery,sqlalchemy,pure_eval]<2  # v2 is not compatible w/ legacy sentry 9
 simplejson
 speaklater
 sqlalchemy<2  # major upgrade
