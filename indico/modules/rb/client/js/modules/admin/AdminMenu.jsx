@@ -84,12 +84,12 @@ function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clea
         </Menu.Menu>
       </Menu.Item>
       <Menu.Item>
-        <Menu.Header styleName="locations-header">
-          <Translate>Locations</Translate>
-          <Link to="/admin/locations/">
+        <Link to="/admin/locations/">
+          <Menu.Header styleName="locations-header">
+            <Translate as="strong">Locations</Translate>
             <Icon name="setting" />
-          </Link>
-        </Menu.Header>
+          </Menu.Header>
+        </Link>
         {hasLocations && (
           <Menu.Menu>
             {locations.map(location => (
