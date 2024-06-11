@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {createDateParser} from './date_parser';
+import {createDateParser} from '../date_parser';
 
 describe('createDateParser', () => {
   test.each([['yyy.mm.dd'], ['yyyy.mm'], ['dd/mm/'], '[d//y]'])(
