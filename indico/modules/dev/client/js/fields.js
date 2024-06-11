@@ -33,12 +33,10 @@ const getFields = () => {
     eventId: 1,
     sessionUser: {...Indico.User, favoriteUsers: {}}, // clean up the user object
     emptyMessage: null,
-    autoSort: true,
     hasPredefinedAffiliations: false,
     canEnterManually: true,
     defaultSearchExternal: false,
     nameFormat: '',
-    validateEmailUrl: null,
   };
 
   return [
