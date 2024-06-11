@@ -15,7 +15,7 @@ import {Translate} from 'indico/react/i18n';
 import {FinalField} from '../forms';
 
 /**
- * A field that lets the user enter email addresses
+ * A field that lets the user add tags or keywords
  */
 function TagListField({
   value,
@@ -102,9 +102,6 @@ TagListField.defaultProps = {
 
 export default React.memo(TagListField);
 
-/**
- * Like `FinalField` but for a `EmailListField`.
- */
 export function FinalTagList({name, ...rest}) {
   return <FinalField name={name} component={TagListField} isEqual={_.isEqual} {...rest} />;
 }
