@@ -56,14 +56,24 @@ class ContributionFieldValueSchema(mm.Schema):
         fields = ('id', 'name', 'value')
 
 
+def _get_principal_roles(principal):
+    roles = [principal.author_type.name]
+    if principal.is_speaker:
+        roles.append('speaker')
+    if principal.contribution and principal.is_submitter:
+        roles.append('submitter')
+    return roles
+
+
 class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
     affiliation_link = fields.Nested(AffiliationSchema)
     email_hash = fields.Function(lambda x: hashlib.md5(x.email.encode()).hexdigest() if x.email else None)
+    roles = fields.Function(_get_principal_roles, load_only=True)
 
     class Meta:
         model = ContributionPersonLink
         fields = ('id', 'person_id', 'email', 'email_hash', 'first_name', 'last_name', 'full_name', 'title',
-                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type')
+                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type', 'roles')
 
     @post_dump
     def _hide_sensitive_data(self, data, **kwargs):
