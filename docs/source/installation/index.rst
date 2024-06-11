@@ -12,4 +12,4 @@ Installation guides
     Development <development.rst>
     Plugins <plugins.rst>
     Translations <translations.rst>
-    LaTeX <latex.rst>
+    PDF Generation <pdf_generation.rst>

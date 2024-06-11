@@ -382,8 +382,8 @@ displayed there to create your initial user.
 11. Install TeXLive
 -------------------
 
-Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
-Indico can generate PDF files in various places.
+Follow the :ref:`PDF generation guide <pdf_generation>` to setup PDF document
+generation in Indico.
 
 
 .. _deb-apache-shib:

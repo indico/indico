@@ -255,4 +255,5 @@ redirects = {
     'installation/production/centos/nginx': '../../rpm/nginx',
     'installation/production/debian/apache': '../../deb/apache',
     'installation/production/debian/nginx': '../../deb/nginx',
+    'installation/latex': '../pdf_generation',
 }
