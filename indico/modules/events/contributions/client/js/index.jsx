@@ -26,7 +26,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
-import ContributionForm from './ContributionForm';
+import {EditContributionButton} from './ContributionForm';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
 
@@ -53,11 +53,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 (function(global) {
-  global.setupContributionForm = function setupContributionForm() {
-    const root = document.querySelector('#contrib-form-container');
-    if (root) {
-      ReactDOM.render(<ContributionForm />, root);
-    }
+  global.setupContributionForm = function setupContributionForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, contribId, eventTitle, personLinkFieldParams} = element.dataset;
+
+    ReactDOM.render(
+      <EditContributionButton
+        eventId={+eventId}
+        contribId={contribId && +contribId}
+        eventTitle={eventTitle}
+        personLinkFieldParams={
+          personLinkFieldParams && camelizeKeys(JSON.parse(personLinkFieldParams))
+        }
+        triggerSelector={trigger}
+      />,
+      element
+    );
   };
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
     const editableSubmissionButton = document.querySelector('#editable-submission-button');
@@ -174,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         onSelect(newSession, oldSession) {
           const $this = $(this);
           const styleObject = $this[0].style;
-          const postData = {session_id: newSession ? newSession.id : null};
+          const postData = {session: {id: newSession ? newSession.id : null}};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(function(
             data
@@ -260,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         onSelect(newTrack) {
           const $this = $(this);
-          const postData = {track_id: newTrack ? newTrack.id : null};
+          const postData = {track: {id: newTrack ? newTrack.id : null}};
 
           return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
             const label = newTrack ? newTrack.title : $T.gettext('No track');
