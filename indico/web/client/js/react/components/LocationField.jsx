@@ -117,6 +117,7 @@ export default function LocationField({value, onChange, disabled, required, edit
             selectOnBlur={false}
             search
             allowAdditions
+            additionLabel={`${Translate.string('Just use')} `}
           />
           <Form.Select
             styleName="room-dropdown"
@@ -131,6 +132,7 @@ export default function LocationField({value, onChange, disabled, required, edit
             selectOnBlur={false}
             search
             allowAdditions
+            additionLabel={`${Translate.string('Just use')} `}
           />
         </Form.Group>
       ) : (
