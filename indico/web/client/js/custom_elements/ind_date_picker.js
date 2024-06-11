@@ -340,7 +340,7 @@ customElements.define(
       // Note that this may not work on iOS Safari. We are not currently explicitly
       // targeting this browser, so we'll leave this as is.
       window.addEventListener('click', handleDialogClose);
-      this.cleanup = function() {
+      this.cleanup = () => {
         window.removeEventListener('click', handleDialogClose);
       };
 
@@ -351,7 +351,7 @@ customElements.define(
         if (ev.target.closest('dialog') === dialog) {
           return;
         }
-        setTimeout(function() {
+        setTimeout(() => {
           indCalendar.open = false;
         });
       }

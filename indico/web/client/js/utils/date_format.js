@@ -15,16 +15,12 @@ export function formatDate(formatString, date) {
   const day = `${date.getDate()}`;
 
   return formatString
-    .replace(/yy+/i, function(s) {
+    .replace(/yy+/i, s => {
       if (s.length === 2) {
         return year.slice(3);
       }
       return year;
     })
-    .replace(/m{1,2}/i, function(s) {
-      return month.padStart(s.length, '0');
-    })
-    .replace(/d{1,2}/i, function(s) {
-      return day.padStart(s.length, '0');
-    });
+    .replace(/m{1,2}/i, s => month.padStart(s.length, '0'))
+    .replace(/d{1,2}/i, s => day.padStart(s.length, '0'));
 }

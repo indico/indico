@@ -83,7 +83,7 @@ export function createDateParser(formatString) {
   const regex = new RegExp(regexSource);
 
   // Crate the parser function
-  return function(text) {
+  return text => {
     const match = regex.exec(text);
     if (match) {
       const year = Number(match.groups.year);
