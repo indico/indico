@@ -74,7 +74,8 @@ TEMPLATE_DATA_JSON_SCHEMA = {
                     'font_size': {'type': 'string'},
                     'text_align': {'type': 'string'},
                     'bold': {'type': 'boolean'},
-                    'italic': {'type': 'boolean'}
+                    'italic': {'type': 'boolean'},
+                    'preserve_aspect_ratio': {'type': 'boolean'}
                 }
             },
             'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
