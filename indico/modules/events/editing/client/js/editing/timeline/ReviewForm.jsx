@@ -192,24 +192,6 @@ export default function ReviewForm() {
                     options={judgmentOptions}
                     loading={loading}
                   />
-                  <Field name="upload_changes" subscription={{value: true}}>
-                    {({input: {value: uploadChanges}}) => (
-                      <UpdateFilesBox
-                        visible={
-                          judgmentType === EditingReviewAction.update ||
-                          ([EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
-                            judgmentType
-                          ) &&
-                            uploadChanges)
-                        }
-                        mustChange={judgmentType === EditingReviewAction.update || uploadChanges}
-                        requirePublishable={[
-                          EditingReviewAction.accept,
-                          EditingReviewAction.update,
-                        ].includes(judgmentType)}
-                      />
-                    )}
-                  </Field>
                   <FinalTextArea
                     name="comment"
                     placeholder={Translate.string('Leave a comment...')}
@@ -228,6 +210,24 @@ export default function ReviewForm() {
                       toggle
                     />
                   )}
+                  <Field name="upload_changes" subscription={{value: true}}>
+                    {({input: {value: uploadChanges}}) => (
+                      <UpdateFilesBox
+                        visible={
+                          judgmentType === EditingReviewAction.update ||
+                          ([EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
+                            judgmentType
+                          ) &&
+                            uploadChanges)
+                        }
+                        mustChange={judgmentType === EditingReviewAction.update || uploadChanges}
+                        requirePublishable={[
+                          EditingReviewAction.accept,
+                          EditingReviewAction.update,
+                        ].includes(judgmentType)}
+                      />
+                    )}
+                  </Field>
                   <FinalTagInput name="tags" options={tagOptions} />
                   <div styleName="judgment-submit-button">
                     <FinalSubmitButton
