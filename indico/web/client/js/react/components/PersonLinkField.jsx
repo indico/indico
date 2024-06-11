@@ -571,7 +571,6 @@ export function WTFPersonLinkField({
   canEnterManually,
   defaultSearchExternal,
   nameFormat,
-  validateEmailUrl,
   extraParams,
 }) {
   const [persons, setPersons] = useState(
@@ -617,7 +616,6 @@ export function WTFPersonLinkField({
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
-      validateEmailUrl={validateEmailUrl}
       extraParams={extraParams}
     />
   );
@@ -634,7 +632,6 @@ WTFPersonLinkField.propTypes = {
   nameFormat: PropTypes.string,
   canEnterManually: PropTypes.bool,
   defaultSearchExternal: PropTypes.bool,
-  validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
 };
 
@@ -648,6 +645,5 @@ WTFPersonLinkField.defaultProps = {
   canEnterManually: true,
   defaultSearchExternal: false,
   nameFormat: '',
-  validateEmailUrl: null,
   extraParams: {},
 };
