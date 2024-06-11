@@ -166,7 +166,7 @@ const PrincipalListField = props => {
               )}
             </>
           )}
-          {renderPluginComponents('setManagersButton', {fieldId})}
+          {renderPluginComponents('setManagersButton', {fieldId, eventId})}
         </Button.Group>
       )}
     </>
