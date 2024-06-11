@@ -2,7 +2,7 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types) %}
+{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types, person_link_field_params) %}
     {% if contribs %}
         {% set has_codes = contribs|selectattr('code')|any %}
         <form method="POST">
@@ -251,6 +251,19 @@
                                 {{ render_attachment_info(contrib) }}
                                 <td class="i-table actions-column hide-if-locked">
                                     <div class="group right entry-action-buttons vertical-aligner">
+                                        <a href="#" id="contrib-{{ contrib.id }}-edit-trigger"
+                                           class="icon-edit i-link highlight"
+                                           title="{% trans %}NEW Edit contribution{% endtrans %}"></a>
+                                        <div
+                                            id="contrib-{{ contrib.id }}-edit"
+                                            data-event-id="{{ event.id }}"
+                                            data-contrib-id="{{ contrib.id }}"
+                                            data-event-title="{{ event.title }}"
+                                            data-person-link-field-params="{{ person_link_field_params | tojson | forceescape }}">
+                                        </div>
+                                        <script>
+                                            setupContributionForm('#contrib-{{ contrib.id }}-edit', '#contrib-{{ contrib.id }}-edit-trigger');
+                                        </script>
                                         <a href="#" class="icon-edit i-link highlight js-dialog-action"
                                            data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
                                            data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
