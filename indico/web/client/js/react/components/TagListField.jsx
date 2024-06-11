@@ -61,6 +61,13 @@ function TagListField({
     }
   };
 
+  const handleAddItem = (e, {value: newItem}) => {
+    if (isValid(newItem)) {
+      setValue([...value, newItem]);
+      setSearchQuery('');
+    }
+  };
+
   return (
     <Dropdown
       options={options}
@@ -78,6 +85,7 @@ function TagListField({
       onChange={handleChange}
       onSearchChange={handleSearchChange}
       onBlur={handleBlur}
+      onAddItem={handleAddItem}
       selectedLabel={null}
       icon=""
       {...rest}
