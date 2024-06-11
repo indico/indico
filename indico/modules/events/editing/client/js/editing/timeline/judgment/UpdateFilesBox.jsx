@@ -11,14 +11,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Message} from 'semantic-ui-react';
+import {Form, Message} from 'semantic-ui-react';
 
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
 import {FinalFileManager} from '../FileManager';
 import * as selectors from '../selectors';
 
-export default function UpdateFilesBox({visible, mustChange}) {
+export default function UpdateFilesBox({visible, mustChange, requirePublishable}) {
   const lastRevisionWithFiles = useSelector(selectors.getLastRevisionWithFiles);
   const staticData = useSelector(selectors.getStaticData);
   const {eventId, contributionId, editableType} = staticData;
@@ -26,7 +26,7 @@ export default function UpdateFilesBox({visible, mustChange}) {
   const publishableFileTypes = useSelector(selectors.getPublishableFileTypes);
 
   return (
-    <div style={{display: visible ? 'block' : 'none'}}>
+    <Form.Field style={{display: !visible ? 'none' : undefined}}>
       <FinalFileManager
         name="files"
         fileTypes={fileTypes}
@@ -40,12 +40,15 @@ export default function UpdateFilesBox({visible, mustChange}) {
       />
       <Field name="files" subscription={{value: true}}>
         {({input: {value: currentFiles}}) => {
-          if (publishableFileTypes.some(fileType => fileType.id in currentFiles)) {
+          if (
+            !requirePublishable ||
+            publishableFileTypes.some(fileType => fileType.id in currentFiles)
+          ) {
             return null;
           }
           return (
             <>
-              <Message style={{marginTop: 0}} visible warning>
+              <Message visible warning>
                 <PluralTranslate count={publishableFileTypes.length}>
                   <Singular>
                     There are no publishable files. Please upload a{' '}
@@ -76,11 +79,12 @@ export default function UpdateFilesBox({visible, mustChange}) {
           );
         }}
       </Field>
-    </div>
+    </Form.Field>
   );
 }
 
 UpdateFilesBox.propTypes = {
   visible: PropTypes.bool.isRequired,
   mustChange: PropTypes.bool.isRequired,
+  requirePublishable: PropTypes.bool.isRequired,
 };

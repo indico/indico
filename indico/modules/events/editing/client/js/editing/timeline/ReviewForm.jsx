@@ -203,6 +203,10 @@ export default function ReviewForm() {
                             uploadChanges)
                         }
                         mustChange={judgmentType === EditingReviewAction.update || uploadChanges}
+                        requirePublishable={[
+                          EditingReviewAction.accept,
+                          EditingReviewAction.update,
+                        ].includes(judgmentType)}
                       />
                     )}
                   </Field>
