@@ -331,6 +331,7 @@ function ShareWidget({
           tabIndex={0}
           aria-label={Translate.string('Share this page')}
           aria-modal
+          alt={Translate.string('Share widget icon')}
         />
       }
       content={
