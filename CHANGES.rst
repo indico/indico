@@ -36,6 +36,7 @@ Improvements
   abstract person link list field when there is a linked abstract (:pr:`6342`)
 - Add option to hide person titles throughout the event (:issue:`038`, :pr:`6104`, thanks
   :user:`vasantvohra`)
+- Preserve input when switching between judgment actions for an editable (:pr:`6375`)
 
 Bugfixes
 ^^^^^^^^
