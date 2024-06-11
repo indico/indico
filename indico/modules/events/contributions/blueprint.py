@@ -60,7 +60,7 @@ _bp.add_url_rule('/manage/contributions/import', 'contributions_import',
 
 # Single contribution
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>', 'manage_contrib_rest', management.RHContributionREST,
-                 methods=('DELETE', 'PATCH'))
+                 methods=('GET', 'DELETE', 'PATCH'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/edit', 'manage_update_contrib',
                  management.RHEditContribution, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/protection', 'manage_contrib_protection',

@@ -5,8 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
-import {Button, Form} from 'semantic-ui-react';
+import contributionURL from 'indico-url:contributions.manage_contrib_rest';
+
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, {useEffect, useState} from 'react';
+import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
   CollapsibleContainer,
@@ -14,69 +18,159 @@ import {
   FinalReferences,
   FinalTagList,
 } from 'indico/react/components';
-import {FinalPersonLinkField} from 'indico/react/components/PersonLinkField';
+import {FinalContributionPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
+import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
-export default function ContributionForm() {
-  const [modalOpen, setModalOpen] = useState(false);
-  // TODO get this from session:
-  const event = {id: 1, title: 'TODO Conference name here'};
+export function ContributionForm({eventId, contribId, eventTitle, personLinkFieldParams, onClose}) {
+  const [autoSort, setAutoSort] = useState(true); // TODO see if we can put this inside the field
+  const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
+  const {data: contrib, loading} = useIndicoAxios(contribURL);
   const referenceTypes = [{id: 1, name: 'DOI'}, {id: 2, name: 'URL'}, {id: 3, name: 'ISBN'}];
+
+  const handleSubmit = async formData => {
+    console.debug('Submitting', {
+      ..._.pick(formData, ['title', 'description', 'keywords', 'board_number', 'code']),
+      ..._.omit(formData.location_data, 'use_default'),
+      inherit_location: !formData.location_data.use_default,
+      // TODO: references
+    });
+    const resp = await indicoAxios.patch(contribURL, {
+      ..._.pick(formData, ['title', 'description', 'keywords', 'board_number', 'code']),
+      ..._.omit(formData.location_data, 'use_default'),
+      inherit_location: !formData.location_data.use_default,
+      // TODO: references
+    });
+    console.debug('Response', resp);
+  };
+
+  console.debug(contrib, loading, personLinkFieldParams);
+
+  if (loading) {
+    return (
+      <Dimmer active>
+        <Loader />
+      </Dimmer>
+    );
+  }
+
+  return (
+    <FinalModalForm
+      id="contribution-form"
+      header={Translate.string("Edit contribution '{title}'", {title: contrib.title})}
+      onSubmit={handleSubmit}
+      onClose={onClose}
+      initialValues={{
+        person_links: camelizeKeys(contrib.persons),
+        location_data: {
+          use_default: contrib.inherit_location,
+          ..._.pick(contrib, ['venue_name', 'venue_id', 'room_name', 'room_id', 'address']),
+        },
+        references: [], // WHERE DOES THIS COME FROM ???
+        ..._.pick(contrib, ['title', 'description', 'keywords', 'board_number', 'code']),
+      }}
+      size="small"
+    >
+      <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
+      <FinalTextArea name="description" label={Translate.string('Description')} />
+      <FinalContributionPersonLinkField
+        name="person_links"
+        label={Translate.string('Conveners')}
+        eventId={eventId}
+        sessionUser={Indico.User}
+        autoSort={autoSort}
+        setAutoSort={setAutoSort}
+        {...personLinkFieldParams}
+      />
+      <FinalLocationField
+        name="location_data"
+        label={Translate.string('Location')}
+        parent={{title: eventTitle, type: Translate.string('Event')}}
+      />
+      <FinalTagList
+        name="keywords"
+        label={Translate.string('Keywords')}
+        placeholder={Translate.string('Please enter a keyword')}
+      />
+      <CollapsibleContainer title={Translate.string('Advanced')} dividing>
+        CUSTOM FIELDS HERE!
+        {referenceTypes.length > 0 && (
+          <FinalReferences
+            name="references"
+            label={Translate.string('External IDs')}
+            description={Translate.string('Manage external resources for this contribution')}
+            referenceTypes={referenceTypes}
+          />
+        )}
+        <Form.Group widths="equal">
+          <FinalInput name="board_number" label={Translate.string('Board number')} />
+          <FinalInput name="code" label={Translate.string('Program code')} />
+        </Form.Group>
+      </CollapsibleContainer>
+    </FinalModalForm>
+  );
+}
+
+ContributionForm.propTypes = {
+  eventId: PropTypes.number.isRequired,
+  contribId: PropTypes.number.isRequired,
+  eventTitle: PropTypes.string.isRequired,
+  personLinkFieldParams: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
+
+export function EditContributionButton({
+  eventId,
+  contribId,
+  eventTitle,
+  personLinkFieldParams,
+  triggerSelector,
+  ...rest
+}) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!triggerSelector) {
+      return;
+    }
+    const handler = () => setOpen(true);
+    const element = document.querySelector(triggerSelector);
+    element.addEventListener('click', handler);
+    return () => element.removeEventListener('click', handler);
+  }, [triggerSelector]);
 
   return (
     <>
-      <Button onClick={() => setModalOpen(true)}>Open Contribution Form</Button>
-      {modalOpen && (
-        <FinalModalForm
-          id="contribution-form"
-          header={Translate.string("Edit contribution '{contribution}'", {contribution: 'TODO'})}
-          onSubmit={() => {}}
-          onClose={() => setModalOpen(false)}
-          initialValues={{
-            person_links: [],
-            location_data: {use_default: true},
-            keywords: [],
-            references: [],
-          }}
-          size="small"
-        >
-          <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
-          <FinalTextArea name="description" label={Translate.string('Description')} />
-          <FinalPersonLinkField
-            name="person_links"
-            label={Translate.string('Conveners')}
-            eventId={event.id}
-            sessionUser={Indico.User}
-          />
-          <FinalLocationField
-            name="location_data"
-            label={Translate.string('Location')}
-            parent={{title: event.title, type: Translate.string('Event')}}
-          />
-          <FinalTagList
-            name="keywords"
-            label={Translate.string('Keywords')}
-            placeholder={Translate.string('Please enter a keyword')}
-          />
-          <CollapsibleContainer title={Translate.string('Advanced')} dividing>
-            CUSTOM FIELDS HERE!
-            {referenceTypes.length > 0 && (
-              <FinalReferences
-                name="references"
-                label={Translate.string('External IDs')}
-                description={Translate.string('Manage external resources for this contribution')}
-                referenceTypes={referenceTypes}
-              />
-            )}
-            <Form.Group widths="equal">
-              <FinalInput name="board_number" label={Translate.string('Board number')} />
-              <FinalInput name="code" label={Translate.string('Program code')} />
-            </Form.Group>
-          </CollapsibleContainer>
-        </FinalModalForm>
+      {!triggerSelector && (
+        <Button onClick={() => setOpen(true)} {...rest}>
+          <Translate>Edit contribution</Translate>
+        </Button>
+      )}
+      {open && (
+        <ContributionForm
+          eventId={eventId}
+          contribId={contribId}
+          eventTitle={eventTitle}
+          personLinkFieldParams={personLinkFieldParams}
+          onClose={() => setOpen(false)}
+        />
       )}
     </>
   );
 }
+
+EditContributionButton.propTypes = {
+  eventId: PropTypes.number.isRequired,
+  contribId: PropTypes.number.isRequired,
+  eventTitle: PropTypes.string.isRequired,
+  personLinkFieldParams: PropTypes.object.isRequired,
+  triggerSelector: PropTypes.string,
+};
+
+EditContributionButton.defaultProps = {
+  triggerSelector: null,
+};
