@@ -12,7 +12,7 @@ import React from 'react';
 import {Field} from 'react-final-form';
 import {Form, Input} from 'semantic-ui-react';
 
-import {SingleDatePicker} from 'indico/react/components';
+import {DatePicker} from 'indico/react/components';
 import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
@@ -23,6 +23,8 @@ export function DateInputComponent({
   id,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   required,
   dateFormat,
@@ -32,7 +34,7 @@ export function DateInputComponent({
   const timeValue = value.includes('T') ? value.split('T')[1] : '';
 
   const handleDateChange = newDate => {
-    const dateString = newDate ? newDate.toISOString().split('T')[0] : '';
+    const dateString = newDate || '';
     const timeString = timeFormat ? timeValue : '00:00:00';
     onChange(`${dateString}T${timeString}`);
   };
@@ -42,18 +44,16 @@ export function DateInputComponent({
   return (
     <Form.Group styleName="date-field">
       <Form.Field>
-        <SingleDatePicker
+        <DatePicker
           id={id}
           name="date"
           disabled={disabled}
           required={required}
-          date={toMoment(dateValue, 'YYYY-MM-DD', true)}
-          onDateChange={handleDateChange}
-          placeholder={dateFormat}
-          displayFormat={dateFormat}
-          isOutsideRange={() => false}
-          verticalSpacing={10}
-          enableOutsideDays
+          format={dateFormat}
+          value={dateValue}
+          onChange={handleDateChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
       </Form.Field>
       {timeFormat && (
@@ -82,6 +82,8 @@ DateInputComponent.propTypes = {
   id: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   required: PropTypes.bool.isRequired,
   dateFormat: PropTypes.oneOf([

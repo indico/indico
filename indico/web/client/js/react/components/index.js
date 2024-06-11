@@ -20,6 +20,7 @@ export {default as Modal} from './Modal';
 export {default as Paginator} from './Paginator';
 export {default as TooltipIfTruncated} from './TooltipIfTruncated';
 export {default as SingleDatePicker, FinalSingleDatePicker} from './dates/SingleDatePicker';
+export {default as DatePicker} from './DatePicker';
 export {default as DateRangePicker} from './dates/DateRangePicker';
 export {default as CalendarSingleDatePicker} from './dates/CalendarSingleDatePicker';
 export {default as CalendarRangeDatePicker} from './dates/CalendarRangeDatePicker';
