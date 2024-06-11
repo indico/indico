@@ -136,14 +136,11 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
         EditingReviewAction.accept: RevisionType.acceptance,
         EditingReviewAction.reject: RevisionType.rejection,
         EditingReviewAction.update: RevisionType.needs_submitter_confirmation,
-        EditingReviewAction.update_accept: RevisionType.needs_submitter_confirmation,
         EditingReviewAction.request_update: RevisionType.needs_submitter_changes,
     }[action]
 
     db.session.flush()
     new_revision = None
-    if action == EditingReviewAction.accept:
-        _ensure_publishable_files(revision)
     old_state = revision.editable.state
     new_revision = EditingRevision(user=editor,
                                    type=revision_type,
@@ -151,21 +148,12 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                    comment=comment,
                                    tags=set(tags))
     revision.editable.revisions.append(new_revision)
-    if action in (EditingReviewAction.update, EditingReviewAction.update_accept):
+    if action in (EditingReviewAction.update, EditingReviewAction.accept):
         _ensure_publishable_files(new_revision)
     submitters = revision.editable.contribution.get_manager_list(include_groups=False, permission='submit',
                                                                  explicit=True)
-    if action == EditingReviewAction.update_accept:
-        update_revision = new_revision
-        new_revision = EditingRevision(user=editor,
-                                       type=RevisionType.acceptance,
-                                       tags=set(tags))
-        revision.editable.revisions.append(new_revision)
-        db.session.flush()
-        notify_editor_judgment(update_revision, submitters, action)
-    else:
-        db.session.flush()
-        notify_editor_judgment(new_revision, submitters, action)
+    db.session.flush()
+    notify_editor_judgment(new_revision, submitters, action)
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
     _log_review(revision.editable, LogKind.positive, f'Revision for {revision.editable.log_title} reviewed',
                 old_state=old_state)

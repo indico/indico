@@ -57,57 +57,34 @@ function getPreviousRevisionWithFiles(revisions, index) {
     .find(revision => !revision.isUndone && revision.files?.length);
 }
 
-function getRevisedRevision(revisions, revision) {
-  return revisions
-    .slice(0, revisions.indexOf(revision))
-    .reverse()
-    .find(r => !r.isUndone || revision.isUndone);
-}
-
 export const revisionStates = {
-  [RevisionType.needs_submitter_confirmation]: {
-    any: revision =>
-      Translate.string('{editorName} (editor) has made some changes to the paper', {
-        editorName: revision.user.fullName,
-      }),
-  },
-  [RevisionType.changes_acceptance]: {
-    any: Translate.string('Submitter has accepted proposed changes'),
-  },
-  [RevisionType.changes_rejection]: {
-    any: Translate.string('Submitter has rejected proposed changes'),
-  },
-  [RevisionType.needs_submitter_changes]: {
-    any: Translate.string('Submitter has been asked to make some changes'),
-  },
-  [RevisionType.acceptance]: {
-    [RevisionType.needs_submitter_confirmation]: revision =>
-      Translate.string('{editorName} (editor) has accepted after making some changes', {
-        editorName: revision.user.fullName,
-      }),
-    any: revision =>
-      Translate.string('{editorName} (editor) has accepted this revision', {
-        editorName: revision.user.fullName,
-      }),
-  },
-  [RevisionType.rejection]: {
-    any: revision =>
-      Translate.string('{editorName} (editor) has rejected this revision', {
-        editorName: revision.user.fullName,
-      }),
-  },
-  [RevisionType.replacement]: {
-    any: Translate.string('Revision has been replaced'),
-  },
-  [RevisionType.reset]: {
-    any: Translate.string("This editable's state has been reset"),
-  },
+  [RevisionType.needs_submitter_confirmation]: revision =>
+    Translate.string('{editorName} (editor) has made some changes to the paper', {
+      editorName: revision.user.fullName,
+    }),
+  [RevisionType.changes_acceptance]: Translate.string('Submitter has accepted proposed changes'),
+  [RevisionType.changes_rejection]: Translate.string('Submitter has rejected proposed changes'),
+  [RevisionType.needs_submitter_changes]: Translate.string(
+    'Submitter has been asked to make some changes'
+  ),
+  [RevisionType.acceptance]: revision =>
+    revision.files.length
+      ? Translate.string('{editorName} (editor) has accepted after making some changes', {
+          editorName: revision.user.fullName,
+        })
+      : Translate.string('{editorName} (editor) has accepted this revision', {
+          editorName: revision.user.fullName,
+        }),
+  [RevisionType.rejection]: revision =>
+    Translate.string('{editorName} (editor) has rejected this revision', {
+      editorName: revision.user.fullName,
+    }),
+  [RevisionType.replacement]: Translate.string('Revision has been replaced'),
+  [RevisionType.reset]: Translate.string("This editable's state has been reset"),
 };
 
 function getRevisionHeader(revisions, revision) {
-  const revisedRevisionType = getRevisedRevision(revisions, revision)?.type.name;
-  const headerStates = revisionStates[revision.type.name];
-  const header = headerStates?.[revisedRevisionType] || headerStates?.any;
+  const header = revisionStates[revision.type.name];
   return typeof header === 'function' ? header(revision) : header;
 }
 

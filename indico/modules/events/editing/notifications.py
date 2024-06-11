@@ -66,7 +66,8 @@ def notify_editor_judgment(revision, submitters, action):
                                       recipient_name=submitter.first_name,
                                       contribution=editable.contribution,
                                       action=action.value,
-                                      text=revision.comment)
+                                      text=revision.comment,
+                                      has_files=bool(revision.files))
             email = make_email(submitter.email, template=tpl)
         send_email(email, editable.event, 'Editing', log_metadata={'editable_id': editable.id})
 

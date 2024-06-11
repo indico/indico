@@ -36,17 +36,15 @@
 .file-manager {
   display: flex;
   flex-wrap: wrap;
-  margin-left: -0.9em;
+  gap: 0.9em;
 
   .file-type {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1em;
     border: 1px solid $gray;
     border-radius: 3px;
     padding: 1em;
     width: 31%;
-    margin-left: 0.9em;
 
     .file-requirements {
       font-style: italic;

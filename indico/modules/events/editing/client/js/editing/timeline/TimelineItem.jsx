@@ -140,7 +140,7 @@ export default function TimelineItem({block, index}) {
       </div>
       {visible && (!!block.items.length || isLastBlock || isLastValidBlock) && (
         <RevisionLog items={block.items} separator={isLastBlock}>
-          {isLastValidBlock && canComment && <ReviewForm block={block} />}
+          {isLastValidBlock && canComment && <ReviewForm />}
         </RevisionLog>
       )}
     </>
