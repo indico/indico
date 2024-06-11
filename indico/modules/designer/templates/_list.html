@@ -28,7 +28,10 @@
            data-href="{{ url_for('event_registration.' + endpoint, regform, template_id=tpl.id) }}"
            data-title="{{ print_title }}"
            data-method="POST"
-           data-ajax-dialog>
+           data-ajax-dialog
+           {% for attrs in template_hook('badge-form-button-extra-params', as_list=true, tpl=tpl, regform=regform) %}
+               {{ attrs | html_params }}
+           {% endfor %}>
         </a>
     {% else %}
         {% if no_registrations %}
@@ -42,7 +45,10 @@
                data-ajax-dialog
                {% if no_registrations %}
                    title="{{ no_registrations_msg }}"
-               {% endif %}>
+               {% endif %}
+               {% for attrs in template_hook('badge-form-button-extra-params', as_list=true, tpl=tpl, regform=regform) %}
+                   {{ attrs | html_params }}
+               {% endfor %}>
                 {{ text }}
             </a>
         {% endif %}
@@ -81,7 +87,7 @@
                         style="padding-left: 0.2em;"
                         {% if unlinkable %}
                             title="{% trans %}Unlink registration form{% endtrans %}"
-                            data-href="{{ url_for('.unlink_regform', tpl) }}"
+                            data-href="{{ url_for('designer.unlink_regform', tpl) }}"
                             data-method="POST"
                             data-update="#template-list"
                         {% else %}
@@ -108,53 +114,57 @@
                             {% endfor %}
                         </ul>
                     {% endif %}
-                    {% if not event and tpl.type.name == 'badge' and tpl.is_ticket %}
-                        {% set inherited_default = default_ticket == tpl and tpl.category != target and
-                                not target.default_ticket_template %}
-                        {% set global_default = default_ticket == tpl and target.is_root %}
-                        <button class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
-                                {{ 'default-on-category' if default_ticket == tpl }}
-                                {{ 'inherited' if inherited_default }}
-                                {{ 'global-default' if global_default }}"
-                                {% if inherited_default %}
-                                    title="{% trans %}This is the inherited default ticket template{% endtrans %}"
-                                {% elif global_default %}
-                                    title="{% trans %}This is the global default ticket template{% endtrans %}"
-                                {% else %}
-                                    title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
-                                    data-href="{{ url_for('.toggle_category_default_ticket', target, template_id=tpl.id) }}"
-                                    data-method="POST"
-                                    data-update="#template-list"
-                                {% endif %}>
-                        </button>
-                    {% endif %}
-                    {% if not event and tpl.type.name == 'badge' and not tpl.is_ticket %}
-                        {% set inherited_default = default_badge == tpl and tpl.category != target and
-                                not target.default_badge_template %}
-                        {% set global_default = default_badge == tpl and target.is_root %}
-                        <button class="i-button icon-tag icon-only borderless hide-if-locked toggle-default
-                                {{ 'default-on-category' if default_badge == tpl }}
-                                {{ 'inherited' if inherited_default }}
-                                {{ 'global-default' if global_default }}"
-                                {% if inherited_default %}
-                                    title="{% trans %}This is the inherited default badge template{% endtrans %}"
-                                {% elif global_default %}
-                                    title="{% trans %}This is the global default badge template{% endtrans %}"
-                                {% else %}
-                                    title="{% trans %}Toggle default badge template for this category{% endtrans %}"
-                                    data-href="{{ url_for('.toggle_category_default_badge', target, template_id=tpl.id) }}"
-                                    data-method="POST"
-                                    data-update="#template-list"
-                                {% endif %}>
-                        </button>
-                    {% endif %}
+                    {% block designer_tpl_ticket_action scoped %}
+                        {% if not event and tpl.type.name == 'badge' and tpl.is_ticket %}
+                            {% set inherited_default = default_ticket == tpl and tpl.category != target and
+                                    not target.default_ticket_template %}
+                            {% set global_default = default_ticket == tpl and target.is_root %}
+                            <button class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
+                                    {{ 'default-on-category' if default_ticket == tpl }}
+                                    {{ 'inherited' if inherited_default }}
+                                    {{ 'global-default' if global_default }}"
+                                    {% if inherited_default %}
+                                        title="{% trans %}This is the inherited default ticket template{% endtrans %}"
+                                    {% elif global_default %}
+                                        title="{% trans %}This is the global default ticket template{% endtrans %}"
+                                    {% else %}
+                                        title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
+                                        data-href="{{ url_for('designer.toggle_category_default_ticket', target, template_id=tpl.id) }}"
+                                        data-method="POST"
+                                        data-update="#template-list"
+                                    {% endif %}>
+                            </button>
+                        {% endif %}
+                    {% endblock %}
+                    {% block designer_tpl_badge_action scoped %}
+                        {% if not event and tpl.type.name == 'badge' and not tpl.is_ticket %}
+                            {% set inherited_default = default_badge == tpl and tpl.category != target and
+                                    not target.default_badge_template %}
+                            {% set global_default = default_badge == tpl and target.is_root %}
+                            <button class="i-button icon-tag icon-only borderless hide-if-locked toggle-default
+                                    {{ 'default-on-category' if default_badge == tpl }}
+                                    {{ 'inherited' if inherited_default }}
+                                    {{ 'global-default' if global_default }}"
+                                    {% if inherited_default %}
+                                        title="{% trans %}This is the inherited default badge template{% endtrans %}"
+                                    {% elif global_default %}
+                                        title="{% trans %}This is the global default badge template{% endtrans %}"
+                                    {% else %}
+                                        title="{% trans %}Toggle default badge template for this category{% endtrans %}"
+                                        data-href="{{ url_for('designer.toggle_category_default_badge', target, template_id=tpl.id) }}"
+                                        data-method="POST"
+                                        data-update="#template-list"
+                                    {% endif %}>
+                            </button>
+                        {% endif %}
+                    {% endblock %}
                     {% set clonable = tpl.is_clonable or (not event and tpl.owner == target) %}
                     <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
                         {{ 'not-clonable' if not clonable }}"
                         {% if not clonable %}
                             title="{% trans %}This template cannot be cloned{% endtrans %}">
                         {% else %}
-                            data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
+                            data-href="{{ url_for('designer.clone_template', target, template_id=tpl.id) }}"
                             title="{% trans %}Clone this template{% endtrans %}"
                             data-update="#template-list"
                             {% if event %}
@@ -168,7 +178,7 @@
                     </button>
                     {% if not inherited %}
                         <a class="i-button icon-edit icon-only text-color borderless hide-if-locked"
-                           href="{{ url_for('.edit_template', tpl) }}"
+                           href="{{ url_for('designer.edit_template', tpl) }}"
                            title="{% trans %}Edit template{% endtrans %}"></a>
                     {% endif %}
                     {% if not inherited %}
@@ -182,7 +192,7 @@
                                     {% endif %}
                                 {% else %}
                                     title="{% trans %}Delete template{% endtrans %}"
-                                    data-href="{{ url_for('.delete_template', tpl) }}"
+                                    data-href="{{ url_for('designer.delete_template', tpl) }}"
                                     data-method="DELETE"
                                     data-update="#template-list"
                                     data-confirm="{% trans title=tpl.title -%}
@@ -201,31 +211,33 @@
                                 data-ajax-dialog>
                         </button>
                     {% elif event %}
-                        {% set single_form = event.registration_forms|first if event.registration_forms|length == 1
-                                             else tpl.registration_form %}
-                        {% if single_form %}
-                            {{ _render_badge_form_button(single_form, tpl, format='icon') }}
-                        {% else %}
-                            {% set print_title -%}
-                                {%- if tpl.is_ticket -%}
-                                    {% trans %}Print tickets{% endtrans %}
-                                {%- else -%}
-                                    {% trans %}Print badges{% endtrans %}
-                                {%- endif -%}
-                            {%- endset %}
-                            <button class="i-button icon-printer icon-only highlight text-color js-dropdown borderless
-                                                    {{ 'disabled' if not event.registration_forms }}"
-                                    title="{{ print_title if event.registration_forms
-                                                else _('There are no registration forms in this event') }}"
-                                    data-toggle="dropdown"></button>
-                            <ul class="i-dropdown">
-                                {% for regform in event.registration_forms %}
-                                    <li>
-                                        {{ _render_badge_form_button(regform, tpl, format='text', text=regform.title) }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
+                        {% block print_action scoped %}
+                            {% set single_form = event.registration_forms|first if event.registration_forms|length == 1
+                                                else tpl.registration_form %}
+                            {% if single_form %}
+                                {{ _render_badge_form_button(single_form, tpl, format='icon') }}
+                            {% else %}
+                                {% set print_title -%}
+                                    {%- if tpl.is_ticket -%}
+                                        {% trans %}Print tickets{% endtrans %}
+                                    {%- else -%}
+                                        {% trans %}Print badges{% endtrans %}
+                                    {%- endif -%}
+                                {%- endset %}
+                                <button class="i-button icon-printer icon-only highlight text-color js-dropdown borderless
+                                                        {{ 'disabled' if not event.registration_forms }}"
+                                        title="{{ print_title if event.registration_forms
+                                                    else _('There are no registration forms in this event') }}"
+                                        data-toggle="dropdown"></button>
+                                <ul class="i-dropdown">
+                                    {% for regform in event.registration_forms %}
+                                        <li>
+                                            {{ _render_badge_form_button(regform, tpl, format='text', text=regform.title) }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endblock %}
                     {% endif %}
                 </div>
             </div>
@@ -254,7 +266,7 @@
         <div class="flexrow f-a-center f-j-space-between">
             <h3>{% trans %}Custom templates{% endtrans %}</h3>
             <button class="i-button highlight icon-plus hide-if-locked"
-                    data-href="{{ url_for('.add_template', target) }}"
+                    data-href="{{ url_for('designer.add_template', target) }}"
                     data-title="{% trans %}Add a new blank designer template{% endtrans %}"
                     data-update="#template-list"
                     data-ajax-dialog>
