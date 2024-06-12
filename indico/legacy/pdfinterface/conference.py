@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# ruff: noqa: PGH004
 # flake8: noqa
 
 import re

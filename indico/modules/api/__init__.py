@@ -17,9 +17,6 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('settings',)
-
-
 class APIMode(IndicoIntEnum):
     KEY = 0  # public requests without API key, authenticated requests with api key
     ONLYKEY = 1  # all requests require an API key

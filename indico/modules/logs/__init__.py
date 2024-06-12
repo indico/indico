@@ -16,7 +16,7 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('CategoryLogEntry', 'EventLogEntry', 'LogKind', 'CategoryLogRealm', 'EventLogRealm')
+__all__ = ('CategoryLogEntry', 'EventLogEntry', 'LogKind', 'EventLogRealm')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
