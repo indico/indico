@@ -174,10 +174,14 @@ export default function LocationField({value, onChange, disabled, required, edit
           />
           <Popup
             trigger={<Icon color="grey" name="info circle" />}
-            content={Translate.string("Using default location from '{title}' ({type})", {
-              title: parent.title,
-              type: parent.type,
-            })}
+            content={
+              value.use_default
+                ? Translate.string("Using default location from '{title}' ({type})", {
+                    title: parent.title,
+                    type: parent.type,
+                  })
+                : Translate.string('Using custom location')
+            }
           />
         </Form.Group>
       )}
