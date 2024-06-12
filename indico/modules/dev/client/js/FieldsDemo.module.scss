@@ -9,30 +9,21 @@
 @use 'base/borders' as *;
 @use 'base/typography' as *;
 
-.actions {
-  position: absolute;
-  top: -1.5em;
-  right: 0;
-}
-
 .extra-options-field {
   @include font-family-monospace();
 }
 
-:global(.ui.form .fields).form-actions {
-  margin: 0 1em;
+.form-actions {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 1em;
 }
 
-pre {
+pre.submitted-value {
   @include default-border-radius();
   font-style: normal;
   font-size: 0.9em;
   border: 1px solid $pastel-gray;
   background: $light-gray;
   padding: 1em;
-}
-
-// fix for SUI issues
-:global(.ui.styled.accordion .content .ui.list .item .content) {
-  padding: 0;
 }
