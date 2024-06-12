@@ -93,7 +93,17 @@ const getFields = () => {
       component: FinalLocationField,
       initialValue: {},
       editAddress: true,
-      parent: {title: 'A Conference', type: 'Event'},
+      parent: {
+        title: 'A Conference test',
+        type: 'Event',
+        location_data: {
+          venue_id: 1,
+          venue_name: 'CERN',
+          room_id: 1,
+          room_name: 'Main Auditorium',
+          address: 'Geneva, Switzerland',
+        },
+      },
     },
     {title: 'Session color picker', component: FinalSessionColorPicker, initialValue: {}},
     {
