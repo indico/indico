@@ -57,10 +57,16 @@ Bugfixes
 - Fix UI breaking when performing bulk actions via the list of editables (:pr:`6369`)
 - Include registration documents in user data export (:issue:`6331`, :pr:`6338`)
 
+Accessibility
+^^^^^^^^^^^^^
+
+- Improve registration form date picker accessibility (:pr:`6371`, thanks :user:`foxbunny`)
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Use unguessable URLs for user avatar pictures (:pr:`6346`, thanks :user:`vtran99`)
+- Add ``<ind-date-picker>`` custom element (:pr:`6371`, thanks :user:`foxbunny`)
 
 
 Version 3.3.2
@@ -302,7 +308,6 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
-- Improve registration form date picker accessibility (:pr:`6371`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -329,7 +334,6 @@ Internal Changes
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
 - Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
-- Add ``<ind-date-picker>`` custom element (:pr:`6371`, thanks :user:`foxbunny`)
 
 
 ----
