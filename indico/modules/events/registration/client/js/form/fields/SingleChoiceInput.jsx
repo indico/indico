@@ -32,6 +32,8 @@ function SingleChoiceDropdown({
   existingValue,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   isRequired,
   isPurged,
@@ -117,6 +119,8 @@ function SingleChoiceDropdown({
           options={options}
           value={(!isPurged && selectedChoice.caption) || ''}
           required={isRequired}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
       </Form.Field>
       {extraSlotsDropdown}
@@ -138,6 +142,8 @@ SingleChoiceDropdown.propTypes = {
   id: PropTypes.string.isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
   isPurged: PropTypes.bool.isRequired,
@@ -294,6 +300,8 @@ function SingleChoiceInputComponent({
   existingValue,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   isRequired,
   isPurged,
@@ -310,6 +318,8 @@ function SingleChoiceInputComponent({
         value={value}
         existingValue={existingValue}
         onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
         disabled={disabled}
         isRequired={isRequired}
         isPurged={isPurged}
