@@ -78,7 +78,7 @@ function Item({
           </td>
         );
       })}
-      <td style={{textAlign: 'end'}}>
+      <td>
         {canRemove && (
           <a
             className="icon-remove remove-row"
@@ -208,7 +208,7 @@ export default function ItemListField({
               {title}
             </th>
           ))}
-          <th style={{width: '3.7em'}} />
+          <th />
         </tr>
       </thead>
       <tbody>
