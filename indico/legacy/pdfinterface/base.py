@@ -18,7 +18,7 @@ from PIL import Image as PILImage
 from reportlab import platypus
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.fonts import addMapping
-from reportlab.lib.pagesizes import A0, A1, A2, A3, A4, A5, A6, LETTER, landscape
+from reportlab.lib.pagesizes import A3, A4, A5, A6, LETTER, landscape
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm, inch
 from reportlab.pdfbase import pdfmetrics
@@ -232,18 +232,6 @@ class Spacer(platypus.Spacer):
         return self._part
 
 
-class Image(platypus.Image):
-    def __init__(self, filename, part='', width=None, height=None, kind='direct', mask='auto', lazy=1):
-        platypus.Image.__init__(self, filename, width=None, height=None, kind='direct', mask='auto', lazy=1)
-        self._part = part
-
-    def setPart(self, part):
-        self._part = part
-
-    def getPart(self):
-        return self._part
-
-
 class PageBreak(platypus.PageBreak):
     def __init__(self, part=''):
         platypus.PageBreak.__init__(self)
@@ -256,106 +244,8 @@ class PageBreak(platypus.PageBreak):
         return self._part
 
 
-class Preformatted(platypus.Preformatted):
-    def __init__(self, text, style, part='', bulletText=None, dedent=0):
-        platypus.Preformatted.__init__(self, text, style, bulletText=None, dedent=0)
-        self._part = part
-
-    def setPart(self, part):
-        self._part = part
-
-    def getPart(self):
-        return self._part
-
-
-class CanvasA0(Canvas):
-    def __init__(self, filename,
-                 pagesize=None,
-                 bottomup=1,
-                 pageCompression=None,
-                 encoding=None,
-                 invariant=None,
-                 verbosity=0):
-
-        Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
-                        encoding=encoding, invariant=invariant, verbosity=verbosity)
-        self.scale(4.0, 4.0)
-        self.setPageSize(A0)
-
-
-class CanvasA1(Canvas):
-    def __init__(self, filename,
-                 pagesize=None,
-                 bottomup=1,
-                 pageCompression=None,
-                 encoding=None,
-                 invariant=None,
-                 verbosity=0):
-
-        Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
-                        encoding=encoding, invariant=invariant, verbosity=verbosity)
-        self.scale(2.0 * math.sqrt(2.0), 2.0 * math.sqrt(2.0))
-        self.setPageSize(A1)
-
-
-class CanvasA2(Canvas):
-    def __init__(self, filename,
-                 pagesize=None,
-                 bottomup=1,
-                 pageCompression=None,
-                 encoding=None,
-                 invariant=None,
-                 verbosity=0):
-
-        Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
-                        encoding=encoding, invariant=invariant, verbosity=verbosity)
-        self.scale(2.0, 2.0)
-        self.setPageSize(A2)
-
-
-class CanvasA3(Canvas):
-    def __init__(self, filename,
-                 pagesize=None,
-                 bottomup=1,
-                 pageCompression=None,
-                 encoding=None,
-                 invariant=None,
-                 verbosity=0):
-
-        Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
-                        encoding=encoding, invariant=invariant, verbosity=verbosity)
-        self.scale(math.sqrt(2.0), math.sqrt(2.0))
-        self.setPageSize(A3)
-
-
-class CanvasA5(Canvas):
-    def __init__(self, filename,
-                 pagesize=None,
-                 bottomup=1,
-                 pageCompression=None,
-                 encoding=None,
-                 invariant=None,
-                 verbosity=0):
-
-        Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
-                        encoding=encoding, invariant=invariant, verbosity=verbosity)
-        self.scale(1.0 / math.sqrt(2.0), 1.0 / math.sqrt(2.0))
-        self.setPageSize(A5)
-
-
-pagesizeNameToCanvas = {'A4': Canvas,  # noqa: N816
-                        'A0': CanvasA0,
-                        'A1': CanvasA1,
-                        'A2': CanvasA2,
-                        'A3': CanvasA3,
-                        'A5': CanvasA5,
-                        'Letter': Canvas}
-
-
 class PDFBase:
-
     def __init__(self, doc=None, story=None, pagesize='A4', printLandscape=False, title=None):
-
         if doc:
             self._doc = doc
         else:

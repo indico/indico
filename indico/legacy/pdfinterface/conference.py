@@ -62,7 +62,6 @@ def _get_sans_style_sheet():
 
 
 class ProgrammeToPDF(PDFBase):
-
     def __init__(self, event, tz=None):
         self.event = event
         self._tz = self.event.tzinfo
@@ -143,7 +142,6 @@ class ProgrammeToPDF(PDFBase):
 
 
 class TimetablePDFFormat:
-
     def __init__(self, params=None):
         if params is None:
             self.contribId = True
