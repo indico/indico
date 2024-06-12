@@ -168,7 +168,11 @@ export default function LocationField({value, onChange, disabled, required, edit
             label={Translate.string('Use default')}
             checked={value.use_default}
             onChange={(_, {checked}) =>
-              onChange(checked ? {use_default: true} : {...value, use_default: false})
+              onChange(
+                checked
+                  ? {...(parent.location_data || {}), use_default: true}
+                  : {...value, use_default: false}
+              )
             }
             disabled={disabled}
           />
@@ -205,6 +209,13 @@ LocationField.propTypes = {
   parent: PropTypes.shape({
     title: PropTypes.string,
     type: PropTypes.string,
+    location_data: PropTypes.shape({
+      venue_id: PropTypes.number,
+      venue_name: PropTypes.string,
+      room_id: PropTypes.number,
+      room_name: PropTypes.string,
+      address: PropTypes.string,
+    }),
   }),
 };
 
