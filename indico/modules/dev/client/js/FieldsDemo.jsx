@@ -9,17 +9,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm, FormSpy} from 'react-final-form';
-import {
-  Accordion,
-  Button,
-  Form,
-  Header,
-  Icon,
-  Message,
-  Rail,
-  Segment,
-  Table,
-} from 'semantic-ui-react';
+import {Accordion, Button, Form, Header, Message, Segment, Table} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 
@@ -27,9 +17,11 @@ import getFields from './fields';
 
 import './FieldsDemo.module.scss';
 
+function prettyPrintJson(obj) {
+  return JSON.stringify(obj, null, 2);
+}
+
 function FieldDemo({title, component: Component, initialValue, placeholder, ...extraOptions}) {
-  const [showOptions, setShowOptions] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
   const [output, setOutput] = useState(null);
   return (
     <FinalForm
@@ -39,68 +31,26 @@ function FieldDemo({title, component: Component, initialValue, placeholder, ...e
         field: initialValue,
         label: 'Field',
         placeholder,
-        options: JSON.stringify(extraOptions, null, 2),
+        options: prettyPrintJson(extraOptions),
       }}
       subscription={{
-        validating: true,
-        hasValidationErrors: true,
         pristine: true,
         submitSucceeded: true,
+        validating: true,
+        hasValidationErrors: true,
+        errors: true,
       }}
     >
-      {({handleSubmit, form, validating, hasValidationErrors, pristine, submitSucceeded}) => (
+      {({
+        handleSubmit,
+        form,
+        pristine,
+        submitSucceeded,
+        validating,
+        hasValidationErrors,
+        errors,
+      }) => (
         <Form onSubmit={handleSubmit}>
-          {showOptions && (
-            <Rail position="left" attached>
-              <Segment>
-                <Header as="h4" dividing>
-                  Field options
-                </Header>
-                <FinalInput name="label" label="Label" />
-                <FinalTextArea name="description" label="Description" />
-                {placeholder && <FinalInput name="placeholder" label="Placeholder" />}
-                <FinalCheckbox name="disabled" label="Disabled" />
-                <FinalCheckbox name="required" label="Required" />
-                {Object.keys(extraOptions).length > 0 && (
-                  <FinalTextArea
-                    name="options"
-                    styleName="extra-options-field"
-                    label="Other options"
-                    nullIfEmpty
-                  />
-                )}
-              </Segment>
-            </Rail>
-          )}
-          {showInfo && (
-            <Rail position="right" attached>
-              <Segment>
-                <Header as="h4" dividing>
-                  Form info
-                </Header>
-                <Table definition>
-                  <Table.Body>
-                    <Table.Row>
-                      <Table.Cell>Validating</Table.Cell>
-                      <Table.Cell>{String(validating)}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row negative={hasValidationErrors}>
-                      <Table.Cell>Has validation errors</Table.Cell>
-                      <Table.Cell>{String(hasValidationErrors)}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                      <Table.Cell>Pristine</Table.Cell>
-                      <Table.Cell>{String(pristine)}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row positive={submitSucceeded}>
-                      <Table.Cell>Submit succeeded</Table.Cell>
-                      <Table.Cell>{String(submitSucceeded)}</Table.Cell>
-                    </Table.Row>
-                  </Table.Body>
-                </Table>
-              </Segment>
-            </Rail>
-          )}
           <FormSpy subscription={{values: true}}>
             {({
               values: {
@@ -113,19 +63,7 @@ function FieldDemo({title, component: Component, initialValue, placeholder, ...e
               },
             }) => {
               try {
-                return (
-                  <Segment raised>
-                    <Component
-                      name="field"
-                      label={label}
-                      description={description}
-                      disabled={disabled}
-                      required={required}
-                      placeholder={placeholderValue}
-                      {...JSON.parse(options)}
-                    />
-                  </Segment>
-                );
+                options = JSON.parse(options);
               } catch {
                 return (
                   <Message
@@ -137,36 +75,44 @@ function FieldDemo({title, component: Component, initialValue, placeholder, ...e
                   />
                 );
               }
+              return (
+                <Segment raised>
+                  <Component
+                    name="field"
+                    label={label}
+                    description={description}
+                    disabled={disabled}
+                    required={required}
+                    placeholder={placeholderValue}
+                    {...options}
+                  />
+                </Segment>
+              );
             }}
           </FormSpy>
-          <Form.Group styleName="form-actions">
+          <FieldControls
+            {...{
+              pristine,
+              validating,
+              hasValidationErrors,
+              submitSucceeded,
+              errors,
+              placeholder,
+              extraOptions,
+            }}
+          />
+          <div styleName="form-actions">
             <Button type="button" onClick={() => form.reset()} disabled={pristine}>
               Clear
             </Button>
             <FinalSubmitButton label="Submit" disabledUntilChange={false} />
-          </Form.Group>
-          <div styleName="actions">
-            <Icon
-              name="setting"
-              title="Show field options"
-              color="blue"
-              onClick={() => setShowOptions(!showOptions)}
-              link
-            />
-            <Icon
-              name="info circle"
-              title="Show form info"
-              color="blue"
-              onClick={() => setShowInfo(!showInfo)}
-              link
-            />
           </div>
           {submitSucceeded && (
             <>
               <Header as="h4" dividing>
                 Output
               </Header>
-              <pre>{JSON.stringify(output, null, 2)}</pre>
+              <pre styleName="submitted-value">{prettyPrintJson(output)}</pre>
             </>
           )}
         </Form>
@@ -184,6 +130,95 @@ FieldDemo.propTypes = {
 
 FieldDemo.defaultProps = {
   initialValue: null,
+  placeholder: null,
+};
+
+function FieldControls({
+  pristine,
+  submitSucceeded,
+  validating,
+  hasValidationErrors,
+  errors,
+  placeholder,
+  extraOptions,
+}) {
+  const formInfo = (
+    <Table definition>
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell>Pristine</Table.Cell>
+          <Table.Cell>{String(pristine)}</Table.Cell>
+        </Table.Row>
+        <Table.Row positive={submitSucceeded}>
+          <Table.Cell>Submit succeeded</Table.Cell>
+          <Table.Cell>{String(submitSucceeded)}</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Validating</Table.Cell>
+          <Table.Cell>{String(validating)}</Table.Cell>
+        </Table.Row>
+        <Table.Row negative={hasValidationErrors}>
+          <Table.Cell>Has validation errors</Table.Cell>
+          <Table.Cell>{String(hasValidationErrors)}</Table.Cell>
+        </Table.Row>
+        <Table.Row negative={hasValidationErrors}>
+          <Table.Cell>Errors</Table.Cell>
+          <Table.Cell>{prettyPrintJson(errors)}</Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    </Table>
+  );
+
+  const rows = prettyPrintJson(extraOptions).split('\n').length;
+  const formOptions = (
+    <>
+      <Header as="h4" dividing>
+        Field options
+      </Header>
+      <Form.Group widths="equal">
+        <FinalInput name="label" label="Label" />
+        <FinalTextArea name="description" label="Description" rows={1} />
+      </Form.Group>
+      {placeholder && <FinalInput name="placeholder" label="Placeholder" />}
+      <FinalCheckbox name="disabled" label="Disabled" />
+      <FinalCheckbox name="required" label="Required" />
+      {Object.keys(extraOptions).length > 0 && (
+        <FinalTextArea
+          name="options"
+          styleName="extra-options-field"
+          label="Other options"
+          nullIfEmpty
+          rows={rows}
+          spellCheck="false"
+        />
+      )}
+    </>
+  );
+
+  return (
+    <Accordion
+      panels={[
+        {key: 'formInfo', title: 'Form state', content: {content: formInfo}},
+        {key: 'formOptions', title: 'Field options', content: {content: formOptions}},
+      ]}
+      exclusive={false}
+      styled
+      fluid
+    />
+  );
+}
+
+FieldControls.propTypes = {
+  pristine: PropTypes.bool.isRequired,
+  validating: PropTypes.bool.isRequired,
+  hasValidationErrors: PropTypes.bool.isRequired,
+  submitSucceeded: PropTypes.bool.isRequired,
+  errors: PropTypes.object.isRequired,
+  placeholder: PropTypes.string,
+  extraOptions: PropTypes.object.isRequired,
+};
+
+FieldControls.defaultProps = {
   placeholder: null,
 };
 
