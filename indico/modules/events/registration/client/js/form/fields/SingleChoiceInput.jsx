@@ -106,8 +106,8 @@ function SingleChoiceDropdown({
       onChange({});
       return;
     }
-    const selectedChoice = choices.find(c => c.caption === evt.target.value);
-    onChange(selectedChoice ? {[selectedChoice.id]: 1} : {'': -1});
+    const selected = choices.find(c => c.caption === evt.target.value);
+    onChange(selected ? {[selected.id]: 1} : {'': -1});
   };
 
   return (
