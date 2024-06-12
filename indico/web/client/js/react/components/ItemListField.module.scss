@@ -62,6 +62,14 @@
     padding: 4px 4px;
   }
 
+  // Auto-size last column
+  // https://stackoverflow.com/a/10853277
+  td:last-child,
+  th:last-child {
+    width: 1px;
+    white-space: nowrap;
+  }
+
   tr {
     &:hover td {
       background: $light-blue;
