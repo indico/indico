@@ -472,7 +472,6 @@ PersonLinkField.defaultProps = {
 };
 
 export function FinalPersonLinkField({name, ...rest}) {
-  // TODO make autosort work here
   return <FinalField name={name} component={PersonLinkField} {...rest} />;
 }
 
