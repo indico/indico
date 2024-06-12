@@ -119,6 +119,7 @@ function SingleChoiceDropdown({
           options={options}
           value={(!isPurged && selectedChoice.caption) || ''}
           required={isRequired}
+          disabled={disabled}
           onFocus={onFocus}
           onBlur={onBlur}
         />
