@@ -39,7 +39,7 @@ export default function Combobox({options, value, onChange, ...inputProps}) {
           );
         })}
       </ul>
-      <button type="button" value="clear">
+      <button type="button" value="clear" disabled={inputProps.disabled}>
         <Translate as="span">Clear the combobox</Translate>
       </button>
     </ind-combobox>
