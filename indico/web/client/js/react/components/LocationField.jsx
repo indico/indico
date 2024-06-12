@@ -106,6 +106,7 @@ export default function LocationField({value, onChange, disabled, required, edit
       {locationsEnabled || loading ? (
         <Form.Group widths="equal">
           <Form.Select
+            styleName="venue-dropdown"
             placeholder={Translate.string('Venue')}
             disabled={disabled || value.use_default}
             required={required && !value.use_default}
@@ -138,6 +139,7 @@ export default function LocationField({value, onChange, disabled, required, edit
       ) : (
         <Form.Group widths="equal">
           <Form.Input
+            styleName="venue-field"
             placeholder={Translate.string('Venue')}
             value={value.venue_name || ''}
             onChange={makeOnChange('venue_name')}
@@ -145,6 +147,7 @@ export default function LocationField({value, onChange, disabled, required, edit
             required={required}
           />
           <Form.Input
+            styleName="room-field"
             placeholder={Translate.string('Room')}
             value={value.room_name || ''}
             onChange={makeOnChange('room_name')}
