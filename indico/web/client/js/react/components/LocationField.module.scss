@@ -13,3 +13,15 @@
     background-color: transparent;
   }
 }
+
+.room-dropdown :global(.ui.disabled.search),
+.venue-dropdown :global(.ui.disabled.search) {
+  opacity: 1;
+}
+
+:global(.ui.form .disabled.field) {
+  &.venue-field,
+  &.room-field {
+    opacity: 1;
+  }
+}
