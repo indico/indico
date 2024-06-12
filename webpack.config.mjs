@@ -5,12 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {readFileSync} from 'fs';
 import path from 'path';
 
 // eslint-disable-next-line import/default
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import glob from 'glob';
-import {pdfjs} from 'react-pdf';
 import {minify} from 'uglify-js';
 import webpack from 'webpack';
 import {customizeArray, mergeWithCustomize} from 'webpack-merge';
@@ -20,8 +20,9 @@ import {
   webpackDefaults,
   indicoStaticLoader,
   generateAssetPath,
-} from './webpack';
-import config from './webpack-build-config';
+} from './webpack/base.mjs';
+
+const config = JSON.parse(readFileSync('./webpack-build-config.json'));
 
 let entryPoints = {
   jquery: ['./js/jquery/index.js'],
@@ -39,13 +40,15 @@ const modulesDir = path.join(config.build.rootPath, '..', 'node_modules');
 const extraResolveAliases = [
   {name: 'jquery', alias: path.resolve(modulesDir, 'jquery/src/jquery')},
 ];
+const pdfjsVersion = JSON.parse(readFileSync(path.join(modulesDir, 'pdfjs-dist', 'package.json')))
+  .version;
 
 // Add Module Bundles
 glob
   .sync(path.join(config.build.rootPath, 'modules/**/module.json'))
   .sort((a, b) => b.split('/').length - a.split('/').length)
   .forEach(file => {
-    const module = {produceBundle: true, partials: {}, ...require(file)};
+    const module = {produceBundle: true, partials: {}, ...JSON.parse(readFileSync(file))};
     // eslint-disable-next-line prefer-template
     const moduleName = 'module_' + (module.parent ? module.parent + '.' : '') + module.name;
     const dirName = path.join(path.dirname(file), 'client/js');
@@ -143,8 +146,8 @@ export default env => {
         patterns: [
           {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform},
           {
-            from: path.resolve(modulesDir, 'pdfjs-dist/build/pdf.worker.min.js'),
-            to: `js/pdf.worker-${pdfjs.version}.min.js`,
+            from: path.resolve(modulesDir, 'pdfjs-dist/build/pdf.worker.min.mjs'),
+            to: `js/pdf.worker-${pdfjsVersion}.min.js`,
           },
         ],
       }),
@@ -155,6 +158,11 @@ export default env => {
     ],
     resolve: {
       alias: extraResolveAliases,
+      // TODO remove after updating react:
+      fallback: {
+        'react/jsx-runtime': 'react/jsx-runtime.js',
+        'react/jsx-dev-runtime': 'react/jsx-dev-runtime.js',
+      },
     },
   });
 };

@@ -233,9 +233,9 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
         dump_plugin_args += ['--plugin', name]
     subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path,
                            *dump_plugin_args, *force_url_map])
-    webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
+    webpack_config_file = os.path.join(plugin_dir, 'webpack.config.mjs')
     if not os.path.exists(webpack_config_file):
-        webpack_config_file = 'plugin.webpack.config.js'
+        webpack_config_file = 'plugin.webpack.config.mjs'
     if os.path.exists(os.path.join(plugin_dir, 'package.json')):
         with _chdir(plugin_dir):
             try:

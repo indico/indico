@@ -5,19 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* eslint-disable import/no-commonjs, import/unambiguous, import/newline-after-import */
-/* global module:false */
+import {readFileSync} from 'node:fs';
+import path from 'path';
+import process from 'process';
 
-const path = require('path');
-const process = require('process');
+import glob from 'glob';
+import _ from 'lodash';
+import {mergeWithCustomize, customizeArray} from 'webpack-merge';
 
-const glob = require('glob');
-const _ = require('lodash');
-const {mergeWithCustomize, customizeArray} = require('webpack-merge');
-
-const config = require(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config'));
-const bundles = require(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-bundles'));
-const base = require(path.join(config.build.indicoSourcePath, 'webpack'));
+const config = JSON.parse(
+  readFileSync(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config.json'))
+);
+const bundles = JSON.parse(
+  readFileSync(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-bundles.json'))
+);
+const base = await import(path.join(config.build.indicoSourcePath, 'webpack/base.mjs'));
 
 const entry = bundles.entry || {};
 
@@ -28,7 +30,7 @@ if (!_.isEmpty(config.themes)) {
 
 function generateModuleAliases() {
   return glob.sync(path.join(config.indico.build.rootPath, 'modules/**/module.json')).map(file => {
-    const mod = {produceBundle: true, partials: {}, ...require(file)};
+    const mod = {produceBundle: true, partials: {}, ...JSON.parse(readFileSync(file))};
     const dirName = path.join(path.dirname(file), 'client/js');
     const modulePath = path.join('indico/modules', mod.parent || '', mod.name);
     return {
@@ -39,7 +41,7 @@ function generateModuleAliases() {
   });
 }
 
-module.exports = env => {
+export default env => {
   return mergeWithCustomize({
     customizeArray: customizeArray({
       'resolve.alias': 'prepend',

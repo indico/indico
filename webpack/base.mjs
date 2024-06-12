@@ -7,6 +7,7 @@
 
 import {createHash} from 'crypto';
 import fs from 'fs';
+import Module from 'node:module';
 import path from 'path';
 
 import autoprefixer from 'autoprefixer';
@@ -16,6 +17,8 @@ import postcssURL from 'postcss-url';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
+
+const require = Module.createRequire(import.meta.url);
 
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
   const indicoRelativePath = path.resolve(indicoClientPath, filePath);
