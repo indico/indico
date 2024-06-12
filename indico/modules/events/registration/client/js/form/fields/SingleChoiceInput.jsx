@@ -13,7 +13,7 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
 
-import Combobox from 'indico/react/components/Combobox';
+import {Combobox} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
