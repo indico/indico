@@ -5,14 +5,14 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-# ruff: noqa: PGH004
-# flake8: noqa
+# ruff: noqa: N802, N803, N806
+# flake8: noqa: N802, N803, N806
 
 import math
 import os
-import xml.sax.saxutils as saxutils
 from importlib.resources import as_file, files
 from io import BytesIO
+from xml.sax import saxutils  # noqa: S406
 
 from PIL import Image as PILImage
 from reportlab import platypus
@@ -85,56 +85,58 @@ def modifiedFontSize(fontsize, lowerNormalHigher):
     else:
         return fontsize
 
-alreadyRegistered = False
+
+already_registered = False
 
 
 def setTTFonts():
-    global alreadyRegistered
-    if not alreadyRegistered:
-        with as_file(files('indico_fonts')) as font_dir:
-            pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(font_dir, 'LiberationSerif-Regular.ttf')))
-            pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(font_dir, 'LiberationSerif-Bold.ttf')))
-            pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(font_dir, 'LiberationSerif-Italic.ttf')))
-            pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(font_dir, 'LiberationSerif-BoldItalic.ttf')))
-            addMapping('Times-Roman', 0, 0, 'Times-Roman')
-            addMapping('Times-Roman', 1, 0, 'Times-Bold')
-            addMapping('Times-Roman', 0, 1, 'Times-Italic')
-            addMapping('Times-Roman', 1, 1, 'Times-Bold-Italic')
-            pdfmetrics.registerFont(TTFont('Sans', os.path.join(font_dir, 'LiberationSans-Regular.ttf')))
-            pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(font_dir, 'LiberationSans-Bold.ttf')))
-            pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(font_dir, 'LiberationSans-Italic.ttf')))
-            pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(font_dir, 'LiberationSans-BoldItalic.ttf')))
-            addMapping('Sans', 0, 0, 'Sans')
-            addMapping('Sans', 1, 0, 'Sans-Bold')
-            addMapping('Sans', 0, 1, 'Sans-Italic')
-            addMapping('Sans', 1, 1, 'Sans-Bold-Italic')
-            pdfmetrics.registerFont(TTFont('Courier', os.path.join(font_dir, 'LiberationMono-Regular.ttf')))
-            pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(font_dir, 'LiberationMono-Bold.ttf')))
-            pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(font_dir, 'LiberationMono-Italic.ttf')))
-            pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(font_dir, 'LiberationMono-BoldItalic.ttf')))
-            addMapping('Courier', 0, 0, 'Courier')
-            addMapping('Courier', 1, 0, 'Courier-Bold')
-            addMapping('Courier', 0, 1, 'Courier-Italic')
-            addMapping('Courier', 1, 1, 'Courier-Bold-Italic')
-            pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(font_dir, 'LinLibertine_Rah.ttf')))
-            pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(font_dir, 'LinLibertine_RBah.ttf')))
-            pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(font_dir, 'LinLibertine_RIah.ttf')))
-            pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(font_dir, 'LinLibertine_RBIah.ttf')))
-            addMapping('LinuxLibertine', 0, 0, 'LinuxLibertine')
-            addMapping('LinuxLibertine', 1, 0, 'LinuxLibertine-Bold')
-            addMapping('LinuxLibertine', 0, 1, 'LinuxLibertine-Italic')
-            addMapping('LinuxLibertine', 1, 1, 'LinuxLibertine-Bold-Italic')
-            pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(font_dir, 'kochi-mincho-subst.ttf')))
-            pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(font_dir, 'kochi-gothic-subst.ttf')))
-        alreadyRegistered = True
+    global already_registered  # noqa: PLW0603
+    if already_registered:
+        return
+    already_registered = True
+    with as_file(files('indico_fonts')) as font_dir:
+        pdfmetrics.registerFont(TTFont('Times-Roman', os.path.join(font_dir, 'LiberationSerif-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Bold', os.path.join(font_dir, 'LiberationSerif-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Italic', os.path.join(font_dir, 'LiberationSerif-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Times-Bold-Italic', os.path.join(font_dir, 'LiberationSerif-BoldItalic.ttf')))
+        addMapping('Times-Roman', 0, 0, 'Times-Roman')
+        addMapping('Times-Roman', 1, 0, 'Times-Bold')
+        addMapping('Times-Roman', 0, 1, 'Times-Italic')
+        addMapping('Times-Roman', 1, 1, 'Times-Bold-Italic')
+        pdfmetrics.registerFont(TTFont('Sans', os.path.join(font_dir, 'LiberationSans-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Bold', os.path.join(font_dir, 'LiberationSans-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Italic', os.path.join(font_dir, 'LiberationSans-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Sans-Bold-Italic', os.path.join(font_dir, 'LiberationSans-BoldItalic.ttf')))
+        addMapping('Sans', 0, 0, 'Sans')
+        addMapping('Sans', 1, 0, 'Sans-Bold')
+        addMapping('Sans', 0, 1, 'Sans-Italic')
+        addMapping('Sans', 1, 1, 'Sans-Bold-Italic')
+        pdfmetrics.registerFont(TTFont('Courier', os.path.join(font_dir, 'LiberationMono-Regular.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Bold', os.path.join(font_dir, 'LiberationMono-Bold.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Italic', os.path.join(font_dir, 'LiberationMono-Italic.ttf')))
+        pdfmetrics.registerFont(TTFont('Courier-Bold-Italic', os.path.join(font_dir, 'LiberationMono-BoldItalic.ttf')))
+        addMapping('Courier', 0, 0, 'Courier')
+        addMapping('Courier', 1, 0, 'Courier-Bold')
+        addMapping('Courier', 0, 1, 'Courier-Italic')
+        addMapping('Courier', 1, 1, 'Courier-Bold-Italic')
+        pdfmetrics.registerFont(TTFont('LinuxLibertine', os.path.join(font_dir, 'LinLibertine_Rah.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold', os.path.join(font_dir, 'LinLibertine_RBah.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Italic', os.path.join(font_dir, 'LinLibertine_RIah.ttf')))
+        pdfmetrics.registerFont(TTFont('LinuxLibertine-Bold-Italic', os.path.join(font_dir, 'LinLibertine_RBIah.ttf')))
+        addMapping('LinuxLibertine', 0, 0, 'LinuxLibertine')
+        addMapping('LinuxLibertine', 1, 0, 'LinuxLibertine-Bold')
+        addMapping('LinuxLibertine', 0, 1, 'LinuxLibertine-Italic')
+        addMapping('LinuxLibertine', 1, 1, 'LinuxLibertine-Bold-Italic')
+        pdfmetrics.registerFont(TTFont('Kochi-Mincho', os.path.join(font_dir, 'kochi-mincho-subst.ttf')))
+        pdfmetrics.registerFont(TTFont('Kochi-Gothic', os.path.join(font_dir, 'kochi-gothic-subst.ttf')))
 
 
 def int_to_roman(value):
     """Convert an integer to Roman numerals."""
     if not 0 < value < 4000:
-        raise ValueError( _('Int to Roman Error: Argument must be between 1 and 3999'))
-    ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
-    nums = ('m',  'cm', 'd', 'cd','c', 'xc','l','xl','x','ix','v','iv','i')
+        raise ValueError('Int to Roman Error: Argument must be between 1 and 3999')
+    ints = (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    nums = ('m', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i')
     result = ''
     for i in range(len(ints)):
         count = int(value / ints[i])
@@ -159,6 +161,7 @@ class Paragraph(platypus.Paragraph):
     def getPart(self):
         return self._part
 
+
 class SimpleParagraph(platypus.Flowable):
     """Simple and fast paragraph.
 
@@ -166,7 +169,7 @@ class SimpleParagraph(platypus.Flowable):
              It's used only to increase PDF performance in places where normal paragraph is not needed.
     """
 
-    def __init__(self, text, fontSize = 10, indent = 0, spaceAfter = 2):
+    def __init__(self, text, fontSize=10, indent=0, spaceAfter=2):
         platypus.Flowable.__init__(self)
         self.text = text
         self.height = fontSize + spaceAfter
@@ -178,9 +181,10 @@ class SimpleParagraph(platypus.Flowable):
         return ''
 
     def draw(self):
-        #centre the text
-        self.canv.setFont('Times-Roman',self.fontSize)
+        # centre the text
+        self.canv.setFont('Times-Roman', self.fontSize)
         self.canv.drawString(self.indent, self.spaceAfter, self.text)
+
 
 class TableOfContentsEntry(Paragraph):
     """Class used to create table of contents entry with its number.
@@ -194,16 +198,14 @@ class TableOfContentsEntry(Paragraph):
         self._pageNumber = pageNumber
 
     def _drawDots(self):
-        """
-        Draw row of dots from the end of the abstract title to the page number.
-        """
+        """Draw row of dots from the end of the abstract title to the page number."""
         try:
             freeSpace = int(self.blPara.lines[-1][0])
         except TypeError:
             # Sometimes we get an ABag instead of a tuple.. in this case we use the extraSpace attribute
             # as it seems to contain just what we need.
             freeSpace = int(self.blPara.lines[-1].extraSpace)
-        while( freeSpace > 10 ):
+        while (freeSpace > 10):
             dot = self.beginText(self.width + 10 - freeSpace, self.style.leading - self.style.fontSize)
             dot.textLine('.')
             self.canv.drawText(dot)
@@ -217,6 +219,7 @@ class TableOfContentsEntry(Paragraph):
         self.canv.drawText(tx)
         self._drawDots()
 
+
 class Spacer(platypus.Spacer):
     def __init__(self, width, height, part=''):
         platypus.Spacer.__init__(self, width, height)
@@ -227,6 +230,7 @@ class Spacer(platypus.Spacer):
 
     def getPart(self):
         return self._part
+
 
 class Image(platypus.Image):
     def __init__(self, filename, part='', width=None, height=None, kind='direct', mask='auto', lazy=1):
@@ -251,9 +255,10 @@ class PageBreak(platypus.PageBreak):
     def getPart(self):
         return self._part
 
+
 class Preformatted(platypus.Preformatted):
-    def __init__(self, text, style, part='', bulletText = None, dedent=0):
-        platypus.Preformatted.__init__(self, text, style, bulletText = None, dedent=0)
+    def __init__(self, text, style, part='', bulletText=None, dedent=0):
+        platypus.Preformatted.__init__(self, text, style, bulletText=None, dedent=0)
         self._part = part
 
     def setPart(self, part):
@@ -264,12 +269,12 @@ class Preformatted(platypus.Preformatted):
 
 
 class CanvasA0(Canvas):
-    def __init__(self,filename,
+    def __init__(self, filename,
                  pagesize=None,
-                 bottomup = 1,
+                 bottomup=1,
                  pageCompression=None,
-                 encoding = None,
-                 invariant = None,
+                 encoding=None,
+                 invariant=None,
                  verbosity=0):
 
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
@@ -277,13 +282,14 @@ class CanvasA0(Canvas):
         self.scale(4.0, 4.0)
         self.setPageSize(A0)
 
+
 class CanvasA1(Canvas):
-    def __init__(self,filename,
+    def __init__(self, filename,
                  pagesize=None,
-                 bottomup = 1,
+                 bottomup=1,
                  pageCompression=None,
-                 encoding = None,
-                 invariant = None,
+                 encoding=None,
+                 invariant=None,
                  verbosity=0):
 
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
@@ -291,13 +297,14 @@ class CanvasA1(Canvas):
         self.scale(2.0 * math.sqrt(2.0), 2.0 * math.sqrt(2.0))
         self.setPageSize(A1)
 
+
 class CanvasA2(Canvas):
-    def __init__(self,filename,
+    def __init__(self, filename,
                  pagesize=None,
-                 bottomup = 1,
+                 bottomup=1,
                  pageCompression=None,
-                 encoding = None,
-                 invariant = None,
+                 encoding=None,
+                 invariant=None,
                  verbosity=0):
 
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
@@ -305,13 +312,14 @@ class CanvasA2(Canvas):
         self.scale(2.0, 2.0)
         self.setPageSize(A2)
 
+
 class CanvasA3(Canvas):
-    def __init__(self,filename,
+    def __init__(self, filename,
                  pagesize=None,
-                 bottomup = 1,
+                 bottomup=1,
                  pageCompression=None,
-                 encoding = None,
-                 invariant = None,
+                 encoding=None,
+                 invariant=None,
                  verbosity=0):
 
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
@@ -319,13 +327,14 @@ class CanvasA3(Canvas):
         self.scale(math.sqrt(2.0), math.sqrt(2.0))
         self.setPageSize(A3)
 
+
 class CanvasA5(Canvas):
-    def __init__(self,filename,
+    def __init__(self, filename,
                  pagesize=None,
-                 bottomup = 1,
+                 bottomup=1,
                  pageCompression=None,
-                 encoding = None,
-                 invariant = None,
+                 encoding=None,
+                 invariant=None,
                  verbosity=0):
 
         Canvas.__init__(self, filename, pagesize=pagesize, bottomup=bottomup, pageCompression=pageCompression,
@@ -333,26 +342,26 @@ class CanvasA5(Canvas):
         self.scale(1.0 / math.sqrt(2.0), 1.0 / math.sqrt(2.0))
         self.setPageSize(A5)
 
-pagesizeNameToCanvas = {'A4': Canvas,
+
+pagesizeNameToCanvas = {'A4': Canvas,  # noqa: N816
                         'A0': CanvasA0,
                         'A1': CanvasA1,
                         'A2': CanvasA2,
                         'A3': CanvasA3,
                         'A5': CanvasA5,
-                        'Letter': Canvas,
-                        }
+                        'Letter': Canvas}
 
 
 class PDFBase:
 
-    def __init__(self, doc=None, story=None, pagesize = 'A4', printLandscape=False, title=None):
+    def __init__(self, doc=None, story=None, pagesize='A4', printLandscape=False, title=None):
 
         if doc:
             self._doc = doc
         else:
-            #create a new document
-            #As the constructor of SimpleDocTemplate can take only a filename or a file object,
-            #to keep the PDF data not in a file, we use a dummy file object which save the data in a string
+            # create a new document
+            # As the constructor of SimpleDocTemplate can take only a filename or a file object,
+            # to keep the PDF data not in a file, we use a dummy file object which save the data in a string
             self._fileDummy = BytesIO()
             if printLandscape:
                 self._doc = SimpleDocTemplate(self._fileDummy, pagesize=landscape(PDFSizes().PDFpagesizes[pagesize]))
@@ -365,8 +374,8 @@ class PDFBase:
         if story is not None:
             self._story = story
         else:
-            #create a new story with a spacer which take all the first page
-            #then the first page is only drawing by the firstPage method
+            # create a new story with a spacer which take all the first page
+            # then the first page is only drawing by the firstPage method
             self._story = [PageBreak()]
 
         if printLandscape:
@@ -395,10 +404,10 @@ class PDFBase:
         """Add the content to the story."""
 
     def getPDFBin(self):
-        #build the pdf in the fileDummy
+        # build the pdf in the fileDummy
         self.getBody()
         self._doc.build(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
-        #return the data from the fileDummy
+        # return the data from the fileDummy
         return self._fileDummy.getvalue()
 
     def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0, 0, 0), align='center', width=None,
@@ -406,9 +415,9 @@ class PDFBase:
         if maximumWidth is None:
             maximumWidth = self._PAGE_WIDTH-1*cm
         if width is None:
-            width=self._PAGE_WIDTH/2.0
+            width = self._PAGE_WIDTH/2.0
         if height is None:
-            height=self._PAGE_HEIGHT-10*measurement
+            height = self._PAGE_HEIGHT-10*measurement
         draw = c.drawCentredString
         if align == 'right':
             draw = c.drawRightString
@@ -417,21 +426,21 @@ class PDFBase:
         c.setFont(font, size)
         c.setFillColorRGB(*color)
         titleWords = text.split()
-        line=''
+        line = ''
         for word in titleWords:
-            lineAux = '%s %s'%(line, word)
+            lineAux = f'{line} {word}'
             lsize = c.stringWidth(lineAux, font, size)
             if lsize < maximumWidth:
                 line = lineAux
             else:
-                draw(width,height, line)
+                draw(width, height, line)
                 height -= lineSpacing*measurement
                 line = word
-        if line.strip() != '':
+        if line.strip():
             draw(width, height, line)
         return height
 
-    def _drawLogo(self, c, drawTitle = True):
+    def _drawLogo(self, c, drawTitle=True):
         from indico.modules.events.util import create_event_logo_tmp_file
         logo = self.event.logo
         imagePath = ''
@@ -444,7 +453,7 @@ class PDFBase:
 
                 # resize in case too big for page
                 if width > self._PAGE_WIDTH / 2:
-                    ratio =  float(height)/width
+                    ratio = float(height)/width
                     width = self._PAGE_WIDTH / 2
                     height = width * ratio
                 startHeight = self._PAGE_HEIGHT
@@ -464,17 +473,17 @@ class PDFBase:
         return 0
 
 
-def _doNothing(canvas, doc):
-    'Dummy callback for onPage.'
+def _do_nothing(canvas, doc):
+    """Dummy callback for onPage."""
 
 
 class DocTemplateWithTOC(SimpleDocTemplate):
     def __init__(self, indexedFlowable, filename, firstPageNumber=1, include_toc=False, **kw):
-        """toc is the TableOfContents object
+        """Toc is the TableOfContents object
         indexedFlowale is a dictionnary with flowables as key and a dictionnary as value.
             the sub-dictionnary have two key:
                 text: the text which will br print in the table
-                level: the level of the entry( modifying the indentation and the police
+                level: the level of the entry( modifying the indentation and the police.
         """
         self.include_toc = include_toc
         self._toc = []
@@ -490,11 +499,12 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 
     def afterFlowable(self, flowable):
         if flowable in self._indexedFlowable:
-            self._toc.append((self._indexedFlowable[flowable]['level'],self._indexedFlowable[flowable]['text'], self.page + self._firstPageNumber - 1))
+            self._toc.append((self._indexedFlowable[flowable]['level'], self._indexedFlowable[flowable]['text'],
+                              self.page + self._firstPageNumber - 1))
         try:
-            if flowable.getPart() != '':
-                self._part = flowable.getPart()
-        except Exception:
+            if part := flowable.getPart():
+                self._part = part
+        except Exception:  # noqa: S110
             pass
 
     def handle_documentBegin(self):
@@ -523,27 +533,29 @@ class DocTemplateWithTOC(SimpleDocTemplate):
 
     def laterPages(self, c, doc):
         c.saveState()
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        c.drawCentredString(self._PAGE_WIDTH / 2.0, 0.5 * cm, '%s ' % int_to_roman(doc.page - 1))
+        c.setFont('Times-Roman', 9)
+        c.setFillColorRGB(0.5, 0.5, 0.5)
+        c.drawCentredString(self._PAGE_WIDTH / 2.0, 0.5 * cm, f'{int_to_roman(doc.page - 1)} ')
         c.restoreState()
 
-    def multiBuild(self, story, filename=None, canvasMaker=Canvas, maxPasses=10, onFirstPage=_doNothing, onLaterPages=_doNothing):
-        self._calc()    #in case we changed margins sizes etc
+    def multiBuild(self, story, filename=None, canvasMaker=Canvas, maxPasses=10, onFirstPage=_do_nothing,
+                   onLaterPages=_do_nothing):
+        self._calc()  # in case we changed margins sizes etc
         frameT = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='normal')
-        self.addPageTemplates([PageTemplate(id='Later',frames=frameT, onPageEnd=onLaterPages,pagesize=self.pagesize)])
-        if onLaterPages is _doNothing and hasattr(self,'onLaterPages'):
+        self.addPageTemplates([PageTemplate(id='Later', frames=frameT, onPageEnd=onLaterPages, pagesize=self.pagesize)])
+        if onLaterPages is _do_nothing and hasattr(self, 'onLaterPages'):
             self.pageTemplates[0].beforeDrawPage = self.onLaterPages
         SimpleDocTemplate.multiBuild(self, story, maxPasses, canvasmaker=canvasMaker)
         self._prepareTOC()
         contentFile = self.filename
         self.filename = BytesIO()
         self.pageTemplates = []
-        self.addPageTemplates([PageTemplate(id='First',frames=frameT, onPage=onFirstPage,pagesize=self.pagesize)])
-        if onFirstPage is _doNothing and hasattr(self,'onFirstPage'):
+        self.addPageTemplates([PageTemplate(id='First', frames=frameT, onPage=onFirstPage, pagesize=self.pagesize)])
+        if onFirstPage is _do_nothing and hasattr(self, 'onFirstPage'):
             self.pageTemplates[0].beforeDrawPage = self.onFirstPage
-        self.addPageTemplates([PageTemplate(id='Later',frames=frameT, onPageEnd=self.laterPages,pagesize=self.pagesize)])
-        if onLaterPages is _doNothing and hasattr(self,'onLaterPages'):
+        self.addPageTemplates([PageTemplate(id='Later', frames=frameT, onPageEnd=self.laterPages,
+                                            pagesize=self.pagesize)])
+        if onLaterPages is _do_nothing and hasattr(self, 'onLaterPages'):
             self.pageTemplates[1].beforeDrawPage = self.onLaterPages
         SimpleDocTemplate.multiBuild(self, self._tocStory, maxPasses, canvasmaker=canvasMaker)
         self.mergePDFs(self.filename, contentFile)
@@ -610,7 +622,7 @@ class PDFWithTOC(PDFBase):
     def getBody(self, story=None):
         """Add the content to the story.
         When you want to put a paragraph p in the toc, add it to the self._indexedFlowable as this:
-            self._indexedFlowable[p] = {"text":"my title", "level":1}
+            self._indexedFlowable[p] = {'text':'my title', 'level':1}.
         """
         if not story:
             story = self._story
