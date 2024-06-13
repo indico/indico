@@ -10,8 +10,9 @@
     {% endcall %}
     {{ form_header(form, id='attachment-link-form')}}
     {{ form_row(form.link_url, widget_attrs={'placeholder': 'Example: https://www.google.com'}) }}
-    {{ form_rows(form, fields=('title', 'description', 'folder', 'protected')) }}
-    {{ form_rows(form, fields=('acl',)) }}
+    {{ form_rows(form, fields=('title',)) }}
+    {{ form_rows(form, skip=('link_url', 'title', 'description', 'folder', 'protected', 'acl')) }}
+    {{ form_rows(form, fields=('description', 'folder', 'protected', 'acl')) }}
     {{ protection_message | safe }}
     {% call form_footer(attach_form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
