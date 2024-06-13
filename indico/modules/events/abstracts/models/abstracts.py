@@ -458,6 +458,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         sums = defaultdict(Counter)
         lens = defaultdict(Counter)
         for r in self.reviews:
+            if not r.track:
+                continue
             sums[r.track.id] += Counter(r.scores)
             lens[r.track.id] += Counter(r.scores.keys())
         return {track: {question: score / lens[track][question]
