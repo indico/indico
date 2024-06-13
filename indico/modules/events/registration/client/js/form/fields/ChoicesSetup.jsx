@@ -50,21 +50,16 @@ export function Choices({
       title: Translate.string('Price ({currency})', {currency}),
       width: '7em',
       defaultValue: 0,
-      fieldProps: item => ({
-        type: item.isNoAccommodation ? 'hidden' : 'number',
-        min: 0,
-        step: 0.01,
-      }),
+      render: item => !item.isNoAccommodation,
+      fieldProps: {type: 'number', min: 0, step: 0.01},
     },
     {
       name: 'placesLimit',
       title: Translate.string('Limit'),
       width: '7em',
       defaultValue: 0,
-      fieldProps: item => ({
-        type: item.isNoAccommodation ? 'hidden' : 'number',
-        min: 0,
-      }),
+      render: item => !item.isNoAccommodation,
+      fieldProps: {type: 'number', min: 0},
     },
   ];
   if (withExtraSlots) {
@@ -74,8 +69,9 @@ export function Choices({
       width: '9em',
       as: Input,
       defaultValue: 0,
+      render: item => !item.isNoAccommodation,
       fieldProps: (item, onItemChange) => ({
-        type: item.isNoAccommodation ? 'hidden' : 'number',
+        type: 'number',
         min: 0,
         icon: {
           name: 'dollar',
@@ -96,7 +92,6 @@ export function Choices({
         onChange={onChange}
         itemShape={itemShape}
         disabled={disabled}
-        isItemEnabledKey="isEnabled"
         canRemoveItem={item => !item.isNoAccommodation}
         onFocus={onFocus}
         onBlur={onBlur}
