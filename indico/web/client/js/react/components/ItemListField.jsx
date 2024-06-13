@@ -23,6 +23,7 @@ const itemValueShapeSchema = PropTypes.shape({
   name: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   as: PropTypes.elementType,
+  render: PropTypes.func,
   fieldProps: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
   defaultValue: PropTypes.any,
   width: PropTypes.string,
@@ -34,7 +35,7 @@ function Item({
   index,
   id,
   canRemove,
-  isEnabledKey,
+  canDisableItem,
   onChange,
   onMove,
   onFocus,
@@ -57,9 +58,12 @@ function Item({
   };
 
   return (
-    <tr styleName={isEnabledKey && !value[isEnabledKey] ? 'disabled-row' : undefined} {...rest}>
+    <tr styleName={canDisableItem && !value.isEnabled ? 'disabled-row' : undefined} {...rest}>
       {children}
-      {shape.map(({name, as, defaultValue, fieldProps}) => {
+      {shape.map(({name, as, render, defaultValue, fieldProps}) => {
+        if (render && !render(value)) {
+          return <td key={name} />;
+        }
         const Component = as || 'input';
         const newDefault = defaultValue === undefined ? '' : defaultValue;
         const extraProps =
@@ -86,18 +90,18 @@ function Item({
             onClick={disabled ? undefined : onDelete}
           />
         )}
-        {isEnabledKey &&
-          (value[isEnabledKey] ? (
+        {canDisableItem &&
+          (value.isEnabled ? (
             <a
               className="icon-disable"
               title={Translate.string('Disable choice')}
-              onClick={() => onChange(isEnabledKey, false)}
+              onClick={() => onChange('isEnabled', false)}
             />
           ) : (
             <a
               className="icon-checkmark remove-row"
               title={Translate.string('Enable choice')}
-              onClick={() => onChange(isEnabledKey, true)}
+              onClick={() => onChange('isEnabled', true)}
             />
           ))}
       </td>
@@ -118,7 +122,7 @@ Item.propTypes = {
   disabled: PropTypes.bool.isRequired,
   sortable: PropTypes.bool.isRequired,
   canRemove: PropTypes.bool,
-  isEnabledKey: PropTypes.string,
+  canDisableItem: PropTypes.bool,
   children: PropTypes.node,
 };
 
@@ -126,7 +130,7 @@ Item.defaultProps = {
   onFocus: null,
   onBlur: null,
   canRemove: true,
-  isEnabledKey: null,
+  canDisableItem: false,
   children: null,
 };
 
@@ -165,8 +169,6 @@ export default function ItemListField({
   scrollable,
   canDisableItem,
   canRemoveItem,
-  isItemEnabledKey,
-  idKey,
   ...rest
 }) {
   const makeOnDelete = index => () => onChange(value.filter((__, idx) => index !== idx));
@@ -183,11 +185,11 @@ export default function ItemListField({
     const newItem = Object.fromEntries(
       itemShape.map(item => [item.name, item.defaultValue === undefined ? '' : item.defaultValue])
     );
-    if (canDisableItem && !(isItemEnabledKey in newItem)) {
-      newItem[isItemEnabledKey] = true;
+    if (canDisableItem && !('isEnabled' in newItem)) {
+      newItem.isEnabled = true;
     }
-    if (!(idKey in newItem)) {
-      newItem[idKey] = `new:${nanoid()}`;
+    if (!('id' in newItem)) {
+      newItem.id = `new:${nanoid()}`;
     }
     onChange([...value, newItem]);
   };
@@ -214,9 +216,9 @@ export default function ItemListField({
       <tbody>
         {value.map((item, idx) => (
           <ItemComponent
-            key={item[idKey]}
+            key={item.id}
             index={idx}
-            id={item[idKey]}
+            id={item.id}
             onChange={makeOnChange(idx)}
             onDelete={makeOnDelete(idx)}
             onMove={handleMove}
@@ -224,7 +226,7 @@ export default function ItemListField({
             value={item}
             sortable={sortable}
             disabled={disabled}
-            isEnabledKey={canDisableItem ? isItemEnabledKey : null}
+            canDisableItem={canDisableItem}
             canRemove={canRemoveItem(item)}
             {...rest}
           />
@@ -260,8 +262,6 @@ ItemListField.propTypes = {
   scrollable: PropTypes.bool,
   canDisableItem: PropTypes.bool,
   canRemoveItem: PropTypes.func,
-  isItemEnabledKey: PropTypes.string,
-  idKey: PropTypes.string,
 };
 
 ItemListField.defaultProps = {
@@ -270,8 +270,6 @@ ItemListField.defaultProps = {
   scrollable: false,
   canDisableItem: false,
   canRemoveItem: () => true,
-  isItemEnabledKey: 'enabled',
-  idKey: 'id',
 };
 
 export function FinalItemList(props) {
