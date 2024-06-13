@@ -56,6 +56,7 @@ Bugfixes
   events (:pr:`6359`)
 - Fix UI breaking when performing bulk actions via the list of editables (:pr:`6369`)
 - Include registration documents in user data export (:issue:`6331`, :pr:`6338`)
+- Fix error when viewing an abstract with reviews in deleted tracks (:pr:`6393`)
 
 Accessibility
 ^^^^^^^^^^^^^
