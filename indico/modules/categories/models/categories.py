@@ -67,7 +67,7 @@ class InheritableConfigMode(RichIntEnum):
     __titles__ = [
         _('Disabled: Ignore any inherited configuration'),
         _('Enabled: Use configuration from this category'),
-        _('Inheriting: Use configuration from parent category'),
+        _('Inheriting: Use value from parent category (Enabled)'),
     ]
     disabled = 0
     enabled = 1
@@ -77,7 +77,7 @@ class InheritableConfigMode(RichIntEnum):
     def get_form_field_titles(cls, parent_configured):
         if parent_configured:
             return cls.__titles__
-        return [*cls.__titles__[:2], _('Inheriting: Disabled (not configured on any parent category)')]
+        return [*cls.__titles__[:2], _('Inheriting: Use value from parent category (Disabled)')]
 
 
 class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, AttachedItemsMixin, db.Model):
