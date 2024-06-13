@@ -440,7 +440,7 @@ def get_request_user():
 def strip_path_from_url(url):
     """Strip away the path from a given URL.
 
-    (e.g. https://foo.bar/baz?a -> https://foo.bar)
+    (e.g. https://foo.bar/baz?qux -> https://foo.bar)
     """
     url = urlsplit(url, allow_fragments=False)
 
