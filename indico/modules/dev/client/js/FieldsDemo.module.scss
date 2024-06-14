@@ -27,3 +27,8 @@ pre.submitted-value {
   background: $light-gray;
   padding: 1em;
 }
+
+// fix for SUI issues
+:global(.ui.styled.accordion .content .ui.list .item .content) {
+  padding: 0;
+}
