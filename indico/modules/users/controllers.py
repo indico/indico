@@ -455,7 +455,7 @@ class RHUserPreferencesMastodonServer(RHUserBase):
 
         url = urlsplit(server_url)
         if url.scheme not in ('http', 'https'):
-            raise ExpectedError(_('Invalid URL'))
+            raise ExpectedError(_('Invalid URL.'))
         url = strip_path_from_url(urlunsplit(url))
 
         server_info = get_mastodon_server_name(url)
