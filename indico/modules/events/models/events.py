@@ -1148,6 +1148,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         with force_locale(locale):
             yield
 
+    def has_receipt_templates(self):
+        """Check if the event has any receipt document templates."""
+        from indico.modules.receipts.util import has_any_templates
+        return has_any_templates(self)
+
 
 Event.register_location_events()
 Event.register_protection_events()

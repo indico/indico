@@ -9,7 +9,7 @@ from flask import session
 
 from indico.core import signals
 from indico.modules.events.registration.util import ActionMenuEntry
-from indico.modules.receipts.util import can_user_manage_receipt_templates, has_any_receipts, has_any_templates
+from indico.modules.receipts.util import can_user_manage_receipt_templates, has_any_receipts
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -38,7 +38,7 @@ def _category_sidemenu_items(sender, category, **kwargs):
 
 @signals.event.registrant_list_action_menu.connect
 def _get_action_menu_items(regform, **kwargs):
-    has_templates = has_any_templates(regform.event)
+    has_templates = regform.event.has_receipt_templates()
     if has_templates:
         yield ActionMenuEntry(
             _('Generate Documents'),
