@@ -41,8 +41,8 @@ export default function DatePicker({
         type="text"
         onChange={handleDateChange}
         defaultValue={formattedValue}
-        placeholder={format}
         {...inputProps}
+        placeholder={format}
       />
       <button type="button" disabled={inputProps.disabled}>
         <Translate as="span">Open a calendar</Translate>
