@@ -641,3 +641,21 @@
   max-width: 100%;
   max-height: 450px;
 }
+
+.no-data-placeholder {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px;
+
+  i {
+    font-size: 3em;
+    color: $dark-gray;
+  }
+
+  span {
+    font-size: 1.5em;
+    color: $dark-gray;
+  }
+}
