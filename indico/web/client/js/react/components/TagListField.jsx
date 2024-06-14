@@ -111,7 +111,17 @@ TagListField.defaultProps = {
 export default React.memo(TagListField);
 
 export function FinalTagList({name, ...rest}) {
-  return <FinalField name={name} component={TagListField} isEqual={_.isEqual} {...rest} />;
+  return (
+    <FinalField
+      name={name}
+      component={TagListField}
+      isEqual={_.isEqual}
+      description={Translate.string(
+        'Enter keywords separated by commas, semicolons, or by pressing Enter.'
+      )}
+      {...rest}
+    />
+  );
 }
 
 FinalTagList.propTypes = {
