@@ -20,6 +20,7 @@ import {
 } from 'indico/react/components';
 import {FinalContributionPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
+import {FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -70,12 +71,20 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
           ..._.pick(contrib, ['venue_name', 'venue_id', 'room_name', 'room_id', 'address']),
         },
         references: [], // WHERE DOES THIS COME FROM ???
-        ..._.pick(contrib, ['title', 'description', 'keywords', 'board_number', 'code']),
+        ..._.pick(contrib, [
+          'title',
+          'description',
+          'duration',
+          'keywords',
+          'board_number',
+          'code',
+        ]),
       }}
       size="small"
     >
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
+      <FinalDuration name="duration" label={Translate.string('Duration')} />
       <FinalContributionPersonLinkField
         name="person_links"
         label={Translate.string('People')}
