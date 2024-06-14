@@ -27,7 +27,6 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
 export function ContributionForm({eventId, contribId, eventTitle, personLinkFieldParams, onClose}) {
-  const [autoSort, setAutoSort] = useState(true); // TODO see if we can put this inside the field
   const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
   const {data: contrib, loading} = useIndicoAxios(contribURL);
   const referenceTypes = [{id: 1, name: 'DOI'}, {id: 2, name: 'URL'}, {id: 3, name: 'ISBN'}];
@@ -82,8 +81,6 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
         label={Translate.string('Conveners')}
         eventId={eventId}
         sessionUser={Indico.User}
-        autoSort={autoSort}
-        setAutoSort={setAutoSort}
         {...personLinkFieldParams}
       />
       <FinalLocationField
