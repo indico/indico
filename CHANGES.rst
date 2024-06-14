@@ -37,6 +37,8 @@ Improvements
 - Add option to hide person titles throughout the event (:issue:`038`, :pr:`6104`, thanks
   :user:`vasantvohra`)
 - Preserve input when switching between judgment actions for an editable (:pr:`6375`)
+- Allow generating documents from the registration summary page (:issue:`6212`, :pr:`6306`,
+  thanks :user:`hitenvidhani`)
 
 Bugfixes
 ^^^^^^^^

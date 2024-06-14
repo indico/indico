@@ -143,59 +143,79 @@
 
 {% macro render_receipts_list(registration, from_management=false) %}
     {% set receipts = registration.receipt_files if from_management else registration.published_receipts %}
-    {% if receipts %}
+    {% set can_generate_receipts = from_management and registration.event.has_receipt_templates() %}
+
+    {% if receipts or can_generate_receipts %}
         <div class="regform-done">
             <div class="i-box-header">
                 <div class="i-box-title">
                     {% trans %}Documents{% endtrans %}
                 </div>
+                {% if can_generate_receipts %}
+                    <a href="#" class="i-button accept icon-agreement"
+                        data-callback="printReceipts"
+                        data-params="{{ {'registration_id': [registration.id|string],
+                                         'event_id': registration.registration_form.event.id,
+                                         'reload_after': true} | tojson | forceescape }}">
+                        {% trans %}Generate document{% endtrans %}
+                    </a>
+                {% endif %}
             </div>
             <div class="i-box-content">
-                <table class="registration-info">
-                    {% for receipt in receipts | sort(attribute='file.filename') %}
-                        {% set filename = receipt.file.filename %}
-                        <tr class="{{ 'unpublished-receipt' if not receipt.is_published }}">
-                            <th class="regform-done-caption">{{ receipt.template.type.title if receipt.template.type else '' }}</th>
-                            <td class="regform-done-data">
-                                <a href="{{ url_for('.download_receipt', receipt.locator.filename) if from_management else receipt.registrant_download_url }}">
-                                    {{ filename }}
-                                </a>
-                                {% if not receipt.is_published -%}
-                                    <span class="unpublished-receipt-warning">({% trans %}not published{% endtrans %})</span>
-                                {% endif %}
-                            </td>
-                            {% if from_management -%}
-                                <td class="actions-column">
-                                    <div class="group right entry-action-buttons">
-                                        {% if receipt.is_published %}
-                                            <a href="#" class="icon-eye-blocked"
-                                               title="{% trans %}Unpublish document{% endtrans %}"
-                                               data-title="{% trans name=receipt.file.filename %}Unpublish '{{ name }}' to the registrant{% endtrans %}"
-                                               data-href="{{ url_for('.unpublish_receipt', receipt) }}"
-                                               data-method="POST"
-                                               data-update="#receipts-list"
-                                               data-confirm="{% trans name=filename %}Are you sure you want to unpublish the document '{{ name }}' to the registrant?{% endtrans %}"></a>
-                                        {% else %}
-                                            <a href="#" class="icon-eye js-dialog-action"
-                                               title="{% trans %}Publish document{% endtrans %}"
-                                               data-title="{% trans name=receipt.file.filename %}Publish '{{ name }}' to the registrant{% endtrans %}"
-                                               data-href="{{ url_for('.publish_receipt', receipt) }}"
-                                               data-update="#receipts-list"
-                                               data-ajax-dialog></a>
-                                        {% endif %}
-                                        <a href="#" class="icon-remove js-delete"
-                                           data-title="{% trans name=receipt.file.filename %}Delete the document '{{ name }}'?{% endtrans %}"
-                                           title="{% trans %}Delete document{% endtrans %}"
-                                           data-confirm="{% trans name=filename %}Are you sure you want to completely delete the document '{{ name }}'?{% endtrans %}"
-                                           data-update="#receipts-list"
-                                           data-method="DELETE"
-                                           data-href="{{ url_for('.delete_receipt', receipt) }}"></a>
-                                    </div>
+                {%- if receipts %}
+                    <table class="registration-info">
+                        {% for receipt in receipts | sort(attribute='file.filename') %}
+                            {% set filename = receipt.file.filename %}
+                            <tr class="{{ 'unpublished-receipt' if not receipt.is_published }}">
+                                <th class="regform-done-caption">{{ receipt.template.type.title if receipt.template.type else '' }}</th>
+                                <td class="regform-done-data">
+                                    <a href="{{ url_for('.download_receipt', receipt.locator.filename) if from_management else receipt.registrant_download_url }}">
+                                        {{ filename }}
+                                    </a>
+                                    {% if not receipt.is_published -%}
+                                        <span class="unpublished-receipt-warning">({% trans %}not published{% endtrans %})</span>
+                                    {% endif %}
                                 </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </table>
+                                {% if from_management -%}
+                                    <td class="actions-column">
+                                        <div class="group right entry-action-buttons">
+                                            {% if receipt.is_published %}
+                                                <a href="#" class="icon-eye-blocked"
+                                                   title="{% trans %}Unpublish document{% endtrans %}"
+                                                   data-title="{% trans name=receipt.file.filename %}Unpublish '{{ name }}' to the registrant{% endtrans %}"
+                                                   data-href="{{ url_for('.unpublish_receipt', receipt) }}"
+                                                   data-method="POST"
+                                                   data-update="#receipts-list"
+                                                   data-confirm="{% trans name=filename %}Are you sure you want to unpublish the document '{{ name }}' to the registrant?{% endtrans %}"></a>
+                                            {% else %}
+                                                <a href="#" class="icon-eye js-dialog-action"
+                                                   title="{% trans %}Publish document{% endtrans %}"
+                                                   data-title="{% trans name=receipt.file.filename %}Publish '{{ name }}' to the registrant{% endtrans %}"
+                                                   data-href="{{ url_for('.publish_receipt', receipt) }}"
+                                                   data-update="#receipts-list"
+                                                   data-ajax-dialog></a>
+                                            {% endif %}
+                                            <a href="#" class="icon-remove js-delete"
+                                               data-title="{% trans name=receipt.file.filename %}Delete the document '{{ name }}'?{% endtrans %}"
+                                               title="{% trans %}Delete document{% endtrans %}"
+                                               data-confirm="{% trans name=filename %}Are you sure you want to completely delete the document '{{ name }}'?{% endtrans %}"
+                                               data-update="#receipts-list"
+                                               data-method="DELETE"
+                                               data-href="{{ url_for('.delete_receipt', receipt) }}"></a>
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {%- else -%}
+                    <div class="no-data-placeholder">
+                        <i class="icon-agreement"></i>
+                        <span>
+                            {% trans %}There are no documents yet.{% endtrans %}
+                        </span>
+                    </div>
+                {%- endif %}
             </div>
         </div>
     {% endif %}

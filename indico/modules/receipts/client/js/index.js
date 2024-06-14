@@ -11,8 +11,22 @@ import {injectModal} from 'indico/react/util';
 
 import PrintReceiptsModal from './printing/PrintReceiptsModal';
 
-window.printReceipts = function({registration_id: registrationIds, event_id: eventId}) {
+window.printReceipts = function({
+  registration_id: registrationIds,
+  event_id: eventId,
+  reload_after: reloadAfter,
+}) {
   injectModal(resolve => (
-    <PrintReceiptsModal onClose={resolve} registrationIds={registrationIds} eventId={eventId} />
+    <PrintReceiptsModal
+      onClose={generated => {
+        if (generated && reloadAfter) {
+          location.reload();
+        } else {
+          resolve();
+        }
+      }}
+      registrationIds={registrationIds}
+      eventId={eventId}
+    />
   ));
 };

@@ -141,7 +141,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
         filename: 'document',
         save_config: true,
       }}
-      onClose={onClose}
+      onClose={() => onClose(receiptIds.length > 0)}
       header={Translate.string('Generate Documents')}
       keepDirtyOnReinitialize
       noSubmitButton
