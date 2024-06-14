@@ -78,7 +78,7 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
       <FinalTextArea name="description" label={Translate.string('Description')} />
       <FinalContributionPersonLinkField
         name="person_links"
-        label={Translate.string('Conveners')}
+        label={Translate.string('People')}
         eventId={eventId}
         sessionUser={Indico.User}
         {...personLinkFieldParams}
