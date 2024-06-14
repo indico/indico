@@ -32,7 +32,8 @@ const identity = v => v;
 export const unsortedArraysEqual = (a, b) => _.isEqual((a || []).sort(), (b || []).sort());
 
 export function FormFieldAdapter({
-  input: {value, ...input},
+  input: {name, value, ...input},
+  id,
   label,
   placeholder,
   required,
@@ -91,6 +92,8 @@ export function FormFieldAdapter({
     input.loading = validating;
   }
 
+  id ??= `finalfield-${name}`;
+
   const field = (
     <Form.Field
       required={required}
@@ -99,8 +102,10 @@ export function FormFieldAdapter({
       defaultValue={defaultValue}
       {...fieldProps}
     >
-      {label && <label>{label}</label>}
+      {label && <label htmlFor={id}>{label}</label>}
       <Component
+        id={id}
+        name={name}
         {...input}
         value={value === undefined ? undefinedValue : value}
         {...props}
@@ -129,6 +134,7 @@ export function FormFieldAdapter({
 }
 
 FormFieldAdapter.propTypes = {
+  id: PropTypes.string,
   disabled: PropTypes.bool,
   input: PropTypes.object.isRequired,
   required: PropTypes.bool,
@@ -148,6 +154,7 @@ FormFieldAdapter.propTypes = {
 };
 
 FormFieldAdapter.defaultProps = {
+  id: undefined,
   disabled: false,
   required: false,
   hideValidationError: false,
