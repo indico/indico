@@ -402,6 +402,27 @@ function TimePickerAdapter(props) {
   return <FormFieldAdapter {...props} as={TimePickerComponent} />;
 }
 
+function DurationComponent({value, onChange, ...rest}) {
+  return (
+    <TimePickerComponent
+      value={moment()
+        .startOf('day')
+        .seconds(value)}
+      onChange={v => onChange(v.diff(moment().startOf('day'), 'seconds'))}
+      {...rest}
+    />
+  );
+}
+
+DurationComponent.propTypes = {
+  value: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+function DurationAdapter(props) {
+  return <FormFieldAdapter {...props} as={DurationComponent} />;
+}
+
 /**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
@@ -677,6 +698,29 @@ FinalTimePicker.defaultProps = {
   defaultValue: moment()
     .startOf('day')
     .minutes(20),
+};
+
+export function FinalDuration({name, label, defaultValue, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      adapter={DurationAdapter}
+      label={label}
+      defaultValue={defaultValue}
+      {...rest}
+    />
+  );
+}
+
+FinalDuration.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  defaultValue: PropTypes.number,
+};
+
+FinalDuration.defaultProps = {
+  label: null,
+  defaultValue: 1200, // 20 minutes
 };
 
 /**
