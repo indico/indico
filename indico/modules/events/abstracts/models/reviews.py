@@ -191,6 +191,8 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     def can_edit(self, user, check_state=False):
         if user is None:
             return False
+        if self.track is None:
+            return False
         if check_state and self.abstract.public_state.name != 'under_review':
             return False
         return self.user == user

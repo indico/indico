@@ -645,7 +645,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return AbstractReviewingState.mixed
 
     def get_reviewed_for_groups(self, user, include_reviewed=False):
-        already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
+        already_reviewed = {x.track for x in self.get_reviews(user=user) if x.track} if include_reviewed else set()
         if self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
             return self.reviewed_for_tracks | already_reviewed
         reviewer_tracks = {track for track in self.reviewed_for_tracks
