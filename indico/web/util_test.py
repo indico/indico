@@ -16,7 +16,8 @@ from indico.modules.events.models.persons import EventPerson
 from indico.web.flask.util import make_view_func
 from indico.web.rh import RH, allow_signed_url, custom_auth, oauth_scope
 from indico.web.util import (_check_request_user, _lookup_request_user, _request_likely_seen_by_user, get_oauth_user,
-                             get_request_user, is_legacy_signed_url_valid, signed_url_for_user, verify_signed_user_url)
+                             get_request_user, is_legacy_signed_url_valid, signed_url_for_user, strip_path_from_url,
+                             verify_signed_user_url)
 
 
 @pytest.mark.parametrize(('url', 'valid'), (
@@ -610,3 +611,15 @@ def test_get_request_user_legacy_api(test_client, dummy_user, dummy_event, dummy
     resp = test_client.get(api_path, headers=personal_oauth_headers)
     assert resp.status_code == 200
     assert resp.json['count'] == 1
+
+
+@pytest.mark.parametrize(('url', 'expected'), (
+    ('https://foo.bar', 'https://foo.bar'),
+    ('https://foo.bar/baz', 'https://foo.bar'),
+    ('https://foo.bar/baz/qux', 'https://foo.bar'),
+    ('https://foo.bar/baz?qux=quuz', 'https://foo.bar'),
+    ('https://foo.bar/baz?qux=quuz#corge', 'https://foo.bar'),
+    ('foo.bar/baz', 'foo.bar/baz'),
+))
+def test_strip_path_from_url(url, expected):
+    assert strip_path_from_url(url) == expected

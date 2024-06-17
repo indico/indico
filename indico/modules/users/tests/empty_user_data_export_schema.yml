@@ -39,6 +39,7 @@ settings:
   force_language: false
   force_timezone: false
   lang: null
+  mastodon_server_url: null
   name_format: first_last
   show_future_events: false
   show_past_events: false

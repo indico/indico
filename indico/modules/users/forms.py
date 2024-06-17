@@ -9,7 +9,7 @@ from operator import itemgetter
 
 from pytz import common_timezones, common_timezones_set
 from wtforms.fields import BooleanField, EmailField, IntegerField, SelectField, StringField
-from wtforms.validators import DataRequired, Email, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Email, NumberRange, Optional, ValidationError
 
 from indico.core.auth import multipass
 from indico.core.config import config
@@ -22,8 +22,9 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoEnumSelectField, IndicoSelectMultipleCheckboxField, MultiStringField,
                                      PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless
+from indico.web.forms.validators import HiddenUnless, MastodonServer
 from indico.web.forms.widgets import SwitchWidget
+from indico.web.util import strip_path_from_url
 
 
 class UserPreferencesForm(IndicoForm):
@@ -74,6 +75,13 @@ class UserPreferencesForm(IndicoForm):
         _('Markdown editor for minutes'),
         widget=SwitchWidget(),
         description=_('Use Markdown editor instead of HTML editor when editing the minutes of a meeting.'))
+
+    mastodon_server_url = StringField(
+        _('Preferred Mastodon server'),
+        validators=[MastodonServer(), Optional()],
+        filters=[lambda x: strip_path_from_url(x) if x else x],
+        description=_('URL of the Mastodon server you prefer to use for sharing links to events/meetings '
+                      '(e.g. https://mastodon.social).'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

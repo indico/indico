@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global ajaxDialog:false */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -12,7 +14,6 @@ import {ManageNotes} from 'indico/react/components';
 
 import './util/list_generator';
 import './util/static_filters';
-import './util/social';
 import './favorite';
 
 (function() {

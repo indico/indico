@@ -435,3 +435,17 @@ def get_request_user():
         })
 
     return user, source
+
+
+def strip_path_from_url(url):
+    """Strip away the path from a given URL.
+
+    (e.g. https://foo.bar/baz?qux -> https://foo.bar)
+    """
+    url = urlsplit(url, allow_fragments=False)
+
+    if not url.netloc:
+        # return the original URL if it's not a valid URL
+        return url.geturl()
+
+    return urlunsplit(url._replace(path='', query=''))
