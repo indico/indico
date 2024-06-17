@@ -41,6 +41,7 @@ Improvements
   thanks :user:`hitenvidhani`)
 - Modernize the event social share widget and add support for sharing to
   Mastodon (:pr:`6289`)
+- Enable the calendaring + social sharing widget in events by default (:pr:`6398`)
 
 Bugfixes
 ^^^^^^^^

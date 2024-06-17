@@ -15,5 +15,5 @@ core_settings = SettingsProxy('core', {
 
 
 social_settings = SettingsProxy('social', {
-    'enabled': False,
+    'enabled': True,
 })
