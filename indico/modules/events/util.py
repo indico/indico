@@ -26,6 +26,7 @@ from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
 from indico.core.config import config
+from indico.core.db import db
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories.models.roles import CategoryRole
@@ -38,6 +39,7 @@ from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.models.settings import EventSetting
 from indico.modules.events.models.static_list_links import StaticListLink
@@ -785,3 +787,7 @@ def split_log_location_changes(changes):
 
 def format_log_person(data):
     return f'{data.full_name} <{data.email}>' if data.email else data.full_name
+
+
+def get_all_reference_types():
+    return ReferenceType.query.order_by(db.func.lower(ReferenceType.name)).all()

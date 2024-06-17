@@ -18,6 +18,7 @@ from indico.modules.events.operations import (create_event_label, create_referen
                                               delete_reference_type, update_event_label, update_reference_type)
 from indico.modules.events.schemas import AutoLinkerRuleSchema
 from indico.modules.events.settings import autolinker_settings, unlisted_events_settings
+from indico.modules.events.util import get_all_reference_types
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
@@ -28,13 +29,9 @@ from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
 
-def _get_all_reference_types():
-    return ReferenceType.query.order_by(db.func.lower(ReferenceType.name)).all()
-
-
 def _render_reference_type_list():
     tpl = get_template_module('events/admin/_reference_type_list.html')
-    return tpl.render_reference_type_list(_get_all_reference_types())
+    return tpl.render_reference_type_list(get_all_reference_types())
 
 
 class RHManageReferenceTypeBase(RHAdminBase):
@@ -49,7 +46,7 @@ class RHReferenceTypes(RHAdminBase):
     """Manage reference types in server admin area."""
 
     def _process(self):
-        types = _get_all_reference_types()
+        types = get_all_reference_types()
         return WPEventAdmin.render_template('admin/reference_types.html', 'reference_types', reference_types=types)
 
 
