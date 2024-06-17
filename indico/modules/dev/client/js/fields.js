@@ -121,7 +121,6 @@ const getFields = () => {
       title: 'References field',
       component: FinalReferences,
       initialValue: [],
-      referenceTypes: [{id: 1, name: 'Type 1'}, {id: 2, name: 'Type 2'}, {id: 3, name: 'Type 3'}],
     },
     {
       title: 'Tag list',
