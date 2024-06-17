@@ -570,10 +570,10 @@ def get_mastodon_server_name(url):
     try:
         resp = requests.get(f'{server_url}/api/v2/instance')
         resp.raise_for_status()
-    except requests.RequestException:
+        data = resp.json()
+    except (requests.RequestException, requests.JSONDecodeError):
         return None
 
-    data = resp.json()
     return {
         'name': data['title'],
     }
