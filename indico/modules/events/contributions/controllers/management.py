@@ -18,6 +18,7 @@ from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
@@ -313,6 +314,8 @@ class RHContributionREST(RHManageContributionBase):
             if not self._can_update_scheduling():
                 raise Forbidden
             updates.update(self._get_contribution_track_updates(track.get('id')))
+        if (references := data.get('references')) is not None:
+            updates |= {'references': self._get_references(references)}
         rv = {}
         if updates:
             rv = update_contribution(self.contrib, updates)
@@ -344,6 +347,17 @@ class RHContributionREST(RHManageContributionBase):
             if track_id != self.contrib.track_id:
                 updates['track'] = track
         return updates
+
+    @no_autoflush
+    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
+        references = []
+        for entry in data:
+            reference_type = ReferenceType.get(entry['reference_type_id'])
+            if not reference_type:
+                raise BadRequest('Invalid reference type')
+            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
+                                                    value=entry['value']))
+        return references
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
