@@ -7,7 +7,7 @@
 
 import re
 from datetime import date, timedelta
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
@@ -431,7 +431,6 @@ class MastodonServer:
             url = urlsplit(field.data)
             if url.scheme not in ('http', 'https'):
                 raise ValidationError(_('Invalid URL.'))
-            url = urlunsplit(url)
 
-            if not get_mastodon_server_name(url):
+            if not get_mastodon_server_name(field.data):
                 raise ValidationError(_('Invalid Mastodon server URL.'))

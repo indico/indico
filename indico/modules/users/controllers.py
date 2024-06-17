@@ -8,7 +8,7 @@
 from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
@@ -456,7 +456,7 @@ class RHUserPreferencesMastodonServer(RHUserBase):
         url = urlsplit(server_url)
         if url.scheme not in ('http', 'https'):
             raise ExpectedError(_('Invalid URL.'))
-        url = strip_path_from_url(urlunsplit(url))
+        url = strip_path_from_url(server_url)
 
         server_info = get_mastodon_server_name(url)
         if not server_info:
