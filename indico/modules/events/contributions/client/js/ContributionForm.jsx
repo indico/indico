@@ -70,7 +70,11 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
           use_default: contrib.inherit_location,
           ..._.pick(contrib, ['venue_name', 'venue_id', 'room_name', 'room_id', 'address']),
         },
-        references: [], // WHERE DOES THIS COME FROM ???
+        references: contrib.references.map(({id, reference_type_id: type, value}) => ({
+          id,
+          type,
+          value,
+        })),
         ..._.pick(contrib, [
           'title',
           'description',
@@ -104,14 +108,11 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
       />
       <CollapsibleContainer title={Translate.string('Advanced')} dividing>
         CUSTOM FIELDS HERE!
-        {referenceTypes.length > 0 && (
-          <FinalReferences
-            name="references"
-            label={Translate.string('External IDs')}
-            description={Translate.string('Manage external resources for this contribution')}
-            referenceTypes={referenceTypes}
-          />
-        )}
+        <FinalReferences
+          name="references"
+          label={Translate.string('External IDs')}
+          description={Translate.string('Manage external resources for this contribution')}
+        />
         <Form.Group widths="equal">
           <FinalInput name="board_number" label={Translate.string('Board number')} />
           <FinalInput name="code" label={Translate.string('Program code')} />
