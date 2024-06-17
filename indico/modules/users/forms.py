@@ -14,6 +14,7 @@ from wtforms.validators import DataRequired, Email, NumberRange, Optional, Valid
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
+from indico.modules.core.settings import social_settings
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
@@ -85,7 +86,8 @@ class UserPreferencesForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        if not social_settings.get('enabled'):
+            del self.mastodon_server_url
         locales = [(code, f'{name} ({territory})' if territory else name)
                    for code, (name, territory, __) in get_all_locales().items()]
         self.lang.choices = sorted(locales, key=itemgetter(1))
