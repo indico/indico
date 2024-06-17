@@ -18,6 +18,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.fields import (ContributionField, ContributionFieldValue,
                                                                ContributionFieldVisibility)
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBlockSchema
 from indico.modules.events.tracks.schemas import TrackSchema
@@ -84,12 +85,18 @@ class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
+class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionReference
+        fields = ('id', 'reference_type_id', 'value')
+
+
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'friendly_id', 'code', 'abstract_id', 'board_number', 'keywords',
                   'venue_name', 'room_name', 'address', 'inherit_location',
-                  'start_dt', 'end_dt', 'duration',
+                  'start_dt', 'end_dt', 'duration', 'references',
                   'session', 'session_block', 'track', 'type', 'custom_fields', 'persons')
 
     session = fields.Nested(BasicSessionSchema, only=('id', 'title', 'friendly_id', 'code'))
@@ -99,6 +106,7 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
     custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
     persons = SortedList(fields.Nested(ContributionPersonLinkSchema), attribute='person_links',
                          sort_key=attrgetter('display_order_key'))
+    references = fields.List(fields.Nested(ContributionReferenceSchema))
 
     @post_dump(pass_original=True)
     def _hide_restricted_fields(self, data, orig, **kwargs):
