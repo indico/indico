@@ -88,7 +88,9 @@ class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
 class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = ContributionReference
-        fields = ('id', 'reference_type_id', 'value')
+        fields = ('id', 'type', 'value')
+
+    type = fields.Integer(attribute='reference_type_id')
 
 
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
