@@ -37,13 +37,13 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
       ..._.pick(formData, ['title', 'description', 'keywords', 'board_number', 'code']),
       ..._.omit(formData.location_data, 'use_default'),
       inherit_location: !formData.location_data.use_default,
-      // TODO: references
+      references: formData.references.map(({id, ...rest}) => rest),
     });
     const resp = await indicoAxios.patch(contribURL, {
       ..._.pick(formData, ['title', 'description', 'keywords', 'board_number', 'code']),
       ..._.omit(formData.location_data, 'use_default'),
       inherit_location: !formData.location_data.use_default,
-      // TODO: references
+      references: formData.references.map(({id, ...rest}) => rest),
     });
     console.debug('Response', resp);
   };
@@ -70,11 +70,6 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
           use_default: contrib.inherit_location,
           ..._.pick(contrib, ['venue_name', 'venue_id', 'room_name', 'room_id', 'address']),
         },
-        references: contrib.references.map(({id, reference_type_id: type, value}) => ({
-          id,
-          type,
-          value,
-        })),
         ..._.pick(contrib, [
           'title',
           'description',
@@ -82,6 +77,7 @@ export function ContributionForm({eventId, contribId, eventTitle, personLinkFiel
           'keywords',
           'board_number',
           'code',
+          'references',
         ]),
       }}
       size="small"
