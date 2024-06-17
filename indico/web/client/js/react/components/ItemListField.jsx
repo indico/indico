@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import referenceTypesURL from 'indico-url:events.api_reference_types';
+
 import _ from 'lodash';
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
@@ -14,6 +16,7 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 import {Button, Form, Ref} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
@@ -287,7 +290,10 @@ FinalItemList.defaultProps = {
   sortable: false,
 };
 
-export function FinalReferences({name, referenceTypes, ...rest}) {
+export function FinalReferences({name, ...rest}) {
+  const {data, loading} = useIndicoAxios(referenceTypesURL(), {camelize: true});
+  const referenceTypes = data || [];
+
   return (
     <FinalItemList
       name={name}
@@ -299,6 +305,7 @@ export function FinalReferences({name, referenceTypes, ...rest}) {
           fieldProps: (item, onChange) => ({
             options: referenceTypes.map(r => ({key: r.id, value: r.id, text: r.name})),
             onChange: (__, {value}) => onChange('type', value),
+            loading,
             required: true,
           }),
         },
@@ -311,7 +318,4 @@ export function FinalReferences({name, referenceTypes, ...rest}) {
 
 FinalReferences.propTypes = {
   name: PropTypes.string.isRequired,
-  referenceTypes: PropTypes.arrayOf(
-    PropTypes.shape({id: PropTypes.number.isRequired, name: PropTypes.string.isRequired})
-  ).isRequired,
 };
