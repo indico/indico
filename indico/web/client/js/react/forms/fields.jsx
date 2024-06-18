@@ -34,6 +34,7 @@ export const unsortedArraysEqual = (a, b) => _.isEqual((a || []).sort(), (b || [
 export function FormFieldAdapter({
   input: {name, value, ...input},
   id,
+  autoId,
   label,
   placeholder,
   required,
@@ -92,7 +93,11 @@ export function FormFieldAdapter({
     input.loading = validating;
   }
 
-  id ??= `finalfield-${name}`;
+  const labelProps = {};
+  if (autoId) {
+    input.id ??= `finalfield-${name}`;
+    labelProps.htmlFor = input.id;
+  }
 
   const field = (
     <Form.Field
@@ -102,9 +107,8 @@ export function FormFieldAdapter({
       defaultValue={defaultValue}
       {...fieldProps}
     >
-      {label && <label htmlFor={id}>{label}</label>}
+      {label && <label {...labelProps}>{label}</label>}
       <Component
-        id={id}
         name={name}
         {...input}
         value={value === undefined ? undefinedValue : value}
@@ -135,6 +139,7 @@ export function FormFieldAdapter({
 
 FormFieldAdapter.propTypes = {
   id: PropTypes.string,
+  autoId: PropTypes.bool,
   disabled: PropTypes.bool,
   input: PropTypes.object.isRequired,
   required: PropTypes.bool,
@@ -155,6 +160,7 @@ FormFieldAdapter.propTypes = {
 
 FormFieldAdapter.defaultProps = {
   id: undefined,
+  autoId: true,
   disabled: false,
   required: false,
   hideValidationError: false,
@@ -177,7 +183,15 @@ export function RadioAdapter(props) {
     type, // unused, just don't pass it along with the ...rest
     ...rest
   } = props;
-  return <FormFieldAdapter input={input} {...rest} as={Radio} getValue={(__, {value}) => value} />;
+  return (
+    <FormFieldAdapter
+      input={input}
+      {...rest}
+      as={Radio}
+      getValue={(__, {value}) => value}
+      autoId={false}
+    />
+  );
 }
 
 RadioAdapter.propTypes = {
