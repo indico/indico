@@ -8,6 +8,7 @@
 import CustomElementBase from 'indico/custom_elements/_base';
 import {formatDate} from 'indico/utils/date_format';
 import {createDateParser} from 'indico/utils/date_parser';
+import {topBottomPosition} from 'indico/utils/positioning';
 
 import './ind_date_picker.scss';
 
@@ -77,15 +78,10 @@ customElements.define(
       });
 
       function openDialog() {
-        indCalendar.toggleAttribute('data-position-check');
-        requestAnimationFrame(() => {
-          const inputRect = input.getBoundingClientRect();
-          const dialogRect = indCalendar.firstElementChild.getBoundingClientRect();
-          const dialogBottom = inputRect.bottom + dialogRect.height;
-          const dialogWillFitBelow = dialogBottom < window.innerHeight;
-          indCalendar.style.setProperty('--dialog-bottom', dialogWillFitBelow ? 'auto' : '100%');
-          indCalendar.toggleAttribute('data-position-check');
-          indCalendar.open = true;
+        topBottomPosition(indCalendar.querySelector('dialog'), input, {
+          expand() {
+            indCalendar.open = true;
+          },
         });
       }
     }

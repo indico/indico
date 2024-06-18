@@ -138,7 +138,7 @@ Internal Changes
 - Custom poster/badge designer placeholder returning images need to return a ``BytesIO``
   instead of a Pillow ``Image`` object (:pr:`6441`)
 - Add ``<ind-date-picker>`` custom element (:pr:`6371`, thanks :user:`foxbunny`)
-- Add ``<ind-combobox>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
+- Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 
 
 Version 3.3.2

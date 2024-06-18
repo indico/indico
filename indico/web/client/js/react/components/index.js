@@ -25,7 +25,7 @@ export {default as DateRangePicker} from './dates/DateRangePicker';
 export {default as CalendarSingleDatePicker} from './dates/CalendarSingleDatePicker';
 export {default as CalendarRangeDatePicker} from './dates/CalendarRangeDatePicker';
 export {default as DatePeriodField, FinalDatePeriod} from './dates/DatePeriodField';
-export {default as Combobox} from './Combobox';
+export {default as ComboBox} from './ComboBox';
 export {default as Carousel} from './Carousel';
 export {default as ScrollButton} from './ScrollButton';
 export {default as StickyWithScrollBack} from './StickyWithScrollBack';

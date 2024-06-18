@@ -6,19 +6,23 @@
 // LICENSE file for more details.
 
 @use 'partials/icons';
+@use 'partials/sui_debt';
 @use 'design_system';
 
-ind-combobox {
+ind-combo-box {
   display: inline-block;
   position: relative;
 
-  .ui.form & [role='combobox'], // This selector is a quick fix to override the existing styles
-  [role='combobox'] {
-    padding-right: 2em;
+  input[role='combobox'] {
+    @include sui_debt.field-override() {
+      padding-right: 2em;
+    }
   }
 
-  .ui.form &[clearable] [role='combobox'] {
-    padding-right: 4.5em;
+  &[clearable] input[role='combobox'] {
+    @include sui_debt.field_override() {
+      padding-right: 4.5em;
+    }
   }
 
   [role='combobox'][aria-expanded='true'] {
@@ -43,29 +47,32 @@ ind-combobox {
     transform: translateY(-50%) rotate(180deg);
   }
 
-  [aria-selected='true'] {
-    background: var(--control-alt-clickable-surface-color);
-    color: var(--control-alt-text-color);
-    outline: medium;
-  }
-
-  &:not([open]) [role='listbox'] {
+  &:not([open]) [role='listbox']:not([data-position-check]) {
     display: none;
   }
 
-  &[open] [role='listbox'] {
+  &[open] [role='listbox'],
+  [role='listbox'][data-position-check] {
+    --target-bottom: 'auto';
+
     position: absolute;
-    background: white;
+    bottom: var(--target-bottom);
     z-index: 10;
     min-width: 100%;
-    max-height: min(75vh, 10em);
+    max-height: min(75vh, 16em);
     overflow-y: auto;
 
+    background: white;
     border: 1px solid #85b7d9; // color from semantic UI
     border-top: 0;
     border-bottom-left-radius: 0.28571429rem; // value from semantic UI
     border-bottom-right-radius: 0.28571429rem; // value from semantic UI
     box-shadow: var(--control-raised-shadow);
+  }
+
+  [role='listbox'][data-position-check] {
+    opacity: 0;
+    pointer-events: none;
   }
 
   [role='option'] {
@@ -77,9 +84,20 @@ ind-combobox {
       cursor: pointer;
     }
 
+    &[aria-disabled] {
+      color: var(--control-disabled-text-color);
+      pointer-events: none;
+    }
+
     &:not([aria-selected='true']):hover {
       background: var(--control-clickable-surface-focus-color);
     }
+  }
+
+  [aria-selected='true'] {
+    background: var(--control-alt-clickable-surface-color);
+    color: var(--control-alt-text-color);
+    outline: medium;
   }
 
   button[value='clear']:not([hidden]) {
