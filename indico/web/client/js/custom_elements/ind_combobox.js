@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import './ind_combobox.scss';
+import {topBottomPosition} from 'indico/utils/positioning';
 
-let lastId = 1;
+import './ind_combobox.scss';
 
 function setNativeInputValue(input, value) {
   // React adds its own setter to the input and messes with the native event mechanism.
@@ -16,21 +16,17 @@ function setNativeInputValue(input, value) {
 }
 
 customElements.define(
-  'ind-combobox',
-  class IndCombobox extends HTMLElement {
-    #comboId;
-
-    constructor() {
-      super();
-      this.#comboId = `x-combobox-${lastId++}`;
-    }
+  'ind-combo-box',
+  class extends HTMLElement {
+    static lastId = 1;
 
     get value() {
       return this.querySelector('input').value;
     }
 
     connectedCallback() {
-      const this_ = this;
+      const indComboBox = this;
+      const id = `combo-box-${this.constructor.lastId++}`;
       const listbox = this.querySelector('[role=listbox]');
       const input = this.querySelector('input');
       const clearButton = this.querySelector('button[value=clear]');
@@ -45,7 +41,7 @@ customElements.define(
 
       // Prepare the element state
 
-      listbox.id = `${this.#comboId}-list`;
+      listbox.id = `${id}-list`;
       input.setAttribute('aria-haspopup', true);
       input.setAttribute('aria-controls', listbox.id);
       this.toggleAttribute('clearable', clearButton);
@@ -59,7 +55,7 @@ customElements.define(
       // Each option is given a unique id so that aria-activedescendant can
       // point to them when they are selected using arrow keys.
       for (let i = 0, option; (option = listbox.children[i]); i++) {
-        option.id = `${this.#comboId}-option-${i + 1}`;
+        option.id = `${id}-option-${i + 1}`;
         if (!option.dataset.value) {
           option.dataset.value = option.textContent;
         }
@@ -85,7 +81,9 @@ customElements.define(
 
       listbox.addEventListener('pointerdown', evt => {
         // We use pointerdown instead of click here, because click fires after blur (see below)
-        const option = evt.target.closest('[role=option]:not([aria-selected=true])');
+        const option = evt.target.closest(
+          '[role=option]:not([aria-selected=true]):not([aria-disabled])'
+        );
         if (option) {
           selectOption(option);
           toggleClearButton(true);
@@ -116,8 +114,8 @@ customElements.define(
           // their original sort order.
           let optionRank = 0;
 
-          if (filterKeyword) {
-            // Skip if no filter keyword
+          // Skip if no filter keyword
+          if (filterKeyword && !option.hasAttribute('aria-disabled')) {
             // Exact initial match
             optionRank += optionValue.startsWith(filterKeyword) * 1000;
             // Case-insensitive initial match
@@ -150,7 +148,7 @@ customElements.define(
           selectInputText(filterKeyword.length);
         }
 
-        toggleListbox(candidateCount > 0);
+        toggleListbox(filterKeyword && candidateCount > 0);
         toggleClearButton();
       });
 
@@ -222,10 +220,20 @@ customElements.define(
 
       function toggleListbox(isOpen) {
         // The list box visibility is controlled using CSS based on aria-expanded on the input
-        input.setAttribute('aria-expanded', isOpen);
-        listbox.hiudden = !isOpen;
-        this_.toggleAttribute('open', isOpen);
-        listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
+        if (isOpen) {
+          input.setAttribute('aria-expanded', true);
+          listbox.hidden = false;
+          topBottomPosition(listbox, input, {
+            expand: () => {
+              indComboBox.toggleAttribute('open', true);
+            },
+          });
+          listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
+        } else {
+          input.removeAttribute('aria-expanded');
+          listbox.hidden = true;
+          indComboBox.removeAttribute('open');
+        }
       }
 
       function closeListbox() {
@@ -257,6 +265,7 @@ customElements.define(
       function moveVirtualCursorToOption(option) {
         // Omit the option to remove selection
         input.setAttribute('aria-activedescendant', option?.id || '');
+        option.scrollIntoView({block: 'nearest'});
       }
 
       function selectInputText(startIndex = input.value.length) {
@@ -266,21 +275,25 @@ customElements.define(
       function findNextSelectableOption() {
         const currentOption = listbox.querySelector('[aria-selected=true]');
         let nextOption = currentOption?.nextElementSibling;
-        while (nextOption?.hidden) {
+        while (nextOption?.hidden || nextOption?.hasAttribute('aria-disabled')) {
           nextOption = nextOption.nextElementSibling;
         }
-        return nextOption || listbox.querySelector('[role=option]:not([hidden])');
+        return (
+          nextOption || listbox.querySelector('[role=option]:not([hidden]):not([aria-disabled])')
+        );
       }
 
       function findPreviousSelectableOption() {
         const currentOption = listbox.querySelector('[aria-selected=true]');
         let previousOption = currentOption?.previousElementSibling;
-        while (previousOption?.hidden) {
+        while (previousOption?.hidden || previousOption?.hasAttribute('aria-disabled')) {
           previousOption = previousOption.previousElementSibling;
         }
         return (
           previousOption ||
-          listbox.querySelector('[role=option]:nth-last-child(1 of :not([hidden]))')
+          listbox.querySelector(
+            '[role=option]:nth-last-child(1 of :not([hidden]):not([aria-disabled]))'
+          )
         );
       }
     }

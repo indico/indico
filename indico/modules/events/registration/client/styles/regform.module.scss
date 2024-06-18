@@ -240,16 +240,33 @@
       .single-choice-dropdown {
         align-items: center;
         margin-bottom: 0;
+        gap: 0.5em;
+        justify-content: flex-start;
+        padding: 0 0.5em;
 
-        :global(.field):first-child,
-        ind-combobox {
-          max-width: var(--max-form-item-width);
+        :global(.field):first-child {
           width: 100%;
+          max-width: var(--max-form-item-width);
+          padding: 0;
+
+          ind-combo-box {
+            width: 100%;
+          }
+        }
+
+        .extra-slots {
+          display: flex;
+          align-items: center;
+
+          ind-combo-box {
+            max-width: 5em;
+          }
         }
 
         .dropdown-text {
           display: flex;
           align-items: center;
+          justify-content: space-between;
 
           .caption {
             flex-grow: 1;
@@ -270,6 +287,10 @@
           }
         }
 
+        [aria-disabled] .labels {
+          opacity: 0.6;
+        }
+
         :global(.dropdown .divider.text) {
           width: 100%;
         }
@@ -288,8 +309,7 @@
       textarea,
       input[type='email'],
       input[type='file'],
-      input[type='text'],
-      ind-combobox {
+      input[type='text'] {
         max-width: var(--max-form-item-width);
       }
 

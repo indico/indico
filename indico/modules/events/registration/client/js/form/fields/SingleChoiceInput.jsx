@@ -13,7 +13,7 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
 
-import {Combobox} from 'indico/react/components';
+import {ComboBox} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
@@ -45,23 +45,31 @@ function SingleChoiceDropdown({
   const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id in value) || {};
+  const selectedSeats = value[selectedChoice.id] || 0;
 
   const isPaidChoice = choice => choice.price > 0 && paid;
   const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
 
   let extraSlotsDropdown = null;
-  if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
-    const options = _.range(1, selectedChoice.maxExtraSlots + 2).map(i => ({
-      key: i,
+  const extraSlotsLabelId = `${id}-label`;
+  const shouldShowExtraSlots = withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0;
+  const shouldShowExtraSlotsLabel = shouldShowExtraSlots && !!selectedChoice.price;
+
+  if (shouldShowExtraSlots) {
+    const slotValues = _.range(1, selectedChoice.maxExtraSlots + 2);
+    const options = slotValues.map(i => ({
       value: i,
-      text: i,
       disabled:
         selectedChoice.placesLimit > 0 &&
         (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) + i >
           selectedChoice.placesLimit,
     }));
+    const comboBoxExtraProps = {};
+    if (shouldShowExtraSlotsLabel) {
+      comboBoxExtraProps['aria-describedby'] = extraSlotsLabelId;
+    }
     extraSlotsDropdown = (
-      <Form.Select
+      <ComboBox
         id={id ? `${id}-extraslots` : ''}
         options={options}
         disabled={
@@ -71,39 +79,52 @@ function SingleChoiceDropdown({
             (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) >=
               selectedChoice.placesLimit)
         }
-        value={value[selectedChoice.id]}
-        onChange={(_evt, data) => onChange({[selectedChoice.id]: data.value})}
-        fluid
+        value={String(selectedSeats)}
+        onChange={evt => {
+          const selectedSlots = Number(evt.target.value);
+          onChange({[selectedChoice.id]: selectedSlots});
+        }}
+        aria-label={Translate.string('Select extra slots')}
+        required
+        {...comboBoxExtraProps}
       />
     );
   }
 
-  const options = choices.map(c => [
-    c.caption,
-    <div styleName="dropdown-text" hidden={c.disabled} key={c.id}>
-      <div styleName="caption">
-        <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
+  const options = choices.map(choice => ({
+    value: choice.caption,
+    label: (
+      <div styleName="dropdown-text" key={choice.id}>
+        <div styleName="caption">
+          <ChoiceLabel choice={choice} management={management} paid={isPaidChoice(choice)} />
+        </div>
+        <div styleName="labels">
+          {!!choice.price && (
+            <Label>
+              {choice.price} {currency}
+            </Label>
+          )}
+          {choice.placesLimit === 0 ? null : (
+            <PlacesLeft
+              placesLimit={choice.placesLimit}
+              placesUsed={placesUsed[choice.id] || 0}
+              isEnabled={choice.isEnabled}
+            />
+          )}
+        </div>
       </div>
-      <div styleName="labels">
-        {!!c.price && (
-          <Label>
-            {c.price} {currency}
-          </Label>
-        )}
-        {c.placesLimit === 0 ? null : (
-          <PlacesLeft
-            placesLimit={c.placesLimit}
-            placesUsed={placesUsed[c.id] || 0}
-            isEnabled={c.isEnabled}
-          />
-        )}
-      </div>
-    </div>,
-  ]);
+    ),
+    disabled:
+      !choice.isEnabled ||
+      isPaidChoiceLocked(choice) ||
+      (choice.placesLimit > 0 &&
+        (placesUsed[choice.id] || 0) >= choice.placesLimit &&
+        !existingValue[choice.id]),
+  }));
 
   const handleChange = evt => {
     if (!evt.target.value) {
-      onChange({});
+      onChange({'': -1});
       return;
     }
     const selected = choices.find(c => c.caption === evt.target.value);
@@ -113,7 +134,7 @@ function SingleChoiceDropdown({
   return (
     <Form.Group styleName="single-choice-dropdown">
       <Form.Field>
-        <Combobox
+        <ComboBox
           id={id}
           onChange={handleChange}
           options={options}
@@ -124,17 +145,19 @@ function SingleChoiceDropdown({
           onBlur={onBlur}
         />
       </Form.Field>
-      {extraSlotsDropdown}
-      {extraSlotsDropdown && !!selectedChoice.price && (
-        <Label pointing="left">
-          {Translate.string('Total: {total} {currency}', {
-            total: (
-              (selectedChoice.extraSlotsPay ? value[selectedChoice.id] : 1) * selectedChoice.price
-            ).toFixed(2),
-            currency,
-          })}
-        </Label>
-      )}
+      <div styleName="extra-slots">
+        {extraSlotsDropdown}
+        {shouldShowExtraSlotsLabel && (
+          <Label pointing="left" id={extraSlotsLabelId}>
+            {Translate.string('Total: {total} {currency}', {
+              total: (
+                (selectedChoice.extraSlotsPay ? selectedSeats : 1) * selectedChoice.price
+              ).toFixed(2),
+              currency,
+            })}
+          </Label>
+        )}
+      </div>
     </Form.Group>
   );
 }

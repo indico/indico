@@ -49,7 +49,7 @@ ind-calendar {
   @extend %text-size-reset;
 
   dialog[open],
-  &[data-position-check] dialog {
+  dialog[data-position-check] {
     position: absolute;
     left: 0;
     display: flex;
@@ -63,12 +63,12 @@ ind-calendar {
   }
 
   dialog[open] {
-    bottom: var(--dialog-bottom);
+    bottom: var(--target-bottom);
 
     box-shadow: var(--control-raised-shadow);
   }
 
-  &[data-position-check] dialog {
+  dialog[data-position-check] {
     opacity: 0;
     pointer-events: none;
   }
