@@ -255,7 +255,6 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
                     labelPosition="right"
                     placeholder="https://mastodon.social"
                     fluid
-                    autoFocus
                     error={!!submitError && !dirtySinceLastSubmit}
                     componentLabel={
                       <Button
