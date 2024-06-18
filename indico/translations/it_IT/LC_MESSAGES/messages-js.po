@@ -7,7 +7,7 @@
 # Andrea Lenarduzzi <andreaussi@yahoo.it>, 2019
 # francesca.m <francesca.m.martelli@gmail.com>, 2014
 # michele michelotto <michelotto@pd.infn.it>, 2018-2019,2022
-# Pierpaolo Gallo, 2023
+# Pierpaolo Gallo, 2023-2024
 # Ruggero Turra, 2021
 # Segreteria AIUM <segreteria@aium.it>, 2023
 # Tomáš Roun <tomas.roun8@gmail.com>, 2024
@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-18 17:55+0100\n"
+"POT-Creation-Date: 2024-06-18 11:48+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
 "Language-Team: Italian (Italy) (http://app.transifex.com/indico/indico/language/it_IT/)\n"
@@ -50,6 +50,10 @@ msgstr "Gestisci il materiale"
 #: indico/modules/attachments/client/js/package.js:49
 msgid "Building package"
 msgstr "Pacchetto in preparazione"
+
+#: indico/modules/auth/templates/login_page.html:130
+msgid "Login with {0}"
+msgstr ""
 
 #: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
@@ -91,8 +95,12 @@ msgid "The category list has been sorted."
 msgstr "La lista delle categorie è stata ordinata."
 
 #: indico/modules/categories/client/js/management.js:184
+#: indico/modules/categories/templates/management/delete_categories.html:3
 msgid "Delete category"
-msgstr "Cancella categoria"
+msgid_plural "Delete categories"
+msgstr[0] "Cancella categoria"
+msgstr[1] "Cancella categorie"
+msgstr[2] "Cancella categorie"
 
 #: indico/modules/categories/client/js/management.js:188
 msgid "This category cannot be deleted because it is not empty."
@@ -176,6 +184,14 @@ msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] "Questa è la categoria che stai cercando di spostare"
 msgstr[1] "Questa è una delle categorie che stai cercando di spostare"
 msgstr[2] "Questa è una delle categorie che stai cercando di spostare"
+
+#: indico/modules/categories/templates/display/base.html:115
+msgid "Navigate to"
+msgstr ""
+
+#: indico/modules/categories/templates/display/base.html:116
+msgid "Navigate to a category"
+msgstr ""
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -303,6 +319,11 @@ msgstr "Il retro è vuoto."
 msgid "Error"
 msgstr "Errore"
 
+#: indico/modules/designer/templates/_list.html:80
+msgctxt "Designer template linked to registration form"
+msgid "Linked to"
+msgstr ""
+
 #: indico/modules/events/abstracts/client/js/index.js:75
 #: indico/modules/events/abstracts/client/js/index.js:88
 msgid "Show preview"
@@ -311,6 +332,17 @@ msgstr "Mostra anteprima"
 #: indico/modules/events/abstracts/client/js/index.js:79
 msgid "Hide preview"
 msgstr "Nascondi anteprima"
+
+#: indico/modules/events/abstracts/templates/display/tracks.html:61
+msgctxt "track convener"
+msgid "Convener"
+msgstr "Coordinatore"
+
+#: indico/modules/events/agreements/templates/agreement_form.html:110
+msgid ""
+"You won't be able to change your decision later. If necessary, please "
+"contact the manager of the event."
+msgstr ""
 
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
@@ -351,6 +383,10 @@ msgstr[0] "Vuoi veramente cancellare la registrazione selezionata?"
 msgstr[1] "Vuoi veramente cancellare le {0} registrazioni selezionate?"
 msgstr[2] "Vuoi veramente cancellare le {0} registrazioni selezionate?"
 
+#: indico/modules/events/reminders/templates/edit_reminder.html:40
+msgid "Reminder Preview"
+msgstr ""
+
 #: indico/modules/events/sessions/client/js/index.js:118
 msgid "Filter types"
 msgstr "Filtra tipi"
@@ -363,6 +399,66 @@ msgstr "Aggiungi nuovo tipo"
 #: indico/modules/events/sessions/client/js/index.js:150
 msgid "No type"
 msgstr "Nessun tipo"
+
+#: indico/modules/events/surveys/templates/display/survey_questionnaire.html:70
+msgid "Submit"
+msgstr "Invia"
+
+#: indico/modules/events/surveys/templates/display/survey_questionnaire.html:71
+msgid "Submitting..."
+msgstr ""
+
+#: indico/modules/events/surveys/templates/display/survey_questionnaire.html:72
+msgid ""
+"Your answers have been saved, do not forget to submit the survey when you "
+"finish!"
+msgstr ""
+
+#: indico/modules/events/templates/display/access_key.html:50
+msgid "Invalid access key"
+msgstr ""
+
+#: indico/modules/events/timetable/templates/_timetable.html:56
+msgid "The timetable has not been filled yet."
+msgstr ""
+
+#: indico/modules/events/timetable/templates/display/indico/_common.html:42
+msgid "Speaker"
+msgid_plural "Speakers"
+msgstr[0] "Relatore"
+msgstr[1] "Relatori"
+msgstr[2] "Relatori"
+
+#: indico/modules/events/timetable/templates/display/indico/_session_block.html:44
+msgid "Convener"
+msgid_plural "Conveners"
+msgstr[0] "Coordinatore"
+msgstr[1] "Coordinatori"
+msgstr[2] "Coordinatori"
+
+#: indico/modules/users/templates/dashboard.html:241
+msgid "You have favorited this category"
+msgstr "Avete favorito questa categoria"
+
+#: indico/modules/users/templates/users_merge.html:15
+msgid "E-mail"
+msgstr "E-mail"
+
+#: indico/modules/users/templates/users_merge.html:15
+msgid "Affiliation"
+msgstr ""
+
+#: indico/modules/users/templates/users_merge.html:85
+msgid "Are you sure you want to merge those two users?"
+msgstr ""
+
+#: indico/modules/users/templates/users_merge.html:94
+msgid "Please notice there are warning messages!"
+msgstr ""
+
+#: indico/modules/users/templates/users_merge.html:95
+msgid "Confirm user merge"
+msgstr ""
 
 #: indico/modules/vc/client/js/index.js:83
 msgid ""
@@ -629,7 +725,7 @@ msgstr "Ripulisci la ricerca"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js:706
 msgid "You selected category \"{0}\". Are you sure you want to proceed?"
-msgstr ""
+msgstr "Hai scelto la categoria \"{0}\". Sei sicuro di voler proseguire?"
 
 #: indico/web/client/js/jquery/widgets/itempicker.js:23
 msgid "Type to filter..."
@@ -1024,7 +1120,7 @@ msgstr "sposta a ridimensiona"
 msgid ""
 "<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
 "applied to blocks after."
-msgstr ""
+msgstr "Tasto <kbd class=\"tt-key\">SHIFT</kbd> premuto. I cambiamenti verranno applicati ai blocchi di seguito."
 
 #: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
 msgid "Drop to move block inside session"
@@ -1363,3 +1459,16 @@ msgstr "Adatta calendario al contenuto"
 #: indico/web/client/js/legacy/libs/timetable/Undo.js:13
 msgid "Undo last operation"
 msgstr "Annulla ultima operazione"
+
+#: indico/web/templates/forms/email_recipients_widget.html:23
+#: indico/web/templates/forms/email_recipients_widget.html:29
+msgid "Show more"
+msgstr ""
+
+#: indico/web/templates/forms/email_recipients_widget.html:29
+msgid "Show less"
+msgstr ""
+
+#: indico/web/templates/forms/tag_list_widget.html:32
+msgid "Add new keyword"
+msgstr ""
