@@ -32,7 +32,9 @@ const preprocessData = data => {
     .map(e => Object.values(e))
     .flat();
   const childEntries = blocks
-    .map(e => (e.entries ? Object.values(e.entries).map(v => ({...v, parentId: e.id})) : []))
+    .map(({id, entries, isPoster}) =>
+      entries ? Object.values(entries).map(v => ({...v, parentId: id, isPoster})) : []
+    )
     .flat();
   return [blocks, childEntries].map(en =>
     en.map(e => ({
@@ -45,6 +47,7 @@ const preprocessData = data => {
         'sessionId',
         'description',
         'parentId',
+        'isPoster',
       ]),
       type: entryTypeMapping[e.entryType],
       start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
