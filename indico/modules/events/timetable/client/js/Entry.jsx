@@ -16,7 +16,7 @@ import './Entry.module.scss';
 
 export default function Entry({event: entry}) {
   const {type, title} = entry;
-  const contributions = useSelector(selectors.getChildren);
+  const contributions = useSelector(selectors.getVisibleChildren);
   const displayMode = useSelector(selectors.getDisplayMode);
 
   if (type === 'placeholder') {

@@ -30,7 +30,7 @@ const DnDCalendar = withDragAndDrop(Calendar);
 export default function Timetable() {
   const dispatch = useDispatch();
   const displayMode = useSelector(selectors.getDisplayMode);
-  const entries = useSelector(selectors.getAllEntries);
+  const entries = useSelector(selectors.getVisibleEntries);
   const blocks = useSelector(selectors.getBlocks);
   const selected = useSelector(selectors.getSelectedEntry);
   const draggedContrib = useSelector(selectors.getDraggedContrib);

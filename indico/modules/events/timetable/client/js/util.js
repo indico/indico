@@ -55,6 +55,7 @@ export const entrySchema = PropTypes.shape({
   displayOrder: PropTypes.number,
   parentId: PropTypes.string, // only for contributions
   columnId: PropTypes.number, // set only if parentId is null
+  isPoster: PropTypes.bool, // only for contributions
 });
 
 export const hasContributions = (block, contribs) => contribs.some(e => e.parentId === block.id);

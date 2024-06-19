@@ -40,6 +40,10 @@ export const getChildren = createSelector(
   getUpdatedEntries,
   entries => entries.children
 );
+export const getVisibleChildren = createSelector(
+  getChildren,
+  children => children.filter(c => !c.isPoster)
+);
 export const getUnscheduled = createSelector(
   getUpdatedEntries,
   entries => entries.unscheduled
@@ -48,9 +52,9 @@ export const getNumUnscheduled = createSelector(
   getUnscheduled,
   unscheduled => unscheduled.length
 );
-export const getAllEntries = createSelector(
+export const getVisibleEntries = createSelector(
   getBlocks,
-  getChildren,
+  getVisibleChildren,
   (blocks, children) => [...blocks, ...children]
 );
 export const getSelectedId = createSelector(
@@ -58,7 +62,7 @@ export const getSelectedId = createSelector(
   entries => entries.selectedId
 );
 export const getSelectedEntry = createSelector(
-  getAllEntries,
+  getVisibleEntries,
   getSelectedId,
   (entries, id) => id && entries.find(e => e.id === id)
 );
