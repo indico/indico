@@ -95,8 +95,10 @@ export function FormFieldAdapter({
 
   const labelProps = {};
   if (autoId) {
-    input.id ??= `finalfield-${name}`;
+    input.id = id || `finalfield-${name}`;
     labelProps.htmlFor = input.id;
+  } else if (id) {
+    input.id = id;
   }
 
   const field = (
