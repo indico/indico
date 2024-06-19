@@ -64,6 +64,7 @@ ItemLocked.propTypes = {
 };
 
 export default function FormItem({
+  id,
   title,
   description,
   retentionPeriod,
@@ -78,14 +79,14 @@ export default function FormItem({
   ...rest
 }) {
   // TODO move outside like with setupActions etc?
-  const paidItemLocked = useSelector(state => isPaidItemLocked(state, rest.id));
+  const paidItemLocked = useSelector(state => isPaidItemLocked(state, id));
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
 
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
-  const inputProps = {title, description, isEnabled, ...rest};
+  const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
 
@@ -108,7 +109,7 @@ export default function FormItem({
 
   const showAsRequired = meta.alwaysRequired || isRequired;
   const inputRequired = !isManagement && showAsRequired;
-  const htmlId = `input-${inputProps.id}`;
+  const htmlId = `input-${inputProps.fieldId}`;
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (

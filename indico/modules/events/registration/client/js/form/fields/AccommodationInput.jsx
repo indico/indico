@@ -196,7 +196,7 @@ AccommodationInputComponent.propTypes = {
 };
 
 export default function AccommodationInput({
-  id,
+  fieldId,
   htmlId,
   htmlName,
   disabled,
@@ -207,7 +207,7 @@ export default function AccommodationInput({
   departure,
   placesUsed,
 }) {
-  const existingValue = useSelector(state => getFieldValue(state, id)) || {choice: null};
+  const existingValue = useSelector(state => getFieldValue(state, fieldId)) || {choice: null};
   return (
     <FinalField
       id={htmlId}
@@ -234,7 +234,7 @@ export default function AccommodationInput({
 }
 
 AccommodationInput.propTypes = {
-  id: PropTypes.number.isRequired,
+  fieldId: PropTypes.number.isRequired,
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,

@@ -21,7 +21,7 @@ import {PlacesLeft} from './PlacesLeftLabel';
 import '../../../styles/regform.module.scss';
 
 function BooleanInputComponent({
-  id,
+  fieldId,
   value,
   onChange,
   disabled,
@@ -32,7 +32,7 @@ function BooleanInputComponent({
   placesUsed,
 }) {
   const currency = useSelector(getCurrency);
-  const existingValue = useSelector(state => getFieldValue(state, id));
+  const existingValue = useSelector(state => getFieldValue(state, fieldId));
 
   const makeOnClick = newValue => () => {
     if (value === newValue && !required) {
@@ -77,7 +77,7 @@ function BooleanInputComponent({
 }
 
 BooleanInputComponent.propTypes = {
-  id: PropTypes.number.isRequired,
+  fieldId: PropTypes.number.isRequired,
   value: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
@@ -93,7 +93,7 @@ BooleanInputComponent.defaultProps = {
 };
 
 export default function BooleanInput({
-  id,
+  fieldId,
   htmlName,
   disabled,
   isRequired,
@@ -110,7 +110,7 @@ export default function BooleanInput({
 
   return (
     <FinalField
-      id={id}
+      fieldId={fieldId}
       name={htmlName}
       component={BooleanInputComponent}
       required={isRequired ? 'no-validator' : isRequired}
@@ -126,7 +126,7 @@ export default function BooleanInput({
 }
 
 BooleanInput.propTypes = {
-  id: PropTypes.number.isRequired,
+  fieldId: PropTypes.number.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,

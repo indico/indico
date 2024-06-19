@@ -182,7 +182,7 @@ MultiChoiceInputComponent.propTypes = {
 };
 
 export default function MultiChoiceInput({
-  id,
+  fieldId,
   htmlId,
   htmlName,
   disabled,
@@ -192,7 +192,7 @@ export default function MultiChoiceInput({
   withExtraSlots,
   placesUsed,
 }) {
-  const existingValue = useSelector(state => getFieldValue(state, id)) || {};
+  const existingValue = useSelector(state => getFieldValue(state, fieldId)) || {};
   return (
     <FinalField
       id={htmlId}
@@ -220,7 +220,7 @@ export default function MultiChoiceInput({
 }
 
 MultiChoiceInput.propTypes = {
-  id: PropTypes.number.isRequired,
+  fieldId: PropTypes.number.isRequired,
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,

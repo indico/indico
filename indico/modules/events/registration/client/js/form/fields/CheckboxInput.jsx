@@ -22,7 +22,7 @@ import {PlacesLeft} from './PlacesLeftLabel';
 import styles from '../../../styles/regform.module.scss';
 
 export default function CheckboxInput({
-  id,
+  fieldId,
   htmlId,
   htmlName,
   disabled,
@@ -35,7 +35,7 @@ export default function CheckboxInput({
   retentionPeriodIcon,
 }) {
   const currency = useSelector(getCurrency);
-  const existingValue = useSelector(state => getFieldValue(state, id));
+  const existingValue = useSelector(state => getFieldValue(state, fieldId));
   const checkboxId = `${htmlId}-checkbox`;
 
   return (
@@ -67,7 +67,7 @@ export default function CheckboxInput({
 }
 
 CheckboxInput.propTypes = {
-  id: PropTypes.number.isRequired,
+  fieldId: PropTypes.number.isRequired,
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
