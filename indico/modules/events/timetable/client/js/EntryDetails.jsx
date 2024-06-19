@@ -162,7 +162,7 @@ export function ContributionDetails({entry, uses24HourFormat, dispatch, showTitl
           <Translate as="strong">Title</Translate>: {entry.title}
         </div>
       )}
-      <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />
+      {!entry.isPoster && <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />}
       <AttachmentsDisplay entry={entry} />
     </DetailsSegment>
   );
