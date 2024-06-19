@@ -93,5 +93,9 @@ export function CountrySettings({htmlName}) {
 }
 
 CountrySettings.propTypes = {
-  htmlName: PropTypes.string.isRequired,
+  htmlName: PropTypes.string,
+};
+
+CountrySettings.defaultProps = {
+  htmlName: undefined,
 };
