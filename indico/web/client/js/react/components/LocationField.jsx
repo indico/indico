@@ -54,7 +54,14 @@ const processLocations = (locations, value) => {
   return [venues, rooms];
 };
 
-export default function LocationField({value, onChange, disabled, required, editAddress, parent}) {
+export default function LocationField({
+  value,
+  onChange,
+  disabled,
+  required,
+  editAddress,
+  locationParent,
+}) {
   const {data, loading} = useIndicoAxios(locationsURL(), {camelize: true});
   const locationsEnabled = data?.enabled || false;
   const locations = data?.locations || [];
@@ -108,8 +115,8 @@ export default function LocationField({value, onChange, disabled, required, edit
           <Form.Select
             styleName="venue-dropdown"
             placeholder={Translate.string('Venue')}
-            disabled={disabled || value.use_default}
-            required={required && !value.use_default}
+            disabled={disabled || value.inheriting}
+            required={required && !value.inheriting}
             clearable={!required}
             options={venues}
             value={value.venue_id || value.venue_name}
@@ -123,8 +130,8 @@ export default function LocationField({value, onChange, disabled, required, edit
           <Form.Select
             styleName="room-dropdown"
             placeholder={Translate.string('Room')}
-            disabled={disabled || value.use_default}
-            required={required && !value.use_default}
+            disabled={disabled || value.inheriting}
+            required={required && !value.inheriting}
             clearable={!required}
             options={rooms}
             value={value.room_id || value.room_name}
@@ -143,7 +150,7 @@ export default function LocationField({value, onChange, disabled, required, edit
             placeholder={Translate.string('Venue')}
             value={value.venue_name || ''}
             onChange={makeOnChange('venue_name')}
-            disabled={disabled || value.use_default}
+            disabled={disabled || value.inheriting}
             required={required}
           />
           <Form.Input
@@ -151,7 +158,7 @@ export default function LocationField({value, onChange, disabled, required, edit
             placeholder={Translate.string('Room')}
             value={value.room_name || ''}
             onChange={makeOnChange('room_name')}
-            disabled={disabled || value.use_default}
+            disabled={disabled || value.inheriting}
             required={required}
           />
         </Form.Group>
@@ -161,20 +168,20 @@ export default function LocationField({value, onChange, disabled, required, edit
           placeholder={Translate.string('Address')}
           value={value.address || ''}
           onChange={makeOnChange('address')}
-          disabled={disabled || value.use_default}
+          disabled={disabled || value.inheriting}
           required={required}
         />
       )}
-      {parent && (
+      {locationParent && (
         <Form.Group>
           <Form.Checkbox
             label={Translate.string('Use default')}
-            checked={value.use_default}
+            checked={value.inheriting}
             onChange={(_, {checked}) =>
               onChange(
                 checked
-                  ? {...(parent.location_data || {}), use_default: true}
-                  : {...value, use_default: false}
+                  ? {...locationParent.location_data, inheriting: true}
+                  : {...value, inheriting: false}
               )
             }
             disabled={disabled}
@@ -182,10 +189,10 @@ export default function LocationField({value, onChange, disabled, required, edit
           <Popup
             trigger={<Icon color="grey" name="info circle" />}
             content={
-              value.use_default
+              value.inheriting
                 ? Translate.string("Using default location from '{title}' ({type})", {
-                    title: parent.title,
-                    type: parent.type,
+                    title: locationParent.title,
+                    type: locationParent.type,
                   })
                 : Translate.string('Using custom location')
             }
@@ -203,13 +210,13 @@ LocationField.propTypes = {
     room_id: PropTypes.number,
     room_name: PropTypes.string,
     address: PropTypes.string,
-    use_default: PropTypes.bool,
+    inheriting: PropTypes.bool,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
   editAddress: PropTypes.bool,
-  parent: PropTypes.shape({
+  locationParent: PropTypes.shape({
     title: PropTypes.string,
     type: PropTypes.string,
     location_data: PropTypes.shape({
@@ -226,7 +233,7 @@ LocationField.defaultProps = {
   disabled: false,
   required: false,
   editAddress: true,
-  parent: null,
+  locationParent: null,
 };
 
 export function FinalLocationField({name, ...rest}) {

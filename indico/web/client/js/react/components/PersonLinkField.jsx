@@ -559,6 +559,10 @@ FinalContributionPersonLinkField.defaultProps = {
   defaultIsSubmitter: true,
 };
 
+export function FinalSessionBlockPersonLinkField(props) {
+  return <FinalPersonLinkField roles={[]} {...props} />;
+}
+
 export function WTFPersonLinkField({
   fieldId,
   eventId,

@@ -75,6 +75,15 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/acl-message', 'acl_mess
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/clone', 'clone_contribution', management.RHCloneContribution,
                  methods=('POST',))
 
+_bp.add_url_rule('/api/contributions/<int:contrib_id>', 'api_manage_contrib', management.RHAPIContribution,
+                 methods=('GET', 'PATCH'))
+_bp.add_url_rule('/api/contributions/create', 'api_create_contrib', management.RHAPIContributionCreate,
+                 methods=('POST',))
+_bp.add_url_rule('/api/contributions/location-parent', 'api_contribs_location_parent',
+                 management.RHAPIContributionsInheritedLocation)
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/location-parent', 'api_contrib_location_parent',
+                 management.RHAPIContributionInheritedLocation)
+
 # Contribution RESTful endpoints
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/references/', 'create_contrib_reference_rest',
                  management.RHCreateContributionReferenceREST, methods=('POST',))
