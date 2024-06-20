@@ -1,0 +1,1450 @@
+# Translations template for indico.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the indico project.
+# 
+# Translators:
+# Anna Szabó, 2024
+# Béla Csábi <csabibela@ga.sze.hu>, 2019
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014
+# Janos Mohacsi <mohacsi@niif.hu>, 2022
+# Miklós Timár, 2018
+# Miklós Timár, 2018
+# Zsolt Iván Varga <vargazsoltivan@gmail.com>, 2019-2020
+msgid ""
+msgstr ""
+"Project-Id-Version: Indico\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"PO-Revision-Date: 2011-07-07 13:45+0000\n"
+"Last-Translator: Anna Szabó, 2024\n"
+"Language-Team: Hungarian (Hungary) (http://app.transifex.com/indico/indico/language/hu_HU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+"Language: hu_HU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: indico/modules/attachments/client/js/legacy.js:152
+msgid "This file no longer exists. Please reload the page."
+msgstr "Ez a fájl már nem létezik. Kérjük, frissítse az oldalt."
+
+#: indico/modules/attachments/client/js/legacy.js:158
+msgid "You are not authorized to access this file."
+msgstr "Nem jogosult hozzáférni ehhez a fájlhoz."
+
+#: indico/modules/attachments/client/js/legacy.js:158
+#: indico/modules/attachments/client/js/legacy.js:161
+msgid "Access Denied"
+msgstr "Hozzáférés megtagadva"
+
+#: indico/modules/attachments/client/js/legacy.js:160
+msgid "This file is protected. You will be redirected to the login page."
+msgstr "Ez a fájl védett. A rendszer átirányítja a bejelentkezési oldalra."
+
+#: indico/modules/attachments/client/js/legacy.js:233
+msgid "Manage material"
+msgstr "Anyagkezelés"
+
+#: indico/modules/attachments/client/js/package.js:49
+msgid "Building package"
+msgstr "Csomag építése"
+
+#: indico/modules/auth/templates/login_page.html:130
+msgid "Login with {0}"
+msgstr ""
+
+#: indico/modules/categories/client/js/calendar.js:106
+msgid "Today"
+msgstr "Ma"
+
+#: indico/modules/categories/client/js/calendar.js:134
+msgid "{0} long-lasting event not shown"
+msgid_plural "{0} long-lasting events not shown"
+msgstr[0] "{0} hosszú távú esemény nem látható"
+msgstr[1] "{0} hosszú távú esemény nem látható"
+
+#: indico/modules/categories/client/js/calendar.js:144
+msgid "Long lasting events"
+msgstr "Hosszan tartó események"
+
+#: indico/modules/categories/client/js/display.js:25
+msgid "empty"
+msgstr "nincs esemény"
+
+#: indico/modules/categories/client/js/display.js:26
+msgid "{0} event"
+msgid_plural "{0} events"
+msgstr[0] "{0} esemény"
+msgstr[1] "{0} esemény"
+
+#: indico/modules/categories/client/js/management.js:57
+#: indico/modules/events/management/client/js/index.js:387
+msgid "Undo"
+msgstr "Visszavonás"
+
+#: indico/modules/categories/client/js/management.js:59
+msgid "The category order has been restored."
+msgstr "A kategória sorrendje helyreállítva."
+
+#: indico/modules/categories/client/js/management.js:61
+msgid "The category list has been sorted."
+msgstr "A kategórialista rendezve lett."
+
+#: indico/modules/categories/client/js/management.js:184
+#: indico/modules/categories/templates/management/delete_categories.html:3
+msgid "Delete category"
+msgid_plural "Delete categories"
+msgstr[0] "Kategória törlése"
+msgstr[1] "Kategóriák törlése"
+
+#: indico/modules/categories/client/js/management.js:188
+msgid "This category cannot be deleted because it is not empty."
+msgstr "Ezt a kategóriát nem lehet törölni, mert az nem üres."
+
+#: indico/modules/categories/client/js/management.js:196
+msgid ""
+"At least one selected category cannot be deleted because it is not empty."
+msgstr "Legalább egy kiválasztott kategóriát nem lehet törölni, mert nem üres."
+
+#: indico/modules/categories/client/js/management.js:201
+msgid "Delete the selected category"
+msgid_plural "Delete {0} selected categories"
+msgstr[0] "A kiválasztott kategória törlése"
+msgstr[1] "A kiválasztott {0} kategória törlése"
+
+#: indico/modules/categories/client/js/management.js:209
+msgid "Select the categories to delete first."
+msgstr "Előbb válassza ki az törlendő kategóriákat."
+
+#: indico/modules/categories/client/js/management.js:218
+msgid "Delete categories"
+msgstr "Kategóriák törlése"
+
+#: indico/modules/categories/client/js/management.js:238
+msgid "Move the selected category"
+msgid_plural "Move the {0} selected categories"
+msgstr[0] "A kiválasztott kategória mozgatása"
+msgstr[1] "A kiválasztott {0} kategória mozgatása"
+
+#: indico/modules/categories/client/js/management.js:245
+msgid "Select the categories to move first."
+msgstr "Előbb válassza ki az mozgatni kívánt kategóriákat."
+
+#: indico/modules/categories/client/js/management.js:274
+#: indico/modules/vc/client/js/index.js:54
+#: indico/web/client/js/jquery/utils/forms.js:405
+msgid "*"
+msgid_plural "All {0} events in this category are currently selected."
+msgstr[0] "*"
+msgstr[1] "A kategória mind a {0} eseménye jelenleg kiválasztva."
+
+#: indico/modules/categories/client/js/management.js:279
+msgid "Only {0} out of {1} events is currently selected."
+msgid_plural "Only {0} out of {1} events are currently selected."
+msgstr[0] "Jelenleg a (z) {0} esemény közül csak {1} van kiválasztva."
+msgstr[1] "Jelenleg a (z) {0} esemény közül csak {1} van kiválasztva."
+
+#: indico/modules/categories/client/js/management.js:358
+msgid "Move here"
+msgstr "Mozgatás ide"
+
+#: indico/modules/categories/client/js/management.js:359
+msgid "Move category"
+msgid_plural "Move categories"
+msgstr[0] "Kategória áthelyezése"
+msgstr[1] "Kategóriák áthelyezése"
+
+#: indico/modules/categories/client/js/management.js:361
+msgid "Select new category parent for the category"
+msgid_plural "Select new category parent for {0} selected categories"
+msgstr[0] "Válassza ki a kategória új szülőjét"
+msgstr[1] "Válassza ki a {0} kategória új szülőjét"
+
+#: indico/modules/categories/client/js/management.js:380
+msgid "The category is already here"
+msgid_plural "The selected categories are already here"
+msgstr[0] "A kategória már itt van"
+msgstr[1] "A kiválasztott kategóriák már itt vannak"
+
+#: indico/modules/categories/client/js/management.js:388
+msgid "This is the category you are trying to move"
+msgid_plural "This is one of the categories you are trying to move"
+msgstr[0] "Ez az a kategória, amelyet megpróbál áthelyezi"
+msgstr[1] "Ezek azok a kategóriák, amelyeket megpróbál áthelyezi"
+
+#: indico/modules/categories/templates/display/base.html:115
+msgid "Navigate to"
+msgstr "Navigálás"
+
+#: indico/modules/categories/templates/display/base.html:116
+msgid "Navigate to a category"
+msgstr "Navigálás egy kategóriához"
+
+#: indico/modules/cephalopod/client/js/index.js:40
+msgid "Unknown error while contacting the Community Hub"
+msgstr "Ismeretlen hiba a közösségi központhoz való kapcsolatfelvétel során"
+
+#: indico/modules/cephalopod/client/js/index.js:42
+msgid "Internal error: Parse error on the reply of the Community Hub."
+msgstr "Belső hiba: Elemzési hiba a Community Hub válaszában."
+
+#: indico/modules/cephalopod/client/js/index.js:44
+msgid "Unable to contact the Community Hub."
+msgstr "Nem sikerült kapcsolatba lépni a Közösségi Központtal."
+
+#: indico/modules/cephalopod/client/js/index.js:46
+msgid "The connection to the Community Hub timed out."
+msgstr "A kapcsolat a Közösségi Központtal megszűnt."
+
+#: indico/modules/cephalopod/client/js/index.js:51
+msgid "Your server is not registered with the Community Hub."
+msgstr "A szerver nincs regisztrálva a Community Hub-ban."
+
+#: indico/modules/cephalopod/client/js/index.js:86
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+#: indico/modules/cephalopod/client/js/index.js:87
+msgid "This server is not registered as part of the community."
+msgstr "Ezt a szervert nem regisztrált a közösség részeként."
+
+#: indico/modules/cephalopod/client/js/index.js:108
+msgid "Synchronized"
+msgstr "Szinkronizáva"
+
+#: indico/modules/cephalopod/client/js/index.js:109
+msgid "This server is registered as part of the community and is up to date."
+msgstr "Ezt a szervert a közösség részeként regisztrált, és naprakészek."
+
+#: indico/modules/cephalopod/client/js/index.js:118
+msgid "Out of sync"
+msgstr "Nincs szinkronban"
+
+#: indico/modules/cephalopod/client/js/index.js:119
+msgid ""
+"Your Indico server is out of sync. Synchronize it with the button on the "
+"right."
+msgstr "Az Indico kiszolgálója nincs szinkronban. Szinkronizálja a jobb oldali gombbal."
+
+#: indico/modules/cephalopod/client/js/index.js:129
+msgid "Error!"
+msgstr "Hiba!"
+
+#: indico/modules/cephalopod/client/js/index.js:147
+msgid ""
+"Your Indico server is not synchronized with the Community Hub! You can solve"
+" this <a href=\"{0}\">here</a>."
+msgstr "Az Indico kiszolgáló nincs szinkronizálva a Közösségi Központtal! Meg lehet oldani ezt <a href=\"{0}\">itt</a>."
+
+#: indico/modules/designer/client/js/index.js:31
+#: indico/modules/designer/client/js/index.js:847
+msgid ""
+"The back side of the templates that use this one as the back side will be "
+"removed."
+msgstr "A sablonok hátulja, amelyek ezt a hátlapot használják, eltávolításra kerül."
+
+#: indico/modules/designer/client/js/index.js:34
+#: indico/modules/designer/client/js/index.js:850
+msgid "Disassociate back sides"
+msgstr "Válasszuk le a hátsó oldalakat"
+
+#: indico/modules/designer/client/js/index.js:95
+msgid "Fixed text"
+msgstr "Rögzített szöveg"
+
+#: indico/modules/designer/client/js/index.js:587
+msgid "Please choose a name for the template"
+msgstr "Válasszon nevet a sablonnak"
+
+#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:593
+#: indico/modules/designer/client/js/index.js:602
+msgid "Warning"
+msgstr "Figyelmeztetés"
+
+#: indico/modules/designer/client/js/index.js:592
+msgid "The template cannot be empty. Add some elements or a background image."
+msgstr "A sablon nem lehet üres. Adjon hozzá néhány elemet vagy háttérképet."
+
+#: indico/modules/designer/client/js/index.js:599
+msgid ""
+"The Fixed image element cannot be empty. Upload an image inside it or remove"
+" it."
+msgstr "A fix kép elem nem lehet  üres. Töltsön fel képet, vagy törölje az elemet."
+
+#: indico/modules/designer/client/js/index.js:628
+msgid "Are you sure you want to change the dimensions of this template?"
+msgstr "Biztos benne, hogy meg akarja változtatni ennek a sablonnak a méreteit?"
+
+#: indico/modules/designer/client/js/index.js:772
+#: indico/modules/designer/client/js/index.js:1124
+msgid "Choose a file"
+msgstr "Fájl kiválasztása"
+
+#: indico/modules/designer/client/js/index.js:780
+msgid "Fixed Image"
+msgstr "Fix kép"
+
+#: indico/modules/designer/client/js/index.js:838
+msgid "This back side template will be removed"
+msgstr "Ez a hátsó sablon eltávolításra kerül"
+
+#: indico/modules/designer/client/js/index.js:840
+msgid "The back side of this template will be removed"
+msgstr "A sablon hátulja el lesz távolítva"
+
+#: indico/modules/designer/client/js/index.js:841
+msgid "Disassociate back side"
+msgstr "Válasszuk le a hátsó oldalt"
+
+#: indico/modules/designer/client/js/index.js:845
+msgid "The back side is empty."
+msgstr "A hátsó oldal üres."
+
+#: indico/modules/designer/client/js/index.js:983
+#: indico/modules/designer/client/js/index.js:997
+msgid "Error"
+msgstr "Hiba"
+
+#: indico/modules/designer/templates/_list.html:80
+msgctxt "Designer template linked to registration form"
+msgid "Linked to"
+msgstr "Csatlakoztatva ehhez: "
+
+#: indico/modules/events/abstracts/client/js/index.js:75
+#: indico/modules/events/abstracts/client/js/index.js:88
+msgid "Show preview"
+msgstr "Előnézet megjelenítése"
+
+#: indico/modules/events/abstracts/client/js/index.js:79
+msgid "Hide preview"
+msgstr "Az előnézet elrejtése"
+
+#: indico/modules/events/abstracts/templates/display/tracks.html:61
+msgctxt "track convener"
+msgid "Convener"
+msgstr "Szekcióelnök"
+
+#: indico/modules/events/agreements/templates/agreement_form.html:110
+msgid ""
+"You won't be able to change your decision later. If necessary, please "
+"contact the manager of the event."
+msgstr ""
+
+#: indico/modules/events/client/js/cloning.js:59
+msgid "{0} new event will be created."
+msgid_plural "{0} new events will be created."
+msgstr[0] "{0} esemény lesz létrehozva."
+msgstr[1] "{0} új esemény lesz létrehozva."
+
+#: indico/modules/events/client/js/layout.js:165
+msgid "Menu Entry Settings"
+msgstr "Menübeviteli beállítások"
+
+#: indico/modules/events/client/js/util/static_filters.js:19
+msgid "{0} out of {1} displayed"
+msgstr "{0} jelenik meg a(z) {1} közül"
+
+#: indico/modules/events/client/js/util/static_filters.js:61
+msgid "There are no entries that match your search criteria."
+msgstr "Nincs olyan bejegyzés, amely megfelelne a keresési feltételeknek."
+
+#: indico/modules/events/management/client/js/index.js:385
+msgid "Undoing previous operation..."
+msgstr "Az előző művelet visszavonása ..."
+
+#: indico/modules/events/registration/client/js/index.js:54
+#: indico/modules/events/registration/client/js/registration.js:42
+msgid "Terms and Conditions"
+msgstr "Felhasználási feltételek"
+
+#: indico/modules/events/registration/client/js/reglists.js:43
+msgid "Email Preview"
+msgstr "E-mail előnézet"
+
+#: indico/modules/events/registration/client/js/reglists.js:60
+msgid "Do you really want to delete the selected registration?"
+msgid_plural "Do you really want to delete the {0} selected registrations?"
+msgstr[0] "Tényleg törli a kiválasztott regisztrációt?"
+msgstr[1] "Tényleg törli a kiválasztott {0} regisztrációt?"
+
+#: indico/modules/events/reminders/templates/edit_reminder.html:40
+msgid "Reminder Preview"
+msgstr ""
+
+#: indico/modules/events/sessions/client/js/index.js:118
+msgid "Filter types"
+msgstr "Típusok szűrése"
+
+#: indico/modules/events/sessions/client/js/index.js:123
+#: indico/modules/events/sessions/client/js/index.js:126
+msgid "Add new type"
+msgstr "Új típus hozzáadása"
+
+#: indico/modules/events/sessions/client/js/index.js:150
+msgid "No type"
+msgstr "Nincs típus"
+
+#: indico/modules/events/surveys/templates/display/survey_questionnaire.html:70
+msgid "Submit"
+msgstr "Küldés"
+
+#: indico/modules/events/surveys/templates/display/survey_questionnaire.html:71
+msgid "Submitting..."
+msgstr ""
+
+#: indico/modules/events/surveys/templates/display/survey_questionnaire.html:72
+msgid ""
+"Your answers have been saved, do not forget to submit the survey when you "
+"finish!"
+msgstr ""
+
+#: indico/modules/events/templates/display/access_key.html:50
+msgid "Invalid access key"
+msgstr ""
+
+#: indico/modules/events/timetable/templates/_timetable.html:56
+msgid "The timetable has not been filled yet."
+msgstr ""
+
+#: indico/modules/events/timetable/templates/display/indico/_common.html:42
+msgid "Speaker"
+msgid_plural "Speakers"
+msgstr[0] "Előadó"
+msgstr[1] "Előadók"
+
+#: indico/modules/events/timetable/templates/display/indico/_session_block.html:44
+msgid "Convener"
+msgid_plural "Conveners"
+msgstr[0] "Szekcióelnök"
+msgstr[1] "Szekcióelnökök"
+
+#: indico/modules/users/templates/dashboard.html:241
+msgid "You have favorited this category"
+msgstr ""
+
+#: indico/modules/users/templates/users_merge.html:15
+msgid "E-mail"
+msgstr "E-mail cím"
+
+#: indico/modules/users/templates/users_merge.html:15
+msgid "Affiliation"
+msgstr "Szervezet"
+
+#: indico/modules/users/templates/users_merge.html:85
+msgid "Are you sure you want to merge those two users?"
+msgstr ""
+
+#: indico/modules/users/templates/users_merge.html:94
+msgid "Please notice there are warning messages!"
+msgstr ""
+
+#: indico/modules/users/templates/users_merge.html:95
+msgid "Confirm user merge"
+msgstr ""
+
+#: indico/modules/vc/client/js/index.js:83
+msgid ""
+"This room has been deleted and cannot be used. You can detach it from the "
+"event, however."
+msgstr "Ez a szoba törlésre került, és nem használható. Az eseményről azonban leválaszthatja."
+
+#: indico/modules/vc/client/js/index.js:112
+msgid "Click to toggle collapse status"
+msgstr "Kattintson a meghiúsulás állapotának váltására"
+
+#: indico/web/client/js/jquery/extensions/clipboard.js:49
+msgid "Copied to clipboard"
+msgstr "A vágólapra másolva"
+
+#: indico/web/client/js/jquery/extensions/clipboard.js:57
+msgid "Press {0} to copy"
+msgstr "A másoláshoz nyomja meg a(z) {0} gombot"
+
+#: indico/web/client/js/jquery/extensions/global.js:260
+msgid "Create new lecture"
+msgstr "Hozzon létre új előadást"
+
+#: indico/web/client/js/jquery/extensions/global.js:261
+msgid "Create new meeting"
+msgstr "Hozzon létre új találkozót"
+
+#: indico/web/client/js/jquery/extensions/global.js:262
+msgid "Create new conference"
+msgstr "Hozzon létre új konferenciát"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:79
+msgid ""
+"You have unsaved changes. Do you really want to close the dialog without "
+"saving?"
+msgstr "Mentetlen változtatások vannak. Valóban bezárja az ablakot mentés nélkül?"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:149
+#: indico/web/client/js/jquery/utils/ajaxform.js:134
+#: indico/web/client/js/jquery/utils/ajaxform.js:283
+msgid "Unsaved changes"
+msgstr "Nem mentett változások"
+
+#: indico/web/client/js/jquery/utils/ajaxdialog.js:181
+#: indico/web/client/js/jquery/utils/misc.js:87
+#: indico/web/client/js/legacy/libs/timetable/Management.js:247
+msgid "Close"
+msgstr "Bezár"
+
+#: indico/web/client/js/jquery/utils/ajaxform.js:266
+msgid "You have unsaved changes that will be lost."
+msgstr "Vannak el nem mentett változások, amelyek el fognak veszni."
+
+#: indico/web/client/js/jquery/utils/declarative.js:265
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:708
+msgid "Confirm action"
+msgstr "Erősítse meg a műveletet"
+
+#: indico/web/client/js/jquery/utils/declarative.js:375
+msgid "Direct link to this item"
+msgstr "Közvetlen link ehhez az elemhez"
+
+#: indico/web/client/js/jquery/utils/defaults.js:19
+msgid "Next"
+msgstr "Következő"
+
+#: indico/web/client/js/jquery/utils/defaults.js:20
+msgid "Previous"
+msgstr "Előző"
+
+#: indico/web/client/js/jquery/utils/errors.js:31
+#: indico/web/client/js/utils/axios.js:44
+msgid "Something went wrong"
+msgstr "Valami hiba történt"
+
+#: indico/web/client/js/jquery/utils/forms.js:19
+msgid "The passwords do not match."
+msgstr "A jelszavak nem egyeznek."
+
+#: indico/web/client/js/jquery/utils/forms.js:69
+msgid "Field must be at least {0} character long."
+msgid_plural "Field must be at least {0} characters long."
+msgstr[0] "A mezőnek legalább {0} karakter hosszúnak kell lennie."
+msgstr[1] "A mezőnek legalább {0} karakter hosszúnak kell lennie."
+
+#: indico/web/client/js/jquery/utils/forms.js:77
+msgid "Field cannot be longer than {0} character."
+msgid_plural "Field cannot be longer than {0} characters."
+msgstr[0] "A mező nem lehet hosszabb, mint {0} karakter."
+msgstr[1] "A mező nem lehet hosszabb, mint {0} karakter."
+
+#: indico/web/client/js/jquery/utils/forms.js:85
+msgid "Field must be between {0} and {1} characters long."
+msgstr "A mezőnek legalább {0} és legfeljebb {1} karakter hosszúnak kell lennie."
+
+#: indico/web/client/js/jquery/utils/forms.js:91
+msgid "Field must contain at least {0} word."
+msgid_plural "Field must contain at least {0} words."
+msgstr[0] "A mezőnek legalább {0} szót kell tartalmaznia."
+msgstr[1] "A mezőnek legalább {0} szót kell tartalmaznia."
+
+#: indico/web/client/js/jquery/utils/forms.js:99
+msgid "Field cannot contain more than {0} word."
+msgid_plural "Field cannot contain more than {0} words."
+msgstr[0] "A mező legfeljebb {0} szót tartalmazhat."
+msgstr[1] "A mező legfeljebb {0} szót tartalmazhat."
+
+#: indico/web/client/js/jquery/utils/forms.js:107
+msgid "Field must contain between {0} and {1} words."
+msgstr "A mezőnek legalább {0} és legfeljebb {1} szót kell tartalmaznia."
+
+#: indico/web/client/js/jquery/utils/forms.js:125
+msgid "Save now"
+msgstr "Mentés most"
+
+#: indico/web/client/js/jquery/utils/forms.js:126
+msgid "Saving..."
+msgstr "Mentés…"
+
+#: indico/web/client/js/jquery/utils/forms.js:127
+msgid "Do not forget to save your changes!"
+msgstr "Ne felejtse el menteni a változtatásokat!"
+
+#: indico/web/client/js/jquery/utils/forms.js:411
+msgid "Only {0} out of {1} rows is currently selected"
+msgid_plural "Only {0} out of {1} rows are currently selected."
+msgstr[0] "Jelenleg a (z) {0} esemény közül csak {1} van kiválasztva"
+msgstr[1] "Jelenleg a (z) {0} esemény közül csak {1} van kiválasztva."
+
+#: indico/web/client/js/jquery/utils/forms.js:450
+msgid "Select only the current page."
+msgstr "Csak az aktuális oldal kiválasztása."
+
+#: indico/web/client/js/jquery/utils/forms.js:464
+msgid "Click here to select them all."
+msgstr "Kattintson ide az összes kiválasztásához."
+
+#: indico/web/client/js/jquery/utils/misc.js:16
+#: indico/web/client/js/jquery/utils/misc.js:30
+msgid "Please confirm"
+msgstr "Kérem erősítse meg"
+
+#: indico/web/client/js/jquery/utils/misc.js:101
+msgid "Executing operation..."
+msgstr "Művelet végrehajtása ..."
+
+#: indico/web/client/js/jquery/utils/misc.js:103
+msgid "Operation done!"
+msgstr "A művelet kész!"
+
+#: indico/web/client/js/jquery/utils/misc.js:168
+msgid "Operation failed!"
+msgstr "A művelet nem sikerült!"
+
+#: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:675
+msgid "Loading..."
+msgstr "Betöltés..."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:20
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:24
+msgid "This category doesn't contain any subcategory"
+msgstr "Ez a kategória nem tartalmaz alkategóriát"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:28
+msgid "Select a category"
+msgstr "Válasszon egy kategóriát"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:35
+msgid "Not possible for categories where you cannot propose events"
+msgstr "Nem lehetséges olyan kategóriák esetében, ahol nem lehet eseményeket javasolni"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:39
+msgid "Not possible for categories where you cannot propose/create events"
+msgstr "Nem lehetséges olyan kategóriák esetében, ahol nem lehet eseményeket javasolni/alkotni"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:43
+msgid "Not possible for categories where you cannot create events"
+msgstr "Nem lehetséges olyan kategóriákban, ahol nem lehet eseményeket létrehozni"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:47
+msgid "Not possible for categories where you are not a manager"
+msgstr "Nem lehetséges olyan kategóriák esetében, ahol Ön nem szervező"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:53
+msgid "Not possible for categories descending from category \"{0}\""
+msgstr "Nem lehetséges a(z) \"{0}\" kategóriából származó kategóriákban"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:57
+msgid "Not possible for this category"
+msgstr "Ebben a kategóriában nem lehetséges"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:146
+msgid "Search"
+msgstr "Keresés"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:203
+msgid "Go to: {0}"
+msgstr "Ugrás: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:240
+msgid "This category is protected"
+msgstr "Ez a kategória védett"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:288
+msgid "Go to parent: {0}"
+msgstr "Ugrás a szülőhöz: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:337
+msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
+msgstr "Ezt csak <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> lehet."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:342
+msgid ""
+"You can <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one, <a"
+" class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> or <a "
+"class=\"js-search\">search</a>."
+msgstr "Ezt <a class=\"js-action\" data-category-id=\"{0}\">{1},</a> <a class=\"js-navigate-up\" data-parent-id=\"{2}\">felnavigálhat</a> vagy <a class=\"js-search\">kereshet</a>."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:350
+msgid ""
+"You can <a class=\"js-navigate-up\" data-parent-id=\"{2}\">navigate up</a> "
+"or <a class=\"js-search\">search</a>."
+msgstr "Navigálhat <a class=\"js-navigate-up\" data-parent-id=\"{2}\">fel,</a> vagy <a class=\"js-search\">keressen.</a>"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:365
+msgid "Your search doesn't match any category"
+msgstr "A keresés nem felel meg egyik kategóriának sem"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:370
+msgid ""
+"You can <a class=\"js-search\">modify</a> or <a class=\"js-clear-"
+"search\">clear</a> your search."
+msgstr "Módosíthatja <a class=\"js-search\">modify</a> vagy <a class=\"js-clear-search\">törölheti</a> a keresést."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:444
+msgid "In favorite categories"
+msgstr "Kedvenc kategóriákban"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:451
+msgid "Search result"
+msgstr "Keresési eredmény"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:472
+msgid "Displaying {0} out of {1} results."
+msgstr "{0} eredmény jelenik meg a(z) {1} közül."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:473
+msgid "There are no results."
+msgstr "Nincs eredmény."
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:482
+msgid "Clear search"
+msgstr "Törölje a keresést"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js:706
+msgid "You selected category \"{0}\". Are you sure you want to proceed?"
+msgstr "Ön a „{0}” kategóriát választotta. Biztos, hogy folytatni szeretné?"
+
+#: indico/web/client/js/jquery/widgets/itempicker.js:23
+msgid "Type to filter..."
+msgstr "Írja be a szűrőt..."
+
+#: indico/web/client/js/jquery/widgets/misc.js:58
+msgid "You can copy the URL below using CTRL + C (&#8984; + C on OSX):"
+msgstr "Az alábbi URL-t a CTRL + C (&#8984; + C az OSX-en) segítségével másolhatja:"
+
+#: indico/web/client/js/jquery/widgets/multitextfield.js:254
+msgid "Type to add {0}"
+msgstr "Gépelje be a {0}-(o)t"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
+#: indico/web/client/js/jquery/widgets/multitextfield.js:278
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1506
+msgid "Delete"
+msgstr "Törlés"
+
+#: indico/web/client/js/jquery/widgets/multitextfield.js:353
+msgid "Empty values are not allowed."
+msgstr "Az üres értékek nem megengedettek."
+
+#: indico/web/client/js/jquery/widgets/rulelistwidget.js:60
+msgid "Select an option"
+msgstr "Válasszon ki egy lehetőséget"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:68
+msgid "Using default location from: {0} ({1})"
+msgstr "Alapértelmezett hely használata a következőhelyről: {0} ({1})"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:70
+msgid "Using custom location"
+msgstr "Az egyéni hely használata"
+
+#: indico/web/client/js/jquery/widgets/jinja/location_widget.js:166
+msgid "Just use \"{0}\""
+msgstr "Csak használjon \"{0}\"-t"
+
+#: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:29
+msgid "<strong>1</strong> char left"
+msgid_plural "<strong>{0}</strong> chars left"
+msgstr[0] "<strong>1</strong> karakter maradt"
+msgstr[1] "<strong>{0}</strong> karakter maradt"
+
+#: indico/web/client/js/jquery/widgets/jinja/markdown_widget.js:39
+msgid "<strong>1</strong> word left"
+msgid_plural "<strong>{0}</strong> words left"
+msgstr[0] "<strong>1</strong> szó maradt"
+msgstr[1] "<strong>{0}</strong> szó maradt"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:39
+msgid "Save"
+msgstr "Mentés"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1438
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:49
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:354
+#: indico/web/client/js/legacy/libs/timetable/Management.js:670
+msgid "Cancel"
+msgstr "Mégsem"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:296
+msgid "Must be between {0} and {1}"
+msgstr "{0} és {1} között kell lennie"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:298
+msgid "Must be above {0}"
+msgstr "{0} felett kell lennie"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:300
+msgid "Must be below {0}"
+msgstr "{0} alatt kell lennie"
+
+#: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:319
+msgid "Please fill in the required fields."
+msgstr "Töltsd ki a kötelező mezőket."
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:172
+msgid "IP networks cannot have management permissions"
+msgstr "Az IP-hálózatoknak nem lehet felügyeleti jogosultságuk"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:173
+msgid "Registrants cannot have management permissions"
+msgstr "A regisztrálók nem rendelkezhetnek felügyeleti engedélyekkel"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:185
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:186
+msgid "Assign Permissions"
+msgstr "Jogosultságok hozzárendelése"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:197
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:204
+msgid "Delete entry '{0}'"
+msgstr "'{0}' bejegyzés törlése"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:205
+msgid "Are you sure you want to remove yourself from the list?"
+msgstr "Biztosan eltávolítja magát a listáról?"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:289
+msgid "All options have been added"
+msgstr "Minden lehetőség hozzáadva"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:320
+msgid "This entry was already added"
+msgstr "Ezt a bejegyzést már hozzáadtuk"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:354
+msgid "Anonymous"
+msgstr "Vendég"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:364
+msgid "Additional users"
+msgstr "További felhasználók"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:368
+msgid "{0} user has implicit read access due to other roles"
+msgid_plural "{0} users have implicit read access due to other roles"
+msgstr[0] "{0} felhasználó más szerepkörök miatt implicit olvasási hozzáféréssel rendelkezik"
+msgstr[1] "{0} felhasználó más szerepkörök miatt implicit olvasási hozzáféréssel rendelkezik"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:384
+msgid "Category Managers"
+msgstr "Kategóriakezelők"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:386
+msgid "Parent Category Managers"
+msgstr "Szülőkategória-kezelők"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:388
+msgid "Event Managers"
+msgstr "Rendezvényszervezők"
+
+#: indico/web/client/js/jquery/widgets/jinja/permissions_widget.js:407
+msgid "Registrants in \"{0}\""
+msgstr "Regisztrálók a \"{0}\""
+
+#: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Popup.js:245
+msgid "OK"
+msgstr "OK"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:465
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:473
+msgid "Previous tab"
+msgstr "Előző ablak"
+
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:485
+#: indico/web/client/js/legacy/libs/indico/Core/Widgets/Base.js:492
+msgid "Next tab"
+msgstr "Következő ablak"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:267
+msgid "At least one must be selected"
+msgstr "Legalább egyet ki kell választani"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:271
+msgid "Please enable the checkbox"
+msgstr "Kérjük, engedélyezze a jelölőnégyzetet"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:275
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:279
+msgid "Please choose an option"
+msgstr "Kérjük, válasszon egy lehetőséget"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:286
+msgid "Field must be a number"
+msgstr "A mezőnek számnak kell lennie"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:298
+msgid "Field must be a positive number"
+msgstr "A mezőnek pozitív számnak kell lennie"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:304
+msgid "Date format is not valid. It should be dd/mm/yyyy hh:mm"
+msgstr "A dátum formátuma nem érvényes. Ez legyen: nn/hh/éééé óó:pp"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:310
+msgid "Invalid e-mail address"
+msgstr "Érvénytelen e-mail cím"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:316
+msgid "Invalid URL"
+msgstr "Érvénytelen URL"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:318
+msgid "Time format is not valid. It should be hh:mm"
+msgstr "Érvénytelen időformátum. A helyes időformátum óó:pp"
+
+#: indico/web/client/js/legacy/libs/indico/Legacy/Util.js:324
+msgid "Field is mandatory"
+msgstr "Ezt a mezőt kötelező kitölteni"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:225
+msgid "Add break"
+msgstr "Szünet hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:241
+msgid "Add session"
+msgstr "Ülés hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Actions.js:269
+msgid "Add session block"
+msgstr "Ülés blokk hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:45
+msgid "Session"
+msgstr "Ülés"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:46
+msgid "Room"
+msgstr "Terem"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:133
+msgid "Updating the timetable..."
+msgstr "Az ütemterv frissítése ..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:184
+#: indico/web/client/js/legacy/libs/timetable/Base.js:423
+msgid "Filter"
+msgstr "Szűrő"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:202
+msgid "Printable version"
+msgstr "Nyomtatható változat"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:223
+msgid "Go back"
+msgstr "Vissza"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:230
+#: indico/web/client/js/legacy/libs/timetable/Base.js:389
+msgid "Print"
+msgstr "Nyomtatás"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:274
+msgid "Export to PDF"
+msgstr "PDF-be exportálás"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:282
+msgid "Switching to full screen mode..."
+msgstr "Teljes képernyő módra váltás ..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:319
+msgid "Exit Full Screen"
+msgstr "Kilépés a teljes képernyős módból"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:396
+msgid "PDF"
+msgstr "PDF"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:403
+msgid "Full screen"
+msgstr "Teljes képernyő"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:410
+msgid "Link"
+msgstr "Hivatkozás"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:415
+msgid "Detailed view"
+msgstr "Részletes nézet"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:478
+msgid "All days"
+msgstr "Minden nap"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:482
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1218
+msgctxt "momentjs date format for timetable tab headers"
+msgid "ddd DD/MM"
+msgstr "MM.DD ddd"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:684
+msgid "You are viewing the contents of the session block:"
+msgstr "A munkamenetblokk tartalmát tekinti meg:"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:773
+msgid "Your changes triggered the automatic modification of some settings:"
+msgstr "A módosítások néhány beállítás automatikus módosítását váltották ki:"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:781
+#: indico/web/client/js/legacy/libs/timetable/Base.js:785
+msgid "The <strong>starting time</strong> of the session interval <strong>"
+msgstr "A munkamenet-időköz <strong>kezdési időpontja</strong><strong>"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:783
+#: indico/web/client/js/legacy/libs/timetable/Base.js:787
+#: indico/web/client/js/legacy/libs/timetable/Base.js:796
+#: indico/web/client/js/legacy/libs/timetable/Base.js:800
+msgid "</strong> was moved from "
+msgstr "</strong> áthelyezték innen "
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:788
+msgid ""
+"The <strong>starting time</strong> of the <strong>Event</strong> was moved "
+"from "
+msgstr "<strong>Az esemény</strong> <strong>kezdési időpontja</strong> áthelyezve lett "
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:794
+#: indico/web/client/js/legacy/libs/timetable/Base.js:798
+msgid "The <strong>ending time</strong> of the session interval <strong>"
+msgstr "A munkamenet-időköz <strong>befejezési időpontja</strong><strong>"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:801
+msgid ""
+"The <strong>ending time</strong> of the <strong>Event</strong> was moved "
+"from "
+msgstr "<strong>Az esemény</strong> <strong>befejezési időpontja</strong> áthelyezve lett"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:807
+msgid "The contents of the interval <strong>"
+msgstr "Az intervallum tartalma <strong>"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:809
+msgid "</strong> were moved from "
+msgstr "</strong> áthelyezték innen "
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:819
+msgid " to "
+msgstr " -nak/nek"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1012
+msgid "Session block"
+msgstr "Ülés blokk"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1030
+msgid "Contribution"
+msgstr "Felszólalás"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1044
+msgid "Break"
+msgstr "Szünet"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1066
+msgid "Add poster"
+msgstr "Poszter hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1071
+msgid "Add new"
+msgstr "Új hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1075
+#: indico/web/client/js/legacy/libs/timetable/Management.js:664
+msgid "Reschedule"
+msgstr "Átütemez"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1085
+msgid "Fit to content"
+msgstr "Illessze a tartalomhoz"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1094
+msgid "Add new block"
+msgstr "Új blokk hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1138
+msgid "Add one hour"
+msgstr "Egy óra hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1207
+msgid "Session legend"
+msgstr "Munkamenet jelmagyarázata"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1243
+msgid "see more..."
+msgstr "tovább..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1248
+msgid "less..."
+msgstr "kevesebb..."
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1562
+msgid "Go to event timetable"
+msgstr "Ugrás az esemény ütemtervére"
+
+#: indico/web/client/js/legacy/libs/timetable/Base.js:1732
+msgid "Up to timetable"
+msgstr "Ütemterv szerint"
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:42
+msgid "move to resize"
+msgstr "mozgassa az átméretezéshez"
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:420
+msgid ""
+"<kbd class=\"tt-key\">Shift</kbd> is currently pressed. Changes will be "
+"applied to blocks after."
+msgstr "Jelenleg lenyomva tartja a<kbd class=\"tt-key\">Shift</kbd> gombot. A módosítások a blokkokra ezután kerülnek alkalmazásra."
+
+#: indico/web/client/js/legacy/libs/timetable/DragAndDrop.js:594
+msgid "Drop to move block inside session"
+msgstr "Dobás a blokk mozgatásához az ülésen belül"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:113
+msgid "Show materials"
+msgstr "Anyagok megjelenítése"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:218
+msgid "et al."
+msgstr "és mtsai."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:318
+msgid "This poster session has "
+msgstr "Ennek a poszter ülésnek van "
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:320
+msgid " contribution(s)."
+msgstr "felszólalás(ok)."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:322
+msgid "Please click for more information."
+msgstr "Kattintson további információkért."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:625
+msgid "Move entry"
+msgstr "A bejegyzés áthelyezése"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:669
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:680
+msgid "This timetable entry does not exist anymore. Please refresh the page."
+msgstr "Ez az ütemterv-bejegyzés már nem létezik. Kérjük, frissítse az oldalt."
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:681
+msgid "Refresh"
+msgstr "Frissítés"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:784
+msgid "Move up"
+msgstr "Mozgatás felfelé"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
+msgid "Move down"
+msgstr "Mozgatás lefelé"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1440
+msgid "Edit poster"
+msgstr "Poszter szerkesztése"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1472
+msgid "Manage protection"
+msgstr "Védelem kezelése"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1474
+msgid "Manage poster protection"
+msgstr "A poszterek védelmének kezelése"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1502
+msgid "Unschedule"
+msgstr "Ütemezés visszavonása"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1503
+msgid "Unschedule poster"
+msgstr "Poszter ütemezésének visszavonása"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1504
+msgid "Are you sure you want to unschedule the poster?"
+msgstr "Biztosan eltávolítja a poszter ütemezését?"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1507
+msgid "Delete poster"
+msgstr "Poszter törlése"
+
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1508
+msgid "Are you sure you want to delete the poster?"
+msgstr "Biztosan törli a posztert?"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:219
+msgid "Sessions"
+msgstr "Ülések"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:224
+msgid "No sessions in the timetable"
+msgstr "Nincsenek szekciók az ütemtervben"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:228
+msgid "Rooms"
+msgstr "Termek"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:233
+msgid "No rooms found in the timetable"
+msgstr "Az ütemtervben nem találhatóak termek"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:238
+msgid "Filter options"
+msgstr "Szűrési lehetőségek"
+
+#: indico/web/client/js/legacy/libs/timetable/Filter.js:244
+msgid "Reset filter"
+msgstr "A szűrő visszaállítása"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:15
+msgid "All"
+msgstr "Összes"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:16
+msgid "None"
+msgstr "Egyik sem"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:19
+msgid "ID"
+msgstr "ID"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:21
+msgid "Title"
+msgstr "Titulus"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:24
+msgid "Sort by: "
+msgstr "Sorrend:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:29
+msgid "Select: "
+msgstr "Kiválasztás:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:188
+msgid "Add Contribution"
+msgstr "Felszólalás hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:238
+msgid "Add selected"
+msgstr "A kiválasztott hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:273
+msgid "Create a new one"
+msgstr "Hozzon létre egy újat"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:280
+msgid "You may choose to:"
+msgstr "Választhat:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:286
+msgid "Choose one (or more) unscheduled"
+msgstr "Válasszon egy (vagy több) nem ütemezett"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:294
+msgid "To add an unscheduled contribution, please select at least one"
+msgstr "Nem tervezett feszólalás hozzáadásához kérjük, válasszon legalább egyet"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:334
+msgid "Add contribution"
+msgstr "Felszólalás hozzáadása"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:387
+msgid "Step 1: Choose type of rescheduling"
+msgstr "1. lépés: Válassza ki az ütemezés típusát"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:397
+#: indico/web/client/js/legacy/libs/timetable/Management.js:434
+msgid "See an example"
+msgstr "Láss egy példát"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:402
+msgid "Adjust starting time of all entries"
+msgstr "Az összes bejegyzés kezdetének beállítása"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+msgid "Move the entries of "
+msgstr "Mozgassa a bejegyzéseket"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:406
+#: indico/web/client/js/legacy/libs/timetable/Management.js:409
+msgid " by changing their"
+msgstr " megváltoztatásával"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:407
+msgid "Move the entries of the interval "
+msgstr "Az intervallum bejegyzéseinek áthelyezése"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:410
+msgid " starting times. "
+msgstr "kezdési idők."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:412
+msgid "The first entry will start when the event starts ("
+msgstr "Az első bejegyzés az esemény indulásakor kezdődik ("
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:415
+msgid "The first entry will start when the interval starts ("
+msgstr "Az első bejegyzés az intervallum indulásakor kezdődik ("
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:418
+msgid ""
+"and the other entries will follow consecutively after it. The durations of "
+"the entries will not change. "
+msgstr "és a többi tétel egymás után következik. A nevezések időtartama nem változik."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:439
+msgid "Adjust duration of all entries"
+msgstr "Az összes bejegyzés időtartamának beállítása"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:442
+msgid "Adjust the "
+msgstr "Állítsa be a "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:443
+msgid " duration "
+msgstr " időtartam "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:444
+msgid "of the entries of "
+msgstr "a bejegyzések"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:447
+msgid "the interval "
+msgstr "az intervallum "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:448
+msgid ""
+" to fill the gaps between them, so that their starting time don't change. If"
+" a time gap is specified, the duration will be extended up to the value of "
+"this time gap before the starting time of the next entry. "
+msgstr "hogy kitöltsék a köztük lévő réseket, hogy kezdő idejük ne változjon. Ha időrést adnak meg, az időtartamot meghosszabbítják ezen időrés értékéig a következő bejegyzés kezdő időpontja előtt."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:531
+msgid "Step 2: Choose time gap between entries"
+msgstr "2. lépés: Válasszon időrést a bejegyzések között"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:568
+msgid "Step 3: Choose to fit sessions to their content"
+msgstr "3. lépés: Válassza ki, hogy illeszkedjenek az ülések a tartalmukhoz"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:617
+msgid "There will be no gaps between consecutive entries."
+msgstr "Az egymást követő bejegyzések között nincs különbség."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:622
+msgid "Entries will be separated by gaps of "
+msgstr "A bejegyzéseket a következők fogják elválasztani:"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:624
+msgid "1 hour "
+msgstr "1 óra "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:626
+msgid " hours "
+msgstr " óra "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:630
+msgid "and "
+msgstr "és "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:634
+msgid "1 minute."
+msgstr "1 perc."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:636
+msgid " minutes."
+msgstr " perc."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:717
+msgid "Rescheduling..."
+msgstr "Átütemezés..."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:733
+msgid "Are you sure you want to reschedule entries ?"
+msgstr "Biztosan át akarja ütemezni a bejegyzéseket?"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:740
+msgid "The entries that are part of a session will"
+msgstr "A munkamenet részét használó bejegyzések"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:745
+msgid " first"
+msgstr " első"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:747
+msgid " be fitted to their content."
+msgstr " illeszkedjenek a tartalmaikhoz."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
+msgid "Then, all entries "
+msgstr "Ezután az összes bejegyzés "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:753
+msgid "All entries "
+msgstr "Minden bejegyzés "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:754
+msgid " will have their "
+msgstr " lesz nekik "
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+msgid "starting times"
+msgstr "kezdési idők"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:755
+msgid "duration"
+msgstr "időtartam"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:756
+msgid " changed."
+msgstr " megváltozott."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:763
+msgid "Please review your choice"
+msgstr "Kérjük, tekintse át választását"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:779
+msgid "Please select the rescheduling type"
+msgstr "Válassza ki az újraütemezés típusát"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:809
+msgid "Reschedule Entries"
+msgstr "A bejegyzések átütemezése"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:845
+msgid ""
+"This will change the starting and ending times of the session block {0} so "
+"that it encompasses all entries defined in its timetable."
+msgstr "Ez megváltoztatja a szekcióblokkok kezdő és befejező időpontjait {0} úgy, hogy az magában foglalja az ütemtervben meghatározott összes bejegyzést."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:852
+msgid "Are you sure you want to proceed?"
+msgstr "Biztosan folytatja?"
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:874
+msgid "Fitting..."
+msgstr "Illesztés..."
+
+#: indico/web/client/js/legacy/libs/timetable/Management.js:888
+msgid "Fit timetable to content"
+msgstr "Illessze be az ütemtervet a tartalomba"
+
+#: indico/web/client/js/legacy/libs/timetable/Undo.js:13
+msgid "Undo last operation"
+msgstr "Az utolsó művelet visszavonása"
+
+#: indico/web/templates/forms/email_recipients_widget.html:23
+#: indico/web/templates/forms/email_recipients_widget.html:29
+msgid "Show more"
+msgstr ""
+
+#: indico/web/templates/forms/email_recipients_widget.html:29
+msgid "Show less"
+msgstr ""
+
+#: indico/web/templates/forms/tag_list_widget.html:32
+msgid "Add new keyword"
+msgstr ""
