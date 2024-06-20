@@ -38,7 +38,7 @@
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     <div class="flexrow f-wrap">
-        {% for field in section.active_fields %}
+        {% for field in section.available_fields %}
             {% set filter_choices = field.field_impl.filter_choices %}
             {{ _render_column_selector(field.id, field, filter_choices) }}
         {% endfor %}
@@ -90,11 +90,11 @@
             {% endfor %}
         </div>
 
-        {% for section in regform.sections if section.is_visible and section.active_fields %}
+        {% for section in regform.sections if section.is_visible and section.available_fields %}
             {{ _render_regform_item_col_selector(section) }}
         {% endfor %}
 
-        {% set disabled_sections = regform.disabled_sections|selectattr('active_fields')|list %}
+        {% set disabled_sections = regform.disabled_sections|selectattr('available_fields')|list %}
         {% if disabled_sections %}
             <h1 class="disabled-caption">
                 {%- trans %}Disabled sections{% endtrans -%}
