@@ -20,13 +20,30 @@ import {getStaticData} from '../selectors';
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
 
+const asciiSearch = (options, query) => {
+  // To find accented country names in the drop-down easily
+  // the country names (and query string as well) are transliterated
+  // to contain only ASCII characters.
+  // Example:
+  // * typing "turk" will show "Türkey" and "Turkmenistan"
+  // * typing "ürk" will show "Burkina Faso", "Türkey", and "Turkmenistan"
+  // See https://stackoverflow.com/a/37511463 for more details regarding the transliteration.
+  const transliterate = inputStr =>
+    inputStr
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '');
+  const asciiQuery = transliterate(query);
+  return options.filter(opt => transliterate(opt.text).includes(asciiQuery));
+};
+
 function CountryInputComponent({value, onChange, disabled, choices, clearable}) {
   return (
     <Dropdown
       styleName="country-dropdown"
       placeholder={Translate.string('Select a country')}
       fluid
-      search
+      search={asciiSearch}
       selection
       selectOnBlur={false}
       selectOnNavigation={false}

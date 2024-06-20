@@ -47,6 +47,8 @@ Improvements
 - Modernize the event social share widget and add support for sharing to
   Mastodon (:pr:`6289`)
 - Enable the calendaring + social sharing widget in events by default (:pr:`6398`)
+- Ignore diacritics when searching in the registration form country field (:pr:`6403`,
+  thanks :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^
