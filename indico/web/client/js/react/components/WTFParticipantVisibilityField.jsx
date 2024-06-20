@@ -19,7 +19,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
 
   // Trigger change only after the DOM has changed
   useEffect(() => {
-    parentElement.dispatchEvent(new Event('change', {bubbles: true}));
+    $('#visibility').trigger('change');
   }, [participantVisibility, publicVisibility, visibilityDuration, parentElement]);
 
   const choiceMap = {

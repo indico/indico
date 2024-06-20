@@ -73,7 +73,8 @@ def _attrs_for_validators(field, validators):
 
             attrs['data-hidden-unless'] = json.dumps({'field': condition_field.name,
                                                       'values': values,
-                                                      'checked_only': checked_only})
+                                                      'checked_only': checked_only,
+                                                      'inverted': validator.inverted})
     return attrs
 
 
