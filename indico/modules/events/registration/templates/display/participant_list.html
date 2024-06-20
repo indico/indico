@@ -1,18 +1,25 @@
 {% if preview %}
     {% extends 'events/management/base.html' %}
-    {% set page_title = 'Participant List Preview' %}
+{% elif event.type == 'conference' %}
+    {% extends 'events/registration/display/_event_registration_base.html' %}
 {% else %}
-    {% if event.type == 'conference' %}
-        {% extends 'events/registration/display/_event_registration_base.html' %}
-    {% else %}
-        {% extends 'events/registration/display/_meeting_registration_base.html' %}
-    {% endif %}
+    {% extends 'events/registration/display/_meeting_registration_base.html' %}
 {% endif %}
 
 {% from 'message_box.html' import message_box %}
 
+{% block back_button_url -%}
+    {%- if preview -%}
+        {{ url_for('.manage_regform_list', event) }}
+    {%- endif -%}
+{%- endblock %}
+
 {% block title %}
-    {{- page_title -}}
+    {%- if not preview -%}
+        {{- page_title -}}
+    {%- else -%}
+        {% trans %}Participant List Preview{% endtrans %}
+    {%- endif -%}
 {% endblock %}
 
 {% block subtitle %}
@@ -22,7 +29,11 @@
 {% endblock %}
 
 {% block description %}
-    {%- if tables|length > 1 -%}
+    {%- if preview -%}
+        {% trans -%}
+            This preview shows the participant list like another registered participant would see it.
+        {%- endtrans %}
+    {%- elif tables|length > 1 -%}
         {% trans -%}
             The lists of participants grouped by the registration form they used to register for the event.
         {%- endtrans %}

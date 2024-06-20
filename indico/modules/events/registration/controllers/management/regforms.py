@@ -17,6 +17,7 @@ from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
+from indico.modules.events.registration.controllers.display import ParticipantListMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
                                                       RegistrationFormCreateForm, RegistrationFormEditForm,
@@ -48,6 +49,16 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                     .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
         return WPManageRegistration.render_template('management/regform_list.html', self.event, regforms=regforms)
+
+
+class RHParticipantListPreview(ParticipantListMixin, RHManageRegFormsBase):
+    """Preview the participant list like a registered participant would see it."""
+
+    view_class = WPManageRegistration
+    preview = True
+
+    def is_participant(self, user, regform=None):
+        return True
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):

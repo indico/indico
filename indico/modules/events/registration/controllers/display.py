@@ -26,13 +26,12 @@ from indico.modules.events.registration.models.invitations import InvitationStat
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
-from indico.modules.events.registration.util import (can_preview_participant_list, check_registration_email,
-                                                     create_registration, generate_ticket,
+from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
-                                                      WPDisplayRegistrationParticipantList, WPManageRegistration)
+                                                      WPDisplayRegistrationParticipantList)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
@@ -133,14 +132,12 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                is_restricted_access=self.is_restricted_access)
 
 
-class RHParticipantList(RHRegistrationFormDisplayBase):
-    """List of all public registrations."""
-
-    view_class = WPDisplayRegistrationParticipantList
-    preview = False
+class ParticipantListMixin:
+    view_class = None
+    preview = None
 
     def is_participant(self, user, regform=None):
-        return self.event.is_user_registered(user, regform)
+        raise NotImplementedError
 
     @staticmethod
     def _is_checkin_visible(reg):
@@ -275,18 +272,14 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         )
 
 
-class RHParticipantListPreview(RHParticipantList):
+class RHParticipantList(ParticipantListMixin, RHRegistrationFormDisplayBase):
+    """List of all public registrations."""
 
-    view_class = WPManageRegistration
-    preview = True
-
-    def _check_access(self):
-        RHParticipantList._check_access(self)
-        if not self.event.can_manage(session.user, permission='registration'):
-            raise Forbidden(_('You are not allowed to access this page.'))
+    view_class = WPDisplayRegistrationParticipantList
+    preview = False
 
     def is_participant(self, user, regform=None):
-        return can_preview_participant_list(self.event, session.user)
+        return self.event.is_user_registered(user, regform)
 
 
 class InvitationMixin:
