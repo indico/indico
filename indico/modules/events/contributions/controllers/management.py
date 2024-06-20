@@ -41,7 +41,8 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             delete_contribution, delete_subcontribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
-from indico.modules.events.contributions.schemas import ContributionFieldSchema, FullContributionSchema
+from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionSchema,
+                                                         FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, import_contributions_from_csv,
                                                       make_contribution_form)
@@ -54,6 +55,7 @@ from indico.modules.events.management.controllers.emails import (EmailRolesMetad
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.schemas import LocationParentSchema
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
@@ -314,8 +316,6 @@ class RHContributionREST(RHManageContributionBase):
             if not self._can_update_scheduling():
                 raise Forbidden
             updates.update(self._get_contribution_track_updates(track.get('id')))
-        if (references := data.get('references')) is not None:
-            updates |= {'references': self._get_references(references)}
         rv = {}
         if updates:
             rv = update_contribution(self.contrib, updates)
@@ -348,6 +348,18 @@ class RHContributionREST(RHManageContributionBase):
                 updates['track'] = track
         return updates
 
+
+class RHAPIContribution(RHManageContributionBase):
+    def _process_GET(self):
+        return ContributionSchema().jsonify(self.contrib)
+
+    @use_args(ContributionSchema, partial=True)
+    def _process_PATCH(self, data):
+        if (references := data.get('references')) is not None:
+            data['references'] = self._get_references(references)
+        with track_location_changes():
+            update_contribution(self.contrib, data)
+
     @no_autoflush
     def _get_references(self, data: list[dict]) -> list[ContributionReference]:
         references = []
@@ -358,6 +370,43 @@ class RHContributionREST(RHManageContributionBase):
             references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
                                                     value=entry['value']))
         return references
+
+
+class RHAPIContributionCreate(RHManageContributionsBase):
+    @use_args(ContributionSchema)
+    def _process_POST(self, data):
+        if (references := data.get('references')) is not None:
+            data['references'] = self._get_references(references)
+        create_contribution(self.event, data)
+
+    @no_autoflush
+    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
+        references = []
+        for entry in data:
+            reference_type = ReferenceType.get(entry['reference_type_id'])
+            if not reference_type:
+                raise BadRequest('Invalid reference type')
+            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
+                                                    value=entry['value']))
+        return references
+
+
+class RHAPIContributionsInheritedLocation(RHManageContributionsBase):
+    """API for the location parent of the event."""
+
+    def _process_GET(self):
+        if Contribution.allow_location_inheritance:
+            return LocationParentSchema().jsonify(self.event)
+        return jsonify(None)
+
+
+class RHAPIContributionInheritedLocation(RHManageContributionBase):
+    """API for the location parent of the event."""
+
+    def _process_GET(self):
+        if self.contrib.allow_location_inheritance:
+            return LocationParentSchema().jsonify(self.contrib.location_parent)
+        return jsonify(None)
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):

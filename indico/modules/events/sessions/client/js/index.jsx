@@ -11,8 +11,8 @@ import ReactDOM from 'react-dom';
 import 'indico/modules/events/util/types_dialog';
 
 import './session_display';
-import SessionBlockForm from './SessionBlockForm';
-import SessionForm from './SessionForm';
+import {EditSessionBlockButton} from './SessionBlockForm';
+import {AddSessionButton, EditSessionButton} from './SessionForm';
 
 (function(global) {
   function setupTableSorter() {
@@ -160,17 +160,52 @@ import SessionForm from './SessionForm';
     });
   }
 
-  global.setupSessionForm = function setupSessionForm() {
-    const root = document.querySelector('#session-form-container');
-    if (root) {
-      ReactDOM.render(<SessionForm />, root);
-    }
+  global.setupSessionForm = function setupSessionForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, sessionId, eventType, eventTitle} = element.dataset;
+    console.log(eventId, sessionId, eventTitle, eventType);
+
+    ReactDOM.render(
+      <EditSessionButton
+        eventId={+eventId}
+        sessionId={sessionId && +sessionId}
+        eventTitle={eventTitle}
+        eventType={eventType}
+        triggerSelector={trigger}
+      />,
+      element
+    );
   };
 
-  global.setupBlockForm = function setupBlockForm() {
-    const root = document.querySelector('#block-form-container');
-    if (root) {
-      ReactDOM.render(<SessionBlockForm />, root);
-    }
+  global.setupSessionCreateForm = function setupSessionCreateForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, eventType} = element.dataset;
+    console.log(eventId, eventType);
+
+    ReactDOM.render(
+      <AddSessionButton eventId={+eventId} eventType={eventType} triggerSelector={trigger} />,
+      element
+    );
+  };
+
+  global.setupSessionBlockForm = function setupSessionBlockForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, sessionId, blockId, eventType, eventTitle} = element.dataset;
+    console.log(eventId, blockId, eventTitle, eventType);
+
+    const portal = document.createElement('div');
+    document.body.appendChild(portal);
+
+    ReactDOM.render(
+      <EditSessionBlockButton
+        eventId={+eventId}
+        sessionId={sessionId && +sessionId}
+        blockId={blockId && +blockId}
+        eventTitle={eventTitle}
+        eventType={eventType}
+        triggerSelector={trigger}
+      />,
+      portal
+    );
   };
 })(window);

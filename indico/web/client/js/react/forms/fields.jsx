@@ -362,6 +362,7 @@ ComboDropdownAdapter.defaultProps = {
 
 function TimePickerComponent({value, disabled, onChange, onBlur, onFocus}) {
   // TODO: Make more props overridable
+  console.log('start_dt', value);
 
   const markTouched = () => {
     onFocus();
@@ -370,14 +371,14 @@ function TimePickerComponent({value, disabled, onChange, onBlur, onFocus}) {
 
   function handleOnChange(v) {
     markTouched();
-    onChange(v);
+    onChange(v.toISOString());
   }
 
   return (
     <div className="ui input" styleName="time-picker">
       <TimePicker
         showSecond={false}
-        value={value || null}
+        value={value ? moment(value) : null}
         focusOnOpen
         format="H:mm"
         onChange={handleOnChange}
@@ -391,7 +392,7 @@ function TimePickerComponent({value, disabled, onChange, onBlur, onFocus}) {
 }
 
 TimePickerComponent.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
+  value: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
@@ -407,8 +408,9 @@ function DurationComponent({value, onChange, ...rest}) {
     <TimePickerComponent
       value={moment()
         .startOf('day')
-        .seconds(value)}
-      onChange={v => onChange(v.diff(moment().startOf('day'), 'seconds'))}
+        .seconds(value)
+        .toISOString()}
+      onChange={v => onChange(moment(v).diff(moment().startOf('day'), 'seconds'))}
       {...rest}
     />
   );
@@ -712,14 +714,15 @@ export function FinalTimePicker({name, label, defaultValue, ...rest}) {
 FinalTimePicker.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
-  defaultValue: PropTypes.object,
+  defaultValue: PropTypes.string,
 };
 
 FinalTimePicker.defaultProps = {
   label: null,
   defaultValue: moment()
     .startOf('day')
-    .minutes(20),
+    .minutes(20)
+    .toISOString(),
 };
 
 export function FinalDuration({name, label, defaultValue, ...rest}) {

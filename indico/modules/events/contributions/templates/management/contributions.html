@@ -83,6 +83,20 @@
                         data-ajax-dialog>
                     {%- trans %}New contribution{% endtrans -%}
                 </button>
+                <button id="add-new-contrib-trigger"
+                        class="i-button highlight icon-plus"
+                        data-title="{% trans %}Add new session{% endtrans %}">
+                    {% trans %}New contribution (React){% endtrans %}
+                </button>
+                <div
+                    id="contrib-create-form"
+                    data-event-id="{{ event.id }}"
+                    data-event-type="{{ event.type }}"
+                    data-person-link-field-params="{{ person_link_field_params | tojson | forceescape }}">
+                </div>
+                <script>
+                    setupContributionCreateForm('#contrib-create-form', '#add-new-contrib-trigger');
+                </script>
                 <button class="i-button js-enable-if-checked icon-remove disabled hide-if-locked"
                         title="{% trans %}Remove{% endtrans %}"
                         data-method="POST"
