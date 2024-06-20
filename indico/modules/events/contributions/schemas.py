@@ -20,7 +20,7 @@ from indico.modules.events.contributions.models.fields import (ContributionField
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBlockSchema
+from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema, LocationDataSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.marshmallow import SortedList
@@ -98,17 +98,16 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
         model = Contribution
         fields = ('id', 'title', 'description', 'friendly_id', 'code', 'abstract_id', 'board_number', 'keywords',
                   'venue_name', 'room_name', 'address', 'inherit_location',
-                  'start_dt', 'end_dt', 'duration', 'references',
+                  'start_dt', 'end_dt', 'duration',
                   'session', 'session_block', 'track', 'type', 'custom_fields', 'persons')
 
     session = fields.Nested(BasicSessionSchema, only=('id', 'title', 'friendly_id', 'code'))
-    session_block = fields.Nested(SessionBlockSchema, only=('id', 'title', 'code'))
+    session_block = fields.Nested(BasicSessionBlockSchema, only=('id', 'title', 'code'))
     track = fields.Nested(TrackSchema, only=('id', 'title', 'code'))
     type = fields.Nested(ContributionTypeSchema, only=('id', 'name'))
     custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
     persons = SortedList(fields.Nested(ContributionPersonLinkSchema), attribute='person_links',
                          sort_key=attrgetter('display_order_key'))
-    references = fields.List(fields.Nested(ContributionReferenceSchema))
 
     @post_dump(pass_original=True)
     def _hide_restricted_fields(self, data, orig, **kwargs):
@@ -123,3 +122,16 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
 
 contribution_type_schema = ContributionTypeSchema()
 contribution_type_schema_basic = ContributionTypeSchema(only=('id', 'name'))
+
+
+class ContributionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Contribution
+        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords',
+                  'location_data', 'duration', 'references', 'custom_fields', 'person_links')
+
+    custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
+    person_links = SortedList(fields.Nested(ContributionPersonLinkSchema),
+                              sort_key=attrgetter('display_order_key'))
+    references = fields.List(fields.Nested(ContributionReferenceSchema))
+    location_data = fields.Nested(LocationDataSchema)

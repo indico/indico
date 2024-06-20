@@ -14,10 +14,18 @@
     <div id="session-form-container" style="min-height: 50px;"></div>
     <div id="block-form-container" style="min-height: 50px;"></div>
     <div id="contrib-form-container" style="min-height: 50px;"></div>
-    <script>
+    {# <div
+        id="block-edit"
+        data-event-id="{{ event.id }}"
+        data-session-id="{{ block.session.id }}"
+        data-block-id="{{ block.id }}"
+        data-event-type="{{ event.type }}"
+        data-event-title="{{ event.title }}">
+    </div> #}
+    {# <script>
         setupSessionForm();
         setupBlockForm();
         setupContributionForm();
-    </script>
+    </script> #}
     {{ render_timetable(timetable_data, event_info, management=true, custom_links=custom_links) }}
 {% endblock %}
