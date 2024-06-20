@@ -413,7 +413,7 @@ class RegistrationFormSection(RegistrationFormItem):
         return [child for child in self.children if child.is_field]
 
     @property
-    def active_fields(self):
+    def available_fields(self):
         return [field for field in self.fields if not field.is_deleted]
 
     @property

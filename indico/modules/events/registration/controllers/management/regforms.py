@@ -110,17 +110,17 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
             flash(_('The settings for "{}" have been saved.').format(self.regform.title), 'success')
             return jsonify_data()
 
-        available_fields = {field.id: field for field in self.regform.active_fields}
+        active_fields = {field.id: field for field in self.regform.active_fields}
         enabled_fields = []
         for field_id in registration_settings.get_participant_list_columns(self.event, self.regform):
             try:
-                field = available_fields[field_id]
+                field = active_fields[field_id]
             except KeyError:
                 continue
             enabled_fields.append(field)
-            del available_fields[field_id]
+            del active_fields[field_id]
 
-        disabled_fields = list(available_fields.values())
+        disabled_fields = list(active_fields.values())
         return jsonify_template('events/registration/management/regform_display_form_columns.html', form=form,
                                 enabled_columns=enabled_fields, disabled_columns=disabled_fields)
 
