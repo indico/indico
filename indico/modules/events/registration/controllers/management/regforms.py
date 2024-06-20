@@ -10,6 +10,7 @@ from operator import itemgetter
 
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
+from webargs import fields
 
 from indico.core import signals
 from indico.core.db import db
@@ -35,6 +36,7 @@ from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale, orig_string
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -55,10 +57,14 @@ class RHParticipantListPreview(ParticipantListMixin, RHManageRegFormsBase):
     """Preview the participant list like a registered participant would see it."""
 
     view_class = WPManageRegistration
-    preview = True
+
+    @use_kwargs({'guest': fields.Bool(load_default=False)}, location='query')
+    def _process_args(self, guest):
+        RHManageRegFormsBase._process_args(self)
+        self.preview = 'guest' if guest else 'participant'
 
     def is_participant(self, user):
-        return True
+        return self.preview == 'participant'
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
