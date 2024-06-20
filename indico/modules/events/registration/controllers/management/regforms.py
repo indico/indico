@@ -57,7 +57,7 @@ class RHParticipantListPreview(ParticipantListMixin, RHManageRegFormsBase):
     view_class = WPManageRegistration
     preview = True
 
-    def is_participant(self, user, regform=None):
+    def is_participant(self, user):
         return True
 
 
