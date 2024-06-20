@@ -29,6 +29,8 @@ export function DateInputComponent({
   required,
   dateFormat,
   timeFormat,
+  minDate,
+  maxDate,
 }) {
   const dateValue = value.split('T')[0];
   const timeValue = value.includes('T') ? value.split('T')[1] : '';
@@ -54,6 +56,8 @@ export function DateInputComponent({
           onChange={handleDateChange}
           onFocus={onFocus}
           onBlur={onBlur}
+          min={minDate}
+          max={maxDate}
         />
       </Form.Field>
       {timeFormat && (
@@ -98,10 +102,14 @@ DateInputComponent.propTypes = {
     'YYYY',
   ]).isRequired,
   timeFormat: PropTypes.oneOf(['12h', '24h']),
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
 };
 
 DateInputComponent.defaultProps = {
   timeFormat: null,
+  minDate: undefined,
+  maxDate: undefined,
 };
 
 export default function DateInput({

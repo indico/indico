@@ -22,6 +22,8 @@ export default function DatePicker({
   onChange,
   value,
   format = moment.localeData().longDateFormat('L'),
+  min,
+  max,
   ...inputProps
 }) {
   function handleDateChange(ev) {
@@ -47,7 +49,10 @@ export default function DatePicker({
       <button type="button" disabled={inputProps.disabled}>
         <Translate as="span">Open a calendar</Translate>
       </button>
-      <ind-calendar>
+      <ind-calendar
+        min={fromISOLocalDate(min)?.toDateString()}
+        max={fromISOLocalDate(max)?.toDateString()}
+      >
         <dialog>
           <div className="controls">
             <button type="button" value="previous-year">
@@ -96,11 +101,15 @@ DatePicker.propTypes = {
   format: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any,
+  min: PropTypes.string,
+  max: PropTypes.string,
 };
 
 DatePicker.defaultProps = {
   value: undefined,
   format: undefined,
+  min: undefined,
+  max: undefined,
 };
 
 /**

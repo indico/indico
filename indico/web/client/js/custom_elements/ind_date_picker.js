@@ -23,19 +23,9 @@ customElements.define(
       return this.querySelector('input').value;
     }
 
-    get start() {
-      return this.getAttribute('start');
-    }
-
-    get end() {
-      return this.getAttribute('end');
-    }
-
     connectedCallback() {
       const id = `date-picker-${this.constructor.lastId++}`;
       const input = this.querySelector('input');
-      const startInput = document.getElementById(this.start);
-      const endInput = document.getElementById(this.end);
       const openCalendarButton = this.querySelector('button');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
@@ -83,12 +73,6 @@ customElements.define(
       });
       input.addEventListener('input', () => {
         indCalendar.value = toDateString(parseDate(this.value));
-      });
-      startInput?.addEventListener('input', () => {
-        indCalendar.rangeStart = toDateString(parseDate(startInput.value));
-      });
-      endInput?.addEventListener('input', () => {
-        indCalendar.rangeEnd = toDateString(parseDate(endInput.value));
       });
 
       function openDialog() {
@@ -142,20 +126,20 @@ customElements.define(
       this.setAttribute('value', value || '');
     }
 
-    get rangeStart() {
-      return this.getAttribute('range-start');
+    get min() {
+      return this.getAttribute('min');
     }
 
-    set rangeStart(value) {
-      this.setAttribute('range-start', value || '');
+    set min(dateString) {
+      this.setAttribute('min', dateString);
     }
 
-    get rangeEnd() {
-      return this.getAttribute('range-end');
+    get max() {
+      return this.getAttribute('max');
     }
 
-    set rangeEnd(value) {
-      this.setAttribute('range-end', value || '');
+    set max(dateString) {
+      this.setAttribute('max', dateString);
     }
 
     connectedCallback() {
@@ -400,13 +384,9 @@ customElements.define(
 
         // Populate the calendar cells
 
+        const min = toOptionalDate(indCalendar.min);
+        const max = toOptionalDate(indCalendar.max);
         const month = firstDayOfMonth.getMonth();
-        // Note that getDay() returns Sunday as 0, but we need 7 because of the weekInfo API
-
-        const rangeStart = toOptionalDate(indCalendar.rangeStart);
-        const rangeEnd = toOptionalDate(indCalendar.rangeEnd);
-        const markStart = rangeStart || (rangeEnd && selectedDate);
-        const markEnd = rangeEnd || (rangeStart && selectedDate);
 
         for (let i = 0; i < CALENDAR_CELL_COUNT; i++) {
           const date = new Date(firstDayOfCalendar);
@@ -430,10 +410,7 @@ customElements.define(
           calendarButton.value = toDateString(date);
 
           // Mark range
-          calendarButton.disabled = date < rangeStart || date > rangeEnd;
-          calendarButton.toggleAttribute('data-range-start', sameDate(date, markStart));
-          calendarButton.toggleAttribute('data-range-end', sameDate(date, markEnd));
-          calendarButton.toggleAttribute('data-range', date < markEnd && date > markStart);
+          calendarButton.disabled = date < min || date > max;
 
           // Mark selected
           if (calendarButton.value === indCalendar.value) {
@@ -453,7 +430,7 @@ customElements.define(
       this.cleanup();
     }
 
-    static observedAttributes = ['open', 'value', 'range-start', 'range-end'];
+    static observedAttributes = ['open', 'value', 'min', 'max'];
 
     attributeChangedCallback(name) {
       switch (name) {
@@ -461,8 +438,8 @@ customElements.define(
           this.dispatchEvent(new Event('attrchange.open'));
           break;
         case 'value':
-        case 'range-start':
-        case 'range-end':
+        case 'min':
+        case 'max':
           this.dispatchEvent(new Event('attrchange.value'));
           break;
       }
@@ -484,10 +461,6 @@ function getToday() {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   return now;
-}
-
-function sameDate(a, b) {
-  return a?.getTime() === b?.getTime();
 }
 
 function toDateString(date) {
