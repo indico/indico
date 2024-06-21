@@ -249,12 +249,14 @@ export default class DateNavigator extends React.Component {
           </Button>
         }
         content={
-          <CalendarSingleDatePicker
-            date={this.selectedDate}
-            onDateChange={this.onSelect}
-            disabledDate={this.calendarDisabledDate}
-            noBorder
-          />
+          <div className="ui form">
+            <CalendarSingleDatePicker
+              date={this.selectedDate}
+              onDateChange={this.onSelect}
+              disabledDate={this.calendarDisabledDate}
+              noBorder
+            />
+          </div>
         }
         hideOnScroll
       />
