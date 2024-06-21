@@ -776,6 +776,10 @@ def format_log_ref(ref):
     return f'{ref.reference_type.name}:{ref.value}'
 
 
+def format_log_contrib_field_value(value):
+    return value.data
+
+
 def _get_venue_room_name(data):
     venue_name = data['venue'].name if data.get('venue') else data.get('venue_name', '')
     room_name = data['room'].full_name if data.get('room') else data.get('room_name', '')

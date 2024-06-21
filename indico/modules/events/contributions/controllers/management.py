@@ -357,7 +357,9 @@ class RHAPIContribution(RHManageContributionBase):
     def _process_PATCH(self, data):
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
+        print('update contribution', data)
         with track_location_changes():
+            # TODO: custom fields logs
             update_contribution(self.contrib, data)
 
     @no_autoflush
@@ -412,6 +414,11 @@ class RHAPIContributionInheritedLocation(RHManageContributionBase):
 class RHAPIContributionDefaultDuration(RHManageContributionsBase):
     def _process(self):
         return jsonify(contribution_settings.get(self.event, 'default_duration').seconds)
+
+
+class RHAPIContributionFields(RHManageContributionsBase):
+    def _process(self):
+        return ContributionFieldSchema(many=True).jsonify(self.event.contribution_fields.filter_by(is_active=True))
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):

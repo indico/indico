@@ -8,10 +8,11 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import fields, post_dump
+from marshmallow import ValidationError, fields, post_dump, post_load, validates
 from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import column2field
 
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -124,13 +125,39 @@ contribution_type_schema = ContributionTypeSchema()
 contribution_type_schema_basic = ContributionTypeSchema(only=('id', 'name'))
 
 
+class ContribFieldSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionField
+        fields = ('title', 'description', 'is_required', 'field_data')
+
+
+class ContribFieldValueSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionFieldValue
+        fields = ('id', 'data')
+
+    id = fields.Integer(attribute='contribution_field_id', required=True)
+    data = fields.Raw(load_default=None)
+
+    @validates('id')
+    def _check_contribution_field(self, id, **kwargs):
+        if not ContributionField.get(id):
+            raise ValidationError('Invalid contribution field')
+
+    @post_load()
+    @no_autoflush
+    def make_instance(self, data, **kwargs):
+        return ContributionFieldValue(contribution_field_id=data['contribution_field_id'], data=data['data'])
+
+
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords',
                   'location_data', 'duration', 'references', 'custom_fields', 'person_links')
 
-    custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
+    # TODO: filter inactive and resitricted contrib fields
+    custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
     person_links = SortedList(fields.Nested(ContributionPersonLinkSchema),
                               sort_key=attrgetter('display_order_key'))
     references = fields.List(fields.Nested(ContributionReferenceSchema))

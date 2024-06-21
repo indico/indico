@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 // import contributionURL from 'indico-url:contributions.manage_contrib_rest';
+import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
 import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
 import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
@@ -16,7 +17,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {FormSpy} from 'react-final-form';
-import {Button, Dimmer, Form, Loader, Message, MessageHeader} from 'semantic-ui-react';
+import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
   CollapsibleContainer,
@@ -26,7 +27,7 @@ import {
 } from 'indico/react/components';
 import {FinalContributionPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
-import {FinalDuration} from 'indico/react/forms/fields';
+import {FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -34,6 +35,10 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
 export function ContributionEditForm({eventId, contribId, personLinkFieldParams, onClose}) {
+  const {data: fields, loading: fieldsLoading} = useIndicoAxios(
+    contribFieldsURL({event_id: eventId}),
+    {camelize: true}
+  );
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentContribURL({event_id: eventId, contrib_id: contribId})
   );
@@ -41,7 +46,12 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
   const {data: contrib, loading} = useIndicoAxios(contribURL);
 
   const handleSubmit = async formData => {
-    formData = _.omit(formData, ['person_links', 'custom_fields']); // TODO person links, custom fields
+    formData = _.omit(formData, ['person_links']); // TODO person links
+    const customFields = Object.entries(formData.custom_fields).map(([key, data]) => ({
+      id: parseInt(key.replace('field_', ''), 10),
+      data,
+    }));
+    formData = {...formData, custom_fields: customFields};
     try {
       await indicoAxios.patch(contribURL, {
         ...formData,
@@ -55,7 +65,7 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
     await new Promise(() => {});
   };
 
-  if (loading || locationParentLoading) {
+  if (loading || locationParentLoading || fieldsLoading) {
     return (
       <Dimmer active>
         <Loader />
@@ -63,7 +73,56 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
     );
   }
 
-  console.log(contrib);
+  const customContribFields = fields.map(
+    ({id, fieldType, title, description, isRequired, fieldData}) => {
+      const key = `custom_field_${id}`;
+      const name = `custom_fields.field_${id}`;
+      if (fieldType === 'text') {
+        if (fieldData.multiline) {
+          return (
+            <FinalTextArea
+              key={key}
+              name={name}
+              label={title}
+              description={description}
+              required={isRequired}
+            />
+          );
+        } else {
+          return (
+            <FinalInput
+              key={key}
+              name={name}
+              label={title}
+              description={description}
+              required={isRequired}
+            />
+          );
+        }
+      } else if (fieldType === 'single_choice') {
+        const options = fieldData.options.map(opt => ({
+          key: opt.id,
+          text: opt.option,
+          value: id,
+        }));
+
+        return (
+          <FinalDropdown
+            key={key}
+            name={name}
+            label={title}
+            description={description}
+            required={isRequired}
+            options={options}
+            selection
+          />
+        );
+      } else {
+        console.warn('Unsupported field type', fieldType);
+        return null;
+      }
+    }
+  );
 
   return (
     <FinalModalForm
@@ -73,6 +132,9 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
       onClose={onClose}
       initialValues={{
         ...contrib,
+        custom_fields: Object.fromEntries(
+          contrib.custom_fields.map(field => [`field_${field.id}`, field.data])
+        ),
         person_links: camelizeKeys(contrib.person_links),
       }}
       size="small"
@@ -103,10 +165,8 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
         label={Translate.string('Keywords')}
         placeholder={Translate.string('Please enter a keyword')}
       />
+      {customContribFields}
       <CollapsibleContainer title={Translate.string('Advanced')} dividing>
-        <Message negative>
-          <MessageHeader>TODO: Implement custom contribution fields</MessageHeader>
-        </Message>
         <FinalReferences
           name="references"
           label={Translate.string('External IDs')}
@@ -130,6 +190,10 @@ ContributionEditForm.propTypes = {
 };
 
 export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}) {
+  const {data: fields, loading: fieldsLoading} = useIndicoAxios(
+    contribFieldsURL({event_id: eventId}),
+    {camelize: true}
+  );
   const {data: defaultDuration, loading: defaultDurationLoading} = useIndicoAxios(
     defaultDurationURL({event_id: eventId})
   );
@@ -138,7 +202,12 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
   );
 
   const handleSubmit = async formData => {
-    formData = _.omit(formData, ['person_links', 'custom_fields']); // TODO person links, custom fields
+    formData = _.omit(formData, ['person_links']); // TODO person links
+    const customFields = Object.entries(formData.custom_fields).map(([key, data]) => ({
+      id: parseInt(key.replace('field_', ''), 10),
+      data,
+    }));
+    formData = {...formData, custom_fields: customFields};
     try {
       await indicoAxios.post(contributionCreateURL({event_id: eventId}), {
         ...formData,
@@ -152,7 +221,7 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
     await new Promise(() => {});
   };
 
-  if (locationParentLoading || defaultDurationLoading) {
+  if (locationParentLoading || defaultDurationLoading || fieldsLoading) {
     return (
       <Dimmer active>
         <Loader />
@@ -163,6 +232,57 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
   const locationData = locationParent
     ? {...locationParent.location_data, inheriting: true}
     : {inheriting: false};
+
+  const customContribFields = fields.map(
+    ({id, fieldType, title, description, isRequired, fieldData}) => {
+      const key = `custom_field_${id}`;
+      const name = `custom_fields.field_${id}`;
+      if (fieldType === 'text') {
+        if (fieldData.multiline) {
+          return (
+            <FinalTextArea
+              key={key}
+              name={name}
+              label={title}
+              description={description}
+              required={isRequired}
+            />
+          );
+        } else {
+          return (
+            <FinalInput
+              key={key}
+              name={name}
+              label={title}
+              description={description}
+              required={isRequired}
+            />
+          );
+        }
+      } else if (fieldType === 'single_choice') {
+        const options = fieldData.options.map(opt => ({
+          key: opt.id,
+          text: opt.option,
+          value: id,
+        }));
+
+        return (
+          <FinalDropdown
+            key={key}
+            name={name}
+            label={title}
+            description={description}
+            required={isRequired}
+            options={options}
+            selection
+          />
+        );
+      } else {
+        console.warn('Unsupported field type', fieldType);
+        return null;
+      }
+    }
+  );
 
   return (
     <FinalModalForm
@@ -176,12 +296,13 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
         keywords: [],
         references: [],
         location_data: locationData,
+        custom_fields: Object.fromEntries(fields.map(field => [`field_${field.id}`, ''])),
       }}
       size="small"
     >
       <FormSpy subscription={{values: true, errors: true}}>
         {({values, errors}) => {
-          console.log(values, errors);
+          console.log('finalform', values, errors);
           return null;
         }}
       </FormSpy>
@@ -205,10 +326,8 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
         label={Translate.string('Keywords')}
         placeholder={Translate.string('Please enter a keyword')}
       />
+      {customContribFields}
       <CollapsibleContainer title={Translate.string('Advanced')} dividing>
-        <Message negative>
-          <MessageHeader>TODO: Implement custom contribution fields</MessageHeader>
-        </Message>
         <FinalReferences
           name="references"
           label={Translate.string('External IDs')}
