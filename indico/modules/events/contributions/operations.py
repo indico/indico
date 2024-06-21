@@ -19,7 +19,8 @@ from indico.modules.events.contributions.models.persons import AuthorType, Contr
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.timetable.operations import (delete_timetable_entry, schedule_contribution,
                                                         update_timetable_entry)
-from indico.modules.events.util import format_log_person, format_log_ref, set_custom_fields, split_log_location_changes
+from indico.modules.events.util import (format_log_contrib_field_value, format_log_person, format_log_ref,
+                                        set_custom_fields, split_log_location_changes)
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.signals import make_interceptable
@@ -249,6 +250,10 @@ def log_contribution_update(contrib, changes, *, visible_person_link_changes=Fal
             'type': 'string',
             'convert': lambda changes: [x.name if x else None for x in changes]
         },
+        'field_values': {
+            'title': 'Custom fields',
+            'convert': lambda changes: [list(map(format_log_contrib_field_value, refs)) for refs in changes]
+        }
     }
     split_log_location_changes(changes)
     if not visible_person_link_changes:
