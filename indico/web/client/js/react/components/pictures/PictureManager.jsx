@@ -276,6 +276,7 @@ const PictureManager = ({
     multiple: false,
     noClick: true,
     noKeyboard: true,
+    maxSize: Indico.FileRestrictions.MaxUploadFileSize * 2 ** 20,
   });
 
   let picture = null;

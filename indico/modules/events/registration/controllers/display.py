@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import mimetypes
 from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
@@ -28,11 +29,13 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
-                                                     get_initial_form_values, get_user_data, make_registration_schema)
+                                                     get_initial_form_values, get_user_data, make_registration_schema,
+                                                     resize_uploaded_registration_picture)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.files.models.files import File
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
@@ -445,6 +448,18 @@ class RHUploadRegistrationFile(UploadFileMixin, InvitationMixin, RHRegistrationF
 
     def get_file_context(self):
         return 'event', self.event.id, 'regform', self.regform.id, 'registration'
+
+
+class RHUploadRegistrationPicture(RHUploadRegistrationFile):
+    """Upload a picture from a registration form."""
+
+    def _save_file(self, file, stream):
+        from indico.modules.files.schemas import FileSchema
+        context = self.get_file_context()
+        content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
+        resized_image_bytes = resize_uploaded_registration_picture(stream, 1000)
+        f = File.create_from_stream(resized_image_bytes, file.filename, content_type, context)
+        return FileSchema().jsonify(f), 201
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):

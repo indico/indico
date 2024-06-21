@@ -10,11 +10,13 @@ import csv
 import dataclasses
 import itertools
 import uuid
+from io import BytesIO
 from operator import attrgetter
 
 from flask import json, session
 from marshmallow import RAISE, ValidationError, fields, validates
 from marshmallow_enum import EnumField
+from PIL import Image, ImageOps
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -995,3 +997,22 @@ def get_persons(registrations, include_accompanying_persons=False):
                             'registration': registration,
                             'is_accompanying': True} for person in registration.accompanying_persons)
     return persons
+
+
+def resize_uploaded_registration_picture(source, size):
+    """Resize uploaded registration picture to the given size."""
+    try:
+        picture = Image.open(source)
+        picture = ImageOps.exif_transpose(picture)
+        size_x, size_y = picture.size
+        if max(size_x, size_y) < size:
+            source.seek(0)
+            return source
+        ratio = float(size) / max(size_x, size_y)
+        picture = picture.resize((int(ratio * size_x), int(ratio * size_y)), Image.Resampling.BICUBIC)
+        image_bytes = BytesIO()
+        picture.save(image_bytes, 'PNG')
+        image_bytes.seek(0)
+        return image_bytes
+    except Exception:
+        return None

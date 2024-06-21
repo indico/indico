@@ -395,7 +395,7 @@ class EmailField(RegistrationFormFieldBase):
 class PictureField(FileField):
     name = 'picture'
     setup_schema_fields = {
-        'min_picture_size': fields.Integer(load_default=0, validate=validate.Range(0, 1200)),
+        'min_picture_size': fields.Integer(load_default=0, validate=validate.Range(0, 1000)),
     }
 
     def get_validators(self, existing_registration):
