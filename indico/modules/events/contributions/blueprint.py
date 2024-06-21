@@ -83,6 +83,8 @@ _bp.add_url_rule('/api/contributions/location-parent', 'api_contribs_location_pa
                  management.RHAPIContributionsInheritedLocation)
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/location-parent', 'api_contrib_location_parent',
                  management.RHAPIContributionInheritedLocation)
+_bp.add_url_rule('/api/contributions/duration', 'api_contribs_duration',
+                 management.RHAPIContributionDefaultDuration)
 
 # Contribution RESTful endpoints
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/references/', 'create_contrib_reference_rest',

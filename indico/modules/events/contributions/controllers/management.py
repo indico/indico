@@ -409,6 +409,11 @@ class RHAPIContributionInheritedLocation(RHManageContributionBase):
         return jsonify(None)
 
 
+class RHAPIContributionDefaultDuration(RHManageContributionsBase):
+    def _process(self):
+        return jsonify(contribution_settings.get(self.event, 'default_duration').seconds)
+
+
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
     """List of persons in the contribution."""
 
