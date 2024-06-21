@@ -7,6 +7,7 @@
 
 // import contributionURL from 'indico-url:contributions.manage_contrib_rest';
 import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
+import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
@@ -129,6 +130,9 @@ ContributionEditForm.propTypes = {
 };
 
 export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}) {
+  const {data: defaultDuration, loading: defaultDurationLoading} = useIndicoAxios(
+    defaultDurationURL({event_id: eventId})
+  );
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentURL({event_id: eventId})
   );
@@ -148,7 +152,7 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
     await new Promise(() => {});
   };
 
-  if (locationParentLoading) {
+  if (locationParentLoading || defaultDurationLoading) {
     return (
       <Dimmer active>
         <Loader />
@@ -167,6 +171,7 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
       onSubmit={handleSubmit}
       onClose={onClose}
       initialValues={{
+        duration: defaultDuration,
         person_links: [],
         keywords: [],
         references: [],
