@@ -1014,5 +1014,5 @@ def resize_uploaded_registration_picture(source, size):
         picture.save(image_bytes, 'PNG')
         image_bytes.seek(0)
         return image_bytes
-    except Exception:
+    except OSError:
         return None
