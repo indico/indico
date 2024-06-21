@@ -80,7 +80,7 @@ Authentication
     user (these would be rejected on the SSO side, which should implement its own rate
     limiting).
 
-    The default allows a burst of 15 attempts, and then only 5 attempts every 15
+    The default allows a burst of 10 attempts, and then only 5 attempts every 15
     minutes for the next 24 hours.  Setting the rate limit to ``None`` disables it.
 
     Default: ``'5 per 15 minutes; 10 per day'``
