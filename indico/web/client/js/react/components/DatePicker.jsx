@@ -118,10 +118,40 @@ DatePicker.defaultProps = {
 export function FinalDatePicker({name, ...rest}) {
   const validDate = val =>
     val === INVALID ? Translate.string('The entered date is not valid.') : undefined;
-  rest.validate = rest.validate ? v.chain(validDate, rest.validate) : validDate;
-  return <FinalField name={name} component={DatePicker} {...rest} />;
+  const validators = [validDate];
+  if (rest.min) {
+    validators.push(val =>
+      val < rest.min
+        ? Translate.string('The entered date cannot be earlier than {min}.', {
+            min: moment(rest.min).format('L'),
+          })
+        : undefined
+    );
+  }
+  if (rest.max) {
+    validators.push(val =>
+      val > rest.max
+        ? Translate.string('The entered date cannot be later than {max}.', {
+            max: moment(rest.max).format('L'),
+          })
+        : undefined
+    );
+  }
+  if (rest.validate) {
+    validators.push(rest.validate);
+  }
+  return (
+    <FinalField name={name} component={DatePicker} {...rest} validate={v.chain(...validators)} />
+  );
 }
 
 FinalDatePicker.propTypes = {
   name: PropTypes.string.isRequired,
+  min: PropTypes.string,
+  max: PropTypes.string,
+};
+
+FinalDatePicker.defaultProps = {
+  min: undefined,
+  max: undefined,
 };
