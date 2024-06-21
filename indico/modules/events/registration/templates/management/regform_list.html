@@ -64,6 +64,15 @@
                     <div class="label">{% trans %}Participant list{% endtrans %}</div>
                     {% trans %}Define how the participant list will be shown on the event page{% endtrans %}
                 </div>
+                {% if event.type == 'conference' %}
+                    <div class="toolbar">
+                        <div class="group">
+                            <a href="{{ url_for('.manage_participant_list_preview', event) }}" class="i-button icon-list">
+                                {%- trans %}Preview as participant{% endtrans -%}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="toolbar">
                     <div class="group">
                         <a href="{{ url_for('.manage_regforms_display', event) }}" class="i-button icon-settings">

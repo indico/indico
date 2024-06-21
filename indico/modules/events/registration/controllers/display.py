@@ -132,10 +132,12 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
                                                is_restricted_access=self.is_restricted_access)
 
 
-class RHParticipantList(RHRegistrationFormDisplayBase):
-    """List of all public registrations."""
+class ParticipantListMixin:
+    view_class = None
+    preview = None
 
-    view_class = WPDisplayRegistrationParticipantList
+    def is_participant(self, user):
+        raise NotImplementedError
 
     @staticmethod
     def _is_checkin_visible(reg):
@@ -146,7 +148,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             return ''
         return url_for('event_registration.participant_picture', reg, field_data_id=field_data.field_data_id)
 
-    def _merged_participant_list_table(self):
+    def _merged_participant_list_table(self, is_participant):
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
             columns = [{'text': personal_data.get(column_name, '')} if column_name != 'picture'
@@ -173,7 +175,6 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
                  .signal_query('merged-participant-list-publishable-registrations', event=self.event))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
                                                      for reg in query if reg.is_publishable(is_participant)),
                                key=lambda reg: tuple(x['text'].lower() for x in reg['columns']
@@ -236,14 +237,15 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'num_participants': query.count()}
 
     def _process(self):
+        is_participant = self.is_participant(session.user)
         regforms = (RegistrationForm.query.with_parent(self.event)
-                    .filter(RegistrationForm.is_participant_list_visible(self.event.is_user_registered(session.user)),
+                    .filter(RegistrationForm.is_participant_list_visible(is_participant),
                             ~RegistrationForm.participant_list_disabled)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
-            tables = [self._merged_participant_list_table()]
+            tables = [self._merged_participant_list_table(is_participant)]
         else:
             tables = []
             regforms_dict = {regform.id: regform for regform in regforms}
@@ -263,10 +265,21 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return self.view_class.render_template(
             'display/participant_list.html',
             self.event,
+            preview=self.preview,
             tables=tables,
             published=bool(regforms),
             num_participants=num_participants
         )
+
+
+class RHParticipantList(ParticipantListMixin, RHRegistrationFormDisplayBase):
+    """List of all public registrations."""
+
+    view_class = WPDisplayRegistrationParticipantList
+    preview = False
+
+    def is_participant(self, user):
+        return self.event.is_user_registered(user)
 
 
 class InvitationMixin:

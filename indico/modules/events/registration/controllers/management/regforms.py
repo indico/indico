@@ -10,6 +10,7 @@ from operator import itemgetter
 
 from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
+from webargs import fields
 
 from indico.core import signals
 from indico.core.db import db
@@ -17,6 +18,7 @@ from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
+from indico.modules.events.registration.controllers.display import ParticipantListMixin
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
                                                       RegistrationFormCreateForm, RegistrationFormEditForm,
@@ -34,6 +36,7 @@ from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale, orig_string
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -48,6 +51,20 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                     .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
         return WPManageRegistration.render_template('management/regform_list.html', self.event, regforms=regforms)
+
+
+class RHParticipantListPreview(ParticipantListMixin, RHManageRegFormsBase):
+    """Preview the participant list like a registered participant would see it."""
+
+    view_class = WPManageRegistration
+
+    @use_kwargs({'guest': fields.Bool(load_default=False)}, location='query')
+    def _process_args(self, guest):
+        RHManageRegFormsBase._process_args(self)
+        self.preview = 'guest' if guest else 'participant'
+
+    def is_participant(self, user):
+        return self.preview == 'participant'
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):

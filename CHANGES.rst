@@ -49,6 +49,8 @@ Improvements
 - Enable the calendaring + social sharing widget in events by default (:pr:`6398`)
 - Ignore diacritics when searching in the registration form country field (:pr:`6403`,
   thanks :user:`tomako`)
+- Add preview option for managers to see the participant list as shown to registered
+  participants or unregistered guests (:pr:`6052`, thanks :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
