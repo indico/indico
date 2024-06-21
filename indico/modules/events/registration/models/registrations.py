@@ -646,8 +646,7 @@ class Registration(db.Model):
             if data.storage_file_id is None:
                 continue
             with data.open() as f:
-                thumbnail_bytes = resize_uploaded_registration_picture(f, 120)
-                if not thumbnail_bytes:
+                if not (thumbnail_bytes := resize_uploaded_registration_picture(f, 120)):
                     continue
                 attachment = MIMEImage(thumbnail_bytes.read())
             attachment.add_header('Content-ID', f'<{data.attachment_cid}>')
