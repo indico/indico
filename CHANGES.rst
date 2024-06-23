@@ -76,12 +76,14 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve registration form date picker accessibility (:pr:`6371`, thanks :user:`foxbunny`)
+- Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Use unguessable URLs for user avatar pictures (:pr:`6346`, thanks :user:`vtran99`)
 - Add ``<ind-date-picker>`` custom element (:pr:`6371`, thanks :user:`foxbunny`)
+- Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 - Use native ESM for webpack config files (:pr:`6389`)
 
 
