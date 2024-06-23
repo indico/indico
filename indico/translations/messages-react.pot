@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-06-24 11:48+0200\n"
+"POT-Creation-Date: 2024-06-24 22:09+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -1062,7 +1062,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:316
 #: indico/modules/receipts/client/js/templates/Editor.jsx:178
-#: indico/web/client/js/custom_elements/ind_share_widget.js:267
+#: indico/web/client/js/custom_elements/ind_share_widget.js:266
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:116
 #: indico/web/client/js/react/components/notes/NoteEditor.jsx:188
 msgid "Save"
@@ -2388,7 +2388,7 @@ msgstr ""
 msgid "The associated registration data has been deleted."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/FormItem.jsx:99
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:100
 msgid "Field data will be purged {retentionPeriod} week after the event ended."
 msgid_plural "Field data will be purged {retentionPeriod} weeks after the event ended."
 msgstr[0] ""
@@ -2598,11 +2598,11 @@ msgstr ""
 msgid "Enable choice"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:27
+#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:44
 msgid "Select a country"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:90
+#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:107
 msgid "Default to affiliation country"
 msgstr ""
 
@@ -5708,32 +5708,32 @@ msgid ""
 "add one below."
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:285
+#: indico/web/client/js/custom_elements/ind_share_widget.js:284
 msgid "Preferred Mastodon server added! You can now share this event below."
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:295
+#: indico/web/client/js/custom_elements/ind_share_widget.js:294
 msgid "Share on {mastodonServerName}"
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:333
-#: indico/web/client/js/custom_elements/ind_share_widget.js:342
+#: indico/web/client/js/custom_elements/ind_share_widget.js:332
+#: indico/web/client/js/custom_elements/ind_share_widget.js:341
 msgid "Share this page"
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:335
+#: indico/web/client/js/custom_elements/ind_share_widget.js:334
 msgid "Share widget icon"
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:347
+#: indico/web/client/js/custom_elements/ind_share_widget.js:346
 msgid "Direct link"
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:354
+#: indico/web/client/js/custom_elements/ind_share_widget.js:353
 msgid "Add to calendar"
 msgstr ""
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:361
+#: indico/web/client/js/custom_elements/ind_share_widget.js:360
 msgid "Share on social media"
 msgstr ""
 

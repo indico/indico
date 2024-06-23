@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.3.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:47+0200\n"
+"POT-Creation-Date: 2024-06-23 22:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgstr ""
 #: indico/modules/events/papers/templates/management/overview.html:158
 #: indico/modules/events/registration/templates/management/regform.html:133
 #: indico/modules/events/registration/templates/management/regform.html:150
-#: indico/modules/events/registration/templates/management/regform_list.html:124
+#: indico/modules/events/registration/templates/management/regform_list.html:133
 #: indico/modules/events/surveys/templates/management/survey.html:76
 #: indico/modules/events/surveys/templates/management/survey_list.html:42
 #: indico/modules/events/templates/display/common/_manage_button.html:118
@@ -122,7 +122,7 @@ msgstr ""
 #: indico/core/celery/templates/celery_tasks.html:14 indico/modules/events/abstracts/settings.py:66
 #: indico/modules/events/abstracts/templates/management/cfa_actions/_base.html:20
 #: indico/modules/events/papers/templates/management/cfp_actions/_base.html:22
-#: indico/modules/events/registration/controllers/management/regforms.py:306
+#: indico/modules/events/registration/controllers/management/regforms.py:323
 #: indico/modules/events/registration/templates/management/_registration_details.html:361
 #: indico/modules/events/registration/templates/management/regform_actions/not_started.html:26
 #: indico/modules/events/surveys/controllers/management/survey.py:120
@@ -459,7 +459,7 @@ msgstr ""
 
 #: indico/legacy/pdfinterface/conference.py:1024 indico/legacy/pdfinterface/conference.py:1192
 #: indico/modules/events/registration/lists.py:49
-#: indico/modules/events/registration/templates/display/participant_list.html:44
+#: indico/modules/events/registration/templates/display/participant_list.html:72
 #: indico/modules/events/registration/templates/management/_registration_details.html:245
 msgid "Checked in"
 msgstr ""
@@ -10959,7 +10959,7 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/regform.html:99
 #: indico/modules/events/registration/templates/management/regform.html:187
 #: indico/modules/events/registration/templates/management/regform_list.html:56
-#: indico/modules/events/registration/templates/management/regform_list.html:85
+#: indico/modules/events/registration/templates/management/regform_list.html:94
 #: indico/modules/events/tracks/templates/management.html:35
 msgid "Configure"
 msgstr ""
@@ -11312,7 +11312,7 @@ msgid "The target event already has registration forms"
 msgstr ""
 
 #: indico/modules/events/registration/clone.py:90
-#: indico/modules/events/registration/templates/management/regform_list.html:111
+#: indico/modules/events/registration/templates/management/regform_list.html:120
 #: indico/modules/events/registration/templates/management/regform_stats.html:37 indico/modules/users/models/export.py:37
 msgid "Registrations"
 msgstr ""
@@ -11997,39 +11997,39 @@ msgstr ""
 msgid "This registration form is private."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:284
+#: indico/modules/events/registration/controllers/display.py:297
 msgid "Your invitation code is not valid."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:288
+#: indico/modules/events/registration/controllers/display.py:301
 msgid "This invitation does not exist or has been withdrawn."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:348
+#: indico/modules/events/registration/controllers/display.py:361
 msgid "You are trying to register with a form that requires you to be logged in"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:375
+#: indico/modules/events/registration/controllers/display.py:388
 msgid "You cannot register for this event"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:454
+#: indico/modules/events/registration/controllers/display.py:467
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:457
+#: indico/modules/events/registration/controllers/display.py:470
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering or log in to your Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:477
+#: indico/modules/events/registration/controllers/display.py:490
 msgid "Your registration has been withdrawn."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:504
+#: indico/modules/events/registration/controllers/display.py:517
 msgid "You declined the invitation to register."
 msgstr ""
 
@@ -12055,35 +12055,35 @@ msgid_plural "{n} invitations were skipped."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:64
+#: indico/modules/events/registration/controllers/management/regforms.py:81
 msgid "The participants display settings have been saved."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:110
+#: indico/modules/events/registration/controllers/management/regforms.py:127
 msgid "The settings for \"{}\" have been saved."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:202
+#: indico/modules/events/registration/controllers/management/regforms.py:219
 msgid "Registration form has been successfully created"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:230
+#: indico/modules/events/registration/controllers/management/regforms.py:247
 msgid "Registration form has been successfully modified"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:246
+#: indico/modules/events/registration/controllers/management/regforms.py:263
 msgid "Registration form deleted"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:263
+#: indico/modules/events/registration/controllers/management/regforms.py:280
 msgid "Registrations for {} are now open"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:279
+#: indico/modules/events/registration/controllers/management/regforms.py:296
 msgid "Registrations for {} are now closed"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/regforms.py:295
+#: indico/modules/events/registration/controllers/management/regforms.py:312
 msgid "Registrations for {} have been scheduled"
 msgstr ""
 
@@ -12133,7 +12133,7 @@ msgstr[1] ""
 #: indico/modules/events/registration/templates/display/regform_display.html:33
 #: indico/modules/events/registration/templates/display/regform_list.html:74
 #: indico/modules/events/registration/templates/management/regform.html:128
-#: indico/modules/events/registration/templates/management/regform_list.html:106
+#: indico/modules/events/registration/templates/management/regform_list.html:115
 #: indico/modules/events/registration/templates/management/regform_reglist.html:21
 msgid "Registration is disabled due to an expired retention period"
 msgstr ""
@@ -12652,7 +12652,7 @@ msgid "Apply for participation"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/event_header.html:94
-#: indico/modules/events/registration/templates/display/participant_list.html:86
+#: indico/modules/events/registration/templates/display/participant_list.html:114
 #, python-format
 msgid "%(num)s more participant"
 msgid_plural "%(num)s more participants"
@@ -12663,31 +12663,51 @@ msgstr[1] ""
 msgid "See the full list"
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/participant_list.html:15
+#: indico/modules/events/registration/templates/display/participant_list.html:21
+msgid "Participant List Preview"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:27
 #, python-format
 msgid "1 participant"
 msgid_plural "%(num)s participants"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/templates/display/participant_list.html:21
+#: indico/modules/events/registration/templates/display/participant_list.html:33
+msgid "This preview shows the participant list like an unregistered guest would see it."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:38
+msgid "Show registered participant view instead."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:41
+msgid "This preview shows the participant list like a registered participant would see it."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:46
+msgid "Show unregistered guest view instead."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:49
 msgid "The lists of participants grouped by the registration form they used to register for the event."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/participant_list.html:94
+#: indico/modules/events/registration/templates/display/participant_list.html:122
 #, python-format
 msgid "There is %(num)s hidden participant"
 msgid_plural "There are %(num)s hidden participants"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/registration/templates/display/participant_list.html:98
-#: indico/modules/events/registration/templates/display/participant_list.html:111
+#: indico/modules/events/registration/templates/display/participant_list.html:126
+#: indico/modules/events/registration/templates/display/participant_list.html:139
 #: indico/modules/events/registration/templates/management/_reglist.html:176
 msgid "There are no registrations yet."
 msgstr ""
 
-#: indico/modules/events/registration/templates/display/participant_list.html:107
+#: indico/modules/events/registration/templates/display/participant_list.html:135
 msgid "There are no published registrations."
 msgstr ""
 
@@ -13609,7 +13629,7 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_display.html:33
 #: indico/modules/events/registration/templates/management/regform_edit.html:8
-#: indico/modules/events/registration/templates/management/regform_list.html:151
+#: indico/modules/events/registration/templates/management/regform_list.html:160
 msgid "Create form"
 msgstr ""
 
@@ -13747,37 +13767,41 @@ msgstr ""
 msgid "Define how the participant list will be shown on the event page"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:70
-msgid "Customize"
+#: indico/modules/events/registration/templates/management/regform_list.html:71
+msgid "Preview as participant"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_list.html:79
+msgid "Customize"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html:88
 #: indico/modules/events/registration/templates/management/registration_tags.html:5
 msgid "Registration tags"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:80
+#: indico/modules/events/registration/templates/management/regform_list.html:89
 msgid "Create tags to mark and filter registrations"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:95
+#: indico/modules/events/registration/templates/management/regform_list.html:104
 msgid "List of registration forms"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:130
+#: indico/modules/events/registration/templates/management/regform_list.html:139
 msgid "Delete this registration form"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:134
+#: indico/modules/events/registration/templates/management/regform_list.html:143
 msgid "Delete registration form?"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:135
+#: indico/modules/events/registration/templates/management/regform_list.html:144
 #, python-format
 msgid "Do you really want to delete the registration form &quot;%(title)s&quot;?"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/regform_list.html:143
+#: indico/modules/events/registration/templates/management/regform_list.html:152
 msgid "There are no registration forms yet."
 msgstr ""
 
