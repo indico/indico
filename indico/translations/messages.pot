@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 3.3.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-23 22:09+0200\n"
+"POT-Creation-Date: 2024-06-24 18:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7253,7 +7253,7 @@ msgstr ""
 msgid "The contribution '{}' is not displayed in the list due to the enabled filters"
 msgstr ""
 
-#: indico/modules/events/contributions/util.py:296 indico/modules/events/registration/util.py:91
+#: indico/modules/events/contributions/util.py:296 indico/modules/events/registration/util.py:93
 msgid "Row {}: malformed CSV data - please check that the number of columns is correct"
 msgstr ""
 
@@ -11961,75 +11961,75 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:96
+#: indico/modules/events/registration/util.py:98
 msgid "Row {}: missing e-mail address"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:100
+#: indico/modules/events/registration/util.py:102
 msgid "Row {}: invalid e-mail address"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:102
+#: indico/modules/events/registration/util.py:104
 msgid "Row {}: missing first or last name"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:107 indico/util/roles.py:45
+#: indico/modules/events/registration/util.py:109 indico/util/roles.py:45
 msgid "Row {}: email address is not unique"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:109
+#: indico/modules/events/registration/util.py:111
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:867 indico/modules/events/registration/util.py:902
+#: indico/modules/events/registration/util.py:869 indico/modules/events/registration/util.py:904
 msgid "Row {}: a registration with this email already exists"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:871 indico/modules/events/registration/util.py:908
+#: indico/modules/events/registration/util.py:873 indico/modules/events/registration/util.py:910
 msgid "Row {}: a registration for this user already exists"
 msgstr ""
 
-#: indico/modules/events/registration/util.py:913
+#: indico/modules/events/registration/util.py:915
 msgid "Row {}: an invitation for this user already exists"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:91
+#: indico/modules/events/registration/controllers/display.py:92
 msgid "This registration form is private."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:297
+#: indico/modules/events/registration/controllers/display.py:298
 msgid "Your invitation code is not valid."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:301
+#: indico/modules/events/registration/controllers/display.py:302
 msgid "This invitation does not exist or has been withdrawn."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:361
+#: indico/modules/events/registration/controllers/display.py:362
 msgid "You are trying to register with a form that requires you to be logged in"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:388
+#: indico/modules/events/registration/controllers/display.py:389
 msgid "You cannot register for this event"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:467
+#: indico/modules/events/registration/controllers/display.py:481
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:470
+#: indico/modules/events/registration/controllers/display.py:484
 msgid ""
 "We could not find a registration for you.  If have already registered, please use the direct access link from the "
 "email you received after registering or log in to your Indico account."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:490
+#: indico/modules/events/registration/controllers/display.py:504
 msgid "Your registration has been withdrawn."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:517
+#: indico/modules/events/registration/controllers/display.py:531
 msgid "You declined the invitation to register."
 msgstr ""
 
@@ -12289,15 +12289,11 @@ msgstr ""
 msgid "Invalid email address"
 msgstr ""
 
-#: indico/modules/events/registration/fields/simple.py:412
+#: indico/modules/events/registration/fields/simple.py:414
 msgid "Invalid picture file."
 msgstr ""
 
-#: indico/modules/events/registration/fields/simple.py:414
-msgid "This field only accepts jpg, png, gif and webp picture formats."
-msgstr ""
-
-#: indico/modules/events/registration/fields/simple.py:417
+#: indico/modules/events/registration/fields/simple.py:419
 msgid "The uploaded picture pixels is smaller than the minimum size of {}."
 msgstr ""
 
@@ -12974,7 +12970,7 @@ msgid "Manage registration form"
 msgstr ""
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:36
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:57
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:59
 #: indico/modules/rb/templates/emails/reservations/occurrence_rejection_email_to_manager.txt:13
 #: indico/modules/rb/templates/emails/reservations/occurrence_rejection_email_to_user.txt:13
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_manager.txt:11
@@ -13001,23 +12997,23 @@ msgstr ""
 msgid "Thank you! Your registration for the event %(strong)s%(title)s%(endstrong)s %(at_time)s has been received."
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:34
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:36
 msgid "To manage your registration follow this link:"
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:36
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:38
 msgid "Manage my registration"
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:64
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:66
 msgid "Please note that this event requires manual approval."
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:65
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:67
 msgid "You will be notified when the registration process is complete."
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:72
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:74
 #, python-format
 msgid "Please proceed to the checkout %(link)shere%(endlink)s in order to complete it."
 msgstr ""

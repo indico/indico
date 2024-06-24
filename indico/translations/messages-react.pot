@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-06-24 22:09+0200\n"
+"POT-Creation-Date: 2024-06-24 18:50+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -851,7 +851,7 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:348
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx:181
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:317
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:320
 msgid "Upload in progress"
 msgstr ""
 
@@ -2178,7 +2178,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:701
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:699
 #: indico/web/client/js/react/forms/final-form.jsx:171
 msgid "Close"
 msgstr ""
@@ -2514,7 +2514,7 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:158
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:169
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:95
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:264
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:272
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:173
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:30
 #: indico/modules/users/client/js/PersonalDataForm.jsx:85
@@ -2606,23 +2606,23 @@ msgstr ""
 msgid "Default to affiliation country"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:121
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:129
 msgid "The provided date is invalid."
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:245
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:253
 msgid "12 hours"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:246
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:254
 msgid "24 hours"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:252
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:260
 msgid "Date format"
 msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:262
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:270
 msgid "Time format"
 msgstr ""
 
@@ -3410,7 +3410,7 @@ msgid "Reason for booking"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:403
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:661
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:660
 msgid "Internal notes about the booking are only visible to room managers."
 msgstr ""
 
@@ -3997,7 +3997,7 @@ msgid "List of Rooms"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/Menu.jsx:22
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:710
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:708
 msgid "Bookings"
 msgstr ""
 
@@ -4700,7 +4700,7 @@ msgid "One or more bookings would conflict with yours."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:170
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:680
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:678
 msgid "Bookings in the past are not allowed."
 msgstr ""
 
@@ -4851,7 +4851,7 @@ msgstr ""
 msgid "Internal notes (optional)"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:702
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:700
 msgid "I've changed my mind!"
 msgstr ""
 
@@ -5793,32 +5793,40 @@ msgstr ""
 msgid "Click again to confirm ({delay})"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:48
+#: indico/web/client/js/react/components/DatePicker.jsx:50
 msgid "Open a calendar"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:54
+#: indico/web/client/js/react/components/DatePicker.jsx:59
 msgid "Previous year"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:57
+#: indico/web/client/js/react/components/DatePicker.jsx:62
 msgid "Previous month"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:66
+#: indico/web/client/js/react/components/DatePicker.jsx:71
 msgid "Next month"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:69
+#: indico/web/client/js/react/components/DatePicker.jsx:74
 msgid "Next year"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:87
+#: indico/web/client/js/react/components/DatePicker.jsx:92
 msgid "Date format: {format}"
 msgstr ""
 
-#: indico/web/client/js/react/components/DatePicker.jsx:111
+#: indico/web/client/js/react/components/DatePicker.jsx:120
 msgid "The entered date is not valid."
+msgstr ""
+
+#: indico/web/client/js/react/components/DatePicker.jsx:125
+msgid "The entered date cannot be earlier than {min}."
+msgstr ""
+
+#: indico/web/client/js/react/components/DatePicker.jsx:134
+msgid "The entered date cannot be later than {max}."
 msgstr ""
 
 #: indico/web/client/js/react/components/EmailListField.jsx:71
@@ -6245,15 +6253,15 @@ msgid ""
 "picture with a minimum of {minPictureSize} pixels on its shortest side."
 msgstr ""
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:319
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:322
 msgid "Picture upload/capture failed"
 msgstr ""
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:321
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:324
 msgid "Picture is being captured"
 msgstr ""
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:323
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:326
 msgid "Picture is being edited"
 msgstr ""
 
