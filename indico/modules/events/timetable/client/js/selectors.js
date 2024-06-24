@@ -13,6 +13,7 @@ export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
+export const getOpenModal = state => state.openModal;
 
 export const getEventStartDt = createSelector(
   getStaticData,
@@ -100,4 +101,13 @@ export const getDisplayMode = createSelector(
 export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
+);
+
+export const getModalType = createSelector(
+  getOpenModal,
+  openModal => openModal.type
+);
+export const getModalEntry = createSelector(
+  getOpenModal,
+  openModal => openModal.entry
 );

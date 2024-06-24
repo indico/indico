@@ -6,25 +6,26 @@
 // LICENSE file for more details.
 
 import React from 'react';
+import {useDispatch} from 'react-redux';
 import {Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-import {entryTypes, handleUnimplemented} from '../util';
+import * as actions from '../actions';
+import {entryTypes} from '../util';
 
 export default function NewEntryDropdown(props) {
+  const dispatch = useDispatch();
+
   return (
     <Dropdown {...props}>
       <Dropdown.Menu>
         <Dropdown.Header content={Translate.string('Add new')} />
-        {['session', 'contribution', 'break'].map(newType => (
-          <Dropdown.Item
-            key={newType}
-            text={entryTypes[newType].title}
-            icon={entryTypes[newType].icon}
-            onClick={handleUnimplemented}
-          />
-        ))}
+        {['session', 'contribution', 'break'].map(newType => {
+          const {title, icon} = entryTypes[newType];
+          const handleClick = () => dispatch(actions.addEntry(newType));
+          return <Dropdown.Item key={newType} text={title} icon={icon} onClick={handleClick} />;
+        })}
       </Dropdown.Menu>
     </Dropdown>
   );

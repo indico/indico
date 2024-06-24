@@ -20,6 +20,9 @@ export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
+export const ADD_ENTRY = 'Add entry';
+export const EDIT_ENTRY = 'Edit entry';
+export const CLOSE_MODAL = 'Close modal';
 
 export function setTimetableData(data) {
   return {type: SET_TIMETABLE_DATA, data};
@@ -79,4 +82,16 @@ export function setDisplayMode(mode) {
 
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
+}
+
+export function addEntry(entryType) {
+  return {type: ADD_ENTRY, entryType};
+}
+
+export function editEntry(entryType, entry) {
+  return {type: EDIT_ENTRY, entryType, entry};
+}
+
+export function closeModal() {
+  return {type: CLOSE_MODAL};
 }
