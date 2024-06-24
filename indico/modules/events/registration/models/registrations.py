@@ -648,10 +648,7 @@ class Registration(db.Model):
             with data.open() as f:
                 if not (thumbnail_bytes := resize_uploaded_registration_picture(f, 120)):
                     continue
-                try:
-                    attachment = MIMEImage(thumbnail_bytes.read())
-                except TypeError:
-                    continue
+                attachment = MIMEImage(thumbnail_bytes.read(), _subtype='jpeg')
             attachment.add_header('Content-ID', f'<{data.attachment_cid}>')
             picture_attachements.append(attachment)
         return picture_attachements
