@@ -8,19 +8,18 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Confirm, Icon, Label, List, Modal} from 'semantic-ui-react';
+import React from 'react';
+import {useSelector} from 'react-redux';
+import {Icon, Label, List, Modal} from 'semantic-ui-react';
 
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import * as actions from '../actions';
 import * as selectors from '../selectors';
 import {entryColorSchema, entrySchema, entryTypes, getNumDays, isChildOf} from '../util';
 
 import DetailsSegment from './DetailsSegment';
 
-import './SaveButton.module.scss';
+import './Changelog.module.scss';
 
 function DiffLabel({diff, children}) {
   return (
@@ -230,9 +229,7 @@ EntryChangeList.defaultProps = {
   children: null,
 };
 
-export default function SaveButton({as: Component, ...rest}) {
-  const dispatch = useDispatch();
-  const [open, setOpen] = useState(false);
+export default function ReviewChangesButton({as: Component, ...rest}) {
   const changes = useSelector(selectors.getMergedChanges);
   const blocks = useSelector(selectors.getBlocks);
   const blockChanges = _.sortBy(
@@ -250,58 +247,51 @@ export default function SaveButton({as: Component, ...rest}) {
   );
 
   return (
-    <>
-      <Confirm
-        open={open}
-        header={Translate.string('Review and save changes')}
-        onConfirm={() => {
-          dispatch(actions.saveChanges());
-          setOpen(false);
-        }}
-        onCancel={() => setOpen(false)}
-        confirmButton={Translate.string('Save')}
-        content={
-          <Modal.Content styleName="changelog">
-            {blockChanges.map(({change, old, entry}) => (
-              <EntryChangeList
-                key={entry.id}
-                change={change}
-                old={old}
-                entry={entry}
-                color={entry.color}
-                raised
-              >
-                {changes
-                  .filter(({entry: child}) => isChildOf(child, entry))
-                  .map(({change: childChange, old: childOld, entry: child}) => (
-                    <EntryChangeList
-                      key={child.id}
-                      change={childChange}
-                      old={childOld}
-                      entry={child}
-                      color={entry.color}
-                    />
-                  ))}
-              </EntryChangeList>
-            ))}
-          </Modal.Content>
-        }
-      />
-      <Component
-        onClick={() => setOpen(true)}
-        title={Translate.string('Review and save changes')}
-        disabled={changes.length === 0}
-        {...rest}
-      >
-        <Translate>Save</Translate>
-        {changes.length > 0 && (
-          <Label color="red" size="mini" content={changes.length} circular floating />
-        )}
-      </Component>
-    </>
+    <Modal
+      trigger={
+        <Component
+          title={Translate.string('Review changes')}
+          disabled={changes.length === 0}
+          {...rest}
+        >
+          <Icon name="history" />
+          {changes.length > 0 && (
+            <Label color="red" size="mini" content={changes.length} circular floating />
+          )}
+        </Component>
+      }
+      header={Translate.string('Review changes')}
+      content={
+        <Modal.Content styleName="changelog">
+          {blockChanges.map(({change, old, entry}) => (
+            <EntryChangeList
+              key={entry.id}
+              change={change}
+              old={old}
+              entry={entry}
+              color={entry.color}
+              raised
+            >
+              {changes
+                .filter(({entry: child}) => isChildOf(child, entry))
+                .map(({change: childChange, old: childOld, entry: child}) => (
+                  <EntryChangeList
+                    key={child.id}
+                    change={childChange}
+                    old={childOld}
+                    entry={child}
+                    color={entry.color}
+                  />
+                ))}
+            </EntryChangeList>
+          ))}
+        </Modal.Content>
+      }
+      actions={[Translate.string('Close')]}
+    />
   );
 }
 
-SaveButton.propTypes = {
+ReviewChangesButton.propTypes = {
   as: PropTypes.elementType.isRequired,
 };
