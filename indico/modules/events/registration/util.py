@@ -1001,7 +1001,8 @@ def get_persons(registrations, include_accompanying_persons=False):
 
 def process_uploaded_registration_picture(source, size):
     """Process the uploaded registration picture.
-    By converting the picture to JPEG and resizing large pictures to the given `size`.
+
+    This converts the picture to JPEG and resizes it to a maximum size.
     """
     try:
         picture = Image.open(source)
