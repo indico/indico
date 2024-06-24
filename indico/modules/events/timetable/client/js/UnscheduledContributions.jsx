@@ -7,6 +7,7 @@
 
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -40,7 +41,16 @@ export default function UnscheduledContributions() {
   return (
     <div styleName="contributions-container">
       <div styleName="content">
-        <Translate as="h4">Unscheduled contributions</Translate>
+        <h4>
+          <Translate>Unscheduled contributions</Translate>
+          <Icon
+            name="close"
+            color="black"
+            onClick={() => dispatch(actions.toggleShowUnscheduled())}
+            title={Translate.string('Hide unscheduled contributions')}
+            link
+          />
+        </h4>
         {contribs.length > 0 ? (
           contribs.map(contrib => (
             <ContributionDetails
