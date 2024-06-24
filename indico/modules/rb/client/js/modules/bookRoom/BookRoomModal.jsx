@@ -657,11 +657,9 @@ class BookRoomModal extends React.Component {
                       <Icon name="clipboard list" />
                       <Translate>Internal notes (optional)</Translate>
                     </h3>
-                    <p>
-                      <Translate>
-                        Internal notes about the booking are only visible to room managers.
-                      </Translate>
-                    </p>
+                    <Translate as="p">
+                      Internal notes about the booking are only visible to room managers.
+                    </Translate>
                     <FinalTextArea name="internalNote" disabled={fprops.submitSucceeded} />
                   </Segment>
                 </Form>
