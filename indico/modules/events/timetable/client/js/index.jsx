@@ -18,21 +18,24 @@ import Timetable from './Timetable';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+const DEBUG_MODE = false; //TODO: remove
+
 (function(global) {
   global.setupTimetable = function setupTimetable() {
     const root = document.querySelector('#timetable-container');
     if (root) {
-      const {timetableData, eventInfo, customLinks} = root.dataset;
+      const {timetableData, customLinks} = root.dataset;
+      const eventInfo = JSON.parse(root.dataset.eventInfo);
       const initialData = {
         staticData: {
           eventId: parseInt(eventInfo.id, 10),
-          startDt: new Date(2023, 4, 8),
-          endDt: new Date(2023, 4, 12),
+          startDt: DEBUG_MODE ? new Date(2023, 4, 8) : new Date(eventInfo.startDate.date), // TODO handle tz
+          endDt: DEBUG_MODE ? new Date(2023, 4, 12) : new Date(eventInfo.endDate.date), // TODO handle tz
         },
       };
       const store = createReduxStore('regform-submission', reducers, initialData);
       console.debug(customLinks); // TODO find out what these are
-      store.dispatch(setTimetableData(tData || JSON.parse(timetableData)));
+      store.dispatch(setTimetableData(DEBUG_MODE ? tData : JSON.parse(timetableData)));
       ReactDOM.render(
         <Provider store={store}>
           <Timetable />
