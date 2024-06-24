@@ -45,6 +45,7 @@ const preprocessData = data => {
         'code',
         'sessionCode',
         'sessionId',
+        'contributionId',
         'description',
         'parentId',
         'isPoster',
@@ -127,6 +128,18 @@ export default {
         return {...state, mode: action.mode};
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
+      default:
+        return state;
+    }
+  },
+  openModal: (state = {type: null, entry: null}, action) => {
+    switch (action.type) {
+      case actions.ADD_ENTRY:
+        return {type: action.entryType, entry: null};
+      case actions.EDIT_ENTRY:
+        return {type: action.entryType, entry: action.entry};
+      case actions.CLOSE_MODAL:
+        return {type: null, entry: null};
       default:
         return state;
     }

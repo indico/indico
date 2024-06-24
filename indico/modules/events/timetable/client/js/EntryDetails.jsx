@@ -131,7 +131,11 @@ SessionDetails.propTypes = detailsPropTypes;
 
 export function ContributionDetails({entry, uses24HourFormat, dispatch, showTitle, ...rest}) {
   const contribActions = [
-    {icon: 'edit', title: Translate.string('Edit contribution'), onClick: handleUnimplemented},
+    {
+      icon: 'edit',
+      title: Translate.string('Edit contribution'),
+      onClick: () => dispatch(actions.editEntry('contribution', entry)),
+    },
     {
       icon: 'shield',
       title: Translate.string('Manage contribution protection'),
@@ -150,6 +154,7 @@ export function ContributionDetails({entry, uses24HourFormat, dispatch, showTitl
       onClick: () => dispatch(actions.deleteEntry(entry)),
     });
   }
+
   return (
     <DetailsSegment
       title={Translate.string('Contribution')}
