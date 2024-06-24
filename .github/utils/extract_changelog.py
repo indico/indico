@@ -75,7 +75,7 @@ def convert_to_markdown(text):
     # headings
     text = re.sub(r'^([A-Z a-z]+)\n\^+$', lambda m: f'# {EMOJIS[m.group(1)]} {m.group(1)}', text, flags=re.MULTILINE)
     # external links
-    text = re.sub(r'`([^`<]+) <([^>]+)>`_', r'[\1](\2)', text)
+    text = re.sub(r'`([^`<]+) <([^>]+)>`_{1,2}', r'[\1](\2)', text)
     # inline code/monospace
     text = text.replace('``', '`')
     # wrapped bullet points & note blocks

@@ -161,7 +161,7 @@ Major Features
 - The existing Indico Check-in app has been completely rewritten as a PWA
   (Progressive Web App). Please note that the old Check-in app has been
   deprecated and is not compatible with the new version of Indico. The new app
-  can be found `here <https://checkin.getindico.io/>`_.
+  can be found `here <https://checkin.getindico.io/>`__.
 - A new badge/ticket setting has been added which, when enabled, makes it
   possible to print badges and/or tickets for accompanying persons in addition
   to the main registrant.
@@ -314,14 +314,14 @@ Accessibility
 - Make search fields more accessible (:issue:`5948`, :pr:`5950`, thanks :user:`foxbunny`)
 - Make search result status messages more accessible (:issue:`5949`, :pr:`5950`,
   thanks :user:`foxbunny`)
-- Make search results tabs accessible (:issues:`5964`, :pr:`5965`, thanks :user:`foxbunny`)
+- Make search results tabs accessible (:issue:`5964`, :pr:`5965`, thanks :user:`foxbunny`)
 - Make timezone list accessible (:issue:`5908`, :pr:`5914`, thanks :user:`foxbunny`)
 - Make "Skip access checks" checkbox in search keyboard-accessible (:issue:`5952`, :pr:`5953`,
   thanks :user:`foxbunny`)
 - Prevent icons from being announced to screen readers as random characters (:issue:`5985`,
   :pr:`5986`, thanks :user:`foxbunny`)
-- Add proper labels to the captcha play and reload buttons (:issue:`6064`, :pr:`6080`,
-  :thanks:`foxbunny`)
+- Add proper labels to the captcha play and reload buttons (:issue:`6064`, :pr:`6080`, thanks
+  :user:`foxbunny`)
 - Associate form labels with form controls in the registration form (:issue:`6059`, :issue:`6073`,
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
@@ -348,7 +348,7 @@ Internal Changes
 - Remove watchman reloader support, use watchfiles instead (:pr:`5978`)
 - Improve ``indico i18n`` CLI to support plugin-related i18n operations (:issue:`5906`, :pr:`5961`,
   thanks :user:`SegiNyn`)
-- Use `ruff <https://docs.astral.sh/ruff/>`_ for linting Python code (:pr:`6037`)
+- Use `ruff <https://docs.astral.sh/ruff/>`__ for linting Python code (:pr:`6037`)
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
 - Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
@@ -365,7 +365,7 @@ Version 3.2.9
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Update `Werkzeug <https://pypi.org/project/Werkzeug/>`_ library due to a
+- Update `Werkzeug <https://pypi.org/project/Werkzeug/>`__ library due to a
   DoS vulnerability while parsing certain file uploads (:cve:`CVE-2023-46136`)
 - Fix registration form CAPTCHA not being fully validated (:pr:`6096`)
 
@@ -404,7 +404,7 @@ Version 3.2.8
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Update `Pillow <https://pypi.org/project/Pillow/>`_ library due to
+- Update `Pillow <https://pypi.org/project/Pillow/>`__ library due to
   vulnerabilities in libwebp (:cve:`CVE-2023-4863`)
 
 Internationalization
@@ -625,9 +625,9 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Sanitize HTML in global announcement messages
-- Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
+- Update `cryptography <https://pypi.org/project/cryptography/>`__ library due to
   vulnerabilities in OpenSSL (:cve:`CVE-2023-0286`)
-- Update `werkzeug <https://pypi.org/project/werkzeug/>`_ library due to a potential
+- Update `werkzeug <https://pypi.org/project/werkzeug/>`__ library due to a potential
   Denial of Service vulnerability (:cve:`CVE-2023-25577`)
 
 .. note::
@@ -759,7 +759,7 @@ Version 3.2.1
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Update `cryptography <https://pypi.org/project/cryptography/>`_ library due to
+- Update `cryptography <https://pypi.org/project/cryptography/>`__ library due to
   vulnerabilities in OpenSSL (:cve:`CVE-2022-3602`, :cve:`CVE-2022-3786`)
 
 .. note::
@@ -1592,7 +1592,7 @@ Improvements
 - Generate material packages in a background task to avoid timeouts or using excessive
   amounts of disk space in case of people submitting several times (:pr:`4630`)
 - Add new :data:`EXPERIMENTAL_EDITING_SERVICE` setting to enable extending an event's Editing
-  workflow through an `OpenReferee server <https://github.com/indico/openreferee/>`_ (:pr:`4659`)
+  workflow through an `OpenReferee server <https://github.com/indico/openreferee/>`__ (:pr:`4659`)
 
 Bugfixes
 ^^^^^^^^
@@ -1828,9 +1828,9 @@ Version 2.2.8
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Update `bleach <https://github.com/mozilla/bleach>`_ to fix a regular expression
+- Update `bleach <https://github.com/mozilla/bleach>`__ to fix a regular expression
   denial of service vulnerability
-- Update `Pillow <https://github.com/python-pillow/Pillow>`_ to fix a buffer overflow
+- Update `Pillow <https://github.com/python-pillow/Pillow>`__ to fix a buffer overflow
   vulnerability
 
 
@@ -1934,7 +1934,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Strip ``@``, ``+``, ``-`` and ``=`` from the beginning of strings when exporting
-  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`_
+  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`__
   when opening the CSV file in Excel
 - Use 027 instead of 000 umask when temporarily changing it to get the current umask
 - Fix LaTeX sanitization to prevent malicious users from running unsafe LaTeX commands
@@ -2017,11 +2017,11 @@ Major Changes
 - ⚠️ **Drop support for Internet Explorer 11 and other outdated or
   discontinued browser versions.** Indico shows a warning message
   when accessed using such a browser. The latest list of supported
-  browsers can be found `in the README on GitHub <https://github.com/indico/indico#browser-support>`_,
+  browsers can be found `in the README on GitHub <https://github.com/indico/indico#browser-support>`__,
   but generally Indico now supports the last two versions of each major
   browser (determined at release time), plus the current Firefox ESR.
 - Rewrite the room booking frontend to be more straightforward and
-  user-friendly. Check `our blog for details <https://getindico.io/indico/update/release/milestone/2019/02/22/indico-2-2-news.html>`_.
+  user-friendly. Check `our blog for details <https://getindico.io/indico/update/release/milestone/2019/02/22/indico-2-2-news.html>`__.
 
 Improvements
 ^^^^^^^^^^^^
@@ -2115,7 +2115,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Strip ``@``, ``+``, ``-`` and ``=`` from the beginning of strings when exporting
-  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`_
+  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`__
   when opening the CSV file in Excel
 - Use 027 instead of 000 umask when temporarily changing it to get the current umask
 - Fix LaTeX sanitization to prevent malicious users from running unsafe LaTeX commands
@@ -2454,7 +2454,7 @@ Version 2.0.2
 Security fixes
 ^^^^^^^^^^^^^^
 
-- Update `bleach <https://github.com/mozilla/bleach>`_ to fix an XSS vulnerability
+- Update `bleach <https://github.com/mozilla/bleach>`__ to fix an XSS vulnerability
 
 Improvements
 ^^^^^^^^^^^^
