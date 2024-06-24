@@ -82,7 +82,7 @@ def _make_image_preview(img):
             preview = preview.convert('RGB')
         preview = square(preview)
         if preview.height > IMAGE_PREVIEW_SIZE:
-            preview = preview.resize((IMAGE_PREVIEW_SIZE, IMAGE_PREVIEW_SIZE), resample=Image.BICUBIC)
+            preview = preview.resize((IMAGE_PREVIEW_SIZE, IMAGE_PREVIEW_SIZE), resample=Image.Resampling.BICUBIC)
         image_bytes = BytesIO()
         imgtype = 'png' if preview.mode == 'RGBA' else 'jpeg'
         preview.save(image_bytes, imgtype.upper())

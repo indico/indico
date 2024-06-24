@@ -397,7 +397,7 @@ class RHSaveProfilePicture(RHUserBase):
                 pic = pic.convert('RGB')
             pic = square(pic)
             if pic.height > 256:
-                pic = pic.resize((256, 256), resample=Image.BICUBIC)
+                pic = pic.resize((256, 256), resample=Image.Resampling.BICUBIC)
             image_bytes = BytesIO()
             pic.save(image_bytes, 'PNG')
             image_bytes.seek(0)

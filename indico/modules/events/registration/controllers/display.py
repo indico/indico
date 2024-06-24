@@ -10,7 +10,7 @@ from uuid import UUID
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from webargs import fields
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, UnprocessableEntity
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
@@ -28,7 +28,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
-                                                     get_initial_form_values, get_user_data, make_registration_schema)
+                                                     get_initial_form_values, get_user_data, make_registration_schema,
+                                                     process_uploaded_registration_picture)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -445,6 +446,19 @@ class RHUploadRegistrationFile(UploadFileMixin, InvitationMixin, RHRegistrationF
 
     def get_file_context(self):
         return 'event', self.event.id, 'regform', self.regform.id, 'registration'
+
+
+class RHUploadRegistrationPicture(RHUploadRegistrationFile):
+    """Upload a picture from a registration form."""
+
+    def _save_file(self, file, stream):
+        resized_image_stream = process_uploaded_registration_picture(stream, 1000)
+        if not resized_image_stream:
+            raise UnprocessableEntity('Could not process image')
+        return super()._save_file(file, resized_image_stream)
+
+    def get_file_metadata(self):
+        return {'registration_picture_checked': True}
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):

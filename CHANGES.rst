@@ -65,7 +65,7 @@ Bugfixes
 - Fix error when trying to import data from an unlisted event (:issue:`6350`, :pr:`6351`)
 - Show results from the Get Next Editable search on top of the list (:pr:`6353`)
 - Attach registration pictures and display them inline when sending email notifications
-  instead of just showing their filename (:pr:`6336`, thanks :user:`SegiNyn`)
+  instead of just showing their filename (:pr:`6336, 6411`, thanks :user:`SegiNyn`)
 - Fix editable list filter storage being shared between different editable types and
   events (:pr:`6359`)
 - Fix UI breaking when performing bulk actions via the list of editables (:pr:`6369`)

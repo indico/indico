@@ -7,7 +7,7 @@
 
 import managementPreviewURL from 'indico-url:event_registration.manage_registration_file';
 import registrantPreviewURL from 'indico-url:event_registration.registration_picture';
-import uploadURL from 'indico-url:event_registration.upload_registration_file';
+import uploadURL from 'indico-url:event_registration.upload_registration_picture';
 
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
@@ -88,7 +88,7 @@ export function PictureSettings() {
       )}
       step="1"
       min="0"
-      max="1200"
+      max="1000"
       validate={v.optional(v.min(0))}
       fluid
       format={val => val || ''}

@@ -201,7 +201,7 @@ const PictureManager = ({
       fetch(imageSrc)
         .then(res => res.blob())
         .then(blob => {
-          const file = new File([blob], 'picture.png', blob);
+          const file = new File([blob], 'picture.jpg', blob);
           uploadPicture(file);
         });
     }
@@ -276,6 +276,9 @@ const PictureManager = ({
     multiple: false,
     noClick: true,
     noKeyboard: true,
+    maxSize: Indico.FileRestrictions.MaxUploadFileSize
+      ? Indico.FileRestrictions.MaxUploadFileSize * 1024 * 1024
+      : undefined,
   });
 
   let picture = null;

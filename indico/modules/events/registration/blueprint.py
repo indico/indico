@@ -212,6 +212,8 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform', display
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/upload', 'upload_registration_file',
                  display.RHUploadRegistrationFile, methods=('POST',))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/upload-picture', 'upload_registration_picture',
+                 display.RHUploadRegistrationPicture, methods=('POST',))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/edit', 'edit_registration_display',
                  display.RHRegistrationDisplayEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/withdraw', 'withdraw_registration',
