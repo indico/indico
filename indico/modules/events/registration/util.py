@@ -999,22 +999,22 @@ def get_persons(registrations, include_accompanying_persons=False):
     return persons
 
 
-def resize_uploaded_registration_picture(source, size):
-    """Resize uploaded registration picture to the given size."""
+def process_uploaded_registration_picture(source, size):
+    """Process the uploaded registration picture.
+    By converting the picture to JPEG and resizing large pictures to the given `size`.
+    """
     try:
         picture = Image.open(source)
     except OSError:
         return None
     picture = ImageOps.exif_transpose(picture)
-    size_x, size_y = picture.size
-    if max(size_x, size_y) < size:
-        source.seek(0)
-        return source
-    ratio = size / max(size_x, size_y)
-    picture = picture.resize((int(ratio * size_x), int(ratio * size_y)), Image.Resampling.BICUBIC)
-    image_bytes = BytesIO()
     if picture.mode != 'RGB':
         picture = picture.convert('RGB')
+    size_x, size_y = picture.size
+    if max(size_x, size_y) > size:
+        ratio = size / max(size_x, size_y)
+        picture = picture.resize((int(ratio * size_x), int(ratio * size_y)), Image.Resampling.BICUBIC)
+    image_bytes = BytesIO()
     picture.save(image_bytes, 'JPEG')
     image_bytes.seek(0)
     return image_bytes

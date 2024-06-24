@@ -405,13 +405,15 @@ class PictureField(FileField):
             file = File.query.filter(File.uuid == value, ~File.claimed).first()
             if not file:
                 raise ValidationError('Invalid file')
+            if not file.meta.get('registration_picture_checked'):
+                raise ValidationError('Picture has not been properly validated')
             try:
                 with file.open() as f:
                     pic = Image.open(f)
             except OSError:
                 raise ValidationError(_('Invalid picture file.'))
-            if pic.format.lower() not in {'jpeg', 'png', 'gif', 'webp'}:
-                raise ValidationError(_('This field only accepts jpg, png, gif and webp picture formats.'))
+            if pic.format.lower() != 'jpeg':
+                raise ValidationError(_('This field only accepts jpg picture format.'))
             min_picture_size = self._get_min_size()
             if min_picture_size and min(pic.size) < min_picture_size:
                 raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')

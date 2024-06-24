@@ -201,7 +201,7 @@ const PictureManager = ({
       fetch(imageSrc)
         .then(res => res.blob())
         .then(blob => {
-          const file = new File([blob], 'picture.png', blob);
+          const file = new File([blob], 'picture.jpeg', blob);
           uploadPicture(file);
         });
     }

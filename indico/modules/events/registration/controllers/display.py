@@ -29,7 +29,7 @@ from indico.modules.events.registration.notifications import notify_registration
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, make_registration_schema,
-                                                     resize_uploaded_registration_picture)
+                                                     process_uploaded_registration_picture)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -452,8 +452,11 @@ class RHUploadRegistrationPicture(RHUploadRegistrationFile):
     """Upload a picture from a registration form."""
 
     def _save_file(self, file, stream):
-        resized_image_stream = resize_uploaded_registration_picture(stream, 1000)
+        resized_image_stream = process_uploaded_registration_picture(stream, 1000)
         return super()._save_file(file, resized_image_stream)
+
+    def get_file_metadata(self):
+        return {'registration_picture_checked': True}
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):

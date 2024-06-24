@@ -10,6 +10,7 @@ from uuid import UUID
 
 from flask import request
 from marshmallow import fields
+from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
 from indico.modules.files import logger
@@ -40,6 +41,9 @@ class UploadFileMixin:
         context = self.get_file_context()
         content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
         f = File.create_from_stream(stream, file.filename, content_type, context)
+        if meta := self.get_file_metadata():
+            f.meta.update(meta)
+            flag_modified(f, 'meta')
         return FileSchema().jsonify(f), 201
 
     def get_file_context(self):
@@ -59,6 +63,13 @@ class UploadFileMixin:
         If this function returns false, the upload is rejected.
         """
         return True
+
+    def get_file_metadata(self):
+        """Get a dict of extra metadata to store on the File.
+
+        This is usually not needed, but could be used e.g. to add some flag which
+        is then used in a validator of the form accepting the file uploaded here.
+        """
 
 
 class RHFileBase(RHProtected):
