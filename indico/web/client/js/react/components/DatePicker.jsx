@@ -22,6 +22,8 @@ export default function DatePicker({
   onChange,
   value,
   format = moment.localeData().longDateFormat('L'),
+  min,
+  max,
   ...inputProps
 }) {
   function handleDateChange(ev) {
@@ -47,7 +49,10 @@ export default function DatePicker({
       <button type="button" disabled={inputProps.disabled}>
         <Translate as="span">Open a calendar</Translate>
       </button>
-      <ind-calendar>
+      <ind-calendar
+        min={fromISOLocalDate(min)?.toDateString()}
+        max={fromISOLocalDate(max)?.toDateString()}
+      >
         <dialog>
           <div className="controls">
             <button type="button" value="previous-year">
@@ -96,11 +101,15 @@ DatePicker.propTypes = {
   format: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any,
+  min: PropTypes.string,
+  max: PropTypes.string,
 };
 
 DatePicker.defaultProps = {
   value: undefined,
   format: undefined,
+  min: undefined,
+  max: undefined,
 };
 
 /**
@@ -109,10 +118,40 @@ DatePicker.defaultProps = {
 export function FinalDatePicker({name, ...rest}) {
   const validDate = val =>
     val === INVALID ? Translate.string('The entered date is not valid.') : undefined;
-  rest.validate = rest.validate ? v.chain(validDate, rest.validate) : validDate;
-  return <FinalField name={name} component={DatePicker} {...rest} />;
+  const validators = [validDate];
+  if (rest.min) {
+    validators.push(val =>
+      val < rest.min
+        ? Translate.string('The entered date cannot be earlier than {min}.', {
+            min: moment(rest.min).format('L'),
+          })
+        : undefined
+    );
+  }
+  if (rest.max) {
+    validators.push(val =>
+      val > rest.max
+        ? Translate.string('The entered date cannot be later than {max}.', {
+            max: moment(rest.max).format('L'),
+          })
+        : undefined
+    );
+  }
+  if (rest.validate) {
+    validators.push(rest.validate);
+  }
+  return (
+    <FinalField name={name} component={DatePicker} {...rest} validate={v.chain(...validators)} />
+  );
 }
 
 FinalDatePicker.propTypes = {
   name: PropTypes.string.isRequired,
+  min: PropTypes.string,
+  max: PropTypes.string,
+};
+
+FinalDatePicker.defaultProps = {
+  min: undefined,
+  max: undefined,
 };

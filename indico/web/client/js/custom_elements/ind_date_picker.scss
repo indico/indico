@@ -173,7 +173,11 @@ ind-calendar {
     border: none;
 
     &:hover {
-      background-color: var(--surface-highlight-color);
+      background-color: var(--control-clickable-surface-focus-color);
+    }
+
+    &:focus-visible {
+      z-index: 1;
     }
   }
 
@@ -204,8 +208,12 @@ ind-calendar {
     opacity: 0.5;
   }
 
-  [data-current-month='false'] {
-    background-color: #fff;
-    color: #ddd;
+  button[data-current-month='true'] {
+    color: var(--control-text-color);
+  }
+
+  button[data-current-month='false'] {
+    color: var(--text-secondary-color);
+    background: var(--background-secondary);
   }
 }
