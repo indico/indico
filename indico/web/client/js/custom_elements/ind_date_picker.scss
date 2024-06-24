@@ -175,6 +175,10 @@ ind-calendar {
     &:hover {
       background-color: var(--control-clickable-surface-focus-color);
     }
+
+    &:focus-visible {
+      z-index: 1;
+    }
   }
 
   [role='listbox'] :is([data-range-start], [data-range-end], [data-range]) {

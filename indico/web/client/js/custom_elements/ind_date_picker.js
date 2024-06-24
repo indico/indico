@@ -421,7 +421,8 @@ customElements.define(
         }
 
         const focusableButton =
-          listbox.querySelector('[aria-selected]') || listbox.firstElementChild;
+          listbox.querySelector('[aria-selected]') ||
+          listbox.querySelector('button:not(:disabled)');
         focusableButton.tabIndex = 0;
       }
     }
