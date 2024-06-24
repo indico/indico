@@ -276,7 +276,9 @@ const PictureManager = ({
     multiple: false,
     noClick: true,
     noKeyboard: true,
-    maxSize: Indico.FileRestrictions.MaxUploadFileSize * 1024 * 1024,
+    maxSize: Indico.FileRestrictions.MaxUploadFileSize
+      ? Indico.FileRestrictions.MaxUploadFileSize * 1024 * 1024
+      : undefined,
   });
 
   let picture = null;
