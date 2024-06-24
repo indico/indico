@@ -10,7 +10,7 @@ from uuid import UUID
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
 from webargs import fields
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound, UnprocessableEntity
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
@@ -453,6 +453,8 @@ class RHUploadRegistrationPicture(RHUploadRegistrationFile):
 
     def _save_file(self, file, stream):
         resized_image_stream = process_uploaded_registration_picture(stream, 1000)
+        if not resized_image_stream:
+            raise UnprocessableEntity('Could not process image')
         return super()._save_file(file, resized_image_stream)
 
     def get_file_metadata(self):
