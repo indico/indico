@@ -48,6 +48,8 @@ export const entrySchema = PropTypes.shape({
   description: PropTypes.string,
   code: PropTypes.string,
   sessionCode: PropTypes.string, // only for sessions
+  sessionId: PropTypes.number, // only for sessions
+  contributionId: PropTypes.number, // only for contributions
   start: PropTypes.instanceOf(Date).isRequired,
   end: PropTypes.instanceOf(Date).isRequired,
   color: entryColorSchema,

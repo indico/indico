@@ -14,6 +14,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as actions from './actions';
 import Entry from './Entry';
 import EntryDetails from './EntryDetails';
+import ContributionEntryForm from './forms/ContributionEntryForm';
 import {entryStyleGetter, layoutAlgorithm} from './layout';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
@@ -108,6 +109,7 @@ export default function Timetable() {
         selectable
       />
       {selected && <EntryDetails />}
+      <ContributionEntryForm />
     </div>
   );
 }
