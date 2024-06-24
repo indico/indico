@@ -14,8 +14,8 @@ import {Dropdown, Icon, Label, Menu} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import ReviewChangesButton from './components/Changelog';
 import NewEntryDropdown from './components/NewEntryDropdown';
-import SaveButton from './components/SaveButton';
 import * as selectors from './selectors';
 import {getNumDays} from './util';
 
@@ -194,7 +194,7 @@ export default function Toolbar({date, localizer, onNavigate}) {
           title={Translate.string('Add new')}
           item
         />
-        <SaveButton as={Menu.Item} styleName="save-button" />
+        <ReviewChangesButton as={Menu.Item} styleName="action" />
       </Menu>
     </div>
   );
