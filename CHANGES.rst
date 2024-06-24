@@ -71,6 +71,8 @@ Bugfixes
 - Fix UI breaking when performing bulk actions via the list of editables (:pr:`6369`)
 - Include registration documents in user data export (:issue:`6331`, :pr:`6338`)
 - Fix error when viewing an abstract with reviews in deleted tracks (:pr:`6393`)
+- Do not include custom messages about the current registration status when sending
+  notifications about new documents (:pr:`6413`)
 
 Accessibility
 ^^^^^^^^^^^^^
