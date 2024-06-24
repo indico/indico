@@ -20,5 +20,13 @@
     height: 90vh;
     overflow-y: auto;
     padding-right: 0.8em;
+
+    & > h4 {
+      display: flex;
+
+      & > i:global(.icon) {
+        margin-left: auto;
+      }
+    }
   }
 }
