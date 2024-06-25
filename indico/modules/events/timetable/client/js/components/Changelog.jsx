@@ -52,11 +52,11 @@ const renderDateDiff = (oldValue, newValue) => {
 };
 
 const renderTimeDiff = (oldValue, newValue) => {
-  const hours = moment(newValue).diff(moment(oldValue), 'hours');
-  const minutes = moment(newValue).diff(moment(oldValue), 'minutes');
+  const hours = moment(newValue).diff(moment(oldValue), 'hours') % 24;
+  const minutes = moment(newValue).diff(moment(oldValue), 'minutes') % 60;
   return (
-    <DiffLabel diff={newValue - oldValue}>
-      {Math.abs(hours)}:{Math.abs(minutes) % 60}
+    <DiffLabel diff={hours || minutes}>
+      {String(Math.abs(hours)).padStart(2, '0')}:{String(Math.abs(minutes)).padStart(2, '0')}
     </DiffLabel>
   );
 };
