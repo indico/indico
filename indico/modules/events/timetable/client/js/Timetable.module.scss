@@ -9,11 +9,17 @@
 
 .timetable {
   display: flex;
+  flex-direction: column;
+
+  & > .content {
+    display: flex;
+  }
 
   :global(.rbc-calendar) {
     flex-grow: 1;
     min-width: 0;
     height: auto;
+    margin-top: 1em;
   }
 
   &.compact .parent-entry {
