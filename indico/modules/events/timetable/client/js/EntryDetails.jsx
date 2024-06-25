@@ -223,21 +223,22 @@ export default function EntryDetails() {
   return (
     <div styleName="details-container">
       <div styleName="content">
-        <Icon
-          name="close"
-          color="black"
-          className="right"
-          onClick={() => dispatch(actions.selectEntry(null))}
-          title={Translate.string('Close details')}
-          link
-        />
-        <Header
-          size="small"
-          color="blue"
-          icon={entryIcons[type]}
-          content={formatTitle(title, code)}
-          subheader={formatTitle(slotTitle, sessionCode)}
-        />
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+          <Header
+            size="small"
+            color="blue"
+            icon={entryIcons[type]}
+            content={formatTitle(title, code)}
+            subheader={formatTitle(slotTitle, sessionCode)}
+          />
+          <Icon
+            name="close"
+            color="black"
+            onClick={() => dispatch(actions.selectEntry(null))}
+            title={Translate.string('Close details')}
+            link
+          />
+        </div>
         {description && <div styleName="description">{description}</div>}
         <PopupContentComponent
           entry={entry}
