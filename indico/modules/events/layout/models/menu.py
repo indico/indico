@@ -16,6 +16,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMixin
 from indico.modules.events.layout.models.principals import MenuEntryPrincipal
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, slugify, text_to_repr
 from indico.web.flask.util import url_for
 
@@ -452,9 +453,13 @@ class EventPage(db.Model):
     # - legacy_mapping (LegacyPageMapping.page)
     # - menu_entry (MenuEntry.page)
 
-    @property
+    @locator_property
     def locator(self):
         return dict(self.menu_entry.event.locator, page_id=self.id, slug=slugify(self.menu_entry.title, fallback=None))
+
+    @locator.noslug
+    def locator(self):
+        return dict(self.menu_entry.event.locator, page_id=self.id)
 
     @property
     def is_default(self):

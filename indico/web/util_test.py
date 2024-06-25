@@ -10,6 +10,7 @@ from authlib.oauth2.rfc6750 import InsufficientScopeError
 from flask import session
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.errors import IndicoError
 from indico.core.oauth.protector import IndicoAuthlibHTTPError, IndicoResourceProtector
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.persons import EventPerson
@@ -579,7 +580,7 @@ def test_get_request_user_nested_exceptions(mocker, app, test_client):
     assert b'The persistent link you used is invalid' in resp.data
 
     # random failure during authentication on an existing page
-    mocker.patch('indico.web.util._lookup_request_user', side_effect=Exception('kaboom'))
+    mocker.patch('indico.web.util._lookup_request_user', side_effect=IndicoError('kaboom'))
     resp = test_client.get('/test/fail?user_token=garbage')
     assert resp.status_code == 500
     assert b'kaboom' in resp.data

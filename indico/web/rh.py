@@ -77,6 +77,9 @@ class RH:
         'endpoint': None
     }
 
+    #: Like `normalize_url_spec`, but runs after the access check succeeded
+    normalize_url_spec_late = None
+
     def __init__(self):
         self.commit = True
 
@@ -100,7 +103,7 @@ class RH:
     def csrf_token(self):
         return session.csrf_token if session.csrf_protected else ''
 
-    def normalize_url(self):
+    def normalize_url(self, *, late=False):
         """Perform URL normalization.
 
         This uses the :attr:`normalize_url_spec` to check if the URL
@@ -109,7 +112,10 @@ class RH:
 
         :return: ``None`` or a redirect response
         """
-        if current_app.debug and self.normalize_url_spec is RH.normalize_url_spec:
+        spec = self.normalize_url_spec_late if late else self.normalize_url_spec
+        base_spec = RH.normalize_url_spec_late if late else RH.normalize_url_spec
+
+        if current_app.debug and spec is base_spec and spec is not None:
             # in case of ``class SomeRH(RH, MixinWithNormalization)``
             # the default value from `RH` overwrites the normalization
             # rule from ``MixinWithNormalization``.  this is never what
@@ -118,19 +124,19 @@ class RH:
             cls = next((x
                         for x in inspect.getmro(self.__class__)
                         if (x is not RH and x is not self.__class__ and hasattr(x, 'normalize_url_spec') and
-                            getattr(x, 'normalize_url_spec', None) is not RH.normalize_url_spec)),
+                            getattr(x, 'normalize_url_spec', None) is not base_spec)),
                        None)
             if cls is not None:
                 raise Exception(f'Normalization rule of {cls} in {type(self)} is overwritten by base RH. '
                                 'Put mixins with class-level attributes on the left of the base class')
-        if not self.normalize_url_spec or not any(self.normalize_url_spec.values()):
+        if not spec or not any(spec.values()):
             return
         spec = {
-            'args': self.normalize_url_spec.get('args', {}),
-            'locators': self.normalize_url_spec.get('locators', set()),
-            'preserved_args': self.normalize_url_spec.get('preserved_args', set()),
-            'copy_query_args': self.normalize_url_spec.get('copy_query_args', set()),
-            'endpoint': self.normalize_url_spec.get('endpoint', None)
+            'args': spec.get('args', {}),
+            'locators': spec.get('locators', set()),
+            'preserved_args': spec.get('preserved_args', set()),
+            'copy_query_args': spec.get('copy_query_args', set()),
+            'endpoint': spec.get('endpoint'),
         }
         # Initialize the new view args with preserved arguments (since those would be lost otherwise)
         new_view_args = {k: v for k, v in request.view_args.items() if k in spec['preserved_args']}
@@ -240,8 +246,7 @@ class RH:
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFound(_('The specified item could not be found.'))
 
-        rv = self.normalize_url()
-        if rv is not None:
+        if rv := self.normalize_url():
             return rv
 
         signal_rv = values_from_signal(signals.rh.before_check_access.send(type(self), rh=self))
@@ -250,6 +255,9 @@ class RH:
         if not signal_rv:
             self._check_access()
         signals.rh.check_access.send(type(self), rh=self)
+
+        if rv := self.normalize_url(late=True):
+            return rv
 
         signal_rv = values_from_signal(signals.rh.before_process.send(type(self), rh=self),
                                        single_value=True, as_list=True)

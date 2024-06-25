@@ -73,6 +73,8 @@ Bugfixes
 - Fix error when viewing an abstract with reviews in deleted tracks (:pr:`6393`)
 - Do not include custom messages about the current registration status when sending
   notifications about new documents (:pr:`6413`)
+- Only normalize title slug in custom page URL after successful access check
+  (:issue:`6416`, :pr:`6417`)
 
 Accessibility
 ^^^^^^^^^^^^^

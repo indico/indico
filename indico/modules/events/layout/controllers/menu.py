@@ -243,7 +243,14 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
 class RHPageDisplay(RHDisplayEventBase):
     normalize_url_spec = {
         'locators': {
-            lambda self: self.page
+            lambda self: self.page.locator.noslug,
+        },
+        'preserved_args': {'slug'},
+    }
+
+    normalize_url_spec_late = {
+        'locators': {
+            lambda self: self.page,
         }
     }
 
