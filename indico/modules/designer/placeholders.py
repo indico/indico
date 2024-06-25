@@ -23,7 +23,8 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationFullNameNoTitlePlaceholderB', 'RegistrationFullNamePlaceholderC',
            'RegistrationFullNameNoTitlePlaceholderC', 'RegistrationFullNamePlaceholderD',
            'RegistrationFullNameNoTitlePlaceholderD', 'RegistrationTitlePlaceholder',
-           'RegistrationFirstNamePlaceholder', 'RegistrationLastNamePlaceholder', 'RegistrationTicketQRPlaceholder',
+           'RegistrationFirstNamePlaceholder', 'RegistrationLastNamePlaceholder',
+           'RegistrationLastNameUpperPlaceholder', 'RegistrationTicketQRPlaceholder',
            'RegistrationEmailPlaceholder', 'RegistrationAmountPlaceholder', 'RegistrationPricePlaceholder',
            'RegistrationFriendlyIDPlaceholder', 'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
@@ -267,6 +268,16 @@ class RegistrationLastNamePlaceholder(PersonPlaceholder):
     name = 'last_name'
     description = _('Last Name')
     field = 'last_name'
+
+
+class RegistrationLastNameUpperPlaceholder(PersonPlaceholder):
+    name = 'last_name_upper'
+    description = _('Last Name (uppercase)')
+    field = 'last_name'
+
+    @classmethod
+    def render(cls, person):
+        return super().render(person).upper()
 
 
 class RegistrationEmailPlaceholder(RegistrationPlaceholder):

@@ -27,6 +27,7 @@ Group 'registrant':
 	full_name_no_title_c: PIG, Guinea
 	full_name_no_title_d: PIG, G.
 	last_name: Pig
+	last_name_upper: PIG
 	num_accompanying_persons: 5
 	phone: +41227676000
 	position: Developer
