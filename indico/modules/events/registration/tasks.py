@@ -46,7 +46,7 @@ def delete_field_data():
     registration_data = (RegistrationData.query
                          .join(RegistrationFormFieldData)
                          .join(RegistrationFormField, RegistrationFormFieldData.field_id == RegistrationFormField.id)
-                         .join(RegistrationForm)
+                         .join(RegistrationForm, RegistrationFormField.registration_form_id == RegistrationForm.id)
                          .join(Event)
                          .filter(~RegistrationFormField.is_purged,
                                  RegistrationFormField.retention_period.isnot(None),
