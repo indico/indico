@@ -621,12 +621,9 @@ export const getNumDays = (start, end) => moment(end).diff(moment(start), 'days'
  * to make the selected day visible
  */
 export const resizeWindow = ({offset}, {newSize, dayIdx}) => {
-  const newNumDays = Math.max(Math.floor((newSize - 210) / 110), 2);
-  const numDaysOutOfBounds = dayIdx - newNumDays - offset + 1;
-  return {
-    numDays: newNumDays,
-    offset: numDaysOutOfBounds > 0 ? offset + numDaysOutOfBounds : offset,
-  };
+  const numDays = Math.max(Math.floor((newSize - 340) / 110), 2);
+  const numDaysOutOfBounds = dayIdx - numDays - offset + 1;
+  return {numDays, offset: numDaysOutOfBounds > 0 ? offset + numDaysOutOfBounds : offset};
 };
 
 // TODO remove

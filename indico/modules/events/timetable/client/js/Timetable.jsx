@@ -60,56 +60,60 @@ export default function Timetable() {
 
   return (
     <div styleName={`timetable ${displayMode}`}>
-      <UnscheduledContributions />
-      <DnDCalendar
-        date={date}
-        defaultView="day"
-        events={[...(displayMode === 'blocks' ? blocks : entries), placeholderEntry]}
-        localizer={localizer}
-        views={{day: true}}
-        components={{toolbar: Toolbar, event: Entry}}
-        resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
-        onEventDrop={args => dispatch(actions.moveEntry(args))}
-        onEventResize={args => dispatch(actions.resizeEntry(args))}
-        onSelectSlot={({bounds, start, end, resourceId}) => {
-          dispatch(actions.selectEntry(null));
-          if (!bounds) {
+      <Toolbar date={date} localizer={localizer} onNavigate={(__, d) => setDate(d)} />
+      <div styleName="content">
+        <UnscheduledContributions />
+        <DnDCalendar
+          date={date}
+          defaultView="day"
+          events={[...(displayMode === 'blocks' ? blocks : entries), placeholderEntry]}
+          localizer={localizer}
+          views={{day: true}}
+          components={{event: Entry}}
+          resources={[...Array(numColumns).keys()].map(n => ({id: n + 1}))}
+          onEventDrop={args => dispatch(actions.moveEntry(args))}
+          onEventResize={args => dispatch(actions.resizeEntry(args))}
+          onSelectSlot={({bounds, start, end, resourceId}) => {
+            dispatch(actions.selectEntry(null));
+            if (!bounds) {
+              setPlaceholderEntry(null);
+              return;
+            }
+            setPlaceholderEntry({
+              id: 'placeholder',
+              type: 'placeholder',
+              start,
+              end,
+              columnId: resourceId,
+            });
+          }}
+          onSelectEvent={e => dispatch(actions.selectEntry(e))}
+          onDropFromOutside={args => {
+            if (!draggedContrib) {
+              return;
+            }
+            dispatch(actions.scheduleContrib(draggedContrib, args));
             setPlaceholderEntry(null);
-            return;
-          }
-          setPlaceholderEntry({
-            id: 'placeholder',
-            type: 'placeholder',
-            start,
-            end,
-            columnId: resourceId,
-          });
-        }}
-        onSelectEvent={e => dispatch(actions.selectEntry(e))}
-        onDropFromOutside={args => {
-          if (!draggedContrib) {
-            return;
-          }
-          dispatch(actions.scheduleContrib(draggedContrib, args));
-          setPlaceholderEntry(null);
-        }}
-        onNavigate={setDate}
-        eventPropGetter={entryStyleGetter(entries, selected)}
-        dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
-        allDayMaxRows={0}
-        step={5}
-        timeslots={6}
-        min={new Date(1972, 0, 1, minHour, 0, 0)}
-        max={new Date(1972, 0, 1, maxHour, 0, 0)}
-        tooltipAccessor={null}
-        resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
-        draggableAccessor={e => e.type !== 'placeholder'}
-        resizableAccessor={e => e.type !== 'placeholder'}
-        resizable
-        selectable
-      />
-      {selected && <EntryDetails />}
-      <ContributionEntryForm />
+          }}
+          onNavigate={() => {}}
+          toolbar={false}
+          eventPropGetter={entryStyleGetter(entries, selected)}
+          dayLayoutAlgorithm={layoutAlgorithm(entries, numColumns, displayMode === 'compact')}
+          allDayMaxRows={0}
+          step={5}
+          timeslots={6}
+          min={new Date(1972, 0, 1, minHour, 0, 0)}
+          max={new Date(1972, 0, 1, maxHour, 0, 0)}
+          tooltipAccessor={null}
+          resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
+          draggableAccessor={e => e.type !== 'placeholder'}
+          resizableAccessor={e => e.type !== 'placeholder'}
+          resizable
+          selectable
+        />
+        {selected && <EntryDetails />}
+        <ContributionEntryForm />
+      </div>
     </div>
   );
 }
