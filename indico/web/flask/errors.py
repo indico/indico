@@ -107,6 +107,9 @@ def handle_databaseerror(exc):
 
 @errors_bp.app_errorhandler(Exception)
 def handle_exception(exc, message=None):
+    if current_app.testing:
+        # Make sure errors from RHs fail tests and don't get silenced
+        raise  # noqa: PLE0704
     Logger.get('flask').exception(str(exc) or 'Uncaught Exception')
     if not current_app.debug or request.is_xhr or request.is_json:
         sentry_sdk.capture_exception(exc)
