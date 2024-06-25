@@ -33,6 +33,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
+from indico.modules.events.registration.constants import REGISTRATION_PICTURE_SIZE, REGISTRATION_PICTURE_THUMBNAIL_SIZE
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
@@ -999,11 +1000,9 @@ def get_persons(registrations, include_accompanying_persons=False):
     return persons
 
 
-def process_uploaded_registration_picture(source, size):
-    """Process the uploaded registration picture.
-
-    This converts the picture to JPEG and resizes it to a maximum size.
-    """
+def process_registration_picture(source, *, thumbnail=False):
+    """Resize the picture to a maximum size and save it as JPEG."""
+    max_size = REGISTRATION_PICTURE_THUMBNAIL_SIZE if thumbnail else REGISTRATION_PICTURE_SIZE
     try:
         picture = Image.open(source)
     except OSError:
@@ -1012,8 +1011,8 @@ def process_uploaded_registration_picture(source, size):
     if picture.mode != 'RGB':
         picture = picture.convert('RGB')
     size_x, size_y = picture.size
-    if max(size_x, size_y) > size:
-        ratio = size / max(size_x, size_y)
+    if max(size_x, size_y) > max_size:
+        ratio = max_size / max(size_x, size_y)
         picture = picture.resize((int(ratio * size_x), int(ratio * size_y)), Image.Resampling.BICUBIC)
     image_bytes = BytesIO()
     picture.save(image_bytes, 'JPEG')
