@@ -143,7 +143,7 @@ export const applyChanges = state => {
   );
   const [unscheduled, scheduled] = _.partition(newEntries, 'deleted');
   const [children, blocks] = _.partition(scheduled, 'parentId');
-  return {blocks, children, unscheduled};
+  return {blocks, children, unscheduled: unscheduled.filter(e => e.type === 'contribution')};
 };
 
 /**
