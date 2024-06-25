@@ -5,7 +5,7 @@ Changelog
 Version 3.3.3
 -------------
 
-*Unreleased*
+*Released on June 26, 2024*
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
