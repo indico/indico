@@ -69,11 +69,16 @@ export default function Toolbar({date, localizer, onNavigate}) {
 
   const getDateFromIdx = idx => new Date(eventStart.getTime() + idx * 24 * 60 * 60 * 1000);
 
-  const makeScrollHandler = newOffset => () => {
-    if (currentDayIdx < newOffset) {
+  const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
+    if (mouseDown && e.buttons !== 1) {
+      return;
+    }
+    if (typeof navigateTo === 'number') {
+      onNavigate(Navigate.DATE, getDateFromIdx(navigateTo));
+    } else if (currentDayIdx < newOffset) {
       onNavigate(Navigate.DATE, getDateFromIdx(newOffset));
     } else if (currentDayIdx >= newOffset + maxDays) {
-      onNavigate(Navigate.DATE, getDateFromIdx(newOffset + maxDays - 1));
+      onNavigate(Navigate.DATE, getDateFromIdx(newOffset + maxDays));
     }
     dispatch(actions.scrollNavbar(newOffset));
   };
@@ -122,7 +127,8 @@ export default function Toolbar({date, localizer, onNavigate}) {
         {numDays > maxDays && (
           <>
             <Menu.Item
-              onClick={makeScrollHandler(0)}
+              onClick={makeScrollHandler(0, 0)}
+              onMouseEnter={makeScrollHandler(0, 0, true)}
               disabled={offset === 0}
               title={Translate.string('Go to start')}
               icon="angle double left"
@@ -130,6 +136,7 @@ export default function Toolbar({date, localizer, onNavigate}) {
             />
             <Menu.Item
               onClick={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0))}
+              onMouseEnter={makeScrollHandler(Math.max(offset - SCROLL_STEP, 0), null, true)}
               disabled={offset === 0}
               title={Translate.string('Scroll left')}
               icon="angle left"
@@ -156,6 +163,11 @@ export default function Toolbar({date, localizer, onNavigate}) {
           <>
             <Menu.Item
               onClick={makeScrollHandler(Math.min(offset + SCROLL_STEP, numDays - maxDays))}
+              onMouseEnter={makeScrollHandler(
+                Math.min(offset + SCROLL_STEP, numDays - maxDays),
+                null,
+                true
+              )}
               disabled={numDays - offset <= maxDays}
               title={Translate.string('Scroll right')}
               icon="angle right"
@@ -163,7 +175,8 @@ export default function Toolbar({date, localizer, onNavigate}) {
               styleName="action"
             />
             <Menu.Item
-              onClick={makeScrollHandler(numDays - maxDays)}
+              onClick={makeScrollHandler(numDays - maxDays, numDays)}
+              onMouseEnter={makeScrollHandler(numDays - maxDays, numDays, true)}
               disabled={numDays - offset <= maxDays}
               title={Translate.string('Go to end')}
               icon="angle double right"
