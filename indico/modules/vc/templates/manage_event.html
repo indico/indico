@@ -8,7 +8,7 @@
         {% if plugins %}
             {% if event_vc_rooms %}
                 {{ template_hook('before-vc-list', event=event) }}
-                <table class="i-table-widget">
+                <table class="i-table-widget vc-room-management-table">
                     <thead>
                          <tr>
                             <th class="small-column"></th>
@@ -25,8 +25,7 @@
                                 <td><a href="#" class="icon-next toggle-details"></a></td>
                                 <td>
                                     {%- if vc_room.plugin %}
-                                        <img class="plugin-logo"
-                                             src="{{ vc_room.plugin.logo_url}}"
+                                        <img src="{{ vc_room.plugin.logo_url }}"
                                              alt="{{ vc_room.plugin.friendly_name }}"
                                              title="{{ vc_room.plugin.friendly_name}}">
                                     {% else %}
@@ -34,30 +33,36 @@
                                     {% endif -%}
                                 </td>
                                 <td>{{ vc_room.name }}</td>
-                                <td>{{ template_hook('event-vc-room-list-item-labels', event=event, vc_room=vc_room) }}</td>
+                                <td>{{ template_hook('event-vc-room-list-item-labels', event=event, vc_room=vc_room, event_vc_room=event_vc_room) }}</td>
                                 <td>
-                                    <div class="toolbar vc-toolbar">
-                                        <div class="group">
+                                    <div class="toolbar vc-management-button-toolbar">
+                                        <div class="ui mini icon buttons">
                                             {% if vc_room.status.name != 'deleted' %}
-                                                <button class="i-button icon-loop js-vcroom-refresh hide-if-locked"
+                                                <button class="ui button js-vcroom-refresh hide-if-locked"
                                                         title="{% trans %}Check videoconference status{% endtrans %}"
-                                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></button>
-                                                <button class="i-button icon-edit js-vcroom-edit hide-if-locked"
+                                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
+                                                    <i class="icon refresh"></i>
+                                                </button>
+                                                <button class="ui button js-vcroom-edit hide-if-locked"
                                                         data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
                                                         title="{% trans %}Edit{% endtrans %}"
                                                         data-title="{% trans %}Edit room{% endtrans %}"
                                                         data-ajax-dialog
-                                                        data-reload-after></button>
+                                                        data-reload-after>
+                                                    <i class="icon edit"></i>
+                                                </button>
                                             {% endif %}
                                             <button data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
                                                     data-num-events="{{ vc_room.events | count }}"
                                                     data-extra-msg="{{ vc_room.plugin.get_extra_delete_msg(vc_room, event_vc_room) if vc_room.plugin else '' }}"
-                                                    class="i-button icon-remove js-vcroom-remove hide-if-locked"
-                                                    title="{% trans %}Detach{% endtrans %}"></button>
-                                            {% if vc_room.status.name != 'deleted' and vc_room.plugin %}
-                                                {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
-                                            {% endif %}
+                                                    class="ui negative button js-vcroom-remove hide-if-locked"
+                                                    title="{% trans %}Detach{% endtrans %}">
+                                                <i class="icon trash"></i>
+                                            </button>
                                         </div>
+                                        {% if vc_room.status.name != 'deleted' and vc_room.plugin %}
+                                            {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -78,7 +83,7 @@
             {% endif %}
             <div class="add-room-options right hide-if-locked">
                 {% if plugins|length == 1 %}
-                    <button class="i-button js-create-room"
+                    <button class="ui icon button js-create-room"
                             data-vc-system="{{ plugins[0].service_name }}"
                             data-href="{{ url_for('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}"
                             data-title="{% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}"
@@ -88,17 +93,18 @@
                         {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
                     </button>
                 {% elif plugins|length > 1 %}
-                    <button class="i-button icon-plus js-create-room"
+                    <button class="ui button js-create-room"
                             data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create', attach=False) }}"
                             data-title="{% trans %}Create videoconference{% endtrans %}"
                             data-ajax-dialog
                             data-reload-after>
+                        <i class="icon plus"></i>
                         {%- trans %}Create new room{% endtrans -%}
                     </button>
                 {% endif %}
                 <span>
                     <a href="#" id="btn-add-existing"
-                       class="i-button icon-plus"
+                       class="ui icon button"
                        {% if plugins|length == 1 %}
                            data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=plugins[0].service_name) }}"
                            data-title="{% trans plugin_name=plugins[0].friendly_name %}Attach {{ plugin_name }} room{% endtrans %}"
@@ -108,6 +114,7 @@
                        {% endif %}
                        data-ajax-dialog
                        data-reload-after>
+                        <i class="icon plus"></i>
                         {% trans %}Add existing room{% endtrans %}
                     </a>
                 </span>

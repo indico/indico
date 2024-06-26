@@ -28,10 +28,6 @@ div.event-service-association-title {
   }
 }
 
-.conference > .event-service-toolbar.vc-toolbar.toolbar {
-  margin-right: 0;
-}
-
 div.event-service-row {
   border: 1px solid $pastel-gray;
   background-color: $light-gray;
@@ -53,10 +49,6 @@ div.event-service-row {
       margin-bottom: 0;
       padding: 0;
       margin-right: 2em;
-
-      .join-button {
-        min-width: 5em;
-      }
     }
 
     .event-service-row-toggle {
@@ -178,8 +170,4 @@ div.event-service-row {
       }
     }
   }
-}
-
-.vc-toolbar {
-  margin-right: 1em;
 }
