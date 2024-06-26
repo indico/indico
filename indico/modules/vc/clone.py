@@ -65,10 +65,10 @@ class VCCloner(EventCloner):
             if not plugin:
                 continue
             clone = plugin.clone_room(old_event_vc_room, link_object)
-            signals.vc.cloned_vc_room.send(
-                old_event_vc_room, new_assoc=clone, vc_room=old_event_vc_room.vc_room, link_object=link_object
-            )
 
             if clone:
                 # the plugin may decide to not clone the room
                 old_event_vc_room.vc_room.events.append(clone)
+                signals.vc.cloned_vc_room.send(
+                    old_event_vc_room, new_assoc=clone, vc_room=old_event_vc_room.vc_room, link_object=link_object
+                )

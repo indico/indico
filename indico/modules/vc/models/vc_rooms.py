@@ -341,7 +341,7 @@ class VCRoomEventAssociation(db.Model):
         """Get a dict mapping link objects to event vc rooms."""
         return {vcr.link_object: vcr for vcr in cls.find_for_event(event)}
 
-    def delete(self, user: User, check_vc_room: bool = True):
+    def delete(self, user: User, *, check_vc_room: bool = True):
         """Delete a VC room from an event.
 
         If the room is not used anywhere else, the room itself is also deleted.
@@ -351,7 +351,7 @@ class VCRoomEventAssociation(db.Model):
                               (no more associations left)
         """
         # send signals
-        signals.vc.detached_vc_room.send(self, vc_room=self.vc_room, event=self.event)
+        signals.vc.detached_vc_room.send(self, vc_room=self.vc_room, old_link=self.link_object, event=self.event)
 
         Logger.get('modules.vc').info(
             'Detaching videoconference %s from event %s (%s)', self.vc_room, self.event, self.link_object

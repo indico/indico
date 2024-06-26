@@ -84,7 +84,7 @@
                             data-title="{% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}"
                             data-ajax-dialog
                             data-reload-after>
-                        <img src="{{ plugins[0].icon_url }}" alt="">
+                        <img src="{{ plugins[0].icon_url }}" alt="{{ plugins[0].service_name }}">
                         {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
                     </button>
                 {% elif plugins|length > 1 %}

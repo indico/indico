@@ -17,7 +17,7 @@ from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.util import get_managed_vc_plugins, get_vc_plugins
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.web.flask.templating import get_overridable_template_name, template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
@@ -59,16 +59,19 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     if not event.can_manage(session.user):
         return
-    return SideMenuItem('videoconference', _('Videoconference'), url_for('vc.manage_vc_rooms', event),
-                        section='services')
+    return SideMenuItem(
+        'videoconference', _('Videoconference'), url_for('vc.manage_vc_rooms', event), section='services'
+    )
 
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     def _visible(event):
         return bool(get_vc_plugins()) and VCRoomEventAssociation.find_for_event(event).has_rows()
-    return MenuEntryData(_('Videoconference'), 'videoconference_rooms', 'vc.event_videoconference',
-                         position=14, visible=_visible)
+
+    return MenuEntryData(
+        _('Videoconference'), 'videoconference_rooms', 'vc.event_videoconference', position=14, visible=_visible
+    )
 
 
 @signals.event.contribution_deleted.connect
@@ -77,31 +80,21 @@ def _link_object_deleted(obj: Contribution | SessionBlock, **kwargs):
     assocs = list(obj.vc_room_associations)
     for event_vc_room in assocs:
         # tie the room to the event instead
-        signals.vc.detached_vc_room.send(event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event)
+        signals.vc.detached_vc_room.send(event_vc_room, vc_room=event_vc_room.vc_room, old_link=obj, event=obj.event)
 
-        old_link = event_vc_room.link_object
         event_vc_room.link_object = obj.event
 
         signals.vc.attached_vc_room.send(
-            event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event, data={}, old_link=old_link
+            event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event, data={}, old_link=obj
         )
 
-    n_objects = len(assocs)
-    if not n_objects:
+    if not assocs:
         return
 
     if isinstance(obj, Contribution):
-        message = ngettext(
-            'There was a VC room associated to this contribution. It has been linked to the event instead',
-            'There were {} VC rooms associated to this contribution. They have been linked to the event instead',
-            n_objects
-        )
+        message = _('There was a VC room associated with this contribution. It has been linked to the event instead')
     else:
-        message = ngettext(
-            'There was a VC room associated to this session block. It has been linked to the event instead',
-            'There were {} VC rooms associated to this session block. They have been linked to the event instead',
-            n_objects
-        )
+        message = _('There was a VC room associated with this session block. It has been linked to the event instead')
     flash(message, 'warning')
 
 
@@ -128,6 +121,7 @@ def _topmenu_items(sender, **kwargs):
 @signals.event_management.get_cloners.connect
 def _get_vc_cloner(sender, **kwargs):
     from indico.modules.vc.clone import VCCloner
+
     return VCCloner
 
 
