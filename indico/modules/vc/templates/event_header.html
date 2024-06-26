@@ -1,7 +1,2 @@
 {% from 'vc/list_vc_rooms.html' import render_vc_rooms_list  %}
-{% if not g.static_site and event_vc_rooms %}
-    <div class="event-details-row">
-        <div class="event-details-label align-top">{% trans %}Videoconference{% endtrans %}</div>
-        <div class="event-details-content">{{ render_vc_rooms_list(event, event_vc_rooms) }}</div>
-    </div>
-{% endif %}
+{{ render_vc_rooms_list(event, event_vc_rooms) }}
