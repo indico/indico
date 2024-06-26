@@ -45,10 +45,9 @@ def process_vc_room_association(plugin: IndicoPlugin, event: Event, vc_room: VCR
             old_link = None
         else:
             old_link = event_vc_room.link_object
-            signals.vc.detached_vc_room.send(event_vc_room, vc_room=vc_room, event=event, data=form.data)
 
         # set the actual link_object on the association
-        plugin.update_data_association(event, vc_room, event_vc_room, form.data)
+        assoc_has_changed = plugin.update_data_association(event, vc_room, event_vc_room, form.data)
 
         # check whether there is a room-event association already present
         # for the given event, room and plugin
@@ -70,11 +69,16 @@ def process_vc_room_association(plugin: IndicoPlugin, event: Event, vc_room: VCR
               'error')
         db.session.rollback()
         return None
-    else:
+    elif assoc_has_changed and not new_room:
+        if old_link:
+            signals.vc.detached_vc_room.send(
+                event_vc_room, vc_room=vc_room, old_link=old_link, event=event, data=form.data
+            )
         signals.vc.attached_vc_room.send(
             event_vc_room, vc_room=vc_room, event=event, data=form.data, old_link=old_link, new_room=new_room
         )
-        return event_vc_room
+
+    return event_vc_room
 
 
 class RHVCManageEventBase(RHManageEventBase):

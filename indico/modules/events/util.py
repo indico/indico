@@ -777,7 +777,7 @@ def split_log_location_changes(changes: dict) -> dict:
     """Re-process change dict to include readable location information (for logging)."""
     res = copy.copy(changes)
 
-    if (location_changes := res.get('location_data')) is None:
+    if (location_changes := res.pop('location_data', None)) is None:
         return res
 
     if location_changes[0]['address'] != location_changes[1]['address']:
