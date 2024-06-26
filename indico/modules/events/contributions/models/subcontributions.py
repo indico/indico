@@ -42,6 +42,7 @@ class SubContribution(SearchableTitleMixin, SearchableDescriptionMixin, Attached
     __tablename__ = 'subcontributions'
     __auto_table_args = (db.Index(None, 'friendly_id', 'contribution_id', unique=True),
                          db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
+                         db.CheckConstraint("duration >= '0'", 'nonnegative_duration'),
                          {'schema': 'events'})
 
     PRELOAD_EVENT_ATTACHED_ITEMS = True

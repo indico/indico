@@ -46,6 +46,8 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
                          db.CheckConstraint("date_trunc('minute', default_contribution_duration) = "
                                             'default_contribution_duration',
                                             'default_contribution_duration_no_seconds'),
+                         db.CheckConstraint("default_contribution_duration > '0'",
+                                            'positive_default_contribution_duration'),
                          {'schema': 'events'})
     location_backref_name = 'sessions'
     disallowed_protection_modes = frozenset()
