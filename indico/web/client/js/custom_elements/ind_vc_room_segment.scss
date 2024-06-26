@@ -1,0 +1,85 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+ind-vc-room-segment.ui.segment {
+  display: flex;
+  flex-direction: column;
+
+  padding: 0;
+  margin: 0;
+
+  .ui.secondary.menu {
+    margin: 0;
+    width: 100%;
+
+    > .item {
+      margin: 0;
+
+      &.vc-icon img {
+        height: 0.8em;
+        width: auto;
+      }
+
+      &.vc-room-name {
+        display: inline;
+        text-wrap: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        flex: 0 4 50%;
+      }
+    }
+
+    .right.menu > .item {
+      margin: 0;
+    }
+  }
+}
+
+ind-vc-room-segment .expand-button {
+  cursor: pointer;
+}
+
+ind-vc-room-segment .secondary.segment {
+  --time-menu-animation: 0.2s;
+  --length-menu-travel: -5em;
+  display: block;
+  z-index: 1;
+}
+
+ind-vc-room-segment.expanded .secondary.segment {
+  animation: menu-slide-down var(--time-menu-animation);
+}
+
+ind-vc-room-segment:not(.expanded) .secondary.segment {
+  display: none; // must be set to none to hide it from a11y tools and tab navigation as well
+  animation: menu-slide-up var(--time-menu-animation);
+}
+
+@keyframes menu-slide-down {
+  from {
+    display: block;
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes menu-slide-up {
+  from {
+    display: block;
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    display: none;
+    opacity: 0;
+    transform: translateY(var(--length-menu-travel));
+  }
+}

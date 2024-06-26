@@ -1,43 +1,59 @@
 {% macro render_vc_room(event_vc_room, event) -%}
     {% set vc_room = event_vc_room.vc_room %}
     {% set plugin = vc_room.plugin %}
-    <div class="event-service-row">
-        <div class="event-service-row-collapsed clearfix">
-            <div class="event-service-info event-service-row-toggle trigger left">
-                <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
-                <span class="event-service-title">{{ vc_room.name }}</span>
+    <ind-vc-room-segment class="ui segment vc-room-segment">
+        <div class="ui secondary menu">
+            <div class="item vc-icon">
+                <img src="{{ plugin.logo_url }}">
             </div>
-            {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
+            <div class="item vc-room-name">
+                {{ vc_room.name }}
+            </div>
+            <div class="right menu">
+                <div class="item">
+                    {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
+                </div>
+                <div class="item">
+                    <a class="ui mini button basic expand-button icon">
+                        <i class="chevron down icon"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="event-service-details">
+        <div class="ui bottom attached secondary segment">
             {{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}
         </div>
-        <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
-    </div>
+    </ind-vc-room-segment>
 {%- endmacro %}
 
 {%- macro render_conference_vc_rooms_list(event, event_vc_rooms) -%}
+    <div class="ui top attached blue inverted segment">
+        <i class="ui icon video"></i>
+        {% trans %}Videoconference{% endtrans %}
+    </div>
     {% for event_vc_room in event_vc_rooms %}
         {% set vc_room = event_vc_room.vc_room %}
         {% set plugin = vc_room.plugin %}
-        {% if loop.length == 1 %}
-            {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
-        {% else %}
-            <div class="event-service-row">
-                <div class="event-service-row-collapsed conference clearfix">
-                    <div class="event-service-info left">
-                        <img src="{{ plugin.icon_url }}" style="height: 16px;" alt="">
-                        <span class="event-service-title">{{ vc_room.name }}</span>
+        <ind-vc-room-segment class="ui {% if loop.last %}bottom{% endif %} attached segment">
+            <div class="ui compact secondary menu">
+                <div class="item vc-icon">
+                    <img src="{{ plugin.logo_url }}">
+                </div>
+                <div class="item vc-room-name">
+                    {{ vc_room.name }}
+                </div>
+                <div class="right menu">
+                    <div class="item">
+                        {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
                     </div>
-                    {{ plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
                 </div>
             </div>
-        {% endif %}
+        </ind-vc-room-segment>
     {% endfor %}
 {%- endmacro %}
 
 {% macro render_vc_rooms_list(event, event_vc_rooms, linked_to=None) -%}
-    <div>
+    <div class="vc-room-list">
         {% if linked_to %}
             {% if linked_to.event %}
                 <div class="groupTitleNoBorder event-service-association-title">
