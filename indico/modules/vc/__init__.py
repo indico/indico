@@ -92,14 +92,14 @@ def _link_object_deleted(obj: Contribution | SessionBlock, **kwargs):
 
     if isinstance(obj, Contribution):
         message = ngettext(
-            'There was a VC room associated to this contribution. It has been linked to the event instead',
-            'There were {} VC rooms associated to this contribution. They have been linked to the event instead',
+            'There was a VC room associated with this contribution. It has been linked to the event instead',
+            'There were {} VC rooms associated with this contribution. They have been linked to the event instead',
             n_objects
         )
     else:
         message = ngettext(
-            'There was a VC room associated to this session block. It has been linked to the event instead',
-            'There were {} VC rooms associated to this session block. They have been linked to the event instead',
+            'There was a VC room associated with this session block. It has been linked to the event instead',
+            'There were {} VC rooms associated with this session block. They have been linked to the event instead',
             n_objects
         )
     flash(message, 'warning')
