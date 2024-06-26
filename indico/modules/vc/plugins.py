@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import copy
 import re
 import typing as t
 
@@ -186,6 +187,8 @@ class VCPluginMixin:
         block_id = data.pop('block')
         link_type = VCRoomLinkType[data.pop('linking')]
 
+        old_link_object = event_vc_room.link_object
+
         if link_type == VCRoomLinkType.event:
             event_vc_room.link_object = event
         elif link_type == VCRoomLinkType.contribution:
@@ -197,7 +200,12 @@ class VCPluginMixin:
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
+        return old_link_object != event_vc_room.link_object
+
     def update_data_vc_room(self, vc_room: VCRoom, data: dict, is_new=False):
+        if not is_new:
+            signals.vc.updated_vc_room_data.send(vc_room, data=copy.copy(data))
+
         if 'name' in data:
             vc_room.name = data.pop('name')
 
