@@ -69,7 +69,7 @@ function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
                 entry={contrib}
                 uses24HourFormat={uses24HourFormat}
                 dispatch={dispatch}
-                showTitle
+                title={contrib.title}
               />
             )),
           },
@@ -129,7 +129,7 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
 
 SessionDetails.propTypes = detailsPropTypes;
 
-export function ContributionDetails({entry, uses24HourFormat, dispatch, showTitle, ...rest}) {
+export function ContributionDetails({entry, uses24HourFormat, dispatch, children, ...rest}) {
   const contribActions = [
     {
       icon: 'edit',
@@ -162,24 +162,23 @@ export function ContributionDetails({entry, uses24HourFormat, dispatch, showTitl
       actions={contribActions}
       {...rest}
     >
-      {showTitle && (
-        <div>
-          <Translate as="strong">Title</Translate>: {entry.title}
-        </div>
+      {children || (
+        <>
+          {!entry.isPoster && <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />}
+          <AttachmentsDisplay entry={entry} />
+        </>
       )}
-      {!entry.isPoster && <TimeDisplay entry={entry} uses24HourFormat={uses24HourFormat} />}
-      <AttachmentsDisplay entry={entry} />
     </DetailsSegment>
   );
 }
 
 ContributionDetails.propTypes = {
   ...detailsPropTypes,
-  showTitle: PropTypes.bool,
+  children: PropTypes.node,
 };
 
 ContributionDetails.defaultProps = {
-  showTitle: false,
+  children: null,
 };
 
 function BreakDetails({entry, uses24HourFormat, dispatch}) {

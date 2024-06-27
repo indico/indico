@@ -7,10 +7,11 @@
 
 import {createSelector} from 'reselect';
 
-import {applyChanges, getNumDays, mergeChanges} from './util';
+import {applyChanges, appendSessionAttributes, getNumDays, mergeChanges} from './util';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
+export const getSessions = state => state.sessions;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
 export const getOpenModal = state => state.openModal;
@@ -35,11 +36,13 @@ export const getUpdatedEntries = createSelector(
 );
 export const getBlocks = createSelector(
   getUpdatedEntries,
-  entries => entries.blocks
+  getSessions,
+  (entries, sessions) => appendSessionAttributes(entries.blocks, sessions)
 );
 export const getChildren = createSelector(
   getUpdatedEntries,
-  entries => entries.children
+  getSessions,
+  (entries, sessions) => appendSessionAttributes(entries.children, sessions)
 );
 export const getVisibleChildren = createSelector(
   getChildren,
@@ -47,7 +50,8 @@ export const getVisibleChildren = createSelector(
 );
 export const getUnscheduled = createSelector(
   getUpdatedEntries,
-  entries => entries.unscheduled
+  getSessions,
+  (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
 );
 export const getNumUnscheduled = createSelector(
   getUnscheduled,
@@ -79,10 +83,10 @@ export const getMergedChanges = createSelector(
   getEntries,
   entries => mergeChanges(entries)
 );
-export const getDraggedContrib = createSelector(
+export const getDraggedContribs = createSelector(
   getEntries,
   getUnscheduled,
-  (entries, contribs) => contribs.find(c => c.id === entries.draggedId)
+  (entries, contribs) => contribs.filter(c => entries.draggedIds.has(c.id))
 );
 
 export const getNavbarMaxDays = createSelector(

@@ -11,9 +11,9 @@ import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
 
-import {setTimetableData} from './actions';
+import {setSessionData, setTimetableData} from './actions';
 import reducers from './reducers';
-import {timetableData as tData} from './sample-data';
+import {timetableData as tData, eventInfo as eInfo} from './sample-data';
 import Timetable from './Timetable';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -24,8 +24,9 @@ const DEBUG_MODE = false; //TODO: remove
   global.setupTimetable = function setupTimetable() {
     const root = document.querySelector('#timetable-container');
     if (root) {
-      const {timetableData, customLinks} = root.dataset;
-      const eventInfo = JSON.parse(root.dataset.eventInfo);
+      const {customLinks} = root.dataset;
+      const timetableData = DEBUG_MODE ? tData : JSON.parse(root.dataset.timetableData);
+      const eventInfo = DEBUG_MODE ? eInfo : JSON.parse(root.dataset.eventInfo);
       const initialData = {
         staticData: {
           eventId: parseInt(eventInfo.id, 10),
@@ -35,7 +36,8 @@ const DEBUG_MODE = false; //TODO: remove
       };
       const store = createReduxStore('regform-submission', reducers, initialData);
       console.debug(customLinks); // TODO find out what these are
-      store.dispatch(setTimetableData(DEBUG_MODE ? tData : JSON.parse(timetableData)));
+      store.dispatch(setTimetableData(timetableData));
+      store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(
         <Provider store={store}>
           <Timetable />

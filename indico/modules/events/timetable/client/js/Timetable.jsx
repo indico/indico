@@ -34,7 +34,7 @@ export default function Timetable() {
   const entries = useSelector(selectors.getVisibleEntries);
   const blocks = useSelector(selectors.getBlocks);
   const selected = useSelector(selectors.getSelectedEntry);
-  const draggedContrib = useSelector(selectors.getDraggedContrib);
+  const draggedContribs = useSelector(selectors.getDraggedContribs);
   const [date, setDate] = useState(
     entries.reduce((min, {start}) => (start < min ? start : min), entries[0].start)
   );
@@ -89,10 +89,10 @@ export default function Timetable() {
           }}
           onSelectEvent={e => dispatch(actions.selectEntry(e))}
           onDropFromOutside={args => {
-            if (!draggedContrib) {
+            if (draggedContribs.length === 0) {
               return;
             }
-            dispatch(actions.scheduleContrib(draggedContrib, args));
+            dispatch(actions.scheduleContribs(draggedContribs, args));
             setPlaceholderEntry(null);
           }}
           onNavigate={() => {}}

@@ -51,7 +51,7 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
   const [open, setOpen] = useState(false);
 
   const makePickHandler = color => () => {
-    dispatch(actions.changeColor(color));
+    dispatch(actions.changeColor(entry.sessionId, color));
     setOpen(false);
   };
 
@@ -75,7 +75,7 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
                     icon="paint brush"
                     styleName={toClasses({
                       choice: true,
-                      selected: color.background === entry.color.background,
+                      selected: color.background === entry.color?.background,
                     })}
                     circular
                   />

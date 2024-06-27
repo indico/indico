@@ -9,15 +9,14 @@ import _ from 'lodash';
 
 import * as actions from './actions';
 import {
-  applyChanges,
   resizeEntry,
   deleteEntry,
-  scheduleContrib,
+  scheduleContribs,
   preprocessEntries,
   resizeWindow,
   moveEntry,
-  changeColor,
-  mergeChanges,
+  changeSessionColor,
+  changeBreakColor,
 } from './util';
 
 const entryTypeMapping = {
@@ -32,8 +31,8 @@ const preprocessData = data => {
     .map(e => Object.values(e))
     .flat();
   const childEntries = blocks
-    .map(({id, entries, isPoster}) =>
-      entries ? Object.values(entries).map(v => ({...v, parentId: id, isPoster})) : []
+    .map(({id, entries}) =>
+      entries ? Object.values(entries).map(v => ({...v, parentId: id})) : []
     )
     .flat();
   return [blocks, childEntries].map(en =>
@@ -48,15 +47,26 @@ const preprocessData = data => {
         'contributionId',
         'description',
         'parentId',
-        'isPoster',
       ]),
       type: entryTypeMapping[e.entryType],
       start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
       end: new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
       attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
-      color: e.entryType === 'Contribution' ? undefined : {text: e.textColor, background: e.color},
+      color: e.entryType === 'Break' ? {text: e.textColor, background: e.color} : undefined,
       deleted: false,
     }))
+  );
+};
+
+const preprocessSessionData = data => {
+  return new Map(
+    Object.entries(data).map(([, s]) => [
+      s.id,
+      {
+        ..._.pick(s, ['title', 'isPoster']), // TODO get other attrs
+        color: {text: s.textColor, background: s.color},
+      },
+    ])
   );
 };
 
@@ -69,7 +79,7 @@ export default {
       changes: [],
       currentChangeIdx: 0,
       selectedId: null,
-      draggedId: null,
+      draggedIds: new Set(),
     },
     action
   ) => {
@@ -84,12 +94,17 @@ export default {
         return {...state, selectedId: action.entry?.id};
       case actions.DELETE_ENTRY:
         return {...state, ...deleteEntry(state, action.entry), selectedId: null};
-      case actions.DRAG_UNSCHEDULED_CONTRIB:
-        return {...state, draggedId: action.contribId};
-      case actions.SCHEDULE_CONTRIB:
-        return {...state, ...scheduleContrib(state, action.contrib, action.args), draggedId: null};
+      case actions.DRAG_UNSCHEDULED_CONTRIBS:
+        return {...state, draggedIds: action.contribIds};
+      case actions.SCHEDULE_CONTRIBS:
+        console.debug('SCHEDULE_CONTRIBS', action.contribs, action.args);
+        return {
+          ...state,
+          ...scheduleContribs(state, action.contribs, action.args),
+          draggedIds: new Set(),
+        };
       case actions.CHANGE_COLOR:
-        return {...state, ...changeColor(state, action.color)};
+        return action.sessionId ? state : {...state, ...changeBreakColor(state, action.color)};
       case actions.UNDO_CHANGE:
         return {
           ...state,
@@ -100,14 +115,16 @@ export default {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
         };
-      case actions.SAVE_CHANGES:
-        console.log('[UNIMPLEMENTED] Saving changes:', mergeChanges(state));
-        return {
-          ...state,
-          ...applyChanges(state),
-          changes: [],
-          currentChangeIdx: 0,
-        };
+      default:
+        return state;
+    }
+  },
+  sessions: (state = [], action) => {
+    switch (action.type) {
+      case actions.SET_SESSION_DATA:
+        return preprocessSessionData(action.data);
+      case actions.CHANGE_COLOR:
+        return action.sessionId ? changeSessionColor(state, action.sessionId, action.color) : state;
       default:
         return state;
     }

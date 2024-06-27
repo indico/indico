@@ -10,6 +10,10 @@
 .segment-header:global(.ui.label) {
   display: flex;
 
+  &.selected {
+    filter: brightness(0.8);
+  }
+
   .actions {
     margin-left: auto;
     padding-left: 0.5em;
@@ -37,9 +41,14 @@
   &[draggable] > .segment-header {
     @include icon-before('icon-drag-indicator');
     cursor: grab;
+    padding-left: 0.3em;
 
     &:active {
       cursor: grabbing;
+    }
+
+    &::before {
+      padding-right: 0.25em;
     }
   }
 }
