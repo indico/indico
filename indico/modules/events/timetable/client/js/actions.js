@@ -6,16 +6,16 @@
 // LICENSE file for more details.
 
 export const SET_TIMETABLE_DATA = 'Set timetable data';
+export const SET_SESSION_DATA = 'Set session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DELETE_ENTRY = 'Delete entry';
-export const DRAG_UNSCHEDULED_CONTRIB = 'Drag unscheduled contribution';
-export const SCHEDULE_CONTRIB = 'Schedule contribution';
+export const DRAG_UNSCHEDULED_CONTRIBS = 'Drag unscheduled contributions';
+export const SCHEDULE_CONTRIBS = 'Schedule contributions';
 export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
-export const SAVE_CHANGES = 'Save changes';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
@@ -26,6 +26,10 @@ export const CLOSE_MODAL = 'Close modal';
 
 export function setTimetableData(data) {
   return {type: SET_TIMETABLE_DATA, data};
+}
+
+export function setSessionData(data) {
+  return {type: SET_SESSION_DATA, data};
 }
 
 export function moveEntry(args) {
@@ -44,16 +48,16 @@ export function deleteEntry(entry) {
   return {type: DELETE_ENTRY, entry};
 }
 
-export function dragUnscheduledContrib(contribId) {
-  return {type: DRAG_UNSCHEDULED_CONTRIB, contribId};
+export function dragUnscheduledContribs(contribIds) {
+  return {type: DRAG_UNSCHEDULED_CONTRIBS, contribIds};
 }
 
-export function scheduleContrib(contrib, args) {
-  return {type: SCHEDULE_CONTRIB, contrib, args};
+export function scheduleContribs(contribs, args) {
+  return {type: SCHEDULE_CONTRIBS, contribs, args};
 }
 
-export function changeColor(color) {
-  return {type: CHANGE_COLOR, color};
+export function changeColor(sessionId, color) {
+  return {type: CHANGE_COLOR, sessionId, color};
 }
 
 export function undoChange() {
@@ -62,10 +66,6 @@ export function undoChange() {
 
 export function redoChange() {
   return {type: REDO_CHANGE};
-}
-
-export function saveChanges() {
-  return {type: SAVE_CHANGES};
 }
 
 export function scrollNavbar(offset) {

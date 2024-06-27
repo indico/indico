@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Label, Segment} from 'semantic-ui-react';
 
-import {Translate} from 'indico/react/i18n';
+import {toClasses} from 'indico/react/util';
 
 import {entryColorSchema, entrySchema} from '../util';
 
@@ -26,7 +26,10 @@ function ActionIcon({icon, onClick, title, color}) {
   return (
     <Icon
       name={icon}
-      onClick={onClick}
+      onClick={e => {
+        e.stopPropagation();
+        onClick(e);
+      }}
       style={{color: color?.text || 'rgba(0, 0, 0, 0.6)'}}
       title={title}
       link
@@ -51,6 +54,7 @@ export default function DetailsSegment({
   actions,
   children,
   entry,
+  selected,
   dispatch,
   ...rest
 }) {
@@ -58,11 +62,11 @@ export default function DetailsSegment({
     <Segment style={{borderColor: color?.background}} {...rest}>
       <Label
         style={{backgroundColor: color?.background, color: color?.text}}
-        styleName="segment-header"
+        styleName={toClasses({'segment-header': true, selected})}
         attached="top"
       >
         {icon && <Icon name={icon} />}
-        <Translate>{title}</Translate>
+        {title}
         {subtitle && <Label.Detail>{subtitle}</Label.Detail>}
         <div styleName="actions">
           {actions.map(({wrapper: Wrapper, ...action}) =>
@@ -92,6 +96,7 @@ DetailsSegment.propTypes = {
   actions: PropTypes.arrayOf(PropTypes.shape(actionShape)),
   children: PropTypes.node.isRequired,
   entry: entrySchema,
+  selected: PropTypes.bool,
   dispatch: PropTypes.func,
 };
 
@@ -101,5 +106,6 @@ DetailsSegment.defaultProps = {
   actions: [],
   color: {},
   entry: null,
+  selected: false,
   dispatch: () => {},
 };
