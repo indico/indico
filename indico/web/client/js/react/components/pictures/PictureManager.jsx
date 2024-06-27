@@ -110,7 +110,7 @@ const PictureManager = ({
   }, [picturePreview, previewURL, isInitialPicture]);
 
   const deleteUploadedPicture = useCallback(() => {
-    if (uploadFinished) {
+    if (uploadFinished || pictureState.picture !== null) {
       deleteFile(pictureState.picture.uuid);
     }
   }, [uploadFinished, pictureState.picture]);
@@ -216,6 +216,13 @@ const PictureManager = ({
       cropperBackActionRef.current = 'initial';
     }
   }, [isCapturing, uploadFinished, isInitialPicture]);
+
+  const onOpenEditDialog = () => {
+    setCustomFileRejections(null);
+    fetch(getPreview())
+      .then(res => res.blob())
+      .then(blob => dispatch({type: 'START_EDITING', imageSrc: URL.createObjectURL(blob)}));
+  };
 
   const cropBackAction = () => {
     if (cropperBackActionRef.current === 'camera') {
@@ -339,6 +346,7 @@ const PictureManager = ({
   const cropper = {
     pictureCropper: Cropper,
     isEditActive: isEditing,
+    onOpenEditDialog,
   };
 
   return (
