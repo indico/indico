@@ -147,6 +147,17 @@ export const applyChanges = state => {
 };
 
 /**
+ * Appends the corresponding session's attributes to each entry in the array.
+ * @param {array} entries Entries array
+ * @param {Map} sessions Sessions map
+ * @returns {array} Entries array with color attribute
+ */
+export const appendSessionAttributes = (entries, sessions) =>
+  entries.map(e =>
+    e.sessionId ? {...e, ..._.pick(sessions.get(e.sessionId), ['color', 'isPoster'])} : e
+  );
+
+/**
  * Updates the last entry of the changes array with a new change.
  * @param {array} changes Changes array
  * @param {object} newChange New change
@@ -572,28 +583,32 @@ export const deleteEntry = (state, entry) => {
  * Schedules a contribution
  * @param {object} state State of the timetable
  * @param {object} contrib Contribution to be scheduled
- * @param {object} args {start, end, resource} Arguments from the schedule event
+ * @param {object} args {start, resource} Arguments from the schedule event
  * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
  * currentChangeIdx
  */
-export const scheduleContrib = (state, contrib, {start, end, resource}) => {
-  console.debug('scheduleContrib', state, contrib, {start, end, resource});
-  return moveContrib(state, {
-    start,
-    end: new Date(start.getTime() + CONTRIB_DEFAULT_DURATION * 60000),
-    event: contrib,
-    resourceId: resource,
-  });
+export const scheduleContribs = (state, contribs, {start, resource}) => {
+  // TODO change this to single action
+  return contribs.reduce(
+    (newState, contrib) =>
+      moveContrib(newState, {
+        start,
+        end: new Date(start.getTime() + CONTRIB_DEFAULT_DURATION * 60000),
+        event: contrib,
+        resourceId: resource,
+      }),
+    state
+  );
 };
 
 /**
- * Changes the color of the selected block (of type session or break)
+ * Changes the color of the selected Break block
  * @param {object} state State of the timetable
  * @param {object} color New color
  * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
  * currentChangeIdx
  */
-export const changeColor = (state, color) => {
+export const changeBreakColor = (state, color) => {
   const {selectedId, blocks} = state;
   const selectedBlock = blocks.find(b => b.id === selectedId);
   return addNewChange(
@@ -603,6 +618,18 @@ export const changeColor = (state, color) => {
       : [selectedBlock]
     ).map(({id}) => ({id, color}))
   );
+};
+
+/**
+ * Changes the color of the selected block (of type session or break)
+ * @param {object} state State of the timetable
+ * @param {object} color New color
+ * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
+ * currentChangeIdx
+ */
+export const changeSessionColor = (sessions, sessionId, color) => {
+  const newSessions = new Map(sessions);
+  return newSessions.set(sessionId, {...sessions.get(sessionId), color});
 };
 
 /**
