@@ -25,7 +25,7 @@ const entryTypeMapping = {
   Contribution: 'contribution',
 };
 
-const preprocessData = data => {
+const preprocessData = (data, eventInfo) => {
   // TODO remove this preprocessing once the backend returns the data in the correct format
   const blocks = Object.values(data)
     .map(e => Object.values(e))
@@ -35,7 +35,9 @@ const preprocessData = data => {
       entries ? Object.values(entries).map(v => ({...v, parentId: id})) : []
     )
     .flat();
-  return [blocks, childEntries].map(en =>
+  console.debug(eventInfo);
+  const unscheduled = eventInfo.contributions || [];
+  return [blocks, childEntries, unscheduled].map(en =>
     en.map(e => ({
       ..._.pick(e, [
         'id',
@@ -46,11 +48,12 @@ const preprocessData = data => {
         'sessionId',
         'contributionId',
         'description',
+        'duration',
         'parentId',
       ]),
       type: entryTypeMapping[e.entryType],
-      start: new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
-      end: new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
+      start: e.startDate && new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
+      end: e.endDate && new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
       attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
       color: e.entryType === 'Break' ? {text: e.textColor, background: e.color} : undefined,
       deleted: false,
@@ -85,7 +88,7 @@ export default {
   ) => {
     switch (action.type) {
       case actions.SET_TIMETABLE_DATA:
-        return {...state, ...preprocessEntries(...preprocessData(action.data))};
+        return {...state, ...preprocessEntries(...preprocessData(action.data, action.eventInfo))};
       case actions.MOVE_ENTRY:
         return {...state, ...moveEntry(state, action.args)};
       case actions.RESIZE_ENTRY:

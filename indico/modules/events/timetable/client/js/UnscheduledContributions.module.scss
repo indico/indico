@@ -28,5 +28,20 @@
         margin-left: auto;
       }
     }
+
+    .contribution {
+      cursor: pointer;
+
+      :global(.square.outline.icon) {
+        cursor: pointer;
+      }
+    }
+
+    .description {
+      margin-top: 0.5em;
+      font-size: 0.9em;
+      font-style: italic;
+      color: $gray;
+    }
   }
 }
