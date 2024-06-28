@@ -5,22 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import notScheduledURL from 'indico-url:timetable.not_scheduled';
-
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
+import {Field, Form as FinalForm} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon} from 'semantic-ui-react';
+import {Form, Icon} from 'semantic-ui-react';
 
 import {CollapsibleContainer} from 'indico/react/components';
-import {useIndicoAxios} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
+import {FinalInput, FinalSubmitButton} from 'indico/react/forms';
+import {Param, Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import {ContributionDetails} from './EntryDetails';
 import * as selectors from './selectors';
-import {entrySchema} from './util';
+import {entrySchema, entryTypes, formatTitle} from './util';
 
 import './UnscheduledContributions.module.scss';
 
@@ -30,18 +29,17 @@ function UnscheduledContributionList({
   dispatch,
   selected,
   setSelected,
+  showSession,
 }) {
   const sessions = useSelector(selectors.getSessions);
 
   const makeHandleSelect = id => e => {
     e.stopPropagation();
-    setSelected(state => {
-      const set = new Set([...state, id]);
-      if (state.has(id)) {
-        set.delete(id);
-      }
-      return set;
-    });
+    const set = new Set([...selected, id]);
+    if (selected.has(id)) {
+      set.delete(id);
+    }
+    setSelected(set);
   };
 
   const makeHandleDrag = id => () => {
@@ -53,23 +51,36 @@ function UnscheduledContributionList({
     }
   };
 
-  return contribs.map(contrib => (
-    <ContributionDetails
-      key={contrib.id}
-      entry={{...contrib, deleted: true}}
-      title={contrib.title}
-      uses24HourFormat={uses24HourFormat}
-      dispatch={dispatch}
-      onDragStart={makeHandleDrag(contrib.id)}
-      onClick={makeHandleSelect(contrib.id)}
-      selected={selected.has(contrib.id)}
-      icon={selected.has(contrib.id) ? 'check square outline' : 'square outline'}
-      draggable
-    >
-      <p>Session: {sessions.get(contrib.sessionId)?.title}</p>
-      <p>Duration: TODO</p>
-    </ContributionDetails>
-  ));
+  return (
+    <Form.Field onClick={() => setSelected(new Set())}>
+      {contribs.map(contrib => (
+        <ContributionDetails
+          key={contrib.id}
+          styleName="contribution"
+          entry={{...contrib, deleted: true}}
+          title={entryTypes.contribution.formatTitle(contrib)}
+          uses24HourFormat={uses24HourFormat}
+          dispatch={dispatch}
+          onDragStart={makeHandleDrag(contrib.id)}
+          onClick={makeHandleSelect(contrib.id)}
+          selected={selected.has(contrib.id)}
+          icon={selected.has(contrib.id) ? 'check square outline' : 'square outline'}
+          draggable
+        >
+          {showSession && contrib.sessionId && (
+            <p>
+              <Translate as="strong">Session:</Translate> {sessions.get(contrib.sessionId)?.title}
+            </p>
+          )}
+          {!contrib.isPoster && (
+            <p>
+              <Translate as="strong">Duration:</Translate> {contrib.duration}
+            </p>
+          )}
+        </ContributionDetails>
+      ))}
+    </Form.Field>
+  );
 }
 
 UnscheduledContributionList.propTypes = {
@@ -78,21 +89,20 @@ UnscheduledContributionList.propTypes = {
   dispatch: PropTypes.func.isRequired,
   selected: PropTypes.instanceOf(Set).isRequired,
   setSelected: PropTypes.func.isRequired,
+  showSession: PropTypes.bool,
+};
+
+UnscheduledContributionList.defaultProps = {
+  showSession: false,
 };
 
 export default function UnscheduledContributions() {
   const dispatch = useDispatch();
-  const {eventId} = useSelector(selectors.getStaticData);
   const contribs = useSelector(selectors.getUnscheduled);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const selectedEntry = useSelector(selectors.getSelectedEntry);
   const [selected, setSelected] = useState(new Set());
   const uses24HourFormat = true; // TODO fix this with localeUses24HourTime
-  const {data, loading} = useIndicoAxios({
-    url: notScheduledURL({event_id: eventId}),
-    trigger: showUnscheduled,
-  });
-  console.debug(data, loading, contribs); //TODO
 
   // ensure that the dragged contrib is cleared when dropping outside the calendar
   useEffect(() => {
@@ -115,15 +125,19 @@ export default function UnscheduledContributions() {
   }
 
   const [currentContribs, otherContribs] = _.partition(
-    contribs,
-    c => c.sessionId === selectedEntry?.sessionId
+    _.sortBy(contribs, ['code', 'title']),
+    c => c.sessionId === selectedEntry?.sessionId || (!c.sessionId && !selectedEntry?.sessionId)
   );
 
   return (
-    <div styleName="contributions-container" onClick={() => setSelected(new Set())}>
+    <div styleName="contributions-container">
       <div styleName="content">
         <h4>
-          <Translate>Unscheduled contributions</Translate>
+          {selectedEntry?.type === 'session'
+            ? Translate.string('Unscheduled contributions for session "{sessionName}"', {
+                sessionName: formatTitle(selectedEntry.title, selectedEntry.code),
+              })
+            : Translate.string('Unscheduled contributions with no assigned session')}
           <Icon
             name="close"
             color="black"
@@ -133,13 +147,88 @@ export default function UnscheduledContributions() {
           />
         </h4>
         {currentContribs.length > 0 ? (
-          <UnscheduledContributionList
-            contribs={currentContribs}
-            uses24HourFormat={uses24HourFormat}
-            dispatch={dispatch}
-            selected={selected}
-            setSelected={setSelected}
-          />
+          <FinalForm
+            onSubmit={values => console.log(values)}
+            initialValues={{
+              contribs: new Set(),
+              gap: 0,
+            }}
+            subscription={{}}
+          >
+            {({handleSubmit}) => (
+              <Form onSubmit={handleSubmit}>
+                <Field name="contribs" isEqual={_.isEqual} format={v => v} parse={v => v}>
+                  {({input: {value, onChange}}) => (
+                    <UnscheduledContributionList
+                      contribs={currentContribs}
+                      uses24HourFormat={uses24HourFormat}
+                      dispatch={dispatch}
+                      selected={value}
+                      setSelected={onChange}
+                    />
+                  )}
+                </Field>
+                <Field name="contribs" subscription={{value: true}}>
+                  {({input: {value}}) => (
+                    <>
+                      {currentContribs.length > 1 && !selectedEntry?.isPoster && (
+                        <FinalInput
+                          name="gap"
+                          label={Translate.string('Gap between contributions')}
+                          componentLabel={{content: Translate.string('minutes', 'duration')}}
+                          labelPosition="right"
+                          type="number"
+                          min="0"
+                          step="1"
+                          disabled={value.size === 1}
+                          fluid
+                        />
+                      )}
+                      <FinalSubmitButton
+                        disabledUntilChange={false}
+                        label={
+                          value.size > 0
+                            ? Translate.string('Schedule selected')
+                            : Translate.string('Schedule all')
+                        }
+                        fluid
+                      />
+                    </>
+                  )}
+                </Field>
+                <p styleName="description">
+                  {selectedEntry?.type === 'session' ? (
+                    <Translate>
+                      The contributions will be scheduled sequentially, in the presented order,
+                      after the last contribution inside the selected block (
+                      <Param
+                        name="blockTitle"
+                        value={entryTypes.session.formatTitle(selectedEntry)}
+                        wrapper={<strong />}
+                      />
+                      ) .
+                    </Translate>
+                  ) : selectedEntry ? (
+                    <Translate>
+                      The contributions will be scheduled sequentially, in the presented order,
+                      after the currently selected entry (
+                      <Param
+                        name="blockTitle"
+                        value={entryTypes[selectedEntry.type].formatTitle(selectedEntry)}
+                        wrapper={<strong />}
+                      />
+                      ) .
+                    </Translate>
+                  ) : (
+                    <Translate>
+                      The contributions will be scheduled sequentially, in the presented order,
+                      after the last entry on the currently selected day.
+                    </Translate>
+                  )}
+                </p>
+              </Form>
+            )}
+          </FinalForm>
         ) : (
           <p>
             {selectedEntry?.sessionId ? (
@@ -168,6 +257,7 @@ export default function UnscheduledContributions() {
               dispatch={dispatch}
               selected={selected}
               setSelected={setSelected}
+              showSession
             />
           </CollapsibleContainer>
         )}

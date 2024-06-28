@@ -18,7 +18,7 @@ import DetailsSegment from './components/DetailsSegment';
 import EntryColorPicker from './components/EntryColorPicker';
 import TimeDisplay from './components/TimeDisplay';
 import * as selectors from './selectors';
-import {entrySchema, formatTitle, handleUnimplemented, isChildOf} from './util';
+import {entrySchema, entryTypes, formatTitle, handleUnimplemented, isChildOf} from './util';
 
 import './EntryDetails.module.scss';
 
@@ -69,7 +69,7 @@ function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
                 entry={contrib}
                 uses24HourFormat={uses24HourFormat}
                 dispatch={dispatch}
-                title={contrib.title}
+                title={entryTypes.contribution.formatTitle(contrib)}
               />
             )),
           },
@@ -82,12 +82,12 @@ function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
 ContributionsDisplay.propTypes = detailsPropTypes;
 
 function SessionDetails({entry, uses24HourFormat, dispatch}) {
-  const {title, slotTitle, code, color} = entry;
+  const {title, slotTitle, code, sessionCode, color} = entry;
   return (
     <>
       <DetailsSegment
         title={Translate.string('Block')}
-        subtitle={slotTitle}
+        subtitle={formatTitle(slotTitle, sessionCode)}
         actions={[
           {icon: 'edit', title: Translate.string('Edit session block')},
           {

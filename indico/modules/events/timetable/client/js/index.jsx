@@ -36,7 +36,7 @@ const DEBUG_MODE = false; //TODO: remove
       };
       const store = createReduxStore('regform-submission', reducers, initialData);
       console.debug(customLinks); // TODO find out what these are
-      store.dispatch(setTimetableData(timetableData));
+      store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(
         <Provider store={store}>

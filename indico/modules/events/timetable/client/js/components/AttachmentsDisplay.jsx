@@ -16,7 +16,7 @@ export default function AttachmentsDisplay({entry}) {
   const {attachmentCount} = entry;
   return (
     <p>
-      <Translate as="strong">Materials</Translate>: <Icon name="paperclip" />
+      <Translate as="strong">Materials:</Translate> <Icon name="paperclip" />
       {attachmentCount > 0 ? (
         <PluralTranslate count={attachmentCount}>
           <Singular>

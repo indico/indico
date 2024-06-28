@@ -313,9 +313,10 @@ const layoutBlocks = (state, draggedEntry = null) => {
  * @param {array} children Child-entries to be sorted
  * @returns {object} {blocks, children} Sorted blocks and children
  */
-export const preprocessEntries = (blocks, children) => ({
+export const preprocessEntries = (blocks, children, unscheduled) => ({
   blocks: applyChanges({blocks, ...layoutBlocks({blocks, changes: []})}).blocks,
   children,
+  unscheduled,
 });
 
 /**

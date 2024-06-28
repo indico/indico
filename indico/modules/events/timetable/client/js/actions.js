@@ -24,8 +24,8 @@ export const ADD_ENTRY = 'Add entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
 
-export function setTimetableData(data) {
-  return {type: SET_TIMETABLE_DATA, data};
+export function setTimetableData(data, eventInfo) {
+  return {type: SET_TIMETABLE_DATA, data, eventInfo};
 }
 
 export function setSessionData(data) {
