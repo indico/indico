@@ -30,7 +30,7 @@ import './Picture.module.scss';
 export function PictureArea({
   dropzone: {getRootProps, getInputProps, isDragActive, open: openUploadDialog, fileRejections},
   capture: {pictureCamera: PictureCamera, onOpenCameraDialog, isCameraActive, isCameraAllowed},
-  cropper: {pictureCropper: PictureCropper, isEditActive},
+  cropper: {pictureCropper: PictureCropper, onOpenEditDialog, isEditActive},
   picture,
   dragText,
   pictureAction,
@@ -124,6 +124,16 @@ export function PictureArea({
                                   'You need to grant this site camera permissions before taking a picture'
                                 )
                           }
+                        />
+                        <Divider horizontal>
+                          <Translate>Or</Translate>
+                        </Divider>
+                        <Button
+                          type="button"
+                          styleName="picture-selection-btn"
+                          icon="edit"
+                          content={Translate.string('Edit current picture')}
+                          onClick={() => onOpenEditDialog()}
                         />
                       </>
                     ) : (

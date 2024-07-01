@@ -10,7 +10,8 @@ Version 3.3.4
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Allow cropping an existing picture in registration form picture fields (:pr:`6423`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

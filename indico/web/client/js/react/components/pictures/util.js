@@ -11,5 +11,4 @@ export const PictureState = {
   ...UploadState, // initial, uploading, error, finished
   capturing: 'capturing', // the camera is active and picture may be captured
   editing: 'editing', // picture is being edited
-  dropzone: 'dropzone', // The picture was taken using the dropzone or upload dialog
 };
