@@ -6,13 +6,13 @@
 # LICENSE file for more details.
 
 import hashlib
-from operator import attrgetter
 
 from marshmallow import ValidationError, fields, post_dump, post_load
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.marshmallow import mm
+from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.sessions.models.sessions import Session
@@ -21,7 +21,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelField, SortedList
+from indico.util.marshmallow import ModelField
 from indico.web.forms.colors import get_colors
 
 
@@ -132,5 +132,5 @@ class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
 
     start_dt = fields.DateTime()
     location_data = fields.Nested(LocationDataSchema)
-    conveners = SortedList(fields.Nested(SessionBlockPersonLinkSchema), attribute='person_links',
-                           sort_key=attrgetter('display_order_key'))
+    # TODO: Make it so that passing explicit `many=True` is not required
+    conveners = fields.Nested(_SessionBlockPersonLinkSchema(many=True), attribute='person_links')

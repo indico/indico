@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
   global.setupContributionCreateForm = function setupContributionCreateForm(field, trigger) {
     const element = document.querySelector(field);
     const {eventId, eventType, personLinkFieldParams} = element.dataset;
-    console.log(eventId, eventType);
 
     ReactDOM.render(
       <CreateContributionButton

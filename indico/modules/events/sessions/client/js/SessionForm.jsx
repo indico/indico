@@ -191,18 +191,11 @@ export function SessionCreateForm({eventId, eventType, onClose}) {
     );
   }
 
-  // const sessionTypes = data.session_types.map(({id, name}) => ({
-  //   key: id,
-  //   text: name,
-  //   value: id,
-  // }));
   const sessionTypes = sessionTypesData.map(({id, name}) => ({
     key: id,
     text: name,
     value: id,
   }));
-  // console.log(data);
-  console.log('color', sessionColor);
 
   const locationData = locationParent
     ? {...locationParent.location_data, inheriting: true}
