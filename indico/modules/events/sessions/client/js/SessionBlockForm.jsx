@@ -22,7 +22,7 @@ import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {camelizeKeys} from 'indico/utils/case';
+import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
 export default function SessionBlockEditForm({eventId, sessionId, blockId, onClose}) {
   const {data: blockData, loading} = useIndicoAxios(
@@ -33,7 +33,31 @@ export default function SessionBlockEditForm({eventId, sessionId, blockId, onClo
   );
 
   const handleSubmit = async formData => {
-    formData = _.omit(formData, 'conveners'); // TODO person links
+    const personLinks = formData.conveners.map(
+      ({
+        affiliationMeta,
+        affiliationId,
+        type,
+        avatarURL,
+        favoriteUsers,
+        fullName,
+        id,
+        isAdmin,
+        language,
+        name,
+        userId,
+        userIdentifier,
+        invalid,
+        detail,
+        ...rest
+      }) => ({
+        ...rest,
+      })
+    );
+    formData = {
+      ...formData,
+      conveners: snakifyKeys(personLinks),
+    };
     try {
       await indicoAxios.patch(
         sessionBlockURL({event_id: eventId, session_id: sessionId, block_id: blockId}),
@@ -79,7 +103,7 @@ export default function SessionBlockEditForm({eventId, sessionId, blockId, onClo
         name="conveners"
         label={Translate.string('Conveners')}
         eventId={eventId}
-        sessionUser={Indico.User}
+        sessionUser={{...Indico.User, userId: Indico.User.id}}
       />
       <FinalLocationField
         name="location_data"

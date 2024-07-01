@@ -13,7 +13,6 @@ import locationParentURL from 'indico-url:contributions.api_contribs_location_pa
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {FormSpy} from 'react-final-form';
@@ -46,12 +45,35 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
   const {data: contrib, loading} = useIndicoAxios(contribURL);
 
   const handleSubmit = async formData => {
-    formData = _.omit(formData, ['person_links']); // TODO person links
+    // formData = _.omit(formData, ['person_links']); // TODO person links
     const customFields = Object.entries(formData.custom_fields).map(([key, data]) => ({
       id: parseInt(key.replace('field_', ''), 10),
       data,
     }));
-    formData = {...formData, custom_fields: customFields};
+    const personLinks = formData.person_links.map(
+      ({
+        affiliationMeta,
+        avatarURL,
+        favoriteUsers,
+        fullName,
+        id,
+        isAdmin,
+        language,
+        name,
+        userId,
+        userIdentifier,
+        invalid,
+        detail,
+        ...rest
+      }) => ({
+        ...rest,
+      })
+    );
+    formData = {
+      ...formData,
+      custom_fields: customFields,
+      person_links: snakifyKeys(personLinks),
+    };
     try {
       await indicoAxios.patch(contribURL, {
         ...formData,
@@ -152,7 +174,7 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
         name="person_links"
         label={Translate.string('People')}
         eventId={eventId}
-        sessionUser={Indico.User}
+        sessionUser={{...Indico.User, userId: Indico.User.id}}
         {...personLinkFieldParams}
       />
       <FinalLocationField
@@ -202,12 +224,35 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
   );
 
   const handleSubmit = async formData => {
-    formData = _.omit(formData, ['person_links']); // TODO person links
+    // formData = _.omit(formData, ['person_links']); // TODO person links
     const customFields = Object.entries(formData.custom_fields).map(([key, data]) => ({
       id: parseInt(key.replace('field_', ''), 10),
       data,
     }));
-    formData = {...formData, custom_fields: customFields};
+    const personLinks = formData.person_links.map(
+      ({
+        affiliationMeta,
+        avatarURL,
+        favoriteUsers,
+        fullName,
+        id,
+        isAdmin,
+        language,
+        name,
+        userId,
+        userIdentifier,
+        invalid,
+        detail,
+        ...rest
+      }) => ({
+        ...rest,
+      })
+    );
+    formData = {
+      ...formData,
+      custom_fields: customFields,
+      person_links: snakifyKeys(personLinks),
+    };
     try {
       await indicoAxios.post(contributionCreateURL({event_id: eventId}), {
         ...formData,
@@ -313,7 +358,7 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
         name="person_links"
         label={Translate.string('People')}
         eventId={eventId}
-        sessionUser={Indico.User}
+        sessionUser={{...Indico.User, userId: Indico.User.id}}
         {...personLinkFieldParams}
       />
       <FinalLocationField

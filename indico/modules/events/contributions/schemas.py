@@ -21,6 +21,7 @@ from indico.modules.events.contributions.models.fields import (ContributionField
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema, LocationDataSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
@@ -158,7 +159,6 @@ class ContributionSchema(mm.SQLAlchemyAutoSchema):
 
     # TODO: filter inactive and resitricted contrib fields
     custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
-    person_links = SortedList(fields.Nested(ContributionPersonLinkSchema),
-                              sort_key=attrgetter('display_order_key'))
+    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)

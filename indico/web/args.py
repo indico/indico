@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
 from collections.abc import Mapping
 
 from flask import g
@@ -93,6 +94,17 @@ def use_args(schema_cls, **kwargs):
         return schema_cls(**schema_kwargs, context=context)
 
     return parser.use_args(factory, **webargs_kwargs)
+
+
+# TODO: This is just a convenience function for now. I'd like to come up with a nicer way to do this..
+def use_args_schema_context(schema_cls, context_fn, **use_args_kwargs):
+    def wrapper(func):
+        @functools.wraps(func)
+        def wrapped(self, *args, **kwargs):
+            w = use_args(schema_cls, context=context_fn(self), **use_args_kwargs)
+            return w(func)(self, *args, **kwargs)
+        return wrapped
+    return wrapper
 
 
 def use_kwargs(schema_cls, **kwargs):
