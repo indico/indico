@@ -66,7 +66,7 @@ from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
-from indico.web.args import use_args, use_kwargs
+from indico.web.args import use_args, use_args_schema_context, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -353,11 +353,16 @@ class RHAPIContribution(RHManageContributionBase):
     def _process_GET(self):
         return ContributionSchema().jsonify(self.contrib)
 
-    @use_args(ContributionSchema, partial=True)
+    # @use_args(ContributionSchema)
+    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event, 'object': self.contrib})
     def _process_PATCH(self, data):
+        # from indico.web.args import parser
+        # data = parser.parse(ContributionSchema(context={'event': self.event, 'object': self.contrib}))
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
-        print('update contribution', data)
+
+        # TODO: quick hack to get the person_link data in the right format
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         with track_location_changes():
             # TODO: custom fields logs
             update_contribution(self.contrib, data)
@@ -375,10 +380,14 @@ class RHAPIContribution(RHManageContributionBase):
 
 
 class RHAPIContributionCreate(RHManageContributionsBase):
-    @use_args(ContributionSchema)
+    # @use_args(ContributionSchema)
+    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data):
         if (references := data.get('references')) is not None:
             data['references'] = self._get_references(references)
+        # TODO: quick hack to get the person_link data in the right format
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        print('create contribution', data)
         create_contribution(self.event, data)
 
     @no_autoflush

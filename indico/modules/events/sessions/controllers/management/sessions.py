@@ -34,7 +34,7 @@ from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import get_random_color, track_location_changes, track_time_changes
 from indico.modules.logs import LogKind
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import use_args
+from indico.web.args import use_args, use_args_schema_context
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -241,7 +241,8 @@ class RHAPISessionBlock(RHManageSessionBase):
     def _process_GET(self):
         return SessionBlockSchema().jsonify(self.session_block)
 
-    @use_args(SessionBlockSchema, partial=True)
+    # @use_args(SessionBlockSchema)
+    @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event, 'object': self.session_block})
     def _process_PATCH(self, data):
         print('session block data', data)
         with track_location_changes(), track_time_changes():
