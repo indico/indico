@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix display of empty session selection in registration summary (:pr:`6421`,
+  thanks :user:`jbtwist`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
