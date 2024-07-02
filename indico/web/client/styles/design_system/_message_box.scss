@@ -1,0 +1,34 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'variables';
+
+body {
+  // Message boxes
+  --msgbox-alert-key-color: #c00;
+  --msgbox-alert-sub-color: #fff6f6;
+  --msgbox-alert-text-color: var(--text-color);
+}
+
+%message-box {
+  --msgbox-key-color: black; // override where extended
+  --msgbox-sub-color: #efefef; // override where extended
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  background: var(--msgbox-sub-color);
+  border: 0.2em solid var(--msgbox-key-color);
+  padding: 1em 1.5em; // XXX: 1.5em is to match SUI, but it should be 1em really
+  border-radius: 0.35em; // XXX: Match SUI
+}
+
+%message-box-heading {
+  font-weight: bold;
+  color: var(--msgbox-key-color);
+}
