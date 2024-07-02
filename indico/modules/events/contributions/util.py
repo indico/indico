@@ -29,7 +29,7 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.util import track_time_changes
+from indico.modules.events.util import get_person_link_field_params, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
 from indico.util.spreadsheets import csv_text_io_wrapper
@@ -375,3 +375,12 @@ def get_boa_export_formats():
     if not config.LATEX_ENABLED:
         del formats['PDF']
     return formats
+
+
+def get_contribution_person_link_field_params(contrib):
+    has_abstract = bool(contrib.abstract)
+    return get_person_link_field_params(contrib.event) | {
+        'default_is_submitter': not has_abstract,
+        'default_is_speaker': not has_abstract,
+        'default_is_author': has_abstract,
+    }
