@@ -15,12 +15,11 @@ from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
-from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import get_registered_event_persons
-from indico.modules.events.util import ListGeneratorBase, get_person_link_field_params
+from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 
@@ -236,14 +235,10 @@ class ContributionListGenerator(ListGeneratorBase):
         static_columns = self._get_static_columns(static_item_ids)
         dynamic_columns = self._get_sorted_custom_fields(dynamic_item_ids)
         has_types = bool(self.event.contribution_types.all())
-        person_link_field_params = get_person_link_field_params(self.event)
-        if self.event.type_ == EventType.conference:
-            person_link_field_params['allow_authors'] = True
         return {'contribs': contributions, 'sessions': sessions, 'tracks': tracks, 'total_entries': total_entries,
                 'total_duration': total_duration, 'selected_entry': selected_entry,
                 'registered_persons': registered_persons, 'static_columns': static_columns,
-                'dynamic_columns': dynamic_columns, 'has_types': has_types,
-                'person_link_field_params': person_link_field_params}
+                'dynamic_columns': dynamic_columns, 'has_types': has_types}
 
     def render_list(self, contrib=None):
         """Render the contribution list template components.
