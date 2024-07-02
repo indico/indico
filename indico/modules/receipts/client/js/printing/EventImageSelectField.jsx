@@ -131,7 +131,7 @@ export default function EventImageSelectField({
 EventImageSelectField.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  description: PropTypes.string,
   value: PropTypes.string,
   required: PropTypes.bool,
   loading: PropTypes.bool,
@@ -141,6 +141,7 @@ EventImageSelectField.propTypes = {
 };
 
 EventImageSelectField.defaultProps = {
+  description: null,
   value: null,
   required: false,
   loading: false,
