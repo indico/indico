@@ -55,16 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
 (function(global) {
   global.setupContributionForm = function setupContributionForm(field, trigger) {
     const element = document.querySelector(field);
-    const {eventId, contribId, eventTitle, personLinkFieldParams} = element.dataset;
+    const {eventId, contribId, eventTitle} = element.dataset;
 
     ReactDOM.render(
       <EditContributionButton
         eventId={+eventId}
         contribId={contribId && +contribId}
         eventTitle={eventTitle}
-        personLinkFieldParams={
-          personLinkFieldParams && camelizeKeys(JSON.parse(personLinkFieldParams))
-        }
         triggerSelector={trigger}
       />,
       element
@@ -73,15 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   global.setupContributionCreateForm = function setupContributionCreateForm(field, trigger) {
     const element = document.querySelector(field);
-    const {eventId, eventType, personLinkFieldParams} = element.dataset;
+    const {eventId, eventType} = element.dataset;
 
     ReactDOM.render(
       <CreateContributionButton
         eventId={+eventId}
         eventType={eventType}
-        personLinkFieldParams={
-          personLinkFieldParams && camelizeKeys(JSON.parse(personLinkFieldParams))
-        }
         triggerSelector={trigger}
       />,
       element
