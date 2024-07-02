@@ -514,10 +514,17 @@ export function FinalContributionPersonLinkField({
   allowAuthors,
   allowSubmitters,
   defaultIsSubmitter,
+  defaultIsSpeaker,
+  defaultIsAuthor,
   ...rest
 }) {
   const roles = [
-    {name: 'speaker', label: Translate.string('Speaker'), icon: 'microphone', default: true},
+    {
+      name: 'speaker',
+      label: Translate.string('Speaker'),
+      icon: 'microphone',
+      default: defaultIsSpeaker,
+    },
   ];
   if (allowSubmitters) {
     roles.push({
@@ -534,6 +541,7 @@ export function FinalContributionPersonLinkField({
         label: Translate.string('Author'),
         plural: Translate.string('Authors'),
         section: true,
+        default: defaultIsAuthor,
       },
       {
         name: 'secondary',
@@ -551,12 +559,16 @@ FinalContributionPersonLinkField.propTypes = {
   allowAuthors: PropTypes.bool,
   allowSubmitters: PropTypes.bool,
   defaultIsSubmitter: PropTypes.bool,
+  defaultIsSpeaker: PropTypes.bool,
+  defaultIsAuthor: PropTypes.bool,
 };
 
 FinalContributionPersonLinkField.defaultProps = {
   allowAuthors: true,
   allowSubmitters: true,
   defaultIsSubmitter: true,
+  defaultIsSpeaker: true,
+  defaultIsAuthor: false,
 };
 
 export function FinalSessionBlockPersonLinkField(props) {
