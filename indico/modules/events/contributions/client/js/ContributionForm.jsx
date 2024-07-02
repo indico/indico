@@ -8,10 +8,12 @@
 // import contributionURL from 'indico-url:contributions.manage_contrib_rest';
 import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
 import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
+import contribPersonLinkFieldParamsURL from 'indico-url:contributions.api_contrib_person_link_params';
 import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
+import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
@@ -33,7 +35,11 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
-export function ContributionEditForm({eventId, contribId, personLinkFieldParams, onClose}) {
+export function ContributionEditForm({eventId, contribId, onClose}) {
+  const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
+    contribPersonLinkFieldParamsURL({event_id: eventId, contrib_id: contribId}),
+    {camelize: true}
+  );
   const {data: fields, loading: fieldsLoading} = useIndicoAxios(
     contribFieldsURL({event_id: eventId}),
     {camelize: true}
@@ -87,7 +93,7 @@ export function ContributionEditForm({eventId, contribId, personLinkFieldParams,
     await new Promise(() => {});
   };
 
-  if (loading || locationParentLoading || fieldsLoading) {
+  if (loading || locationParentLoading || fieldsLoading || personLinkFieldParamsLoading) {
     return (
       <Dimmer active>
         <Loader />
@@ -207,11 +213,14 @@ ContributionEditForm.propTypes = {
   eventId: PropTypes.number.isRequired,
   contribId: PropTypes.number.isRequired,
   eventTitle: PropTypes.string.isRequired,
-  personLinkFieldParams: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}) {
+export function ContributionCreateForm({eventId, onClose}) {
+  const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
+    personLinkFieldParamsURL({event_id: eventId}),
+    {camelize: true}
+  );
   const {data: fields, loading: fieldsLoading} = useIndicoAxios(
     contribFieldsURL({event_id: eventId}),
     {camelize: true}
@@ -266,7 +275,12 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
     await new Promise(() => {});
   };
 
-  if (locationParentLoading || defaultDurationLoading || fieldsLoading) {
+  if (
+    locationParentLoading ||
+    defaultDurationLoading ||
+    fieldsLoading ||
+    personLinkFieldParamsLoading
+  ) {
     return (
       <Dimmer active>
         <Loader />
@@ -389,7 +403,6 @@ export function ContributionCreateForm({eventId, personLinkFieldParams, onClose}
 
 ContributionCreateForm.propTypes = {
   eventId: PropTypes.number.isRequired,
-  personLinkFieldParams: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 

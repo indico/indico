@@ -44,8 +44,8 @@ from indico.modules.events.contributions.operations import (create_contribution,
 from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionSchema,
                                                          FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
-                                                      get_boa_export_formats, import_contributions_from_csv,
-                                                      make_contribution_form)
+                                                      get_boa_export_formats, get_contribution_person_link_field_params,
+                                                      import_contributions_from_csv, make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.controllers.base import EditEventSettingsMixin
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -428,6 +428,11 @@ class RHAPIContributionDefaultDuration(RHManageContributionsBase):
 class RHAPIContributionFields(RHManageContributionsBase):
     def _process(self):
         return ContributionFieldSchema(many=True).jsonify(self.event.contribution_fields.filter_by(is_active=True))
+
+
+class RHAPIContributionPersonLinkFieldParams(RHManageContributionBase):
+    def _process_GET(self):
+        return jsonify(get_contribution_person_link_field_params(self.contrib))
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
