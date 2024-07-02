@@ -274,7 +274,7 @@ class BookRoom extends React.Component {
                 <RoomRenderer rooms={this.visibleRooms}>
                   {room => (
                     <Slot name="actions">
-                      {room.canUserBook && (
+                      {labels.bookButton !== null && room.canUserBook && (
                         <ResponsivePopup
                           trigger={bookingModalBtn(room)}
                           content={labels.bookButton}
@@ -282,8 +282,7 @@ class BookRoom extends React.Component {
                           hideOnScroll
                         />
                       )}
-                      {room.canUserPrebook && (
-                        // eslint-disable-next-line max-len
+                      {labels.preBookButton !== null && room.canUserPrebook && (
                         <Icon.Group onClick={() => this.openBookingForm(room.id, null, true)}>
                           <ResponsivePopup
                             trigger={<Button circular icon="check" color="orange" />}
