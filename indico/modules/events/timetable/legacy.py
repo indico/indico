@@ -325,13 +325,16 @@ def serialize_entry_update(entry, session_=None):
 
 
 def serialize_event_info(event):
+    from indico.modules.events.contributions import Contribution
     return {'_type': 'Conference',
             'id': str(event.id),
             'title': event.title,
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,
             'isConference': event.type_ == EventType.conference,
-            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions}}
+            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions},
+            'contributions': [serialize_contribution(c)
+                              for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)]}
 
 
 def serialize_session(sess):

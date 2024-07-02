@@ -6,7 +6,9 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+import TimePicker from 'rc-time-picker';
 import React from 'react';
 import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
@@ -358,6 +360,71 @@ ComboDropdownAdapter.defaultProps = {
   includeMeta: false,
 };
 
+function TimePickerComponent({value, disabled, onChange, onBlur, onFocus}) {
+  // TODO: Make more props overridable
+  console.log('start_dt', value);
+
+  const markTouched = () => {
+    onFocus();
+    onBlur();
+  };
+
+  function handleOnChange(v) {
+    markTouched();
+    onChange(v.toISOString());
+  }
+
+  return (
+    <div className="ui input" styleName="time-picker">
+      <TimePicker
+        showSecond={false}
+        value={value ? moment(value) : null}
+        focusOnOpen
+        format="H:mm"
+        onChange={handleOnChange}
+        allowEmpty={false}
+        placeholder="h:mm"
+        disabled={disabled}
+        disabledMinutes={h => (h === 0 ? [0] : [])} // TODO: Do we need this?
+      />
+    </div>
+  );
+}
+
+TimePickerComponent.propTypes = {
+  value: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+};
+
+function TimePickerAdapter(props) {
+  return <FormFieldAdapter {...props} as={TimePickerComponent} />;
+}
+
+function DurationComponent({value, onChange, ...rest}) {
+  return (
+    <TimePickerComponent
+      value={moment()
+        .startOf('day')
+        .seconds(value)
+        .toISOString()}
+      onChange={v => onChange(moment(v).diff(moment().startOf('day'), 'seconds'))}
+      {...rest}
+    />
+  );
+}
+
+DurationComponent.propTypes = {
+  value: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+function DurationAdapter(props) {
+  return <FormFieldAdapter {...props} as={DurationComponent} />;
+}
+
 /**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
@@ -608,6 +675,55 @@ FinalComboDropdown.propTypes = {
 
 FinalComboDropdown.defaultProps = {
   label: null,
+};
+
+export function FinalTimePicker({name, label, defaultValue, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      adapter={TimePickerAdapter}
+      label={label}
+      defaultValue={defaultValue}
+      {...rest}
+    />
+  );
+}
+
+FinalTimePicker.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  defaultValue: PropTypes.string,
+};
+
+FinalTimePicker.defaultProps = {
+  label: null,
+  defaultValue: moment()
+    .startOf('day')
+    .minutes(20)
+    .toISOString(),
+};
+
+export function FinalDuration({name, label, defaultValue, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      adapter={DurationAdapter}
+      label={label}
+      defaultValue={defaultValue}
+      {...rest}
+    />
+  );
+}
+
+FinalDuration.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  defaultValue: PropTypes.number,
+};
+
+FinalDuration.defaultProps = {
+  label: null,
+  defaultValue: 1200, // 20 minutes
 };
 
 /**
