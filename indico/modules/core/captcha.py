@@ -24,11 +24,14 @@ from indico.web.forms.widgets import JinjaWidget
 
 def _verify_captcha(user_answer):
     if plugin := get_captcha_plugin():
-        return plugin.validate_captcha(user_answer)
-    else:
-        answer = session.get('captcha_state')
-        # 1 and 7 are too similar and we never use 1 in a challenge
-        return bool(answer) and answer == user_answer.replace('1', '7')
+        captcha_validation = plugin.validate_captcha(user_answer)
+        if plugin.custom_captcha_validator and captcha_validation is NotImplemented:
+            raise NotImplementedError('CAPTCHA plugin must implement validate_captcha(answer)')
+        if captcha_validation is not NotImplemented:
+            return captcha_validation
+    answer = session.get('captcha_state')
+    # 1 and 7 are too similar and we never use 1 in a challenge
+    return bool(answer) and answer == user_answer.replace('1', '7')
 
 
 def generate_captcha_challenge():
@@ -73,7 +76,7 @@ class WTFCaptchaField(StringField):
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = valuelist[0]
-        if not _verify_captcha(self.data):
+        if not _verify_captcha(self.data or ''):
             raise WTFValidationError(_('Incorrect answer'))
 
 

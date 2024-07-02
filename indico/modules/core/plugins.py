@@ -9,6 +9,8 @@ from flask import session
 
 
 class CaptchaPluginMixin:
+    custom_captcha_validator = True
+
     def is_captcha_available(self):
         """Whether this plugin's CAPTCHA is available.
 
@@ -44,7 +46,7 @@ class CaptchaPluginMixin:
         Other implementations might need to send a request to a cloud-based API to validate
         the CAPTCHA.
         """
-        raise NotImplementedError('CAPTCHA plugin must implement validate_captcha(answer)')
+        return NotImplemented
 
     def get_captcha_settings(self):
         """Return CAPTCHA settings.
