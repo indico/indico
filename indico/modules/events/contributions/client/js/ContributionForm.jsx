@@ -406,14 +406,7 @@ ContributionCreateForm.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export function EditContributionButton({
-  eventId,
-  contribId,
-  eventTitle,
-  personLinkFieldParams,
-  triggerSelector,
-  ...rest
-}) {
+export function EditContributionButton({eventId, contribId, eventTitle, triggerSelector, ...rest}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -438,7 +431,6 @@ export function EditContributionButton({
           eventId={eventId}
           contribId={contribId}
           eventTitle={eventTitle}
-          personLinkFieldParams={personLinkFieldParams}
           onClose={() => setOpen(false)}
         />
       )}
@@ -450,7 +442,6 @@ EditContributionButton.propTypes = {
   eventId: PropTypes.number.isRequired,
   contribId: PropTypes.number.isRequired,
   eventTitle: PropTypes.string.isRequired,
-  personLinkFieldParams: PropTypes.object.isRequired,
   triggerSelector: PropTypes.string,
 };
 
@@ -458,12 +449,7 @@ EditContributionButton.defaultProps = {
   triggerSelector: null,
 };
 
-export function CreateContributionButton({
-  eventId,
-  personLinkFieldParams,
-  triggerSelector,
-  ...rest
-}) {
+export function CreateContributionButton({eventId, triggerSelector, ...rest}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -483,20 +469,13 @@ export function CreateContributionButton({
           <Translate>Edit contribution</Translate>
         </Button>
       )}
-      {open && (
-        <ContributionCreateForm
-          eventId={eventId}
-          personLinkFieldParams={personLinkFieldParams}
-          onClose={() => setOpen(false)}
-        />
-      )}
+      {open && <ContributionCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
     </>
   );
 }
 
 CreateContributionButton.propTypes = {
   eventId: PropTypes.number.isRequired,
-  personLinkFieldParams: PropTypes.object.isRequired,
   triggerSelector: PropTypes.string,
 };
 
