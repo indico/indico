@@ -201,6 +201,7 @@ def get_person_link_field_params(event=None):
         name_format = session.user.settings.get('name_format')
     extra_params = values_from_signal(signals.event.person_link_field_extra_params.send(), as_list=True)
     return {
+        'allow_authors': event.type_ == EventType.conference if event else False,
         'has_predefined_affiliations': Affiliation.query.filter(~Affiliation.is_deleted).has_rows(),
         'can_enter_manually': (not event or event.can_manage(session.user) or
                                not persons_settings.get(event, 'disallow_custom_persons')),
