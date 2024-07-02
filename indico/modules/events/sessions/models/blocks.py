@@ -26,6 +26,7 @@ class SessionBlock(LocationMixin, db.Model):
     __tablename__ = 'session_blocks'
     __auto_table_args = (db.UniqueConstraint('id', 'session_id'),  # useless but needed for the compound fkey
                          db.CheckConstraint("date_trunc('minute', duration) = duration", 'duration_no_seconds'),
+                         db.CheckConstraint("duration > '0'", 'positive_duration'),
                          {'schema': 'events'})
     location_backref_name = 'session_blocks'
     allow_relationship_preloading = True
