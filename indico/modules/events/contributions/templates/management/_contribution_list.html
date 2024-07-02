@@ -2,7 +2,7 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types, person_link_field_params) %}
+{% macro render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types) %}
     {% if contribs %}
         {% set has_codes = contribs|selectattr('code')|any %}
         <form method="POST">
@@ -258,8 +258,7 @@
                                             id="contrib-{{ contrib.id }}-edit"
                                             data-event-id="{{ event.id }}"
                                             data-contrib-id="{{ contrib.id }}"
-                                            data-event-title="{{ event.title }}"
-                                            data-person-link-field-params="{{ person_link_field_params | tojson | forceescape }}">
+                                            data-event-title="{{ event.title }}">
                                         </div>
                                         <script>
                                             setupContributionForm('#contrib-{{ contrib.id }}-edit', '#contrib-{{ contrib.id }}-edit-trigger');

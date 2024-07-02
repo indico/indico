@@ -91,8 +91,7 @@
                 <div
                     id="contrib-create-form"
                     data-event-id="{{ event.id }}"
-                    data-event-type="{{ event.type }}"
-                    data-person-link-field-params="{{ person_link_field_params | tojson | forceescape }}">
+                    data-event-type="{{ event.type }}">
                 </div>
                 <script>
                     setupContributionCreateForm('#contrib-create-form', '#add-new-contrib-trigger');
@@ -218,7 +217,7 @@
             </div>
         </div>
         <div class="list-content" id="contribution-list">
-            {{ render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types, person_link_field_params) }}
+            {{ render_contrib_list(event, total_entries, contribs, sessions, tracks, registered_persons, static_columns, dynamic_columns, has_types) }}
         </div>
         <div id="filter-placeholder"></div>
     </div>
