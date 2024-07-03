@@ -40,7 +40,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
-from indico.util.date_time import format_date, format_datetime, format_time, now_utc
+from indico.util.date_time import format_date, format_datetime, format_interval, format_time, now_utc
 from indico.util.i18n import _
 from indico.util.iterables import materialize_iterable
 
@@ -149,6 +149,9 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_datetime': format_datetime,
             'format_time': format_time,
             'format_currency': _format_currency,
+        })
+        env.globals.update({
+            'format_interval': format_interval,
         })
         return env.from_string(code).render(
             **template_context,
