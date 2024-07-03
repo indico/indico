@@ -198,6 +198,7 @@ def get_initial_form_values(regform, *, management=False):
     return initial_values
 
 
+@make_interceptable
 def get_user_data(regform, user, invitation=None):
     if user is None:
         user_data = {}
