@@ -12,7 +12,6 @@ from urllib.parse import urlsplit
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
-from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
 from marshmallow_enum import EnumField
@@ -58,9 +57,8 @@ from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExpor
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
-from indico.util.marshmallow import HumanizedDate, Principal, validate_with_message
+from indico.util.marshmallow import HumanizedDate, ModelField, Principal, validate_with_message
 from indico.util.signals import values_from_signal
-from indico.util.signing import static_secure_serializer
 from indico.util.string import make_unique_token, remove_accents
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.templating import get_template_module
@@ -356,15 +354,14 @@ class RHProfilePicturePreview(RHUserBase):
 class RHProfilePictureDisplay(RH):
     """Display the user's profile picture."""
 
-    def _process_args(self):
-        self.user = User.get_or_404(request.view_args['user_id'])
-        try:
-            sig_user_id = static_secure_serializer.loads(request.view_args['signature'],
-                                                         salt='user-profile-picture-display')
-            if self.user.id != sig_user_id:
-                raise NotFound
-        except BadSignature:
+    @use_kwargs({
+        'user': ModelField(User, required=True, filter_deleted=True, data_key='user_id'),
+        'sig_user_id': fields.Integer(required=True),
+    }, location='view_args')
+    def _process_args(self, user, sig_user_id):
+        if user.id != sig_user_id:
             raise NotFound
+        self.user = user
 
     def _process(self):
         return send_avatar(self.user)
