@@ -12,6 +12,7 @@ export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
 export const DELETE_ENTRY = 'Delete entry';
 export const DRAG_UNSCHEDULED_CONTRIBS = 'Drag unscheduled contributions';
+export const DROP_UNSCHEDULED_CONTRIBS = 'Drop unscheduled contributions';
 export const SCHEDULE_CONTRIBS = 'Schedule contributions';
 export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
@@ -52,8 +53,12 @@ export function dragUnscheduledContribs(contribIds) {
   return {type: DRAG_UNSCHEDULED_CONTRIBS, contribIds};
 }
 
-export function scheduleContribs(contribs, args) {
-  return {type: SCHEDULE_CONTRIBS, contribs, args};
+export function dropUnscheduledContribs(contribs, args) {
+  return {type: DROP_UNSCHEDULED_CONTRIBS, contribs, args};
+}
+
+export function scheduleContribs(contribs, gap) {
+  return {type: SCHEDULE_CONTRIBS, contribs, gap};
 }
 
 export function changeColor(sessionId, color) {
