@@ -19,7 +19,7 @@ import {entryStyleGetter, layoutAlgorithm} from './layout';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import UnscheduledContributions from './UnscheduledContributions';
-import {isChildOf} from './util';
+import {getEndDt, isChildOf} from './util';
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 
@@ -50,7 +50,8 @@ export default function Timetable() {
     return start.getMinutes() === 0 ? hours - 1 : hours;
   }, 9);
 
-  const maxHour = currentDateEntries.reduce((max, {end}) => {
+  const maxHour = currentDateEntries.reduce((max, e) => {
+    const end = getEndDt(e);
     const hours = end.getHours();
     if (hours < max - 1) {
       return max;
@@ -66,7 +67,9 @@ export default function Timetable() {
         <DnDCalendar
           date={date}
           defaultView="day"
-          events={[...(displayMode === 'blocks' ? blocks : entries), placeholderEntry]}
+          events={[...(displayMode === 'blocks' ? blocks : entries), placeholderEntry].filter(
+            e => e
+          )}
           localizer={localizer}
           views={{day: true}}
           components={{event: Entry}}
@@ -92,7 +95,7 @@ export default function Timetable() {
             if (draggedContribs.length === 0) {
               return;
             }
-            dispatch(actions.scheduleContribs(draggedContribs, args));
+            dispatch(actions.dropUnscheduledContribs(draggedContribs, args));
             setPlaceholderEntry(null);
           }}
           onNavigate={() => {}}
@@ -108,6 +111,7 @@ export default function Timetable() {
           resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
           draggableAccessor={e => e.type !== 'placeholder'}
           resizableAccessor={e => e.type !== 'placeholder'}
+          endAccessor={getEndDt}
           resizable
           selectable
         />

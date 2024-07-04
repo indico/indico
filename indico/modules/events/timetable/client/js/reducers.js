@@ -17,6 +17,7 @@ import {
   moveEntry,
   changeSessionColor,
   changeBreakColor,
+  dropUnscheduledContribs,
 } from './util';
 
 const entryTypeMapping = {
@@ -46,6 +47,7 @@ const preprocessData = (data, eventInfo) => {
         'code',
         'sessionCode',
         'sessionId',
+        'isPoster', // TODO get from session instead?
         'contributionId',
         'description',
         'duration',
@@ -53,7 +55,6 @@ const preprocessData = (data, eventInfo) => {
       ]),
       type: entryTypeMapping[e.entryType],
       start: e.startDate && new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
-      end: e.endDate && new Date(Date.parse(`${e.endDate.date} ${e.endDate.time}`)),
       attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
       color: e.entryType === 'Break' ? {text: e.textColor, background: e.color} : undefined,
       deleted: false,
@@ -99,11 +100,17 @@ export default {
         return {...state, ...deleteEntry(state, action.entry), selectedId: null};
       case actions.DRAG_UNSCHEDULED_CONTRIBS:
         return {...state, draggedIds: action.contribIds};
-      case actions.SCHEDULE_CONTRIBS:
-        console.debug('SCHEDULE_CONTRIBS', action.contribs, action.args);
+      case actions.DROP_UNSCHEDULED_CONTRIBS:
         return {
           ...state,
-          ...scheduleContribs(state, action.contribs, action.args),
+          ...dropUnscheduledContribs(state, action.contribs, action.args),
+          draggedIds: new Set(),
+        };
+      case actions.SCHEDULE_CONTRIBS:
+        console.debug('SCHEDULE_CONTRIBS', action.contribs, action.gap);
+        return {
+          ...state,
+          ...scheduleContribs(state, action.contribs, action.gap),
           draggedIds: new Set(),
         };
       case actions.CHANGE_COLOR:

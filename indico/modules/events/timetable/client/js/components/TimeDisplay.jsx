@@ -16,7 +16,7 @@ import {Accordion, Form, Icon} from 'semantic-ui-react';
 import {FinalCheckbox, FinalField, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {entrySchema, handleUnimplemented} from '../util';
+import {entrySchema, getEndDt, handleUnimplemented} from '../util';
 
 function TimePickerField({value, onChange, uses24HourFormat}) {
   return (
@@ -90,7 +90,7 @@ TimeEditForm.propTypes = {
 
 export default function TimeDisplay({entry, uses24HourFormat}) {
   const startTime = moment(entry.start).format('HH:mm');
-  const endTime = moment(entry.end).format('HH:mm');
+  const endTime = moment(getEndDt(entry)).format('HH:mm');
   return (
     <Accordion
       panels={[

@@ -124,7 +124,6 @@ const changeParams = {
 };
 
 function Change({param, oldValue, newValue}) {
-  console.debug('Change', param, oldValue, newValue);
   const changeParam = changeParams[param];
   if (!changeParam) {
     // TODO remove this check when fully implemented
@@ -163,14 +162,9 @@ Change.propTypes = {
  */
 const processDateTimeChanges = (old, entry) => {
   const dateTimeChange = {oldValue: old.start, newValue: entry.start};
-  const durationChange = {
-    oldValue: moment(old.end).diff(moment(old.start), 'minutes'),
-    newValue: moment(entry.end).diff(moment(entry.start), 'minutes'),
-  };
   return [
     entry.start.toDateString() !== old.start.toDateString() && ['startDate', dateTimeChange],
     entry.start.toTimeString() !== old.start.toTimeString() && ['startTime', dateTimeChange],
-    durationChange.oldValue !== durationChange.newValue && ['duration', durationChange],
   ].filter(x => x);
 };
 
@@ -185,11 +179,6 @@ function EntryChangeList({change, old, entry, color, children, ...rest}) {
             const newChange = {oldValue: old[key], newValue: value};
             switch (key) {
               case 'start':
-              case 'end':
-                // ensure that this is only ran once
-                if (key === 'end' && 'start' in change) {
-                  return [];
-                }
                 return processDateTimeChanges(old, entry);
               case 'parentId':
                 return [

@@ -148,7 +148,7 @@ export default function UnscheduledContributions() {
         </h4>
         {currentContribs.length > 0 ? (
           <FinalForm
-            onSubmit={values => console.log(values)}
+            onSubmit={values => dispatch(actions.scheduleContribs(values.contribs, values.gap))}
             initialValues={{
               contribs: new Set(),
               gap: 0,
