@@ -47,10 +47,13 @@ def secure_filename(filename, fallback):
     """
     if not filename:
         return fallback
-    filename = _secure_filename(str_to_ascii(filename))
     filename, ext = os.path.splitext(filename)
-    filename = f'{filename[:150]}{ext}'
-    return filename or fallback
+    if not (filename := _secure_filename(str_to_ascii(filename))):
+        # fallback to the name part of the fallback (it may or may not contain an extension)
+        filename = os.path.splitext(fallback)[0]
+    if ext and not (ext := _secure_filename(str_to_ascii(ext.lstrip('.')))):
+        ext = os.path.splitext(fallback)[1].lstrip('.')
+    return f'{filename[:150]}.{ext}' if ext else filename[:150]
 
 
 def secure_client_filename(filename, fallback='file'):
