@@ -84,6 +84,7 @@ ind-select {
 
     @include sui_debt.field-override() {
       padding: calc(0.67857143em + 1px) calc(1em + 1px);
+      padding-right: 2em;
     }
   }
 
@@ -164,9 +165,8 @@ ind-select {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    right: 1.5em;
+    right: 2em;
     min-width: 0;
-    max-width: auto;
     padding: 0.2em;
     width: auto;
 

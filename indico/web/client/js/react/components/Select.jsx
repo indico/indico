@@ -31,6 +31,11 @@ export default function Select({options, value, onChange, disabled, required, ..
       <div className="caption" data-caption>
         <Translate>Select a choice</Translate>
       </div>
+      {required ? null : (
+        <button type="button" className="clear" value="clear" hidden>
+          <span>Clear</span>
+        </button>
+      )}
 
       <dialog aria-label={Translate.string('Options')}>
         <label className="option-filter">
