@@ -224,6 +224,9 @@ customElements.define(
           input.setAttribute('aria-expanded', true);
           listbox.hidden = false;
           topBottomPosition(listbox, input, {
+            setStyle(target, targetWillFitBottom) {
+              target.toggleAttribute('data-top', !targetWillFitBottom);
+            },
             expand: () => {
               indComboBox.toggleAttribute('open', true);
             },

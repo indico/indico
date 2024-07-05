@@ -53,21 +53,28 @@ ind-combo-box {
 
   &[open] [role='listbox'],
   [role='listbox'][data-position-check] {
-    --target-bottom: 'auto';
-
     position: absolute;
-    bottom: var(--target-bottom);
     z-index: 10;
     min-width: 100%;
     max-height: min(75vh, 16em);
     overflow-y: auto;
 
-    background: white;
-    border: 1px solid #85b7d9; // color from semantic UI
+    @include sui_debt.input-border();
+    @include sui_debt.input-background();
+    @include sui_debt.box-shadow();
+  }
+
+  [role='listbox']:not([data-top]) {
     border-top: 0;
+    border-top-left-radius: 0.28571429rem; // value from semantic UI
+    border-top-right-radius: 0.28571429rem; // value from semantic UI
+  }
+
+  [role='listbox'][data-top] {
+    bottom: 100%;
+    border-bottom: 0;
     border-bottom-left-radius: 0.28571429rem; // value from semantic UI
     border-bottom-right-radius: 0.28571429rem; // value from semantic UI
-    box-shadow: var(--control-raised-shadow);
   }
 
   [role='listbox'][data-position-check] {
@@ -76,8 +83,8 @@ ind-combo-box {
   }
 
   [role='option'] {
+    @include sui_debt.input-padding();
     list-style: none;
-    padding: 0.6em 0.4em;
     color: var(--text-color);
 
     &:not([aria-selected='true']) {

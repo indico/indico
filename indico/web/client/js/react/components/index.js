@@ -45,6 +45,7 @@ export {default as ManagementPageBackButton} from './ManagementPageBackButton';
 export {default as ManagementPageSubTitle} from './ManagementPageSubTitle';
 export {default as ManagementPageTitle} from './ManagementPageTitle';
 export {default as ManageNotes} from './notes/ManageNotes';
+export {default as Select} from './Select';
 export {default as TinyMCETextEditor, FinalTinyMCETextEditor} from './TinyMCETextEditor';
 export {default as WTFButtonsBooleanField} from './WTFButtonsBooleanField';
 export {default as WTFDateField} from './WTFDateField';
