@@ -139,6 +139,7 @@ Internal Changes
   instead of a Pillow ``Image`` object (:pr:`6441`)
 - Add ``<ind-date-picker>`` custom element (:pr:`6371`, thanks :user:`foxbunny`)
 - Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
+- Add ``<ind-select>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 
 
 Version 3.3.2

@@ -249,7 +249,8 @@
           max-width: var(--max-form-item-width);
           padding: 0;
 
-          ind-combo-box {
+          ind-combo-box,
+          ind-select {
             width: 100%;
           }
         }

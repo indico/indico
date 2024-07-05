@@ -14,9 +14,7 @@ const DEFAULT_POSITION_OPTIONS = {
   },
   // Function to reveal the target once position styles are applied
   // eslint-disable-next-line no-unused-vars
-  expand(target, anchor) {
-    throw Error('expand() option is required');
-  },
+  expand(target, anchor) {},
 };
 
 /**

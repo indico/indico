@@ -12,7 +12,7 @@
 ind-date-picker {
   display: flex;
   flex-direction: column;
-  gap: 0.2em;
+  gap: var(--control-internal-gap);
   align-items: flex-start;
   position: relative;
 

@@ -13,7 +13,7 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
 
-import {ComboBox} from 'indico/react/components';
+import {Select} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
@@ -69,7 +69,7 @@ function SingleChoiceDropdown({
       comboBoxExtraProps['aria-describedby'] = extraSlotsLabelId;
     }
     extraSlotsDropdown = (
-      <ComboBox
+      <Select
         id={id ? `${id}-extraslots` : ''}
         options={options}
         disabled={
@@ -92,10 +92,10 @@ function SingleChoiceDropdown({
   }
 
   const options = choices.map(choice => ({
-    value: choice.caption,
+    value: choice.id,
     label: (
       <div styleName="dropdown-text" key={choice.id}>
-        <div styleName="caption">
+        <div styleName="caption" data-label>
           <ChoiceLabel choice={choice} management={management} paid={isPaidChoice(choice)} />
         </div>
         <div styleName="labels">
@@ -124,21 +124,20 @@ function SingleChoiceDropdown({
 
   const handleChange = evt => {
     if (!evt.target.value) {
-      onChange({'': -1});
+      onChange({});
       return;
     }
-    const selected = choices.find(c => c.caption === evt.target.value);
-    onChange(selected ? {[selected.id]: 1} : {'': -1});
+    onChange({[evt.target.value]: 1});
   };
 
   return (
     <Form.Group styleName="single-choice-dropdown">
       <Form.Field>
-        <ComboBox
+        <Select
           id={id}
           onChange={handleChange}
           options={options}
-          value={(!isPurged && selectedChoice.caption) || ''}
+          value={(!isPurged && selectedChoice.id) || ''}
           required={isRequired}
           disabled={disabled}
           onFocus={onFocus}
