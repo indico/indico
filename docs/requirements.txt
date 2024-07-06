@@ -9,7 +9,7 @@ babel==2.14.0
     #   sphinx
 blinker==1.7.0
     # via flask
-certifi==2024.2.2
+certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
