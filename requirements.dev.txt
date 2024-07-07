@@ -24,7 +24,7 @@ blinker==1.7.0
     #   flask
 build==1.2.1
     # via -r requirements.dev.in
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   -c requirements.txt
     #   requests
