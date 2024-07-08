@@ -10,6 +10,7 @@ import csv
 import dataclasses
 import itertools
 import uuid
+from datetime import timedelta
 from io import BytesIO
 from operator import attrgetter
 
@@ -431,6 +432,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
 
 @no_autoflush
 def modify_registration(registration, data, management=False, notify_user=True):
+    from indico.modules.events.registration.tasks import delete_previous_registration_file
+
     old_data = snapshot_registration_data(registration)
     old_price = registration.price
     personal_data_changes = {}
@@ -460,6 +463,11 @@ def modify_registration(registration, data, management=False, notify_user=True):
             # keep current value
             continue
 
+        if field_impl.is_file_field:
+            if file_data := data_by_field.get(form_item.id):
+                eta = now_utc() + timedelta(minutes=10)
+                delete_previous_registration_file.apply_async([file_data, file_data.storage_backend,
+                                                               file_data.storage_file_id], eta=eta)
         if form_item.id not in data_by_field:
             data_by_field[form_item.id] = RegistrationData(registration=registration,
                                                            field_data=form_item.current_data)

@@ -12,6 +12,7 @@ from celery.schedules import crontab
 from indico.core import signals
 from indico.core.celery import celery
 from indico.core.db import db
+from indico.core.storage.backend import get_storage
 from indico.modules.events import Event
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.models.form_fields import RegistrationFormField, RegistrationFormFieldData
@@ -99,3 +100,14 @@ def delete_registrations():
         regform.is_purged = True
 
     db.session.commit()
+
+
+@celery.task(name='delete_previous_registration_file')
+def delete_previous_registration_file(reg_data, storage_backend, storage_file_id):
+    if storage_file_id is None:
+        return
+    if reg_data.storage_file_id == storage_file_id:
+        return
+    logger.debug('Deleting registration file: %s', storage_file_id)
+    storage = get_storage(storage_backend)
+    storage.delete(storage_file_id)
