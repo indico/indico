@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {Navigate} from 'react-big-calendar';
 import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu} from 'semantic-ui-react';
+import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -49,6 +49,7 @@ export default function Toolbar({date, localizer, onNavigate}) {
   const numUnscheduled = useSelector(selectors.getNumUnscheduled);
   const canUndo = useSelector(selectors.canUndo);
   const canRedo = useSelector(selectors.canRedo);
+  const error = useSelector(selectors.getError);
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
@@ -85,6 +86,15 @@ export default function Toolbar({date, localizer, onNavigate}) {
 
   return (
     <div styleName="toolbar" ref={ref}>
+      {error && (
+        <Message
+          warning
+          icon="warning sign"
+          header={error.title}
+          content={<p>{error.content}</p>}
+          onDismiss={() => dispatch(actions.dismissError())}
+        />
+      )}
       <Menu tabular>
         <Menu.Item
           onClick={() => dispatch(actions.toggleShowUnscheduled())}

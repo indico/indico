@@ -17,6 +17,7 @@ export const SCHEDULE_CONTRIBS = 'Schedule contributions';
 export const CHANGE_COLOR = 'Change color';
 export const UNDO_CHANGE = 'Undo change';
 export const REDO_CHANGE = 'Redo change';
+export const DISMISS_ERROR = 'Dismiss error';
 export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
@@ -71,6 +72,10 @@ export function undoChange() {
 
 export function redoChange() {
   return {type: REDO_CHANGE};
+}
+
+export function dismissError() {
+  return {type: DISMISS_ERROR};
 }
 
 export function scrollNavbar(offset) {

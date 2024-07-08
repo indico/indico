@@ -88,6 +88,10 @@ export const getDraggedContribs = createSelector(
   getUnscheduled,
   (entries, contribs) => contribs.filter(c => entries.draggedIds.has(c.id))
 );
+export const getError = createSelector(
+  getEntries,
+  entries => entries.error
+);
 
 export const getNavbarMaxDays = createSelector(
   getNavigation,

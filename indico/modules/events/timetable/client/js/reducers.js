@@ -84,6 +84,7 @@ export default {
       currentChangeIdx: 0,
       selectedId: null,
       draggedIds: new Set(),
+      error: null,
     },
     action
   ) => {
@@ -97,7 +98,11 @@ export default {
       case actions.SELECT_ENTRY:
         return {...state, selectedId: action.entry?.id};
       case actions.DELETE_ENTRY:
-        return {...state, ...deleteEntry(state, action.entry), selectedId: null};
+        return {
+          ...state,
+          ...deleteEntry(state, action.entry),
+          selectedId: action.entry?.id === state.selectedId ? null : state.selectedId,
+        };
       case actions.DRAG_UNSCHEDULED_CONTRIBS:
         return {...state, draggedIds: action.contribIds};
       case actions.DROP_UNSCHEDULED_CONTRIBS:
@@ -107,7 +112,6 @@ export default {
           draggedIds: new Set(),
         };
       case actions.SCHEDULE_CONTRIBS:
-        console.debug('SCHEDULE_CONTRIBS', action.contribs, action.gap);
         return {
           ...state,
           ...scheduleContribs(state, action.contribs, action.gap),
@@ -125,6 +129,8 @@ export default {
           ...state,
           currentChangeIdx: state.currentChangeIdx + 1,
         };
+      case actions.DISMISS_ERROR:
+        return {...state, error: null};
       default:
         return state;
     }

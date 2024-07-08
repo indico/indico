@@ -62,6 +62,17 @@ export const getEndDt = entry => new Date(entry.start.getTime() + entry.duration
 const isConcurrent = (entry, other) =>
   entry.id !== other.id && entry.start < getEndDt(other) && getEndDt(entry) > other.start;
 export const getConcurrentEntries = (entry, entries) => entries.filter(e => isConcurrent(entry, e));
+const getLatestEntry = entries =>
+  entries.reduce((acc, e) => (getEndDt(e) > getEndDt(acc) ? e : acc), entries[0]);
+const getLatestEndDt = entries => entries.length > 0 && getEndDt(getLatestEntry(entries));
+
+/**
+ * Generates the error message to be displayed in the toolbar
+ * @param title Title of the error message
+ * @param content Content of the error message
+ * @returns {object} {error} Error message object
+ */
+const error = (title, content) => ({error: {title, content}});
 
 /**
  * Calculates the column ID for a given block (top-level entry) based on the desired display order.
@@ -175,6 +186,7 @@ const addNewChange = ({changes, currentChangeIdx, ...entries}, newChange) => ({
   ...entries,
   changes: [...changes.slice(0, currentChangeIdx), newChange],
   currentChangeIdx: currentChangeIdx + 1,
+  error: null,
 });
 
 /**
@@ -411,11 +423,7 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
  * @returns {array|boolean} Rearranged contributions or false if they don't fit in the block
  */
 const rearrangeContribsAfterMove = (rearranged, inserted) => {
-  const prevContrib = rearranged.reduce(
-    (acc, c) =>
-      getEndDt(c) <= inserted[0].start && (!acc || getEndDt(c) > getEndDt(acc)) ? c : acc,
-    null
-  );
+  const prevContrib = getLatestEntry(rearranged.filter(c => getEndDt(c) <= inserted[0].start));
   const rearrangedContribs = _.sortBy(
     rearranged.filter(c => getEndDt(c) > inserted[0].start),
     'start'
@@ -461,7 +469,10 @@ const moveContribs = (state, contribs, start, columnId, gap = 0) => {
       (parent.sessionId !== contribs[0].sessionId || newContribs[0].start < parent.start)) ||
     (!parent && contribs[0].sessionId)
   ) {
-    return {};
+    return error(
+      Translate.string('Scheduling error'),
+      Translate.string('Cannot schedule contributions inside a block from a different session.')
+    );
   }
   // check if it's being dragged to outside of a block or to a block without enough space
   if (!parent) {
@@ -469,7 +480,10 @@ const moveContribs = (state, contribs, start, columnId, gap = 0) => {
   }
   // if it's being dragged to a poster session, just schedule it at the beginning with the default duration
   if (parent?.isPoster) {
-    return addNewChange(state, newContribs.map(c => ({...c, start})));
+    return addNewChange(
+      state,
+      newContribs.map(c => ({...c, parentId: parent.id, start: parent.start}))
+    );
   }
   if (getEndDt(newContribs.at(-1)) > getEndDt(parent)) {
     // TODO resize block to fit all instead
@@ -664,20 +678,40 @@ export const dropUnscheduledContribs = (state, contribs, {start, resource}) => {
 /**
  * Schedules a list of contributions
  * @param {object} state State of the timetable
- * @param {array} contribs Contributions to be scheduled
+ * @param {Set} contribIds Contributions to be scheduled
  * @param {number} gap Gap between contributions in minutes
  * @returns {object} {changes, currentChangeIdx} Updated changes array and an incremented
  * currentChangeIdx
  */
-export const scheduleContribs = (state, contribs, gap) => {
-  const {blocks} = applyChanges(state);
+export const scheduleContribs = (state, contribIds, gap) => {
+  const {blocks, children, unscheduled} = applyChanges(state);
   const selectedBlock = state.selectedId && blocks.find(b => b.id === state.selectedId);
   const parent = selectedBlock?.type === 'session' ? selectedBlock : null;
-  const resource = selectedBlock?.columnId || 1;
-  // TODO if the set is empty, schedule all unscheduled from the session
+  const columnId =
+    selectedBlock?.columnId || blocks.reduce((acc, b) => Math.max(acc, b.columnId), 0) + 1;
+  const contribs =
+    contribIds.size > 0
+      ? unscheduled.filter(c => contribIds.has(c.id))
+      : unscheduled.filter(c => (parent ? c.sessionId === parent.sessionId : !c.sessionId));
   // TODO fix start datetime (based on selected day)
-  const start = parent?.start || (selectedBlock && getEndDt(selectedBlock)) || new Date();
-  return moveContribs(state, contribs, start, resource, gap);
+  console.debug('scheduleContribs', contribIds, contribs, gap, parent, selectedBlock, columnId);
+  if (parent && !parent.isPoster) {
+    const lastEndDt = getLatestEndDt(children.filter(c => isChildOf(c, parent))) || parent.start;
+    if (lastEndDt.getTime() >= getEndDt(parent).getTime()) {
+      // TODO expand the session to fit the new contribs
+      return resizeBlock(state, {
+        event: parent,
+        start: parent.start,
+        end: new Date(lastEndDt.getTime() + gap * 60000),
+      });
+    }
+    return moveContribs(state, contribs, lastEndDt, columnId, gap);
+  }
+  const start =
+    (parent?.isPoster && parent.start) ||
+    (selectedBlock && getEndDt(selectedBlock)) ||
+    getLatestEndDt(blocks.filter());
+  return moveContribs(state, contribs, start, columnId, gap);
 };
 
 /**
