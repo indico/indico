@@ -299,8 +299,8 @@ class Reservation(db.Model):
             if prebook and not room.can_prebook(user, allow_admin=(not ignore_admin)):
                 raise NoReportError('You cannot book this room')
 
-        room.check_advance_days(data['end_dt'].date(), user)
-        room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
+        room.check_advance_days(data['end_dt'].date(), user, allow_admin=(not ignore_admin))
+        room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user, allow_admin=(not ignore_admin))
 
         if (
             force_internal_note or
@@ -483,7 +483,7 @@ class Reservation(db.Model):
 
         # Check for conflicts with nonbookable periods
         admin = allow_admin and rb_is_admin(user)
-        if not admin and not self.room.can_manage(user, permission='override'):
+        if not admin and not self.room.can_manage(user, allow_admin=allow_admin, permission='override'):
             nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:

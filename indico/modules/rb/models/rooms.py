@@ -601,10 +601,10 @@ class Room(ProtectionManagersMixin, db.Model):
             return False
         return rb_is_admin(user)
 
-    def check_advance_days(self, end_date, user=None, quiet=False):
+    def check_advance_days(self, end_date, user=None, quiet=False, allow_admin=True):
         if not self.max_advance_days:
             return True
-        if user and (rb_is_admin(user) or self.can_manage(user)):
+        if user and ((allow_admin and rb_is_admin(user)) or self.can_override(user, allow_admin=allow_admin)):
             return True
         advance_days = (end_date - date.today()).days
         ok = advance_days < self.max_advance_days
@@ -614,8 +614,8 @@ class Room(ProtectionManagersMixin, db.Model):
             msg = _('You cannot book this room more than {} days in advance')
             raise NoReportError(msg.format(self.max_advance_days))
 
-    def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
-        if user and (rb_is_admin(user) or self.can_manage(user)):
+    def check_bookable_hours(self, start_time, end_time, user=None, quiet=False, allow_admin=True):
+        if user and ((allow_admin and rb_is_admin(user)) or self.can_override(user, allow_admin=allow_admin)):
             return True
         bookable_hours = self.bookable_hours.all()
         if not bookable_hours:
