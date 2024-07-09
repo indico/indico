@@ -24,7 +24,7 @@ bcrypt==4.1.2
     # via -r requirements.in
 billiard==4.2.0
     # via celery
-bleach==6.1.0
+bleach[css]==6.1.0
     # via -r requirements.in
 blinker==1.7.0
     # via
@@ -41,7 +41,7 @@ cachetools==5.3.3
     # via google-auth
 captcha==0.5.0
     # via -r requirements.in
-celery==5.3.6
+celery[redis]==5.3.6
     # via
     #   -r requirements.in
     #   sentry-sdk
@@ -135,7 +135,7 @@ flask-webpackext==1.0.2
     # via -r requirements.in
 flask-wtf==1.2.1
     # via -r requirements.in
-fonttools==4.51.0
+fonttools[woff]==4.51.0
     # via weasyprint
 google-auth==2.29.0
     # via -r requirements.in
@@ -184,7 +184,7 @@ kombu==5.3.7
     # via celery
 limits==3.10.1
     # via flask-limiter
-lxml==5.2.1
+lxml[html5]==5.2.1
     # via
     #   -r requirements.in
     #   feedgen
@@ -211,7 +211,7 @@ marshmallow==3.21.1
     #   marshmallow-oneofschema
     #   marshmallow-sqlalchemy
     #   webargs
-marshmallow-dataclass==8.6.1
+marshmallow-dataclass[enum]==8.6.1
     # via -r requirements.in
 marshmallow-enum==1.5.1
     # via -r requirements.in
@@ -303,7 +303,7 @@ pyyaml==6.0.1
     # via -r requirements.in
 qrcode==7.4.2
     # via -r requirements.in
-redis==5.0.3
+redis[hiredis]==5.0.3
     # via
     #   -r requirements.in
     #   celery
@@ -323,7 +323,7 @@ rpds-py==0.18.0
     #   referencing
 rsa==4.9
     # via google-auth
-sentry-sdk==1.45.0
+sentry-sdk[celery,flask,pure-eval,sqlalchemy]==1.45.0
     # via -r requirements.in
 simplejson==3.19.2
     # via -r requirements.in
@@ -402,7 +402,7 @@ werkzeug==3.0.3
     #   flask
 wrapt==1.16.0
     # via deprecated
-wtforms==3.1.2
+wtforms[email]==3.1.2
     # via
     #   -r requirements.in
     #   flask-wtf
@@ -414,7 +414,7 @@ wtforms-sqlalchemy==0.4.1
     # via -r requirements.in
 xlsxwriter==3.2.0
     # via -r requirements.in
-zipp==3.18.1
+zipp==3.19.1
     # via importlib-metadata
 zopfli==0.2.3
     # via fonttools
