@@ -54,7 +54,7 @@ export default function SectionSettingsModal({id, onClose}) {
       <FinalTextArea
         name="description"
         label={Translate.string('Description')}
-        description={<Translate>You can use Markdown or basic HTML formatting tags.</Translate>}
+        description={<Translate>You may use Markdown for formatting.</Translate>}
       />
       <FinalCheckbox
         disabled={isPersonalData}
