@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 import {Header, Icon, List, Message, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {serializeDate} from 'indico/utils/date';
+import {getWeekday, serializeDate} from 'indico/utils/date';
 
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
@@ -72,7 +72,7 @@ class BookingEditCalendar extends React.Component {
         blockings: data.blockings[day] || [],
         overridableBlockings: data.overridableBlockings[day] || [],
         nonbookablePeriods: data.nonbookablePeriods[day] || [],
-        unbookableHours: data.unbookableHours || [],
+        unbookableHours: data.unbookableHours[getWeekday(day)],
       },
       label: (
         <>

@@ -8,5 +8,11 @@
 .availability-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding-bottom: 5px;
+}
+
+.weekday-selector {
+  min-width: 100px !important;
+  margin-right: 10px;
 }

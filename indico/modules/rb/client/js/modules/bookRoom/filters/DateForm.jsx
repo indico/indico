@@ -66,7 +66,7 @@ export default class DateForm extends FilterFormComponent {
   render() {
     const {isRange, disabledDate} = this.props;
     const {startDate, endDate} = this.state;
-    return isRange ? (
+    const picker = isRange ? (
       <CalendarRangeDatePicker
         startDate={startDate}
         endDate={endDate}
@@ -88,5 +88,7 @@ export default class DateForm extends FilterFormComponent {
         noBorder
       />
     );
+
+    return <div className="ui form">{picker}</div>;
   }
 }

@@ -18,7 +18,7 @@ import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from '
 
 import {Translate, Param} from 'indico/react/i18n';
 import {IndicoPropTypes, Markdown, Responsive, useResponsive} from 'indico/react/util';
-import {serializeDate} from 'indico/utils/date';
+import {getWeekday, serializeDate} from 'indico/utils/date';
 
 import * as globalActions from '../../actions';
 import {actions as bookingsActions} from '../../common/bookings';
@@ -173,7 +173,7 @@ function RoomDetails({
       bookings: bookings || [],
       preBookings: preBookings || [],
       nonbookablePeriods: nonbookablePeriods || [],
-      unbookableHours: unbookableHours || [],
+      unbookableHours: unbookableHours[getWeekday(day)],
       blockings: blockings || [],
       overridableBlockings: overridableBlockings || [],
     },
