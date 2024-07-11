@@ -18,7 +18,7 @@ from indico.modules.events.registration.fields.base import RegistrationFormField
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.util.date_time import format_interval
+from indico.util.date_time import format_interval, format_skeleton
 from indico.util.i18n import _
 
 
@@ -95,7 +95,9 @@ class SessionsField(RegistrationFormFieldBase):
                   .all())
         if for_humans or for_search:
             return '; '.join(b.full_title for b in blocks)
-        return [_format_block(b, tzinfo) for b in blocks]
+        return ['{day}: {block}'.format(day=format_skeleton(b.start_dt, 'EdMM', timezone=tzinfo),
+                                        block=_format_block(b, tzinfo))
+                for b in blocks]
 
     def create_sql_filter(self, data_list):
         data_list = json.dumps(list(map(int, data_list)))
