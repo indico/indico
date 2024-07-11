@@ -35,7 +35,8 @@ class SessionsFieldDataSchema(mm.Schema):
 
 def _format_block(block, tzinfo):
     interval = format_interval(block.start_dt.astimezone(tzinfo), block.end_dt.astimezone(tzinfo), 'Hm')
-    return f'{interval} - {block.full_title}'
+    day = format_skeleton(block.start_dt, 'EdMM', timezone=tzinfo)
+    return f'{day}: {interval} - {block.full_title}'
 
 
 class SessionsField(RegistrationFormFieldBase):
@@ -95,9 +96,7 @@ class SessionsField(RegistrationFormFieldBase):
                   .all())
         if for_humans or for_search:
             return '; '.join(b.full_title for b in blocks)
-        return ['{day}: {block}'.format(day=format_skeleton(b.start_dt, 'EdMM', timezone=tzinfo),
-                                        block=_format_block(b, tzinfo))
-                for b in blocks]
+        return [_format_block(b, tzinfo) for b in blocks]
 
     def create_sql_filter(self, data_list):
         data_list = json.dumps(list(map(int, data_list)))
