@@ -95,7 +95,7 @@ class SessionsField(RegistrationFormFieldBase):
                   .all())
         if for_humans or for_search:
             return '; '.join(b.full_title for b in blocks)
-        return ['{day}: {block}'.format(day=format_skeleton(b.start_dt, 'EdM', timezone=tzinfo),
+        return ['{day}: {block}'.format(day=format_skeleton(b.start_dt, 'EdMM', timezone=tzinfo),
                                         block=_format_block(b, tzinfo))
                 for b in blocks]
 
