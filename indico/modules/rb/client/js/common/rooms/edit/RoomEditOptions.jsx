@@ -29,7 +29,7 @@ export default function RoomEditOptions({active, showEquipment, globalAttributes
       <Header>
         <Translate>Availability</Translate>
       </Header>
-      <Form.Group>
+      <Form.Group widths="equal">
         <FinalField name="bookable_hours" component={DailyAvailability} isEqual={_.isEqual} />
         <FinalField name="nonbookable_periods" component={NonBookablePeriods} isEqual={_.isEqual} />
       </Form.Group>

@@ -19,6 +19,8 @@ Improvements
   contribution (:pr:`6453`)
 - Allow alternative CSV delimiters when importing registration invitations (:pr:`6458`,
   thanks :user:`Moliholy, unconventionaldotdev`)
+- A room's bookable hours can now be applied to specific weekdays, making it
+  unbookable on any other weekdays (:pr:`6439`)
 
 Bugfixes
 ^^^^^^^^

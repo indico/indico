@@ -5,11 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime
+from datetime import time
 from operator import attrgetter
 
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
+from indico.modules.rb.util import WEEKDAYS
 from indico.util.iterables import group_list
 
 
@@ -17,20 +18,34 @@ def get_rooms_unbookable_hours(rooms):
     room_ids = [room.id for room in rooms]
     query = BookableHours.query.filter(BookableHours.room_id.in_(room_ids))
     rooms_hours = group_list(query, key=attrgetter('room_id'), sort_by=attrgetter('room_id'))
-    inverted_rooms_hours = {}
-    for room_id, hours in rooms_hours.items():
-        hours.sort(key=lambda x: x.start_time)
-        inverted_hours = []
-        first = BookableHours(start_time=datetime.strptime('00:00', '%H:%M').time(), end_time=hours[0].start_time)
-        inverted_hours.append(first)
-        for i in range(1, len(hours)):
-            hour = BookableHours(start_time=hours[i - 1].end_time, end_time=hours[i].start_time)
-            inverted_hours.append(hour)
-        last = BookableHours(start_time=hours[-1].end_time,
-                             end_time=datetime.strptime('23:59', '%H:%M').time())
-        inverted_hours.append(last)
-        inverted_rooms_hours[room_id] = inverted_hours
-    return inverted_rooms_hours
+    return {room_id: _get_hours_by_weekday(hours) for room_id, hours in rooms_hours.items()}
+
+
+def _get_hours_by_weekday(all_hours):
+    if not all_hours:
+        return []
+    by_weekday = dict(group_list(all_hours, key=lambda x: x.weekday or '',
+                                 sort_by=lambda x: (x.weekday or '', x.start_time)))
+    inverted_hours = {}
+    for weekday in WEEKDAYS:
+        weekday_hours = by_weekday.get(weekday, [])
+        if not (hours := sorted(by_weekday.get('', []) + weekday_hours, key=attrgetter('start_time'))):
+            continue
+        inverted_hours[weekday] = _invert_hours(hours)
+    # any weekday with no entries is fully unbookable
+    inverted_hours |= {weekday: [BookableHours(start_time=time(), end_time=time(23, 59), weekday=weekday)]
+                       for weekday in set(WEEKDAYS) - set(inverted_hours)}
+    return inverted_hours
+
+
+def _invert_hours(hours):
+    # XXX this does not support overlaps and creates nonsense in that case, but we now have validation when
+    # saving a room's availability, so unless there's already bad data we don't have any problems in here
+    return [
+        BookableHours(start_time=time(), end_time=hours[0].start_time),
+        *(BookableHours(start_time=hours[i - 1].end_time, end_time=hours[i].start_time) for i in range(1, len(hours))),
+        BookableHours(start_time=hours[-1].end_time, end_time=time(23, 59))
+    ]
 
 
 def get_rooms_nonbookable_periods(rooms, start_dt, end_dt):

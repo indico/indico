@@ -361,7 +361,7 @@ class NonBookablePeriodAdminSchema(mm.SQLAlchemyAutoSchema):
 class BookableHoursSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = BookableHours
-        fields = ('start_time', 'end_time')
+        fields = ('start_time', 'end_time', 'weekday')
 
 
 class LocationsSchema(mm.SQLAlchemyAutoSchema):

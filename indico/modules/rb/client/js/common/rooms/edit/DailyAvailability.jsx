@@ -9,7 +9,7 @@ import moment from 'moment';
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Icon} from 'semantic-ui-react';
+import {Button, Dropdown, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {serializeTime} from 'indico/utils/date';
@@ -39,16 +39,44 @@ export default class DailyAvailability extends React.Component {
     );
   };
 
+  handleWeekdayChange = (weekday, index) => {
+    const {value, onChange} = this.props;
+    onChange(value.map((v, vIndex) => (vIndex === index ? {...v, weekday} : v)));
+  };
+
   handleRemoveTimes = index => {
     const {onChange, value} = this.props;
     onChange(value.filter((__, i) => i !== index));
   };
 
   renderEntry = (bookableHour, index) => {
-    const {start_time: startT, end_time: endT} = bookableHour;
+    const {start_time: startT, end_time: endT, weekday} = bookableHour;
     const key = nanoid();
+    const weekdayOptions = moment.weekdays(true).map(wd => ({
+      value: moment()
+        .day(wd)
+        .locale('en')
+        .format('ddd')
+        .toLowerCase(),
+      text: moment()
+        .isoWeekday(wd)
+        .format('ddd'),
+    }));
+
     return (
       <div key={key} className="flex-container">
+        <Dropdown
+          options={weekdayOptions}
+          value={weekday}
+          onChange={(__, {value: day}) => this.handleWeekdayChange(day || null, index)}
+          placeholder={Translate.string('All days')}
+          styleName="weekday-selector"
+          selectOnBlur={false}
+          selectOnNavigation={false}
+          selection
+          clearable
+          compact
+        />
         <TimeRangePicker
           startTime={moment(startT, 'HH:mm')}
           endTime={moment(endT, 'HH:mm')}
@@ -73,7 +101,9 @@ export default class DailyAvailability extends React.Component {
           className="room-edit-modal-add-btn"
           icon
           labelPosition="left"
-          onClick={() => onChange([...value, {start_time: '08:00', end_time: '17:00'}])}
+          onClick={() =>
+            onChange([...value, {start_time: '08:00', end_time: '17:00', weekday: null}])
+          }
         >
           <Icon name="plus" />
           <Translate>Add new Daily Availability</Translate>

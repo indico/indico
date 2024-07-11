@@ -8,26 +8,37 @@
 from datetime import time
 
 from indico.core.db import db
+from indico.util.string import format_repr
 
 
 class BookableHours(db.Model):
     __tablename__ = 'room_bookable_hours'
-    __table_args__ = {'schema': 'roombooking'}
+    __table_args__ = (
+        db.CheckConstraint("weekday IN ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')", 'valid_weekdays'),
+        db.Index(None, 'room_id', 'start_time', 'end_time', 'weekday', unique=True),
+        {'schema': 'roombooking'}
+    )
 
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
     start_time = db.Column(
         db.Time,
         nullable=False,
-        primary_key=True
     )
     end_time = db.Column(
         db.Time,
         nullable=False,
-        primary_key=True
     )
+    weekday = db.Column(
+        db.String,
+        nullable=True,
+        default=None
+    )  # mon, tue, wed, etc.
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('roombooking.rooms.id'),
-        primary_key=True,
         nullable=False
     )
 
@@ -35,7 +46,11 @@ class BookableHours(db.Model):
     # - room (Room.bookable_hours)
 
     def __repr__(self):
-        return f'<BookableHours({self.room_id}, {self.start_time}, {self.end_time})>'
+        return format_repr(self, 'room_id', 'start_time', 'end_time', weekday=None)
+
+    @property
+    def key(self):
+        return self.start_time, self.end_time, self.weekday
 
     def fits_period(self, st, et):
         st = _tuplify(st, False)

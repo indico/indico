@@ -6,9 +6,10 @@
 # LICENSE file for more details.
 
 from io import BytesIO
+from operator import itemgetter
 
 from flask import jsonify, request, session
-from marshmallow import missing
+from marshmallow import missing, validate
 from PIL import Image
 from sqlalchemy.orm import joinedload
 from webargs import fields
@@ -35,9 +36,11 @@ from indico.modules.rb.schemas import (AdminRoomSchema, EquipmentTypeArgs, Featu
                                        admin_equipment_type_schema, admin_locations_schema, bookable_hours_schema,
                                        map_areas_schema, nonbookable_periods_admin_schema, room_attribute_schema,
                                        room_equipment_schema, room_feature_schema, room_update_schema)
-from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
+from indico.modules.rb.util import (WEEKDAYS, build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
+from indico.util.date_time import overlaps
 from indico.util.i18n import _
+from indico.util.iterables import group_list
 from indico.web.args import use_args, use_kwargs, use_rh_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
@@ -320,10 +323,17 @@ class RHRoomAvailability(RHRoomAdminBase):
 
 
 class RHUpdateRoomAvailability(RHRoomAdminBase):
-    @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(),
-                                                'end_time': fields.Time()}, many=True),
-               'nonbookable_periods': fields.Nested({'start_dt': fields.Date(),
-                                                     'end_dt': fields.Date()}, many=True)})
+    @use_args({
+        'bookable_hours': fields.List(fields.Nested({
+            'start_time': fields.Time(required=True),
+            'end_time': fields.Time(required=True),
+            'weekday': fields.Str(validate=validate.OneOf(WEEKDAYS), allow_none=True, required=True),
+        })),
+        'nonbookable_periods': fields.List(fields.Nested({
+            'start_dt': fields.Date(),
+            'end_dt': fields.Date(),
+        }))
+    })
     def _process(self, args):
         if 'bookable_hours' in args:
             self._check_invalid_times(args)
@@ -336,6 +346,18 @@ class RHUpdateRoomAvailability(RHRoomAdminBase):
     def _check_invalid_times(self, availability):
         if any(bh['start_time'] >= bh['end_time'] for bh in availability['bookable_hours']):
             abort(422, messages={'bookable_hours': [_('Start time should not be later than end time')]})
+        grouped_hours = group_list(availability['bookable_hours'],
+                                   key=lambda x: x['weekday'] or '',
+                                   sort_by=lambda x: (x['weekday'] or '', x['start_time'], x['end_time']))
+        for weekday, hours in grouped_hours.items():
+            if weekday:
+                # For weekday-specific hours, we still need to consider hours that apply to all weekdays
+                hours = sorted(grouped_hours.get('', []) + hours, key=itemgetter('start_time', 'end_time'))
+            for i in range(1, len(hours)):
+                a = hours[i-1]['start_time'], hours[i-1]['end_time']
+                b = hours[i]['start_time'], hours[i]['end_time']
+                if overlaps(a, b):
+                    abort(422, messages={'bookable_hours': [_('Periods may not overlap')]})
 
 
 class RHRoomEquipment(RHRoomAdminBase):
