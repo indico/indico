@@ -106,6 +106,6 @@ def delete_registrations():
 def delete_previous_registration_file(reg_data, storage_backend, storage_file_id):
     if reg_data.storage_backend == storage_backend and reg_data.storage_file_id == storage_file_id:
         return
-    logger.debug('Deleting registration file: %s', storage_file_id)
+    logger.debug('Deleting registration file: %s from %s storage', storage_file_id, storage_backend)
     storage = get_storage(storage_backend)
     storage.delete(storage_file_id)
