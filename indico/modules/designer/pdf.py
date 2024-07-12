@@ -129,7 +129,7 @@ class DesignerPDFBase:
         item_height = (item['height'] / PIXELS_CM * cm) if item.get('height') is not None else None
         item_preserve_aspect_ratio = item.get('preserve_aspect_ratio', True)
 
-        if isinstance(content, Image.Image):
+        if isinstance(content, BytesIO):
             canvas.drawImage(ImageReader(content), margin_x + item_x, self.height - margin_y - item_height - item_y,
                              item_width, item_height, mask='auto', preserveAspectRatio=item_preserve_aspect_ratio)
         else:
