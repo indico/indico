@@ -47,4 +47,4 @@ class RHAPIEventSessionBlocks(RHProtectedEventBase):
             for sb in blocks
             if sb.can_access(session.user)
         ]
-        return group_list(res, key=itemgetter('start_date'), sort_by=itemgetter('start_date'))
+        return group_list(res, key=itemgetter('start_date'), sort_by=itemgetter('start_date', 'time'))
