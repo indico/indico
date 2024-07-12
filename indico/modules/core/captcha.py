@@ -24,11 +24,10 @@ from indico.web.forms.widgets import JinjaWidget
 
 def _verify_captcha(user_answer):
     if plugin := get_captcha_plugin():
-        captcha_validation = plugin.validate_captcha(user_answer)
-        if plugin.custom_captcha_validator and captcha_validation is NotImplemented:
-            raise NotImplementedError('CAPTCHA plugin must implement validate_captcha(answer)')
-        if captcha_validation is not NotImplemented:
-            return captcha_validation
+        if (result := plugin.validate_captcha(user_answer)) is not NotImplemented:
+            return result
+
+    # No CAPTCHA plugin or a plugin that wants to use the default validation logic
     answer = session.get('captcha_state')
     # 1 and 7 are too similar and we never use 1 in a challenge
     return bool(answer) and answer == user_answer.replace('1', '7')

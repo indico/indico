@@ -9,7 +9,18 @@ from flask import session
 
 
 class CaptchaPluginMixin:
+    #: Whether overriding `validate_captcha` is required. Only set this to ``False`` if
+    #: your plugin customizes the build-in CAPTCHA or has some other type of CAPTCHA
+    #: that wants to re-use the default validation logic.
     custom_captcha_validator = True
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        is_default_validator = cls.validate_captcha is CaptchaPluginMixin.validate_captcha
+        if cls.custom_captcha_validator and is_default_validator:
+            raise TypeError(f'{cls} must override `validate_captcha` or set `custom_captcha_validator` to False')
+        elif not cls.custom_captcha_validator and not is_default_validator:
+            raise TypeError(f'{cls} must not override `validate_captcha` since `custom_captcha_validator` is False')
 
     def is_captcha_available(self):
         """Whether this plugin's CAPTCHA is available.
