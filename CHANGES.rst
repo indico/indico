@@ -20,6 +20,8 @@ Bugfixes
   thanks :user:`jbtwist`)
 - Include date when displaying session field data in registration summary (:pr:`6431`,
   thanks :user:`jbtwist`)
+- Fix the order of a day's session blocks in the registration form session field
+  (:pr:`6428`, thanks :user:`jbtwist`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
