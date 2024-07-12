@@ -27,21 +27,31 @@ def test_secure_client_filename(filename, expected):
     assert secure_client_filename(filename) == expected
 
 
-@pytest.mark.parametrize(('filename', 'expected'), (
-    ('', 'fallback'),
-    (None, 'fallback'),
-    ('foo.txt', 'foo.txt'),
-    ('../../../etc/passwd', 'etc_passwd'),
-    ('m\xf6p.txt', 'moep.txt'),
-    ('/m\xf6p.txt', 'moep.txt'),
-    (r'spacy   \filename', 'spacy_filename'),
-    ('.filename', 'filename'),
-    ('filename', 'filename'),
-    ('file.name', 'file.name'),
-    ('   ', 'fallback')
+@pytest.mark.parametrize(('filename', 'fallback_ext', 'expected'), (
+    ('', '', 'fallback'),
+    (None, '', 'fallback'),
+    ('foo.txt', '', 'foo.txt'),
+    ('foo.txt', 'example.zip', 'foo.txt'),
+    ('../../../etc/passwd', '', 'etc_passwd'),
+    ('m\xf6p.txt', '', 'moep.txt'),
+    ('/m\xf6p.txt', '', 'moep.txt'),
+    (r'spacy   \filename', '', 'spacy_filename'),
+    ('.filename', '', 'filename'),
+    ('filename.', '', 'filename'),
+    ('filename', '', 'filename'),
+    ('file.name', '', 'file.name'),
+    ('   ', '', 'fallback'),
+    ('foo', '.txt', 'foo'),
+    ('\u4e17', '', 'fallback'),
+    ('\u4e17.txt', '', 'fallback.txt'),
+    ('\u4e17.txt', '.zip', 'fallback.txt'),
+    ('\u4e17.\u4e17', '', 'fallback'),
+    ('\u4e17.', '.txt', 'fallback.txt'),
+    ('\u4e17.\u4e17', '.txt', 'fallback.txt'),
+    ('.\u4e17', '.txt', 'fallback'),
 ))
-def test_secure_filename(filename, expected):
-    assert secure_filename(filename, 'fallback') == expected
+def test_secure_filename(filename, fallback_ext, expected):
+    assert secure_filename(filename, f'fallback{fallback_ext}') == expected
 
 
 def test_secure_filename_max_length():
