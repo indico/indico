@@ -27,7 +27,6 @@ from indico.util.date_time import now_utc
 
 
 class VersionedResourceMixin:
-
     # Class that will inherit from StoredFileMixin
     stored_file_class = None
     # Foreign key that, from such a class, will point here
