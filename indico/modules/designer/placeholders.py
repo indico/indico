@@ -8,7 +8,6 @@
 from io import BytesIO
 
 from babel.numbers import format_currency
-from PIL import Image
 
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.events.registration.util import generate_ticket_qr_code
@@ -106,8 +105,7 @@ class EventLogoPlaceholder(DesignerPlaceholder):
     def render(cls, event):
         if not event.has_logo:
             return ''
-        buf = BytesIO(event.logo)
-        return Image.open(buf)
+        return BytesIO(event.logo)
 
 
 class EventDatesPlaceholder(DesignerPlaceholder):
@@ -381,8 +379,8 @@ class RegistrationPicturePlaceholder(RegistrationPDPlaceholder):
     @classmethod
     def render(cls, registration):
         if picture_data := registration.get_personal_data_picture():
-            buf = picture_data.open()
-            return Image.open(buf)
+            with picture_data.open() as fd:
+                return BytesIO(fd.read())
         return None
 
 
@@ -417,8 +415,8 @@ class FixedImagePlaceholder(DesignerPlaceholder):
 
     @classmethod
     def render(cls, item):
-        buf = DesignerImageFile.get(item['image_id']).open()
-        return Image.open(buf)
+        with DesignerImageFile.get(item['image_id']).open() as fd:
+            return BytesIO(fd.read())
 
 
 class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
@@ -463,7 +461,8 @@ class RegistrationFormFieldPlaceholder(DesignerPlaceholder):
 
     def _render_image(self, data):
         if data.storage_file_id is not None:
-            return Image.open(data.open())
+            with data.open() as fd:
+                return BytesIO(fd.read())
 
     def _render_accommodation(self, friendly_data):
         if friendly_data['is_no_accommodation']:

@@ -736,9 +736,10 @@ def _base64_encode_uuid(uid):
 
 
 def generate_ticket_qr_code(person):
-    """Generate a Pillow `Image` with a QR Code encoding a check-in ticket.
+    """Generate an image with a QR code encoding a check-in ticket.
 
     :param registration: corresponding `Registration` object
+    :return: A `BytesIO` containing the image data
     """
     qr = QRCode(
         version=None,
@@ -750,7 +751,10 @@ def generate_ticket_qr_code(person):
     qr_data = json.dumps(data, separators=(',', ':')) if not isinstance(data, str) else data
     qr.add_data(qr_data)
     qr.make(fit=True)
-    return qr.make_image()._img
+    buf = BytesIO()
+    qr.make_image().save(buf)
+    buf.seek(0)
+    return buf
 
 
 def get_event_regforms(event, user, with_registrations=False, only_in_acl=False):

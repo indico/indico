@@ -7,11 +7,11 @@
 
 import itertools
 from datetime import datetime
+from io import BytesIO
 from operator import attrgetter
 from pathlib import Path
 
 import pytest
-from PIL import Image
 
 from indico.modules.designer import placeholders
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
@@ -124,4 +124,4 @@ def test_render_image_placeholders(dummy_event, dummy_reg, dummy_designer_image_
     for ph in image_placeholders:
         kwargs = _get_render_kwargs(ph, dummy_event, dummy_person, dummy_reg, dummy_item)
         res = ph.render(**kwargs)
-        assert isinstance(res, Image.Image) or res is None
+        assert isinstance(res, BytesIO) or res is None

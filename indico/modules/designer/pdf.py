@@ -129,16 +129,9 @@ class DesignerPDFBase:
         item_height = (item['height'] / PIXELS_CM * cm) if item.get('height') is not None else None
         item_preserve_aspect_ratio = item.get('preserve_aspect_ratio', True)
 
-        if isinstance(content, Image.Image):
-            # Due to an `ImageReader` bug JPEG image is not identified if it's a PIL Image,
-            # so they are placed into the PDF in uncompressed size.
-            # Passing the image in its original format as file-like object is a workaround until it is fixed.
-            with BytesIO() as img_bytes:
-                content.save(img_bytes, format=content.format)
-                img_bytes.seek(0)
-                canvas.drawImage(ImageReader(img_bytes),
-                                 margin_x + item_x, self.height - margin_y - item_height - item_y,
-                                 item_width, item_height, mask='auto', preserveAspectRatio=item_preserve_aspect_ratio)
+        if isinstance(content, BytesIO):
+            canvas.drawImage(ImageReader(content), margin_x + item_x, self.height - margin_y - item_height - item_y,
+                             item_width, item_height, mask='auto', preserveAspectRatio=item_preserve_aspect_ratio)
         else:
             content = content.unescape() if isinstance(content, RichMarkup) else content
             content = sanitize_html(strip_tags(content))
