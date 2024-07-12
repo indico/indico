@@ -8,6 +8,7 @@
 from datetime import time
 
 from indico.core.db import db
+from indico.util.date_time import overlaps
 from indico.util.string import format_repr
 
 
@@ -51,6 +52,9 @@ class BookableHours(db.Model):
     @property
     def key(self):
         return self.start_time, self.end_time, self.weekday
+
+    def overlaps(self, st, et):
+        return overlaps((st, et), (self.start_time, self.end_time))
 
     def fits_period(self, st, et):
         st = _tuplify(st, False)

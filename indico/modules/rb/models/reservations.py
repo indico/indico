@@ -28,7 +28,8 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
-from indico.modules.rb.util import format_weekdays, get_prebooking_collisions, rb_is_admin
+from indico.modules.rb.operations.misc import get_rooms_unbookable_hours
+from indico.modules.rb.util import WEEKDAYS, format_weekdays, get_prebooking_collisions, rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import _, force_locale
@@ -300,7 +301,6 @@ class Reservation(db.Model):
                 raise NoReportError('You cannot book this room')
 
         room.check_advance_days(data['end_dt'].date(), user, allow_admin=(not ignore_admin))
-        room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user, allow_admin=(not ignore_admin))
 
         if (
             force_internal_note or
@@ -481,9 +481,9 @@ class Reservation(db.Model):
         if user is None:
             user = self.created_by_user
 
-        # Check for conflicts with nonbookable periods
         admin = allow_admin and rb_is_admin(user)
         if not admin and not self.room.can_manage(user, allow_admin=allow_admin, permission='override'):
+            # Check for conflicts with nonbookable periods
             nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
@@ -493,6 +493,22 @@ class Reservation(db.Model):
                         if not skip_conflicts:
                             raise ConflictingOccurrences
                         occurrence.cancel(user, 'Skipped due to nonbookable date', silent=True, propagate=False)
+                        break
+
+            # Check for violations of bookable hours; we use the inverted (unbookable) data because
+            # while it might be very interesting to not allow a booking to cross the boundary between
+            # two bookable hours periods (e.g. for a room that can be booked in the morning and in the
+            # afternoon, but not with a single booking spanning both), our frontend and general conflict
+            # checking logic does not really handle this as it only prevents overlaps with unbookable periods
+            unbookable_hours = get_rooms_unbookable_hours([self.room]).get(self.room.id, dict.fromkeys(WEEKDAYS, ()))
+            for occurrence in self.occurrences:
+                if not occurrence.is_valid:
+                    continue
+                for ubh in unbookable_hours[WEEKDAYS[occurrence.start_dt.weekday()]]:
+                    if ubh.overlaps(occurrence.start_dt.time(), occurrence.end_dt.time()):
+                        if not skip_conflicts:
+                            raise ConflictingOccurrences
+                        occurrence.cancel(user, 'Skipped due to unbookable time', silent=True, propagate=False)
                         break
 
         # Check for conflicts with blockings
@@ -578,7 +594,6 @@ class Reservation(db.Model):
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)
-        self.room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
 
         if rb_settings.get('internal_notes_enabled') and self.room.can_manage(user):
             populate_fields.add('internal_note')
