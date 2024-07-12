@@ -24,7 +24,6 @@ def _deserialize_date(date_dict):
 
 
 class AtomSerializer(Serializer):
-
     schemaless = False
     _mime = 'application/atom+xml'
 

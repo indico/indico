@@ -395,7 +395,6 @@ class RHMoveSubcategories(RHMoveCategoryBase):
 
 
 class RHSortSubcategories(RHManageCategoryBase):
-
     @use_kwargs({
         'categories': fields.List(fields.Int(), required=True)
     })

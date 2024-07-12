@@ -44,7 +44,6 @@ class FileHook(EventBaseHook):
 
 
 class FileSerializer(Serializer):
-
     encapsulate = False
     schemaless = False
 

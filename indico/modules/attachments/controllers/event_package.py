@@ -52,7 +52,6 @@ def _get_obj_parent(obj):
 
 
 class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
-
     #: Whether unscheduled contributions should be included
     ALLOW_UNSCHEDULED = False
 

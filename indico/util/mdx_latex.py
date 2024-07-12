@@ -440,7 +440,6 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
 
 
 class UnescapeHtmlTextPostProcessor(markdown.postprocessors.Postprocessor):
-
     def run(self, text):
         return unescape_html_entities(text)
 
@@ -448,7 +447,6 @@ class UnescapeHtmlTextPostProcessor(markdown.postprocessors.Postprocessor):
 
 
 class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
-
     def run(self, instr):
         """
         Convert all math sections in {text} whether latex, asciimathml or

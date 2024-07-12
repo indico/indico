@@ -19,7 +19,6 @@ ConfigData = namedtuple('ConfigData', ['margin_horizontal', 'margin_vertical', '
 
 
 class PosterPDF(DesignerPDFBase):
-
     def __init__(self, template, config, event):
         super().__init__(template, config)
         self.event = event

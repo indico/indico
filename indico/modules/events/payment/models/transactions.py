@@ -58,7 +58,6 @@ class TransactionStatus(IndicoIntEnum):
 
 
 class TransactionStatusTransition:
-
     initial_statuses = [TransactionStatus.cancelled, TransactionStatus.failed, TransactionStatus.rejected]
 
     @classmethod

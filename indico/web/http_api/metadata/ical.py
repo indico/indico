@@ -110,7 +110,6 @@ def serialize_session(cal, fossil, now, fid=None):
 
 
 class ICalSerializer(Serializer):
-
     schemaless = False
     _mime = 'text/calendar'
 
