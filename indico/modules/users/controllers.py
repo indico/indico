@@ -109,9 +109,9 @@ class RHUserBase(RHProtected):
     allow_system_user = False
 
     def _process_args(self):
+        self.user = session.user
         if not session.user:
             return
-        self.user = session.user
         if 'user_id' in request.view_args:
             self.user = User.get(request.view_args['user_id'])
             if self.user is None:

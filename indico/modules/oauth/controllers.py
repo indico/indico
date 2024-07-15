@@ -257,6 +257,8 @@ class RHPersonalTokenBase(RHPersonalTokensUserBase):
 
     def _process_args(self):
         RHPersonalTokensUserBase._process_args(self)
+        if self.user is None:
+            return
         self.token: PersonalToken = (
             PersonalToken.query
             .with_parent(self.user)
