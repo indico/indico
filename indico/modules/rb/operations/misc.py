@@ -41,11 +41,13 @@ def _get_hours_by_weekday(all_hours):
 def _invert_hours(hours):
     # XXX this does not support overlaps and creates nonsense in that case, but we now have validation when
     # saving a room's availability, so unless there's already bad data we don't have any problems in here
-    return [
+    inverted = [
         BookableHours(start_time=time(), end_time=hours[0].start_time),
         *(BookableHours(start_time=hours[i - 1].end_time, end_time=hours[i].start_time) for i in range(1, len(hours))),
         BookableHours(start_time=hours[-1].end_time, end_time=time(23, 59))
     ]
+    # filter out "invalid" entries caused by two consecutive periods
+    return [x for x in inverted if x.start_time != x.end_time]
 
 
 def get_rooms_nonbookable_periods(rooms, start_dt, end_dt):
