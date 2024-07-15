@@ -114,6 +114,8 @@ Internal Changes
 - Use unguessable URLs for user avatar pictures (:pr:`6346`, thanks :user:`vtran99`)
 - Add ``<ind-date-picker>`` custom element (:pr:`6371, 6406`, thanks :user:`foxbunny`)
 - Use native ESM for webpack config files (:pr:`6389`)
+- Rename ``active_fields`` to ``available_fields`` in ``RegistrationFormSection``
+  (:pr:`6409`, thanks :user:`omegak`)
 
 
 Version 3.3.2
