@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import time
-
 from indico.core.db import db
 from indico.util.date_time import overlaps
 from indico.util.string import format_repr
@@ -55,16 +53,3 @@ class BookableHours(db.Model):
 
     def overlaps(self, st, et):
         return overlaps((st, et), (self.start_time, self.end_time))
-
-    def fits_period(self, st, et):
-        st = _tuplify(st, False)
-        et = _tuplify(et, True)
-        period_st = _tuplify(self.start_time, False)
-        period_et = _tuplify(self.end_time, True)
-        return period_st <= st and period_et >= et
-
-
-def _tuplify(t, end):
-    if end and t == time(0):
-        return 24, 0
-    return t.hour, t.minute

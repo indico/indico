@@ -43,7 +43,7 @@ def dummy_location(db, create_location):
 @pytest.fixture
 def create_reservation(db, dummy_room, dummy_user):
     """Return a callable which lets you create reservations."""
-    def _create_reservation(**params):
+    def _create_reservation(*, allow_admin=False, **params):
         params.setdefault('start_dt', date.today() + relativedelta(hour=8, minute=30))
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
         params.setdefault('repeat_frequency', RepeatFrequency.NEVER)
@@ -53,7 +53,7 @@ def create_reservation(db, dummy_room, dummy_user):
         params.setdefault('booked_for_user', dummy_user)
         params.setdefault('created_by_user', dummy_user)
         reservation = Reservation(**params)
-        reservation.create_occurrences(skip_conflicts=False)
+        reservation.create_occurrences(skip_conflicts=False, allow_admin=allow_admin)
         db.session.add(reservation)
         db.session.flush()
         return reservation
