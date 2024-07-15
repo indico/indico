@@ -33,7 +33,7 @@ ind-select {
     text-overflow: ellipsis;
   }
 
-  &:focus .caption {
+  &:focus-visible .caption {
     @include sui_debt.field_override() {
       @include sui_debt.input-focus-border();
     }
