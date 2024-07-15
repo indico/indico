@@ -116,6 +116,8 @@ Internal Changes
 - Use native ESM for webpack config files (:pr:`6389`)
 - Rename ``active_fields`` to ``available_fields`` in ``RegistrationFormSection``
   (:pr:`6409`, thanks :user:`omegak`)
+- Custom poster/badge designer placeholder returning images need to return a ``BytesIO``
+  instead of a Pillow ``Image`` object (:pr:`6441`)
 
 
 Version 3.3.2
