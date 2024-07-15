@@ -39,7 +39,9 @@ export default function Select({options, value, onChange, disabled, required, ..
 
       <dialog aria-label={Translate.string('Options')}>
         <label className="option-filter">
-          <span>Filter the options</span>
+          <span>
+            <Translate>Filter the options</Translate>
+          </span>
           <input className="filter" type="text" autoComplete="off" aria-expanded="false" />
         </label>
 
