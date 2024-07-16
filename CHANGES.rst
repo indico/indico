@@ -26,7 +26,8 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Indicate when a booking begins/ends in the booking calendar in day-based mode (when
+  using a plugin to customize the room booking module) (:pr:`6414`)
 
 
 Version 3.3.3
