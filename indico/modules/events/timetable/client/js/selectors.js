@@ -7,7 +7,7 @@
 
 import {createSelector} from 'reselect';
 
-import {applyChanges, appendSessionAttributes, getNumDays, mergeChanges} from './util';
+import {appendSessionAttributes, getNumDays, mergeChanges} from './util';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = state => state.entries;
@@ -30,17 +30,13 @@ export const getEventNumDays = createSelector(
   (startDt, endDt) => getNumDays(startDt, endDt) + 1
 );
 
-export const getUpdatedEntries = createSelector(
-  getEntries,
-  entries => applyChanges(entries)
-);
 export const getBlocks = createSelector(
-  getUpdatedEntries,
+  getEntries,
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.blocks, sessions)
 );
 export const getChildren = createSelector(
-  getUpdatedEntries,
+  getEntries,
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.children, sessions)
 );
@@ -49,7 +45,7 @@ export const getVisibleChildren = createSelector(
   children => children.filter(c => !c.isPoster)
 );
 export const getUnscheduled = createSelector(
-  getUpdatedEntries,
+  getEntries,
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
 );
@@ -81,7 +77,8 @@ export const canRedo = createSelector(
 );
 export const getMergedChanges = createSelector(
   getEntries,
-  entries => mergeChanges(entries)
+  getSessions,
+  (entries, sessions) => mergeChanges(entries, sessions)
 );
 export const getDraggedContribs = createSelector(
   getEntries,
