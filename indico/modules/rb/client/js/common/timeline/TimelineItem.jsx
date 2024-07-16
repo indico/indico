@@ -239,6 +239,7 @@ class TimelineItem extends React.Component {
       onClickCandidate,
       onClickReservation,
       room,
+      dayBased,
       actions: {openBookingDetails},
     } = this.props;
     if (type === 'blocking' || type === 'overridable-blocking') {
@@ -366,11 +367,17 @@ class TimelineItem extends React.Component {
       'unbookable-periods',
       'unbookable-hours',
     ];
+
+    const isStartingReservation = reservation && startDt === reservation.startDt;
+    const isEndingReservation = reservation && endDt === reservation.endDt;
+
     const overflowLeft =
       !notOverflowing.includes(type) &&
+      (!dayBased || isStartingReservation) &&
       segmentStartDt.hours() * 60 + segmentStartDt.minutes() < startHour * 60;
     const overflowRight =
       !notOverflowing.includes(type) &&
+      (!dayBased || isEndingReservation) &&
       segmentEndDt.hours() * 60 + segmentEndDt.minutes() > endHour * 60;
     const styleName = `timeline-occurrence ${overflowRight ? 'overflow-right' : ''} ${
       overflowLeft ? 'overflow-left' : ''
