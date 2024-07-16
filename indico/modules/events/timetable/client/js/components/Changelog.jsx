@@ -113,11 +113,11 @@ const changeParams = {
         Translate.string('None')
       ),
   },
-  deleted: {
+  unscheduled: {
     renderDiff: () => (
       <p>
         <Icon name="exclamation triangle" color="red" />
-        <Translate>This entry has been deleted from the timetable.</Translate>
+        <Translate>This entry has been unscheduled from the timetable.</Translate>
       </p>
     ),
   },
@@ -154,32 +154,24 @@ Change.propTypes = {
   newValue: PropTypes.any.isRequired,
 };
 
-/**
- * Split date, time changes, and duration into separate changes.
- * @param {object} old old entry
- * @param {object} entry new entry
- * @returns {array} change entries
- */
-const processDateTimeChanges = (old, entry) => {
-  const dateTimeChange = {oldValue: old.start, newValue: entry.start};
-  return [
-    entry.start.toDateString() !== old.start.toDateString() && ['startDate', dateTimeChange],
-    entry.start.toTimeString() !== old.start.toTimeString() && ['startTime', dateTimeChange],
-  ].filter(x => x);
-};
-
-function EntryChangeList({change, old, entry, color, children, ...rest}) {
+function EntryChangeList({change, old, new: new_, color, children, ...rest}) {
   const blocks = useSelector(selectors.getBlocks);
-  const {title, icon, formatTitle} = entryTypes[entry.type];
+  const {title, icon, formatTitle} = entryTypes[new_.type];
   return (
-    <DetailsSegment title={formatTitle(entry)} subtitle={title} color={color} icon={icon} {...rest}>
+    <DetailsSegment title={formatTitle(new_)} subtitle={title} color={color} icon={icon} {...rest}>
       <List divided>
         {Object.entries(change)
           .flatMap(([key, value]) => {
-            const newChange = {oldValue: old[key], newValue: value};
+            const newChange = {oldValue: key in old ? old[key] : null, newValue: value};
             switch (key) {
               case 'start':
-                return processDateTimeChanges(old, entry);
+                if (!value) {
+                  return [['unscheduled', {oldValue: false, newValue: true}]];
+                }
+                return [
+                  value.toDateString() !== old.start?.toDateString() && ['startDate', newChange],
+                  value.toTimeString() !== old.start?.toTimeString() && ['startTime', newChange],
+                ].filter(x => x);
               case 'parentId':
                 return [
                   [
@@ -208,7 +200,7 @@ function EntryChangeList({change, old, entry, color, children, ...rest}) {
 EntryChangeList.propTypes = {
   change: PropTypes.object.isRequired,
   old: entrySchema.isRequired,
-  entry: entrySchema.isRequired,
+  new: entrySchema.isRequired,
   color: entryColorSchema,
   children: PropTypes.node,
 };
@@ -219,20 +211,19 @@ EntryChangeList.defaultProps = {
 };
 
 export default function ReviewChangesButton({as: Component, ...rest}) {
-  const changes = useSelector(selectors.getMergedChanges);
+  const changesMap = useSelector(selectors.getMergedChanges);
   const blocks = useSelector(selectors.getBlocks);
+  const changes = Object.values(changesMap);
   const blockChanges = _.sortBy(
     [
-      ...changes.filter(({entry}) => !entry.parentId),
+      ...changes.filter(({new: e}) => !e.parentId),
       ...blocks
         .filter(
-          block =>
-            !changes.some(({entry}) => entry.id === block.id) &&
-            changes.some(({entry}) => isChildOf(entry, block))
+          block => !(block.id in changesMap) && changes.some(({new: e}) => isChildOf(e, block))
         )
-        .map(block => ({change: {}, old: block, entry: block})),
+        .map(block => ({old: block, new: block, change: {}})),
     ],
-    [({entry}) => entry.start, ({entry}) => entry.columnId]
+    [c => c.new.start, c => c.new.columnId]
   );
 
   return (
@@ -252,25 +243,12 @@ export default function ReviewChangesButton({as: Component, ...rest}) {
       header={Translate.string('Review changes')}
       content={
         <Modal.Content styleName="changelog">
-          {blockChanges.map(({change, old, entry}) => (
-            <EntryChangeList
-              key={entry.id}
-              change={change}
-              old={old}
-              entry={entry}
-              color={entry.color}
-              raised
-            >
+          {blockChanges.map(b => (
+            <EntryChangeList key={b.new.id} {...b} color={b.new.color} raised>
               {changes
-                .filter(({entry: child}) => isChildOf(child, entry))
-                .map(({change: childChange, old: childOld, entry: child}) => (
-                  <EntryChangeList
-                    key={child.id}
-                    change={childChange}
-                    old={childOld}
-                    entry={child}
-                    color={entry.color}
-                  />
+                .filter(c => isChildOf(c.new, b.new))
+                .map(c => (
+                  <EntryChangeList key={c.new.id} {...c} color={b.new.color} />
                 ))}
             </EntryChangeList>
           ))}
