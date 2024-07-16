@@ -28,6 +28,9 @@ Internal Changes
 
 - Indicate when a booking begins/ends in the booking calendar in day-based mode (when
   using a plugin to customize the room booking module) (:pr:`6414`)
+- Update the list of supported browsers so people using highly outdated browsers where
+  certain features are likely broken get a warning about having to update their browser
+  (:pr:`6442`)
 
 
 Version 3.3.3

@@ -1,36 +1,39 @@
 [production-template]
 >0.5% in alt-eu and >0.5% in alt-as and >0.5% in alt-na and >0.5% in alt-sa and >0.5% in alt-af and >0.5% in alt-oc and >1%
 not ie > 0
-last 2 Chrome versions
-last 2 Edge versions
-last 2 Safari versions
-last 2 Firefox versions
-last 2 FirefoxAndroid versions
+last 4 Chrome versions
+last 4 Edge versions
+last 4 Safari versions
+last 4 Firefox versions
+last 4 FirefoxAndroid versions
 Firefox esr
-edge 18
-edge 17
 
 # begin generated code
 # use `npm run update-browsers` to update
 [production]
-and_chr 84
-and_ff 68
-chrome 84
-chrome 83
-chrome 81
-edge 84
-edge 83
-edge 18
-edge 17
-firefox 79
-firefox 78
-firefox 77
-firefox 68
-ios_saf 13.4-13.5
-ios_saf 13.3
-safari 13.1
-safari 13
-samsung 11.1-11.2
+and_chr 126
+and_ff 127
+chrome 126
+chrome 125
+chrome 124
+chrome 123
+chrome 109
+edge 126
+edge 125
+edge 124
+edge 123
+firefox 128
+firefox 127
+firefox 126
+firefox 125
+firefox 115
+ios_saf 17.4
+ios_saf 16.6-16.7
+safari 17.5
+safari 17.4
+safari 17.3
+safari 17.2
+samsung 25
 # end generated code
 
 [supported]
@@ -38,12 +41,9 @@ last 2 Chrome versions
 last 2 Firefox versions
 last 2 Edge versions
 last 2 Safari versions
-edge 18
-edge 17
 
 [development]
 last 2 Chrome versions
 last 2 Firefox versions
 last 2 Edge versions
 last 2 Safari versions
-edge 18

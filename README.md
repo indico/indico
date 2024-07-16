@@ -42,9 +42,9 @@ much as possible, but only issues detected on those will be considered at critic
 <!-- BROWSERS - this is all machine-generated! Don't change it. -->
 | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" /><br>Firefox | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /><br>Chrome | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /><br>Safari | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" /><br>Edge |
 |:---------:|:---------:|:---------:|:---------:|
-| 78+ | 83+ | 13+ | 17+ |
+| 127+ | 125+ | 17.4+ | 125+ |
 
-However, if you have an issue with a browser [on this list](https://browserl.ist/?q=and_chr%2084%2C%20and_ff%2068%2C%20chrome%2084%2C%20chrome%2083%2C%20chrome%2081%2C%20edge%2084%2C%20edge%2083%2C%20edge%2018%2C%20edge%2017%2C%20firefox%2079%2C%20firefox%2078%2C%20firefox%2077%2C%20firefox%2068%2C%20ios_saf%2013.4-13.5%2C%20ios_saf%2013.3%2C%20safari%2013.1%2C%20safari%2013%2C%20samsung%2011.1-11.2), please feel free to open a bug report.
+However, if you have an issue with a browser [on this list](https://browserl.ist/?q=and_chr%20126%2C%20and_ff%20127%2C%20chrome%20126%2C%20chrome%20125%2C%20chrome%20124%2C%20chrome%20123%2C%20chrome%20109%2C%20edge%20126%2C%20edge%20125%2C%20edge%20124%2C%20edge%20123%2C%20firefox%20128%2C%20firefox%20127%2C%20firefox%20126%2C%20firefox%20125%2C%20firefox%20115%2C%20ios_saf%2017.4%2C%20ios_saf%2016.6-16.7%2C%20safari%2017.5%2C%20safari%2017.4%2C%20safari%2017.3%2C%20safari%2017.2%2C%20samsung%2025), please feel free to open a bug report.
 <!-- ENDBROWSERS -->
 
 ## Getting Indico
