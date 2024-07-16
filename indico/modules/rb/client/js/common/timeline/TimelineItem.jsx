@@ -101,7 +101,6 @@ class TimelineItem extends React.Component {
       openBookingDetails: PropTypes.func.isRequired,
     }).isRequired,
     hideRecurringTooltip: PropTypes.bool,
-    hideRepeatingTimeline: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -111,7 +110,6 @@ class TimelineItem extends React.Component {
     setSelectable: null,
     dayBased: false,
     hideRecurringTooltip: false,
-    hideRepeatingTimeline: false,
   };
 
   calculateWidth = (startDt, endDt) => {
@@ -241,8 +239,8 @@ class TimelineItem extends React.Component {
       onClickCandidate,
       onClickReservation,
       room,
+      dayBased,
       actions: {openBookingDetails},
-      hideRepeatingTimeline,
     } = this.props;
     if (type === 'blocking' || type === 'overridable-blocking') {
       segmentStartDt = moment(startHour, 'HH:mm');
@@ -375,11 +373,11 @@ class TimelineItem extends React.Component {
 
     const overflowLeft =
       !notOverflowing.includes(type) &&
-      (!hideRepeatingTimeline || isStartingReservation) &&
+      (!dayBased || isStartingReservation) &&
       segmentStartDt.hours() * 60 + segmentStartDt.minutes() < startHour * 60;
     const overflowRight =
       !notOverflowing.includes(type) &&
-      (!hideRepeatingTimeline || isEndingReservation) &&
+      (!dayBased || isEndingReservation) &&
       segmentEndDt.hours() * 60 + segmentEndDt.minutes() > endHour * 60;
     const styleName = `timeline-occurrence ${overflowRight ? 'overflow-right' : ''} ${
       overflowLeft ? 'overflow-left' : ''
@@ -439,7 +437,6 @@ class TimelineItem extends React.Component {
       setSelectable,
       dayBased,
       hideRecurringTooltip,
-      hideRepeatingTimeline,
       ...restProps
     } = this.props;
     return (
