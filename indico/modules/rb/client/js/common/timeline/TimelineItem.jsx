@@ -111,7 +111,7 @@ class TimelineItem extends React.Component {
     setSelectable: null,
     dayBased: false,
     hideRecurringTooltip: false,
-    hideRepeatingTimeline: PropTypes.bool,
+    hideRepeatingTimeline: false,
   };
 
   calculateWidth = (startDt, endDt) => {
@@ -370,8 +370,8 @@ class TimelineItem extends React.Component {
       'unbookable-hours',
     ];
 
-    const isStartingReservation = startDt === reservation.startDt;
-    const isEndingReservation = endDt === reservation.endDt;
+    const isStartingReservation = reservation && startDt === reservation.startDt;
+    const isEndingReservation = reservation && endDt === reservation.endDt;
 
     const overflowLeft =
       !notOverflowing.includes(type) &&
