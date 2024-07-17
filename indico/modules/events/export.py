@@ -74,10 +74,11 @@ def import_event(source_file, category_id=0, create_users=None, create_affiliati
                                 affiliations are encountered.
     :param verbose: Whether to enable verbose output.
     :param force: Whether to ignore version conflicts.
-    :return: The imported event.
+    :return: The imported event and the ID mapping.
     """
     importer = EventImporter(source_file, category_id, create_users, create_affiliations, verbose, force)
-    return importer.deserialize()
+    event = importer.deserialize()
+    return event, dict(importer.source_id_map)
 
 
 def _model_to_table(name):
@@ -150,6 +151,7 @@ class EventExporter:
         # some refactoring of how this class is used
         self.archive = tarfile.open(mode='w|', fileobj=self.target_file)  # noqa: SIM115
         self.id_map = defaultdict(dict)
+        self.orig_ids = defaultdict(dict)
         self.used_uuids = set()
         self.seen_rows = set()
         self.fk_map = self._get_reverse_fk_map()
@@ -176,6 +178,8 @@ class EventExporter:
         }
         yaml_data = yaml.dump(metadata, indent=2)
         self._add_file('data.yaml', len(yaml_data), yaml_data)
+        ids_data = yaml.dump(dict(self.orig_ids), indent=2)
+        self._add_file('ids.yaml', len(ids_data), ids_data)
         self.archive.close()
 
     def _load_spec(self):
@@ -263,6 +267,9 @@ class EventExporter:
             else:
                 type_ = 'idref'
         uuid = self.id_map[fullname].setdefault(value, self._get_uuid())
+        if incoming:
+            assert uuid not in self.orig_ids[fullname]
+            self.orig_ids[fullname][uuid] = value
         if type_ == 'userref' and uuid not in self.users:
             user = User.get(value)
             self.users[uuid] = None if user.is_system else {
@@ -415,6 +422,11 @@ class EventImporter:
         self.force = force
         self.archive = tarfile.open(fileobj=source_file)  # noqa: SIM115
         self.data = yaml.unsafe_load(self.archive.extractfile('data.yaml'))
+        try:
+            self.source_ids = yaml.unsafe_load(self.archive.extractfile('ids.yaml'))
+        except KeyError:
+            self.source_ids = None
+        self.source_id_map = defaultdict(dict)
         self.id_map = {}
         self.user_map = {}
         self.affiliation_map = {}
@@ -672,6 +684,7 @@ class EventImporter:
         import_defaults = self.spec['defaults'].get(table.fullname, {})
         import_custom = self.spec['custom'].get(table.fullname, {})
         set_idref = None
+        set_idref_fullname = None
         file_data = None
         insert_values = dict(import_defaults)
         deferred_idrefs = {}
@@ -686,6 +699,7 @@ class EventImporter:
                 if value[0] == 'idref_set':
                     assert set_idref is None
                     set_idref = value[1]
+                    set_idref_fullname = f'{table.fullname}.{col}'
                     continue
                 elif value[0] == 'file':
                     # import files later in case we end up skipping the column due to a missing user
@@ -744,7 +758,7 @@ class EventImporter:
         if set_idref is not None:
             # if a column was marked as having incoming FKs, store
             # the ID so the reference can be resolved to the ID
-            self._set_idref(set_idref, _get_inserted_pk(res))
+            self._set_idref(set_idref, _get_inserted_pk(res), set_idref_fullname)
         if is_event:
             self.event_id = _get_inserted_pk(res)
         for col, uuid in deferred_idrefs.items():
@@ -752,7 +766,9 @@ class EventImporter:
             # later once the ID is available
             self.deferred_idrefs[uuid].add((table, col, _get_inserted_pk(res)))
 
-    def _set_idref(self, uuid, id_):
+    def _set_idref(self, uuid, id_, fullname):
+        if self.source_ids is not None:
+            self.source_id_map[fullname][self.source_ids[fullname][uuid]] = id_
         self.id_map[uuid] = id_
         # update all the previously-deferred ID references
         for table, col, pk_value in self.deferred_idrefs.pop(uuid, ()):
