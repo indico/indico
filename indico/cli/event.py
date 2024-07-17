@@ -6,8 +6,10 @@
 # LICENSE file for more details.
 
 import sys
+from pathlib import Path
 
 import click
+import yaml
 
 from indico.cli.core import cli_group
 from indico.core import signals
@@ -77,11 +79,14 @@ def export(event_id, target_file):
 @click.option('-y', '--yes', is_flag=True, help='Always commit the imported event without prompting')
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
               help='ID of the target category. Defaults to the root category.')
-def import_(source_file, create_users, create_affiliations, force, verbose, yes, category_id):
+@click.option('-m', '--id-map', 'id_map_path', type=click.Path(dir_okay=False, path_type=Path),
+              help='Store the mapping between old and new IDs in this YAML file')
+def import_(source_file, create_users, create_affiliations, force, verbose, yes, category_id,
+            id_map_path: Path | None = None):
     """Import an event exported from another Indico instance."""
     click.echo('Importing event...')
-    event = import_event(source_file, category_id, create_users=create_users, create_affiliations=create_affiliations,
-                         verbose=verbose, force=force)
+    event, id_map = import_event(source_file, category_id, create_users=create_users,
+                                 create_affiliations=create_affiliations, verbose=verbose, force=force)
     if event is None:
         click.secho('Import failed.', fg='red')
         sys.exit(1)
@@ -90,6 +95,9 @@ def import_(source_file, create_users, create_affiliations, force, verbose, yes,
         sys.exit(1)
     db.session.commit()
     click.secho(event.external_url, fg='green', bold=True)
+    if id_map_path:
+        id_map_path.write_text(yaml.dump(id_map, indent=2))
+        click.echo(f'ID mapping written to {id_map_path}')
 
 
 @cli.command('create-series')
