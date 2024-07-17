@@ -129,7 +129,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           <FinalTextArea
             name="description"
             label={Translate.string('Description')}
-            description={<Translate>You can use Markdown or basic HTML formatting tags.</Translate>}
+            description={<Translate>You may use Markdown for formatting.</Translate>}
           />
           {meta.hasPrice && (
             <FinalInput

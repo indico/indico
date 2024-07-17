@@ -22,6 +22,8 @@ Bugfixes
   thanks :user:`jbtwist`)
 - Fix the order of a day's session blocks in the registration form session field
   (:pr:`6428`, thanks :user:`jbtwist`)
+- Wrap overly long descriptions and filenames in registration form fields (:pr:`6436`,
+  thanks :user:`SegiNyn`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
