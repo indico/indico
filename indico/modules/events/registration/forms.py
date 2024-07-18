@@ -31,6 +31,7 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.util.enum import RichStrEnum
+from indico.modules.events.settings import data_retention_settings
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
@@ -40,7 +41,9 @@ from indico.web.forms.fields.datetime import TimeDeltaField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import (HiddenFieldList, IndicoEmailRecipientsField, IndicoMultipleTagSelectField,
                                             IndicoParticipantVisibilityField)
-from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime, NoRelativeURLs
+from indico.web.forms.util import inject_validators
+from indico.web.forms.validators import (DataRetentionPeriodValidator, HiddenUnless, IndicoEmail, LinkedDateTime,
+                                         NoRelativeURLs)
 from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 
@@ -139,12 +142,22 @@ class RegistrationFormCreateForm(IndicoForm):
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and everyone '
                                                                 'else who can access the event'))
-    retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
+    retention_period = TimeDeltaField(_('Retention period'), [DataRetentionPeriodValidator()], units=('weeks',),
                                       description=_('Specify for how many weeks the registration '
                                                     'data, including the participant list, should be stored. '
                                                     'Retention periods for individual fields can be set in the '
                                                     'registration form designer'),
                                       render_kw={'placeholder': _('Indefinite')})
+
+    def __init__(self, *args, **kwargs):
+        minimum_retention = data_retention_settings.get('minimum_data_retention') or timedelta(days=7)
+        maximum_retention = data_retention_settings.get('maximum_data_retention')
+        if maximum_retention:
+            inject_validators(self, 'retention_period', [DataRequired()])
+        maximum_retention = maximum_retention or timedelta(days=3650)
+        super().__init__(*args, **kwargs)
+        self.retention_period.render_kw.update({'min': minimum_retention.days // 7,
+                                                'max': maximum_retention.days // 7})
 
     def validate_visibility(self, field):
         participant_visibility, public_visibility = (PublishRegistrationsMode[v] for v in field.data[:-1])
@@ -153,21 +166,17 @@ class RegistrationFormCreateForm(IndicoForm):
                                     'for the public'))
         if field.data[2] is not None:
             visibility_duration = timedelta(weeks=field.data[2])
+            max_retention_period = data_retention_settings.get('maximum_data_retention') or timedelta(days=3650)
             if visibility_duration <= timedelta():
                 raise ValidationError(_('The visibility duration cannot be zero.'))
-            elif visibility_duration > timedelta(days=3650):
-                raise ValidationError(_('The visibility duration cannot be longer than 10 years. Leave the field empty '
-                                        'for indefinite.'))
+            elif visibility_duration > max_retention_period:
+                raise ValidationError(_('The visibility duration cannot be longer than {} weeks. Leave the field empty '
+                                        'for indefinite.').format(max_retention_period.days // 7))
 
     def validate_retention_period(self, field):
         retention_period = field.data
         if retention_period is None:
             return
-        elif retention_period <= timedelta():
-            raise ValidationError(_('The retention period cannot be zero or negative.'))
-        elif retention_period > timedelta(days=3650):
-            raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
-                                    'indefinite.'))
         visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
                                else None)
         if visibility_duration and visibility_duration > retention_period:
@@ -607,7 +616,7 @@ class RegistrationPrivacyForm(IndicoForm):
                                                   description=_('Specify under which conditions the participant list '
                                                                 'will be visible to other participants and everyone '
                                                                 'else who can access the event'))
-    retention_period = TimeDeltaField(_('Retention period'), units=('weeks',),
+    retention_period = TimeDeltaField(_('Retention period'), [DataRetentionPeriodValidator()], units=('weeks',),
                                       description=_('Specify for how many weeks the registration '
                                                     'data, including the participant list, should be stored. '
                                                     'Retention periods for individual fields can be set in the '
@@ -619,7 +628,14 @@ class RegistrationPrivacyForm(IndicoForm):
 
     def __init__(self, *args, regform, **kwargs):
         self.regform = regform
+        minimum_retention = data_retention_settings.get('minimum_data_retention') or timedelta(days=7)
+        maximum_retention = data_retention_settings.get('maximum_data_retention')
+        if maximum_retention:
+            inject_validators(self, 'retention_period', [DataRequired()])
+        maximum_retention = maximum_retention or timedelta(days=3650)
         super().__init__(*args, **kwargs)
+        self.retention_period.render_kw.update({'min': minimum_retention.days // 7,
+                                                'max': maximum_retention.days // 7})
 
     @generated_data
     def publish_registrations_participants(self):
@@ -661,21 +677,17 @@ class RegistrationPrivacyForm(IndicoForm):
             raise ValidationError(_("'Show all participants' can only be set if there are no registered users."))
         if field.data[2] is not None:
             visibility_duration = timedelta(weeks=field.data[2])
-            if visibility_duration <= timedelta():
+            max_retention_period = data_retention_settings.get('maximum_data_retention') or timedelta(days=3650)
+            if visibility_duration < timedelta():
                 raise ValidationError(_('The visibility duration cannot be zero.'))
-            elif visibility_duration > timedelta(days=3650):
-                raise ValidationError(_('The visibility duration cannot be longer than 10 years. Leave the field empty '
-                                        'for indefinite.'))
+            elif visibility_duration > max_retention_period:
+                raise ValidationError(_('The visibility duration cannot be longer than {} weeks. Leave the field empty '
+                                        'for indefinite.').format(max_retention_period.days // 7))
 
     def validate_retention_period(self, field):
         retention_period = field.data
         if retention_period is None:
             return
-        elif retention_period <= timedelta():
-            raise ValidationError(_('The retention period cannot be zero or negative.'))
-        elif retention_period > timedelta(days=3650):
-            raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
-                                    'indefinite.'))
         visibility_duration = (timedelta(weeks=self.visibility.data[2]) if self.visibility.data[2] is not None
                                else None)
         if visibility_duration and visibility_duration > retention_period:
