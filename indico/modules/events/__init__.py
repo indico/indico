@@ -150,6 +150,8 @@ def _sidemenu_items(sender, **kwargs):
                            section='customization')
         yield SideMenuItem('autolinker', _('Auto-linker'), url_for('events.autolinker_admin'),
                            section='customization')
+        yield SideMenuItem('data_retention', _('Data Retention'), url_for('events.data_retention'),
+                           section='customization')
 
 
 @signals.menu.sections.connect_via('top-menu')

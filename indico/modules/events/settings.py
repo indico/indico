@@ -14,7 +14,7 @@ from flask.helpers import get_root_path
 
 from indico.core import signals
 from indico.core.settings import ACLProxyBase, SettingProperty, SettingsProxyBase
-from indico.core.settings.converters import DatetimeConverter
+from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
 from indico.core.settings.proxy import SettingsProxy
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
@@ -268,4 +268,12 @@ unlisted_events_settings = SettingsProxy('unlisted_events', {
 
 autolinker_settings = SettingsProxy('autolinker', {
     'rules': []
+})
+
+data_retention_settings = SettingsProxy('data_retention', {
+    'minimum_data_retention': None,
+    'maximum_data_retention': None,
+}, converters={
+    'minimum_data_retention': TimedeltaConverter,
+    'maximum_data_retention': TimedeltaConverter
 })
