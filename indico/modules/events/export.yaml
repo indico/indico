@@ -466,6 +466,7 @@ import:
     PaperRevision.submitter_id: system
     PaperRevision.judge_id: system
     EditingRevision.user_id: system
+    EditingRevisionComment.user_id: system
     # set to none
     EventPerson.user_id: none
     EventLogEntry.user_id: none
@@ -475,7 +476,6 @@ import:
     AbstractEmailLogEntry.user_id: none
     PaperReviewComment.modified_by_id: none
     Editable.editor_id: none
-    EditingRevisionComment.user_id: none
     # skip row
     EventRole.members.prop.secondary.c.user_id: skip
     EventPrincipal.user_id: skip
