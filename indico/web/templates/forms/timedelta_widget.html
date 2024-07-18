@@ -7,7 +7,7 @@
         {# The order of these two fields matters! If you change it, update
            `process_formdata` and `_value` in TimeDeltaField accordingly! #}
         <input type="number" name="{{ field.name }}" id="{{ field.id }}-value" value="{{ current_value }}"
-               {% if field.flags.required %} required {% if not 'min' in input_args %} min="1" {% endif %} {% endif %}
+               {% if field.flags.required %} required {% if 'min' not in input_args %}min="1"{% endif %}{% endif %}
                {{ input_args|html_params }}>
         {% if field.choices|length > 1 %}
             <select id="{{ field.id }}-unit" name="{{ field.name }}" data-tooltip-anchor
