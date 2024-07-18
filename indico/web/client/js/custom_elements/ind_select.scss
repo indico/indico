@@ -23,6 +23,7 @@ ind-select {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    user-select: none;
 
     @include sui_debt.field_override() {
       padding-right: 2.5em;
