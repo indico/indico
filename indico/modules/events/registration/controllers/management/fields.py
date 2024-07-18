@@ -52,8 +52,9 @@ class GeneralFieldDataSchema(mm.Schema):
     @validates('retention_period')
     def _check_retention_period(self, retention_period, **kwargs):
         field = self.context['field']
-        min_retention_period = data_retention_settings.get('minimum_data_retention') or timedelta(days=7)
-        max_retention_period = data_retention_settings.get('maximum_data_retention')
+        with db.session.no_autoflush:
+            min_retention_period = data_retention_settings.get('minimum_data_retention') or timedelta(days=7)
+            max_retention_period = data_retention_settings.get('maximum_data_retention')
         if retention_period is not None:
             if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.is_required:
                 raise ValidationError('Cannot add retention period to required field')
