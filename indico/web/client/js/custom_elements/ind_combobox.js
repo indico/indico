@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import CustomElementBase from 'indico/custom_elements/_base';
 import {topBottomPosition} from 'indico/utils/positioning';
 
 import './ind_combobox.scss';
@@ -17,14 +18,14 @@ function setNativeInputValue(input, value) {
 
 customElements.define(
   'ind-combo-box',
-  class extends HTMLElement {
+  class extends CustomElementBase {
     static lastId = 1;
 
     get value() {
       return this.querySelector('input').value;
     }
 
-    connectedCallback() {
+    setup() {
       const indComboBox = this;
       const id = `combo-box-${this.constructor.lastId++}`;
       const listbox = this.querySelector('[role=listbox]');
