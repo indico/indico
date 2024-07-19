@@ -48,6 +48,7 @@ export default function TagModal({header, onSubmit, tag, onClose}) {
         name="color"
         label={Translate.string('Color')}
         options={availableColors}
+        search={null}
         selection
         required
       />
