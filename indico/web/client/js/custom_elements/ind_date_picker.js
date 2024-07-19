@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import CustomElementBase from 'indico/custom_elements/_base';
 import {formatDate} from 'indico/utils/date_format';
 import {createDateParser} from 'indico/utils/date_parser';
 
@@ -15,7 +16,7 @@ const CALENDAR_CELL_COUNT = 42; // 6 rows, 7 days each
 
 customElements.define(
   'ind-date-picker',
-  class extends HTMLElement {
+  class extends CustomElementBase {
     // Last value of the internal id used in the widgets
     static lastId = 0;
 
@@ -23,7 +24,7 @@ customElements.define(
       return this.querySelector('input').value;
     }
 
-    connectedCallback() {
+    setup() {
       const id = `date-picker-${this.constructor.lastId++}`;
       const input = this.querySelector('input');
       const openCalendarButton = this.querySelector('button');
@@ -88,16 +89,12 @@ customElements.define(
         });
       }
     }
-
-    disconnectedCallback() {
-      this.cleanup();
-    }
   }
 );
 
 customElements.define(
   'ind-calendar',
-  class extends HTMLElement {
+  class extends CustomElementBase {
     static lastId = 0;
 
     constructor() {
@@ -142,7 +139,7 @@ customElements.define(
       this.setAttribute('max', dateString);
     }
 
-    connectedCallback() {
+    setup() {
       const indCalendar = this;
       const dialog = this.firstElementChild;
       const monthYearGroup = this.querySelector('.month-year');
@@ -323,10 +320,12 @@ customElements.define(
 
       // Note that this may not work on iOS Safari. We are not currently explicitly
       // targeting this browser, so we'll leave this as is.
-      window.addEventListener('click', handleDialogClose);
-      this.cleanup = () => {
+      this.addEventListener('x-connect', () => {
+        window.addEventListener('click', handleDialogClose);
+      });
+      this.addEventListener('x-disconnect', () => {
         window.removeEventListener('click', handleDialogClose);
-      };
+      });
 
       function handleDialogClose(ev) {
         if (!indCalendar.open) {
@@ -425,10 +424,6 @@ customElements.define(
           listbox.querySelector('button:not(:disabled)');
         focusableButton.tabIndex = 0;
       }
-    }
-
-    disconnectedCallback() {
-      this.cleanup();
     }
 
     static observedAttributes = ['open', 'value', 'min', 'max'];
