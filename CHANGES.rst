@@ -14,6 +14,7 @@ Improvements
   thanks :user:`SegiNyn`)
 - Add task to delete old registration files when they become orphaned due to a new
   file being uploaded (:pr:`6434`, thanks :user:`SegiNyn`)
+- Add configuration for min and max data retention period allowed (:pr:`6445`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
