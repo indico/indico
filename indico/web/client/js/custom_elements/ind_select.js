@@ -5,13 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import CustomElementBase from 'indico/custom_elements/_base';
 import {topBottomPosition} from 'indico/utils/positioning';
 
 import './ind_select.scss';
 
 customElements.define(
   'ind-select',
-  class extends HTMLElement {
+  class extends CustomElementBase {
     static formAssociated = true;
 
     static lastId = 1;
@@ -40,7 +41,7 @@ customElements.define(
       this.toggleAttribute('required', isRequired);
     }
 
-    connectedCallback() {
+    setup() {
       const indSelect = this;
       const caption = this.querySelector('[data-caption]');
       const dialog = this.querySelector('dialog');
@@ -48,7 +49,7 @@ customElements.define(
       const listbox = dialog.querySelector('[role=listbox]');
       const optionList = listbox.querySelectorAll('[role=option]');
       const clear = this.querySelector('button[value=clear]');
-      const id = `x-select-${this.constructor.lastId++}`;
+      const id = (this.id = `x-select-${this.constructor.lastId++}`);
       const defaultCaption = caption.textContent;
       const internals = this.attachInternals();
 
