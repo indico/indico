@@ -16,12 +16,15 @@ from flask import send_file as _send_file
 from flask import url_for as _url_for
 from flask.helpers import get_root_path
 from flask_cors import cross_origin
+from itsdangerous import BadData
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
 
 from indico.core.config import config
 from indico.util.caching import memoize
+from indico.util.i18n import _
 from indico.util.locators import get_locator
+from indico.util.signing import secure_serializer, static_secure_serializer
 from indico.web.util import jsonify_data
 
 
@@ -314,7 +317,7 @@ class ListConverter(BaseConverter):
     """Match a dash-separated list."""
 
     def __init__(self, map):
-        BaseConverter.__init__(self, map)
+        super().__init__(map)
         self.regex = r'\w+(?:-\w+)*'
 
     def to_python(self, value):
@@ -324,6 +327,24 @@ class ListConverter(BaseConverter):
         if isinstance(value, (list, tuple, set)):
             value = '-'.join(value)
         return super().to_url(value)
+
+
+class SignedValueConverter(BaseConverter):
+    def __init__(self, map, /, salt, max_age=None):
+        super().__init__(map)
+        self.salt = salt
+        self.max_age = max_age
+        self.serializer = secure_serializer if max_age else static_secure_serializer
+
+    def to_python(self, value):
+        try:
+            return self.serializer.loads(value, salt=self.salt, max_age=self.max_age)
+        except BadData:
+            raise NotFound(_('Invalid or expired signature'))
+
+    def to_url(self, value):
+        signed = self.serializer.dumps(value, salt=self.salt)
+        return super().to_url(signed)
 
 
 class XAccelMiddleware:
