@@ -350,3 +350,20 @@ export function useDebouncedAsyncValidate(validate, milliseconds = 250) {
       };
     });
 }
+
+/**
+ * When combining native JavaScript components with React, React may
+ * suppress some events when the input values are manipulated by the
+ * event handlers after the native event is dispatched. In such cases,
+ * we use the native event handler instead of React's onChange.
+ *
+ * In most cases this should work fine as long as the callback does not
+ * specifically expect the React's SyntheticEvent instance.
+ */
+export function useNativeEvent(ref, eventType, callback, options = {}) {
+  useEffect(() => {
+    const node = ref.current;
+    node.addEventListener(eventType, callback, options);
+    return () => node.removeEventListener(eventType, callback);
+  }, [ref, eventType, callback, options]);
+}

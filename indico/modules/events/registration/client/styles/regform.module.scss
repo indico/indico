@@ -34,6 +34,8 @@
 }
 
 .form-item {
+  --max-form-item-width: 36em;
+
   display: flex;
   margin-top: 10px;
   padding-top: 3px;
@@ -101,7 +103,7 @@
     }
 
     .label {
-      max-width: 500px;
+      max-width: var(--max-form-item-width);
       overflow-wrap: anywhere;
     }
 
@@ -165,7 +167,7 @@
         flex-direction: column;
 
         ul {
-          max-width: 500px;
+          max-width: var(--max-form-item-width);
           padding-left: 1.5rem;
 
           li {
@@ -232,16 +234,40 @@
       }
 
       .country-dropdown {
-        max-width: 500px;
+        max-width: var(--max-form-item-width);
       }
 
       .single-choice-dropdown {
         align-items: center;
         margin-bottom: 0;
+        gap: 0.5em;
+        justify-content: flex-start;
+        padding: 0 0.5em;
+
+        :global(.field):first-child {
+          width: 100%;
+          max-width: var(--max-form-item-width);
+          padding: 0;
+
+          ind-combo-box,
+          ind-select {
+            width: 100%;
+          }
+        }
+
+        .extra-slots {
+          display: flex;
+          align-items: center;
+
+          ind-combo-box {
+            max-width: 5em;
+          }
+        }
 
         .dropdown-text {
           display: flex;
           align-items: center;
+          justify-content: space-between;
 
           .caption {
             flex-grow: 1;
@@ -260,6 +286,10 @@
               white-space: nowrap;
             }
           }
+        }
+
+        [aria-disabled] .labels {
+          opacity: 0.6;
         }
 
         :global(.dropdown .divider.text) {
@@ -281,7 +311,7 @@
       input[type='email'],
       input[type='file'],
       input[type='text'] {
-        max-width: 500px;
+        max-width: var(--max-form-item-width);
       }
 
       input[type='tel'],
@@ -291,7 +321,7 @@
     }
 
     > .description {
-      max-width: 500px;
+      max-width: var(--max-form-item-width);
       padding-left: 2px;
       text-align: justify;
       font-style: italic;
