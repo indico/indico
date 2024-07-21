@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Form} from 'semantic-ui-react';
 
 import {MarkdownEditor, TinyMCETextEditor} from 'indico/react/components';
@@ -20,34 +20,44 @@ export default function WTFDescriptionField({
   height,
   currentInput,
 }) {
-  // const field = useMemo(() => document.getElementById(`${fieldId}`), [fieldId]);
-  // const [loading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState(currentInput);
+
+  useEffect(() => {
+    setInputValue(currentInput);
+  }, [currentInput]);
+
+  const handleChange = newValue => {
+    setInputValue(newValue);
+  };
 
   return (
     <Form.Field>
       {renderMode === 'markdown' && (
         <MarkdownEditor
           name={fieldId}
+          fieldId={fieldId}
           imageUploadURL={imageUploadURL}
           height={height}
           required={required}
           disabled={disabled}
-          value={currentInput}
+          value={inputValue}
+          onChange={e => handleChange(e)}
         />
       )}
       {renderMode === 'html' && (
         <TinyMCETextEditor
           name={fieldId}
-          // loading={loading}
-          value={currentInput}
+          fieldId={fieldId}
+          value={inputValue}
+          lazyValue
           parse={v => v}
           config={{images: true, imageUploadURL, fullScreen: false}}
           height={height}
           required={required}
           disabled={disabled}
-          onBlur={() => undefined}
-          onChange={() => undefined}
-          onFocus={() => undefined}
+          // onBlur={e => handleChange(e.target.getContent())}
+          onChange={e => handleChange(e.target ? e.target.getContent() : e)}
+          // onFocus={e => handleChange(e.target.getContent())}
         />
       )}
     </Form.Field>
