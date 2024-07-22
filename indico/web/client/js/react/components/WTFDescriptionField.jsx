@@ -26,8 +26,20 @@ export default function WTFDescriptionField({
     setInputValue(currentInput);
   }, [currentInput]);
 
-  const handleChange = newValue => {
+  const handleHTMLChange = newValue => {
     setInputValue(newValue);
+    const descriptionField = $(`#${fieldId}`);
+    // Update the hidden input field directly using jQuery
+    descriptionField.val(newValue);
+    descriptionField.trigger('change');
+  };
+
+  const handleMarkdownChange = newValue => {
+    setInputValue(newValue['text']);
+    const descriptionField = $(`#${fieldId}`);
+    // Update the hidden input field directly using jQuery
+    descriptionField.val(newValue['text']);
+    descriptionField.trigger('change');
   };
 
   return (
@@ -41,7 +53,7 @@ export default function WTFDescriptionField({
           required={required}
           disabled={disabled}
           value={inputValue}
-          onChange={e => handleChange(e)}
+          onChange={handleMarkdownChange}
         />
       )}
       {renderMode === 'html' && (
@@ -49,15 +61,14 @@ export default function WTFDescriptionField({
           name={fieldId}
           fieldId={fieldId}
           value={inputValue}
-          lazyValue
           parse={v => v}
           config={{images: true, imageUploadURL, fullScreen: false}}
           height={height}
           required={required}
           disabled={disabled}
-          // onBlur={e => handleChange(e.target.getContent())}
-          onChange={e => handleChange(e.target ? e.target.getContent() : e)}
-          // onFocus={e => handleChange(e.target.getContent())}
+          onBlur={v => v}
+          onChange={handleHTMLChange}
+          onFocus={v => v}
         />
       )}
     </Form.Field>

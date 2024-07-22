@@ -138,8 +138,8 @@ class DescriptionWidget(JinjaWidget):
     and upload them using that URL.
     """
 
-    def __init__(self, *, render_mode, height='40vh'):
-        super().__init__('forms/new_markdown_widget.html', render_mode=render_mode, height=height)
+    def __init__(self, *, render_mode, height='50vh'):
+        super().__init__('forms/description_widget.html', render_mode=render_mode, height=height)
 
 
 class SwitchWidget(JinjaWidget):
