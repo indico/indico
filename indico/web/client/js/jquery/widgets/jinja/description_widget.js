@@ -11,7 +11,7 @@ import ReactDOM from 'react-dom';
 import WTFDescriptionField from "indico/react/components/WTFDescriptionField";
 
 (function (global) {
-  global.setupNewMarkDownEditor = function setupNewMarkDownEditor({
+  global.setupDescriptionWidget = function setupDescriptionWidget({
   fieldId,
   required,
   disabled,

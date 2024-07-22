@@ -10,7 +10,7 @@
 
 {% block javascript %}
     <script>
-        setupNewMarkDownEditor({
+        setupDescriptionWidget({
             fieldId: {{ field.id | tojson }},
             required: {{ required | default(false) | tojson }},
             disabled: {{ disabled | default(false) | tojson }},
