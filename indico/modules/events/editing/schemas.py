@@ -259,9 +259,10 @@ class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords')
+        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords', 'persons')
 
     editable = fields.Method('_get_editable')
+    persons = fields.Method('_get_persons')
 
     def _get_editable(self, contribution):
         editable_type = self.context['editable_type']
@@ -270,21 +271,29 @@ class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
             return None
         return EditableBasicSchema().dump(editable)
 
+    def _get_persons(self, contribution):
+        return [person.full_name for person in contribution.person_links]
+
 
 class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('contribution_id', 'contribution_title', 'contribution_code', 'contribution_friendly_id',
-                  'contribution_keywords', 'id', 'state', 'timeline_url', 'editor', 'can_assign_self')
+        fields = ('contribution_id', 'contribution_title', 'contribution_persons', 'contribution_code',
+                  'contribution_friendly_id', 'contribution_keywords', 'id', 'state', 'timeline_url',
+                  'editor', 'can_assign_self')
 
     contribution_friendly_id = fields.Int(attribute='contribution.friendly_id')
     contribution_code = fields.String(attribute='contribution.code')
     contribution_title = fields.String(attribute='contribution.title')
+    contribution_persons = fields.Method('_get_contrib_persons')
     contribution_keywords = fields.List(fields.String(), attribute='contribution.keywords')
     state = EnumField(EditableState)
     timeline_url = fields.String()
     editor = fields.Nested(EditingUserSchema)
     can_assign_self = fields.Function(lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
+
+    def _get_contrib_persons(self, editable):
+        return [person.full_name for person in editable.contribution.person_links]
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):
