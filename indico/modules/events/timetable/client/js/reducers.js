@@ -55,7 +55,7 @@ const preprocessData = (data, eventInfo) => {
       ]),
       type: entryTypeMapping[e.entryType],
       start: e.startDate && new Date(Date.parse(`${e.startDate.date} ${e.startDate.time}`)),
-      attachmentCount: e.attachments?.files?.length + e.attachments?.folders.length, // TODO count files in folders
+      attachmentCount: e.attachments?.files?.length + e.attachments?.folders?.length, // TODO count files in folders
       color: e.entryType === 'Break' ? {text: e.textColor, background: e.color} : null,
       deleted: false,
     }))
