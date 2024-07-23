@@ -14,6 +14,8 @@ Improvements
   thanks :user:`SegiNyn`)
 - Add task to delete old registration files when they become orphaned due to a new
   file being uploaded (:pr:`6434`, thanks :user:`SegiNyn`)
+- A room's bookable hours can now be applied to specific weekdays, making it
+  unbookable on any other weekdays (:pr:`6439`)
 
 Bugfixes
 ^^^^^^^^

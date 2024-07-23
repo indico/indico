@@ -145,7 +145,7 @@ def serialize_nonbookable_periods(data):
 
 def serialize_unbookable_hours(data):
     from indico.modules.rb.schemas import bookable_hours_schema
-    return [bookable_hours_schema.dump(d) for d in data]
+    return {wd: [bookable_hours_schema.dump(d) for d in day_data] for wd, day_data in data.items()}
 
 
 def serialize_concurrent_pre_bookings(data):
@@ -212,7 +212,7 @@ def serialize_booking_details(booking):
 
     start_dt = datetime.combine(booking.start_dt, time.min)
     end_dt = datetime.combine(booking.end_dt, time.max)
-    unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, [])
+    unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, dict.fromkeys(WEEKDAYS, ()))
     other_bookings = get_existing_room_occurrences(booking.room, start_dt, end_dt, booking.repeat_frequency,
                                                    booking.repeat_interval, skip_booking_id=booking.id)
     blocked_rooms = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date())
@@ -238,7 +238,7 @@ def serialize_availability(availability):
         data['blockings'] = serialize_blockings(data.get('blockings', {}))
         data['overridable_blockings'] = serialize_blockings(data.get('overridable_blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
-        data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
+        data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', dict.fromkeys(WEEKDAYS, ())))
         data['concurrent_pre_bookings'] = serialize_concurrent_pre_bookings(data.get('concurrent_pre_bookings', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
                      for k in ('candidates', 'conflicting_candidates', 'pre_bookings', 'bookings', 'conflicts',

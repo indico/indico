@@ -160,3 +160,15 @@ export function serializeDateTimeRange(startDt, endDt) {
     ? `${startDate} ${startTime} - ${endTime}`
     : `${startDate} ${startTime} - ${endDate} ${endTime}`;
 }
+
+/**
+ * Get the 3-letter weekday from a date string
+ * @param {String} date - A date string (or undefined for current date)
+ * @returns {String} - The 3-letter weekday (mon, tue, ...)
+ */
+export function getWeekday(date = undefined) {
+  return moment(date)
+    .locale('en')
+    .format('ddd')
+    .toLocaleLowerCase();
+}
