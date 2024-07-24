@@ -192,13 +192,14 @@ function EditableListDisplay({
           selectedOptions.includes(contrib.c.editable.editor.identifier),
       },
       {
-        key: 'code',
-        text: Translate.string('Program code'),
-        options: _.uniq(contribList.map(c => c.code).filter(x => x)).map(code => ({
-          value: code,
-          text: code,
+        key: 'session',
+        text: Translate.string('Session'),
+        options: _.uniqBy(contribList.map(c => c.session).filter(x => x), 'id').map(session => ({
+          value: `${session.id}`,
+          text: session.code ? `${session.code} - ${session.title}` : session.title,
         })),
-        isMatch: (contrib, selectedOptions) => selectedOptions.includes(contrib.c.code),
+        isMatch: (contrib, selectedOptions) =>
+          contrib.c.session && selectedOptions.includes(`${contrib.c.session.id}`),
       },
       {
         key: 'keywords',

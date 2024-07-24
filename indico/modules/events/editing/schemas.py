@@ -24,6 +24,7 @@ from indico.modules.events.editing.models.review_conditions import EditingReview
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
 from indico.modules.events.editing.models.tags import EditingTag
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import get_all_user_roles
 from indico.modules.users import User
 from indico.util.caching import memoize_request
@@ -256,13 +257,20 @@ class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
                        attribute='latest_revision.tags')
 
 
+class SessionBasicSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Session
+        fields = ('id', 'title', 'code')
+
+
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords', 'persons')
+        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords', 'persons', 'session')
 
     editable = fields.Method('_get_editable')
     persons = fields.List(fields.Pluck(ContributionPersonLinkSchema, 'full_name'), attribute='person_links')
+    session = fields.Nested(SessionBasicSchema)
 
     def _get_editable(self, contribution):
         editable_type = self.context['editable_type']
@@ -276,8 +284,8 @@ class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
         fields = ('contribution_id', 'contribution_title', 'contribution_persons', 'contribution_code',
-                  'contribution_friendly_id', 'contribution_keywords', 'id', 'state', 'timeline_url',
-                  'editor', 'can_assign_self')
+                  'contribution_friendly_id', 'contribution_keywords', 'contribution_session',
+                  'id', 'state', 'timeline_url', 'editor', 'can_assign_self')
 
     contribution_friendly_id = fields.Int(attribute='contribution.friendly_id')
     contribution_code = fields.String(attribute='contribution.code')
@@ -285,6 +293,7 @@ class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     contribution_persons = fields.List(fields.Pluck(ContributionPersonLinkSchema, 'full_name'),
                                        attribute='contribution.person_links')
     contribution_keywords = fields.List(fields.String(), attribute='contribution.keywords')
+    contribution_session = fields.Nested(SessionBasicSchema, attribute='contribution.session')
     state = EnumField(EditableState)
     timeline_url = fields.String()
     editor = fields.Nested(EditingUserSchema)

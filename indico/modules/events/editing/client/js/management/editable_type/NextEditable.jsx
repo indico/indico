@@ -89,13 +89,17 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
   const filterOptions = useMemo(
     () => [
       {
-        key: 'code',
-        text: Translate.string('Program code'),
-        options: _.uniq(editables?.map(e => e.contributionCode).filter(x => x)).map(code => ({
-          value: code,
-          text: code,
-        })),
-        isMatch: (editable, selectedOptions) => selectedOptions.includes(editable.contributionCode),
+        key: 'session',
+        text: Translate.string('Session'),
+        options: _.uniqBy(editables?.map(e => e.contributionSession).filter(x => x), 'id').map(
+          session => ({
+            value: `${session.id}`,
+            text: session.code ? `${session.code} - ${session.title}` : session.title,
+          })
+        ),
+        isMatch: (editable, selectedOptions) =>
+          editable.contributionSession &&
+          selectedOptions.includes(`${editable.contributionSession.id}`),
       },
       {
         key: 'keywords',
