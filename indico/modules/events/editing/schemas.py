@@ -16,7 +16,7 @@ from sqlalchemy import func
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import BasicContributionSchema
+from indico.modules.events.contributions.schemas import BasicContributionSchema, ContributionPersonLinkSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
@@ -262,7 +262,7 @@ class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords', 'persons')
 
     editable = fields.Method('_get_editable')
-    persons = fields.Method('_get_persons')
+    persons = fields.List(fields.Pluck(ContributionPersonLinkSchema, 'full_name'), attribute='person_links')
 
     def _get_editable(self, contribution):
         editable_type = self.context['editable_type']
@@ -270,9 +270,6 @@ class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
         if not editable:
             return None
         return EditableBasicSchema().dump(editable)
-
-    def _get_persons(self, contribution):
-        return [person.full_name for person in contribution.person_links]
 
 
 class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
@@ -285,15 +282,13 @@ class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     contribution_friendly_id = fields.Int(attribute='contribution.friendly_id')
     contribution_code = fields.String(attribute='contribution.code')
     contribution_title = fields.String(attribute='contribution.title')
-    contribution_persons = fields.Method('_get_contrib_persons')
+    contribution_persons = fields.List(fields.Pluck(ContributionPersonLinkSchema, 'full_name'),
+                                       attribute='contribution.person_links')
     contribution_keywords = fields.List(fields.String(), attribute='contribution.keywords')
     state = EnumField(EditableState)
     timeline_url = fields.String()
     editor = fields.Nested(EditingUserSchema)
     can_assign_self = fields.Function(lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
-
-    def _get_contrib_persons(self, editable):
-        return [person.full_name for person in editable.contribution.person_links]
 
     @post_dump(pass_many=True)
     def sort_list(self, data, many, **kwargs):

@@ -62,8 +62,8 @@ class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
 
     class Meta:
         model = ContributionPersonLink
-        fields = ('id', 'person_id', 'email', 'email_hash', 'first_name', 'last_name', 'title', 'affiliation',
-                  'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type')
+        fields = ('id', 'person_id', 'email', 'email_hash', 'first_name', 'last_name', 'full_name', 'title',
+                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type')
 
     @post_dump
     def _hide_sensitive_data(self, data, **kwargs):

@@ -14,7 +14,7 @@ Improvements
   thanks :user:`SegiNyn`)
 - Add task to delete old registration files when they become orphaned due to a new
   file being uploaded (:pr:`6434`, thanks :user:`SegiNyn`)
-- Allow searching by the contribution's authors in editable lists (:pr:`6451`)
+- Allow searching for author names in editable lists (:pr:`6451`)
 
 Bugfixes
 ^^^^^^^^

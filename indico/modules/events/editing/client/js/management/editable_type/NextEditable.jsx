@@ -208,7 +208,7 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
             searchableFields={e => [
               e.contributionTitle,
               e.contributionCode,
-              e.contributionPersons.join(''),
+              ...e.contributionPersons,
             ]}
             onChangeFilters={onChangeFilters}
             onChangeList={setFilteredSet}
