@@ -153,6 +153,11 @@
 
     <div class="toolbar f-j-end hide-if-locked">
         <div class="group">
+            <a class="i-button" href="{{ url_for('.quick_setup_notifications', event) }}">
+                {% trans %}Quick setup{% endtrans %}
+            </a>
+        </div>
+        <div class="group">
             <button class="i-button icon-plus highlight"
                     data-href="{{ url_for('.email_tpl_add', event) }}"
                     data-title="{% trans %}Add a new notification ruleset{% endtrans %}"

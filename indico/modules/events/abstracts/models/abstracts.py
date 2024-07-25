@@ -72,6 +72,14 @@ class AbstractReviewingState(RichIntEnum):
     mixed = 5
 
 
+class AbstractNotifiedStates(RichIntEnum):
+    submit = 1
+    accept = 3
+    reject = 4
+    merge = 5
+    invite = 7
+
+
 class EditTrackMode(IndicoIntEnum):
     none = 0
     both = 1
