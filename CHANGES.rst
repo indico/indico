@@ -14,6 +14,7 @@ Improvements
   thanks :user:`SegiNyn`)
 - Add task to delete old registration files when they become orphaned due to a new
   file being uploaded (:pr:`6434`, thanks :user:`SegiNyn`)
+- Add quick setup button to configure call for abstracts notifications (:pr: `6454`, thanks :user: `jbtwist`)
 
 Bugfixes
 ^^^^^^^^
