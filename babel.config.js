@@ -58,6 +58,6 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 module.exports = {
-  presets: ['@babel/preset-env', '@babel/react'],
+  presets: ['@babel/preset-env', '@babel/react', '@babel/preset-typescript'],
   plugins,
 };

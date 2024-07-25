@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "allowJs": true,
+    "noEmit": true,
+    "lib": ["ESNext", "DOM"],
+    "isolatedModules": true,
+    "moduleResolution": "Node",
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "indico/modules/core/*": ["./indico/modules/core/client/js/*"],
+      "indico/modules/rb/*": ["./indico/modules/rb/client/js/*"],
+      "indico/modules/users/*": ["./indico/modules/users/client/js/*"],
+      "indico/modules/search/*": ["./indico/modules/search/client/js/*"],
+      "indico/modules/events/reviewing/*": ["./indico/modules/events/client/js/reviewing/*"],
+      "indico/modules/events/editing/*": ["./indico/modules/events/editing/client/js/*"],
+      "indico/modules/events/management/*": ["./indico/modules/events/management/client/js/*"],
+      "indico/modules/events/persons/*": ["./indico/modules/events/persons/client/js/*"],
+      "indico/modules/events/*": ["./indico/modules/events/client/js/*"],
+      "indico/*": ["./indico/web/client/js/*"],
+      "axios/unsafe/*": ["./node_modules/axios/lib/*"],
+      "*": ["./node_modules/*"],
+    },
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": [
+    "indico/**/client/**/*",
+    "indico/web/client/js/types",
+  ],
+}
