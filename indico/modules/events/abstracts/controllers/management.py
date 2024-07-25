@@ -16,7 +16,8 @@ from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import (AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm, AbstractSubmissionSettingsForm)
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractNotifiedStates, AbstractState
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
@@ -51,6 +52,17 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
         else:
             abstracts_count = Abstract.query.with_parent(self.event).count()
             custom_boa = None
+            rules = self.event._get_email_templates_rules()
+            states_string = [str(e.title) for e in AbstractState if e.value not in rules
+                             and e.value in AbstractNotifiedStates]
+            if states_string:
+                if len(states_string) < 1:
+                    states_string = states_string[0]
+                else:
+                    states_string = ', '.join(states_string[:-1]) + ' and ' + states_string[-1]
+                warning_string = _('''Email notifications for {} are not set up. Please, set them up or click on
+                                   the 'Quick setup' button in the notifications section.''').format(states_string)
+                flash(warning_string, 'warning')
             if self.event.has_custom_boa:
                 custom_boa = BasicFileSchema().dump(self.event.custom_boa)
             return WPManageAbstracts.render_template('management/overview.html', self.event,
