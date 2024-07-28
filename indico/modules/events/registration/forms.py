@@ -7,6 +7,7 @@
 
 from datetime import time, timedelta
 from decimal import Decimal
+from enum import auto
 from operator import itemgetter
 
 import jsonschema
@@ -29,7 +30,7 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
-from indico.util.enum import RichIntEnum
+from indico.util.enum import RichStrEnum
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
@@ -279,22 +280,28 @@ class InvitationFormExisting(InvitationFormBase):
                                   .format(emails=', '.join(sorted(existing))))
 
 
-class CSVFieldDelimiter(RichIntEnum):
-    __titles__ = [_('Comma'), _('Semicolon'), _('Tab'), _('Space')]
+class CSVFieldDelimiter(RichStrEnum):
+    __titles__ = {
+        'comma': _('Comma'),
+        'semicolon': _('Semicolon'),
+        'tab': _('Tab'),
+        'space': _('Space')
+    }
     __delimiters__ = {
-        0: ',',
-        1: ';',
-        2: '\t',
-        3: ' ',
+        'comma': ',',
+        'semicolon': ';',
+        'tab': '\t',
+        'space': ' ',
     }
 
-    comma = 0
-    semicolon = 1
-    tab = 2
-    space = 3
+    comma = auto()
+    semicolon = auto()
+    tab = auto()
+    space = auto()
 
-    def char(self):
-        return self.__delimiters__[self.value]
+    @property
+    def delimiter(self):
+        return self.__delimiters__[self.name]
 
 
 class ImportInvitationsForm(InvitationFormBase):
