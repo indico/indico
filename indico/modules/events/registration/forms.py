@@ -29,6 +29,7 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
@@ -278,12 +279,31 @@ class InvitationFormExisting(InvitationFormBase):
                                   .format(emails=', '.join(sorted(existing))))
 
 
+class CSVFieldDelimiter(RichIntEnum):
+    __titles__ = [_('Comma'), _('Semicolon'), _('Tab'), _('Space')]
+    __delimiters__ = {
+        0: ',',
+        1: ';',
+        2: '\t',
+        3: ' ',
+    }
+
+    comma = 0
+    semicolon = 1
+    tab = 2
+    space = 3
+
+    def char(self):
+        return self.__delimiters__[self.value]
+
+
 class ImportInvitationsForm(InvitationFormBase):
-    _invitation_fields = ('source_file', 'skip_existing', *InvitationFormBase._invitation_fields)
+    _invitation_fields = ('source_file', 'skip_existing', 'delimiter', *InvitationFormBase._invitation_fields)
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
                             accepted_file_types='.csv')
     skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
                                  description=_('If enabled, users with existing invitations will be ignored.'))
+    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter, default=CSVFieldDelimiter.comma)
 
 
 class EmailRegistrantsForm(IndicoForm):
