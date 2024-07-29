@@ -310,7 +310,7 @@ class ImportInvitationsForm(InvitationFormBase):
                             accepted_file_types='.csv')
     skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
                                  description=_('If enabled, users with existing invitations will be ignored.'))
-    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter, default=CSVFieldDelimiter.comma)
+    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter, default=CSVFieldDelimiter.comma.name)
 
 
 class EmailRegistrantsForm(IndicoForm):
