@@ -379,8 +379,13 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
                 filename = secure_filename(file.filename, f'file-{file.id}')
                 file_type = revision_file.file_type
                 folder_name = secure_filename(file_type.name, f'file-type-{file_type.id}')
+                first_revision = (EditingRevisionFile.query
+                                  .filter_by(file=file)
+                                  .join(EditingRevision)
+                                  .order_by(EditingRevision.created_dt)
+                                  .first().revision)
                 info = ZipInfo(filename=os.path.join(folder_name, filename),
-                               date_time=self.revision.created_dt.astimezone(self.event.tzinfo).timetuple()[:6])
+                               date_time=first_revision.created_dt.astimezone(self.event.tzinfo).timetuple()[:6])
                 info.external_attr = 0o644 << 16
                 with file.storage.open(file.storage_file_id) as src, zip_handler.open(info, 'w') as dest:
                     shutil.copyfileobj(src, dest, 1024*8)
