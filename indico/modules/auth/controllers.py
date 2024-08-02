@@ -271,7 +271,13 @@ class RHRegister(RH):
 
         signup_config = handler.get_signup_config()
         if request.method == 'POST':
-            return self._process_post(handler)
+            if request.data:
+                return self._process_post(handler)
+            elif request.form.get('email') != session.get('register_verified_email'):
+                # User somehow succeeded to trigger again the request to send verification email
+                # while the session is pending to a previously validated email
+                flash(_('You have to complete or cancel the registration with the email validated before proceeding '
+                        'registration of another email.'), 'warning')
         return WPSignup.render_template('register.html', signup_config=signup_config)
 
     def _process_verify(self, handler):
