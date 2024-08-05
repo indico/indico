@@ -22,6 +22,7 @@ export {default as TooltipIfTruncated} from './TooltipIfTruncated';
 export {default as SingleDatePicker, FinalSingleDatePicker} from './dates/SingleDatePicker';
 export {default as DatePicker, FinalDatePicker} from './DatePicker';
 export {default as DateRangePicker} from './dates/DateRangePicker';
+export {default as DateRangePicker2} from './DateRangePicker';
 export {default as CalendarSingleDatePicker} from './dates/CalendarSingleDatePicker';
 export {default as CalendarRangeDatePicker} from './dates/CalendarRangeDatePicker';
 export {default as DatePeriodField, FinalDatePeriod} from './dates/DatePeriodField';
