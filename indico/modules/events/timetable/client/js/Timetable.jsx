@@ -111,7 +111,7 @@ export default function Timetable() {
           resourceAccessor={e => e.columnId || blocks.find(p => isChildOf(e, p)).columnId}
           draggableAccessor={e => e.type !== 'placeholder'}
           resizableAccessor={e => e.type !== 'placeholder'}
-          endAccessor={getEndDt}
+          endAccessor={e => e.end || getEndDt(e)}
           resizable
           selectable
         />
