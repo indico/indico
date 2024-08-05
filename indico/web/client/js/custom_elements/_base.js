@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {toOptionalDate} from 'indico/utils/date';
+
+function toKebabCase(propertyName) {
+  return propertyName.replace(/[^A-Z][A-Z]/g, s => `${s[0]}-${s[1].toLowerCase()}`).toLowerCase();
+}
+
 export default class CustomElementBase extends HTMLElement {
   static setValue = (element, value) => {
     // This is a hack to bypass the setter that React adds to the
@@ -14,6 +20,117 @@ export default class CustomElementBase extends HTMLElement {
     // through React.
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, value);
   };
+
+  /**
+   * Specification of attributes that will be used in the
+   * custom element.
+   *
+   * The attributes object maps from property names in camel-case
+   * to the specification objects. Property names are specified
+   * in camelCase and that is the name you will be using to access
+   * them within JavaScript. The attribute names are derived from
+   * these propertyNames by kebab-casing them. For example, if you
+   * specify a property 'minValue', you will be accessing it as
+   * `this.minValue`, or `this.getAttribute('min-value')`. This keeps
+   * things consistent with native elements.
+   *
+   * The specification objects can be constructor functions `String`
+   * or `Boolean`, `Number`, `Date`, or an object with the following
+   * properties:
+   *
+   * - `type` (required) - either `String`, `Boolean`, `Number`, `Date`
+   * - `readonly` (optional) - `true` or `false` (default: `false`)
+   * - `default` (optional) - any value (default: `null`)
+   *
+   * The `Boolean` attributes' value is always a Boolean, and the
+   * presence of the attribute represents the value (think
+   * `disabled` or `checked` attributes in HTML). When setting the
+   * value, the truthiness of the value is used to add or remove the
+   * attribute.
+   *
+   * The `Number` attributes' value is a number or a `NaN` if the
+   * attribute is not present or is set to a non-numeric value.
+   *
+   * The `Date` attributes' value is a `Date` object or `null` if
+   * set to a value that cannot be parsed as a date. When setting
+   * the date, it will be set to an RFC 2822 format (e.g.,
+   * 'Thu, 01 Sep 2016') by invoking the `.toDateString()` method on
+   * the value. If the value being set is a string, it will be set as
+   * is. If the value is not a string, and also not have a
+   * `.toDateString()` method (it doesn't have to be a `Date` object),
+   * it is replaced with an empty string.
+   *
+   * The `String` attributes are normal attirbutes, and their value
+   * is always string. Any value set on this attribute will be coerced
+   * into string.
+   *
+   * By default, attributes listed in this object are automatically
+   * observed. If you wish to observe only some of them, you should
+   * manually set the `observedAttributes` static property.
+   */
+  static attributes = {};
+
+  static get observedAttributes() {
+    return Object.keys(this.attributes);
+  }
+
+  constructor() {
+    super();
+
+    for (const propertyName in this.constructor.attributes) {
+      let attributeSpec = this.constructor.attributes[propertyName];
+      if (typeof attributeSpec === 'function') {
+        attributeSpec = {type: attributeSpec};
+      }
+      const defaultValue = attributeSpec.default ?? null;
+      const attributeName = toKebabCase(propertyName);
+      let getter, setter;
+      switch (attributeSpec.type) {
+        case Boolean:
+          getter = function() {
+            return this.hasAttribute(attributeName);
+          };
+          setter = function(value) {
+            this.toggleAttribute(attributeName, value);
+          };
+          break;
+        case Number:
+          getter = function() {
+            return Number(this.getAttribute(attributeName));
+          };
+          setter = function(value) {
+            this.setAttribute(attributeName, value ?? '');
+          };
+          break;
+        case Date:
+          getter = function() {
+            return toOptionalDate(this.getAttribute(attributeName));
+          };
+          setter = function(value) {
+            if (typeof value === 'string') {
+              this.setAttribute(attributeName, value);
+            } else {
+              this.setAttribute(attributeName, value?.toDateString?.() || '');
+            }
+          };
+          break;
+        default:
+          getter = function() {
+            return this.getAttribute(attributeName) ?? defaultValue;
+          };
+          setter = function(value) {
+            this.setAttribute(attributeName, value);
+          };
+      }
+      const descriptor = {
+        get: getter,
+      };
+      if (!attributeSpec.readonly) {
+        descriptor.set = setter;
+      }
+      Object.defineProperty(this, propertyName, descriptor);
+    }
+  }
 
   connectedCallback() {
     // Custom elements may get temporarily disconnected. Since the
@@ -40,5 +157,11 @@ export default class CustomElementBase extends HTMLElement {
 
   disconnectedCallbasck() {
     this.dispatchEvent(new Event('x-disconnect'));
+  }
+
+  attributeChangedCallback(name) {
+    const eventName = this.constructor.attributes[name]?.changeEventAlias ?? name;
+    this.dispatchEvent(new Event(`x-attrchange.${eventName}`));
+    this.dispatchEvent(new Event('x-attrchange'));
   }
 }
