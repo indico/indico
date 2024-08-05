@@ -131,7 +131,7 @@ export function ContributionEditForm({eventId, contribId, onClose}) {
         const options = fieldData.options.map(opt => ({
           key: opt.id,
           text: opt.option,
-          value: id,
+          value: opt.id,
         }));
 
         return (
@@ -322,7 +322,7 @@ export function ContributionCreateForm({eventId, onClose}) {
         const options = fieldData.options.map(opt => ({
           key: opt.id,
           text: opt.option,
-          value: id,
+          value: opt.id,
         }));
 
         return (
