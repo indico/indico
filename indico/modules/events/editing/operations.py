@@ -129,9 +129,10 @@ def publish_editable_revision(revision):
 
 
 @no_autoflush
-def review_editable_revision(revision, editor, action, comment, tags, files=None):
+def review_editable_revision(revision, editor, action, comment, tags, files=None, management=False):
     ensure_latest_revision(revision)
-    _ensure_state(revision, EditableState.ready_for_review)
+    if not management:
+        _ensure_state(revision, EditableState.ready_for_review)
     revision_type = {
         EditingReviewAction.accept: RevisionType.acceptance,
         EditingReviewAction.reject: RevisionType.rejection,
@@ -455,5 +456,5 @@ def _compose_filepath(editable, revision_file):
 
 
 def _ensure_publishable_files(revision):
-    if not revision.editable.latest_revision_with_files.has_publishable_files:
+    if not revision.editable.has_publishable_files:
         raise InvalidEditableState
