@@ -6,14 +6,22 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
+import {getToday, toDateString, DateRange, OpenDateRange} from 'indico/utils/date';
 import {formatDate} from 'indico/utils/date_format';
 import {createDateParser} from 'indico/utils/date_parser';
+import {getWeekInfoForLocale, getFirstDayOfWeek, getWeekdayNames} from 'indico/utils/l10n';
 import {topBottomPosition} from 'indico/utils/positioning';
+import {setNativeInputValue} from 'indico/utils/react_integration';
 
 import './ind_date_picker.scss';
 
 const DEFAULT_LOCALE = document.documentElement.dataset.canonicalLocale;
-const CALENDAR_CELL_COUNT = 42; // 6 rows, 7 days each
+const KEYBOARD_MOVEMENT = {
+  ArrowRight: 'nextday',
+  ArrowLeft: 'previousday',
+  ArrowDown: 'nextweek',
+  ArrowUp: 'previousweek',
+};
 
 customElements.define(
   'ind-date-picker',
@@ -21,29 +29,32 @@ customElements.define(
     // Last value of the internal id used in the widgets
     static lastId = 0;
 
+    static attributes = {
+      min: Date, // Minimum selectable date (inclusive)
+      max: Date, // Maximum selectable date (inclusive)
+      format: String, // Date format
+    };
+
     get value() {
       return this.querySelector('input').value;
     }
 
     setup() {
+      const indDatePicker = this;
       const id = `date-picker-${this.constructor.lastId++}`;
       const input = this.querySelector('input');
       const openCalendarButton = this.querySelector('button');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
 
-      const dateFormat = formatDescription.textContent
-        .split(':')[1]
-        .trim()
-        .toLowerCase();
-      const parseDate = createDateParser(dateFormat);
+      const parseDate = createDateParser(this.format);
 
-      indCalendar.format = dateFormat;
-      indCalendar.value = toDateString(parseDate(this.value));
+      indCalendar.format = this.format;
+      indCalendar.rangeStart = indCalendar.rangeEnd = toDateString(parseDate(this.value));
+      indCalendar.min = this.min;
+      indCalendar.max = this.max;
       formatDescription.id = `${id}-format`;
       input.setAttribute('aria-describedby', formatDescription.id);
-      openCalendarButton.setAttribute('aria-haspopup', 'dialog');
-      openCalendarButton.setAttribute('aria-controls', true);
 
       // This property is defined here rather than in the class because it
       // relies on the parseDate() function created in this scope.
@@ -51,10 +62,8 @@ customElements.define(
         get: () => parseDate(input.value),
       });
 
-      openCalendarButton.addEventListener('click', () => {
-        openCalendarButton.disabled = true;
-        requestAnimationFrame(openDialog);
-      });
+      openCalendarButton.addEventListener('click', open);
+      input.addEventListener('click', open);
       indCalendar.addEventListener('close', () => {
         openCalendarButton.disabled = false;
       });
@@ -63,26 +72,168 @@ customElements.define(
         openCalendarButton.focus();
       });
       indCalendar.addEventListener('x-select', () => {
-        CustomElementBase.setValue(input, formatDate(dateFormat, new Date(indCalendar.value)));
+        CustomElementBase.setValue(input, formatDate(this.format, new Date(indCalendar.value)));
         input.select();
         input.focus();
         input.dispatchEvent(new Event('input', {bubbles: true}));
       });
       input.addEventListener('keydown', evt => {
         if (evt.code === 'ArrowDown' && evt.altKey) {
-          openDialog();
+          openDialog(indCalendar, input);
         }
       });
       input.addEventListener('input', () => {
-        indCalendar.value = toDateString(parseDate(this.value));
+        indCalendar.rangeStart = indCalendar.rangeEnd = toDateString(parseDate(this.value));
+      });
+      this.addEventListener('x-attrchange.min', function() {
+        indCalendar.min = indDatePicker.min;
+      });
+      this.addEventListener('x-attrchange.max', function() {
+        indCalendar.max = indDatePicker.max;
       });
 
-      function openDialog() {
-        topBottomPosition(indCalendar.querySelector('dialog'), input, {
-          expand() {
-            indCalendar.open = true;
-          },
-        });
+      function open() {
+        // Disable the button to prevent re-opening when clicking
+        // the button while the dialog is open
+        openCalendarButton.disabled = true;
+        openDialog(indCalendar, input);
+      }
+    }
+  }
+);
+
+customElements.define(
+  'ind-date-range-picker',
+  class extends CustomElementBase {
+    // Last value of the internal id used in the widgets
+    static lastId = 0;
+
+    static attributes = {
+      rangeStart: Date, // Start of the selected range (inclusive)
+      rangeEnd: Date, // End of the selected range (inclusive)
+      rangeStartMin: Date, // Minimum allowed value for the start of the range (inclusive)
+      rangeStartMax: Date, // Maximum allowed value for the start of the range (inclusive)
+      rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
+      rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
+    };
+
+    get value() {
+      const rangeStartInput = this.querySelector('input[data-range-start]');
+      const rangeEndInput = this.querySelector('input[data-range-end]');
+      return `${rangeStartInput.value}:${rangeEndInput.value}`;
+    }
+
+    setup() {
+      const id = `date-range-picker-${this.constructor.lastId++}`;
+      const fieldset = this.querySelector('fieldset');
+      const rangeStartInput = this.querySelector('input[data-range-start]');
+      const rangeEndInput = this.querySelector('input[data-range-end]');
+      const openCalendarButton = this.querySelector('[data-calendar-trigger]');
+      const formatDescription = this.querySelector('[data-format]');
+      const indCalendar = this.querySelector('ind-calendar');
+      let nextFieldIsRangeStart = true;
+
+      const dateFormat = formatDescription.textContent
+        .split(':')[1]
+        .trim()
+        .toLowerCase();
+      const parseDate = createDateParser(dateFormat);
+
+      indCalendar.format = dateFormat;
+      indCalendar.rangeStart = this.rangeStart;
+      indCalendar.rangeEnd = this.rangeEnd;
+      rangeStartInput.value = formatDate(dateFormat, this.rangeStart);
+      rangeEndInput.value = formatDate(dateFormat, this.rangeEnd);
+      indCalendar.min = this.rangeStartMin;
+      indCalendar.max = this.rangeStartMax;
+
+      formatDescription.id = `${id}-format`;
+      rangeStartInput.setAttribute('aria-describedby', formatDescription.id);
+      rangeEndInput.setAttribute('aria-describedby', formatDescription.id);
+
+      // This property is defined here rather than in the class because it
+      // relies on the parseDate() function created in this scope.
+      Object.defineProperty(this, 'dateRange', {
+        get: () => {
+          return [parseDate(rangeStartInput.value), parseDate(rangeEndInput.value)];
+        },
+      });
+      this.addEventListener('click', evt => {
+        if (evt.target === evt.currentTarget || evt.target === fieldset) {
+          rangeStartInput.focus();
+          rangeStartInput.select();
+        }
+      });
+      this.addEventListener('x-attrchange.range-start', () => {
+        indCalendar.rangeStart = this.rangeStart;
+        rangeStartInput.value = formatDate(dateFormat, this.rangeStart);
+      });
+      this.addEventListener('x-attrchange.range-end', () => {
+        indCalendar.rangeEnd = this.rangeEnd;
+        rangeEndInput.value = formatDate(dateFormat, this.rangeEnd);
+      });
+      rangeStartInput.addEventListener('input', () => {
+        indCalendar.rangeStart = parseDate(rangeStartInput.value);
+      });
+      rangeEndInput.addEventListener('input', () => {
+        indCalendar.rangeEnd = parseDate(rangeEndInput.value);
+      });
+      openCalendarButton.addEventListener('click', open);
+      rangeStartInput.addEventListener('click', open);
+      rangeEndInput.addEventListener('click', open);
+      indCalendar.addEventListener('close', () => {
+        openCalendarButton.disabled = false;
+      });
+      indCalendar.addEventListener('x-select', evt => {
+        // We alterantate between selecting the first date (range start)
+        // and the second date (range end). The calendar is only closed
+        // after the second date is selected.
+        const value = new Date(evt.target.value);
+        if (nextFieldIsRangeStart) {
+          setNativeInputValue(rangeStartInput, formatDate(dateFormat, value));
+          setNativeInputValue(rangeEndInput, '');
+          indCalendar.rangeStart = value;
+          indCalendar.rangeEnd = '';
+          indCalendar.min = this.rangeEndMin;
+          indCalendar.max = this.rangeEndMax;
+          nextFieldIsRangeStart = false;
+          rangeStartInput.dispatchEvent(new Event('input', {bubbles: true}));
+        } else {
+          const rangeStart = new Date(indCalendar.rangeStart);
+          if (value < rangeStart) {
+            // We allow the user to select the dates in reverse order
+            // and we simply flip them around in this scenario.
+            setNativeInputValue(rangeEndInput, formatDate(dateFormat, rangeStart));
+            setNativeInputValue(rangeStartInput, formatDate(dateFormat, value));
+            indCalendar.rangeStart = value;
+            indCalendar.rangeEnd = rangeStart;
+          } else {
+            indCalendar.rangeEnd = value;
+            setNativeInputValue(rangeEndInput, formatDate(dateFormat, value));
+          }
+          indCalendar.min = this.rangeStartMin;
+          indCalendar.max = this.rangeStartMax;
+          indCalendar.open = false;
+          rangeEndInput.focus();
+          rangeEndInput.select();
+          nextFieldIsRangeStart = true;
+          rangeEndInput.dispatchEvent(new Event('input', {bubbles: true}));
+        }
+      });
+      rangeStartInput.addEventListener('keydown', handleAltDownToOpen);
+      rangeEndInput.addEventListener('keydown', handleAltDownToOpen);
+
+      function handleAltDownToOpen(evt) {
+        if (evt.code === 'ArrowDown' && evt.altKey) {
+          openDialog(indCalendar, rangeStartInput);
+        }
+      }
+
+      function open() {
+        // Disable the button to prevent re-opening when clicking
+        // the button while the dialog is open
+        openCalendarButton.disabled = true;
+        openDialog(indCalendar, rangeStartInput);
       }
     }
   }
@@ -91,49 +242,17 @@ customElements.define(
 customElements.define(
   'ind-calendar',
   class extends CustomElementBase {
-    static lastId = 0;
-
-    constructor() {
-      super();
-      this.calendarId = this.constructor.lastId++;
-      this.weekInfo = getWeekInfoForLocale(this.locale);
-    }
-
-    get open() {
-      return this.hasAttribute('open');
-    }
-
-    set open(isOpen) {
-      this.toggleAttribute('open', isOpen);
-    }
-
-    get locale() {
-      return this.getAttribute('lang') || DEFAULT_LOCALE;
-    }
-
-    get value() {
-      return this.getAttribute('value');
-    }
-
-    set value(value) {
-      this.setAttribute('value', value || '');
-    }
-
-    get min() {
-      return this.getAttribute('min');
-    }
-
-    set min(dateString) {
-      this.setAttribute('min', dateString);
-    }
-
-    get max() {
-      return this.getAttribute('max');
-    }
-
-    set max(dateString) {
-      this.setAttribute('max', dateString);
-    }
+    static attributes = {
+      open: Boolean,
+      locale: {
+        type: String,
+        default: DEFAULT_LOCALE,
+      },
+      rangeStart: Date,
+      rangeEnd: Date,
+      min: Date,
+      max: Date,
+    };
 
     setup() {
       const indCalendar = this;
@@ -141,9 +260,9 @@ customElements.define(
       const monthYearGroup = this.querySelector('.month-year');
       const editMonthSelect = monthYearGroup.querySelector('select');
       const editYearInput = monthYearGroup.querySelector('input');
-      const weekdaysGroup = dialog.querySelector('.weekdays');
-      const listbox = dialog.querySelector('[role=listbox]');
-      let calendarDisplayDate;
+      const calendars = this.querySelector('.calendars');
+      const dateGrids = this.querySelectorAll('ind-date-grid');
+      let calendarDisplayDate, cursor;
 
       // Populate month names in the select list
       for (let i = 0; i < 12; i++) {
@@ -156,32 +275,21 @@ customElements.define(
         editMonthSelect.append(monthOption);
       }
 
-      // Populate weekday names in the calendar header
-      getWeekdayNames(this.weekInfo).forEach(({full, short}, i) => {
-        const headerCell = weekdaysGroup.children[i];
-        headerCell.setAttribute('aria-label', full);
-        headerCell.textContent = short;
-        headerCell.id = `calendar-${this.calendarId}-wkd-${i + 1}`;
-      });
-
-      // Populate calendar with blank buttons
-      for (let i = 0; i < CALENDAR_CELL_COUNT; i++) {
-        const calendarButton = document.createElement('button');
-        calendarButton.setAttribute('role', 'option');
-        calendarButton.setAttribute('aria-describedby', weekdaysGroup.children[i % 6].id);
-        calendarButton.tabIndex = -1;
-        calendarButton.type = 'button';
-        listbox.append(calendarButton);
+      for (const grid of dateGrids) {
+        grid.hideDatesFromOtherMonths = dateGrids.length > 1;
       }
 
-      this.addEventListener('attrchange.open', () => {
+      this.addEventListener('x-attrchange.open', () => {
         if (this.open) {
           show();
         } else {
           close();
         }
       });
-      this.addEventListener('attrchange.value', updateCalendar);
+      this.addEventListener('x-attrchange.range-start', updateCalendar);
+      this.addEventListener('x-attrchange.range-end', updateCalendar);
+      this.addEventListener('x-attrchange.min', updateCalendar);
+      this.addEventListener('x-attrchange.max', updateCalendar);
 
       dialog.addEventListener('pointerdown', () => {
         // Because Safari does not focus buttons (and other elements) when they
@@ -214,7 +322,6 @@ customElements.define(
 
       // Handle open/close to prep the dialog state
       dialog.addEventListener('open', () => {
-        calendarDisplayDate = toOptionalDate(this.value) || getToday();
         const focusTarget = dialog.querySelector('[aria-selected=true]') || dialog;
         focusTarget.focus();
       });
@@ -247,10 +354,13 @@ customElements.define(
             updateCalendar();
             break;
           default:
-            // Date selection
-            this.open = false;
-            this.value = button.value;
-            this.dispatchEvent(new Event('x-select'));
+            // The only remaining option is a calendar button - date selection.
+            // We dispatch the x-select event on the button itself, and the
+            // input component will handle updating its value.
+            if (button.hasAttribute('aria-disabled')) {
+              return;
+            }
+            button.dispatchEvent(new Event('x-select', {bubbles: true}));
         }
       });
       editYearInput.addEventListener('input', () => {
@@ -266,68 +376,84 @@ customElements.define(
         calendarDisplayDate.setMonth(editMonthSelect.value);
         updateCalendar();
       });
-      listbox.addEventListener('keydown', evt => {
-        const currentDate = listbox.querySelector(':focus');
-        const currentDateIndex = Array.prototype.indexOf.call(listbox.children, currentDate);
-        switch (evt.code) {
-          case 'ArrowRight': {
-            evt.preventDefault();
-            let nextDate = currentDate?.nextElementSibling;
-            if (!nextDate) {
-              // We've reached the end. Flip to next month and start from the beginning.
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
-              updateCalendar();
-              nextDate = listbox.firstElementChild;
-            }
-            focusCalendarButton(nextDate);
-            break;
-          }
-          case 'ArrowLeft': {
-            evt.preventDefault();
-            let previousDate = currentDate?.previousElementSibling;
-            if (!previousDate) {
-              // We've reached the end. Flip to previous month and start from the end.
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
-              updateCalendar();
-              previousDate = listbox.lastElementChild;
-            }
-            focusCalendarButton(previousDate);
-            break;
-          }
-          case 'ArrowUp': {
-            evt.preventDefault();
-            let nextIndex = currentDateIndex - 7;
-            if (nextIndex < 1) {
-              // We've reached the end. Flip to previous month and start from last row.
-              nextIndex = listbox.children.length - 7 + currentDateIndex;
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
-              updateCalendar();
-            }
-            focusCalendarButton(listbox.children[nextIndex] || listbox.lastElementChild);
-            break;
-          }
-          case 'ArrowDown': {
-            evt.preventDefault();
-            let nextIndex = currentDateIndex + 7;
-            if (nextIndex > listbox.children.length - 1) {
-              // We've reached the end. Flip to next month and start from the first row.
-              nextIndex = currentDateIndex % 7;
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
-              updateCalendar();
-            }
-            focusCalendarButton(listbox.children[nextIndex] || listbox.firstElementChild);
-            break;
-          }
-        }
-      });
 
       // Handle closing/opening the dialog by clicking outside
-      this.addEventListener('keydown', evt => {
+      indCalendar.addEventListener('keydown', evt => {
         if (evt.code !== 'Escape') {
           return;
         }
         this.open = false;
         this.dispatchEvent(new Event('x-keyclose'));
+      });
+
+      // Grid calendar month change
+      indCalendar.addEventListener('x-datechange.next', () => {
+        calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
+        updateCalendar();
+      });
+      indCalendar.addEventListener('x-datechange.previous', () => {
+        calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
+        updateCalendar();
+      });
+
+      // Grid cursor movement
+      indCalendar.addEventListener('x-move', evt => {
+        const {direction, currentDate} = evt.detail;
+        const nextDate = new Date(currentDate);
+
+        switch (direction) {
+          case 'nextday':
+            nextDate.setDate(nextDate.getDate() + 1);
+            break;
+          case 'previousday':
+            nextDate.setDate(nextDate.getDate() - 1);
+            break;
+          case 'nextweek':
+            nextDate.setDate(nextDate.getDate() + 7);
+            break;
+          case 'previousweek':
+            nextDate.setDate(nextDate.getDate() - 7);
+            break;
+        }
+
+        const nextDateString = nextDate.toDateString();
+        const targetButton = findFocusableButton(nextDateString);
+        if (targetButton) {
+          targetButton.focus();
+        } else {
+          if (direction.startsWith('next')) {
+            calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
+            updateCalendar();
+          } else {
+            calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
+            updateCalendar();
+          }
+          setTimeout(function() {
+            findFocusableButton(nextDateString).focus();
+          });
+        }
+      });
+
+      calendars?.addEventListener('focusin', evt => {
+        if (evt.target.matches('[aria-disabled]')) {
+          return;
+        }
+        cursor = evt.target.value;
+        updateGrids();
+      });
+      calendars?.addEventListener('focusout', () => {
+        cursor = undefined;
+        updateGrids();
+      });
+      calendars?.addEventListener('mouseover', evt => {
+        if (evt.target.matches('button[value]:not([aria-disabled])')) {
+          cursor = evt.target.value;
+          updateGrids();
+        }
+      });
+      calendars?.addEventListener('mouseout', () => {
+        cursor = undefined;
+        updateGrids();
       });
 
       // Note that this may not work on iOS Safari. We are not currently explicitly
@@ -339,25 +465,16 @@ customElements.define(
         window.removeEventListener('click', handleDialogClose);
       });
 
-      function handleDialogClose(ev) {
+      function handleDialogClose(evt) {
         if (!indCalendar.open) {
           return;
         }
-        if (ev.target.closest('dialog') === dialog) {
+        if (evt.target.closest('dialog') === dialog) {
           return;
         }
         setTimeout(() => {
           indCalendar.open = false;
         });
-      }
-
-      function focusCalendarButton(calendarButton) {
-        const currentlyFocusable = listbox.querySelector('[tabindex="0"]');
-        if (currentlyFocusable) {
-          currentlyFocusable.tabIndex = -1;
-        }
-        calendarButton.tabIndex = 0;
-        calendarButton.focus();
       }
 
       function show() {
@@ -367,6 +484,7 @@ customElements.define(
         if (dialog.open) {
           return;
         }
+        updateCalendar();
         dialog.show();
         dialog.dispatchEvent(new Event('open'));
       }
@@ -382,11 +500,32 @@ customElements.define(
         indCalendar.dispatchEvent(new Event('close'));
       }
 
+      function getRange() {
+        if (indCalendar.rangeStart && !indCalendar.rangeEnd) {
+          // When we have an open range, then we use the cursor
+          // position as a fallback. This is generally only
+          // applicable top range selection as a single date
+          // picker will always set both ends of the range.
+          const start = new Date(indCalendar.rangeStart);
+          const end = new Date(cursor);
+          if (start > end) {
+            return new DateRange(end, start);
+          }
+          return new DateRange(start, end);
+        }
+        return new DateRange(indCalendar.rangeStart, indCalendar.rangeEnd);
+      }
+
       function updateCalendar() {
-        const selectedDate = toOptionalDate(indCalendar.value);
-        const firstDayOfMonth = new Date(calendarDisplayDate || selectedDate || getToday());
+        const selectedRange = getRange();
+        const firstDayOfMonth = new Date(
+          calendarDisplayDate || selectedRange.start || indCalendar.min || getToday()
+        );
         firstDayOfMonth.setDate(1);
-        const firstDayOfCalendar = getFirstDayOfWeek(indCalendar.weekInfo, firstDayOfMonth);
+
+        // If the calendar display date is not set, set it to the computed
+        // first day of month
+        calendarDisplayDate ??= firstDayOfMonth;
 
         // Populate the year/month controls
 
@@ -394,117 +533,219 @@ customElements.define(
         editYearInput.value = firstDayOfMonth.getFullYear();
 
         // Populate the calendar cells
+        updateGrids(firstDayOfMonth.getFullYear(), firstDayOfMonth.getMonth());
+      }
 
-        const min = toOptionalDate(indCalendar.min);
-        const max = toOptionalDate(indCalendar.max);
-        const month = firstDayOfMonth.getMonth();
+      function updateGrids(year, month) {
+        const range = getRange();
+        dateGrids.forEach((grid, i) => {
+          if (year !== undefined && month !== undefined) {
+            const gridDate = new Date(year, month);
+            gridDate.setMonth(gridDate.getMonth() + i);
+            grid.year = gridDate.getFullYear();
+            grid.month = gridDate.getMonth();
+          }
+          grid.rangeStart = range.start?.toString() || '';
+          grid.rangeEnd = range.end?.toString() || '';
+          grid.min = indCalendar.min;
+          grid.max = indCalendar.max;
+        });
+      }
 
-        for (let i = 0; i < CALENDAR_CELL_COUNT; i++) {
-          const date = new Date(firstDayOfCalendar);
-          date.setDate(date.getDate() + i);
-          const calendarButton = listbox.querySelector(`button:nth-of-type(${i + 1})`);
-          calendarButton.textContent = date.getDate();
-          calendarButton.dataset.currentMonth = date.getMonth() === month;
-          calendarButton.setAttribute(
-            'aria-label',
-            date.toLocaleDateString(indCalendar.locale, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-          );
-          calendarButton.toggleAttribute(
-            'data-weekend',
-            indCalendar.weekInfo.weekend.includes(date.getDay() + 1)
-          );
-          calendarButton.tabIndex = -1; // reset tabIndex
-          calendarButton.value = toDateString(date);
-
-          // Mark range
-          calendarButton.disabled = date < min || date > max;
-
-          // Mark selected
-          if (calendarButton.value === indCalendar.value) {
-            calendarButton.setAttribute('aria-selected', true);
-          } else {
-            calendarButton.removeAttribute('aria-selected');
+      function findFocusableButton(dateString) {
+        const focusableButtons = [];
+        for (const grid of dateGrids) {
+          const button = grid.makeFocusable(dateString);
+          if (button) {
+            focusableButtons.push(button);
           }
         }
-
-        const focusableButton =
-          listbox.querySelector('[aria-selected]') ||
-          listbox.querySelector('button:not(:disabled)');
-        focusableButton.tabIndex = 0;
-      }
-    }
-
-    static observedAttributes = ['open', 'value', 'min', 'max'];
-
-    attributeChangedCallback(name) {
-      switch (name) {
-        case 'open':
-          this.dispatchEvent(new Event('attrchange.open'));
-          break;
-        case 'value':
-        case 'min':
-        case 'max':
-          this.dispatchEvent(new Event('attrchange.value'));
-          break;
+        return (
+          focusableButtons.find(function(button) {
+            return button.dataset.currentMonth === 'true';
+          }) || focusableButtons[0]
+        );
       }
     }
   }
 );
 
-// Date functions
+customElements.define(
+  'ind-date-grid',
+  class extends CustomElementBase {
+    static lastId = 0;
 
-function getToday() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now;
-}
+    static attributes = {
+      min: Date,
+      max: Date,
+      rangeStart: Date,
+      rangeEnd: Date,
+      year: Number,
+      month: Number,
+      locale: {
+        type: String,
+        default: DEFAULT_LOCALE,
+      },
+      hideDatesFromOtherMonths: Boolean,
+    };
 
-function toDateString(date) {
-  // We do not use ISO date format because it will be interpreted as UTC
-  return date?.toDateString();
-}
+    setup() {
+      const indDateGrid = this;
+      const weekInfo = getWeekInfoForLocale(this.locale);
+      const listbox = this.querySelector('[role=listbox]');
+      const calendarButtons = listbox.querySelectorAll('[role=option]');
+      const weekdayLabels = this.querySelectorAll('[data-weekday-labels] abbr');
+      const monthLabel = this.querySelector('[data-month-label]');
+      const id = `date-grid-${this.constructor.lastId++}`;
 
-function toOptionalDate(dateString) {
-  const date = new Date(dateString);
-  if (!date.getTime()) {
-    return;
+      // Populate weekday names in the calendar header
+      getWeekdayNames(weekInfo).forEach(({full, short}, i) => {
+        const headerCell = weekdayLabels[i];
+        headerCell.setAttribute('aria-label', full);
+        headerCell.setAttribute('title', full);
+        headerCell.textContent = short;
+        headerCell.id = `${id}-wkd-${i + 1}`;
+      });
+
+      // Prepare the initial button states
+      calendarButtons.forEach((calendarButton, i) => {
+        calendarButton.setAttribute('aria-describedby', weekdayLabels[i % 7].id);
+        calendarButton.tabIndex = -1;
+        calendarButton.type = 'button';
+      });
+
+      indDateGrid.addEventListener('x-attrchange', updateGridDates);
+
+      listbox.addEventListener('keydown', evt => {
+        // Movement keyboard commands simply translate the keyboard
+        // events to custom x-move events. These are handled by
+        // <ind-calendar> because that's the first common ancestor
+        // of all the grids, and can facilitate cross-grid movement.
+
+        const currentDate = listbox.querySelector(':focus').value;
+
+        const movementDirection = KEYBOARD_MOVEMENT[evt.code];
+        if (movementDirection) {
+          evt.preventDefault();
+          indDateGrid.dispatchEvent(
+            new CustomEvent('x-move', {
+              detail: {direction: movementDirection, currentDate},
+              bubbles: true,
+            })
+          );
+        }
+      });
+
+      let debounceTimer;
+
+      function updateGridDates() {
+        // This function is debounced as sometimes we may set multiple
+        // properties on the ind-date-grid element, and we only want the
+        // DOM to update once.
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const firstDayOfMonth = new Date(indDateGrid.year, indDateGrid.month, 1);
+          const firstDayOfCalendar = getFirstDayOfWeek(weekInfo, firstDayOfMonth);
+          const calendarMonth = firstDayOfMonth.getMonth();
+
+          if (monthLabel) {
+            monthLabel.textContent = firstDayOfMonth.toLocaleDateString(indDateGrid.locale, {
+              month: 'long',
+              year: 'numeric',
+            });
+          }
+
+          const allowedDateRange = new OpenDateRange(indDateGrid.min, indDateGrid.max);
+          const range = new DateRange(indDateGrid.rangeStart, indDateGrid.rangeEnd);
+
+          let focusableButton = listbox.querySelector('[role=option]');
+
+          calendarButtons.forEach((calendarButton, i) => {
+            const date = new Date(firstDayOfCalendar);
+            date.setDate(date.getDate() + i);
+            const currentMonth = date.getMonth() === calendarMonth;
+
+            if (!currentMonth && indDateGrid.hideDatesFromOtherMonths) {
+              calendarButton.textContent = '';
+              calendarButton.dataset.currentMonth = false;
+              calendarButton.removeAttribute('aria-label');
+              calendarButton.removeAttribute('aria-selected');
+              calendarButton.removeAttribute('data-week');
+              calendarButton.removeAttribute('data-range-start');
+              calendarButton.removeAttribute('data-range-end');
+              calendarButton.value = '';
+              calendarButton.tabIndex = -1;
+              calendarButton.disabled = true;
+              return;
+            }
+
+            // Upate button attributes
+            calendarButton.textContent = date.getDate();
+            calendarButton.dataset.currentMonth = date.getMonth() === calendarMonth;
+            calendarButton.setAttribute(
+              'aria-label',
+              date.toLocaleDateString(indDateGrid.locale, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+            );
+            calendarButton.toggleAttribute(
+              'data-weekend',
+              weekInfo.weekend.includes(date.getDay() + 1)
+            );
+            calendarButton.tabIndex = -1;
+            calendarButton.value = toDateString(date);
+
+            if (!allowedDateRange.includes(date)) {
+              calendarButton.setAttribute('aria-disabled', true);
+            } else {
+              calendarButton.removeAttribute('aria-disabled');
+            }
+
+            if (range.includes(date)) {
+              calendarButton.setAttribute('aria-selected', true);
+            } else {
+              calendarButton.removeAttribute('aria-selected');
+            }
+            calendarButton.toggleAttribute('data-range-start', range.startsWith(date));
+            calendarButton.toggleAttribute('data-range-end', range.endsWith(date));
+            if (range.startsWith(date)) {
+              focusableButton = calendarButton;
+            }
+          });
+
+          focusableButton.tabIndex = 0;
+          indDateGrid.dispatchEvent(new Event('x-update-grid'));
+        });
+      }
+    }
+
+    static observedAttributes = ['year', 'month', 'range-start', 'range-end'];
+
+    attributeChangedCallback() {
+      this.dispatchEvent(new Event('x-attrchange'));
+    }
+
+    makeFocusable(dateString) {
+      const calendarButton = this.querySelector(`[value="${dateString}"]`);
+      if (!calendarButton) {
+        return;
+      }
+      const currentlyFocusable = this.querySelector('[tabindex="0"]');
+      if (currentlyFocusable) {
+        currentlyFocusable.tabIndex = -1;
+      }
+      calendarButton.tabIndex = 0;
+      return calendarButton;
+    }
   }
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
+);
 
-// Localization
-
-function getWeekInfoForLocale(locale) {
-  let weekInfo = new Intl.Locale(locale).weekInfo;
-  weekInfo ??= {firstDay: 7, weekend: [6, 7]}; /* Firefox 😭 */
-  weekInfo.weekDays = [];
-  for (let i = weekInfo.firstDay, end = i + 7; i < end; i++) {
-    weekInfo.weekDays.push(i % 7 || 7);
-  }
-  return weekInfo;
-}
-
-function getFirstDayOfWeek(weekInfo, date) {
-  const offset = weekInfo.weekDays.indexOf(date.getDay() || 7);
-  const firstDayOfWeek = new Date(date);
-  firstDayOfWeek.setDate(firstDayOfWeek.getDate() - offset);
-  return firstDayOfWeek;
-}
-
-function getWeekdayNames(weekInfo, locale) {
-  const date = getFirstDayOfWeek(weekInfo, getToday());
-  const weekdayNames = [];
-  for (let i = 0; i < 7; i++) {
-    weekdayNames.push({
-      full: date.toLocaleDateString(locale, {weekday: 'long'}),
-      short: date.toLocaleDateString(locale, {weekday: 'narrow'}),
-    });
-    date.setDate(date.getDate() + 1);
-  }
-  return weekdayNames;
+function openDialog(indCalendar, input) {
+  topBottomPosition(indCalendar.firstElementChild, input, {
+    expand() {
+      indCalendar.open = true;
+    },
+  });
 }

@@ -172,3 +172,71 @@ export function getWeekday(date = undefined) {
     .format('ddd')
     .toLocaleLowerCase();
 }
+
+export function getToday() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+}
+
+export function toDateString(date) {
+  // We do not use ISO date format because it will be interpreted as UTC
+  return date?.toDateString() || '';
+}
+
+export function toOptionalDate(dateString) {
+  const date = new Date(dateString);
+  if (!date.getTime()) {
+    return;
+  }
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+export function isSameDate(x, y) {
+  return x?.toDateString() === y?.toDateString();
+}
+
+class DateRangeBase {
+  constructor(start, end) {
+    this.start = toOptionalDate(start);
+    this.end = toOptionalDate(end);
+  }
+
+  get isInvalid() {
+    return !this.start && !this.end;
+  }
+
+  startsWith(date) {
+    return isSameDate(date, this.start);
+  }
+
+  endsWith(date) {
+    return isSameDate(date, this.end);
+  }
+}
+
+export class DateRange extends DateRangeBase {
+  includes(date) {
+    if (this.isInvalid) {
+      return false;
+    }
+    if (!this.start) {
+      return isSameDate(date, this.end);
+    }
+    if (!this.end) {
+      return isSameDate(date, this.start);
+    }
+    return date >= this.start && date <= this.end;
+  }
+}
+
+export class OpenDateRange extends DateRangeBase {
+  includes(date) {
+    if (this.isInvalid) {
+      return true;
+    }
+
+    return date >= (this.start || -Infinity) && date <= (this.end || Infinity);
+  }
+}
