@@ -18,3 +18,68 @@
     @content;
   }
 }
+
+@mixin input-font {
+  font-family: 'Muli', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+@mixin border-radius {
+  border-radius: 0.28571429rem;
+}
+
+@mixin input-border {
+  border: 1px solid #85b7d9;
+}
+
+@mixin input-background {
+  background: white;
+}
+
+@mixin box-shadow {
+  box-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.3);
+}
+
+@mixin input-padding {
+  padding: 0.67857143em 1em;
+}
+
+@mixin input-focus-border {
+  border-color: #85b7d9;
+}
+
+@mixin input {
+  .ui.form & {
+    @include input-font();
+    @include border-radius();
+    @include input-background();
+    @include input-padding();
+    margin: 0;
+    outline: none;
+    line-height: 1.21428571em;
+    font-size: 1em;
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    color: rgba(0, 0, 0, 0.87);
+    box-shadow: 0 0 0 0 transparent inset;
+    transition: color 0.1s ease, border-color 0.1s ease;
+    flex: 1;
+  }
+
+  .ui.form &:focus {
+    border-color: #85b7d9;
+  }
+
+  .ui.form .field.error & {
+    background: #fff6f6;
+    border-color: #c00;
+    color: #c00;
+    box-shadow: none;
+  }
+}
+
+@mixin nested-input-font-weight {
+  @include field-override() {
+    label input {
+      font-size: revert;
+    }
+  }
+}
