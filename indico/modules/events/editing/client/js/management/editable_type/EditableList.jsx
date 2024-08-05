@@ -49,7 +49,7 @@ import {natSortCompare} from 'indico/utils/sort';
 
 import StateIndicator from '../../editing/timeline/StateIndicator';
 import {userPropTypes} from '../../editing/timeline/util';
-import {EditableType, GetNextEditableTitles} from '../../models';
+import {EditableType, EditingReviewAction, GetNextEditableTitles} from '../../models';
 
 import CommentButton from './CommentButton';
 import NextEditable from './NextEditable';
@@ -156,13 +156,19 @@ function EditableListDisplay({
   const judgmentOptions = [
     {
       key: 'accept',
-      value: 'accept',
+      value: EditingReviewAction.accept,
       text: Translate.string('Accept'),
       label: {color: 'green', empty: true, circular: true},
     },
     {
+      key: 'requestUpdate',
+      value: EditingReviewAction.requestUpdate,
+      text: Translate.string('Request changes'),
+      label: {color: 'red', empty: true, circular: true},
+    },
+    {
       key: 'reject',
-      value: 'reject',
+      value: EditingReviewAction.reject,
       text: Translate.string('Reject'),
       label: {color: 'black', empty: true, circular: true},
     },
