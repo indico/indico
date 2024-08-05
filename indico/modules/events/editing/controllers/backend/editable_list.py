@@ -22,7 +22,7 @@ from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHE
                                                             RHEditableTypeManagementBase)
 from indico.modules.events.editing.models.editable import Editable, EditableState
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
+from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.operations import (assign_editor, create_revision_comment, generate_editables_json,
                                                       generate_editables_zip, unassign_editor)
 from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingConfirmationAction,
@@ -155,18 +155,19 @@ class RHCreateComment(RHEditablesBase):
 
 class RHApplyJudgment(RHEditablesBase):
     @use_kwargs({
-        'action': fields.String(required=True, validate=validate.OneOf(['accept', 'reject']))
+        'action': fields.String(required=True, validate=validate.OneOf(['accept', 'reject', 'request_update']))
     })
     def _process(self, action):
         changed = []
         for editable in self.editables:
-            revision = editable.latest_revision
-            if action == 'accept' and not revision.has_publishable_files:
+            if action == 'accept' and not editable.latest_revision.has_publishable_files:
                 continue
-            if revision.type == RevisionType.ready_for_review:
-                review_and_publish_editable(revision, EditingReviewAction[action], '')
-            elif revision.type == RevisionType.needs_submitter_confirmation and action == 'accept':
-                confirm_and_publish_changes(revision, EditingConfirmationAction.accept, '')
+            if editable.state == EditableState.ready_for_review:
+                review_and_publish_editable(editable.latest_revision, EditingReviewAction[action], '')
+            elif editable.state == EditableState.needs_submitter_confirmation and action != 'reject':
+                confirm_and_publish_changes(editable.latest_revision, (EditingConfirmationAction.accept
+                                                                       if action == 'accept'
+                                                                       else EditingConfirmationAction.reject), '')
                 db.session.flush()
             else:
                 continue
