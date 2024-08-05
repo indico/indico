@@ -8,7 +8,8 @@
 import uuid
 
 from flask import jsonify, request, session
-from marshmallow import fields, validate
+from marshmallow import fields
+from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import and_, func, over
 from werkzeug.exceptions import Forbidden
@@ -16,8 +17,7 @@ from werkzeug.exceptions import Forbidden
 from indico.core.cache import make_scoped_cache
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.editing.controllers.backend.util import (confirm_and_publish_changes,
-                                                                    review_and_publish_editable)
+from indico.modules.events.editing.controllers.backend.util import review_and_publish_editable
 from indico.modules.events.editing.controllers.base import (RHEditablesBase, RHEditableTypeEditorBase,
                                                             RHEditableTypeManagementBase)
 from indico.modules.events.editing.models.editable import Editable, EditableState
@@ -25,8 +25,7 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.operations import (assign_editor, create_revision_comment, generate_editables_json,
                                                       generate_editables_zip, unassign_editor)
-from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingConfirmationAction,
-                                                   EditingEditableListSchema, EditingReviewAction,
+from indico.modules.events.editing.schemas import (EditableBasicSchema, EditingEditableListSchema, EditingReviewAction,
                                                    FilteredEditableSchema)
 from indico.modules.files.models.files import File
 from indico.util.i18n import _
@@ -155,22 +154,23 @@ class RHCreateComment(RHEditablesBase):
 
 class RHApplyJudgment(RHEditablesBase):
     @use_kwargs({
-        'action': fields.String(required=True, validate=validate.OneOf(['accept', 'reject', 'request_update']))
+        'action': EnumField(EditingReviewAction, required=True)
     })
     def _process(self, action):
+        if action == EditingReviewAction.update:
+            raise ValueError('Invalid action')
         changed = []
+        disallowed_state = {
+            EditingReviewAction.accept: EditableState.accepted,
+            EditingReviewAction.reject: EditableState.rejected,
+            EditingReviewAction.request_update: EditableState.needs_submitter_changes
+        }[action]
         for editable in self.editables:
-            if action == 'accept' and not editable.latest_revision.has_publishable_files:
+            if action == EditingReviewAction.accept and not editable.has_publishable_files:
                 continue
-            if editable.state == EditableState.ready_for_review:
-                review_and_publish_editable(editable.latest_revision, EditingReviewAction[action], '')
-            elif editable.state == EditableState.needs_submitter_confirmation and action != 'reject':
-                confirm_and_publish_changes(editable.latest_revision, (EditingConfirmationAction.accept
-                                                                       if action == 'accept'
-                                                                       else EditingConfirmationAction.reject), '')
-                db.session.flush()
-            else:
+            if editable.state == disallowed_state:
                 continue
+            review_and_publish_editable(editable.latest_revision, action, '', management=True)
             db.session.expire(editable)
             changed.append(editable)
         return EditableBasicSchema(many=True).jsonify(changed)
