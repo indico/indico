@@ -139,6 +139,10 @@ class Editable(db.Model):
                 .order_by(EditingRevision.created_dt.desc())
                 .first())
 
+    @property
+    def has_publishable_files(self):
+        return self.latest_revision_with_files.has_publishable_files
+
     def _has_general_editor_permissions(self, user):
         """Whether the user has general editor permissions on the Editable.
 
