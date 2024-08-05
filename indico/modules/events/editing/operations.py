@@ -134,9 +134,10 @@ def publish_editable_revision(revision):
 
 
 @no_autoflush
-def review_editable_revision(revision, editor, action, comment, tags, files=None):
+def review_editable_revision(revision, editor, action, comment, tags, files=None, management=False):
     ensure_latest_revision(revision)
-    _ensure_state(revision, EditableState.ready_for_review)
+    if not management:
+        _ensure_state(revision, EditableState.ready_for_review)
     revision_type = {
         EditingReviewAction.accept: RevisionType.acceptance,
         EditingReviewAction.reject: RevisionType.rejection,
@@ -155,7 +156,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
     revision.editable.revisions.append(new_revision)
     db.session.flush()
     if action in (EditingReviewAction.update, EditingReviewAction.accept):
-        _ensure_publishable_files(new_revision.editable)
+        _ensure_publishable_files(new_revision)
     submitters = revision.editable.contribution.get_manager_list(include_groups=False, permission='submit',
                                                                  explicit=True)
     db.session.flush()
@@ -182,7 +183,7 @@ def confirm_editable_changes(revision, submitter, action, comment):
     revision.editable.revisions.append(new_revision)
     db.session.flush()
     if action == EditingConfirmationAction.accept:
-        _ensure_publishable_files(revision.editable)
+        _ensure_publishable_files(revision)
     db.session.flush()
     notify_submitter_confirmation(new_revision, submitter, action)
     logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)
@@ -460,6 +461,6 @@ def _compose_filepath(editable, revision_file):
     return os.path.join(filepath, filename)
 
 
-def _ensure_publishable_files(editable):
-    if not editable.latest_revision_with_files.has_publishable_files:
+def _ensure_publishable_files(revision):
+    if not revision.editable.has_publishable_files:
         raise InvalidEditableState
