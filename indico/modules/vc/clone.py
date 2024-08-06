@@ -17,7 +17,7 @@ from indico.util.i18n import _
 class VCCloner(EventCloner):
     name = 'vc'
     friendly_name = _('Videoconference')
-    uses = {'sessions', 'contributions'}
+    uses = {'sessions', 'contributions', 'timetable'}
     is_default = True
 
     @property
