@@ -389,7 +389,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
 
 export function indicoStaticLoader(config) {
   return {
-    test: /\/static\/(images|fonts)\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/,
+    test: /\/static\/(images|fonts)\/.*\.(jpe?g|png|gif|svg|webp|woff2?|ttf|eot)$/,
     use: {
       loader: 'file-loader',
       options: {
