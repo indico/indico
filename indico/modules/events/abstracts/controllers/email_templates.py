@@ -5,17 +5,18 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import redirect, request
+from flask import flash, redirect, request
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import (CreateEmailTemplateForm, EditEmailTemplateRuleForm,
                                                    EditEmailTemplateTextForm)
-from indico.modules.events.abstracts.models.abstracts import AbstractNotifiedStates, AbstractState
+from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.notifications import get_abstract_notification_tpl_module
-from indico.modules.events.abstracts.util import build_default_email_template, create_mock_abstract
+from indico.modules.events.abstracts.util import (build_default_email_template, create_mock_abstract,
+                                                  get_email_templates_rules)
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
@@ -116,18 +117,27 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
 
 
 class RHQuickSetupEmailTemplates(RHManageAbstractsBase):
-    """Setups email templates notifications for every non-configured management action."""
+    """Set up email templates notifications for every non-configured management action."""
 
     def _process(self):
-        rules = self.event._get_email_templates_rules()
-        notificable_values = {e.value: e.name for e in AbstractNotifiedStates}
-        non_configured_notifications = {k: v for k, v in notificable_values.items() if k not in rules}
+        rules = get_email_templates_rules(self.event)
+        notified_states = {
+            'Submit': AbstractState.submitted.value,
+            'Withdrawn': AbstractState.withdrawn.value,
+            'Accept': AbstractState.accepted.value,
+            'Reject': AbstractState.rejected.value,
+            'Merge': AbstractState.merged.value,
+            'Invite': AbstractState.invited.value
+        }
+        non_configured_notifications = {k: v for k, v in notified_states.items() if v not in rules}
         for k, v in non_configured_notifications.items():
-            new_tpl = build_default_email_template(self.event, v)
-            new_tpl.title = v.capitalize()
-            new_tpl.rules = [{'state': [k]}]
+            new_tpl = build_default_email_template(self.event, k.lower())
+            new_tpl.title = k
+            new_tpl.rules = [{'state': [v]}]
             self.event.abstract_email_templates.append(new_tpl)
-        db.session.flush()
+            db.session.flush()
+        flash('Default notifications for emails created. You may customize them using the Notifications option.',
+              'success')
         return redirect(url_for('abstracts.management', self.event))
 
 

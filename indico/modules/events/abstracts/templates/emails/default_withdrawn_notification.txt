@@ -1,0 +1,14 @@
+{% extends 'events/abstracts/emails/default_notification.txt' %}
+
+{% block subject -%}
+    {% trans %}Abstract Withdrawn notification (#{abstract_id}){% endtrans %}
+{%- endblock %}
+
+{% block body -%}
+    {% trans -%}We're sorry to let you know that your abstract "{abstract_title}" with ID #{abstract_id} has been withdrawn.{%- endtrans %}
+
+    {% trans linebreak='\n' -%}
+        Kind regards,{{ linebreak }}
+        The organizers of {event_title}
+    {%- endtrans %}
+{%- endblock %}

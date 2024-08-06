@@ -127,7 +127,7 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>/edit-text',
 _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>',
                  'email_tpl_rest', email_templates.RHEmailTemplateREST, methods=('PATCH',))
 _bp.add_url_rule('/manage/abstracts/email-templates/quick_setup',
-                 'quick_setup_notifications', email_templates.RHQuickSetupEmailTemplates, methods=('GET',))
+                 'quick_setup_notifications', email_templates.RHQuickSetupEmailTemplates, methods=('POST',))
 
 
 # URLs available in both management and display areas

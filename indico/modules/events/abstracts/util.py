@@ -439,3 +439,12 @@ def can_create_invited_abstracts(event):
                for tpl in event.abstract_email_templates
                for rule in tpl.rules
                if 'state' in rule)
+
+
+def get_email_templates_rules(event):
+    rules = set()
+    for template in event.abstract_email_templates:
+        for rule in template.rules:
+            if state := rule.get('state'):
+                rules.update(state)
+    return rules
