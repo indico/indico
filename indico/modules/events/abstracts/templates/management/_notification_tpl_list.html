@@ -152,6 +152,15 @@
     {% endif %}
 
     <div class="toolbar f-j-end hide-if-locked">
+        <div class="group {% if email_tpls %} hidden {% endif %}">
+            <button class="i-button"
+                    data-href="{{ url_for('.quick_setup_notifications', event) }}"
+                    data-title="{% trans %}Quick setup{% endtrans %}"
+                    data-update="#email-template-manager"
+                    data-method="POST">
+            {% trans %}Quick setup{% endtrans %}
+            </button>
+        </div>
         <div class="group">
             <button class="i-button icon-plus highlight"
                     data-href="{{ url_for('.email_tpl_add', event) }}"

@@ -51,6 +51,11 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
         else:
             abstracts_count = Abstract.query.with_parent(self.event).count()
             custom_boa = None
+            rules = self.event._get_email_templates_rules()
+            if not rules:
+                warning_string = _('''Email notifications are not set up. Please, set them up or click on
+                                   the 'Quick setup' button in the notifications section.''')
+                flash(warning_string, 'warning')
             if self.event.has_custom_boa:
                 custom_boa = BasicFileSchema().dump(self.event.custom_boa)
             return WPManageAbstracts.render_template('management/overview.html', self.event,

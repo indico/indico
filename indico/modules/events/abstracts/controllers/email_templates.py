@@ -114,6 +114,30 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
         return jsonify_data(flash=False)
 
 
+class RHQuickSetupEmailTemplates(RHManageAbstractsBase):
+    """Set up email templates notifications for every non-configured management action."""
+
+    def _process(self):
+        rules = self.event._get_email_templates_rules()
+        notified_states = {
+            'Submit': AbstractState.submitted.value,
+            'Withdrawn': AbstractState.withdrawn.value,
+            'Accept': AbstractState.accepted.value,
+            'Reject': AbstractState.rejected.value,
+            'Merge': AbstractState.merged.value,
+            'Invite': AbstractState.invited.value
+        }
+        non_configured_notifications = {k: v for k, v in notified_states.items() if k not in rules}
+        for k, v in non_configured_notifications.items():
+            new_tpl = build_default_email_template(self.event, k.lower())
+            new_tpl.title = k
+            new_tpl.rules = [{'state': [v]}]
+            self.event.abstract_email_templates.append(new_tpl)
+            db.session.flush()
+        return jsonify_template('events/abstracts/management/notification_tpl_list.html', event=self.event,
+                                **_get_rules_fields(self.event))
+
+
 def _get_rules_fields(event):
     abstract = create_mock_abstract(event)
     email_tpl_dict = {et.id: get_abstract_notification_tpl_module(et, abstract)

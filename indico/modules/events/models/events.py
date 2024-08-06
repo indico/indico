@@ -1110,6 +1110,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 ))
                 .has_rows())
 
+    def _get_email_templates_rules(self):
+        rules = set()
+        for template in self.abstract_email_templates:
+            for rule in template.rules:
+                if state := rule.get('state'):
+                    rules.update(state)
+        return rules
+
     @property
     def supported_languages(self):
         locales = get_all_locales()
