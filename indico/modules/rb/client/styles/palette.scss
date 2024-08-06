@@ -51,6 +51,6 @@ $other-booking-fadeout-colors: $other-booking-color, lighten($other-booking-colo
 $internal-notes-segment-color: #db9200;
 
 @mixin rb-splash-background {
-  background-image: url('static:images/globe.png');
+  background-image: url('static:images/globe.webp');
   background-size: cover;
 }
