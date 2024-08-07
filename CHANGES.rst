@@ -15,6 +15,8 @@ Improvements
 - Add task to delete old registration files when they become orphaned due to a new
   file being uploaded (:pr:`6434`, thanks :user:`SegiNyn`)
 - Allow searching for author names in editable lists (:pr:`6451`)
+- Add ability to filter editable lists by the parent session of the editable's
+  contribution (:pr:`6453`)
 
 Bugfixes
 ^^^^^^^^
