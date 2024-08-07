@@ -35,6 +35,8 @@ Internal Changes
 - Update the list of supported browsers so people using highly outdated browsers where
   certain features are likely broken get a warning about having to update their browser
   (:pr:`6442`)
+- Convert Room Booking splash image to WEBP (20x smaller file size) (:pr:`6468`,
+  :issue:`6465`, thanks :user:`bbb-user-de`)
 
 
 Version 3.3.3
