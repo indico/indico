@@ -38,7 +38,7 @@ export function DateInputComponent({
   const handleDateChange = newDate => {
     const dateString = newDate || '';
     const timeString = timeFormat ? timeValue : '00:00:00';
-    onChange(`${dateString}T${timeString}`);
+    onChange(dateString ? `${dateString}T${timeString}` : '');
   };
   const handleTimeChange = newTime =>
     onChange(newTime ? `${dateValue}T${newTime.format('HH:mm:00')}` : dateValue);
@@ -141,6 +141,7 @@ export default function DateInput({
         dateFormat={friendlyDateFormat}
         timeFormat={timeFormat}
         validate={validateDateTime}
+        parse={v => v}
       />
     );
   } else {
