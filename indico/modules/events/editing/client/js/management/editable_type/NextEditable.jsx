@@ -205,11 +205,11 @@ function NextEditableDisplay({eventId, editableType, onClose, fileTypes, managem
             filters={filters}
             filterOptions={filterOptions}
             searchableId={e => e.contributionFriendlyId}
-            searchableFields={e =>
-              e.editor
-                ? [e.contributionTitle, e.contributionCode, e.editor.fullName]
-                : [e.contributionTitle, e.contributionCode]
-            }
+            searchableFields={e => [
+              e.contributionTitle,
+              e.contributionCode,
+              ...e.contributionPersons,
+            ]}
             onChangeFilters={onChangeFilters}
             onChangeList={setFilteredSet}
           />

@@ -45,7 +45,8 @@ class RHEditableList(RHEditableTypeEditorBase):
         RHEditableTypeEditorBase._process_args(self)
         self.contributions = (Contribution.query
                               .with_parent(self.event)
-                              .options(joinedload('editables').selectinload('revisions').selectinload('tags'))
+                              .options(joinedload('editables').selectinload('revisions').selectinload('tags'),
+                                       joinedload('person_links'))
                               .order_by(Contribution.friendly_id)
                               .all())
 
@@ -234,7 +235,7 @@ class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
         revision_query = revision_query.subquery()
         return (Editable.query
                 .join(revision_query, revision_query.c.editable_id == Editable.id)
-                .options(joinedload('contribution'))
+                .options(joinedload('contribution').selectinload('person_links'))
                 .all())
 
     @use_kwargs({

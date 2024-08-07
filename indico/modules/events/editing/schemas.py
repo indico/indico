@@ -16,7 +16,7 @@ from sqlalchemy import func
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.roles import CategoryRole
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.schemas import BasicContributionSchema
+from indico.modules.events.contributions.schemas import BasicContributionSchema, ContributionPersonLinkSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable, EditableState, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
@@ -259,9 +259,10 @@ class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
 class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords')
+        fields = ('id', 'friendly_id', 'title', 'code', 'editable', 'keywords', 'persons')
 
     editable = fields.Method('_get_editable')
+    persons = fields.List(fields.Pluck(ContributionPersonLinkSchema, 'full_name'), attribute='person_links')
 
     def _get_editable(self, contribution):
         editable_type = self.context['editable_type']
@@ -274,12 +275,15 @@ class EditingEditableListSchema(mm.SQLAlchemyAutoSchema):
 class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('contribution_id', 'contribution_title', 'contribution_code', 'contribution_friendly_id',
-                  'contribution_keywords', 'id', 'state', 'timeline_url', 'editor', 'can_assign_self')
+        fields = ('contribution_id', 'contribution_title', 'contribution_persons', 'contribution_code',
+                  'contribution_friendly_id', 'contribution_keywords', 'id', 'state', 'timeline_url',
+                  'editor', 'can_assign_self')
 
     contribution_friendly_id = fields.Int(attribute='contribution.friendly_id')
     contribution_code = fields.String(attribute='contribution.code')
     contribution_title = fields.String(attribute='contribution.title')
+    contribution_persons = fields.List(fields.Pluck(ContributionPersonLinkSchema, 'full_name'),
+                                       attribute='contribution.person_links')
     contribution_keywords = fields.List(fields.String(), attribute='contribution.keywords')
     state = EnumField(EditableState)
     timeline_url = fields.String()

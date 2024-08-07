@@ -325,8 +325,8 @@ function EditableListDisplay({
         searchableId: c.friendlyId,
         searchableFields:
           c.editable && c.editable.editor
-            ? [c.title, c.code, c.editable.editor.fullName]
-            : [c.title, c.code],
+            ? [c.title, c.code, ...c.persons, c.editable.editor.fullName]
+            : [c.title, c.code, ...c.persons],
         c,
       })),
     [contribList]
