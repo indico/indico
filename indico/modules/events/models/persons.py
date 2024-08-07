@@ -321,7 +321,7 @@ class EventPerson(PersonMixin, db.Model):
             value = getattr(self, column_name) or getattr(other, column_name)
             setattr(self, column_name, value)
 
-        for event_link in other.event_links:
+        for event_link in other.event_links[:]:
             existing_event_link = next((link for link in self.event_links if link.event_id == event_link.event_id),
                                        None)
             if existing_event_link is None:
@@ -329,7 +329,7 @@ class EventPerson(PersonMixin, db.Model):
             else:
                 other.event_links.remove(event_link)
 
-        for abstract_link in other.abstract_links:
+        for abstract_link in other.abstract_links[:]:
             existing_abstract_link = next((link for link in self.abstract_links
                                            if link.abstract_id == abstract_link.abstract_id), None)
 
@@ -341,7 +341,7 @@ class EventPerson(PersonMixin, db.Model):
                                                                             abstract_link.author_type)
                 other.abstract_links.remove(abstract_link)
 
-        for contribution_link in other.contribution_links:
+        for contribution_link in other.contribution_links[:]:
             existing_contribution_link = next((link for link in self.contribution_links
                                                if link.contribution_id == contribution_link.contribution_id), None)
 
@@ -353,7 +353,7 @@ class EventPerson(PersonMixin, db.Model):
                                                                                 contribution_link.author_type)
                 other.contribution_links.remove(contribution_link)
 
-        for subcontribution_link in other.subcontribution_links:
+        for subcontribution_link in other.subcontribution_links[:]:
             existing_subcontribution_link = next(
                 (link for link in self.subcontribution_links
                  if link.subcontribution_id == subcontribution_link.subcontribution_id), None)
@@ -362,7 +362,7 @@ class EventPerson(PersonMixin, db.Model):
             else:
                 other.subcontribution_links.remove(subcontribution_link)
 
-        for session_block_link in other.session_block_links:
+        for session_block_link in other.session_block_links[:]:
             existing_session_block_link = next((link for link in self.session_block_links
                                                 if link.session_block_id == session_block_link.session_block_id),
                                                None)
