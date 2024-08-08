@@ -62,6 +62,16 @@ export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
       };
       return {...styledEntry, size, style};
     }
+
+    // Check for empty space to the right of the entry
+    // If there is empty space, expand the entry to fill it
+    const {columnId} = styledEntry.event;
+    const concurrentEntries = getConcurrentEntries(styledEntry.event, allEntries).sort(
+      (a, b) => a.columnId - b.columnId
+    );
+    const rightConcurrent = concurrentEntries.filter(e => columnId < e.columnId);
+    const gapSize = rightConcurrent.length === 0 ? 0 : rightConcurrent[0].columnId - columnId - 1;
+
     // make entries take up the full width if there are no concurrencies
     if (getConcurrentEntries(styledEntry.event, allEntries).length === 0) {
       const size = 100 * numColumns;
@@ -71,6 +81,14 @@ export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
         left: 0,
         width: `calc(${size}% + ${padding}px)`,
         xOffset: 0,
+      };
+      return {...styledEntry, size, style};
+    } else if (gapSize > 0) {
+      const size = 100 * (1 + gapSize);
+      const padding = 10 * gapSize - (styledEntry.idx === 0 ? 0 : 3);
+      const style = {
+        ...styledEntry.style,
+        width: `calc(${size}% + ${padding}px)`,
       };
       return {...styledEntry, size, style};
     }
