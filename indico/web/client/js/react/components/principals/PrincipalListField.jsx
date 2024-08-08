@@ -11,6 +11,7 @@ import React from 'react';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {FinalField} from '../../forms';
 
@@ -44,6 +45,7 @@ const PrincipalListField = props => {
     eventId,
     favoriteUsersController,
     className,
+    fieldId,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -79,6 +81,10 @@ const PrincipalListField = props => {
   };
   const handleAddItems = data => {
     onChange([...value, ...data.map(x => x.identifier)]);
+    markTouched();
+  };
+  const handleAddCSVEmails = data => {
+    onChange([...value, ...data.map(x => x)]);
     markTouched();
   };
 
@@ -164,6 +170,11 @@ const PrincipalListField = props => {
               )}
             </>
           )}
+          {renderPluginComponents('principal-list-field-add-buttons', {
+            fieldId,
+            eventId,
+            onChange: handleAddCSVEmails,
+          })}
         </Button.Group>
       )}
     </>
@@ -185,6 +196,7 @@ PrincipalListField.propTypes = {
   withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
   className: PropTypes.string,
+  fieldId: PropTypes.string.isRequired,
 };
 
 PrincipalListField.defaultProps = {
