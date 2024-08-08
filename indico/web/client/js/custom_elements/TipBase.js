@@ -11,7 +11,7 @@ import './tips.scss';
 let viewportWidth = document.documentElement.clientWidth;
 let viewportHeight = document.documentElement.clientHeight;
 
-domReady.then(() => requestIdleCallback(updateClientGeometry));
+domReady.then(() => setTimeout(updateClientGeometry));
 window.addEventListener('resize', updateClientGeometry);
 window.addEventListener('orientationchange', updateClientGeometry);
 
