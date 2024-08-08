@@ -36,7 +36,7 @@ class PosterPDF(DesignerPDFBase):
                                       config.margin_horizontal, config.margin_vertical,
                                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)
 
-        placeholders = get_placeholders('designer-fields')
+        placeholders = get_placeholders(self.placeholders_context)
 
         for item in tpl_data.items:
             placeholder = placeholders.get(item['type'])
