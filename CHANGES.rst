@@ -17,6 +17,8 @@ Improvements
 - Allow searching for author names in editable lists (:pr:`6451`)
 - Add ability to filter editable lists by the parent session of the editable's
   contribution (:pr:`6453`)
+- Allow alternative CSV delimiters when importing registration invitations (:pr:`6458`,
+  thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
