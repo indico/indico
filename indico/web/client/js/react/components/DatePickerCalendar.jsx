@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import {Translate} from 'indico/react/i18n';
-import {range} from 'indico/utils/iterable';
 
 const NUM_DAYS_PER_WEEK = 7;
 const NUM_CALENDAR_CELLS = 42; // 6 weeks x 7 days
@@ -19,12 +19,12 @@ function DatePickerCalendarGrid({includeMonthHeader = false}) {
     <ind-date-grid data-grid>
       {includeMonthHeader ? <div className="month-label" data-month-label /> : null}
       <div className="weekdays" data-weekday-labels>
-        {Array.from(range(NUM_DAYS_PER_WEEK)).map(i => (
+        {_.range(NUM_DAYS_PER_WEEK).map(i => (
           <abbr key={i} />
         ))}
       </div>
       <div role="listbox">
-        {Array.from(range(NUM_CALENDAR_CELLS)).map(i => (
+        {_.range(NUM_CALENDAR_CELLS).map(i => (
           <button type="button" role="option" key={i} />
         ))}
       </div>

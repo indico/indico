@@ -30,10 +30,7 @@ export default function DatePicker({
   function handleDateChange(ev) {
     const {date} = ev.target.closest('ind-date-picker');
     const invalid = !!ev.target.value && !date;
-    // en-CA uses the ISO format date (YYYY-MM-DD) but gives it in local time zone.
-    // Do not use toISOString() for this because it may result in incorrect date due
-    // to time zone differences.
-    onChange(invalid ? INVALID : date?.toLocaleDateString('en-CA'));
+    onChange(invalid ? INVALID : formatDate(formatDate.ISO_FORMAT, date));
   }
 
   const formattedValue = formatDate(format, fromISOLocalDate(value));

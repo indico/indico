@@ -270,6 +270,10 @@ customElements.define(
         editMonthSelect.append(monthOption);
       }
 
+      for (const grid of dateGrids) {
+        grid.hideDatesFromOtherMonths = dateGrids.length > 1;
+      }
+
       this.addEventListener('x-attrchange.open', () => {
         if (this.open) {
           show();
@@ -561,6 +565,7 @@ customElements.define(
         type: String,
         default: DEFAULT_LOCALE,
       },
+      hideDatesFromOtherMonths: Boolean,
     };
 
     setup() {
@@ -637,6 +642,21 @@ customElements.define(
           calendarButtons.forEach((calendarButton, i) => {
             const date = new Date(firstDayOfCalendar);
             date.setDate(date.getDate() + i);
+            const currentMonth = date.getMonth() === calendarMonth;
+
+            if (!currentMonth && indDateGrid.hideDatesFromOtherMonths) {
+              calendarButton.textContent = '';
+              calendarButton.dataset.currentMonth = false;
+              calendarButton.removeAttribute('aria-label');
+              calendarButton.removeAttribute('aria-selected');
+              calendarButton.removeAttribute('data-week');
+              calendarButton.removeAttribute('data-range-start');
+              calendarButton.removeAttribute('data-range-end');
+              calendarButton.value = '';
+              calendarButton.tabIndex = -1;
+              calendarButton.disabled = true;
+              return;
+            }
 
             // Upate button attributes
             calendarButton.textContent = date.getDate();
