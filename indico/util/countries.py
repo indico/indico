@@ -12,9 +12,11 @@ from werkzeug.datastructures import ImmutableDict
 
 from indico.core.config import config
 from indico.util.i18n import get_current_locale
+from indico.util.signals import make_interceptable
 from indico.util.string import remove_accents, str_to_ascii
 
 
+@make_interceptable
 def get_countries(locale=None):
     if locale is None:
         locale = get_current_locale()
