@@ -29,6 +29,7 @@ Bugfixes
   (:pr:`6428`, thanks :user:`jbtwist`)
 - Wrap overly long descriptions and filenames in registration form fields (:pr:`6436`,
   thanks :user:`SegiNyn`)
+- Fix validation error when clearing a date field in the registration form (:pr:`6470`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
