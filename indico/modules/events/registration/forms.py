@@ -305,13 +305,13 @@ class CSVFieldDelimiter(RichStrEnum):
 
 
 class ImportInvitationsForm(InvitationFormBase):
-    _invitation_fields = ('source_file', 'skip_existing', 'delimiter', *InvitationFormBase._invitation_fields)
+    _invitation_fields = ('source_file', 'delimiter', 'skip_existing', *InvitationFormBase._invitation_fields)
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
                             accepted_file_types='.csv')
-    skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
-                                 description=_('If enabled, users with existing invitations will be ignored.'))
     delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter,
                                       default=CSVFieldDelimiter.comma.name)
+    skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
+                                 description=_('If enabled, users with existing invitations will be ignored.'))
 
 
 class EmailRegistrantsForm(IndicoForm):
