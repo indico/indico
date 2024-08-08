@@ -83,6 +83,10 @@ const PrincipalListField = props => {
     onChange([...value, ...data.map(x => x.identifier)]);
     markTouched();
   };
+  const handleAddCSVEmails = data => {
+    onChange([...value, ...data.map(x => x)]);
+    markTouched();
+  };
 
   const [entries, pendingEntries] = getPrincipalList(value, informationMap);
 
@@ -166,7 +170,11 @@ const PrincipalListField = props => {
               )}
             </>
           )}
-          {renderPluginComponents('setManagersButton', {fieldId, eventId})}
+          {renderPluginComponents('principal-list-field-add-buttons', {
+            fieldId,
+            eventId,
+            onChange: handleAddCSVEmails,
+          })}
         </Button.Group>
       )}
     </>
