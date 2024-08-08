@@ -53,6 +53,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx_reredirects']
 
 # sphinx-issues config
+issues_user_uri = 'https://github.com/{user}'
 issues_github_path = 'indico/indico'
 
 # Add any paths that contain templates here, relative to this directory.
