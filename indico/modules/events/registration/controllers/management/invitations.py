@@ -183,7 +183,7 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         skip_access_check = form.skip_access_check.data
         skip_existing = form.skip_existing.data
-        delimiter = form.delimiter.enum[form.delimiter.data].delimiter
+        delimiter = form.delimiter.data
         if form.validate_on_submit():
             invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
                                                                form.email_from.data, form.email_subject.data,
