@@ -53,6 +53,8 @@ def _extract_font_size(text):
 
 
 class DesignerPDFBase:
+    placeholders_context = 'designer-fields'
+
     def __init__(self, template, config):
         self.config = self._build_config(config)
         self.template = template

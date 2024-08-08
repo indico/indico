@@ -26,6 +26,7 @@ from indico.core.logger import Logger
 from indico.core.oauth import require_oauth
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
+from indico.util.signals import make_interceptable
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult, HTTPAPIResultSchema
@@ -98,6 +99,7 @@ def checkAK(apiKey, signature, timestamp, path, query):
     return ak, onlyPublic
 
 
+@make_interceptable
 def handler(prefix, path):
     path = posixpath.join('/', prefix, path)
     logger = Logger.get('httpapi')
