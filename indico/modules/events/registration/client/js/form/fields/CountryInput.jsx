@@ -8,9 +8,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Dropdown} from 'semantic-ui-react';
 
-import {FinalCheckbox, FinalField} from 'indico/react/forms';
+import {FinalCheckbox, FinalDropdown} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import '../../../styles/regform.module.scss';
@@ -20,65 +19,23 @@ import {getStaticData} from '../selectors';
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
 
-const asciiSearch = (options, query) => {
-  // To find accented country names in the drop-down easily
-  // the country names (and query string as well) are transliterated
-  // to contain only ASCII characters.
-  // Example:
-  // * typing "turk" will show "Türkey" and "Turkmenistan"
-  // * typing "ürk" will show "Burkina Faso", "Türkey", and "Turkmenistan"
-  // See https://stackoverflow.com/a/37511463 for more details regarding the transliteration.
-  const transliterate = inputStr =>
-    inputStr
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '');
-  const asciiQuery = transliterate(query);
-  return options.filter(opt => transliterate(opt.text).includes(asciiQuery));
-};
-
-function CountryInputComponent({value, onChange, disabled, choices, clearable}) {
+export default function CountryInput({htmlId, htmlName, disabled, isRequired, choices}) {
   return (
-    <Dropdown
+    <FinalDropdown
+      id={htmlId}
+      name={htmlName}
+      required={isRequired}
+      disabled={disabled}
+      clearable={!isRequired}
       styleName="country-dropdown"
       placeholder={Translate.string('Select a country')}
       fluid
-      search={asciiSearch}
       selection
-      selectOnBlur={false}
-      selectOnNavigation={false}
-      disabled={disabled}
-      clearable={clearable}
-      value={value}
-      onChange={(_, {value: newValue = ''}) => onChange(newValue)}
       options={choices.map(country => ({
         key: country.countryKey,
         value: country.countryKey,
         text: `${isoToFlag(country.countryKey)} ${country.caption}`,
       }))}
-    />
-  );
-}
-
-CountryInputComponent.propTypes = {
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
-  clearable: PropTypes.bool.isRequired,
-};
-
-export default function CountryInput({htmlId, htmlName, disabled, isRequired, choices}) {
-  return (
-    <FinalField
-      id={htmlId}
-      name={htmlName}
-      component={CountryInputComponent}
-      required={isRequired}
-      disabled={disabled}
-      choices={choices}
-      clearable={!isRequired}
-      parse={x => x}
     />
   );
 }
