@@ -20,7 +20,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {loadTimeline} from './actions';
 import DeleteEditable from './DeleteEditable';
-import {getDetails} from './selectors';
+import {getDetails, isTimelineOutdated} from './selectors';
 
 export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   const {
@@ -32,6 +32,7 @@ export default function TimelineHeader({children, contribution, state, submitter
     editingEnabled,
     reviewConditionsValid,
   } = useSelector(getDetails);
+  const isOutdated = useSelector(isTimelineOutdated);
   const dispatch = useDispatch();
 
   const unassignEditor = async () => {
@@ -105,7 +106,7 @@ export default function TimelineHeader({children, contribution, state, submitter
                     <Param name="editorName" value={editor.fullName} wrapper={<strong />} /> is the
                     assigned editor
                   </Translate>
-                  {canUnassign && (
+                  {canUnassign && !isOutdated && (
                     <>
                       {' ('}
                       <a onClick={unassignEditor}>
@@ -118,7 +119,7 @@ export default function TimelineHeader({children, contribution, state, submitter
               ) : (
                 <>
                   <Translate>No editor assigned</Translate>
-                  {canAssignSelf && (
+                  {canAssignSelf && !isOutdated && (
                     <>
                       {' ('}
                       <a onClick={assignMyself}>
