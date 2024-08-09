@@ -92,6 +92,9 @@
 {% endmacro %}
 
 {% macro participant_table(table) %}
+    <div id="participant-list-accordion" data-hello="Hello">
+        Heyyy
+    </div>
     <section>
         {% set hidden_participants = table.num_participants - table.rows|length %}
         {% if table.title %}
@@ -152,5 +155,6 @@
             cssDesc: 'header-sort-desc',
             headerTemplate: ''
         });
+        setupParticipantListAccordion('#participant-list-accordion');
     </script>
 {% endblock %}
