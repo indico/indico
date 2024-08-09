@@ -41,6 +41,7 @@ Internal Changes
   (:pr:`6442`)
 - Convert Room Booking splash image to WEBP (20x smaller file size) (:pr:`6468`,
   :issue:`6465`, thanks :user:`bbb-user-de`)
+- Add support for TypeScript (and TSX) (:pr:`6456`)
 
 
 Version 3.3.3
