@@ -92,9 +92,6 @@
 {% endmacro %}
 
 {% macro participant_table(table) %}
-    <div id="participant-list-accordion" data-hello="Hello">
-        Heyyy
-    </div>
     <section>
         {% set hidden_participants = table.num_participants - table.rows|length %}
         {% if table.title %}
@@ -142,10 +139,16 @@
             {% trans %}There are no registrations yet.{% endtrans %}
         {% endcall %}
     {% else %}
+        <h1> Hello world </h1>
+        <p>{{tables}}</p>
         <div class="registrations list">
-            {% for table in tables %}
+            <div
+                id="participant-list-accordion"
+                data-tables="{{tables}}"
+            ></div>
+            {# {% for table in tables %}
                 {{ participant_table(table) }}
-            {% endfor %}
+            {% endfor %} #}
         </div>
     {% endif %}
 
