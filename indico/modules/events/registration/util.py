@@ -75,7 +75,7 @@ class ActionMenuEntry:
     extra_classes: str = ''
 
 
-def import_user_records_from_csv(fileobj, columns):
+def import_user_records_from_csv(fileobj, columns, delimiter=','):
     """Parse and do basic validation of user data from a CSV file.
 
     :param fileobj: the CSV file to be read
@@ -84,7 +84,7 @@ def import_user_records_from_csv(fileobj, columns):
              the keys of which are given by the column names.
     """
     with csv_text_io_wrapper(fileobj) as ftxt:
-        reader = csv.reader(ftxt.read().splitlines())
+        reader = csv.reader(ftxt.read().splitlines(), delimiter=delimiter)
     used_emails = set()
     email_row_map = {}
     user_records = []
@@ -891,14 +891,14 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
 
 
 def import_invitations_from_csv(regform, fileobj, email_from, email_subject, email_body, *,
-                                skip_moderation=True, skip_access_check=True, skip_existing=False):
+                                skip_moderation=True, skip_access_check=True, skip_existing=False, delimiter=','):
     """Import invitations from a CSV file.
 
     :return: A list of invitations and the number of skipped records which
              is zero if skip_existing=False
     """
     columns = ['first_name', 'last_name', 'affiliation', 'email']
-    user_records = import_user_records_from_csv(fileobj, columns=columns)
+    user_records = import_user_records_from_csv(fileobj, columns=columns, delimiter=delimiter)
 
     reg_data = (db.session.query(Registration.user_id, Registration.email)
                 .with_parent(regform)

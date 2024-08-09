@@ -400,7 +400,7 @@ def strip_whitespace(s):
     This utility is useful in cases where you might get None or
     non-string values such as WTForms filters.
     """
-    if isinstance(s, str):
+    if isinstance(s, str) and not isinstance(s, Enum):
         s = s.strip()
     return s
 
