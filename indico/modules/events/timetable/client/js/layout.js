@@ -70,7 +70,12 @@ export const layoutAlgorithm = (allEntries, numColumns, compact) => props =>
       (a, b) => a.columnId - b.columnId
     );
     const rightConcurrent = concurrentEntries.filter(e => columnId < e.columnId);
-    const gapSize = rightConcurrent.length === 0 ? 0 : rightConcurrent[0].columnId - columnId - 1;
+    let gapSize;
+    if (rightConcurrent.length > 0) {
+      gapSize = rightConcurrent[0].columnId - columnId - 1;
+    } else {
+      gapSize = numColumns - columnId;
+    }
 
     // make entries take up the full width if there are no concurrencies
     if (getConcurrentEntries(styledEntry.event, allEntries).length === 0) {
