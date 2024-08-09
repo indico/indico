@@ -52,11 +52,7 @@ export default function RegistrationFormSetup() {
         </div>
 
         {/* we need a dummy FinalForm so our fields don't break... */}
-        <FinalForm
-          initialValues={initialValues}
-          subscription={{initialValues: true}}
-          onSubmit={() => undefined}
-        >
+        <FinalForm initialValues={initialValues} onSubmit={() => undefined}>
           {fprops => {
             // FinalForm does not propagate changes to initialValues immediately.
             // The first render contains the old initialValues, which is a problem for

@@ -26,6 +26,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
+import FormErrorList from '../form/FormErrorList';
 import FormSection from '../form/FormSection';
 import {getNestedSections, getStaticData} from '../form/selectors';
 
@@ -92,6 +93,7 @@ function ManagementOptions({isUpdateMode}) {
     </Message>
   );
 }
+
 ManagementOptions.propTypes = {
   isUpdateMode: PropTypes.bool.isRequired,
 };
@@ -170,7 +172,6 @@ export default function RegistrationFormSubmission() {
       onSubmit={onSubmit}
       initialValues={isUpdateMode ? registrationData : initialValues}
       initialValuesEqual={_.isEqual}
-      subscription={{}}
       decorators={getPluginObjects('regformFormDecorators')}
     >
       {fprops => (
@@ -192,6 +193,7 @@ export default function RegistrationFormSubmission() {
             {!isManagement && !isUpdateMode && policyAgreementRequired && (
               <PrivacyPolicy url={privacyNoticeURL({event_id: eventId})} />
             )}
+            <FormErrorList />
             <FinalSubmitButton
               disabledUntilChange={false}
               disabledIfInvalid={false}
