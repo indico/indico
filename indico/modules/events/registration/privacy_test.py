@@ -18,31 +18,42 @@ from indico.modules.events.registration.models.registrations import (PublishRegi
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
-def assert_visibility(reg, visibility, test_visibility_prop=True):
-    def _is_publishable_query(is_participant):
-        return Registration.query.with_parent(reg.event).filter(Registration.is_publishable(is_participant)).has_rows()
+def assert_visibility(reg, visibility, test_visibility_prop=True, test_hide_from_other_forms=False, user=None):
+    def _is_publishable_query(user, hide_from_other_forms=False):
+        return (Registration.query.with_parent(reg.event)
+                .filter(Registration.is_publishable(user, hide_from_other_forms)).has_rows())
 
     if test_visibility_prop:
         assert reg.visibility == visibility
     if visibility == RegistrationVisibility.nobody:
-        assert not reg.is_publishable(True)
-        assert not reg.is_publishable(False)
-        assert not _is_publishable_query(True)
-        assert not _is_publishable_query(False)
+        assert not reg.is_publishable(reg.user)
+        assert not reg.is_publishable(None)
+        assert not _is_publishable_query(reg.user)
+        assert not _is_publishable_query(None)
     elif visibility == RegistrationVisibility.participants:
-        assert reg.is_publishable(True)
-        assert not reg.is_publishable(False)
-        assert _is_publishable_query(True)
-        assert not _is_publishable_query(False)
+        assert reg.is_publishable(reg.user)
+        assert not reg.is_publishable(None)
+        assert _is_publishable_query(reg.user)
+        assert not _is_publishable_query(None)
+        if test_hide_from_other_forms:
+            assert reg.is_publishable(user)
+            assert not reg.is_publishable(None)
+            assert _is_publishable_query(user, True)
+            assert not _is_publishable_query(None, True)
     elif visibility == RegistrationVisibility.all:
-        assert reg.is_publishable(True)
-        assert reg.is_publishable(False)
-        assert _is_publishable_query(True)
-        assert _is_publishable_query(False)
+        assert reg.is_publishable(reg.user)
+        assert reg.is_publishable(None)
+        assert _is_publishable_query(reg.user)
+        assert _is_publishable_query(None)
+        if test_hide_from_other_forms:
+            assert reg.is_publishable(user)
+            assert reg.is_publishable(None)
+            assert _is_publishable_query(user, True)
+            assert _is_publishable_query(None, True)
 
 
 @pytest.mark.usefixtures('dummy_reg')
-def test_registration_visibility(dummy_event, dummy_regform):
+def test_registration_visibility(dummy_event, dummy_regform, dummy_user):
     set_feature_enabled(dummy_event, 'registration', True)
 
     reg = dummy_event.registrations.one()
@@ -57,50 +68,84 @@ def test_registration_visibility(dummy_event, dummy_regform):
 
     reg.consent_to_publish = RegistrationVisibility.participants
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.all
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
     reg.consent_to_publish = RegistrationVisibility.nobody
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.participants
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.all
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.hide_all
     reg.consent_to_publish = RegistrationVisibility.nobody
     assert_visibility(reg, RegistrationVisibility.nobody)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.participants
     assert_visibility(reg, RegistrationVisibility.nobody)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.all
     assert_visibility(reg, RegistrationVisibility.nobody)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_hide_from_other_forms=True,
+                      user=dummy_user)
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_with_consent
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_with_consent
     reg.consent_to_publish = RegistrationVisibility.nobody
     assert_visibility(reg, RegistrationVisibility.nobody)
+    assert_visibility(reg, RegistrationVisibility.nobody, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.participants
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.all
     assert_visibility(reg, RegistrationVisibility.all)
+    assert_visibility(reg, RegistrationVisibility.all, test_hide_from_other_forms=True,
+                      user=dummy_user)
 
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
     reg.consent_to_publish = RegistrationVisibility.nobody
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.participants
     assert_visibility(reg, RegistrationVisibility.participants)
+    assert_visibility(reg, RegistrationVisibility.participants, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.all
     assert_visibility(reg, RegistrationVisibility.all)
+    assert_visibility(reg, RegistrationVisibility.all, test_hide_from_other_forms=True,
+                      user=dummy_user)
 
     dummy_regform.publish_registrations_public = PublishRegistrationsMode.show_all
     dummy_regform.publish_registrations_participants = PublishRegistrationsMode.show_all
     reg.consent_to_publish = RegistrationVisibility.nobody
     assert_visibility(reg, RegistrationVisibility.all)
+    assert_visibility(reg, RegistrationVisibility.all, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.participants
     assert_visibility(reg, RegistrationVisibility.all)
+    assert_visibility(reg, RegistrationVisibility.all, test_hide_from_other_forms=True,
+                      user=dummy_user)
     reg.consent_to_publish = RegistrationVisibility.all
     assert_visibility(reg, RegistrationVisibility.all)
+    assert_visibility(reg, RegistrationVisibility.all, test_hide_from_other_forms=True,
+                      user=dummy_user)
 
     reg.state = RegistrationState.rejected
     assert not reg.is_active
