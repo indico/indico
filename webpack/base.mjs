@@ -248,12 +248,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
           },
         },
         {
-          test: /\.js$/,
-          loader: 'babel-loader',
-          exclude: /node_modules/,
-        },
-        {
-          test: /\.jsx$/,
+          test: /\.(js|jsx|ts|tsx)$/,
           loader: 'babel-loader',
           exclude: /node_modules/,
         },
@@ -316,7 +311,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
       // Webpack 5 does not include polyfills for node.js core modules by default
       fallback: {path: require.resolve('path-browserify')},
       symlinks: false,
-      extensions: ['.js', '.json', '.jsx'],
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       modules: nodeModules,
     },
     resolveLoader: {

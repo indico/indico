@@ -8,6 +8,7 @@ plugins:
   - react-hooks
   - prettier
   - jest
+  - '@typescript-eslint'
 
 extends:
   - 'indico'
@@ -34,7 +35,7 @@ settings:
         - ['indico/modules/events', './indico/modules/events/client/js']
         - ['indico', './indico/web/client/js']
         - ['axios/unsafe', './node_modules/axios/lib']
-      extensions: [.js, .jsx, .json]
+      extensions: [.js, .jsx, .json, .ts, .tsx]
   import/internal-regex: ^indico/
   react:
     version: detect
@@ -81,6 +82,16 @@ overrides:
       - indico/modules/rb/**/*
     rules:
       import/no-cycle: off
+  - files:
+      - '**/*.ts'
+      - '**/*.tsx'
+    parser: '@typescript-eslint/parser'
+    parserOptions:
+      project: './tsconfig.json'
+    extends:
+      - 'plugin:@typescript-eslint/strict'
+      - 'plugin:@typescript-eslint/stylistic'
+      - 'plugin:import/typescript'
 
 globals:
   Indico: false
