@@ -190,7 +190,7 @@ jobs:
 
       - name: Run eslint
         if: success() || failure()
-        run: npx eslint --ext .js --ext .jsx
+        run: npx eslint --ext .js --ext .jsx --ext .ts --ext .tsx
              indico/modules/rb/
              indico/modules/logs/
              indico/modules/events/editing/
