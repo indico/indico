@@ -22,6 +22,7 @@ privacy_settings = EventSettingsProxy('privacy', {
     'data_controller_email': '',
     'privacy_policy_urls': [],
     'privacy_policy': '',
+    'hide_participants_from_other_forms': False,
 })
 
 global_event_settings = SettingsProxy('events', {

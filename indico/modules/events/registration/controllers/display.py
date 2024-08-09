@@ -149,7 +149,7 @@ class ParticipantListMixin:
             return ''
         return url_for('event_registration.participant_picture', reg, field_data_id=field_data.field_data_id)
 
-    def _merged_participant_list_table(self, is_participant):
+    def _merged_participant_list_table(self):
         def _process_registration(reg, column_names):
             personal_data = reg.get_personal_data()
             columns = [{'text': personal_data.get(column_name, '')} if column_name != 'picture'
@@ -176,12 +176,11 @@ class ParticipantListMixin:
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form'))
                  .signal_query('merged-participant-list-publishable-registrations', event=self.event))
-        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names)
-                                                     for reg in query if reg.is_publishable(is_participant)),
-                               key=lambda reg: tuple(x['text'].lower() for x in reg['columns']
-                                                     if not x.get('is_picture')))
+        registrations = _deduplicate_reg_data(_process_registration(reg, column_names)
+                                              for reg in query if reg.is_publishable(session.user))
         return {'headers': headers,
-                'rows': registrations,
+                'rows': sorted(registrations, key=lambda reg: tuple(x['text'].lower() for x in reg['columns']
+                                                                    if not x.get('is_picture'))),
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
                 'num_participants': query.count()}
 
@@ -228,9 +227,8 @@ class ParticipantListMixin:
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields, picture_ids) for reg in query
-                         if reg.is_publishable(is_participant)]
+                         if reg.is_publishable(session.user)]
         return {'headers': headers,
                 'rows': registrations,
                 'title': regform.title,
@@ -246,7 +244,7 @@ class ParticipantListMixin:
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
         if registration_settings.get(self.event, 'merge_registration_forms'):
-            tables = [self._merged_participant_list_table(is_participant)]
+            tables = [self._merged_participant_list_table()]
         else:
             tables = []
             regforms_dict = {regform.id: regform for regform in regforms}
@@ -599,8 +597,7 @@ class RHRegistrationAvatar(RHDisplayEventBase):
 
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
-        is_participant = self.registration.event.is_user_registered(session.user)
-        if not self.registration.is_publishable(is_participant):
+        if not self.registration.is_publishable(session.user):
             raise Forbidden('Participant is not published')
 
     def _process(self):
@@ -681,8 +678,7 @@ class RHParticipantListPictureDownload(RHParticipantList):
             if (self.data.field_data.field_id not in
                     participant_list_form_columns[str(request.view_args['reg_form_id'])]):
                 raise Forbidden('Picture field is not exposed in participant list')
-        is_participant = self.registration.event.is_user_registered(session.user)
-        if not self.registration.is_publishable(is_participant):
+        if not self.registration.is_publishable(session.user):
             raise Forbidden('Participant is not published')
 
     def _process_args(self):
