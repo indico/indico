@@ -2,7 +2,7 @@
     {% set data_controller_exists = privacy_info.data_controller_name or privacy_info.data_controller_email %}
     {% if data_controller_exists or privacy_info.privacy_policy_urls|length > 1 %}
         <div class="privacy-dropdown" tabindex="-1">
-            <button class="tiny compact ui blue icon button"
+            <button class="mini ui blue icon button"
                     title="{% trans %}Event privacy information{% endtrans %}">
                 <i class="balance scale icon"></i>
                 <i class="caret down icon"></i>

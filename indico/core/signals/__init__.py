@@ -6,8 +6,8 @@
 # LICENSE file for more details.
 
 from indico.core.signals import (acl, agreements, attachments, category, core, event, event_management, menu, plugin,
-                                 rb, rh, users)
+                                 rb, rh, users, vc)
 
 
 __all__ = ('acl', 'agreements', 'attachments', 'category', 'core', 'event', 'event_management', 'menu', 'plugin', 'rb',
-           'rh', 'users')
+           'rh', 'users', 'vc')

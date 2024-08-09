@@ -101,3 +101,9 @@ class _LocatorDict(UserDict):
         except KeyError:
             raise AttributeError('No such locator: ' + name)
         return fn(self._obj)
+
+    def __repr__(self):
+        return f'<Locator {self.data}>'
+
+    def __reduce__(self):
+        return (dict, (self.data,))

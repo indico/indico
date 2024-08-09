@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime
 from operator import attrgetter
 
 from flask import session
@@ -108,6 +109,7 @@ def delete_timetable_entry(entry, log=True):
     object_type, object_title = _get_object_info(entry)
     signals.event.timetable_entry_deleted.send(entry)
     entry.object = None
+    entry.parent = None
     db.session.flush()
     if log:
         logger.info('Timetable entry %s deleted by %s', entry, session.user)
@@ -131,7 +133,7 @@ def fit_session_block_entry(entry, log=True):
                         data={'Session block': entry.session_block.full_title})
 
 
-def move_timetable_entry(entry, parent=None, day=None):
+def move_timetable_entry(entry: TimetableEntry, parent: TimetableEntry | None = None, day: datetime | None = None):
     """Move the `entry` to another session or top-level timetable.
 
     :param entry: `TimetableEntry` to be moved
