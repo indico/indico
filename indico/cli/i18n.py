@@ -315,7 +315,7 @@ def extract_messages_react(directory=INDICO_DIR):
         if not paths:
             return
     with _chdir(INDICO_DIR):
-        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', *paths],
+        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', '--ext', 'js,jsx,ts,tsx', *paths],
                                          env=dict(os.environ, FORCE_COLOR='1'))
     _get_messages_react_pot(directory).write_bytes(output)
 
