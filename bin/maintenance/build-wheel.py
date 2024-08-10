@@ -13,13 +13,9 @@ import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
-from distutils.log import ERROR, set_threshold
-from distutils.text_file import TextFile
-from glob import glob
 
 import click
 from setuptools import find_packages
-from setuptools.command.egg_info import FileList
 
 
 def fail(message, *args, **kwargs):
@@ -102,22 +98,15 @@ def compile_catalogs():
 def build_wheel(target_dir):
     info('building wheel')
     try:
-        # we need to disable isolation because babel is required during the build.
-        # eventually we should probably move to pyproject.toml with a custom in-tree
-        # build backend that does most of things this script does, properly specify
-        # babel as a build requirement, and then call e.g. the setuptools build backend
-        # to produce the actual wheel. but this is much more work so for now we just
-        # disable build isolation
-        subprocess.check_output([sys.executable, '-m', 'build', '-w', '-n', '-o', target_dir], stderr=subprocess.STDOUT)
+        subprocess.check_output([sys.executable, '-m', 'build', '-w', '-o', target_dir], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('build failed', verbose_msg=exc.output)
 
 
 def git_is_clean_indico():
-    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*'))})
-    cmds = [['git', 'diff', '--stat', '--color=always', *toplevel],
-            ['git', 'diff', '--stat', '--color=always', '--staged', *toplevel],
-            ['git', 'clean', '-dn', '-e', '__pycache__', *toplevel]]
+    cmds = [['git', 'diff', '--stat', '--color=always', 'indico'],
+            ['git', 'diff', '--stat', '--color=always', '--staged', 'indico'],
+            ['git', 'clean', '-dn', '-e', '__pycache__', 'indico']]
     for cmd in cmds:
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
@@ -125,44 +114,8 @@ def git_is_clean_indico():
     return True, None
 
 
-def _iter_package_modules(package_masks):
-    for package in find_packages(include=package_masks):
-        path = '/'.join(package.split('.'))
-        if not os.path.exists(os.path.join(path, '__init__.py')):
-            continue
-        yield from glob(os.path.join(path, '*.py'))
-
-
-def _get_included_files(package_masks):
-    old_threshold = set_threshold(ERROR)
-    file_list = FileList()
-    file_list.extend(_iter_package_modules(package_masks))
-    manifest = TextFile('MANIFEST.in', strip_comments=1, skip_blanks=1, join_lines=1, lstrip_ws=1, rstrip_ws=1,
-                        collapse_join=1)
-    for line in manifest.readlines():
-        file_list.process_template_line(line)
-    set_threshold(old_threshold)
-    return file_list.files
-
-
-def _get_ignored_package_files_indico():
-    files = set(_get_included_files(('indico', 'indico.*')))
-    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'],
-                                     text=True)
-    ignored = set(output.splitlines())
-    dist_path = 'indico/web/static/dist/'
-    i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/(?:messages\.mo|messages-react\.json)')
-    return {path for path in ignored & files if not path.startswith(dist_path) and not i18n_re.match(path)}
-
-
-def package_is_clean_indico():
-    garbage = _get_ignored_package_files_indico()
-    if garbage:
-        return False, '\n'.join(garbage)
-    return True, None
-
-
 def git_is_clean_plugin():
+    # TODO check if this actually does something useful, `toplevel` seems to be always empty in case of plugins...
     toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*'))})
     cmds = [['git', 'diff', '--stat', '--color=always', *toplevel],
             ['git', 'diff', '--stat', '--color=always', '--staged', *toplevel]]
@@ -253,7 +206,6 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean, no_git):
     """Build the indico wheel."""
     target_dir = obj['target_dir']
     if no_git:
-        clean, output = True, None
         warn('Assuming clean non-git working tree')
         if add_version_suffix:
             fail('The --no-git option cannot be used with --add-version-suffix')
@@ -264,26 +216,12 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean, no_git):
             warn('working tree is not clean [ignored]')
         elif not clean:
             fail('working tree is not clean', verbose_msg=output)
-    if no_git:
-        clean, output = True, None
-        warn('Assuming clean non-git package')
-        if add_version_suffix:
-            fail('The --no-git option cannot be used with --add-version-suffix', verbose_msg=output)
-    else:
-        # check for git-ignored files included in the package
-        clean, output = package_is_clean_indico()
-        if not clean and ignore_unclean:
-            warn('package contains unexpected files listed in git exclusions [ignored]')
-        elif not clean:
-            fail('package contains unexpected files listed in git exclusions', verbose_msg=output)
     if assets:
         build_assets()
     else:
         warn('building assets disabled')
-    clean_build_dirs()
     with patch_indico_version(add_version_suffix):
         build_wheel(target_dir)
-    clean_build_dirs()
 
 
 def _validate_plugin_dir(ctx, param, value):

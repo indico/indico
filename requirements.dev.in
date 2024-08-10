@@ -4,6 +4,8 @@ flake8-quotes
 flake8
 flask-url-map-serializer
 freezegun
+hatchling
+hatch-requirements-txt
 isort
 migra
 pep8-naming
@@ -25,6 +27,7 @@ sphinx-rtd-theme
 sphinx!=4.0.*  # not compatible with jinja 3 - https://github.com/sphinx-doc/sphinx/issues/9216
 sphinxcontrib-mermaid
 sqlparse
+tomlkit
 unbeheader
 uv
 watchfiles
