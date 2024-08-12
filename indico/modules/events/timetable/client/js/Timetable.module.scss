@@ -88,4 +88,21 @@
       }
     }
   }
+
+  // Resize handles
+  // ------------------------------
+  :global(.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor:first-child) {
+    top: -2px !important;
+  }
+
+  :global(.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor:last-child) {
+    bottom: -2px !important;
+  }
+
+  :global(.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor .rbc-addons-dnd-resize-ns-icon) {
+    display: block !important;
+    width: 100% !important;
+    height: 5px !important;
+    border-top: 0;
+  }
 }
