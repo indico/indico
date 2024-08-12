@@ -139,17 +139,11 @@
             {% trans %}There are no registrations yet.{% endtrans %}
         {% endcall %}
     {% else %}
-        <h1> Hello world! </h1>
-        <p>{{ tables }}</p>
-        <br />
         <div class="registrations list">
             <div
                 id="participant-list-accordion"
                 data-tables="{{ tables | tojson | forceescape }}"
             ></div>
-            {# {% for table in tables %}
-                {{ participant_table(table) }}
-            {% endfor %} #}
         </div>
     {% endif %}
 
