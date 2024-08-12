@@ -1016,7 +1016,7 @@ def process_registration_picture(source, *, thumbnail=False):
     max_size = REGISTRATION_PICTURE_THUMBNAIL_SIZE if thumbnail else REGISTRATION_PICTURE_SIZE
     try:
         picture = Image.open(source)
-    except OSError:
+    except (OSError, Image.DecompressionBombError):
         return None
     picture = ImageOps.exif_transpose(picture)
     if picture.mode != 'RGB':
