@@ -9,6 +9,7 @@ import mimetypes
 
 from flask import flash, jsonify, render_template, request, session
 from marshmallow import fields
+from werkzeug.exceptions import UnprocessableEntity
 
 from indico.core import signals
 from indico.core.db import db
@@ -20,6 +21,7 @@ from indico.modules.attachments.models.attachments import Attachment, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
+from indico.modules.files.util import validate_upload_file_size
 from indico.util.fs import secure_client_filename
 from indico.util.i18n import _, ngettext
 from indico.util.signals import make_interceptable
@@ -82,6 +84,8 @@ class AddAttachmentEditorMixin:
 
     @use_kwargs({'upload': fields.Field(required=True)}, location='files')
     def _process(self, upload):
+        if not validate_upload_file_size(upload):
+            raise UnprocessableEntity
         folder = AttachmentFolder.get_or_create(self.object, 'Editor uploads', is_always_visible=False, is_hidden=True)
         # Commit the folder creation quickly to make it less likely to end up with two folders having
         # the same name in case multiple images where uploaded in parallel (in case of someone dropping

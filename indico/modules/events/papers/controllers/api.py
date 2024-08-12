@@ -8,7 +8,7 @@
 from flask import request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.models.comments import PaperReviewComment
@@ -20,6 +20,7 @@ from indico.modules.events.papers.operations import (create_comment, create_pape
                                                      update_review)
 from indico.modules.events.papers.schemas import PaperSchema
 from indico.modules.events.papers.util import is_type_reviewing_possible
+from indico.modules.files.util import validate_upload_file_size
 from indico.util.i18n import _
 from indico.util.marshmallow import max_words, not_empty
 from indico.web.args import parser, use_kwargs
@@ -113,6 +114,8 @@ class RHSubmitNewRevision(RHPaperBase):
 
     @use_kwargs({'files': fields.List(fields.Field(), required=True)}, location='files')
     def _process(self, files):
+        if not validate_upload_file_size(files, multiple=True):
+            raise UnprocessableEntity
         create_paper_revision(self.paper, session.user, files)
         return '', 204
 
