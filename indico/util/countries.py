@@ -16,7 +16,6 @@ from indico.util.signals import make_interceptable
 from indico.util.string import remove_accents, str_to_ascii
 
 
-@make_interceptable
 def get_countries(locale=None):
     if locale is None:
         locale = get_current_locale()
@@ -24,6 +23,7 @@ def get_countries(locale=None):
 
 
 @lru_cache
+@make_interceptable
 def _get_countries(locale):
     _countries = {country.alpha_2: getattr(country, 'common_name', country.name) for country in pycountry.countries}
     _countries = {code: locale.territories.get(code, name) for code, name in _countries.items()}
