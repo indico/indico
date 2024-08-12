@@ -186,8 +186,8 @@ def build_indico(dev, clean, watch, url_root):
 
 
 def _validate_plugin_dir(ctx, param, value):
-    if not os.path.exists(os.path.join(value, 'setup.py')):
-        raise click.BadParameter(f'no setup.py found in {value}')
+    if not os.path.exists(os.path.join(value, 'pyproject.toml')):
+        raise click.BadParameter(f'no pyproject.toml found in {value}')
     if (not os.path.exists(os.path.join(value, 'webpack.config.js')) and
             not os.path.exists(os.path.join(value, 'webpack-bundles.json'))):
         raise click.BadParameter(f'no webpack.config.js or webpack-bundles.json found in {value}')

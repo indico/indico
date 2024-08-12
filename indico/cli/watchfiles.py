@@ -61,10 +61,10 @@ class IndicoFilter(DefaultFilter):
             return False
 
         # we blacklisted the main indico build dir on the filter level, but for plugins we simply
-        # consider any build dir adjacent to a setup.cfg irrelevant
+        # consider any build dir adjacent to a pyproject.toml irrelevant
         if '/build/' in path or path.endswith('/build'):
             path_obj = Path(path)
-            if (list(path_obj.parents)[-path_obj.parts.index('build')] / 'setup.cfg').exists():
+            if (list(path_obj.parents)[-path_obj.parts.index('build')] / 'pyproject.toml').exists():
                 return False
 
         return super().__call__(change, path)
