@@ -104,7 +104,7 @@ function AccordionItem({ index, table }: AccordionItemProps) {
 
 export default function ParticipantListAccordion({ tables }: ParticipantListAccordionProps) {
 return (
-    <Accordion styled className="accordion">
+    <Accordion styled fluid>
     {tables.map((table: any, i: number) => (
         <AccordionItem key={i} index={i} table={table} />
     ))}
