@@ -150,8 +150,9 @@ import setupRegformSubmission from './form_submission';
     }
   });
 
-  global.setupParticipantListAccordion = function setupParticipantListAccordion(containerSelector) {
+  global.setupParticipantListAccordion = containerSelector => {
     const element = document.querySelector(containerSelector);
-    ReactDOM.render(<ParticipantListAccordion title="This is a piece of text" />, element);
+    const tables = JSON.parse(element.dataset.tables);
+    ReactDOM.render(<ParticipantListAccordion tables={tables} />, element);
   };
 })(window);
