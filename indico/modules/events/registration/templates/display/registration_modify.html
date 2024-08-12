@@ -31,6 +31,7 @@
          data-publish-to-public="{{ regform.publish_registrations_public.name }}"
          data-consent-to-publish="{{ registration.consent_to_publish.name }}"
          data-policy-agreement-required="{{ regform.require_privacy_policy_agreement | tojson | forceescape }}"
+         data-bypass-target="{% trans %}Skip to registration form{% endtrans %}"
          {{ regform_attrs_template_hook(event, registration.registration_form, false, registration) }}
     ></div>
 {% endblock %}

@@ -110,7 +110,7 @@
 {% endmacro %}
 
 {% macro render_registration_summary(registration, from_management=false) %}
-    <div id="registration-summary" class="regform-done">
+    <div id="registration-summary" class="regform-done" data-bypass-target="{% trans %}Skip to registration summary{% endtrans %}">
         <div class="i-box-header">
             <div class="i-box-title">
                 {% trans %}Summary{% endtrans %}
