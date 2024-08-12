@@ -49,51 +49,12 @@ def get_translation_domain(plugin_name=_use_context):
             return get_domain()
 
 
-def _gettext(tr, message):
-    """Look for a translation in both the standard and plural translations.
-
-    Same as gettext.GNUTranslations.gettext but when the translation is not found,
-    it looks for a translation in plurals to find the singular case.
-    When neither is found, the gettext fallback is used.
-
-    This is needed because by default, gettext() only looks through non-pluralized translations.
-    For example, the following cannot be translated with gettext:
-
-    # Polish
-    msgid "Convener"
-    msgid_plural "Conveners"
-    msgstr[0] "Lider"
-
-    To get a translation for 'Convener', we need ngettext('Convener', 'Conveners', 1).
-
-    See GNUTranslations.gettext & ngettext for more details.
-    """
-    translation = tr.gettext(message)
-    if message != translation:
-        return translation
-    return tr.ngettext(message, message, 1)
-
-
-def _pgettext(tr, context, message):
-    # pgettext variant of _gettext
-    translation = tr.pgettext(context, message)
-    if message != translation:
-        return translation
-    return tr.npgettext(context, message, message, 1)
-
-
 def _indico_gettext(*args, **kwargs):
     func_name = kwargs.pop('func_name', 'gettext')
     plugin_name = kwargs.pop('plugin_name', None)
 
     translations = get_translation_domain(plugin_name).get_translations()
-
-    if func_name == 'gettext':
-        return _gettext(translations, *args, **kwargs)
-    elif func_name == 'pgettext':
-        return _pgettext(translations, *args, **kwargs)
-    else:
-        return getattr(translations, func_name)(*args, **kwargs)
+    return getattr(translations, func_name)(*args, **kwargs)
 
 
 def lazy_gettext(string, plugin_name=None):
