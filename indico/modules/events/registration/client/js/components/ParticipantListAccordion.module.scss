@@ -1,0 +1,34 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.participants-count-wrapper {
+  display: flex;
+  margin-left: auto;
+  align-items: baseline;
+  gap: 10px;
+  vertical-align: middle;
+  color: grey;
+
+  > span {
+    display: flex;
+    gap: 5px;
+    transition: 0.1s;
+
+    &:hover {
+      color: black;
+    }
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+
+  &:last-child {
+    margin-left: auto;
+  }
+}

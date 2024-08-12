@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import { Param, Plural, PluralTranslate, Singular } from 'indico/react/i18n';
-import React, { useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import {
   AccordionTitle,
   AccordionContent,
@@ -19,8 +19,11 @@ import {
   TableBody,
   Table,
   TableFooter,
+  Popup,
 } from 'semantic-ui-react'
 
+
+import './ParticipantListAccordion.module.scss';
 
 interface ParticipantListAccordionProps {
     tables: any
@@ -31,22 +34,99 @@ interface AccordionItemProps {
     table: any;
 }
 
-function AccordionItem({ index, table }: AccordionItemProps) {
-    const [isActive, setIsActive] = useState(true);
-    const hiddenParticipantsCount = table.num_participants - table.rows.length;
+
+interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
+    styleName?: string;
+    visibleCount?: number;
+    hiddenCount?: number;
+}
+
+const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => {
+    return (
+        <PluralTranslate count={count}>
+            <Param
+                name="participants-count"
+                value={count}
+            />{' '}
+            <Singular>
+                participant registered anonymously
+            </Singular>
+            <Plural>
+                participants registered anonymously
+            </Plural>
+        </PluralTranslate>
+    )
+}
+
+const ParticipantCountTranslationVisible: React.FC<{ count: number }> = ({ count }) => {
+    return (
+        <PluralTranslate count={count}>
+            <Singular>
+                participant registered
+            </Singular>
+            <Plural>
+                participants registered
+            </Plural>
+        </PluralTranslate>
+    )
+}
   
+const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, visibleCount, hiddenCount, ...props }) => {
+    return (
+        <div className={styleName} {...props}>
+            { visibleCount > 0 &&
+                <Popup
+                    position="bottom center"
+                    content={ <ParticipantCountTranslationVisible count={visibleCount} /> }
+                    trigger={
+                        <span title="hey">
+                            {visibleCount} <Icon name="user" />
+                        </span>
+                    }
+                />
+            }
+            { hiddenCount > 0 && 
+                <Popup
+                    position="bottom center"
+                    content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
+                    trigger={
+                        <span title="hey">
+                            {hiddenCount} <Icon name="user outline" />
+                        </span>
+                    }
+                />
+            }
+        </div>
+    );
+};
+
+function AccordionItem({ index, table }: AccordionItemProps) {
+    const visibleParticipantsCount = table.rows.length
+    const hiddenParticipantsCount = table.num_participants - visibleParticipantsCount;
+    const hasInvisibleParticipants = hiddenParticipantsCount > 0
+
+    const [isActive, setIsActive] = useState(visibleParticipantsCount > 0);
     const handleClick = () => {
-      setIsActive(!isActive);
+        setIsActive(!isActive);
     };
+
   
     return (
       <>
         <AccordionTitle
-          active={isActive}
-          onClick={handleClick}
+            active={isActive}
+            onClick={handleClick}
+            styleName="title"
         >
-          <Icon name="dropdown" />
-          {table.title} ({table.num_participants})
+            <Icon name="dropdown" />
+            {table.title} ({table.num_participants})
+            <ParticipantCounter
+                styleName="participants-count-wrapper"
+                visibleCount={visibleParticipantsCount}
+                hiddenCount={hiddenParticipantsCount}
+            >
+                <Icon name="dropdown" />
+            </ParticipantCounter>
         </AccordionTitle>
         <AccordionContent active={isActive} key={`c${index}`}>
           <Table celled>
@@ -72,25 +152,25 @@ function AccordionItem({ index, table }: AccordionItemProps) {
               ))}
             </TableBody>
             
-            { (hiddenParticipantsCount > 0 && table.num_participants != hiddenParticipantsCount) &&
+            { hasInvisibleParticipants &&
                 <TableFooter>
                     <TableRow>
                         <TableHeaderCell colSpan="3">
-                        <PluralTranslate count={hiddenParticipantsCount}>
-                            <Singular>
-                                <Param
-                                    name="visible-participants"
-                                    value={hiddenParticipantsCount}
-                                    />{' '}
-                                participant registered anonymously
-                            </Singular>
-                            <Plural>
-                                <Param
-                                    name="visible-participants"
-                                    value={hiddenParticipantsCount}
-                                    />{' '}
-                                participants registered anonymously
-                            </Plural>
+                            <PluralTranslate count={hiddenParticipantsCount}>
+                                <Singular>
+                                    <Param
+                                        name="visible-participants"
+                                        value={hiddenParticipantsCount}
+                                        />{' '}
+                                    participant registered anonymously
+                                </Singular>
+                                <Plural>
+                                    <Param
+                                        name="visible-participants"
+                                        value={hiddenParticipantsCount}
+                                        />{' '}
+                                    participants registered anonymously
+                                </Plural>
                             </PluralTranslate>
                         </TableHeaderCell>
                     </TableRow>
