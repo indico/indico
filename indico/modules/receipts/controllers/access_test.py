@@ -10,25 +10,10 @@ from zipfile import ZipFile
 
 import pytest
 
-from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
-
-
-@pytest.fixture
-def dummy_event_template(db, dummy_event):
-    tpl = ReceiptTemplate(title='Dummy', event=dummy_event, html='Test')
-    db.session.flush()
-    return tpl
-
-
-@pytest.fixture
-def dummy_category_template(db, dummy_category):
-    tpl = ReceiptTemplate(title='Dummy', category=dummy_category, html='Test')
-    db.session.flush()
-    return tpl
 
 
 @pytest.mark.parametrize('owner_type', ('event', 'category'))

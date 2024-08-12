@@ -11,9 +11,21 @@ import pytest
 
 from indico.modules.files.models.files import File
 from indico.modules.receipts.models.files import ReceiptFile
+from indico.modules.receipts.models.templates import ReceiptTemplate
 
 
-pytest_plugins = 'indico.modules.receipts.controllers.access_test'
+@pytest.fixture
+def dummy_event_template(db, dummy_event):
+    tpl = ReceiptTemplate(title='Dummy', event=dummy_event, html='Test')
+    db.session.flush()
+    return tpl
+
+
+@pytest.fixture
+def dummy_category_template(db, dummy_category):
+    tpl = ReceiptTemplate(title='Dummy', category=dummy_category, html='Test')
+    db.session.flush()
+    return tpl
 
 
 @pytest.fixture
