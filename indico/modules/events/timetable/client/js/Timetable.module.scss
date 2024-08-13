@@ -105,4 +105,10 @@
     height: 5px !important;
     border-top: 0;
   }
+
+  // disable global 'opacity: 0.5' for entries when dragging
+  :global(.rbc-addons-dnd.rbc-addons-dnd-is-dragging
+      .rbc-event:not(.rbc-addons-dnd-dragged-event):not(.rbc-addons-dnd-drag-preview)) {
+    opacity: unset !important;
+  }
 }
