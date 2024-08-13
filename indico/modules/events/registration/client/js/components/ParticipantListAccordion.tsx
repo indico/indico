@@ -50,14 +50,14 @@ const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count 
                     name="anonymous-participants-count"
                     value={count}
                 />{' '}
-                participant registered anonymously
+                participant registered anonymously.
             </Singular>
             <Plural>
                 <Param
                     name="anonymous-participants-count"
                     value={count}
                 />{' '}
-                participants registered anonymously
+                participants registered anonymously.
             </Plural>
         </PluralTranslate>
     )
