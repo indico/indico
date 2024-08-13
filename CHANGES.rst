@@ -50,6 +50,8 @@ Internal Changes
 - Convert Room Booking splash image to WEBP (20x smaller file size) (:pr:`6468`,
   :issue:`6465`, thanks :user:`bbb-user-de`)
 - Add support for TypeScript (and TSX) (:pr:`6456`)
+- Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
+- Add ``<ind-select>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 
 
 Version 3.3.3
@@ -141,9 +143,6 @@ Internal Changes
   (:pr:`6409`, thanks :user:`omegak`)
 - Custom poster/badge designer placeholder returning images need to return a ``BytesIO``
   instead of a Pillow ``Image`` object (:pr:`6441`)
-- Add ``<ind-date-picker>`` custom element (:pr:`6371`, thanks :user:`foxbunny`)
-- Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
-- Add ``<ind-select>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 
 
 Version 3.3.2
