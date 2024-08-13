@@ -1,0 +1,132 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+@use 'partials/sui_debt';
+@use 'design_system';
+
+ind-combo-box {
+  display: inline-block;
+  position: relative;
+
+  input[role='combobox'] {
+    @include sui_debt.field-override() {
+      padding-right: 2em;
+    }
+  }
+
+  &[clearable] input[role='combobox'] {
+    @include sui_debt.field_override() {
+      padding-right: 4.5em;
+    }
+  }
+
+  [role='combobox'][aria-expanded='true'] {
+    // Quick hack due to high specificicity of the underlying styles
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  &::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    position: absolute;
+    top: 50%;
+    right: 0.5em;
+
+    font-size: 1.2em;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  &[open]::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  &:not([open]) [role='listbox']:not([data-position-check]) {
+    display: none;
+  }
+
+  &[open] [role='listbox'],
+  [role='listbox'][data-position-check] {
+    position: absolute;
+    z-index: 10;
+    min-width: 100%;
+    max-height: min(75vh, 16em);
+    overflow-y: auto;
+
+    @include sui_debt.input-border();
+    @include sui_debt.input-background();
+    @include sui_debt.box-shadow();
+  }
+
+  [role='listbox']:not([data-top]) {
+    border-top: 0;
+    border-top-left-radius: 0.28571429rem; // value from semantic UI
+    border-top-right-radius: 0.28571429rem; // value from semantic UI
+  }
+
+  [role='listbox'][data-top] {
+    bottom: 100%;
+    border-bottom: 0;
+    border-bottom-left-radius: 0.28571429rem; // value from semantic UI
+    border-bottom-right-radius: 0.28571429rem; // value from semantic UI
+  }
+
+  [role='listbox'][data-position-check] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  [role='option'] {
+    @include sui_debt.input-padding();
+    list-style: none;
+    color: var(--text-color);
+
+    &:not([aria-selected='true']) {
+      cursor: pointer;
+    }
+
+    &[aria-disabled] {
+      color: var(--control-disabled-text-color);
+      pointer-events: none;
+    }
+
+    &:not([aria-selected='true']):hover {
+      background: var(--control-clickable-surface-focus-color);
+    }
+  }
+
+  [aria-selected='true'] {
+    background: var(--control-alt-clickable-surface-color);
+    color: var(--control-alt-text-color);
+    outline: medium;
+  }
+
+  button[value='clear']:not([hidden]) {
+    @extend %button-clear;
+    @extend %flex-inline-center;
+    position: absolute;
+    top: 50%;
+    right: 2em;
+    width: 1.5em;
+    aspect-ratio: 1;
+    padding: 0;
+
+    transform: translateY(-50%);
+
+    &::after {
+      @extend %icon;
+      @extend %icon-cross;
+      font-size: 87.5%;
+    }
+
+    span {
+      @extend %visually-hidden;
+    }
+  }
+}

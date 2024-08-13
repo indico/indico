@@ -158,7 +158,6 @@ const fieldRegistry = {
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator, singleChoiceSettingsFormDecorator],
     settingsFormInitialData: singleChoiceSettingsInitialData,
     icon: 'dropmenu',
-    renderAsFieldset: true,
   },
   multi_choice: {
     title: Translate.string('Multiple Choice'),

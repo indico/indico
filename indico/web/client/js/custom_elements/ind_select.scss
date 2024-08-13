@@ -1,0 +1,202 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+@use 'partials/sui_debt';
+
+ind-select {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  padding: 0;
+
+  cursor: pointer;
+
+  .caption {
+    @include sui_debt.input();
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+
+    @include sui_debt.field_override() {
+      padding-right: 2.5em;
+    }
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &:focus-visible .caption {
+    @include sui_debt.field_override() {
+      @include sui_debt.input-focus-border();
+    }
+  }
+
+  .caption::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+
+    position: absolute;
+    right: 0.5em;
+    display: inline-block;
+
+    font-size: 1.2em;
+  }
+
+  &[open] .caption::after {
+    transform: rotate(180deg);
+    z-index: 11; // make the arrow appear above the filter input
+  }
+
+  dialog {
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    width: calc(100% + 1px);
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+
+    border: 0;
+  }
+
+  .option-filter {
+    width: 100%;
+  }
+
+  .option-filter span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .option-filter input {
+    width: 100%;
+
+    @include sui_debt.field-override() {
+      padding: calc(0.67857143em + 1px) calc(1em + 1px);
+      padding-right: 2em;
+    }
+  }
+
+  &[open] .option-filter input:not([data-top]) {
+    @include sui_debt.field-override() {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  &[open] .option-filter input[data-top] {
+    @include sui_debt.field-override() {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+    }
+  }
+
+  .option-filter input::placeholder {
+    @include sui_debt.input-font();
+    font-weight: normal;
+    font-size: 1em;
+  }
+
+  [role='listbox'] {
+    --target-bottom: 'auto';
+
+    position: absolute;
+    min-width: 100%;
+    max-height: min(75vh, 16em);
+    bottom: var(--target-bottom);
+    overflow-y: auto;
+
+    @include sui_debt.input-border();
+    @include sui_debt.input-background();
+    @include sui_debt.box-shadow();
+    @include sui_debt.border-radius();
+  }
+
+  [role='listbox']:not([data-top]) {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  [role='listbox'][data-top] {
+    border-bottom: 0;
+    bottom: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  [role='option'],
+  .no-option {
+    @include sui_debt.input-padding();
+
+    list-style: none;
+  }
+
+  [role='option'] {
+    color: var(--text-color);
+    cursor: pointer;
+  }
+
+  .no-option {
+    color: var(--clickable-text-disabled-color);
+    cursor: not-allowed;
+  }
+
+  [role='option']:not([aria-selected]):hover {
+    background: var(--control-clickable-surface-focus-color);
+  }
+
+  [aria-selected] {
+    background: var(--control-alt-clickable-surface-focus-color);
+    color: var(--control-alt-text-color);
+    cursor: initial;
+  }
+
+  [aria-disabled] {
+    color: #aaa;
+    cursor: initial;
+    pointer-events: none;
+  }
+
+  .clear:not([hidden]) {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    right: 2em;
+    min-width: 0;
+    padding: 0.2em;
+    width: auto;
+
+    border: 0;
+    background: transparent;
+  }
+
+  .clear > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .clear::after {
+    @extend %icon;
+    @extend %icon-cross;
+    display: inline-block;
+    width: 1em;
+    aspect-ratio: 1;
+  }
+}

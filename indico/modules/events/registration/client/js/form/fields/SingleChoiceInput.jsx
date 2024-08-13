@@ -13,6 +13,7 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
 
+import {Select} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
@@ -31,6 +32,8 @@ function SingleChoiceDropdown({
   existingValue,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   isRequired,
   isPurged,
@@ -42,23 +45,31 @@ function SingleChoiceDropdown({
   const management = useSelector(getManagement);
   const currency = useSelector(getCurrency);
   const selectedChoice = choices.find(c => c.id in value) || {};
+  const selectedSeats = value[selectedChoice.id] || 0;
 
   const isPaidChoice = choice => choice.price > 0 && paid;
   const isPaidChoiceLocked = choice => !management && isPaidChoice(choice);
 
   let extraSlotsDropdown = null;
-  if (withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0) {
-    const options = _.range(1, selectedChoice.maxExtraSlots + 2).map(i => ({
-      key: i,
+  const extraSlotsLabelId = `${id}-label`;
+  const shouldShowExtraSlots = withExtraSlots && selectedChoice && selectedChoice.maxExtraSlots > 0;
+  const shouldShowExtraSlotsLabel = shouldShowExtraSlots && !!selectedChoice.price;
+
+  if (shouldShowExtraSlots) {
+    const slotValues = _.range(1, selectedChoice.maxExtraSlots + 2);
+    const options = slotValues.map(i => ({
       value: i,
-      text: i,
       disabled:
         selectedChoice.placesLimit > 0 &&
         (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) + i >
           selectedChoice.placesLimit,
     }));
+    const comboBoxExtraProps = {};
+    if (shouldShowExtraSlotsLabel) {
+      comboBoxExtraProps['aria-describedby'] = extraSlotsLabelId;
+    }
     extraSlotsDropdown = (
-      <Form.Select
+      <Select
         id={id ? `${id}-extraslots` : ''}
         options={options}
         disabled={
@@ -68,73 +79,84 @@ function SingleChoiceDropdown({
             (placesUsed[selectedChoice.id] || 0) - (existingValue[selectedChoice.id] || 0) >=
               selectedChoice.placesLimit)
         }
-        value={value[selectedChoice.id]}
-        onChange={(_evt, data) => onChange({[selectedChoice.id]: data.value})}
-        fluid
+        value={String(selectedSeats)}
+        onChange={evt => {
+          const selectedSlots = Number(evt.target.value);
+          onChange({[selectedChoice.id]: selectedSlots});
+        }}
+        aria-label={Translate.string('Select extra slots')}
+        required
+        {...comboBoxExtraProps}
       />
     );
   }
 
-  const options = choices.map(c => ({
-    key: c.id,
-    value: c.id,
-    disabled:
-      !c.isEnabled ||
-      isPaidChoiceLocked(c) ||
-      (c.placesLimit > 0 && (placesUsed[c.id] || 0) >= c.placesLimit && !existingValue[c.id]),
-    text: c.caption,
-    content: (
-      <div styleName="dropdown-text">
-        <div styleName="caption">
-          <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
+  const options = choices.map(choice => ({
+    value: choice.id,
+    label: (
+      <div styleName="dropdown-text" key={choice.id}>
+        <div styleName="caption" data-label>
+          <ChoiceLabel choice={choice} management={management} paid={isPaidChoice(choice)} />
         </div>
         <div styleName="labels">
-          {!!c.price && (
+          {!!choice.price && (
             <Label>
-              {c.price} {currency}
+              {choice.price} {currency}
             </Label>
           )}
-          {c.placesLimit === 0 ? null : (
+          {choice.placesLimit === 0 ? null : (
             <PlacesLeft
-              placesLimit={c.placesLimit}
-              placesUsed={placesUsed[c.id] || 0}
-              isEnabled={c.isEnabled}
+              placesLimit={choice.placesLimit}
+              placesUsed={placesUsed[choice.id] || 0}
+              isEnabled={choice.isEnabled}
             />
           )}
         </div>
       </div>
     ),
+    disabled:
+      !choice.isEnabled ||
+      isPaidChoiceLocked(choice) ||
+      (choice.placesLimit > 0 &&
+        (placesUsed[choice.id] || 0) >= choice.placesLimit &&
+        !existingValue[choice.id]),
   }));
+
+  const handleChange = evt => {
+    if (!evt.target.value) {
+      onChange({});
+      return;
+    }
+    onChange({[evt.target.value]: 1});
+  };
 
   return (
     <Form.Group styleName="single-choice-dropdown">
       <Form.Field>
-        <Dropdown
+        <Select
           id={id}
-          selection
-          style={{width: 500, opacity: 1}}
-          placeholder={Translate.string('Choose an option')}
+          onChange={handleChange}
           options={options}
-          disabled={disabled}
           value={(!isPurged && selectedChoice.id) || ''}
-          onChange={(e, data) => onChange(data.value ? {[data.value]: 1} : {})}
-          clearable={!isRequired}
-          search
-          selectOnNavigation={false}
-          selectOnBlur={false}
+          required={isRequired}
+          disabled={disabled}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
       </Form.Field>
-      {extraSlotsDropdown}
-      {extraSlotsDropdown && !!selectedChoice.price && (
-        <Label pointing="left">
-          {Translate.string('Total: {total} {currency}', {
-            total: (
-              (selectedChoice.extraSlotsPay ? value[selectedChoice.id] : 1) * selectedChoice.price
-            ).toFixed(2),
-            currency,
-          })}
-        </Label>
-      )}
+      <div styleName="extra-slots">
+        {extraSlotsDropdown}
+        {shouldShowExtraSlotsLabel && (
+          <Label pointing="left" id={extraSlotsLabelId}>
+            {Translate.string('Total: {total} {currency}', {
+              total: (
+                (selectedChoice.extraSlotsPay ? selectedSeats : 1) * selectedChoice.price
+              ).toFixed(2),
+              currency,
+            })}
+          </Label>
+        )}
+      </div>
     </Form.Group>
   );
 }
@@ -143,6 +165,8 @@ SingleChoiceDropdown.propTypes = {
   id: PropTypes.string.isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   isRequired: PropTypes.bool.isRequired,
   isPurged: PropTypes.bool.isRequired,
@@ -299,6 +323,8 @@ function SingleChoiceInputComponent({
   existingValue,
   value,
   onChange,
+  onFocus,
+  onBlur,
   disabled,
   isRequired,
   isPurged,
@@ -315,6 +341,8 @@ function SingleChoiceInputComponent({
         value={value}
         existingValue={existingValue}
         onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
         disabled={disabled}
         isRequired={isRequired}
         isPurged={isPurged}
@@ -370,6 +398,19 @@ export default function SingleChoiceInput({
   placesUsed,
 }) {
   const existingValue = useSelector(state => getFieldValue(state, fieldId)) || {};
+
+  function validate(value) {
+    const noValue = !value || !Object.keys(value).length;
+    if (isRequired && noValue) {
+      return Translate.string('This field is required');
+    }
+
+    if (noValue) {
+      // When there is no value but the field is not required, it's a pass
+      return;
+    }
+  }
+
   return (
     <FinalField
       id={htmlId}
@@ -378,11 +419,7 @@ export default function SingleChoiceInput({
       format={v => v || {}}
       required={isRequired}
       isRequired={isRequired}
-      validate={v =>
-        isRequired && (!v || !Object.keys(v).length)
-          ? Translate.string('This field is required.')
-          : undefined
-      }
+      validate={validate}
       disabled={disabled}
       isPurged={isPurged}
       itemType={itemType}

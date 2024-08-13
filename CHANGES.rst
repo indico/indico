@@ -34,6 +34,11 @@ Bugfixes
 - Fix validation error when clearing a date field in the registration form (:pr:`6470`)
 - Fix access error when a manager registers a user in a private registration form (:pr:`6486`)
 
+Accessibility
+^^^^^^^^^^^^^
+
+- Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
@@ -45,6 +50,8 @@ Internal Changes
 - Convert Room Booking splash image to WEBP (20x smaller file size) (:pr:`6468`,
   :issue:`6465`, thanks :user:`bbb-user-de`)
 - Add support for TypeScript (and TSX) (:pr:`6456`)
+- Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
+- Add ``<ind-select>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 
 
 Version 3.3.3
