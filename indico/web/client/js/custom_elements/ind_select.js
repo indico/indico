@@ -225,7 +225,7 @@ customElements.define(
           selectOption(selectableOption);
           dispatchChange();
         }
-        noOptionFoundMessage.hidden = numMatches;
+        noOptionFoundMessage.hidden = !!numMatches;
       }
 
       function selectNextOption() {
