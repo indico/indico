@@ -9,7 +9,6 @@ from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
-from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, UnprocessableEntity
 
 from indico.core.db import db
@@ -19,14 +18,14 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
-from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
+from indico.modules.events.registration.controllers import CheckEmailMixin, RegistrationEditMixin, RegistrationFormMixin
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
-from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
+from indico.modules.events.registration.util import (create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
                                                      get_initial_form_values, get_user_data, make_registration_schema,
                                                      process_registration_picture)
@@ -38,7 +37,7 @@ from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
+from indico.util.marshmallow import UUIDString
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
@@ -302,23 +301,15 @@ class InvitationMixin:
             flash(_('This invitation does not exist or has been withdrawn.'), 'warning')
 
 
-class RHRegistrationFormCheckEmail(InvitationMixin, RHRegistrationFormBase):
+class RHRegistrationFormCheckEmail(CheckEmailMixin, InvitationMixin, RHRegistrationFormBase):
     """Check how an email will affect the registration."""
 
     ALLOW_PROTECTED_EVENT = True
 
-    @use_kwargs({
-        'email': LowercaseString(required=True, validate=not_empty),
-        'update': UUIDString(load_default=None),
-        'management': fields.Bool(load_default=False),
-    }, location='query')
-    def _process_args(self, email, update, management):
+    def _process_args(self):
         RHRegistrationFormBase._process_args(self)
         InvitationMixin._process_args(self)
-        self.email = email
-        self.update = update
-        self.management = management
-        self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None
+        CheckEmailMixin._process_args(self)
 
     def _check_access(self):
         if not self.existing_registration and not (self.invitation and self.invitation.skip_access_check):
@@ -329,11 +320,7 @@ class RHRegistrationFormCheckEmail(InvitationMixin, RHRegistrationFormBase):
                     raise
 
     def _process(self):
-        if self.update:
-            return jsonify(check_registration_email(self.regform, self.email, self.existing_registration,
-                                                    management=self.management))
-        else:
-            return jsonify(check_registration_email(self.regform, self.email, management=self.management))
+        return self._check_email()
 
 
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):

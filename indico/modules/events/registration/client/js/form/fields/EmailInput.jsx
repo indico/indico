@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import validateEmailURL from 'indico-url:event_registration.check_email';
+import validateEmailManagementURL from 'indico-url:event_registration.check_email_management';
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
@@ -39,8 +40,9 @@ export default function EmailInput({htmlId, htmlName, disabled, isRequired}) {
     if (formToken) {
       params.form_token = formToken;
     }
-    return validateEmailURL(params);
-  }, [eventId, regformId, invitationToken, formToken]);
+    const fn = management ? validateEmailManagementURL : validateEmailURL;
+    return fn(params);
+  }, [eventId, regformId, invitationToken, formToken, management]);
   const validateEmail = useDebouncedAsyncValidate(async email => {
     let msg, response;
     email = email.trim();
@@ -61,7 +63,7 @@ export default function EmailInput({htmlId, htmlName, disabled, isRequired}) {
     });
     try {
       response = await indicoAxios.get(url, {
-        params: isUpdateMode ? {email, management, update: registrationUuid} : {email, management},
+        params: isUpdateMode ? {email, update: registrationUuid} : {email},
       });
     } catch (error) {
       return handleAxiosError(error);

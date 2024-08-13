@@ -58,6 +58,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create', 
                  reglists.RHRegistrationCreate, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create-multiple',
                  'create_multiple_registrations', reglists.RHRegistrationCreateMultiple, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-email', 'check_email_management',
+                 reglists.RHRegistrationCheckEmail)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 'delete_registrations',
                  reglists.RHRegistrationDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',

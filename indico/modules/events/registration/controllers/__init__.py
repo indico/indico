@@ -11,9 +11,11 @@ from sqlalchemy.orm import defaultload
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import (get_flat_section_submission_data, get_form_registration_data,
-                                                     make_registration_schema, modify_registration)
-from indico.web.args import parser
+from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
+                                                     get_form_registration_data, make_registration_schema,
+                                                     modify_registration)
+from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
+from indico.web.args import parser, use_kwargs
 
 
 class RegistrationFormMixin:
@@ -81,3 +83,23 @@ class RegistrationEditMixin:
                                                paid=self.registration.is_paid,
                                                registration_data=registration_data,
                                                file_data=self._get_file_data())
+
+
+class CheckEmailMixin:
+    """Check how an email will affect the registration."""
+
+    @use_kwargs({
+        'email': LowercaseString(required=True, validate=not_empty),
+        'update': UUIDString(load_default=None),
+    }, location='query')
+    def _process_args(self, email, update):
+        self.email = email
+        self.update = update
+        self.existing_registration = self.regform.get_registration(uuid=self.update) if self.update else None
+
+    def _check_email(self, *, management=False):
+        if self.update:
+            return jsonify(check_registration_email(self.regform, self.email, self.existing_registration,
+                                                    management=management))
+        else:
+            return jsonify(check_registration_email(self.regform, self.email, management=management))
