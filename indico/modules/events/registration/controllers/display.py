@@ -86,6 +86,7 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
         RHRegistrationFormDisplayBase._check_access(self)
         if (
             not getattr(self, 'registration', None)
+            and not self.management
             and self.regform.private
             and self.regform.uuid != request.args.get('form_token')
         ):
