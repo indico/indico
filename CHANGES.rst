@@ -34,6 +34,11 @@ Bugfixes
 - Fix validation error when clearing a date field in the registration form (:pr:`6470`)
 - Fix access error when a manager registers a user in a private registration form (:pr:`6486`)
 
+Accessibility
+^^^^^^^^^^^^^
+
+- Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
@@ -125,7 +130,6 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve registration form date picker accessibility (:pr:`6371`, thanks :user:`foxbunny`)
-- Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

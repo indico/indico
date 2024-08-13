@@ -46,7 +46,7 @@ export default function Select({options, value, onChange, disabled, required, ..
         </label>
 
         <ul role="listbox">
-          {options.map(function(option) {
+          {options.map(option => {
             if (typeof option === 'string') {
               option = {
                 value: option,
@@ -70,6 +70,9 @@ export default function Select({options, value, onChange, disabled, required, ..
               </li>
             );
           })}
+          <li className="no-option" hidden>
+            <Translate>No option matches your keyword</Translate>
+          </li>
         </ul>
       </dialog>
     </ind-select>

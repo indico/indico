@@ -8,7 +8,7 @@
 import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
+import React from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
@@ -399,8 +399,6 @@ export default function SingleChoiceInput({
 }) {
   const existingValue = useSelector(state => getFieldValue(state, fieldId)) || {};
 
-  const optionSet = useMemo(() => new Set(choices.map(choice => choice.id)), [choices]);
-
   function validate(value) {
     const noValue = !value || !Object.keys(value).length;
     if (isRequired && noValue) {
@@ -410,12 +408,6 @@ export default function SingleChoiceInput({
     if (noValue) {
       // When there is no value but the field is not required, it's a pass
       return;
-    }
-
-    for (const key in value) {
-      if (!optionSet.has(key)) {
-        return Translate.string('Please select one of the provided choices');
-      }
     }
   }
 

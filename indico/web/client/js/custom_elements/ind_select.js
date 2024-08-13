@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
+import {Translate} from 'indico/react/i18n';
 import {topBottomPosition} from 'indico/utils/positioning';
 
 import './ind_select.scss';
@@ -48,8 +49,9 @@ customElements.define(
       const filter = dialog.querySelector('input');
       const listbox = dialog.querySelector('[role=listbox]');
       const optionList = listbox.querySelectorAll('[role=option]');
+      const noOptionFoundMessage = listbox.querySelector('.no-option');
       const clear = this.querySelector('button[value=clear]');
-      const id = (this.id = `x-select-${this.constructor.lastId++}`);
+      const id = `x-select-${this.constructor.lastId++}`;
       const defaultCaption = caption.textContent;
       const internals = this.attachInternals();
 
@@ -82,7 +84,7 @@ customElements.define(
           return;
         }
 
-        if (evt.target.closest('[data-caption]') === caption) {
+        if (evt.target.closest('[data-caption]') === caption || evt.target === evt.currentTarget) {
           toggleListbox();
         }
       });
@@ -104,7 +106,7 @@ customElements.define(
         }
         toggleListbox(false);
         indSelect._closedViaFocusout = true;
-        setTimeout(function() {
+        setTimeout(() => {
           delete indSelect._closedViaFocusout;
         }, 200);
       });
@@ -205,12 +207,15 @@ customElements.define(
 
       function applyFilter(keyword) {
         let selectableOption;
+        let numMatches = 0;
         for (const option of optionList) {
           if (!keyword) {
             option.hidden = false;
+            numMatches++;
           } else {
             const label = getOptionLabel(option).toLowerCase();
             option.hidden = !label.includes(keyword);
+            numMatches += Number(!option.hidden);
             if (label === keyword && !option.hasAttribute('aria-disabled')) {
               selectableOption = option;
             }
@@ -220,21 +225,17 @@ customElements.define(
           selectOption(selectableOption);
           dispatchChange();
         }
+        noOptionFoundMessage.hidden = numMatches;
       }
 
       function selectNextOption() {
-        selectOptionWithIndex(function(currentIndex, optionCount) {
-          return (currentIndex + 1) % optionCount;
-        });
+        selectOptionWithIndex((currentIndex, optionCount) => (currentIndex + 1) % optionCount);
       }
 
       function selectPreviousOption() {
-        selectOptionWithIndex(function(currentIndex, optionCount) {
-          if (currentIndex <= 0) {
-            return optionCount - 1;
-          }
-          return currentIndex - 1;
-        });
+        selectOptionWithIndex((currentIndex, optionCount) =>
+          currentIndex <= 0 ? optionCount - 1 : currentIndex - 1
+        );
       }
 
       function selectOption(option) {
@@ -292,7 +293,7 @@ customElements.define(
         if (indSelect.required) {
           internals.setValidity(
             {valueMissing: !indSelect.value},
-            'Please select an item in the list.'
+            Translate.string('Please select an item in the list.')
           );
         }
       }

@@ -137,12 +137,21 @@ ind-select {
     border-bottom-right-radius: 0;
   }
 
-  [role='option'] {
+  [role='option'],
+  .no-option {
     @include sui_debt.input-padding();
 
     list-style: none;
+  }
+
+  [role='option'] {
     color: var(--text-color);
     cursor: pointer;
+  }
+
+  .no-option {
+    color: var(--clickable-text-disabled-color);
+    cursor: not-allowed;
   }
 
   [role='option']:not([aria-selected]):hover {
