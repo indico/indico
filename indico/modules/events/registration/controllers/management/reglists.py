@@ -38,7 +38,7 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
-from indico.modules.events.registration.controllers import RegistrationEditMixin
+from indico.modules.events.registration.controllers import CheckEmailMixin, RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
@@ -412,6 +412,17 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
             return jsonify_data(**self.list_generator.render_list())
 
         return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
+
+
+class RHRegistrationCheckEmail(CheckEmailMixin, RHManageRegFormBase):
+    """Check how an email will affect the registration."""
+
+    def _process_args(self):
+        RHManageRegFormBase._process_args(self)
+        CheckEmailMixin._process_args(self)
+
+    def _process(self):
+        return self._check_email(management=True)
 
 
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
