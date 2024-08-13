@@ -37,65 +37,42 @@ interface AccordionItemProps {
 
 interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
     styleName?: string;
-    visibleCount?: number;
     hiddenCount?: number;
 }
 
 const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => {
     return (
         <PluralTranslate count={count}>
-            <Param
-                name="participants-count"
-                value={count}
-            />{' '}
             <Singular>
+                <Param
+                    name="anonymous-participants-count"
+                    value={count}
+                />{' '}
                 participant registered anonymously
             </Singular>
             <Plural>
+                <Param
+                    name="anonymous-participants-count"
+                    value={count}
+                />{' '}
                 participants registered anonymously
             </Plural>
         </PluralTranslate>
     )
 }
 
-const ParticipantCountTranslationVisible: React.FC<{ count: number }> = ({ count }) => {
-    return (
-        <PluralTranslate count={count}>
-            <Singular>
-                participant registered
-            </Singular>
-            <Plural>
-                participants registered
-            </Plural>
-        </PluralTranslate>
-    )
-}
-  
-const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, visibleCount, hiddenCount, ...props }) => {
+const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, hiddenCount, ...props }) => {
     return (
         <div className={styleName} {...props}>
-            { visibleCount > 0 &&
-                <Popup
-                    position="bottom center"
-                    content={ <ParticipantCountTranslationVisible count={visibleCount} /> }
-                    trigger={
-                        <span title="hey">
-                            {visibleCount} <Icon name="user" />
-                        </span>
-                    }
-                />
-            }
-            { hiddenCount > 0 && 
-                <Popup
-                    position="bottom center"
-                    content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
-                    trigger={
-                        <span title="hey">
-                            {hiddenCount} <Icon name="user outline" />
-                        </span>
-                    }
-                />
-            }
+            <Popup
+                position="left center"
+                content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
+                trigger={
+                    <span>
+                        { hiddenCount } <Icon name="user" />
+                    </span>
+                }
+            />
         </div>
     );
 };
@@ -119,10 +96,9 @@ function AccordionItem({ index, table }: AccordionItemProps) {
             styleName="title"
         >
             <Icon name="dropdown" />
-            {table.title} ({table.num_participants})
+            {table.title}
             <ParticipantCounter
                 styleName="participants-count-wrapper"
-                visibleCount={visibleParticipantsCount}
                 hiddenCount={hiddenParticipantsCount}
             >
                 <Icon name="dropdown" />
