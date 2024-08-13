@@ -20,10 +20,12 @@ import {
   Table,
   TableFooter,
   Popup,
+  Segment,
 } from 'semantic-ui-react'
 
 
 import './ParticipantListAccordion.module.scss';
+import { Translate } from 'react-jsx-i18n';
 
 interface ParticipantListAccordionProps {
     tables: any
@@ -34,10 +36,10 @@ interface AccordionItemProps {
     table: any;
 }
 
-
 interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
+    totalCount: number;
+    hiddenCount: number;
     styleName?: string;
-    hiddenCount?: number;
 }
 
 const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => {
@@ -61,7 +63,7 @@ const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count 
     )
 }
 
-const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, hiddenCount, ...props }) => {
+const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, totalCount, hiddenCount, ...props }) => {
     return (
         <div className={styleName} {...props}>
             <Popup
@@ -69,7 +71,7 @@ const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, hidd
                 content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
                 trigger={
                     <span>
-                        { hiddenCount } <Icon name="user" />
+                        { totalCount } <Icon name="user" />
                     </span>
                 }
             />
@@ -79,13 +81,33 @@ const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, hidd
 
 function AccordionItem({ index, table }: AccordionItemProps) {
     const visibleParticipantsCount = table.rows.length
-    const hiddenParticipantsCount = table.num_participants - visibleParticipantsCount;
+    const totalParticipantCount = table.num_participants;
+    const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
     const hasInvisibleParticipants = hiddenParticipantsCount > 0
 
     const [isActive, setIsActive] = useState(visibleParticipantsCount > 0);
     const handleClick = () => {
         setIsActive(!isActive);
     };
+
+    const anonymousRegistrationText = (
+        <PluralTranslate count={hiddenParticipantsCount}>
+            <Singular>
+                <Param
+                    name="hidden-participants"
+                    value={hiddenParticipantsCount}
+                    />{' '}
+                participant registered anonymously.
+            </Singular>
+            <Plural>
+                <Param
+                    name="hidden-participants"
+                    value={hiddenParticipantsCount}
+                    />{' '}
+                participants registered anonymously.
+            </Plural>
+        </PluralTranslate>
+    )
 
   
     return (
@@ -99,61 +121,54 @@ function AccordionItem({ index, table }: AccordionItemProps) {
             {table.title}
             <ParticipantCounter
                 styleName="participants-count-wrapper"
+                totalCount={totalParticipantCount}
                 hiddenCount={hiddenParticipantsCount}
-            >
-                <Icon name="dropdown" />
-            </ParticipantCounter>
+            />
         </AccordionTitle>
         <AccordionContent active={isActive} key={`c${index}`}>
-          <Table celled>
-            <TableHeader>
-              <TableRow>
-                {table.headers.map((headerText: string, j: number) => (
-                  <TableHeaderCell key={j}>
-                    {headerText}
-                  </TableHeaderCell>
-                ))}
-              </TableRow>
-            </TableHeader>
-  
-            <TableBody>
-              {table.rows.map((row: any, j: number) => (
-                <TableRow key={j}>
-                  {row.columns.map((col: any, k: number) => (
-                    <TableCell key={`${j}-${k}`}>
-                      {col.text}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
+            { visibleParticipantsCount > 0 ?
+                (
+                    <Table celled>
+                        <TableHeader>
+                        <TableRow>
+                            {table.headers.map((headerText: string, j: number) => (
+                            <TableHeaderCell key={j}>
+                                {headerText}
+                            </TableHeaderCell>
+                            ))}
+                        </TableRow>
+                        </TableHeader>
             
-            { hasInvisibleParticipants &&
-                <TableFooter>
-                    <TableRow>
-                        <TableHeaderCell colSpan="3">
-                            <PluralTranslate count={hiddenParticipantsCount}>
-                                <Singular>
-                                    <Param
-                                        name="visible-participants"
-                                        value={hiddenParticipantsCount}
-                                        />{' '}
-                                    participant registered anonymously
-                                </Singular>
-                                <Plural>
-                                    <Param
-                                        name="visible-participants"
-                                        value={hiddenParticipantsCount}
-                                        />{' '}
-                                    participants registered anonymously
-                                </Plural>
-                            </PluralTranslate>
-                        </TableHeaderCell>
-                    </TableRow>
-                </TableFooter>
+                        <TableBody>
+                        {table.rows.map((row: any, j: number) => (
+                            <TableRow key={j}>
+                            {row.columns.map((col: any, k: number) => (
+                                <TableCell key={`${j}-${k}`}>
+                                {col.text}
+                                </TableCell>
+                            ))}
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                        
+                        { hasInvisibleParticipants &&
+                            <TableFooter>
+                                <TableRow>
+                                    <TableHeaderCell colSpan="3">
+                                        { anonymousRegistrationText }
+                                    </TableHeaderCell>
+                                </TableRow>
+                            </TableFooter>
+                        }
+                    </Table>
+                ) :
+                (
+                    <Segment>
+                        { hasInvisibleParticipants ? anonymousRegistrationText : <Translate>No registrations</Translate> }
+                    </Segment>
+                )
             }
-          </Table>
-        </AccordionContent>
+            </AccordionContent>
       </>
     );
   }
