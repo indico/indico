@@ -8,9 +8,10 @@
 import PropTypes from 'prop-types';
 import React, {useRef} from 'react';
 
-import 'indico/custom_elements/ind_select';
 import {useNativeEvent} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
+
+import 'indico/custom_elements/ind_select';
 
 export default function Select({options, value, onChange, disabled, required, ...inputProps}) {
   const indSelectRef = useRef();
