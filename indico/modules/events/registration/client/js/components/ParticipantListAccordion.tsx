@@ -109,15 +109,20 @@ function ParticipantTable({ table }: { table: TableObj }) {
                 </TableHeader>
     
                 <TableBody>
-                {table.rows.map((row: any, j: number) => (
-                    <TableRow key={j} className="table-row">
-                    {row.columns.map((col: any, k: number) => (
-                        <TableCell key={`${j}-${k}`}>
-                            { k % 2 == 0 ? col.text : col.text + 'kjlhsfdajhkdsjhkfasdkjfhkdjsafjfnfhfhsahf98enfsd8f9asdfn89sda7f0sd7f8796f769d768adn87d6896sdf'}
-                        </TableCell>
+                    {table.rows.map((row: { columns: [] }, j: number) => (
+                        <TableRow key={j} className="table-row">
+                        {row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
+                            <TableCell key={`${j}-${k}`}>
+                                {
+                                    col.is_picture
+                                        ? <img src={col.text} className="cell-img" />
+                                        : col.text
+                                }
+                                
+                            </TableCell>
+                        ))}
+                        </TableRow>
                     ))}
-                    </TableRow>
-                ))}
                 </TableBody>
                 
                 { hasInvisibleParticipants &&

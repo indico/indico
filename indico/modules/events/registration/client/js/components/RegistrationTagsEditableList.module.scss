@@ -43,3 +43,7 @@
     width: max-content;
   }
 }
+
+:global(.cell-img) {
+  max-width: 100%;
+}
