@@ -22,9 +22,9 @@ import {
   Popup,
   Message,
 } from 'semantic-ui-react'
+import { Translate } from 'react-jsx-i18n';
 
 import './ParticipantListAccordion.module.scss';
-import { Translate } from 'react-jsx-i18n';
 
 
 interface TableObj {
@@ -97,23 +97,23 @@ function ParticipantTable({ table }: { table: TableObj }) {
 
     return (
         visibleParticipantsCount > 0 ? (
-            <Table celled>
+            <Table celled className="table">
                 <TableHeader>
-                <TableRow>
-                    {table.headers.map((headerText: string, j: number) => (
-                    <TableHeaderCell key={j}>
-                        {headerText}
-                    </TableHeaderCell>
-                    ))}
-                </TableRow>
+                    <TableRow className="table-row">
+                        {table.headers.map((headerText: string, j: number) => (
+                        <TableHeaderCell key={j} width={1}>
+                            {headerText}
+                        </TableHeaderCell>
+                        ))}
+                    </TableRow>
                 </TableHeader>
     
                 <TableBody>
                 {table.rows.map((row: any, j: number) => (
-                    <TableRow key={j}>
+                    <TableRow key={j} className="table-row">
                     {row.columns.map((col: any, k: number) => (
                         <TableCell key={`${j}-${k}`}>
-                        {col.text}
+                            {col.text + 'kjlhsfdajhkdsjhkfasdkjfhkdjsafjfnfhfhsahf98enfsd8f9asdfn89sda7f0sd7f8796f769d768adn87d6896sdf'}
                         </TableCell>
                     ))}
                     </TableRow>
@@ -151,11 +151,13 @@ function AccordionParticipantsItem({ index, table, children, collapsible=true }:
       <>
         <AccordionTitle
             active={isActive}
-            onClick={collapsible && handleClick}
+            onClick={collapsible ? handleClick : undefined}
             styleName="title"
         >
             { collapsible && <Icon name="dropdown" /> }
-            { table.title ?? <Translate>Participants</Translate> }
+            <p>
+                { `${table.title}jkhdsafiadfiasdfhasdfhasdkjfhasiudfiuaewhfisaumhaifhhiehmiadhshfsdmsafuhsamiufasdkflsadkjfakjsdfhjkasdhfksjdah8asdfhiusadh87fyhewikfnsdf9ds8f` ?? <Translate>Participants</Translate> }
+            </p>
             <ParticipantCounter
                 styleName="participants-count-wrapper"
                 totalCount={totalParticipantCount}

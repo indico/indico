@@ -25,10 +25,23 @@
 }
 
 .title {
-  display: flex;
-  align-items: center;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+
+  > p {
+    word-break: break-all;
+    flex-grow: 1;
+    margin-bottom: 0;
+  }
 
   &:last-child {
     margin-left: auto;
   }
+}
+
+:global(.table) {
+  display: inline-block;
+  overflow: auto;
+  max-height: 400px;
 }
