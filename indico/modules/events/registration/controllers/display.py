@@ -32,13 +32,12 @@ from indico.modules.events.registration.util import (create_registration, genera
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
-from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.files.controllers import UploadRegistrationFileMixin
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.marshmallow import UUIDString
-from indico.web.args import parser, use_kwargs
+from indico.web.args import parser
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
 
@@ -401,7 +400,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                captcha_settings=get_captcha_settings())
 
 
-class RHUploadRegistrationFile(UploadFileMixin, InvitationMixin, RHRegistrationFormBase):
+class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHRegistrationFormBase):
     """
     Upload a file from a registration form.
 
@@ -412,13 +411,10 @@ class RHUploadRegistrationFile(UploadFileMixin, InvitationMixin, RHRegistrationF
 
     ALLOW_PROTECTED_EVENT = True
 
-    @use_kwargs({
-        'token': UUIDString(load_default=None),
-    }, location='query')
-    def _process_args(self, token):
+    def _process_args(self):
         RHRegistrationFormBase._process_args(self)
         InvitationMixin._process_args(self)
-        self.existing_registration = self.regform.get_registration(uuid=token) if token else None
+        UploadRegistrationFileMixin._process_args(self)
 
     def _check_access(self):
         if not self.existing_registration:
@@ -430,9 +426,6 @@ class RHUploadRegistrationFile(UploadFileMixin, InvitationMixin, RHRegistrationF
             except Forbidden:
                 if not self.invitation or not self.invitation.skip_access_check:
                     raise
-
-    def get_file_context(self):
-        return 'event', self.event.id, 'regform', self.regform.id, 'registration'
 
 
 class RHUploadRegistrationPicture(RHUploadRegistrationFile):

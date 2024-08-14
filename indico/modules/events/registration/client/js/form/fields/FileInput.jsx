@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import uploadFileManagementURL from 'indico-url:event_registration.upload_file_management';
 import uploadFileURL from 'indico-url:event_registration.upload_registration_file';
 
 import PropTypes from 'prop-types';
@@ -20,7 +21,7 @@ import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
 export default function FileInput({htmlName, disabled, isRequired}) {
-  const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
+  const {eventId, regformId, registrationUuid, fileData, management} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const [invitationToken, formToken] = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -49,7 +50,7 @@ export default function FileInput({htmlName, disabled, isRequired}) {
         name={htmlName}
         disabled={disabled}
         required={isRequired}
-        uploadURL={uploadFileURL(urlParams)}
+        uploadURL={management ? uploadFileManagementURL(urlParams) : uploadFileURL(urlParams)}
         initialFileDetails={initialFileDetails}
       />
     </div>
