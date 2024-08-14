@@ -139,12 +139,10 @@
             {% trans %}There are no registrations yet.{% endtrans %}
         {% endcall %}
     {% else %}
-        <div class="registrations list">
-            <div
-                id="participant-list-accordion"
-                data-tables="{{ tables | tojson | forceescape }}"
-            ></div>
-        </div>
+        <div
+            id="participant-list-accordion"
+            data-tables="{{ tables | tojson | forceescape }}"
+        ></div>
     {% endif %}
 
     <script>

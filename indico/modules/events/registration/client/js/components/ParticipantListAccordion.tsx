@@ -20,21 +20,28 @@ import {
   Table,
   TableFooter,
   Popup,
-  Segment,
   Message,
 } from 'semantic-ui-react'
 
 
 import './ParticipantListAccordion.module.scss';
-import { Translate } from 'react-jsx-i18n';
+
+interface TableObj {
+    headers: string[];
+    rows: object[];
+    num_participants: number;
+    show_checkin: boolean;
+    title?: string;
+}
 
 interface ParticipantListAccordionProps {
-    tables: any
+    tables: TableObj[];
 }
 
 interface AccordionItemProps {
     index: number;
-    table: any;
+    table: TableObj;
+    children?: any;
 }
 
 interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
@@ -80,11 +87,60 @@ const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, tota
     );
 };
 
-function AccordionItem({ index, table }: AccordionItemProps) {
+function ParticipantTable({ table }: { table: TableObj }) {
     const visibleParticipantsCount = table.rows.length
     const totalParticipantCount = table.num_participants;
     const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
     const hasInvisibleParticipants = hiddenParticipantsCount > 0
+
+    return (
+        visibleParticipantsCount > 0 ? (
+            <Table celled>
+                <TableHeader>
+                <TableRow>
+                    {table.headers.map((headerText: string, j: number) => (
+                    <TableHeaderCell key={j}>
+                        {headerText}
+                    </TableHeaderCell>
+                    ))}
+                </TableRow>
+                </TableHeader>
+    
+                <TableBody>
+                {table.rows.map((row: any, j: number) => (
+                    <TableRow key={j}>
+                    {row.columns.map((col: any, k: number) => (
+                        <TableCell key={`${j}-${k}`}>
+                        {col.text}
+                        </TableCell>
+                    ))}
+                    </TableRow>
+                ))}
+                </TableBody>
+                
+                { hasInvisibleParticipants &&
+                    <TableFooter>
+                        <TableRow>
+                            <TableHeaderCell colSpan={ table.headers.length }>
+                                <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableFooter>
+                }
+            </Table>
+        ) :
+        (
+            <Message>
+                <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
+            </Message>
+        )
+    )
+}
+
+function AccordionItem({ index, table, children }: AccordionItemProps) {
+    const visibleParticipantsCount = table.rows.length
+    const totalParticipantCount = table.num_participants;
+    const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
 
     const [isActive, setIsActive] = useState(visibleParticipantsCount > 0);
     const handleClick = () => {
@@ -99,7 +155,7 @@ function AccordionItem({ index, table }: AccordionItemProps) {
             styleName="title"
         >
             <Icon name="dropdown" />
-            {table.title}
+            { table.title }
             <ParticipantCounter
                 styleName="participants-count-wrapper"
                 totalCount={totalParticipantCount}
@@ -107,59 +163,24 @@ function AccordionItem({ index, table }: AccordionItemProps) {
             />
         </AccordionTitle>
         <AccordionContent active={isActive} key={`c${index}`}>
-            { visibleParticipantsCount > 0 ?
-                (
-                    <Table celled>
-                        <TableHeader>
-                        <TableRow>
-                            {table.headers.map((headerText: string, j: number) => (
-                            <TableHeaderCell key={j}>
-                                {headerText}
-                            </TableHeaderCell>
-                            ))}
-                        </TableRow>
-                        </TableHeader>
-            
-                        <TableBody>
-                        {table.rows.map((row: any, j: number) => (
-                            <TableRow key={j}>
-                            {row.columns.map((col: any, k: number) => (
-                                <TableCell key={`${j}-${k}`}>
-                                {col.text}
-                                </TableCell>
-                            ))}
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                        
-                        { hasInvisibleParticipants &&
-                            <TableFooter>
-                                <TableRow>
-                                    <TableHeaderCell colSpan="3">
-                                        <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
-                                    </TableHeaderCell>
-                                </TableRow>
-                            </TableFooter>
-                        }
-                    </Table>
-                ) :
-                (
-                    <Message>
-                        <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
-                    </Message>
-                )
-            }
-            </AccordionContent>
+            { children ?? <ParticipantTable table={table} /> }
+        </AccordionContent>
       </>
     );
   }
 
 export default function ParticipantListAccordion({ tables }: ParticipantListAccordionProps) {
-return (
-    <Accordion styled fluid>
-    {tables.map((table: any, i: number) => (
-        <AccordionItem key={i} index={i} table={table} />
-    ))}
-    </Accordion>
-);
+    return (
+        tables.length == 1 && tables[0].title
+            ? <ParticipantTable table={ tables[0] } />
+            : (
+                <Accordion styled fluid>
+                    {
+                        tables.map((table: any, i: number) => (
+                            <AccordionItem key={i} index={i} table={table} />
+                        ))
+                    }
+                </Accordion>
+            )
+    );
 }
