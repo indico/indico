@@ -23,8 +23,8 @@ import {
   Message,
 } from 'semantic-ui-react'
 
-
 import './ParticipantListAccordion.module.scss';
+
 
 interface TableObj {
     headers: string[];
@@ -38,10 +38,11 @@ interface ParticipantListAccordionProps {
     tables: TableObj[];
 }
 
-interface AccordionItemProps {
+interface AccordionParticipantsItemProps {
     index: number;
     table: TableObj;
     children?: any;
+    startsOpen?: boolean;
 }
 
 interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
@@ -71,21 +72,19 @@ const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count 
     )
 }
 
-const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, totalCount, hiddenCount, ...props }) => {
-    return (
-        <div className={styleName} {...props}>
-            <Popup
-                position="left center"
-                content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
-                trigger={
-                    <span>
-                        { totalCount } <Icon name="user" />
-                    </span>
-                }
-            />
-        </div>
-    );
-};
+const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, totalCount, hiddenCount, ...props }) => (
+    <div className={styleName} {...props}>
+        <Popup
+            position="left center"
+            content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
+            trigger={
+                <span>
+                    { totalCount } <Icon name="user" />
+                </span>
+            }
+        />
+    </div>
+);
 
 function ParticipantTable({ table }: { table: TableObj }) {
     const visibleParticipantsCount = table.rows.length
@@ -137,15 +136,13 @@ function ParticipantTable({ table }: { table: TableObj }) {
     )
 }
 
-function AccordionItem({ index, table, children }: AccordionItemProps) {
+function AccordionParticipantsItem({ index, table, children, startsOpen }: AccordionParticipantsItemProps) {
     const visibleParticipantsCount = table.rows.length
     const totalParticipantCount = table.num_participants;
     const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
 
-    const [isActive, setIsActive] = useState(visibleParticipantsCount > 0);
-    const handleClick = () => {
-        setIsActive(!isActive);
-    };
+    const [isActive, setIsActive] = useState(startsOpen || visibleParticipantsCount > 0);
+    const handleClick = () => setIsActive(!isActive);
   
     return (
       <>
@@ -155,7 +152,7 @@ function AccordionItem({ index, table, children }: AccordionItemProps) {
             styleName="title"
         >
             <Icon name="dropdown" />
-            { table.title }
+            { table.title ?? 'Participants' }
             <ParticipantCounter
                 styleName="participants-count-wrapper"
                 totalCount={totalParticipantCount}
@@ -170,14 +167,15 @@ function AccordionItem({ index, table, children }: AccordionItemProps) {
   }
 
 export default function ParticipantListAccordion({ tables }: ParticipantListAccordionProps) {
+    console.log(tables.length)
     return (
         tables.length == 1 && tables[0].title
-            ? <ParticipantTable table={ tables[0] } />
+            ? <ParticipantTable table={ tables[0] } title="All Participants" startsOpen={true} />
             : (
                 <Accordion styled fluid>
                     {
                         tables.map((table: any, i: number) => (
-                            <AccordionItem key={i} index={i} table={table} />
+                            <AccordionParticipantsItem key={i} index={i} table={table} startsOpen={tables.length == 1}/>
                         ))
                     }
                 </Accordion>
