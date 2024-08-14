@@ -24,6 +24,7 @@ import {
 } from 'semantic-ui-react'
 
 import './ParticipantListAccordion.module.scss';
+import { Translate } from 'react-jsx-i18n';
 
 
 interface TableObj {
@@ -43,6 +44,8 @@ interface AccordionParticipantsItemProps {
     table: TableObj;
     children?: any;
     startsOpen?: boolean;
+    collapsible?: boolean;
+    title?: string;
 }
 
 interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
@@ -136,23 +139,23 @@ function ParticipantTable({ table }: { table: TableObj }) {
     )
 }
 
-function AccordionParticipantsItem({ index, table, children, startsOpen }: AccordionParticipantsItemProps) {
+function AccordionParticipantsItem({ index, table, children, collapsible=true }: AccordionParticipantsItemProps) {
     const visibleParticipantsCount = table.rows.length
     const totalParticipantCount = table.num_participants;
     const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
 
-    const [isActive, setIsActive] = useState(startsOpen || visibleParticipantsCount > 0);
+    const [isActive, setIsActive] = useState(!collapsible || visibleParticipantsCount > 0);
     const handleClick = () => setIsActive(!isActive);
   
     return (
       <>
         <AccordionTitle
             active={isActive}
-            onClick={handleClick}
+            onClick={collapsible && handleClick}
             styleName="title"
         >
-            <Icon name="dropdown" />
-            { table.title ?? 'Participants' }
+            { collapsible && <Icon name="dropdown" /> }
+            { table.title ?? <Translate>Participants</Translate> }
             <ParticipantCounter
                 styleName="participants-count-wrapper"
                 totalCount={totalParticipantCount}
@@ -167,18 +170,14 @@ function AccordionParticipantsItem({ index, table, children, startsOpen }: Accor
   }
 
 export default function ParticipantListAccordion({ tables }: ParticipantListAccordionProps) {
-    console.log(tables.length)
     return (
-        tables.length == 1 && tables[0].title
-            ? <ParticipantTable table={ tables[0] } title="All Participants" startsOpen={true} />
-            : (
-                <Accordion styled fluid>
-                    {
-                        tables.map((table: any, i: number) => (
-                            <AccordionParticipantsItem key={i} index={i} table={table} startsOpen={tables.length == 1}/>
-                        ))
-                    }
-                </Accordion>
-            )
+        <Accordion styled fluid>
+            { tables.length == 1 // Case of no participants is handled in Jinja now
+                ? <AccordionParticipantsItem table={tables[0]} index={1} startsOpen={true} collapsible={false} />
+                : tables.map((table: any, i: number) => (
+                    <AccordionParticipantsItem key={i} index={i} table={table} />
+                ))
+            }
+        </Accordion>
     );
 }
