@@ -21,6 +21,7 @@ import {
   TableFooter,
   Popup,
   Segment,
+  Message,
 } from 'semantic-ui-react'
 
 
@@ -89,26 +90,6 @@ function AccordionItem({ index, table }: AccordionItemProps) {
     const handleClick = () => {
         setIsActive(!isActive);
     };
-
-    const anonymousRegistrationText = (
-        <PluralTranslate count={hiddenParticipantsCount}>
-            <Singular>
-                <Param
-                    name="hidden-participants"
-                    value={hiddenParticipantsCount}
-                    />{' '}
-                participant registered anonymously.
-            </Singular>
-            <Plural>
-                <Param
-                    name="hidden-participants"
-                    value={hiddenParticipantsCount}
-                    />{' '}
-                participants registered anonymously.
-            </Plural>
-        </PluralTranslate>
-    )
-
   
     return (
       <>
@@ -155,7 +136,7 @@ function AccordionItem({ index, table }: AccordionItemProps) {
                             <TableFooter>
                                 <TableRow>
                                     <TableHeaderCell colSpan="3">
-                                        { anonymousRegistrationText }
+                                        <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
                                     </TableHeaderCell>
                                 </TableRow>
                             </TableFooter>
@@ -163,9 +144,9 @@ function AccordionItem({ index, table }: AccordionItemProps) {
                     </Table>
                 ) :
                 (
-                    <Segment>
-                        { hasInvisibleParticipants ? anonymousRegistrationText : <Translate>No registrations</Translate> }
-                    </Segment>
+                    <Message>
+                        <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
+                    </Message>
                 )
             }
             </AccordionContent>
