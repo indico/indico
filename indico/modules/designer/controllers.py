@@ -357,6 +357,11 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                 raise UserValueError(_('A Fixed Image element must contain an image'))
             if image_item['image_id'] not in template_images:
                 raise UserValueError(_('The image file does not belong to this template'))
+        for item in data['items']:
+            # tolerate color codes without prefix '#'
+            for color_attr in ['color', 'background_color']:
+                if item[color_attr] and not item[color_attr].startswith('#'):
+                    item[color_attr] = '#' + item[color_attr]
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json.get('backside_template_id'),
                         is_clonable=request.json['is_clonable'],
