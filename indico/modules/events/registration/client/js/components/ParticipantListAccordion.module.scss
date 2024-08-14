@@ -39,9 +39,3 @@
     margin-left: auto;
   }
 }
-
-:global(.table) {
-  display: inline-block;
-  overflow: auto;
-  max-height: 400px;
-}

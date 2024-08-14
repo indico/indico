@@ -97,7 +97,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
 
     return (
         visibleParticipantsCount > 0 ? (
-            <Table celled className="table">
+            <Table fixed celled className="table">
                 <TableHeader>
                     <TableRow className="table-row">
                         {table.headers.map((headerText: string, j: number) => (
@@ -113,7 +113,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
                     <TableRow key={j} className="table-row">
                     {row.columns.map((col: any, k: number) => (
                         <TableCell key={`${j}-${k}`}>
-                            {col.text + 'kjlhsfdajhkdsjhkfasdkjfhkdjsafjfnfhfhsahf98enfsd8f9asdfn89sda7f0sd7f8796f769d768adn87d6896sdf'}
+                            { k % 2 == 0 ? col.text : col.text + 'kjlhsfdajhkdsjhkfasdkjfhkdjsafjfnfhfhsahf98enfsd8f9asdfn89sda7f0sd7f8796f769d768adn87d6896sdf'}
                         </TableCell>
                     ))}
                     </TableRow>
