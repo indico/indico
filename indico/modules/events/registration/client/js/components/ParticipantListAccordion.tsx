@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import { Param, Plural, PluralTranslate, Singular } from "indico/react/i18n";
-import React, { HTMLAttributes, useState } from "react"
+import { Param, Plural, PluralTranslate, Singular, Translate } from "indico/react/i18n";
+import React, { HTMLAttributes, useState } from "react";
 import {
   AccordionTitle,
   AccordionContent,
@@ -21,8 +21,7 @@ import {
   TableFooter,
   Popup,
   Message,
-} from "semantic-ui-react"
-import { Translate } from "react-jsx-i18n";
+} from "semantic-ui-react";
 
 import "./ParticipantListAccordion.module.scss";
 
@@ -58,6 +57,8 @@ interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => {
+    if (count <= 0) return <Translate>No anonymous participants registered</Translate>;
+
     return (
         <PluralTranslate count={count}>
             <Singular>
