@@ -106,19 +106,18 @@ function ParticipantTable({ table }: { table: TableObj }) {
 
     const handleSort = (columnIndex: number) => {
         const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
-        let direction: sortDirectionType = "ascending";
-    
-        if (sortColumn === columnIndex) {
-            direction = (({
-                [ null as any ]: "ascending",
-                "ascending": "descending",
-                "descending": null
-            }[sortDirection]) as sortDirectionType);
+
+        let directions: Record<sortDirectionType, sortDirectionType> = {
+            [ null as any ]: "ascending",
+            "ascending": "descending",
+            "descending": null
         }
+    
+        let direction: sortDirectionType = sortColumn === columnIndex
+            ? ((directions[sortDirection]))
+            : "ascending";
 
         const sortedData = direction == null ? [...table.rows] : [...sortedRows].sort((a, b) => {
-
-            console.log(a.columns[columnIndex].text.toLowerCase(), " vs ", b.columns[columnIndex].text.toLowerCase())
             const textA = a.columns[columnIndex].text.toLowerCase();
             const textB = b.columns[columnIndex].text.toLowerCase();
     
@@ -151,7 +150,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
                     { sortedRows.map((row, j: number) => (
                         <TableRow key={j} className="table-row">
                         { row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
-                            <TableCell key={`${j}-${k}`}>
+                            <TableCell key={`${j}-${k}`} title={ col.text }>
                                 { col.is_picture
                                     ? <img src={col.text} className="cell-img" />
                                     : col.text
