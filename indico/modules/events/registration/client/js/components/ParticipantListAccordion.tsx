@@ -6,7 +6,9 @@
 // LICENSE file for more details.
 
 import { Param, Plural, PluralTranslate, Singular, Translate } from "indico/react/i18n";
-import React, { HTMLAttributes, useState } from "react";
+
+import React, { HTMLAttributes, ReactNode, useState } from "react";
+
 import {
     AccordionTitle,
     AccordionContent,
@@ -28,10 +30,10 @@ import "./ParticipantListAccordion.module.scss";
 
 interface TableObj {
     headers: string[];
-    rows: Array<{
+    rows: [{
         checked_in: boolean;
-        columns: Array<{ text: string; is_picture: boolean; sort_key: string | null }>;
-    }>;
+        columns: [{ text: string; is_picture: boolean; sort_key: string | null }];
+    }];
     num_participants: number;
     show_checkin: boolean;
     title?: string;
@@ -44,7 +46,7 @@ interface ParticipantListAccordionProps {
 interface AccordionParticipantsItemProps {
     index: number;
     table: TableObj;
-    children?: any;
+    children?: ReactNode;
     startsOpen?: boolean;
     collapsible?: boolean;
     title?: string;
@@ -150,7 +152,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
                         <TableRow key={j} className="table-row">
                             {row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
                                 <TableCell key={`${j}-${k}`} title={col.text}>
-                                    { col.is_picture
+                                    { col.is_picture && col.text
                                         ? <img src={col.text} className="cell-img" />
                                         : col.text
                                     }
@@ -217,7 +219,7 @@ export default function ParticipantListAccordion({ tables }: ParticipantListAcco
         <Accordion styled fluid>
             {tables.length == 1 // Case of no participants is handled in Jinja now
                 ? <AccordionParticipantsItem table={tables[0]} index={1} startsOpen={true} collapsible={false} />
-                : tables.map((table: any, i: number) => (
+                : tables.map((table: TableObj, i: number) => (
                     <AccordionParticipantsItem key={i} index={i} table={table} />
                 ))
             }
