@@ -26,14 +26,21 @@ import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/
 
 import './ParticipantListAccordion.module.scss';
 
+interface TableColumnObj {
+  id: number;
+  text: string;
+  is_picture: boolean;
+}
+
+interface TableRowObj {
+  id: number;
+  checked_in: boolean;
+  columns: TableColumnObj[];
+}
+
 interface TableObj {
   headers: string[];
-  rows: [
-    {
-      checked_in: boolean;
-      columns: [{text: string; is_picture: boolean; sort_key: string | null}];
-    }
-  ];
+  rows: TableRowObj[];
   num_participants: number;
   show_checkin: boolean;
   title?: string;
@@ -140,11 +147,12 @@ function ParticipantTable({table}: {table: TableObj}) {
     <Table fixed celled sortable className="table">
       <TableHeader>
         <TableRow className="table-row">
-          {table.headers.map((headerText: string, j: number) => (
+          {table.headers.map((headerText: string, i: number) => (
             <TableHeaderCell
-              key={`${j}`}
-              sorted={sortColumn === j ? sortDirection : undefined}
-              onClick={() => handleSort(j)}
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              sorted={sortColumn === i ? sortDirection : undefined}
+              onClick={() => handleSort(i)}
               title={headerText}
             >
               {headerText}
@@ -153,10 +161,11 @@ function ParticipantTable({table}: {table: TableObj}) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {sortedRows.map((row, j: number) => (
-          <TableRow key={`${j}`} className="table-row">
-            {row.columns.map((col: {text: string; is_picture: boolean}, k: number) => (
-              <TableCell key={`${j}-${k}`} title={col.text}>
+        {sortedRows.map((row: TableRowObj) => (
+          <TableRow key={row.id} className="table-row">
+            {row.columns.map((col: TableColumnObj, i: number) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <TableCell key={i} title={col.text}>
                 {col.is_picture && col.text ? (
                   <img src={col.text} className="cell-img" />
                 ) : (
@@ -230,6 +239,7 @@ export default function ParticipantListAccordion({tables}: ParticipantListAccord
         <AccordionParticipantsItem table={tables[0]} index={1} collapsible={false} />
       ) : (
         tables.map((table: TableObj, i: number) => (
+          // eslint-disable-next-line react/no-array-index-key
           <AccordionParticipantsItem key={i} index={i} table={table} />
         ))
       )}
