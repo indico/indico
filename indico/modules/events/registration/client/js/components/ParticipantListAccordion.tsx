@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import { Param, Plural, PluralTranslate, Singular } from 'indico/react/i18n';
-import React, { HTMLAttributes, useState } from 'react'
+import { Param, Plural, PluralTranslate, Singular } from "indico/react/i18n";
+import React, { HTMLAttributes, useState } from "react"
 import {
   AccordionTitle,
   AccordionContent,
@@ -21,15 +21,18 @@ import {
   TableFooter,
   Popup,
   Message,
-} from 'semantic-ui-react'
-import { Translate } from 'react-jsx-i18n';
+} from "semantic-ui-react"
+import { Translate } from "react-jsx-i18n";
 
-import './ParticipantListAccordion.module.scss';
+import "./ParticipantListAccordion.module.scss";
 
 
 interface TableObj {
     headers: string[];
-    rows: object[];
+    rows: Array<{
+        checked_in: boolean;
+        columns: Array<{ text: string; is_picture: boolean; sort_key: string | null }>;
+    }>;
     num_participants: number;
     show_checkin: boolean;
     title?: string;
@@ -61,14 +64,14 @@ const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count 
                 <Param
                     name="anonymous-participants-count"
                     value={count}
-                />{' '}
+                />{" "}
                 participant registered anonymously.
             </Singular>
             <Plural>
                 <Param
                     name="anonymous-participants-count"
                     value={count}
-                />{' '}
+                />{" "}
                 participants registered anonymously.
             </Plural>
         </PluralTranslate>
@@ -95,21 +98,57 @@ function ParticipantTable({ table }: { table: TableObj }) {
     const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
     const hasInvisibleParticipants = hiddenParticipantsCount > 0
 
+    type sortDirectionType = "ascending" | "descending" | null;
+
+    const [sortColumn, setSortColumn] = useState<number | null>(null);
+    const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
+    const [sortedRows, setSortedRows] = useState([...table.rows]);
+
+    const handleSort = (columnIndex: number) => {
+        const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
+        let direction: sortDirectionType = "ascending";
+    
+        if (sortColumn === columnIndex) {
+            direction = (({
+                [ null as any ]: "ascending",
+                "ascending": "descending",
+                "descending": null
+            }[sortDirection]) as sortDirectionType);
+        }
+
+        const sortedData = direction == null ? [...table.rows] : [...sortedRows].sort((a, b) => {
+
+            console.log(a.columns[columnIndex].text.toLowerCase(), " vs ", b.columns[columnIndex].text.toLowerCase())
+            const textA = a.columns[columnIndex].text.toLowerCase();
+            const textB = b.columns[columnIndex].text.toLowerCase();
+    
+            if (textA < textB) return direction === "ascending" ? -1 : 1;
+            if (textA > textB) return direction === "ascending" ? 1 : -1;
+
+            return 0;
+        });
+
+        setSortColumn(currentSortColumn);
+        setSortDirection(direction);
+        setSortedRows(sortedData);
+    };
+    
+
     return (
         visibleParticipantsCount > 0 ? (
-            <Table fixed celled className="table">
+            <Table fixed celled sortable className="table">
                 <TableHeader>
                     <TableRow className="table-row">
                         {table.headers.map((headerText: string, j: number) => (
-                        <TableHeaderCell key={j} width={1}>
-                            {headerText}
-                        </TableHeaderCell>
+                            <TableHeaderCell key={j} width={1} sorted={sortColumn === j ? sortDirection : undefined} onClick={() => handleSort(j)}>
+                                {headerText}
+                            </TableHeaderCell>
                         ))}
                     </TableRow>
                 </TableHeader>
     
                 <TableBody>
-                    { table.rows.map((row: { columns: [] }, j: number) => (
+                    { sortedRows.map((row, j: number) => (
                         <TableRow key={j} className="table-row">
                         { row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
                             <TableCell key={`${j}-${k}`}>
