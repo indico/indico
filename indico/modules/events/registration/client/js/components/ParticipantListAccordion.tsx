@@ -109,14 +109,13 @@ function ParticipantTable({ table }: { table: TableObj }) {
                 </TableHeader>
     
                 <TableBody>
-                    {table.rows.map((row: { columns: [] }, j: number) => (
+                    { table.rows.map((row: { columns: [] }, j: number) => (
                         <TableRow key={j} className="table-row">
-                        {row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
+                        { row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
                             <TableCell key={`${j}-${k}`}>
-                                {
-                                    col.is_picture
-                                        ? <img src={col.text} className="cell-img" />
-                                        : col.text
+                                { col.is_picture
+                                    ? <img src={col.text} className="cell-img" />
+                                    : col.text
                                 }
                                 
                             </TableCell>
@@ -161,7 +160,7 @@ function AccordionParticipantsItem({ index, table, children, collapsible=true }:
         >
             { collapsible && <Icon name="dropdown" /> }
             <p>
-                { `${table.title}jkhdsafiadfiasdfhasdfhasdkjfhasiudfiuaewhfisaumhaifhhiehmiadhshfsdmsafuhsamiufasdkflsadkjfakjsdfhjkasdhfksjdah8asdfhiusadh87fyhewikfnsdf9ds8f` ?? <Translate>Participants</Translate> }
+                { table.title ?? <Translate>Participants</Translate> }
             </p>
             <ParticipantCounter
                 styleName="participants-count-wrapper"
