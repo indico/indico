@@ -145,8 +145,10 @@ function ParticipantTable({table}: {table: TableObj}) {
     <Table fixed celled sortable className="table">
       <TableHeader>
         <TableRow className="table-row">
-          { table.show_checkin &&
-            <TableHeaderCell width={1} /> // For checkin status
+          { table.show_checkin && // For checkin status
+            <TableHeaderCell width={1} textAlign="center">
+              <Icon name="ticket" /> 
+            </TableHeaderCell>
           }
           {table.headers.map((headerText: string, i: number) => (
             <TableHeaderCell
