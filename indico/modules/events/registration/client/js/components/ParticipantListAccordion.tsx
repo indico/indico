@@ -57,9 +57,7 @@ interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => {
-    if (count <= 0) return <Translate>No anonymous participants registered</Translate>;
-
-    return (
+    return count > 0 ? (
         <PluralTranslate count={count}>
             <Singular>
                 <Param
@@ -76,7 +74,7 @@ const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count 
                 participants registered anonymously.
             </Plural>
         </PluralTranslate>
-    )
+    ) : <Translate>No anonymous participants registered</Translate>
 }
 
 const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, totalCount, hiddenCount, ...props }) => (
@@ -152,7 +150,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
                         <TableRow key={j} className="table-row">
                             {row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
                                 <TableCell key={`${j}-${k}`} title={col.text}>
-                                    {col.is_picture
+                                    { col.is_picture
                                         ? <img src={col.text} className="cell-img" />
                                         : col.text
                                     }
