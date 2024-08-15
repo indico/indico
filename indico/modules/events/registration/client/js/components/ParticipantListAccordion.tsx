@@ -145,6 +145,9 @@ function ParticipantTable({table}: {table: TableObj}) {
     <Table fixed celled sortable className="table">
       <TableHeader>
         <TableRow className="table-row">
+          { table.show_checkin &&
+            <TableHeaderCell width={1} /> // For checkin status
+          }
           {table.headers.map((headerText: string, i: number) => (
             <TableHeaderCell
               // eslint-disable-next-line react/no-array-index-key
@@ -161,6 +164,16 @@ function ParticipantTable({table}: {table: TableObj}) {
       <TableBody>
         {sortedRows.map((row: TableRowObj) => (
           <TableRow key={row.id} className="table-row">
+            {
+              table.show_checkin && (
+                <TableCell textAlign="center">
+                  { row.checked_in
+                    ? <Icon name="check" color="green" /> 
+                    : <Icon name="close" color="red" />
+                  }
+                </TableCell> 
+              )
+            }
             {row.columns.map((col: TableColumnObj, i: number) => (
               // eslint-disable-next-line react/no-array-index-key
               <TableCell key={i} title={col.text}>
