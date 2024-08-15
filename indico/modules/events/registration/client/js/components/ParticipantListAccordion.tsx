@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import { Param, Plural, PluralTranslate, Singular, Translate } from "indico/react/i18n";
-
 import React, { HTMLAttributes, ReactNode, useState } from "react";
 
 import {
@@ -24,6 +22,8 @@ import {
     Popup,
     Message,
 } from "semantic-ui-react";
+
+import { Param, Plural, PluralTranslate, Singular, Translate } from "indico/react/i18n";
 
 import "./ParticipantListAccordion.module.scss";
 
@@ -47,7 +47,6 @@ interface AccordionParticipantsItemProps {
     index: number;
     table: TableObj;
     children?: ReactNode;
-    startsOpen?: boolean;
     collapsible?: boolean;
     title?: string;
 }
@@ -108,13 +107,13 @@ function ParticipantTable({ table }: { table: TableObj }) {
     const handleSort = (columnIndex: number) => {
         const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
 
-        let directions: Record<sortDirectionType, sortDirectionType> = {
-            [null as any]: "ascending",
+        const directions: Record<sortDirectionType, sortDirectionType> = {
+            [null as symbol]: "ascending",
             "ascending": "descending",
             "descending": null
         }
 
-        let direction: sortDirectionType = sortColumn === columnIndex
+        const direction: sortDirectionType = sortColumn === columnIndex
             ? ((directions[sortDirection]))
             : "ascending";
 
@@ -122,8 +121,11 @@ function ParticipantTable({ table }: { table: TableObj }) {
             const textA = a.columns[columnIndex].text.toLowerCase();
             const textB = b.columns[columnIndex].text.toLowerCase();
 
-            if (textA < textB) return direction === "ascending" ? -1 : 1;
-            if (textA > textB) return direction === "ascending" ? 1 : -1;
+            if (textA < textB) {
+                return direction === "ascending" ? -1 : 1;
+            } else if (textA > textB) {
+                return direction === "ascending" ? 1 : -1;
+            }
 
             return 0;
         });
@@ -197,9 +199,9 @@ function AccordionParticipantsItem({ index, table, children, collapsible = true 
                 onClick={collapsible ? handleClick : undefined}
                 styleName="title"
             >
-                {collapsible && <Icon name="dropdown" />}
+                { collapsible && <Icon name="dropdown" /> }
                 <p>
-                    {table.title ?? <Translate>Participants</Translate>}
+                    {table.title || <Translate>Participants</Translate>}
                 </p>
                 <ParticipantCounter
                     styleName="participants-count-wrapper"
@@ -217,8 +219,8 @@ function AccordionParticipantsItem({ index, table, children, collapsible = true 
 export default function ParticipantListAccordion({ tables }: ParticipantListAccordionProps) {
     return (
         <Accordion styled fluid>
-            {tables.length == 1 // Case of no participants is handled in Jinja now
-                ? <AccordionParticipantsItem table={tables[0]} index={1} startsOpen={true} collapsible={false} />
+            {tables.length === 1 // Case of no participants is handled in Jinja now
+                ? <AccordionParticipantsItem table={tables[0]} index={1} collapsible={false} />
                 : tables.map((table: TableObj, i: number) => (
                     <AccordionParticipantsItem key={i} index={i} table={table} />
                 ))
