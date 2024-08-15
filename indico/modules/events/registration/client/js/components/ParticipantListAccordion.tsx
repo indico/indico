@@ -8,19 +8,19 @@
 import { Param, Plural, PluralTranslate, Singular, Translate } from "indico/react/i18n";
 import React, { HTMLAttributes, useState } from "react";
 import {
-  AccordionTitle,
-  AccordionContent,
-  Accordion,
-  Icon,
-  TableRow,
-  TableHeaderCell,
-  TableHeader,
-  TableCell,
-  TableBody,
-  Table,
-  TableFooter,
-  Popup,
-  Message,
+    AccordionTitle,
+    AccordionContent,
+    Accordion,
+    Icon,
+    TableRow,
+    TableHeaderCell,
+    TableHeader,
+    TableCell,
+    TableBody,
+    Table,
+    TableFooter,
+    Popup,
+    Message,
 } from "semantic-ui-react";
 
 import "./ParticipantListAccordion.module.scss";
@@ -83,10 +83,10 @@ const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, tota
     <div className={styleName} {...props}>
         <Popup
             position="left center"
-            content={ <ParticipantCountTranslationHidden count={hiddenCount} /> }
+            content={<ParticipantCountTranslationHidden count={hiddenCount} />}
             trigger={
                 <span>
-                    { totalCount } <Icon name="user" />
+                    {totalCount} <Icon name="user" />
                 </span>
             }
         />
@@ -109,11 +109,11 @@ function ParticipantTable({ table }: { table: TableObj }) {
         const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
 
         let directions: Record<sortDirectionType, sortDirectionType> = {
-            [ null as any ]: "ascending",
+            [null as any]: "ascending",
             "ascending": "descending",
             "descending": null
         }
-    
+
         let direction: sortDirectionType = sortColumn === columnIndex
             ? ((directions[sortDirection]))
             : "ascending";
@@ -121,7 +121,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
         const sortedData = direction == null ? [...table.rows] : [...sortedRows].sort((a, b) => {
             const textA = a.columns[columnIndex].text.toLowerCase();
             const textB = b.columns[columnIndex].text.toLowerCase();
-    
+
             if (textA < textB) return direction === "ascending" ? -1 : 1;
             if (textA > textB) return direction === "ascending" ? 1 : -1;
 
@@ -132,7 +132,7 @@ function ParticipantTable({ table }: { table: TableObj }) {
         setSortDirection(direction);
         setSortedRows(sortedData);
     };
-    
+
 
     return (
         visibleParticipantsCount > 0 ? (
@@ -140,84 +140,84 @@ function ParticipantTable({ table }: { table: TableObj }) {
                 <TableHeader>
                     <TableRow className="table-row">
                         {table.headers.map((headerText: string, j: number) => (
-                            <TableHeaderCell key={j} width={1} sorted={sortColumn === j ? sortDirection : undefined} onClick={() => handleSort(j)}>
+                            <TableHeaderCell key={j} width={1} sorted={sortColumn === j ? sortDirection : undefined} onClick={() => handleSort(j)} title={headerText}>
                                 {headerText}
                             </TableHeaderCell>
                         ))}
                     </TableRow>
                 </TableHeader>
-    
+
                 <TableBody>
-                    { sortedRows.map((row, j: number) => (
+                    {sortedRows.map((row, j: number) => (
                         <TableRow key={j} className="table-row">
-                        { row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
-                            <TableCell key={`${j}-${k}`} title={ col.text }>
-                                { col.is_picture
-                                    ? <img src={col.text} className="cell-img" />
-                                    : col.text
-                                }
-                                
-                            </TableCell>
-                        ))}
+                            {row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
+                                <TableCell key={`${j}-${k}`} title={col.text}>
+                                    {col.is_picture
+                                        ? <img src={col.text} className="cell-img" />
+                                        : col.text
+                                    }
+
+                                </TableCell>
+                            ))}
                         </TableRow>
                     ))}
                 </TableBody>
-                
-                { hasInvisibleParticipants &&
+
+                {hasInvisibleParticipants &&
                     <TableFooter>
                         <TableRow>
-                            <TableHeaderCell colSpan={ table.headers.length }>
-                                <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
+                            <TableHeaderCell colSpan={table.headers.length}>
+                                <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
                             </TableHeaderCell>
                         </TableRow>
                     </TableFooter>
                 }
             </Table>
         ) :
-        (
-            <Message>
-                <ParticipantCountTranslationHidden count={ hiddenParticipantsCount }/>
-            </Message>
-        )
+            (
+                <Message>
+                    <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
+                </Message>
+            )
     )
 }
 
-function AccordionParticipantsItem({ index, table, children, collapsible=true }: AccordionParticipantsItemProps) {
+function AccordionParticipantsItem({ index, table, children, collapsible = true }: AccordionParticipantsItemProps) {
     const visibleParticipantsCount = table.rows.length
     const totalParticipantCount = table.num_participants;
     const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
 
     const [isActive, setIsActive] = useState(!collapsible || visibleParticipantsCount > 0);
     const handleClick = () => setIsActive(!isActive);
-  
+
     return (
-      <>
-        <AccordionTitle
-            active={isActive}
-            onClick={collapsible ? handleClick : undefined}
-            styleName="title"
-        >
-            { collapsible && <Icon name="dropdown" /> }
-            <p>
-                { table.title ?? <Translate>Participants</Translate> }
-            </p>
-            <ParticipantCounter
-                styleName="participants-count-wrapper"
-                totalCount={totalParticipantCount}
-                hiddenCount={hiddenParticipantsCount}
-            />
-        </AccordionTitle>
-        <AccordionContent active={isActive} key={`c${index}`}>
-            { children ?? <ParticipantTable table={table} /> }
-        </AccordionContent>
-      </>
+        <>
+            <AccordionTitle
+                active={isActive}
+                onClick={collapsible ? handleClick : undefined}
+                styleName="title"
+            >
+                {collapsible && <Icon name="dropdown" />}
+                <p>
+                    {table.title ?? <Translate>Participants</Translate>}
+                </p>
+                <ParticipantCounter
+                    styleName="participants-count-wrapper"
+                    totalCount={totalParticipantCount}
+                    hiddenCount={hiddenParticipantsCount}
+                />
+            </AccordionTitle>
+            <AccordionContent active={isActive} key={`c${index}`}>
+                {children ?? <ParticipantTable table={table} />}
+            </AccordionContent>
+        </>
     );
-  }
+}
 
 export default function ParticipantListAccordion({ tables }: ParticipantListAccordionProps) {
     return (
         <Accordion styled fluid>
-            { tables.length == 1 // Case of no participants is handled in Jinja now
+            {tables.length == 1 // Case of no participants is handled in Jinja now
                 ? <AccordionParticipantsItem table={tables[0]} index={1} startsOpen={true} collapsible={false} />
                 : tables.map((table: any, i: number) => (
                     <AccordionParticipantsItem key={i} index={i} table={table} />
