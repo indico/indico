@@ -8,19 +8,19 @@
 import React, { HTMLAttributes, ReactNode, useState } from "react";
 
 import {
-    AccordionTitle,
-    AccordionContent,
-    Accordion,
-    Icon,
-    TableRow,
-    TableHeaderCell,
-    TableHeader,
-    TableCell,
-    TableBody,
-    Table,
-    TableFooter,
-    Popup,
-    Message,
+  AccordionTitle,
+  AccordionContent,
+  Accordion,
+  Icon,
+  TableRow,
+  TableHeaderCell,
+  TableHeader,
+  TableCell,
+  TableBody,
+  Table,
+  TableFooter,
+  Popup,
+  Message,
 } from "semantic-ui-react";
 
 import { Param, Plural, PluralTranslate, Singular, Translate } from "indico/react/i18n";
@@ -29,159 +29,155 @@ import "./ParticipantListAccordion.module.scss";
 
 
 interface TableObj {
-    headers: string[];
-    rows: [{
-        checked_in: boolean;
-        columns: [{ text: string; is_picture: boolean; sort_key: string | null }];
-    }];
-    num_participants: number;
-    show_checkin: boolean;
-    title?: string;
+  headers: string[];
+  rows: [{
+    checked_in: boolean;
+    columns: [{ text: string; is_picture: boolean; sort_key: string | null }];
+  }];
+  num_participants: number;
+  show_checkin: boolean;
+  title?: string;
 }
 
 interface ParticipantListAccordionProps {
-    tables: TableObj[];
+  tables: TableObj[];
 }
 
 interface AccordionParticipantsItemProps {
-    index: number;
-    table: TableObj;
-    children?: ReactNode;
-    collapsible?: boolean;
-    title?: string;
+  index: number;
+  table: TableObj;
+  children?: ReactNode;
+  collapsible?: boolean;
+  title?: string;
 }
 
 interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
-    totalCount: number;
-    hiddenCount: number;
-    styleName?: string;
+  totalCount: number;
+  hiddenCount: number;
+  styleName?: string;
 }
 
-const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => {
-    return count > 0 ? (
-        <PluralTranslate count={count}>
-            <Singular>
-                <Param
-                    name="anonymous-participants-count"
-                    value={count}
-                />{" "}
-                participant registered anonymously.
-            </Singular>
-            <Plural>
-                <Param
-                    name="anonymous-participants-count"
-                    value={count}
-                />{" "}
-                participants registered anonymously.
-            </Plural>
-        </PluralTranslate>
-    ) : <Translate>No anonymous participants registered</Translate>
-}
+const ParticipantCountTranslationHidden: React.FC<{ count: number }> = ({ count }) => (
+  count > 0 ? (
+    <PluralTranslate count={count}>
+      <Singular>
+        <Param
+          name="anonymous-participants-count"
+          value={count}
+        />{" "}
+        participant registered anonymously.
+      </Singular>
+      <Plural>
+        <Param
+          name="anonymous-participants-count"
+          value={count}
+        />{" "}
+        participants registered anonymously.
+      </Plural>
+    </PluralTranslate>
+  ) : <Translate>No anonymous participants registered</Translate>
+)
 
 const ParticipantCounter: React.FC<ParticipantCounterProps> = ({ styleName, totalCount, hiddenCount, ...props }) => (
-    <div className={styleName} {...props}>
-        <Popup
-            position="left center"
-            content={<ParticipantCountTranslationHidden count={hiddenCount} />}
-            trigger={
-                <span>
-                    {totalCount} <Icon name="user" />
-                </span>
-            }
-        />
-    </div>
+  <div className={styleName} {...props}>
+    <Popup
+      position="left center"
+      content={<ParticipantCountTranslationHidden count={hiddenCount} />}
+      trigger={
+        <span>
+          {totalCount} <Icon name="user" />
+        </span>
+      }
+    />
+  </div>
 );
 
 function ParticipantTable({ table }: { table: TableObj }) {
-    const visibleParticipantsCount = table.rows.length
-    const totalParticipantCount = table.num_participants;
-    const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
-    const hasInvisibleParticipants = hiddenParticipantsCount > 0
+  const visibleParticipantsCount = table.rows.length
+  const totalParticipantCount = table.num_participants;
+  const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
+  const hasInvisibleParticipants = hiddenParticipantsCount > 0
 
-    type sortDirectionType = "ascending" | "descending" | null;
+  type sortDirectionType = "ascending" | "descending" | null;
 
-    const [sortColumn, setSortColumn] = useState<number | null>(null);
-    const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
-    const [sortedRows, setSortedRows] = useState([...table.rows]);
+  const [sortColumn, setSortColumn] = useState<number | null>(null);
+  const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
+  const [sortedRows, setSortedRows] = useState([...table.rows]);
 
-    const handleSort = (columnIndex: number) => {
-        const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
+  const handleSort = (columnIndex: number) => {
+    const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
 
-        const directions: Record<sortDirectionType, sortDirectionType> = {
-            [null as symbol]: "ascending",
-            "ascending": "descending",
-            "descending": null
-        }
+    const directions: Record<sortDirectionType, sortDirectionType> = {
+      [null as symbol]: "ascending",
+      "ascending": "descending",
+      "descending": null
+    }
 
-        const direction: sortDirectionType = sortColumn === columnIndex
-            ? ((directions[sortDirection]))
-            : "ascending";
+    const direction: sortDirectionType = sortColumn === columnIndex
+      ? ((directions[sortDirection]))
+      : "ascending";
 
-        const sortedData = direction == null ? [...table.rows] : [...sortedRows].sort((a, b) => {
-            const textA = a.columns[columnIndex].text.toLowerCase();
-            const textB = b.columns[columnIndex].text.toLowerCase();
+    const sortedData = direction === null ? [...table.rows] : [...sortedRows].sort((a, b) => {
+      const textA = a.columns[columnIndex].text.toLowerCase();
+      const textB = b.columns[columnIndex].text.toLowerCase();
 
-            if (textA < textB) {
-                return direction === "ascending" ? -1 : 1;
-            } else if (textA > textB) {
-                return direction === "ascending" ? 1 : -1;
-            }
+      if (textA < textB) {
+        return direction === "ascending" ? -1 : 1;
+      } else if (textA > textB) {
+        return direction === "ascending" ? 1 : -1;
+      }
 
-            return 0;
-        });
+      return 0;
+    });
 
-        setSortColumn(currentSortColumn);
-        setSortDirection(direction);
-        setSortedRows(sortedData);
-    };
+    setSortColumn(currentSortColumn);
+    setSortDirection(direction);
+    setSortedRows(sortedData);
+  };
 
-
-    return (
-        visibleParticipantsCount > 0 ? (
-            <Table fixed celled sortable className="table">
-                <TableHeader>
-                    <TableRow className="table-row">
-                        {table.headers.map((headerText: string, j: number) => (
-                            <TableHeaderCell key={j} width={1} sorted={sortColumn === j ? sortDirection : undefined} onClick={() => handleSort(j)} title={headerText}>
-                                {headerText}
-                            </TableHeaderCell>
-                        ))}
-                    </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                    {sortedRows.map((row, j: number) => (
-                        <TableRow key={j} className="table-row">
-                            {row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
-                                <TableCell key={`${j}-${k}`} title={col.text}>
-                                    { col.is_picture && col.text
-                                        ? <img src={col.text} className="cell-img" />
-                                        : col.text
-                                    }
-
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableBody>
-
-                {hasInvisibleParticipants &&
-                    <TableFooter>
-                        <TableRow>
-                            <TableHeaderCell colSpan={table.headers.length}>
-                                <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
-                            </TableHeaderCell>
-                        </TableRow>
-                    </TableFooter>
-                }
-            </Table>
-        ) :
-            (
-                <Message>
-                    <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
-                </Message>
-            )
+  return (
+      visibleParticipantsCount > 0 ? (
+        <Table fixed celled sortable className="table">
+          <TableHeader>
+            <TableRow className="table-row">
+              { table.headers.map((headerText: string, j: number) => (
+                <TableHeaderCell key={j} width={1} sorted={ sortColumn === j ? sortDirection : undefined } onClick={() => handleSort(j)} title={headerText}>
+                    {headerText}
+                </TableHeaderCell>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            { sortedRows.map((row, j: number) => (
+              <TableRow key={j} className="table-row">
+                { row.columns.map((col: { text: string, is_picture: boolean }, k: number) => (
+                  <TableCell key={`${j}-${k}`} title={col.text}>
+                    { col.is_picture && col.text
+                      ? <img src={col.text} className="cell-img" />
+                      : col.text
+                    }
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+          { hasInvisibleParticipants &&
+            <TableFooter>
+              <TableRow>
+                <TableHeaderCell colSpan={table.headers.length}>
+                  <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
+                </TableHeaderCell>
+              </TableRow>
+            </TableFooter>
+          }
+        </Table>
+      ) :
+    (
+      <Message>
+        <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
+      </Message>
     )
+  )
 }
 
 function AccordionParticipantsItem({ index, table, children, collapsible = true }: AccordionParticipantsItemProps) {
