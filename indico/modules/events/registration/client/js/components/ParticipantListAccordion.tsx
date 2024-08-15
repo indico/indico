@@ -111,8 +111,6 @@ function ParticipantTable({table}: {table: TableObj}) {
   const [sortedRows, setSortedRows] = useState([...table.rows]);
 
   const handleSort = (columnIndex: number) => {
-    const currentSortColumn = sortColumn === columnIndex ? sortColumn : columnIndex;
-
     const directions: Record<sortDirectionType, sortDirectionType> = {
       [null as symbol]: 'ascending',
       ascending: 'descending',
@@ -138,7 +136,7 @@ function ParticipantTable({table}: {table: TableObj}) {
             return 0;
           });
 
-    setSortColumn(currentSortColumn);
+    setSortColumn(columnIndex);
     setSortDirection(direction);
     setSortedRows(sortedData);
   };
