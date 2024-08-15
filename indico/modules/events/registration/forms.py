@@ -30,8 +30,8 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
-from indico.util.enum import RichStrEnum
 from indico.modules.events.settings import data_retention_settings
+from indico.util.enum import RichStrEnum
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
