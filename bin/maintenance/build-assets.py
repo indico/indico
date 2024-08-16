@@ -18,7 +18,6 @@ from pathlib import Path
 
 import click
 import yaml
-from setuptools import find_packages
 
 
 def fail(message, *args, **kwargs):
@@ -102,9 +101,9 @@ def _get_plugin_themes(plugin_dir):
     return _parse_plugin_theme_yaml(data)
 
 
-def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
+def _get_plugin_webpack_build_config(plugin_dir: Path, url_root='/'):
     core_config = _get_webpack_build_config(url_root)
-    packages = [x for x in find_packages(plugin_dir) if '.' not in x]
+    packages = [x.parent.name for x in plugin_dir.glob('*/__init__.py')]
     assert len(packages) == 1
     plugin_root_path = os.path.join(plugin_dir, packages[0])
     plugin_name = packages[0].replace('indico_', '')  # XXX: find a better solution for this
@@ -214,16 +213,15 @@ def _chdir(path):
 
 
 @cli.command('plugin', short_help='Builds assets of a plugin.')
-@click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+@click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
                 callback=_validate_plugin_dir)
 @_common_build_options()
-def build_plugin(plugin_dir, dev, clean, watch, url_root):
+def build_plugin(plugin_dir: Path, dev, clean, watch, url_root):
     """Run webpack to build plugin assets."""
     clean = clean or (clean is None and not dev)
-    webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
+    webpack_build_config_file = plugin_dir / 'webpack-build-config.json'
     webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root)
-    with open(webpack_build_config_file, 'w') as f:
-        json.dump(webpack_build_config, f, indent=2, sort_keys=True)
+    webpack_build_config_file.write_text(json.dumps(webpack_build_config, indent=2, sort_keys=True))
     if clean:
         _clean(webpack_build_config, plugin_dir)
     force_url_map = ['--force'] if clean or not dev else []
@@ -233,10 +231,10 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
         dump_plugin_args += ['--plugin', name]
     subprocess.check_call([sys.executable, 'bin/maintenance/dump_url_map.py', '--output', url_map_path,
                            *dump_plugin_args, *force_url_map])
-    webpack_config_file = os.path.join(plugin_dir, 'webpack.config.mjs')
-    if not os.path.exists(webpack_config_file):
+    webpack_config_file = plugin_dir / 'webpack.config.mjs'
+    if not webpack_config_file.exists():
         webpack_config_file = 'plugin.webpack.config.mjs'
-    if os.path.exists(os.path.join(plugin_dir, 'package.json')):
+    if (plugin_dir / 'package.json').exists():
         with _chdir(plugin_dir):
             try:
                 subprocess.check_call(['npm', 'install', '--quiet'])
@@ -245,14 +243,14 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
     args = _get_webpack_args(dev, watch)
     args += ['--config', webpack_config_file]
     os.environ['NODE_PATH'] = os.path.abspath('node_modules')
-    os.environ['INDICO_PLUGIN_ROOT'] = plugin_dir
+    os.environ['INDICO_PLUGIN_ROOT'] = str(plugin_dir)
     try:
         subprocess.check_call(['npx', 'webpack', *args])
     except subprocess.CalledProcessError:
         fail('running webpack failed')
     finally:
         if not dev:
-            os.unlink(webpack_build_config_file)
+            webpack_build_config_file.unlink()
 
 
 @cli.command('all-plugins', short_help='Builds assets of all plugins in a directory.')
