@@ -19,7 +19,6 @@
     flex-grow: 1;
     min-width: 0;
     height: auto;
-    margin-top: 1em;
   }
 
   &.compact .parent-entry {
@@ -110,5 +109,9 @@
   :global(.rbc-addons-dnd.rbc-addons-dnd-is-dragging
       .rbc-event:not(.rbc-addons-dnd-dragged-event):not(.rbc-addons-dnd-drag-preview)) {
     opacity: unset !important;
+  }
+
+  :global(.rbc-time-view) {
+    border-top: none;
   }
 }
