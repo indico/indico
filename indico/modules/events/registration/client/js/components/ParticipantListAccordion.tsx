@@ -127,13 +127,19 @@ function ParticipantTable({table}: {table: TableObj}) {
       direction === null
         ? [...table.rows]
         : [...sortedRows].sort((a, b) => {
-            let comparedVals = [a, b].map(el =>
+            const comparedVals = [a, b].map(el =>
               typeof column === 'string' ? el[column] : el.columns[column].text
             );
 
-            comparedVals = comparedVals.map(el =>
-              (typeof el === 'boolean' ? (el ? 'O' : 'X') : el).toLowerCase()
-            );
+            if (comparedVals.every(el => typeof el === 'boolean')) {
+              if (direction === 'ascending') {
+                return comparedVals[0] > comparedVals[1] ? -1 : 1;
+              } else if (direction === 'descending') {
+                return comparedVals[0] > comparedVals[1] ? 1 : -1;
+              } else {
+                return 0;
+              }
+            }
 
             return (
               comparedVals[0].localeCompare(comparedVals[1]) * (direction === 'ascending' ? 1 : -1)
