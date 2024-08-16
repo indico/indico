@@ -244,11 +244,12 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no
 
 @cli.command('all-plugins', short_help='Builds all plugin wheels in a directory.')
 @click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.option('--no-git', is_flag=True, help='Skip checks and assume clean non-git working tree')
 @click.pass_context
-def build_all_plugins(ctx, plugins_dir, add_version_suffix, ignore_unclean, no_git):
+def build_all_plugins(ctx, assets, plugins_dir, add_version_suffix, ignore_unclean, no_git):
     """Build all plugin wheels in a directory.
 
     PLUGINS_DIR is the path to the folder containing the plugin directories
@@ -257,7 +258,7 @@ def build_all_plugins(ctx, plugins_dir, add_version_suffix, ignore_unclean, no_g
                      if os.path.exists(os.path.join(plugins_dir, d, 'pyproject.toml')))
     for plugin in plugins:
         step('plugin: {}', plugin)
-        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin),
+        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), assets=assets,
                    add_version_suffix=add_version_suffix, ignore_unclean=ignore_unclean, no_git=no_git)
 
 
