@@ -109,11 +109,11 @@ function ParticipantTable({table}: {table: TableObj}) {
 
   type sortDirectionType = 'ascending' | 'descending' | null;
 
-  const [sortColumn, setSortColumn] = useState<number | null>(null);
+  const [sortColumn, setSortColumn] = useState<number | string | null>(null);
   const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
   const [sortedRows, setSortedRows] = useState([...table.rows]);
 
-  const handleSort = (columnIndex: number) => {
+  const handleSort = (column: number | string | null) => {
     const directions: Record<sortDirectionType, sortDirectionType> = {
       [null as sortDirectionType]: 'ascending',
       ascending: 'descending',
@@ -121,25 +121,25 @@ function ParticipantTable({table}: {table: TableObj}) {
     };
 
     const direction: sortDirectionType =
-      sortColumn === columnIndex ? directions[sortDirection] : 'ascending';
+      sortColumn === column ? directions[sortDirection] : 'ascending';
 
-    const sortedData =
-      direction === null
-        ? [...table.rows]
-        : [...sortedRows].sort((a, b) => {
-            const textA = a.columns[columnIndex].text.toLowerCase();
-            const textB = b.columns[columnIndex].text.toLowerCase();
+    let sortedData;
 
-            if (textA < textB) {
-              return direction === 'ascending' ? -1 : 1;
-            } else if (textA > textB) {
-              return direction === 'ascending' ? 1 : -1;
-            }
+    if (direction === null) {
+      sortedData = [...table.rows];
+    } else {
+      sortedData = [...sortedRows].sort((a, b) => {
+        const comparedVals: string[] = [a, b].map(el =>
+          (typeof column === 'string' ? `${el[column]}` : el.columns[column].text).toLowerCase()
+        );
 
-            return 0;
-          });
+        return (
+          comparedVals[0].localeCompare(comparedVals[1]) * (direction === 'ascending' ? 1 : -1)
+        );
+      });
+    }
 
-    setSortColumn(columnIndex);
+    setSortColumn(column);
     setSortDirection(direction);
     setSortedRows(sortedData);
   };
@@ -149,7 +149,12 @@ function ParticipantTable({table}: {table: TableObj}) {
       <TableHeader>
         <TableRow className="table-row">
           {table.show_checkin && ( // For checkin status
-            <TableHeaderCell width={1} textAlign="center">
+            <TableHeaderCell
+              width={1}
+              textAlign="center"
+              onClick={() => handleSort('checked_in')}
+              sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
+            >
               <Icon name="ticket" />
             </TableHeaderCell>
           )}
@@ -168,7 +173,7 @@ function ParticipantTable({table}: {table: TableObj}) {
       </TableHeader>
       <TableBody>
         {sortedRows.map((row: TableRowObj) => (
-          <TableRow key={row.id} className="table-row">
+          <TableRow key={row.id}>
             {table.show_checkin && (
               <TableCell textAlign="center">
                 {row.checked_in ? (
@@ -249,7 +254,7 @@ function AccordionParticipantsItem({
 
 export default function ParticipantListAccordion({tables}: ParticipantListAccordionProps) {
   return (
-    <Accordion styled fluid>
+    <Accordion fluid>
       {tables.length === 1 ? ( // Case of no participants is handled in Jinja now
         <AccordionParticipantsItem table={tables[0]} index={1} collapsible={false} />
       ) : (
