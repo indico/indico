@@ -123,21 +123,18 @@ function ParticipantTable({table}: {table: TableObj}) {
     const direction: sortDirectionType =
       sortColumn === column ? directions[sortDirection] : 'ascending';
 
-    let sortedData;
+    const sortedData =
+      direction === null
+        ? [...table.rows]
+        : [...sortedRows].sort((a, b) => {
+            const comparedVals: string[] = [a, b].map(el =>
+              (typeof column === 'string' ? `${el[column]}` : el.columns[column].text).toLowerCase()
+            );
 
-    if (direction === null) {
-      sortedData = [...table.rows];
-    } else {
-      sortedData = [...sortedRows].sort((a, b) => {
-        const comparedVals: string[] = [a, b].map(el =>
-          (typeof column === 'string' ? `${el[column]}` : el.columns[column].text).toLowerCase()
-        );
-
-        return (
-          comparedVals[0].localeCompare(comparedVals[1]) * (direction === 'ascending' ? 1 : -1)
-        );
-      });
-    }
+            return (
+              comparedVals[0].localeCompare(comparedVals[1]) * (direction === 'ascending' ? 1 : -1)
+            );
+          });
 
     setSortColumn(column);
     setSortDirection(direction);
