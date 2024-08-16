@@ -34,25 +34,35 @@ def _show_diff(old, new, filename):
     print(highlight(diff, DiffLexer(), Terminal256Formatter(style='native')))
 
 
-def _update_pyproject_reqs(data):
-    reqs = {x.name: str(x) for x in load_requirements_files(['requirements.dev.txt'])[0]}
-    for deplist in (
-        data['build-system']['requires'],
-        data['tool']['hatch']['build']['targets']['wheel']['hooks']['custom']['dependencies'],
+def _update_pyproject_reqs(data, context):
+    reqs = {x.name: str(x) for x in load_requirements_files(['requirements.txt'])[0]}
+    reqs |= {x.name: str(x) for x in load_requirements_files(['requirements.dev.txt'])[0]}
+    for getter in (
+        lambda: data['build-system']['requires'],
+        lambda: data['tool']['hatch']['build']['targets']['wheel']['hooks']['custom']['dependencies'],
     ):
+        try:
+            deplist = getter()
+        except KeyError:
+            continue
         for i, req in enumerate(deplist):
-            deplist[i] = tomlkit.string(reqs[Requirement(req).name], literal=True)
+            req_name = Requirement(req).name
+            try:
+                new_req = reqs[req_name]
+            except KeyError:
+                print(f'[{context}] Requirement {req_name} not pinned in Indico core')
+                continue
+            deplist[i] = tomlkit.string(new_req, literal=True)
 
 
-def _update_pyproject():
-    pyproject = Path('pyproject.toml')
-    old_content = pyproject.read_text()
+def _update_pyproject(pyproject_path: Path, context: str):
+    old_content = pyproject_path.read_text()
     data = tomlkit.parse(old_content)
-    _update_pyproject_reqs(data)
+    _update_pyproject_reqs(data, context)
     new_content = tomlkit.dumps(data)
     if old_content != new_content:
-        _show_diff(old_content, new_content, 'pyproject.toml')
-        pyproject.write_text(new_content)
+        _show_diff(old_content, new_content, str(pyproject_path))
+        pyproject_path.write_text(new_content)
 
 
 @click.command()
@@ -85,7 +95,9 @@ def main(upgrade, upgrade_packages):
         if proc.returncode:
             failed = True
 
-    _update_pyproject()
+    _update_pyproject(Path('pyproject.toml'), 'Indico')
+    for plugin_pyproject in Path('../plugins').glob('**/pyproject.toml'):
+        _update_pyproject(plugin_pyproject, plugin_pyproject.parent.name)
 
     sys.exit(1 if failed else 0)
 
