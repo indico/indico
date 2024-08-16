@@ -138,9 +138,7 @@ function ParticipantTable({table}: {table: TableObj}) {
             } else if (comparedVals.every(el => typeof el === 'boolean')) {
               sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
             } else {
-              sortResult = comparedVals[0]
-                .toLowerCase()
-                .localeCompare(comparedVals[1].toLowerCase());
+              sortResult = comparedVals[0].localeCompare(comparedVals[1]);
             }
 
             return sortResult * (direction === 'ascending' ? 1 : -1);
