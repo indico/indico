@@ -8,18 +8,15 @@
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
-from distutils.log import ERROR, set_threshold
-from distutils.text_file import TextFile
-from glob import glob
+from pathlib import Path
 
 import click
-from setuptools import find_packages
-from setuptools.command.egg_info import FileList
 
 
 def fail(message, *args, **kwargs):
@@ -73,116 +70,40 @@ def build_assets_plugin(plugin_dir):
 
 
 def clean_build_dirs():
-    info('cleaning build dirs')
-    try:
-        subprocess.check_output([sys.executable, 'setup.py', 'clean', '-a'], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as exc:
-        fail('clean failed', verbose_msg=exc.output)
-
-
-def compile_catalogs():
-    path = None
-    # find ./xxx/translations/ with at least one subdir
-    for root, dirs, _files in os.walk('.'):
-        segments = root.split(os.sep)
-        if segments[-1] == 'translations' and len(segments) == 3 and dirs:
-            path = root
-            break
-    if path is None:
-        noop('plugin has no translations')
+    if not os.path.exists('build'):
         return
-    info('compiling translations')
+    # XXX this should no longer be needed now that we do a clean source -> sdist -> wheel
+    # build (and no longer use setuptools for our own plugins anyway), but let's keep it
+    # around just in case
+    info('cleaning build dirs')
+    shutil.rmtree('build')
+
+
+def build_wheel(target_dir: Path):
+    info('building wheel')
+    old_sdists = set(target_dir.glob('*.tar.gz'))
     try:
-        subprocess.check_output([sys.executable, 'setup.py', 'compile_catalog', '-d', path, '-f'],
+        subprocess.check_output([sys.executable, '-m', 'build', '--installer', 'uv', '-o', target_dir],
                                 stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
-        fail('compile_catalog failed', verbose_msg=exc.output)
-
-
-def build_wheel(target_dir):
-    info('building wheel')
-    try:
-        # we need to disable isolation because babel is required during the build.
-        # eventually we should probably move to pyproject.toml with a custom in-tree
-        # build backend that does most of things this script does, properly specify
-        # babel as a build requirement, and then call e.g. the setuptools build backend
-        # to produce the actual wheel. but this is much more work so for now we just
-        # disable build isolation
-        subprocess.check_output([sys.executable, '-m', 'build', '-w', '-n', '-o', target_dir], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as exc:
         fail('build failed', verbose_msg=exc.output)
+    finally:
+        # We do not use/support sdists, but by using a standard build where first an sdist is
+        # built, and then a wheel is built using that sdist, we ensure that e.g. a plugin which
+        # still uses setuptools as its build backend does not leave build artifacts such as the
+        # `build` dir behind.
+        for sdist in set(target_dir.glob('*.tar.gz')) - old_sdists:
+            sdist.unlink()
 
 
-def git_is_clean_indico():
-    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*'))})
-    cmds = [['git', 'diff', '--stat', '--color=always', *toplevel],
-            ['git', 'diff', '--stat', '--color=always', '--staged', *toplevel],
-            ['git', 'clean', '-dn', '-e', '__pycache__', *toplevel]]
+def git_is_clean(*paths):
+    cmds = [['git', 'diff', '--stat', '--color=always', *paths],
+            ['git', 'diff', '--stat', '--color=always', '--staged', *paths],
+            ['git', 'clean', '-dn', *paths]]
     for cmd in cmds:
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
         if rv:
             return False, rv
-    return True, None
-
-
-def _iter_package_modules(package_masks):
-    for package in find_packages(include=package_masks):
-        path = '/'.join(package.split('.'))
-        if not os.path.exists(os.path.join(path, '__init__.py')):
-            continue
-        yield from glob(os.path.join(path, '*.py'))
-
-
-def _get_included_files(package_masks):
-    old_threshold = set_threshold(ERROR)
-    file_list = FileList()
-    file_list.extend(_iter_package_modules(package_masks))
-    manifest = TextFile('MANIFEST.in', strip_comments=1, skip_blanks=1, join_lines=1, lstrip_ws=1, rstrip_ws=1,
-                        collapse_join=1)
-    for line in manifest.readlines():
-        file_list.process_template_line(line)
-    set_threshold(old_threshold)
-    return file_list.files
-
-
-def _get_ignored_package_files_indico():
-    files = set(_get_included_files(('indico', 'indico.*')))
-    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'],
-                                     text=True)
-    ignored = set(output.splitlines())
-    dist_path = 'indico/web/static/dist/'
-    i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/(?:messages\.mo|messages-react\.json)')
-    return {path for path in ignored & files if not path.startswith(dist_path) and not i18n_re.match(path)}
-
-
-def package_is_clean_indico():
-    garbage = _get_ignored_package_files_indico()
-    if garbage:
-        return False, '\n'.join(garbage)
-    return True, None
-
-
-def git_is_clean_plugin():
-    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*'))})
-    cmds = [['git', 'diff', '--stat', '--color=always', *toplevel],
-            ['git', 'diff', '--stat', '--color=always', '--staged', *toplevel]]
-    if toplevel:
-        # only check for ignored files if we have packages. for single-module
-        # plugins we don't have any package data to include anyway...
-        cmds.append(['git', 'clean', '-dn', '-e', '__pycache__', *toplevel])
-    for cmd in cmds:
-        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True)
-        if rv:
-            return False, rv
-    if not toplevel:
-        # If we have just a single pyfile we don't need to check for ignored files
-        return True, None
-    rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', *toplevel],
-                                 stderr=subprocess.STDOUT, text=True)
-    garbage_re = re.compile(r'(\.(py[co]|mo)$)|(/__pycache__/)|(^({})/static/dist/)'.format('|'.join(toplevel)))
-    garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
-    if garbage:
-        return False, '\n'.join(garbage)
     return True, None
 
 
@@ -192,7 +113,7 @@ def patch_indico_version(add_version_suffix):
 
 
 def patch_plugin_version(add_version_suffix):
-    return _patch_version(add_version_suffix, 'setup.cfg', r'^version = (.+)$', r'version = \1{}')
+    return _patch_version(add_version_suffix, 'pyproject.toml', r"^version = '(.+)'$", r"version = '\1{}'")
 
 
 @contextmanager
@@ -233,13 +154,12 @@ def _patch_version(add_version_suffix, file_name, search, replace):
 
 
 @click.group()
-@click.option('--target-dir', '-d', type=click.Path(file_okay=False, resolve_path=True), default='dist/',
-              help='target dir for build wheels relative to the current dir')
+@click.option('--target-dir', '-d', type=click.Path(file_okay=False, resolve_path=True, path_type=Path),
+              default='dist/', help='target dir for build wheels relative to the current dir')
 @click.pass_obj
-def cli(obj, target_dir):
+def cli(obj, target_dir: Path):
     obj['target_dir'] = target_dir
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
+    target_dir.mkdir(exist_ok=True)
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 
@@ -253,42 +173,27 @@ def build_indico(obj, assets, add_version_suffix, ignore_unclean, no_git):
     """Build the indico wheel."""
     target_dir = obj['target_dir']
     if no_git:
-        clean, output = True, None
         warn('Assuming clean non-git working tree')
         if add_version_suffix:
             fail('The --no-git option cannot be used with --add-version-suffix')
     else:
         # check for unclean git status
-        clean, output = git_is_clean_indico()
+        clean, output = git_is_clean('indico')
         if not clean and ignore_unclean:
             warn('working tree is not clean [ignored]')
         elif not clean:
             fail('working tree is not clean', verbose_msg=output)
-    if no_git:
-        clean, output = True, None
-        warn('Assuming clean non-git package')
-        if add_version_suffix:
-            fail('The --no-git option cannot be used with --add-version-suffix', verbose_msg=output)
-    else:
-        # check for git-ignored files included in the package
-        clean, output = package_is_clean_indico()
-        if not clean and ignore_unclean:
-            warn('package contains unexpected files listed in git exclusions [ignored]')
-        elif not clean:
-            fail('package contains unexpected files listed in git exclusions', verbose_msg=output)
     if assets:
         build_assets()
     else:
         warn('building assets disabled')
-    clean_build_dirs()
     with patch_indico_version(add_version_suffix):
         build_wheel(target_dir)
-    clean_build_dirs()
 
 
 def _validate_plugin_dir(ctx, param, value):
-    if not os.path.exists(os.path.join(value, 'setup.py')):
-        raise click.BadParameter(f'no setup.py found in {value}')
+    if not os.path.exists(os.path.join(value, 'pyproject.toml')):
+        raise click.BadParameter(f'no pyproject.toml found in {value}')
     return value
 
 
@@ -308,7 +213,7 @@ def _plugin_has_assets(plugin_dir):
 def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no_git):
     """Build a plugin wheel.
 
-    PLUGIN_DIR is the path to the folder containing the plugin's setup.py
+    PLUGIN_DIR is the path to the folder containing the plugin's pyproject.toml
     """
     target_dir = obj['target_dir']
     with _chdir(plugin_dir):
@@ -318,7 +223,7 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no
             if add_version_suffix:
                 fail('The --no-git option cannot be used with --add-version-suffix')
         else:
-            clean, output = git_is_clean_plugin()
+            clean, output = git_is_clean('.')
             if not clean and ignore_unclean:
                 warn('working tree is not clean, but ignored')
             elif not clean:
@@ -331,7 +236,6 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no
     else:
         warn('building assets disabled')
     with _chdir(plugin_dir):
-        compile_catalogs()
         clean_build_dirs()
         with patch_plugin_version(add_version_suffix):
             build_wheel(target_dir)
@@ -340,19 +244,21 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no
 
 @cli.command('all-plugins', short_help='Builds all plugin wheels in a directory.')
 @click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.option('--no-git', is_flag=True, help='Skip checks and assume clean non-git working tree')
 @click.pass_context
-def build_all_plugins(ctx, plugins_dir, add_version_suffix, ignore_unclean, no_git):
+def build_all_plugins(ctx, assets, plugins_dir, add_version_suffix, ignore_unclean, no_git):
     """Build all plugin wheels in a directory.
 
     PLUGINS_DIR is the path to the folder containing the plugin directories
     """
-    plugins = sorted(d for d in os.listdir(plugins_dir) if os.path.exists(os.path.join(plugins_dir, d, 'setup.py')))
+    plugins = sorted(d for d in os.listdir(plugins_dir)
+                     if os.path.exists(os.path.join(plugins_dir, d, 'pyproject.toml')))
     for plugin in plugins:
         step('plugin: {}', plugin)
-        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin),
+        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), assets=assets,
                    add_version_suffix=add_version_suffix, ignore_unclean=ignore_unclean, no_git=no_git)
 
 

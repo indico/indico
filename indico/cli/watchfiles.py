@@ -45,11 +45,10 @@ def _disable_reloader(argv):
 class IndicoFilter(DefaultFilter):
     PYTHON_SUFFIXES = ('.py', '.pyx', '.pyd', '/entry_points.txt')
 
-    def __init__(self, indico_root_path, indico_config_paths):
+    def __init__(self, indico_config_paths):
         self.indico_config_paths = {str(x) for x in indico_config_paths}
         ignore_dirs = set(super().ignore_dirs) - {'site-packages'}
-        ignore_paths = {indico_root_path / 'build'}
-        super().__init__(ignore_dirs=ignore_dirs, ignore_paths=ignore_paths)
+        super().__init__(ignore_dirs=ignore_dirs)
 
     def __call__(self, change, path):
         if path in self.indico_config_paths:
@@ -60,11 +59,13 @@ class IndicoFilter(DefaultFilter):
             # anything that's not python-related doesn't matter
             return False
 
-        # we blacklisted the main indico build dir on the filter level, but for plugins we simply
-        # consider any build dir adjacent to a setup.cfg irrelevant
+        # for indico itself we no longer have a build dir since hatchling does not create one,
+        # but for plugins we simply consider any build dir adjacent to a pyproject.toml irrelevant.
+        # it would be nice if no plugins used setuptools to make this unnecessary, but unfortunately
+        # we don't have control over which build backend other people use
         if '/build/' in path or path.endswith('/build'):
             path_obj = Path(path)
-            if (list(path_obj.parents)[-path_obj.parts.index('build')] / 'setup.cfg').exists():
+            if (list(path_obj.parents)[-path_obj.parts.index('build')] / 'pyproject.toml').exists():
                 return False
 
         return super().__call__(change, path)
@@ -100,7 +101,7 @@ class Watchfiles:
             indico_config_paths = {indico_project_root / 'indico.conf', indico_project_root / 'logging.yaml'}
 
         self._paths = sorted(paths)
-        watcher = watch(*paths, watch_filter=IndicoFilter(indico_root_path, indico_config_paths))
+        watcher = watch(*paths, watch_filter=IndicoFilter(indico_config_paths))
         self._launch()
         for changes in watcher:
             self._print_changes(changes)

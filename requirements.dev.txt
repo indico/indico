@@ -74,6 +74,12 @@ greenlet==3.0.3
     #   sqlalchemy
 h11==0.14.0
     # via uvicorn
+hatch-requirements-txt==0.4.1
+    # via -r requirements.dev.in
+hatchling==1.25.0
+    # via
+    #   -r requirements.dev.in
+    #   hatch-requirements-txt
 idna==3.7
     # via
     #   -c requirements.txt
@@ -109,6 +115,8 @@ packaging==24.0
     # via
     #   -c requirements.txt
     #   build
+    #   hatch-requirements-txt
+    #   hatchling
     #   pytest
     #   sphinx
     #   sqlbag
@@ -116,12 +124,16 @@ parso==0.8.4
     # via
     #   -c requirements.txt
     #   pyquotes
+pathspec==0.12.1
+    # via hatchling
 pep8-naming==0.13.3
     # via -r requirements.dev.in
 plantweb==1.2.1
     # via -r requirements.dev.in
 pluggy==1.4.0
-    # via pytest
+    # via
+    #   hatchling
+    #   pytest
 port-for==0.7.2
     # via pytest-redis
 psutil==5.9.8
@@ -235,6 +247,10 @@ starlette==0.37.2
     # via sphinx-autobuild
 tokenize-rt==5.2.0
     # via pyupgrade
+tomlkit==0.13.0
+    # via -r requirements.dev.in
+trove-classifiers==2024.7.2
+    # via hatchling
 unbeheader==1.3.0
     # via -r requirements.dev.in
 urllib3==1.26.19

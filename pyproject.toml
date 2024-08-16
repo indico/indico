@@ -1,0 +1,75 @@
+[project]
+name = 'indico'
+dynamic = ['version', 'dependencies', 'optional-dependencies']
+description = 'Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool'
+readme = 'README.md'
+license = 'MIT'
+authors = [{ name = 'Indico Team', email = 'indico-team@cern.ch' }]
+classifiers = [
+    'Environment :: Web Environment',
+    'Framework :: Flask',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.12',
+]
+requires-python = '>=3.12.2, <3.13'
+
+[project.urls]
+Homepage = 'https://getindico.io'
+Blog = 'https://getindico.io/blog/'
+Community = 'https://talk.getindico.io/'
+Changelog = 'https://docs.getindico.io/en/stable/changelog/'
+Releases = 'https://github.com/indico/indico/releases'
+Issues = 'https://github.com/indico/indico/issues'
+GitHub = 'https://github.com/indico/indico'
+
+[project.scripts]
+indico = 'indico.cli.core:cli'
+
+[project.entry-points.'celery.commands']
+unlock = 'indico.core.celery.cli:UnlockCommand'
+
+[project.entry-points.pytest11]
+indico = 'indico.testing.pytest_plugin'
+
+[build-system]
+requires = ['hatchling==1.25.0', 'hatch-requirements-txt==0.4.1']
+build-backend = 'hatchling.build'
+
+[tool.hatch]
+version = { path = 'indico/__init__.py' }
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ['requirements.txt']
+
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev = ['requirements.dev.txt']
+
+[tool.hatch.build]
+packages = ['indico']
+exclude = [
+    '*.no-header',
+    '.keep',
+    'module.json',
+    # exclude original client sources (they are all included in source maps anyway)
+    'indico/web/client/',
+    'indico/modules/*/client/',
+    'indico/modules/events/*/client/',
+    'indico/modules/rb/event/client/',
+    # no need for tests outside development
+    'test_snapshots/',
+    'tests/',
+    '*_test.py',
+]
+artifacts = [
+    'indico/translations/**/messages-react.json',
+    'indico/translations/**/*.mo',
+    'indico/web/static/dist/',
+]
+
+[tool.hatch.build.targets.sdist.hooks.custom]
+path = 'hatch_build.py'
+dependencies = ['babel==2.14.0']
+
+[tool.uv]
+# uv does not know about dynamic metadata so `pip install -e .` should always reinstall
+reinstall-package = ['indico']

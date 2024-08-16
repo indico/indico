@@ -155,8 +155,8 @@ def _validate_plugin_dir(check_tx=False):
         if check_tx:
             if not os.path.exists(os.path.join(plugin_dir, '.tx', 'config')):
                 raise click.BadParameter(f'no transifex configuration found in {plugin_dir}.')
-        if not os.path.exists(os.path.join(plugin_dir, 'setup.py')):
-            raise click.BadParameter(f'no setup.py found in {plugin_dir}.')
+        if not os.path.exists(os.path.join(plugin_dir, 'pyproject.toml')):
+            raise click.BadParameter(f'no pyproject.toml found in {plugin_dir}.')
         if not list(Path(plugin_dir).glob('*/translations')):
             raise click.BadParameter(f'no translations folder found in {plugin_dir}.')
         return plugin_dir

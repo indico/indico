@@ -16,9 +16,11 @@ def package_is_editable(package):
     # based on pip.dist_is_editable
     dist = distribution(package)
     for path_item in sys.path:
-        if (Path(path_item) / f'{dist.name}.egg-link').is_file():
+        if (Path(path_item) / f'{dist.name}.egg-link').is_file():  # setuptools legacy
             return True
-        if any(Path(path_item).glob(f'__editable__.{dist.name}-*.pth')):
+        if any(Path(path_item).glob(f'__editable__.{dist.name}-*.pth')):  # setuptools new
+            return True
+        if (Path(path_item) / f'_{dist.name}.pth').is_file():  # hatchling
             return True
     return False
 

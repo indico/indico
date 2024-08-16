@@ -8,7 +8,7 @@ build:
   jobs:
     pre_install:
       # RTD python versions are usually behind a bit...
-      - sed -i -E "/^python_requires = /d" setup.cfg
+      - sed -i -E "/^requires-python = /d" pyproject.toml
     post_install:
       - npm install -g @mermaid-js/mermaid-cli
 

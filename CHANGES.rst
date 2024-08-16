@@ -52,6 +52,10 @@ Internal Changes
 - Add support for TypeScript (and TSX) (:pr:`6456`)
 - Add ``<ind-combo-box>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
 - Add ``<ind-select>`` custom element (:pr:`6310`, thanks :user:`foxbunny`)
+- Indico and plugin wheels are not built using hatchling instead of setuptools, and
+  package metadata is specified using ``pyproject.toml``. Developers who want to build
+  their own plugins need to switch from ``setup.py`` and/or ``setup.cfg`` to ``pyproject.toml``
+  as well (:pr:`6477`)
 
 
 Version 3.3.3
