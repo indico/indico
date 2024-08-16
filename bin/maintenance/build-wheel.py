@@ -14,6 +14,7 @@ import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
+from pathlib import Path
 
 import click
 
@@ -71,17 +72,28 @@ def build_assets_plugin(plugin_dir):
 def clean_build_dirs():
     if not os.path.exists('build'):
         return
+    # XXX this should no longer be needed now that we do a clean source -> sdist -> wheel
+    # build (and no longer use setuptools for our own plugins anyway), but let's keep it
+    # around just in case
     info('cleaning build dirs')
     shutil.rmtree('build')
 
 
-def build_wheel(target_dir):
+def build_wheel(target_dir: Path):
     info('building wheel')
+    old_sdists = set(target_dir.glob('*.tar.gz'))
     try:
-        subprocess.check_output([sys.executable, '-m', 'build', '--installer', 'uv', '-w', '-o', target_dir],
+        subprocess.check_output([sys.executable, '-m', 'build', '--installer', 'uv', '-o', target_dir],
                                 stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('build failed', verbose_msg=exc.output)
+    finally:
+        # We do not use/support sdists, but by using a standard build where first an sdist is
+        # built, and then a wheel is built using that sdist, we ensure that e.g. a plugin which
+        # still uses setuptools as its build backend does not leave build artifacts such as the
+        # `build` dir behind.
+        for sdist in set(target_dir.glob('*.tar.gz')) - old_sdists:
+            sdist.unlink()
 
 
 def git_is_clean(*paths):
@@ -142,13 +154,12 @@ def _patch_version(add_version_suffix, file_name, search, replace):
 
 
 @click.group()
-@click.option('--target-dir', '-d', type=click.Path(file_okay=False, resolve_path=True), default='dist/',
-              help='target dir for build wheels relative to the current dir')
+@click.option('--target-dir', '-d', type=click.Path(file_okay=False, resolve_path=True, path_type=Path),
+              default='dist/', help='target dir for build wheels relative to the current dir')
 @click.pass_obj
-def cli(obj, target_dir):
+def cli(obj, target_dir: Path):
     obj['target_dir'] = target_dir
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
+    target_dir.mkdir(exist_ok=True)
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 

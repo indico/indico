@@ -44,7 +44,7 @@ files = ['requirements.txt']
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 dev = ['requirements.dev.txt']
 
-[tool.hatch.build.targets.wheel]
+[tool.hatch.build]
 packages = ['indico']
 exclude = [
     '*.no-header',
@@ -66,7 +66,7 @@ artifacts = [
     'indico/web/static/dist/',
 ]
 
-[tool.hatch.build.targets.wheel.hooks.custom]
+[tool.hatch.build.targets.sdist.hooks.custom]
 path = 'hatch_build.py'
 dependencies = ['babel==2.14.0']
 

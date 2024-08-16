@@ -39,7 +39,7 @@ def _update_pyproject_reqs(data, context):
     reqs |= {x.name: str(x) for x in load_requirements_files(['requirements.dev.txt'])[0]}
     for getter in (
         lambda: data['build-system']['requires'],
-        lambda: data['tool']['hatch']['build']['targets']['wheel']['hooks']['custom']['dependencies'],
+        lambda: data['tool']['hatch']['build']['targets']['sdist']['hooks']['custom']['dependencies'],
     ):
         try:
             deplist = getter()
