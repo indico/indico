@@ -127,8 +127,12 @@ function ParticipantTable({table}: {table: TableObj}) {
       direction === null
         ? [...table.rows]
         : [...sortedRows].sort((a, b) => {
-            const comparedVals: string[] = [a, b].map(el =>
-              (typeof column === 'string' ? `${el[column]}` : el.columns[column].text).toLowerCase()
+            let comparedVals = [a, b].map(el =>
+              typeof column === 'string' ? el[column] : el.columns[column].text
+            );
+
+            comparedVals = comparedVals.map(el =>
+              (typeof el === 'boolean' ? (el ? 'O' : 'X') : el).toLowerCase()
             );
 
             return (
