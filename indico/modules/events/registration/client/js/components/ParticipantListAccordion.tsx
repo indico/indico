@@ -233,7 +233,7 @@ function AccordionParticipantsItem({
         styleName="title"
       >
         {collapsible && <Icon name="dropdown" />}
-        <p>{table.title || <Translate>Participants</Translate>}</p>
+        <p>{table.title || <Translate>Participants</Translate>}kasdfkjlsafkjsahdfkjsadhfklsdahfkhfjhfdkasdfkjlsafkjsahdfkjsadhfklsdahfkhfjhfdkasdfkjlsafkjsahdfkjsadhfklsdahfkhfjhfdkasdfkjlsafkjsahdfkjsadhfklsdahfkhfjhfd</p>
         <ParticipantCounter
           styleName="participants-count-wrapper"
           totalCount={totalParticipantCount}

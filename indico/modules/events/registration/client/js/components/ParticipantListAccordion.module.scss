@@ -13,6 +13,7 @@
 
   > span {
     display: flex;
+    flex-shrink: 0;
     gap: 5px;
     transition: 0.1s;
 
@@ -28,8 +29,12 @@
   gap: 10px;
 
   > p {
-    word-break: break-all;
+    word-break: break-word;
     flex-grow: 1;
     margin-bottom: 0;
+  }
+
+  > span {
+    flex-shrink: 0;
   }
 }
