@@ -63,19 +63,17 @@ interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
   styleName?: string;
 }
 
-function ParticipantCountTranslationHidden({count}: { count: number }) {
+function ParticipantCountTranslationHidden({count}: {count: number}) {
   return (
     <PluralTranslate count={count}>
       <Singular>
-        <Param name="count" value={count} /> participant registered
-        anonymously.
+        <Param name="count" value={count} /> participant registered anonymously.
       </Singular>
       <Plural>
-        <Param name="count" value={count} /> participants registered
-        anonymously.
+        <Param name="count" value={count} /> participants registered anonymously.
       </Plural>
     </PluralTranslate>
-  )
+  );
 }
 
 function ParticipantCounter({
@@ -84,7 +82,11 @@ function ParticipantCounter({
   styleName = '',
   ...props
 }: ParticipantCounterProps) {
-  const participantCounterElement = <span>{totalCount} <Icon name="user" /></span>
+  const participantCounterElement = (
+    <span>
+      {totalCount} <Icon name="user" />
+    </span>
+  );
 
   return hiddenCount > 0 ? (
     <div className={styleName} {...props}>
@@ -94,7 +96,9 @@ function ParticipantCounter({
         trigger={participantCounterElement}
       />
     </div>
-  ) : participantCounterElement;
+  ) : (
+    participantCounterElement
+  );
 }
 
 function ParticipantTable({table}: {table: TableObj}) {
