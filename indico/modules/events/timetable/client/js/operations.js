@@ -103,15 +103,20 @@ const resizeBlock = (state, {event: block, start, end, resourceId: columnId}) =>
   if (newStart.getTime() !== block.start.getTime()) {
     newEntry.start = newStart;
   }
-  const newEnd = block.isPoster
-    ? end
-    : new Date(
-        Math.max(
-          ...children.filter(c => isChildOf(c, block)).map(c => getEndDt(c).getTime()),
-          end.getTime()
-        )
-      );
-  if (newEnd.getTime() !== getEndDt(block).getTime()) {
+  const newEnd =
+    block.isPoster || block.type === 'break' || block.type === 'contribution'
+      ? end
+      : new Date(
+          Math.max(
+            ...children.filter(c => isChildOf(c, block)).map(c => getEndDt(c).getTime()),
+            end.getTime()
+          )
+        );
+  if (
+    newEnd.getTime() !== getEndDt(block).getTime() ||
+    block.type === 'break' ||
+    block.type === 'contribution'
+  ) {
     newEntry.duration = (newEnd.getTime() - newStart.getTime()) / 60000;
   }
   if (!newEntry.start && !newEntry.duration) {
@@ -297,6 +302,7 @@ const resizeChild = (state, args) => {
     start,
     duration: (end.getTime() - start.getTime()) / 60000,
   };
+  console.log('newContrib', newContrib);
   const parent = blocks.find(b => isChildOf(child, b));
   const parentContribs = children.filter(c => c.id !== child.id && isChildOf(c, parent));
   const hasCollisions = parentContribs.some(c => isConcurrent(c, newContrib));
