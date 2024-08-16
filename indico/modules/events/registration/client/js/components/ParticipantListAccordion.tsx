@@ -63,40 +63,39 @@ interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
   styleName?: string;
 }
 
-const ParticipantCountTranslationHidden: React.FC<{count: number}> = ({count}) =>
-  count > 0 ? (
+function ParticipantCountTranslationHidden({count}: { count: number }) {
+  return (
     <PluralTranslate count={count}>
       <Singular>
-        <Param name="anonymous-participants-count" value={count} /> participant registered
+        <Param name="count" value={count} /> participant registered
         anonymously.
       </Singular>
       <Plural>
-        <Param name="anonymous-participants-count" value={count} /> participants registered
+        <Param name="count" value={count} /> participants registered
         anonymously.
       </Plural>
     </PluralTranslate>
-  ) : (
-    <Translate>No anonymous participants registered</Translate>
-  );
+  )
+}
 
-const ParticipantCounter: React.FC<ParticipantCounterProps> = ({
+function ParticipantCounter({
   totalCount,
   hiddenCount,
   styleName = '',
   ...props
-}) => (
-  <div className={styleName} {...props}>
-    <Popup
-      position="left center"
-      content={<ParticipantCountTranslationHidden count={hiddenCount} />}
-      trigger={
-        <span>
-          {totalCount} <Icon name="user" />
-        </span>
-      }
-    />
-  </div>
-);
+}: ParticipantCounterProps) {
+  const participantCounterElement = <span>{totalCount} <Icon name="user" /></span>
+
+  return hiddenCount > 0 ? (
+    <div className={styleName} {...props}>
+      <Popup
+        position="left center"
+        content={<ParticipantCountTranslationHidden count={hiddenCount} />}
+        trigger={participantCounterElement}
+      />
+    </div>
+  ) : participantCounterElement;
+}
 
 function ParticipantTable({table}: {table: TableObj}) {
   const visibleParticipantsCount = table.rows.length;
@@ -112,7 +111,7 @@ function ParticipantTable({table}: {table: TableObj}) {
 
   const handleSort = (columnIndex: number) => {
     const directions: Record<sortDirectionType, sortDirectionType> = {
-      [null as symbol]: 'ascending',
+      [null as sortDirectionType]: 'ascending',
       ascending: 'descending',
       descending: null,
     };
