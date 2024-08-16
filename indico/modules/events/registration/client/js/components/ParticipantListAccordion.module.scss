@@ -9,7 +9,6 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
-  color: grey;
 
   > span {
     display: flex;
@@ -27,6 +26,7 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
+  font-weight: bold;
 
   > p {
     word-break: break-word;
@@ -37,4 +37,10 @@
   > span {
     flex-shrink: 0;
   }
+}
+
+:global(img.cell-img) {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
 }
