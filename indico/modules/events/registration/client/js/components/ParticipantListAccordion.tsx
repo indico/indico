@@ -131,19 +131,19 @@ function ParticipantTable({table}: {table: TableObj}) {
               typeof column === 'string' ? el[column] : el.columns[column].text
             );
 
-            if (comparedVals.every(el => typeof el === 'boolean')) {
-              if (direction === 'ascending') {
-                return comparedVals[0] > comparedVals[1] ? -1 : 1;
-              } else if (direction === 'descending') {
-                return comparedVals[0] > comparedVals[1] ? 1 : -1;
-              } else {
-                return 0;
-              }
+            let sortResult;
+
+            if (comparedVals[0] === comparedVals[1]) {
+              return 0;
+            } else if (comparedVals.every(el => typeof el === 'boolean')) {
+              sortResult = comparedVals[0] > comparedVals[1] ? -1 : 1;
+            } else {
+              sortResult = comparedVals[0]
+                .toLowerCase()
+                .localeCompare(comparedVals[1].toLowerCase());
             }
 
-            return (
-              comparedVals[0].localeCompare(comparedVals[1]) * (direction === 'ascending' ? 1 : -1)
-            );
+            return sortResult * (direction === 'ascending' ? 1 : -1);
           });
 
     setSortColumn(column);
