@@ -14,7 +14,7 @@ attrs==23.2.0
     # via
     #   -c requirements.txt
     #   aiosmtpd
-babel==2.14.0
+babel==2.16.0
     # via
     #   -c requirements.txt
     #   sphinx

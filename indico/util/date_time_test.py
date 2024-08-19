@@ -71,8 +71,8 @@ def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expect
 
 
 @pytest.mark.parametrize(('skeleton', 'expected'), (
-    ('EEEEdMMMM', 'Monday, 8 February'),
-    ('EEEdMMM', 'Mon, 8 Feb'),
+    ('EEEEdMMMM', 'Monday 8 February'),
+    ('EEEdMMM', 'Mon 8 Feb'),
 ))
 def test_format_skeleton(skeleton, expected):
     dt = as_utc(datetime(2021, 2, 8)).astimezone(timezone('Europe/Zurich'))
