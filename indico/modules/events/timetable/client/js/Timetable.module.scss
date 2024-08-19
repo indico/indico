@@ -70,6 +70,7 @@
 
   :global(.rbc-event) {
     outline: none;
+    border: none;
     z-index: 1;
 
     &.selected {
