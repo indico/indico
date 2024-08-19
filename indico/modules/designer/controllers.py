@@ -13,6 +13,7 @@ from io import BytesIO
 from flask import flash, jsonify, request, session
 from markupsafe import Markup
 from PIL import Image
+from reportlab.lib.colors import toColor
 from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -346,9 +347,8 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
         if backside:
             self._validate_backside_template(backside)
-        placeholders = set(get_placeholder_options(regform=self.template.registration_form))
-        invalid_placeholders = {x['type'] for x in data['items']} - placeholders
-        if invalid_placeholders:
+        placeholders = get_placeholder_options(regform=self.template.registration_form)
+        if invalid_placeholders := {x['type'] for x in data['items']} - set(placeholders):
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
         image_items = [item for item in data['items'] if item['type'] == 'fixed_image']
         template_images = {img.id for img in self.template.images}
@@ -357,12 +357,26 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                 raise UserValueError(_('A Fixed Image element must contain an image'))
             if image_item['image_id'] not in template_images:
                 raise UserValueError(_('The image file does not belong to this template'))
+        for item in data['items']:
+            if (color := item.get('color')) and not self._validate_color(color):
+                item_name = placeholders[item['type']].description
+                raise UserValueError(_('Invalid color in field "{}": {}').format(item_name, color))
+            if (color := item.get('background_color')) and not self._validate_color(color):
+                item_name = placeholders[item['type']].description
+                raise UserValueError(_('Invalid background color in field "{}": {}').format(item_name, color))
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json.get('backside_template_id'),
                         is_clonable=request.json['is_clonable'],
                         clear_background=request.json['clear_background'])
         flash(_('Template successfully saved.'), 'success')
         return jsonify_data()
+
+    def _validate_color(self, color):
+        try:
+            toColor(color)
+        except ValueError:
+            return False
+        return True
 
     def _validate_backside_template(self, backside_template):
         """Verify if the given template can be used as a backside for the current template.

@@ -525,9 +525,17 @@ import {$T} from 'indico/utils/i18n';
       },
       color: function() {
         selectedItem.color = $('#text-color-selector').val();
+        if (/^[a-f0-9]{3,6}$/.test(selectedItem.color)) {
+          selectedItem.color = `#${selectedItem.color}`;
+          $('#text-color-selector').val(selectedItem.color);
+        }
       },
       background_color: function() {
         selectedItem.background_color = $('#bg-color-selector').val();
+        if (/^[a-f0-9]{3,6}$/.test(selectedItem.background_color)) {
+          selectedItem.background_color = `#${selectedItem.background_color}`;
+          $('#bg-color-selector').val(selectedItem.background_color);
+        }
       },
       alignment: function() {
         selectedItem.text_align = $('#alignment-selector').val();
