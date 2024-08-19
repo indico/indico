@@ -268,10 +268,9 @@ export default function ParticipantListAccordion({
 
   if (infoContent) {
     return (
-      <Message info>
+      <Message info size="large">
         <MessageContent>
-          <Icon name="info circle" />
-          {infoContent}
+          <Icon name="info circle" />{infoContent}
         </MessageContent>
       </Message>
     );
