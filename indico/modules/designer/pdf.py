@@ -11,6 +11,7 @@ from io import BytesIO
 
 from PIL import Image
 from reportlab.lib import pagesizes
+from reportlab.lib.colors import getAllNamedColors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
@@ -95,12 +96,21 @@ class DesignerPDFBase:
         data.seek(0)
         return data
 
+    def _normalize_color(self, color):
+        if not color:
+            return None
+        elif color in getAllNamedColors():
+            return color
+        if re.match(r'^[a-f0-9]{3,6}$', color):
+            color = f'#{color}'
+        return color
+
     def _draw_item(self, canvas, item, tpl_data, content, margin_x, margin_y):
         font_size = _extract_font_size(item['font_size'])
         styles = {
             'alignment': ALIGNMENTS[item['text_align']],
-            'textColor': item.get('color') or '#000000',
-            'backColor': item.get('background_color') or None,
+            'textColor': self._normalize_color(item.get('color') or '#000000'),
+            'backColor': self._normalize_color(item.get('background_color') or None),
             'borderPadding': (0, 0, 4, 0),
             'fontSize': font_size,
             'leading': font_size
