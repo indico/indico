@@ -23,7 +23,7 @@ from indico.modules.events.registration.util import get_flat_section_positions_s
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
 
@@ -64,10 +64,14 @@ class GeneralFieldDataSchema(mm.Schema):
                 raise ValidationError(_('Retention period cannot be longer than that of the registration form'),
                                       'retention_period')
             if retention_period < min_retention_period:
-                raise ValidationError(_('The retention period cannot be less than {} weeks.')
+                raise ValidationError(ngettext('The retention period cannot be less than {} week.',
+                                               'The retention period cannot be less than {} weeks.',
+                                               min_retention_period.days // 7)
                                       .format(min_retention_period.days // 7))
             elif max_retention_period and retention_period > max_retention_period:
-                raise ValidationError(_('The retention period cannot be longer than {} weeks.')
+                raise ValidationError(ngettext('The retention period cannot be longer than {} week.',
+                                               'The retention period cannot be longer than {} weeks.',
+                                               max_retention_period.days // 7)
                                       .format(max_retention_period.days // 7))
             elif retention_period > timedelta(3650):
                 raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty '

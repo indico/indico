@@ -196,5 +196,4 @@ class RHDataRetentionSettings(RHAdminBase):
             data_retention_settings.set_multi(form.data)
             flash(_('Settings have been saved'), 'success')
             return redirect(url_for('events.data_retention'))
-        return WPEventAdmin.render_template('admin/data_retention.html',
-                                            'data_retention', form=form)
+        return WPEventAdmin.render_template('admin/data_retention.html', 'data_retention', form=form)

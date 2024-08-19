@@ -449,10 +449,14 @@ class DataRetentionPeriodValidator:
             return
         min_retention_period = data_retention_settings.get('minimum_data_retention') or timedelta(days=7)
         if retention_period < min_retention_period:
-            raise ValidationError(_('The retention period cannot be less than {} weeks.')
+            raise ValidationError(ngettext('The retention period cannot be less than {} week.',
+                                           'The retention period cannot be less than {} weeks.',
+                                           min_retention_period.days // 7)
                                   .format(min_retention_period.days // 7))
         elif max_retention_period and retention_period > max_retention_period:
-            raise ValidationError(_('The retention period cannot be longer than {} weeks.')
+            raise ValidationError(ngettext('The retention period cannot be longer than {} week.',
+                                           'The retention period cannot be longer than {} weeks.',
+                                           max_retention_period.days // 7)
                                   .format(max_retention_period.days // 7))
         elif retention_period > timedelta(3650):
             raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '

@@ -144,12 +144,16 @@ class DataRetentionSettingsForm(IndicoForm):
                                                           'configurable for registrations. This includes the '
                                                           'retention period of individual registration form fields.'),
                                             render_kw={'placeholder': _('Indefinite'), 'min': 1, 'max': 521})
-    maximum_data_retention = TimeDeltaField(_('Maximum data retention period'), units=('weeks',),
-                                            description=_(
-        'Specify the maximum data retention period (in weeks) configurable for registrations. This includes the '
-        'retention period of individual registration form fields. Note that setting this value will make the '
-        'retention period field mandatory during registration form setup.'),
-        render_kw={'placeholder': _('Indefinite'), 'min': 1, 'max': 521})
+    maximum_data_retention = TimeDeltaField(
+        _('Maximum data retention period'),
+        units=('weeks',),
+        description=_(
+            'Specify the maximum data retention period (in weeks) configurable for registrations. This includes the '
+            'retention period of individual registration form fields. Note that setting this value will make the '
+            'retention period field mandatory during registration form setup.'
+        ),
+        render_kw={'placeholder': _('Indefinite'), 'min': 1, 'max': 521},
+    )
 
     def validate_minimum_data_retention(self, field):
         maximum_retention = self.data.get('maximum_data_retention')
