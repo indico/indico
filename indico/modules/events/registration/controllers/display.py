@@ -440,7 +440,7 @@ class RHUploadRegistrationPicture(RHUploadRegistrationFile):
 
     def _save_file(self, file, stream):
         if not (resized_image_stream := process_registration_picture(stream)):
-            raise UnprocessableEntity('Could not process image')
+            raise UnprocessableEntity('Could not process image, it may be corrupted or too big')
         return super()._save_file(file, resized_image_stream)
 
     def get_file_metadata(self):
