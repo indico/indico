@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {HTMLAttributes, ReactNode, useState} from 'react';
+import React, {HTMLAttributes, useState} from 'react';
 import {
   AccordionTitle,
   AccordionContent,
@@ -53,7 +53,6 @@ interface ParticipantListAccordionProps {
 interface AccordionParticipantsItemProps {
   index: number;
   table: TableObj;
-  children?: ReactNode;
   collapsible?: boolean;
 }
 
@@ -63,7 +62,7 @@ interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
   styleName?: string;
 }
 
-function ParticipantCountTranslationHidden({count}: {count: number}) {
+function ParticipantCountHidden({count}: {count: number}) {
   return (
     <PluralTranslate count={count}>
       <Singular>
@@ -92,7 +91,7 @@ function ParticipantCounter({
     <div className={styleName} {...props}>
       <Popup
         position="left center"
-        content={<ParticipantCountTranslationHidden count={hiddenCount} />}
+        content={<ParticipantCountHidden count={hiddenCount} />}
         trigger={participantCounterElement}
       />
     </div>
@@ -150,9 +149,9 @@ function ParticipantTable({table}: {table: TableObj}) {
   };
 
   return visibleParticipantsCount > 0 ? (
-    <Table fixed celled sortable className="table">
+    <Table fixed celled sortable>
       <TableHeader>
-        <TableRow className="table-row">
+        <TableRow>
           {table.show_checkin && ( // For checkin status
             <TableHeaderCell
               width={1}
@@ -205,7 +204,7 @@ function ParticipantTable({table}: {table: TableObj}) {
         <TableFooter>
           <TableRow>
             <TableHeaderCell colSpan={table.headers.length}>
-              <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
+              <ParticipantCountHidden count={hiddenParticipantsCount} />
             </TableHeaderCell>
           </TableRow>
         </TableFooter>
@@ -214,7 +213,7 @@ function ParticipantTable({table}: {table: TableObj}) {
   ) : (
     <Message>
       {totalParticipantCount > 0 ? (
-        <ParticipantCountTranslationHidden count={hiddenParticipantsCount} />
+        <ParticipantCountHidden count={hiddenParticipantsCount} />
       ) : (
         <Translate>No participants registered</Translate>
       )}
@@ -225,7 +224,6 @@ function ParticipantTable({table}: {table: TableObj}) {
 function AccordionParticipantsItem({
   index,
   table,
-  children = null,
   collapsible = true,
 }: AccordionParticipantsItemProps) {
   const visibleParticipantsCount = table.rows.length;
@@ -250,8 +248,8 @@ function AccordionParticipantsItem({
           hiddenCount={hiddenParticipantsCount}
         />
       </AccordionTitle>
-      <AccordionContent active={isActive} key={`c${index}`}>
-        {children || <ParticipantTable table={table} />}
+      <AccordionContent active={isActive}>
+        <ParticipantTable table={table} />
       </AccordionContent>
     </>
   );
