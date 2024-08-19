@@ -391,7 +391,8 @@ class EventPerson(PersonMixin, db.Model):
             any(link for link in self.abstract_links if not link.abstract.is_deleted) or
             any(link for link in self.session_block_links if not link.session_block.session.is_deleted) or
             any(link for link in self.contribution_links if not link.contribution.is_deleted) or
-            any(link for link in self.subcontribution_links if not link.subcontribution.contribution.is_deleted)
+            any(link for link in self.subcontribution_links if (not link.subcontribution.is_deleted and
+                                                                not link.subcontribution.contribution.is_deleted))
         )
 
 
