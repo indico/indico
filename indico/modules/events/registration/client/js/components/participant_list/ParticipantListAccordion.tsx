@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {HTMLAttributes, ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {
   AccordionTitle,
   AccordionContent,
@@ -26,43 +26,14 @@ import {
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import './ParticipantListAccordion.module.scss';
-
-interface TableColumnObj {
-  id: number;
-  text: string;
-  is_picture: boolean;
-}
-
-interface TableRowObj {
-  id: number;
-  checked_in: boolean;
-  columns: TableColumnObj[];
-}
-
-interface TableObj {
-  headers: string[];
-  rows: TableRowObj[];
-  num_participants: number;
-  show_checkin: boolean;
-  title?: string;
-}
-
-interface ParticipantListAccordionProps {
-  totalParticipantCount: number;
-  published: boolean;
-  tables: TableObj[];
-}
-
-interface AccordionParticipantsItemProps {
-  table: TableObj;
-  collapsible?: boolean;
-}
-
-interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
-  totalCount: number;
-  hiddenCount: number;
-  styleName?: string;
-}
+import {
+  AccordionParticipantsItemProps,
+  ParticipantCounterProps,
+  ParticipantListAccordionProps,
+  TableColumnObj,
+  TableObj,
+  TableRowObj,
+} from './types';
 
 function ParticipantCountHidden({count}: {count: number}) {
   return (

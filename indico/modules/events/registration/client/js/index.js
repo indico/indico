@@ -16,7 +16,7 @@ import './invitations';
 import './reglists';
 
 import ConsentToPublishEditor from './components/ConsentToPublishEditor';
-import ParticipantListAccordion from './components/ParticipantListAccordion';
+import ParticipantListAccordion from './components/participant_list/ParticipantListAccordion';
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 import setupRegformSetup from './form_setup';
 import setupRegformSubmission from './form_submission';
