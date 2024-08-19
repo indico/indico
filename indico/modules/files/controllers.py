@@ -30,7 +30,7 @@ class UploadFileMixin:
 
     @use_kwargs({'file': fields.Field(required=True)}, location='files')
     def _process(self, file):
-        if not (validate_upload_file_size(file) and self.validate_file(file)):
+        if not validate_upload_file_size(file) or not self.validate_file(file):
             # XXX: we could include a nicer error message, but none of the upload
             # widgets show it right now, so no need to add more (translatable) strings
             # nobody sees

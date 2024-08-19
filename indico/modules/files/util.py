@@ -10,23 +10,18 @@ import os
 from indico.core.config import config
 
 
-def validate_upload_file_size(files, multiple=False):
+def validate_upload_file_size(*files):
     """Validate size of one or more uploaded files.
 
-    Validation is done using the `MAX_UPLOAD_FILE_SIZE` and `MAX_UPLOAD_FILES_TOTAL_SIZE` config.
+    Validation is done using the `MAX_UPLOAD_FILE_SIZE` config.
     """
-    if not multiple:
-        files = [files]
-    max_upload_files_total_size = config.MAX_UPLOAD_FILES_TOTAL_SIZE * 1024 * 1024
     max_upload_file_size = config.MAX_UPLOAD_FILE_SIZE * 1024 * 1024
-    if max_upload_files_total_size == 0 and max_upload_file_size == 0:
+    if not max_upload_file_size:
         return True
-    total_file_size = 0
     for file in files:
-        file_size = os.fstat(file.fileno()).st_size
-        if max_upload_file_size != 0 and file_size > max_upload_file_size:
-            return False
-        total_file_size += file_size
-        if max_upload_files_total_size != 0 and total_file_size > max_upload_files_total_size:
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        if file_size > max_upload_file_size:
             return False
     return True
