@@ -180,6 +180,8 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     def _get_room_counts(self):
         query = (db.session.query(RoomEquipmentAssociation.c.equipment_id, db.func.count())
+                 .join(Room)
+                 .filter(~Room.is_deleted)
                  .group_by(RoomEquipmentAssociation.c.equipment_id))
         return dict(query)
 
@@ -240,6 +242,8 @@ class RHAttributes(RHRoomBookingAdminBase):
 
     def _get_room_counts(self):
         query = (db.session.query(RoomAttributeAssociation.attribute_id, db.func.count())
+                 .join(Room)
+                 .filter(~Room.is_deleted)
                  .group_by(RoomAttributeAssociation.attribute_id))
         return dict(query)
 

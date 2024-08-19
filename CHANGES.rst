@@ -34,6 +34,7 @@ Bugfixes
 - Fix validation error when clearing a date field in the registration form (:pr:`6470`)
 - Fix access error when a manager registers a user in a private registration form (:pr:`6486`)
 - Improve color handling in badge designer (auto-add ``#`` for hex colors) (:pr:`6492`)
+- Do not count deleted rooms for equipment/attribute usage numbers (:issue:`6493`, :pr:`6494`)
 
 Accessibility
 ^^^^^^^^^^^^^
