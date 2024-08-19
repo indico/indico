@@ -270,7 +270,8 @@ export default function ParticipantListAccordion({
     return (
       <Message info size="large">
         <MessageContent>
-          <Icon name="info circle" />{infoContent}
+          <Icon name="info circle" />
+          {infoContent}
         </MessageContent>
       </Message>
     );
