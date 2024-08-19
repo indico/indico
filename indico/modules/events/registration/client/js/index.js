@@ -153,6 +153,16 @@ import setupRegformSubmission from './form_submission';
   global.setupParticipantListAccordion = containerSelector => {
     const element = document.querySelector(containerSelector);
     const tables = JSON.parse(element.dataset.tables);
-    ReactDOM.render(<ParticipantListAccordion tables={tables} />, element);
+    const {totalParticipantCount, published} = element.dataset;
+    console.log('THE PUBLISHEDDDDD');
+    console.log(published);
+    ReactDOM.render(
+      <ParticipantListAccordion
+        tables={tables}
+        totalParticipantCount={totalParticipantCount}
+        published={published}
+      />,
+      element
+    );
   };
 })(window);

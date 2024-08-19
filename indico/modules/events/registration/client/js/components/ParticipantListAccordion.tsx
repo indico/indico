@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {HTMLAttributes, useState} from 'react';
+import React, {HTMLAttributes, ReactNode, useState} from 'react';
 import {
   AccordionTitle,
   AccordionContent,
@@ -20,6 +20,7 @@ import {
   TableFooter,
   Popup,
   Message,
+  MessageContent,
 } from 'semantic-ui-react';
 
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
@@ -47,11 +48,12 @@ interface TableObj {
 }
 
 interface ParticipantListAccordionProps {
+  totalParticipantCount: number;
+  published: boolean;
   tables: TableObj[];
 }
 
 interface AccordionParticipantsItemProps {
-  index: number;
   table: TableObj;
   collapsible?: boolean;
 }
@@ -191,7 +193,7 @@ function ParticipantTable({table}: {table: TableObj}) {
               // eslint-disable-next-line react/no-array-index-key
               <TableCell key={i} title={col.text}>
                 {col.is_picture && col.text ? (
-                  <img src={col.text} className="cell-img" />
+                  <img src={col.text} alt={col.text} className="cell-img" />
                 ) : (
                   col.text
                 )}
@@ -215,17 +217,13 @@ function ParticipantTable({table}: {table: TableObj}) {
       {totalParticipantCount > 0 ? (
         <ParticipantCountHidden count={hiddenParticipantsCount} />
       ) : (
-        <Translate>No participants registered</Translate>
+        <Translate>No participants registered.</Translate>
       )}
     </Message>
   );
 }
 
-function AccordionParticipantsItem({
-  index,
-  table,
-  collapsible = true,
-}: AccordionParticipantsItemProps) {
+function AccordionParticipantsItem({table, collapsible = true}: AccordionParticipantsItemProps) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;
   const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
@@ -255,15 +253,38 @@ function AccordionParticipantsItem({
   );
 }
 
-export default function ParticipantListAccordion({tables}: ParticipantListAccordionProps) {
+export default function ParticipantListAccordion({
+  published,
+  totalParticipantCount,
+  tables,
+}: ParticipantListAccordionProps) {
+  let infoContent: ReactNode;
+
+  if (!published) {
+    infoContent = <Translate>There are no published registrations.</Translate>;
+  } else if (totalParticipantCount <= 0) {
+    infoContent = <Translate>There are no registrations yet.</Translate>;
+  }
+
+  if (infoContent) {
+    return (
+      <Message info>
+        <MessageContent>
+          <Icon name="info circle" />
+          {infoContent}
+        </MessageContent>
+      </Message>
+    );
+  }
+
   return (
     <Accordion fluid>
-      {tables.length === 1 ? ( // Case of no participants is handled in Jinja now
-        <AccordionParticipantsItem table={tables[0]} index={1} collapsible={false} />
+      {tables.length === 1 ? (
+        <AccordionParticipantsItem table={tables[0]} collapsible={false} />
       ) : (
         tables.map((table: TableObj, i: number) => (
           // eslint-disable-next-line react/no-array-index-key
-          <AccordionParticipantsItem key={i} index={i} table={table} />
+          <AccordionParticipantsItem key={i} table={table} />
         ))
       )}
     </Accordion>

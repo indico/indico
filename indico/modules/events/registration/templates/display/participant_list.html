@@ -130,7 +130,7 @@
 {% endmacro %}
 
 {% block content %}
-    {% if not published or not tables %}
+    {# {% if not published or not tables %}
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no published registrations.{% endtrans %}
         {% endcall %}
@@ -138,12 +138,15 @@
         {% call message_box('info', fixed_width=true) %}
             {% trans %}There are no registrations yet.{% endtrans %}
         {% endcall %}
-    {% else %}
-        <div
-            id="participant-list-accordion"
-            data-tables="{{ tables | tojson | forceescape }}"
-        ></div>
-    {% endif %}
+    {% else %} #}
+    <div
+        id="participant-list-accordion"
+        data-tables="{{ tables | tojson | forceescape }}"
+        {% if published %}
+            data-published="true"
+        {% endif %}
+        data-total-participant-count="{{ num_participants }}"
+    ></div>
 
     <script>
         $('.registrations .tablesorter').tablesorter({
