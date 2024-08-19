@@ -5,34 +5,41 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
+import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import NewEntryDropdown from './components/NewEntryDropdown';
+import {TimetablePopup} from './entry_popups';
 import * as selectors from './selectors';
 import {entrySchema, entryTypes, getEndDt, isChildOf} from './util';
 
 import './Entry.module.scss';
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  Dropdown,
-  DropdownHeader,
-  DropdownItem,
-  DropdownMenu,
-  Icon,
-  Popup,
-} from 'semantic-ui-react';
-import EntryDetails from './EntryDetails';
-import moment from 'moment';
-import {createPortal} from 'react-dom';
 
 export default function Entry({event: entry}) {
+  const dispatch = useDispatch();
   const {type, title} = entry;
   const contributions = useSelector(selectors.getVisibleChildren);
   const displayMode = useSelector(selectors.getDisplayMode);
+  const ref = useRef();
+  const selected = useSelector(selectors.getSelectedEntry);
+  const [open, setOpen] = useState(!!selected);
+  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
+
+  const closePopup = () => {
+    setOpen(false);
+    dispatch(actions.selectEntry(null));
+  };
+
+  useEffect(() => {
+    if (selected && selected.id === entry.id) {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [selected, setOpen, entry]);
 
   if (type === 'placeholder') {
     return <NewEntryDropdown icon={null} open />;
@@ -74,11 +81,30 @@ export default function Entry({event: entry}) {
     </div>
   );
 
-  return (
-    <div>
+  const trigger = (
+    <div ref={ref}>
       {displayMode === 'compact' && hasContribs && compactTitle}
       {(displayMode !== 'compact' || !hasContribs) && fullTitle}
     </div>
+  );
+
+  if (!popupsEnabled) {
+    return trigger;
+  }
+
+  return (
+    <>
+      {trigger}
+      {!!ref.current && (
+        <TimetablePopup
+          open={open}
+          onClose={closePopup}
+          entry={entry}
+          type={type}
+          rect={ref.current.getBoundingClientRect()}
+        />
+      )}
+    </>
   );
 }
 

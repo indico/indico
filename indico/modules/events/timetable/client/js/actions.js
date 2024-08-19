@@ -25,6 +25,7 @@ export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const ADD_ENTRY = 'Add entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
+export const EXPERIMENTAL_TOGGLE_POPUPS = 'Experimental toggle popups';
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -104,4 +105,8 @@ export function editEntry(entryType, entry) {
 
 export function closeModal() {
   return {type: CLOSE_MODAL};
+}
+
+export function experimentalTogglePopups() {
+  return {type: EXPERIMENTAL_TOGGLE_POPUPS};
 }

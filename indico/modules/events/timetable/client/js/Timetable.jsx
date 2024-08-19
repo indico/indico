@@ -10,6 +10,7 @@ import React, {useState} from 'react';
 import {Calendar, momentLocalizer} from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import {useDispatch, useSelector} from 'react-redux';
+import {Checkbox} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import Entry from './Entry';
@@ -41,6 +42,7 @@ export default function Timetable() {
   const [placeholderEntry, setPlaceholderEntry] = useState(null);
   const currentDateEntries = entries.filter(e => e.start.getDate() === date.getDate());
   const numColumns = Math.max(...currentDateEntries.map(e => e.columnId).filter(e => e), 1);
+  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
 
   const minHour = currentDateEntries.reduce((min, {start}) => {
     const hours = start.getHours();
@@ -61,6 +63,14 @@ export default function Timetable() {
 
   return (
     <div styleName={`timetable ${displayMode}`}>
+      <div style={{height: 50}}>
+        <Checkbox
+          toggle
+          checked={popupsEnabled}
+          onChange={() => dispatch(actions.experimentalTogglePopups())}
+          label="Experminetal: Use popups instead of sidebar"
+        />
+      </div>
       <Toolbar date={date} localizer={localizer} onNavigate={(__, d) => setDate(d)} />
       <div styleName="content">
         <UnscheduledContributions />
@@ -115,7 +125,7 @@ export default function Timetable() {
           resizable
           selectable
         />
-        {selected && <EntryDetails />}
+        {!popupsEnabled && selected && <EntryDetails />}
         <ContributionEntryForm />
       </div>
     </div>

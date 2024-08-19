@@ -116,3 +116,5 @@ export const getModalEntry = createSelector(
   getOpenModal,
   openModal => openModal.entry
 );
+
+export const getPopupsEnabled = state => state.experimental.popupsEnabled;
