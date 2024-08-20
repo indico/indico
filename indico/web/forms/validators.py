@@ -458,6 +458,6 @@ class DataRetentionPeriodValidator:
                                            'The retention period cannot be longer than {} weeks.',
                                            max_retention_period.days // 7)
                                   .format(max_retention_period.days // 7))
-        elif retention_period > timedelta(3650):
+        elif not max_retention_period and retention_period > timedelta(3650):
             raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
                                     'indefinite.'))

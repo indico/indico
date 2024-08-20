@@ -32,7 +32,7 @@ from indico.modules.events.registration.models.registrations import PublishRegis
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.settings import data_retention_settings
 from indico.util.enum import RichStrEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
@@ -170,8 +170,11 @@ class RegistrationFormCreateForm(IndicoForm):
             if visibility_duration <= timedelta():
                 raise ValidationError(_('The visibility duration cannot be zero.'))
             elif visibility_duration > max_retention_period:
-                raise ValidationError(_('The visibility duration cannot be longer than {} weeks. Leave the field empty '
-                                        'for indefinite.').format(max_retention_period.days // 7))
+                msg = ngettext('The visibility duration cannot be longer than {} week. Leave the field empty for '
+                               'indefinite.',
+                               'The visibility duration cannot be longer than {} weeks. Leave the field empty for '
+                               'indefinite.', max_retention_period.days // 7)
+                raise ValidationError(msg.format(max_retention_period.days // 7))
 
     def validate_retention_period(self, field):
         retention_period = field.data
@@ -681,8 +684,11 @@ class RegistrationPrivacyForm(IndicoForm):
             if visibility_duration < timedelta():
                 raise ValidationError(_('The visibility duration cannot be zero.'))
             elif visibility_duration > max_retention_period:
-                raise ValidationError(_('The visibility duration cannot be longer than {} weeks. Leave the field empty '
-                                        'for indefinite.').format(max_retention_period.days // 7))
+                raise ValidationError(ngettext('The visibility duration cannot be longer than {} week. Leave the '
+                                               'field empty for indefinite.',
+                                               'The visibility duration cannot be longer than {} weeks. Leave the '
+                                               'field empty for indefinite.', max_retention_period.days // 7)
+                                      .format(max_retention_period.days // 7))
 
     def validate_retention_period(self, field):
         retention_period = field.data
