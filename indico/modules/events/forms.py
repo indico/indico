@@ -139,11 +139,11 @@ class UnlistedEventsForm(IndicoForm):
 
 
 class DataRetentionSettingsForm(IndicoForm):
-    minimum_data_retention = TimeDeltaField(_('Minimum data retention period'), units=('weeks',),
+    minimum_data_retention = TimeDeltaField(_('Minimum data retention period'), [DataRequired()], units=('weeks',),
                                             description=_('Specify the minimum data retention period (in weeks) '
                                                           'configurable for registrations. This includes the '
                                                           'retention period of individual registration form fields.'),
-                                            render_kw={'placeholder': _('Indefinite'), 'min': 1})
+                                            render_kw={'min': 1})
     maximum_data_retention = TimeDeltaField(
         _('Maximum data retention period'),
         units=('weeks',),
@@ -156,23 +156,19 @@ class DataRetentionSettingsForm(IndicoForm):
     )
 
     def validate_minimum_data_retention(self, field):
+        minimum_retention = field.data
+        if minimum_retention <= timedelta():
+            raise ValidationError(_('The retention period cannot be zero or negative.'))
         maximum_retention = self.data.get('maximum_data_retention')
-        if maximum_retention and not (minimum_retention := self._validate_data_rentention(field)):
-            raise ValidationError(_('The minimum retention period cannot be indefinite when a maximum is set.'))
         if maximum_retention and minimum_retention > maximum_retention:
             raise ValidationError(_('The minimum retention period cannot be greater than the maximum.'))
 
     def validate_maximum_data_retention(self, field):
-        if not (maximum_retention := self._validate_data_rentention(field)):
+        maximum_retention = field.data
+        if maximum_retention is None:
             return
+        if maximum_retention <= timedelta():
+            raise ValidationError(_('The retention period cannot be zero or negative.'))
         minimum_retention = self.data.get('minimum_data_retention')
         if minimum_retention and minimum_retention > maximum_retention:
             raise ValidationError(_('The minimum retention period cannot be greater than the maximum.'))
-
-    def _validate_data_rentention(self, field):
-        retention_period = field.data
-        if retention_period is None:
-            return
-        if retention_period <= timedelta():
-            raise ValidationError(_('The retention period cannot be zero or negative.'))
-        return retention_period

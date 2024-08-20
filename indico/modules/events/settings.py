@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import re
+from datetime import timedelta
 from functools import wraps
 from pathlib import Path
 
@@ -271,7 +272,7 @@ autolinker_settings = SettingsProxy('autolinker', {
 })
 
 data_retention_settings = SettingsProxy('data_retention', {
-    'minimum_data_retention': None,
+    'minimum_data_retention': timedelta(days=7),
     'maximum_data_retention': None,
 }, converters={
     'minimum_data_retention': TimedeltaConverter,

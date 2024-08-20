@@ -447,7 +447,7 @@ class DataRetentionPeriodValidator:
             raise ValidationError(_('The retention period cannot be indefinite.'))
         elif retention_period is None:
             return
-        min_retention_period = data_retention_settings.get('minimum_data_retention') or timedelta(days=7)
+        min_retention_period = data_retention_settings.get('minimum_data_retention')
         if retention_period < min_retention_period:
             raise ValidationError(ngettext('The retention period cannot be less than {} week.',
                                            'The retention period cannot be less than {} weeks.',
