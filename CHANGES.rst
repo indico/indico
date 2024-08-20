@@ -45,6 +45,7 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
+- Make error messages accessible in the registration form (:pr:`6324`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -395,7 +396,6 @@ Accessibility
   :pr:`6076`, thanks :user:`foxbunny`)
 - Make dropdown menu fully accessible (:issue:`5896`, :pr:`5897`, thanks :user:`foxbunny`)
 - Improve registration form color contrast and font sizes (:pr:`6098`, thanks :user:`foxbunny`)
-- Make error messages accessible in the registration form (:pr:`6324`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -422,6 +422,7 @@ Internal Changes
 - Add ``<ind-menu>`` custom element for managing drop-down menus (:issue:`5896`, :pr:`5897`,
   thanks :user:`foxbunny`)
 - Allow plugins to add extra fields to the room booking form (:pr:`6126`, thanks :user:`VojtechPetru`)
+
 
 ----
 
