@@ -45,7 +45,7 @@ const PrincipalListField = props => {
     eventId,
     favoriteUsersController,
     className,
-    fieldId,
+    importExport,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
@@ -171,8 +171,9 @@ const PrincipalListField = props => {
             </>
           )}
           {renderPluginComponents('principal-list-field-add-buttons', {
-            fieldId,
+            importExport,
             eventId,
+            entries,
             onChange: handleAddCSVEmails,
           })}
         </Button.Group>
@@ -196,7 +197,7 @@ PrincipalListField.propTypes = {
   withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
   className: PropTypes.string,
-  fieldId: PropTypes.string.isRequired,
+  importExport: PropTypes.bool,
 };
 
 PrincipalListField.defaultProps = {
@@ -208,6 +209,7 @@ PrincipalListField.defaultProps = {
   eventId: null,
   readOnly: false,
   className: undefined,
+  importExport: false,
 };
 
 export default React.memo(PrincipalListField);
