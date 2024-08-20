@@ -38,7 +38,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
-from indico.modules.events.registration.controllers import CheckEmailMixin, RegistrationEditMixin
+from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
+                                                            UploadRegistrationFileMixin, UploadRegistrationPictureMixin)
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
@@ -635,6 +636,14 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         if pay != self.registration.is_paid:
             toggle_registration_payment(self.registration, paid=pay)
         return jsonify_data(html=_render_registration_details(self.registration))
+
+
+class RHRegistrationUploadFile(UploadRegistrationFileMixin, RHManageRegFormBase):
+    """Upload a file from a registration form."""
+
+
+class RHRegistrationUploadPicture(UploadRegistrationPictureMixin, RHRegistrationUploadFile):
+    """Upload a picture from a registration form."""
 
 
 def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):

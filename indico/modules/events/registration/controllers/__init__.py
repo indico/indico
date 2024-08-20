@@ -7,13 +7,15 @@
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import defaultload
+from werkzeug.exceptions import UnprocessableEntity
 
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
                                                      get_form_registration_data, make_registration_schema,
-                                                     modify_registration)
+                                                     modify_registration, process_registration_picture)
+from indico.modules.files.controllers import UploadFileMixin
 from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
 from indico.web.args import parser, use_kwargs
 
@@ -103,3 +105,30 @@ class CheckEmailMixin:
                                                     management=management))
         else:
             return jsonify(check_registration_email(self.regform, self.email, management=management))
+
+
+class UploadRegistrationFileMixin(UploadFileMixin):
+    """Upload a file from a registration form.
+
+    Regform file fields do not wait for the regform to be submitted,
+    but upload the selected files immediately, saving just the generated uuid.
+    Only this uuid is then sent when the regform is submitted.
+    """
+
+    def get_file_context(self):
+        return 'event', self.event.id, 'regform', self.regform.id, 'registration'
+
+
+class UploadRegistrationPictureMixin:
+    """Perform additional validation for regform picture uploads.
+
+    This mixin must be used in addition to `UploadRegistrationFileMixin`.
+    """
+
+    def _save_file(self, file, stream):
+        if not (resized_image_stream := process_registration_picture(stream)):
+            raise UnprocessableEntity('Could not process image, it may be corrupted or too big')
+        return super()._save_file(file, resized_image_stream)
+
+    def get_file_metadata(self):
+        return {'registration_picture_checked': True}
