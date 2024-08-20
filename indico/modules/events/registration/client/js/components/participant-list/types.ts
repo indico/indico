@@ -20,6 +20,14 @@ export interface TableObj {
   title?: string;
 }
 
+export interface ParticipantListProps {
+  published: boolean;
+  totalParticipantCount: number;
+  tables: TableObj[];
+  title: string;
+  preview?: string;
+}
+
 export interface ParticipantAccordionProps {
   totalParticipantCount: number;
   published: boolean;
