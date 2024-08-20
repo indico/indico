@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Modal, Icon, Popup} from 'semantic-ui-react';
 
-import {serializeDate} from 'indico/utils/date';
+import {getWeekday, serializeDate} from 'indico/utils/date';
 
 import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
@@ -48,7 +48,7 @@ const _getRowSerializer = (day, room) => {
       conflicts: conflicts[day] || [],
       preConflicts: preConflicts[day] || [],
       nonbookablePeriods: nonbookablePeriods[day] || [],
-      unbookableHours: unbookableHours || [],
+      unbookableHours: unbookableHours[getWeekday(day)],
       blockings: blockings[day] || [],
       overridableBlockings: overridableBlockings[day] || [],
       concurrentPreBookings: concurrentPreBookings[day] || [],

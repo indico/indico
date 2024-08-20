@@ -614,18 +614,5 @@ class Room(ProtectionManagersMixin, db.Model):
             msg = _('You cannot book this room more than {} days in advance')
             raise NoReportError(msg.format(self.max_advance_days))
 
-    def check_bookable_hours(self, start_time, end_time, user=None, quiet=False, allow_admin=True):
-        if user and ((allow_admin and rb_is_admin(user)) or self.can_override(user, allow_admin=allow_admin)):
-            return True
-        bookable_hours = self.bookable_hours.all()
-        if not bookable_hours:
-            return True
-        for bt in bookable_hours:
-            if bt.fits_period(start_time, end_time):
-                return True
-        if quiet:
-            return False
-        raise NoReportError('Room cannot be booked at this time')
-
 
 Room.register_protection_events()

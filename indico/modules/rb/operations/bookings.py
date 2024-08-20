@@ -30,7 +30,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
 from indico.modules.rb.operations.conflicts import get_concurrent_pre_bookings, get_rooms_conflicts
 from indico.modules.rb.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
-from indico.modules.rb.util import (group_by_occurrence_date, serialize_availability, serialize_blockings,
+from indico.modules.rb.util import (WEEKDAYS, group_by_occurrence_date, serialize_availability, serialize_blockings,
                                     serialize_booking_details, serialize_nonbookable_periods, serialize_occurrences,
                                     serialize_unbookable_hours)
 from indico.util.date_time import iterdays, overlaps, server_to_utc
@@ -137,7 +137,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         room_nonoverridable_blocked_rooms = nonoverridable_blocked_rooms.get(room.id, [])
         room_overridable_blocked_rooms = overridable_blocked_rooms.get(room.id, [])
         room_nonbookable_periods = nonbookable_periods.get(room.id, [])
-        room_unbookable_hours = unbookable_hours.get(room.id, [])
+        room_unbookable_hours = unbookable_hours.get(room.id, dict.fromkeys(WEEKDAYS, ()))
 
         room_candidates = get_room_candidates(candidates, room_conflicts)
         availability[room.id] = {'room_id': room.id,
@@ -231,7 +231,7 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
     calendar = {room.id: {
         'room_id': room.id,
         'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
-        'unbookable_hours': unbookable_hours.get(room.id, []),
+        'unbookable_hours': unbookable_hours.get(room.id, dict.fromkeys(WEEKDAYS, ())),
         'blockings': group_blockings(nonoverridable_blocked_rooms.get(room.id, []), dates),
         'overridable_blockings': group_blockings(overridable_blocked_rooms.get(room.id, []), dates),
     } for room in rooms}
@@ -271,7 +271,7 @@ def get_room_details_availability(room, start_dt, end_dt):
     overridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
                                                                          overridable_only=True,
                                                                          explicit=True)).get(room.id, [])
-    unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, [])
+    unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, dict.fromkeys(WEEKDAYS, ()))
     nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt).get(room.id, [])
 
     availability = []

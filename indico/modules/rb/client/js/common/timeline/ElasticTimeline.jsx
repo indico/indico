@@ -11,7 +11,7 @@ import React from 'react';
 import {Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {dayRange, serializeDate, toMoment} from 'indico/utils/date';
+import {dayRange, getWeekday, serializeDate, toMoment} from 'indico/utils/date';
 
 import DailyTimelineContent from './DailyTimelineContent';
 import MonthlyTimelineContent from './MonthlyTimelineContent';
@@ -99,7 +99,7 @@ export default class ElasticTimeline extends React.Component {
         overridableBlockings: overridableBlockings[dt] || [],
         nonbookablePeriods: nonbookablePeriods[dt] || [],
         unbookableHours:
-          dateRange.length !== 0 && !dateRange.includes(dt) ? [] : unbookableHours || [],
+          dateRange.length !== 0 && !dateRange.includes(dt) ? [] : unbookableHours[getWeekday(dt)],
         cancellations: cancellations[dt] || [],
         rejections: rejections[dt] || [],
       };

@@ -15,7 +15,7 @@ from sqlalchemy.orm import contains_eager
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import (TempReservationConcurrentOccurrence, TempReservationOccurrence,
+from indico.modules.rb.util import (WEEKDAYS, TempReservationConcurrentOccurrence, TempReservationOccurrence,
                                     check_empty_candidates, rb_is_admin)
 from indico.util.date_time import get_overlap
 from indico.util.iterables import group_list
@@ -127,7 +127,7 @@ def get_room_unbookable_hours_conflicts(candidates, occurrences):
     conflicts = set()
     conflicting_candidates = set()
     for candidate in candidates:
-        for occurrence in occurrences:
+        for occurrence in occurrences[WEEKDAYS[candidate.start_dt.weekday()]]:
             hours_start_dt = candidate.start_dt.replace(hour=occurrence.start_time.hour,
                                                         minute=occurrence.start_time.minute)
             hours_end_dt = candidate.end_dt.replace(hour=occurrence.end_time.hour,
