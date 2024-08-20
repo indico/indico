@@ -8,6 +8,7 @@
 from fnmatch import fnmatch
 
 from flask import session
+from wtforms import HiddenField
 from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
@@ -97,6 +98,7 @@ class RegistrationEmailForm(IndicoForm):
                        [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email],
                        filters=[_tolower])
     captcha = WTFCaptchaField()
+    is_email_verification = HiddenField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
