@@ -16,7 +16,7 @@ import './invitations';
 import './reglists';
 
 import ConsentToPublishEditor from './components/ConsentToPublishEditor';
-import ParticipantListAccordion from './components/participant_list/ParticipantListAccordion';
+import ParticipantList from './components/participant-list/ParticipantList';
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 import setupRegformSetup from './form_setup';
 import setupRegformSubmission from './form_submission';
@@ -150,13 +150,13 @@ import setupRegformSubmission from './form_submission';
     }
   });
 
-  global.setupParticipantListAccordion = containerSelector => {
+  global.setupParticipantList = containerSelector => {
     const element = document.querySelector(containerSelector);
     const tables = JSON.parse(element.dataset.tables);
     const {totalParticipantCount, published, preview, title} = element.dataset;
 
     ReactDOM.render(
-      <ParticipantListAccordion
+      <ParticipantList
         tables={tables}
         totalParticipantCount={totalParticipantCount}
         published={published}

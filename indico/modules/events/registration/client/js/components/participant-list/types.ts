@@ -20,13 +20,13 @@ export interface TableObj {
   title?: string;
 }
 
-export interface ParticipantListAccordionProps {
+export interface ParticipantAccordionProps {
   totalParticipantCount: number;
   published: boolean;
   tables: TableObj[];
 }
 
-export interface AccordionParticipantsItemProps {
+export interface ParticipantAccordionItemProps {
   table: TableObj;
   collapsible?: boolean;
 }

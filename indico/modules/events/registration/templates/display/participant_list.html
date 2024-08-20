@@ -52,7 +52,7 @@
 
 {% block content %}
     <div
-        id="participant-list-accordion"
+        id="participant-list"
         data-tables="{{ tables | tojson | forceescape }}"
         data-preview="{{ preview }}"
         data-event="{{ event }}"
@@ -70,6 +70,6 @@
             headerTemplate: ''
         });
 
-        setupParticipantListAccordion('#participant-list-accordion');
+        setupParticipantList('#participant-list');
     </script>
 {% endblock %}

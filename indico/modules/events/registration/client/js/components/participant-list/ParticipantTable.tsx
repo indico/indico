@@ -1,79 +1,22 @@
-// This file is part of Indico.
-// Copyright (C) 2002 - 2024 CERN
-//
-// Indico is free software; you can redistribute it and/or
-// modify it under the terms of the MIT License; see the
-// LICENSE file for more details.
-
-import React, {ReactNode, useState} from 'react';
+import React, {useState} from 'react';
 import {
-  AccordionTitle,
-  AccordionContent,
-  Accordion,
   Icon,
-  TableRow,
-  TableHeaderCell,
-  TableHeader,
-  TableCell,
-  TableBody,
-  Table,
-  TableFooter,
-  Popup,
   Message,
-  MessageContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHeader,
+  TableHeaderCell,
+  TableRow,
 } from 'semantic-ui-react';
 
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 
-import './ParticipantListAccordion.module.scss';
-import {
-  AccordionParticipantsItemProps,
-  ParticipantCounterProps,
-  ParticipantListAccordionProps,
-  TableColumnObj,
-  TableObj,
-  TableRowObj,
-} from './types';
+import {ParticipantCountHidden} from './ParticipantSharedTranslations';
+import {TableColumnObj, TableObj, TableRowObj} from './types';
 
-function ParticipantCountHidden({count}: {count: number}) {
-  return (
-    <PluralTranslate count={count}>
-      <Singular>
-        <Param name="count" value={count} /> participant registered anonymously.
-      </Singular>
-      <Plural>
-        <Param name="count" value={count} /> participants registered anonymously.
-      </Plural>
-    </PluralTranslate>
-  );
-}
-
-function ParticipantCounter({
-  totalCount,
-  hiddenCount,
-  styleName = '',
-  ...props
-}: ParticipantCounterProps) {
-  const participantCounterElement = (
-    <span>
-      {totalCount} <Icon name="user" />
-    </span>
-  );
-
-  return hiddenCount > 0 ? (
-    <div className={styleName} {...props}>
-      <Popup
-        position="left center"
-        content={<ParticipantCountHidden count={hiddenCount} />}
-        trigger={participantCounterElement}
-      />
-    </div>
-  ) : (
-    participantCounterElement
-  );
-}
-
-function ParticipantTable({table}: {table: TableObj}) {
+export default function ParticipantTable({table}: {table: TableObj}) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;
   const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
@@ -191,73 +134,5 @@ function ParticipantTable({table}: {table: TableObj}) {
         <Translate>No participants registered.</Translate>
       )}
     </Message>
-  );
-}
-
-function AccordionParticipantsItem({table, collapsible = true}: AccordionParticipantsItemProps) {
-  const visibleParticipantsCount = table.rows.length;
-  const totalParticipantCount = table.num_participants;
-  const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
-
-  const [isActive, setIsActive] = useState(!collapsible || visibleParticipantsCount > 0);
-  const handleClick = () => setIsActive(!isActive);
-
-  return (
-    <>
-      <AccordionTitle
-        active={isActive}
-        onClick={collapsible ? handleClick : undefined}
-        styleName="title"
-      >
-        {collapsible && <Icon name="dropdown" />}
-        <p>{table.title || <Translate>Participants</Translate>}</p>
-        <ParticipantCounter
-          styleName="participants-count-wrapper"
-          totalCount={totalParticipantCount}
-          hiddenCount={hiddenParticipantsCount}
-        />
-      </AccordionTitle>
-      <AccordionContent active={isActive}>
-        <ParticipantTable table={table} />
-      </AccordionContent>
-    </>
-  );
-}
-
-export default function ParticipantListAccordion({
-  published,
-  totalParticipantCount,
-  tables,
-}: ParticipantListAccordionProps) {
-  let infoContent: ReactNode;
-
-  if (!published) {
-    infoContent = <Translate>There are no published registrations.</Translate>;
-  } else if (totalParticipantCount <= 0) {
-    infoContent = <Translate>There are no registrations yet.</Translate>;
-  }
-
-  if (infoContent) {
-    return (
-      <Message info size="large">
-        <MessageContent>
-          <Icon name="info circle" />
-          {infoContent}
-        </MessageContent>
-      </Message>
-    );
-  }
-
-  return (
-    <Accordion fluid>
-      {tables.length === 1 ? (
-        <AccordionParticipantsItem table={tables[0]} collapsible={false} />
-      ) : (
-        tables.map((table: TableObj, i: number) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <AccordionParticipantsItem key={i} table={table} />
-        ))
-      )}
-    </Accordion>
   );
 }
