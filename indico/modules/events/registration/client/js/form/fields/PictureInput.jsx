@@ -7,7 +7,8 @@
 
 import managementPreviewURL from 'indico-url:event_registration.manage_registration_file';
 import registrantPreviewURL from 'indico-url:event_registration.registration_picture';
-import uploadURL from 'indico-url:event_registration.upload_registration_picture';
+import managementUploadURL from 'indico-url:event_registration.upload_picture_management';
+import registrantUploadURL from 'indico-url:event_registration.upload_registration_picture';
 
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
@@ -33,6 +34,7 @@ export default function PictureInput({htmlName, disabled, isRequired, minPicture
   }, []);
 
   const previewURL = isManagement ? managementPreviewURL : registrantPreviewURL;
+  const uploadURL = isManagement ? managementUploadURL : registrantUploadURL;
   const uploadUrlParams = {
     event_id: eventId,
     reg_form_id: regformId,

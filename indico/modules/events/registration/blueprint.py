@@ -64,6 +64,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 
                  reglists.RHRegistrationDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/upload', 'upload_file_management',
                  reglists.RHRegistrationUploadFile, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/upload-picture', 'upload_picture_management',
+                 reglists.RHRegistrationUploadPicture, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
                  reglists.RHRegistrationDetails)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',

@@ -39,7 +39,7 @@ from indico.modules.events.registration.badges import (RegistrantsListToBadgesPD
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
-                                                            UploadRegistrationFileMixin)
+                                                            UploadRegistrationFileMixin, UploadRegistrationPictureMixin)
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
@@ -640,6 +640,10 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
 
 class RHRegistrationUploadFile(UploadRegistrationFileMixin, RHManageRegFormBase):
     """Upload a file from a registration form."""
+
+
+class RHRegistrationUploadPicture(UploadRegistrationPictureMixin, RHRegistrationUploadFile):
+    """Upload a picture from a registration form."""
 
 
 def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):

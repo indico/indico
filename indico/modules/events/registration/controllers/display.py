@@ -9,7 +9,7 @@ from uuid import UUID
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload, lazyload, load_only, subqueryload
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound, UnprocessableEntity
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
@@ -19,7 +19,8 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
-                                                            RegistrationFormMixin, UploadRegistrationFileMixin)
+                                                            RegistrationFormMixin, UploadRegistrationFileMixin,
+                                                            UploadRegistrationPictureMixin)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
@@ -28,8 +29,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.util import (create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_flat_section_submission_data,
-                                                     get_initial_form_values, get_user_data, make_registration_schema,
-                                                     process_registration_picture)
+                                                     get_initial_form_values, get_user_data, make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -426,16 +426,8 @@ class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHR
                     raise
 
 
-class RHUploadRegistrationPicture(RHUploadRegistrationFile):
+class RHUploadRegistrationPicture(UploadRegistrationPictureMixin, RHUploadRegistrationFile):
     """Upload a picture from a registration form."""
-
-    def _save_file(self, file, stream):
-        if not (resized_image_stream := process_registration_picture(stream)):
-            raise UnprocessableEntity('Could not process image, it may be corrupted or too big')
-        return super()._save_file(file, resized_image_stream)
-
-    def get_file_metadata(self):
-        return {'registration_picture_checked': True}
 
 
 class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistrationBase):
