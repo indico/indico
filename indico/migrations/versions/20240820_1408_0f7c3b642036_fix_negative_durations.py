@@ -38,6 +38,9 @@ def upgrade():
              {entry_ends_after_parent})
         {entry_ends_after_parent}''')  # noqa: S608
 
+    # force execution of trigger events
+    op.execute('SET CONSTRAINTS ALL IMMEDIATE')
+
 
 def downgrade():
     pass
