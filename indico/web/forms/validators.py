@@ -438,7 +438,7 @@ class MastodonServer:
 
 
 class DataRetentionPeriodValidator:
-    """Validates the data retention period."""
+    """Validate a data retention period against the global defaults."""
 
     def __call__(self, form, field):
         retention_period = field.data
