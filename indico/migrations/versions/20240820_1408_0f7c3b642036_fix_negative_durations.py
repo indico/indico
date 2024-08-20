@@ -25,8 +25,9 @@ def upgrade():
     ''')
 
     op.execute("UPDATE events.sessions SET default_contribution_duration = '1 minute' WHERE default_contribution_duration <= '0'")
-    op.execute("UPDATE events.session_blocks SET duration = '1 minute' WHERE duration < '0'")
-    op.execute("UPDATE events.contributions SET duration = '1 minute' WHERE duration < '0'")
+    op.execute("UPDATE events.session_blocks SET duration = '1 minute' WHERE duration <= '0'")
+    op.execute("UPDATE events.contributions SET duration = '1 minute' WHERE duration <= '0'")
+    # Subcontributions and breaks are allowed to have a zero duration
     op.execute("UPDATE events.breaks SET duration = '1 minute' WHERE duration < '0'")
     op.execute("UPDATE events.subcontributions SET duration = '0' WHERE duration < '0'")
 
