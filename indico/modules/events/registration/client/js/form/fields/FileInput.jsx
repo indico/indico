@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadFileManagementURL from 'indico-url:event_registration.upload_file_management';
-import uploadFileURL from 'indico-url:event_registration.upload_registration_file';
+import managementUploadURL from 'indico-url:event_registration.upload_file_management';
+import participantUploadURL from 'indico-url:event_registration.upload_registration_file';
 
 import PropTypes from 'prop-types';
 import React, {useMemo} from 'react';
@@ -14,15 +14,16 @@ import {useSelector} from 'react-redux';
 
 import {FinalSingleFileManager} from 'indico/react/components';
 
-import {getUpdateMode} from '../../form_submission/selectors';
+import {getManagement, getUpdateMode} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
 export default function FileInput({htmlName, disabled, isRequired}) {
-  const {eventId, regformId, registrationUuid, fileData, management} = useSelector(getStaticData);
+  const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
+  const isManagement = useSelector(getManagement);
   const [invitationToken, formToken] = useMemo(() => {
     const params = new URLSearchParams(location.search);
     return [params.get('invitation'), params.get('form_token')];
@@ -50,7 +51,7 @@ export default function FileInput({htmlName, disabled, isRequired}) {
         name={htmlName}
         disabled={disabled}
         required={isRequired}
-        uploadURL={management ? uploadFileManagementURL(urlParams) : uploadFileURL(urlParams)}
+        uploadURL={isManagement ? managementUploadURL(urlParams) : participantUploadURL(urlParams)}
         initialFileDetails={initialFileDetails}
       />
     </div>

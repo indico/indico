@@ -14,6 +14,7 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
                                                      get_form_registration_data, make_registration_schema,
                                                      modify_registration)
+from indico.modules.files.controllers import UploadFileMixin
 from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
 from indico.web.args import parser, use_kwargs
 
@@ -103,3 +104,15 @@ class CheckEmailMixin:
                                                     management=management))
         else:
             return jsonify(check_registration_email(self.regform, self.email, management=management))
+
+
+class UploadRegistrationFileMixin(UploadFileMixin):
+    """Upload a file from a registration form.
+
+    Regform file fields do not wait for the regform to be submitted,
+    but upload the selected files immediately, saving just the generated uuid.
+    Only this uuid is then sent when the regform is submitted.
+    """
+
+    def get_file_context(self):
+        return 'event', self.event.id, 'regform', self.regform.id, 'registration'

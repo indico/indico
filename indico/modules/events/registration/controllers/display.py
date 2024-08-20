@@ -18,7 +18,8 @@ from indico.modules.events.controllers.base import RegistrationRequired, RHDispl
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
-from indico.modules.events.registration.controllers import CheckEmailMixin, RegistrationEditMixin, RegistrationFormMixin
+from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
+                                                            RegistrationFormMixin, UploadRegistrationFileMixin)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
@@ -32,12 +33,12 @@ from indico.modules.events.registration.util import (create_registration, genera
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
-from indico.modules.files.controllers import UploadRegistrationFileMixin
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.web.args import parser
+from indico.util.marshmallow import UUIDString
+from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError
 
@@ -401,20 +402,17 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
 
 class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHRegistrationFormBase):
-    """
-    Upload a file from a registration form.
-
-    Regform file fields do not wait for the regform to be submitted,
-    but upload the selected files immediately, saving just the generated uuid.
-    Only this uuid is then sent when the regform is submitted.
-    """
+    """Upload a file from a registration form."""
 
     ALLOW_PROTECTED_EVENT = True
 
-    def _process_args(self):
+    @use_kwargs({
+        'token': UUIDString(load_default=None),
+    }, location='query')
+    def _process_args(self, token):
         RHRegistrationFormBase._process_args(self)
         InvitationMixin._process_args(self)
-        UploadRegistrationFileMixin._process_args(self)
+        self.existing_registration = self.regform.get_registration(uuid=token) if token else None
 
     def _check_access(self):
         if not self.existing_registration:

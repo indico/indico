@@ -38,7 +38,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
                                                        RegistrantsListToBadgesPDFDoubleSided,
                                                        RegistrantsListToBadgesPDFFoldable)
-from indico.modules.events.registration.controllers import CheckEmailMixin, RegistrationEditMixin
+from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
+                                                            UploadRegistrationFileMixin)
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
@@ -57,7 +58,6 @@ from indico.modules.events.registration.util import (ActionMenuEntry, create_reg
                                                      import_registrations_from_csv, make_registration_schema)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
-from indico.modules.files.controllers import UploadRegistrationFileMixin
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.receipts.models.files import ReceiptFile
@@ -639,17 +639,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
 
 
 class RHRegistrationUploadFile(UploadRegistrationFileMixin, RHManageRegFormBase):
-    """
-    Upload a file from a registration form.
-
-    Regform file fields do not wait for the regform to be submitted,
-    but upload the selected files immediately, saving just the generated uuid.
-    Only this uuid is then sent when the regform is submitted.
-    """
-
-    def _process_args(self):
-        RHManageRegFormBase._process_args(self)
-        UploadRegistrationFileMixin._process_args(self)
+    """Upload a file from a registration form."""
 
 
 def _modify_registration_status(registration, approve, rejection_reason='', attach_rejection_reason=False):

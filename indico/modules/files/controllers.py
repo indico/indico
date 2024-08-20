@@ -16,7 +16,6 @@ from werkzeug.exceptions import Forbidden, UnprocessableEntity
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.modules.files.util import validate_upload_file_size
-from indico.util.marshmallow import UUIDString
 from indico.util.signing import secure_serializer
 from indico.web.args import use_kwargs
 from indico.web.rh import RHProtected
@@ -72,17 +71,6 @@ class UploadFileMixin:
         This is usually not needed, but could be used e.g. to add some flag which
         is then used in a validator of the form accepting the file uploaded here.
         """
-
-
-class UploadRegistrationFileMixin(UploadFileMixin):
-    @use_kwargs({
-        'token': UUIDString(load_default=None),
-    }, location='query')
-    def _process_args(self, token):
-        self.existing_registration = self.regform.get_registration(uuid=token) if token else None
-
-    def get_file_context(self):
-        return 'event', self.event.id, 'regform', self.regform.id, 'registration'
 
 
 class RHFileBase(RHProtected):
