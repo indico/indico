@@ -16,6 +16,14 @@ depends_on = None
 
 
 def upgrade():
+    # Temporarily disable triggers because some legacy events may be broken beyond repair,
+    # and the changes here would trigger errors from the event consistency check trigger.
+    op.execute('''
+        ALTER TABLE events.session_blocks DISABLE TRIGGER consistent_timetable;
+        ALTER TABLE events.breaks DISABLE TRIGGER consistent_timetable;
+        ALTER TABLE events.contributions DISABLE TRIGGER consistent_timetable;
+    ''')
+
     op.execute("UPDATE events.sessions SET default_contribution_duration = '1 minute' WHERE default_contribution_duration <= '0'")
     op.execute("UPDATE events.session_blocks SET duration = '1 minute' WHERE duration < '0'")
     op.execute("UPDATE events.contributions SET duration = '1 minute' WHERE duration < '0'")
@@ -38,8 +46,11 @@ def upgrade():
              {entry_ends_after_parent})
         {entry_ends_after_parent}''')  # noqa: S608
 
-    # force execution of trigger events
-    op.execute('SET CONSTRAINTS ALL IMMEDIATE')
+    op.execute('''
+        ALTER TABLE events.session_blocks ENABLE TRIGGER consistent_timetable;
+        ALTER TABLE events.breaks ENABLE TRIGGER consistent_timetable;
+        ALTER TABLE events.contributions ENABLE TRIGGER consistent_timetable;
+    ''')
 
 
 def downgrade():
