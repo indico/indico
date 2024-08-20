@@ -172,6 +172,7 @@ export default function RegistrationFormSubmission() {
       onSubmit={onSubmit}
       initialValues={isUpdateMode ? registrationData : initialValues}
       initialValuesEqual={_.isEqual}
+      subscription={{}}
       decorators={getPluginObjects('regformFormDecorators')}
     >
       {fprops => (
