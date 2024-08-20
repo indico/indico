@@ -7,6 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {WTFPrincipalListField} from 'indico/react/components';
 
 window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ...options}) {
@@ -19,6 +20,7 @@ window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ..
       withCategoryRoles: false,
       withRegistrants: false,
       withEmails: false,
+      importExport: false,
     },
     ...options,
   };
