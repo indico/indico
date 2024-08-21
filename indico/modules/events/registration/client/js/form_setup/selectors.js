@@ -67,3 +67,9 @@ export const getURLParams = createSelector(
     };
   }
 );
+
+/** Get the maximum data retention configurable by the registration form and fields */
+export const getDataRetentionRange = createSelector(
+  getStaticData,
+  staticData => staticData.dataRetentionRange
+);

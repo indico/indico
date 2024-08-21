@@ -17,6 +17,7 @@
          data-event-end-date="{{ event.end_dt_local.date() }}"
          data-regform-id="{{ regform.id }}"
          data-currency="{{ regform.currency }}"
+         data-data-retention-range="{{ data_retention_range | tojson }}"
          data-has-predefined-affiliations="{{ has_predefined_affiliations | tojson | forceescape }}"
          data-form-data="{{ form_data | tojson | forceescape }}"></div>
 {% endblock %}

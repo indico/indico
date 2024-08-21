@@ -215,7 +215,7 @@ export default function FinalSingleFileManager({name, ...rest}) {
   return (
     <Field
       name={`_${name}_invalidator`}
-      validate={value => console.log(value)}
+      validate={value => value || undefined}
       render={({input: {onChange: setDummyValue}}) => (
         <FinalField
           name={name}

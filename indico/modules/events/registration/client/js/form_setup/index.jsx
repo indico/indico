@@ -22,6 +22,7 @@ export default function setupRegformSetup(root) {
     eventEndDate,
     regformId,
     currency,
+    dataRetentionRange,
     hasPredefinedAffiliations,
     formData,
   } = root.dataset;
@@ -34,6 +35,7 @@ export default function setupRegformSetup(root) {
       eventStartDate,
       eventEndDate,
       currency,
+      dataRetentionRange: JSON.parse(dataRetentionRange),
     },
   };
   const store = createReduxStore('regform-setup', reducers, initialData);

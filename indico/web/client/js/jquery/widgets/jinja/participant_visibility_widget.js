@@ -14,6 +14,7 @@ window.setupParticipantVisibilityWidget = function setupParticipantVisibilityWid
   fieldId,
   values,
   choices,
+  maxVisibilityPeriod,
 }) {
   const wrapperId = `${fieldId}-wrapper`;
   ReactDOM.render(
@@ -22,6 +23,7 @@ window.setupParticipantVisibilityWidget = function setupParticipantVisibilityWid
       wrapperId={wrapperId}
       values={values}
       choices={choices}
+      maxVisibilityPeriod={maxVisibilityPeriod}
     />,
     document.getElementById(wrapperId)
   );

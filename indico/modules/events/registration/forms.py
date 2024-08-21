@@ -154,8 +154,9 @@ class RegistrationFormCreateForm(IndicoForm):
         maximum_retention = data_retention_settings.get('maximum_data_retention')
         if maximum_retention:
             inject_validators(self, 'retention_period', [DataRequired()])
-        maximum_retention = maximum_retention or timedelta(days=3650)
         super().__init__(*args, **kwargs)
+        maximum_retention = maximum_retention or timedelta(days=3650)
+        self.visibility.max_visibility_period = maximum_retention.days // 7
         self.retention_period.render_kw.update({'min': minimum_retention.days // 7,
                                                 'max': maximum_retention.days // 7})
 
@@ -635,8 +636,9 @@ class RegistrationPrivacyForm(IndicoForm):
         maximum_retention = data_retention_settings.get('maximum_data_retention')
         if maximum_retention:
             inject_validators(self, 'retention_period', [DataRequired()])
-        maximum_retention = maximum_retention or timedelta(days=3650)
         super().__init__(*args, **kwargs)
+        maximum_retention = maximum_retention or timedelta(days=3650)
+        self.visibility.max_visibility_period = maximum_retention.days // 7
         self.retention_period.render_kw.update({'min': minimum_retention.days // 7,
                                                 'max': maximum_retention.days // 7})
 

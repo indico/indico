@@ -31,6 +31,7 @@ from indico.modules.events.registration.util import (close_registration, create_
                                                      get_flat_section_setup_data)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
+from indico.modules.events.settings import data_retention_settings
 from indico.modules.events.util import update_object_principals
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.users.models.affiliations import Affiliation
@@ -327,9 +328,13 @@ class RHRegistrationFormModify(RHManageRegFormBase):
     """Modify the form of a registration form."""
 
     def _process(self):
+        min_data_retention = data_retention_settings.get('minimum_data_retention')
+        max_data_retention = data_retention_settings.get('maximum_data_retention') or timedelta(days=3650)
         return WPManageRegistration.render_template('management/regform_modify.html', self.event,
                                                     form_data=get_flat_section_setup_data(self.regform),
                                                     regform=self.regform,
+                                                    data_retention_range=(min_data_retention.days // 7,
+                                                                          max_data_retention.days // 7),
                                                     has_predefined_affiliations=Affiliation.query.has_rows())
 
 
