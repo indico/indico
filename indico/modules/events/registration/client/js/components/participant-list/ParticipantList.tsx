@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
+import manageRegFormListURL from 'indico-url:event_registration.manage_regform_list';
 
 import React from 'react';
 import {Button, Divider, Header, HeaderContent, Icon, Popup} from 'semantic-ui-react';
@@ -79,7 +80,7 @@ export default function ParticipantList({
                 position="bottom center"
                 content={<Translate>Back</Translate>}
                 trigger={
-                  <a href="www.google.com" className="back-button">
+                  <a href={manageRegFormListURL({event_id: eventId})} className="back-button">
                     <Icon name="chevron left" color="grey" size="small" />
                   </a>
                 }
