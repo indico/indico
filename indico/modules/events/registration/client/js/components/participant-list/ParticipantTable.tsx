@@ -23,6 +23,8 @@ import {Translate} from 'indico/react/i18n';
 import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import {TableColumnObj, TableObj, TableRowObj} from './types';
 
+import './ParticipantTable.module.scss';
+
 export default function ParticipantTable({table}: {table: TableObj}) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;

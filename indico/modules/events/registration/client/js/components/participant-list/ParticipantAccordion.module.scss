@@ -5,9 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-:global(span.participants-count-wrapper) {
+:global(.participants-count-wrapper) {
   display: flex;
-  flex-shrink: 0;
   gap: 5px;
 }
 
@@ -26,10 +25,4 @@
   > span {
     flex-shrink: 0;
   }
-}
-
-:global(img.cell-img) {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
 }
