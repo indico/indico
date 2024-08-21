@@ -80,7 +80,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
           {table.show_checkin && ( // For checkin status
             <TableHeaderCell
               width={1}
-              textAlign="center"
+              className="participant-table-row"
               onClick={() => handleSort('checked_in')}
               sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
             >
@@ -91,8 +91,9 @@ export default function ParticipantTable({table}: {table: TableObj}) {
             <TableHeaderCell
               // eslint-disable-next-line react/no-array-index-key
               key={i}
-              sorted={sortColumn === i ? sortDirection : undefined}
+              className="participant-table-row"
               onClick={() => handleSort(i)}
+              sorted={sortColumn === i ? sortDirection : undefined}
               title={headerText}
             >
               {headerText}

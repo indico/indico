@@ -3,3 +3,12 @@
   aspect-ratio: 1 / 1;
   object-fit: contain;
 }
+
+:global(table.ui.sortable > thead > tr > th.participant-table-row) {
+  position: relative;
+
+  &::after {
+    position: absolute;
+    right: 10px;
+  }
+}
