@@ -5,42 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.participants-count-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-
-  > span {
-    display: flex;
-    flex-shrink: 0;
-    gap: 5px;
-    transition: 0.1s;
-
-    &:hover {
-      color: black;
-    }
-  }
-}
-
-.title {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-weight: bold;
-
-  > p {
-    word-break: break-word;
-    flex-grow: 1;
-    margin-bottom: 0;
-  }
-
-  > span {
-    flex-shrink: 0;
-  }
-}
-
-:global(img.cell-img) {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
+.view-toggle {
+  transform: scale(5);
 }

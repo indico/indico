@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {HTMLAttributes} from 'react';
-
 export interface TableColumnObj {
   id: number;
   text: string;
@@ -32,6 +30,7 @@ export interface ParticipantListProps {
   totalParticipantCount: number;
   tables: TableObj[];
   title: string;
+  eventId: number;
   preview?: string;
 }
 
@@ -47,8 +46,7 @@ export interface ParticipantAccordionItemProps {
   noTitle?: boolean;
 }
 
-export interface ParticipantCounterProps extends HTMLAttributes<HTMLSpanElement> {
+export interface ParticipantCounterProps {
   totalCount: number;
   hiddenCount: number;
-  styleName?: string;
 }

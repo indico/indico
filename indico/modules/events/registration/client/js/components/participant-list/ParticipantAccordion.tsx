@@ -18,7 +18,6 @@ import {
 
 import {Translate} from 'indico/react/i18n';
 
-import './ParticipantList.module.scss';
 import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import ParticipantTable from './ParticipantTable';
 import {
@@ -28,26 +27,19 @@ import {
   TableObj,
 } from './types';
 
-function ParticipantCounter({
-  totalCount,
-  hiddenCount,
-  styleName = '',
-  ...props
-}: ParticipantCounterProps) {
+function ParticipantCounter({totalCount, hiddenCount}: ParticipantCounterProps) {
   const participantCounterElement = (
-    <span>
+    <span className="participants-count-wrapper">
       {totalCount} <Icon name="user" />
     </span>
   );
 
   return hiddenCount > 0 ? (
-    <div className={styleName} {...props}>
-      <Popup
-        position="left center"
-        content={<ParticipantCountHidden count={hiddenCount} />}
-        trigger={participantCounterElement}
-      />
-    </div>
+    <Popup
+      position="left center"
+      content={<ParticipantCountHidden count={hiddenCount} />}
+      trigger={participantCounterElement}
+    />
   ) : (
     participantCounterElement
   );
@@ -71,12 +63,11 @@ function ParticipantAccordionItem({
         <AccordionTitle
           active={isActive}
           onClick={collapsible ? handleClick : undefined}
-          styleName="title"
+          className="title"
         >
           {collapsible && <Icon name="dropdown" />}
           <p>{table.title || <Translate>Participants</Translate>}</p>
           <ParticipantCounter
-            styleName="participants-count-wrapper"
             totalCount={totalParticipantCount}
             hiddenCount={hiddenParticipantsCount}
           />

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-// import regformListURL from 'indico-url:manage_regform_list';
+import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
 
 import React from 'react';
 import {Button, Divider, Header, HeaderContent} from 'semantic-ui-react';
@@ -15,6 +15,8 @@ import {PluralTranslate, Translate, Plural, Singular, Param} from 'indico/react/
 
 import ParticipantAccordion from './ParticipantAccordion';
 import {ParticipantListProps} from './types';
+
+import './ParticipantAccordion.module.scss';
 
 // TODO: Implement this Jinja logic here
 // {% block title %} 💚
@@ -61,9 +63,8 @@ export default function ParticipantList({
   tables,
   preview,
   title,
+  eventId,
 }: ParticipantListProps) {
-  console.log('that thing');
-  // console.log(regformListURL({}));
   let description, viewToggle;
 
   if (preview === 'guest') {
@@ -72,15 +73,22 @@ export default function ParticipantList({
         This preview shows the participant list like an unregistered guest would see it.
       </Translate>
     );
+    viewToggle = (
+      <Button href={participantListPreviewURL({event_id: eventId})} className="view-toggle">
+        <Translate>Show registered guest view instead.</Translate>
+      </Button>
+    );
   } else if (preview) {
     description = (
       <Translate>
         This preview shows the participant list like a registered participant would see it.
       </Translate>
     );
-    //         <a href="{{ url_for('.manage_participant_list_preview', event, guest=1) }}">
     viewToggle = (
-      <Button href="www.google.com">
+      <Button
+        href={participantListPreviewURL({event_id: eventId, guest: 1})}
+        className="view-toggle"
+      >
         <Translate>Show unregistered guest view instead.</Translate>
       </Button>
     );
