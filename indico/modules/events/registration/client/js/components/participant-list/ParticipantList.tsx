@@ -1,5 +1,13 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+// import regformListURL from 'indico-url:manage_regform_list';
+
 import React from 'react';
-import {Link} from 'react-router-dom';
 import {Button, Divider, Header, HeaderContent} from 'semantic-ui-react';
 import HeaderSubHeader from 'semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader';
 
@@ -54,7 +62,9 @@ export default function ParticipantList({
   preview,
   title,
 }: ParticipantListProps) {
-  let description, viewSwitchLink;
+  console.log('that thing');
+  // console.log(regformListURL({}));
+  let description, viewToggle;
 
   if (preview === 'guest') {
     description = (
@@ -69,7 +79,7 @@ export default function ParticipantList({
       </Translate>
     );
     //         <a href="{{ url_for('.manage_participant_list_preview', event, guest=1) }}">
-    viewSwitchLink = (
+    viewToggle = (
       <Button href="www.google.com">
         <Translate>Show unregistered guest view instead.</Translate>
       </Button>
@@ -100,13 +110,9 @@ export default function ParticipantList({
           </PluralTranslate>
         </HeaderSubHeader>
         <Divider />
-        {description && (
-          <>
-            <HeaderSubHeader content={description} />
-            {viewSwitchLink}
-          </>
-        )}
+        {description && <HeaderSubHeader content={description} />}
       </Header>
+      {viewToggle}
       <ParticipantAccordion
         published={published}
         totalParticipantCount={totalParticipantCount}

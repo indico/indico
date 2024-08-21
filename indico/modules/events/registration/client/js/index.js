@@ -158,7 +158,7 @@ import setupRegformSubmission from './form_submission';
     ReactDOM.render(
       <ParticipantList
         tables={tables}
-        totalParticipantCount={totalParticipantCount}
+        totalParticipantCount={Number(totalParticipantCount)}
         published={published !== undefined}
         preview={preview}
         title={title}

@@ -53,7 +53,11 @@ function ParticipantCounter({
   );
 }
 
-function ParticipantAccordionItem({table, collapsible = true}: ParticipantAccordionItemProps) {
+function ParticipantAccordionItem({
+  table,
+  collapsible = true,
+  noTitle = false,
+}: ParticipantAccordionItemProps) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;
   const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;
@@ -63,19 +67,21 @@ function ParticipantAccordionItem({table, collapsible = true}: ParticipantAccord
 
   return (
     <>
-      <AccordionTitle
-        active={isActive}
-        onClick={collapsible ? handleClick : undefined}
-        styleName="title"
-      >
-        {collapsible && <Icon name="dropdown" />}
-        <p>{table.title || <Translate>Participants</Translate>}</p>
-        <ParticipantCounter
-          styleName="participants-count-wrapper"
-          totalCount={totalParticipantCount}
-          hiddenCount={hiddenParticipantsCount}
-        />
-      </AccordionTitle>
+      {!noTitle && (
+        <AccordionTitle
+          active={isActive}
+          onClick={collapsible ? handleClick : undefined}
+          styleName="title"
+        >
+          {collapsible && <Icon name="dropdown" />}
+          <p>{table.title || <Translate>Participants</Translate>}</p>
+          <ParticipantCounter
+            styleName="participants-count-wrapper"
+            totalCount={totalParticipantCount}
+            hiddenCount={hiddenParticipantsCount}
+          />
+        </AccordionTitle>
+      )}
       <AccordionContent active={isActive}>
         <ParticipantTable table={table} />
       </AccordionContent>
@@ -110,7 +116,7 @@ export default function ParticipantAccordion({
   return (
     <Accordion fluid>
       {tables.length === 1 ? (
-        <ParticipantAccordionItem table={tables[0]} collapsible={false} />
+        <ParticipantAccordionItem table={tables[0]} collapsible={false} noTitle />
       ) : (
         tables.map((table: TableObj, i: number) => (
           // eslint-disable-next-line react/no-array-index-key
