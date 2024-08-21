@@ -8,7 +8,7 @@
 import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
 
 import React from 'react';
-import {Button, Divider, Header, HeaderContent} from 'semantic-ui-react';
+import {Button, Divider, Header, HeaderContent, Icon, Popup} from 'semantic-ui-react';
 import HeaderSubHeader from 'semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader';
 
 import {PluralTranslate, Translate, Plural, Singular, Param} from 'indico/react/i18n';
@@ -17,45 +17,6 @@ import ParticipantAccordion from './ParticipantAccordion';
 import {ParticipantListProps} from './types';
 
 import './ParticipantList.module.scss';
-
-// TODO: Implement this Jinja logic here
-// {% block title %} 💚
-//     {%- if not preview -%}
-//         {{- page_title -}}
-//     {%- else -%}
-//         {% trans %}Participant List Preview{% endtrans %}
-//     {%- endif -%}
-// {% endblock %}
-
-// {% block subtitle %} 💚
-//     {% if num_participants %}
-//         {%- trans num=num_participants %}1 participant{% pluralize %}{{ num }} participants{% endtrans -%}
-//     {% endif %}
-// {% endblock %} #}
-
-// {# {% block description %}
-//     {%- if preview == 'guest' -%}
-//         {% trans -%}
-//             This preview shows the participant list like an unregistered guest would see it.
-//         {%- endtrans %}
-//         <br>
-//         <a href="{{ url_for('.manage_participant_list_preview', event) }}">
-//             {%- trans %}Show registered participant view instead.{% endtrans -%}
-//         </a>
-//     {% elif preview %}
-//         {% trans -%}
-//             This preview shows the participant list like a registered participant would see it.
-//         {%- endtrans %}
-//         <br>
-//         <a href="{{ url_for('.manage_participant_list_preview', event, guest=1) }}">
-//             {%- trans %}Show unregistered guest view instead.{% endtrans -%}
-//         </a>
-//     {%- elif tables|length > 1 -%}
-//         {% trans -%}
-//             The lists of participants grouped by the registration form they used to register for the event.
-//         {%- endtrans %}
-//     {%- endif -%}
-// {% endblock %}
 
 export default function ParticipantList({
   published,
@@ -111,8 +72,23 @@ export default function ParticipantList({
   return (
     <section>
       <Header as="h2" color="blue">
-        <HeaderContent>
-          {preview ? title : <Translate>Participant List Preview</Translate>}
+        <HeaderContent className="header-text">
+          {preview ? (
+            <>
+              <Popup
+                position="bottom center"
+                content={<Translate>Back</Translate>}
+                trigger={
+                  <a href="www.google.com" className="back-button">
+                    <Icon name="chevron left" color="grey" size="small" />
+                  </a>
+                }
+              />
+              <Translate>Participant List Preview</Translate>
+            </>
+          ) : (
+            title
+          )}
         </HeaderContent>
         <HeaderSubHeader>
           <PluralTranslate count={totalParticipantCount}>

@@ -5,6 +5,22 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+:global(.ui.header .content.header-text) {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  > a {
+    position: absolute;
+    transform: translateX(-80%);
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
 :global(.ui.button.view-toggle) {
   margin-bottom: 10px;
 }
