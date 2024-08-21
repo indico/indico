@@ -115,8 +115,10 @@ class HTTPAPIHook:
         max_records = self.MAX_RECORDS.get(self._detail, 1000)
         self._userLimit = get_query_parameter(self._queryParams, ['n', 'limit'], 0, integer=True)
         if self._userLimit > max_records:
-            raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s'" %
-                               (max_records, self._detail), 400)
+            raise HTTPAPIError(
+                f"You can only request up to {max_records} records per request with the detail level '{self._detail}'",
+                400
+            )
         self._limit = self._userLimit if self._userLimit > 0 else max_records
 
         fromDT = get_query_parameter(self._queryParams, ['f', 'from'])

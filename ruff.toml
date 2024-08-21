@@ -156,6 +156,9 @@ allow-dunder-method-names = [
     '__clause_element__',
 ]
 
+[lint.ruff]
+parenthesize-tuple-in-subscript = true
+
 [lint.per-file-ignores]
 # signals use wildcard imports to expose everything in `indico.core.signals`
 'indico/core/signals/event/__init__.py' = ['E402', 'F403', 'F401']
