@@ -57,13 +57,11 @@
     <div
         id="participant-list"
         data-tables="{{ tables | tojson | forceescape }}"
-        data-preview="{{ preview }}"
         data-event="{{ event }}"
         data-title="{{ page_title if not preview and page_title else '' }}"
         data-total-participant-count="{{ num_participants }}"
-        {% if published %}
-            data-published="true"
-        {% endif %}
+        {% if preview %} data-preview="{{ preview }}" {% endif %}
+        {% if published %} data-published {% endif %}
     ></div>
 
     <script>

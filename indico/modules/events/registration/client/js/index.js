@@ -159,7 +159,7 @@ import setupRegformSubmission from './form_submission';
       <ParticipantList
         tables={tables}
         totalParticipantCount={totalParticipantCount}
-        published={published}
+        published={published !== undefined}
         preview={preview}
         title={title}
       />,
