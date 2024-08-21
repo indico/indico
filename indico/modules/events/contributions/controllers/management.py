@@ -351,7 +351,7 @@ class RHContributionREST(RHManageContributionBase):
 
 class RHAPIContribution(RHManageContributionBase):
     def _process_GET(self):
-        return ContributionSchema().jsonify(self.contrib)
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 
     # @use_args(ContributionSchema)
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event, 'object': self.contrib})
@@ -363,7 +363,7 @@ class RHAPIContribution(RHManageContributionBase):
 
         # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
-        with track_location_changes():
+        with (track_time_changes(), track_location_changes()):
             # TODO: custom fields logs
             update_contribution(self.contrib, data)
 

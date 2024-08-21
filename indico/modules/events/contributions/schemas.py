@@ -22,10 +22,11 @@ from indico.modules.events.contributions.models.persons import ContributionPerso
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema, LocationDataSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.marshmallow import SortedList
+from indico.util.marshmallow import EventTimezoneDateTimeField, SortedList
 
 
 class BasicContributionSchema(mm.SQLAlchemyAutoSchema):
@@ -151,14 +152,25 @@ class ContribFieldValueSchema(mm.SQLAlchemyAutoSchema):
         return ContributionFieldValue(contribution_field_id=data['contribution_field_id'], data=data['data'])
 
 
+class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = SessionBlock
+        fields = ('start_dt', 'end_dt')
+
+    start_dt = EventTimezoneDateTimeField()
+    end_dt = EventTimezoneDateTimeField()
+
+
 class ContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
-        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords',
-                  'location_data', 'duration', 'references', 'custom_fields', 'person_links')
+        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
+                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'session_block')
 
+    start_dt = EventTimezoneDateTimeField()
     # TODO: filter inactive and resitricted contrib fields
     custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
     person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
     references = fields.List(fields.Nested(ContributionReferenceSchema))
     location_data = fields.Nested(LocationDataSchema)
+    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)

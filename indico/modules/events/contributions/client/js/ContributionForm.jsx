@@ -14,8 +14,10 @@ import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
 import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
+import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
 
 import {
@@ -26,12 +28,13 @@ import {
 } from 'indico/react/components';
 import {FinalContributionPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
-import {FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
+import {FinalDateTimePicker, FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
+import {toMoment} from 'indico/utils/date';
 
 function ContributionForm({
   eventId,
@@ -39,6 +42,8 @@ function ContributionForm({
   locationParent,
   customFields,
   onSubmit,
+  initialValues,
+  sessionBlock,
   loading,
   ...rest
 }) {
@@ -138,10 +143,44 @@ function ContributionForm({
   );
 
   return (
-    <FinalModalForm id="contribution-form" onSubmit={handleSubmit} size="small" {...rest}>
+    <FinalModalForm
+      id="contribution-form"
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      size="small"
+      {...rest}
+    >
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
-      <FinalDuration name="duration" label={Translate.string('Duration')} />
+      {initialValues.start_dt ? (
+        <>
+          <Field name="duration" subscription={{value: true}}>
+            {({input: {value: duration}}) => (
+              <FinalDateTimePicker
+                name="start_dt"
+                label={Translate.string('Start date')}
+                sessionBlock={sessionBlock}
+                minStartDt={sessionBlock && toMoment(sessionBlock.startDt)}
+                maxEndDt={sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second')}
+                required
+              />
+            )}
+          </Field>
+          <Field name="start_dt" subscription={{value: true}}>
+            {({input: {value: startDt}}) => (
+              <FinalDuration
+                name="duration"
+                label={Translate.string('Duration')}
+                max={
+                  sessionBlock && toMoment(sessionBlock.endDt).diff(toMoment(startDt), 'seconds')
+                }
+              />
+            )}
+          </Field>
+        </>
+      ) : (
+        <FinalDuration name="duration" label={Translate.string('Duration')} />
+      )}
       <FinalContributionPersonLinkField
         name="person_links"
         label={Translate.string('People')}
@@ -195,6 +234,8 @@ ContributionForm.propTypes = {
     })
   ),
   onSubmit: PropTypes.func.isRequired,
+  initialValues: PropTypes.object,
+  sessionBlock: PropTypes.object,
   loading: PropTypes.bool.isRequired,
 };
 
@@ -202,6 +243,8 @@ ContributionForm.defaultProps = {
   personLinkFieldParams: {},
   locationParent: {},
   customFields: [],
+  initialValues: {},
+  sessionBlock: null,
 };
 
 export function ContributionEditForm({eventId, contribId, onClose}) {
@@ -246,13 +289,14 @@ export function ContributionEditForm({eventId, contribId, onClose}) {
         loading
           ? {}
           : {
-              ...contrib,
+              ..._.omit(contrib, 'session_block'),
               custom_fields: Object.fromEntries(
                 contrib.custom_fields.map(field => [`field_${field.id}`, field.data])
               ),
               person_links: camelizeKeys(contrib.person_links),
             }
       }
+      sessionBlock={camelizeKeys(contrib?.session_block)}
       loading={loading}
     />
   );
