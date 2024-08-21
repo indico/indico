@@ -27,6 +27,8 @@ import {
   TableObj,
 } from './types';
 
+import './ParticipantAccordion.module.scss';
+
 function ParticipantCounter({totalCount, hiddenCount}: ParticipantCounterProps) {
   const participantCounterElement = (
     <span className="participants-count-wrapper">

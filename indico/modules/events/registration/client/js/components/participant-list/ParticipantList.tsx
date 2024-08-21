@@ -16,7 +16,7 @@ import {PluralTranslate, Translate, Plural, Singular, Param} from 'indico/react/
 import ParticipantAccordion from './ParticipantAccordion';
 import {ParticipantListProps} from './types';
 
-import './ParticipantAccordion.module.scss';
+import './ParticipantList.module.scss';
 
 // TODO: Implement this Jinja logic here
 // {% block title %} 💚
@@ -74,9 +74,14 @@ export default function ParticipantList({
       </Translate>
     );
     viewToggle = (
-      <Button href={participantListPreviewURL({event_id: eventId})} className="view-toggle">
-        <Translate>Show registered guest view instead.</Translate>
-      </Button>
+      <Button
+        basic
+        color="blue"
+        icon="user"
+        href={participantListPreviewURL({event_id: eventId})}
+        className="view-toggle"
+        content={<Translate>Show registered guest view instead.</Translate>}
+      />
     );
   } else if (preview) {
     description = (
@@ -86,11 +91,13 @@ export default function ParticipantList({
     );
     viewToggle = (
       <Button
+        basic
+        color="blue"
+        icon="user secret"
         href={participantListPreviewURL({event_id: eventId, guest: 1})}
         className="view-toggle"
-      >
-        <Translate>Show unregistered guest view instead.</Translate>
-      </Button>
+        content={<Translate>Show unregistered guest view instead.</Translate>}
+      />
     );
   } else if (tables.length > 1) {
     description = (
