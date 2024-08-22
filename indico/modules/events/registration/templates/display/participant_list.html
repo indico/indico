@@ -1,9 +1,7 @@
 {% if preview %}
     {% extends 'events/management/base.html' %}
-{% elif event.type == 'conference' %}
-    {% extends 'events/display/conference/base.html' %}
 {% else %}
-    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+    {% extends 'events/display/conference/base.html' %}
 {% endif %}
 
 {% block content %}

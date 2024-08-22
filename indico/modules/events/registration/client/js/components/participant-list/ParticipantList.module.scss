@@ -5,8 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+:global(.ui.header .content).header-text {
+  display: flex;
+}
+
 .header-text {
-  display: flex !important;
   align-items: center;
   position: relative;
 
