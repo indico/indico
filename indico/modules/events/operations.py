@@ -390,7 +390,7 @@ def update_event_privacy(event, data):
             'convert': lambda changes: [[dict(sorted(rec.items())) for rec in chg] for chg in changes]
         },
         'privacy_policy': {'title': 'Privacy policy', 'type': 'text'},
-        'hide_participants_from_other_forms': {'title': 'Hide participants from other forms', 'type': 'boolean'}
+        'hide_participants_from_other_forms': {'title': 'Hide participants from other forms', 'type': 'bool'}
     }
     assert set(data.keys()) <= log_fields.keys()
     changes = {}
