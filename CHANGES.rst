@@ -63,6 +63,7 @@ Internal Changes
   package metadata is specified using ``pyproject.toml``. Developers who want to build
   their own plugins need to switch from ``setup.py`` and/or ``setup.cfg`` to ``pyproject.toml``
   as well (:pr:`6477`)
+- Prevent timetable entries with zero/negative durations (:pr:`6420`)
 
 
 Version 3.3.3
