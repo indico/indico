@@ -173,7 +173,11 @@ def _extend_event_menu(sender, **kwargs):
                                  get_menu_entry_by_name('my_sessions', event).is_visible)
 
     def _visible_privacy_information(event):
-        return any(privacy_settings.get_all(event).values())
+        return any(
+            v
+            for k, v in privacy_settings.get_all(event).items()
+            if k in {'data_controller_name', 'data_controller_email', 'privacy_policy_urls', 'privacy_policy'}
+        )
 
     yield MenuEntryData(_('Overview'), 'overview', 'events.display_overview', position=0, static_site=True)
     yield MenuEntryData(_('My Conference'), 'my_conference', position=7, visible=_my_conference_visible)
