@@ -24,14 +24,18 @@ def upgrade():
         ALTER TABLE events.contributions DISABLE TRIGGER consistent_timetable;
     ''')
 
-    op.execute("UPDATE events.sessions SET default_contribution_duration = '1 minute' WHERE default_contribution_duration <= '0'")
-    op.execute("UPDATE events.session_blocks SET duration = '1 minute' WHERE duration <= '0'")
-    op.execute("UPDATE events.contributions SET duration = '1 minute' WHERE duration <= '0'")
+    op.execute('''
+        UPDATE events.sessions SET default_contribution_duration = '1 minute' WHERE default_contribution_duration <= '0';
+        UPDATE events.session_blocks SET duration = '1 minute' WHERE duration <= '0';
+        UPDATE events.contributions SET duration = '1 minute' WHERE duration <= '0';
+    ''')
     # Subcontributions and breaks are allowed to have a zero duration
-    op.execute("UPDATE events.breaks SET duration = '1 minute' WHERE duration < '0'")
-    op.execute("UPDATE events.subcontributions SET duration = '0' WHERE duration < '0'")
+    op.execute('''
+        UPDATE events.subcontributions SET duration = '0' WHERE duration < '0';
+        UPDATE events.breaks SET duration = '1 minute' WHERE duration < '0';
+    ''')
 
-    # After reseting the durations to a positive value, it is possible that some entries
+    # After resetting the durations to a positive value, it is possible that some entries
     # end after the parent block which must be fixed by extending the block duration.
     entry_ends_after_parent = '''
         FROM events.timetable_entries te
