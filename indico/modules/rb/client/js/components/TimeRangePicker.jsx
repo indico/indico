@@ -9,62 +9,62 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Dropdown} from 'semantic-ui-react';
 
+import {ComboBox} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
 
-const ARROW_KEYS = ['ArrowUp', 'ArrowDown', 'Up', 'Down'];
+// FIXME: Alignment of time options in the list
+
 const START_HOUR = '06:00';
+const ALLOWED_INPUT_FORMATS = ['HH:mm', 'HHmm', 'H:mm', 'Hmm'];
+const MIN_DURATION = moment.duration(30, 'minutes');
 
 function _humanizeDuration(duration) {
-  const hours = duration.hours();
   const minutes = duration.minutes();
-  if (hours === 1 && minutes === 0) {
-    return Translate.string('1 hour');
-  } else if (hours !== 0) {
-    return Translate.string('{time} hours', {time: hours + minutes / 60});
-  } else {
-    return Translate.string('{time} min', {time: minutes});
+  const hours = duration.hours() + minutes / 60;
+  if (hours < 1) {
+    return PluralTranslate.string('{time} min', '{time} min', minutes, {time: minutes});
   }
+  return PluralTranslate.string('{time} hour', '{time} hours', hours, {time: hours});
 }
 
 function generateStartTimeOptions(minTime) {
+  // The options for the start time is an array of strings.
+  // Even though the minTime is specified, it is capped at
+  // START_HOUR, so options before START_HOUR are not shown
+  // even though they are allowed.
   const options = [];
+  let next = moment.max(moment(START_HOUR, 'HH:mm'), minTime);
   const end = moment().endOf('day');
-  const next = moment(START_HOUR, 'HH:mm');
-
-  // eslint-disable-next-line no-unmodified-loop-condition
   while (next < end) {
-    const momentNext = moment(next);
-    const serializedNext = serializeTime(momentNext);
-    if (momentNext >= moment(minTime, 'HH:mm')) {
-      options.push({key: serializedNext, value: serializedNext, text: serializedNext});
-    }
-    next.add(30, 'm');
+    options.push(serializeTime(next));
+    next = next.add(MIN_DURATION);
   }
   return options;
 }
 
 function generateEndTimeOptions(start) {
+  // The labels for end time options include a duration
+  // so the option array contains objects with `value` and
+  // `label` properties. The end time options start 30
+  // minutes after the start time.
   const options = [];
   const end = moment().endOf('day');
-  const next = moment(start).add(30, 'm');
-  let duration;
-  // eslint-disable-next-line no-unmodified-loop-condition
+  let next = moment(start).add(MIN_DURATION);
   while (next < end) {
-    duration = _humanizeDuration(moment.duration(next.diff(start)));
-    const serializedNext = serializeTime(moment(next));
-    const text = (
+    const duration = _humanizeDuration(moment.duration(next.diff(start)));
+    const value = serializeTime(moment(next));
+    const label = (
       <div styleName="end-time-item">
-        {serializedNext} <span styleName="duration">({duration})</span>
+        {value} <span styleName="duration">({duration})</span>
       </div>
     );
-    options.push({key: serializedNext, value: serializedNext, text});
-    next.add(30, 'm');
+    options.push({value, label});
+    next = next.add(MIN_DURATION);
   }
   return options;
 }
@@ -86,16 +86,20 @@ export default class TimeRangePicker extends React.Component {
   constructor(props) {
     super(props);
 
-    const {startTime, endTime} = this.props;
+    const {startTime, endTime, minTime} = this.props;
     const duration = moment.duration(endTime.diff(startTime));
-    const startSearchQuery = serializeTime(moment(startTime));
-    const endSearchQuery = serializeTime(moment(endTime));
+    const startInputValue = serializeTime(moment(startTime));
+    const endInputValue = serializeTime(moment(endTime));
+    this.minTime = moment(minTime ?? '00:00', 'HH:mm');
     this.state = {
       startTime,
       endTime,
       duration,
-      startSearchQuery,
-      endSearchQuery,
+      startInputValue,
+      endInputValue,
+      startTimeOptions: generateStartTimeOptions(this.minTime || START_HOUR),
+      endTimeOptions: generateEndTimeOptions(startTime),
+      promptText: '',
     };
   }
 
@@ -103,161 +107,166 @@ export default class TimeRangePicker extends React.Component {
     return nextState !== this.state || !_.isEqual(this.props, nextProps);
   }
 
-  updateStartTime = (
-    event,
-    currentStartTime,
-    previousStartTime,
-    endTime,
-    duration,
-    startSearchQuery
-  ) => {
-    if (event.type === 'keydown' && ARROW_KEYS.includes(event.key)) {
-      this.setState({
-        startSearchQuery: currentStartTime,
-      });
-      return;
-    }
-    let start;
-    const {onChange, minTime} = this.props;
-    if (event.type === 'click') {
-      start = moment(currentStartTime, ['HH:mm', 'Hmm']);
-    } else {
-      start = moment(startSearchQuery, ['HH:mm', 'Hmm']);
-    }
-    if (!start.isValid()) {
-      this.setState({
-        startSearchQuery: serializeTime(previousStartTime),
-      });
-      return;
-    } else if (start < moment(minTime, 'HH:mm')) {
-      this.setState({
-        startSearchQuery: serializeTime(previousStartTime),
-      });
-      return;
-    }
-
-    let end = toMoment(endTime, 'HH:mm');
-    if (end.isSameOrBefore(start, 'minute')) {
-      end = moment(start).add(duration);
-      if (end > moment().endOf('day')) {
-        end = moment().endOf('day');
-        if (start.isSame(end, 'minute')) {
-          start = moment(end).subtract(duration);
-        }
-      }
-    } else {
-      duration = moment.duration(end.diff(start));
-    }
-    this.setState({
-      startTime: start,
-      endTime: end,
-      startSearchQuery: serializeTime(start),
-      endSearchQuery: serializeTime(end),
-      duration,
-    });
-    onChange(start, end);
+  parseUserInputAsTime = value => {
+    return moment(value, ALLOWED_INPUT_FORMATS, true);
   };
 
-  updateEndTime = (event, currentEndTime, previousEndTime, startTime, duration, endSearchQuery) => {
-    if (event.type === 'keydown' && ARROW_KEYS.includes(event.key)) {
-      this.setState({
-        endSearchQuery: currentEndTime,
-      });
-      return;
-    }
-    let end;
-    if (event.type === 'click') {
-      end = moment(currentEndTime, ['HH:mm', 'Hmm']);
-    } else {
-      end = moment(endSearchQuery, ['HH:mm', 'Hmm']);
-    }
-    if (!end.isValid()) {
-      this.setState({
-        endSearchQuery: serializeTime(previousEndTime),
-      });
-      return;
-    }
-    let start = toMoment(startTime, 'HH:mm');
-    const {onChange, minTime} = this.props;
-    if (end < moment(minTime, 'HH:mm')) {
-      this.setState({
-        endSearchQuery: serializeTime(previousEndTime),
-      });
-      return;
-    }
-    if (end.isSameOrBefore(start, 'minute')) {
-      start = moment(end).subtract(duration);
-      if (start < moment().startOf('day')) {
-        start = moment().startOf('day');
-        if (end.isSame(start, 'minute')) {
-          end = moment(start).add(duration);
-        }
-      } else if (start < moment(start, 'HH:mm')) {
-        this.setState({
-          endSearchQuery: serializeTime(previousEndTime),
-        });
-        return;
-      }
-    } else {
-      duration = moment.duration(end.diff(start));
-    }
+  // Set the new start time from user input
+  updateStartTime = evt => {
     this.setState({
-      startTime: start,
-      endTime: end,
-      startSearchQuery: serializeTime(start),
-      endSearchQuery: serializeTime(end),
-      duration,
+      startInputValue: evt.target.value,
     });
-    onChange(start, end);
+    const startTime = this.parseUserInputAsTime(evt.target.value);
+
+    if (!startTime.isValid()) {
+      return;
+    }
+
+    if (startTime < this.minTime) {
+      return;
+    }
+
+    this.setState({
+      startTime,
+      endTimeOptions: generateEndTimeOptions(startTime),
+      promptText: serializeTime(startTime),
+    });
+
+    const {onChange} = this.props;
+    const {endTime} = this.state;
+    onChange(startTime, endTime);
+  };
+
+  // Set the new end time from user input and optionally nudge the start time
+  updateEndTime = evt => {
+    this.setState({
+      endInputValue: evt.target.value,
+    });
+    const endTime = this.parseUserInputAsTime(evt.target.value);
+
+    if (!endTime.isValid()) {
+      return;
+    }
+
+    this.setState({
+      endTime,
+      promptText: serializeTime(endTime),
+    });
+
+    const {onChange} = this.props;
+    const {startTime} = this.state;
+    onChange(startTime, endTime);
+  };
+
+  // When user leaves the start time field, fix the time formatting
+  // and optionally adjust the end time.
+  fixStartTime = () => {
+    const {startTime} = this.state;
+
+    this.setState({
+      startInputValue: serializeTime(startTime),
+    });
+
+    // Do we need to nudge the end time?
+    let {endTime} = this.state;
+    if (startTime > endTime) {
+      const {duration} = this.state;
+      endTime = moment(startTime).add(duration);
+      this.setState({
+        endTime,
+        endInputValue: serializeTime(endTime),
+        promptText: Translate.string('end time is adjusted to {endTime}', {
+          endTime: serializeTime(endTime),
+        }),
+        duration: moment.duration(endTime.diff(startTime)),
+      });
+      const {onChange} = this.props;
+      onChange(startTime, endTime);
+    } else {
+      this.setState({
+        duration: moment.duration(endTime.diff(startTime)),
+      });
+    }
+  };
+
+  // When user leaves the end time field, fix the time formatting,
+  // and optionally adjust the start time.
+  fixEndTime = () => {
+    const {endTime} = this.state;
+
+    this.setState({
+      endInputValue: serializeTime(endTime),
+    });
+
+    // Do we need to nudge the start time?
+    let {startTime} = this.state;
+    if (endTime < startTime) {
+      const {duration} = this.state;
+      startTime = moment(endTime).subtract(duration);
+      if (startTime < this.minTime) {
+        startTime = moment(this.minTime);
+      }
+      this.setState({
+        startTime,
+        startInputValue: serializeTime(startTime),
+        promptText: Translate.string('start time is adjusted to {startTime}', {
+          startTime: serializeTime(startTime),
+        }),
+      });
+      const {onChange} = this.props;
+      onChange(startTime, endTime);
+    } else {
+      this.setState({
+        duration: moment.duration(endTime.diff(startTime)),
+      });
+    }
   };
 
   onStartSearchChange = event => {
     this.setState({
-      startSearchQuery: event.target.value,
+      startInputValue: event.target.value,
     });
   };
 
   onEndSearchChange = event => {
     this.setState({
-      endSearchQuery: event.target.value,
+      endInputValue: event.target.value,
     });
   };
 
   render() {
-    const {startTime, endTime, duration, startSearchQuery, endSearchQuery} = this.state;
-    const {disabled, minTime} = this.props;
-    const startOptions = generateStartTimeOptions(minTime || START_HOUR);
-    const endOptions = generateEndTimeOptions(startTime);
+    const {
+      startInputValue,
+      endInputValue,
+      startTimeOptions,
+      endTimeOptions,
+      promptText,
+    } = this.state;
+    const {disabled} = this.props;
+
     return (
       <div styleName="time-range-picker">
-        <Dropdown
-          options={startOptions}
-          search={() => startOptions}
-          icon={null}
-          selection
-          styleName="start-time-dropdown"
-          searchQuery={startSearchQuery}
-          onSearchChange={this.onStartSearchChange}
-          value={serializeTime(startTime)}
+        <ComboBox
+          onChange={this.updateStartTime}
+          onBlur={this.fixStartTime}
+          options={startTimeOptions}
+          value={startInputValue}
           disabled={disabled}
-          onChange={(event, {value}) => {
-            this.updateStartTime(event, value, startTime, endTime, duration, startSearchQuery);
-          }}
         />
-        <Dropdown
-          options={endOptions}
-          search={() => endOptions}
-          icon={null}
-          selection
-          styleName="end-time-dropdown"
-          searchQuery={endSearchQuery}
-          onSearchChange={this.onEndSearchChange}
-          value={serializeTime(endTime)}
+        <ComboBox
+          onChange={this.updateEndTime}
+          onBlur={this.fixEndTime}
+          options={endTimeOptions}
+          value={endInputValue}
           disabled={disabled}
-          onChange={(event, {value}) => {
-            this.updateEndTime(event, value, endTime, startTime, duration, endSearchQuery);
-          }}
         />
+
+        <div styleName="prompt" aria-live="polite">
+          {/* Prompt text is used to provide cues to the screen readers
+              about how the entered input is going to be interpreted
+              by the application. */}
+          {promptText}
+        </div>
       </div>
     );
   }

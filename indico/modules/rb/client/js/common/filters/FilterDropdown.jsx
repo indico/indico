@@ -151,6 +151,7 @@ export default class FilterDropdown extends React.Component {
     return (
       <Popup
         position="bottom left"
+        className="ui form"
         styleName="filter-dropdown"
         style={{maxWidth: 'unset'}}
         trigger={renderTrigger(title, renderedValue, counter, disabled)}
