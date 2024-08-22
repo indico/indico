@@ -503,6 +503,7 @@ Improvements
   module (:issue:`6503`, :pr:`6502`)
 - Add quick setup button to configure default notifications in Call for Abstracts
   (:pr:`6454`, thanks :user:`jbtwist`)
+- Expose registration form image data for use in the check-in app (:pr:`6506`)
 
 Bugfixes
 ^^^^^^^^
