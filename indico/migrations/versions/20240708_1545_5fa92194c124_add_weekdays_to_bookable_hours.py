@@ -23,7 +23,8 @@ def upgrade():
     op.drop_constraint('pk_room_bookable_hours', 'room_bookable_hours', schema='roombooking')
     op.create_primary_key(None, 'room_bookable_hours', ['id'], schema='roombooking')
     op.create_check_constraint(
-        'valid_weekdays', 'room_bookable_hours', "weekday IN ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')",
+        'valid_weekdays', 'room_bookable_hours',
+        "weekday::text IN ('mon'::text, 'tue'::text, 'wed'::text, 'thu'::text, 'fri'::text, 'sat'::text, 'sun'::text)",
         schema='roombooking'
     )
     op.create_index(None, 'room_bookable_hours', ['room_id', 'start_time', 'end_time', 'weekday'], unique=True,
