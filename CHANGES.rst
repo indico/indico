@@ -23,6 +23,7 @@ Improvements
   unbookable on any other weekdays (:pr:`6439`)
 - Add global settings for min/max registration form data retention periods (:pr:`6445`,
   thanks :user:`SegiNyn`)
+- Expose registration form image data for use in the check-in app (:pr:`6506`)
 
 Bugfixes
 ^^^^^^^^
