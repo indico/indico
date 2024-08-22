@@ -101,8 +101,13 @@ export default function ParticipantList({
             </Plural>
           </PluralTranslate>
         </HeaderSubHeader>
-        <Divider />
-        {description && <HeaderSubHeader content={description} />}
+        {
+          description &&
+          <>
+            <Divider />
+            <HeaderSubHeader content={description} />
+          </>
+        }
       </Header>
       {viewToggle}
       <ParticipantAccordion
