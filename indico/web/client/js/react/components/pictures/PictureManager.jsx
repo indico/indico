@@ -196,7 +196,8 @@ const PictureManager = ({
 
   const onImageCrop = () => {
     if (cropperRef.current.cropper !== undefined) {
-      const imageSrc = cropperRef.current.cropper.getCroppedCanvas().toDataURL();
+      const settings = {minWidth: 25, minHeight: 25};
+      const imageSrc = cropperRef.current.cropper.getCroppedCanvas(settings).toDataURL();
       setPicturePreview(imageSrc);
       fetch(imageSrc)
         .then(res => res.blob())
