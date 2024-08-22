@@ -37,6 +37,19 @@ export default function ParticipantTable({table}: {table: TableObj}) {
   const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
   const [sortedRows, setSortedRows] = useState([...table.rows]);
 
+  // TODO: Replace this logic with a better datastructure.
+  const isColumnSortable = (colIndex: number) => {
+    const { rows } = table
+
+    if (!rows?.length) {
+      return false;
+    }
+    
+    // More conditions could be added, but by that time I hope we have replaced the
+    // data structure coming from the back-end, which does not make sense.
+    return !table.rows[0].columns[colIndex].is_picture
+  }
+
   const handleSort = (column: number | string | null) => {
     const directions: Record<sortDirectionType, sortDirectionType> = {
       [null as sortDirectionType]: 'ascending',
@@ -79,7 +92,8 @@ export default function ParticipantTable({table}: {table: TableObj}) {
         <TableRow>
           {table.show_checkin && ( // For checkin status
             <TableHeaderCell
-              width={1}
+              width={3}
+              textAlign="center"
               className="participant-table-row"
               onClick={() => handleSort('checked_in')}
               sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
@@ -87,18 +101,23 @@ export default function ParticipantTable({table}: {table: TableObj}) {
               <Icon name="ticket" />
             </TableHeaderCell>
           )}
-          {table.headers.map((headerText: string, i: number) => (
-            <TableHeaderCell
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              className="participant-table-row"
-              onClick={() => handleSort(i)}
-              sorted={sortColumn === i ? sortDirection : undefined}
-              title={headerText}
-            >
-              <p>{headerText}</p>
-            </TableHeaderCell>
-          ))}
+          {table.headers.map((headerText: string, i: number) => {
+            const isSortable = isColumnSortable(i);
+
+            return (
+              <TableHeaderCell
+                // eslint-disable-next-line react/no-array-index-key
+                key={i}
+                width={5}
+                className="participant-table-row"
+                onClick={isSortable ? () => handleSort(i) : undefined}
+                sorted={isSortable && sortColumn === i ? sortDirection : undefined}
+                title={`${headerText} ${!isSortable ? '(Not sortable)' : ''}`}
+              >
+                <p>{headerText}</p>
+              </TableHeaderCell>
+            )
+          })}
         </TableRow>
       </TableHeader>
       <TableBody>
