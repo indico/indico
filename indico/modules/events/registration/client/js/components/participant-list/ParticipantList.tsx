@@ -80,7 +80,9 @@ export default function ParticipantList({
                 position="bottom center"
                 content={<Translate>Back</Translate>}
                 trigger={
-                  <a href={manageRegFormListURL({event_id: eventId})} className="back-button">
+                  <a 
+                    href={manageRegFormListURL({event_id: eventId})}
+                  >
                     <Icon name="chevron left" color="grey" size="small" />
                   </a>
                 }

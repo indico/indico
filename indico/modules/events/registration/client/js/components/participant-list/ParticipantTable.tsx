@@ -130,7 +130,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
               // eslint-disable-next-line react/no-array-index-key
               <TableCell key={i} title={col.text}>
                 {col.is_picture && col.text ? (
-                  <img src={col.text} alt={col.text} className="cell-img" />
+                  <img src={col.text} alt={col.text} styleName="cell-img" />
                 ) : (
                   col.text
                 )}

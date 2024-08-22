@@ -93,6 +93,10 @@ overrides:
       - 'plugin:@typescript-eslint/strict'
       - 'plugin:@typescript-eslint/stylistic'
       - 'plugin:import/typescript'
+  - files: ["*.d.ts"]
+    rules:
+      import/unambiguous: off
+      @typescript-eslint/no-unused-vars: off
 
 globals:
   Indico: false

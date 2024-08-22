@@ -24,6 +24,6 @@
   }
 }
 
-.view-toggle {
-  margin-bottom: 10px !important;
+:global(section .ui.button).view-toggle {
+  margin-bottom: 10px;
 }
