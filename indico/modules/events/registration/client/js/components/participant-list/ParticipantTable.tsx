@@ -39,16 +39,11 @@ export default function ParticipantTable({table}: {table: TableObj}) {
 
   // TODO: Replace this logic with a better datastructure.
   const isColumnSortable = (colIndex: number) => {
-    const { rows } = table
-
-    if (!rows?.length) {
-      return false;
-    }
-    
+    const {rows} = table;
     // More conditions could be added, but by that time I hope we have replaced the
     // data structure coming from the back-end, which does not make sense.
-    return !table.rows[0].columns[colIndex].is_picture
-  }
+    return !rows || !rows.length || !rows[0].columns[colIndex].is_picture;
+  };
 
   const handleSort = (column: number | string | null) => {
     const directions: Record<sortDirectionType, sortDirectionType> = {
@@ -116,7 +111,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
               >
                 <p>{headerText}</p>
               </TableHeaderCell>
-            )
+            );
           })}
         </TableRow>
       </TableHeader>
