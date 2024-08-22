@@ -41,7 +41,7 @@ export default function ParticipantList({
         color="blue"
         icon="user"
         href={participantListPreviewURL({event_id: eventId})}
-        className="view-toggle"
+        styleName="view-toggle"
         content={<Translate>Show registered guest view instead.</Translate>}
       />
     );
@@ -57,7 +57,7 @@ export default function ParticipantList({
         color="blue"
         icon="user secret"
         href={participantListPreviewURL({event_id: eventId, guest: 1})}
-        className="view-toggle"
+        styleName="view-toggle"
         content={<Translate>Show unregistered guest view instead.</Translate>}
       />
     );
@@ -73,7 +73,7 @@ export default function ParticipantList({
   return (
     <section>
       <Header as="h2" color="blue">
-        <HeaderContent className="header-text">
+        <HeaderContent styleName="header-text">
           {preview ? (
             <>
               <Popup

@@ -5,12 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-:global(.participants-count-wrapper) {
+.participants-count-wrapper {
   display: flex;
   gap: 5px;
 }
 
-:global(.accordion-title) {
+.accordion-title {
   display: flex;
   align-items: baseline;
   gap: 10px;

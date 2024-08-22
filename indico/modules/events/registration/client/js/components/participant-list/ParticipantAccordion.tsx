@@ -65,7 +65,7 @@ function ParticipantAccordionItem({
         <AccordionTitle
           active={isActive}
           onClick={collapsible ? handleClick : undefined}
-          className="accordion-title"
+          styleName="accordion-title"
         >
           {collapsible && <Icon name="dropdown" />}
           <p>{table.title || <Translate>Participants</Translate>}</p>

@@ -5,13 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-:global(img.cell-img) {
+img.cell-img {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: contain;
 }
 
-:global(table.ui.sortable > thead > tr > th.participant-table-row) {
+.participant-table-row {
   position: relative;
 
   > p {

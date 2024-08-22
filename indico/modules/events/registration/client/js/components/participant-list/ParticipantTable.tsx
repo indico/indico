@@ -89,7 +89,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
             <TableHeaderCell
               width={3}
               textAlign="center"
-              className="participant-table-row"
+              styleName="participant-table-row"
               onClick={() => handleSort('checked_in')}
               sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
             >
@@ -104,7 +104,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 width={5}
-                className="participant-table-row"
+                styleName="participant-table-row"
                 onClick={isSortable ? () => handleSort(i) : undefined}
                 sorted={isSortable && sortColumn === i ? sortDirection : undefined}
                 title={`${headerText} ${!isSortable ? '(Not sortable)' : ''}`}
