@@ -13,7 +13,8 @@ from indico.util.string import format_repr
 class BookableHours(db.Model):
     __tablename__ = 'room_bookable_hours'
     __table_args__ = (
-        db.CheckConstraint("weekday IN ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')", 'valid_weekdays'),
+        db.CheckConstraint("weekday::text IN ('mon'::text, 'tue'::text, 'wed'::text, 'thu'::text, 'fri'::text, "
+                           "'sat'::text, 'sun'::text)", 'valid_weekdays'),
         db.Index(None, 'room_id', 'start_time', 'end_time', 'weekday', unique=True),
         {'schema': 'roombooking'}
     )
