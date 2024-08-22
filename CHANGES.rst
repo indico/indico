@@ -225,6 +225,7 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
+- Improve time picker accessibility in the Room Booking module (thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

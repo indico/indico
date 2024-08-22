@@ -62,6 +62,7 @@ ind-combo-box {
     @include sui_debt.input-border();
     @include sui_debt.input-background();
     @include sui_debt.box-shadow();
+    @include sui_debt.missing-geometry-reset();
   }
 
   [role='listbox']:not([data-top]) {
@@ -85,6 +86,7 @@ ind-combo-box {
     @include sui_debt.input-padding();
     list-style: none;
     color: var(--text-color);
+    text-align: left;
 
     &:not([aria-selected='true']) {
       cursor: pointer;

@@ -57,3 +57,10 @@
 .filter-dropdown-footer:global(.ui.buttons) {
   margin-top: 10px;
 }
+
+.form-container {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.2em;
+}

@@ -90,6 +90,13 @@
   }
 }
 
+@mixin missing-geometry-reset() {
+  & {
+    padding: 0;
+    margin: 0;
+  }
+}
+
 @mixin nested-input-font-weight {
   @include field-override() {
     label input {
