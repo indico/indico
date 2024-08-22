@@ -7,6 +7,14 @@
 :global(table.ui.sortable > thead > tr > th.participant-table-row) {
   position: relative;
 
+  > p {
+    line-height: 1em;
+    display: inline-block;
+    width: calc(100% - 10px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   &::after {
     position: absolute;
     right: 10px;

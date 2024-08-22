@@ -96,7 +96,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
               sorted={sortColumn === i ? sortDirection : undefined}
               title={headerText}
             >
-              {headerText}
+              <p>{headerText}</p>
             </TableHeaderCell>
           ))}
         </TableRow>
