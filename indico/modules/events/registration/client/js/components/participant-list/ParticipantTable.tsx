@@ -105,10 +105,10 @@ export default function ParticipantTable({table}: {table: TableObj}) {
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 width={3}
-                styleName="participant-table-row"
+                styleName={`participant-table-row ${isSortable ? '' : 'unsortable'}`}
                 onClick={isSortable ? () => handleSort(i) : undefined}
                 sorted={isSortable && sortColumn === i ? sortDirection : undefined}
-                title={`${headerText} ${!isSortable ? `(${Translate.string('Not sortable')})` : ''}`}
+                title={headerText}
               >
                 <p>{headerText}</p>
               </TableHeaderCell>

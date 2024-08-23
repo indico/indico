@@ -26,4 +26,10 @@
     position: absolute;
     right: 10px;
   }
+
+  &:not(.unsortable):not(:global(.sorted))::after {
+    display: inline-block !important;
+    content: '\f0dc' !important;
+    opacity: 0.4 !important;
+  }
 }
