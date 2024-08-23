@@ -17,11 +17,22 @@ import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
 import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm} from 'semantic-ui-react';
+import {
+  Button,
+  Icon,
+  Loader,
+  Checkbox,
+  Message,
+  Dropdown,
+  Confirm,
+  Popup,
+  Label,
+} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -390,13 +401,28 @@ function EditableListDisplay({
     return <div>{title}</div>;
   };
   const renderStatus = (editable, rowIndex) => {
+    let updated = false;
+    if (editable) {
+      const lastUpdate = localStorage.getItem(`editable-${editable.id}-last-update`);
+      if (lastUpdate) {
+        updated = moment(lastUpdate).isBefore(editable.lastUpdateDt);
+      }
+    }
     return (
-      <StateIndicator
-        state={editable ? editable.state : 'not_submitted'}
-        circular
-        label
-        monochrome={!filteredSet.has(sortedList[rowIndex].id)}
-      />
+      <>
+        <StateIndicator
+          state={editable ? editable.state : 'not_submitted'}
+          circular
+          label
+          monochrome={!filteredSet.has(sortedList[rowIndex].id)}
+        />
+        {updated && (
+          <Popup
+            trigger={<Label size="mini" color="red" icon="exclamation" corner />}
+            content={Translate.string('There has been an update to the latest revision')}
+          />
+        )}
+      </>
     );
   };
   const renderFuncs = {

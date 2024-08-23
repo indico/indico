@@ -156,6 +156,10 @@ class Editable(db.Model):
                 .order_by(EditingRevision.created_dt.desc())
                 .first())
 
+    @property
+    def last_update_dt(self):
+        return self.latest_revision.last_update_dt if self.latest_revision else None
+
     def _has_general_editor_permissions(self, user):
         """Whether the user has general editor permissions on the Editable.
 

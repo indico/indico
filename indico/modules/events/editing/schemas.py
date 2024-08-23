@@ -204,7 +204,8 @@ class EditableSchema(mm.SQLAlchemyAutoSchema):
         model = Editable
         fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'review_conditions_valid',
                   'can_perform_editor_actions', 'can_perform_submitter_actions', 'can_create_internal_comments',
-                  'can_unassign', 'can_assign_self', 'can_delete', 'editing_enabled', 'state', 'has_published_revision')
+                  'can_unassign', 'can_assign_self', 'can_delete', 'editing_enabled', 'state', 'has_published_revision',
+                  'last_update_dt')
 
     contribution = fields.Nested(BasicContributionSchema)
     editor = fields.Nested(EditingUserSchema)
@@ -248,7 +249,7 @@ class EditableDumpSchema(EditableSchema):
 class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count', 'tags')
+        fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count', 'tags', 'last_update_dt')
 
     state = EnumField(EditableState)
     editor = fields.Nested(EditingUserSchema)
