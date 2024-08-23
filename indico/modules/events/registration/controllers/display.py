@@ -245,7 +245,7 @@ class ParticipantListMixin:
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
-        if registration_settings.get(self.event, 'merge_registration_forms'):
+        if merged := bool(registration_settings.get(self.event, 'merge_registration_forms')):
             tables = [self._merged_participant_list_table(is_participant)]
         else:
             tables = []
@@ -269,6 +269,7 @@ class ParticipantListMixin:
             self.event,
             preview=self.preview,
             tables=tables,
+            merged=merged,
             published=bool(regforms),
             num_participants=num_participants
         )
