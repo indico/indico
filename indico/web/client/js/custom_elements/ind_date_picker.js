@@ -62,8 +62,12 @@ customElements.define(
         get: () => parseDate(input.value),
       });
 
-      openCalendarButton.addEventListener('click', open);
-      input.addEventListener('click', open);
+      openCalendarButton.addEventListener('click', () => {
+        // Disable the button to prevent re-opening when clicking
+        // the button while the dialog is open
+        openCalendarButton.disabled = true;
+        openDialog(indCalendar, input);
+      });
       indCalendar.addEventListener('close', () => {
         openCalendarButton.disabled = false;
       });
@@ -91,13 +95,6 @@ customElements.define(
       this.addEventListener('x-attrchange.max', function() {
         indCalendar.max = indDatePicker.max;
       });
-
-      function open() {
-        // Disable the button to prevent re-opening when clicking
-        // the button while the dialog is open
-        openCalendarButton.disabled = true;
-        openDialog(indCalendar, input);
-      }
     }
   }
 );
@@ -178,9 +175,12 @@ customElements.define(
       rangeEndInput.addEventListener('input', () => {
         indCalendar.rangeEnd = parseDate(rangeEndInput.value);
       });
-      openCalendarButton.addEventListener('click', open);
-      rangeStartInput.addEventListener('click', open);
-      rangeEndInput.addEventListener('click', open);
+      openCalendarButton.addEventListener('click', () => {
+        // Disable the button to prevent re-opening when clicking
+        // the button while the dialog is open
+        openCalendarButton.disabled = true;
+        openDialog(indCalendar, rangeStartInput);
+      });
       indCalendar.addEventListener('close', () => {
         openCalendarButton.disabled = false;
       });
@@ -214,8 +214,7 @@ customElements.define(
           indCalendar.min = this.rangeStartMin;
           indCalendar.max = this.rangeStartMax;
           indCalendar.open = false;
-          rangeEndInput.focus();
-          rangeEndInput.select();
+          openCalendarButton.focus();
           nextFieldIsRangeStart = true;
           rangeEndInput.dispatchEvent(new Event('input', {bubbles: true}));
         }
@@ -227,13 +226,6 @@ customElements.define(
         if (evt.code === 'ArrowDown' && evt.altKey) {
           openDialog(indCalendar, rangeStartInput);
         }
-      }
-
-      function open() {
-        // Disable the button to prevent re-opening when clicking
-        // the button while the dialog is open
-        openCalendarButton.disabled = true;
-        openDialog(indCalendar, rangeStartInput);
       }
     }
   }
@@ -663,11 +655,14 @@ customElements.define(
           calendarButtons.forEach((calendarButton, i) => {
             const date = new Date(firstDayOfCalendar);
             date.setDate(date.getDate() + i);
-            const currentMonth = date.getMonth() === calendarMonth;
+            const belongsToCurrentMonth = date.getMonth() === calendarMonth;
+            const isRenderable = !indDateGrid.hideDatesFromOtherMonths || belongsToCurrentMonth;
 
-            if (!currentMonth && indDateGrid.hideDatesFromOtherMonths) {
+            calendarButton.dataset.currentMonth = belongsToCurrentMonth;
+            calendarButton.disabled = !isRenderable;
+
+            if (!isRenderable) {
               calendarButton.textContent = '';
-              calendarButton.dataset.currentMonth = false;
               calendarButton.removeAttribute('aria-label');
               calendarButton.removeAttribute('aria-selected');
               calendarButton.removeAttribute('data-week');
@@ -681,7 +676,6 @@ customElements.define(
 
             // Upate button attributes
             calendarButton.textContent = date.getDate();
-            calendarButton.dataset.currentMonth = date.getMonth() === calendarMonth;
             calendarButton.setAttribute(
               'aria-label',
               date.toLocaleDateString(indDateGrid.locale, {
