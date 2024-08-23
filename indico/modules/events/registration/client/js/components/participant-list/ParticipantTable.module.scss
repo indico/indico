@@ -19,9 +19,9 @@
   position: relative;
 
   > p {
+    width: 100%;
     line-height: 1em;
     display: inline-block;
-    width: calc(100% - 10px);
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -31,9 +31,15 @@
     right: 10px;
   }
 
-  &:not(.unsortable):not(:global(.sorted))::after {
-    display: inline-block !important;
-    content: '\f0dc' !important;
-    opacity: 0.4 !important;
+  &:not(.unsortable) {
+    > p {
+      width: calc(100% - 12px);
+    }
   }
+}
+
+:global(.ui.sortable.table) .participant-table-row:not(.unsortable):not(:global(.sorted))::after {
+  display: inline-block;
+  content: '\f0dc';
+  opacity: 0.4;
 }
