@@ -16,11 +16,11 @@
         data-total-participant-count="{{ num_participants }}"
         data-event-id="{{ event.id }}"
         {% if merged %} data-merged {% endif %}
+        {% if published %} data-published {% endif %}
         {% if preview %}
             style="margin-top: 20px;"
             data-preview="{{ preview }}"
         {% endif %}
-        {% if published %} data-published {% endif %}
     ></div>
 
     <script>
