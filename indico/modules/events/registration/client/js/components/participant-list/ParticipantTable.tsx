@@ -37,7 +37,6 @@ export default function ParticipantTable({table}: {table: TableObj}) {
   const [sortDirection, setSortDirection] = useState<sortDirectionType>(null);
   const [sortedRows, setSortedRows] = useState([...table.rows]);
 
-  // TODO: Replace this logic with a better datastructure.
   const isColumnSortable = (colIndex: number) => {
     const {rows} = table;
     // More conditions could be added, but by that time I hope we have replaced the
