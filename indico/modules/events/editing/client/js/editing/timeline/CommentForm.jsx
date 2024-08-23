@@ -33,14 +33,14 @@ export default function CommentForm({
   const onCommentClickHandler = () => {
     if (!commentFormVisible) {
       setCommentFormVisible(true);
-      onToggleExpand && onToggleExpand(true);
+      onToggleExpand(true);
     }
   };
   const handleSubmit = async (formData, form) => {
     const rv = await onSubmit(formData, form);
     if (!rv) {
       setCommentFormVisible(false);
-      onToggleExpand && onToggleExpand(false);
+      onToggleExpand(false);
     }
   };
 
@@ -85,7 +85,7 @@ export default function CommentForm({
                     content={Translate.string('Cancel')}
                     onClick={() => {
                       setCommentFormVisible(false);
-                      onToggleExpand && onToggleExpand(false);
+                      onToggleExpand(false);
                       fprops.form.reset();
                     }}
                   />
@@ -116,6 +116,6 @@ CommentForm.defaultProps = {
     internal: false,
   },
   expanded: false,
-  onToggleExpand: null,
+  onToggleExpand: () => {},
   onTextAreaChange: null,
 };
