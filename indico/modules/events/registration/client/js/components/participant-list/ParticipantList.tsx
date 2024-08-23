@@ -43,7 +43,7 @@ export default function ParticipantList({
         icon="user"
         href={participantListPreviewURL({event_id: eventId})}
         styleName="view-toggle"
-        content={<Translate>Show registered guest view instead.</Translate>}
+        content={<Translate>Show registered participant view instead.</Translate>}
       />
     );
   } else if (preview) {
