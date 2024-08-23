@@ -10,12 +10,6 @@ import {topBottomPosition} from 'indico/utils/positioning';
 
 import './ind_combobox.scss';
 
-function setNativeInputValue(input, value) {
-  // React adds its own setter to the input and messes with the native event mechanism.
-  // In order for the value to be set in a standard way, we need to resort to this hack.
-  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value);
-}
-
 customElements.define(
   'ind-combo-box',
   class extends CustomElementBase {
@@ -263,7 +257,7 @@ customElements.define(
         // Omit the option to clear the selection and reset the input
         deselectCurrentSelection();
         option?.setAttribute('aria-selected', true);
-        setNativeInputValue(input, option?.dataset.value);
+        CustomElementBase.setValue(input, option?.dataset.value);
       }
 
       function moveVirtualCursorToOption(option) {

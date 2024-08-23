@@ -6,6 +6,15 @@
 // LICENSE file for more details.
 
 export default class CustomElementBase extends HTMLElement {
+  static setValue = (element, value) => {
+    // This is a hack to bypass the setter that React adds to the
+    // value property. Apparently, modifying a value before firing
+    // an event will cause React to not handle the event at all,
+    // probably because it expects values to only ever be modified
+    // through React.
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, value);
+  };
+
   connectedCallback() {
     // Custom elements may get temporarily disconnected. Since the
     // setup method may run operations that should not be repeated
