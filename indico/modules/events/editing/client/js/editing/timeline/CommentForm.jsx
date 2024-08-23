@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Form as FinalForm} from 'react-final-form';
+import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Button, Form} from 'semantic-ui-react';
 
@@ -55,12 +55,17 @@ export default function CommentForm({
           <Form onSubmit={fprops.handleSubmit}>
             <InputComponent
               {...inputProps}
-              {...(commentFormVisible && {onTextAreaChange})}
               onFocus={onCommentClickHandler}
               name="text"
               placeholder={Translate.string('Leave a comment...')}
               hideValidationError
               required
+            />
+            <FormSpy
+              subscription={{values: true}}
+              onChange={({values}) => {
+                commentFormVisible && onTextAreaChange ? onTextAreaChange(values.text) : null;
+              }}
             />
             {commentFormVisible && (
               <>
@@ -102,6 +107,7 @@ CommentForm.propTypes = {
     internal: PropTypes.bool,
   }),
   expanded: PropTypes.bool,
+  onTextAreaChange: PropTypes.func,
 };
 
 CommentForm.defaultProps = {
@@ -110,4 +116,5 @@ CommentForm.defaultProps = {
     internal: false,
   },
   expanded: false,
+  onTextAreaChange: null,
 };

@@ -87,10 +87,6 @@ export default function ReviewForm() {
   const [textAreaValue, setTextAreaValue] = useState('');
   const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
 
-  const handleTextAreaChange = value => {
-    setTextAreaValue(value);
-  };
-
   const createComment = async (formData, form) => {
     const rv = await dispatch(createRevisionComment(lastRevision.createCommentURL, formData));
     if (rv.error) {
@@ -115,7 +111,7 @@ export default function ReviewForm() {
       <CommentForm
         onSubmit={createComment}
         onToggleExpand={setCommentFormVisible}
-        onTextAreaChange={handleTextAreaChange}
+        onTextAreaChange={setTextAreaValue}
       />
       {canPerformSubmitterActions && canReview && !editor && (
         <>
@@ -133,7 +129,7 @@ export default function ReviewForm() {
           />
         </>
       )}
-      {canJudge && (
+      {commentFormVisible && canJudge && (
         <div className="review-trigger flexrow">
           <span className="comment-or-review">
             <Translate>or</Translate>
@@ -180,7 +176,7 @@ export default function ReviewForm() {
           {!judgmentType && judgmentForm}
           <FinalForm
             initialValues={{
-              comment: '',
+              comment: textAreaValue,
               tags: lastRevision.tags
                 .filter(t => !t.system)
                 .map(t => t.id)

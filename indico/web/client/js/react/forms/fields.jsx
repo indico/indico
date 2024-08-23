@@ -470,14 +470,7 @@ FinalInput.defaultProps = {
 /**
  * Like `FinalField` but with extra features for ``<textarea>`` fields.
  */
-export function FinalTextArea({name, label, nullIfEmpty, action, onTextAreaChange, ...rest}) {
-  const handleChange = event => {
-    const value = event.target.value;
-    if (onTextAreaChange) {
-      onTextAreaChange(value);
-    }
-  };
-
+export function FinalTextArea({name, label, nullIfEmpty, action, ...rest}) {
   return (
     <FinalField
       name={name}
