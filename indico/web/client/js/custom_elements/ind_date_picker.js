@@ -63,7 +63,7 @@ customElements.define(
         openCalendarButton.focus();
       });
       indCalendar.addEventListener('x-select', () => {
-        setNativeInputValue(input, formatDate(dateFormat, new Date(indCalendar.value)));
+        CustomElementBase.setValue(input, formatDate(dateFormat, new Date(indCalendar.value)));
         input.select();
         input.focus();
         input.dispatchEvent(new Event('input', {bubbles: true}));
@@ -438,14 +438,6 @@ customElements.define(
     }
   }
 );
-
-// React hacks
-
-function setNativeInputValue(input, value) {
-  // React adds its own setter to the input and messes with the native event mechanism.
-  // In order for the value to be set in a standard way, we need to resort to this hack.
-  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value);
-}
 
 // Date functions
 
