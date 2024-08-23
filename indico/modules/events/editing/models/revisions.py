@@ -176,3 +176,8 @@ class EditingRevision(RenderModeMixin, db.Model):
     @property
     def is_editor_revision(self):
         return self.type.is_editor_action
+
+    @property
+    def last_update_dt(self):
+        latest_comment_dt = max((comment.modified_dt or comment.created_dt for comment in self.comments), default=None)
+        return latest_comment_dt or self.modified_dt or self.created_dt
