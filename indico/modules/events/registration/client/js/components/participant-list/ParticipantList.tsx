@@ -26,6 +26,7 @@ export default function ParticipantList({
   preview,
   title,
   eventId,
+  merged,
 }: ParticipantListProps) {
   let description, viewToggle;
 
@@ -101,19 +102,19 @@ export default function ParticipantList({
             </Plural>
           </PluralTranslate>
         </HeaderSubHeader>
-        {
-          description &&
+        {description && (
           <>
             <Divider />
             <HeaderSubHeader content={description} />
           </>
-        }
+        )}
       </Header>
       {viewToggle}
       <ParticipantAccordion
         published={published}
         totalParticipantCount={totalParticipantCount}
         tables={tables}
+        merged={merged}
       />
     </section>
   );

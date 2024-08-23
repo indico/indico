@@ -31,7 +31,7 @@ import './ParticipantAccordion.module.scss';
 
 function ParticipantCounter({totalCount, hiddenCount}: ParticipantCounterProps) {
   const participantCounterElement = (
-    <span className="participants-count-wrapper">
+    <span styleName="participants-count-wrapper">
       {totalCount} <Icon name="user" />
     </span>
   );
@@ -86,6 +86,7 @@ export default function ParticipantAccordion({
   published,
   totalParticipantCount,
   tables,
+  merged,
 }: ParticipantAccordionProps) {
   let infoContent: ReactNode;
 
@@ -108,14 +109,15 @@ export default function ParticipantAccordion({
 
   return (
     <Accordion fluid>
-      {tables.length === 1 ? (
-        <ParticipantAccordionItem table={tables[0]} collapsible={false} noTitle />
-      ) : (
-        tables.map((table: TableObj, i: number) => (
+      {tables.map((table: TableObj, i: number) => (
+        <ParticipantAccordionItem
           // eslint-disable-next-line react/no-array-index-key
-          <ParticipantAccordionItem key={i} table={table} />
-        ))
-      )}
+          key={i}
+          collapsible={tables.length !== 1}
+          table={table}
+          noTitle={merged}
+        />
+      ))}
     </Accordion>
   );
 }

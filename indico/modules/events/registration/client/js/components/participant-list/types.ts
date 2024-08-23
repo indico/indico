@@ -27,6 +27,7 @@ export interface TableObj {
 
 export interface ParticipantListProps {
   published: boolean;
+  merged: boolean;
   totalParticipantCount: number;
   tables: TableObj[];
   title: string;
@@ -38,6 +39,7 @@ export interface ParticipantAccordionProps {
   totalParticipantCount: number;
   published: boolean;
   tables: TableObj[];
+  merged?: boolean;
 }
 
 export interface ParticipantAccordionItemProps {

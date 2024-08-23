@@ -15,8 +15,11 @@
         data-title="{{ page_title if not preview and page_title else '' }}"
         data-total-participant-count="{{ num_participants }}"
         data-event-id="{{ event.id }}"
-        {% if preview %} style="margin-top: 20px;" {% endif %}
-        {% if preview %} data-preview="{{ preview }}" {% endif %}
+        {% if merged %} data-merged {% endif %}
+        {% if preview %}
+            style="margin-top: 20px;"
+            data-preview="{{ preview }}"
+        {% endif %}
         {% if published %} data-published {% endif %}
     ></div>
 
