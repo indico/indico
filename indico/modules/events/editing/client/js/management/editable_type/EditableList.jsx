@@ -22,17 +22,7 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {
-  Button,
-  Icon,
-  Loader,
-  Checkbox,
-  Message,
-  Dropdown,
-  Confirm,
-  Popup,
-  Label,
-} from 'semantic-ui-react';
+import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm, Popup} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -378,8 +368,27 @@ function EditableListDisplay({
     );
   };
 
+  const renderId = (id, editable) => {
+    if (editable) {
+      const lastUpdate = localStorage.getItem(`editable-${editable.id}-last-update`);
+      if (lastUpdate && moment(lastUpdate).isBefore(editable.lastUpdateDt)) {
+        return (
+          <Popup
+            trigger={
+              <div styleName="id-cell">
+                <Icon size="mini" color="red" name="circle" />
+                {id}
+              </div>
+            }
+            content={Translate.string('There has been an update to the latest revision')}
+          />
+        );
+      }
+    }
+    return id;
+  };
   const renderCode = code => code || Translate.string('n/a');
-  const renderEditor = editable => {
+  const renderEditor = (__, editable) => {
     return editable && editable.editor ? (
       <div>
         <Icon name="user outline" />
@@ -390,7 +399,7 @@ function EditableListDisplay({
     );
   };
   // eslint-disable-next-line no-shadow
-  const renderTitle = (title, index) => {
+  const renderTitle = (title, __, index) => {
     if (sortedList[index].editable) {
       return management ? (
         <a href={sortedList[index].editable.timelineURL}>{title}</a>
@@ -400,32 +409,18 @@ function EditableListDisplay({
     }
     return <div>{title}</div>;
   };
-  const renderStatus = (editable, rowIndex) => {
-    let updated = false;
-    if (editable) {
-      const lastUpdate = localStorage.getItem(`editable-${editable.id}-last-update`);
-      if (lastUpdate) {
-        updated = moment(lastUpdate).isBefore(editable.lastUpdateDt);
-      }
-    }
+  const renderStatus = (__, editable, rowIndex) => {
     return (
-      <>
-        <StateIndicator
-          state={editable ? editable.state : 'not_submitted'}
-          circular
-          label
-          monochrome={!filteredSet.has(sortedList[rowIndex].id)}
-        />
-        {updated && (
-          <Popup
-            trigger={<Label size="mini" color="red" icon="exclamation" corner />}
-            content={Translate.string('There has been an update to the latest revision')}
-          />
-        )}
-      </>
+      <StateIndicator
+        state={editable ? editable.state : 'not_submitted'}
+        circular
+        label
+        monochrome={!filteredSet.has(sortedList[rowIndex].id)}
+      />
     );
   };
   const renderFuncs = {
+    friendlyId: renderId,
     title: renderTitle,
     code: renderCode,
     revision: editable => (editable ? editable.revisionCount : ''),
@@ -435,11 +430,8 @@ function EditableListDisplay({
 
   // eslint-disable-next-line react/prop-types
   const renderCell = ({dataKey, rowIndex}) => {
-    let data = sortedList[rowIndex][dataKey];
-    if (['editor', 'revision', 'status'].includes(dataKey)) {
-      data = sortedList[rowIndex].editable;
-    }
-    const fn = renderFuncs[dataKey] || (x => x);
+    const row = sortedList[rowIndex];
+    const fn = renderFuncs[dataKey];
     return (
       <TooltipIfTruncated>
         <div
@@ -447,7 +439,7 @@ function EditableListDisplay({
           role="gridcell"
           style={dataKey === 'title' ? {display: 'block'} : {}}
         >
-          {fn(data, rowIndex)}
+          {fn(row[dataKey], row.editable, rowIndex)}
         </div>
       </TooltipIfTruncated>
     );

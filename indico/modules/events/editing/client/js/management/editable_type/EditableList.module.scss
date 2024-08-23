@@ -40,6 +40,11 @@ $border: 1px solid $pastel-gray;
     display: flex;
   }
 
+  .id-cell {
+    display: flex;
+    align-items: center;
+  }
+
   :global(.ReactVirtualized__Table__Grid) {
     outline: none;
   }
