@@ -5,10 +5,6 @@
 {% endif %}
 
 {% block content %}
-    {#
-        TODO:   Remove the condition style="margin-top..." on this element
-                when we do not use events/management/base.html anymore at the top
-    #}
     <div
         id="participant-list"
         data-tables="{{ tables | tojson | forceescape }}"
