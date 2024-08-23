@@ -96,7 +96,7 @@ overrides:
   - files: ["*.d.ts"]
     rules:
       import/unambiguous: off
-      no-unused-vars: off
+      '@typescript-eslint/no-unused-vars' : off
 
 globals:
   Indico: false

@@ -142,7 +142,7 @@ export default function ParticipantTable({table}: {table: TableObj}) {
       {hasInvisibleParticipants && (
         <TableFooter>
           <TableRow>
-            <TableHeaderCell colSpan={table.headers.length}>
+            <TableHeaderCell colSpan={table.headers.length + (table.show_checkin ? 1 : 0)}>
               <ParticipantCountHidden count={hiddenParticipantsCount} />
             </TableHeaderCell>
           </TableRow>
