@@ -17,15 +17,13 @@ import {serializeTime, toMoment} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
 
-// FIXME: Alignment of time options in the list
-
 const START_HOUR = '06:00';
 const ALLOWED_INPUT_FORMATS = ['HH:mm', 'HHmm', 'H:mm', 'Hmm'];
 const MIN_DURATION = moment.duration(30, 'minutes');
 
 function _humanizeDuration(duration) {
   const minutes = duration.minutes();
-  const hours = duration.hours() + minutes / 60;
+  const hours = Math.round((duration.hours() + minutes / 60) * 10) / 10;
   if (hours < 1) {
     return PluralTranslate.string('{time} min', '{time} min', minutes, {time: minutes});
   }
@@ -38,7 +36,7 @@ function generateStartTimeOptions(minTime) {
   // START_HOUR, so options before START_HOUR are not shown
   // even though they are allowed.
   const options = [];
-  let next = moment.max(moment(START_HOUR, 'HH:mm'), minTime);
+  let next = moment.max(moment(START_HOUR, 'HH:mm'), minTime).minute(0);
   const end = moment().endOf('day');
   while (next < end) {
     options.push(serializeTime(next));
@@ -54,7 +52,9 @@ function generateEndTimeOptions(start) {
   // minutes after the start time.
   const options = [];
   const end = moment().endOf('day');
-  let next = moment(start).add(MIN_DURATION);
+  let next = moment(start)
+    .minute(0)
+    .add(MIN_DURATION);
   while (next < end) {
     const duration = _humanizeDuration(moment.duration(next.diff(start)));
     const value = serializeTime(moment(next));
@@ -90,7 +90,12 @@ export default class TimeRangePicker extends React.Component {
     const duration = moment.duration(endTime.diff(startTime));
     const startInputValue = serializeTime(moment(startTime));
     const endInputValue = serializeTime(moment(endTime));
+
+    // For end of day, we use '23:59' instead of moment#endOf('day')
+    // as the latter cannot be represented by the input value.
+    this.endOfDay = moment('23:59', 'HH:mm');
     this.minTime = moment(minTime ?? '00:00', 'HH:mm');
+
     this.state = {
       startTime,
       endTime,
@@ -161,7 +166,14 @@ export default class TimeRangePicker extends React.Component {
   // When user leaves the start time field, fix the time formatting
   // and optionally adjust the end time.
   fixStartTime = () => {
-    const {startTime} = this.state;
+    let {startTime} = this.state;
+    const {duration} = this.state;
+
+    // Corner case: start time is EOD, so we need to back off by duration
+    if (startTime.isSame(this.endOfDay, 'minute')) {
+      startTime = moment(startTime).subtract(duration);
+      this.setState({startTime});
+    }
 
     this.setState({
       startInputValue: serializeTime(startTime),
@@ -169,9 +181,14 @@ export default class TimeRangePicker extends React.Component {
 
     // Do we need to nudge the end time?
     let {endTime} = this.state;
-    if (startTime > endTime) {
-      const {duration} = this.state;
+    if (startTime.isSameOrAfter(endTime, 'minute')) {
       endTime = moment(startTime).add(duration);
+
+      // Corner case: star time + duration goes beyond date boundary, so we cap it off at EOD
+      if (endTime > moment(startTime).endOf('day')) {
+        endTime = this.endOfDay;
+      }
+
       this.setState({
         endTime,
         endInputValue: serializeTime(endTime),
@@ -180,6 +197,7 @@ export default class TimeRangePicker extends React.Component {
         }),
         duration: moment.duration(endTime.diff(startTime)),
       });
+
       const {onChange} = this.props;
       onChange(startTime, endTime);
     } else {
@@ -192,7 +210,14 @@ export default class TimeRangePicker extends React.Component {
   // When user leaves the end time field, fix the time formatting,
   // and optionally adjust the start time.
   fixEndTime = () => {
-    const {endTime} = this.state;
+    let {endTime} = this.state;
+    const {duration} = this.state;
+
+    // Corner case: endTime is at minTime, so we need to back it off by duration
+    if (endTime.isSameOrBefore(this.minTime, 'minute')) {
+      endTime = moment(endTime).add(duration);
+      this.setState({endTime});
+    }
 
     this.setState({
       endInputValue: serializeTime(endTime),
@@ -200,12 +225,14 @@ export default class TimeRangePicker extends React.Component {
 
     // Do we need to nudge the start time?
     let {startTime} = this.state;
-    if (endTime < startTime) {
-      const {duration} = this.state;
+    if (endTime.isSameOrBefore(startTime, 'minute')) {
       startTime = moment(endTime).subtract(duration);
-      if (startTime < this.minTime) {
+
+      // Corner case: start time is before minTime, so we cap it at minTime
+      if (startTime.isBefore(this.minTime, 'minute')) {
         startTime = moment(this.minTime);
       }
+
       this.setState({
         startTime,
         startInputValue: serializeTime(startTime),
@@ -213,6 +240,7 @@ export default class TimeRangePicker extends React.Component {
           startTime: serializeTime(startTime),
         }),
       });
+
       const {onChange} = this.props;
       onChange(startTime, endTime);
     } else {
