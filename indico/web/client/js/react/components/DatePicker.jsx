@@ -11,7 +11,7 @@ import React from 'react';
 
 import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
-import {formatDate} from 'indico/utils/date_format';
+import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 import {fromISOLocalDate} from 'indico/utils/date_parser';
 
 import 'indico/custom_elements/ind_date_picker';
@@ -27,12 +27,9 @@ export default function DatePicker({
   ...inputProps
 }) {
   function handleDateChange(ev) {
-    const {date, value: pickerValue} = ev.target.closest('ind-date-picker');
-    const invalid = !!pickerValue && !date;
-    // en-CA uses the ISO format date (YYYY-MM-DD) but gives it in local time zone.
-    // Do not use toISOString() for this because it may result in incorrect date due
-    // to time zone differences.
-    onChange(invalid ? INVALID : date?.toLocaleDateString('en-CA'));
+    const {date} = ev.target.closest('ind-date-picker');
+    const invalid = !!ev.target.value && !date;
+    onChange(invalid ? INVALID : formatDate(ISO_FORMAT, date));
   }
 
   const formattedValue = formatDate(format, fromISOLocalDate(value));

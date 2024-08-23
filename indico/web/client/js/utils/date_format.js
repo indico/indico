@@ -24,3 +24,5 @@ export function formatDate(formatString, date) {
     .replace(/m{1,2}/i, s => month.padStart(s.length, '0'))
     .replace(/d{1,2}/i, s => day.padStart(s.length, '0'));
 }
+
+export const ISO_FORMAT = 'yyyy-mm-dd';

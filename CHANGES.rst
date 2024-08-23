@@ -40,6 +40,8 @@ Bugfixes
 - Improve color handling in badge designer (auto-add ``#`` for hex colors) (:pr:`6492`)
 - Do not count deleted rooms for equipment/attribute usage numbers (:issue:`6493`, :pr:`6494`)
 - Allow deleting event persons which are linked to a deleted subcontribution (:pr:`6495`)
+- Fix validation error in registration form date fields when using Safari (:issue:`6474`,
+  :pr:`6501`, thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
