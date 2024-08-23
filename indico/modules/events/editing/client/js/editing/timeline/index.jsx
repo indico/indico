@@ -46,6 +46,12 @@ export default function Timeline() {
     };
   }, [dispatch]);
 
+  useEffect(() => {
+    if (details) {
+      localStorage.setItem(`editable-${details.id}-last-update`, details.lastUpdateDt);
+    }
+  }, [details]);
+
   const refresh = () => {
     dispatch(actions.useUpdatedTimeline());
   };
