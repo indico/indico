@@ -81,7 +81,6 @@ export default function ReviewForm() {
     avatarURL: Indico.User.avatarURL,
   };
 
-  const [commentFormVisible, setCommentFormVisible] = useState(false);
   const [judgmentType, setJudgmentType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [textAreaValue, setTextAreaValue] = useState('');
@@ -108,11 +107,7 @@ export default function ReviewForm() {
 
   const judgmentForm = (
     <div className="flexrow f-a-center" styleName="judgment-form">
-      <CommentForm
-        onSubmit={createComment}
-        onToggleExpand={setCommentFormVisible}
-        onTextAreaChange={setTextAreaValue}
-      />
+      <CommentForm onSubmit={createComment} onTextAreaChange={setTextAreaValue} />
       {canPerformSubmitterActions && canReview && !editor && (
         <>
           <span className="comment-or-review">
@@ -129,7 +124,7 @@ export default function ReviewForm() {
           />
         </>
       )}
-      {commentFormVisible && canJudge && (
+      {canJudge && (
         <div className="review-trigger flexrow">
           <span className="comment-or-review">
             <Translate>or</Translate>

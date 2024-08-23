@@ -33,14 +33,14 @@ export default function CommentForm({
   const onCommentClickHandler = () => {
     if (!commentFormVisible) {
       setCommentFormVisible(true);
-      onToggleExpand(true);
+      onToggleExpand && onToggleExpand(true);
     }
   };
   const handleSubmit = async (formData, form) => {
     const rv = await onSubmit(formData, form);
     if (!rv) {
       setCommentFormVisible(false);
-      onToggleExpand(false);
+      onToggleExpand && onToggleExpand(false);
     }
   };
 
@@ -64,7 +64,7 @@ export default function CommentForm({
             <FormSpy
               subscription={{values: true}}
               onChange={({values}) => {
-                commentFormVisible && onTextAreaChange ? onTextAreaChange(values.text) : null;
+                commentFormVisible && onTextAreaChange && onTextAreaChange(values.text);
               }}
             />
             {commentFormVisible && (
@@ -85,7 +85,7 @@ export default function CommentForm({
                     content={Translate.string('Cancel')}
                     onClick={() => {
                       setCommentFormVisible(false);
-                      onToggleExpand(false);
+                      onToggleExpand && onToggleExpand(false);
                       fprops.form.reset();
                     }}
                   />
@@ -101,7 +101,7 @@ export default function CommentForm({
 
 CommentForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-  onToggleExpand: PropTypes.func.isRequired,
+  onToggleExpand: PropTypes.func,
   initialValues: PropTypes.shape({
     text: PropTypes.string,
     internal: PropTypes.bool,
@@ -116,5 +116,6 @@ CommentForm.defaultProps = {
     internal: false,
   },
   expanded: false,
+  onToggleExpand: null,
   onTextAreaChange: null,
 };
