@@ -18,7 +18,13 @@ import {getDetails} from './selectors';
 
 import './CommentForm.module.scss';
 
-export default function CommentForm({onSubmit, onToggleExpand, initialValues, expanded}) {
+export default function CommentForm({
+  onSubmit,
+  onToggleExpand,
+  initialValues,
+  expanded,
+  onTextAreaChange,
+}) {
   const {canCreateInternalComments} = useSelector(getDetails);
   const [commentFormVisible, setCommentFormVisible] = useState(expanded);
 
@@ -49,6 +55,7 @@ export default function CommentForm({onSubmit, onToggleExpand, initialValues, ex
           <Form onSubmit={fprops.handleSubmit}>
             <InputComponent
               {...inputProps}
+              {...(commentFormVisible && {onTextAreaChange})}
               onFocus={onCommentClickHandler}
               name="text"
               placeholder={Translate.string('Leave a comment...')}

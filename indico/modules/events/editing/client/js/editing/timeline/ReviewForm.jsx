@@ -84,7 +84,12 @@ export default function ReviewForm() {
   const [commentFormVisible, setCommentFormVisible] = useState(false);
   const [judgmentType, setJudgmentType] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [textAreaValue, setTextAreaValue] = useState('');
   const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
+
+  const handleTextAreaChange = value => {
+    setTextAreaValue(value);
+  };
 
   const createComment = async (formData, form) => {
     const rv = await dispatch(createRevisionComment(lastRevision.createCommentURL, formData));
@@ -107,7 +112,11 @@ export default function ReviewForm() {
 
   const judgmentForm = (
     <div className="flexrow f-a-center" styleName="judgment-form">
-      <CommentForm onSubmit={createComment} onToggleExpand={setCommentFormVisible} />
+      <CommentForm
+        onSubmit={createComment}
+        onToggleExpand={setCommentFormVisible}
+        onTextAreaChange={handleTextAreaChange}
+      />
       {canPerformSubmitterActions && canReview && !editor && (
         <>
           <span className="comment-or-review">
@@ -124,7 +133,7 @@ export default function ReviewForm() {
           />
         </>
       )}
-      {!commentFormVisible && canJudge && (
+      {canJudge && (
         <div className="review-trigger flexrow">
           <span className="comment-or-review">
             <Translate>or</Translate>
