@@ -15,7 +15,7 @@ import HeaderSubHeader from 'semantic-ui-react/dist/commonjs/elements/Header/Hea
 import {PluralTranslate, Translate, Plural, Singular, Param} from 'indico/react/i18n';
 
 import ParticipantAccordion from './ParticipantAccordion';
-import {ParticipantListProps} from './types';
+import {ParticipantListProps, PreviewEnum} from './types';
 
 import './ParticipantList.module.scss';
 
@@ -30,7 +30,7 @@ export default function ParticipantList({
 }: ParticipantListProps) {
   let description, viewToggle;
 
-  if (preview === 'guest') {
+  if (preview === PreviewEnum.GUEST) {
     description = (
       <Translate>
         This preview shows the participant list like an unregistered guest would see it.

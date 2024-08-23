@@ -5,6 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+export enum PreviewEnum {
+  GUEST = 'guest',
+  PARTICIPANT = 'participant',
+}
+
 export interface TableColumnObj {
   id: number;
   text: string;
@@ -32,7 +37,7 @@ export interface ParticipantListProps {
   tables: TableObj[];
   title: string;
   eventId: number;
-  preview?: string;
+  preview?: PreviewEnum;
 }
 
 export interface ParticipantAccordionProps {
