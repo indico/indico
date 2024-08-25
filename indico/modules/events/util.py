@@ -366,9 +366,9 @@ def create_event_logo_tmp_file(event, tmpdir=None):
     """
     logo_meta = event.logo_metadata
     logo_extension = guess_extension(logo_meta['content_type']) or os.path.splitext(logo_meta['filename'])[1]
-    temp_file = NamedTemporaryFile(delete=False, dir=(tmpdir or config.TEMP_DIR), suffix=logo_extension)
-    temp_file.write(event.logo)
-    temp_file.flush()
+    with NamedTemporaryFile(delete=False, dir=(tmpdir or config.TEMP_DIR), suffix=logo_extension) as temp_file:
+        temp_file.write(event.logo)
+        temp_file.flush()
     return os.path.relpath(temp_file.name, tmpdir) if tmpdir else temp_file.name
 
 
@@ -707,7 +707,7 @@ class ZipGeneratorMixin:
         :param name_suffix: The suffix to the zip file name
         :param return_file: Return the temp file instead of a response
         """
-        temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
+        temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)  # noqa: SIM115
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()
             for item in self._iter_items(files_holder):

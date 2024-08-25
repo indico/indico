@@ -76,7 +76,7 @@ def initialize_new_request(user, options, include_files):
 
 
 def generate_zip(user, data, files, max_size):
-    temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)
+    temp_file = NamedTemporaryFile(suffix='.zip', dir=config.TEMP_DIR, delete=False)  # noqa: SIM115
     try:
         return _generate_zip(user, data, files, max_size, temp_file)
     finally:

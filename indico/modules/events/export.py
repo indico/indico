@@ -146,7 +146,9 @@ class EventExporter:
     def __init__(self, event, target_file):
         self.event = event
         self.target_file = target_file
-        self.archive = tarfile.open(mode='w|', fileobj=self.target_file)
+        # XXX we're not using a context manager here since changing that would probably require
+        # some refactoring of how this class is used
+        self.archive = tarfile.open(mode='w|', fileobj=self.target_file)  # noqa: SIM115
         self.id_map = defaultdict(dict)
         self.used_uuids = set()
         self.seen_rows = set()
@@ -174,6 +176,7 @@ class EventExporter:
         }
         yaml_data = yaml.dump(metadata, indent=2)
         self._add_file('data.yaml', len(yaml_data), yaml_data)
+        self.archive.close()
 
     def _load_spec(self):
         def _process_tablespec(tablename, tablespec):
@@ -410,7 +413,7 @@ class EventImporter:
         self.create_affiliations = create_affiliations
         self.verbose = verbose
         self.force = force
-        self.archive = tarfile.open(fileobj=source_file)
+        self.archive = tarfile.open(fileobj=source_file)  # noqa: SIM115
         self.data = yaml.unsafe_load(self.archive.extractfile('data.yaml'))
         self.id_map = {}
         self.user_map = {}

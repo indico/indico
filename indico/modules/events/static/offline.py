@@ -88,8 +88,10 @@ class StaticEventCreator:
 
     def create(self):
         """Trigger the creation of a ZIP file containing the site."""
-        temp_file = NamedTemporaryFile(prefix=f'static-{self.event.id}-', suffix='.zip', dir=config.TEMP_DIR,
-                                       delete=False)
+        temp_file = NamedTemporaryFile(  # noqa: SIM115
+            prefix=f'static-{self.event.id}-', suffix='.zip', dir=config.TEMP_DIR,
+            delete=False
+        )
         self._zip_file = ZipFile(temp_file.name, 'w', allowZip64=True)
 
         with collect_static_files() as used_assets:
