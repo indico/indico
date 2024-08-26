@@ -183,16 +183,32 @@ customElements.define(
       });
       this.addEventListener('attrchange.value', updateCalendar);
 
+      dialog.addEventListener('pointerdown', () => {
+        // Because Safari does not focus buttons (and other elements) when they
+        // are clicked, we need to mark the dialog as having received such clicks
+        // and test for it in the close handler.
+        dialog.noImmediateClose = true;
+        setTimeout(() => {
+          // Unset with a delay to allow focusout handler to see this flag.
+          // It must still be unset so it doesn't linger on forever. The delay
+          // was chosen based on trial and error. In general, you don't want
+          // to make it shorter, but you may increase it if some browser/OS
+          // combination unsets the flag too quickly.
+          delete dialog.noImmediateClose;
+        }, 100);
+      });
+
       dialog.addEventListener('focusout', () => {
         // The focusout event is triggered on the dialog or somewhere in it.
         // We use requestAnimationFrame to allow the target element to get
         // focused so we know where the focus is going.
         requestAnimationFrame(() => {
-          // If the focus has moved to an element outside the dialog, we close
-          if (dialog.contains(document.activeElement)) {
-            return;
+          // When a button in the dialog is clicked, `noImmediateClose` is set on
+          // the dialog element. We test for the absence of this flag as well as
+          // focus escaping from the dialog as two cues to close it.
+          if (!dialog.noImmediateClose && !dialog.contains(document.activeElement)) {
+            this.open = false;
           }
-          this.open = false;
         });
       });
 
