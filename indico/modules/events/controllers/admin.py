@@ -10,14 +10,15 @@ from webargs import fields
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.forms import EventKeywordsForm, EventLabelForm, ReferenceTypeForm, UnlistedEventsForm
+from indico.modules.events.forms import (DataRetentionSettingsForm, EventKeywordsForm, EventLabelForm,
+                                         ReferenceTypeForm, UnlistedEventsForm)
 from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
                                               delete_reference_type, update_event_label, update_reference_type)
 from indico.modules.events.schemas import AutoLinkerRuleSchema
-from indico.modules.events.settings import autolinker_settings, unlisted_events_settings
+from indico.modules.events.settings import autolinker_settings, data_retention_settings, unlisted_events_settings
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
@@ -184,3 +185,15 @@ class RHAutoLinkerConfig(RHAdminBase):
     })
     def _process(self, rules):
         autolinker_settings.set('rules', rules)
+
+
+class RHDataRetentionSettings(RHAdminBase):
+    """Manage minimun and maximum data retention period in the admin area."""
+
+    def _process(self):
+        form = DataRetentionSettingsForm(obj=FormDefaults(**data_retention_settings.get_all()))
+        if form.validate_on_submit():
+            data_retention_settings.set_multi(form.data)
+            flash(_('Settings have been saved'), 'success')
+            return redirect(url_for('events.data_retention'))
+        return WPEventAdmin.render_template('admin/data_retention.html', 'data_retention', form=form)

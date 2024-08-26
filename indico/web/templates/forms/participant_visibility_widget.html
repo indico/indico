@@ -10,6 +10,7 @@
             fieldId: {{ field.id | tojson }},
             values: {{ field.data | tojson }},
             choices: {{ field.choices | tojson }},
+            maxVisibilityPeriod: {{ field.max_visibility_period | tojson }},
         });
     </script>
 {% endblock %}

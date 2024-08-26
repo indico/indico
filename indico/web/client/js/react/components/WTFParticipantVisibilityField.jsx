@@ -11,7 +11,13 @@ import {Dropdown, Form, Icon, Input, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function WTFParticipantVisibilityField({fieldId, wrapperId, values, choices}) {
+export default function WTFParticipantVisibilityField({
+  fieldId,
+  wrapperId,
+  values,
+  choices,
+  maxVisibilityPeriod,
+}) {
   const parentElement = useMemo(() => document.getElementById(wrapperId), [wrapperId]);
   const [participantVisibility, setParticipantVisibility] = useState(values[0]);
   const [publicVisibility, setPublicVisibility] = useState(values[1]);
@@ -91,7 +97,7 @@ export default function WTFParticipantVisibilityField({fieldId, wrapperId, value
             placeholder={Translate.string('Permanent')}
             step="1"
             min="1"
-            max="521"
+            max={maxVisibilityPeriod}
             value={visibilityDuration === null ? '' : visibilityDuration}
             onChange={(evt, {value}) => setVisibilityDuration(value === '' ? null : +value)}
             disabled={participantVisibility === 'hide_all'}
@@ -128,4 +134,5 @@ WTFParticipantVisibilityField.propTypes = {
   wrapperId: PropTypes.string.isRequired,
   values: PropTypes.array.isRequired,
   choices: PropTypes.array.isRequired,
+  maxVisibilityPeriod: PropTypes.number.isRequired,
 };

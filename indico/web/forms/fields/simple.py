@@ -216,3 +216,4 @@ class IndicoLinkListField(JSONField):
 class IndicoParticipantVisibilityField(JSONField):
     widget = JinjaWidget('forms/participant_visibility_widget.html', single_kwargs=True, single_line=True)
     choices = [(mode.name, mode.title) for mode in PublishRegistrationsMode]
+    max_visibility_period = 521

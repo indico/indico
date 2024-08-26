@@ -6,9 +6,10 @@
 # LICENSE file for more details.
 
 from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerConfig, RHCreateEventLabel,
-                                                     RHCreateReferenceType, RHDeleteEventLabel, RHDeleteReferenceType,
-                                                     RHEditEventLabel, RHEditReferenceType, RHEventLabels,
-                                                     RHReferenceTypes, RHUnlistedEvents, RHUpdateEventKeywords)
+                                                     RHCreateReferenceType, RHDataRetentionSettings, RHDeleteEventLabel,
+                                                     RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
+                                                     RHEventLabels, RHReferenceTypes, RHUnlistedEvents,
+                                                     RHUpdateEventKeywords)
 from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import (RHAutoLinkerRules, RHDisplayPrivacyPolicy, RHEventAccessKey,
@@ -29,6 +30,8 @@ _bp.add_url_rule('/admin/event-labels/create', 'create_event_label', RHCreateEve
 _bp.add_url_rule('/admin/event-keywords/', 'event_keywords', RHUpdateEventKeywords, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/unlisted-events/', 'unlisted_events', RHUnlistedEvents, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/autolinker/', 'autolinker_admin', RHAutoLinker)
+_bp.add_url_rule('/admin/data-retention/', 'data_retention', RHDataRetentionSettings,
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/autolinker/config', 'autolinker_config', RHAutoLinkerConfig, methods=('POST',))
 
 # Single reference type

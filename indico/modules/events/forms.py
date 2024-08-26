@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import time
+from datetime import time, timedelta
 
 from flask import session
 from wtforms.fields import BooleanField, StringField, TextAreaField, URLField
@@ -24,6 +24,7 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField, IndicoTagListField,
                                      IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.fields.colors import SUIColorPickerField
+from indico.web.forms.fields.datetime import TimeDeltaField
 from indico.web.forms.fields.principals import PrincipalListField
 from indico.web.forms.fields.simple import IndicoButtonsBooleanField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
@@ -135,3 +136,44 @@ class UnlistedEventsForm(IndicoForm):
     authorized_creators = PrincipalListField(_('Authorized users'), [HiddenUnless('enabled', preserve_data=True)],
                                              allow_external_users=True, allow_groups=True,
                                              description=_('These users may create unlisted events.'))
+
+
+class DataRetentionSettingsForm(IndicoForm):
+    minimum_data_retention = TimeDeltaField(
+        _('Minimum data retention period'),
+        [DataRequired()],
+        units=('weeks',),
+        description=_(
+            'Specify the minimum data retention period (in weeks) configurable for registrations. This includes the '
+            'retention period of individual registration form fields.'
+        ),
+        render_kw={'min': 1},
+    )
+    maximum_data_retention = TimeDeltaField(
+        _('Maximum data retention period'),
+        units=('weeks',),
+        description=_(
+            'Specify the maximum data retention period (in weeks) configurable for registrations. This includes the '
+            'retention period of individual registration form fields. Note that setting this value will make the '
+            'retention period field mandatory during registration form setup.'
+        ),
+        render_kw={'placeholder': _('Indefinite'), 'min': 1},
+    )
+
+    def validate_minimum_data_retention(self, field):
+        minimum_retention = field.data
+        if minimum_retention <= timedelta():
+            raise ValidationError(_('The retention period cannot be zero or negative.'))
+        maximum_retention = self.data.get('maximum_data_retention')
+        if maximum_retention and minimum_retention > maximum_retention:
+            raise ValidationError(_('The minimum retention period cannot be greater than the maximum.'))
+
+    def validate_maximum_data_retention(self, field):
+        maximum_retention = field.data
+        if maximum_retention is None:
+            return
+        if maximum_retention <= timedelta():
+            raise ValidationError(_('The retention period cannot be zero or negative.'))
+        minimum_retention = self.data.get('minimum_data_retention')
+        if minimum_retention and minimum_retention > maximum_retention:
+            raise ValidationError(_('The minimum retention period cannot be greater than the maximum.'))

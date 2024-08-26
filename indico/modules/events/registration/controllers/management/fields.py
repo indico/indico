@@ -20,9 +20,10 @@ from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
+from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import not_empty
 from indico.util.string import snakify_keys
 
@@ -51,11 +52,10 @@ class GeneralFieldDataSchema(mm.Schema):
     @validates('retention_period')
     def _check_retention_period(self, retention_period, **kwargs):
         field = self.context['field']
+        with db.session.no_autoflush:
+            min_retention_period = data_retention_settings.get('minimum_data_retention')
+            max_retention_period = data_retention_settings.get('maximum_data_retention')
         if retention_period is not None:
-            if retention_period.days < 7:
-                raise ValidationError('Retention period must be at least 1 week')
-            if retention_period > timedelta(days=3650):
-                raise ValidationError('Retention period cannot be longer than 10 years')
             if field.type == RegistrationFormItemType.field_pd and field.personal_data_type.is_required:
                 raise ValidationError('Cannot add retention period to required field')
 
@@ -63,6 +63,19 @@ class GeneralFieldDataSchema(mm.Schema):
             if regform_retention_period and retention_period > regform_retention_period:
                 raise ValidationError(_('Retention period cannot be longer than that of the registration form'),
                                       'retention_period')
+            if retention_period < min_retention_period:
+                raise ValidationError(ngettext('The retention period cannot be less than {} week.',
+                                               'The retention period cannot be less than {} weeks.',
+                                               min_retention_period.days // 7)
+                                      .format(min_retention_period.days // 7))
+            elif max_retention_period and retention_period > max_retention_period:
+                raise ValidationError(ngettext('The retention period cannot be longer than {} week.',
+                                               'The retention period cannot be longer than {} weeks.',
+                                               max_retention_period.days // 7)
+                                      .format(max_retention_period.days // 7))
+            elif not max_retention_period and retention_period > timedelta(3650):
+                raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty '
+                                        'for indefinite.'))
 
     @post_load(pass_original=True)
     def _split_unknown(self, data, original_data, **kwargs):

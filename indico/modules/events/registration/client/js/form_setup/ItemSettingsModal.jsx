@@ -30,6 +30,7 @@ import {getStaticData, getItemById} from '../form/selectors';
 
 import * as actions from './actions';
 import ItemTypeDropdown from './ItemTypeDropdown';
+import {getDataRetentionRange} from './selectors';
 
 const EMPTY_DATA = {}; // avoid new object on every selector call since this triggers a warning
 
@@ -38,6 +39,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
   const [newItemType, setNewItemType] = useState(defaultNewItemType);
   const editing = id !== null;
   const staticData = useSelector(getStaticData);
+  const dataRetentionRange = useSelector(getDataRetentionRange);
   const {inputType: existingInputType, fieldIsRequired, ...itemData} = useSelector(state =>
     editing ? getItemById(state, id) : EMPTY_DATA
   );
@@ -158,9 +160,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 type="number"
                 placeholder={Translate.string('Permanent')}
                 step="1"
-                min="1"
-                max="521"
-                validate={v.optional(v.range(1, 521))}
+                min={dataRetentionRange.min}
+                max={dataRetentionRange.max}
+                validate={v.optional(v.range(dataRetentionRange.min, dataRetentionRange.max))}
                 label={Translate.string('Retention period (weeks)')}
                 description={Translate.string(
                   'Specify how long user-provided data for this field will be preserved in the database.'

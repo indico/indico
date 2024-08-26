@@ -21,6 +21,8 @@ Improvements
   thanks :user:`Moliholy, unconventionaldotdev`)
 - A room's bookable hours can now be applied to specific weekdays, making it
   unbookable on any other weekdays (:pr:`6439`)
+- Add global settings for min/max registration form data retention periods (:pr:`6445`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

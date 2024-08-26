@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
+from indico.modules.events.settings import data_retention_settings
 from indico.modules.users.util import get_mastodon_server_name
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
@@ -434,3 +435,29 @@ class MastodonServer:
 
             if not get_mastodon_server_name(field.data):
                 raise ValidationError(_('Invalid Mastodon server URL.'))
+
+
+class DataRetentionPeriodValidator:
+    """Validate a data retention period against the global defaults."""
+
+    def __call__(self, form, field):
+        retention_period = field.data
+        max_retention_period = data_retention_settings.get('maximum_data_retention')
+        if max_retention_period and retention_period is None:
+            raise ValidationError(_('The retention period cannot be indefinite.'))
+        elif retention_period is None:
+            return
+        min_retention_period = data_retention_settings.get('minimum_data_retention')
+        if retention_period < min_retention_period:
+            raise ValidationError(ngettext('The retention period cannot be less than {} week.',
+                                           'The retention period cannot be less than {} weeks.',
+                                           min_retention_period.days // 7)
+                                  .format(min_retention_period.days // 7))
+        elif max_retention_period and retention_period > max_retention_period:
+            raise ValidationError(ngettext('The retention period cannot be longer than {} week.',
+                                           'The retention period cannot be longer than {} weeks.',
+                                           max_retention_period.days // 7)
+                                  .format(max_retention_period.days // 7))
+        elif not max_retention_period and retention_period > timedelta(3650):
+            raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
+                                    'indefinite.'))
