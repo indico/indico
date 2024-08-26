@@ -170,7 +170,7 @@ class RHApplyJudgment(RHEditablesBase):
                 continue
             if editable.state == disallowed_state:
                 continue
-            review_and_publish_editable(editable.latest_revision, action, '', management=True)
+            review_and_publish_editable(editable.latest_revision, action, management=True)
             db.session.expire(editable)
             changed.append(editable)
         return EditableBasicSchema(many=True).jsonify(changed)
