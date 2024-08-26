@@ -333,8 +333,8 @@ class RHRegistrationFormModify(RHManageRegFormBase):
         return WPManageRegistration.render_template('management/regform_modify.html', self.event,
                                                     form_data=get_flat_section_setup_data(self.regform),
                                                     regform=self.regform,
-                                                    data_retention_range=(min_data_retention.days // 7,
-                                                                          max_data_retention.days // 7),
+                                                    data_retention_range={'min': min_data_retention.days // 7,
+                                                                          'max': max_data_retention.days // 7},
                                                     has_predefined_affiliations=Affiliation.query.has_rows())
 
 

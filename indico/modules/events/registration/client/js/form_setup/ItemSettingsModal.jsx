@@ -160,9 +160,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
                 type="number"
                 placeholder={Translate.string('Permanent')}
                 step="1"
-                min={dataRetentionRange[0]}
-                max={dataRetentionRange[1]}
-                validate={v.optional(v.range(dataRetentionRange[0], dataRetentionRange[1]))}
+                min={dataRetentionRange.min}
+                max={dataRetentionRange.max}
+                validate={v.optional(v.range(dataRetentionRange.min, dataRetentionRange.max))}
                 label={Translate.string('Retention period (weeks)')}
                 description={Translate.string(
                   'Specify how long user-provided data for this field will be preserved in the database.'
