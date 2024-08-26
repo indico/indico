@@ -89,12 +89,10 @@ export function PictureSettings() {
         'Minimum picture size that can be uploaded in pixels. Leave empty for no min size validation.'
       )}
       step="1"
-      min="0"
+      min="25"
       max="1000"
-      validate={v.optional(v.min(0))}
+      validate={v.optional(v.range(25, 1000))}
       fluid
-      format={val => val || ''}
-      parse={val => +val || 0}
     />
   );
 }

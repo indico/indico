@@ -43,6 +43,8 @@ Bugfixes
 - Fix validation error in registration form date fields when using Safari (:issue:`6474`,
   :pr:`6501`, thanks :user:`foxbunny`)
 - Fix date picker month/year navigation not working in Safari (:pr:`6505`, thanks :user:`foxbunny`)
+- Enforce a minimum size on the registration form picture cropper to avoid sending an empty
+  image after repeated cropping (:pr:`6498`, thanks :user:`jbtwist`)
 
 Accessibility
 ^^^^^^^^^^^^^
