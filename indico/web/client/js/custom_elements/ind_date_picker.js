@@ -75,8 +75,8 @@ customElements.define(
         openCalendarButton.disabled = false;
         openCalendarButton.focus();
       });
-      indCalendar.addEventListener('x-select', () => {
-        CustomElementBase.setValue(input, formatDate(this.format, new Date(indCalendar.value)));
+      indCalendar.addEventListener('x-select', evt => {
+        CustomElementBase.setValue(input, formatDate(this.format, new Date(evt.target.value)));
         input.select();
         input.focus();
         input.dispatchEvent(new Event('input', {bubbles: true}));
