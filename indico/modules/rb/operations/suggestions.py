@@ -17,7 +17,7 @@ from indico.modules.rb.operations.bookings import get_existing_rooms_occurrences
 from indico.modules.rb.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb.operations.rooms import search_for_rooms
-from indico.modules.rb.util import group_by_occurrence_date
+from indico.modules.rb.util import WEEKDAYS, group_by_occurrence_date
 from indico.util.date_time import overlaps
 
 
@@ -63,7 +63,7 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
         taken_periods = [(occ.start_dt, occ.end_dt) for occ in rooms_occurrences.get(room.id, [])]
         if room.id in unbookable_hours:
             taken_periods.extend((datetime.combine(start_dt, uh.start_time), datetime.combine(end_dt, uh.end_time))
-                                 for uh in unbookable_hours[room.id])
+                                 for uh in unbookable_hours[room.id][WEEKDAYS[start_dt.weekday()]])
 
         taken_periods = sorted(taken_periods)
         suggested_time = get_start_time_suggestion(taken_periods, start_dt, end_dt)
