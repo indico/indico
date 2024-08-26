@@ -160,13 +160,6 @@ Cache
 
     Default: ``None``
 
-.. data:: MEMCACHED_SERVERS
-
-    The list of memcached servers (each entry is an ``ip:port`` string)
-    to use with the ``memcached`` cache backend.
-
-    Default: ``[]``
-
 
 Celery
 ------

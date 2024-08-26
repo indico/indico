@@ -68,7 +68,6 @@ DEFAULTS = {
     'MAX_DATA_EXPORT_SIZE': 10 * 1024,  # 10GB
     'MAX_UPLOAD_FILES_TOTAL_SIZE': 0,
     'MAX_UPLOAD_FILE_SIZE': 0,
-    'MEMCACHED_SERVERS': [],
     'NO_REPLY_EMAIL': None,
     'PLUGINS': set(),
     'PROFILE': False,
