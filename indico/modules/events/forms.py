@@ -139,11 +139,16 @@ class UnlistedEventsForm(IndicoForm):
 
 
 class DataRetentionSettingsForm(IndicoForm):
-    minimum_data_retention = TimeDeltaField(_('Minimum data retention period'), [DataRequired()], units=('weeks',),
-                                            description=_('Specify the minimum data retention period (in weeks) '
-                                                          'configurable for registrations. This includes the '
-                                                          'retention period of individual registration form fields.'),
-                                            render_kw={'min': 1})
+    minimum_data_retention = TimeDeltaField(
+        _('Minimum data retention period'),
+        [DataRequired()],
+        units=('weeks',),
+        description=_(
+            'Specify the minimum data retention period (in weeks) configurable for registrations. This includes the '
+            'retention period of individual registration form fields.'
+        ),
+        render_kw={'min': 1},
+    )
     maximum_data_retention = TimeDeltaField(
         _('Maximum data retention period'),
         units=('weeks',),
