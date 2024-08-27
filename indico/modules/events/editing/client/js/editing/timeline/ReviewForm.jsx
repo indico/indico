@@ -206,7 +206,7 @@ export default function ReviewForm() {
                     /* otherwise changing required doesn't work properly if the field has been touched */
                     key={judgmentType}
                   />
-                  <DirtyInitialValue field="comment" value={textAreaValue} />
+                  <DirtyInitialValue field="comment" value={textAreaValue} force={!judgmentType} />
                   {[EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
                     judgmentType
                   ) && (

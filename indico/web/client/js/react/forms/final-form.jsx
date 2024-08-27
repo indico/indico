@@ -86,12 +86,12 @@ FieldCondition.defaultProps = {
  * to the `FinalSubmitButton` of the form to ensure it correctly gets enabled if the initial value
  * set using this component is all that's necessary for the submit button to be enabled.
  */
-export function DirtyInitialValue({field, value}) {
+export function DirtyInitialValue({field, value, force = false}) {
   const {
     input: {value: currentValue, onChange: setValue, onFocus, onBlur},
   } = useField(field);
   useEffect(() => {
-    if (currentValue) {
+    if (currentValue && !force) {
       // Do not set an initial value when there is already a value
       return;
     }
@@ -100,13 +100,14 @@ export function DirtyInitialValue({field, value}) {
       setValue(value);
       onBlur();
     });
-  }, [currentValue, setValue, onFocus, onBlur, value]);
+  }, [currentValue, setValue, onFocus, onBlur, value, force]);
   return null;
 }
 
 DirtyInitialValue.propTypes = {
   field: PropTypes.string.isRequired,
   value: PropTypes.any.isRequired,
+  force: PropTypes.bool,
 };
 
 /**

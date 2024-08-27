@@ -43,6 +43,7 @@ export default function CommentForm({
     if (!rv) {
       setCommentFormVisible(false);
       onToggleExpand(false);
+      onTextAreaChange('');
     }
   };
 
@@ -84,6 +85,7 @@ export default function CommentForm({
                     onClick={() => {
                       setCommentFormVisible(false);
                       onToggleExpand(false);
+                      onTextAreaChange('');
                       fprops.form.reset();
                     }}
                   />
