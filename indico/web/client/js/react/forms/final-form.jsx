@@ -8,8 +8,8 @@
 import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
-import {Field, Form as FinalForm} from 'react-final-form';
+import React, {useEffect} from 'react';
+import {Field, Form as FinalForm, useField} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
@@ -75,6 +75,38 @@ FieldCondition.propTypes = {
 FieldCondition.defaultProps = {
   is: true,
   inverted: false,
+};
+
+/**
+ * A component that sets the value of a form field after the final-form has been initialized.
+ * This can be used when you want to set the initial value of a field in a way that marks the
+ * field as touched and dirty.
+ *
+ * Note that when using this, you most likely need to pass `extraSubscription={{touched: true}}`
+ * to the `FinalSubmitButton` of the form to ensure it correctly gets enabled if the initial value
+ * set using this component is all that's necessary for the submit button to be enabled.
+ */
+export function DirtyInitialValue({field, value}) {
+  const {
+    input: {value: currentValue, onChange: setValue, onFocus, onBlur},
+  } = useField(field);
+  useEffect(() => {
+    if (currentValue) {
+      // Do not set an initial value when there is already a value
+      return;
+    }
+    setTimeout(() => {
+      onFocus();
+      setValue(value);
+      onBlur();
+    });
+  }, [currentValue, setValue, onFocus, onBlur, value]);
+  return null;
+}
+
+DirtyInitialValue.propTypes = {
+  field: PropTypes.string.isRequired,
+  value: PropTypes.any.isRequired,
 };
 
 /**

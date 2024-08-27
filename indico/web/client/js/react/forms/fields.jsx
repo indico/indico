@@ -650,6 +650,7 @@ export function FinalSubmitButton({
   fluid,
   style,
   children,
+  extraSubscription,
 }) {
   const {
     validating,
@@ -666,6 +667,7 @@ export function FinalSubmitButton({
       submitting: true,
       submitError: true,
       submitSucceeded: true,
+      ...extraSubscription,
     },
   });
   const disabled =
@@ -717,6 +719,7 @@ FinalSubmitButton.propTypes = {
   fluid: PropTypes.bool,
   size: PropTypes.string,
   style: PropTypes.object,
+  extraSubscription: PropTypes.object,
   children: PropTypes.func,
 };
 
@@ -734,6 +737,7 @@ FinalSubmitButton.defaultProps = {
   fluid: false,
   size: null,
   style: null,
+  extraSubscription: {},
   children: null,
 };
 
