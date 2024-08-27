@@ -9,7 +9,11 @@ import React from 'react';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
-export function ParticipantCountHidden({count}: {count: number}) {
+interface ParticipantCountHiddenProps {
+  count: number;
+}
+
+export function ParticipantCountHidden({count}: ParticipantCountHiddenProps) {
   return (
     <PluralTranslate count={count}>
       <Singular>

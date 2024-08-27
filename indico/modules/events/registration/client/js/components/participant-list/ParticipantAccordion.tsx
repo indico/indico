@@ -25,18 +25,18 @@ import { TableObj } from './types';
 import './ParticipantAccordion.module.scss';
 
 
-export interface ParticipantCounterProps {
+interface ParticipantCounterProps {
   totalCount: number;
   hiddenCount: number;
 }
 
-export interface ParticipantAccordionItemProps {
+interface ParticipantAccordionItemProps {
   table: TableObj;
   collapsible?: boolean;
   noTitle?: boolean;
 }
 
-export interface ParticipantAccordionProps {
+interface ParticipantAccordionProps {
   totalParticipantCount: number;
   published: boolean;
   tables: TableObj[];

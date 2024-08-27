@@ -25,7 +25,11 @@ import {TableColumnObj, TableObj, TableRowObj} from './types';
 
 import './ParticipantTable.module.scss';
 
-export default function ParticipantTable({table}: {table: TableObj}) {
+interface ParticipantTableProps {
+  table: TableObj;
+}
+
+export default function ParticipantTable({table}: ParticipantTableProps) {
   const visibleParticipantsCount = table.rows.length;
   const totalParticipantCount = table.num_participants;
   const hiddenParticipantsCount = totalParticipantCount - visibleParticipantsCount;

@@ -19,7 +19,7 @@ import {PreviewEnum, TableObj} from './types';
 
 import './ParticipantList.module.scss';
 
-export interface ParticipantListProps {
+interface ParticipantListProps {
   published: boolean;
   merged: boolean;
   totalParticipantCount: number;
