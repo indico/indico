@@ -128,12 +128,13 @@ def get_category_view_params(category, now, is_flat=False):
     future_event_query = event_query.filter(Event.start_dt >= future_threshold)
     current_event_query = event_query.filter(Event.start_dt >= past_threshold,
                                              Event.start_dt < future_threshold)
-    json_ld_events = events = current_event_query.all()
+    events = current_event_query.all()
 
     future_event_count = future_event_query.count()
     past_event_count = past_event_query.count()
     has_hidden_events = bool(hidden_event_ids)
 
+    json_ld_events = events[:]
     if not session.user and future_event_count:
         json_ld_events += future_event_query.all()
 
