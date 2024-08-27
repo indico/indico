@@ -24,8 +24,10 @@ export default function CommentForm({
   onToggleExpand,
   initialValues,
   expanded,
-  textAreaValue,
-  onTextAreaChange,
+  commentValue,
+  onCommentChange,
+  syncComment,
+  setSyncComment,
 }) {
   const {canCreateInternalComments} = useSelector(getDetails);
   const [commentFormVisible, setCommentFormVisible] = useState(expanded);
@@ -43,7 +45,7 @@ export default function CommentForm({
     if (!rv) {
       setCommentFormVisible(false);
       onToggleExpand(false);
-      onTextAreaChange('');
+      onCommentChange('');
     }
   };
 
@@ -59,13 +61,19 @@ export default function CommentForm({
             <InputComponent
               {...inputProps}
               onFocus={onCommentClickHandler}
-              onChange={onTextAreaChange}
+              onChange={onCommentChange}
               name="text"
               placeholder={Translate.string('Leave a comment...')}
               hideValidationError
               required
             />
-            {textAreaValue && <DirtyInitialValue field="text" value={textAreaValue} />}
+            {syncComment && (
+              <DirtyInitialValue
+                field="text"
+                value={commentValue}
+                onUpdate={() => setSyncComment(false)}
+              />
+            )}
             {commentFormVisible && (
               <>
                 {canCreateInternalComments && (
@@ -85,7 +93,7 @@ export default function CommentForm({
                     onClick={() => {
                       setCommentFormVisible(false);
                       onToggleExpand(false);
-                      onTextAreaChange('');
+                      onCommentChange('');
                       fprops.form.reset();
                     }}
                   />
@@ -107,8 +115,10 @@ CommentForm.propTypes = {
     internal: PropTypes.bool,
   }),
   expanded: PropTypes.bool,
-  onTextAreaChange: PropTypes.func,
-  textAreaValue: PropTypes.string,
+  onCommentChange: PropTypes.func,
+  commentValue: PropTypes.string,
+  syncComment: PropTypes.bool,
+  setSyncComment: PropTypes.func,
 };
 
 CommentForm.defaultProps = {
@@ -118,6 +128,8 @@ CommentForm.defaultProps = {
   },
   expanded: false,
   onToggleExpand: () => {},
-  onTextAreaChange: null,
-  textAreaValue: '',
+  onCommentChange: () => {},
+  commentValue: '',
+  syncComment: false,
+  setSyncComment: () => {},
 };

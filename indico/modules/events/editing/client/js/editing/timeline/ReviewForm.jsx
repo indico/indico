@@ -84,7 +84,8 @@ export default function ReviewForm() {
 
   const [judgmentType, setJudgmentType] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [textAreaValue, setTextAreaValue] = useState('');
+  const [commentValue, setCommentValue] = useState('');
+  const [syncComment, setSyncComment] = useState(false);
   const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
 
   const createComment = async (formData, form) => {
@@ -110,8 +111,10 @@ export default function ReviewForm() {
     <div className="flexrow f-a-center" styleName="judgment-form">
       <CommentForm
         onSubmit={createComment}
-        textAreaValue={textAreaValue}
-        onTextAreaChange={setTextAreaValue}
+        commentValue={commentValue}
+        onCommentChange={setCommentValue}
+        syncComment={syncComment}
+        setSyncComment={setSyncComment}
       />
       {canPerformSubmitterActions && canReview && !editor && (
         <>
@@ -142,7 +145,13 @@ export default function ReviewForm() {
             floating
           >
             <Dropdown.Menu>
-              <JudgmentDropdownItems options={judgmentOptions} setJudgmentType={setJudgmentType} />
+              <JudgmentDropdownItems
+                options={judgmentOptions}
+                setJudgmentType={type => {
+                  setSyncComment(true);
+                  setJudgmentType(type);
+                }}
+              />
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -193,7 +202,10 @@ export default function ReviewForm() {
                 <Form id="judgment-form" onSubmit={handleSubmit}>
                   <JudgmentBoxHeader
                     judgmentType={judgmentType}
-                    setJudgmentType={setJudgmentType}
+                    setJudgmentType={type => {
+                      setSyncComment(true);
+                      setJudgmentType(type);
+                    }}
                     options={judgmentOptions}
                     loading={loading}
                   />
@@ -203,10 +215,17 @@ export default function ReviewForm() {
                     hideValidationError
                     autoFocus
                     required={judgmentType !== EditingReviewAction.accept}
+                    onChange={setCommentValue}
                     /* otherwise changing required doesn't work properly if the field has been touched */
                     key={judgmentType}
                   />
-                  <DirtyInitialValue field="comment" value={textAreaValue} force={!judgmentType} />
+                  {syncComment && (
+                    <DirtyInitialValue
+                      field="comment"
+                      value={commentValue}
+                      onUpdate={() => setSyncComment(false)}
+                    />
+                  )}
                   {[EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
                     judgmentType
                   ) && (
