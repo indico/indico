@@ -20,10 +20,9 @@ import {Translate} from 'indico/react/i18n';
 
 import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import ParticipantTable from './ParticipantTable';
-import { TableObj } from './types';
+import {TableObj} from './types';
 
 import './ParticipantAccordion.module.scss';
-
 
 interface ParticipantCounterProps {
   totalCount: number;
