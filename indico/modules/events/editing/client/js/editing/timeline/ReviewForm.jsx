@@ -261,7 +261,7 @@ export default function ReviewForm() {
                       // XXX: For some reason the button does not properly update with the correct
                       // `dirty` state after setting the `comment` value programmatically, but by
                       // also subscribing to `touched` we avoid this bug.
-                      // If someone ever needs to change something there or test thie behavior, it
+                      // If someone ever needs to change something there or test this behavior, it
                       // happens when you write a comment, then switch to judgment mode, then close
                       // the judgment form again and then switch to judgment mode again.
                       extraSubscription={{touched: true}}
