@@ -93,6 +93,8 @@ overrides:
       - 'plugin:@typescript-eslint/strict'
       - 'plugin:@typescript-eslint/stylistic'
       - 'plugin:import/typescript'
+    rules:
+      no-shadow: off
   - files: ["*.d.ts"]
     rules:
       import/unambiguous: off
