@@ -12,6 +12,7 @@ import {useSelector} from 'react-redux';
 import {Button, Form} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {DirtyInitialValue} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 
 import {getDetails} from './selectors';
@@ -23,6 +24,7 @@ export default function CommentForm({
   onToggleExpand,
   initialValues,
   expanded,
+  textAreaValue,
   onTextAreaChange,
 }) {
   const {canCreateInternalComments} = useSelector(getDetails);
@@ -62,6 +64,7 @@ export default function CommentForm({
               hideValidationError
               required
             />
+            {textAreaValue && <DirtyInitialValue field="text" value={textAreaValue} />}
             {commentFormVisible && (
               <>
                 {canCreateInternalComments && (
@@ -103,6 +106,7 @@ CommentForm.propTypes = {
   }),
   expanded: PropTypes.bool,
   onTextAreaChange: PropTypes.func,
+  textAreaValue: PropTypes.string,
 };
 
 CommentForm.defaultProps = {
@@ -113,4 +117,5 @@ CommentForm.defaultProps = {
   expanded: false,
   onToggleExpand: () => {},
   onTextAreaChange: null,
+  textAreaValue: '',
 };

@@ -16,6 +16,7 @@ import {Dropdown, Form} from 'semantic-ui-react';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FinalCheckbox, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {DirtyInitialValue} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -107,7 +108,11 @@ export default function ReviewForm() {
 
   const judgmentForm = (
     <div className="flexrow f-a-center" styleName="judgment-form">
-      <CommentForm onSubmit={createComment} onTextAreaChange={setTextAreaValue} />
+      <CommentForm
+        onSubmit={createComment}
+        textAreaValue={textAreaValue}
+        onTextAreaChange={setTextAreaValue}
+      />
       {canPerformSubmitterActions && canReview && !editor && (
         <>
           <span className="comment-or-review">
@@ -171,7 +176,7 @@ export default function ReviewForm() {
           {!judgmentType && judgmentForm}
           <FinalForm
             initialValues={{
-              comment: textAreaValue,
+              comment: '',
               tags: lastRevision.tags
                 .filter(t => !t.system)
                 .map(t => t.id)
@@ -201,6 +206,7 @@ export default function ReviewForm() {
                     /* otherwise changing required doesn't work properly if the field has been touched */
                     key={judgmentType}
                   />
+                  <DirtyInitialValue field="comment" value={textAreaValue} />
                   {[EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
                     judgmentType
                   ) && (
@@ -233,6 +239,13 @@ export default function ReviewForm() {
                     <FinalSubmitButton
                       label={Translate.string('Judge')}
                       disabledUntilChange={judgmentType !== EditingReviewAction.accept}
+                      // XXX: For some reason the button does not properly update with the correct
+                      // `dirty` state after setting the `comment` value programmatically, but by
+                      // also subscribing to `touched` we avoid this bug.
+                      // If someone ever needs to change something there or test thie behavior, it
+                      // happens when you write a comment, then switch to judgment mode, then close
+                      // the judgment form again and then switch to judgment mode again.
+                      extraSubscription={{touched: true}}
                     />
                   </div>
                 </Form>
