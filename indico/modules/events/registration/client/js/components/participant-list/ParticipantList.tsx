@@ -15,9 +15,19 @@ import HeaderSubHeader from 'semantic-ui-react/dist/commonjs/elements/Header/Hea
 import {PluralTranslate, Translate, Plural, Singular, Param} from 'indico/react/i18n';
 
 import ParticipantAccordion from './ParticipantAccordion';
-import {ParticipantListProps, PreviewEnum} from './types';
+import {PreviewEnum, TableObj} from './types';
 
 import './ParticipantList.module.scss';
+
+export interface ParticipantListProps {
+  published: boolean;
+  merged: boolean;
+  totalParticipantCount: number;
+  tables: TableObj[];
+  title: string;
+  eventId: number;
+  preview?: PreviewEnum;
+}
 
 export default function ParticipantList({
   published,

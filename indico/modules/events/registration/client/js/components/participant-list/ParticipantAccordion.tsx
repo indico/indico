@@ -20,14 +20,28 @@ import {Translate} from 'indico/react/i18n';
 
 import {ParticipantCountHidden} from './ParticipantSharedTranslations';
 import ParticipantTable from './ParticipantTable';
-import {
-  ParticipantAccordionItemProps,
-  ParticipantAccordionProps,
-  ParticipantCounterProps,
-  TableObj,
-} from './types';
+import { TableObj } from './types';
 
 import './ParticipantAccordion.module.scss';
+
+
+export interface ParticipantCounterProps {
+  totalCount: number;
+  hiddenCount: number;
+}
+
+export interface ParticipantAccordionItemProps {
+  table: TableObj;
+  collapsible?: boolean;
+  noTitle?: boolean;
+}
+
+export interface ParticipantAccordionProps {
+  totalParticipantCount: number;
+  published: boolean;
+  tables: TableObj[];
+  merged?: boolean;
+}
 
 function ParticipantCounter({totalCount, hiddenCount}: ParticipantCounterProps) {
   const participantCounterElement = (

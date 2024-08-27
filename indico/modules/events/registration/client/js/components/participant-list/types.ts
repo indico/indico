@@ -29,31 +29,3 @@ export interface TableObj {
   show_checkin: boolean;
   title?: string;
 }
-
-export interface ParticipantListProps {
-  published: boolean;
-  merged: boolean;
-  totalParticipantCount: number;
-  tables: TableObj[];
-  title: string;
-  eventId: number;
-  preview?: PreviewEnum;
-}
-
-export interface ParticipantAccordionProps {
-  totalParticipantCount: number;
-  published: boolean;
-  tables: TableObj[];
-  merged?: boolean;
-}
-
-export interface ParticipantAccordionItemProps {
-  table: TableObj;
-  collapsible?: boolean;
-  noTitle?: boolean;
-}
-
-export interface ParticipantCounterProps {
-  totalCount: number;
-  hiddenCount: number;
-}
