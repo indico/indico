@@ -47,6 +47,8 @@ Bugfixes
 - Fix date picker month/year navigation not working in Safari (:pr:`6505`, thanks :user:`foxbunny`)
 - Enforce a minimum size on the registration form picture cropper to avoid sending an empty
   image after repeated cropping (:pr:`6498`, thanks :user:`jbtwist`)
+- Fix future events being always displayed after current events in categories while not
+  logged in (:pr:`6509`)
 
 Accessibility
 ^^^^^^^^^^^^^
