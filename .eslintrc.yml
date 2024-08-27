@@ -74,6 +74,7 @@ rules:
   no-restricted-globals:
     - error
     - event
+  react/require-default-props: off
 
 overrides:
   - files:
