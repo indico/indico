@@ -6,7 +6,14 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
-import {getToday, toDateString, DateRange, OpenDateRange} from 'indico/utils/date';
+import {
+  clampDate,
+  getToday,
+  toDateString,
+  DateRange,
+  OpenDateRange,
+  isSameDate,
+} from 'indico/utils/date';
 import {formatDate} from 'indico/utils/date_format';
 import {createDateParser} from 'indico/utils/date_parser';
 import {getWeekInfoForLocale, getFirstDayOfWeek, getWeekdayNames} from 'indico/utils/l10n';
@@ -34,6 +41,8 @@ customElements.define(
       max: Date, // Maximum selectable date (inclusive)
       format: String, // Date format
     };
+
+    static observedAttributes = ['min', 'max'];
 
     get value() {
       return this.querySelector('input').value;
@@ -76,10 +85,10 @@ customElements.define(
         openCalendarButton.focus();
       });
       indCalendar.addEventListener('x-select', evt => {
-        CustomElementBase.setValue(input, formatDate(this.format, new Date(evt.target.value)));
+        setValue(new Date(evt.target.value));
+        indCalendar.open = false;
         input.select();
         input.focus();
-        input.dispatchEvent(new Event('input', {bubbles: true}));
       });
       input.addEventListener('keydown', evt => {
         if (evt.code === 'ArrowDown' && evt.altKey) {
@@ -89,12 +98,22 @@ customElements.define(
       input.addEventListener('input', () => {
         indCalendar.rangeStart = indCalendar.rangeEnd = toDateString(parseDate(this.value));
       });
-      this.addEventListener('x-attrchange.min', function() {
+      this.addEventListener('x-attrchange.min', updateRange);
+      this.addEventListener('x-attrchange.max', updateRange);
+
+      function setValue(date) {
+        if (isSameDate(indDatePicker.date, date)) {
+          return;
+        }
+        CustomElementBase.setValue(input, formatDate(indDatePicker.format, date));
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+      }
+
+      function updateRange() {
         indCalendar.min = indDatePicker.min;
-      });
-      this.addEventListener('x-attrchange.max', function() {
         indCalendar.max = indDatePicker.max;
-      });
+        setValue(clampDate(indDatePicker.min, indDatePicker.max, indDatePicker.date));
+      }
     }
   }
 );
@@ -113,6 +132,15 @@ customElements.define(
       rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
       rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
     };
+
+    static observedAttributes = [
+      'range-start',
+      'range-end',
+      'range-start-min',
+      'range-start-max',
+      'range-end-min',
+      'range-end-max',
+    ];
 
     get value() {
       const rangeStartInput = this.querySelector('input[data-range-start]');
@@ -169,12 +197,18 @@ customElements.define(
         indCalendar.rangeEnd = this.rangeEnd;
         rangeEndInput.value = formatDate(dateFormat, this.rangeEnd);
       });
+      this.addEventListener('x-attrchange.range-start-min', updateRanges);
+      this.addEventListener('x-attrchange.range-start-max', updateRanges);
+      this.addEventListener('x-attrchange.range-end-min', updateRanges);
+      this.addEventListener('x-attrchange.range-end-max', updateRanges);
       rangeStartInput.addEventListener('input', () => {
         indCalendar.rangeStart = parseDate(rangeStartInput.value);
       });
       rangeEndInput.addEventListener('input', () => {
         indCalendar.rangeEnd = parseDate(rangeEndInput.value);
       });
+      rangeStartInput.addEventListener('keydown', handleAltDownToOpen);
+      rangeEndInput.addEventListener('keydown', handleAltDownToOpen);
       openCalendarButton.addEventListener('click', () => {
         // Disable the button to prevent re-opening when clicking
         // the button while the dialog is open
@@ -219,13 +253,27 @@ customElements.define(
           rangeEndInput.dispatchEvent(new Event('input', {bubbles: true}));
         }
       });
-      rangeStartInput.addEventListener('keydown', handleAltDownToOpen);
-      rangeEndInput.addEventListener('keydown', handleAltDownToOpen);
 
       function handleAltDownToOpen(evt) {
         if (evt.code === 'ArrowDown' && evt.altKey) {
           openDialog(indCalendar, rangeStartInput);
         }
+      }
+
+      function updateRanges() {
+        if (nextFieldIsRangeStart) {
+          indCalendar.min = this.rangeStartMin;
+          indCalendar.max = this.rangeStartMax;
+        } else {
+          indCalendar.min = this.rangeEndMin;
+          indCalendar.max = this.rangeEndMax;
+        }
+        indCalendar.rangeStart = clampDate(
+          indCalendar.min,
+          indCalendar.max,
+          indCalendar.rangeStart
+        );
+        indCalendar.rangeEnd = clampDate(indCalendar.min, indCalendar.max, indCalendar.rangeEnd);
       }
     }
   }

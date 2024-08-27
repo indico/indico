@@ -13,7 +13,7 @@ import DatePickerCalendar from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {DateRange} from 'indico/utils/date';
-import {formatDate} from 'indico/utils/date_format';
+import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 import {fromISOLocalDate} from 'indico/utils/date_parser';
 
 import 'indico/custom_elements/ind_date_picker';
@@ -30,11 +30,21 @@ export default function DateRangePicker({
   rangeStartMax,
   rangeEndMin,
   rangeEndMax,
+  min,
+  max,
   readOnly,
   disabled,
   onChange,
 }) {
   format ??= moment.localeData().longDateFormat('L');
+
+  if (min) {
+    rangeStartMin = rangeStartMax = min;
+  }
+
+  if (max) {
+    rangeEndMin = rangeEndMax = max;
+  }
 
   function handleChange(ev) {
     const picker = ev.currentTarget;
@@ -47,8 +57,8 @@ export default function DateRangePicker({
 
     onChange({
       // ISO local dates
-      startDate: startInvalid ? INVALID : start?.toLocaleDateString('en-ca') || null,
-      endDate: endInvalid ? INVALID : end?.toLocaleDateString('en-ca') || null,
+      startDate: startInvalid ? INVALID : formatDate(ISO_FORMAT, start) || null,
+      endDate: endInvalid ? INVALID : formatDate(ISO_FORMAT, end) || null,
     });
   }
 
@@ -119,6 +129,8 @@ DateRangePicker.propTypes = {
   rangeStartMax: PropTypes.string,
   rangeEndMin: PropTypes.string,
   rangeEndMax: PropTypes.string,
+  min: PropTypes.string,
+  max: PropTypes.string,
 };
 
 DateRangePicker.defaultProps = {
@@ -131,6 +143,8 @@ DateRangePicker.defaultProps = {
   rangeStartMax: '',
   rangeEndMin: '',
   rangeEndMax: '',
+  min: '',
+  max: '',
 };
 
 function validDate(key, message) {

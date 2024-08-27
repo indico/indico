@@ -240,3 +240,16 @@ export class OpenDateRange extends DateRangeBase {
     return date >= (this.start || -Infinity) && date <= (this.end || Infinity);
   }
 }
+
+export function clampDate(minDate, maxDate, date) {
+  if (!date) {
+    return date;
+  }
+  if (date < minDate) {
+    return new Date(minDate);
+  }
+  if (date > maxDate) {
+    return new Date(maxDate);
+  }
+  return date;
+}
