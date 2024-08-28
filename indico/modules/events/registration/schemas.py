@@ -153,10 +153,12 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
             if field['id'] in filenames:
                 obj = registration.data_by_field[field['id']]
                 field_data['data'] = filenames[field['id']]
-                if field['inputType'] == 'picture':
-                    field_data['data'] = url_for('.registration_picture', obj.locator.file, _external=True)
-                else:
-                    field_data['data'] = filenames[field['id']]
+                picture_data = {
+                    'filename': filenames[field['id']],
+                    'url': (url_for('.registration_picture', obj.locator.file, _external=True)
+                            if field['inputType'] == 'picture' else None)
+                }
+                field_data['data'] = picture_data
             section['fields'].append(field_data)
 
         return list(data.values())
