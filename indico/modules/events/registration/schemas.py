@@ -89,10 +89,8 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
                 if r.field_data.field.field_impl.is_file_field and r.storage_file_id is not None}
 
     def _get_personal_data_picture(self, registration):
-        picture = registration.get_personal_data_picture()
-        if picture is None:
-            return
-        return url_for('.registration_picture', picture.locator.file, _external=True)
+        if picture := registration.get_personal_data_picture():
+            return url_for('.registration_picture', picture.locator.file, _external=True)
 
     def _get_registration_data(self, registration):
         regform = registration.registration_form
