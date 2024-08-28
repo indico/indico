@@ -23,6 +23,7 @@ import 'moment/locale/it';
 import 'moment/locale/mn';
 import 'moment/locale/pl';
 import 'moment/locale/pt-br';
+import 'moment/locale/sv';
 import 'moment/locale/tr';
 import 'moment/locale/uk';
 import 'moment/locale/zh-cn';
