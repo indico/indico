@@ -10,6 +10,7 @@ id: <id>
 is_paid: false
 occupied_slots: 1
 payment_date: null
+personal_data_picture: null
 price: 0
 regform_id: <id>
 registration_data:
