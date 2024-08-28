@@ -7,6 +7,11 @@ Version 3.3.4
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Swedish
+
 Improvements
 ^^^^^^^^^^^^
 
