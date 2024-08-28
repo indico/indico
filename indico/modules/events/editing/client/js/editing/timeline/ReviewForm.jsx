@@ -133,27 +133,29 @@ export default function ReviewForm() {
         </>
       )}
       {canJudge && (
-        <div className="review-trigger flexrow">
-          <span className="comment-or-review">
-            <Translate>or</Translate>
-          </span>
-          <Dropdown
-            className="judgment-btn"
-            text={Translate.string('Judge')}
-            direction="left"
-            button
-            floating
-          >
-            <Dropdown.Menu>
-              <JudgmentDropdownItems
-                options={judgmentOptions}
-                setJudgmentType={type => {
-                  setSyncComment(true);
-                  setJudgmentType(type);
-                }}
-              />
-            </Dropdown.Menu>
-          </Dropdown>
+        <div className="flexcol allign-strech">
+          <div className="review-trigger flexrow">
+            <span className="comment-or-review">
+              <Translate>or</Translate>
+            </span>
+            <Dropdown
+              className="judgment-btn"
+              text={Translate.string('Judge')}
+              direction="left"
+              button
+              floating
+            >
+              <Dropdown.Menu>
+                <JudgmentDropdownItems
+                  options={judgmentOptions}
+                  setJudgmentType={type => {
+                    setSyncComment(true);
+                    setJudgmentType(type);
+                  }}
+                />
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </div>
       )}
     </div>
