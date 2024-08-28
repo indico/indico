@@ -14,8 +14,9 @@ from indico.core import signals
 from indico.core.config import config
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
 from indico.modules.events.registration.util import _base64_encode_uuid, get_custom_ticket_qr_code_handlers
@@ -159,3 +160,24 @@ class RHCheckinAPIRegistrationCustomQRCode(RHCheckinAPIBase):
             'i': [qr_code_version, url, _base64_encode_uuid(self.registration.ticket_uuid)]
         }
         return jsonify(result)
+
+
+class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
+    """Return back the picture from the picture field of the registration form."""
+
+    # TODO: De-duplicate this stuff (move this into a mixin)
+    def _process_args(self):
+        super()._process_args()
+        registration_id = request.view_args['registration_id']
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationFormItem.input_type == 'picture',
+                                   RegistrationData.registration_id == registration_id,
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
+                           .join(RegistrationData.field_data)
+                           .join(RegistrationFormFieldData.field)
+                           .options(joinedload('registration').joinedload('registration_form'))
+                           .one())
+
+    def _process(self):
+        return self.field_data.send()
