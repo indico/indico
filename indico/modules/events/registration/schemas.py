@@ -14,7 +14,6 @@ from webargs import fields
 from indico.core.marshmallow import mm
 from indico.modules.events import Event
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.registration.util import get_flat_section_submission_data, get_form_registration_data
@@ -137,11 +136,10 @@ class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):
             if field['id'] in filenames:
                 obj = registration.data_by_field[field['id']]
                 field_data['data'] = filenames[field['id']]
-                if (
-                    obj.field_data.field.input_type == 'picture'
-                    or obj.field_data.field.personal_data_type == PersonalDataType.picture
-                ):
+                if field['inputType'] == 'picture':
                     field_data['data'] = url_for('.registration_picture', obj.locator.file, _external=True)
+                else:
+                    field_data['data'] = filenames[field['id']]
             section['fields'].append(field_data)
 
         return list(data.values())

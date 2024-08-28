@@ -13,8 +13,9 @@ from werkzeug.exceptions import NotFound
 from indico.core import signals
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
                                                         CheckinRegistrationSchema)
 from indico.web.args import use_kwargs
@@ -130,3 +131,24 @@ class RHCheckinAPIRegistrationUUID(RHCheckinAPIBase):
 
     def _process_GET(self):
         return CheckinRegistrationSchema().jsonify(self.registration)
+
+
+class RHCheckinAPIRegistrationPicture(RHCheckinAPIBase):
+    """Return back the picture from the picture field of the registration form."""
+
+    # TODO: De-duplicate this stuff (move this into a mixin)
+    def _process_args(self):
+        super()._process_args()
+        registration_id = request.view_args['registration_id']
+        self.field_data = (RegistrationData.query
+                           .filter(RegistrationFormItem.input_type == 'picture',
+                                   RegistrationData.registration_id == registration_id,
+                                   RegistrationData.field_data_id == request.view_args['field_data_id'],
+                                   RegistrationData.filename.isnot(None))
+                           .join(RegistrationData.field_data)
+                           .join(RegistrationFormFieldData.field)
+                           .options(joinedload('registration').joinedload('registration_form'))
+                           .one())
+
+    def _process(self):
+        return self.field_data.send()
