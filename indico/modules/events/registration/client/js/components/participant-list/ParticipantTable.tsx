@@ -132,11 +132,10 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
             {row.columns.map((col: TableColumnObj, i: number) => (
               // eslint-disable-next-line react/no-array-index-key
               <TableCell key={i} title={col.text}>
-                {col.is_picture && col.text ? (
+                {
+                  col.is_picture ? (col.text ? (
                   <img src={col.text} alt="" styleName="cell-img" />
-                ) : (
-                  col.text
-                )}
+                ) : <div styleName="cell-img" />) : col.text}
               </TableCell>
             ))}
           </TableRow>
