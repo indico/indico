@@ -60,7 +60,7 @@ export default function TimelineHeader({children, contribution, state, submitter
     <>
       <div className="submission-title flexrow">
         <MathJax>
-          <h3 className="f-self-strech">
+          <h3>
             {contribution.title} <span className="submission-id">#{contribution.friendlyId}</span>
             {contribution.code && <span className="submission-code">{contribution.code}</span>}
           </h3>
