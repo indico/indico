@@ -174,7 +174,7 @@ export default function FormItem({
         )}
         {description && (
           <div styleName="description">
-            <Markdown>{description}</Markdown>
+            <Markdown targetBlank>{description}</Markdown>
           </div>
         )}
         {renderPluginComponents(`regform-${inputType}-field-item`, inputProps)}

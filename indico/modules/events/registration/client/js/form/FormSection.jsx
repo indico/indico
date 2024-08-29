@@ -47,7 +47,7 @@ export default function FormSection({
             {title}
           </div>
           <div className="i-box-description">
-            <Markdown>{description}</Markdown>
+            <Markdown targetBlank>{description}</Markdown>
           </div>
         </div>
         {setupActions && (
