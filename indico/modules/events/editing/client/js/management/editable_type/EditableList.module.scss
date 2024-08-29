@@ -99,4 +99,15 @@ $border: 1px solid $pastel-gray;
     /* stylelint-disable-next-line value-keyword-case */
     fill: currentColor;
   }
+
+  :global(.more-indicator) {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    background-color: white;
+    padding: 0.9em;
+    cursor: pointer;
+  }
 }
