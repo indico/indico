@@ -351,8 +351,8 @@ def test_revocation_wrong_app(db, create_application, dummy_token, test_client):
         'client_secret': other_app.client_secret
     }
     resp = test_client.post('/oauth/revoke', data=data)
-    assert resp.status_code == 200
-    assert resp.json == {}
+    assert resp.status_code == 400
+    assert resp.json == {'error': 'invalid_grant'}
     assert dummy_token in db.session
     # make sure we can still use the token
     resp = test_client.get('/api/user/', headers={'Authorization': f'Bearer {dummy_token._plaintext_token}'})
