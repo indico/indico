@@ -33,7 +33,7 @@ from indico.modules.rb.operations.misc import get_rooms_nonbookable_periods, get
 from indico.modules.rb.util import (WEEKDAYS, group_by_occurrence_date, serialize_availability, serialize_blockings,
                                     serialize_booking_details, serialize_nonbookable_periods, serialize_occurrences,
                                     serialize_unbookable_hours)
-from indico.util.date_time import iterdays, overlaps, server_to_utc
+from indico.util.date_time import iterdays, server_to_utc
 from indico.util.i18n import _
 from indico.util.iterables import group_list
 from indico.util.string import natural_sort_key
@@ -301,9 +301,12 @@ def check_room_available(room, start_dt, end_dt):
     occurrences = get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=True)
     prebookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
     bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
-    unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, [])
-    hours_overlap = any(hours for hours in unbookable_hours
-                        if overlaps((start_dt.time(), end_dt.time()), (hours.start_time, hours.end_time)))
+    unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, dict.fromkeys(WEEKDAYS, ()))
+    hours_overlap = any(
+        ubh.overlaps(start_dt.time(), end_dt.time())
+        for day_start_dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, (RepeatFrequency.DAY, 1, None))
+        for ubh in unbookable_hours[WEEKDAYS[day_start_dt.weekday()]]
+    )
     nonbookable_periods = any(get_rooms_nonbookable_periods([room], start_dt, end_dt))
     blocked_rooms = get_rooms_blockings([room], start_dt, end_dt)
     nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True, explicit=True)

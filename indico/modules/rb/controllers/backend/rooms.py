@@ -185,8 +185,8 @@ class RHRoomFavorites(RHRoomBookingBase):
 
 class RHCheckRoomAvailable(RHRoomBase):
     @use_kwargs({
-        'start_dt': NaiveDateTime(),
-        'end_dt': NaiveDateTime(),
+        'start_dt': NaiveDateTime(required=True),
+        'end_dt': NaiveDateTime(required=True),
     }, location='query')
     def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))
