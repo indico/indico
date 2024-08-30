@@ -75,6 +75,8 @@ Internal Changes
   their own plugins need to switch from ``setup.py`` and/or ``setup.cfg`` to ``pyproject.toml``
   as well (:pr:`6477`)
 - Prevent timetable entries with zero/negative durations (:pr:`6420`)
+- Warn when required ``indico.conf`` settings are missing or empty (:pr:`6504`, thanks
+  :user:`omegak`)
 
 
 Version 3.3.3

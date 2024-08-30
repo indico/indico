@@ -118,6 +118,11 @@ INTERNAL_DEFAULTS = {
     'TESTING': False
 }
 
+# Keys that are required to be set in the config file
+REQUIRED_KEYS = {'SQLALCHEMY_DATABASE_URI', 'SECRET_KEY', 'BASE_URL', 'CELERY_BROKER', 'REDIS_CACHE_URL',
+                 'DEFAULT_TIMEZONE', 'DEFAULT_LOCALE', 'CACHE_DIR', 'TEMP_DIR', 'LOG_DIR', 'STORAGE_BACKENDS',
+                 'ATTACHMENT_STORAGE', 'SUPPORT_EMAIL', 'NO_REPLY_EMAIL'}
+
 
 def get_config_path():
     """Get the path of the indico config file.
@@ -187,6 +192,12 @@ def _sanitize_data(data, allow_internal=False):
     return {k: v for k, v in data.items() if k in allowed}
 
 
+def _validate_config(data):
+    for key in sorted(REQUIRED_KEYS):
+        if not data.get(key):
+            warnings.warn(f'Required config key {key} is not configured', stacklevel=2)
+
+
 def load_config(only_defaults=False, override=None):
     """Load the configuration data.
 
@@ -215,6 +226,7 @@ def load_config(only_defaults=False, override=None):
     if override:
         data.update(_sanitize_data(override, allow_internal=True))
     _postprocess_config(data)
+    _validate_config(data)
     return ImmutableDict(data)
 
 
