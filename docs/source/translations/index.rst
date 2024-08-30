@@ -30,7 +30,7 @@ Languages with partial translations:
 - Croatian 🇭🇷
 - Greek 🇬🇷
 - Estonian 🇪🇪
-- and more! 
+- and more!
 
 We are always looking for new translators to help us make Indico accessible to
 the widest possible audience. You can help us achieve that goal by contributing
