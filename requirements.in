@@ -25,6 +25,7 @@ flask-webpackext
 flask-wtf
 flask
 google-auth
+hiredis<3  # https://github.com/redis/redis-py/pull/3324 - remove this line altogether once it's fixed
 html2text
 icalendar
 indico-fonts
@@ -35,7 +36,7 @@ jsonschema
 lxml[html5]
 markdown
 markupsafe
-marshmallow-dataclass[enum]
+marshmallow-dataclass
 marshmallow-enum
 marshmallow-oneofschema
 marshmallow-sqlalchemy
@@ -45,6 +46,7 @@ pillow
 prompt-toolkit
 psycopg2
 pycountry!=23.12.11  # annoying warning: https://github.com/pycountry/pycountry/issues/192
+pydyf<0.10  # https://github.com/Kozea/WeasyPrint/issues/2202 - remove this line altogether once it's fixed
 pygments
 pypdf
 python-dateutil
