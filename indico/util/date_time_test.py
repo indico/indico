@@ -77,7 +77,7 @@ def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expect
     ('MMdd', 'Md', 'MMdd'),  # Expand numeric fields
     ('MMMMdddd', 'MMMddd', 'MMMMdddd')  # Expand alphabetic fields
 ))
-def test__adjust_skeleton_skeleton(skeleton, format, expected):
+def test_adjust_skeleton_skeleton(skeleton, format, expected):
     assert _adjust_skeleton(format, skeleton) == expected
 
 
