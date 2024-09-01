@@ -24,14 +24,32 @@ import {Translate} from 'indico/react/i18n';
     }
   }
 
-  function hideFieldUnless(field, conditionField, requiredValues, checkedOnly) {
+  // Check criteria for HiddenUnless validator
+  function matchCriteria(requiredValues, value){
+    if(value && (typeof value === 'string') && value[0] === '['){
+      // case composite field: value is an array
+      value = JSON.parse(value);
+      let i = 0;
+      while(i < value.length){
+        if(!(requiredValues[i] === null || _.contains(requiredValues[i], value[i])))
+          return false;
+        i++;
+      }
+      return true;
+    }
+    else{
+      return _.contains(requiredValues, value);
+    }
+  }
+
+  function hideFieldUnless(field, conditionField, requiredValues, checkedOnly, inverted) {
     conditionField.on('change', function() {
       const value = checkedOnly
         ? conditionField.filter(':checked').val() || false
         : conditionField.val();
       const active = !!(
-        (!requiredValues.length && value) ||
-        (requiredValues.length && _.contains(requiredValues, value))
+        ((!requiredValues.length && value) ||
+        (requiredValues.length && matchCriteria(requiredValues, value))) ^ inverted
       );
       field.closest('.form-group').toggle(active);
       let realField = field.is(':input') ? field : field.find(':input');
@@ -153,7 +171,7 @@ import {Translate} from 'indico/react/i18n';
       const field = $(this);
       const data = field.data('hidden-unless');
       const conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
-      hideFieldUnless(field, conditionField, data.values, data.checked_only);
+      hideFieldUnless(field, conditionField, data.values, data.checked_only, data.inverted);
       setTimeout(() => {
         // we defer this call since react-based fields may no have fully rendered yet,
         // so if we call it too early we end up disabling only the hidden fields but
