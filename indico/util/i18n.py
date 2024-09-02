@@ -248,7 +248,7 @@ def get_all_locales():
                      for t in babel.list_translations()
                      if config.CUSTOM_LANGUAGES.get(str(t), missing) is not None}
         counts = Counter(x[0] for x in languages.values())
-        return {code: (name, territory, counts[name] > 1) for code, (name, territory) in languages.items()}
+        return {code: (name, territory or '', counts[name] > 1) for code, (name, territory) in languages.items()}
 
 
 def set_session_lang(lang):
