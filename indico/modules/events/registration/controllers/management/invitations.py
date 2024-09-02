@@ -180,11 +180,11 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
             tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
             defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
         form = ImportInvitationsForm(obj=defaults, regform=self.regform)
-        skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
-        skip_access_check = form.skip_access_check.data
-        skip_existing = form.skip_existing.data
-        delimiter = form.delimiter.data
         if form.validate_on_submit():
+            skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
+            skip_access_check = form.skip_access_check.data
+            skip_existing = form.skip_existing.data
+            delimiter = form.delimiter.data.delimiter
             invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
                                                                form.email_from.data, form.email_subject.data,
                                                                form.email_body.data,

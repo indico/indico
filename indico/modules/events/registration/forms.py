@@ -322,7 +322,7 @@ class ImportInvitationsForm(InvitationFormBase):
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
                             accepted_file_types='.csv')
     delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter,
-                                      default=CSVFieldDelimiter.comma.name)
+                                      default=CSVFieldDelimiter.comma)
     skip_existing = BooleanField(_('Skip existing invitations'), widget=SwitchWidget(), default=False,
                                  description=_('If enabled, users with existing invitations will be ignored.'))
 
