@@ -142,7 +142,8 @@ function AccommodationInputComponent({
           {!!selectedChoice.price && (
             <Label pointing="left" styleName="price-tag">
               {Translate.string('Total: {total} {currency}', {
-                total: (nights * selectedChoice.price).toFixed(2),
+                // Default to 0 in case of NaN
+                total: ((nights || 0) * selectedChoice.price).toFixed(2),
                 currency,
               })}
             </Label>

@@ -296,6 +296,12 @@ ind-date-grid {
       color: var(--control-text-color);
     }
 
+    &[aria-selected]:hover,
+    &[aria-selected]:focus-visible {
+      background-color: var(--control-alt-clickable-surface-focus-color);
+      color: var(--control-alt-text-color);
+    }
+
     &:focus-visible {
       z-index: 1;
     }
