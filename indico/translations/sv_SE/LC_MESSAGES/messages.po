@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
+# Adrian, 2024
 # Thomas Wennersten, 2024
 # Ulf T, 2024
 msgid ""
@@ -11,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: Ulf T, 2024\n"
+"Last-Translator: Adrian, 2024\n"
 "Language-Team: Swedish (Sweden) (http://app.transifex.com/indico/indico/language/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20537,19 +20538,19 @@ msgstr "i morgon"
 
 #: indico/util/date_time.py:289
 msgid "'Yesterday'"
-msgstr "\"Igår"
+msgstr "'Igår'"
 
 #: indico/util/date_time.py:290
 msgid "'Today'"
-msgstr "\"Idag"
+msgstr "'Idag'"
 
 #: indico/util/date_time.py:291
 msgid "'Tomorrow'"
-msgstr "\"I morgon"
+msgstr "'I morgon'"
 
 #: indico/util/date_time.py:292
 msgid "'Last' EEEE"
-msgstr "\"Sista\" EEEE"
+msgstr "'Sista' EEEE"
 
 #: indico/util/date_time.py:293
 msgid "EEEE"
@@ -20557,27 +20558,27 @@ msgstr "EEEE"
 
 #: indico/util/date_time.py:308
 msgid "'Yesterday' 'at' {time_fmt}"
-msgstr "\"Igår\" \"vid {time_fmt}"
+msgstr "'Igår' 'vid' {time_fmt}"
 
 #: indico/util/date_time.py:309
 msgid "'Today' 'at' {time_fmt}"
-msgstr "\"Idag\" \"vid {time_fmt}"
+msgstr "'Idag' 'vid' {time_fmt}"
 
 #: indico/util/date_time.py:310
 msgid "'Tomorrow' 'at' {time_fmt}"
-msgstr "\"I morgon\" \"vid {time_fmt}"
+msgstr "'I morgon' 'vid' {time_fmt}"
 
 #: indico/util/date_time.py:311
 msgid "'Last' EEEE 'at' {time_fmt}"
-msgstr "\"Sista\" EEEE \"vid {time_fmt}"
+msgstr "'Sista' EEEE 'vid' {time_fmt}"
 
 #: indico/util/date_time.py:312
 msgid "EEEE 'at' {time_fmt}"
-msgstr "EEEE \"vid {time_fmt}"
+msgstr "EEEE 'vid' {time_fmt}"
 
 #: indico/util/date_time.py:313
 msgid "{date_fmt} 'at' {time_fmt}"
-msgstr "{date_fmt} \"at {time_fmt}"
+msgstr "{date_fmt} 'vid' {time_fmt}"
 
 #: indico/util/marshmallow.py:63 indico/web/forms/validators.py:424
 msgid "Links and images may not use relative URLs."
