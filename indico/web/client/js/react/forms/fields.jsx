@@ -649,6 +649,7 @@ export function FinalSubmitButton({
   icon,
   fluid,
   style,
+  disabled,
   children,
 }) {
   const {
@@ -668,20 +669,21 @@ export function FinalSubmitButton({
       submitSucceeded: true,
     },
   });
-  const disabled =
+  const isDisabled =
+    disabled ||
     validating ||
     (disabledIfInvalid && hasValidationErrors) ||
     (disabledUntilChange && pristine) ||
     (disabledAfterSubmit && submitSucceeded) ||
     submitting;
   return (
-    <Form.Field disabled={disabled} style={style}>
+    <Form.Field disabled={isDisabled} style={style}>
       <Popup
         trigger={
           <Button
             type="submit"
             form={form}
-            disabled={disabled}
+            disabled={isDisabled}
             loading={submitting && activeSubmitButton}
             primary={color === null}
             content={label}
@@ -698,7 +700,7 @@ export function FinalSubmitButton({
       >
         <div styleName="field-error">{submitError}</div>
       </Popup>
-      {children && children(disabled)}
+      {children && children(isDisabled)}
     </Form.Field>
   );
 }
@@ -717,6 +719,7 @@ FinalSubmitButton.propTypes = {
   fluid: PropTypes.bool,
   size: PropTypes.string,
   style: PropTypes.object,
+  disabled: PropTypes.bool,
   children: PropTypes.func,
 };
 
@@ -734,6 +737,7 @@ FinalSubmitButton.defaultProps = {
   fluid: false,
   size: null,
   style: null,
+  disabled: false,
   children: null,
 };
 

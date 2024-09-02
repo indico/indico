@@ -46,10 +46,6 @@ export default function Timeline() {
     };
   }, [dispatch]);
 
-  const refresh = () => {
-    dispatch(actions.useUpdatedTimeline());
-  };
-
   if (isInitialEditableDetailsLoading) {
     return <Loader active />;
   } else if (!details) {
@@ -61,10 +57,13 @@ export default function Timeline() {
       {isOutdated && (
         <Message
           warning
-          header={Translate.string('This revision has been updated')}
+          header={Translate.string('This timeline has been updated')}
           content={
             <Translate>
-              <Param name="link" wrapper={<a onClick={refresh} />}>
+              <Param
+                name="link"
+                wrapper={<a onClick={() => dispatch(actions.useUpdatedTimeline())} />}
+              >
                 Click here to refresh
               </Param>{' '}
               and see the most recent version.
