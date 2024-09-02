@@ -198,13 +198,15 @@ class RHManageParticipants(RHManageRegFormsBase):
 class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Create a new registration form."""
 
-    def _process(self):
+    def _get_form_defaults(self):
         participant_visibility = (PublishRegistrationsMode.hide_all
                                   if self.event.type_ == EventType.conference
                                   else PublishRegistrationsMode.show_all)
         public_visibility = PublishRegistrationsMode.hide_all
-        form = RegistrationFormCreateForm(event=self.event,
-                                          visibility=[participant_visibility.name, public_visibility.name, None])
+        return FormDefaults(visibility=[participant_visibility.name, public_visibility.name, None])
+
+    def _process(self):
+        form = RegistrationFormCreateForm(obj=self._get_form_defaults(), event=self.event)
         if form.validate_on_submit():
             regform = RegistrationForm(event=self.event, currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
