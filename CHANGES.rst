@@ -32,6 +32,8 @@ Improvements
   (:pr:`6512`)
 - Preserve entered text when switching between commenting and judging in the editing
   module (:issue:`6503`, :pr:`6502`)
+- Add quick setup button to configure default notifications in Call for Abstracts
+  (:pr:`6454`, thanks :user:`jbtwist`)
 
 Bugfixes
 ^^^^^^^^

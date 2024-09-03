@@ -22,6 +22,7 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import close_cfa, open_cfa, schedule_cfa
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
+from indico.modules.events.abstracts.util import get_configured_notification_states
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
                                               sort_reviewing_questions, update_reviewing_question)
@@ -51,11 +52,13 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
         else:
             abstracts_count = Abstract.query.with_parent(self.event).count()
             custom_boa = None
+            configured_states = get_configured_notification_states(self.event)
             if self.event.has_custom_boa:
                 custom_boa = BasicFileSchema().dump(self.event.custom_boa)
             return WPManageAbstracts.render_template('management/overview.html', self.event,
                                                      abstracts_count=abstracts_count, cfa=self.event.cfa,
-                                                     custom_boa=custom_boa)
+                                                     custom_boa=custom_boa,
+                                                     notifications_configured=bool(configured_states))
 
 
 class RHScheduleCFA(RHManageAbstractsBase):

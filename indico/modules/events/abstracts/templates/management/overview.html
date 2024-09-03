@@ -1,6 +1,31 @@
 {% extends 'events/abstracts/management/_base.html' %}
 
 {% block content %}
+    {% if not notifications_configured %}
+        <div class="warning-message-box fixed-width">
+            <div class="message-box-content">
+                <span class="icon"></span>
+                <div class="message-text">
+                    {% trans %}
+                        No email notifications templates are configured for this event.
+                        You can add the default templates using the button below and customize them, or
+                        use the "Notifications" dialog to set up custom notification templates.
+                    {% endtrans %}
+                </div>
+            </div>
+            <div class="toolbar f-j-end" style="width: 100%; margin-top: 5px;">
+                <div class="group">
+                    <button class="i-button icon-settings highlight"
+                            data-href="{{ url_for('.quick_setup_notifications', event) }}"
+                            data-method="POST"
+                            data-reload-after>
+                        {% trans %}Setup default notifications{% endtrans %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% if not cfa.has_started %}
         {% include 'events/abstracts/management/cfa_actions/not_started.html' %}
     {% elif cfa.has_started and not cfa.has_ended %}

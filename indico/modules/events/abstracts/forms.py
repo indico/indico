@@ -467,7 +467,8 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
         ('accept', _('Accept')),
         ('reject', _('Reject')),
         ('invite', _('Invited')),
-        ('merge', _('Merge'))
+        ('merge', _('Merge')),
+        ('withdrawn', _('Withdrawn'))
     ], description=_('The default template that will be used as a basis for this notification. '
                      'You can customize it later.'))
 

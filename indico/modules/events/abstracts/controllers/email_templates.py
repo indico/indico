@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import request
+from flask import flash, request
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -15,7 +15,9 @@ from indico.modules.events.abstracts.forms import (CreateEmailTemplateForm, Edit
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.notifications import get_abstract_notification_tpl_module
-from indico.modules.events.abstracts.util import build_default_email_template, create_mock_abstract
+from indico.modules.events.abstracts.util import (build_default_email_template, create_mock_abstract,
+                                                  get_configured_notification_states)
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -111,6 +113,32 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
         if 'stop_on_match' in request.json:
             self.email_tpl.stop_on_match = request.json['stop_on_match']
 
+        return jsonify_data(flash=False)
+
+
+class RHQuickSetupEmailTemplates(RHManageAbstractsBase):
+    """Add all missing notification templates."""
+
+    def _process(self):
+        configured_states = get_configured_notification_states(self.event)
+        notified_states = {
+            AbstractState.submitted.value: ('submit', 'Submitted'),
+            AbstractState.withdrawn.value: ('withdrawn', 'Withdrawn'),
+            AbstractState.accepted.value: ('accept', 'Accepted'),
+            AbstractState.rejected.value: ('reject', 'Rejected'),
+            AbstractState.merged.value: ('merge', 'Merged'),
+            AbstractState.invited.value: ('invite', 'Invited'),
+        }
+        for state, (tpl_name, title) in notified_states.items():
+            if state in configured_states:
+                continue
+            new_tpl = build_default_email_template(self.event, tpl_name)
+            new_tpl.title = title
+            new_tpl.rules = [{'state': [state]}]
+            self.event.abstract_email_templates.append(new_tpl)
+            db.session.flush()
+        flash(_('Default notification templates added. You may customize them using the "Notifications" button.'),
+              'success')
         return jsonify_data(flash=False)
 
 
