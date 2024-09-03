@@ -184,7 +184,7 @@ class ParticipantListMixin:
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
                 'num_participants': query.count()}
 
-    def _participant_list_table(self, regform):
+    def _participant_list_table(self, regform, *, is_participant):
         def _process_registration(reg, column_ids, active_fields, picture_ids):
             data_by_field = reg.data_by_field
 
@@ -227,7 +227,6 @@ class ParticipantListMixin:
                            db.func.lower(Registration.last_name),
                            Registration.friendly_id)
                  .signal_query('participant-list-publishable-registrations', regform=regform))
-        is_participant = self.event.is_user_registered(session.user)
         registrations = [_process_registration(reg, column_ids, active_fields, picture_ids) for reg in query
                          if reg.is_publishable(is_participant)]
         return {'headers': headers,
@@ -256,9 +255,10 @@ class ParticipantListMixin:
                     # The settings might reference forms that are not available
                     # anymore (publishing was disabled, etc.)
                     continue
-                tables.append(self._participant_list_table(regform))
+                tables.append(self._participant_list_table(regform, is_participant=is_participant))
             # There might be forms that have not been sorted by the user yet
-            tables.extend(map(self._participant_list_table, regforms_dict.values()))
+            tables.extend(self._participant_list_table(regform, is_participant=is_participant)
+                          for regform in regforms_dict.values())
 
         num_participants = sum(table['num_participants'] for table in tables)
 
