@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import errno
+import itertools
 import os
 import shutil
 from collections import defaultdict, namedtuple
@@ -441,10 +442,10 @@ def can_create_invited_abstracts(event):
                if 'state' in rule)
 
 
-def get_email_templates_rules(event):
-    rules = set()
-    for template in event.abstract_email_templates:
-        for rule in template.rules:
-            if state := rule.get('state'):
-                rules.update(state)
-    return rules
+def get_configured_notification_states(event):
+    return set(itertools.chain.from_iterable(
+        state
+        for template in event.abstract_email_templates
+        for rule in template.rules
+        if (state := rule.get('state'))
+    ))

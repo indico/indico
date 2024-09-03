@@ -16,7 +16,7 @@ from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.notifications import get_abstract_notification_tpl_module
 from indico.modules.events.abstracts.util import (build_default_email_template, create_mock_abstract,
-                                                  get_email_templates_rules)
+                                                  get_configured_notification_states)
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_template
@@ -117,10 +117,10 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
 
 
 class RHQuickSetupEmailTemplates(RHManageAbstractsBase):
-    """Set up email templates notifications for every non-configured management action."""
+    """Add all missing notification templates."""
 
     def _process(self):
-        rules = get_email_templates_rules(self.event)
+        configured_states = get_configured_notification_states(self.event)
         notified_states = {
             AbstractState.submitted.value: ('submit', 'Submitted'),
             AbstractState.withdrawn.value: ('withdrawn', 'Withdrawn'),
@@ -129,8 +129,9 @@ class RHQuickSetupEmailTemplates(RHManageAbstractsBase):
             AbstractState.merged.value: ('merge', 'Merged'),
             AbstractState.invited.value: ('invite', 'Invited'),
         }
-        non_configured_notifications = {state: v for state, v in notified_states.items() if state not in rules}
-        for state, (tpl_name, title) in non_configured_notifications.items():
+        for state, (tpl_name, title) in notified_states.items():
+            if state in configured_states:
+                continue
             new_tpl = build_default_email_template(self.event, tpl_name)
             new_tpl.title = title
             new_tpl.rules = [{'state': [state]}]
