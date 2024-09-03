@@ -129,7 +129,7 @@ def publish_editable_revision(revision):
 
 
 @no_autoflush
-def review_editable_revision(revision, editor, action, comment, tags, files=None, management=False):
+def review_editable_revision(revision, editor, action, comment, tags, files=None, *, management=False):
     ensure_latest_revision(revision)
     if not management:
         _ensure_state(revision, EditableState.ready_for_review)

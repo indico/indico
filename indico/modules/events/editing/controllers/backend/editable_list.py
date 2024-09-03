@@ -8,7 +8,7 @@
 import uuid
 
 from flask import jsonify, request, session
-from marshmallow import fields
+from marshmallow import fields, validate
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import and_, func, over
@@ -154,23 +154,26 @@ class RHCreateComment(RHEditablesBase):
 
 class RHApplyJudgment(RHEditablesBase):
     @use_kwargs({
-        'action': EnumField(EditingReviewAction, required=True)
+        'action': EnumField(EditingReviewAction, required=True, validate=validate.OneOf({
+            EditingReviewAction.accept,
+            EditingReviewAction.reject,
+            EditingReviewAction.request_update
+        })),
+        'comment': fields.String(load_default='')
     })
-    def _process(self, action):
-        if action == EditingReviewAction.update:
-            raise ValueError('Invalid action')
-        changed = []
+    def _process(self, action, comment):
         disallowed_state = {
             EditingReviewAction.accept: EditableState.accepted,
             EditingReviewAction.reject: EditableState.rejected,
             EditingReviewAction.request_update: EditableState.needs_submitter_changes
         }[action]
+        changed = []
         for editable in self.editables:
             if action == EditingReviewAction.accept and not editable.has_publishable_files:
                 continue
             if editable.state == disallowed_state:
                 continue
-            review_and_publish_editable(editable.latest_revision, action, management=True)
+            review_and_publish_editable(editable.latest_revision, action, comment, management=True)
             db.session.expire(editable)
             changed.append(editable)
         return EditableBasicSchema(many=True).jsonify(changed)
