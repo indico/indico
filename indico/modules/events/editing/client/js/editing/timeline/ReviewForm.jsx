@@ -133,7 +133,7 @@ export default function ReviewForm() {
         </>
       )}
       {canJudge && (
-        <div className="flexcol allign-strech">
+        <div className="flexcol align-strech">
           <div className="review-trigger flexrow">
             <span className="comment-or-review">
               <Translate>or</Translate>
