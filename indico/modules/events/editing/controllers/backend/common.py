@@ -43,14 +43,17 @@ class RHMenuEntries(RHEditingBase):
     """Return the menu entries for the editing view."""
 
     def _process(self):
-        menu_entries = named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event))
+        menu_entries = sorted(
+            named_objects_from_signal(signals.menu.items.send('event-editing-sidemenu', event=self.event)).values(),
+            key=lambda x: (-x.weight, x.title),
+        )
         is_editing_manager = self.event.can_manage(session.user, permission='editing_manager')
         show_editable_list = {
             et.name: (is_editing_manager or self.event.can_manage(session.user, et.editor_permission))
             for et in EditableType
         }
         return jsonify(
-            items=EditingMenuItemSchema(many=True).dump(list(menu_entries.values())),
+            items=EditingMenuItemSchema(many=True).dump(menu_entries),
             show_management_link=is_editing_manager,
             show_editable_list=show_editable_list
         )
