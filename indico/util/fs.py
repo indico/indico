@@ -47,6 +47,8 @@ def secure_filename(filename, fallback):
     """
     if not filename:
         return fallback
+    if fallback is None:
+        fallback = ''
     filename, ext = os.path.splitext(filename)
     if not (filename := _secure_filename(str_to_ascii(filename))):
         # fallback to the name part of the fallback (it may or may not contain an extension)

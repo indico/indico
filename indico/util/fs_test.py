@@ -41,6 +41,7 @@ def test_secure_client_filename(filename, expected):
     ('filename', '', 'filename'),
     ('file.name', '', 'file.name'),
     ('   ', '', 'fallback'),
+    ('foo.', '', 'foo'),
     ('foo', '.txt', 'foo'),
     ('\u4e17', '', 'fallback'),
     ('\u4e17.txt', '', 'fallback.txt'),
@@ -52,6 +53,17 @@ def test_secure_client_filename(filename, expected):
 ))
 def test_secure_filename(filename, fallback_ext, expected):
     assert secure_filename(filename, f'fallback{fallback_ext}') == expected
+
+
+@pytest.mark.parametrize(('filename', 'expected'), (
+    ('foo', 'foo'),
+    ('foo.', 'foo'),
+    ('\u4e17', ''),
+    ('\u4e17.', ''),
+))
+def test_secure_filename_empty_fallback(filename, expected):
+    assert secure_filename(filename, '') == expected
+    assert secure_filename(filename, None) == expected
 
 
 def test_secure_filename_max_length():
