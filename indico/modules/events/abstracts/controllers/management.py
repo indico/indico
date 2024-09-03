@@ -57,7 +57,7 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
                 custom_boa = BasicFileSchema().dump(self.event.custom_boa)
             return WPManageAbstracts.render_template('management/overview.html', self.event,
                                                      abstracts_count=abstracts_count, cfa=self.event.cfa,
-                                                     custom_boa=custom_boa, quick_setup=bool(not rules))
+                                                     custom_boa=custom_boa, notifications_configured=bool(rules))
 
 
 class RHScheduleCFA(RHManageAbstractsBase):

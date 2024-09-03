@@ -1,7 +1,7 @@
 {% extends 'events/abstracts/management/_base.html' %}
 
 {% block content %}
-    {% if quick_setup %}
+    {% if not notifications_configured %}
         <div class="warning-message-box fixed-width">
             <div class="message-box-content">
                 <span class="icon"></span>
