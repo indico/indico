@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import flash, redirect, request
+from flask import flash, request
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -17,8 +17,8 @@ from indico.modules.events.abstracts.models.email_templates import AbstractEmail
 from indico.modules.events.abstracts.notifications import get_abstract_notification_tpl_module
 from indico.modules.events.abstracts.util import (build_default_email_template, create_mock_abstract,
                                                   get_email_templates_rules)
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -122,23 +122,23 @@ class RHQuickSetupEmailTemplates(RHManageAbstractsBase):
     def _process(self):
         rules = get_email_templates_rules(self.event)
         notified_states = {
-            'Submit': AbstractState.submitted.value,
-            'Withdrawn': AbstractState.withdrawn.value,
-            'Accept': AbstractState.accepted.value,
-            'Reject': AbstractState.rejected.value,
-            'Merge': AbstractState.merged.value,
-            'Invite': AbstractState.invited.value
+            AbstractState.submitted.value: ('submit', 'Submitted'),
+            AbstractState.withdrawn.value: ('withdrawn', 'Withdrawn'),
+            AbstractState.accepted.value: ('accept', 'Accepted'),
+            AbstractState.rejected.value: ('reject', 'Rejected'),
+            AbstractState.merged.value: ('merge', 'Merged'),
+            AbstractState.invited.value: ('invite', 'Invited'),
         }
-        non_configured_notifications = {k: v for k, v in notified_states.items() if v not in rules}
-        for k, v in non_configured_notifications.items():
-            new_tpl = build_default_email_template(self.event, k.lower())
-            new_tpl.title = k
-            new_tpl.rules = [{'state': [v]}]
+        non_configured_notifications = {state: v for state, v in notified_states.items() if state not in rules}
+        for state, (tpl_name, title) in non_configured_notifications.items():
+            new_tpl = build_default_email_template(self.event, tpl_name)
+            new_tpl.title = title
+            new_tpl.rules = [{'state': [state]}]
             self.event.abstract_email_templates.append(new_tpl)
             db.session.flush()
-        flash('Default notifications for emails created. You may customize them using the Notifications option.',
+        flash(_('Default notification templates added. You may customize them using the "Notifications" button.'),
               'success')
-        return redirect(url_for('abstracts.management', self.event))
+        return jsonify_data(flash=False)
 
 
 def _get_rules_fields(event):
