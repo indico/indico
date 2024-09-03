@@ -16,6 +16,7 @@ import {Dropdown, Form} from 'semantic-ui-react';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FinalCheckbox, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {DirtyInitialValue} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -81,9 +82,10 @@ export default function ReviewForm() {
     avatarURL: Indico.User.avatarURL,
   };
 
-  const [commentFormVisible, setCommentFormVisible] = useState(false);
   const [judgmentType, setJudgmentType] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [commentValue, setCommentValue] = useState('');
+  const [syncComment, setSyncComment] = useState(false);
   const files = getFilesFromRevision(fileTypes, lastRevisionWithFiles);
 
   const createComment = async (formData, form) => {
@@ -107,7 +109,13 @@ export default function ReviewForm() {
 
   const judgmentForm = (
     <div className="flexrow f-a-center" styleName="judgment-form">
-      <CommentForm onSubmit={createComment} onToggleExpand={setCommentFormVisible} />
+      <CommentForm
+        onSubmit={createComment}
+        commentValue={commentValue}
+        onCommentChange={setCommentValue}
+        syncComment={syncComment}
+        setSyncComment={setSyncComment}
+      />
       {canPerformSubmitterActions && canReview && !editor && (
         <>
           <span className="comment-or-review">
@@ -124,22 +132,30 @@ export default function ReviewForm() {
           />
         </>
       )}
-      {!commentFormVisible && canJudge && (
-        <div className="review-trigger flexrow">
-          <span className="comment-or-review">
-            <Translate>or</Translate>
-          </span>
-          <Dropdown
-            className="judgment-btn"
-            text={Translate.string('Judge')}
-            direction="left"
-            button
-            floating
-          >
-            <Dropdown.Menu>
-              <JudgmentDropdownItems options={judgmentOptions} setJudgmentType={setJudgmentType} />
-            </Dropdown.Menu>
-          </Dropdown>
+      {canJudge && (
+        <div className="flexcol align-strech">
+          <div className="review-trigger flexrow">
+            <span className="comment-or-review">
+              <Translate>or</Translate>
+            </span>
+            <Dropdown
+              className="judgment-btn"
+              text={Translate.string('Judge')}
+              direction="left"
+              button
+              floating
+            >
+              <Dropdown.Menu>
+                <JudgmentDropdownItems
+                  options={judgmentOptions}
+                  setJudgmentType={type => {
+                    setSyncComment(true);
+                    setJudgmentType(type);
+                  }}
+                />
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </div>
       )}
     </div>
@@ -188,7 +204,10 @@ export default function ReviewForm() {
                 <Form id="judgment-form" onSubmit={handleSubmit}>
                   <JudgmentBoxHeader
                     judgmentType={judgmentType}
-                    setJudgmentType={setJudgmentType}
+                    setJudgmentType={type => {
+                      setSyncComment(true);
+                      setJudgmentType(type);
+                    }}
                     options={judgmentOptions}
                     loading={loading}
                   />
@@ -198,9 +217,17 @@ export default function ReviewForm() {
                     hideValidationError
                     autoFocus
                     required={judgmentType !== EditingReviewAction.accept}
+                    onChange={setCommentValue}
                     /* otherwise changing required doesn't work properly if the field has been touched */
                     key={judgmentType}
                   />
+                  {syncComment && (
+                    <DirtyInitialValue
+                      field="comment"
+                      value={commentValue}
+                      onUpdate={() => setSyncComment(false)}
+                    />
+                  )}
                   {[EditingReviewAction.accept, EditingReviewAction.requestUpdate].includes(
                     judgmentType
                   ) && (
@@ -233,6 +260,13 @@ export default function ReviewForm() {
                     <FinalSubmitButton
                       label={Translate.string('Judge')}
                       disabledUntilChange={judgmentType !== EditingReviewAction.accept}
+                      // XXX: For some reason the button does not properly update with the correct
+                      // `dirty` state after setting the `comment` value programmatically, but by
+                      // also subscribing to `touched` we avoid this bug.
+                      // If someone ever needs to change something there or test this behavior, it
+                      // happens when you write a comment, then switch to judgment mode, then close
+                      // the judgment form again and then switch to judgment mode again.
+                      extraSubscription={{touched: true}}
                     />
                   </div>
                 </Form>

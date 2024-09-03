@@ -193,6 +193,7 @@
   .review-trigger {
     white-space: nowrap;
     align-items: center;
+    flex-basis: 50%;
 
     .judgment-btn,
     .judgment-btn.active {
@@ -210,6 +211,10 @@
         vertical-align: bottom;
       }
     }
+  }
+
+  .align-strech {
+    align-self: stretch;
   }
 }
 

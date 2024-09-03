@@ -30,6 +30,8 @@ Improvements
   thanks :user:`SegiNyn`)
 - Always open links in registration form field/section descriptions in a new tab
   (:pr:`6512`)
+- Preserve entered text when switching between commenting and judging in the editing
+  module (:issue:`6503`, :pr:`6502`)
 
 Bugfixes
 ^^^^^^^^
