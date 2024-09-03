@@ -90,7 +90,7 @@ email-validator==1.2.1
     # via
     #   -r requirements.in
     #   wtforms
-executing==2.0.1
+executing==2.1.0
     # via
     #   sentry-sdk
     #   stack-data
@@ -115,7 +115,7 @@ flask-babel==4.0.0
     # via -r requirements.in
 flask-caching==2.3.0
     # via -r requirements.in
-flask-cors==4.0.1
+flask-cors==5.0.0
     # via -r requirements.in
 flask-limiter==3.8.0
     # via -r requirements.in
