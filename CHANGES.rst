@@ -7,6 +7,16 @@ Version 3.3.4
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix an XSS vulnerability during account creation. Exploitation requires initiating
+  account creation with a maliciously crafted link, and then finalizing the signup
+  process, so it can only target newly created (and thus unprivileged) Indico users.
+  We consider this vulnerability to be of "medium" severity since the ability to abuse
+  this is somewhat limited, but you should update as soon as possible nonetheless
+  (GHSA-rrqf-w74j-24ff)
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
