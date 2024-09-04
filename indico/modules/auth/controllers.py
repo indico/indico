@@ -39,7 +39,7 @@ from indico.util.i18n import _, force_locale
 from indico.util.marshmallow import LowercaseString, ModelField, not_empty
 from indico.util.passwords import validate_secure_password
 from indico.util.signing import secure_serializer
-from indico.util.string import crc32
+from indico.util.string import crc32, validate_email
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -718,6 +718,8 @@ class LocalRegistrationHandler(RegistrationHandler):
             def validate_username(self, username, **kwargs):
                 if Identity.query.filter_by(provider='indico', identifier=username).has_rows():
                     raise ValidationError(_('This username is already in use.'))
+                if validate_email(username, check_dns=False):
+                    raise ValidationError(_('Your username cannot be an email address.'))
 
             @validates_schema(skip_on_field_errors=False)
             def validate_password(self, data, **kwargs):
