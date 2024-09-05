@@ -13,7 +13,7 @@ from flask import after_this_request, current_app, g, jsonify, render_template, 
 from flask_cors.core import get_cors_options, set_cors_headers
 from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
-from werkzeug.exceptions import Forbidden, HTTPException
+from werkzeug.exceptions import Forbidden, HTTPException, TooManyRequests
 
 from indico.core.cache import make_scoped_cache
 from indico.core.errors import NoReportError
@@ -96,6 +96,9 @@ def _is_error_reporting_opted_out(code):
 def _is_error_reportable(exc):
     # client explicitly opted out from reporting this (expected) error
     if hasattr(exc, 'code') and _is_error_reporting_opted_out(exc.code):
+        return False
+    # rate limit exceeded
+    elif isinstance(exc, TooManyRequests):
         return False
     # error marked as not reportable
     elif isinstance(exc, NoReportError) or getattr(exc, '_disallow_report', False):
