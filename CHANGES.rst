@@ -41,7 +41,7 @@ Security fixes
   process, so it can only target newly created (and thus unprivileged) Indico users.
   We consider this vulnerability to be of "medium" severity since the ability to abuse
   this is somewhat limited, but you should update as soon as possible nonetheless
-  (GHSA-rrqf-w74j-24ff)
+  (:cve:`CVE-2024-45399`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
