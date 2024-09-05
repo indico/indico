@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import preval from 'preval.macro';
+
 import CustomElementBase from 'indico/custom_elements/_base';
 import {formatDate} from 'indico/utils/date_format';
 import {createDateParser} from 'indico/utils/date_parser';
@@ -157,7 +159,7 @@ customElements.define(
       }
 
       // Populate weekday names in the calendar header
-      getWeekdayNames(this.weekInfo).forEach(({full, short}, i) => {
+      getWeekdayNames(this.weekInfo, this.locale).forEach(({full, short}, i) => {
         const headerCell = weekdaysGroup.children[i];
         headerCell.setAttribute('aria-label', full);
         headerCell.textContent = short;
@@ -479,9 +481,52 @@ function toOptionalDate(dateString) {
 
 // Localization
 
+// This is used in browsers that do not support Intl API.
+// Only those items where the data differs from the generic
+// fallback are listed.
+// language=JavaScript
+const WEEK_INFO = preval`
+const fs = require('node:fs');
+const path = require('node:path');
+const MONDAY = 1
+const SATURDAY = 6
+
+// Traverse up to package.json and then calculate
+// translations path from there
+let packageJsonDir = __dirname;
+while (packageJsonDir !== path.dirname(packageJsonDir)) {
+  if (fs.existsSync(path.join(packageJsonDir, 'package.json'))) {
+    break;
+  }
+  packageJsonDir = path.dirname(packageJsonDir);
+}
+const translationDir = path.resolve(packageJsonDir, 'indico/translations')
+
+const localeData = {}
+const paths = fs.readdirSync(translationDir, {withFileTypes: true});
+
+for (let p of paths) {
+  if (p.isDirectory()) {
+    // Transform locale to a browser-compatible version
+    let parts = p.name.split('_')
+    let localeName = parts[0] + '-' + parts.at(-1)
+
+    // Convert to week info
+    const weekInfo = new Intl.Locale(localeName).weekInfo
+
+    // To save bandwidth, we store fallback only for non-ISO-8601 weeks
+    if (weekInfo.firstDay !== MONDAY || weekInfo.weekend[0] !== SATURDAY) {
+      localeData[localeName] = weekInfo;
+    }
+  }
+}
+
+module.exports = localeData;
+`;
+const ISO_WEEK_INFO = {firstDay: 1, weekend: [6, 7]};
+
 function getWeekInfoForLocale(locale) {
-  let weekInfo = new Intl.Locale(locale).weekInfo;
-  weekInfo ??= {firstDay: 7, weekend: [6, 7]}; /* Firefox 😭 */
+  const weekInfo = WEEK_INFO[locale] ?? ISO_WEEK_INFO;
   weekInfo.weekDays = [];
   for (let i = weekInfo.firstDay, end = i + 7; i < end; i++) {
     weekInfo.weekDays.push(i % 7 || 7);
