@@ -657,6 +657,18 @@ LaTeX
 
     Default: ``False``
 
+.. data:: LATEX_RATE_LIMIT
+
+    Applies a rate limit to public endpoints that generate PDFs using LaTeX
+    when accessed by people who are not logged in (such as crawlers).
+
+    Rate limiting is applied by IP address.
+
+    The default allows 2 PDF generations every 3 seconds. Setting the rate limit
+    to ``None`` disables it.
+
+    Default: ``'2 per 3 seconds'``
+
 
 Logging
 -------

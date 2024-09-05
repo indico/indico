@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import codecs
+import functools
 import os
 import subprocess
 import tempfile
@@ -13,6 +14,7 @@ from importlib.resources import as_file
 from importlib.resources import files as res_files
 from io import BytesIO
 from operator import attrgetter
+from pathlib import Path
 from zipfile import ZipFile
 
 import markdown
@@ -22,8 +24,13 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from jinja2.ext import Extension
 from jinja2.lexer import Token
 from pytz import timezone
+from sqlalchemy import inspect
+from werkzeug.exceptions import TooManyRequests
+from werkzeug.local import LocalProxy
 
+from indico.core.cache import make_scoped_cache
 from indico.core.config import config
+from indico.core.limiter import make_rate_limiter
 from indico.core.logger import Logger
 from indico.legacy.pdfinterface.base import escape
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
@@ -36,6 +43,45 @@ from indico.util.date_time import format_date, format_human_timedelta, format_ti
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
 from indico.util.string import render_markdown
+
+
+#: A rate limiter for PDF generation endpoints that are available publicly without logging in
+latex_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('latex', config.LATEX_RATE_LIMIT)))
+cache = make_scoped_cache('latex-pdfs')
+
+
+def generate_cached_pdf(fn, key, obj=None) -> BytesIO:
+    """Generate a PDF from LaTeX with caching and rate limiting.
+
+    This expects a callable (which will be called with `obj` as its argument)
+    that generates a PDF file and returns the PDF bytes.
+
+    It also takes a `key` which should be unique to this particular PDF generation and
+    of course the `obj` which is the object from which the PDF is generated (this must be
+    an SQLAlchemy object).
+
+    In cases where there is no single object, the `obj` argument can be omitted, in which
+    case `fn` will be called without arguments. The `key` must contain enough details to
+    ensure proper cache separation in that case.
+
+    The generated PDF is cached (longer when the request comes from an unauthenticated user),
+    and rate limiting is applied as well if the user is unauthenticated.
+    """
+    user_id = session.user.id if session.user else None
+    # Cache for a short time even if the user is logged-in, because IIRC some browsers send more
+    # than one request for PDF files.
+    cache_ttl = 15 if session.user else 300
+    # XXX We cache by user just in case something in the templates depends on who's generating them.
+    # I don't think it's the case, and it should not be the case, but better stick on the safe side.
+    cache_key = (key, user_id, *(inspect(obj).identity_key[:2] if obj else ()))
+    if (cached := cache.get(cache_key)) is not None:
+        return BytesIO(cached)
+    if not session.user and not latex_rate_limiter.hit():
+        delay = format_human_timedelta(latex_rate_limiter.get_reset_delay())
+        raise TooManyRequests(f"You're doing this too fast, please try again in {delay}")
+    data = fn(obj) if obj is not None else fn()
+    cache.set(cache_key, data, cache_ttl)
+    return BytesIO(data)
 
 
 class PDFLaTeXBase:
@@ -58,9 +104,10 @@ class PDFLaTeXBase:
 
         self._args = {'markdown': _convert_markdown}
 
-    def generate(self):
+    def generate(self, *, as_bytes=False):
         latex = LatexRunner(self.source_dir, has_toc=self._table_of_contents)
-        return latex.run(self.LATEX_TEMPLATE, **self._args)
+        filename = latex.run(self.LATEX_TEMPLATE, **self._args)
+        return Path(filename).read_bytes() if as_bytes else filename
 
     def generate_source_archive(self):
         latex = LatexRunner(self.source_dir, has_toc=self._table_of_contents)

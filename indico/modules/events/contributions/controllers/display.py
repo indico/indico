@@ -14,7 +14,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.core.db import db
-from indico.legacy.pdfinterface.latex import ContribsToPDF, ContribToPDF
+from indico.legacy.pdfinterface.latex import ContribsToPDF, ContribToPDF, generate_cached_pdf
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.ical import contribution_to_ical
@@ -233,8 +233,8 @@ class RHContributionExportToPDF(RHContributionDisplayBase):
     def _process(self):
         if not config.LATEX_ENABLED:
             raise NotFound
-        pdf = ContribToPDF(self.contrib)
-        return send_file('contribution.pdf', pdf.generate(), 'application/pdf')
+        data = generate_cached_pdf(lambda c: ContribToPDF(c).generate(as_bytes=True), 'contrib', self.contrib)
+        return send_file('contribution.pdf', data, 'application/pdf')
 
 
 class RHContributionsExportToPDF(RHContributionList):
@@ -242,8 +242,11 @@ class RHContributionsExportToPDF(RHContributionList):
         if not config.LATEX_ENABLED:
             raise NotFound
         contribs = self.list_generator.get_list_kwargs()['contribs']
-        pdf = ContribsToPDF(self.event, contribs)
-        return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
+        data = generate_cached_pdf(
+            lambda: ContribsToPDF(self.event, contribs).generate(as_bytes=True),
+            ('contribs', '-'.join(sorted(str(c.id) for c in contribs))),
+        )
+        return send_file('contributions.pdf', data, 'application/pdf')
 
 
 @allow_signed_url

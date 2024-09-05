@@ -57,6 +57,7 @@ DEFAULTS = {
     'FAILED_LOGIN_RATE_LIMIT': '5 per 15 minutes; 10 per day',
     'FAVICON_URL': None,
     'IDENTITY_PROVIDERS': {},
+    'LATEX_RATE_LIMIT': '2 per 3 seconds',
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,
     'LOCAL_REGISTRATION': True,
@@ -293,8 +294,11 @@ class IndicoConfig:
         return urljoin(self.BASE_URL, self.WALLET_LOGO_URL) if self.WALLET_LOGO_URL else None
 
     def validate(self):
-        from indico.core.auth import login_rate_limiter
-        login_rate_limiter._get_current_object()  # fail in case FAILED_LOGIN_RATE_LIMIT invalid
+        from indico.core.auth import login_rate_limiter, signup_rate_limiter
+        from indico.legacy.pdfinterface.latex import latex_rate_limiter
+        login_rate_limiter._get_current_object()  # fail in case FAILED_LOGIN_RATE_LIMIT is invalid
+        signup_rate_limiter._get_current_object()  # fail in case SIGNUP_RATE_LIMIT is invalid
+        latex_rate_limiter._get_current_object()  # fail in case LATEX_RATE_LIMIT is invalid
         if self.DEFAULT_TIMEZONE not in pytz.all_timezones_set:
             raise ValueError(f'Invalid default timezone: {self.DEFAULT_TIMEZONE}')
         if self.SMTP_ALLOWED_SENDERS and not self.SMTP_SENDER_FALLBACK:
