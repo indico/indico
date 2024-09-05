@@ -1,0 +1,55 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'partials/icons';
+@use 'partials/sui_debt';
+
+.checkbox-label {
+  display: inline-flex;
+  gap: var(--content-gap-normal);
+  align-items: center;
+}
+
+.checkbox {
+  --checkbox-size: 1.2em;
+
+  appearance: none;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+
+  // XXX: We cannot use sui_debt here because of `appearance:none`.
+  // Since we need this element to match the appearance of the SUI
+  // controls, we have to hard-code the styles here.
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+
+  &:disabled {
+    border-color: 1px solid rgba(34, 36, 38, 0.15);
+  }
+
+  &:focus {
+    border: 1px solid #85b7d9;
+  }
+
+  &:checked {
+    background-color: #85b7d9;
+  }
+
+  &:checked::before {
+    @extend %icon;
+    @extend %icon-checkmark;
+
+    position: absolute; // do not affect the layout
+    display: inline-block;
+    color: white;
+
+    font-size: 87.5%;
+  }
+}

@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'partials/icons';
 @use './variables';
 @use './layout';
 @use './utils';
 @use './button';
-@use 'partials/icons';
 
 %dialog-modal {
   @extend %text-size-reset;
