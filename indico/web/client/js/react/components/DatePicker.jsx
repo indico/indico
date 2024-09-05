@@ -35,7 +35,7 @@ export default function DatePicker({
   const formattedValue = formatDate(format, fromISOLocalDate(value));
 
   return (
-    <ind-date-picker>
+    <ind-date-picker format={format}>
       <input
         type="text"
         onChange={handleDateChange}
