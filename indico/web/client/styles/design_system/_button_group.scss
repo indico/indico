@@ -5,11 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'partials/icons';
 @use './button';
 @use './layout';
 @use './form_controls';
 @use './utils';
-@use 'partials/icons';
 
 %button-group-base {
   // Recommended structure:

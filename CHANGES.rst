@@ -146,6 +146,7 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
+- Reimplement Checkbox to make it programmatically focusable (:pr:`6528`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

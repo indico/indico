@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
 @use 'partials/icons';
 @use 'partials/sui_debt';
-@use 'design_system';
 
 ind-combo-box {
   display: inline-block;

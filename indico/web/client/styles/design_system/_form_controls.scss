@@ -5,10 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'partials/icons';
 @use './variables';
 @use './utils';
 @use './layout';
-@use 'partials/icons';
 
 %form-label {
   @extend %reset-font-and-color;
