@@ -12,7 +12,7 @@ import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
 import {Button, Dropdown, Form, Input, Popup, Radio, TextArea, Icon} from 'semantic-ui-react';
 
-import {Checkbox} from 'indico/react/components';
+import Checkbox from 'indico/react/components/Checkbox';
 
 import formatters from './formatters';
 import parsers from './parsers';
