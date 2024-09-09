@@ -5,8 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import * as fields from './fields';
+
 export {handleSubmissionError} from './errors';
-export {
+export const {
   FinalCheckbox,
   FinalComboDropdown,
   FinalDropdown,
@@ -17,7 +19,7 @@ export {
   FinalTextArea,
   FormFieldAdapter,
   unsortedArraysEqual,
-} from './fields';
+} = fields; // Fix circular dependency issue
 export {default as validators} from './validators';
 export {default as parsers} from './parsers';
 export {default as formatters} from './formatters';
