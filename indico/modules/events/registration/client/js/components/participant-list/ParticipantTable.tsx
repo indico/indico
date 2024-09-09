@@ -90,7 +90,6 @@ export default function ParticipantTable({table}: ParticipantTableProps) {
         <TableRow>
           {table.show_checkin && ( // For checkin status
             <TableHeaderCell
-              textAlign="center"
               styleName="participant-table-row icon-cell"
               onClick={() => handleSort('checked_in')}
               sorted={sortColumn === 'checked_in' ? sortDirection : undefined}
