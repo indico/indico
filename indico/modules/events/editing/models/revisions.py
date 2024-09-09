@@ -7,6 +7,11 @@
 
 from collections import defaultdict
 
+from sqlalchemy import orm
+from sqlalchemy.event import listens_for
+from sqlalchemy.orm import column_property
+from sqlalchemy.sql import select
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
@@ -177,7 +182,13 @@ class EditingRevision(RenderModeMixin, db.Model):
     def is_editor_revision(self):
         return self.type.is_editor_action
 
-    @property
-    def last_update_dt(self):
-        latest_comment_dt = max((comment.modified_dt or comment.created_dt for comment in self.comments), default=None)
-        return latest_comment_dt or self.modified_dt or self.created_dt
+    @listens_for(orm.mapper, 'after_configured', once=True)
+    def _mappers_configured():
+        from indico.modules.events.editing.models.comments import EditingRevisionComment
+        query = (select([db.func.greatest(db.func.max(EditingRevisionComment.modified_dt),
+                                          db.func.max(EditingRevisionComment.created_dt),
+                                          EditingRevision.modified_dt, EditingRevision.created_dt)])
+                 .where(EditingRevisionComment.revision_id == EditingRevision.id)
+                 .correlate_except(EditingRevisionComment)
+                 .scalar_subquery())
+        EditingRevision.last_update_dt = column_property(query)
