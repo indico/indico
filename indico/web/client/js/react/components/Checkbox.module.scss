@@ -23,6 +23,7 @@
   align-items: center;
   width: var(--checkbox-size);
   height: var(--checkbox-size);
+  margin: 0;
 
   // XXX: We cannot use sui_debt here because of `appearance:none`.
   // Since we need this element to match the appearance of the SUI
