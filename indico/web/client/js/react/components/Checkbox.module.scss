@@ -39,18 +39,32 @@
     border: 1px solid #85b7d9;
   }
 
-  &:checked {
+  &:checked,
+  &:indeterminate {
     background-color: #85b7d9;
+  }
+
+  &:checked::before,
+  &:indeterminate::before {
+    position: absolute; // do not affect the layout
+    display: inline-block;
+
+    color: white;
+    font-size: 87.5%;
   }
 
   &:checked::before {
     @extend %icon;
     @extend %icon-checkmark;
+  }
 
-    position: absolute; // do not affect the layout
+  &:indeterminate::before {
+    content: '';
+
     display: inline-block;
-    color: white;
+    width: 0.8em;
+    height: 0.2em;
 
-    font-size: 87.5%;
+    background-color: currentcolor;
   }
 }
