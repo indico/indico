@@ -15,56 +15,106 @@
 }
 
 .checkbox {
-  --checkbox-size: 1.2em;
-
   appearance: none;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: var(--checkbox-size);
-  height: var(--checkbox-size);
-  margin: 0;
 
-  // XXX: We cannot use sui_debt here because of `appearance:none`.
-  // Since we need this element to match the appearance of the SUI
-  // controls, we have to hard-code the styles here.
-  border: 1px solid rgba(34, 36, 38, 0.15);
-  border-radius: 0.28571429rem;
+  transition: background 0.2s;
 
-  &:disabled {
-    border-color: 1px solid rgba(34, 36, 38, 0.15);
+  &:not([data-as-toggle]) {
+    --checkbox-size: 1.2em;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    margin: 0;
+
+    // XXX: We cannot use sui_debt here because of `appearance:none`.
+    // Since we need this element to match the appearance of the SUI
+    // controls, we have to hard-code the styles here.
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    border-radius: 0.28571429rem;
+
+    &:disabled {
+      border-color: 1px solid rgba(34, 36, 38, 0.15);
+    }
+
+    &:focus {
+      border: 1px solid #85b7d9;
+    }
+
+    &:checked,
+    &:indeterminate {
+      background-color: #85b7d9;
+    }
+
+    &:checked::before,
+    &:indeterminate::before {
+      position: absolute; // do not affect the layout
+      display: inline-block;
+
+      color: white;
+      font-size: 87.5%;
+    }
+
+    &:checked::before {
+      @extend %icon;
+      @extend %icon-checkmark;
+    }
+
+    &:indeterminate::before {
+      content: '';
+
+      display: inline-block;
+      width: 0.8em;
+      height: 0.2em;
+
+      background-color: currentcolor;
+    }
   }
 
-  &:focus {
-    border: 1px solid #85b7d9;
-  }
+  &[data-as-toggle='true'] {
+    --toggle-size: 1.5em;
 
-  &:checked,
-  &:indeterminate {
-    background-color: #85b7d9;
-  }
-
-  &:checked::before,
-  &:indeterminate::before {
-    position: absolute; // do not affect the layout
     display: inline-block;
+    position: relative;
+    width: calc(var(--toggle-size) * 2);
+    height: var(--toggle-size);
 
-    color: white;
-    font-size: 87.5%;
-  }
+    overflow: hidden;
+    border-radius: calc(var(--toggle-size) / 2) / 50%;
+    box-shadow: inset 0 0 0.1em rgba(0, 0, 0, 0.4);
+    @include sui_debt.input-border();
+    @include sui_debt.input-background();
 
-  &:checked::before {
-    @extend %icon;
-    @extend %icon-checkmark;
-  }
+    &:is(:focus, :hover) {
+      @include sui_debt.input-focus-border();
+    }
 
-  &:indeterminate::before {
-    content: '';
+    &::before {
+      // Toggle button
+      content: '';
 
-    display: inline-block;
-    width: 0.8em;
-    height: 0.2em;
+      display: inline-block;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      aspect-ratio: 1;
 
-    background-color: currentcolor;
+      box-shadow: 0 0 0.2em rgba(0, 0, 0, 0.4);
+      border-radius: 50%;
+      transition: transform 0.2s;
+      @include sui_debt.input-border();
+      @include sui_debt.input-background();
+    }
+
+    &:checked {
+      background: #85b7d9;
+    }
+
+    &:checked::before {
+      transform: translateX(var(--toggle-size));
+    }
   }
 }

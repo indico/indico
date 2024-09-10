@@ -10,17 +10,18 @@ import React, {useEffect, useRef} from 'react';
 
 import './Checkbox.module.scss';
 
-export default function Checkbox({label, onChange, indeterminate, ...inputProps}) {
-  console.log(inputProps);
+export default function Checkbox({label, onChange, indeterminate, showAsToggle, ...inputProps}) {
   const checkbox = useRef();
 
   useEffect(() => {
     checkbox.current.indeterminate = indeterminate;
-    console.log(checkbox.current, checkbox.current.indeterminate);
   }, [indeterminate]);
 
-  // Type, whether specified or not, will always be 'checkbox'
+  // Props fixup
   inputProps.type = 'checkbox';
+  if (showAsToggle) {
+    inputProps['data-as-toggle'] = true;
+  }
 
   const handleChange = evt => {
     onChange(evt, {checked: evt.target.checked});
@@ -40,8 +41,10 @@ Checkbox.propTypes = {
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   onChange: PropTypes.func.isRequired,
   indeterminate: PropTypes.bool,
+  showAsToggle: PropTypes.bool,
 };
 
 Checkbox.defaultProps = {
   indeterminate: false,
+  showAsToggle: false,
 };
