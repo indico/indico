@@ -110,7 +110,7 @@ const PictureManager = ({
   }, [picturePreview, previewURL, isInitialPicture]);
 
   const deleteUploadedPicture = useCallback(() => {
-    if (uploadFinished || pictureState.picture !== null) {
+    if (uploadFinished || (pictureState.picture !== null && pictureState.picture.uuid !== null)) {
       deleteFile(pictureState.picture.uuid);
     }
   }, [uploadFinished, pictureState.picture]);
@@ -197,7 +197,9 @@ const PictureManager = ({
   const onImageCrop = () => {
     if (cropperRef.current.cropper !== undefined) {
       const settings = {minWidth: 25, minHeight: 25};
-      const imageSrc = cropperRef.current.cropper.getCroppedCanvas(settings).toDataURL();
+      const imageSrc = cropperRef.current.cropper
+        .getCroppedCanvas(settings)
+        .toDataURL('image/jpeg');
       setPicturePreview(imageSrc);
       fetch(imageSrc)
         .then(res => res.blob())
