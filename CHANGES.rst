@@ -15,7 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Make picture field more resilient when uploading and resizing pictures close to
+  the max upload file size (:pr:`6530`, thanks :user:`SegiNyn`)
 
 Accessibility
 ^^^^^^^^^^^^^
