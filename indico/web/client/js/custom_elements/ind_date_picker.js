@@ -611,25 +611,45 @@ customElements.define(
         indCalendar.dispatchEvent(new Event('close'));
       }
 
-      function getRange() {
-        if (!indCalendar.rangeStart !== !indCalendar.rangeEnd) {
-          // When we have an open range, then we use the cursor
-          // position as a fallback. This is generally only
-          // applicable top range selection as a single date
-          // picker will always set both ends of the range.
-          const cursorDate = new Date(hoverCursor);
-          const start = indCalendar.rangeStart || cursorDate;
-          const end = indCalendar.rangeEnd || cursorDate;
-          if (start > end) {
-            return new DateRange(end, start);
-          }
-          return new DateRange(start, end);
-        }
+      function getSelectionRange() {
         return new DateRange(indCalendar.rangeStart, indCalendar.rangeEnd);
       }
 
+      function getHoverRange() {
+        // Hover range extends for either end of the selected range to the
+        // cursor position, or, if both ends are selected, then from the
+        // end farther away from the cursor to the cursor position. If no
+        // cursor is present, then the hover range is invalid and should
+        // not be used.
+
+        const cursorDate = hoverCursor && new Date(hoverCursor);
+
+        // If either end of the range is missing, cursor position is used
+        let start = indCalendar.rangeStart ?? cursorDate;
+        let end = indCalendar.rangeEnd ?? cursorDate;
+
+        // If cursor is present, adjust the closer side to the cursor position
+        if (cursorDate) {
+          const distanceToStart = Math.abs(start - cursorDate);
+          const distanceToEnd = Math.abs(end - cursorDate);
+
+          if (distanceToStart <= distanceToEnd) {
+            start = cursorDate;
+          } else {
+            end = cursorDate;
+          }
+        }
+
+        // Ensure correct order
+        if (start > end) {
+          [start, end] = [end, start];
+        }
+
+        return new DateRange(start, end);
+      }
+
       function updateCalendar() {
-        const selectedRange = getRange();
+        const selectedRange = getSelectionRange();
         const firstDayOfMonth = new Date(
           calendarDisplayDate ||
             selectedRange.start ||
@@ -652,7 +672,9 @@ customElements.define(
       }
 
       function updateGrids(year, month) {
-        const range = getRange();
+        const selectionRange = getSelectionRange();
+        const hoverRange = getHoverRange();
+        const markedRange = hoverRange.isInvalid ? selectionRange : hoverRange;
         dateGrids.forEach((grid, i) => {
           if (year !== undefined && month !== undefined) {
             const gridDate = new Date(year, month);
@@ -660,8 +682,8 @@ customElements.define(
             grid.year = gridDate.getFullYear();
             grid.month = gridDate.getMonth();
           }
-          grid.rangeStart = range.start?.toString() || '';
-          grid.rangeEnd = range.end?.toString() || '';
+          grid.rangeStart = markedRange.start?.toString() || '';
+          grid.rangeEnd = markedRange.end?.toString() || '';
           grid.setAllowableSelectionRange(indCalendar.allowableSelectionRange);
         });
       }
