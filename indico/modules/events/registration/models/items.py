@@ -7,6 +7,7 @@
 
 from uuid import uuid4
 
+from flask import session
 from sqlalchemy import literal
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -436,6 +437,10 @@ class RegistrationFormSection(RegistrationFormItem):
 
     def _get_default_log_data(self):
         return {'Section ID': self.id}
+
+    def can_see(self, is_management):
+        from indico.modules.events.registration.util import can_see_section
+        return can_see_section(self, session.user, is_management)
 
 
 class RegistrationFormPersonalDataSection(RegistrationFormSection):
