@@ -191,7 +191,7 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
 def can_see_section(section, user, is_management):
     if user is None:
         return False
-    return bool(True if not section.is_manager_only or is_management else False)
+    return bool(not section.is_manager_only or is_management)
 
 
 def get_initial_form_values(regform, *, management=False):
