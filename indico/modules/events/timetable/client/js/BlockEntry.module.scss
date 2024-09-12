@@ -1,0 +1,64 @@
+@container (min-width: 500px) {
+  button .title-wrapper {
+    max-width: 30%;
+  }
+}
+
+@container (max-width: 60px) {
+  button .title-wrapper {
+    &.long {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+    
+    .title,
+    .time {
+      display: none;
+    }
+  }
+}
+
+.simple .title-wrapper {
+  max-width: unset;
+}
+
+.title-wrapper {
+  max-width: min(50%, 200px);
+  word-break: break-all;
+
+  &.tiny {
+    white-space: nowrap;
+    padding-left: 8px;
+    padding-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1rem;
+  }
+
+  &.small {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 8px;
+    line-height: 1rem;
+  }
+
+  &.long {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .multiline-ellipsis {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .title {
+    font-weight: bold;
+  }
+}
