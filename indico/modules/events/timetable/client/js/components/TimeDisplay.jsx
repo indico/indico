@@ -89,8 +89,10 @@ TimeEditForm.propTypes = {
 };
 
 export default function TimeDisplay({entry, uses24HourFormat}) {
-  const startTime = moment(entry.start).format('HH:mm');
-  const endTime = moment(getEndDt(entry)).format('HH:mm');
+  const startTime = moment(entry.startDt).format('HH:mm');
+  const endTime = moment(entry.startDt)
+    .add(entry.duration, 'minutes')
+    .format('HH:mm');
   return (
     <Accordion
       panels={[
