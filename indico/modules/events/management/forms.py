@@ -216,6 +216,8 @@ class EventContactInfoForm(IndicoForm):
 
 
 class EventClassificationForm(IndicoForm):
+    _fields_order = ('keywords', 'references', 'label', 'label_message')
+
     # The 'keywords' field is dynamically added when creating the form.
     references = ReferencesField(_('External IDs'), reference_class=EventReference)
     label = QuerySelectField(_('Label'), allow_blank=True, get_label='title')

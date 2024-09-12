@@ -154,6 +154,9 @@ class RHEditEventContactInfo(RHEditEventDataBase):
 class RHEditEventClassification(RHEditEventDataBase):
     section_name = 'classification'
 
+    def render_form(self, form):
+        return jsonify_form(form, fields=form._fields_order, footer_align_right=True)
+
     @property
     def form_class(self):
         if allowed_keywords := global_event_settings.get('allowed_keywords'):
