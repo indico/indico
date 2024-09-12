@@ -1,0 +1,92 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.time-gutter {
+  max-width: 50px;
+  padding-right: 10px;
+  border-right: 1px solid #d4d4d5;
+
+  .time-slot {
+    div {
+      position: relative;
+      top: -8px;
+    }
+  }
+}
+
+.lines {
+  .line::after {
+    position: absolute;
+    border-bottom: 1px solid #d4d4d5;
+    content: '';
+    width: 100%;
+  }
+
+  &.first {
+    .line::after {
+      left: -10px;
+      width: calc(10px + 100%);
+    }
+  }
+}
+
+.dragging:before {
+  content: attr(data-dragging);
+}
+
+.dragging {
+  background-color: paleturquoise;
+}
+
+.calendar {
+  position: relative;
+  width: 100%;
+
+  &.day:not(:last-child) {
+    border-right: 1px solid #d4d4d5;
+  }
+}
+
+.entry {
+  // background-color: #5b1aff;
+  color: white;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: unset;
+  border: none;
+  padding: 0;
+  outline: none;
+
+  &.block {
+    // background-color: rgb(4, 115, 134);
+  }
+
+  &.break {
+    // background-color: #f09000;
+  }
+}
+
+.drag-handle {
+  text-align: left;
+  font-size: 15px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.resize-handle {
+  position: absolute;
+  cursor: ns-resize;
+  width: 100%;
+  height: 4px;
+  bottom: 0;
+  z-index: 10;
+
+  &.block {
+    z-index: 9;
+  }
+}
