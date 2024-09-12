@@ -5,16 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import PropTypes from 'prop-types';
+import moment, {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
-import {Navigate} from 'react-big-calendar';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
-import ReviewChangesButton from './components/Changelog';
 import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
 import {getNumDays} from './util';
@@ -41,7 +39,13 @@ const displayModes = [
   },
 ];
 
-export default function Toolbar({date, localizer, onNavigate}) {
+export default function Toolbar({
+  date,
+  onNavigate,
+}: {
+  date: Moment;
+  onNavigate: (dt: Moment) => void;
+}) {
   const dispatch = useDispatch();
   const ref = useRef(null);
   const eventStart = useSelector(selectors.getEventStartDt);
@@ -68,18 +72,18 @@ export default function Toolbar({date, localizer, onNavigate}) {
     };
   }, [handleResize]);
 
-  const getDateFromIdx = idx => new Date(eventStart.getTime() + idx * 24 * 60 * 60 * 1000);
+  const getDateFromIdx = idx => moment(eventStart.getTime() + idx * 24 * 60 * 60 * 1000);
 
   const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
     if (mouseDown && e.buttons !== 1) {
       return;
     }
     if (typeof navigateTo === 'number') {
-      onNavigate(Navigate.DATE, getDateFromIdx(navigateTo));
+      onNavigate(getDateFromIdx(navigateTo));
     } else if (currentDayIdx < newOffset) {
-      onNavigate(Navigate.DATE, getDateFromIdx(newOffset));
+      onNavigate(getDateFromIdx(newOffset));
     } else if (currentDayIdx >= newOffset + maxDays) {
-      onNavigate(Navigate.DATE, getDateFromIdx(newOffset + maxDays));
+      onNavigate(getDateFromIdx(newOffset + maxDays));
     }
     dispatch(actions.scrollNavbar(newOffset));
   };
@@ -159,12 +163,9 @@ export default function Toolbar({date, localizer, onNavigate}) {
           return (
             <Menu.Item
               key={n}
-              content={localizer.format(
-                d,
-                Translate.string('ddd DD/MM', 'momentjs date format for timetable tab headers')
-              )}
-              onClick={() => onNavigate(Navigate.DATE, d)}
-              onMouseEnter={e => e.buttons === 1 && onNavigate(Navigate.DATE, d)}
+              content={d.format('ddd DD/MM')}
+              onClick={() => onNavigate(d)}
+              onMouseEnter={e => e.buttons === 1 && onNavigate(d)}
               active={n + offset === currentDayIdx}
             />
           );
@@ -217,14 +218,8 @@ export default function Toolbar({date, localizer, onNavigate}) {
           title={Translate.string('Add new')}
           item
         />
-        <ReviewChangesButton as={Menu.Item} styleName="action" />
+        {/* <ReviewChangesButton as={Menu.Item} styleName="action" /> */}
       </Menu>
     </div>
   );
 }
-
-Toolbar.propTypes = {
-  date: PropTypes.instanceOf(Date).isRequired,
-  localizer: PropTypes.object.isRequired,
-  onNavigate: PropTypes.func.isRequired,
-};
