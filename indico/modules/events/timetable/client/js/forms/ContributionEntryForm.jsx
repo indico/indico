@@ -8,10 +8,10 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {
-  ContributionCreateForm,
-  ContributionEditForm,
-} from 'indico/modules/events/contributions/ContributionForm';
+// import {
+//   ContributionCreateForm,
+//   ContributionEditForm,
+// } from 'indico/modules/events/contributions/ContributionForm';
 
 import * as actions from '../actions';
 import * as selectors from '../selectors';

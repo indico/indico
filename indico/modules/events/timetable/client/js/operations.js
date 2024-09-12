@@ -302,7 +302,6 @@ const resizeChild = (state, args) => {
     start,
     duration: (end.getTime() - start.getTime()) / 60000,
   };
-  console.log('newContrib', newContrib);
   const parent = blocks.find(b => isChildOf(child, b));
   const parentContribs = children.filter(c => c.id !== child.id && isChildOf(c, parent));
   const hasCollisions = parentContribs.some(c => isConcurrent(c, newContrib));
