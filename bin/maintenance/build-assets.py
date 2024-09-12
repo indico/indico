@@ -254,15 +254,15 @@ def build_plugin(plugin_dir: Path, dev, clean, watch, url_root):
 
 
 @cli.command('all-plugins', short_help='Builds assets of all plugins in a directory.')
-@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path))
 @_common_build_options(allow_watch=False)
 @click.pass_context
 def build_all_plugins(ctx, plugins_dir, dev, clean, url_root):
     """Run webpack to build plugin assets."""
-    plugins = sorted(d for d in os.listdir(plugins_dir) if _is_plugin_dir(os.path.join(plugins_dir, d)))
+    plugins = sorted(d for d in plugins_dir.iterdir() if _is_plugin_dir(plugins_dir / d))
     for plugin in plugins:
         step('plugin: {}', plugin)
-        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), dev=dev, clean=clean, watch=False,
+        ctx.invoke(build_plugin, plugin_dir=(plugins_dir / plugin), dev=dev, clean=clean, watch=False,
                    url_root=url_root)
 
 
