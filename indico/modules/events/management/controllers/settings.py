@@ -155,7 +155,7 @@ class RHEditEventClassification(RHEditEventDataBase):
     section_name = 'classification'
 
     def render_form(self, form):
-        return jsonify_form(form, fields=form._fields_order, footer_align_right=True)
+        return jsonify_form(form, fields=form._field_order, footer_align_right=True)
 
     @property
     def form_class(self):
