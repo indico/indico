@@ -102,8 +102,10 @@ Break.propTypes = {
 };
 
 function Contribution({entry, onClose}) {
-  const startTime = moment(entry.start).format('HH:mm');
-  const endTime = moment(getEndDt(entry)).format('HH:mm');
+  const startTime = moment(entry.startDt).format('HH:mm');
+  const endTime = moment(entry.startDt)
+    .add(entry.duration, 'minutes')
+    .format('HH:mm');
 
   return (
     <Card fluid>
@@ -225,7 +227,7 @@ export function TimetablePopup({open, onClose, type, entry, rect}) {
       }}
     >
       {type === 'break' && <Break entry={entry} onClose={onClose} />}
-      {type === 'contribution' && <Contribution entry={entry} onClose={onClose} />}
+      {type === 'contrib' && <Contribution entry={entry} onClose={onClose} />}
       {type === 'session' && <Block entry={entry} onClose={onClose} />}
     </div>,
     document.body

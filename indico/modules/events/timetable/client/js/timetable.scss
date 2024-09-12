@@ -1,0 +1,82 @@
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main.main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: unset;
+  overflow: hidden;
+
+  & > div:not(.main-breadcrumb) {
+    flex-grow: 1;
+    overflow: hidden;
+
+    & > .full-width-content-wrapper {
+      height: 100%;
+
+      & > div {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        & > div.layout-side-menu {
+          min-height: unset;
+        }
+
+        & > div.layout-side-menu:last-child {
+          flex-grow: 1;
+          overflow: hidden;
+
+          & > div.content-column {
+            height: 100%;
+
+            & > div.management-page {
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+
+              & > header {
+                margin-bottom: 0;
+              }
+
+              & > div.page-content {
+                flex-grow: 1;
+                overflow: hidden;
+
+                & > #timetable-container {
+                  height: 100%;
+
+                  & > div {
+                    height: 100%;
+
+                    & > div:last-child {
+                      height: 100%;
+                      width: 100%;
+                      flex-grow: 1;
+                      overflow: hidden;
+
+                      & > div.wrapper {
+                        width: 100%;
+                        overflow-y: scroll;
+                        // extra space for the scrollbar
+                        padding-right: 10px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+div.footer {
+  display: none;
+}
