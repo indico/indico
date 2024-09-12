@@ -17,11 +17,34 @@ import {FinalInput, FinalSubmitButton} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
+import {useDraggable} from './dnd';
 import {ContributionDetails} from './EntryDetails';
 import * as selectors from './selectors';
 import {entrySchema, entryTypes, formatTitle} from './util';
 
 import './UnscheduledContributions.module.scss';
+
+function DraggableUnscheduledContribution({id, children}: {id: number; children: React.ReactNode}) {
+  const draggableId = `unscheduled-${id}`;
+  const {attributes, listeners, setNodeRef, transform, isDragging} = useDraggable({
+    id: draggableId,
+  });
+
+  const style: Record<string, string | number | undefined> = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        position: 'relative',
+        zIndex: 900,
+        cursor: isDragging ? 'grabbing' : 'grab',
+      }
+    : {};
+
+  return (
+    <div style={style} ref={setNodeRef} {...listeners} {...attributes}>
+      {children}
+    </div>
+  );
+}
 
 function UnscheduledContributionList({
   contribs,
@@ -54,30 +77,33 @@ function UnscheduledContributionList({
   return (
     <Form.Field onClick={() => setSelected(new Set())}>
       {contribs.map(contrib => (
-        <ContributionDetails
-          key={contrib.id}
-          styleName="contribution"
-          entry={{...contrib, deleted: true}}
-          title={entryTypes.contribution.formatTitle(contrib)}
-          uses24HourFormat={uses24HourFormat}
-          dispatch={dispatch}
-          onDragStart={makeHandleDrag(contrib.id)}
-          onClick={makeHandleSelect(contrib.id)}
-          selected={selected.has(contrib.id)}
-          icon={selected.has(contrib.id) ? 'check square outline' : 'square outline'}
-          draggable
-        >
-          {showSession && contrib.sessionId && (
-            <p>
-              <Translate as="strong">Session:</Translate> {sessions.get(contrib.sessionId)?.title}
-            </p>
-          )}
-          {!contrib.isPoster && (
-            <p>
-              <Translate as="strong">Duration:</Translate> {contrib.duration}
-            </p>
-          )}
-        </ContributionDetails>
+        <DraggableUnscheduledContribution key={contrib.id} id={contrib.id}>
+          <ContributionDetails
+            key={contrib.id}
+            styleName="contribution"
+            entry={{...contrib, deleted: true}}
+            title={entryTypes.contribution.formatTitle(contrib)}
+            uses24HourFormat={uses24HourFormat}
+            dispatch={dispatch}
+            onDragStart={makeHandleDrag(contrib.id)}
+            onClick={makeHandleSelect(contrib.id)}
+            selected={selected.has(contrib.id)}
+            icon={selected.has(contrib.id) ? 'check square outline' : 'square outline'}
+            draggable
+          >
+            {showSession && contrib.sessionId && (
+              <p>
+                <Translate as="strong">Session:</Translate>{' '}
+                {(sessions.get(contrib.sessionId) || {}).title}
+              </p>
+            )}
+            {!contrib.isPoster && (
+              <p>
+                <Translate as="strong">Duration:</Translate> {contrib.duration}
+              </p>
+            )}
+          </ContributionDetails>
+        </DraggableUnscheduledContribution>
       ))}
     </Form.Field>
   );
@@ -100,20 +126,11 @@ export default function UnscheduledContributions() {
   const dispatch = useDispatch();
   const contribs = useSelector(selectors.getUnscheduled);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  const selectedEntry = useSelector(selectors.getSelectedEntry);
+  // const selectedEntry = useSelector(selectors.getSelectedEntry);
+  const selectedEntry = null;
+
   const [selected, setSelected] = useState(new Set());
   const uses24HourFormat = true; // TODO fix this with localeUses24HourTime
-
-  // ensure that the dragged contrib is cleared when dropping outside the calendar
-  useEffect(() => {
-    const onDrop = e =>
-      e.target.className !== 'rbc-events-container' &&
-      dispatch(actions.dragUnscheduledContribs(new Set()));
-    document.addEventListener('drop', onDrop);
-    return () => {
-      document.removeEventListener('drop', onDrop);
-    };
-  }, [dispatch]);
 
   // ensure that the selections are cleared when the list changes
   useEffect(() => {
@@ -126,14 +143,16 @@ export default function UnscheduledContributions() {
 
   const [currentContribs, otherContribs] = _.partition(
     _.sortBy(contribs, ['code', 'title']),
-    c => c.sessionId === selectedEntry?.sessionId || (!c.sessionId && !selectedEntry?.sessionId)
+    c =>
+      c.sessionId === (selectedEntry || {}).sessionId ||
+      (!c.sessionId && !(selectedEntry || {}).sessionId)
   );
 
   return (
     <div styleName="contributions-container">
       <div styleName="content">
         <h4>
-          {selectedEntry?.type === 'session'
+          {(selectedEntry || {}).type === 'session'
             ? Translate.string('Unscheduled contributions for session "{sessionName}"', {
                 sessionName: formatTitle(selectedEntry.title, selectedEntry.code),
               })
@@ -156,7 +175,7 @@ export default function UnscheduledContributions() {
             subscription={{}}
           >
             {({handleSubmit}) => (
-              <Form onSubmit={handleSubmit}>
+              <Form onSubmit={handleSubmit} style={{position: 'unset'}}>
                 <Field name="contribs" isEqual={_.isEqual} format={v => v} parse={v => v}>
                   {({input: {value, onChange}}) => (
                     <UnscheduledContributionList
@@ -171,7 +190,7 @@ export default function UnscheduledContributions() {
                 <Field name="contribs" subscription={{value: true}}>
                   {({input: {value}}) => (
                     <>
-                      {currentContribs.length > 1 && !selectedEntry?.isPoster && (
+                      {currentContribs.length > 1 && !(selectedEntry || {}).isPoster && (
                         <FinalInput
                           name="gap"
                           label={Translate.string('Gap between contributions')}
@@ -197,7 +216,7 @@ export default function UnscheduledContributions() {
                   )}
                 </Field>
                 <p styleName="description">
-                  {selectedEntry?.type === 'session' ? (
+                  {(selectedEntry || {}).type === 'session' ? (
                     <Translate>
                       The contributions will be scheduled sequentially, in the presented order,
                       after the last contribution inside the selected block (
@@ -231,7 +250,7 @@ export default function UnscheduledContributions() {
           </FinalForm>
         ) : (
           <p>
-            {selectedEntry?.sessionId ? (
+            {selectedEntry && selectedEntry.sessionId ? (
               <Translate>
                 There are no unscheduled contributions for the selected session.
               </Translate>
