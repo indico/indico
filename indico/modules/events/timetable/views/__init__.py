@@ -36,6 +36,9 @@ class WPManageTimetable(WPEventManagement):
         'module_events.timetable.css'
     )
 
+    # def _get_footer(self):
+    #     return ''  # YYY
+
     def __init__(self, rh, event_, **kwargs):
         custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))
         WPEventManagement.__init__(self, rh, event_, custom_links=custom_links, **kwargs)
