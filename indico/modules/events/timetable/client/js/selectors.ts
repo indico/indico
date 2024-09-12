@@ -7,14 +7,23 @@
 
 import {createSelector} from 'reselect';
 
+import {ReduxState} from './reducers';
 import {appendSessionAttributes, getNumDays, mergeChanges} from './util';
 
 export const getStaticData = state => state.staticData;
-export const getEntries = state => state.entries;
+export const getEntries = (state: ReduxState) => state.entries;
+export const getDayEntries = (state: ReduxState) =>
+  state.entries.changes[state.entries.currentChangeIdx].entries;
 export const getSessions = state => state.sessions;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
 export const getOpenModal = state => state.openModal;
+export const getLatestChange = (state: ReduxState) =>
+  state.entries.changes[state.entries.currentChangeIdx];
+
+export const getNumUnscheduled = (state: ReduxState) =>
+  state.entries.changes[state.entries.currentChangeIdx].unscheduled.length;
+export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
 
 export const getEventStartDt = createSelector(
   getStaticData,
@@ -45,22 +54,18 @@ export const getVisibleChildren = createSelector(
   children => children.filter(c => !c.isPoster)
 );
 export const getUnscheduled = createSelector(
-  getEntries,
+  getLatestChange,
   getSessions,
   (entries, sessions) => appendSessionAttributes(entries.unscheduled, sessions)
 );
-export const getNumUnscheduled = createSelector(
-  getUnscheduled,
-  unscheduled => unscheduled.length
-);
+// export const getNumUnscheduled = createSelector(
+//   getUnscheduled,
+//   unscheduled => unscheduled.length
+// );
 export const getVisibleEntries = createSelector(
   getBlocks,
   getVisibleChildren,
   (blocks, children) => [...blocks, ...children]
-);
-export const getSelectedId = createSelector(
-  getEntries,
-  entries => entries.selectedId
 );
 export const getSelectedEntry = createSelector(
   getVisibleEntries,
@@ -73,7 +78,7 @@ export const canUndo = createSelector(
 );
 export const canRedo = createSelector(
   getEntries,
-  entries => entries.currentChangeIdx < entries.changes.length
+  entries => entries.currentChangeIdx < entries.changes.length - 1
 );
 export const getMergedChanges = createSelector(
   getEntries,

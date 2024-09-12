@@ -12,10 +12,8 @@
   padding: 1em 1em 0.2em 0;
   width: 25em;
   flex-shrink: 0;
-  border-right: 1px solid $separator-color;
 
   .content {
-    position: sticky;
     top: 6em;
     height: 90vh;
     overflow-y: auto;
