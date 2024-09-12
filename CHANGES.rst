@@ -17,6 +17,7 @@ Bugfixes
 
 - Make picture field more resilient when uploading and resizing pictures close to
   the max upload file size (:pr:`6530`, thanks :user:`SegiNyn`)
+- Fix the order of the event classifications in edit mode (:pr:`6531`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -97,7 +98,6 @@ Bugfixes
   image after repeated cropping (:pr:`6498`, thanks :user:`jbtwist`)
 - Fix future events being always displayed after current events in categories while not
   logged in (:pr:`6509`)
-- Fix the order of the event classifications in edit mode (:pr:`6531`)
 
 Accessibility
 ^^^^^^^^^^^^^
