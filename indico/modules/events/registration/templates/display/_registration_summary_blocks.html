@@ -1,7 +1,8 @@
-{% macro render_registration_info(registration, from_management=false) %}
-    {{ template_hook('before-render-registration-info', registration=registration, from_management=from_management) }}
-    {% for section in registration.sections_with_answered_fields if (section.can_see(from_management) or
-                                                                     (not section.is_manager_only and not section.is_deleted)) -%}
+{% macro render_registration_info(registration, login_user, from_management=false) %}
+    {{ template_hook('before-render-registration-info', registration=registration, from_management=from_management,
+                     login_user=login_user) }}
+    {% for section in registration.sections_with_answered_fields if (section.can_see(login_user, from_management) and
+                                                                     not section.is_deleted) -%}
         <tr class="regform-done-title">
             <td colspan="2">{{ section.title }}</td>
         </tr>
@@ -109,7 +110,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_registration_summary(registration, from_management=false) %}
+{% macro render_registration_summary(registration, login_user, from_management=false) %}
     <div id="registration-summary" class="regform-done" data-bypass-target="{% trans %}Skip to registration summary{% endtrans %}">
         <div class="i-box-header">
             <div class="i-box-title">
@@ -132,7 +133,7 @@
         </div>
         <div class="i-box-content">
             <table class="registration-info">
-                {{ render_registration_info(registration, from_management) }}
+                {{ render_registration_info(registration, login_user, from_management) }}
             </table>
         </div>
     </div>

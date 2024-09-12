@@ -7,7 +7,6 @@
 
 from uuid import uuid4
 
-from flask import session
 from sqlalchemy import literal
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -20,7 +19,7 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import orig_string
-from indico.util.signals import values_from_signal
+from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.string import camelize_keys, format_repr
 
 
@@ -438,9 +437,11 @@ class RegistrationFormSection(RegistrationFormItem):
     def _get_default_log_data(self):
         return {'Section ID': self.id}
 
-    def can_see(self, is_management):
-        from indico.modules.events.registration.util import can_see_section
-        return can_see_section(self, session.user, is_management)
+    @make_interceptable
+    def can_see(self, user, is_management):
+        if not user and self.registration_form.require_login:
+            return False
+        return not self.is_manager_only or is_management
 
 
 class RegistrationFormPersonalDataSection(RegistrationFormSection):

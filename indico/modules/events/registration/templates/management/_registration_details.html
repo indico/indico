@@ -1,7 +1,7 @@
 {% from 'events/registration/display/_registration_summary_blocks.html' import render_registration_summary,
                                                                                render_invoice %}
 
-{% macro render_registration_details(registration, payment_enabled, assigned_tags, all_tags) %}
+{% macro render_registration_details(registration, login_user, payment_enabled, assigned_tags, all_tags) %}
     <div id="registration-details">
         {{ template_hook('before-registration-actions', registration=registration) }}
         <div class="action-box">
@@ -32,7 +32,7 @@
             </div>
         {% endif %}
         {{ template_hook('before-registration-summary', registration=registration) }}
-        {{ render_registration_summary(registration, from_management=True) }}
+        {{ render_registration_summary(registration, login_user, from_management=True) }}
         {% call render_invoice(registration, payment_enabled) %}
             <table class="regform-done-footer registration-info">
                 <tr>

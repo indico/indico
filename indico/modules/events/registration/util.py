@@ -187,13 +187,6 @@ def get_flat_section_submission_data(regform, *, management=False, registration=
     return {'sections': section_data, 'items': item_data}
 
 
-@make_interceptable
-def can_see_section(section, user, is_management):
-    if user is None:
-        return False
-    return bool(not section.is_manager_only or is_management)
-
-
 def get_initial_form_values(regform, *, management=False):
     initial_values = {}
     for item in regform.active_fields:
