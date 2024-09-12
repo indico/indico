@@ -5,114 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-@use 'base/palette' as *;
-
 .timetable {
   display: flex;
   flex-direction: column;
 
   & > .content {
     display: flex;
-  }
-
-  :global(.rbc-calendar) {
-    flex-grow: 1;
-    min-width: 0;
-    height: auto;
-  }
-
-  &.compact .parent-entry {
-    overflow: visible;
-    padding-left: 0;
-    padding-right: 0;
-
-    :global(.rbc-addons-dnd-resizable) {
-      overflow: visible;
-    }
-  }
-
-  &.full :global(.rbc-day-slot) {
-    min-width: 25em;
-  }
-
-  &.blocks :global(.rbc-day-slot) {
-    min-width: 0;
-  }
-
-  &:not(.blocks) .parent-entry {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .placeholder-entry {
-    overflow: visible;
-    background-color: rgba($dark-gray, 0.8);
-    border-color: $light-black;
-  }
-
-  :global(.rbc-allday-cell),
-  :global(.rbc-row-resource),
-  :global(.rbc-event-label) {
-    display: none;
-  }
-
-  :global(.rbc-time-content) {
-    border-top: 0;
-  }
-
-  :global(.rbc-timeslot-group) {
-    border-left: 0;
-  }
-
-  :global(.rbc-time-slot) {
-    min-height: 0.8em;
-  }
-
-  :global(.rbc-event) {
-    outline: none;
-    border: none;
-    z-index: 1;
-
-    &.selected {
-      filter: brightness(0.8);
-    }
-
-    &.child-entry {
-      filter: opacity(0.8);
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      border-left-width: 0;
-
-      &.selected {
-        filter: opacity(0.9) brightness(0.95);
-      }
-    }
-  }
-
-  // Resize handles
-  // ------------------------------
-  :global(.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor:first-child) {
-    top: -2px !important;
-  }
-
-  :global(.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor:last-child) {
-    bottom: -2px !important;
-  }
-
-  :global(.rbc-addons-dnd .rbc-addons-dnd-resize-ns-anchor .rbc-addons-dnd-resize-ns-icon) {
-    display: block !important;
-    width: 100% !important;
-    height: 5px !important;
-    border-top: 0;
-  }
-
-  // disable global 'opacity: 0.5' for entries when dragging
-  :global(.rbc-addons-dnd.rbc-addons-dnd-is-dragging
-      .rbc-event:not(.rbc-addons-dnd-dragged-event):not(.rbc-addons-dnd-drag-preview)) {
-    opacity: unset !important;
-  }
-
-  :global(.rbc-time-view) {
-    border-top: none;
   }
 }
