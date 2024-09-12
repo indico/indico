@@ -226,7 +226,8 @@ def load_config(only_defaults=False, override=None):
     if override:
         data.update(_sanitize_data(override, allow_internal=True))
     _postprocess_config(data)
-    _validate_config(data)
+    if not only_defaults:
+        _validate_config(data)
     return ImmutableDict(data)
 
 
