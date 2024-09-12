@@ -97,6 +97,7 @@ Bugfixes
   image after repeated cropping (:pr:`6498`, thanks :user:`jbtwist`)
 - Fix future events being always displayed after current events in categories while not
   logged in (:pr:`6509`)
+- Fix the order of the event classifications in edit mode (:pr:`6531`)
 
 Accessibility
 ^^^^^^^^^^^^^
