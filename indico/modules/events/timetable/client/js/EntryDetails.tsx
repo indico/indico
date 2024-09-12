@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {Accordion, Divider, Header, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -17,8 +17,8 @@ import AttachmentsDisplay from './components/AttachmentsDisplay';
 import DetailsSegment from './components/DetailsSegment';
 import EntryColorPicker from './components/EntryColorPicker';
 import TimeDisplay from './components/TimeDisplay';
-import * as selectors from './selectors';
-import {entrySchema, entryTypes, formatTitle, handleUnimplemented, isChildOf} from './util';
+import {Entry} from './types';
+import {entrySchema, entryTypes, formatTitle, handleUnimplemented} from './util';
 
 import './EntryDetails.module.scss';
 
@@ -35,8 +35,7 @@ const detailsPropTypes = {
 };
 
 function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
-  const children = useSelector(selectors.getChildren);
-  const contribs = children.filter(c => isChildOf(c, entry));
+  const contribs = entry.children;
 
   if (contribs.length === 0) {
     return (
@@ -205,17 +204,15 @@ function BreakDetails({entry, uses24HourFormat, dispatch}) {
 
 BreakDetails.propTypes = detailsPropTypes;
 
-export default function EntryDetails() {
+export default function EntryDetails({entry}: {entry: Entry}) {
   const dispatch = useDispatch();
-  const entry = useSelector(selectors.getSelectedEntry);
   const {title, slotTitle, description, code, sessionCode, type} = entry;
-
   // TODO figure this out:
   const uses24HourFormat = true;
 
   const PopupContentComponent = {
-    session: SessionDetails,
-    contribution: ContributionDetails,
+    block: SessionDetails,
+    contrib: ContributionDetails,
     break: BreakDetails,
   }[type];
 
