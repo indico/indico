@@ -17,6 +17,7 @@ Bugfixes
 
 - Make picture field more resilient when uploading and resizing pictures close to
   the max upload file size (:pr:`6530`, thanks :user:`SegiNyn`)
+- Fix the order of the event classifications in edit mode (:issue:`6531`, :pr:`6534`)
 
 Accessibility
 ^^^^^^^^^^^^^
