@@ -83,7 +83,8 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
 
 _bp.add_url_rule('/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
 _bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics_legacy', RHExportDashboardICSLegacy)
-_bp.add_url_rule('/<int:user_id>/picture-<slug>/<signature>', 'user_profile_picture_display', RHProfilePictureDisplay)
+_bp.add_url_rule('/<int:user_id>/picture-<slug>/<signed(user_profile_picture_display):sig_user_id>',
+                 'user_profile_picture_display', RHProfilePictureDisplay)
 
 # User search
 _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)
