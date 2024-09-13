@@ -10,7 +10,8 @@ Version 3.3.5
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Allow specifying "prev" and "next" as the date param on the category overview
+  page to show the previous or next period relative to the current date (:pr:`6537`)
 
 Bugfixes
 ^^^^^^^^
