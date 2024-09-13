@@ -388,9 +388,15 @@ class RHCategoryOverview(RHDisplayCategoryBase):
         self.period = request.args.get('period', 'day')
         if self.period not in ('day', 'month', 'week'):
             raise BadRequest('Invalid period argument')
-        if 'date' in request.args:
+        if (date_arg := request.args.get('date')) in {'prev', 'next'}:
+            delta = relativedelta(**{f'{self.period}s': 1})
+            if date_arg == 'prev':
+                date = datetime.now() - delta
+            else:
+                date = datetime.now() + delta
+        elif date_arg:
             try:
-                date = datetime.strptime(request.args['date'], '%Y-%m-%d')
+                date = datetime.strptime(date_arg, '%Y-%m-%d')
             except ValueError:
                 raise BadRequest('Invalid date argument')
         else:
