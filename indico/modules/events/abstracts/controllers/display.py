@@ -10,7 +10,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.core.errors import NoReportError
-from indico.legacy.pdfinterface.latex import AbstractsToPDF
+from indico.legacy.pdfinterface.latex import AbstractsToPDF, generate_cached_pdf
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.operations import create_abstract, update_abstract
@@ -43,8 +43,12 @@ class RHMyAbstractsExportPDF(RHAbstractsBase):
     def _process(self):
         if not config.LATEX_ENABLED:
             raise NotFound
-        pdf = AbstractsToPDF(self.event, get_user_abstracts(self.event, session.user))
-        return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
+        abstracts = get_user_abstracts(self.event, session.user)
+        data = generate_cached_pdf(
+            lambda: AbstractsToPDF(self.event, abstracts).generate(as_bytes=True),
+            ('my-abstracts', '-'.join(sorted(str(a.id) for a in abstracts))),
+        )
+        return send_file('my-abstracts.pdf', data, 'application/pdf')
 
 
 class RHSubmitAbstract(RHAbstractsBase):

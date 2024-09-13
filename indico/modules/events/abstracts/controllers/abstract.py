@@ -10,7 +10,7 @@ from sqlalchemy.orm import defaultload, joinedload
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import config
-from indico.legacy.pdfinterface.latex import AbstractToPDF, ConfManagerAbstractToPDF
+from indico.legacy.pdfinterface.latex import AbstractToPDF, ConfManagerAbstractToPDF, generate_cached_pdf
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.files import AbstractFile
@@ -92,9 +92,9 @@ class RHAbstractExportPDF(RHAbstractBase):
     def _process(self):
         if not config.LATEX_ENABLED:
             raise NotFound
-        pdf = AbstractToPDF(self.abstract)
         filename = f'abstract-{self.abstract.friendly_id}.pdf'
-        return send_file(filename, pdf.generate(), 'application/pdf')
+        data = generate_cached_pdf(lambda a: AbstractToPDF(a).generate(as_bytes=True), 'abstract', self.abstract)
+        return send_file(filename, data, 'application/pdf')
 
 
 class RHAbstractExportFullPDF(RHAbstractBase):
@@ -106,6 +106,7 @@ class RHAbstractExportFullPDF(RHAbstractBase):
     def _process(self):
         if not config.LATEX_ENABLED:
             raise NotFound
-        pdf = ConfManagerAbstractToPDF(self.abstract)
         filename = f'abstract-{self.abstract.friendly_id}-reviews.pdf'
-        return send_file(filename, pdf.generate(), 'application/pdf')
+        data = generate_cached_pdf(lambda a: ConfManagerAbstractToPDF(a).generate(as_bytes=True), 'abstract-full',
+                                   self.abstract)
+        return send_file(filename, data, 'application/pdf')
