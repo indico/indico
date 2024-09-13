@@ -660,7 +660,14 @@ def check_html_tags():
 
 
 def _extract_placeholders(string):
-    return set(re.findall(r'(\{[^}]+\})', string))
+    pattern = r'''
+        (\{[^}]*\}      # Match closing curly brace (incl. empty)
+        |               # OR
+        \%\([^)]+\)     # Match closing parenthesis
+        [sdf]           # Match format type (string, decimal, float)
+        )
+    '''
+    return set(re.findall(pattern, string, re.VERBOSE))
 
 
 def _get_invalid_po_format_strings(path):
