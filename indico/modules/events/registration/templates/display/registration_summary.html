@@ -136,7 +136,7 @@
     </div>
 </div>
 
-{{ render_registration_summary(registration, login_user) }}
+{{ render_registration_summary(registration) }}
 {% call render_invoice(registration, payment_enabled, payment_conditions) %}
     {% if payment_enabled and registration.state.name == 'unpaid' and
        (not registration.is_paid or registration.is_pending_transaction_expired()) %}

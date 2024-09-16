@@ -88,8 +88,7 @@ def _render_registration_details(registration):
     assigned_tags = schema.dump(registration.tags)
     all_tags = schema.dump(event.registration_tags)
 
-    return tpl.render_registration_details(registration=registration, login_user=session.user,
-                                           payment_enabled=event.has_feature('payment'),
+    return tpl.render_registration_details(registration=registration, payment_enabled=event.has_feature('payment'),
                                            assigned_tags=assigned_tags, all_tags=all_tags)
 
 

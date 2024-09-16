@@ -438,10 +438,8 @@ class RegistrationFormSection(RegistrationFormItem):
         return {'Section ID': self.id}
 
     @make_interceptable
-    def can_see(self, user, is_management):
-        if not user and self.registration_form.require_login:
-            return False
-        return not self.is_manager_only or is_management
+    def is_visible(self, is_management):
+        return not self.is_deleted and (is_management or not self.is_manager_only)
 
 
 class RegistrationFormPersonalDataSection(RegistrationFormSection):
