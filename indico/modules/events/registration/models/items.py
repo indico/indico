@@ -439,7 +439,7 @@ class RegistrationFormSection(RegistrationFormItem):
 
     @make_interceptable
     def is_visible(self, is_management):
-        return not self.is_deleted and (is_management or not self.is_manager_only)
+        return is_management or (not self.is_manager_only and not self.is_deleted)
 
 
 class RegistrationFormPersonalDataSection(RegistrationFormSection):
