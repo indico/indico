@@ -438,7 +438,7 @@ class RegistrationFormSection(RegistrationFormItem):
         return {'Section ID': self.id}
 
     @make_interceptable
-    def is_visible(self, is_management):
+    def is_visible_in_summary(self, is_management):
         return is_management or (not self.is_manager_only and not self.is_deleted)
 
 
