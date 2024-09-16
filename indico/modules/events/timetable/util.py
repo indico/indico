@@ -23,7 +23,7 @@ from indico.modules.events.timetable.legacy import TimetableSerializer, serializ
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.caching import memoize_request
-from indico.util.date_time import format_time, get_day_end, iterdays
+from indico.util.date_time import format_time, get_day_end, get_day_start, iterdays
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_colors
@@ -109,7 +109,8 @@ def find_next_start_dt(duration, obj, day=None, force=False):
             raise ValueError('No day specified for event.')
         if not (obj.start_dt_local.date() <= day <= obj.end_dt_local.date()):
             raise ValueError('Day out of event bounds.')
-        earliest_dt = obj.start_dt if obj.start_dt_local.date() == day else obj.start_dt.replace(hour=8, minute=0)
+        earliest_dt = (obj.start_dt if obj.start_dt_local.date() == day else
+                       get_day_start(day, tzinfo=obj.tzinfo).replace(hour=8, minute=0))
         latest_dt = obj.end_dt if obj.start_dt.date() == day else get_day_end(day, tzinfo=obj.tzinfo)
     elif isinstance(obj, SessionBlock):
         if day is not None:
