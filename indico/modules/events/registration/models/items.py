@@ -19,7 +19,7 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import IndicoIntEnum
 from indico.util.i18n import orig_string
-from indico.util.signals import values_from_signal
+from indico.util.signals import make_interceptable, values_from_signal
 from indico.util.string import camelize_keys, format_repr
 
 
@@ -436,6 +436,10 @@ class RegistrationFormSection(RegistrationFormItem):
 
     def _get_default_log_data(self):
         return {'Section ID': self.id}
+
+    @make_interceptable
+    def is_visible_in_summary(self, is_management):
+        return is_management or (not self.is_manager_only and not self.is_deleted)
 
 
 class RegistrationFormPersonalDataSection(RegistrationFormSection):
