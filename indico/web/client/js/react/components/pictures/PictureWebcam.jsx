@@ -34,7 +34,7 @@ export function PictureWebcam({
         styleName={userMediaActive ? 'picture-outer-div show' : 'picture-outer-div hidden'}
         onClick={onCapture}
       >
-        <div id="picture-inner-div-id" styleName="picture-inner-div">
+        <div id="picture-inner-div" styleName="picture-inner-div">
           <Header as="h3" icon textAlign="center" color="grey">
             <Translate>Camera</Translate>
           </Header>
