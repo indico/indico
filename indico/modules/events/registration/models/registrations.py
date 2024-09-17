@@ -14,11 +14,11 @@ from uuid import uuid4
 
 from babel.numbers import format_currency
 from flask import has_request_context, request, session
-from sqlalchemy import select
+from sqlalchemy import literal, select
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import column_property, mapper
+from sqlalchemy.orm import aliased, column_property, mapper
 
 from indico.core import signals
 from indico.core.config import config
@@ -337,33 +337,46 @@ class Registration(db.Model):
                 r.user = target
 
     @hybrid_method
-    def is_publishable(self, is_participant):
+    def is_publishable(self, user):
         if self.visibility == RegistrationVisibility.nobody or not self.is_state_publishable:
             return False
         if (self.registration_form.publish_registrations_duration is not None
                 and self.event.end_dt + self.registration_form.publish_registrations_duration <= now_utc()):
             return False
         if self.visibility == RegistrationVisibility.participants:
-            return is_participant
+            return self.event.is_user_registered(user, self.registration_form
+                                                 if self.event.hide_participants_from_other_forms else None)
         if self.visibility == RegistrationVisibility.all:
             return True
         return False
 
     @is_publishable.expression
-    def is_publishable(cls, is_participant):
+    def is_publishable(cls, user, hide_participants_from_other_forms=False):
         from indico.modules.events import Event
         from indico.modules.events.registration.models.forms import RegistrationForm
 
-        def _has_regform_publish_mode(mode):
-            if is_participant:
-                return cls.registration_form.has(publish_registrations_participants=mode)
-            else:
-                return cls.registration_form.has(publish_registrations_public=mode)
-        consent_criterion = (
-            cls.consent_to_publish.in_([RegistrationVisibility.all, RegistrationVisibility.participants])
-            if is_participant else
-            cls.consent_to_publish == RegistrationVisibility.all
-        )
+        def _has_regform_publish_mode(mode, is_participant):
+            return db.or_(
+                db.and_(is_participant, cls.registration_form.has(publish_registrations_participants=mode)),
+                db.and_(~is_participant, cls.registration_form.has(publish_registrations_public=mode)))
+        if user:
+            reg_alias = aliased(Registration)
+            query = (db.session.query(reg_alias)
+                     .join(reg_alias.registration_form)
+                     .filter(reg_alias.event_id == cls.event_id,
+                             reg_alias.user == user,
+                             reg_alias.state.in_([RegistrationState.unpaid, RegistrationState.complete]),
+                             ~reg_alias.is_deleted,
+                             ~RegistrationForm.is_deleted))
+            if hide_participants_from_other_forms:
+                query = query.filter(reg_alias.registration_form_id == cls.registration_form_id)
+            is_participant = query.exists()
+        else:
+            is_participant = literal('false')
+        consent_criterion = db.or_(
+            db.and_(is_participant, cls.consent_to_publish.in_([RegistrationVisibility.all,
+                                                                RegistrationVisibility.participants])),
+            db.and_(~is_participant, cls.consent_to_publish == RegistrationVisibility.all))
         return db.and_(
             ~cls.participant_hidden,
             cls.is_state_publishable,
@@ -371,8 +384,8 @@ class Registration(db.Model):
                 RegistrationForm.publish_registrations_duration.is_(None),
                 cls.event.has((Event.end_dt + RegistrationForm.publish_registrations_duration) > now_utc())
             )),
-            ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all),
-            _has_regform_publish_mode(PublishRegistrationsMode.show_all) | consent_criterion
+            ~_has_regform_publish_mode(PublishRegistrationsMode.hide_all, is_participant),
+            _has_regform_publish_mode(PublishRegistrationsMode.show_all, is_participant) | consent_criterion
         )
 
     @hybrid_property
