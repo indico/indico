@@ -10,8 +10,8 @@ import React, {useState} from 'react';
 import Webcam from 'react-webcam';
 import {Header, Icon} from 'semantic-ui-react';
 
-import './Picture.module.scss';
 import {Translate} from 'indico/react/i18n';
+import './Picture.module.scss';
 
 export function PictureWebcam({
   cameraRef,
@@ -34,7 +34,7 @@ export function PictureWebcam({
         styleName={userMediaActive ? 'picture-outer-div show' : 'picture-outer-div hidden'}
         onClick={onCapture}
       >
-        <div styleName="picture-inner-div">
+        <div id="picture-inner-div-id" styleName="picture-inner-div">
           <Header as="h3" icon textAlign="center" color="grey">
             <Translate>Camera</Translate>
           </Header>
