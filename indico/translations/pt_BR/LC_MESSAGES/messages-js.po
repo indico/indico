@@ -15,14 +15,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/indico/indico/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -250,14 +250,14 @@ msgid ""
 msgstr "Seu servidor Indico não está sincronizado com o Hub da Comunidade! Você pode resolver isso <a href=\"{0}\">clicando aqui</a>."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:847
+#: indico/modules/designer/client/js/index.js:855
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "O verso dos modelos que usam este como o verso será removido."
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:850
+#: indico/modules/designer/client/js/index.js:858
 msgid "Disassociate back sides"
 msgstr "Desassociar os lados de trás"
 
@@ -265,57 +265,57 @@ msgstr "Desassociar os lados de trás"
 msgid "Fixed text"
 msgstr "Texto fixo"
 
-#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:595
 msgid "Please choose a name for the template"
 msgstr "Por favor, escolha um nome para o modelo"
 
-#: indico/modules/designer/client/js/index.js:587
-#: indico/modules/designer/client/js/index.js:593
-#: indico/modules/designer/client/js/index.js:602
+#: indico/modules/designer/client/js/index.js:595
+#: indico/modules/designer/client/js/index.js:601
+#: indico/modules/designer/client/js/index.js:610
 msgid "Warning"
 msgstr "Atenção"
 
-#: indico/modules/designer/client/js/index.js:592
+#: indico/modules/designer/client/js/index.js:600
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "O modelo não pode estar vazio. Adicione alguns elementos ou uma imagem de fundo."
 
-#: indico/modules/designer/client/js/index.js:599
+#: indico/modules/designer/client/js/index.js:607
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
 msgstr "O elemento de imagem Fixado não pode estar vazio. Carregue uma imagem dentro dele ou a remova. "
 
-#: indico/modules/designer/client/js/index.js:628
+#: indico/modules/designer/client/js/index.js:636
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Você tem certeza de que você deseja alterar as dimensões deste modelo?"
 
-#: indico/modules/designer/client/js/index.js:772
-#: indico/modules/designer/client/js/index.js:1124
+#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:1132
 msgid "Choose a file"
 msgstr "Escolha um arquivo"
 
-#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:788
 msgid "Fixed Image"
 msgstr "Imagem Fixada"
 
-#: indico/modules/designer/client/js/index.js:838
+#: indico/modules/designer/client/js/index.js:846
 msgid "This back side template will be removed"
 msgstr "O modelo do lado de trás será removido"
 
-#: indico/modules/designer/client/js/index.js:840
+#: indico/modules/designer/client/js/index.js:848
 msgid "The back side of this template will be removed"
 msgstr "O lado de trás deste modelo será removido"
 
-#: indico/modules/designer/client/js/index.js:841
+#: indico/modules/designer/client/js/index.js:849
 msgid "Disassociate back side"
 msgstr "Desassociar os lados de trás"
 
-#: indico/modules/designer/client/js/index.js:845
+#: indico/modules/designer/client/js/index.js:853
 msgid "The back side is empty."
 msgstr "O lado de trás deste modelo está vazio."
 
-#: indico/modules/designer/client/js/index.js:983
-#: indico/modules/designer/client/js/index.js:997
+#: indico/modules/designer/client/js/index.js:991
+#: indico/modules/designer/client/js/index.js:1005
 msgid "Error"
 msgstr "Erro"
 

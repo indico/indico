@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-17 17:42+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
 "Last-Translator: Lanxin Ma <ma@ihep.ac.cn>, 2019-2022\n"
 "Language-Team: Chinese (China) (GB2312) (http://app.transifex.com/indico/indico/language/zh_CN.GB2312/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: zh_CN.GB2312\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -76,7 +76,7 @@ msgstr "查看类别及其事件"
 #: indico/modules/events/papers/templates/management/overview.html:158
 #: indico/modules/events/registration/templates/management/regform.html:133
 #: indico/modules/events/registration/templates/management/regform.html:150
-#: indico/modules/events/registration/templates/management/regform_list.html:124
+#: indico/modules/events/registration/templates/management/regform_list.html:133
 #: indico/modules/events/surveys/templates/management/survey.html:76
 #: indico/modules/events/surveys/templates/management/survey_list.html:42
 #: indico/modules/events/templates/display/common/_manage_button.html:118
@@ -114,7 +114,7 @@ msgstr "周期性任务"
 #: indico/modules/events/contributions/forms.py:221
 #: indico/modules/events/contributions/templates/management/types_dialog.html:19
 #: indico/modules/events/editing/templates/management/editor_list.html:5
-#: indico/modules/events/forms.py:34 indico/modules/events/papers/forms.py:134
+#: indico/modules/events/forms.py:35 indico/modules/events/papers/forms.py:134
 #: indico/modules/events/papers/templates/assign_role.html:14
 #: indico/modules/events/papers/templates/management/_templates.html:9
 #: indico/modules/events/papers/templates/management/competences.html:18
@@ -143,7 +143,7 @@ msgstr "名字"
 #: indico/modules/events/abstracts/settings.py:66
 #: indico/modules/events/abstracts/templates/management/cfa_actions/_base.html:20
 #: indico/modules/events/papers/templates/management/cfp_actions/_base.html:22
-#: indico/modules/events/registration/controllers/management/regforms.py:306
+#: indico/modules/events/registration/controllers/management/regforms.py:324
 #: indico/modules/events/registration/templates/management/_registration_details.html:361
 #: indico/modules/events/registration/templates/management/regform_actions/not_started.html:26
 #: indico/modules/events/surveys/controllers/management/survey.py:120
@@ -172,9 +172,9 @@ msgid "default"
 msgstr "默认的"
 
 #: indico/core/db/sqlalchemy/links.py:23
-#: indico/modules/attachments/controllers/management/base.py:55
+#: indico/modules/attachments/controllers/management/base.py:57
 #: indico/modules/categories/forms.py:364 indico/modules/designer/forms.py:28
-#: indico/modules/events/forms.py:94
+#: indico/modules/events/forms.py:95
 #: indico/modules/events/management/forms.py:375
 #: indico/modules/events/templates/emails/event_creation.txt:20
 #: indico/modules/logs/models/entries.py:31
@@ -183,7 +183,7 @@ msgid "Category"
 msgstr "类别"
 
 #: indico/core/db/sqlalchemy/links.py:23
-#: indico/modules/attachments/controllers/management/base.py:47
+#: indico/modules/attachments/controllers/management/base.py:49
 #: indico/modules/categories/forms.py:366
 #: indico/modules/categories/templates/display/overview/base.html:35
 #: indico/modules/events/registration/wallets/apple.py:85
@@ -198,7 +198,7 @@ msgstr "事件"
 
 #: indico/core/db/sqlalchemy/links.py:23
 #: indico/legacy/pdfinterface/conference.py:869
-#: indico/modules/attachments/controllers/management/base.py:51
+#: indico/modules/attachments/controllers/management/base.py:53
 #: indico/modules/categories/templates/display/overview/base.html:41
 #: indico/modules/events/management/util.py:38
 #: indico/modules/events/timetable/models/entries.py:27
@@ -216,7 +216,7 @@ msgstr "子报告"
 
 #: indico/core/db/sqlalchemy/links.py:23
 #: indico/legacy/pdfinterface/conference.py:848
-#: indico/modules/attachments/controllers/management/base.py:49
+#: indico/modules/attachments/controllers/management/base.py:51
 #: indico/modules/categories/templates/display/overview/base.html:38
 #: indico/modules/events/abstracts/forms.py:222
 #: indico/modules/events/contributions/lists.py:51
@@ -417,7 +417,7 @@ msgstr "保存"
 #: indico/modules/events/papers/templates/management/teams.html:11
 #: indico/modules/events/papers/templates/paper_list_filter.html:81
 #: indico/modules/events/payment/templates/event_plugin_edit.html:36
-#: indico/modules/events/registration/controllers/management/reglists.py:1037
+#: indico/modules/events/registration/controllers/management/reglists.py:1057
 #: indico/modules/events/registration/templates/management/_print_badge_settings_form.html:4
 #: indico/modules/events/registration/templates/management/email.html:25
 #: indico/modules/events/registration/templates/management/import_invitations.html:37
@@ -551,7 +551,7 @@ msgstr "付款日期"
 #: indico/legacy/pdfinterface/conference.py:1024
 #: indico/legacy/pdfinterface/conference.py:1192
 #: indico/modules/events/registration/lists.py:49
-#: indico/modules/events/registration/templates/display/participant_list.html:44
+#: indico/modules/events/registration/templates/display/participant_list.html:72
 #: indico/modules/events/registration/templates/management/_registration_details.html:245
 msgid "Checked in"
 msgstr "入住"
@@ -583,7 +583,7 @@ msgid "Registrants Book"
 msgstr "注册人登记本"
 
 #: indico/legacy/pdfinterface/conference.py:1091
-#: indico/modules/events/layout/models/menu.py:34
+#: indico/modules/events/layout/models/menu.py:35
 msgid "Page"
 msgstr "页"
 
@@ -799,16 +799,17 @@ msgstr "公告"
 
 #: indico/modules/announcement/controllers.py:24
 #: indico/modules/core/controllers.py:109
-#: indico/modules/events/controllers/admin.py:167
+#: indico/modules/events/controllers/admin.py:168
+#: indico/modules/events/controllers/admin.py:197
 #: indico/modules/news/controllers.py:70
 #: indico/modules/receipts/controllers/admin.py:26
 msgid "Settings have been saved"
 msgstr "设置已保存"
 
 #: indico/modules/announcement/forms.py:18 indico/modules/core/forms.py:23
-#: indico/modules/events/forms.py:131
+#: indico/modules/events/forms.py:132
 #: indico/modules/events/payment/plugins.py:30
-#: indico/modules/events/registration/forms.py:111
+#: indico/modules/events/registration/forms.py:116
 #: indico/modules/events/surveys/forms.py:42 indico/modules/oauth/forms.py:46
 msgid "Enabled"
 msgstr "启用"
@@ -1200,7 +1201,7 @@ msgstr "此列表里的用户和组允许访问此材料"
 #: indico/modules/categories/templates/management/_events_list.html:63
 #: indico/modules/categories/templates/management/content.html:91
 #: indico/modules/core/forms.py:18 indico/modules/designer/forms.py:21
-#: indico/modules/designer/placeholders.py:256
+#: indico/modules/designer/placeholders.py:255
 #: indico/modules/events/abstracts/forms.py:428
 #: indico/modules/events/abstracts/forms.py:476
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:85
@@ -1210,15 +1211,15 @@ msgstr "此列表里的用户和组允许访问此材料"
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:21
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html:52
 #: indico/modules/events/contributions/templates/management/import_contributions.html:21
-#: indico/modules/events/forms.py:57 indico/modules/events/layout/forms.py:148
+#: indico/modules/events/forms.py:58 indico/modules/events/layout/forms.py:148
 #: indico/modules/events/layout/forms.py:164
 #: indico/modules/events/management/forms.py:194
 #: indico/modules/events/management/templates/_settings.html:44
 #: indico/modules/events/management/templates/assign_program_codes.html:77
 #: indico/modules/events/papers/templates/_paper_list.html:43
-#: indico/modules/events/registration/forms.py:59
-#: indico/modules/events/registration/forms.py:135
-#: indico/modules/events/registration/forms.py:539
+#: indico/modules/events/registration/forms.py:64
+#: indico/modules/events/registration/forms.py:140
+#: indico/modules/events/registration/forms.py:580
 #: indico/modules/events/sessions/forms.py:29
 #: indico/modules/events/sessions/forms.py:71
 #: indico/modules/events/sessions/forms.py:82
@@ -1248,7 +1249,7 @@ msgstr "名称"
 #: indico/modules/events/contributions/templates/display/contribution_display.html:166
 #: indico/modules/events/contributions/templates/display/subcontribution_display.html:50
 #: indico/modules/events/contributions/templates/management/types_dialog.html:22
-#: indico/modules/events/forms.py:126
+#: indico/modules/events/forms.py:127
 #: indico/modules/events/management/forms.py:62
 #: indico/modules/events/management/templates/_settings.html:47
 #: indico/modules/events/papers/forms.py:135
@@ -1393,31 +1394,31 @@ msgid ""
 "sessions."
 msgstr "只有管理者才可以上傳會議的題材，及報告內容。"
 
-#: indico/modules/attachments/controllers/event_package.py:190
+#: indico/modules/attachments/controllers/event_package.py:189
 msgid "There are no materials matching your criteria."
 msgstr "没有符合您条件的材料。"
 
-#: indico/modules/attachments/controllers/event_package.py:202
+#: indico/modules/attachments/controllers/event_package.py:201
 msgid "Everything"
 msgstr "所有"
 
-#: indico/modules/attachments/controllers/event_package.py:203
+#: indico/modules/attachments/controllers/event_package.py:202
 msgid "Specific sessions"
 msgstr "指定的分会"
 
-#: indico/modules/attachments/controllers/event_package.py:204
+#: indico/modules/attachments/controllers/event_package.py:203
 msgid "Specific contributions"
 msgstr "指定的报告"
 
-#: indico/modules/attachments/controllers/event_package.py:205
+#: indico/modules/attachments/controllers/event_package.py:204
 msgid "Specific days"
 msgstr "指定日期"
 
-#: indico/modules/attachments/controllers/event_package.py:229
+#: indico/modules/attachments/controllers/event_package.py:228
 msgid "{contrib} (in session \"{session}\")"
 msgstr "{contrib} (在 \"{session}\" 分会里)"
 
-#: indico/modules/attachments/controllers/event_package.py:254
+#: indico/modules/attachments/controllers/event_package.py:253
 msgid "Material package generation failed"
 msgstr "材料包生成失败"
 
@@ -1426,36 +1427,36 @@ msgid ""
 "There is no preview available for this file type. Please refresh the page."
 msgstr "此文件类型没有可用的预览。请刷新页面。"
 
-#: indico/modules/attachments/controllers/management/base.py:53
+#: indico/modules/attachments/controllers/management/base.py:55
 msgid "Sub contribution"
 msgstr "子报告"
 
-#: indico/modules/attachments/controllers/management/base.py:123
+#: indico/modules/attachments/controllers/management/base.py:127
 msgid "The attachment has been uploaded"
 msgid_plural "{count} attachments have been uploaded"
 msgstr[0] "{count} 个附件已上传"
 
-#: indico/modules/attachments/controllers/management/base.py:139
+#: indico/modules/attachments/controllers/management/base.py:143
 msgid "The link has been added"
 msgstr "连接已添加"
 
-#: indico/modules/attachments/controllers/management/base.py:174
+#: indico/modules/attachments/controllers/management/base.py:178
 msgid "The attachment \"{name}\" has been updated"
 msgstr "附件 \"{name}\" 已更新"
 
-#: indico/modules/attachments/controllers/management/base.py:198
+#: indico/modules/attachments/controllers/management/base.py:202
 msgid "Folder \"{name}\" created"
 msgstr "文件夹 \"{name}\" 已创建"
 
-#: indico/modules/attachments/controllers/management/base.py:218
+#: indico/modules/attachments/controllers/management/base.py:222
 msgid "Folder \"{name}\" updated"
 msgstr "文件夹 \"{name}\" 已更新"
 
-#: indico/modules/attachments/controllers/management/base.py:231
+#: indico/modules/attachments/controllers/management/base.py:235
 msgid "Folder \"{name}\" deleted"
 msgstr "文件夹 “{name}” 已删除"
 
-#: indico/modules/attachments/controllers/management/base.py:242
+#: indico/modules/attachments/controllers/management/base.py:246
 msgid "Attachment \"{name}\" deleted"
 msgstr "附件\"{name}\"已删除"
 
@@ -1507,7 +1508,7 @@ msgstr "删除 %(name)s?"
 #: indico/modules/events/contributions/templates/management/_subcontribution_list.html:37
 #: indico/modules/events/contributions/templates/management/contributions.html:87
 #: indico/modules/events/contributions/templates/management/contributions.html:94
-#: indico/modules/events/registration/forms.py:561
+#: indico/modules/events/registration/forms.py:602
 #: indico/modules/events/registration/templates/management/regform_reglist.html:81
 #: indico/modules/events/sessions/templates/management/session_list.html:75
 msgid "Remove"
@@ -1789,114 +1790,120 @@ msgid ""
 "the registration."
 msgstr "您已经成功验证了您的电子邮件地址，现在可以继续进行注册。"
 
-#: indico/modules/auth/controllers.py:286
+#: indico/modules/auth/controllers.py:279
+msgid ""
+"Please finish or cancel your pending registration before attempting to "
+"register with another email address."
+msgstr ""
+
+#: indico/modules/auth/controllers.py:292
 msgid "Too many signup attempts. Please wait {}"
 msgstr ""
 
-#: indico/modules/auth/controllers.py:336
+#: indico/modules/auth/controllers.py:342
 msgid ""
 "Your registration request has been received. We will send you an email once "
 "it has been processed."
 msgstr "您的注册申请已收到。一旦处理完毕，我们将向您发送电子邮件。"
 
-#: indico/modules/auth/controllers.py:343
+#: indico/modules/auth/controllers.py:349
 msgid ""
 "You have sucessfully registered your Indico profile. Check <a "
 "href=\"{url}\">your profile</a> for further details and settings."
 msgstr "您已成功注册了 Indico 个人信息。检查 <a href=\"{url}\"> 您的个人信息 </a> 以了解更多详细信息和设置。"
 
-#: indico/modules/auth/controllers.py:365
+#: indico/modules/auth/controllers.py:371
 msgid "Local account added successfully"
 msgstr "本地账户添加成功"
 
-#: indico/modules/auth/controllers.py:373
+#: indico/modules/auth/controllers.py:379
 msgid "Your local account credentials have been updated successfully"
 msgstr "您的本地帐户凭据已成功更新"
 
-#: indico/modules/auth/controllers.py:410
+#: indico/modules/auth/controllers.py:416
 msgid "{provider} ({identifier}) successfully removed from your accounts"
 msgstr "{provider} ({identifier}) 从您的账号中成功删除"
 
-#: indico/modules/auth/controllers.py:621
-#: indico/modules/auth/controllers.py:623 indico/util/marshmallow.py:57
+#: indico/modules/auth/controllers.py:627
+#: indico/modules/auth/controllers.py:629 indico/util/marshmallow.py:57
 msgid "This field cannot be empty."
 msgstr "此字段不能为空。"
 
-#: indico/modules/auth/controllers.py:705 indico/modules/auth/forms.py:34
-#: indico/modules/auth/forms.py:87
+#: indico/modules/auth/controllers.py:711 indico/modules/auth/forms.py:35
+#: indico/modules/auth/forms.py:88
 msgid "This username is already in use."
 msgstr "用户名已经在用。"
 
-#: indico/modules/auth/controllers.py:783
+#: indico/modules/auth/controllers.py:789
 msgid "Your password has been changed successfully."
 msgstr "您的密码已成功修改。"
 
-#: indico/modules/auth/forms.py:29 indico/modules/users/forms.py:110
+#: indico/modules/auth/forms.py:30 indico/modules/users/forms.py:110
 msgid "This email address is already in use."
 msgstr "此电子邮件地址已使用。"
 
-#: indico/modules/auth/forms.py:40
+#: indico/modules/auth/forms.py:41
 msgid "This email address is blacklisted."
 msgstr "此电子邮件地址已列入黑名单。"
 
-#: indico/modules/auth/forms.py:49 indico/modules/auth/forms.py:54
-#: indico/modules/auth/forms.py:63 indico/modules/auth/forms.py:113
-#: indico/modules/auth/forms.py:148
+#: indico/modules/auth/forms.py:50 indico/modules/auth/forms.py:55
+#: indico/modules/auth/forms.py:64 indico/modules/auth/forms.py:115
+#: indico/modules/auth/forms.py:150
 msgid "Username"
 msgstr "用户名"
 
-#: indico/modules/auth/forms.py:50 indico/modules/auth/forms.py:55
-#: indico/modules/auth/forms.py:114
+#: indico/modules/auth/forms.py:51 indico/modules/auth/forms.py:56
+#: indico/modules/auth/forms.py:116
 msgid "Password"
 msgstr "密码"
 
-#: indico/modules/auth/forms.py:58 indico/modules/auth/forms.py:69
-#: indico/modules/auth/forms.py:117 indico/modules/auth/forms.py:151
+#: indico/modules/auth/forms.py:59 indico/modules/auth/forms.py:70
+#: indico/modules/auth/forms.py:119 indico/modules/auth/forms.py:153
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: indico/modules/auth/forms.py:64
+#: indico/modules/auth/forms.py:65
 msgid "Current password"
 msgstr "当前密码"
 
-#: indico/modules/auth/forms.py:66 indico/modules/auth/forms.py:149
+#: indico/modules/auth/forms.py:67 indico/modules/auth/forms.py:151
 msgid "New password"
 msgstr "新密码"
 
-#: indico/modules/auth/forms.py:80
+#: indico/modules/auth/forms.py:81
 msgid "Wrong current password"
 msgstr "错误的当前密码"
 
-#: indico/modules/auth/forms.py:91 indico/modules/auth/forms.py:96
-#: indico/modules/auth/forms.py:112 indico/modules/auth/forms.py:128
+#: indico/modules/auth/forms.py:92 indico/modules/auth/forms.py:97
+#: indico/modules/auth/forms.py:114 indico/modules/auth/forms.py:130
 #: indico/modules/bootstrap/forms.py:21
 #: indico/modules/events/abstracts/forms.py:635
 #: indico/modules/users/forms.py:156
 msgid "Email address"
 msgstr "电子邮件地址"
 
-#: indico/modules/auth/forms.py:92
+#: indico/modules/auth/forms.py:93
 msgid "Choose the email address you want to verify."
 msgstr "选择您要验证的电子邮件地址。"
 
-#: indico/modules/auth/forms.py:109
+#: indico/modules/auth/forms.py:111
 #: indico/modules/events/abstracts/forms.py:633
-#: indico/modules/events/registration/forms.py:231
+#: indico/modules/events/registration/forms.py:246
 #: indico/modules/users/forms.py:115
 #: indico/modules/users/templates/registration_requests.html:12
 msgid "First name"
 msgstr "名"
 
-#: indico/modules/auth/forms.py:110
+#: indico/modules/auth/forms.py:112
 #: indico/modules/events/abstracts/forms.py:634
 #: indico/modules/users/forms.py:114
 msgid "Family name"
 msgstr "姓"
 
-#: indico/modules/auth/forms.py:111
+#: indico/modules/auth/forms.py:113
 #: indico/modules/cephalopod/templates/cephalopod.html:55
 #: indico/modules/events/persons/templates/management/person_list.html:250
-#: indico/modules/events/registration/forms.py:237
+#: indico/modules/events/registration/forms.py:252
 #: indico/modules/events/registration/templates/management/import_invitations.html:19
 #: indico/modules/events/registration/templates/management/import_registrations.html:17
 #: indico/modules/users/forms.py:117 indico/modules/users/forms.py:145
@@ -1904,11 +1911,11 @@ msgstr "姓"
 msgid "Affiliation"
 msgstr "工作单位"
 
-#: indico/modules/auth/forms.py:133
+#: indico/modules/auth/forms.py:135
 msgid "There is no profile with this email address."
 msgstr "没有包含此电子邮件地址的个人信息。"
 
-#: indico/modules/auth/forms.py:136
+#: indico/modules/auth/forms.py:138
 msgid "This profile has no local account."
 msgstr "此个人信息没有本地帐户。"
 
@@ -2420,7 +2427,7 @@ msgstr "请求事件移动"
 msgid "Allows requesting for an event to be moved to this category"
 msgstr "允许请求将事件移至此类别"
 
-#: indico/modules/categories/forms.py:56 indico/modules/events/forms.py:101
+#: indico/modules/categories/forms.py:56 indico/modules/events/forms.py:102
 #: indico/modules/events/management/forms.py:103
 #: indico/modules/events/management/templates/_settings.html:87
 #: indico/modules/events/templates/emails/event_creation.txt:67
@@ -2653,7 +2660,7 @@ msgstr "权限"
 
 #: indico/modules/categories/forms.py:274
 #: indico/modules/events/contributions/forms.py:113
-#: indico/modules/events/forms.py:103
+#: indico/modules/events/forms.py:104
 #: indico/modules/events/layout/forms.py:167
 #: indico/modules/events/management/forms.py:261
 #: indico/modules/events/sessions/forms.py:57
@@ -2791,8 +2798,8 @@ msgstr "代码"
 msgid "A shortcut (max. 3 characters) for the role"
 msgstr "角色的缩写（最多3个字符）"
 
-#: indico/modules/categories/forms.py:390 indico/modules/events/forms.py:58
-#: indico/modules/events/registration/forms.py:540
+#: indico/modules/categories/forms.py:390 indico/modules/events/forms.py:59
+#: indico/modules/events/registration/forms.py:581
 #: indico/modules/events/roles/forms.py:25
 msgid "Color"
 msgstr "颜色"
@@ -2945,34 +2952,34 @@ msgid "{0} category moved to \"{1}\"."
 msgid_plural "{0} categories moved to \"{1}\"."
 msgstr[0] "{0} 个类别移动到 \"{1}\"。"
 
-#: indico/modules/categories/controllers/management.py:443
+#: indico/modules/categories/controllers/management.py:442
 msgid "You have deleted one event"
 msgid_plural "You have deleted {} events"
 msgstr[0] "您删除了{} 事件。"
 
-#: indico/modules/categories/controllers/management.py:461
+#: indico/modules/categories/controllers/management.py:460
 msgid "Your events have been moved to the category \"{}\""
 msgstr "您的事件已移动到类别 \"{}\""
 
-#: indico/modules/categories/controllers/management.py:464
+#: indico/modules/categories/controllers/management.py:463
 msgid "Your events have been split into the categories \"{}\" and \"{}\""
 msgstr "您的事件已拆分到类别 \"{}\" 和 \"{}\""
 
-#: indico/modules/categories/controllers/management.py:467
+#: indico/modules/categories/controllers/management.py:466
 msgid "Split"
 msgstr "拆分"
 
-#: indico/modules/categories/controllers/management.py:490
+#: indico/modules/categories/controllers/management.py:489
 #: indico/modules/events/management/controllers/actions.py:100
 msgid "You may not move events to this category."
 msgstr "您不能移动事件到此类别。"
 
-#: indico/modules/categories/controllers/management.py:497
+#: indico/modules/categories/controllers/management.py:496
 msgid "You have moved {count} event to the category \"{cat}\""
 msgid_plural "You have moved {count} events to the category \"{cat}\""
 msgstr[0] "您已将 {count} 个事件移至 “{cat}” 类别"
 
-#: indico/modules/categories/controllers/management.py:504
+#: indico/modules/categories/controllers/management.py:503
 msgid "You have requested the move of {count} event to the category \"{cat}\""
 msgid_plural ""
 "You have requested the move of {count} events to the category \"{cat}\""
@@ -3046,7 +3053,7 @@ msgstr "所有事件"
 #: indico/modules/categories/templates/management/_events_list.html:106
 #: indico/modules/categories/templates/management/content.html:58
 #: indico/modules/categories/templates/management/content.html:121
-#: indico/modules/events/__init__.py:157
+#: indico/modules/events/__init__.py:159
 #: indico/modules/events/templates/forms/event_creation_form.html:20
 #: indico/modules/events/templates/management/_create_event_button.html:4
 msgid "Create event"
@@ -3621,11 +3628,11 @@ msgstr "首页"
 msgid "General Settings"
 msgstr "常规设置"
 
-#: indico/modules/core/captcha.py:54 indico/modules/core/captcha.py:77
+#: indico/modules/core/captcha.py:56 indico/modules/core/captcha.py:79
 msgid "Incorrect answer"
 msgstr ""
 
-#: indico/modules/core/captcha.py:67
+#: indico/modules/core/captcha.py:69
 msgid "CAPTCHA"
 msgstr ""
 
@@ -3777,15 +3784,15 @@ msgstr "只有正面"
 msgid "Posters/Badges"
 msgstr "海报/胸牌"
 
-#: indico/modules/designer/controllers.py:232
+#: indico/modules/designer/controllers.py:233
 msgid "Created copy of template '{}'"
 msgstr "已创建模板 ‘{}’ 的副本"
 
-#: indico/modules/designer/controllers.py:236
+#: indico/modules/designer/controllers.py:237
 msgid "Go to category"
 msgstr ""
 
-#: indico/modules/designer/controllers.py:247
+#: indico/modules/designer/controllers.py:248
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:278
 #: indico/modules/events/management/forms.py:411
 #: indico/modules/events/management/templates/_action_menu.html:136
@@ -3793,7 +3800,7 @@ msgstr ""
 msgid "Clone"
 msgstr "克隆"
 
-#: indico/modules/designer/controllers.py:267
+#: indico/modules/designer/controllers.py:268
 msgid "Added new template '{}'"
 msgstr "已添加新的模板 '{}'"
 
@@ -3805,32 +3812,40 @@ msgstr "固定图像元素必须包含图像"
 msgid "The image file does not belong to this template"
 msgstr "图像文件不属于该模板"
 
-#: indico/modules/designer/controllers.py:364
+#: indico/modules/designer/controllers.py:363
+msgid "Invalid color in field \"{}\": {}"
+msgstr ""
+
+#: indico/modules/designer/controllers.py:366
+msgid "Invalid background color in field \"{}\": {}"
+msgstr ""
+
+#: indico/modules/designer/controllers.py:371
 msgid "Template successfully saved."
 msgstr "模板保存成功。"
 
-#: indico/modules/designer/controllers.py:421
+#: indico/modules/designer/controllers.py:435
 msgid "Template successfully linked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:438
+#: indico/modules/designer/controllers.py:452
 msgid "Template successfully unlinked."
 msgstr ""
 
-#: indico/modules/designer/controllers.py:478
+#: indico/modules/designer/controllers.py:492
 #: indico/modules/events/layout/controllers/images.py:72
 msgid "The image has been uploaded"
 msgid_plural "{count} images have been uploaded"
 msgstr[0] "{count} 个图片已上传"
 
-#: indico/modules/designer/controllers.py:499
+#: indico/modules/designer/controllers.py:513
 msgid "The template has been deleted"
 msgstr "模板已删除"
 
 #: indico/modules/designer/forms.py:22
 #: indico/modules/events/management/forms.py:331
 #: indico/modules/events/papers/forms.py:136
-#: indico/modules/events/registration/forms.py:472
+#: indico/modules/events/registration/forms.py:513
 msgid "Template"
 msgstr "模板"
 
@@ -3865,159 +3880,163 @@ msgstr ""
 msgid "Event Logo"
 msgstr "事件徽标"
 
-#: indico/modules/designer/placeholders.py:115
+#: indico/modules/designer/placeholders.py:114
 msgid "Event Dates"
 msgstr "事件日期"
 
-#: indico/modules/designer/placeholders.py:120
+#: indico/modules/designer/placeholders.py:119
 msgid "{} to {}"
 msgstr "{} 到 {}"
 
-#: indico/modules/designer/placeholders.py:131
+#: indico/modules/designer/placeholders.py:130
 msgid "Event Title"
 msgstr "事件名称"
 
-#: indico/modules/designer/placeholders.py:141
+#: indico/modules/designer/placeholders.py:140
 msgid "Event Description"
 msgstr "事件说明"
 
-#: indico/modules/designer/placeholders.py:151
+#: indico/modules/designer/placeholders.py:150
 msgid "Event Speakers/Chairs"
 msgstr "事件报告人/主席"
 
-#: indico/modules/designer/placeholders.py:161
+#: indico/modules/designer/placeholders.py:160
 msgid "Event Venue"
 msgstr "事件会址"
 
-#: indico/modules/designer/placeholders.py:171
+#: indico/modules/designer/placeholders.py:170
 msgid "Event Room"
 msgstr "事件会议室"
 
-#: indico/modules/designer/placeholders.py:181
+#: indico/modules/designer/placeholders.py:180
 msgid "Event Organizers"
 msgstr "事件组织者"
 
-#: indico/modules/designer/placeholders.py:191
+#: indico/modules/designer/placeholders.py:190
 msgid "Category Title"
 msgstr "类别名称"
 
-#: indico/modules/designer/placeholders.py:200
+#: indico/modules/designer/placeholders.py:199
 msgid "Full Name"
 msgstr "全名"
 
-#: indico/modules/designer/placeholders.py:207
+#: indico/modules/designer/placeholders.py:206
 msgid "Full Name (no title)"
 msgstr "全名（无称谓）"
 
-#: indico/modules/designer/placeholders.py:214
+#: indico/modules/designer/placeholders.py:213
 msgid "Full Name B"
 msgstr "全名B"
 
-#: indico/modules/designer/placeholders.py:221
+#: indico/modules/designer/placeholders.py:220
 msgid "Full Name B (no title)"
 msgstr "全名B (无称谓)"
 
-#: indico/modules/designer/placeholders.py:228
+#: indico/modules/designer/placeholders.py:227
 msgid "Full Name C"
 msgstr "全名C"
 
-#: indico/modules/designer/placeholders.py:235
+#: indico/modules/designer/placeholders.py:234
 msgid "Full Name C (no title)"
 msgstr "全名C (无称谓)"
 
-#: indico/modules/designer/placeholders.py:242
+#: indico/modules/designer/placeholders.py:241
 msgid "Full Name D (abbrev.)"
 msgstr "全名D（缩写）"
 
-#: indico/modules/designer/placeholders.py:249
+#: indico/modules/designer/placeholders.py:248
 msgid "Full Name D (abbrev., no title)"
 msgstr "全名D（缩写，无称谓）"
 
-#: indico/modules/designer/placeholders.py:262
+#: indico/modules/designer/placeholders.py:261
 #: indico/modules/events/registration/templates/management/import_invitations.html:13
 #: indico/modules/events/registration/templates/management/import_registrations.html:11
 msgid "First Name"
 msgstr "名"
 
-#: indico/modules/designer/placeholders.py:268
+#: indico/modules/designer/placeholders.py:267
 #: indico/modules/events/registration/templates/management/import_invitations.html:16
 #: indico/modules/events/registration/templates/management/import_registrations.html:14
 msgid "Last Name"
 msgstr "姓"
 
-#: indico/modules/designer/placeholders.py:274
-#: indico/modules/events/registration/controllers/management/reglists.py:109
+#: indico/modules/designer/placeholders.py:273
+msgid "Last Name (uppercase)"
+msgstr ""
+
+#: indico/modules/designer/placeholders.py:283
+#: indico/modules/events/registration/controllers/management/reglists.py:110
 #: indico/modules/events/registration/templates/management/import_invitations.html:22
 #: indico/modules/events/registration/templates/management/import_registrations.html:26
 msgid "E-mail"
 msgstr "电子邮件"
 
-#: indico/modules/designer/placeholders.py:280
+#: indico/modules/designer/placeholders.py:289
 msgid "Price (no currency)"
 msgstr "价格(无币种)"
 
-#: indico/modules/designer/placeholders.py:290
+#: indico/modules/designer/placeholders.py:299
 msgid "Price (with currency)"
 msgstr "价格(有币种)"
 
-#: indico/modules/designer/placeholders.py:300
+#: indico/modules/designer/placeholders.py:309
 msgid "Number of accompanying persons"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py:319
+#: indico/modules/designer/placeholders.py:328
 msgid "Accompanying persons"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py:325
+#: indico/modules/designer/placeholders.py:334
 msgid "Accompanying persons (abbrev.)"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py:331
+#: indico/modules/designer/placeholders.py:340
 msgid "Registration ID"
 msgstr "注册ID"
 
-#: indico/modules/designer/placeholders.py:337
+#: indico/modules/designer/placeholders.py:346
 msgid "Institution"
 msgstr "机构"
 
-#: indico/modules/designer/placeholders.py:343
+#: indico/modules/designer/placeholders.py:352
 #: indico/modules/events/registration/templates/management/import_registrations.html:20
 msgid "Position"
 msgstr "职位"
 
-#: indico/modules/designer/placeholders.py:349
+#: indico/modules/designer/placeholders.py:358
 #: indico/modules/events/management/templates/_settings.html:116
 #: indico/web/templates/forms/location_widget.html:72
 msgid "Address"
 msgstr "地址"
 
-#: indico/modules/designer/placeholders.py:355
+#: indico/modules/designer/placeholders.py:364
 msgid "Country"
 msgstr "国家"
 
-#: indico/modules/designer/placeholders.py:361
+#: indico/modules/designer/placeholders.py:370
 #: indico/modules/events/management/templates/_settings.html:188
 msgid "Phone"
 msgstr "电话"
 
-#: indico/modules/designer/placeholders.py:367
+#: indico/modules/designer/placeholders.py:376
 msgid "Picture"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py:382
+#: indico/modules/designer/placeholders.py:391
 msgid "Ticket QR Code"
 msgstr "票单 QR 代码"
 
-#: indico/modules/designer/placeholders.py:394
+#: indico/modules/designer/placeholders.py:403
 msgid "Fixed Text"
 msgstr "固定文本"
 
-#: indico/modules/designer/placeholders.py:404
+#: indico/modules/designer/placeholders.py:413
 #: indico/modules/designer/templates/template.html:275
 msgid "Fixed Image"
 msgstr "固定图像"
 
-#: indico/modules/designer/placeholders.py:459
+#: indico/modules/designer/placeholders.py:469
 msgid "No accommodation"
 msgstr ""
 
@@ -4456,28 +4475,32 @@ msgstr "未列出的事件"
 msgid "Auto-linker"
 msgstr ""
 
-#: indico/modules/events/__init__.py:162
+#: indico/modules/events/__init__.py:153
+msgid "Data Retention"
+msgstr ""
+
+#: indico/modules/events/__init__.py:164
 msgid "Create lecture"
 msgstr "创建讲座"
 
-#: indico/modules/events/__init__.py:163
+#: indico/modules/events/__init__.py:165
 msgid "Create meeting"
 msgstr "创建会议"
 
-#: indico/modules/events/__init__.py:164
+#: indico/modules/events/__init__.py:166
 msgid "Create conference"
 msgstr "创建大会"
 
-#: indico/modules/events/__init__.py:178
+#: indico/modules/events/__init__.py:180
 #: indico/modules/events/registration/stats.py:300
 msgid "Overview"
 msgstr "概览"
 
-#: indico/modules/events/__init__.py:179
+#: indico/modules/events/__init__.py:181
 msgid "My Conference"
 msgstr "我的大会"
 
-#: indico/modules/events/__init__.py:180
+#: indico/modules/events/__init__.py:182
 #: indico/modules/events/templates/display/privacy.html:10
 msgid "Privacy Information"
 msgstr "隐私信息"
@@ -4505,7 +4528,7 @@ msgstr "目标事件已有人"
 #: indico/modules/events/contributions/forms.py:71
 #: indico/modules/events/contributions/forms.py:134
 #: indico/modules/events/contributions/lists.py:61
-#: indico/modules/events/forms.py:125
+#: indico/modules/events/forms.py:126
 #: indico/modules/events/management/forms.py:188
 #: indico/modules/events/management/templates/_settings.html:146
 #: indico/modules/events/persons/templates/management/person_list.html:159
@@ -4597,77 +4620,77 @@ msgstr "电子邮件为 ‘{}’ 的人重复"
 msgid "Category default"
 msgstr "默认类别"
 
-#: indico/modules/events/forms.py:34
+#: indico/modules/events/forms.py:35
 msgid "The name of the external ID type"
 msgstr "外部 ID 类型名"
 
-#: indico/modules/events/forms.py:35
+#: indico/modules/events/forms.py:36
 msgid "URL template"
 msgstr "URL模板"
 
-#: indico/modules/events/forms.py:36
+#: indico/modules/events/forms.py:37
 msgid "The URL template must contain the '{value}' placeholder."
 msgstr "URL模板必须包含 ‘{value}’ 占位符。"
 
-#: indico/modules/events/forms.py:37
+#: indico/modules/events/forms.py:38
 #: indico/modules/events/templates/admin/_reference_type_list.html:8
 msgid "Scheme"
 msgstr "方案"
 
-#: indico/modules/events/forms.py:38
+#: indico/modules/events/forms.py:39
 msgid "The scheme/protocol of the external ID type"
 msgstr "外部 ID 类型的方案/协议"
 
-#: indico/modules/events/forms.py:49
+#: indico/modules/events/forms.py:50
 msgid "This name is already in use."
 msgstr "此名字已使用。"
 
-#: indico/modules/events/forms.py:53
+#: indico/modules/events/forms.py:54
 msgid "The URL template must contain the placeholder '{value}'."
 msgstr "这个 URL 模板必须包含占位符 ‘{value}’。"
 
-#: indico/modules/events/forms.py:59
+#: indico/modules/events/forms.py:60
 msgid "Event does not happen"
 msgstr ""
 
-#: indico/modules/events/forms.py:60
+#: indico/modules/events/forms.py:61
 msgid ""
 "Enable this to indicate that an event with this label does not happen (e.g. "
 "cancelled or postponed). This will prevent event reminders from being sent."
 msgstr ""
 
-#: indico/modules/events/forms.py:73
-#: indico/modules/events/registration/forms.py:554
+#: indico/modules/events/forms.py:74
+#: indico/modules/events/registration/forms.py:595
 msgid "This title is already in use."
 msgstr "此标题已在使用。"
 
 #: indico/modules/events/contributions/forms.py:52
-#: indico/modules/events/forms.py:77
+#: indico/modules/events/forms.py:78
 #: indico/modules/events/management/controllers/settings.py:161
 #: indico/modules/events/management/controllers/settings.py:163
 #: indico/modules/events/management/templates/_settings.html:200
 msgid "Keywords"
 msgstr "关键字"
 
-#: indico/modules/events/forms.py:91
+#: indico/modules/events/forms.py:92
 msgid "Listing"
 msgstr "列表"
 
-#: indico/modules/events/forms.py:92
+#: indico/modules/events/forms.py:93
 msgid "List in a category"
 msgstr "在一个类别中列出"
 
-#: indico/modules/events/forms.py:93
+#: indico/modules/events/forms.py:94
 msgid "Keep unlisted"
 msgstr "保持不公开"
 
-#: indico/modules/events/forms.py:100
+#: indico/modules/events/forms.py:101
 #: indico/modules/events/management/forms.py:61
 msgid "Event title"
 msgstr "事件名称"
 
 #: indico/modules/events/contributions/forms.py:51
-#: indico/modules/events/forms.py:102
+#: indico/modules/events/forms.py:103
 #: indico/modules/events/management/forms.py:171
 #: indico/modules/events/sessions/forms.py:74
 #: indico/modules/events/sessions/forms.py:85
@@ -4677,57 +4700,94 @@ msgstr "事件名称"
 msgid "Location"
 msgstr "地点"
 
-#: indico/modules/events/forms.py:109
+#: indico/modules/events/forms.py:110
 #: indico/modules/events/templates/forms/event_creation_form.html:119
 msgid "You are not allowed to create events in this category."
 msgstr "你不能在此类别建立事件。"
 
 #: indico/modules/events/abstracts/forms.py:656
-#: indico/modules/events/forms.py:115
+#: indico/modules/events/forms.py:116
 #: indico/modules/events/management/forms.py:104
 #: indico/modules/events/management/forms.py:110
 #: indico/modules/events/papers/forms.py:60
-#: indico/modules/events/registration/forms.py:176
+#: indico/modules/events/registration/forms.py:191
 #: indico/modules/events/surveys/forms.py:73
 msgid "Start"
 msgstr "开始"
 
 #: indico/modules/events/abstracts/forms.py:658
-#: indico/modules/events/forms.py:116
+#: indico/modules/events/forms.py:117
 #: indico/modules/events/management/forms.py:105
 #: indico/modules/events/management/forms.py:113
 #: indico/modules/events/papers/forms.py:62
-#: indico/modules/events/registration/forms.py:178
+#: indico/modules/events/registration/forms.py:193
 #: indico/modules/events/surveys/forms.py:76
 msgid "End"
 msgstr "结束  "
 
-#: indico/modules/events/forms.py:124
+#: indico/modules/events/forms.py:125
 msgid "Dates"
 msgstr "日期"
 
-#: indico/modules/events/forms.py:127 indico/modules/events/layout/forms.py:95
+#: indico/modules/events/forms.py:128 indico/modules/events/layout/forms.py:95
 #: indico/modules/events/layout/forms.py:100
 #: indico/modules/events/layout/forms.py:212
 #: indico/modules/events/layout/templates/layout_conference.html:27
 msgid "Theme"
 msgstr "主题"
 
-#: indico/modules/events/forms.py:132
+#: indico/modules/events/forms.py:133
 msgid "Restrict creation"
 msgstr "限制创建"
 
-#: indico/modules/events/forms.py:134
+#: indico/modules/events/forms.py:135
 msgid "Restrict creation of unlisted events to the authorized users below."
 msgstr "仅限授权用户创建未列出的事件。"
 
-#: indico/modules/events/forms.py:135 indico/modules/receipts/forms.py:19
+#: indico/modules/events/forms.py:136 indico/modules/receipts/forms.py:19
 msgid "Authorized users"
 msgstr "授权用户"
 
-#: indico/modules/events/forms.py:137
+#: indico/modules/events/forms.py:138
 msgid "These users may create unlisted events."
 msgstr "这些用户可能会创建未列出的事件。"
+
+#: indico/modules/events/forms.py:143
+msgid "Minimum data retention period"
+msgstr ""
+
+#: indico/modules/events/forms.py:146
+msgid ""
+"Specify the minimum data retention period (in weeks) configurable for "
+"registrations. This includes the retention period of individual registration"
+" form fields."
+msgstr ""
+
+#: indico/modules/events/forms.py:153
+msgid "Maximum data retention period"
+msgstr ""
+
+#: indico/modules/events/forms.py:155
+msgid ""
+"Specify the maximum data retention period (in weeks) configurable for "
+"registrations. This includes the retention period of individual registration"
+" form fields. Note that setting this value will make the retention period "
+"field mandatory during registration form setup."
+msgstr ""
+
+#: indico/modules/events/forms.py:160
+#: indico/modules/events/registration/forms.py:150
+#: indico/modules/events/registration/forms.py:628
+msgid "Indefinite"
+msgstr "不定"
+
+#: indico/modules/events/forms.py:166 indico/modules/events/forms.py:176
+msgid "The retention period cannot be zero or negative."
+msgstr ""
+
+#: indico/modules/events/forms.py:169 indico/modules/events/forms.py:179
+msgid "The minimum retention period cannot be greater than the maximum."
+msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py:26
 #: indico/modules/events/placeholders.py:16
@@ -5402,7 +5462,7 @@ msgstr "发给合作作者"
 
 #: indico/modules/events/abstracts/forms.py:449
 #: indico/modules/events/agreements/forms.py:27
-#: indico/modules/events/registration/forms.py:291
+#: indico/modules/events/registration/forms.py:332
 msgid "CC"
 msgstr "抄送"
 
@@ -5411,7 +5471,7 @@ msgid "Additional CC e-mail addresses (one per line)"
 msgstr "其他的抄送电子邮件地址（每行一个）"
 
 #: indico/modules/events/abstracts/forms.py:450
-#: indico/modules/events/registration/forms.py:294
+#: indico/modules/events/registration/forms.py:335
 #: indico/modules/events/registration/templates/management/email_preview.html:11
 #: indico/modules/events/reminders/templates/preview.html:1
 #: indico/modules/logs/templates/entry_email.html:72
@@ -5442,8 +5502,8 @@ msgstr "接收"
 #: indico/modules/events/abstracts/models/reviews.py:19
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:135
 #: indico/modules/events/papers/models/reviews.py:19
-#: indico/modules/events/registration/controllers/management/reglists.py:662
-#: indico/modules/events/registration/controllers/management/reglists.py:806
+#: indico/modules/events/registration/controllers/management/reglists.py:682
+#: indico/modules/events/registration/controllers/management/reglists.py:826
 #: indico/modules/events/registration/templates/management/_registration_details.html:117
 #: indico/modules/events/requests/base.py:37
 #: indico/modules/users/templates/registration_requests.html:31
@@ -5532,8 +5592,8 @@ msgid "The moment the submission process will end"
 msgstr "提交过程将结束的那一刻"
 
 #: indico/modules/events/abstracts/forms.py:660
-#: indico/modules/events/registration/forms.py:180
-#: indico/modules/events/registration/forms.py:192
+#: indico/modules/events/registration/forms.py:195
+#: indico/modules/events/registration/forms.py:207
 msgid "Modification deadline"
 msgstr "修改最后期限"
 
@@ -7359,14 +7419,14 @@ msgstr "我不同意"
 
 #: indico/modules/events/agreements/forms.py:22
 #: indico/modules/events/agreements/templates/emails/new_signature_email_to_manager.txt:31
-#: indico/modules/events/registration/forms.py:527
+#: indico/modules/events/registration/forms.py:568
 #: indico/modules/rb/templates/booking_list.html:102
 msgid "Reason"
 msgstr "理由"
 
 #: indico/modules/events/agreements/forms.py:26
-#: indico/modules/events/registration/forms.py:204
-#: indico/modules/events/registration/forms.py:290
+#: indico/modules/events/registration/forms.py:219
+#: indico/modules/events/registration/forms.py:331
 #: indico/modules/logs/templates/entry_email.html:23
 msgid "From"
 msgstr "发送人"
@@ -7376,14 +7436,14 @@ msgid "Warning: this email address will be able to sign the agreement!"
 msgstr "警告：此电子邮件地址可以签署协议！"
 
 #: indico/modules/events/agreements/forms.py:29
-#: indico/modules/events/registration/forms.py:206
-#: indico/modules/events/registration/forms.py:295
+#: indico/modules/events/registration/forms.py:221
+#: indico/modules/events/registration/forms.py:336
 msgid "Email body"
 msgstr "电子邮件内容"
 
 #: indico/modules/events/agreements/forms.py:41
-#: indico/modules/events/registration/forms.py:226
-#: indico/modules/events/registration/forms.py:314
+#: indico/modules/events/registration/forms.py:241
+#: indico/modules/events/registration/forms.py:355
 #: indico/util/marshmallow.py:90
 msgid "Missing placeholders: {}"
 msgstr "丢失占位符：{}"
@@ -7844,7 +7904,7 @@ msgstr ""
 
 #: indico/modules/events/contributions/forms.py:222
 #: indico/modules/events/contributions/templates/management/types_dialog.html:25
-#: indico/modules/events/registration/forms.py:66
+#: indico/modules/events/registration/forms.py:71
 msgid "Private"
 msgstr "私有"
 
@@ -7906,7 +7966,7 @@ msgid ""
 msgstr "由于启用了筛选，报告 '{}' 没有显示在列表中"
 
 #: indico/modules/events/contributions/util.py:296
-#: indico/modules/events/registration/util.py:91
+#: indico/modules/events/registration/util.py:94
 msgid ""
 "Row {}: malformed CSV data - please check that the number of columns is "
 "correct"
@@ -8537,31 +8597,31 @@ msgstr "新报告类型"
 msgid "There are no contribution types yet."
 msgstr "还没有报告类型。"
 
-#: indico/modules/events/controllers/admin.py:63
+#: indico/modules/events/controllers/admin.py:64
 msgid "External ID type '{}' created successfully"
 msgstr "外部 ID 类型 '{}' 创建成功"
 
-#: indico/modules/events/controllers/admin.py:75
+#: indico/modules/events/controllers/admin.py:76
 msgid "External ID type '{}' successfully updated"
 msgstr "外部 ID 类型 '{}' 更新成功"
 
-#: indico/modules/events/controllers/admin.py:85
+#: indico/modules/events/controllers/admin.py:86
 msgid "External ID type '{}' successfully deleted"
 msgstr "外部 ID 类型 '{}' 删除成功"
 
-#: indico/modules/events/controllers/admin.py:121
+#: indico/modules/events/controllers/admin.py:122
 msgid "Event label '{}' created successfully"
 msgstr "事件标签 '{}' 已成功创建"
 
-#: indico/modules/events/controllers/admin.py:134
+#: indico/modules/events/controllers/admin.py:135
 msgid "Allowed keywords have been saved"
 msgstr ""
 
-#: indico/modules/events/controllers/admin.py:146
+#: indico/modules/events/controllers/admin.py:147
 msgid "Event label '{}' successfully updated"
 msgstr "事件标签 '{}' 已成功更新"
 
-#: indico/modules/events/controllers/admin.py:156
+#: indico/modules/events/controllers/admin.py:157
 msgid "Event label '{}' successfully deleted"
 msgstr "事件标签 '{}' 已成功删除"
 
@@ -8661,33 +8721,33 @@ msgstr "编辑（配置的标签，文件类型，审核条件）"
 msgid "The requested action is not possible on this revision"
 msgstr "此版本无法执行要求的操作"
 
-#: indico/modules/events/editing/schemas.py:338
+#: indico/modules/events/editing/schemas.py:351
 msgid "Tag code must be unique"
 msgstr "标签代码必须是唯一的"
 
-#: indico/modules/events/editing/schemas.py:368
+#: indico/modules/events/editing/schemas.py:381
 #: indico/modules/rb/schemas.py:491 indico/modules/rb/schemas.py:519
 #: indico/modules/rb/schemas.py:536 indico/modules/rb/schemas.py:554
 msgid "Name must be unique"
 msgstr "名字必须唯一"
 
-#: indico/modules/events/editing/schemas.py:373
+#: indico/modules/events/editing/schemas.py:386
 msgid "Filename template cannot include dots"
 msgstr "文件名模板不能包含点"
 
-#: indico/modules/events/editing/schemas.py:379
+#: indico/modules/events/editing/schemas.py:392
 msgid "Extensions cannot have leading dots"
 msgstr "扩展名不能有前导点"
 
-#: indico/modules/events/editing/schemas.py:394
+#: indico/modules/events/editing/schemas.py:407
 msgid "Cannot unset the only publishable file type"
 msgstr "不能取消设置唯一的可发布文件类型"
 
-#: indico/modules/events/editing/schemas.py:411
+#: indico/modules/events/editing/schemas.py:424
 msgid "Invalid file type used"
 msgstr "使用的文件类型无效"
 
-#: indico/modules/events/editing/schemas.py:415
+#: indico/modules/events/editing/schemas.py:428
 msgid "Conditions have to be unique"
 msgstr "条件必须是唯一的"
 
@@ -8700,11 +8760,11 @@ msgstr "连接失败"
 msgid "Invalid response"
 msgstr "无效的响应"
 
-#: indico/modules/events/editing/controllers/backend/editable_list.py:95
+#: indico/modules/events/editing/controllers/backend/editable_list.py:97
 msgid "You are not an editor of the {} type"
 msgstr "您不是 {} 类型的编辑人"
 
-#: indico/modules/events/editing/controllers/backend/editable_list.py:96
+#: indico/modules/events/editing/controllers/backend/editable_list.py:98
 msgid "This user is not an editor of the {} type"
 msgstr "此用户不是 {} 类型的编辑人"
 
@@ -8728,41 +8788,41 @@ msgstr "无法用服务注册事件: {}"
 msgid "Could not disconnect event from service: {}"
 msgstr "无法从服务断开: {}"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:72
+#: indico/modules/events/editing/controllers/backend/timeline.py:73
 msgid "No such file was found within the paper"
 msgstr "在论文中找不到这样的文件"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:103
+#: indico/modules/events/editing/controllers/backend/timeline.py:104
 msgid "You cannot perform this action on this revision"
 msgstr "您无法在此修订版上执行此操作"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:177
+#: indico/modules/events/editing/controllers/backend/timeline.py:178
 msgid "Editable already exists"
 msgstr "可编辑项已存在"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:190
+#: indico/modules/events/editing/controllers/backend/timeline.py:191
 msgid "Submission failed, please try again later."
 msgstr "提交失败，请稍候再试。"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:209
+#: indico/modules/events/editing/controllers/backend/timeline.py:210
 msgid "Deletion failed, please try again later."
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:303
+#: indico/modules/events/editing/controllers/backend/timeline.py:304
 #: indico/modules/events/editing/controllers/backend/util.py:28
 #: indico/modules/events/editing/controllers/backend/util.py:42
 msgid "Failed processing review, please try again later."
 msgstr "处理审核失败，请稍候再试。"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:427
+#: indico/modules/events/editing/controllers/backend/timeline.py:429
 msgid "You do not have the permission to unassign this user"
 msgstr "您无权取消分配此用户"
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:438
+#: indico/modules/events/editing/controllers/backend/timeline.py:440
 msgid "This editable already has an editor assigned"
 msgstr ""
 
-#: indico/modules/events/editing/controllers/backend/timeline.py:440
+#: indico/modules/events/editing/controllers/backend/timeline.py:442
 msgid "You do not have the permission to assign yourself"
 msgstr "您无权分配您自己"
 
@@ -8894,7 +8954,7 @@ msgstr "\"Editing\" 为论文，幻灯片和/或海报提供了集成的编辑�
 #: indico/modules/events/management/templates/_settings.html:185
 #: indico/modules/events/papers/templates/management/paper_person_list.html:19
 #: indico/modules/events/persons/templates/management/person_list.html:249
-#: indico/modules/events/registration/forms.py:235
+#: indico/modules/events/registration/forms.py:250
 #: indico/modules/events/registration/templates/management/import_invitations.html:32
 #: indico/modules/events/registration/templates/management/regform_invite.html:7
 #: indico/modules/events/registration/wallets/apple.py:95
@@ -9187,19 +9247,19 @@ msgstr "菜单自定义已启用。"
 msgid "Menu customization has been disabled."
 msgstr "菜单自定义已禁用。"
 
-#: indico/modules/events/layout/models/menu.py:34
+#: indico/modules/events/layout/models/menu.py:35
 msgid "Separator"
 msgstr "分离器"
 
-#: indico/modules/events/layout/models/menu.py:34
+#: indico/modules/events/layout/models/menu.py:35
 msgid "Internal Link"
 msgstr "内部链接"
 
-#: indico/modules/events/layout/models/menu.py:34
+#: indico/modules/events/layout/models/menu.py:35
 msgid "User Link"
 msgstr "用户链接"
 
-#: indico/modules/events/layout/models/menu.py:34
+#: indico/modules/events/layout/models/menu.py:35
 msgid "Plugin Link"
 msgstr "插件链接"
 
@@ -9622,7 +9682,7 @@ msgid "Vertical margins"
 msgstr "垂直边距"
 
 #: indico/modules/events/management/forms.py:334
-#: indico/modules/events/registration/forms.py:477
+#: indico/modules/events/registration/forms.py:518
 #: indico/modules/events/timetable/forms.py:181
 msgid "Page size"
 msgstr "页面尺寸"
@@ -10666,8 +10726,8 @@ msgstr "布局审核人"
 msgid "Content Reviewer"
 msgstr "内容审核人"
 
-#: indico/modules/events/papers/controllers/api.py:168
-#: indico/modules/events/papers/controllers/api.py:199
+#: indico/modules/events/papers/controllers/api.py:171
+#: indico/modules/events/papers/controllers/api.py:202
 msgid "Reviewing is currently not possible"
 msgstr "目前无法审核"
 
@@ -11703,7 +11763,7 @@ msgid ""
 msgstr "此事件可选择的货币列表。当删除一个货币时，现有的事件将继续使用它。货币代码必须是有效的 <a href='{0}'> ISO-4217 </a> 代码，如 ''EUR 或 'CHF'。"
 
 #: indico/modules/events/payment/forms.py:32
-#: indico/modules/events/registration/forms.py:91
+#: indico/modules/events/registration/forms.py:96
 msgid "Currency"
 msgstr "货币"
 
@@ -11843,7 +11903,7 @@ msgstr "编辑付款设置"
 #: indico/modules/events/registration/templates/management/regform.html:99
 #: indico/modules/events/registration/templates/management/regform.html:187
 #: indico/modules/events/registration/templates/management/regform_list.html:56
-#: indico/modules/events/registration/templates/management/regform_list.html:85
+#: indico/modules/events/registration/templates/management/regform_list.html:94
 #: indico/modules/events/tracks/templates/management.html:35
 msgid "Configure"
 msgstr "配置"
@@ -12224,7 +12284,7 @@ msgid "The target event already has registration forms"
 msgstr "目标事件已有注册表"
 
 #: indico/modules/events/registration/clone.py:90
-#: indico/modules/events/registration/templates/management/regform_list.html:111
+#: indico/modules/events/registration/templates/management/regform_list.html:120
 #: indico/modules/events/registration/templates/management/regform_stats.html:37
 #: indico/modules/users/models/export.py:37
 msgid "Registrations"
@@ -12234,653 +12294,659 @@ msgstr "注册"
 msgid "The target event already has registrations"
 msgstr "目标事件已有注册"
 
-#: indico/modules/events/registration/forms.py:49
+#: indico/modules/events/registration/forms.py:54
 msgid ""
 "You have to enable the payment feature in order to set a registration fee."
 msgstr "您必须启用付款功能才能设置注册费。"
 
-#: indico/modules/events/registration/forms.py:59
-#: indico/modules/events/registration/forms.py:135
+#: indico/modules/events/registration/forms.py:64
+#: indico/modules/events/registration/forms.py:140
 msgid "The title of the registration form"
 msgstr "注册表名称"
 
-#: indico/modules/events/registration/forms.py:60
+#: indico/modules/events/registration/forms.py:65
 #: indico/modules/events/surveys/forms.py:28
 msgid "Introduction"
 msgstr "介绍"
 
-#: indico/modules/events/registration/forms.py:61
+#: indico/modules/events/registration/forms.py:66
 msgid "Introduction to be displayed when filling out the registration form"
 msgstr "填写注册表时显示的介绍"
 
-#: indico/modules/events/registration/forms.py:62
+#: indico/modules/events/registration/forms.py:67
 #: indico/modules/events/registration/templates/display/_regform_info.html:64
 msgid "Contact info"
 msgstr "联系人信息"
 
-#: indico/modules/events/registration/forms.py:63
+#: indico/modules/events/registration/forms.py:68
 msgid "How registrants can get in touch with somebody for extra information"
 msgstr "注册者如何与他人联系以获取更多信息"
 
-#: indico/modules/events/registration/forms.py:64
+#: indico/modules/events/registration/forms.py:69
 msgid "Moderated"
 msgstr "审核"
 
-#: indico/modules/events/registration/forms.py:65
+#: indico/modules/events/registration/forms.py:70
 msgid "If enabled, registrations require manager approval"
 msgstr "如果启用，注册需要管理员批准"
 
-#: indico/modules/events/registration/forms.py:67
+#: indico/modules/events/registration/forms.py:72
 msgid ""
 "The registration form will not be publicly displayed on the event page. Only"
 " people with the secret link or an invitation will be able to register."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:69
+#: indico/modules/events/registration/forms.py:74
 #: indico/modules/events/surveys/forms.py:31
 msgid "Only logged-in users"
 msgstr "仅登录的用户"
 
-#: indico/modules/events/registration/forms.py:70
+#: indico/modules/events/registration/forms.py:75
 msgid "Users must be logged in to register"
 msgstr "用户必须登录后注册"
 
-#: indico/modules/events/registration/forms.py:71
+#: indico/modules/events/registration/forms.py:76
 msgid "Registrant must have account"
 msgstr "注册人必须有帐号"
 
-#: indico/modules/events/registration/forms.py:72
+#: indico/modules/events/registration/forms.py:77
 msgid "Registrations emails must be associated with an Indico account"
 msgstr "注册的电子邮件必须与 Indico 帐号关联"
 
-#: indico/modules/events/registration/forms.py:73
+#: indico/modules/events/registration/forms.py:78
 msgid "Require CAPTCHA"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:74
+#: indico/modules/events/registration/forms.py:79
 msgid "When registering, users with no account have to answer a CAPTCHA"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:75
+#: indico/modules/events/registration/forms.py:80
 msgid "Limit registrations"
 msgstr "限制注册"
 
-#: indico/modules/events/registration/forms.py:76
+#: indico/modules/events/registration/forms.py:81
 msgid "Whether there is a limit of registrations"
 msgstr "是否有注册限制"
 
-#: indico/modules/events/registration/forms.py:77
+#: indico/modules/events/registration/forms.py:82
 #: indico/modules/events/surveys/forms.py:35
 msgid "Capacity"
 msgstr "容量    "
 
-#: indico/modules/events/registration/forms.py:79
+#: indico/modules/events/registration/forms.py:84
 msgid "Maximum number of registrations"
 msgstr "最大注册数"
 
-#: indico/modules/events/registration/forms.py:80
+#: indico/modules/events/registration/forms.py:85
 msgid "Modification allowed"
 msgstr "允许修改"
 
-#: indico/modules/events/registration/forms.py:81
+#: indico/modules/events/registration/forms.py:86
 msgid "Will users be able to modify their data? When?"
 msgstr "用户将可以修改他们的数据吗？ 什么时候？"
 
-#: indico/modules/events/registration/forms.py:82
+#: indico/modules/events/registration/forms.py:87
 msgid "Publish number of registrations"
 msgstr "发布注册数"
 
-#: indico/modules/events/registration/forms.py:83
+#: indico/modules/events/registration/forms.py:88
 msgid "Number of registered participants will be displayed on the event page"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:85
+#: indico/modules/events/registration/forms.py:90
 msgid "Publish check-in status"
 msgstr "发布报到状态"
 
-#: indico/modules/events/registration/forms.py:86
+#: indico/modules/events/registration/forms.py:91
 msgid "Check-in status will be shown publicly on the event page"
 msgstr "报到情况将在事件页上公开显示"
 
-#: indico/modules/events/registration/forms.py:87
-#: indico/modules/events/registration/forms.py:670
+#: indico/modules/events/registration/forms.py:92
+#: indico/modules/events/registration/forms.py:718
 #: indico/modules/events/registration/templates/display/_regform_info.html:53
 #: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:288
 msgid "Registration fee"
 msgstr "注册费"
 
-#: indico/modules/events/registration/forms.py:90
+#: indico/modules/events/registration/forms.py:95
 msgid "A fixed fee all users have to pay when registering."
 msgstr "所有用户在注册时必须付的固定费用。"
 
-#: indico/modules/events/registration/forms.py:91
+#: indico/modules/events/registration/forms.py:96
 msgid "The currency for new registrations"
 msgstr "新注册使用的币种"
 
-#: indico/modules/events/registration/forms.py:92
+#: indico/modules/events/registration/forms.py:97
 msgid "Notification sender address"
 msgstr "通知发送者地址"
 
-#: indico/modules/events/registration/forms.py:95
+#: indico/modules/events/registration/forms.py:100
 msgid "Message for pending registrations"
 msgstr "等待注册的信息"
 
-#: indico/modules/events/registration/forms.py:96
+#: indico/modules/events/registration/forms.py:101
 msgid ""
 "Text included in emails sent to pending registrations (Markdown syntax)"
 msgstr "发送给待注册的电子邮件中包含的文本 (Markdown 语法)"
 
-#: indico/modules/events/registration/forms.py:99
+#: indico/modules/events/registration/forms.py:104
 msgid "Message for unpaid registrations"
 msgstr "未付款注册信息"
 
-#: indico/modules/events/registration/forms.py:100
+#: indico/modules/events/registration/forms.py:105
 msgid "Text included in emails sent to unpaid registrations (Markdown syntax)"
 msgstr "发送给未付款注册的电子邮件中包含的文本 (Markdown 语法)"
 
-#: indico/modules/events/registration/forms.py:103
+#: indico/modules/events/registration/forms.py:108
 msgid "Message for complete registrations"
 msgstr "完成注册的信息"
 
-#: indico/modules/events/registration/forms.py:104
+#: indico/modules/events/registration/forms.py:109
 msgid ""
 "Text included in emails sent to complete registrations (Markdown syntax)"
 msgstr "发送给完成注册的电子邮件中包含的文本 (Markdown 语法)"
 
-#: indico/modules/events/registration/forms.py:107
+#: indico/modules/events/registration/forms.py:112
 #: indico/modules/events/reminders/forms.py:48
 msgid "Attach iCalendar file"
 msgstr "附加iCalendar文件"
 
-#: indico/modules/events/registration/forms.py:109
+#: indico/modules/events/registration/forms.py:114
 msgid ""
 "Attach an iCalendar file to the mail sent once a registration is complete"
 msgstr "注册完成后，将iCalendar文件附加到发送的邮件中"
 
-#: indico/modules/events/registration/forms.py:112
+#: indico/modules/events/registration/forms.py:117
 msgid "Enable notifications to managers about registrations"
 msgstr "启用向管理员发送有关注册的通知"
 
-#: indico/modules/events/registration/forms.py:113
+#: indico/modules/events/registration/forms.py:118
 msgid "List of recipients"
 msgstr "收件人列表"
 
-#: indico/modules/events/registration/forms.py:116
+#: indico/modules/events/registration/forms.py:121
 msgid "Email addresses that will receive notifications"
 msgstr "将接收通知的邮件地址"
 
-#: indico/modules/events/registration/forms.py:123
+#: indico/modules/events/registration/forms.py:128
 msgid ""
 "Email address set as the sender of all notifications sent to users. If "
 "empty, then {email} is used."
 msgstr "电子邮件地址设置为发送给用户的所有通知的发件人。如果为空，则使用 {email}。"
 
-#: indico/modules/events/registration/forms.py:136
-#: indico/modules/events/registration/forms.py:578
+#: indico/modules/events/registration/forms.py:141
+#: indico/modules/events/registration/forms.py:619
 msgid "Participant list visibility"
 msgstr "参会人列表可见性"
 
-#: indico/modules/events/registration/forms.py:137
-#: indico/modules/events/registration/forms.py:579
+#: indico/modules/events/registration/forms.py:142
+#: indico/modules/events/registration/forms.py:620
 msgid ""
 "Specify under which conditions the participant list will be visible to other"
 " participants and everyone else who can access the event"
 msgstr "指定参会者列表在哪些条件下对其他参会者和可以访问该事件的所有人可见"
 
-#: indico/modules/events/registration/forms.py:140
-#: indico/modules/events/registration/forms.py:582
+#: indico/modules/events/registration/forms.py:145
+#: indico/modules/events/registration/forms.py:623
 msgid "Retention period"
 msgstr "保留期"
 
-#: indico/modules/events/registration/forms.py:141
-#: indico/modules/events/registration/forms.py:583
+#: indico/modules/events/registration/forms.py:146
+#: indico/modules/events/registration/forms.py:624
 msgid ""
 "Specify for how many weeks the registration data, including the participant "
 "list, should be stored. Retention periods for individual fields can be set "
 "in the registration form designer"
 msgstr "指定应该存储多少个星期注册数据，包括参会人列表。可以在注册表设计器中设置单个字段的保留期"
 
-#: indico/modules/events/registration/forms.py:145
-#: indico/modules/events/registration/forms.py:587
-msgid "Indefinite"
-msgstr "不定"
-
-#: indico/modules/events/registration/forms.py:150
-#: indico/modules/events/registration/forms.py:617
+#: indico/modules/events/registration/forms.py:166
+#: indico/modules/events/registration/forms.py:666
 msgid ""
 "Participant visibility cannot be more restrictive for other participants "
 "than for the public"
 msgstr "参会者的可见性对其他参会者的限制不能比对公众的限制更大"
 
-#: indico/modules/events/registration/forms.py:155
-#: indico/modules/events/registration/forms.py:637
+#: indico/modules/events/registration/forms.py:172
+#: indico/modules/events/registration/forms.py:687
 msgid "The visibility duration cannot be zero."
 msgstr "可见持续时间不能为零。"
 
-#: indico/modules/events/registration/forms.py:157
-#: indico/modules/events/registration/forms.py:639
+#: indico/modules/events/registration/forms.py:174
+#: indico/modules/events/registration/forms.py:689
 msgid ""
-"The visibility duration cannot be longer than 10 years. Leave the field "
+"The visibility duration cannot be longer than {} week. Leave the field empty"
+" for indefinite."
+msgid_plural ""
+"The visibility duration cannot be longer than {} weeks. Leave the field "
 "empty for indefinite."
-msgstr ""
+msgstr[0] ""
 
-#: indico/modules/events/registration/forms.py:165
-#: indico/modules/events/registration/forms.py:647
-msgid "The retention period cannot be zero or negative."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py:167
-#: indico/modules/events/registration/forms.py:649
-msgid ""
-"The retention period cannot be longer than 10 years. Leave the field empty "
-"for indefinite."
-msgstr ""
-
-#: indico/modules/events/registration/forms.py:172
-#: indico/modules/events/registration/forms.py:654
+#: indico/modules/events/registration/forms.py:187
+#: indico/modules/events/registration/forms.py:702
 msgid "The retention period cannot be lower than the visibility duration."
 msgstr "保留期不能低于可见持续时间。"
 
-#: indico/modules/events/registration/forms.py:177
+#: indico/modules/events/registration/forms.py:192
 msgid "Moment when registrations will be open"
 msgstr "注册开始的时刻"
 
-#: indico/modules/events/registration/forms.py:179
+#: indico/modules/events/registration/forms.py:194
 msgid "Moment when registrations will be closed"
 msgstr "注册关闭的时刻"
 
-#: indico/modules/events/registration/forms.py:182
+#: indico/modules/events/registration/forms.py:197
 msgid ""
 "Deadline until which registration information can be modified (defaults to "
 "the end date if empty)"
 msgstr "注册信息可被修改的最后期限 (如果为空，则默认为结束日期)"
 
-#: indico/modules/events/registration/forms.py:193
+#: indico/modules/events/registration/forms.py:208
 msgid "Deadline until which registration information can be modified"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:205
+#: indico/modules/events/registration/forms.py:220
 msgid "Email subject"
 msgstr "邮件主题"
 
-#: indico/modules/events/registration/forms.py:208
+#: indico/modules/events/registration/forms.py:223
 msgid "Skip moderation"
 msgstr "跳过评分审核"
 
-#: indico/modules/events/registration/forms.py:209
+#: indico/modules/events/registration/forms.py:224
 msgid "If enabled, the user's registration will be approved automatically."
 msgstr "如果启用，用户的注册将自动批准。"
 
-#: indico/modules/events/registration/forms.py:210
-#: indico/modules/events/registration/forms.py:513
+#: indico/modules/events/registration/forms.py:225
+#: indico/modules/events/registration/forms.py:554
 msgid "Skip access check"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:211
+#: indico/modules/events/registration/forms.py:226
 msgid ""
 "If enabled, the user will be able to register even if the event is access-"
 "restricted."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:232
+#: indico/modules/events/registration/forms.py:247
 msgid "The first name of the user you are inviting."
 msgstr "您邀请的用户的名。"
 
-#: indico/modules/events/registration/forms.py:233
+#: indico/modules/events/registration/forms.py:248
 #: indico/modules/users/templates/registration_requests.html:13
 msgid "Last name"
 msgstr "姓"
 
-#: indico/modules/events/registration/forms.py:234
+#: indico/modules/events/registration/forms.py:249
 msgid "The last name of the user you are inviting."
 msgstr "您邀请的用户的姓。"
 
-#: indico/modules/events/registration/forms.py:236
+#: indico/modules/events/registration/forms.py:251
 msgid "The invitation will be sent to this address."
 msgstr "邀请函将送到此地址。"
 
-#: indico/modules/events/registration/forms.py:238
+#: indico/modules/events/registration/forms.py:253
 msgid "The affiliation of the user you are inviting."
 msgstr "您邀请的用户的工作单位。"
 
-#: indico/modules/events/registration/forms.py:249
+#: indico/modules/events/registration/forms.py:264
 msgid "There is already an invitation with this email address."
 msgstr "已存在具有此电子邮件地址的邀请。"
 
-#: indico/modules/events/registration/forms.py:251
+#: indico/modules/events/registration/forms.py:266
 msgid "There is already a registration with this email address."
 msgstr "已存在具有此电子邮件地址的注册。"
 
-#: indico/modules/events/registration/forms.py:256
+#: indico/modules/events/registration/forms.py:271
 #: indico/modules/users/__init__.py:65
 #: indico/modules/users/templates/users_admin.html:5
 msgid "Users"
 msgstr "用户"
 
-#: indico/modules/events/registration/forms.py:257
+#: indico/modules/events/registration/forms.py:272
 msgid "Select the users to invite."
 msgstr "选择邀请用户。"
 
-#: indico/modules/events/registration/forms.py:272
+#: indico/modules/events/registration/forms.py:287
 msgid ""
 "There are already invitations for the following email addresses: {emails}"
 msgstr "已存在具有下列电子邮件地址的邀请：{emails}"
 
-#: indico/modules/events/registration/forms.py:277
+#: indico/modules/events/registration/forms.py:292
 msgid ""
 "There are already registrations with the following email addresses: {emails}"
 msgstr "已存在具有下列电子邮件地址的注册：{emails}"
 
-#: indico/modules/events/registration/forms.py:283
-#: indico/modules/events/registration/forms.py:509
+#: indico/modules/events/registration/forms.py:298
+msgid "Comma"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py:299
+msgid "Semicolon"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py:300
+msgid "Tab"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py:301
+msgid "Space"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py:322
+#: indico/modules/events/registration/forms.py:550
 #: indico/modules/events/roles/forms.py:42
 #: indico/modules/events/timetable/forms.py:204
 msgid "Source File"
 msgstr "源文件"
 
-#: indico/modules/events/registration/forms.py:283
-#: indico/modules/events/registration/forms.py:509
+#: indico/modules/events/registration/forms.py:322
+#: indico/modules/events/registration/forms.py:550
 #: indico/modules/events/timetable/forms.py:204
 msgid "You need to upload a CSV file."
 msgstr "您需要上传 CSV 文件。"
 
-#: indico/modules/events/registration/forms.py:285
+#: indico/modules/events/registration/forms.py:324
+msgid "CSV field delimiter"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py:326
 msgid "Skip existing invitations"
 msgstr "跳过现有邀请"
 
-#: indico/modules/events/registration/forms.py:286
+#: indico/modules/events/registration/forms.py:327
 msgid "If enabled, users with existing invitations will be ignored."
 msgstr "如果启用，具有现有邀请的用户将被忽略。"
 
-#: indico/modules/events/registration/forms.py:292
+#: indico/modules/events/registration/forms.py:333
 msgid "Beware, addresses in this field will receive one mail per registrant."
 msgstr "注意，此字段中的地址将为每个注册者接收一封邮件。"
 
-#: indico/modules/events/registration/forms.py:296
+#: indico/modules/events/registration/forms.py:337
 #: indico/modules/events/reminders/templates/edit_reminder.html:15
 msgid "Recipients"
 msgstr "收件人"
 
-#: indico/modules/events/registration/forms.py:297
+#: indico/modules/events/registration/forms.py:338
 msgid "Send copy to me"
 msgstr "发送拷贝给我"
 
-#: indico/modules/events/registration/forms.py:298
+#: indico/modules/events/registration/forms.py:339
 msgid "Send copy of each email to my mailbox"
 msgstr "发送每个邮件的拷贝到我邮箱"
 
-#: indico/modules/events/registration/forms.py:299
+#: indico/modules/events/registration/forms.py:340
 msgid "Attach ticket"
 msgstr "附加票单"
 
-#: indico/modules/events/registration/forms.py:300
+#: indico/modules/events/registration/forms.py:341
 msgid "Attach tickets to emails"
 msgstr "邮件中附加票单"
 
-#: indico/modules/events/registration/forms.py:321
+#: indico/modules/events/registration/forms.py:362
 msgid "Enable Tickets"
 msgstr "启用票单"
 
-#: indico/modules/events/registration/forms.py:322
+#: indico/modules/events/registration/forms.py:363
 msgid "Create tickets for registrations using this registration form."
 msgstr "为使用这个注册表的注册创建票单。"
 
-#: indico/modules/events/registration/forms.py:323
+#: indico/modules/events/registration/forms.py:364
 msgid "Export to Google Wallet"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:326
+#: indico/modules/events/registration/forms.py:367
 msgid ""
 "Allow users to export their ticket to Google Wallet. This currently does not"
 " support tickets for accompanying persons."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:329
+#: indico/modules/events/registration/forms.py:370
 msgid "Export to Apple Wallet"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:332
+#: indico/modules/events/registration/forms.py:373
 msgid ""
 "Allow users to export their ticket to Apple Wallet. This currently does not "
 "support tickets for accompanying persons."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:334
+#: indico/modules/events/registration/forms.py:375
 msgid "Send with an e-mail"
 msgstr "用电子邮件发送"
 
-#: indico/modules/events/registration/forms.py:337
+#: indico/modules/events/registration/forms.py:378
 msgid ""
 "Attach PDF ticket to the email sent to a user after completing their "
 "registration."
 msgstr "完成注册后发送含有 PDF 票单的邮件给用户。"
 
-#: indico/modules/events/registration/forms.py:339
+#: indico/modules/events/registration/forms.py:380
 msgid "Download from event homepage"
 msgstr "从事件页面下载"
 
-#: indico/modules/events/registration/forms.py:342
+#: indico/modules/events/registration/forms.py:383
 msgid "Allow users to download their ticket from the conference homepage."
 msgstr "允许用户从会议页面下载他们的票单。"
 
-#: indico/modules/events/registration/forms.py:344
+#: indico/modules/events/registration/forms.py:385
 msgid "Download from summary page"
 msgstr "从总结页下载"
 
-#: indico/modules/events/registration/forms.py:347
+#: indico/modules/events/registration/forms.py:388
 msgid ""
 "Allow users to download their ticket from the registration summary page."
 msgstr "允许用户从注册总结页下载他们的票单。"
 
-#: indico/modules/events/registration/forms.py:350
+#: indico/modules/events/registration/forms.py:391
 msgid "Tickets for accompanying persons"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:353
+#: indico/modules/events/registration/forms.py:394
 msgid "Create tickets for each of the user's accompanying persons."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:356
+#: indico/modules/events/registration/forms.py:397
 msgid "Ticket template"
 msgstr "票单模板"
 
-#: indico/modules/events/registration/forms.py:368
+#: indico/modules/events/registration/forms.py:409
 msgid "Default category template"
 msgstr "默认的类别模板"
 
-#: indico/modules/events/registration/forms.py:433
+#: indico/modules/events/registration/forms.py:474
 #: indico/modules/events/registration/templates/management/regform_list.html:47
 msgid "Registration managers"
 msgstr "注册管理员"
 
-#: indico/modules/events/registration/forms.py:435
+#: indico/modules/events/registration/forms.py:476
 msgid "List of users allowed to modify registrations"
 msgstr "允许修改注册的用户列表"
 
-#: indico/modules/events/registration/forms.py:446
+#: indico/modules/events/registration/forms.py:487
 #: indico/modules/events/registration/templates/management/regform_invitations.html:42
 msgid "Indico users"
 msgstr "Indico 用户"
 
-#: indico/modules/events/registration/forms.py:447
+#: indico/modules/events/registration/forms.py:488
 msgid "Send e-mail notifications"
 msgstr "发送邮件通知"
 
-#: indico/modules/events/registration/forms.py:449
+#: indico/modules/events/registration/forms.py:490
 msgid "Notify the users about the registration."
 msgstr "通知用户注册情况。"
 
-#: indico/modules/events/registration/forms.py:461
-#: indico/modules/events/registration/forms.py:463
+#: indico/modules/events/registration/forms.py:502
+#: indico/modules/events/registration/forms.py:504
 msgid "A registration for {} already exists."
 msgstr "{} 已存在的注册"
 
-#: indico/modules/events/registration/forms.py:469
+#: indico/modules/events/registration/forms.py:510
 msgid "Page configuration"
 msgstr "页面配置"
 
-#: indico/modules/events/registration/forms.py:473
+#: indico/modules/events/registration/forms.py:514
 msgid "Save values for next time"
 msgstr "为下一次保存值"
 
-#: indico/modules/events/registration/forms.py:474
+#: indico/modules/events/registration/forms.py:515
 msgid "Save these values in the event settings"
 msgstr "在事件配置中保存这些值"
 
-#: indico/modules/events/registration/forms.py:475
+#: indico/modules/events/registration/forms.py:516
 msgid "Dashed border around each badge"
 msgstr "每个胸牌周围的虚线边框"
 
-#: indico/modules/events/registration/forms.py:476
+#: indico/modules/events/registration/forms.py:517
 msgid "Display a dashed border around each badge"
 msgstr "在每个胸牌周围显示虚线边框"
 
-#: indico/modules/events/registration/forms.py:478
+#: indico/modules/events/registration/forms.py:519
 msgid "Page orientation"
 msgstr "页面方向"
 
-#: indico/modules/events/registration/forms.py:479
+#: indico/modules/events/registration/forms.py:520
 msgid "Page layout"
 msgstr "页面布局"
 
-#: indico/modules/events/registration/forms.py:480
+#: indico/modules/events/registration/forms.py:521
 msgid ""
 "The single sided (foldable) option is only available if the template "
 "orientation is the same as the page orientation and its width is exactly "
 "half of the page width"
 msgstr "只有当模板方向与页面方向相同且其宽度正好是页面宽度的一半时，单面（可折叠）选项才可用"
 
-#: indico/modules/events/registration/forms.py:484
+#: indico/modules/events/registration/forms.py:525
 msgid "Top margin"
 msgstr "上边距"
 
-#: indico/modules/events/registration/forms.py:485
+#: indico/modules/events/registration/forms.py:526
 msgid "Left margin"
 msgstr "左边距"
 
-#: indico/modules/events/registration/forms.py:486
+#: indico/modules/events/registration/forms.py:527
 msgid "Right margin"
 msgstr "右边距"
 
-#: indico/modules/events/registration/forms.py:487
+#: indico/modules/events/registration/forms.py:528
 msgid "Bottom margin"
 msgstr "底边距"
 
-#: indico/modules/events/registration/forms.py:488
+#: indico/modules/events/registration/forms.py:529
 msgid "Margin between columns"
 msgstr "列间距"
 
-#: indico/modules/events/registration/forms.py:489
+#: indico/modules/events/registration/forms.py:530
 msgid "Margin between rows"
 msgstr "行间距"
 
-#: indico/modules/events/registration/forms.py:511
+#: indico/modules/events/registration/forms.py:552
 msgid "Skip Moderation"
 msgstr "跳过评分审核"
 
-#: indico/modules/events/registration/forms.py:512
+#: indico/modules/events/registration/forms.py:553
 msgid "If enabled, the registration will be immediately accepted"
 msgstr "如果启用，注册将立即接收"
 
-#: indico/modules/events/registration/forms.py:514
+#: indico/modules/events/registration/forms.py:555
 msgid ""
 "If enabled, invited people will be able to register even if the event is "
 "access-restricted."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:516
+#: indico/modules/events/registration/forms.py:557
 msgid "E-mail users"
 msgstr "发邮件给用户"
 
-#: indico/modules/events/registration/forms.py:517
+#: indico/modules/events/registration/forms.py:558
 msgid "Whether the imported users should receive an e-mail notification"
 msgstr "导入的用户是否应接收电子邮件通知"
 
-#: indico/modules/events/registration/forms.py:527
+#: indico/modules/events/registration/forms.py:568
 msgid "You can provide a reason for the rejection here."
 msgstr "您可以在这里提供拒绝的原因。"
 
-#: indico/modules/events/registration/forms.py:528
+#: indico/modules/events/registration/forms.py:569
 msgid "Attach reason"
 msgstr "附加原因"
 
-#: indico/modules/events/registration/forms.py:560
+#: indico/modules/events/registration/forms.py:601
 #: indico/modules/users/templates/emails.html:45
 #: indico/web/templates/forms/multiple_items_widget.html:26
 #: indico/web/templates/forms/permissions_widget.html:11
 msgid "Add"
 msgstr "添加"
 
-#: indico/modules/events/registration/forms.py:560
+#: indico/modules/events/registration/forms.py:601
 msgid "Select tags to assign"
 msgstr "选择要分配的标签"
 
-#: indico/modules/events/registration/forms.py:561
+#: indico/modules/events/registration/forms.py:602
 msgid "Select tags to remove"
 msgstr "选择要删除的标签"
 
-#: indico/modules/events/registration/forms.py:567
+#: indico/modules/events/registration/forms.py:608
 msgid "You cannot add and remove the same tag"
 msgstr "您不能添加和删除同一个的标签"
 
-#: indico/modules/events/registration/forms.py:588
+#: indico/modules/events/registration/forms.py:629
 msgid "Privacy policy"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:589
+#: indico/modules/events/registration/forms.py:630
 msgid ""
 "Specify whether users are required to agree to the event's privacy policy "
 "when registering"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:633
+#: indico/modules/events/registration/forms.py:682
 msgid ""
 "'Show all participants' can only be set if there are no registered users."
 msgstr "只有在没有注册用户的情况下才能设置“显示所有参与者”。"
 
-#: indico/modules/events/registration/forms.py:664
+#: indico/modules/events/registration/forms.py:712
 msgid ""
 "The retention period of the whole form cannot be lower than that of "
 "individual fields."
 msgstr "整个表单的保留期限不能低于单个字段的保留期限。"
 
-#: indico/modules/events/registration/forms.py:669
+#: indico/modules/events/registration/forms.py:717
 #: indico/web/templates/forms/multiple_items_widget.html:19
 msgid "Action"
 msgstr "操作"
 
-#: indico/modules/events/registration/forms.py:674
+#: indico/modules/events/registration/forms.py:722
 msgid "Apply to complete registrations"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:676
+#: indico/modules/events/registration/forms.py:724
 msgid ""
 "If enabled, registrations in the \"complete\" state that had no fee before, "
 "will have the fee updated and changed to the \"unpaid\" state."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:684
+#: indico/modules/events/registration/forms.py:732
 msgid "Remove fee for unpaid registrations"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:685
+#: indico/modules/events/registration/forms.py:733
 msgid "Set fee to the registration form's default ({})"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:687
+#: indico/modules/events/registration/forms.py:735
 msgid "Change fee to custom value"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:689
+#: indico/modules/events/registration/forms.py:737
 msgid ""
 "A fixed fee (in {currency}) the selected users have to pay when registering."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:699
+#: indico/modules/events/registration/forms.py:747
 msgid "Notify users"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py:700
+#: indico/modules/events/registration/forms.py:748
 msgid "Whether users should be notified about the published receipt"
 msgstr ""
 
@@ -12939,37 +13005,37 @@ msgstr "总付费 (未付费)"
 msgid "Total"
 msgstr "合计"
 
-#: indico/modules/events/registration/util.py:96
+#: indico/modules/events/registration/util.py:99
 msgid "Row {}: missing e-mail address"
 msgstr "行{}: 缺少电子邮件地址"
 
-#: indico/modules/events/registration/util.py:100
+#: indico/modules/events/registration/util.py:103
 msgid "Row {}: invalid e-mail address"
 msgstr "行{}: 无效电子邮件地址"
 
-#: indico/modules/events/registration/util.py:102
+#: indico/modules/events/registration/util.py:105
 msgid "Row {}: missing first or last name"
 msgstr "行{}: 缺少名或姓"
 
-#: indico/modules/events/registration/util.py:107 indico/util/roles.py:45
+#: indico/modules/events/registration/util.py:110 indico/util/roles.py:45
 msgid "Row {}: email address is not unique"
 msgstr "行{}: 电子邮件地址不唯一"
 
-#: indico/modules/events/registration/util.py:109
+#: indico/modules/events/registration/util.py:112
 msgid "Row {}: email address belongs to the same user as in row {}"
 msgstr "第 {} 行：电子邮件地址与第 {} 行中的用户属于同一个用户"
 
-#: indico/modules/events/registration/util.py:867
-#: indico/modules/events/registration/util.py:902
+#: indico/modules/events/registration/util.py:881
+#: indico/modules/events/registration/util.py:916
 msgid "Row {}: a registration with this email already exists"
 msgstr "行{}: 用此电子邮件的注册已存在"
 
-#: indico/modules/events/registration/util.py:871
-#: indico/modules/events/registration/util.py:908
+#: indico/modules/events/registration/util.py:885
+#: indico/modules/events/registration/util.py:922
 msgid "Row {}: a registration for this user already exists"
 msgstr "第 {} 行：该用户的注册已经存在"
 
-#: indico/modules/events/registration/util.py:913
+#: indico/modules/events/registration/util.py:927
 msgid "Row {}: an invitation for this user already exists"
 msgstr "第 {} 行：此用户的邀请已存在"
 
@@ -12977,48 +13043,67 @@ msgstr "第 {} 行：此用户的邀请已存在"
 msgid "This registration form is private."
 msgstr ""
 
-#: indico/modules/events/registration/controllers/display.py:284
+#: indico/modules/events/registration/controllers/display.py:297
 msgid "Your invitation code is not valid."
 msgstr "您的邀请码无效。"
 
-#: indico/modules/events/registration/controllers/display.py:288
+#: indico/modules/events/registration/controllers/display.py:301
 msgid "This invitation does not exist or has been withdrawn."
 msgstr "此邀请不存在或已撤回。"
 
-#: indico/modules/events/registration/controllers/display.py:348
+#: indico/modules/events/registration/controllers/display.py:349
 msgid ""
 "You are trying to register with a form that requires you to be logged in"
 msgstr "您正在尝试使用要求您登录的表单进行注册"
 
-#: indico/modules/events/registration/controllers/display.py:375
+#: indico/modules/events/registration/controllers/display.py:376
 msgid "You cannot register for this event"
 msgstr "您不能注册此事件"
 
-#: indico/modules/events/registration/controllers/display.py:454
+#: indico/modules/events/registration/controllers/display.py:450
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering."
 msgstr "我们找不到您的注册信息。如果已经注册，请使用注册后收到的电子邮件中的直接访问链接。"
 
-#: indico/modules/events/registration/controllers/display.py:457
+#: indico/modules/events/registration/controllers/display.py:453
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering or log in to your Indico account."
 msgstr "我们找不到您的注册信息。如果已经注册，请使用注册后收到的电子邮件中的直接访问链接或登录到您的Indico帐户。"
 
-#: indico/modules/events/registration/controllers/display.py:477
+#: indico/modules/events/registration/controllers/display.py:473
 msgid "Your registration has been withdrawn."
 msgstr "您的注册已被撤消。"
 
-#: indico/modules/events/registration/controllers/display.py:504
+#: indico/modules/events/registration/controllers/display.py:500
 msgid "You declined the invitation to register."
 msgstr "您拒绝了注册邀请。"
 
 #: indico/modules/events/registration/controllers/management/fields.py:64
 msgid "Retention period cannot be longer than that of the registration form"
 msgstr "保留期限不能长于组册表的期限"
+
+#: indico/modules/events/registration/controllers/management/fields.py:67
+#: indico/web/forms/validators.py:452
+msgid "The retention period cannot be less than {} week."
+msgid_plural "The retention period cannot be less than {} weeks."
+msgstr[0] ""
+
+#: indico/modules/events/registration/controllers/management/fields.py:72
+#: indico/web/forms/validators.py:457
+msgid "The retention period cannot be longer than {} week."
+msgid_plural "The retention period cannot be longer than {} weeks."
+msgstr[0] ""
+
+#: indico/modules/events/registration/controllers/management/fields.py:77
+#: indico/web/forms/validators.py:462
+msgid ""
+"The retention period cannot be longer than 10 years. Leave the field empty "
+"for indefinite."
+msgstr ""
 
 #: indico/modules/events/registration/controllers/management/invitations.py:91
 msgid "The invitation has been sent."
@@ -13035,156 +13120,156 @@ msgid "One invitation was skipped."
 msgid_plural "{n} invitations were skipped."
 msgstr[0] "{n} 个邀请被跳过。"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:64
+#: indico/modules/events/registration/controllers/management/regforms.py:82
 msgid "The participants display settings have been saved."
 msgstr "参会人显示设置已保存。"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:110
+#: indico/modules/events/registration/controllers/management/regforms.py:128
 msgid "The settings for \"{}\" have been saved."
 msgstr "\"{}\" 设置已保存。"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:202
+#: indico/modules/events/registration/controllers/management/regforms.py:220
 msgid "Registration form has been successfully created"
 msgstr "注册表已成功建立"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:230
+#: indico/modules/events/registration/controllers/management/regforms.py:248
 msgid "Registration form has been successfully modified"
 msgstr "注册表已成功修改"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:246
+#: indico/modules/events/registration/controllers/management/regforms.py:264
 msgid "Registration form deleted"
 msgstr "删除的注册表"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:263
+#: indico/modules/events/registration/controllers/management/regforms.py:281
 msgid "Registrations for {} are now open"
 msgstr "{} 的注册现已打开"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:279
+#: indico/modules/events/registration/controllers/management/regforms.py:297
 msgid "Registrations for {} are now closed"
 msgstr "{} 的注册现已关闭"
 
-#: indico/modules/events/registration/controllers/management/regforms.py:295
+#: indico/modules/events/registration/controllers/management/regforms.py:313
 msgid "Registrations for {} have been scheduled"
 msgstr "{} 的注册现已规划"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:112
+#: indico/modules/events/registration/controllers/management/reglists.py:113
 msgid "Send e-mail"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:116
+#: indico/modules/events/registration/controllers/management/reglists.py:117
 msgid "Download Attachments"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:124
+#: indico/modules/events/registration/controllers/management/reglists.py:125
 msgid "Edit Tags"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:137
+#: indico/modules/events/registration/controllers/management/reglists.py:138
 msgid "Print Badges"
 msgstr "打印胸牌"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:146
+#: indico/modules/events/registration/controllers/management/reglists.py:147
 msgid "Print Tickets"
 msgstr "打印票单"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:154
+#: indico/modules/events/registration/controllers/management/reglists.py:155
 msgid "Update Registration Fee"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:275
+#: indico/modules/events/registration/controllers/management/reglists.py:276
 msgid "The selected registrants have been removed."
 msgstr "选中的注册人已删除。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:328
+#: indico/modules/events/registration/controllers/management/reglists.py:329
 msgid "The email was sent."
 msgid_plural "{num} emails were sent."
 msgstr[0] "{num} 个邮件发出。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:351
+#: indico/modules/events/registration/controllers/management/reglists.py:352
 msgid "Registration was deleted."
 msgid_plural "{num} registrations were deleted."
 msgstr[0] "{num} 个注册删除。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:367
-#: indico/modules/events/registration/controllers/management/reglists.py:408
-#: indico/modules/events/registration/controllers/management/reglists.py:479
+#: indico/modules/events/registration/controllers/management/reglists.py:368
+#: indico/modules/events/registration/controllers/management/reglists.py:409
+#: indico/modules/events/registration/controllers/management/reglists.py:491
 #: indico/modules/events/registration/templates/display/regform_display.html:33
 #: indico/modules/events/registration/templates/display/regform_list.html:74
 #: indico/modules/events/registration/templates/management/regform.html:128
-#: indico/modules/events/registration/templates/management/regform_list.html:106
+#: indico/modules/events/registration/templates/management/regform_list.html:115
 #: indico/modules/events/registration/templates/management/regform_reglist.html:21
 msgid "Registration is disabled due to an expired retention period"
 msgstr "由于保留期已过，注册被禁用"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:373
+#: indico/modules/events/registration/controllers/management/reglists.py:374
 msgid "The registration was created."
 msgstr "注册已建立。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:439
+#: indico/modules/events/registration/controllers/management/reglists.py:451
 msgid ""
 "Text too large to generate a PDF with table style. Please try again "
 "generating with book style."
 msgstr "文本太大，无法生成具有表格样式的PDF。请尝试使用书籍样式重新生成。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:486
+#: indico/modules/events/registration/controllers/management/reglists.py:498
 msgid "{} registration has been imported."
 msgid_plural "{} registrations have been imported."
 msgstr[0] "{} 注册已导入。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:657
+#: indico/modules/events/registration/controllers/management/reglists.py:677
 msgid "Rejecting this registration will trigger a notification email."
 msgstr "拒绝此注册将触发通知电子邮件。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:670
+#: indico/modules/events/registration/controllers/management/reglists.py:690
 msgid ""
 "Cannot reset this registration since there is another valid registration for"
 " the same user or email."
 msgstr "无法重置此注册，因为另一个有效注册具有同一用户或电子邮件。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:681
+#: indico/modules/events/registration/controllers/management/reglists.py:701
 msgid "The registration cannot be reset in its current state."
 msgstr "当前状态在注册不能被重置。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:716
+#: indico/modules/events/registration/controllers/management/reglists.py:736
 msgid "The registration cannot be withdrawn in its current state."
 msgstr "注册在当前状态下无法撤销。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:718
+#: indico/modules/events/registration/controllers/management/reglists.py:738
 msgid "The registration has been withdrawn."
 msgstr "注册已撤消。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:734
+#: indico/modules/events/registration/controllers/management/reglists.py:754
 msgid "Deadline for registration modification has been scheduled"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:757
+#: indico/modules/events/registration/controllers/management/reglists.py:777
 msgid "This registration cannot be marked as checked-in"
 msgstr "此注册无法标记为已签到"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:780
+#: indico/modules/events/registration/controllers/management/reglists.py:800
 msgid "Selected registrations marked as {} successfully."
 msgstr "已成功选择标记为 {} 的注册。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:790
+#: indico/modules/events/registration/controllers/management/reglists.py:810
 msgid "The selected registrations were successfully approved."
 msgstr "选中的注册已成功批准。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:799
+#: indico/modules/events/registration/controllers/management/reglists.py:819
 msgid ""
 "Rejecting these registrations will trigger a notification email for each "
 "registrant."
 msgstr "拒绝这些注册将触发每个注册人的通知电子邮件。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:804
+#: indico/modules/events/registration/controllers/management/reglists.py:824
 msgid "The selected registrations were successfully rejected."
 msgstr "选中的注册已成功拒绝。"
 
-#: indico/modules/events/registration/controllers/management/reglists.py:855
+#: indico/modules/events/registration/controllers/management/reglists.py:875
 msgid "Registration fee has been updated for {} registration."
 msgid_plural "Registration fee has been updated for {} registrations."
 msgstr[0] ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:862
+#: indico/modules/events/registration/controllers/management/reglists.py:882
 msgid ""
 "{} registration was skipped because its fee is not zero or it is in an "
 "invalid state."
@@ -13193,25 +13278,25 @@ msgid_plural ""
 " an invalid state."
 msgstr[0] ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:866
+#: indico/modules/events/registration/controllers/management/reglists.py:886
 msgid "{} registration was skipped because it is not in the unpaid state."
 msgid_plural ""
 "{} registrations were skipped because they are not in the unpaid state."
 msgstr[0] ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:1028
+#: indico/modules/events/registration/controllers/management/reglists.py:1048
 msgid "Document '{}' successfully published"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:1037
+#: indico/modules/events/registration/controllers/management/reglists.py:1057
 msgid "Publish"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:1048
+#: indico/modules/events/registration/controllers/management/reglists.py:1068
 msgid "Document '{}' successfully unpublished"
 msgstr ""
 
-#: indico/modules/events/registration/controllers/management/reglists.py:1065
+#: indico/modules/events/registration/controllers/management/reglists.py:1085
 msgid "Document '{}' successfully deleted"
 msgstr ""
 
@@ -13254,11 +13339,11 @@ msgstr "到达日期不能设置在离开日期后。"
 msgid "Not enough rooms in '{0}'"
 msgstr "“{0}” 中没有足够的会议室"
 
-#: indico/modules/events/registration/fields/sessions.py:68
+#: indico/modules/events/registration/fields/sessions.py:69
 msgid "Please select no more than {max} sessions."
 msgstr ""
 
-#: indico/modules/events/registration/fields/sessions.py:70
+#: indico/modules/events/registration/fields/sessions.py:71
 msgid "Please select at least {min} sessions."
 msgstr ""
 
@@ -13271,19 +13356,15 @@ msgid "Invalid file UUID"
 msgstr "无效文件 UUID"
 
 #: indico/modules/events/registration/fields/simple.py:390
-#: indico/web/forms/validators.py:123
+#: indico/web/forms/validators.py:124
 msgid "Invalid email address"
 msgstr "无效的电子邮件地址"
 
-#: indico/modules/events/registration/fields/simple.py:412
+#: indico/modules/events/registration/fields/simple.py:414
 msgid "Invalid picture file."
 msgstr ""
 
-#: indico/modules/events/registration/fields/simple.py:414
-msgid "This field only accepts jpg, png, gif and webp picture formats."
-msgstr ""
-
-#: indico/modules/events/registration/fields/simple.py:417
+#: indico/modules/events/registration/fields/simple.py:419
 msgid "The uploaded picture pixels is smaller than the minimum size of {}."
 msgstr ""
 
@@ -13453,6 +13534,10 @@ msgstr "<strong> 离开： </strong> %(departure_date)s"
 #, python-format
 msgid "<strong>Accommodation:</strong> %(accommodation)s"
 msgstr "<strong> 住宿：</strong> %(accommodation)s"
+
+#: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:113
+msgid "Skip to registration summary"
+msgstr ""
 
 #: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:116
 msgid "Summary"
@@ -13649,7 +13734,7 @@ msgid "Apply for participation"
 msgstr "申请参加"
 
 #: indico/modules/events/registration/templates/display/event_header.html:94
-#: indico/modules/events/registration/templates/display/participant_list.html:86
+#: indico/modules/events/registration/templates/display/participant_list.html:114
 #, python-format
 msgid "%(num)s more participant"
 msgid_plural "%(num)s more participants"
@@ -13659,31 +13744,55 @@ msgstr[0] "%(num)s 的更多参与者"
 msgid "See the full list"
 msgstr "看完整列表"
 
-#: indico/modules/events/registration/templates/display/participant_list.html:15
+#: indico/modules/events/registration/templates/display/participant_list.html:21
+msgid "Participant List Preview"
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:27
 #, python-format
 msgid "1 participant"
 msgid_plural "%(num)s participants"
 msgstr[0] "%(num)s 个参会人"
 
-#: indico/modules/events/registration/templates/display/participant_list.html:21
+#: indico/modules/events/registration/templates/display/participant_list.html:33
+msgid ""
+"This preview shows the participant list like an unregistered guest would see"
+" it."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:38
+msgid "Show registered participant view instead."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:41
+msgid ""
+"This preview shows the participant list like a registered participant would "
+"see it."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:46
+msgid "Show unregistered guest view instead."
+msgstr ""
+
+#: indico/modules/events/registration/templates/display/participant_list.html:49
 msgid ""
 "The lists of participants grouped by the registration form they used to "
 "register for the event."
 msgstr "此事件的按注册表分组的参会人列表"
 
-#: indico/modules/events/registration/templates/display/participant_list.html:94
+#: indico/modules/events/registration/templates/display/participant_list.html:122
 #, python-format
 msgid "There is %(num)s hidden participant"
 msgid_plural "There are %(num)s hidden participants"
 msgstr[0] "有  %(num)s 个隐藏的参与者"
 
-#: indico/modules/events/registration/templates/display/participant_list.html:98
-#: indico/modules/events/registration/templates/display/participant_list.html:111
+#: indico/modules/events/registration/templates/display/participant_list.html:126
+#: indico/modules/events/registration/templates/display/participant_list.html:139
 #: indico/modules/events/registration/templates/management/_reglist.html:176
 msgid "There are no registrations yet."
 msgstr "还没有注册。"
 
-#: indico/modules/events/registration/templates/display/participant_list.html:107
+#: indico/modules/events/registration/templates/display/participant_list.html:135
 msgid "There are no published registrations."
 msgstr "没有已发布的注册。"
 
@@ -13774,6 +13883,10 @@ msgstr "已达到注册的最大数量。"
 #: indico/modules/events/registration/templates/display/regform_list.html:97
 msgid "No registration forms available for this event"
 msgstr "该事件没有可用的注册表"
+
+#: indico/modules/events/registration/templates/display/registration_modify.html:34
+msgid "Skip to registration form"
+msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_summary.html:14
 msgid "Your registration has been completed"
@@ -13961,7 +14074,7 @@ msgid "Manage registration form"
 msgstr ""
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html:36
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:57
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:59
 #: indico/modules/rb/templates/emails/reservations/occurrence_rejection_email_to_manager.txt:13
 #: indico/modules/rb/templates/emails/reservations/occurrence_rejection_email_to_user.txt:13
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_manager.txt:11
@@ -13990,23 +14103,23 @@ msgid ""
 "%(at_time)s has been received."
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:34
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:36
 msgid "To manage your registration follow this link:"
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:36
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:38
 msgid "Manage my registration"
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:64
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:66
 msgid "Please note that this event requires manual approval."
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:65
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:67
 msgid "You will be notified when the registration process is complete."
 msgstr ""
 
-#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:72
+#: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html:74
 #, python-format
 msgid ""
 "Please proceed to the checkout %(link)shere%(endlink)s in order to complete "
@@ -14673,7 +14786,7 @@ msgstr "从创建注册表开始。"
 
 #: indico/modules/events/registration/templates/management/regform_display.html:33
 #: indico/modules/events/registration/templates/management/regform_edit.html:8
-#: indico/modules/events/registration/templates/management/regform_list.html:151
+#: indico/modules/events/registration/templates/management/regform_list.html:160
 msgid "Create form"
 msgstr "创建表"
 
@@ -14816,38 +14929,42 @@ msgstr "参会人列表"
 msgid "Define how the participant list will be shown on the event page"
 msgstr "定义参会人列表如何显示在会议页面"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:70
+#: indico/modules/events/registration/templates/management/regform_list.html:71
+msgid "Preview as participant"
+msgstr ""
+
+#: indico/modules/events/registration/templates/management/regform_list.html:79
 msgid "Customize"
 msgstr "定制化"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:79
+#: indico/modules/events/registration/templates/management/regform_list.html:88
 #: indico/modules/events/registration/templates/management/registration_tags.html:5
 msgid "Registration tags"
 msgstr "注册标签"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:80
+#: indico/modules/events/registration/templates/management/regform_list.html:89
 msgid "Create tags to mark and filter registrations"
 msgstr "创建标签以标记和过滤注册"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:95
+#: indico/modules/events/registration/templates/management/regform_list.html:104
 msgid "List of registration forms"
 msgstr "注册表列表"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:130
+#: indico/modules/events/registration/templates/management/regform_list.html:139
 msgid "Delete this registration form"
 msgstr "删除此注册表"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:134
+#: indico/modules/events/registration/templates/management/regform_list.html:143
 msgid "Delete registration form?"
 msgstr "删除注册表？"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:135
+#: indico/modules/events/registration/templates/management/regform_list.html:144
 #, python-format
 msgid ""
 "Do you really want to delete the registration form &quot;%(title)s&quot;?"
 msgstr "你确实要删除 &quot;%(title)s&quot; 注册表吗？"
 
-#: indico/modules/events/registration/templates/management/regform_list.html:143
+#: indico/modules/events/registration/templates/management/regform_list.html:152
 msgid "There are no registration forms yet."
 msgstr "还没有注册表。"
 
@@ -16820,6 +16937,15 @@ msgstr ""
 msgid "Example"
 msgstr ""
 
+#: indico/modules/events/templates/admin/data_retention.html:5
+msgid "Data retention settings"
+msgstr ""
+
+#: indico/modules/events/templates/admin/data_retention.html:9
+msgid ""
+"Allowed minimum and maximum data retention period can be configured here."
+msgstr ""
+
 #: indico/modules/events/templates/admin/event_keywords.html:5
 msgid "Allowed event keywords"
 msgstr ""
@@ -18293,16 +18419,16 @@ msgstr "所有用户的应用授权已取消。"
 msgid "Access for '{}' has been successfully revoked."
 msgstr "对 '{}' 的访问已成功撤销。"
 
-#: indico/modules/oauth/controllers.py:274
-#: indico/modules/oauth/controllers.py:293
+#: indico/modules/oauth/controllers.py:276
+#: indico/modules/oauth/controllers.py:295
 msgid "You cannot manage API tokens"
 msgstr "您不能管理 API 令牌"
 
-#: indico/modules/oauth/controllers.py:282
+#: indico/modules/oauth/controllers.py:284
 msgid "Token '{}' updated"
 msgstr "令牌 '{}' 已更新"
 
-#: indico/modules/oauth/controllers.py:314
+#: indico/modules/oauth/controllers.py:316
 msgid "The token '{}' has been successfully revoked."
 msgstr "令牌 '{}' 已成功撤销。 "
 
@@ -18659,19 +18785,23 @@ msgstr "会议室预订模块没有开启。"
 msgid "You are not authorized to access the room booking system."
 msgstr "你没有权限访问会议室预订系统。"
 
-#: indico/modules/rb/controllers/backend/admin.py:97
+#: indico/modules/rb/controllers/backend/admin.py:100
 msgid "Cannot delete location with active rooms"
 msgstr "无法删除在用会议室的地点"
 
-#: indico/modules/rb/controllers/backend/admin.py:334
+#: indico/modules/rb/controllers/backend/admin.py:348
 msgid "Start time should not be later than end time"
 msgstr "开始时间不能晚于结束时间"
 
-#: indico/modules/rb/controllers/backend/admin.py:385
+#: indico/modules/rb/controllers/backend/admin.py:360
+msgid "Periods may not overlap"
+msgstr ""
+
+#: indico/modules/rb/controllers/backend/admin.py:411
 msgid "You cannot upload this file as a room picture."
 msgstr "无法将此文件作为会议室图片上传。"
 
-#: indico/modules/rb/controllers/backend/admin.py:387
+#: indico/modules/rb/controllers/backend/admin.py:413
 #: indico/modules/users/controllers.py:395
 msgid "The file has an invalid format ({format})."
 msgstr "此文件的格式无效 ({format})。"
@@ -18705,8 +18835,8 @@ msgid "Enter the session block name."
 msgstr "输入分会块名。"
 
 #: indico/modules/rb/models/reservations.py:322
-#: indico/modules/rb/models/reservations.py:536
-#: indico/modules/rb/models/reservations.py:677
+#: indico/modules/rb/models/reservations.py:552
+#: indico/modules/rb/models/reservations.py:692
 msgid "Reservation has no valid occurrences"
 msgstr "预订没有有效的事件"
 
@@ -19143,7 +19273,7 @@ msgid ""
 "These users may create/manage document templates without being Indico admins"
 msgstr ""
 
-#: indico/modules/receipts/util.py:236
+#: indico/modules/receipts/util.py:239
 msgid "Could not parse stylesheet"
 msgstr ""
 
@@ -19244,11 +19374,11 @@ msgstr "您无法将此文件作为个人信息图片上传。"
 msgid "Preferences saved"
 msgstr "偏爱已保存"
 
-#: indico/modules/users/controllers.py:458 indico/web/forms/validators.py:433
+#: indico/modules/users/controllers.py:458 indico/web/forms/validators.py:434
 msgid "Invalid URL."
 msgstr ""
 
-#: indico/modules/users/controllers.py:463 indico/web/forms/validators.py:436
+#: indico/modules/users/controllers.py:463 indico/web/forms/validators.py:437
 msgid "Invalid Mastodon server URL."
 msgstr ""
 
@@ -20349,7 +20479,7 @@ msgstr "EEEE '在' {time_fmt}"
 msgid "{date_fmt} 'at' {time_fmt}"
 msgstr "{date_fmt} '在' {time_fmt}"
 
-#: indico/util/marshmallow.py:63 indico/web/forms/validators.py:423
+#: indico/util/marshmallow.py:63 indico/web/forms/validators.py:424
 msgid "Links and images may not use relative URLs."
 msgstr ""
 
@@ -20425,13 +20555,13 @@ msgstr "此文本已自动从HTML转换为Markdown。请仔细检查是否正确
 msgid "My unlisted events"
 msgstr "我的未列出事件"
 
-#: indico/web/rh.py:220
+#: indico/web/rh.py:226
 msgid ""
 "It looks like there was a problem with your current session. Please use your"
 " browser's back button, reload the page and try again."
 msgstr "你当前的分会似乎有问题。请使用浏览器的“后退”按钮，重新加载页面并重试。"
 
-#: indico/web/rh.py:241
+#: indico/web/rh.py:247
 msgid "The specified item could not be found."
 msgstr "找不到指定的项。"
 
@@ -20605,7 +20735,7 @@ msgstr "缺少必需的参数：{}"
 msgid "Invalid or expired token"
 msgstr "无效或过期的令牌"
 
-#: indico/web/flask/errors.py:100 indico/web/flask/errors.py:119
+#: indico/web/flask/errors.py:100 indico/web/flask/errors.py:122
 msgid "Something went wrong"
 msgstr "出问题了"
 
@@ -20623,92 +20753,96 @@ msgstr "你当前的分会似乎有问题。请重新提交表格。"
 msgid "Invalid CSRF token"
 msgstr "无效的 CSRF 令牌"
 
-#: indico/web/forms/validators.py:106
+#: indico/web/forms/validators.py:107
 msgid "This field is mutually exclusive with another field: {}"
 msgid_plural "This field is mutually exclusive with other fields: {}"
 msgstr[0] "该字段与其它字段是互斥的：{}"
 
-#: indico/web/forms/validators.py:112
+#: indico/web/forms/validators.py:113
 msgid "The passwords do not match."
 msgstr "密码不匹配"
 
-#: indico/web/forms/validators.py:123
+#: indico/web/forms/validators.py:124
 msgid "Invalid email address list"
 msgstr "无效的电子邮件地址列表"
 
-#: indico/web/forms/validators.py:148
+#: indico/web/forms/validators.py:149
 msgid "'{}' can't be in the past"
 msgstr "'{}' 不能是过去的"
 
-#: indico/web/forms/validators.py:150
+#: indico/web/forms/validators.py:151
 msgid "'{}' can't be before {}"
 msgstr "'{}' 不能在 {} 之前"
 
-#: indico/web/forms/validators.py:154
+#: indico/web/forms/validators.py:155
 msgid "'{}' can't be in the future"
 msgstr "'{}' 不能在将来"
 
-#: indico/web/forms/validators.py:156
+#: indico/web/forms/validators.py:157
 msgid "'{}' can't be after {}"
 msgstr "'{}' 不能在 {} 之后"
 
-#: indico/web/forms/validators.py:195
+#: indico/web/forms/validators.py:196
 msgid "'{}' can't be in the past ({})"
 msgstr "“{}” 不能在过去({})"
 
-#: indico/web/forms/validators.py:198
+#: indico/web/forms/validators.py:199
 msgid "'{}' can't be before {} ({})"
 msgstr "“{}” 不能在{} ({}) 之前"
 
-#: indico/web/forms/validators.py:202
+#: indico/web/forms/validators.py:203
 msgid "'{}' can't be in the future ({})"
 msgstr "“{}” 不能在将来 ({})"
 
-#: indico/web/forms/validators.py:205
+#: indico/web/forms/validators.py:206
 msgid "'{}' can't be after {} ({})"
 msgstr "“{}”不能在 {} ({})之后"
 
-#: indico/web/forms/validators.py:249 indico/web/forms/validators.py:282
+#: indico/web/forms/validators.py:250 indico/web/forms/validators.py:283
 msgid "{} can't be before {}"
 msgstr "{} 不能在 {} 之前"
 
-#: indico/web/forms/validators.py:251 indico/web/forms/validators.py:284
+#: indico/web/forms/validators.py:252 indico/web/forms/validators.py:285
 msgid "{} can't be after {}"
 msgstr "{} 不能在 {} 之后"
 
-#: indico/web/forms/validators.py:253 indico/web/forms/validators.py:286
+#: indico/web/forms/validators.py:254 indico/web/forms/validators.py:287
 msgid "{} can't be equal to {}"
 msgstr "{} 不能等于 {}"
 
-#: indico/web/forms/validators.py:307
+#: indico/web/forms/validators.py:308
 msgid "Duration cannot exceed {}"
 msgstr "时间不能超过 {}"
 
-#: indico/web/forms/validators.py:325
+#: indico/web/forms/validators.py:326
 msgid "Must be between {earliest} and {latest}."
 msgstr "必须在 {earliest} 和 {latest} 之间"
 
-#: indico/web/forms/validators.py:327
+#: indico/web/forms/validators.py:328
 msgid "Must be later than {earliest}."
 msgstr "必须晚于 {earliest}。"
 
-#: indico/web/forms/validators.py:329
+#: indico/web/forms/validators.py:330
 msgid "Must be earlier than {latest}."
 msgstr "必须早于 {latest}。"
 
-#: indico/web/forms/validators.py:352
+#: indico/web/forms/validators.py:353
 msgid "Field must contain at least {min} word."
 msgid_plural "Field must contain at least {min} words."
 msgstr[0] "字段必须包含至少 {min} 个单词。"
 
-#: indico/web/forms/validators.py:355
+#: indico/web/forms/validators.py:356
 msgid "Field cannot contain more than {max} word."
 msgid_plural "Field cannot contain more than {max} words."
 msgstr[0] "字段不能包含超过 {max} 个单词。"
 
-#: indico/web/forms/validators.py:358
+#: indico/web/forms/validators.py:359
 msgid "Field must contain between {min} and {max} words."
 msgstr "字段必须包含 {min} 到 {max} 个单词。"
+
+#: indico/web/forms/validators.py:447
+msgid "The retention period cannot be indefinite."
+msgstr ""
 
 #: indico/web/forms/fields/colors.py:30
 msgid "Invalid colors selected"

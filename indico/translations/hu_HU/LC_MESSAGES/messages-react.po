@@ -10,7 +10,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-06-24 11:48+0200\n"
+"POT-Creation-Date: 2024-08-24 16:49+0200\n"
 "Last-Translator: Anna Szabó, 2024\n"
 "Language-Team: Hungarian (Hungary) (https://app.transifex.com/indico/teams/6478/hu_HU/)\n"
 "MIME-Version: 1.0\n"
@@ -176,8 +176,8 @@ msgstr "Indico profilom létrehozása"
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewComment.jsx:58
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:81
 #: indico/modules/events/editing/client/js/management/ManageService.jsx:253
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:708
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:230
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:709
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:234
 #: indico/modules/events/management/client/js/EventMove.jsx:180
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx:113
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx:188
@@ -256,8 +256,8 @@ msgid "Room"
 msgstr "Helyiség"
 
 #: indico/modules/categories/client/js/components/CalendarLegend.jsx:123
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:205
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:102
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:206
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:106
 msgid "Keywords"
 msgstr "Kulcsszavak"
 
@@ -914,7 +914,7 @@ msgstr "Fájlnév minta: {pattern}"
 
 #: indico/modules/events/editing/client/js/editing/timeline/FileManager/index.jsx:348
 #: indico/web/client/js/react/components/files/SingleFileManager.jsx:181
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:317
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:328
 msgid "Upload in progress"
 msgstr "Feltöltés folyamatban"
 
@@ -971,7 +971,7 @@ msgstr "Módosítások kérése"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:134
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx:234
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:584
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:585
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx:93
 msgid "Judge"
 msgstr "Elbíráló"
@@ -1124,7 +1124,7 @@ msgstr "A felülvizsgálatot lecserélték"
 
 #: indico/modules/events/editing/client/js/editing/timeline/util.js:83
 msgid "This editable's state has been reset"
-msgstr ""
+msgstr "Ennek a szerkeszthető tartalomnak az állapota vissza lett állítva."
 
 #: indico/modules/events/editing/client/js/management/EditableTypeList.jsx:83
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:373
@@ -1132,7 +1132,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:118
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:316
 #: indico/modules/receipts/client/js/templates/Editor.jsx:178
-#: indico/web/client/js/custom_elements/ind_share_widget.js:267
+#: indico/web/client/js/custom_elements/ind_share_widget.js:266
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:116
 #: indico/web/client/js/react/components/notes/NoteEditor.jsx:188
 msgid "Save"
@@ -1164,7 +1164,7 @@ msgid "Toggle editable types"
 msgstr "Szerkeszthető típusok kiváltása"
 
 #: indico/modules/events/editing/client/js/management/EditingManagementDashboard.jsx:27
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:215
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:216
 #: indico/modules/events/editing/client/js/management/tags/index.js:23
 #: indico/modules/events/registration/client/js/components/RegistrationTagsEditableList.jsx:70
 msgid "Tags"
@@ -1291,7 +1291,7 @@ msgstr ""
 "oldalra{/link}. "
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:156
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:263
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:264
 msgid "Status"
 msgstr "Állapot"
 
@@ -1313,7 +1313,7 @@ msgstr "Elfogadva"
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:161
 #: indico/modules/events/editing/client/js/models.js:72
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:489
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:306
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:307
 #: indico/modules/rb/client/js/util.jsx:293
 msgid "Rejected"
 msgstr "Elutasított"
@@ -1329,57 +1329,58 @@ msgid "Needs submitter confirmation"
 msgstr "A beküldő rekretenye"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:181
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:264
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:265
 msgid "Editor"
 msgstr "Szerkesztő"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:196
 #: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:93
-msgid "Program code"
-msgstr "Program kód"
+#: indico/modules/events/sessions/client/js/session_display.jsx:22
+msgid "Session"
+msgstr "Ülés"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:232
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:233
 msgid "List of papers"
 msgstr "Papírok listája"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:233
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:234
 msgid "List of slides"
 msgstr "Diák listája"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:234
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:235
 msgid "List of posters"
 msgstr "Poszterek listája"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:238
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:239
 msgid "{count} paper was skipped because of its current status."
 msgid_plural "{count} papers were skipped because of their current status."
 msgstr[0] "{count} dolgozat lett kihagyva a jelenlegi állapota miatt."
 msgstr[1] "{count} dolgozat lett kihagyva a jelenlegi állapotuk miatt."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:244
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:245
 msgid "{count} slide was skipped because of its current status."
 msgid_plural "{count} slides were skipped because of their current status."
 msgstr[0] "{count} dia lett kihagyva a jelenlegi állapota miatt."
 msgstr[1] "{count}dia lett kihagyva a jelenlegi állapotuk miatt."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:250
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:251
 msgid "{count} poster was skipped because of its current status."
 msgid_plural "{count} posters were skipped because of their current status."
 msgstr[0] "{count} poszter lett kihagyva a jelenlegi állapota miatt."
 msgstr[1] "{count} poszter lett kihagyva a jelenlegi állapotuk miatt."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:259
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:260
 msgid "ID"
 msgstr "ID"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:260
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:261
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:45
 msgid "Code"
 msgstr "Kód"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:261
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:262
 #: indico/modules/events/editing/client/js/management/tags/TagModal.jsx:46
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:128
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:130
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:53
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:83
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:85
@@ -1390,45 +1391,45 @@ msgstr "Kód"
 msgid "Title"
 msgstr "Cím"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:262
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:263
 msgid "Rev."
 msgstr "Rev."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:345
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:281
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:346
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:285
 msgid "n/a"
 msgstr "n/a"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:547
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:548
 msgid "Assign"
 msgstr "Hozzárendelés"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:555
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:233
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:556
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:237
 msgid "Assign to myself"
 msgstr "Hozzárendelés magamhoz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:563
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:564
 msgid "Unassign"
 msgstr "Hozzárendelés törlése"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:592
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:593
 msgid "Download all files"
 msgstr "Az összes fájl letöltése"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:598
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:599
 msgid "Export as JSON"
 msgstr "Exportálás JSON-ként"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:698
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:699
 msgid "There are no editables yet."
 msgstr "Még nincsenek editables."
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:703
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:704
 msgid "Assignment conflict"
 msgstr "Megbízási ütközés"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:704
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:705
 msgid ""
 "Some editor assignments for the current selection have been changed "
 "externally. Are you sure you want to proceed?"
@@ -1436,7 +1437,7 @@ msgstr ""
 "Az aktuális kiválasztás néhány szerkesztői hozzárendelése külsőleg "
 "megváltozott. Biztos, hogy folytatni szeretné?"
 
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:707
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx:708
 msgid "Force assignments"
 msgstr "Kényszerítse a hozzárendelést"
 
@@ -1562,15 +1563,15 @@ msgstr ""
 msgid "Editing ({type})"
 msgstr "Szerkesztés ({type})"
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:116
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:120
 msgid "has files"
 msgstr "fájlokat tartalmaz"
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:119
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:123
 msgid "has no files"
 msgstr "nincsenek fájlok"
 
-#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:296
+#: indico/modules/events/editing/client/js/management/editable_type/NextEditable.jsx:300
 msgid "There are no editables available."
 msgstr "Nincs elérhető szerkeszthető anyag."
 
@@ -1733,6 +1734,7 @@ msgstr "VAGY"
 #: indico/web/client/js/react/components/files/FileArea.jsx:115
 #: indico/web/client/js/react/components/pictures/PictureArea.jsx:91
 #: indico/web/client/js/react/components/pictures/PictureArea.jsx:104
+#: indico/web/client/js/react/components/pictures/PictureArea.jsx:129
 msgid "Or"
 msgstr "Vagy"
 
@@ -2315,7 +2317,7 @@ msgstr "Szűrés"
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:198
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:210
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:432
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:701
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:699
 #: indico/web/client/js/react/forms/final-form.jsx:171
 msgid "Close"
 msgstr "Bezár"
@@ -2533,7 +2535,7 @@ msgstr "Ez a mező a lejárt megőrzési időszak miatt zárolt."
 msgid "The associated registration data has been deleted."
 msgstr "A kapcsolódó regisztrációs adatok törlésre kerültek."
 
-#: indico/modules/events/registration/client/js/form/FormItem.jsx:99
+#: indico/modules/events/registration/client/js/form/FormItem.jsx:100
 msgid ""
 "Field data will be purged {retentionPeriod} week after the event ended."
 msgid_plural ""
@@ -2573,8 +2575,8 @@ msgstr "Távozás"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:167
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:155
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:130
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:267
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:151
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:291
 msgid "Total: {total} {currency}"
 msgstr "Összesen: {total} {currency}"
 
@@ -2596,7 +2598,7 @@ msgstr "Az érkezési időszak nem érhet véget a távozási időszak után."
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx:327
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:275
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:467
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:504
 msgid "Choices"
 msgstr "Választások"
 
@@ -2650,8 +2652,7 @@ msgid "Accompanying persons count against registration limit"
 msgstr "A kísérő személyek beleszámítanak a regisztrációs korlátba"
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:107
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:49
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:383
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:51
 #: indico/web/client/js/react/components/syncedInputs.jsx:176
 #: indico/web/client/js/react/forms/validators.js:58
 msgid "This field is required."
@@ -2665,8 +2666,8 @@ msgstr "Helyek korlátja"
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:158
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx:169
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx:95
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:264
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:173
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:273
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:197
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:30
 #: indico/modules/users/client/js/PersonalDataForm.jsx:85
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:139
@@ -2756,87 +2757,87 @@ msgstr "Opció letiltása"
 msgid "Enable choice"
 msgstr "Opció engedélyezése"
 
-#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:27
+#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:31
 msgid "Select a country"
 msgstr "Ország kiválaszatása"
 
-#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:90
+#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx:64
 msgid "Default to affiliation country"
 msgstr "Alapértelmezett az intézmény országa szerint"
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:121
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:129
 msgid "The provided date is invalid."
 msgstr "A megadott dátum érvénytelen."
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:245
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:254
 msgid "12 hours"
 msgstr "12 óra"
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:246
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:255
 msgid "24 hours"
 msgstr "24 óra"
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:252
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:261
 msgid "Date format"
 msgstr "Dátumformátum"
 
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:262
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx:271
 msgid "Time format"
 msgstr "Időformátum"
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:60
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:62
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:228
 msgid "Checking email address..."
 msgstr "E-mail cím ellenőrzése ..."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:72
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:74
 msgid "There is already a registration with this email address."
 msgstr "Már van regisztráció ezzel az e-mail címmel."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:74
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:76
 msgid "The user associated with this email address is already registered."
 msgstr "Az e-mail címhez társított felhasználó már regisztrált."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:76
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:78
 msgid "There is no Indico user associated with this email address."
 msgstr "Nincs indico felhasználó társítva ehhez az e-mail címhez."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:81
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:83
 msgid "This email address is not associated with your Indico account."
 msgstr "Ez az e-mail cím nincs társítva az Indico fiókjához."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:84
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:86
 msgid "The registration will be re-associated to a different user ({name})."
 msgstr "A regisztráció egy másik felhasználóhoz lesz hozzárendelve ({name})."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:92
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:94
 msgid "The registration will be disassociated from the current user ({name})."
 msgstr "A regisztráció le lesz választva az aktuális felhasználóról ({name})."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:100
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:102
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:297
 msgid "The domain used in the email address does not exist."
 msgstr "Az e-mail címben használt tartomány nem létezik."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:102
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:104
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx:299
 msgid "This email address is invalid."
 msgstr "Ez az e-mail cím érvénytelen."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:105
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:107
 msgid "The registration will not be associated with any Indico account."
 msgstr "A regisztráció nem lesz társítva egyetlen Indico fiókkal sem."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:107
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:109
 msgid "The registration will be associated with your Indico account."
 msgstr "A regisztráció az Indico fiókjához lesz társítva."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:110
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:112
 msgid ""
 "The registration will remain associated with the Indico account {name}."
 msgstr "A regisztráció továbbra is az {name} Indico fiókhoz kapcsolódik."
 
-#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:117
+#: indico/modules/events/registration/client/js/form/fields/EmailInput.jsx:119
 msgid "The registration will be associated with the Indico account {name}."
 msgstr "A regisztráció az {name} Indico fiókhoz lesz társítva."
 
@@ -2857,7 +2858,7 @@ msgstr ""
 "A választható lehetőségek maximális száma. Üresen hagyva nem lesz beállítva."
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx:270
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:462
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:499
 msgid "Enable extra slots"
 msgstr "Extra helyek engedélyezése"
 
@@ -2874,15 +2875,15 @@ msgstr "Maximum"
 msgid "The minimum value cannot be greater than the maximum value."
 msgstr "A minimális érték nem lehet nagyobb, mint a maximális érték."
 
-#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx:84
+#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx:86
 msgid "Minimum picture size"
 msgstr "Minimális képméret"
 
-#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx:85
+#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx:87
 msgid "Unlimited"
 msgstr "Korlátlan"
 
-#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx:86
+#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx:88
 msgid ""
 "Minimum picture size that can be uploaded in pixels. Leave empty for no min "
 "size validation."
@@ -2900,24 +2901,27 @@ msgstr[1] "{count} hely maradt"
 msgid "No places left"
 msgstr "Nem maradt hely"
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:116
-#: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
-msgid "Choose an option"
-msgstr "Válasszon egy lehetőséget"
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:87
+msgid "Select extra slots"
+msgstr ""
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:440
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:405
+msgid "This field is required"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:477
 msgid "Widget type"
 msgstr "Widget típus"
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:442
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:479
 msgid "Drop-down list"
 msgstr "Legördülő lista"
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:443
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:480
 msgid "Radio buttons"
 msgstr "Rádiógombok"
 
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:452
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx:489
 msgid "Default option"
 msgstr "Alap opció"
 
@@ -3021,23 +3025,23 @@ msgstr "Fájl"
 msgid "Single Choice"
 msgstr "Egyszeri választás"
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:164
+#: indico/modules/events/registration/client/js/form/fields/registry.js:163
 msgid "Multiple Choice"
 msgstr "Feleletválasztós"
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:174
+#: indico/modules/events/registration/client/js/form/fields/registry.js:173
 msgid "Accommodation"
 msgstr "Szállás"
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:187
+#: indico/modules/events/registration/client/js/form/fields/registry.js:186
 msgid "Accompanying Persons"
 msgstr "Kísérő személyek"
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:198
+#: indico/modules/events/registration/client/js/form/fields/registry.js:197
 msgid "Picture"
 msgstr "Kép"
 
-#: indico/modules/events/registration/client/js/form/fields/registry.js:204
+#: indico/modules/events/registration/client/js/form/fields/registry.js:203
 msgid "Timetable Sessions"
 msgstr "Ütemtervi szekciók"
 
@@ -3086,50 +3090,51 @@ msgstr "Szekció letiltása"
 msgid "Configure section"
 msgstr "Szekció konfigurálása"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:101
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:103
 msgid "Configure field \"{section}\""
 msgstr "\"{section}\" konfigurálása"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:106
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:108
 msgid "Add new field"
 msgstr "Új mező hozzáadása"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:124
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:126
 msgid "Please choose a field type."
 msgstr "Kérjük, válasszon egy mezőtípust."
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:131
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:133
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:56
 msgid "Description"
 msgstr "Leírás"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:132
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:134
 #: indico/modules/events/registration/client/js/form_setup/SectionSettingsModal.jsx:57
-msgid "You can use Markdown or basic HTML formatting tags."
-msgstr "Használhat Markdown vagy alapvető HTML formázási címkéket."
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:51
+msgid "You may use Markdown for formatting."
+msgstr "A formázáshoz használhatja a Markdownt."
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:142
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:144
 msgid "Price"
 msgstr "Ár"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:148
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:150
 msgid "Required field"
 msgstr "Kötelező mező"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:155
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:157
 msgid "Privacy"
 msgstr "Adatvédelem"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:159
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:91
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:161
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:97
 msgid "Permanent"
 msgstr "Állandó"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:164
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:166
 msgid "Retention period (weeks)"
 msgstr "Megtartási idő (hetek)"
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:165
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:167
 msgid ""
 "Specify how long user-provided data for this field will be preserved in the "
 "database."
@@ -3137,7 +3142,7 @@ msgstr ""
 "Adja meg, hogy a felhasználó által megadott adatok mennyi ideig maradnak meg"
 " az adatbázisban."
 
-#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:175
+#: indico/modules/events/registration/client/js/form_setup/ItemSettingsModal.jsx:177
 msgid ""
 "Please note that invoice information will be lost as well once a field's "
 "retention period expires."
@@ -3217,10 +3222,6 @@ msgstr "Alkalmaz"
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx:203
 msgid "Register"
 msgstr "Regisztráció"
-
-#: indico/modules/events/sessions/client/js/session_display.jsx:22
-msgid "Session"
-msgstr "Ülés"
 
 #: indico/modules/events/sessions/client/js/session_display.jsx:26
 msgid "Detailed timetable"
@@ -3371,7 +3372,7 @@ msgid "This booking is subject to acceptance by the room owner"
 msgstr "A helyiségoglalás a tulajdonosa jóváhagyásától függ"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:471
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:287
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:288
 #: indico/modules/rb/client/js/util.jsx:294
 msgid "Cancelled"
 msgstr "Törölve"
@@ -3587,7 +3588,7 @@ msgid "Reason for booking"
 msgstr "A foglalás indoka"
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:403
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:661
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:660
 msgid "Internal notes about the booking are only visible to room managers."
 msgstr ""
 "A foglalással kapcsolatos belső megjegyzések csak a szobakezelők számára "
@@ -3752,11 +3753,15 @@ msgid_plural "Last {days} days"
 msgstr[0] "Utolsó nap"
 msgstr[1] "Utolsó {days} nap"
 
-#: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:79
+#: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:72
+msgid "All days"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:109
 msgid "Add new Daily Availability"
 msgstr "Új napi rendelkezésre állás hozzáadása"
 
-#: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:84
+#: indico/modules/rb/client/js/common/rooms/edit/DailyAvailability.jsx:114
 msgid "No daily availability found"
 msgstr "Nem található napi rendelkezésre állás"
 
@@ -3801,10 +3806,6 @@ msgstr "Osztály"
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:50
 msgid "Comments"
 msgstr "Megjegyzések"
-
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditDetails.jsx:51
-msgid "You may use Markdown for formatting."
-msgstr "A formázáshoz használhatja a Markdownt."
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx:21
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:120
@@ -3859,6 +3860,7 @@ msgstr "Értesítések"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx:164
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditOptions.jsx:106
+#: indico/web/client/js/react/components/Select.jsx:41
 msgid "Options"
 msgstr "Opciók"
 
@@ -4089,50 +4091,50 @@ msgstr "{startTime}-tól {endTime}-ig"
 msgid "Every {weekdays}"
 msgstr "Minden {weekdays}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:259
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:264
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:260
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:265
 msgid "Space blocked: {reason}"
 msgstr "Hely zárolva: {reason}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:265
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:266
 msgid "(You are allowed to make a booking)"
 msgstr "(Megadhatja a foglalást)"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:271
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:272
 msgid "Not possible to book in this period"
 msgstr "Ebben az időszakban nem lehet lefoglalni"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:277
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:278
 msgid "Not possible to book between:"
 msgstr "Nem lehetséges a következő időpontok között foglalni:"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:290
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:309
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:291
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:310
 msgid "Reason: {reason}"
 msgstr "Ok: {reason}"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:298
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:299
 msgid "This occurrence will be cancelled"
 msgstr "Az alkalom vissza lesz vonva"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:317
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:318
 msgid "This occurrence is conflicting with an existing booking"
 msgstr "Ez az alkalom ütközik egy meglévő foglalással"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:326
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:327
 msgid "Full overlap between two pre-bookings:"
 msgstr "Két előfoglalás teljes átfedése:"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:331
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:332
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:333
 msgid "{time} by {bookedForName} ({bookingReason})"
 msgstr "{time} by {bookedForName} ({bookingReason})"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:350
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:351
 msgid "Click to book it"
 msgstr "Kattintson a foglaláshoz"
 
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:351
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:352
 msgid "Click to pre-book it"
 msgstr "Kattintson az előfoglaláshoz"
 
@@ -4182,7 +4184,7 @@ msgid "List of Rooms"
 msgstr "Helyiségek listája"
 
 #: indico/modules/rb/client/js/components/Menu.jsx:22
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:710
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:708
 msgid "Bookings"
 msgstr "Foglalások"
 
@@ -4931,7 +4933,7 @@ msgid "One or more bookings would conflict with yours."
 msgstr "Egy vagy több foglalás ellentmondana a tiédnek."
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:170
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:680
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:678
 msgid "Bookings in the past are not allowed."
 msgstr "A múltbeli foglalások nem engedélyezettek."
 
@@ -4953,15 +4955,15 @@ msgstr "Foglalás"
 msgid "Pre-Book"
 msgstr "Előfoglalás"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:334
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:333
 msgid "Here are some alternatives we've found for you!"
 msgstr "Íme néhány alternatíva, amit találtunk az Ön számára!"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:385
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:384
 msgid "List view"
 msgstr "Lista nézet"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:390
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:389
 msgid "Timeline view"
 msgstr "Idővonal nézet"
 
@@ -5100,7 +5102,7 @@ msgstr ""
 msgid "Internal notes (optional)"
 msgstr "Belső megjegyzések (nem kötelező)"
 
-#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:702
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:700
 msgid "I've changed my mind!"
 msgstr "Meggondoltam magam!"
 
@@ -5948,66 +5950,74 @@ msgstr "Kéznél tartott események"
 msgid "Everything"
 msgstr "Bármi"
 
+#: indico/web/client/js/custom_elements/ind_select.js:296
+msgid "Please select an item in the list."
+msgstr ""
+
 #: indico/web/client/js/custom_elements/ind_share_widget.js:52
 msgid "Copy Link"
-msgstr ""
+msgstr "Link másolása"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js:70
 msgid "Google Calendar"
-msgstr ""
+msgstr "Google Naptár"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js:76
 msgid "Outlook"
-msgstr ""
+msgstr "Outlook"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js:121
 #: indico/web/client/js/custom_elements/ind_share_widget.js:122
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js:152
 #: indico/web/client/js/custom_elements/ind_share_widget.js:154
 msgid "Mastodon"
-msgstr ""
+msgstr "Mastodon"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js:170
 msgid "Please login to share on Mastodon"
-msgstr ""
+msgstr "Kérjük, jelentkezzen be a Mastodon-on való megosztáshoz"
 
 #: indico/web/client/js/custom_elements/ind_share_widget.js:219
 msgid ""
 "You have not added a preferred Mastodon server on your profile yet. Please "
 "add one below."
 msgstr ""
+"Még nem adott hozzá preferált Mastodon szervert a profiljához. Kérjük, adjon"
+" hozzá egyet az alábbiakban."
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:285
+#: indico/web/client/js/custom_elements/ind_share_widget.js:284
 msgid "Preferred Mastodon server added! You can now share this event below."
 msgstr ""
+"Preferált Mastodon szerver hozzáadva! Mostantól megoszthatja ezt az eseményt"
+" az alábbiakban."
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:295
+#: indico/web/client/js/custom_elements/ind_share_widget.js:294
 msgid "Share on {mastodonServerName}"
-msgstr ""
+msgstr "Megosztás {mastodonServerName}-on"
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:333
-#: indico/web/client/js/custom_elements/ind_share_widget.js:342
+#: indico/web/client/js/custom_elements/ind_share_widget.js:332
+#: indico/web/client/js/custom_elements/ind_share_widget.js:341
 msgid "Share this page"
-msgstr ""
+msgstr "Oldal megosztása"
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:335
+#: indico/web/client/js/custom_elements/ind_share_widget.js:334
 msgid "Share widget icon"
-msgstr ""
+msgstr "Widget ikon megosztása"
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:347
+#: indico/web/client/js/custom_elements/ind_share_widget.js:346
 msgid "Direct link"
-msgstr ""
+msgstr "Közvetlen link"
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:354
+#: indico/web/client/js/custom_elements/ind_share_widget.js:353
 msgid "Add to calendar"
-msgstr ""
+msgstr "Hozzáadás naptárhoz"
 
-#: indico/web/client/js/custom_elements/ind_share_widget.js:361
+#: indico/web/client/js/custom_elements/ind_share_widget.js:360
 msgid "Share on social media"
-msgstr ""
+msgstr "Megosztás közösségi médián"
 
 #: indico/web/client/js/jquery/utils/forms.js:201
 #: indico/web/client/js/react/forms/unload.jsx:17
@@ -6061,37 +6071,49 @@ msgstr "Válasz"
 msgid "Text copied"
 msgstr "Másolt szöveg"
 
+#: indico/web/client/js/react/components/ComboBox.jsx:60
+msgid "Clear the combobox"
+msgstr ""
+
 #: indico/web/client/js/react/components/ConfirmButton.jsx:45
 msgid "Click again to confirm ({delay})"
 msgstr "Kattintson újra a megerősítéshez ({delay})"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:48
+#: indico/web/client/js/react/components/DatePicker.jsx:47
 msgid "Open a calendar"
-msgstr ""
+msgstr "Naptár megnyitása"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:54
+#: indico/web/client/js/react/components/DatePicker.jsx:56
 msgid "Previous year"
-msgstr ""
+msgstr "Előző év"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:57
+#: indico/web/client/js/react/components/DatePicker.jsx:59
 msgid "Previous month"
-msgstr ""
+msgstr "Előző hónap"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:66
+#: indico/web/client/js/react/components/DatePicker.jsx:68
 msgid "Next month"
-msgstr ""
+msgstr "Következő hónap"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:69
+#: indico/web/client/js/react/components/DatePicker.jsx:71
 msgid "Next year"
 msgstr "Következő év"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:87
+#: indico/web/client/js/react/components/DatePicker.jsx:89
 msgid "Date format: {format}"
 msgstr "Dátum formátum: {format}"
 
-#: indico/web/client/js/react/components/DatePicker.jsx:111
+#: indico/web/client/js/react/components/DatePicker.jsx:117
 msgid "The entered date is not valid."
 msgstr "A megadott dátum érvénytelen."
+
+#: indico/web/client/js/react/components/DatePicker.jsx:122
+msgid "The entered date cannot be earlier than {min}."
+msgstr "A megadott dátum nem lehet korábbi, mint {min}."
+
+#: indico/web/client/js/react/components/DatePicker.jsx:131
+msgid "The entered date cannot be later than {max}."
+msgstr "A megadott dátum nem lehet későbbi, mint {max}."
 
 #: indico/web/client/js/react/components/EmailListField.jsx:71
 msgid "Please enter an email address"
@@ -6286,6 +6308,18 @@ msgstr "Speciális helyőrzők"
 msgid "Back to top"
 msgstr "Vissza a tetejére"
 
+#: indico/web/client/js/react/components/Select.jsx:33
+msgid "Select a choice"
+msgstr ""
+
+#: indico/web/client/js/react/components/Select.jsx:44
+msgid "Filter the options"
+msgstr ""
+
+#: indico/web/client/js/react/components/Select.jsx:75
+msgid "No option matches your keyword"
+msgstr ""
+
 #: indico/web/client/js/react/components/UserMenu.jsx:45
 msgid "Impersonate user"
 msgstr "Felhasználó megszemélyesítése"
@@ -6315,6 +6349,10 @@ msgstr "Dátum és idő törlése"
 msgid "URL"
 msgstr "URL"
 
+#: indico/web/client/js/react/components/WTFMultipleTagSelectField.jsx:51
+msgid "Choose an option"
+msgstr "Válasszon egy lehetőséget"
+
 #: indico/web/client/js/react/components/WTFOccurrencesField.jsx:82
 msgid "Add occurrence"
 msgstr "Előfordulás hozzáadása"
@@ -6327,19 +6365,19 @@ msgstr "Időtartam percben"
 msgid "Remove occurrence"
 msgstr "Előfordulás eltávolítása"
 
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:53
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:59
 msgid "Visibility to participants"
 msgstr "Láthatóság résztvevőknek"
 
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:72
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:78
 msgid "Visibility to everyone"
 msgstr "Láthatóság mindenkinek"
 
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:87
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:93
 msgid "Visibility duration (weeks)"
 msgstr "Láthatóság időtartama (hetek)"
 
-#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:107
+#: indico/web/client/js/react/components/WTFParticipantVisibilityField.jsx:113
 msgid ""
 "Setting 'Visibility to everyone' to 'Show all participants' is discouraged "
 "as everyone who can access this event can see the participant list "
@@ -6510,21 +6548,25 @@ msgid "Drop picture here"
 msgstr "Dobja ide a képet"
 
 #: indico/web/client/js/react/components/pictures/PictureArea.jsx:122
-#: indico/web/client/js/react/components/pictures/PictureArea.jsx:158
+#: indico/web/client/js/react/components/pictures/PictureArea.jsx:168
 msgid "Take a picture with your camera"
 msgstr "Készítsen képet a kamerájával"
 
 #: indico/web/client/js/react/components/pictures/PictureArea.jsx:123
-#: indico/web/client/js/react/components/pictures/PictureArea.jsx:159
+#: indico/web/client/js/react/components/pictures/PictureArea.jsx:169
 msgid "You need to grant this site camera permissions before taking a picture"
 msgstr ""
 "A fényképezés előtt engedélyeznie kell az oldalnak a kamerája használatát."
 
-#: indico/web/client/js/react/components/pictures/PictureArea.jsx:177
+#: indico/web/client/js/react/components/pictures/PictureArea.jsx:135
+msgid "Edit current picture"
+msgstr ""
+
+#: indico/web/client/js/react/components/pictures/PictureArea.jsx:187
 msgid "There were some problems with the picture"
 msgstr "Problémákat akadtak a képpel"
 
-#: indico/web/client/js/react/components/pictures/PictureArea.jsx:226
+#: indico/web/client/js/react/components/pictures/PictureArea.jsx:236
 msgid "Drag a picture here"
 msgstr "Húzzon ide egy képet"
 
@@ -6540,7 +6582,7 @@ msgstr "Forgatás"
 msgid "Done"
 msgstr "Kész"
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:258
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:266
 msgid ""
 "The picture you uploaded is {width} by {height} pixels. Please upload a "
 "picture with a minimum of {minPictureSize} pixels on its shortest side."
@@ -6549,15 +6591,15 @@ msgstr ""
 "töltsön fel olyan képet, amelynek a rövidebb oldala legalább "
 "{minPictureSize} pixel nagyságú."
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:319
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:330
 msgid "Picture upload/capture failed"
 msgstr "A kép feltöltése/felvétel sikertelen"
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:321
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:332
 msgid "Picture is being captured"
 msgstr "A kép rögzítése folyamatban"
 
-#: indico/web/client/js/react/components/pictures/PictureManager.jsx:323
+#: indico/web/client/js/react/components/pictures/PictureManager.jsx:334
 msgid "Picture is being edited"
 msgstr "A kép szerkesztése folyamatban"
 

@@ -10,14 +10,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Emre JILTA <jilta.e@gmail.com>, 2018,2024\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/indico/indico/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
@@ -234,14 +234,14 @@ msgid ""
 msgstr "Indico sunucunuz Topluluk Merkezi ile eş zamanlı değildir! Bu sorunu <a href=\"{0}\">buradan</a> çözebilirsiniz."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:847
+#: indico/modules/designer/client/js/index.js:855
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Arka taraf olarak bunu kullanan şablonların arka tarafı kaldırılacaktır."
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:850
+#: indico/modules/designer/client/js/index.js:858
 msgid "Disassociate back sides"
 msgstr "Arka tarafları ilişkisizlendir"
 
@@ -249,57 +249,57 @@ msgstr "Arka tarafları ilişkisizlendir"
 msgid "Fixed text"
 msgstr "Sabit metin"
 
-#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:595
 msgid "Please choose a name for the template"
 msgstr "Lütfen şablon için bir isim seçin"
 
-#: indico/modules/designer/client/js/index.js:587
-#: indico/modules/designer/client/js/index.js:593
-#: indico/modules/designer/client/js/index.js:602
+#: indico/modules/designer/client/js/index.js:595
+#: indico/modules/designer/client/js/index.js:601
+#: indico/modules/designer/client/js/index.js:610
 msgid "Warning"
 msgstr "Uyarı"
 
-#: indico/modules/designer/client/js/index.js:592
+#: indico/modules/designer/client/js/index.js:600
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Şablon boş olamaz. Bazı öğeler veya bir arka plan görüntüsü ekleyin."
 
-#: indico/modules/designer/client/js/index.js:599
+#: indico/modules/designer/client/js/index.js:607
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
 msgstr "Sabit görüntü öğesi boş bırakılmamalıdır. İçine bir resim yükleyin veya resmi kaldırın."
 
-#: indico/modules/designer/client/js/index.js:628
+#: indico/modules/designer/client/js/index.js:636
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Bu şablonun boyutlarını değiştirmek istediğinizden emin misiniz?"
 
-#: indico/modules/designer/client/js/index.js:772
-#: indico/modules/designer/client/js/index.js:1124
+#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:1132
 msgid "Choose a file"
 msgstr "Bir dosya seç"
 
-#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:788
 msgid "Fixed Image"
 msgstr "Sabit Görüntü"
 
-#: indico/modules/designer/client/js/index.js:838
+#: indico/modules/designer/client/js/index.js:846
 msgid "This back side template will be removed"
 msgstr "Arka taraf şablonu kaldırılacak"
 
-#: indico/modules/designer/client/js/index.js:840
+#: indico/modules/designer/client/js/index.js:848
 msgid "The back side of this template will be removed"
 msgstr "Bu şablonun arka tarafı kaldırılacak"
 
-#: indico/modules/designer/client/js/index.js:841
+#: indico/modules/designer/client/js/index.js:849
 msgid "Disassociate back side"
 msgstr "Arka tarafı ilişkisizlendir"
 
-#: indico/modules/designer/client/js/index.js:845
+#: indico/modules/designer/client/js/index.js:853
 msgid "The back side is empty."
 msgstr "Arka taraf boştur."
 
-#: indico/modules/designer/client/js/index.js:983
-#: indico/modules/designer/client/js/index.js:997
+#: indico/modules/designer/client/js/index.js:991
+#: indico/modules/designer/client/js/index.js:1005
 msgid "Error"
 msgstr "Hata"
 

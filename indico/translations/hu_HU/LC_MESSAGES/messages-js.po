@@ -14,14 +14,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Anna Szabó, 2024\n"
 "Language-Team: Hungarian (Hungary) (http://app.transifex.com/indico/indico/language/hu_HU/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: hu_HU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -52,7 +52,7 @@ msgstr "Csomag építése"
 
 #: indico/modules/auth/templates/login_page.html:130
 msgid "Login with {0}"
-msgstr ""
+msgstr "Belépés ezzel: {0}"
 
 #: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
@@ -238,14 +238,14 @@ msgid ""
 msgstr "Az Indico kiszolgáló nincs szinkronizálva a Közösségi Központtal! Meg lehet oldani ezt <a href=\"{0}\">itt</a>."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:847
+#: indico/modules/designer/client/js/index.js:855
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "A sablonok hátulja, amelyek ezt a hátlapot használják, eltávolításra kerül."
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:850
+#: indico/modules/designer/client/js/index.js:858
 msgid "Disassociate back sides"
 msgstr "Válasszuk le a hátsó oldalakat"
 
@@ -253,57 +253,57 @@ msgstr "Válasszuk le a hátsó oldalakat"
 msgid "Fixed text"
 msgstr "Rögzített szöveg"
 
-#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:595
 msgid "Please choose a name for the template"
 msgstr "Válasszon nevet a sablonnak"
 
-#: indico/modules/designer/client/js/index.js:587
-#: indico/modules/designer/client/js/index.js:593
-#: indico/modules/designer/client/js/index.js:602
+#: indico/modules/designer/client/js/index.js:595
+#: indico/modules/designer/client/js/index.js:601
+#: indico/modules/designer/client/js/index.js:610
 msgid "Warning"
 msgstr "Figyelmeztetés"
 
-#: indico/modules/designer/client/js/index.js:592
+#: indico/modules/designer/client/js/index.js:600
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "A sablon nem lehet üres. Adjon hozzá néhány elemet vagy háttérképet."
 
-#: indico/modules/designer/client/js/index.js:599
+#: indico/modules/designer/client/js/index.js:607
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
 msgstr "A fix kép elem nem lehet  üres. Töltsön fel képet, vagy törölje az elemet."
 
-#: indico/modules/designer/client/js/index.js:628
+#: indico/modules/designer/client/js/index.js:636
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Biztos benne, hogy meg akarja változtatni ennek a sablonnak a méreteit?"
 
-#: indico/modules/designer/client/js/index.js:772
-#: indico/modules/designer/client/js/index.js:1124
+#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:1132
 msgid "Choose a file"
 msgstr "Fájl kiválasztása"
 
-#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:788
 msgid "Fixed Image"
 msgstr "Fix kép"
 
-#: indico/modules/designer/client/js/index.js:838
+#: indico/modules/designer/client/js/index.js:846
 msgid "This back side template will be removed"
 msgstr "Ez a hátsó sablon eltávolításra kerül"
 
-#: indico/modules/designer/client/js/index.js:840
+#: indico/modules/designer/client/js/index.js:848
 msgid "The back side of this template will be removed"
 msgstr "A sablon hátulja el lesz távolítva"
 
-#: indico/modules/designer/client/js/index.js:841
+#: indico/modules/designer/client/js/index.js:849
 msgid "Disassociate back side"
 msgstr "Válasszuk le a hátsó oldalt"
 
-#: indico/modules/designer/client/js/index.js:845
+#: indico/modules/designer/client/js/index.js:853
 msgid "The back side is empty."
 msgstr "A hátsó oldal üres."
 
-#: indico/modules/designer/client/js/index.js:983
-#: indico/modules/designer/client/js/index.js:997
+#: indico/modules/designer/client/js/index.js:991
+#: indico/modules/designer/client/js/index.js:1005
 msgid "Error"
 msgstr "Hiba"
 
@@ -330,7 +330,7 @@ msgstr "Szekcióelnök"
 msgid ""
 "You won't be able to change your decision later. If necessary, please "
 "contact the manager of the event."
-msgstr ""
+msgstr "Később már nem tudja majd megváltoztatni a döntését. Ha szükséges, kérjük, forduljon a rendezvény szervezőjéhez."
 
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
@@ -371,7 +371,7 @@ msgstr[1] "Tényleg törli a kiválasztott {0} regisztrációt?"
 
 #: indico/modules/events/reminders/templates/edit_reminder.html:40
 msgid "Reminder Preview"
-msgstr ""
+msgstr "Emlékeztető előnézet"
 
 #: indico/modules/events/sessions/client/js/index.js:118
 msgid "Filter types"
@@ -392,21 +392,21 @@ msgstr "Küldés"
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:71
 msgid "Submitting..."
-msgstr ""
+msgstr "Beküldés..."
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:72
 msgid ""
 "Your answers have been saved, do not forget to submit the survey when you "
 "finish!"
-msgstr ""
+msgstr "Válaszait elmentettük, ne felejtse el elküldeni a kérdőívet, ha befejezte!"
 
 #: indico/modules/events/templates/display/access_key.html:50
 msgid "Invalid access key"
-msgstr ""
+msgstr "Érvénytelen hozzáférési kulcs"
 
 #: indico/modules/events/timetable/templates/_timetable.html:56
 msgid "The timetable has not been filled yet."
-msgstr ""
+msgstr "Az ütemtervet még nem töltötték ki."
 
 #: indico/modules/events/timetable/templates/display/indico/_common.html:42
 msgid "Speaker"
@@ -422,7 +422,7 @@ msgstr[1] "Szekcióelnökök"
 
 #: indico/modules/users/templates/dashboard.html:241
 msgid "You have favorited this category"
-msgstr ""
+msgstr "Ön kedvelte ezt a kategóriát"
 
 #: indico/modules/users/templates/users_merge.html:15
 msgid "E-mail"
@@ -434,15 +434,15 @@ msgstr "Szervezet"
 
 #: indico/modules/users/templates/users_merge.html:85
 msgid "Are you sure you want to merge those two users?"
-msgstr ""
+msgstr "Biztos, hogy össze szeretné vonni ezt a két felhasználót?"
 
 #: indico/modules/users/templates/users_merge.html:94
 msgid "Please notice there are warning messages!"
-msgstr ""
+msgstr "Kérjük, vegye figyelembe, hogy vannak figyelmeztető üzenetek!"
 
 #: indico/modules/users/templates/users_merge.html:95
 msgid "Confirm user merge"
-msgstr ""
+msgstr "Felhasználó egyesítésének megerősítése"
 
 #: indico/modules/vc/client/js/index.js:83
 msgid ""
@@ -1439,12 +1439,12 @@ msgstr "Az utolsó művelet visszavonása"
 #: indico/web/templates/forms/email_recipients_widget.html:23
 #: indico/web/templates/forms/email_recipients_widget.html:29
 msgid "Show more"
-msgstr ""
+msgstr "Mutasson többet"
 
 #: indico/web/templates/forms/email_recipients_widget.html:29
 msgid "Show less"
-msgstr ""
+msgstr "Mutasson kevesebbet"
 
 #: indico/web/templates/forms/tag_list_widget.html:32
 msgid "Add new keyword"
-msgstr ""
+msgstr "Új kulcsszó hozzáadása"

@@ -15,14 +15,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Last-Translator: Pierpaolo Gallo, 2023-2024\n"
 "Language-Team: Italian (Italy) (http://app.transifex.com/indico/indico/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
@@ -53,7 +53,7 @@ msgstr "Pacchetto in preparazione"
 
 #: indico/modules/auth/templates/login_page.html:130
 msgid "Login with {0}"
-msgstr ""
+msgstr "Login con {0}"
 
 #: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
@@ -187,11 +187,11 @@ msgstr[2] "Questa è una delle categorie che stai cercando di spostare"
 
 #: indico/modules/categories/templates/display/base.html:115
 msgid "Navigate to"
-msgstr ""
+msgstr "Vai a"
 
 #: indico/modules/categories/templates/display/base.html:116
 msgid "Navigate to a category"
-msgstr ""
+msgstr "Vai alla categoria"
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -250,14 +250,14 @@ msgid ""
 msgstr "Il tuo server Indico non è sincronizzato con il Community Hub! Puoi risolvere questo problema <a href=\"{0}\">qui</a>."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:847
+#: indico/modules/designer/client/js/index.js:855
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Il retro dei template che usa questo come retro sarà rimosso"
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:850
+#: indico/modules/designer/client/js/index.js:858
 msgid "Disassociate back sides"
 msgstr "Rimuovi associazione dei lati retro"
 
@@ -265,64 +265,64 @@ msgstr "Rimuovi associazione dei lati retro"
 msgid "Fixed text"
 msgstr "Testo fisso"
 
-#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:595
 msgid "Please choose a name for the template"
 msgstr "Per favore, scegli un nome per il template"
 
-#: indico/modules/designer/client/js/index.js:587
-#: indico/modules/designer/client/js/index.js:593
-#: indico/modules/designer/client/js/index.js:602
+#: indico/modules/designer/client/js/index.js:595
+#: indico/modules/designer/client/js/index.js:601
+#: indico/modules/designer/client/js/index.js:610
 msgid "Warning"
 msgstr "Attenzione"
 
-#: indico/modules/designer/client/js/index.js:592
+#: indico/modules/designer/client/js/index.js:600
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Il template non può essere vuoto. Aggiungi qualche elemento o un'immagine di sfondo."
 
-#: indico/modules/designer/client/js/index.js:599
+#: indico/modules/designer/client/js/index.js:607
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
 msgstr "L'elemento di imagine fissa non può essere vuoto. Carica un'immagine al suo interno oppure rimuovilo."
 
-#: indico/modules/designer/client/js/index.js:628
+#: indico/modules/designer/client/js/index.js:636
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Sei sicuro di voler cambiare le dimensioni di questo template?"
 
-#: indico/modules/designer/client/js/index.js:772
-#: indico/modules/designer/client/js/index.js:1124
+#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:1132
 msgid "Choose a file"
 msgstr "Scegli un file"
 
-#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:788
 msgid "Fixed Image"
 msgstr "Immagine fissa"
 
-#: indico/modules/designer/client/js/index.js:838
+#: indico/modules/designer/client/js/index.js:846
 msgid "This back side template will be removed"
 msgstr "Il template del retro verrà rimosso"
 
-#: indico/modules/designer/client/js/index.js:840
+#: indico/modules/designer/client/js/index.js:848
 msgid "The back side of this template will be removed"
 msgstr "Il retro di questo template verrà rimosso"
 
-#: indico/modules/designer/client/js/index.js:841
+#: indico/modules/designer/client/js/index.js:849
 msgid "Disassociate back side"
 msgstr "Rimuovi associazione lato retro"
 
-#: indico/modules/designer/client/js/index.js:845
+#: indico/modules/designer/client/js/index.js:853
 msgid "The back side is empty."
 msgstr "Il retro è vuoto."
 
-#: indico/modules/designer/client/js/index.js:983
-#: indico/modules/designer/client/js/index.js:997
+#: indico/modules/designer/client/js/index.js:991
+#: indico/modules/designer/client/js/index.js:1005
 msgid "Error"
 msgstr "Errore"
 
 #: indico/modules/designer/templates/_list.html:80
 msgctxt "Designer template linked to registration form"
 msgid "Linked to"
-msgstr ""
+msgstr "Collegato a"
 
 #: indico/modules/events/abstracts/client/js/index.js:75
 #: indico/modules/events/abstracts/client/js/index.js:88
@@ -342,7 +342,7 @@ msgstr "Coordinatore"
 msgid ""
 "You won't be able to change your decision later. If necessary, please "
 "contact the manager of the event."
-msgstr ""
+msgstr "Non potrai cambiare la tua decisione in un secondo momento. Se necessario, contatta il manager dell'evento."
 
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
@@ -385,7 +385,7 @@ msgstr[2] "Vuoi veramente cancellare le {0} registrazioni selezionate?"
 
 #: indico/modules/events/reminders/templates/edit_reminder.html:40
 msgid "Reminder Preview"
-msgstr ""
+msgstr "Anteprima del promemoria"
 
 #: indico/modules/events/sessions/client/js/index.js:118
 msgid "Filter types"
@@ -406,21 +406,21 @@ msgstr "Invia"
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:71
 msgid "Submitting..."
-msgstr ""
+msgstr "Invio in corso"
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:72
 msgid ""
 "Your answers have been saved, do not forget to submit the survey when you "
 "finish!"
-msgstr ""
+msgstr "Le tue risposte sono state salvate, non dimenticare di inviare il sondaggio quando hai finito!"
 
 #: indico/modules/events/templates/display/access_key.html:50
 msgid "Invalid access key"
-msgstr ""
+msgstr "Chiave di accesso non valida"
 
 #: indico/modules/events/timetable/templates/_timetable.html:56
 msgid "The timetable has not been filled yet."
-msgstr ""
+msgstr "L'agenda non è ancora stata completata."
 
 #: indico/modules/events/timetable/templates/display/indico/_common.html:42
 msgid "Speaker"
@@ -446,19 +446,19 @@ msgstr "E-mail"
 
 #: indico/modules/users/templates/users_merge.html:15
 msgid "Affiliation"
-msgstr ""
+msgstr "Affiliazione"
 
 #: indico/modules/users/templates/users_merge.html:85
 msgid "Are you sure you want to merge those two users?"
-msgstr ""
+msgstr "Sei sicuro di voler unire questi due utenti?"
 
 #: indico/modules/users/templates/users_merge.html:94
 msgid "Please notice there are warning messages!"
-msgstr ""
+msgstr "Attenzione: sono presenti messaggi di avvertimento!"
 
 #: indico/modules/users/templates/users_merge.html:95
 msgid "Confirm user merge"
-msgstr ""
+msgstr "Conferma l'unione degli utenti"
 
 #: indico/modules/vc/client/js/index.js:83
 msgid ""
@@ -1463,12 +1463,12 @@ msgstr "Annulla ultima operazione"
 #: indico/web/templates/forms/email_recipients_widget.html:23
 #: indico/web/templates/forms/email_recipients_widget.html:29
 msgid "Show more"
-msgstr ""
+msgstr "Mostra di più"
 
 #: indico/web/templates/forms/email_recipients_widget.html:29
 msgid "Show less"
-msgstr ""
+msgstr "Mostra meno"
 
 #: indico/web/templates/forms/tag_list_widget.html:32
 msgid "Add new keyword"
-msgstr ""
+msgstr "Aggiungi parola chiave"

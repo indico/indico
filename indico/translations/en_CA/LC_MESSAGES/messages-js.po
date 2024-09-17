@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English (Canada) (http://app.transifex.com/indico/indico/language/en_CA/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: en_CA\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -231,14 +231,14 @@ msgid ""
 msgstr "Your Indico server is not synchronised with the Community Hub! You can solve this <a href=\"{0}\">here</a>."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:847
+#: indico/modules/designer/client/js/index.js:855
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr ""
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:850
+#: indico/modules/designer/client/js/index.js:858
 msgid "Disassociate back sides"
 msgstr ""
 
@@ -246,57 +246,57 @@ msgstr ""
 msgid "Fixed text"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:595
 msgid "Please choose a name for the template"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:587
-#: indico/modules/designer/client/js/index.js:593
-#: indico/modules/designer/client/js/index.js:602
+#: indico/modules/designer/client/js/index.js:595
+#: indico/modules/designer/client/js/index.js:601
+#: indico/modules/designer/client/js/index.js:610
 msgid "Warning"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:592
+#: indico/modules/designer/client/js/index.js:600
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:599
+#: indico/modules/designer/client/js/index.js:607
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:628
+#: indico/modules/designer/client/js/index.js:636
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:772
-#: indico/modules/designer/client/js/index.js:1124
+#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:1132
 msgid "Choose a file"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:788
 msgid "Fixed Image"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:838
+#: indico/modules/designer/client/js/index.js:846
 msgid "This back side template will be removed"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:840
+#: indico/modules/designer/client/js/index.js:848
 msgid "The back side of this template will be removed"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:841
+#: indico/modules/designer/client/js/index.js:849
 msgid "Disassociate back side"
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:845
+#: indico/modules/designer/client/js/index.js:853
 msgid "The back side is empty."
 msgstr ""
 
-#: indico/modules/designer/client/js/index.js:983
-#: indico/modules/designer/client/js/index.js:997
+#: indico/modules/designer/client/js/index.js:991
+#: indico/modules/designer/client/js/index.js:1005
 msgid "Error"
 msgstr ""
 

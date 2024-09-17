@@ -24,14 +24,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-18 11:48+0200\n"
+"POT-Creation-Date: 2024-08-27 16:49+0200\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Thorsten Hindermann, 2024\n"
 "Language-Team: German (Germany) (http://app.transifex.com/indico/indico/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -62,7 +62,7 @@ msgstr "Paket wird zusammengestellt"
 
 #: indico/modules/auth/templates/login_page.html:130
 msgid "Login with {0}"
-msgstr ""
+msgstr "Melden Sie sich an mit {0}"
 
 #: indico/modules/categories/client/js/calendar.js:106
 msgid "Today"
@@ -185,11 +185,11 @@ msgstr[1] "Dies ist eine der Kategorien, die Sie verschieben möchten."
 
 #: indico/modules/categories/templates/display/base.html:115
 msgid "Navigate to"
-msgstr ""
+msgstr "Navigiere zu"
 
 #: indico/modules/categories/templates/display/base.html:116
 msgid "Navigate to a category"
-msgstr ""
+msgstr "Navigiere zu einer Kategorie"
 
 #: indico/modules/cephalopod/client/js/index.js:40
 msgid "Unknown error while contacting the Community Hub"
@@ -248,14 +248,14 @@ msgid ""
 msgstr "Ihr Indico-Server ist nicht synchronisiert! Sie können das Problem <a href=\"{0}\">hier</a> lösen."
 
 #: indico/modules/designer/client/js/index.js:31
-#: indico/modules/designer/client/js/index.js:847
+#: indico/modules/designer/client/js/index.js:855
 msgid ""
 "The back side of the templates that use this one as the back side will be "
 "removed."
 msgstr "Die Rückseite aller Vorlagen, die diese Vorlage als Rückseite nutzen, wird entfernt"
 
 #: indico/modules/designer/client/js/index.js:34
-#: indico/modules/designer/client/js/index.js:850
+#: indico/modules/designer/client/js/index.js:858
 msgid "Disassociate back sides"
 msgstr "Rückseiten abtrennen"
 
@@ -263,57 +263,57 @@ msgstr "Rückseiten abtrennen"
 msgid "Fixed text"
 msgstr "Vorgegebener Text"
 
-#: indico/modules/designer/client/js/index.js:587
+#: indico/modules/designer/client/js/index.js:595
 msgid "Please choose a name for the template"
 msgstr "Namen für die Vorlage auswählen"
 
-#: indico/modules/designer/client/js/index.js:587
-#: indico/modules/designer/client/js/index.js:593
-#: indico/modules/designer/client/js/index.js:602
+#: indico/modules/designer/client/js/index.js:595
+#: indico/modules/designer/client/js/index.js:601
+#: indico/modules/designer/client/js/index.js:610
 msgid "Warning"
 msgstr "Warnung"
 
-#: indico/modules/designer/client/js/index.js:592
+#: indico/modules/designer/client/js/index.js:600
 msgid "The template cannot be empty. Add some elements or a background image."
 msgstr "Die Vorlage darf nicht leer sein. Bitte einige Elemente oder ein Hintergrundbild hinzufügen."
 
-#: indico/modules/designer/client/js/index.js:599
+#: indico/modules/designer/client/js/index.js:607
 msgid ""
 "The Fixed image element cannot be empty. Upload an image inside it or remove"
 " it."
 msgstr "Ein Element mit festem Bild darf nicht leer sein. Bitte ein Bild hochladen oder das Element entfernen."
 
-#: indico/modules/designer/client/js/index.js:628
+#: indico/modules/designer/client/js/index.js:636
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr "Sind Sie sicher, dass sie die Maße der Vorlage verändern wollen?"
 
-#: indico/modules/designer/client/js/index.js:772
-#: indico/modules/designer/client/js/index.js:1124
+#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:1132
 msgid "Choose a file"
 msgstr "Datei auswählen"
 
-#: indico/modules/designer/client/js/index.js:780
+#: indico/modules/designer/client/js/index.js:788
 msgid "Fixed Image"
 msgstr "Festes Bild"
 
-#: indico/modules/designer/client/js/index.js:838
+#: indico/modules/designer/client/js/index.js:846
 msgid "This back side template will be removed"
 msgstr "Diese Vorlage für die Rückseite wird entfernt"
 
-#: indico/modules/designer/client/js/index.js:840
+#: indico/modules/designer/client/js/index.js:848
 msgid "The back side of this template will be removed"
 msgstr "Die Rückseite der Vorlage wird entfernt"
 
-#: indico/modules/designer/client/js/index.js:841
+#: indico/modules/designer/client/js/index.js:849
 msgid "Disassociate back side"
 msgstr "Rückseite abtrennen"
 
-#: indico/modules/designer/client/js/index.js:845
+#: indico/modules/designer/client/js/index.js:853
 msgid "The back side is empty."
 msgstr "Rückseite leer"
 
-#: indico/modules/designer/client/js/index.js:983
-#: indico/modules/designer/client/js/index.js:997
+#: indico/modules/designer/client/js/index.js:991
+#: indico/modules/designer/client/js/index.js:1005
 msgid "Error"
 msgstr "Fehler"
 
@@ -340,7 +340,7 @@ msgstr "Vorsitzender"
 msgid ""
 "You won't be able to change your decision later. If necessary, please "
 "contact the manager of the event."
-msgstr ""
+msgstr "Sie können Ihre Entscheidung später nicht mehr ändern. Bitte wenden Sie sich bei Bedarf an den Manager der Veranstaltung."
 
 #: indico/modules/events/client/js/cloning.js:59
 msgid "{0} new event will be created."
@@ -381,7 +381,7 @@ msgstr[1] "Sollen die {0} ausgewählten Anmeldungen wirklich gelöscht werden?"
 
 #: indico/modules/events/reminders/templates/edit_reminder.html:40
 msgid "Reminder Preview"
-msgstr ""
+msgstr "Erinnerungs-Vorschau"
 
 #: indico/modules/events/sessions/client/js/index.js:118
 msgid "Filter types"
@@ -398,25 +398,25 @@ msgstr "Kein Typ"
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:70
 msgid "Submit"
-msgstr ""
+msgstr "Senden"
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:71
 msgid "Submitting..."
-msgstr ""
+msgstr "Wird gesendet..."
 
 #: indico/modules/events/surveys/templates/display/survey_questionnaire.html:72
 msgid ""
 "Your answers have been saved, do not forget to submit the survey when you "
 "finish!"
-msgstr ""
+msgstr "Ihre Antworten wurden gespeichert, vergessen Sie nicht, die Umfrage abzusenden, wenn Sie fertig sind!"
 
 #: indico/modules/events/templates/display/access_key.html:50
 msgid "Invalid access key"
-msgstr ""
+msgstr "Ungültiger Zugriffsschlüssel"
 
 #: indico/modules/events/timetable/templates/_timetable.html:56
 msgid "The timetable has not been filled yet."
-msgstr ""
+msgstr "Der Stundenplan ist noch nicht gefüllt."
 
 #: indico/modules/events/timetable/templates/display/indico/_common.html:42
 msgid "Speaker"
@@ -444,15 +444,15 @@ msgstr "Zugehörigkeit"
 
 #: indico/modules/users/templates/users_merge.html:85
 msgid "Are you sure you want to merge those two users?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie diese beiden Benutzer zusammenführen möchten?"
 
 #: indico/modules/users/templates/users_merge.html:94
 msgid "Please notice there are warning messages!"
-msgstr ""
+msgstr "Bitte beachten Sie, dass es Warnmeldungen gibt!"
 
 #: indico/modules/users/templates/users_merge.html:95
 msgid "Confirm user merge"
-msgstr ""
+msgstr "Benutzerzusammenführung bestätigen"
 
 #: indico/modules/vc/client/js/index.js:83
 msgid ""
@@ -1449,12 +1449,12 @@ msgstr "Letzte Operation rückgängig machen"
 #: indico/web/templates/forms/email_recipients_widget.html:23
 #: indico/web/templates/forms/email_recipients_widget.html:29
 msgid "Show more"
-msgstr ""
+msgstr "Zeige mehr"
 
 #: indico/web/templates/forms/email_recipients_widget.html:29
 msgid "Show less"
-msgstr ""
+msgstr "Zeige weniger"
 
 #: indico/web/templates/forms/tag_list_widget.html:32
 msgid "Add new keyword"
-msgstr ""
+msgstr "Füge neues Schlüsselwort hinzu"
