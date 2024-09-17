@@ -7,6 +7,11 @@ Version 3.3.5
 
 *Unreleased*
 
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+- New translation: Japanese
+
 Improvements
 ^^^^^^^^^^^^
 

@@ -19,12 +19,12 @@ Indico is currently available in the following languages:
 - Italian 🇮🇹
 - Hungarian 🇭🇺
 - Swedish 🇸🇪
+- Japanese 🇯🇵
 
 Languages with partial translations:
 
 - Arabic
 - Dutch 🇳🇱
-- Japanese 🇯🇵
 - Korean 🇰🇷
 - Russian 🇷🇺
 - Croatian 🇭🇷
