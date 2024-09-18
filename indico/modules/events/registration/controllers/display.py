@@ -649,7 +649,7 @@ class RHParticipantListPictureDownload(RHParticipantList):
         else:
             form = self.registration.registration_form
             participant_list_form_columns = registration_settings.get_participant_list_columns(self.event, form)
-            if (self.data.field_data.field_id not in participant_list_form_columns):
+            if self.data.field_data.field_id not in participant_list_form_columns:
                 raise Forbidden('Picture field is not exposed in participant list')
         is_participant = self.registration.event.is_user_registered(session.user)
         if not self.registration.is_publishable(is_participant):
