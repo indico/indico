@@ -26,6 +26,7 @@ from indico.modules.events.registration.forms import (ParticipantsDisplayForm, P
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
+from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
                                                      get_flat_section_setup_data)
@@ -238,25 +239,13 @@ class RHRegistrationFormManage(RHManageRegFormBase):
 class RHRegistrationFormEdit(RHManageRegFormBase):
     """Edit a registration form."""
 
-    def _get_private_status(self, form):
-        if form.private.data != self.regform.private:
-            return 'private' if form.private.data else 'normal'
-        return None
-
     def _get_form_defaults(self):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
 
     def _process(self):
         form = RegistrationFormEditForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
         if form.validate_on_submit():
-            private_status = self._get_private_status(form)
-            form.populate_obj(self.regform)
-            db.session.flush()
-            signals.event.registration_form_edited.send(self.regform)
-            if private_status:
-                self.event.log(EventLogRealm.management, LogKind.change, 'Privacy',
-                               f'Registration form "{self.regform.title}" has been set to {private_status}',
-                               session.user)
+            update_registration_form_settings(self.regform, form.data, skip={'limit_registrations'})
             flash(_('Registration form has been successfully modified'), 'success')
             return redirect(url_for('.manage_regform', self.regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,
