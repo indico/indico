@@ -50,4 +50,5 @@ def update_registration_form_settings(regform, data, *, skip=(), _extra_log_fiel
     db.session.flush()
     signals.event.registration_form_edited.send(regform)
     logger.info('Registration form %r updated with %r by %r', regform, data, session.user)
-    _log_registration_form_update(regform, changes, _extra_log_fields)
+    if changes:
+        _log_registration_form_update(regform, changes, _extra_log_fields)
