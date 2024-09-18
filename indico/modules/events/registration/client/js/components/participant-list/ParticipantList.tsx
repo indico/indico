@@ -8,7 +8,7 @@
 import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
 
 import React from 'react';
-import {Button} from 'semantic-ui-react';
+import {Button, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -41,22 +41,24 @@ export default function ParticipantList({
       <Button
         basic
         color="blue"
-        icon="user"
         href={participantListPreviewURL({event_id: eventId})}
         styleName="view-toggle"
-        content={<Translate>Show registered participant view instead.</Translate>}
-      />
+      >
+        <Icon name="user" />
+        <Translate>Show registered participant view instead.</Translate>
+      </Button>
     );
   } else if (preview) {
     viewToggle = (
       <Button
         basic
         color="blue"
-        icon="user secret"
         href={participantListPreviewURL({event_id: eventId, guest: 1})}
         styleName="view-toggle"
-        content={<Translate>Show unregistered guest view instead.</Translate>}
-      />
+      >
+        <Icon name="user secret" />
+        <Translate>Show unregistered guest view instead.</Translate>
+      </Button>
     );
   }
 
