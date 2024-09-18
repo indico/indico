@@ -23,6 +23,8 @@ Bugfixes
 - Fix the order of the event classifications in edit mode (:issue:`6531`, :pr:`6534`)
 - Fix an issue where scheduling a contribution on a day with an empty timetable would
   schedule it on the first day of the event instead (:issue:`6540`, :pr:`6541`)
+- Fix error in unmerged participant list when the picture field is enabled and participant
+  list columns have not been customized for that registration form (:pr:`6535`)
 
 Accessibility
 ^^^^^^^^^^^^^
