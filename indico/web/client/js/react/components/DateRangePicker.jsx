@@ -84,6 +84,9 @@ export default function DateRangePicker({
             disabled={disabled}
           />
         </label>
+        <button type="button" data-calendar-trigger="left">
+          <Translate as="span">Open a calendar</Translate>
+        </button>
         <span className="arrow" />
         <label>
           <span>{rangeEndLabel}:</span>
@@ -95,7 +98,7 @@ export default function DateRangePicker({
             disabled={disabled}
           />
         </label>
-        <button type="button" data-calendar-trigger>
+        <button type="button" data-calendar-trigger="right">
           <Translate as="span">Open a calendar</Translate>
         </button>
 

@@ -20,6 +20,8 @@ import {getWeekInfoForLocale, getFirstDayOfWeek, getWeekdayNames} from 'indico/u
 import {topBottomPosition} from 'indico/utils/positioning';
 import {setNativeInputValue} from 'indico/utils/react_integration';
 
+import * as ds from './date_selection';
+
 import './ind_date_picker.scss';
 
 const DEFAULT_LOCALE = document.documentElement.dataset.canonicalLocale;
@@ -182,9 +184,11 @@ customElements.define(
       const fieldset = this.querySelector('fieldset');
       const rangeStartInput = this.querySelector('input[data-range-start]');
       const rangeEndInput = this.querySelector('input[data-range-end]');
-      const openCalendarButton = this.querySelector('[data-calendar-trigger]');
+      const calendarTriggerLeft = this.querySelector('[data-calendar-trigger=left]');
+      const calendarTriggerRight = this.querySelector('[data-calendar-trigger=right]');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
+      let selection = ds.newSelection(this.rangeStart, this.rangeEnd);
 
       const dateFormat = formatDescription.textContent
         .split(':')[1]
@@ -195,9 +199,10 @@ customElements.define(
       indCalendar.format = dateFormat;
       indCalendar.rangeStart = this.rangeStart;
       indCalendar.rangeEnd = this.rangeEnd;
+      indCalendar.selectionPreview = selection.copy();
       rangeStartInput.defaultValue = formatDate(dateFormat, this.rangeStart);
       rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
-      updateRanges();
+      updateSelectionLimits();
 
       formatDescription.id = `${id}-format`;
       rangeStartInput.setAttribute('aria-describedby', formatDescription.id);
@@ -224,118 +229,78 @@ customElements.define(
         indCalendar.rangeEnd = this.rangeEnd;
         rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
       });
-      this.addEventListener('x-attrchange.range-start-min', updateRanges);
-      this.addEventListener('x-attrchange.range-start-max', updateRanges);
-      this.addEventListener('x-attrchange.range-end-min', updateRanges);
-      this.addEventListener('x-attrchange.range-end-max', updateRanges);
+      this.addEventListener('x-attrchange.range-start-min', updateSelectionLimits);
+      this.addEventListener('x-attrchange.range-start-max', updateSelectionLimits);
+      this.addEventListener('x-attrchange.range-end-min', updateSelectionLimits);
+      this.addEventListener('x-attrchange.range-end-max', updateSelectionLimits);
       rangeStartInput.addEventListener('input', () => {
-        indCalendar.rangeStart = parseDate(rangeStartInput.value);
+        const date = parseDate(rangeStartInput.value);
+        indCalendar.rangeStart = date;
+        selection = selection.copy({left: date});
       });
       rangeEndInput.addEventListener('input', () => {
-        indCalendar.rangeEnd = parseDate(rangeEndInput.value);
+        const date = parseDate(rangeEndInput.value);
+        indCalendar.rangeEnd = date;
+        selection = selection.copy({right: date});
       });
       rangeStartInput.addEventListener('keydown', handleAltDownToOpen);
       rangeEndInput.addEventListener('keydown', handleAltDownToOpen);
-      openCalendarButton.addEventListener('click', () => {
-        // Disable the button to prevent re-opening when clicking
-        // the button while the dialog is open
-        openCalendarButton.disabled = true;
-        openDialog(indCalendar, rangeStartInput);
+      calendarTriggerLeft.addEventListener('click', () => {
+        selection = ds.triggerLeft(selection);
+        openCalendar();
+      });
+      calendarTriggerRight.addEventListener('click', () => {
+        selection = ds.triggerRight(selection);
+        openCalendar();
       });
       indCalendar.addEventListener('close', () => {
-        openCalendarButton.disabled = false;
+        calendarTriggerLeft.disabled = false;
+        calendarTriggerRight.disabled = false;
       });
       indCalendar.addEventListener('x-select', evt => {
-        const value = new Date(evt.target.value);
+        const result = ds.select(selection, new Date(evt.target.value));
+        selection = result.selection;
 
-        // Selecting the same date as the selection end point clears that
-        // side of the selected range.
+        // Close the calendar if needed
+        if (result.close) {
+          indCalendar.open = false;
+        }
 
-        if (isSameDate(value, indCalendar.rangeStart)) {
-          this.rangeStart = '';
-          setNativeInputValue(rangeStartInput, '');
+        // Set the input values where the value changed
+        if (!isSameDate(selection.left, indCalendar.rangeStart)) {
+          setNativeInputValue(rangeStartInput, formatDate(dateFormat, selection.left));
           rangeStartInput.dispatchEvent(new Event('input', {bubbles: true}));
-          updateRanges();
-          return;
+        }
+        if (!isSameDate(selection.right, indCalendar.rangeEnd)) {
+          setNativeInputValue(rangeEndInput, formatDate(dateFormat, selection.right));
+          rangeEndInput.dispatchEvent(new Event('change', {bubbles: true}));
         }
 
-        if (isSameDate(value, indCalendar.rangeEnd)) {
-          this.rangeEnd = '';
-          setNativeInputValue(rangeEndInput, '');
-          rangeEndInput.dispatchEvent(new Event('input', {bubbles: true}));
-          updateRanges();
-          return;
-        }
-
-        // We alternate between selecting the first date (range start)
-        // and the second date (range end). The calendar is only closed
-        // after the second date is selected. Once both dates are selected
-        // we enter the 'nudge' mode, where the closer end of the selection
-        // is moved on selection.
-
-        switch (this.selectionState) {
-          case START_NEEDED: {
-            this.rangeStart = value;
-            setNativeInputValue(rangeStartInput, formatDate(dateFormat, value));
-            rangeStartInput.dispatchEvent(new Event('input', {bubbles: true}));
-            break;
-          }
-          case END_NEEDED: {
-            const rangeStart = new Date(indCalendar.rangeStart);
-            if (value < rangeStart) {
-              // We allow the user to select the dates in reverse order
-              // and we simply flip them around in this scenario.
-              setNativeInputValue(rangeEndInput, formatDate(dateFormat, rangeStart));
-              setNativeInputValue(rangeStartInput, formatDate(dateFormat, value));
-              this.rangeStart = formatDate(dateFormat, value);
-              this.rangeEnd.rangeEnd = rangeStart;
-            } else {
-              this.rangeEnd = value;
-              setNativeInputValue(rangeEndInput, formatDate(dateFormat, value));
-            }
-            indCalendar.open = false;
-            openCalendarButton.focus();
-            rangeEndInput.dispatchEvent(new Event('input', {bubbles: true}));
-            break;
-          }
-          case BOTH_POPULATED: {
-            const distToStart = Math.abs(indCalendar.rangeStart - value);
-            const distToEnd = Math.abs(indCalendar.rangeEnd - value);
-            if (distToStart < distToEnd) {
-              setNativeInputValue(rangeStartInput, formatDate(dateFormat, value));
-              this.rangeStart = value;
-              rangeStartInput.dispatchEvent(new Event('input', {bubbles: true}));
-            } else {
-              setNativeInputValue(rangeEndInput, formatDate(dateFormat, value));
-              this.rangeEnd = value;
-              rangeEndInput.dispatchEvent(new Event('input', {bubbles: true}));
-            }
-            break;
-          }
-        }
-        updateRanges();
+        // Update the selection range restriction
+        indCalendar.selectionPreview = selection.copy();
+        updateSelectionLimits();
       });
+
+      function updateSelectionLimits() {
+        if (selection.trigger === ds.LEFT) {
+          indCalendar.setAllowableSelectionRange(indDateRangePicker.startRange);
+        } else {
+          indCalendar.setAllowableSelectionRange(indDateRangePicker.endRange);
+        }
+      }
+
+      function openCalendar() {
+        indCalendar.selectionPreview = selection.copy();
+        updateSelectionLimits();
+        calendarTriggerLeft.disabled = true;
+        calendarTriggerRight.disabled = true;
+        openDialog(indCalendar, rangeStartInput);
+      }
 
       function handleAltDownToOpen(evt) {
         if (evt.code === 'ArrowDown' && evt.altKey) {
           openDialog(indCalendar, rangeStartInput);
         }
-      }
-
-      function updateRanges() {
-        let range;
-        switch (indDateRangePicker.selectionState) {
-          case START_NEEDED:
-            range = indDateRangePicker.startRange;
-            break;
-          case END_NEEDED:
-            range = indDateRangePicker.endRange;
-            break;
-          case BOTH_POPULATED:
-            range = indDateRangePicker.combinedRange;
-            break;
-        }
-        indCalendar.setAllowableSelectionRange(range);
       }
     }
   }
@@ -433,8 +398,7 @@ customElements.define(
 
       // Handle open/close to prep the dialog state
       dialog.addEventListener('open', () => {
-        const focusTarget = dialog.querySelector('[aria-selected=true]') || dialog;
-        focusTarget.focus();
+        dialog.focus();
       });
       dialog.addEventListener('close', () => {
         calendarDisplayDate = undefined;
@@ -616,36 +580,27 @@ customElements.define(
       }
 
       function getHoverRange() {
-        // Hover range extends for either end of the selected range to the
-        // cursor position, or, if both ends are selected, then from the
-        // end farther away from the cursor to the cursor position. If no
-        // cursor is present, then the hover range is invalid and should
-        // not be used.
+        // A component that wishes to display the preview must set
+        // the `selectionPreview` property on the <ind-calendar> element
+        // and the value must be a `Selection` object (see
+        // `date_selection.js`).
+        //
+        // When no valid preview can be created an empty `DateRange` is
+        // returned.
 
+        if (!indCalendar.selectionPreview) {
+          return new DateRange();
+        }
+
+        // Obtain the cursor position
         const cursorDate = hoverCursor && new Date(hoverCursor);
-
-        // If either end of the range is missing, cursor position is used
-        let start = indCalendar.rangeStart ?? cursorDate;
-        let end = indCalendar.rangeEnd ?? cursorDate;
-
-        // If cursor is present, adjust the closer side to the cursor position
-        if (cursorDate) {
-          const distanceToStart = Math.abs(start - cursorDate);
-          const distanceToEnd = Math.abs(end - cursorDate);
-
-          if (distanceToStart <= distanceToEnd) {
-            start = cursorDate;
-          } else {
-            end = cursorDate;
-          }
+        if (!cursorDate) {
+          return new DateRange();
         }
 
-        // Ensure correct order
-        if (start > end) {
-          [start, end] = [end, start];
-        }
-
-        return new DateRange(start, end);
+        // Create a preview
+        const {selection: preview} = ds.select(indCalendar.selectionPreview, cursorDate);
+        return preview.toDateRange();
       }
 
       function updateCalendar() {
@@ -696,6 +651,7 @@ customElements.define(
             focusableButtons.push(button);
           }
         }
+        console.log(focusableButtons);
         return (
           focusableButtons.find(button => button.dataset.currentMonth === 'true') ||
           focusableButtons[0]
@@ -800,8 +756,6 @@ customElements.define(
 
           const selectedRange = new DateRange(indDateGrid.rangeStart, indDateGrid.rangeEnd);
 
-          let focusableButton = listbox.querySelector('[role=option]');
-
           calendarButtons.forEach((calendarButton, i) => {
             const date = new Date(firstDayOfCalendar);
             date.setDate(date.getDate() + i);
@@ -854,11 +808,11 @@ customElements.define(
             }
             calendarButton.toggleAttribute('data-range-start', selectedRange.startsWith(date));
             calendarButton.toggleAttribute('data-range-end', selectedRange.endsWith(date));
-            if (selectedRange.startsWith(date)) {
-              focusableButton = calendarButton;
-            }
           });
 
+          const focusableButton = listbox.querySelector(
+            '[role=option]:is([aria-selected=true],[data-current-month=true]:not([aria-disabled]))'
+          );
           focusableButton.tabIndex = 0;
           indDateGrid.dispatchEvent(new Event('x-update-grid'));
         });
