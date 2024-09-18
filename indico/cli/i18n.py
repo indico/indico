@@ -660,12 +660,12 @@ def check_html_tags():
 
 
 def _extract_placeholders(string):
-    pattern = r'''
-        (\{[^}]*\}      # Match closing curly brace (incl. empty)
-        |               # OR
-        \%\([^)]+\)     # Match closing parenthesis
-        [sdf]           # Match format type (string, decimal, float)
-        )
+    pattern = r'''(
+        \{[^}]*\}    # Match closing curly brace (incl. empty)
+        |            # OR
+        \%\([^)]+\)  # Match closing parenthesis
+        [sdf]        # Match format type (string, decimal, float)
+    )
     '''
     return set(re.findall(pattern, string, re.VERBOSE))
 
