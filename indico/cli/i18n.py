@@ -677,10 +677,6 @@ def _get_invalid_po_format_strings(path):
     invalid = []
     for msg_pairs in _iter_msg_pairs(catalog):
         for orig, trans in msg_pairs:
-            # brace format only; python-format (%s etc) is too vague
-            # since there are many strings containing e.g. just `%`
-            # which are never used for formatting, and babel's
-            # `_validate_format` checker fails on those too
             orig_placeholders = _extract_placeholders(orig)
             trans_placeholders = _extract_placeholders(trans)
             if orig_placeholders != trans_placeholders:
