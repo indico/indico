@@ -25,6 +25,8 @@ Bugfixes
   schedule it on the first day of the event instead (:issue:`6540`, :pr:`6541`)
 - Fix error in unmerged participant list when the picture field is enabled and participant
   list columns have not been customized for that registration form (:pr:`6535`)
+- Fix breakage of combobox (and any custom element that uses `ElementInternals`) in
+  older versions of Safari (:pr:`6549`, :thanks:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
