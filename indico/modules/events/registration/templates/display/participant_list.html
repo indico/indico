@@ -4,11 +4,48 @@
     {% extends 'events/display/conference/base.html' %}
 {% endif %}
 
+{% from 'message_box.html' import message_box %}
+
+{% block back_button_url -%}
+    {%- if preview -%}
+        {{ url_for('.manage_regform_list', event) }}
+    {%- endif -%}
+{%- endblock %}
+
+{% block title %}
+    {%- if not preview -%}
+        {{- page_title -}}
+    {%- else -%}
+        {% trans %}Participant List Preview{% endtrans %}
+    {%- endif -%}
+{% endblock %}
+
+{% block subtitle %}
+    {% if num_participants %}
+        {%- trans num=num_participants %}1 participant{% pluralize %}{{ num }} participants{% endtrans -%}
+    {% endif %}
+{% endblock %}
+
+{% block description %}
+    {%- if preview == 'guest' -%}
+        {% trans -%}
+            This preview shows the participant list like an unregistered guest would see it.
+        {%- endtrans %}
+    {% elif preview %}
+        {% trans -%}
+            This preview shows the participant list like a registered participant would see it.
+        {%- endtrans %}
+    {%- elif tables|length > 1 -%}
+        {% trans -%}
+            The lists of participants grouped by the registration form they used to register for the event.
+        {%- endtrans %}
+    {%- endif -%}
+{% endblock %}
+
 {% block content %}
     <div
         id="participant-list"
         data-tables="{{ tables | tojson | forceescape }}"
-        data-title="{{ page_title if not preview and page_title else '' }}"
         data-total-participant-count="{{ num_participants }}"
         data-event-id="{{ event.id }}"
         {% if merged %} data-merged {% endif %}

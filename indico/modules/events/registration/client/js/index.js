@@ -153,14 +153,13 @@ import setupRegformSubmission from './form_submission';
   global.setupParticipantList = containerSelector => {
     const element = document.querySelector(containerSelector);
     const tables = JSON.parse(element.dataset.tables);
-    const {eventId, totalParticipantCount, published, preview, title, merged} = element.dataset;
+    const {eventId, totalParticipantCount, published, preview, merged} = element.dataset;
 
     ReactDOM.render(
       <ParticipantList
         tables={tables}
         totalParticipantCount={Number(totalParticipantCount)}
         preview={preview}
-        title={title}
         published={published !== undefined}
         merged={merged !== undefined}
         eventId={Number(eventId)}

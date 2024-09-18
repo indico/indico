@@ -6,13 +6,11 @@
 // LICENSE file for more details.
 
 import participantListPreviewURL from 'indico-url:event_registration.manage_participant_list_preview';
-import manageRegFormListURL from 'indico-url:event_registration.manage_regform_list';
 
 import React from 'react';
-import {Button, Divider, Header, HeaderContent, Icon, Popup} from 'semantic-ui-react';
-import HeaderSubHeader from 'semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader';
+import {Button} from 'semantic-ui-react';
 
-import {PluralTranslate, Translate, Plural, Singular, Param} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 
 import ParticipantAccordion from './ParticipantAccordion';
 import {PreviewEnum, TableObj} from './types';
@@ -24,7 +22,6 @@ interface ParticipantListProps {
   merged: boolean;
   totalParticipantCount: number;
   tables: TableObj[];
-  title: string;
   eventId: number;
   preview?: PreviewEnum;
 }
@@ -34,18 +31,12 @@ export default function ParticipantList({
   totalParticipantCount,
   tables,
   preview,
-  title,
   eventId,
   merged,
 }: ParticipantListProps) {
-  let description, viewToggle;
+  let viewToggle;
 
   if (preview === PreviewEnum.GUEST) {
-    description = (
-      <Translate>
-        This preview shows the participant list like an unregistered guest would see it.
-      </Translate>
-    );
     viewToggle = (
       <Button
         basic
@@ -57,11 +48,6 @@ export default function ParticipantList({
       />
     );
   } else if (preview) {
-    description = (
-      <Translate>
-        This preview shows the participant list like a registered participant would see it.
-      </Translate>
-    );
     viewToggle = (
       <Button
         basic
@@ -72,53 +58,10 @@ export default function ParticipantList({
         content={<Translate>Show unregistered guest view instead.</Translate>}
       />
     );
-  } else if (tables.length > 1) {
-    description = (
-      <Translate>
-        The lists of participants grouped by the registration form they used to register for the
-        event.
-      </Translate>
-    );
   }
 
   return (
     <section>
-      <Header as="h2" color="blue">
-        <HeaderContent styleName="header-text">
-          {preview ? (
-            <>
-              <Popup
-                position="bottom center"
-                content={<Translate>Back</Translate>}
-                trigger={
-                  <a href={manageRegFormListURL({event_id: eventId})}>
-                    <Icon name="chevron left" color="grey" size="small" />
-                  </a>
-                }
-              />
-              <Translate>Participant List Preview</Translate>
-            </>
-          ) : (
-            title
-          )}
-        </HeaderContent>
-        <HeaderSubHeader>
-          <PluralTranslate count={totalParticipantCount}>
-            <Singular>
-              <Param name="count" value={totalParticipantCount} /> participant
-            </Singular>
-            <Plural>
-              <Param name="count" value={totalParticipantCount} /> participants
-            </Plural>
-          </PluralTranslate>
-        </HeaderSubHeader>
-        {description && (
-          <>
-            <Divider />
-            <HeaderSubHeader content={description} />
-          </>
-        )}
-      </Header>
       {viewToggle}
       <ParticipantAccordion
         published={published}
