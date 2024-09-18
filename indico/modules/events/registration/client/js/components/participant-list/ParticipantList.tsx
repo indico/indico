@@ -45,7 +45,7 @@ export default function ParticipantList({
         styleName="view-toggle"
       >
         <Icon name="user" />
-        <Translate>Show registered participant view instead.</Translate>
+        <Translate>Show registered participant view instead</Translate>
       </Button>
     );
   } else if (preview) {
@@ -57,7 +57,7 @@ export default function ParticipantList({
         styleName="view-toggle"
       >
         <Icon name="user secret" />
-        <Translate>Show unregistered guest view instead.</Translate>
+        <Translate>Show unregistered guest view instead</Translate>
       </Button>
     );
   }
