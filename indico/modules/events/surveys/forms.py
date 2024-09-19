@@ -94,7 +94,7 @@ class SectionForm(IndicoForm):
     title = StringField(_('Title'), [HiddenUnless('display_as_section', preserve_data=True), DataRequired()],
                         description=_('The title of the section.'))
     description = TextAreaField(_('Description'), [HiddenUnless('display_as_section', preserve_data=True)],
-                                description=_('The description text of the section.'))
+                                description=_('You may use Markdown for formatting.'))
 
 
 class TextForm(IndicoForm):

@@ -29,6 +29,7 @@ Bugfixes
 - Fix breakage of the registration form dropdown field (and anything else using a custom
   element that uses ``ElementInternals``) in older versions of Safari (:pr:`6549`,
   :thanks:`foxbunny`)
+- Fix linebreak display in markdown code blocks in survey section descriptions (:pr:`6553`)
 
 Accessibility
 ^^^^^^^^^^^^^
