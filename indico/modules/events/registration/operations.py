@@ -38,9 +38,9 @@ def _log_registration_form_update(regform, changes, extra_log_fields):
         'manager_notification_recipients': 'Registration creation notification emails',
         **(extra_log_fields or {})
     }
-    regform.event.log(EventLogRealm.management, LogKind.change, 'Registration Form',
-                      f'Data updated for "{regform.title}"', session.user,
-                      data={'Changes': make_diff_log(changes, log_fields)})
+    regform.log(EventLogRealm.management, LogKind.change, 'Registration',
+                f'Registration form "{regform.title}" has been updated', session.user,
+                data={'Changes': make_diff_log(changes, log_fields)})
 
 
 @make_interceptable
