@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import 'core-js/es';
+import 'element-internals-polyfill';
 
 import './legacy/presentation.js';
 import './legacy/indico.js';

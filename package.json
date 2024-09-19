@@ -19,6 +19,7 @@
     "connected-react-router": "^6.9.2",
     "core-js": "^3.32.0",
     "dropzone": "^5.9.3",
+    "element-internals-polyfill": "^1.3.11",
     "file-selector": "^0.6.0",
     "final-form": "^4.20.7",
     "final-form-arrays": "^3.0.2",
