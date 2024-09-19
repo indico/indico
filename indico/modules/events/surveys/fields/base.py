@@ -16,7 +16,8 @@ from indico.web.forms.widgets import SwitchWidget
 
 class SurveyFieldConfigForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the question'))
-    description = TextAreaField(_('Description'), description=_("The description (shown below the question's field.)"))
+    description = TextAreaField(_('Description'), description=_("The description (shown below the question's field). "
+                                                                'You may use Markdown for formatting.'))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
                                description=_('If the user has to answer the question.'))
 
