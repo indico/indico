@@ -80,8 +80,6 @@ def main(upgrade, upgrade_packages):
     args = (
         '--custom-compile-command',
         './bin/maintenance/compile-python-deps.py',
-        '--no-emit-package',
-        'setuptools',
     )
     if upgrade:
         args += ('-U',)
