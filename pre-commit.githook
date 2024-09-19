@@ -4,8 +4,6 @@
 # Interesting post on max line length:
 # http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
 
-PYUPGRADE_CMD='pyupgrade --py312-plus --keep-percent-format'
-FLAKE8_CMD='flake8'
 RUFF_CMD='ruff check'
 ESLINT_CMD='npx eslint'
 STYLELINT_CMD='npx stylelint'
@@ -61,46 +59,14 @@ if [[ ${#FILES[@]} -ne 0 ]]; then
 fi
 
 
-# flake8, ruff, pyupgrade
+# ruff
 _get_files '*.py'
 if [[ ${#FILES[@]} -ne 0 ]]; then
-    if ! RESULT=$($FLAKE8_CMD "${FILES[@]}"); then
-        STATUS=1
-        echo "${RED}There are flake8 python issues in your code:${RESET}"
-        echo "$RESULT"
-        echo
-    fi
-
     if ! RESULT=$(CLICOLOR_FORCE=1 $RUFF_CMD "${FILES[@]}"); then
         STATUS=1
         echo "${RED}There are ruff python issues in your code:${RESET}"
         echo "$RESULT"
         echo
-    fi
-
-    # thanks to pyupgrade not having any option to output a diff, we have to
-    # use this incredibly ugly workaround...
-    PYUPGRADE_RESULT=""
-    for f in "${FILES[@]}"; do
-        if ! RESULT=$(diff -u --label "a/$f" --label "b/$f" "$f" <($PYUPGRADE_CMD - < "$f")); then
-            STATUS=1
-            echo "${YELLOW}Outdated python constructs found in ${BRIGHTYELLOW}${f}${RESET}"
-            RESULT=$(IFS= echo "$RESULT" | pygmentize -l diff -f terminal256 -O style=native,bg=dark)
-            if [[ -n "$PYUPGRADE_RESULT" ]]; then
-                PYUPGRADE_RESULT=$(IFS= printf '%s\n%s' "$PYUPGRADE_RESULT" "$RESULT")
-            else
-                PYUPGRADE_RESULT=$(IFS= printf '\n%s' "$RESULT")
-            fi
-        fi
-    done
-
-    if [[ -n "$PYUPGRADE_RESULT" ]]; then
-        echo
-        echo "${RED}There are pyupgrade issues in your code:${RESET}"
-        IFS= echo "$PYUPGRADE_RESULT"
-        echo
-        echo "${CYAN}Run this command to update the files:${RESET}"
-        echo "git diff --staged --name-only --diff-filter d '*.py' | xargs -d'\n' ${PYUPGRADE_CMD}"
     fi
 fi
 

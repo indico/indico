@@ -11,7 +11,7 @@ Thank you very much for submitting a **Pull Request** to Indico! We will be happ
   - [ ] Have you checked that you haven't forgotten to add any **newly created files** to the Git repo?
 
 * Make sure that your code has no errors :white_check_mark::
-  - [ ] **Code style and formatting** - have you run `eslint`, `flake8` and `pydocstyle` (or the [pre-commit hook](https://github.com/indico/indico/blob/master/pre-commit.githook))?
+  - [ ] **Code style and formatting** - have you run `eslint` and `ruff` (or the [pre-commit hook](https://github.com/indico/indico/blob/master/pre-commit.githook))?
   - [ ] **Regressions** - have you tried running the unit tests? (`pytest`)
 
 * Make sure others understand what has changed :loudspeaker::

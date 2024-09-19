@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 # ruff: noqa: N802, N803, N806
-# flake8: noqa: N802, N803, N806
 
 import math
 import os

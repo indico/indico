@@ -1,14 +1,11 @@
 -c requirements.txt
 build
-flake8-quotes
-flake8
 flask-url-map-serializer
 freezegun
 hatchling
 hatch-requirements-txt
 isort
 migra
-pep8-naming
 plantweb
 pygments
 pytest-cov
@@ -17,8 +14,6 @@ pytest-mock
 pytest-redis
 pytest-snapshot
 pytest
-pyquotes
-pyupgrade
 ruff
 sphinx-autobuild
 sphinx-issues

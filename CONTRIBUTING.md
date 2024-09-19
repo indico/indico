@@ -49,7 +49,7 @@ This checklist is meant to help you follow those practices:
    - [ ] Have you added **unit tests** to trickier parts of the Python code?
 
  * :white_check_mark: Make sure your code has no errors:
-    - [ ] **Code style and formatting** - have you run `eslint`, `flake8` and `pydocstyle` (or the [pre-commit hook](https://github.com/indico/indico/blob/master/pre-commit.githook))?
+    - [ ] **Code style and formatting** - have you run `eslint` and `ruff` (or the [pre-commit hook](https://github.com/indico/indico/blob/master/pre-commit.githook))?
     - [ ] **Regressions** - have you tried running the unit tests? (`pytest`)
 
 * :loudspeaker: Make sure others understand what has changed:
