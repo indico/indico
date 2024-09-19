@@ -26,6 +26,7 @@ from indico.modules.events.registration.forms import (ParticipantsDisplayForm, P
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
+from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
                                                      get_flat_section_setup_data)
@@ -244,9 +245,7 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
     def _process(self):
         form = RegistrationFormEditForm(obj=self._get_form_defaults(), event=self.event, regform=self.regform)
         if form.validate_on_submit():
-            form.populate_obj(self.regform)
-            db.session.flush()
-            signals.event.registration_form_edited.send(self.regform)
+            update_registration_form_settings(self.regform, form.data, skip={'limit_registrations'})
             flash(_('Registration form has been successfully modified'), 'success')
             return redirect(url_for('.manage_regform', self.regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,

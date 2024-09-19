@@ -62,7 +62,7 @@ def make_diff_log(changes, fields):
                       for x in change]
         elif all(isinstance(x, bool) for x in change):
             type_ = 'bool'
-        elif all(isinstance(x, (int, float)) for x in change):
+        elif all(isinstance(x, (int, float)) for x in not_none_change):
             type_ = 'number'
         elif all(isinstance(x, (list, tuple)) for x in change):
             type_ = 'list'
