@@ -43,20 +43,12 @@
 {% endblock %}
 
 {% block content %}
-    <div
-        id="participant-list"
-        data-tables="{{ tables | tojson | forceescape }}"
-        data-total-participant-count="{{ num_participants }}"
-        data-event-id="{{ event.id }}"
-        {% if merged %} data-merged {% endif %}
-        {% if published %} data-published {% endif %}
-        {% if preview %}
-            style="margin-top: 20px;"
-            data-preview="{{ preview }}"
-        {% endif %}
-    ></div>
-
-    <script>
-        setupParticipantList('#participant-list');
-    </script>
+    <ind-conference-participant-list
+        tables="{{ tables | tojson | forceescape }}"
+        total-participant-count="{{ num_participants }}"
+        event-id="{{ event.id }}"
+        {% if merged %}merged{% endif %}
+        {% if published %}published{% endif %}
+        {% if preview %}preview="{{ preview }}"{% endif %}
+    ></ind-conference-participant-list>
 {% endblock %}
