@@ -1,9 +1,7 @@
 {% if preview %}
     {% extends 'events/management/base.html' %}
-{% elif event.type == 'conference' %}
-    {% extends 'events/registration/display/_event_registration_base.html' %}
 {% else %}
-    {% extends 'events/registration/display/_meeting_registration_base.html' %}
+    {% extends 'events/display/conference/base.html' %}
 {% endif %}
 
 {% from 'message_box.html' import message_box %}
@@ -33,18 +31,10 @@
         {% trans -%}
             This preview shows the participant list like an unregistered guest would see it.
         {%- endtrans %}
-        <br>
-        <a href="{{ url_for('.manage_participant_list_preview', event) }}">
-            {%- trans %}Show registered participant view instead.{% endtrans -%}
-        </a>
     {% elif preview %}
         {% trans -%}
             This preview shows the participant list like a registered participant would see it.
         {%- endtrans %}
-        <br>
-        <a href="{{ url_for('.manage_participant_list_preview', event, guest=1) }}">
-            {%- trans %}Show unregistered guest view instead.{% endtrans -%}
-        </a>
     {%- elif tables|length > 1 -%}
         {% trans -%}
             The lists of participants grouped by the registration form they used to register for the event.
@@ -52,105 +42,13 @@
     {%- endif -%}
 {% endblock %}
 
-{% macro table_header(columns, show_checkin) %}
-    <thead>
-        <tr class="i-table">
-            {% if show_checkin %}
-                <th class="i-table thin-column" data-sorter="false"></th>
-            {% endif %}
-            {% for column in columns %}
-                <th class="i-table" data-sorter="text">{{ column }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-{% endmacro %}
-
-{% macro table_row(registration, show_checkin) %}
-    <tr class="i-table">
-        {% if show_checkin %}
-            <td class="i-table center"
-                {% if registration.checked_in %}title="{% trans %}Checked in{% endtrans %}"{% endif %}>
-                {% if registration.checked_in %}<i class="icon-checkmark"></i>{% endif %}
-            </td>
-        {% endif %}
-        {% for column in registration.columns %}
-            {% if column.is_picture %}
-                <td class="picture">
-                    {% if column.text %}
-                        <img src="{{ column.text }}" height="64px">
-                    {% else %}
-                        <div style="height: 64px;"></div>
-                    {% endif %}
-                </td>
-            {% else %}
-                <td class="i-table"
-                    {% if column.sort_key %} data-text="{{ column.sort_key }}"{% endif %}>
-                    {{ column.text }}
-                </td>
-            {% endif %}
-        {% endfor %}
-{% endmacro %}
-
-{% macro participant_table(table) %}
-    <section>
-        {% set hidden_participants = table.num_participants - table.rows|length %}
-        {% if table.title %}
-            <div class="header">
-                <div class="header-row">
-                    <h3>{{ table.title }}</h3>
-                </div>
-            </div>
-        {% endif %}
-        {% if table.rows %}
-            <table class="i-table tablesorter">
-                {{ table_header(table.headers, table.show_checkin) }}
-                <tbody>
-                    {% for row in table.rows %}
-                        {{ table_row(row, table.show_checkin) }}
-                    {% endfor %}
-                    {% if hidden_participants %}
-                        <tr class="i-table">
-                            <td class="i-table empty" colspan="{{ table.headers|length+1 if table.show_checkin else table.headers|length }}">
-                                {% trans num=hidden_participants %}{{ num }} more participant{% pluralize %}{{ num }} more participants{% endtrans %}
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        {% elif table.num_participants %}
-            {% call message_box('info', fixed_width=true) %}
-                {% trans num=hidden_participants %}There is {{ num }} hidden participant{% pluralize %}There are {{ num }} hidden participants{% endtrans %}
-            {% endcall %}
-        {% else %}
-            {% call message_box('info', fixed_width=true) %}
-                {% trans %}There are no registrations yet.{% endtrans %}
-            {% endcall %}
-        {% endif %}
-    </section>
-{% endmacro %}
-
 {% block content %}
-    {% if not published or not tables %}
-        {% call message_box('info', fixed_width=true) %}
-            {% trans %}There are no published registrations.{% endtrans %}
-        {% endcall %}
-    {% elif not num_participants %}
-        {% call message_box('info', fixed_width=true) %}
-            {% trans %}There are no registrations yet.{% endtrans %}
-        {% endcall %}
-    {% else %}
-        <div class="registrations list">
-            {% for table in tables %}
-                {{ participant_table(table) }}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <script>
-        $('.registrations .tablesorter').tablesorter({
-            cssAsc: 'header-sort-asc',
-            cssDesc: 'header-sort-desc',
-            headerTemplate: ''
-        });
-    </script>
+    <ind-conference-participant-list
+        tables="{{ tables | tojson | forceescape }}"
+        total-participant-count="{{ num_participants }}"
+        event-id="{{ event.id }}"
+        {% if merged %}merged{% endif %}
+        {% if published %}published{% endif %}
+        {% if preview %}preview="{{ preview }}"{% endif %}
+    ></ind-conference-participant-list>
 {% endblock %}

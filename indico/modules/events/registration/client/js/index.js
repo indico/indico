@@ -15,7 +15,10 @@ import 'indico/react/components/AffiliationPopup';
 import './invitations';
 import './reglists';
 
+import {domReady} from 'indico/utils/domstate';
+
 import ConsentToPublishEditor from './components/ConsentToPublishEditor';
+import ParticipantList from './components/participant-list/ParticipantList';
 import RegistrationTagsEditableList from './components/RegistrationTagsEditableList';
 import setupRegformSetup from './form_setup';
 import setupRegformSubmission from './form_submission';
@@ -148,4 +151,29 @@ import setupRegformSubmission from './form_submission';
       setupRegformSubmission(submissionRootElement);
     }
   });
+
+  customElements.define(
+    'ind-conference-participant-list',
+    class extends HTMLElement {
+      connectedCallback() {
+        domReady.then(() => {
+          ReactDOM.render(
+            <ParticipantList
+              tables={JSON.parse(this.getAttribute('tables'))}
+              totalParticipantCount={Number(this.getAttribute('total-participant-count'))}
+              preview={this.getAttribute('preview')}
+              published={this.getAttribute('published') !== null}
+              merged={this.getAttribute('merged') !== null}
+              eventId={Number(this.getAttribute('event-id'))}
+            />,
+            this
+          );
+        });
+      }
+
+      disconnectedCallback() {
+        ReactDOM.unmountComponentAtNode(this);
+      }
+    }
+  );
 })(window);

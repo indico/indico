@@ -15,6 +15,8 @@ Improvements
 - Add caching and rate-limiting (configurable via :data:`LATEX_RATE_LIMIT`, and only applied
   to unauthenticated users) for endpoints that trigger LaTeX PDF generation (:pr:`6526`)
 - Log changes to registration form settings in the event log (:pr:`6544`, thanks :user:`vtran99`)
+- Improve conference participant list, especially when participants from multiple registration
+  forms are shown separately (:issue:`6440`, :pr:`6489`)
 
 Bugfixes
 ^^^^^^^^

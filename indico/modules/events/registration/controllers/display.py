@@ -154,7 +154,7 @@ class ParticipantListMixin:
             columns = [{'text': personal_data.get(column_name, '')} if column_name != 'picture'
                        else {'text': self._get_picture_url(reg, reg.get_personal_data_picture()), 'is_picture': True}
                        for column_name in column_names]
-            return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
+            return {'id': reg.id, 'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
         def _deduplicate_reg_data(reg_data_iter):
             used = set()
@@ -211,7 +211,7 @@ class ParticipantListMixin:
 
             columns = [{'text': _content(column_id, column_id in picture_ids), 'sort_key': _sort_key_date(column_id),
                        'is_picture': column_id in picture_ids} for column_id in column_ids]
-            return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
+            return {'id': reg.id, 'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
         active_fields = {field.id: field for field in regform.active_fields}
         picture_ids = [id for id, field in active_fields.items()
@@ -229,7 +229,9 @@ class ParticipantListMixin:
                  .signal_query('participant-list-publishable-registrations', regform=regform))
         registrations = [_process_registration(reg, column_ids, active_fields, picture_ids) for reg in query
                          if reg.is_publishable(is_participant)]
-        return {'headers': headers,
+
+        return {'id': regform.id,
+                'headers': headers,
                 'rows': registrations,
                 'title': regform.title,
                 'show_checkin': any(registration['checked_in'] for registration in registrations),
@@ -243,7 +245,7 @@ class ParticipantListMixin:
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .signal_query('participant-list-publishable-regforms', event=self.event)
                     .all())
-        if registration_settings.get(self.event, 'merge_registration_forms'):
+        if merged := bool(registration_settings.get(self.event, 'merge_registration_forms')):
             tables = [self._merged_participant_list_table(is_participant)]
         else:
             tables = []
@@ -267,6 +269,7 @@ class ParticipantListMixin:
             self.event,
             preview=self.preview,
             tables=tables,
+            merged=merged,
             published=bool(regforms),
             num_participants=num_participants
         )

@@ -1,0 +1,28 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.participants-count-wrapper {
+  display: flex;
+  gap: 5px;
+}
+
+.accordion-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-weight: bold;
+
+  > p {
+    word-break: break-word;
+    flex-grow: 1;
+    margin-bottom: 0;
+  }
+
+  > span {
+    flex-shrink: 0;
+  }
+}

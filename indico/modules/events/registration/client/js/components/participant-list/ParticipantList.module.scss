@@ -1,0 +1,29 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+:global(.ui.header .content).header-text {
+  display: flex;
+}
+
+.header-text {
+  align-items: center;
+  position: relative;
+
+  > a {
+    position: absolute;
+    transform: translateX(-80%);
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+:global(section .ui.button).view-toggle {
+  margin-bottom: 20px;
+}
