@@ -17,6 +17,7 @@ Improvements
 - Log changes to registration form settings in the event log (:pr:`6544`, thanks :user:`vtran99`)
 - Improve conference participant list, especially when participants from multiple registration
   forms are shown separately (:issue:`6440`, :pr:`6489`)
+- Include information about attached files in JSON export of abstracts (:pr:`6556`)
 
 Bugfixes
 ^^^^^^^^

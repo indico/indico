@@ -284,6 +284,7 @@ class RHAbstractsExportJSON(RHManageAbstractsExportActionsBase):
                                subqueryload('submitted_for_tracks'),
                                subqueryload('reviewed_for_tracks'),
                                subqueryload('person_links'),
+                               subqueryload('files'),
                                subqueryload('reviews').joinedload('ratings').joinedload('question'))
 
     def _process(self):
