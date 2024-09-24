@@ -276,6 +276,9 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         raise NotFound(f'File not found: {path_or_fd}')
     if safe:
         rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
+    if not no_cache:
+        del rv.cache_control.no_cache
+        rv.cache_control.max_age = 86400  # cache content for 24 hours
     # if the request is conditional, then caching shouldn't be disabled
     if not conditional and no_cache:
         del rv.expires
