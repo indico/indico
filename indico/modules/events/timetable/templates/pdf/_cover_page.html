@@ -2,16 +2,18 @@
 
 {% macro render_cover_page(event) %}
     <div class="pagebreak cover">
-        <div>
-            {% if event.logo %}
-                <img alt="Event logo" src="event://logo" style="max-width: 100%;"></img>
-            {% endif %}
-            <h1>{{ event.title }}</h1>
-            <h3>{{ format_event_date(event) }}</h3>
-            {% if event.venue_name %}
-                <h2>{{ event.venue_name }}</h2>
-            {% endif %}
-            <h1>{% trans %}Programme{% endtrans %}</h1>
+        <div class="cover-wrapper">
+            <div>
+                {% if event.logo %}
+                    <img alt="Event logo" src="event://logo" style="max-width: 100%;"></img>
+                {% endif %}
+                <h1>{{ event.title }}</h1>
+                <h3>{{ format_event_date(event) }}</h3>
+                {% if event.venue_name %}
+                    <h2>{{ event.venue_name }}</h2>
+                {% endif %}
+                <h1>{% trans %}Programme{% endtrans %}</h1>
+            </div>
         </div>
     </div>
 {% endmacro %}

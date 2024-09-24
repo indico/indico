@@ -1,6 +1,6 @@
 * {
   box-sizing: border-box;
-  font-family: Lato;
+  /* font-family: Lato; */
   line-height: 1.2em;
 }
 
@@ -8,26 +8,26 @@
   break-after: always;
 }
 
-.timetable-entry {
-  break-inside: avoid;
-  /* border: 1px solid black; */
-}
-
-.timetable-entry > div {
-  padding: 1em;
-}
-
 .cover {
   counter-reset: program-page 7;
-  display: flex;
   min-height: 100vh;
-  border: 1px solid red;
-  flex-direction: column;
-  justify-content: center;
 }
 
-.cover > div {
+.cover > div.cover-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cover > div.cover-wrapper > div {
   text-align: center;
+  width: 100%;
 }
 
 .toc {
@@ -44,6 +44,7 @@
 
 .toc .toc-item {
   list-style: none;
+  margin-top: 0.5em;
 }
 
 .toc > ol > .toc-item {
@@ -60,10 +61,6 @@
 
 .toc .toc-item a {
   text-decoration: none;
-}
-
-.toc .toc-item {
-  margin-top: 0.5em;
 }
 
 #footer {
@@ -93,11 +90,60 @@
   border-collapse: collapse;
 }
 
-table, tr, td {
+table,
+tr,
+td {
   border: none;
 }
 
 .day-program td {
   padding: 0.5em;
   vertical-align: top;
+}
+
+/* Ajob addition */
+
+.session-block {
+  display: flex;
+  padding: 10px;
+  align-items: stretch;
+  border: 1px solid red;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.session-block-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.session-block-title {
+  border: 1px solid blue;
+  flex-grow: 1;
+}
+
+.session-block-content {
+  width: 100%;
+}
+
+.day-title {
+  margin: 40px 0;
+}
+
+.time {
+  margin-right: 10px;
+  border: 1px solid orange;
+  width: 80px;
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.time > .time-divider {
+  width: 4px;
+  flex-grow: 1;
+  background-color: rgba(0, 0, 0, 0.1);
 }

@@ -9,6 +9,7 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 from werkzeug.exceptions import Forbidden, NotFound
+from weasyprint import CSS, HTML
 
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.modules.events.contributions import contribution_settings
@@ -26,7 +27,6 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-from weasyprint import CSS, HTML
 
 
 class RHTimetableProtectionBase(RHDisplayEventBase):
@@ -95,6 +95,8 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
             if request.args.get('download') == '1':
                 pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
                                 pagesize=form.pagesize.data, **additional_params)
+                print('PDFFFF')
+                print(pdf)
                 return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
             else:
                 url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
@@ -110,13 +112,14 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
             from flask import render_template
             from indico.modules.events.timetable.models.entries import TimetableEntry
             from indico.core.db import db
-            from pathlib import Path
 
             days = {}
             for day in self.event.iter_days():
                 entries = (self.event.timetable_entries
-                           .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
-                                           TimetableEntry.parent_id.is_(None))
+                           .filter(
+                               db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
+                               TimetableEntry.parent_id.is_(None)
+                            )
                            .order_by(TimetableEntry.start_dt))
                 days[day] = entries
 
