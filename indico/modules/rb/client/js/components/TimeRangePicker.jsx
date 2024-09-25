@@ -8,309 +8,266 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState, useMemo} from 'react';
 
 import {ComboBox} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
-import {serializeTime, toMoment} from 'indico/utils/date';
+import * as time from 'indico/utils/time';
 
 import './TimeRangePicker.module.scss';
 
-const START_HOUR = '06:00';
-const ALLOWED_INPUT_FORMATS = ['HH:mm', 'HHmm', 'H:mm', 'Hmm'];
-const MIN_DURATION = moment.duration(30, 'minutes');
+// All times in this module are expressed in integer minutes since midnight.
+// This allows us to perform simple arithmetic operations on time values without
+// needing any specialized libraries. The conversion between the integer values
+// and string values are done using the `utils/time.js` module.
 
-function _humanizeDuration(duration) {
-  const minutes = duration.minutes();
-  const hours = Math.round((duration.hours() + minutes / 60) * 10) / 10;
+const TIME_OPTIONS_STEP_SIZE = 30; // minutes
+const DEFAULT_MIN_TIME = 360; // 6:00
+const START_OF_DAY = 0; // 0:00
+const END_OF_DAY = 1439; // 23:59
+
+function humanizeDuration(duration) {
+  const minutes = duration % 60;
+  const hours = Math.floor((duration / 60) * 10) / 10;
   if (hours < 1) {
     return PluralTranslate.string('{time} min', '{time} min', minutes, {time: minutes});
   }
   return PluralTranslate.string('{time} hour', '{time} hours', hours, {time: hours});
 }
 
-function generateStartTimeOptions(minTime) {
-  // The options for the start time is an array of strings.
-  // Even though the minTime is specified, it is capped at
-  // START_HOUR, so options before START_HOUR are not shown
-  // even though they are allowed.
+function getStartTimeOptions(minTime) {
   const options = [];
-  let next = moment.max(moment(START_HOUR, 'HH:mm'), minTime).minute(0);
-  const end = moment().endOf('day');
-  while (next < end) {
-    options.push(serializeTime(next));
-    next = next.add(MIN_DURATION);
+
+  for (
+    let value = minTime ?? DEFAULT_MIN_TIME;
+    value < END_OF_DAY;
+    value += TIME_OPTIONS_STEP_SIZE
+  ) {
+    options.push(time.toString(value));
   }
+
   return options;
 }
 
-function generateEndTimeOptions(start) {
-  // The labels for end time options include a duration
-  // so the option array contains objects with `value` and
-  // `label` properties. The end time options start 30
-  // minutes after the start time.
+function getEndTimeOptions(startTime) {
   const options = [];
-  const end = moment().endOf('day');
-  let next = moment(start)
-    .minute(0)
-    .add(MIN_DURATION);
-  while (next < end) {
-    const duration = _humanizeDuration(moment.duration(next.diff(start)));
-    const value = serializeTime(moment(next));
-    const label = (
-      <div styleName="end-time-item">
-        {value} <span styleName="duration">({duration})</span>
-      </div>
-    );
-    options.push({value, label});
-    next = next.add(MIN_DURATION);
+
+  for (
+    let value = startTime + TIME_OPTIONS_STEP_SIZE;
+    value < END_OF_DAY;
+    value += TIME_OPTIONS_STEP_SIZE
+  ) {
+    const duration = value - startTime;
+    const timeStr = time.toString(value);
+    options.push({
+      value: timeStr,
+      label: (
+        <div styleName="time-with-duration">
+          {timeStr} <span styleName="duration">({humanizeDuration(duration)})</span>
+        </div>
+      ),
+    });
   }
+
   return options;
 }
 
-export default class TimeRangePicker extends React.Component {
-  static propTypes = {
-    startTime: PropTypes.object.isRequired,
-    endTime: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    disabled: PropTypes.bool,
-    minTime: PropTypes.string,
-  };
+export default function TimeRangePickerMomentAdapter({
+  startTime,
+  endTime,
+  minTime,
+  onChange,
+  ...props
+}) {
+  const startTimeStr = startTime?.format('HH:mm');
+  const endTimeStr = endTime?.format('HH:mm');
+  const minTimeStr = minTime?.format('HH:mm') ?? '';
 
-  static defaultProps = {
-    disabled: false,
-    minTime: '00:00',
-  };
+  const handleChange = (start, end) => onChange(moment(start, 'HH:mm'), moment(end, 'HH:mm'));
 
-  constructor(props) {
-    super(props);
+  return (
+    <TimeRangePicker
+      startTime={startTimeStr}
+      endTime={endTimeStr}
+      minTime={minTimeStr}
+      onChange={handleChange}
+      {...props}
+    />
+  );
+}
 
-    const {startTime, endTime, minTime} = this.props;
-    const duration = moment.duration(endTime.diff(startTime));
-    const startInputValue = serializeTime(moment(startTime));
-    const endInputValue = serializeTime(moment(endTime));
+TimeRangePickerMomentAdapter.propTypes = {
+  startTime: PropTypes.object.isRequired,
+  endTime: PropTypes.object.isRequired,
+  minTime: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+};
 
-    // For end of day, we use '23:59' instead of moment#endOf('day')
-    // as the latter cannot be represented by the input value.
-    this.endOfDay = moment('23:59', 'HH:mm');
-    this.minTime = moment(minTime ?? '00:00', 'HH:mm');
+TimeRangePicker.defaultProps = {
+  disabled: false,
+  minTime: moment(time.toString(DEFAULT_MIN_TIME), 'HH:mm'),
+};
 
-    this.state = {
-      startTime,
-      endTime,
-      duration,
-      startInputValue,
-      endInputValue,
-      startTimeOptions: generateStartTimeOptions(this.minTime || START_HOUR),
-      endTimeOptions: generateEndTimeOptions(startTime),
-      promptText: '',
-    };
-  }
+function TimeRangePicker({startTime, endTime, onChange, disabled, minTime}) {
+  const [startInputValue, setStartInputValue] = useState(time.normalize(startTime));
+  const [endInputValue, setEndInputValue] = useState(time.normalize(endTime));
+  const [promptText, setPromptText] = useState('');
+  const startT = time.timeStrToInt(startTime);
+  const endT = time.timeStrToInt(endTime);
+  const minT = time.timeStrToInt(minTime);
+  const duration = endT - startT;
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextState !== this.state || !_.isEqual(this.props, nextProps);
-  }
+  const startTimeOptions = useMemo(() => {
+    return getStartTimeOptions(minT);
+  }, [minT]);
 
-  parseUserInputAsTime = value => {
-    return moment(value, ALLOWED_INPUT_FORMATS, true);
-  };
+  const endTimeOptions = useMemo(() => {
+    return getEndTimeOptions(startT);
+  }, [startT]);
 
-  // Set the new start time from user input
-  updateStartTime = evt => {
-    this.setState({
-      startInputValue: evt.target.value,
-    });
-    const startTime = this.parseUserInputAsTime(evt.target.value);
+  const emitChange = (start, end) => onChange(time.toString(start), time.toString(end));
 
-    if (!startTime.isValid()) {
+  const updateStartTime = evt => {
+    setStartInputValue(evt.target.value);
+
+    const t = time.timeStrToInt(evt.target.value);
+
+    console.log(evt.target.value, t);
+
+    // Ignore invalid inputs
+    if (!t || t < minT) {
       return;
     }
 
-    if (startTime < this.minTime) {
-      return;
-    }
-
-    this.setState({
-      startTime,
-      endTimeOptions: generateEndTimeOptions(startTime),
-      promptText: serializeTime(startTime),
-    });
-
-    const {onChange} = this.props;
-    const {endTime} = this.state;
-    onChange(startTime, endTime);
-  };
-
-  // Set the new end time from user input and optionally nudge the start time
-  updateEndTime = evt => {
-    this.setState({
-      endInputValue: evt.target.value,
-    });
-    const endTime = this.parseUserInputAsTime(evt.target.value);
-
-    if (!endTime.isValid()) {
-      return;
-    }
-
-    this.setState({
-      endTime,
-      promptText: serializeTime(endTime),
-    });
-
-    const {onChange} = this.props;
-    const {startTime} = this.state;
-    onChange(startTime, endTime);
-  };
-
-  // When user leaves the start time field, fix the time formatting
-  // and optionally adjust the end time.
-  fixStartTime = () => {
-    let {startTime} = this.state;
-    const {duration} = this.state;
-
-    // Corner case: start time is EOD, so we need to back off by duration
-    if (startTime.isSame(this.endOfDay, 'minute')) {
-      startTime = moment(startTime).subtract(duration);
-      this.setState({startTime});
-    }
-
-    this.setState({
-      startInputValue: serializeTime(startTime),
-    });
-
-    // Do we need to nudge the end time?
-    let {endTime} = this.state;
-    if (startTime.isSameOrAfter(endTime, 'minute')) {
-      endTime = moment(startTime).add(duration);
-
-      // Corner case: star time + duration goes beyond date boundary, so we cap it off at EOD
-      if (endTime > moment(startTime).endOf('day')) {
-        endTime = this.endOfDay;
+    // When start time is >= end time, move the end time to keep duration
+    if (t >= endT) {
+      const adjustedEndT = Math.min(t + duration, END_OF_DAY);
+      if (adjustedEndT === t) {
+        emitChange(adjustedEndT - duration, adjustedEndT);
+      } else {
+        emitChange(t, adjustedEndT);
       }
-
-      this.setState({
-        endTime,
-        endInputValue: serializeTime(endTime),
-        promptText: Translate.string('end time is adjusted to {endTime}', {
-          endTime: serializeTime(endTime),
-        }),
-        duration: moment.duration(endTime.diff(startTime)),
-      });
-
-      const {onChange} = this.props;
-      onChange(startTime, endTime);
-    } else {
-      this.setState({
-        duration: moment.duration(endTime.diff(startTime)),
-      });
+      return;
     }
+
+    // Happy path
+    emitChange(t, endT);
   };
 
-  // When user leaves the end time field, fix the time formatting,
-  // and optionally adjust the start time.
-  fixEndTime = () => {
-    let {endTime} = this.state;
-    const {duration} = this.state;
+  const updateEndTime = evt => {
+    setEndInputValue(evt.target.value);
 
-    // Corner case: endTime is at minTime, so we need to back it off by duration
-    if (endTime.isSameOrBefore(this.minTime, 'minute')) {
-      endTime = moment(endTime).add(duration);
-      this.setState({endTime});
+    const t = time.timeStrToInt(evt.target.value);
+
+    // Ignore invalid inputs
+    if (!t || t < minTime) {
+      return;
     }
 
-    this.setState({
-      endInputValue: serializeTime(endTime),
-    });
-
-    // Do we need to nudge the start time?
-    let {startTime} = this.state;
-    if (endTime.isSameOrBefore(startTime, 'minute')) {
-      startTime = moment(endTime).subtract(duration);
-
-      // Corner case: start time is before minTime, so we cap it at minTime
-      if (startTime.isBefore(this.minTime, 'minute')) {
-        startTime = moment(this.minTime);
+    // When end time is <= start time, move the start time to maintain the duration
+    if (t <= startT) {
+      const adjustedStartT = Math.max(t - duration, START_OF_DAY);
+      if (adjustedStartT === t) {
+        emitChange(adjustedStartT, adjustedStartT + duration);
+      } else {
+        emitChange(adjustedStartT, t);
       }
+      return;
+    }
 
-      this.setState({
-        startTime,
-        startInputValue: serializeTime(startTime),
-        promptText: Translate.string('start time is adjusted to {startTime}', {
-          startTime: serializeTime(startTime),
-        }),
-      });
+    // Happy path
+    emitChange(startT, t);
+  };
 
-      const {onChange} = this.props;
-      onChange(startTime, endTime);
-    } else {
-      this.setState({
-        duration: moment.duration(endTime.diff(startTime)),
-      });
+  const fixInputValues = () => {
+    const startTimeStr = time.toString(startT);
+    const endTimeStr = time.toString(endT);
+    let fixedStart = false;
+    let fixedEnd = false;
+
+    if (startInputValue !== startTimeStr) {
+      setStartInputValue(startTimeStr);
+      fixedStart = true;
+    }
+
+    if (endInputValue !== endTimeStr) {
+      setEndInputValue(endTimeStr);
+      fixedEnd = true;
+    }
+
+    switch (true) {
+      case fixedStart && fixedEnd:
+        setPromptText(
+          Translate.string('The times have been adjusted to {start} and {end}.', {
+            start: startTimeStr,
+            end: endTimeStr,
+          })
+        );
+        break;
+      case fixedStart:
+        setPromptText(
+          Translate.string('The start time has been adjusted to {start}.', {start: startTimeStr})
+        );
+        break;
+      case fixedEnd:
+        setPromptText(
+          Translate.string('The end time has been adjusted to {end}.', {end: endTimeStr})
+        );
+        break;
     }
   };
 
-  onStartSearchChange = event => {
-    this.setState({
-      startInputValue: event.target.value,
-    });
-  };
+  return (
+    <div styleName="time-range-picker">
+      <ComboBox
+        onChange={updateStartTime}
+        onBlur={fixInputValues}
+        options={startTimeOptions}
+        value={startInputValue}
+        disabled={disabled}
+      />
+      <ComboBox
+        onChange={updateEndTime}
+        onBlur={fixInputValues}
+        options={endTimeOptions}
+        value={endInputValue}
+        disabled={disabled}
+      />
 
-  onEndSearchChange = event => {
-    this.setState({
-      endInputValue: event.target.value,
-    });
-  };
-
-  render() {
-    const {
-      startInputValue,
-      endInputValue,
-      startTimeOptions,
-      endTimeOptions,
-      promptText,
-    } = this.state;
-    const {disabled} = this.props;
-
-    return (
-      <div styleName="time-range-picker">
-        <ComboBox
-          onChange={this.updateStartTime}
-          onBlur={this.fixStartTime}
-          options={startTimeOptions}
-          value={startInputValue}
-          disabled={disabled}
-        />
-        <ComboBox
-          onChange={this.updateEndTime}
-          onBlur={this.fixEndTime}
-          options={endTimeOptions}
-          value={endInputValue}
-          disabled={disabled}
-        />
-
-        <div styleName="prompt" aria-live="polite">
-          {/* Prompt text is used to provide cues to the screen readers
+      <div styleName="prompt" aria-live="polite">
+        {/* Prompt text is used to provide cues to the screen readers
               about how the entered input is going to be interpreted
               by the application. */}
-          {promptText}
-        </div>
+        {promptText}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
+TimeRangePicker.propTypes = {
+  startTime: PropTypes.string.isRequired,
+  endTime: PropTypes.string.isRequired,
+  minTime: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+};
+
+TimeRangePicker.defaultProps = {
+  disabled: false,
+  minTime: DEFAULT_MIN_TIME,
+};
+
 function ValuedTimeRangePicker({value, onChange, ...rest}) {
-  const startTime = toMoment(value.startTime, 'HH:mm');
-  const endTime = toMoment(value.endTime, 'HH:mm');
-  const handleChange = (start, end) => {
-    onChange({
-      startTime: serializeTime(start),
-      endTime: serializeTime(end),
-    });
-  };
+  const handleChange = (startTime, endTime) => onChange({startTime, endTime});
   return (
-    <TimeRangePicker startTime={startTime} endTime={endTime} onChange={handleChange} {...rest} />
+    <TimeRangePicker
+      startTime={value.startTime}
+      endTime={value.endTime}
+      onChange={handleChange}
+      {...rest}
+    />
   );
 }
 
