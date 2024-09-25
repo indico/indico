@@ -8,7 +8,7 @@
 from datetime import timedelta
 from operator import itemgetter
 
-from flask import flash, jsonify, redirect, render_template, request, session
+from flask import flash, jsonify, redirect, render_template, session
 from sqlalchemy.orm import undefer
 from webargs import fields
 from wtforms.validators import ValidationError
@@ -258,14 +258,14 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
 class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
     """Preview registration emails."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.commit = False
-
     @no_autoflush
-    def _process(self):
-        message = request.form.get('text', '')
-        state = RegistrationState.get(request.form.get('state', RegistrationState.pending.name))
+    @use_kwargs({
+        'message': fields.String(load_default=''),
+        'state': fields.String(load_default=RegistrationState.pending.name)
+    })
+    def _process(self, message, state):
+        self.commit = False
+        state = RegistrationState.get(state)
         if state == RegistrationState.pending:
             self.regform.message_pending = message
         elif state == RegistrationState.unpaid:
@@ -273,7 +273,7 @@ class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
         elif state == RegistrationState.complete:
             self.regform.message_complete = message
         else:
-            raise ValidationError(_('Invalid state'))
+            raise ValidationError('Invalid state')
         mock_registration = Registration(state=state, registration_form=self.regform, currency='USD',
                                          email='test@email.com', first_name=_('{FIRST_NAME}'),
                                          last_name=_('{LAST_NAME}'), checked_in=True, friendly_id=-1,

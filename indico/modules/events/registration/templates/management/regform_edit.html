@@ -40,7 +40,7 @@
                     method: 'POST',
                     data: function () {
                         return {
-                            text: $('#message_pending').val(),
+                            message: $('#message_pending').val(),
                             state: 'pending',
                         };
                     }
@@ -50,7 +50,7 @@
                     method: 'POST',
                     data: function () {
                         return {
-                            text: $('#message_unpaid').val(),
+                            message: $('#message_unpaid').val(),
                             state: 'unpaid',
                         };
                     }
@@ -60,7 +60,7 @@
                     method: 'POST',
                     data: function () {
                         return {
-                            text: $('#message_complete').val(),
+                            message: $('#message_complete').val(),
                             state: 'complete',
                         };
                     }
