@@ -58,8 +58,8 @@ class RegistrationFormEditForm(IndicoForm):
     _price_fields = ('currency', 'base_price')
     _registrant_notification_fields = ('notification_sender_address', 'message_pending', 'message_unpaid',
                                        'message_complete', 'attach_ical')
-    _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
-    _special_fields = _price_fields + _registrant_notification_fields + _manager_notification_fields
+    _organizer_notification_fields = ('organizer_notifications_enabled', 'organizer_notification_recipients')
+    _special_fields = _price_fields + _registrant_notification_fields + _organizer_notification_fields
 
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the registration form'))
     introduction = TextAreaField(_('Introduction'),
@@ -113,12 +113,16 @@ class RegistrationFormEditForm(IndicoForm):
         widget=SwitchWidget(),
         description=_('Attach an iCalendar file to the mail sent once a registration is complete')
     )
-    manager_notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
-                                                 description=_('Enable notifications to managers about registrations'))
-    manager_notification_recipients = EmailListField(_('List of recipients'),
-                                                     [HiddenUnless('manager_notifications_enabled',
-                                                                   preserve_data=True), DataRequired()],
-                                                     description=_('Email addresses that will receive notifications'))
+    organizer_notifications_enabled = BooleanField(
+        _('Enabled'),
+        widget=SwitchWidget(),
+        description=_('Enable e-mail notifications about registrations to organizers'),
+    )
+    organizer_notification_recipients = EmailListField(
+        _('List of recipients'),
+        [HiddenUnless('organizer_notifications_enabled', preserve_data=True), DataRequired()],
+        description=_('Email addresses that will receive notifications'),
+    )
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
