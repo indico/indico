@@ -9,6 +9,7 @@ from datetime import timedelta
 from operator import itemgetter
 
 from flask import flash, jsonify, redirect, render_template, session
+from marshmallow import validate
 from sqlalchemy.orm import undefer
 from webargs import fields
 from wtforms.validators import ValidationError
@@ -276,9 +277,9 @@ class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
             case _:
                 raise ValidationError('Invalid state')
         mock_registration = Registration(state=state, registration_form=self.regform, currency='USD',
-                                         email='test@email.com', first_name=_('{FIRST_NAME}'),
-                                         last_name=_('{LAST_NAME}'), checked_in=True, friendly_id=-1,
-                                         event_id=self.event.id, registration_form_id=self.regform.id)
+                                         email='test@email.com', first_name='Peter', last_name='Higgs',
+                                         checked_in=True, friendly_id=-1, event_id=self.event.id,
+                                         registration_form_id=self.regform.id)
         tpl = get_template_module('events/registration/emails/registration_creation_to_registrant.html',
                                   registration=mock_registration, event=self.event, attach_rejection_reason=True,
                                   old_price=None)
