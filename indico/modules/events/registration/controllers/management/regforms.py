@@ -258,22 +258,23 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
 class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
     """Preview registration emails."""
 
-    @no_autoflush
     @use_kwargs({
         'message': fields.String(load_default=''),
-        'state': fields.String(load_default=RegistrationState.pending.name)
+        'state': fields.Enum(RegistrationState, required=True, validate=validate.OneOf(
+            [RegistrationState.pending, RegistrationState.unpaid, RegistrationState.complete]))
     })
+    @no_autoflush
     def _process(self, message, state):
         self.commit = False
-        state = RegistrationState.get(state)
-        if state == RegistrationState.pending:
-            self.regform.message_pending = message
-        elif state == RegistrationState.unpaid:
-            self.regform.message_unpaid = message
-        elif state == RegistrationState.complete:
-            self.regform.message_complete = message
-        else:
-            raise ValidationError('Invalid state')
+        match state:
+            case RegistrationState.pending:
+                self.regform.message_pending = message
+            case RegistrationState.unpaid:
+                self.regform.message_unpaid = message
+            case RegistrationState.complete:
+                self.regform.message_complete = message
+            case _:
+                raise ValidationError('Invalid state')
         mock_registration = Registration(state=state, registration_form=self.regform, currency='USD',
                                          email='test@email.com', first_name=_('{FIRST_NAME}'),
                                          last_name=_('{LAST_NAME}'), checked_in=True, friendly_id=-1,
