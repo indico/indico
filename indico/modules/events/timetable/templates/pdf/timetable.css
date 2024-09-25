@@ -1,7 +1,5 @@
 * {
-  box-sizing: border-box;
-  /* font-family: Lato; */
-  line-height: 1.2em;
+  font-family: Lato;
 }
 
 .pagebreak {
@@ -105,22 +103,44 @@ td {
 
 .session-block {
   display: flex;
-  padding: 10px;
-  align-items: stretch;
   border: 1px solid red;
-  flex-wrap: nowrap;
-  width: 100%;
+  margin-bottom: 10px;
 }
 
 .session-block-wrapper {
-  display: inline-flex;
-  flex-direction: column;
-  width: 100%;
+  flex-grow: 1;
+  border: 1px solid green;
 }
 
 .session-block-title {
+  margin: 0;
   border: 1px solid blue;
-  flex-grow: 1;
+  padding: 10px;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.session-block-title > h3 {
+  margin: 0;
+}
+
+.session-block-title-info {
+  display: flex;
+  font-size: 0.8em;
+}
+
+.session-block-title-info > * {
+  margin: 0;
+}
+
+.session-block-title-info > *:not(:last-child)::after {
+  content: '|';
+  opacity: 0.5;
+  margin: 0 5px;
+}
+
+.session-block-title > h2 {
+  margin: 0;
 }
 
 .session-block-content {
@@ -135,15 +155,58 @@ td {
   margin-right: 10px;
   border: 1px solid orange;
   width: 80px;
-  gap: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
   color: rgba(0, 0, 0, 0.6);
 }
 
+.time > div:first-child {
+  padding-bottom: 5px;
+}
+
+.time > div:last-child {
+  padding-top: 5px;
+}
+
 .time > .time-divider {
   width: 4px;
   flex-grow: 1;
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+.contrib-timeline {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 10px;
+  border: 1px solid pink;
+}
+
+.contrib-timeline > li {
+  margin: 0;
+  padding: 0;
+}
+
+.contrib-timeline > li:not(:last-child) {
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.contrib-timeline > li > h4 {
+  margin: 0;
+}
+
+.contrib-timeline > li > h4 > .contrib-timeline-time {
+  text-align: center;
+  padding: 4px 8px 4px 12px;
+  font-size: 0.8em;
+  border-radius: 100px;
+  font-weight: normal;
+  margin-right: 10px;
+}
+
+.contrib-timeline > li > .contrib-timeline-content {
+  padding: 10px;
 }
