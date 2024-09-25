@@ -34,6 +34,8 @@ _bp.add_url_rule('/manage/registration/participant-list-preview', 'manage_partic
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit', 'edit_regform', regforms.RHRegistrationFormEdit,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/notification-preview', 'notification_preview',
+                 regforms.RHRegistrationFormNotificationPreview, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete', 'delete_regform', regforms.RHRegistrationFormDelete,
                  methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/open', 'open_regform', regforms.RHRegistrationFormOpen,

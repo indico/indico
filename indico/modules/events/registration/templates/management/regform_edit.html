@@ -29,4 +29,43 @@
             {% trans %}Back{% endtrans %}
         </a>
     {% endcall %}
+
+    {% if regform %}
+        <script>
+            (function () {
+                'use strict';
+
+                $('#message-pending-preview').attr('data-href', '{{ url_for('.notification_preview', regform) }}').ajaxDialog({
+                    title: $T('Pending Registration Preview'),
+                    method: 'POST',
+                    data: function () {
+                        return {
+                            text: $('#message_pending').val(),
+                            state: 'pending',
+                        };
+                    }
+                });
+                $('#message-unpaid-preview').attr('data-href', '{{ url_for('.notification_preview', regform) }}').ajaxDialog({
+                    title: $T('Unpaid Registration Preview'),
+                    method: 'POST',
+                    data: function () {
+                        return {
+                            text: $('#message_unpaid').val(),
+                            state: 'unpaid',
+                        };
+                    }
+                });
+                $('#message-complete-preview').attr('data-href', '{{ url_for('.notification_preview', regform) }}').ajaxDialog({
+                    title: $T('Complete Registration Preview'),
+                    method: 'POST',
+                    data: function () {
+                        return {
+                            text: $('#message_complete').val(),
+                            state: 'complete',
+                        };
+                    }
+                });
+            })();
+        </script>
+    {% endif %}
 {% endblock %}
