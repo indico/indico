@@ -32,7 +32,7 @@
                 <section
                     id="entry-{{ entry.id }}"
                     class="session-block-title {{'pagebreak' if new_page_per_session else ''}}"
-                    style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};"
+                    style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }}; {{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
                 >
                     <h3>
                         {% if session.title and session_block.title %}
@@ -42,16 +42,15 @@
                         {% endif %}
                     </h3>
                     <div class="session-block-title-info">
-                        {% if entry.object.room_name %}
-                            <p>{{ render_place(entry) }}</p>
-                        {% endif %}
+                        <p><b>{% trans %}Session{% endtrans %}</b></p>
                         {% if conveners %}
                             <p>
                                 <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
                                 {{ conveners_names|join(', ') }}
                             </p>
-                        {% else %}
-                            <p>No convener</p>
+                        {% endif %}
+                        {% if entry.object.room_name %}
+                            <p>{{ render_place(entry) }}</p>
                         {% endif %}
                     </div>
                 </section>
@@ -59,7 +58,7 @@
                     <div class="session-block-content">
                         <ul class="contrib-timeline">
                                 {% for child in entry.children %}
-                                    <li>
+                                    <li style="border-color: #{{ session.colors.background }};">
                                         <h4>
                                             <span class="contrib-timeline-time" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
                                                 {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
@@ -68,9 +67,9 @@
                                         </h4>
                                         <div class="contrib-timeline-content">
                                             {% if child.type == 2 and show_contribs %}
-                                                {{ render_contrib(child) }}
+                                                {{ render_nested_contrib(child) }}
                                             {% else %}
-                                                {{ child.object.title}}
+                                                {{ child.object }}
                                             {% endif %}
                                         </div>
                                     </li>
@@ -82,20 +81,44 @@
         </section>
 {% endmacro %}
 
+{% macro render_nested_contrib(entry) %}
+    {% set contrib = entry.object %}
+    {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+    {% if speakers %}
+        <p>
+            <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b><br />
+            {{ speakers|join(', ') }}
+        </p>
+    {% endif %}
+    {% if contrib.description %}
+        <div class="description">
+            <b>{% trans %}Description{% endtrans %}</b>
+            {# Description can be markdown #}
+            <div>
+                {{ contrib.description }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
 {% macro render_contrib(entry) %}
     {% set contrib = entry.object %}
     {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
-    <section class="session-block">
+    <section class="session-block contribution">
         {{ render_time(entry) }}
         <div class="session-block-wrapper">
-            <div class="session-block-title" id="entry-{{ entry.id }}"> {# style="background-color: #{{ entry.colors.background }}; color: #{{ entry.colors.text }};"> #}
+            <div
+                id="entry-{{ entry.id }}"
+                class="session-block-title"
+            >
                 <h3>{{ contrib.title }}</h3>
                 <div class="session-block-title-info">
+                    <p><b>{% trans %}Contribution{% endtrans %}</b></p>
                     {% if speakers %}
                         <p>
                             <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}:</b>
                             {{ speakers|join('; ') }}</b>
-                        </div>
+                        </p>
                     {% else %}
                         <p>No convener</p>
                     {% endif %}
@@ -112,6 +135,9 @@
         <div class="session-block-wrapper">
             <div class="session-block-title" id="entry-{{ entry.id }}" style="background-color: #{{ break.colors.background }}; color: #{{ break.colors.text }};">
                 <h3>{{ break.title }}</h3>
+                <div class="session-block-title-info">
+                    <p><b>{% trans %}Break{% endtrans %}</b></p>
+                </div>
             </div>
         </div>
     </section>
