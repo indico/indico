@@ -103,18 +103,23 @@ td {
 
 .session-block {
   display: flex;
-  border: 1px solid red;
+  /* border: 1px solid red; */
   margin-bottom: 10px;
+}
+
+.session-block.contribution .session-block-title {
+  background-color: rgb(175, 69, 113); /* TODO: Replace with contrib color */
+  color: white;
 }
 
 .session-block-wrapper {
   flex-grow: 1;
-  border: 1px solid green;
+  /* border: 1px solid green; */
 }
 
 .session-block-title {
   margin: 0;
-  border: 1px solid blue;
+  /* border: 1px solid blue; */
   padding: 10px;
   border-radius: 5px;
   flex-grow: 1;
@@ -155,8 +160,9 @@ td {
 
 .time {
   margin-right: 10px;
-  border: 1px solid orange;
+  /* border: 1px solid orange; */
   width: 80px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -179,21 +185,21 @@ td {
 
 .contrib-timeline {
   margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   list-style-type: none;
-  padding: 10px;
-  border: 1px solid pink;
 }
 
 .contrib-timeline > li {
   margin: 0;
-  padding: 0;
+  padding: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top: 0;
 }
 
-.contrib-timeline > li:not(:last-child) {
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+.contrib-timeline > li:last-child {
+  border-radius: 0 0 3px 3px;
 }
 
 .contrib-timeline > li > h4 {
@@ -211,4 +217,35 @@ td {
 
 .contrib-timeline > li > .contrib-timeline-content {
   padding: 10px;
+}
+
+.contrib-timeline-content {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-size: 0.8em;
+}
+
+.contrib-timeline-content > * {
+  margin: 0;
+}
+
+.contrib-timeline-content > :is(p, div) b {
+  line-height: 2em;
+}
+
+.contrib-timeline-content > :is(p, div):not(:last-child) {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.contrib-timeline-content .description {
+  padding-bottom: 5px;
+}
+
+.contrib-timeline-content .description > *:last-child {
+  margin: 0;
+  padding: 0 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
 }
