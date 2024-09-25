@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tomllib
 from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
@@ -21,9 +22,8 @@ import click
 from babel.messages import frontend
 from babel.messages.pofile import read_po
 from flask.helpers import get_root_path
-from setuptools import find_packages
-from setuptools.dist import Distribution
 
+import indico
 from indico.util.console import cformat
 
 
@@ -39,53 +39,59 @@ MESSAGES_JS_POT = os.path.join(TRANSLATIONS_DIR, 'messages-js.pot')
 MESSAGES_REACT_POT = os.path.join(TRANSLATIONS_DIR, 'messages-react.pot')
 
 DEFAULT_OPTIONS = {
-    'init_catalog': {
+    'InitCatalog': {
         'input_file': MESSAGES_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages'
     },
-    'extract_messages': {
+    'ExtractMessages': {
         'keywords': 'L_',
-        'width': '120',
+        'width': 120,
         'output_file': MESSAGES_POT,
-        'mapping_file': 'babel.cfg'
+        'mapping_file': 'babel.cfg',
+        'input_paths': ['indico'],
+        'project': 'Indico',
+        'version': indico.__version__,
     },
-    'compile_catalog': {
+    'CompileCatalog': {
         'domain': 'messages',
         'directory': TRANSLATIONS_DIR
     },
-    'update_catalog': {
+    'UpdateCatalog': {
         'input_file': MESSAGES_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages'
     },
 
     # JavaScript
-    'init_catalog_js': {
+    'InitCatalog_js': {
         'input_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-js'
     },
-    'extract_messages_js': {
+    'ExtractMessages_js': {
         'keywords': '$T gettext ngettext:1,2 pgettext:1c,2 npgettext:1c,2,3',
-        'width': '120',
+        'width': 120,
         'output_file': MESSAGES_JS_POT,
         'mapping_file': 'babel-js.cfg',
-        'no_default_keywords': '1'
+        'no_default_keywords': True,
+        'input_paths': ['indico'],
+        'project': 'Indico',
+        'version': indico.__version__,
     },
-    'update_catalog_js': {
+    'UpdateCatalog_js': {
         'input_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-js'
     },
 
     # JavaScript / React
-    'init_catalog_react': {
+    'InitCatalog_react': {
         'input_file': MESSAGES_REACT_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-react'
     },
-    'update_catalog_react': {
+    'UpdateCatalog_react': {
         'input_file': MESSAGES_REACT_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-react'
@@ -94,46 +100,57 @@ DEFAULT_OPTIONS = {
 
 
 def _get_plugin_options(cmd_name, plugin_dir):
+    pyproject = tomllib.loads((Path(plugin_dir) / 'pyproject.toml').read_text())
+    plugin_name = pyproject['project']['name']
+    plugin_version = pyproject['project']['version']
+    packages = [x.parent.name for x in Path(plugin_dir).glob('*/__init__.py')]
+    assert len(packages) == 1
     return {
-        'init_catalog': {
+        'InitCatalog': {
             'input_file': _get_messages_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
-        'extract_messages': {
+        'ExtractMessages': {
             'output_file': _get_messages_pot(plugin_dir),
-            'mapping_file': 'babel.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel.cfg')) else '../babel.cfg'
+            'mapping_file': 'babel.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel.cfg')) else '../babel.cfg',
+            'input_paths': packages,  # relative to the plugin_dir
+            'project': plugin_name,
+            'version': plugin_version,
         },
-        'compile_catalog': {
+        'CompileCatalog': {
             'directory': _get_translations_dir(plugin_dir),
             'use_fuzzy': True,
         },
-        'update_catalog': {
+        'UpdateCatalog': {
             'input_file': _get_messages_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
 
         # JavaScript
-        'init_catalog_js': {
+        'InitCatalog_js': {
             'input_file': _get_messages_js_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
-        'extract_messages_js': {
+        'ExtractMessages_js': {
             'keywords': '$t gettext ngettext:1,2 pgettext:1c,2 npgettext:1c,2,3',
             'output_file': _get_messages_js_pot(plugin_dir),
             'mapping_file': 'babel-js.cfg' if os.path.isfile(os.path.join(plugin_dir, 'babel-js.cfg'))
-                            else '../babel-js.cfg'
+                            else '../babel-js.cfg',
+            'input_paths': packages,  # relative to the plugin_dir
+            'project': plugin_name,
+            'version': plugin_version,
         },
-        'update_catalog_js': {
+        'UpdateCatalog_js': {
             'input_file': _get_messages_js_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
 
         # JavaScript / React
-        'init_catalog_react': {
+        'InitCatalog_react': {
             'input_file': _get_messages_react_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
-        'update_catalog_react': {
+        'UpdateCatalog_react': {
             'input_file': _get_messages_react_pot(plugin_dir),
             'output_dir': _get_translations_dir(plugin_dir),
         },
@@ -211,38 +228,14 @@ def find_indico_packages(path, prefix=''):
             yield name
 
 
-def _get_indico_distribution():
-    import indico
-
-    return Distribution({
-        'name': 'indico',
-        'version': indico.__version__,
-        'packages': list(find_indico_packages(indico.__path__, indico.__name__))
-    })
-
-
-def _get_plugin_distribution(plugin_dir):
-    packages = [x for x in find_packages(plugin_dir) if '.' not in x]
-    assert len(packages) == 1
-    return Distribution({
-        'name': packages[0],
-        'packages': packages
-    })
-
-
-def wrap_distutils_command(command_class, plugin_dir=None):
+def wrap_babel_command(command_class):
     @wraps(command_class)
     def _wrapper(**kwargs):
-
-        dist = _get_plugin_distribution(plugin_dir) if plugin_dir else _get_indico_distribution()
-        command = command_class(dist)
-
+        command = command_class()
         for key, val in kwargs.items():
             setattr(command, key, val)
-
         command.finalize_options()
         command.run()
-
     return _wrapper
 
 
@@ -253,7 +246,7 @@ def _run_command(cmd_name, extra=None):
         options.update(extra)
     if plugin_dir := options.get('plugin_dir'):
         options.update(_get_plugin_options(cmd_name, plugin_dir))
-    cmd = wrap_distutils_command(cmd_class, plugin_dir=plugin_dir)
+    cmd = wrap_babel_command(cmd_class)
     cmd(**options)
 
 
@@ -300,10 +293,10 @@ def compile_catalog_react(directory=INDICO_DIR, locale=''):
 
 def extract_messages_react(directory=INDICO_DIR):
     """Extract messages for react."""
-    if directory is INDICO_DIR:
+    if directory == INDICO_DIR:
         paths = [os.path.join('indico', 'web', 'client'), os.path.join('indico', 'modules')]
     else:
-        packages = [x for x in find_packages(directory) if '.' not in x]
+        packages = [x.parent.name for x in Path(directory).glob('*/__init__.py')]
         assert len(packages) == 1
         client_path = os.path.join(directory, packages[0], 'client')
         module_path = os.path.join(directory, packages[0], 'modules')
@@ -315,8 +308,10 @@ def extract_messages_react(directory=INDICO_DIR):
         if not paths:
             return
     with _chdir(INDICO_DIR):
-        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', '--ext', 'js,jsx,ts,tsx', *paths],
-                                         env=dict(os.environ, FORCE_COLOR='1'))
+        output = subprocess.check_output(
+            ['npx', 'react-jsx-i18n', 'extract', '--ext', 'js,jsx,ts,tsx', '--base', directory, *paths],
+            env=dict(os.environ, FORCE_COLOR='1')
+        )
     _get_messages_react_pot(directory).write_bytes(output)
 
 
@@ -383,15 +378,15 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
         if javascript:
             _run_command(f'{babel_cmd}_js', extra=extra)
         if react:
-            if babel_cmd == 'compile_catalog':
+            if babel_cmd == 'CompileCatalog':
                 compile_catalog_react(locale=extra.get('locale'))
-            elif babel_cmd == 'extract_messages':
+            elif babel_cmd == 'ExtractMessages':
                 extract_messages_react()
             else:
                 _run_command(f'{babel_cmd}_react', extra=extra)
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
-    if babel_cmd == 'extract_messages':
+    if babel_cmd == 'ExtractMessages':
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
 
 
@@ -415,15 +410,15 @@ def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plug
             if javascript:
                 _run_command(f'{babel_cmd}_js', extra=extra)
             if react:
-                if babel_cmd == 'compile_catalog':
+                if babel_cmd == 'CompileCatalog':
                     compile_catalog_react(plugin_dir, locale=extra.get('locale'))
-                elif babel_cmd == 'extract_messages':
+                elif babel_cmd == 'ExtractMessages':
                     extract_messages_react(plugin_dir)
                 else:
                     _run_command(f'{babel_cmd}_react', extra=extra)
         except Exception as err:
             click.secho(f'Error running {babel_cmd} for {plugin_dir} - {err}', fg='red', bold=True, err=True)
-        if babel_cmd == 'extract_messages':
+        if babel_cmd == 'ExtractMessages':
             remove_empty_pot_files(plugin_dir, python=python, javascript=javascript, react=react)
 
 
@@ -439,7 +434,7 @@ def _command(**kwargs):
 
     if not (python or react or javascript):
         python = react = javascript = True
-        if babel_cmd == 'compile_catalog':
+        if babel_cmd == 'CompileCatalog':
             javascript = False
 
     if plugin_dir:
@@ -461,25 +456,20 @@ def _make_command(group, cmd_name, babel_cmd, **kwargs):
     return cmd_group(wrapper)
 
 
-_make_command(compile_catalog, 'indico', 'compile_catalog', require_js=False)
-_make_command(extract_messages, 'indico', 'extract_messages', require_locale=None)
-_make_command(update_catalog, 'indico', 'update_catalog')
-_make_command(init_catalog, 'indico', 'init_catalog', require_locale=True)
+_make_command(compile_catalog, 'indico', 'CompileCatalog', require_js=False)
+_make_command(extract_messages, 'indico', 'ExtractMessages', require_locale=None)
+_make_command(update_catalog, 'indico', 'UpdateCatalog')
+_make_command(init_catalog, 'indico', 'InitCatalog', require_locale=True)
 
-_make_command(compile_catalog, 'plugin', 'compile_catalog', require_js=False,
-              plugin=True)
-_make_command(extract_messages, 'plugin', 'extract_messages', plugin=True, require_locale=None)
-_make_command(update_catalog, 'plugin', 'update_catalog', plugin=True)
-_make_command(init_catalog, 'plugin', 'init_catalog', require_locale=True,
-              plugin=True)
+_make_command(compile_catalog, 'plugin', 'CompileCatalog', require_js=False, plugin=True)
+_make_command(extract_messages, 'plugin', 'ExtractMessages', plugin=True, require_locale=None)
+_make_command(update_catalog, 'plugin', 'UpdateCatalog', plugin=True)
+_make_command(init_catalog, 'plugin', 'InitCatalog', require_locale=True, plugin=True)
 
-_make_command(compile_catalog, 'all-plugins', 'compile_catalog', require_js=False,
-              all_plugins=True)
-_make_command(extract_messages, 'all-plugins', 'extract_messages', all_plugins=True,
-              require_locale=None)
-_make_command(update_catalog, 'all-plugins', 'update_catalog', all_plugins=True)
-_make_command(init_catalog, 'all-plugins', 'init_catalog', require_locale=True,
-              all_plugins=True)
+_make_command(compile_catalog, 'all-plugins', 'CompileCatalog', require_js=False, all_plugins=True)
+_make_command(extract_messages, 'all-plugins', 'ExtractMessages', all_plugins=True, require_locale=None)
+_make_command(update_catalog, 'all-plugins', 'UpdateCatalog', all_plugins=True)
+_make_command(init_catalog, 'all-plugins', 'InitCatalog', require_locale=True, all_plugins=True)
 
 
 @cli.group('push', short_help='Push .pot files to transifex for indico and indico plugins.')
