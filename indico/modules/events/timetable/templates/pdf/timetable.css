@@ -117,6 +117,8 @@ td {
   border: 1px solid blue;
   padding: 10px;
   border-radius: 5px;
+  flex-grow: 1;
+  min-height: 62px;
   box-sizing: border-box;
 }
 

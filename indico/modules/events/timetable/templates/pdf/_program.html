@@ -67,14 +67,11 @@
                                             {{ child.object.title }}
                                         </h4>
                                         <div class="contrib-timeline-content">
-                                            <div>{{ child.object.title }}</div>
-                                            <div>
-
-                                                <i class="icon-info" data-qtip-oldtitle="These settings can be changed in the indico.conf file on the server."></i>
-                                                {% if child.type == 2 and show_contribs %}
-                                                    {{ render_contrib(child) }}
-                                                {% endif %}
-                                            </div>
+                                            {% if child.type == 2 and show_contribs %}
+                                                {{ render_contrib(child) }}
+                                            {% else %}
+                                                {{ child.object.title}}
+                                            {% endif %}
                                         </div>
                                     </li>
                                 {% endfor %}
@@ -88,22 +85,24 @@
 {% macro render_contrib(entry) %}
     {% set contrib = entry.object %}
     {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
-    <tr class="timetable-entry" id="entry-{{ entry.id }}">
-        {# <td class="time-and-place">
-            <div>{{ render_time(entry) }}</div>
-            <div>{{ render_place(entry) }}</div>
-        </td> #}
-        <td class="contrib content">
-            <div style="font-size: 1.1em;">
-                {{ contrib.title }}
-            </div>
-            {% if speakers %}
-                <div style="padding-left: 1em;">
-                    {{ ngettext('Speaker', 'Speakers', speakers|length)}}: <b>{{ speakers|join('; ') }}</b>
+    <section class="session-block">
+        {{ render_time(entry) }}
+        <div class="session-block-wrapper">
+            <div class="session-block-title" id="entry-{{ entry.id }}"> {# style="background-color: #{{ entry.colors.background }}; color: #{{ entry.colors.text }};"> #}
+                <h3>{{ contrib.title }}</h3>
+                <div class="session-block-title-info">
+                    {% if speakers %}
+                        <p>
+                            <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}:</b>
+                            {{ speakers|join('; ') }}</b>
+                        </div>
+                    {% else %}
+                        <p>No convener</p>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </td>
-    </tr>
+            </div>
+        </div>
+    </section>
 {% endmacro %}
 
 {% macro render_break(entry) %}
