@@ -73,7 +73,7 @@ class RHCategoryIcon(RHDisplayCategoryBase):
             raise NotFound
         metadata = self.category.icon_metadata
         return send_file(metadata['filename'], BytesIO(self.category.icon), mimetype=metadata['content_type'],
-                         conditional=True)
+                         conditional=True, no_cache=False)
 
 
 class RHCategoryLogo(RHDisplayCategoryBase):
@@ -84,7 +84,7 @@ class RHCategoryLogo(RHDisplayCategoryBase):
             raise NotFound
         metadata = self.category.logo_metadata
         return send_file(metadata['filename'], BytesIO(self.category.logo), mimetype=metadata['content_type'],
-                         conditional=True)
+                         conditional=True, no_cache=False)
 
 
 class RHCategoryStatisticsJSON(RHDisplayCategoryBase):
