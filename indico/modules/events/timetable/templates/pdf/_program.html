@@ -8,7 +8,7 @@
                 {% if entry.type == 1 %}
                     {{ render_session_block(entry, show_affiliation, show_contribs, show_title, new_page_per_session) }}
                 {% elif entry.type == 2 and show_contribs %}
-                    {{ render_contrib(entry) }}
+                    {{ render_contrib(entry, show_affiliation) }}
                 {% elif entry.type == 3 and show_breaks %}
                     {{ render_break(entry) }}
                 {% endif %}
@@ -21,69 +21,79 @@
     {% set session_block = entry.object %}
     {% set session = session_block.session %}
     {% set conveners = session_block.person_links %}
-    {% set conveners_names = conveners|map(attribute='full_name')|list %}
     {% set contributions = session_block.contributions %}
-        {% if new_page_per_session %}
-            <div class="pagebreak"></div>
-        {% endif %}
-        <section class="session-block">
-            {{ render_time(entry) }}
-            <div class="session-block-wrapper">
-                <section
-                    id="entry-{{ entry.id }}"
-                    class="session-block-title {{'pagebreak' if new_page_per_session else ''}}"
-                    style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }}; {{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
-                >
-                    <h3>
-                        {% if session.title and session_block.title %}
-                            {{ session.title }}: {{ session_block.title }}
-                        {% else %}
-                            {{ session_block.title or session.title }}
-                        {% endif %}
-                    </h3>
-                    <div class="session-block-title-info">
-                        <p><b>{% trans %}Session{% endtrans %}</b></p>
-                        {% if conveners %}
-                            <p>
-                                <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
-                                {{ conveners_names|join(', ') }}
-                            </p>
-                        {% endif %}
-                        {% if entry.object.room_name %}
-                            <p>{{ render_place(entry) }}</p>
-                        {% endif %}
-                    </div>
-                </section>
-                {% if entry.children %}
-                    <div class="session-block-content">
-                        <ul class="contrib-timeline">
-                                {% for child in entry.children %}
-                                    <li style="border-color: #{{ session.colors.background }};">
-                                        <h4>
-                                            <span class="contrib-timeline-time" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
-                                                {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
-                                            </span>
-                                            {{ child.object.title }}
-                                        </h4>
-                                        <div class="contrib-timeline-content">
-                                            {% if child.type == 2 and show_contribs %}
-                                                {{ render_nested_contrib(child) }}
-                                            {% else %}
-                                                {{ child.object }}
-                                            {% endif %}
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-            </div>
-        </section>
+
+    {% if show_affiliation %}
+        {% set conveners_names = conveners|map(attribute='full_name_affiliation')|list %}
+    {% else %}
+        {% set conveners_names = conveners|map(attribute='full_name')|list %}
+    {% endif %}
+
+    {% if new_page_per_session %}
+        <div class="pagebreak"></div>
+    {% endif %}
+    <section class="session-block">
+        {{ render_time(entry) }}
+        <div class="session-block-wrapper">
+            <section
+                id="entry-{{ entry.id }}"
+                class="session-block-title {{'pagebreak' if new_page_per_session else ''}}"
+                style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }}; {{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
+            >
+                <h3>
+                    {% if session.title and session_block.title %}
+                        {{ session.title }}: {{ session_block.title }}
+                    {% else %}
+                        {{ session_block.title or session.title }}
+                    {% endif %}
+                </h3>
+                <div class="session-block-title-info">
+                    <p><b>{% trans %}Session{% endtrans %}</b></p>
+                    {% if conveners %}
+                        <p>
+                            <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
+                            {{ conveners_names|join(', ') }}
+                        </p>
+                    {% endif %}
+                    {% if entry.object.room_name %}
+                        <p>{{ render_place(entry) }}</p>
+                    {% endif %}
+                </div>
+            </section>
+            {% if entry.children %}
+                <div class="session-block-content">
+                    <ul class="contrib-timeline">
+                        {% for child in entry.children %}
+                            <li style="border-color: #{{ session.colors.background }};">
+                                <h4>
+                                    <span class="contrib-timeline-time" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
+                                        {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
+                                    </span>
+                                    {{ child.object.title }}
+                                </h4>
+                                {% if child.type == 2 and show_contribs %}
+                                    <div class="contrib-timeline-content">
+                                        {{ render_nested_contrib(child, show_affiliation) }}
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endmacro %}
 
-{% macro render_nested_contrib(entry) %}
+{% macro render_nested_contrib(entry, show_affiliation) %}
     {% set contrib = entry.object %}
-    {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+
+    {% if show_affiliation %}
+        {% set speakers = contrib.speakers|map(attribute='full_name_affiliation')|list %}
+    {% else %}
+        {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+    {% endif %}
+
     {% if speakers %}
         <p>
             <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b><br />
@@ -101,9 +111,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_contrib(entry) %}
+{% macro render_contrib(entry, show_affiliation) %}
     {% set contrib = entry.object %}
-    {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+
+    {% if show_affiliation %}
+        {% set speakers = contrib.speakers|map(attribute='full_name_affiliation')|list %}
+    {% else %}
+        {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
+    {% endif %}
+
     <section class="session-block contribution">
         {{ render_time(entry) }}
         <div class="session-block-wrapper">
@@ -116,11 +132,11 @@
                     <p><b>{% trans %}Contribution{% endtrans %}</b></p>
                     {% if speakers %}
                         <p>
-                            <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}:</b>
+                            <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b>
                             {{ speakers|join('; ') }}</b>
                         </p>
                     {% else %}
-                        <p>No convener</p>
+                        <p>{% trans %}No convener{% endtrans %}</p>
                     {% endif %}
                 </div>
             </div>
