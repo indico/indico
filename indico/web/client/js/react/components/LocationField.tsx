@@ -7,7 +7,6 @@
 
 import locationsURL from 'indico-url:event_management.api_locations';
 
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Dropdown, Form, Icon, Popup} from 'semantic-ui-react';
 
@@ -17,7 +16,13 @@ import {Translate} from 'indico/react/i18n';
 
 import './LocationField.module.scss';
 
-const processLocations = (locations, value) => {
+interface LocationType {
+  id: number;
+  name: string;
+  rooms: {id: number; fullName: string}[];
+}
+
+const processLocations = (locations: LocationType[], value) => {
   if (!locations.length) {
     return [[], []];
   }
@@ -54,7 +59,38 @@ const processLocations = (locations, value) => {
   return [venues, rooms];
 };
 
-export default function LocationField({value, onChange, disabled, required, editAddress, parent}) {
+interface LocationFieldProps {
+  disabled?: boolean;
+  required?: boolean;
+  editAddress?: boolean;
+  parent?: {
+    title: string;
+    type: string;
+    location_data?: {
+      venue_id: number;
+      venue_name: string;
+      room_id: number;
+      room_name: string;
+      address: string;
+    };
+  };
+}
+
+interface LocationValueType {
+  venue_id: number;
+  venue_name: string;
+  room_id: number;
+  room_name: string;
+  address: string;
+  use_default: boolean;
+}
+
+interface LocationFieldComponentProps extends LocationFieldProps {
+  value: LocationValueType;
+  onChange: (value: LocationValueType) => void;
+}
+
+export default function LocationField({value, onChange, disabled = false, required = false, editAddress = true, parent = null}: LocationFieldComponentProps) {
   const {data, loading} = useIndicoAxios(locationsURL(), {camelize: true});
   const locationsEnabled = data?.enabled || false;
   const locations = data?.locations || [];
@@ -196,43 +232,10 @@ export default function LocationField({value, onChange, disabled, required, edit
   );
 }
 
-LocationField.propTypes = {
-  value: PropTypes.shape({
-    venue_id: PropTypes.number,
-    venue_name: PropTypes.string,
-    room_id: PropTypes.number,
-    room_name: PropTypes.string,
-    address: PropTypes.string,
-    use_default: PropTypes.bool,
-  }).isRequired,
-  onChange: PropTypes.func.isRequired,
-  disabled: PropTypes.bool,
-  required: PropTypes.bool,
-  editAddress: PropTypes.bool,
-  parent: PropTypes.shape({
-    title: PropTypes.string,
-    type: PropTypes.string,
-    location_data: PropTypes.shape({
-      venue_id: PropTypes.number,
-      venue_name: PropTypes.string,
-      room_id: PropTypes.number,
-      room_name: PropTypes.string,
-      address: PropTypes.string,
-    }),
-  }),
-};
-
-LocationField.defaultProps = {
-  disabled: false,
-  required: false,
-  editAddress: true,
-  parent: null,
-};
-
-export function FinalLocationField({name, ...rest}) {
-  return <FinalField name={name} component={LocationField} {...rest} />;
+interface FinalLocationFieldProps extends LocationFieldProps {
+  name: string;
 }
 
-FinalLocationField.propTypes = {
-  name: PropTypes.string.isRequired,
-};
+export function FinalLocationField({name, ...rest}: FinalLocationFieldProps) {
+  return <FinalField name={name} component={LocationField} {...rest} />;
+}

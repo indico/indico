@@ -6,13 +6,25 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from '../forms';
+
+interface TagListFieldProps {
+  disabled: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
+  isValid?: (value: string) => boolean;
+  searchInputProps?: object;
+}
+
+export interface TagListFieldComponentProps extends TagListFieldProps {
+  value: string[];
+  onChange: (value: string[]) => void;
+}
 
 /**
  * A field that lets the user add tags or keywords
@@ -23,10 +35,10 @@ function TagListField({
   onChange,
   onFocus,
   onBlur,
-  isValid,
-  searchInputProps,
+  isValid = v => !!v.trim(),
+  searchInputProps = {},
   ...rest
-}) {
+}: TagListFieldComponentProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const options = value.filter(isValid).map(x => ({text: x, value: x}));
 
@@ -93,24 +105,13 @@ function TagListField({
   );
 }
 
-TagListField.propTypes = {
-  value: PropTypes.arrayOf(PropTypes.string).isRequired,
-  disabled: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
-  onBlur: PropTypes.func.isRequired,
-  isValid: PropTypes.func,
-  searchInputProps: PropTypes.object,
-};
-
-TagListField.defaultProps = {
-  isValid: value => !!value.trim(),
-  searchInputProps: {},
-};
-
 export default React.memo(TagListField);
 
-export function FinalTagList({name, ...rest}) {
+export interface FinalTagListProps extends TagListFieldProps {
+  name: string;
+}
+
+export function FinalTagList({name, ...rest}: FinalTagListProps) {
   return (
     <FinalField
       name={name}
@@ -123,7 +124,3 @@ export function FinalTagList({name, ...rest}) {
     />
   );
 }
-
-FinalTagList.propTypes = {
-  name: PropTypes.string.isRequired,
-};
