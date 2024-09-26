@@ -19,3 +19,17 @@ declare namespace React {
     styleName?: string;
   }
 }
+
+declare namespace Indico {
+  interface User {
+    id: number;
+    fullName: string;
+    email: string;
+    affiliation: string;
+    favoriteUsers: Record<number, string>;
+  }
+
+  interface Indico {
+    User: User;
+  }
+}

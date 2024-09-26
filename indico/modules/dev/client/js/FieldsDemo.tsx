@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {Accordion, Button, Form, Header, Message, Segment, Table} from 'semantic-ui-react';
@@ -21,7 +20,13 @@ function prettyPrintJson(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-function FieldDemo({title, component: Component, initialValue, placeholder, ...extraOptions}) {
+interface FieldType {
+  component: React.ElementType;
+  initialValue: object | undefined;
+  placeholder: string | undefined;
+}
+
+function FieldDemo({component: Component, initialValue, placeholder, ...extraOptions}: FieldType) {
   const [output, setOutput] = useState(null);
   return (
     <FinalForm
@@ -121,17 +126,15 @@ function FieldDemo({title, component: Component, initialValue, placeholder, ...e
   );
 }
 
-FieldDemo.propTypes = {
-  title: PropTypes.string.isRequired,
-  component: PropTypes.elementType.isRequired,
-  initialValue: PropTypes.any,
-  placeholder: PropTypes.string,
-};
-
-FieldDemo.defaultProps = {
-  initialValue: null,
-  placeholder: null,
-};
+interface FieldControlsPropTypes {
+  pristine: boolean;
+  validating: boolean;
+  hasValidationErrors: boolean;
+  submitSucceeded: boolean;
+  errors: object;
+  placeholder: string | undefined;
+  extraOptions: object;
+}
 
 function FieldControls({
   pristine,
@@ -141,7 +144,7 @@ function FieldControls({
   errors,
   placeholder,
   extraOptions,
-}) {
+}: FieldControlsPropTypes) {
   const formInfo = (
     <Table definition>
       <Table.Body>
@@ -208,26 +211,16 @@ function FieldControls({
   );
 }
 
-FieldControls.propTypes = {
-  pristine: PropTypes.bool.isRequired,
-  validating: PropTypes.bool.isRequired,
-  hasValidationErrors: PropTypes.bool.isRequired,
-  submitSucceeded: PropTypes.bool.isRequired,
-  errors: PropTypes.object.isRequired,
-  placeholder: PropTypes.string,
-  extraOptions: PropTypes.object.isRequired,
-};
-
-FieldControls.defaultProps = {
-  placeholder: null,
-};
-
 export default function FieldsDemo() {
+  interface FieldDefinitionType extends FieldType {
+    title: string;
+  }
+
   return (
     <Accordion
-      panels={_.sortBy(getFields(), 'title').map(field => ({
-        key: field.title,
-        title: field.title,
+      panels={_.sortBy(getFields(), 'title').map(({title, ...field}: FieldDefinitionType) => ({
+        key: title,
+        title,
         content: {
           content: <FieldDemo {...field} />,
         },

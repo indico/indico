@@ -28,7 +28,7 @@ import {
 } from 'indico/react/components/PersonLinkField';
 import {FinalRating} from 'indico/react/components/ReviewRating';
 
-const getFields = () => {
+export default function getFields() {
   const personLinkFieldExtraOptions = {
     eventId: 1,
     sessionUser: {...Indico.User, favoriteUsers: {}}, // clean up the user object
@@ -129,6 +129,4 @@ const getFields = () => {
       placeholder: 'Please enter a keyword',
     },
   ];
-};
-
-export default getFields;
+}

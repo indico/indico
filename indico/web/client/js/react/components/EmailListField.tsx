@@ -6,19 +6,18 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from '../forms';
 
-import TagListField from './TagListField';
+import TagListField, {FinalTagListProps, TagListFieldComponentProps} from './TagListField';
 
 /**
  * A field that lets the user enter email addresses
  */
-const EmailListField = props => {
+const EmailListField = (props: TagListFieldComponentProps) => {
   return (
     <TagListField
       {...props}
@@ -29,19 +28,11 @@ const EmailListField = props => {
   );
 };
 
-EmailListField.propTypes = {
-  ...TagListField.propTypes,
-};
-
 export default React.memo(EmailListField);
 
 /**
  * Like `FinalField` but for a `EmailListField`.
  */
-export function FinalEmailList({name, ...rest}) {
+export function FinalEmailList({name, ...rest}: FinalTagListProps) {
   return <FinalField name={name} component={EmailListField} isEqual={_.isEqual} {...rest} />;
 }
-
-FinalEmailList.propTypes = {
-  name: PropTypes.string.isRequired,
-};

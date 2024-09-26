@@ -9,7 +9,6 @@ import referenceTypesURL from 'indico-url:events.api_reference_types';
 
 import _ from 'lodash';
 import {nanoid} from 'nanoid';
-import PropTypes from 'prop-types';
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
@@ -22,33 +21,42 @@ import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 
 import './ItemListField.module.scss';
 
-const itemValueShapeSchema = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  as: PropTypes.elementType,
-  render: PropTypes.func,
-  fieldProps: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
-  defaultValue: PropTypes.any,
-  width: PropTypes.string,
-});
+interface ItemShapeType {
+  name: string;
+  title: string;
+  as?: React.ElementType;
+  render?: (value: any) => boolean;
+  fieldProps?: object | ((value: any, onChange: (field: string, value: any) => void) => object);
+  defaultValue?: any;
+  width?: string;
+}
+
+interface ItemProps {
+  value: any;
+  shape: ItemShapeType[];
+  onChange: (field: string, value: any) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onDelete: () => void;
+  disabled: boolean;
+  canRemove?: boolean;
+  canDisableItem?: boolean;
+  children?: React.ReactNode;
+}
 
 function Item({
   value,
   shape,
-  index,
-  id,
-  canRemove,
-  canDisableItem,
+  canRemove = true,
+  canDisableItem = false,
   onChange,
-  onMove,
   onFocus,
   onBlur,
   onDelete,
   disabled,
-  sortable,
   children,
   ...rest
-}) {
+}: ItemProps) {
   const makeOnChange = field => evt => {
     const elem = evt.target;
     if (elem.type === 'checkbox') {
@@ -112,32 +120,13 @@ function Item({
   );
 }
 
-Item.propTypes = {
-  index: PropTypes.number.isRequired,
-  id: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onMove: PropTypes.func.isRequired,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  onDelete: PropTypes.func.isRequired,
-  shape: PropTypes.arrayOf(itemValueShapeSchema).isRequired,
-  value: PropTypes.object.isRequired,
-  disabled: PropTypes.bool.isRequired,
-  sortable: PropTypes.bool.isRequired,
-  canRemove: PropTypes.bool,
-  canDisableItem: PropTypes.bool,
-  children: PropTypes.node,
-};
+interface DraggableItemProps extends ItemProps {
+  index: number;
+  id: string;
+  onMove: (sourceIndex: number, targetIndex: number) => void;
+}
 
-Item.defaultProps = {
-  onFocus: null,
-  onBlur: null,
-  canRemove: true,
-  canDisableItem: false,
-  children: null,
-};
-
-function DraggableItem(props) {
+function DraggableItem(props: DraggableItemProps) {
   const {index, id, onMove, disabled} = props;
   const [handleRef, itemRef, style] = useSortableItem({
     type: 'item-list-field-item',
@@ -159,21 +148,31 @@ function DraggableItem(props) {
   );
 }
 
-DraggableItem.propTypes = {
-  ...Item.propTypes,
-};
+interface ItemListFieldProps {
+  itemShape: ItemShapeType[];
+  sortable?: boolean;
+  disabled?: boolean;
+  scrollable?: boolean;
+  canDisableItem?: boolean;
+  canRemoveItem?: (item: object) => boolean;
+}
+
+interface ItemListFieldComponentProps extends ItemListFieldProps {
+  value: object[];
+  onChange: (value: object[]) => void;
+}
 
 export default function ItemListField({
   value,
   onChange,
   itemShape,
-  sortable,
-  disabled,
-  scrollable,
-  canDisableItem,
-  canRemoveItem,
+  sortable = false,
+  disabled = false,
+  scrollable = false,
+  canDisableItem = false,
+  canRemoveItem = () => true,
   ...rest
-}) {
+}: ItemListFieldComponentProps) {
   const makeOnDelete = index => () => onChange(value.filter((__, idx) => index !== idx));
   const makeOnChange = index => (field, val) =>
     onChange(value.map((choice, idx) => (index !== idx ? choice : {...choice, [field]: val})));
@@ -227,7 +226,6 @@ export default function ItemListField({
             onMove={handleMove}
             shape={itemShape}
             value={item}
-            sortable={sortable}
             disabled={disabled}
             canDisableItem={canDisableItem}
             canRemove={canRemoveItem(item)}
@@ -256,41 +254,19 @@ export default function ItemListField({
   );
 }
 
-ItemListField.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.array.isRequired,
-  itemShape: PropTypes.arrayOf(itemValueShapeSchema).isRequired,
-  disabled: PropTypes.bool,
-  sortable: PropTypes.bool,
-  scrollable: PropTypes.bool,
-  canDisableItem: PropTypes.bool,
-  canRemoveItem: PropTypes.func,
-};
+interface FinalItemListProps extends ItemListFieldProps {
+  name: string;
+  required?: boolean;
+  description?: string;
+}
 
-ItemListField.defaultProps = {
-  disabled: false,
-  sortable: false,
-  scrollable: false,
-  canDisableItem: false,
-  canRemoveItem: () => true,
-};
-
-export function FinalItemList(props) {
-  const {sortable} = props;
+export function FinalItemList(props: FinalItemListProps) {
+  const {sortable = false} = props;
   const finalField = <FinalField component={ItemListField} isEqual={_.isEqual} {...props} />;
   return sortable ? <DndProvider backend={HTML5Backend}>{finalField}</DndProvider> : finalField;
 }
 
-FinalItemList.propTypes = {
-  name: PropTypes.string.isRequired,
-  sortable: PropTypes.bool,
-};
-
-FinalItemList.defaultProps = {
-  sortable: false,
-};
-
-export function FinalReferences({name, ...rest}) {
+export function FinalReferences({name, ...rest}: FinalItemListProps) {
   const {data, loading} = useIndicoAxios(referenceTypesURL(), {camelize: true});
   const referenceTypes = data || [];
 
@@ -315,7 +291,3 @@ export function FinalReferences({name, ...rest}) {
     />
   );
 }
-
-FinalReferences.propTypes = {
-  name: PropTypes.string.isRequired,
-};
