@@ -184,7 +184,7 @@ body {
   margin: 0;
 }
 
-.contrib-timeline > li > h4 > .contrib-timeline-time {
+.timebox {
   text-align: center;
   padding: 4px 8px 4px 10px;
   font-size: 0.8em;
@@ -223,6 +223,18 @@ body {
   display: flex;
 }
 
-.pagebreak.pagebreak-children > section:not(:first-of-type) {
-  break-before: always;
+.pagebreak.pagebreak-children > section:not(:last-of-type) {
+  break-after: always;
+}
+
+.session-block-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 10px 70px;
+}
+
+.session-block-date > .timebox {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 0;
 }
