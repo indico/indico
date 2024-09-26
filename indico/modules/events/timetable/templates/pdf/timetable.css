@@ -222,3 +222,7 @@ body {
   background-color: rgba(0, 0, 0, 0.1);
   display: flex;
 }
+
+.pagebreak.pagebreak-children > section:not(:first-of-type) {
+  break-before: always;
+}

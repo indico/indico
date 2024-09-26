@@ -1,15 +1,11 @@
 {% macro render_program(event, days, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_breaks, show_title, new_page_per_session) %}
     {% for day in days %}
-        <div class="pagebreak program-{{loop.index}}" id="day-{{ loop.index }}">
+        <div class="pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
                 <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
             </div>
 
             {% for entry in days[day] %}
-                {% if new_page_per_session and loop.index0 != 0 %}
-                    <div class=pagebreak></div>
-                {% endif %}
-
                 {% if entry.type == 1 %}
                     {{ render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) }}
                 {% elif entry.type == 2 and show_contribs %}
