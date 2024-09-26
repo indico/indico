@@ -158,17 +158,6 @@ jobs:
         run: |
           ruff check --output-format github .
 
-      - name: Run flake8
-        if: success() || failure()
-        run: |
-          echo "::add-matcher::.github/matchers/flake8-problem-matcher.json"
-          flake8 --format '%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
-          echo "::remove-matcher owner=flake8::"
-
-      - name: Run pyquotes
-        if: success() || failure()
-        run: pyquotes --check .
-
       - name: Try extracting i18n strings (Python)
         if: success() || failure()
         run: indico i18n extract indico --python

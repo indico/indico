@@ -37,7 +37,6 @@ click==8.1.7
     #   -c requirements.txt
     #   flask
     #   flask-url-map-serializer
-    #   pyquotes
     #   unbeheader
     #   uvicorn
 colorama==0.4.6
@@ -53,13 +52,6 @@ docutils==0.20.1
     #   plantweb
     #   sphinx
     #   sphinx-rtd-theme
-flake8==7.1.1
-    # via
-    #   -r requirements.dev.in
-    #   flake8-quotes
-    #   pep8-naming
-flake8-quotes==3.4.0
-    # via -r requirements.dev.in
 flask==3.0.3
     # via
     #   -c requirements.txt
@@ -105,8 +97,6 @@ markupsafe==2.1.5
     #   -c requirements.txt
     #   jinja2
     #   werkzeug
-mccabe==0.7.0
-    # via flake8
 migra==3.0.1663481299
     # via -r requirements.dev.in
 mirakuru==2.5.2
@@ -120,14 +110,8 @@ packaging==24.1
     #   pytest
     #   sphinx
     #   sqlbag
-parso==0.8.4
-    # via
-    #   -c requirements.txt
-    #   pyquotes
 pathspec==0.12.1
     # via hatchling
-pep8-naming==0.14.1
-    # via -r requirements.dev.in
 plantweb==1.2.1
     # via -r requirements.dev.in
 pluggy==1.5.0
@@ -138,10 +122,6 @@ port-for==0.7.3
     # via pytest-redis
 psutil==6.0.0
     # via mirakuru
-pycodestyle==2.12.1
-    # via flake8
-pyflakes==3.2.0
-    # via flake8
 pygments==2.18.0
     # via
     #   -c requirements.txt
@@ -149,8 +129,6 @@ pygments==2.18.0
     #   sphinx
 pyproject-hooks==1.1.0
     # via build
-pyquotes==1.0.0
-    # via -r requirements.dev.in
 pytest==8.3.2
     # via
     #   -r requirements.dev.in
@@ -172,8 +150,6 @@ python-dateutil==2.9.0.post0
     # via
     #   -c requirements.txt
     #   freezegun
-pyupgrade==3.17.0
-    # via -r requirements.dev.in
 pyyaml==6.0.2
     # via
     #   -c requirements.txt
@@ -245,8 +221,6 @@ sqlparse==0.5.1
     # via -r requirements.dev.in
 starlette==0.38.4
     # via sphinx-autobuild
-tokenize-rt==6.0.0
-    # via pyupgrade
 tomlkit==0.13.2
     # via -r requirements.dev.in
 trove-classifiers==2024.7.2
@@ -274,6 +248,3 @@ werkzeug==3.0.4
     #   pytest-localserver
 wheel==0.44.0
     # via -r requirements.dev.in
-
-# The following packages were excluded from the output:
-# setuptools

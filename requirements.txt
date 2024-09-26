@@ -158,7 +158,9 @@ idna==3.8
     #   email-validator
     #   requests
 importlib-metadata==8.4.0
-    # via flask-pluginengine
+    # via
+    #   flask-pluginengine
+    #   pywebpack
 importlib-resources==6.4.4
     # via limits
 indico-fonts==1.2
@@ -299,7 +301,7 @@ pytz==2024.1
     #   -r requirements.in
     #   flask-babel
     #   icalendar
-pywebpack==2.0.0
+pywebpack==2.0.1
     # via
     #   -r requirements.in
     #   flask-webpackext

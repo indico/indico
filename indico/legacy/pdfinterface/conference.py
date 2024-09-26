@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 # ruff: noqa: N802, N803, N806, E741, PLR1702
-# flake8: noqa: N802, N803, N806, E741
 
 import re
 from copy import deepcopy
