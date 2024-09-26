@@ -7,7 +7,7 @@ body {
 }
 
 .pagebreak {
-  break-after: always;
+  break-before: always;
 }
 
 .cover {
