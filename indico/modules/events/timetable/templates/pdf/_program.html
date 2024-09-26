@@ -1,12 +1,17 @@
-{% macro render_program(event, days, show_affiliation, show_contribs, show_breaks, show_title, new_page_per_session) %}
+{% macro render_program(event, days, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_breaks, show_title, new_page_per_session) %}
     {% for day in days %}
         <div class="pagebreak program-{{loop.index}}" id="day-{{ loop.index }}">
             <div class="day-title">
                 <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
             </div>
+
             {% for entry in days[day] %}
+                {% if new_page_per_session and loop.index0 != 0 %}
+                    <div class=pagebreak></div>
+                {% endif %}
+
                 {% if entry.type == 1 %}
-                    {{ render_session_block(entry, show_affiliation, show_contribs, show_title, new_page_per_session) }}
+                    {{ render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) }}
                 {% elif entry.type == 2 and show_contribs %}
                     {{ render_contrib(entry, show_affiliation) }}
                 {% elif entry.type == 3 and show_breaks %}
@@ -17,7 +22,7 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro render_session_block(entry, show_affiliation, show_contribs, show_title, new_page_per_session) %}
+{% macro render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) %}
     {% set session_block = entry.object %}
     {% set session = session_block.session %}
     {% set conveners = session_block.person_links %}
@@ -28,16 +33,12 @@
     {% else %}
         {% set conveners_names = conveners|map(attribute='full_name')|list %}
     {% endif %}
-
-    {% if new_page_per_session %}
-        <div class="pagebreak"></div>
-    {% endif %}
     <section class="session-block">
         {{ render_time(entry) }}
         <div class="session-block-wrapper">
             <section
                 id="entry-{{ entry.id }}"
-                class="session-block-title {{'pagebreak' if new_page_per_session else ''}}"
+                class="session-block-title"
                 style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }}; {{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
             >
                 <h3>
@@ -68,7 +69,13 @@
                                 <h4>
                                     <span class="contrib-timeline-time" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
                                         {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
+                                        {% if show_contribs and show_length_contribs %}
+                                            ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
+                                        {% endif %}
                                     </span>
+                                    {% if show_contribs and show_contrib_id %}
+                                        [{{ child.object.friendly_id }}]
+                                    {% endif %}
                                     {{ child.object.title }}
                                 </h4>
                                 {% if child.type == 2 and show_contribs %}
@@ -104,9 +111,7 @@
         <div class="description">
             <b>{% trans %}Description{% endtrans %}</b>
             {# Description can be markdown #}
-            <div>
-                {{ contrib.description }}
-            </div>
+            <div>{{ contrib.description }}</div>
         </div>
     {% endif %}
 {% endmacro %}
@@ -127,7 +132,9 @@
                 id="entry-{{ entry.id }}"
                 class="session-block-title"
             >
-                <h3>{{ contrib.title }}</h3>
+                <h3>
+                    {{ contrib.title }}
+                </h3>
                 <div class="session-block-title-info">
                     <p><b>{% trans %}Contribution{% endtrans %}</b></p>
                     {% if speakers %}

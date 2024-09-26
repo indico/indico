@@ -124,6 +124,27 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 days[day] = entries
 
             now = now_utc()
+            # TODO: (Ajob) Remove list below of settings
+            # 
+            # contribution_info=showContribId
+            # contribution_info=showAbstract
+            # contribution_info=dontShowPosterAbstract
+            # contribution_info=showLengthContribs
+            # document_settings=showCoverPage
+            # document_settings=showTableContents
+            # document_settings=showSessionTOC
+            # download=1
+            # firstPageNumber=1
+            # other=showSpeakerTitle
+            # other=showSpeakerAffiliation
+            # pagesize=A4
+            # session_info=newPagePerSession
+            # session_info=useSessionColorCodes
+            # session_info=showSessionDescription
+            # session_info=printDateCloseToSessions
+            # submitted=
+            # visible_entries=showContribsAtConfLevel
+            # visible_entries=showBreaksAtConfLevel
             html = render_template('events/timetable/pdf/timetable.html', event=self.event, days=days, now=now,
                                    show_title=form.other.data['showSpeakerTitle'],
                                    show_affiliation=form.other.data['showSpeakerAffiliation'],
@@ -133,6 +154,8 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                                    page_size=form.pagesize.data,
                                    page_offset=form.firstPageNumber.data-1,
                                    show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
+                                   show_contrib_id=form.contribution_info.data['showContribId'],
+                                   show_length_contribs=form.contribution_info.data['showLengthContribs'],
                                    show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
                                    new_page_per_session=form.session_info.data['newPagePerSession'],
                                    use_session_colors=form.session_info.data['useSessionColorCodes'],

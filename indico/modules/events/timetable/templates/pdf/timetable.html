@@ -63,4 +63,14 @@
 {% if show_toc %}
     {{ render_toc(event, days, show_session_toc, show_contribs, show_breaks) }}
 {% endif %}
-{{ render_program(event, days, show_affiliation, show_contribs, show_breaks, show_title, new_page_per_session) }}
+{{ render_program(
+    event,
+    days,
+    show_affiliation,
+    show_contribs,
+    show_contrib_id,
+    show_length_contribs,
+    show_breaks,
+    show_title,
+    new_page_per_session
+) }}
