@@ -48,6 +48,7 @@ DEFAULT_OPTIONS = {
         'output_file': MESSAGES_POT,
         'mapping_file': 'babel.cfg',
         'input_paths': ['indico'],
+        'add_location': 'file',
         'project': 'Indico',
         'version': indico.__version__,
     },
@@ -74,6 +75,7 @@ DEFAULT_OPTIONS = {
         'mapping_file': 'babel-js.cfg',
         'no_default_keywords': True,
         'input_paths': ['indico'],
+        'add_location': 'file',
         'project': 'Indico',
         'version': indico.__version__,
     },
@@ -302,10 +304,13 @@ def extract_messages_react(directory: Path = INDICO_DIR):
             return
         paths = [client_path]
     with _chdir(INDICO_DIR):
-        output = subprocess.check_output(
-            ['npx', 'react-jsx-i18n', 'extract', '--ext', 'js,jsx,ts,tsx', '--base', directory, *paths],
-            env=dict(os.environ, FORCE_COLOR='1')
-        )
+        output = subprocess.check_output([
+            'npx', 'react-jsx-i18n', 'extract',
+            '--ext', 'js,jsx,ts,tsx',
+            '--base', directory,
+            '--add-location', 'file',
+            *paths
+        ], env=dict(os.environ, FORCE_COLOR='1'))
     _get_messages_react_pot(directory).write_bytes(output)
 
 
