@@ -159,6 +159,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                                    show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
                                    new_page_per_session=form.session_info.data['newPagePerSession'],
                                    use_session_colors=form.session_info.data['useSessionColorCodes'],
+                                   print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
                                    )
 
             css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data,
