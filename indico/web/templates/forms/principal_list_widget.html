@@ -23,6 +23,7 @@
             withCategoryRoles: {{ field.allow_category_roles | tojson }},
             withRegistrants: {{ field.allow_registration_forms | tojson }},
             withEmails: {{ field.allow_emails | tojson }},
+            importExport: {{ field.allow_import_export | tojson }},
             protectedFieldId: {{ field.protected_field_id | default(none) | tojson }},
         });
     </script>

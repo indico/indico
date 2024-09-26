@@ -39,8 +39,12 @@ class PaperTeamsForm(IndicoForm):
                                   event=lambda form: form.event,
                                   description=_('List of users allowed to manage the call for papers'))
     judges = PrincipalListField(_('Judges'),
+                                allow_import_export=True,
+                                event=lambda form: form.event,
                                 description=_('List of users allowed to judge papers'))
     content_reviewers = PrincipalListField(_('Content reviewers'),
+                                           allow_import_export=True,
+                                           event=lambda form: form.event,
                                            description=_('List of users allowed to review the content of '
                                                          'the assigned papers'))
     layout_reviewers = PrincipalListField(_('Layout reviewers'),
