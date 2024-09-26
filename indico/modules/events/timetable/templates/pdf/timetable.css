@@ -69,36 +69,6 @@
   content: target-counter('#footer', page, decimal);
 }
 
-/* body {
-  border: 1px solid green;
-} */
-
-.time-and-place {
-  /* line-height: 1.2em; */
-  /* max-width: 30%; */
-}
-
-.content {
-  /* padding-left: 2em; */
-}
-
-.day-program {
-  width: 100%;
-  border: none;
-  border-collapse: collapse;
-}
-
-table,
-tr,
-td {
-  border: none;
-}
-
-.day-program td {
-  padding: 0.5em;
-  vertical-align: top;
-}
-
 /* Ajob addition */
 
 .session-block {
@@ -123,8 +93,9 @@ td {
   padding: 10px;
   border-radius: 5px;
   flex-grow: 1;
-  min-height: 62px;
+  min-height: 54px;
   box-sizing: border-box;
+  font-size: 0.8em;
 }
 
 .session-block-title > h3 {
@@ -186,7 +157,6 @@ td {
 .contrib-timeline {
   margin: 0;
   padding: 0;
-  display: flex;
   flex-direction: column;
   list-style-type: none;
 }
@@ -220,9 +190,6 @@ td {
 }
 
 .contrib-timeline-content {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
   font-size: 0.8em;
 }
 
@@ -246,6 +213,7 @@ td {
 .contrib-timeline-content .description > *:last-child {
   margin: 0;
   padding: 0 10px;
+  border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.1);
   display: flex;
 }
