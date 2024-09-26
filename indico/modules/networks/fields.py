@@ -41,11 +41,8 @@ class MultiIPNetworkField(MultiStringField):
     def _fix_network(self, network):
         # XXX: not sure why we need the ascii dance here, but keeping it just in case
         network = network.encode('ascii', 'ignore').decode()
-        if network.startswith('::ffff:'):
-            # convert ipv6-style ipv4 to regular ipv4
-            # the ipaddress library doesn't deal with such IPs properly!
-            network = network[7:]
-        return network
+        # convert ipv6-style ipv4 to regular ipv4 since the ipaddress library doesn't deal with such IPs properly!
+        return network.removeprefix('::ffff:')
 
     def process_formdata(self, valuelist):
         self._data_converted = False

@@ -28,8 +28,7 @@ class ColorTuple(namedtuple('ColorTuple', ('text', 'background'))):
     def __new__(cls, text, background):
         colors = [text or '', background or '']
         for i, color in enumerate(colors):
-            if color.startswith('#'):
-                color = color[1:]
+            color = color.removeprefix('#')
             if len(color) == 3:
                 color = ''.join(x * 2 for x in color)
             colors[i] = color.lower()

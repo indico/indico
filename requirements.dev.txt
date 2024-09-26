@@ -163,7 +163,7 @@ requests==2.32.3
     #   -c requirements.txt
     #   plantweb
     #   sphinx
-ruff==0.6.3
+ruff==0.6.8
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
     # via migra
@@ -231,7 +231,7 @@ urllib3==1.26.20
     # via
     #   -c requirements.txt
     #   requests
-uv==0.4.4
+uv==0.4.16
     # via -r requirements.dev.in
 uvicorn==0.30.6
     # via sphinx-autobuild
