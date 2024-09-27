@@ -214,7 +214,13 @@
 {% endmacro %}
 
 {% macro render_place(entry) %}
-    <b>{% trans %}Location{% endtrans %}:</b> {{ entry.object.room_name }}
+    <b>{% trans %}Location{% endtrans %}:</b>
+    {% if entry.object.venue_name %}
+        {{ entry.object.venue_name }}{% if entry.object.room_name %},{% endif %}
+    {% endif %}
+    {% if entry.object.room_name %}
+        {{ entry.object.room_name }}
+    {%endif%}
 {% endmacro %}
 
 {% macro render_name(person, title=false, affiliation=false) %}
