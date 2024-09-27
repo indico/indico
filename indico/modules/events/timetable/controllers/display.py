@@ -159,6 +159,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                                    show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
                                    new_page_per_session=form.session_info.data['newPagePerSession'],
                                    use_session_colors=form.session_info.data['useSessionColorCodes'],
+                                   show_session_description=form.session_info.data['showSessionDescription'],
                                    print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
                                    )
 
