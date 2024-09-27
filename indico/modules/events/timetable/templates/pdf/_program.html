@@ -1,4 +1,4 @@
-{% macro render_program(event, days, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_breaks, show_title, new_page_per_session, print_date_close_to_sessions) %}
+{% macro render_program(event, days, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_breaks, show_title, new_page_per_session, show_session_description, print_date_close_to_sessions) %}
     {% for day in days %}
         <div class="pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
@@ -11,7 +11,7 @@
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block">
                             {{ render_time(entry) }}
-                            {{ render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) }}
+                            {{ render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session, show_session_description) }}
                         </section>
                     </section>
                 {% elif entry.type == 2 and show_contribs %}
@@ -47,7 +47,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) %}
+{% macro render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session, show_session_description) %}
     {% set session_block = entry.object %}
     {% set session = session_block.session %}
     {% set conveners = session_block.person_links %}
@@ -87,29 +87,41 @@
         </section>
         {% if entry.children %}
             <div class="session-block-content">
-                <ul class="contrib-timeline">
-                    {% for child in entry.children %}
-                        <li style="border-color: #{{ session.colors.background }};">
-                            <h4>
-                                <span class="timebox" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
-                                    {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
-                                    {% if show_contribs and show_length_contribs %}
-                                        ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
+                {% if show_session_description and session.description %}
+                    <div class="session-block-content-box description" style="border-color: #{{ session.colors.background }};">
+                        <ul class="contrib-timeline">
+                            <li>
+                                <h4>{% trans %}Description{% endtrans %}</h4>
+                                {{ session.description }}
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="session-block-content-box" style="border-color: #{{ session.colors.background }};">
+                    <ul class="contrib-timeline">
+                        {% for child in entry.children %}
+                            <li style="border-color: #{{ session.colors.background }};">
+                                <h4>
+                                    <span class="timebox" style="background-color: #{{ session.colors.background }}; color: #{{ session.colors.text }};">
+                                        {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
+                                        {% if show_contribs and show_length_contribs %}
+                                            ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
+                                        {% endif %}
+                                    </span>
+                                    {% if show_contribs and show_contrib_id %}
+                                        [{{ child.object.friendly_id }}]
                                     {% endif %}
-                                </span>
-                                {% if show_contribs and show_contrib_id %}
-                                    [{{ child.object.friendly_id }}]
+                                    {{ child.object.title }}
+                                </h4>
+                                {% if child.type == 2 and show_contribs %}
+                                    <div class="contrib-timeline-content">
+                                        {{ render_nested_contrib(child, show_affiliation) }}
+                                    </div>
                                 {% endif %}
-                                {{ child.object.title }}
-                            </h4>
-                            {% if child.type == 2 and show_contribs %}
-                                <div class="contrib-timeline-content">
-                                    {{ render_nested_contrib(child, show_affiliation) }}
-                                </div>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         {% endif %}
     </div>
