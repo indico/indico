@@ -172,12 +172,10 @@ body {
 .contrib-timeline > li {
   margin: 0;
   padding: 10px;
-  border: 2px solid rgba(0, 0, 0, 0.1);
-  border-top: 0;
 }
 
-.contrib-timeline > li:last-child {
-  border-radius: 0 0 3px 3px;
+.contrib-timeline > li:not(:last-child) {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .contrib-timeline > li > h4 {
@@ -243,4 +241,32 @@ body {
 
 .day {
   break-inside: avoid;
+}
+
+/* Content box */
+.session-block-content-box {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top: 0;
+}
+
+.session-block-content-box:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.session-block-content-box.description {
+  margin-top: 0;
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.session-block-content-box.description li > * {
+  margin: 0;
+}
+
+.session-block-content-box.description li > *:last-child {
+  font-size: 0.8em;
+  line-height: 1.5em;
+  margin: 5px 0 0 0;
+  opacity: 0.8;
 }
