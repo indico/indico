@@ -34,8 +34,8 @@ def _log_registration_form_update(regform, changes, extra_log_fields):
         'message_unpaid': 'Message for unpaid',
         'message_complete': 'Message for complete',
         'attach_ical': 'Attach iCalendar file',
-        'manager_notifications_enabled': 'Notify managers',
-        'manager_notification_recipients': 'Notification recipients',
+        'organizer_notifications_enabled': 'Notify organizers',
+        'organizer_notification_recipients': 'Notification recipients',
         **(extra_log_fields or {})
     }
     regform.log(EventLogRealm.management, LogKind.change, 'Registration',
