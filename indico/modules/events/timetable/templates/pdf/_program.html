@@ -7,22 +7,28 @@
 
             {% for entry in days[day] %}
                 {% if entry.type == 1 %}
-                    {{ render_block_date(entry, day, print_date_close_to_sessions) }}
-                    <section class="session-block">
-                        {{ render_time(entry) }}
-                        {{ render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) }}
+                    <section class="day">
+                        {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                        <section class="session-block">
+                            {{ render_time(entry) }}
+                            {{ render_session_block(entry, show_affiliation, show_contribs, show_contrib_id, show_length_contribs, show_title, new_page_per_session) }}
+                        </section>
                     </section>
                 {% elif entry.type == 2 and show_contribs %}
-                    {{ render_block_date(entry, day, print_date_close_to_sessions) }}
-                    <section class="session-block contribution">
-                        {{ render_time(entry) }}
-                        {{ render_contrib(entry, show_affiliation) }}
+                    <section class="day">
+                        {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                        <section class="session-block contribution">
+                            {{ render_time(entry) }}
+                            {{ render_contrib(entry, show_affiliation) }}
+                        </section>
                     </section>
                 {% elif entry.type == 3 and show_breaks %}
-                    {{ render_block_date(entry, day, print_date_close_to_sessions) }}
-                    <section class="session-block">
-                        {{ render_time(entry) }}
-                        {{ render_break(entry) }}
+                    <section class="day">
+                        {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                        <section class="session-block">
+                            {{ render_time(entry) }}
+                            {{ render_break(entry) }}
+                        </section>
                     </section>
                 {% endif %}
             {% endfor %}
@@ -52,6 +58,7 @@
     {% else %}
         {% set conveners_names = conveners|map(attribute='full_name')|list %}
     {% endif %}
+
     <div class="session-block-wrapper">
         <section
             id="entry-{{ entry.id }}"
@@ -62,6 +69,11 @@
                 {% if session.title and session_block.title %}
                     {{ session.title }}: {{ session_block.title }}
                 {% else %}
+                    {{ session_block.title or session.title }}
+                    {{ session_block.title or session.title }}
+                    {{ session_block.title or session.title }}
+                    {{ session_block.title or session.title }}
+                    {{ session_block.title or session.title }}
                     {{ session_block.title or session.title }}
                 {% endif %}
             </h3>
