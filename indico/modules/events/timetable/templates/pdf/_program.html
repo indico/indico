@@ -214,7 +214,7 @@
 {% endmacro %}
 
 {% macro render_place(entry) %}
-    <b>Location:</b> {{ entry.object.room_name }}
+    <b>{% trans %}Location{% endtrans %}:</b> {{ entry.object.room_name }}
 {% endmacro %}
 
 {% macro render_name(person, title=false, affiliation=false) %}
