@@ -58,8 +58,8 @@ def test_RHRegistrationForm_can_register(db, dummy_regform, dummy_reg, dummy_use
 def test_withdraw_registration_rh(smtp, dummy_regform, dummy_reg, dummy_user):
     # Register the user and enable manager notifications
     dummy_regform.start_dt = now_utc(False)
-    dummy_regform.manager_notifications_enabled = True
-    dummy_regform.manager_notification_recipients = ['mgr@example.test']
+    dummy_regform.organizer_notifications_enabled = True
+    dummy_regform.organizer_notification_recipients = ['mgr@example.test']
     session.set_session_user(dummy_user)
 
     # Set up request

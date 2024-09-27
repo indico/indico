@@ -227,14 +227,16 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether the manager notifications for this event are enabled
-    manager_notifications_enabled = db.Column(
+    #: Whether the organizer notifications for this event are enabled
+    organizer_notifications_enabled = db.Column(
+        'manager_notifications_enabled',
         db.Boolean,
         nullable=False,
         default=False
     )
-    #: List of emails that should receive management notifications
-    manager_notification_recipients = db.Column(
+    #: List of emails that should receive organizer notifications
+    organizer_notification_recipients = db.Column(
+        'manager_notification_recipients',
         ARRAY(db.String),
         nullable=False,
         default=[]
