@@ -223,7 +223,7 @@ body {
   display: flex;
 }
 
-.pagebreak.pagebreak-children > section:not(:last-of-type) {
+.pagebreak.pagebreak-children > section:not(:first-of-type) {
   break-before: always;
 }
 
