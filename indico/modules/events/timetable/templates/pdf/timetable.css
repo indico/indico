@@ -224,7 +224,7 @@ body {
 }
 
 .pagebreak.pagebreak-children > section:not(:last-of-type) {
-  break-after: always;
+  break-before: always;
 }
 
 .session-block-date {
@@ -237,4 +237,10 @@ body {
 .session-block-date > .timebox {
   border: 1px solid rgba(0, 0, 0, 0.1);
   margin: 0;
+}
+
+/* Day */
+
+.day {
+  break-inside: avoid;
 }
