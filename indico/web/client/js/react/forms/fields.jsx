@@ -548,27 +548,6 @@ FinalRadio.propTypes = {
   label: PropTypes.string.isRequired,
 };
 
-const asciiSearch = (options, query) => {
-  // To find accented names in the drop-down easily
-  // the names (and query string as well) are transliterated
-  // to contain only ASCII characters.
-  // Example:
-  // * typing "turk" will show "Türkey" and "Turkmenistan"
-  // * typing "ürk" will show "Burkina Faso", "Türkey", and "Turkmenistan"
-  // See https://stackoverflow.com/a/37511463 for more details regarding the transliteration.
-  const transliterate = inputStr => {
-    if (typeof inputStr !== 'string') {
-      return '';
-    }
-    return inputStr
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '');
-  };
-  const asciiQuery = transliterate(query);
-  return options.filter(opt => transliterate(opt.text).includes(asciiQuery));
-};
-
 /**
  * Like `FinalField` but for a dropdown.
  */
@@ -584,7 +563,8 @@ export function FinalDropdown({name, label, multiple, ...rest}) {
       label={label}
       format={identity}
       parse={identity}
-      search={asciiSearch}
+      search
+      deburr
       // https://github.com/final-form/react-final-form/issues/544
       isMultiple={multiple}
       {...extraProps}
