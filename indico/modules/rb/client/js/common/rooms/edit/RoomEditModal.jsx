@@ -15,6 +15,7 @@ import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes'
 import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
 import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
 import roomNotificationDefaultsURL from 'indico-url:rb.notification_settings';
+import roomPermissionInfoURL from 'indico-url:rb.room_permission_types';
 
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
@@ -47,7 +48,7 @@ import './RoomEditModal.module.scss';
 
 function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
   const favoriteUsersController = useFavoriteUsers();
-  const [permissionManager, permissionInfo] = usePermissionInfo();
+  const [permissionManager, permissionInfo] = usePermissionInfo(roomPermissionInfoURL());
   const equipmentTypes = useSelector(getAllEquipmentTypes);
   const dispatch = useDispatch();
 

@@ -18,6 +18,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.core.permissions import get_unified_permissions, update_principals_permissions
 from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.rooms import RHRoomsPermissions
@@ -109,20 +110,25 @@ class RHLocations(RHRoomBookingAdminBase):
         return '', 204
 
     @use_rh_kwargs(LocationArgs)
-    def _process_POST(self, name, room_name_format, map_url_template):
+    def _process_POST(self, name, room_name_format, map_url_template, acl_entries):
         loc = Location(name=name, room_name_format=room_name_format, map_url_template=(map_url_template or ''))
+        if acl_entries:
+            update_principals_permissions(loc, {}, acl_entries)
         db.session.add(loc)
         db.session.flush()
         return self._jsonify_one(loc), 201
 
     @use_rh_kwargs(LocationArgs, partial=True)
-    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing):
+    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing, acl_entries=None):
         if name is not None:
             self.location.name = name
         if room_name_format is not None:
             self.location.room_name_format = room_name_format
         if map_url_template is not missing:
             self.location.map_url_template = map_url_template or ''
+        if acl_entries is not None:
+            current = {e.principal: get_unified_permissions(e) for e in self.location.acl_entries}
+            update_principals_permissions(self.location, current, acl_entries)
         db.session.flush()
         return self._jsonify_one(self.location)
 

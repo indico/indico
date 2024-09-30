@@ -12,7 +12,7 @@
 .item,
 :global(.ui.list) > .item,
 :global(.ui.list.list) > .item {
-  display: flex;
+  display: flex !important;
   align-items: center;
   min-height: 32px;
 }
