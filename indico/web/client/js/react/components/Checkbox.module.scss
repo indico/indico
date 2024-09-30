@@ -43,17 +43,11 @@
       border: 1px solid #85b7d9;
     }
 
-    &:checked,
-    &:indeterminate {
-      background-color: #85b7d9;
-    }
-
     &:checked::before,
     &:indeterminate::before {
       position: absolute; // do not affect the layout
       display: inline-block;
 
-      color: white;
       font-size: 87.5%;
     }
 
