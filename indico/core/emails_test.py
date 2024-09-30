@@ -27,7 +27,7 @@ class SMTPSenderNotSetMockConfig:
 @pytest.mark.parametrize(('sender_email', 'sender'), (
     ('foo@example.com', 'foo@example.com'),
     ('bar@example.com', 'bar@example.com'),
-    ('test@specific.com', 'Indico sender@example.com'),
+    ('test@specific.com', 'Indico <sender@example.com>'),
     ('foo@specific.com', 'foo@specific.com'),
     ('Foo <foo@example.com>', 'Foo <foo@example.com>'),
     ('Bar <bar@example.com>', 'Bar <bar@example.com>'),
@@ -35,7 +35,7 @@ class SMTPSenderNotSetMockConfig:
     ('Foo <foo@specific.com>', 'Foo <foo@specific.com>'),
     ('', 'Indico <noreply@example.com>'),
 ))
-def _test_get_actual_sender_address(mocker, sender_email, sender):
+def test_get_actual_sender_address(mocker, sender_email, sender):
     mocker.patch('indico.core.emails.config', MockConfig())
     core_settings.set('site_title', 'Indico')
     actual_sender = _get_actual_sender_address(sender_email)
