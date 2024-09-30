@@ -42,7 +42,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far :(
+- Reimplement Checkbox to make it programmatically focusable (:pr:`6528`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
