@@ -911,7 +911,7 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
 
     def _process(self):
         attachments = {}
-        file_fields = [item for item in self.regform.form_items if item.input_type == 'file']
+        file_fields = [item for item in self.regform.form_items if item.is_field and item.field_impl.is_file_field]
         for registration in self.registrations:
             data = registration.data_by_field
             attachments_for_registration = [data.get(file_field.id) for file_field in file_fields

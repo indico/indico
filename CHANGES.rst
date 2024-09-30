@@ -38,6 +38,7 @@ Bugfixes
   element that uses ``ElementInternals``) in older versions of Safari (:pr:`6549`,
   :thanks:`foxbunny`)
 - Fix linebreak display in markdown code blocks in survey section descriptions (:pr:`6553`)
+- Include attached pictures when downloading registration attachments (:pr:`6564`)
 
 Accessibility
 ^^^^^^^^^^^^^
