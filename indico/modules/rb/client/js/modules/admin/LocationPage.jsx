@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import locationPermissionInfoURL from 'indico-url:rb.location_permission_types';
+
 import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -12,11 +14,22 @@ import React from 'react';
 import {Field} from 'react-final-form';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {List} from 'semantic-ui-react';
+import {Form, List} from 'semantic-ui-react';
 
-import {validators as v, FinalDropdown, FinalInput} from 'indico/react/forms';
+import {ACLField} from 'indico/react/components';
+import {PermissionInfoProvider} from 'indico/react/components/principals/hooks';
+import {
+  validators as v,
+  FinalDropdown,
+  FinalInput,
+  FinalField,
+  FinalRadio,
+} from 'indico/react/forms';
+import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {snakifyKeys} from 'indico/utils/case';
+
+import {selectors as userSelectors} from '../../common/user';
 
 import * as adminActions from './actions';
 import EditableList from './EditableList';
@@ -57,6 +70,7 @@ class LocationPage extends React.PureComponent {
   static propTypes = {
     locations: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
+    canAddItem: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
       fetchLocations: PropTypes.func.isRequired,
       deleteLocation: PropTypes.func.isRequired,
@@ -199,6 +213,48 @@ class LocationPage extends React.PureComponent {
           />
         )}
       </Field>
+      <Form.Field>
+        <h5>
+          <Translate>Protection Mode</Translate>
+        </h5>
+        <p className="field-description">
+          <Translate>
+            Restricted locations will be visible only to Location managers selected below
+          </Translate>
+        </p>
+        <Form.Group>
+          <FinalRadio name="protection_mode" value="public" label={Translate.string('Public')} />
+          <FinalRadio
+            name="protection_mode"
+            value="protected"
+            label={Translate.string('Restricted')}
+          />
+        </Form.Group>
+      </Form.Field>
+      <FavoritesProvider>
+        {favoriteUsersController => (
+          <PermissionInfoProvider url={locationPermissionInfoURL()}>
+            {(permissionManager, permissionInfo) => (
+              <div>
+                {permissionManager && permissionInfo && (
+                  <FinalField
+                    name="acl_entries"
+                    component={ACLField}
+                    favoriteUsersController={favoriteUsersController}
+                    label={Translate.string('Permissions')}
+                    permissions={false}
+                    readAccessAllowed={false}
+                    isEqual={_.isEqual}
+                    withGroups
+                    permissionInfo={permissionInfo}
+                    permissionManager={permissionManager}
+                  />
+                )}
+              </div>
+            )}
+          </PermissionInfoProvider>
+        )}
+      </FavoritesProvider>
     </>
   );
 
@@ -217,6 +273,8 @@ class LocationPage extends React.PureComponent {
       'room_name_format',
       'map_url_template',
       '_map_url_template_choice',
+      'protection_mode',
+      'acl_entries',
     ]);
     if (!loc.map_url_template) {
       loc.map_url_template = null;
@@ -232,6 +290,7 @@ class LocationPage extends React.PureComponent {
     const {
       isFetching,
       locations,
+      canAddItem,
       actions: {createLocation, updateLocation, deleteLocation},
     } = this.props;
 
@@ -246,11 +305,14 @@ class LocationPage extends React.PureComponent {
           room_name_format: '{building}/{floor}-{number}',
           _map_url_template_choice: 'none',
           map_url_template: null,
+          protection_mode: 'public',
+          acl_entries: [],
         }}
         addFormProps={{decorators: [formDecorator]}}
         editFormProps={{decorators: [formDecorator]}}
         renderItem={this.renderItem}
         canDeleteItem={loc => loc.canDelete}
+        canAddItem={canAddItem}
         renderAddForm={this.renderForm}
         renderEditForm={this.renderForm}
         renderDeleteMessage={this.renderDeleteMessage}
@@ -266,6 +328,7 @@ export default connect(
   state => ({
     locations: adminSelectors.getAllLocations(state),
     isFetching: adminSelectors.isFetchingLocations(state),
+    canAddItem: userSelectors.isUserRBAdmin(state),
   }),
   dispatch => ({
     actions: bindActionCreators(

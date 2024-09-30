@@ -469,7 +469,7 @@ class Room(ProtectionManagersMixin, db.Model):
 
     @property
     def protection_parent(self):
-        return None
+        return self.location
 
     @staticmethod
     def is_user_admin(user):
@@ -520,6 +520,7 @@ class Room(ProtectionManagersMixin, db.Model):
         non_reservable_rooms = set()
         for room in all_rooms_query:
             is_owner = user == room.owner
+            is_location_manager = room.location.can_manage(user)
             data[room.id] = dict.fromkeys(permissions, False)
             if room.reservations_need_confirmation:
                 prebooking_required_rooms.add(room.id)
@@ -530,7 +531,7 @@ class Room(ProtectionManagersMixin, db.Model):
                     data[room.id]['book'] = True
                 if room.reservations_need_confirmation:
                     data[room.id]['prebook'] = True
-            if is_owner or (is_admin and allow_admin):
+            if is_owner or is_location_manager or (is_admin and allow_admin):
                 data[room.id]['override'] = True
                 data[room.id]['moderate'] = True
                 data[room.id]['manage'] = True
