@@ -9,8 +9,7 @@ import os
 import pickle
 import tempfile
 from datetime import date
-from email.headerregistry import parser
-from email.utils import make_msgid
+from email.utils import make_msgid, parseaddr
 from fnmatch import fnmatch
 from urllib.parse import urlsplit
 
@@ -71,8 +70,7 @@ def _get_actual_sender_address(sender_address):
     site_title = core_settings.get('site_title')
     if not sender_address:
         return f'{site_title} <{config.NO_REPLY_EMAIL}>'
-    address_raw = parser.get_mailbox(sender_address)[0]
-    display_name, address_spec = address_raw.display_name, address_raw.addr_spec
+    display_name, address_spec = parseaddr(sender_address)
     if not config.SMTP_SENDER_FALLBACK:
         return (f'{display_name} ({site_title}) <{config.NO_REPLY_EMAIL}>' if display_name
                 else f'{site_title} <{config.NO_REPLY_EMAIL}>')
