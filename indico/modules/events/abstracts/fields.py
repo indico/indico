@@ -16,7 +16,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_permissions_info
 from indico.modules.categories.util import serialize_category_role
-from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
 from indico.modules.events.contributions.models.persons import AuthorType
@@ -86,6 +86,14 @@ class EmailRuleListField(JSONField):
             # '*' (any) rules should never be included in the JSON, and having
             # such an entry would result in the rule never passing.
             raise ValidationError('Unexpected "*" criterion')
+        invited_rule_present = any(
+            AbstractState.invited.value in value
+            for rule in self.data
+            for value in rule.values()
+        )
+        # disallow mixing invited rules with other rules
+        if invited_rule_present and len(self.data) > 1:
+            raise ValidationError(_('You cannot use the invited rule with other rules'))
 
     def _value(self):
         return super()._value() if self.data else '[]'
