@@ -8,7 +8,7 @@ Create Date: 2024-09-11 15:15:52.630865
 from enum import Enum
 
 import sqlalchemy as sa
-from alembic import context, op
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -39,8 +39,6 @@ class _ProtectionMode(int, Enum):
 
 
 def upgrade():
-    if context.is_offline_mode():
-        raise Exception('This upgrade is only possible in online mode')
     op.create_table(
         'location_principals',
         sa.Column('read_access', sa.Boolean(), nullable=False),
@@ -85,7 +83,5 @@ def upgrade():
 
 
 def downgrade():
-    if context.is_offline_mode():
-        raise Exception('This downgrade is only possible in online mode')
     op.drop_column('locations', 'protection_mode', schema='roombooking')
     op.drop_table('location_principals', schema='roombooking')

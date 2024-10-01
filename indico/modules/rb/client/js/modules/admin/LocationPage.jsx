@@ -214,12 +214,10 @@ class LocationPage extends React.PureComponent {
         )}
       </Field>
       <Form.Field>
-        <h5>
-          <Translate>Protection Mode</Translate>
-        </h5>
+        <Translate as="h5">Protection Mode</Translate>
         <p className="field-description">
           <Translate>
-            Restricted locations will be visible only to Location managers selected below
+            Restricted locations will only be visible to the location managers selected below.
           </Translate>
         </p>
         <Form.Group>
