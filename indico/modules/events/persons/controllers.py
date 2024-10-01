@@ -342,7 +342,7 @@ class RHAPIEmailEventPersonsSend(RHEmailEventPersonsBase):
         'copy_for_sender': fields.Bool(load_default=False),
     })
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender):
-        if sender_address not in self.event.get_allowed_sender_emails():
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
         for recipient in self.recipients:
             if self.no_account and isinstance(recipient, EventPerson):

@@ -83,9 +83,9 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         skip_access_check = form.skip_access_check.data
         if form.validate_on_submit():
+            email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             for user in form.users.data:
-                create_invitation(self.regform, user, form.email_sender.data, form.email_subject.data,
-                                  form.email_body.data,
+                create_invitation(self.regform, user, email_sender, form.email_subject.data, form.email_body.data,
                                   skip_moderation=skip_moderation, skip_access_check=skip_access_check)
             num = len(form.users.data)
             flash(ngettext('The invitation has been sent.',
@@ -106,7 +106,7 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
         'copy_for_sender': fields.Bool(load_default=False),
     })
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender):
-        if sender_address not in self.event.get_allowed_sender_emails():
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
         invitations = _query_pending_invitations(self.regform)
         for invitation in invitations:
@@ -185,8 +185,9 @@ class RHRegistrationFormInviteImport(RHManageRegFormBase):
             skip_access_check = form.skip_access_check.data
             skip_existing = form.skip_existing.data
             delimiter = form.delimiter.data.delimiter
+            email_sender = self.event.get_verbose_email_sender(form.email_sender.data)
             invitations, skipped = import_invitations_from_csv(self.regform, form.source_file.data,
-                                                               form.email_sender.data, form.email_subject.data,
+                                                               email_sender, form.email_subject.data,
                                                                form.email_body.data,
                                                                skip_moderation=skip_moderation,
                                                                skip_access_check=skip_access_check,

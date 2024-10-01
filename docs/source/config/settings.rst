@@ -572,15 +572,24 @@ Emails
 
 .. data:: SMTP_ALLOWED_SENDERS
 
-    A list of allowed envelope sender addresses. Each entry must be an email
-    address, but using the ``*`` wildcard is allowed.
-    For any address not matching an entry in this list, the envelope sender
-    will be rewritten to the :data:`SMTP_SENDER_FALLBACK` address. The ``From``
-    email header which is shown to end users is not affected by this.
+    A list of allowed email senders for this Indico instance. Each entry must be an
+    email address, but using the ``*`` wildcard is allowed.
+    For any address not matching an entry in this list, the ``From`` address will be
+    rewritten to the :data:`SMTP_SENDER_FALLBACK` address, and the name (or email if
+    no name is available) of the original sender will be used in the human-friendly
+    part, e.g. ``John Doe (via Indico) <noreply@example.com>``, while their email
+    address will go into the ``Reply-to`` header.
 
     For example, if your mail server only allowed sending emails from your domain
     ``example.com``, you would set this setting to ``{'*@example.com'}``. If only
     a specific sender address was allowed, you'd use e.g. ``{'indico@example.com'}``.
+
+    .. important::
+
+        You most likely want to configure this setting to ensure emails sent from your
+        Indico instance are not classified as junk, since email spoofing is nowadays
+        being more and more frowned upon by large email providers, as it is commonly
+        abused by spammers and threat actors.
 
     Default: ``set()``
 
@@ -588,7 +597,7 @@ Emails
 
     The envelope sender address to be used for any senders that are not whitelisted
     in :data:`SMTP_ALLOWED_SENDERS`. This setting is required if the sender whitelist
-    is used.
+    is used. Typically setting it to a no-reply address is a good choice.
 
     Default: ``None``
 
