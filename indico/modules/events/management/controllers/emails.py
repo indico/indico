@@ -103,7 +103,7 @@ class EmailRolesSendMixin:
     })
     def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender, recipient_roles):
         recipient_roles = frozenset(recipient_roles)
-        if sender_address not in self.event.get_allowed_sender_emails():
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
             abort(422, messages={'sender_address': ['Invalid sender address']})
         count = 0
         for email, kwargs, log_metadata in self.get_recipients(recipient_roles):

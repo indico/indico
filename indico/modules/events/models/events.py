@@ -7,6 +7,7 @@
 
 from contextlib import contextmanager
 from datetime import timedelta
+from email.utils import formataddr
 from operator import attrgetter
 
 import pytz
@@ -855,7 +856,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return query.first()
 
     def get_allowed_sender_emails(self, *, include_current_user=True, include_creator=True, include_managers=True,
-                                  include_contact=True, include_chairs=True, include_noreply=False, extra=None):
+                                  include_contact=True, include_chairs=True, include_noreply=False, extra=None,
+                                  _for_sending=False):
         """
         Return the emails of people who can be used as senders (or
         rather Reply-to contacts) in emails sent from within an event.
@@ -874,8 +876,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                 address
         :param extra: An email address that is always included, even
                       if it is not in any of the included lists.
-        :return: A dictionary mapping of email pretty names.
-                 e.g Foo <foo@bar.com>: Foo <foo@bar.com>
+        :param: _for_sending: Internal use only; formats the value in a
+                              way suitable for sending an email to it,
+                              instead of in a human-friendly way.
+        :return: A dictionary mapping emails to pretty names
         """
         emails = {}
         # Contact/Support
@@ -903,12 +907,27 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if extra:
             emails.setdefault(extra, None)
         # Sanitize and format emails
-        emails = {(f'{name} <{email.strip().lower()}>' if name else email.strip().lower()):
-                  (f'{name} <{email}>' if name else email)
-                  for email, name in emails.items()
-                  if email and email.strip()}
+        emails = {
+            email.strip().lower(): (
+                formataddr((name, email.strip().lower())) if _for_sending
+                else (f'{name} <{email}>' if name else email)
+            )
+            for email, name in emails.items()
+            if email and email.strip()
+        }
         own_email = session.user.email if has_request_context() and session.user else None
         return dict(sorted(emails.items(), key=lambda x: (x[0] != own_email, x[1].lower())))
+
+    def get_verbose_email_sender(self, email: str) -> str:
+        """Return the verbose version of a sender email address.
+
+        This uses the same logic as :meth:`get_allowed_sender_emails`, but returns
+        just the entry matching the specified email.
+
+        If the email address is no longer in the list of allowed senders, it is
+        returned without adding a name.
+        """
+        return self.get_allowed_sender_emails(_for_sending=True).get(email, email)
 
     @memoize_request
     def has_feature(self, feature):

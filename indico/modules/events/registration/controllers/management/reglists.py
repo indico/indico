@@ -292,6 +292,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     """Send email to selected registrants."""
 
     def _send_emails(self, form):
+        sender_address = self.event.get_verbose_email_sender(form.sender_address.data)
         for registration in self.registrations:
             email_body = replace_placeholders('registration-email', form.body.data, regform=self.regform,
                                               registration=registration)
@@ -310,7 +311,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                 if PicturePlaceholder.is_in(form.body.data):
                     attachments += registration.get_picture_attachments(personal_data_only=True)
                 email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
-                                   sender_address=form.sender_address.data, template=template, html=True,
+                                   sender_address=sender_address, template=template, html=True,
                                    attachments=attachments)
             signals.core.before_notification_send.send('registration-custom-email', email=email,
                                                        registration=registration, form=form)

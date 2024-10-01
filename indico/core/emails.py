@@ -9,7 +9,7 @@ import os
 import pickle
 import tempfile
 from datetime import date
-from email.utils import make_msgid, parseaddr
+from email.utils import formataddr, make_msgid, parseaddr
 from fnmatch import fnmatch
 from urllib.parse import urlsplit
 
@@ -66,18 +66,26 @@ def send_email_task(task, email, log_entry=None):
             db.session.commit()
 
 
-def _get_actual_sender_address(sender_address):
+def get_actual_sender_address(sender_address: str, reply_address: set) -> tuple[str, set]:
     site_title = core_settings.get('site_title')
     if not sender_address:
-        return f'{site_title} <{config.NO_REPLY_EMAIL}>'
-    display_name, address_spec = parseaddr(sender_address)
-    if not config.SMTP_SENDER_FALLBACK:
-        return (f'{display_name} ({site_title}) <{config.NO_REPLY_EMAIL}>' if display_name
-                else f'{site_title} <{config.NO_REPLY_EMAIL}>')
-    if not any(fnmatch(address_spec, pattern) for pattern in config.SMTP_ALLOWED_SENDERS):
-        return (f'{display_name} ({site_title}) <{config.SMTP_SENDER_FALLBACK}>' if display_name
-                else f'{site_title} <{config.SMTP_SENDER_FALLBACK}>')
-    return sender_address
+        return f'{site_title} <{config.NO_REPLY_EMAIL}>', reply_address
+    if not config.SMTP_ALLOWED_SENDERS:
+        # this may result in spoofing
+        return sender_address, reply_address
+    orig_name, orig_address = parseaddr(sender_address)
+    fallback = config.SMTP_SENDER_FALLBACK
+    if any(fnmatch(orig_address, pattern) for pattern in config.SMTP_ALLOWED_SENDERS):
+        # valid sender address for which we are authorized to send emails
+        return sender_address, reply_address
+    # rewrite sender address to the fallback, and try to keep the relevant part of the original one
+    # if we have a name we use the name (the address already goes into reply-to), otherwise we use
+    # the address which looks ugly but is (probably?) better than just using the site name
+    display_name = f'{orig_name or orig_address} (via {site_title})'
+    from_address = formataddr((display_name, fallback))
+    if not reply_address:
+        reply_address = {orig_address}
+    return from_address, reply_address
 
 
 def do_send_email(email, log_entry=None, _from_task=False):
