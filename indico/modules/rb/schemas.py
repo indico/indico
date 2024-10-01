@@ -374,14 +374,12 @@ class LocationsSchema(mm.SQLAlchemyAutoSchema):
 
 class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
     can_delete = Function(lambda loc: not loc.rooms)
-    protection_mode = EnumField(ProtectionMode)
     acl_entries = PrincipalPermissionList(LocationPrincipal)
     can_edit = Function(lambda loc: loc.can_edit(session.user))
 
     class Meta:
         model = Location
-        fields = ('id', 'name', 'can_edit', 'can_delete', 'map_url_template', 'room_name_format', 'protection_mode',
-                  'acl_entries')
+        fields = ('id', 'name', 'can_edit', 'can_delete', 'map_url_template', 'room_name_format', 'acl_entries')
 
 
 class RBUserSchema(UserSchema):
@@ -490,7 +488,6 @@ class LocationArgs(mm.Schema):
     name = fields.String(required=True)
     room_name_format = fields.String(required=True)
     map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, load_default='')
-    protection_mode = EnumField(ProtectionMode)
     acl_entries = PrincipalPermissionList(LocationPrincipal)
 
     @validates('name')

@@ -86,7 +86,7 @@ class RHLocations(RHRoomBookingAdminBase):
         return jsonify(admin_locations_schema.dump(location, many=False))
 
     def _jsonify_many(self):
-        query = Location.query.filter(~Location.is_deleted).options(load_only('id', 'protection_mode'),
+        query = Location.query.filter(~Location.is_deleted).options(load_only('id'),
                                                                     joinedload('acl_entries'))
         locations = [loc for loc in query if loc.can_manage(session.user, allow_admin=True)]
         return jsonify(admin_locations_schema.dump(locations))
@@ -114,9 +114,8 @@ class RHLocations(RHRoomBookingAdminBase):
         return '', 204
 
     @use_rh_kwargs(LocationArgs)
-    def _process_POST(self, name, room_name_format, map_url_template, protection_mode, acl_entries):
-        loc = Location(name=name, room_name_format=room_name_format, map_url_template=(map_url_template or ''),
-                       protection_mode=protection_mode)
+    def _process_POST(self, name, room_name_format, map_url_template, acl_entries):
+        loc = Location(name=name, room_name_format=room_name_format, map_url_template=(map_url_template or ''))
         if acl_entries:
             update_principals_permissions(loc, {}, acl_entries)
         db.session.add(loc)
@@ -124,16 +123,13 @@ class RHLocations(RHRoomBookingAdminBase):
         return self._jsonify_one(loc), 201
 
     @use_rh_kwargs(LocationArgs, partial=True)
-    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing, protection_mode=None,
-                       acl_entries=None):
+    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing, acl_entries=None):
         if name is not None:
             self.location.name = name
         if room_name_format is not None:
             self.location.room_name_format = room_name_format
         if map_url_template is not missing:
             self.location.map_url_template = map_url_template or ''
-        if protection_mode is not None:
-            self.location.protection_mode = protection_mode
         if acl_entries is not None:
             current = {e.principal: get_unified_permissions(e) for e in self.location.acl_entries}
             update_principals_permissions(self.location, current, acl_entries)

@@ -14,17 +14,11 @@ import React from 'react';
 import {Field} from 'react-final-form';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Form, List} from 'semantic-ui-react';
+import {List} from 'semantic-ui-react';
 
 import {ACLField} from 'indico/react/components';
 import {PermissionInfoProvider} from 'indico/react/components/principals/hooks';
-import {
-  validators as v,
-  FinalDropdown,
-  FinalInput,
-  FinalField,
-  FinalRadio,
-} from 'indico/react/forms';
+import {validators as v, FinalDropdown, FinalInput, FinalField} from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {snakifyKeys} from 'indico/utils/case';
@@ -213,22 +207,6 @@ class LocationPage extends React.PureComponent {
           />
         )}
       </Field>
-      <Form.Field>
-        <Translate as="h5">Protection Mode</Translate>
-        <p className="field-description">
-          <Translate>
-            Restricted locations will only be visible to the location managers selected below.
-          </Translate>
-        </p>
-        <Form.Group>
-          <FinalRadio name="protection_mode" value="public" label={Translate.string('Public')} />
-          <FinalRadio
-            name="protection_mode"
-            value="protected"
-            label={Translate.string('Restricted')}
-          />
-        </Form.Group>
-      </Form.Field>
       <FavoritesProvider>
         {favoriteUsersController => (
           <PermissionInfoProvider url={locationPermissionInfoURL()}>
@@ -271,7 +249,6 @@ class LocationPage extends React.PureComponent {
       'room_name_format',
       'map_url_template',
       '_map_url_template_choice',
-      'protection_mode',
       'acl_entries',
     ]);
     if (!loc.map_url_template) {
@@ -303,7 +280,6 @@ class LocationPage extends React.PureComponent {
           room_name_format: '{building}/{floor}-{number}',
           _map_url_template_choice: 'none',
           map_url_template: null,
-          protection_mode: 'public',
           acl_entries: [],
         }}
         addFormProps={{decorators: [formDecorator]}}

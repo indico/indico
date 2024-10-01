@@ -32,12 +32,6 @@ class _PrincipalType(int, Enum):
     registration_form = 8
 
 
-class _ProtectionMode(int, Enum):
-    public = 0
-    inheriting = 1
-    protected = 2
-
-
 def upgrade():
     op.create_table(
         'location_principals',
@@ -75,13 +69,7 @@ def upgrade():
     op.create_index('ix_uq_location_principals_mp_group', 'location_principals',
                     ['mp_group_provider', 'mp_group_name', 'location_id'], unique=True, schema='roombooking',
                     postgresql_where=sa.text('type = 3'))
-    op.add_column('locations', sa.Column('protection_mode',
-                                         PyIntEnum(_ProtectionMode, exclude_values={_ProtectionMode.inheriting}),
-                                         nullable=False, server_default=str(_ProtectionMode.public.value)),
-                  schema='roombooking')
-    op.alter_column('locations', 'protection_mode', server_default=None, schema='roombooking')
 
 
 def downgrade():
-    op.drop_column('locations', 'protection_mode', schema='roombooking')
     op.drop_table('location_principals', schema='roombooking')

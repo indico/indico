@@ -10,7 +10,7 @@ import re
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.util.string import format_repr
 
 
@@ -19,8 +19,7 @@ class Location(ProtectionManagersMixin, db.Model):
     __table_args__ = (db.Index(None, 'name', unique=True, postgresql_where=db.text('NOT is_deleted')),
                       {'schema': 'roombooking'})
 
-    default_protection_mode = ProtectionMode.public
-    disallowed_protection_modes = frozenset({ProtectionMode.inheriting})
+    disable_protection_mode = True
 
     id = db.Column(
         db.Integer,
@@ -109,6 +108,3 @@ class Location(ProtectionManagersMixin, db.Model):
         if not user:
             return False
         return self.can_manage(user) or rb_is_admin(user)
-
-
-Location.register_protection_events()
