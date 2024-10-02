@@ -7,8 +7,6 @@
 
 import deleteFileURL from 'indico-url:files.delete_file';
 
-import _ from 'lodash';
-
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 export async function uploadFile(url, file, onUploadProgress) {
@@ -20,12 +18,12 @@ export async function uploadFile(url, file, onUploadProgress) {
       headers: {'content-type': 'multipart/form-data'},
       onUploadProgress,
     });
-    return data;
+    return {data, error: null};
   } catch (error) {
-    if (_.get(error, 'response.status') !== 422) {
-      handleAxiosError(error);
+    if (error.response?.status === 418) {
+      return {data: null, error: error.response.data.message};
     }
-    return null;
+    return {data: null, error: handleAxiosError(error)};
   }
 }
 

@@ -31,6 +31,7 @@ function reducer(state, action) {
           uuid: null,
         },
         state: UploadState.uploading,
+        error: null,
       };
     case 'UPLOAD_FINISHED':
       return {
@@ -41,17 +42,20 @@ function reducer(state, action) {
           uuid: action.file.uuid,
         },
         state: UploadState.finished,
+        error: null,
       };
     case 'UPLOAD_FAILED':
       return {
         ...state,
         state: UploadState.error,
+        error: action.error,
       };
     case 'RESET':
       return {
         ...state,
         state: UploadState.initial,
         file: null,
+        error: null,
       };
   }
 }
@@ -108,17 +112,17 @@ const SingleFileManager = ({
     async ([file]) => {
       deleteUploadedFile();
       dispatch({type: 'START_UPLOAD', file});
-      const resp = await uploadFile(uploadURL, file, e =>
+      const {data, error} = await uploadFile(uploadURL, file, e =>
         dispatch({
           type: 'PROGRESS',
           percent: Math.floor((e.loaded / e.total) * 100),
         })
       );
-      if (resp !== null) {
-        dispatch({type: 'UPLOAD_FINISHED', file: resp});
-        onChange(resp.uuid);
+      if (data) {
+        dispatch({type: 'UPLOAD_FINISHED', file: data});
+        onChange(data.uuid);
       } else {
-        dispatch({type: 'UPLOAD_FAILED'});
+        dispatch({type: 'UPLOAD_FAILED', error});
         onChange(null);
       }
     },
@@ -188,7 +192,14 @@ const SingleFileManager = ({
     }
   }, [setValidationError, isUploading, uploadFailed]);
 
-  return <SingleFileArea dropzone={dropzone} file={file} fileAction={fileAction} />;
+  return (
+    <SingleFileArea
+      dropzone={dropzone}
+      file={file}
+      fileAction={fileAction}
+      error={uploadState.error}
+    />
+  );
 };
 
 SingleFileManager.propTypes = {

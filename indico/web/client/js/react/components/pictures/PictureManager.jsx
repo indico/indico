@@ -35,6 +35,7 @@ function reducer(state, action) {
           uuid: null,
         },
         state: PictureState.uploading,
+        error: null,
       };
     case 'START_CAPTURING':
       return {
@@ -56,17 +57,20 @@ function reducer(state, action) {
           uuid: action.picture.uuid,
         },
         state: PictureState.finished,
+        error: null,
       };
     case 'FAILED':
       return {
         ...state,
         state: PictureState.error,
+        error: action.error,
       };
     case 'RESET':
       return {
         ...state,
         state: PictureState.initial,
         picture: null,
+        error: null,
       };
   }
 }
@@ -83,12 +87,15 @@ const PictureManager = ({
   required,
   disabled,
   onChange,
+  onFocus,
+  onBlur,
   setValidationError,
   initialPictureDetails,
   uploadURL,
   previewURL,
   minPictureSize,
 }) => {
+  // XXX careful, we have `pictureState` (the current state) and `PictureState` (an enum) here...
   const [pictureState, dispatch] = useReducer(reducer, initialState);
   const [picturePreview, setPicturePreview] = useState(null);
   const cameraRef = useRef(null);
@@ -104,6 +111,7 @@ const PictureManager = ({
   const isEditing = pictureState.state === PictureState.editing;
   const uploadFinished = pictureState.state === PictureState.finished;
   const failed = pictureState.state === PictureState.error;
+  const errorMessage = pictureState.error;
 
   const getPreview = useCallback(() => {
     return isInitialPicture ? previewURL : picturePreview;
@@ -114,6 +122,11 @@ const PictureManager = ({
       deleteFile(pictureState.picture.uuid);
     }
   }, [uploadFinished, pictureState.picture]);
+
+  const markTouched = () => {
+    onFocus();
+    onBlur();
+  };
 
   const reset = () => {
     deleteUploadedPicture();
@@ -176,17 +189,17 @@ const PictureManager = ({
     async file => {
       deleteUploadedPicture();
       dispatch({type: 'START_UPLOAD', picture: file});
-      const resp = await uploadFile(uploadURL, file, e =>
+      const {data, error} = await uploadFile(uploadURL, file, e =>
         dispatch({
           type: 'PROGRESS',
           percent: Math.floor((e.loaded / e.total) * 100),
         })
       );
-      if (resp !== null) {
-        dispatch({type: 'UPLOAD_FINISHED', picture: resp});
-        onChange(resp.uuid);
+      if (data) {
+        dispatch({type: 'UPLOAD_FINISHED', picture: data});
+        onChange(data.uuid);
       } else {
-        dispatch({type: 'FAILED'});
+        dispatch({type: 'FAILED', error});
         setPicturePreview(previewURL);
         onChange(null);
       }
@@ -201,6 +214,7 @@ const PictureManager = ({
         .getCroppedCanvas(settings)
         .toDataURL('image/jpeg');
       setPicturePreview(imageSrc);
+      markTouched();
       fetch(imageSrc)
         .then(res => res.blob())
         .then(blob => {
@@ -280,6 +294,9 @@ const PictureManager = ({
   };
 
   const dropzone = useDropzone({
+    onDragEnter: markTouched,
+    onFileDialogCancel: markTouched,
+    onDrop: markTouched,
     onDropAccepted,
     disabled: disabled || (isUploading || failed || isCapturing || isEditing),
     accept: ['.png', '.jpg', '.jpeg', '.gif', '.webp'],
@@ -337,7 +354,7 @@ const PictureManager = ({
     } else {
       setValidationError(undefined);
     }
-  }, [setValidationError, isUploading, failed, isCapturing, isEditing]);
+  }, [setValidationError, isUploading, failed, errorMessage, isCapturing, isEditing]);
 
   const capture = {
     pictureCamera: Camera,
@@ -360,7 +377,13 @@ const PictureManager = ({
       picture={picture}
       pictureAction={pictureAction}
       picturePreview={getPreview}
-      customFileRejections={customFileRejections}
+      customFileRejections={
+        customFileRejections
+          ? customFileRejections
+          : errorMessage
+          ? {code: 'server-error', message: errorMessage}
+          : null
+      }
     />
   );
 };
@@ -369,6 +392,8 @@ PictureManager.propTypes = {
   disabled: PropTypes.bool.isRequired,
   required: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
   setValidationError: PropTypes.func,
   initialPictureDetails: fileDetailsShape,
   uploadURL: PropTypes.string.isRequired,
