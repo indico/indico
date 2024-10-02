@@ -53,12 +53,6 @@
     {% set conveners = session_block.person_links %}
     {% set contributions = session_block.contributions %}
 
-    {% if show_affiliation %}
-        {% set conveners_names = conveners|map(attribute='full_name_affiliation')|list %}
-    {% else %}
-        {% set conveners_names = conveners|map(attribute='full_name')|list %}
-    {% endif %}
-
     <div class="session-block-wrapper">
         <section
             id="entry-{{ entry.id }}"
@@ -77,7 +71,13 @@
                 {% if conveners %}
                     <p>
                         <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
-                        {{ conveners_names|join(', ') }}
+                        {% for convener in conveners %}
+                            {{ convener.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
+                            {% if show_affiliation and convener.affiliation %}
+                                ({{ convener.affiliation }})
+                            {% endif %}
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor %}
                     </p>
                 {% endif %}
                 {% if entry.object.room_name %}
@@ -115,7 +115,7 @@
                                 </h4>
                                 {% if child.type == 2 and show_contribs %}
                                     <div class="contrib-timeline-content">
-                                        {{ render_nested_contrib(child, show_affiliation) }}
+                                        {{ render_nested_contrib(child, show_title, show_affiliation) }}
                                     </div>
                                 {% endif %}
                             </li>
@@ -127,19 +127,20 @@
     </div>
 {% endmacro %}
 
-{% macro render_nested_contrib(entry, show_affiliation) %}
+{% macro render_nested_contrib(entry, show_title, show_affiliation) %}
     {% set contrib = entry.object %}
-
-    {% if show_affiliation %}
-        {% set speakers = contrib.speakers|map(attribute='full_name_affiliation')|list %}
-    {% else %}
-        {% set speakers = contrib.speakers|map(attribute='full_name')|list %}
-    {% endif %}
+    {% set speakers = contrib.speakers %}
 
     {% if speakers %}
         <p>
             <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b><br />
-            {{ speakers|join(', ') }}
+            {% for speaker in speakers %}
+                {{ speaker.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
+                {% if show_affiliation and speaker.affiliation %}
+                    ({{ speaker.affiliation }})
+                {% endif %}
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
         </p>
     {% endif %}
     {% if contrib.description %}
