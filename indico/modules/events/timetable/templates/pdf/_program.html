@@ -1,4 +1,4 @@
-{% macro render_program(event, days, show_contribs, show_contrib_id, show_length_contribs, show_breaks, new_page_per_session, use_session_colors, show_session_description, print_date_close_to_sessions, show_title, show_affiliation) %}
+{% macro render_program(event, days, show_contribs, show_contrib_id, show_length_contribs, show_breaks, new_page_per_session, show_session_description, print_date_close_to_sessions, show_title, show_affiliation) %}
     {% for day in days %}
         <div class="pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
@@ -8,7 +8,7 @@
             {% for entry in days[day] %}
                 {% if entry.type == 1 %}
                     <section class="day">
-                        {{ get_color_styles(entry, entry.object.session.colors, use_session_colors=use_session_colors) }}
+                        {{ get_color_styles(entry, entry.object.session.colors) }}
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block">
                             {{ render_time(entry) }}
@@ -17,7 +17,6 @@
                     </section>
                 {% elif entry.type == 2 and show_contribs %}
                     <section class="day">
-                        {# {{ get_color_styles(entry.object, use_session_colors=use_session_colors) }} #}
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block contribution">
                             {{ render_time(entry) }}
@@ -26,7 +25,7 @@
                     </section>
                 {% elif entry.type == 3 and show_breaks %}
                     <section class="day">
-                        {{ get_color_styles(entry, entry.object.colors, use_session_colors=use_session_colors) }}
+                        {{ get_color_styles(entry, entry.object.colors) }}
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block">
                             {{ render_time(entry) }}
@@ -219,24 +218,22 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro get_color_styles(entry, colors, use_session_colors) %}
-    {% if not use_session_colors %}
-        {% set c_id = entry.type ~ '-' ~ entry.id %}
+{% macro get_color_styles(entry, colors) %}
+    {% set c_id = entry.type ~ '-' ~ entry.id %}
 
-        <style> 
-            {{ '.c' ~ c_id ~ '-bg-color' }} {
-                background-color: #{{ colors.background }};
-            }
+    <style> 
+        {{ '.c' ~ c_id ~ '-bg-color' }} {
+            background-color: #{{ colors.background }};
+        }
 
-            {{ '.c' ~ c_id ~ '-txt-color' }} {
-                color: #{{ colors.text }};
-            }
+        {{ '.c' ~ c_id ~ '-txt-color' }} {
+            color: #{{ colors.text }};
+        }
 
-            {{ '.c' ~ c_id ~ '-border-color' }} {
-                border-color: #{{ colors.background }};
-            }
-        </style>
-    {% endif %}
+        {{ '.c' ~ c_id ~ '-border-color' }} {
+            border-color: #{{ colors.background }};
+        }
+    </style>
 {% endmacro %}
 
 {% macro get_custom_color(entry, attr) %}
