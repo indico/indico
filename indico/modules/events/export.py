@@ -537,7 +537,7 @@ class EventImporter:
             if self.create_affiliations is None:
                 click.echo('Do you want to create these affiliations now?')
                 click.echo('If you choose to not create them, users/persons will simply lack the extra affiliation '
-                           ' metadata.')
+                           'metadata.')
                 create_affiliations = click.confirm('Create the missing affiliations?', default=True)
             else:
                 create_affiliations = self.create_affiliations
