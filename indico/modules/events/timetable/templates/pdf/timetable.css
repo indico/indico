@@ -1,3 +1,8 @@
+:root {
+  --blue: #09c;
+  --blue-trans: #0099cc55;
+}
+
 * {
   font-family: Lato;
 }
@@ -12,7 +17,6 @@ body {
 
 .cover {
   counter-reset: program-page 7;
-  min-height: 100vh;
 }
 
 .cover > div.cover-wrapper {
@@ -21,7 +25,6 @@ body {
   right: 0;
   top: 0;
   bottom: 0;
-  border: 2px solid rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,38 +39,59 @@ body {
 
 .toc {
   page: toc;
+  display: flex;
+  flex-direction: column;
+}
+
+.toc > div {
+  margin-bottom: 5px;
 }
 
 .toc h1 {
   text-align: center;
 }
 
-.toc ol {
-  padding: 0;
-  list-style-type: none;
-  margin: 0;
+.toc .toc-item:not(.toc-item-main) {
+  border-bottom: 1px solid var(--blue-trans);
 }
 
-.toc .toc-item {
-  margin-top: 0.5em;
-}
-
-.toc > ol > .toc-item {
-  padding-top: 1em;
+.toc .toc-item:not(.toc-item-main) a::before {
+  margin-left: 3px;
+  margin-right: 10px;
+  text-align: center;
+  content: target-counter(attr(href), page, decimal);
+  margin-bottom: 5px;
+  border-radius: 2px;
   font-weight: bold;
 }
 
-.toc .toc-item .toc-item {
-  padding-left: 1em;
+.toc-item-main {
+  font-size: 1.2em;
+  display: flex;
+  font-weight: bold;
+  padding: 10px 0;
 }
 
-.toc .toc-item a::after {
-  content: leader('.') target-counter(attr(href), page, decimal);
+.toc-item-main a::before {
+  display: inline-block;
+  font-size: 1em;
+  padding: 0.6em 0;
+  text-align: center;
+  width: 2.4em;
+  color: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  margin-right: 15px;
+  content: target-counter(attr(href), page, decimal);
+  background-color: var(--blue);
+  color: white;
 }
 
 .toc .toc-item a {
   text-decoration: none;
+  color: black;
 }
+
+/* Numbering */
 
 #footer {
   position: running(footer);
@@ -77,13 +101,13 @@ body {
   content: target-counter('#footer', page, decimal);
 }
 
-/* Ajob addition */
-
 .session-block {
   display: flex;
   margin-bottom: 10px;
   align-items: stretch;
 }
+
+/* Main content */
 
 .session-block.contribution .session-block-title {
   background-color: rgb(175, 69, 113); /* TODO: Replace with contrib color */
