@@ -1,27 +1,23 @@
 {% macro render_toc(event, days, show_sessions=true, show_contribs=true, show_breaks=true) %}
     <nav class="pagebreak toc">
         <h1>{{ _('Table of contents') }}</h1>
-        <ol>
-            {% for day in days %}
-                <li class="toc-item">
-                    <a href="#day-{{ loop.index }}">{{ day|format_skeleton('EEEEdMMMM') }}</a>
-                    {% if show_sessions %}
-                        <ol>
-                            {% for entry in days[day] %}
-                                {% if entry.type == 1 or (entry.type == 2 and show_contribs) or (entry.type == 3 and show_breaks) %}
-                                    {{ render_toc_item(entry) }}
-                                {% endif %}
-                            {% endfor %}
-                        </ol>
+        {% for day in days %}
+            <div class="toc-item toc-item-main">
+                <a href="#day-{{ loop.index }}">{{ day|format_skeleton('EEEEdMMMM') }}</a>
+            </div>
+            {% if show_sessions %}
+                {% for entry in days[day] %}
+                    {% if entry.type == 1 or (entry.type == 2 and show_contribs) or (entry.type == 3 and show_breaks) %}
+                        {{ render_toc_item(entry) }}
                     {% endif %}
-                </li>
-            {% endfor %}
-        </ol>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
     </nav>
 {% endmacro %}
 
 {% macro render_toc_item(entry) %}
-    <li class="toc-item">
+    <div class="toc-item">
         {% if entry.type == 1 %}
             {% set session_block = entry.object %}
             {% set session = session_block.session %}
@@ -33,5 +29,5 @@
             {% set break = entry.object %}
             <a href="#entry-{{ entry.id }}">{{ break.title }}</a>
         {% endif %}
-    </li>
+    </div>
 {% endmacro %}
