@@ -28,6 +28,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 5px solid var(--blue);
+  border-radius: 5px;
 }
 
 .cover > div.cover-wrapper > div {
