@@ -7,6 +7,9 @@
 
 import deleteFileURL from 'indico-url:files.delete_file';
 
+import {FORM_ERROR} from 'final-form';
+
+import {handleSubmissionError} from 'indico/react/forms';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
 export async function uploadFile(url, file, onUploadProgress) {
@@ -18,12 +21,13 @@ export async function uploadFile(url, file, onUploadProgress) {
       headers: {'content-type': 'multipart/form-data'},
       onUploadProgress,
     });
-    return {data, error: null};
+    return {data, errors: null};
   } catch (error) {
-    if (error.response?.status === 418) {
-      return {data: null, error: error.response.data.message};
+    if (error.response?.status === 422) {
+      const errors = handleSubmissionError(error, null, {}, false);
+      return {data: null, errors: errors.file || errors[FORM_ERROR]};
     }
-    return {data: null, error: handleAxiosError(error)};
+    return {data: null, errors: [handleAxiosError(error)]};
   }
 }
 

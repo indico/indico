@@ -35,7 +35,7 @@ function reducer(state, action) {
           uuid: null,
         },
         state: PictureState.uploading,
-        error: null,
+        errors: null,
       };
     case 'START_CAPTURING':
       return {
@@ -57,20 +57,20 @@ function reducer(state, action) {
           uuid: action.picture.uuid,
         },
         state: PictureState.finished,
-        error: null,
+        errors: null,
       };
     case 'FAILED':
       return {
         ...state,
         state: PictureState.error,
-        error: action.error,
+        errors: action.errors,
       };
     case 'RESET':
       return {
         ...state,
         state: PictureState.initial,
         picture: null,
-        error: null,
+        errors: null,
       };
   }
 }
@@ -111,7 +111,7 @@ const PictureManager = ({
   const isEditing = pictureState.state === PictureState.editing;
   const uploadFinished = pictureState.state === PictureState.finished;
   const failed = pictureState.state === PictureState.error;
-  const errorMessage = pictureState.error;
+  const errorMessages = pictureState.errors;
 
   const getPreview = useCallback(() => {
     return isInitialPicture ? previewURL : picturePreview;
@@ -189,7 +189,7 @@ const PictureManager = ({
     async file => {
       deleteUploadedPicture();
       dispatch({type: 'START_UPLOAD', picture: file});
-      const {data, error} = await uploadFile(uploadURL, file, e =>
+      const {data, errors} = await uploadFile(uploadURL, file, e =>
         dispatch({
           type: 'PROGRESS',
           percent: Math.floor((e.loaded / e.total) * 100),
@@ -199,7 +199,7 @@ const PictureManager = ({
         dispatch({type: 'UPLOAD_FINISHED', picture: data});
         onChange(data.uuid);
       } else {
-        dispatch({type: 'FAILED', error});
+        dispatch({type: 'FAILED', errors});
         setPicturePreview(previewURL);
         onChange(null);
       }
@@ -277,13 +277,12 @@ const PictureManager = ({
     const img = await loadImage(imageSrc);
     if (minPictureSize && minPictureSize !== 0) {
       if (Math.min(img.naturalWidth, img.naturalHeight) < minPictureSize) {
-        setCustomFileRejections({
-          code: 'min-size',
-          message: Translate.string(
+        setCustomFileRejections([
+          Translate.string(
             'The picture you uploaded is {width} by {height} pixels. Please upload a picture with a minimum of {minPictureSize} pixels on its shortest side.',
             {width: img.naturalWidth, height: img.naturalHeight, minPictureSize}
           ),
-        });
+        ]);
         rejected = true;
       }
     }
@@ -354,7 +353,7 @@ const PictureManager = ({
     } else {
       setValidationError(undefined);
     }
-  }, [setValidationError, isUploading, failed, errorMessage, isCapturing, isEditing]);
+  }, [setValidationError, isUploading, failed, isCapturing, isEditing]);
 
   const capture = {
     pictureCamera: Camera,
@@ -378,10 +377,8 @@ const PictureManager = ({
       pictureAction={pictureAction}
       picturePreview={getPreview}
       customFileRejections={
-        customFileRejections
-          ? customFileRejections
-          : errorMessage
-          ? {code: 'server-error', message: errorMessage}
+        customFileRejections || errorMessages
+          ? [...(customFileRejections || []), ...(errorMessages || [])]
           : null
       }
     />

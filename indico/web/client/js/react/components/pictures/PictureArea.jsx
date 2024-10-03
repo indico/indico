@@ -197,7 +197,9 @@ export function PictureArea({
             ))}
             {customFileRejections && (
               <Message.List>
-                <Message.Item>{customFileRejections.message}</Message.Item>
+                {customFileRejections.map(err => (
+                  <Message.Item key={err}>{err}</Message.Item>
+                ))}
               </Message.List>
             )}
           </Message>
@@ -228,7 +230,7 @@ PictureArea.propTypes = {
   dragText: PropTypes.string,
   pictureAction: fileActionShape,
   picturePreview: PropTypes.func.isRequired,
-  customFileRejections: PropTypes.object,
+  customFileRejections: PropTypes.arrayOf(PropTypes.string),
 };
 
 PictureArea.defaultProps = {

@@ -7,6 +7,7 @@
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import defaultload
+from webargs.flaskparser import abort
 
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
@@ -18,7 +19,6 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
 from indico.util.marshmallow import LowercaseString, UUIDString, not_empty
 from indico.web.args import parser, use_kwargs
-from indico.web.util import ExpectedError
 
 
 class RegistrationFormMixin:
@@ -128,7 +128,7 @@ class UploadRegistrationPictureMixin:
 
     def _save_file(self, file, stream):
         if not (resized_image_stream := process_registration_picture(stream)):
-            raise ExpectedError(_('Could not process image, it may be corrupted or too big'))
+            abort(422, messages={'file': [_('Could not process image, it may be corrupted or too big')]})
         return super()._save_file(file, resized_image_stream)
 
     def get_file_metadata(self):

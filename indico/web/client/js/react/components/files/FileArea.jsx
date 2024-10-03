@@ -58,7 +58,7 @@ export function FileArea({
   uploadButtonText,
   uploadButtonIcon,
   fileAction,
-  error,
+  errors,
 }) {
   // unfortunately dropzone does not include the `disabled` flag, but the
   // `open` function is always null when the dropzone is disabled
@@ -138,13 +138,15 @@ export function FileArea({
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        {error && (
+        {errors && (
           <Message negative>
             <Message.Header>
-              <Translate>There was a problem with your file</Translate>
+              <Translate>There were some problems with your file</Translate>
             </Message.Header>
             <Message.List>
-              <Message.Item>{error}</Message.Item>
+              {errors.map(err => (
+                <Message.Item key={err}>{err}</Message.Item>
+              ))}
             </Message.List>
           </Message>
         )}
@@ -160,14 +162,14 @@ FileArea.propTypes = {
   uploadButtonText: PropTypes.string,
   uploadButtonIcon: PropTypes.string,
   fileAction: fileActionShape,
-  error: PropTypes.string,
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 FileArea.defaultProps = {
   dragText: Translate.string('Drag file(s) here'),
   uploadButtonText: Translate.string('Choose from your computer'),
   uploadButtonIcon: 'upload',
   fileAction: null,
-  error: null,
+  errors: null,
 };
 
 export function SingleFileArea({file, ...rest}) {
@@ -195,11 +197,11 @@ SingleFileArea.propTypes = {
   dropzone: dropzoneShape.isRequired,
   file: fileDetailsShape,
   fileAction: fileActionShape,
-  error: PropTypes.string,
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 
 SingleFileArea.defaultProps = {
   file: null,
   fileAction: null,
-  error: null,
+  errors: null,
 };
