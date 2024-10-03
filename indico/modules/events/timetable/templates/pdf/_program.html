@@ -71,13 +71,7 @@
                 {% if conveners %}
                     <p>
                         <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
-                        {% for convener in conveners %}
-                            {{ convener.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
-                            {% if show_affiliation and convener.affiliation %}
-                                ({{ convener.affiliation }})
-                            {% endif %}
-                            {% if not loop.last %}, {% endif %}
-                        {% endfor %}
+                        {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
                     </p>
                 {% endif %}
                 {% if entry.object.room_name %}
@@ -134,13 +128,7 @@
     {% if speakers %}
         <p>
             <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b><br />
-            {% for speaker in speakers %}
-                {{ speaker.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
-                {% if show_affiliation and speaker.affiliation %}
-                    ({{ speaker.affiliation }})
-                {% endif %}
-                {% if not loop.last %}, {% endif %}
-            {% endfor %}
+            {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
         </p>
     {% endif %}
     {% if contrib.description %}
@@ -224,11 +212,12 @@
     {%endif%}
 {% endmacro %}
 
-{% macro render_name(person, title=false, affiliation=false) %}
-    {% set name = person.get_full_name(show_title=title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) %}
-    {% if affiliation and person.affiliation %}
-        {{ name }} ({{ person.affiliation }})
-    {% else %}
-        {{ name }}
-    {% endif %}
+{% macro render_names(people, show_title=false, show_affiliation=false, abbrev_first_name=false, last_name_first=false, last_name_upper=false) %}
+    {% for person in people %}
+        {{
+            person.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) +
+            (' (' + person.affiliation + ')' if show_affiliation and person.affiliation else '') +
+            (',' if not loop.last else '')
+        }}
+    {% endfor %}
 {% endmacro %}
