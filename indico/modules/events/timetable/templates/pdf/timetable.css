@@ -55,11 +55,11 @@ body {
   border-bottom: 1px solid var(--blue-trans);
 }
 
-.toc .toc-item:not(.toc-item-main) a::before {
+.toc .toc-item:not(.toc-item-main) a::after {
   margin-left: 3px;
   margin-right: 10px;
   text-align: center;
-  content: target-counter(attr(href), page, decimal);
+  content: leader(' ') target-counter(attr(href), page, decimal);
   margin-bottom: 5px;
   border-radius: 2px;
   font-weight: bold;
