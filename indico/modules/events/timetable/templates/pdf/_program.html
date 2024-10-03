@@ -39,26 +39,6 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro get_color_styles(entry, colors, use_session_colors) %}
-    {% if use_session_colors %}
-        {% set c_id = entry.type ~ '-' ~ entry.id %}
-
-        <style> 
-            {{ '.c' ~ c_id ~ '-bg-color' }} {
-                background-color: #{{ colors.background }};
-            }
-
-            {{ '.c' ~ c_id ~ '-txt-color' }} {
-                color: #{{ colors.text }};
-            }
-
-            {{ '.c' ~ c_id ~ '-border-color' }} {
-                border-color: #{{ colors.background }};
-            }
-        </style>
-    {% endif %}
-{% endmacro %}
-
 {% macro render_session_block(entry, show_contribs, show_contrib_id, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) %}
     {% set session_block = entry.object %}
     {% set session = session_block.session %}
@@ -68,7 +48,7 @@
     <div class="session-block-wrapper">
         <section
             id="entry-{{ entry.id }}"
-            class="session-block-title c{{ entry.type }}-{{ entry.id }}-bg-color c{{ entry.type }}-{{ entry.id }}-txt-color"
+            class="session-block-title {{ get_custom_color(entry, 'bg') }} {{ get_custom_color(entry, 'txt') }}"
             style="{{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
         >
             <h3>
@@ -80,21 +60,21 @@
             </h3>
             <div class="session-block-title-info">
                 <p><b>{% trans %}Session{% endtrans %}</b></p>
+                {% if entry.object.room_name %}
+                    <p>{{ render_place(entry) }}</p>
+                {% endif %}
                 {% if conveners %}
                     <p>
                         <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
-                        {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}
+                        {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}
                     </p>
-                {% endif %}
-                {% if entry.object.room_name %}
-                    <p>{{ render_place(entry) }}</p>
                 {% endif %}
             </div>
         </section>
         {% if entry.children %}
             <div class="session-block-content">
                 {% if show_session_description and session.description %}
-                    <div class="session-block-content-box description c{{ entry.type }}-{{ entry.id }}-border-color">
+                    <div class="session-block-content-box description {{ get_custom_color(entry, 'border') }}">
                         <ul class="contrib-timeline">
                             <li>
                                 <h4>{% trans %}Description{% endtrans %}</h4>
@@ -103,12 +83,12 @@
                         </ul>
                     </div>
                 {% endif %}
-                <div class="session-block-content-box c{{ entry.type }}-{{ entry.id }}-border-color">
+                <div class="session-block-content-box {{ get_custom_color(entry, 'border') }}">
                     <ul class="contrib-timeline">
                         {% for child in entry.children %}
-                            <li class="c{{ entry.type }}-{{ entry.id }}-border-color">
+                            <li class="{{ get_custom_color(entry, 'border') }}">
                                 <h4>
-                                    <span class="timebox c{{ entry.type }}-{{ entry.id }}-bg-color c{{ entry.type }}-{{ entry.id }}-txt-color">
+                                    <span class="timebox {{ get_custom_color(entry, 'bg') }} {{ get_custom_color(entry, 'txt') }}">
                                         {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
                                         {% if show_contribs and show_length_contribs %}
                                             ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
@@ -162,8 +142,9 @@
 
 {% macro render_break(entry) %}
     {% set break = entry.object %}
+
     <div class="session-block-wrapper">
-        <div class="session-block-title c{{ entry.type }}-{{ entry.id }}-bg-color c{{ entry.type }}-{{ entry.id }}-txt-color" id="entry-{{ entry.id }}">
+        <div class="session-block-title {{ get_custom_color(entry, 'bg') }} {{ get_custom_color(entry, 'txt') }}" id="entry-{{ entry.id }}">
             <h3>{{ break.title }}</h3>
             <div class="session-block-title-info">
                 <p><b>{% trans %}Break{% endtrans %}</b></p>
@@ -216,6 +197,8 @@
     </div>
 {% endmacro %}
 
+{# Utilities #}
+
 {% macro render_place(entry) %}
     <b>{% trans %}Location{% endtrans %}:</b>
     {% if entry.object.venue_name %}
@@ -234,4 +217,28 @@
             (',' if not loop.last else '')
         }}
     {% endfor %}
+{% endmacro %}
+
+{% macro get_color_styles(entry, colors, use_session_colors) %}
+    {% if not use_session_colors %}
+        {% set c_id = entry.type ~ '-' ~ entry.id %}
+
+        <style> 
+            {{ '.c' ~ c_id ~ '-bg-color' }} {
+                background-color: #{{ colors.background }};
+            }
+
+            {{ '.c' ~ c_id ~ '-txt-color' }} {
+                color: #{{ colors.text }};
+            }
+
+            {{ '.c' ~ c_id ~ '-border-color' }} {
+                border-color: #{{ colors.background }};
+            }
+        </style>
+    {% endif %}
+{% endmacro %}
+
+{% macro get_custom_color(entry, attr) %}
+    {{ 'c' ~ entry.type ~ '-' ~ entry.id ~ '-' ~ attr ~ '-color' }}
 {% endmacro %}
