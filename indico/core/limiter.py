@@ -30,37 +30,65 @@ class RateLimit:
         self.scope = scope
         self.limits = limits
 
-    def _get_args(self):
-        return self.key_func(), self.scope
+    def _get_args(self, args):
+        # scope args go directly the redis keys and are separated by slashes,
+        # so we want to avoid cases where there's some leakage between different
+        # rate limiters if someone ends up passing user-provided args (even though
+        # this would be a bad idea in general)
+        args = [x.replace('/', '-') if isinstance(x, str) else x for x in args]
+        if not self.key_func:
+            return self.scope, *args
+        return self.key_func(), self.scope, *args
 
-    def hit(self):
+    def hit(self, *args):
         """Check the rate limit and increment the counter.
 
         This method should be used when performing an action that should
         count against the user's rate limit.
+
+        :param args: Additional args to include in the scope, such as a user id.
         """
         if self.limits is None:
             return True
-        args = self._get_args()
+        args = self._get_args(args)
         return any(self.limiter.limiter.hit(lim, *args) for lim in self.limits)
 
-    def test(self):
+    def test(self, *args):
         """Check the rate limit without incrementing the counter.
 
         This method should be used when you just want to see if the rate limit
         has been triggered (e.g. to show a message when loading a form), without
         counting the action against the rate limit.
+
+        :param args: Additional args to include in the scope, such as a user id.
         """
         if self.limits is None:
             return True
-        args = self._get_args()
+        args = self._get_args(args)
         return any(self.limiter.limiter.test(lim, *args) for lim in self.limits)
 
-    def get_reset_delay(self):
-        """Get the duration until the rate limit resets."""
+    def clear(self, *args):
+        """Reset the rate limit.
+
+        This method should be used when you want to reset any previous hits that
+        may still be affecting the limit.
+
+        :param args: Additional args to include in the scope, such as a user id.
+        """
+        if self.limits is None:
+            return
+        args = self._get_args(args)
+        for lim in self.limits:
+            self.limiter.limiter.clear(lim, *args)
+
+    def get_reset_delay(self, *args):
+        """Get the duration until the rate limit resets.
+
+        :param args: Additional args to include in the scope, such as a user id.
+        """
         if self.limits is None:
             return timedelta()
-        args = self._get_args()
+        args = self._get_args(args)
         reset = min(self.limiter.limiter.get_window_stats(lim, *args)[0] for lim in self.limits)
         return timedelta(seconds=reset - int(time.time()))
 
@@ -69,7 +97,7 @@ class RateLimit:
         return f'<RateLimit({self.scope}): {limits}>'
 
 
-def make_rate_limiter(scope, limits):
+def make_rate_limiter(scope, limits, *, by_ip=True):
     """Create a rate limiter.
 
     Multiple limits can be separated with a semicolon; in that case
@@ -78,7 +106,7 @@ def make_rate_limiter(scope, limits):
     of time to allow for bursts.
     """
     limits = list(parse_many(limits)) if limits is not None else None
-    return RateLimit(limiter, limiter._key_func, scope, limits)
+    return RateLimit(limiter, limiter._key_func if by_ip else None, scope, limits)
 
 
 @make_interceptable
