@@ -65,6 +65,8 @@ def rb_is_admin(user):
 
 @memoize_request
 def rb_is_location_manager(user):
+    if user is None:
+        return False
     return has_managed_locations(user)
 
 
