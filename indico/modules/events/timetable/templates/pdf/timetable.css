@@ -53,11 +53,16 @@ body {
   text-align: center;
 }
 
-.toc .toc-item:not(.toc-item-main) {
-  border-bottom: 1px solid var(--blue-trans);
+.toc .toc-sessions > .toc-item:not(:last-child) {
+  border-bottom: 2px solid var(--blue-trans);
 }
 
-.toc .toc-item:not(.toc-item-main) a::after {
+.toc .toc-sessions .toc-item a {
+  display: block;
+  padding: 5px 0;
+}
+
+.toc .toc-sessions .toc-item a::after {
   margin-left: 3px;
   margin-right: 10px;
   text-align: center;
@@ -71,7 +76,6 @@ body {
   font-size: 1.2em;
   display: flex;
   font-weight: bold;
-  padding: 10px 0;
 }
 
 .toc-item-main a::before {

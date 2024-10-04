@@ -6,11 +6,13 @@
                 <a href="#day-{{ loop.index }}">{{ day|format_skeleton('EEEEdMMMM') }}</a>
             </div>
             {% if show_sessions %}
-                {% for entry in days[day] %}
-                    {% if entry.type == 1 or (entry.type == 2 and show_contribs) or (entry.type == 3 and show_breaks) %}
-                        {{ render_toc_item(entry) }}
-                    {% endif %}
-                {% endfor %}
+                <div class="toc-sessions">
+                    {% for entry in days[day] %}
+                        {% if entry.type == 1 or (entry.type == 2 and show_contribs) or (entry.type == 3 and show_breaks) %}
+                            {{ render_toc_item(entry) }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endfor %}
     </nav>
