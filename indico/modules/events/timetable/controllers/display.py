@@ -89,8 +89,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 additional_params = {}
             else:
                 pdf_class = TimeTablePlain
-                additional_params = {'firstPageNumber': form.firstPageNumber.data,
-                                     'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
+                additional_params = {'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
                                      'showSessionDescription': form_data['showSessionDescription']}
             if request.args.get('download') == '1':
                 pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
@@ -118,8 +117,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 entries = (self.event.timetable_entries
                            .filter(
                                db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
-                               TimetableEntry.parent_id.is_(None)
-                            )
+                               TimetableEntry.parent_id.is_(None))
                            .order_by(TimetableEntry.start_dt))
                 days[day] = entries
 
@@ -152,19 +150,15 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                                    show_toc=form.document_settings.data['showTableContents'],
                                    show_session_toc=form.document_settings.data['showSessionTOC'],
                                    page_size=form.pagesize.data,
-                                   page_offset=form.firstPageNumber.data-1,
                                    show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
-                                   show_contrib_id=form.contribution_info.data['showContribId'],
                                    show_length_contribs=form.contribution_info.data['showLengthContribs'],
                                    show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
                                    new_page_per_session=form.session_info.data['newPagePerSession'],
-                                   use_session_colors=form.session_info.data['useSessionColorCodes'],
                                    show_session_description=form.session_info.data['showSessionDescription'],
                                    print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
                                    )
 
-            css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data,
-                                  page_offset=form.firstPageNumber.data-1, event=self.event)
+            css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
 
             # Path('/home/troun/dev/pdf-timetable/index.html').write_text(html)
             # Path('/home/troun/dev/pdf-timetable/main.css').write_text(css)

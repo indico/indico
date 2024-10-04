@@ -1,4 +1,4 @@
-{% macro render_program(event, days, show_contribs, show_contrib_id, show_length_contribs, show_breaks, new_page_per_session, show_session_description, print_date_close_to_sessions, show_title, show_affiliation) %}
+{% macro render_program(event, days, show_contribs, show_length_contribs, show_breaks, new_page_per_session, show_session_description, print_date_close_to_sessions, show_title, show_affiliation) %}
     {% for day in days %}
         <div class="pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
@@ -12,7 +12,7 @@
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block">
                             {{ render_time(entry) }}
-                            {{ render_session_block(entry, show_contribs, show_contrib_id, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) }}
+                            {{ render_session_block(entry, show_contribs, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) }}
                         </section>
                     </section>
                 {% elif entry.type == 2 and show_contribs %}
@@ -38,7 +38,7 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro render_session_block(entry, show_contribs, show_contrib_id, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) %}
+{% macro render_session_block(entry, show_contribs, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) %}
     {% set session_block = entry.object %}
     {% set session = session_block.session %}
     {% set conveners = session_block.person_links %}
@@ -93,9 +93,6 @@
                                             ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
                                         {% endif %}
                                     </span>
-                                    {% if show_contribs and show_contrib_id %}
-                                        [{{ child.object.friendly_id }}]
-                                    {% endif %}
                                     {{ child.object.title }}
                                 </h4>
                                 {% if child.type == 2 and show_contribs %}
