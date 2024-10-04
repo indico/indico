@@ -259,7 +259,7 @@ def _log_event_update(event, changes, extra_log_fields, visible_person_link_chan
         'enforce_locale': 'Enforce language',
         **(extra_log_fields or {})
     }
-    split_log_location_changes(changes)
+    changes = split_log_location_changes(changes)
     if not visible_person_link_changes:
         # Don't log a person link change with no visible changes (changes
         # on an existing link or reordering). It would look quite weird in
