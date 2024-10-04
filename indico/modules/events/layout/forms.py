@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.modules.events.layout import theme_settings
+from indico.modules.events.layout import EVENT_BANNER_WIDTH, EVENT_LOGO_WIDTH, theme_settings
 from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.util import get_css_file_data, get_logo_data, get_plugin_conference_themes
 from indico.modules.users import NameFormat
@@ -79,6 +79,8 @@ class ConferenceLayoutForm(LoggedLayoutForm):
     # Style
     header_text_color = StringField(_('Text color'), widget=ColorPickerWidget())
     header_background_color = StringField(_('Background color'), widget=ColorPickerWidget())
+    header_logo_as_banner = BooleanField(_('Use logo as banner'), widget=SwitchWidget(),
+                                         description=_('Use the event logo as a full-width banner.'))
 
     # Announcement
     announcement = StringField(_('Announcement'),
@@ -125,9 +127,17 @@ class LectureMeetingLayoutForm(LoggedLayoutForm):
 
 
 class LogoForm(IndicoForm):
-    logo = EditableFileField('Logo', accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
-                             add_remove_links=False, handle_flashes=True, get_metadata=get_logo_data,
-                             description=_("Logo to be displayed next to the event's title"))
+    logo = EditableFileField(
+        accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+        add_remove_links=False, handle_flashes=True, get_metadata=get_logo_data
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.logo.description = (_('Logo to be displayed in the event page. When configured as banner, the logo will '
+                                   'be displayed above the event title and the optimal width is {}px. Otherwise, the '
+                                   'logo will be displayed to left of the event title and the optimal width is {}px.')
+                                 .format(EVENT_BANNER_WIDTH, EVENT_LOGO_WIDTH))
 
 
 class CSSForm(IndicoForm):
