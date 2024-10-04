@@ -10,7 +10,7 @@
 
     @page :first {
         counter-reset: toc-page;
-        counter-reset: program-page {{ page_offset }};
+        counter-reset: program-page 0;
 
         @bottom-center {
             content: '{{ now|format_date(format='full', timezone=event.tz) }}';
@@ -67,7 +67,6 @@
     event,
     days,
     show_contribs,
-    show_contrib_id,
     show_length_contribs,
     show_breaks,
     new_page_per_session,
