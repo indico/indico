@@ -1011,6 +1011,7 @@ def get_persons(registrations, include_accompanying_persons=False):
     return persons
 
 
+@make_interceptable
 def process_registration_picture(source, *, thumbnail=False):
     """Resize the picture to a maximum size and save it as JPEG."""
     max_size = REGISTRATION_PICTURE_THUMBNAIL_SIZE if thumbnail else REGISTRATION_PICTURE_SIZE

@@ -7,7 +7,17 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Card, Divider, Grid, Header, Segment, Icon, Progress} from 'semantic-ui-react';
+import {
+  Button,
+  Card,
+  Divider,
+  Grid,
+  Header,
+  Segment,
+  Icon,
+  Progress,
+  Message,
+} from 'semantic-ui-react';
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate, Param} from 'indico/react/i18n';
@@ -48,6 +58,7 @@ export function FileArea({
   uploadButtonText,
   uploadButtonIcon,
   fileAction,
+  errors,
 }) {
   // unfortunately dropzone does not include the `disabled` flag, but the
   // `open` function is always null when the dropzone is disabled
@@ -127,6 +138,18 @@ export function FileArea({
             </Grid.Column>
           </Grid.Row>
         </Grid>
+        {errors && (
+          <Message negative>
+            <Message.Header>
+              <Translate>There were some problems with your file</Translate>
+            </Message.Header>
+            <Message.List>
+              {errors.map(err => (
+                <Message.Item key={err}>{err}</Message.Item>
+              ))}
+            </Message.List>
+          </Message>
+        )}
       </Segment>
     </div>
   );
@@ -139,12 +162,14 @@ FileArea.propTypes = {
   uploadButtonText: PropTypes.string,
   uploadButtonIcon: PropTypes.string,
   fileAction: fileActionShape,
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 FileArea.defaultProps = {
   dragText: Translate.string('Drag file(s) here'),
   uploadButtonText: Translate.string('Choose from your computer'),
   uploadButtonIcon: 'upload',
   fileAction: null,
+  errors: null,
 };
 
 export function SingleFileArea({file, ...rest}) {
@@ -172,9 +197,11 @@ SingleFileArea.propTypes = {
   dropzone: dropzoneShape.isRequired,
   file: fileDetailsShape,
   fileAction: fileActionShape,
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 
 SingleFileArea.defaultProps = {
   file: null,
   fileAction: null,
+  errors: null,
 };

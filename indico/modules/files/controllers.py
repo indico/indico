@@ -11,11 +11,13 @@ from uuid import UUID
 from flask import request
 from marshmallow import fields
 from sqlalchemy.orm.attributes import flag_modified
-from werkzeug.exceptions import Forbidden, UnprocessableEntity
+from webargs.flaskparser import abort
+from werkzeug.exceptions import Forbidden
 
 from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.modules.files.util import validate_upload_file_size
+from indico.util.i18n import _
 from indico.util.signing import secure_serializer
 from indico.web.args import use_kwargs
 from indico.web.rh import RHProtected
@@ -30,11 +32,10 @@ class UploadFileMixin:
 
     @use_kwargs({'file': fields.Field(required=True)}, location='files')
     def _process(self, file):
-        if not validate_upload_file_size(file) or not self.validate_file(file):
-            # XXX: we could include a nicer error message, but none of the upload
-            # widgets show it right now, so no need to add more (translatable) strings
-            # nobody sees
-            raise UnprocessableEntity
+        if not validate_upload_file_size(file):
+            abort(422, messages={'file': [_('The uploaded file is too large')]})
+        if not self.validate_file(file):
+            abort(422, messages={'file': [_('The uploaded file is not allowed')]})
         return self._save_file(file, file.stream)
 
     def _save_file(self, file, stream):

@@ -25,20 +25,29 @@ function flatten(value) {
  * use the `handleSubmitError` function instead (which will call this function if
  * appropriate but also take care of showing an error report dialog otherwise).
  */
-export function handleSubmissionError(error, defaultMessage = null, fieldErrorMap = {}) {
+export function handleSubmissionError(
+  error,
+  defaultMessage = null,
+  fieldErrorMap = {},
+  joinErrors = true
+) {
   const webargsErrors = _.get(error, 'response.data.webargs_errors');
   if (webargsErrors && error.response.status === 422) {
     if (Array.isArray(webargsErrors)) {
       // schema-level validation failed
-      return {[FORM_ERROR]: webargsErrors.join(' / ')};
+      return {[FORM_ERROR]: joinErrors ? webargsErrors.join(' / ') : webargsErrors};
     }
     // flatten errors in case there's more than one
     return _.fromPairs(
       Object.entries(webargsErrors).map(([field, errors]) => {
-        return [fieldErrorMap[field] || field, flatten(errors).join(' / ')];
+        return [
+          fieldErrorMap[field] || field,
+          joinErrors ? flatten(errors).join(' / ') : flatten(errors),
+        ];
       })
     );
   } else {
-    return {[FORM_ERROR]: defaultMessage || error.message};
+    const message = defaultMessage || error.response?.data?.error?.message || error.message;
+    return {[FORM_ERROR]: joinErrors ? message : [message]};
   }
 }

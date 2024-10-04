@@ -74,7 +74,7 @@ export function uploadFiles({
 
   return Promise.all(
     _.zip(acceptedFiles, tmpFileIds).map(async ([{file, replaceFileId}, tmpFileId]) => {
-      const uploadedFile = await uploadFunc(file, e =>
+      const {data: uploadedFile} = await uploadFunc(file, e =>
         dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
       );
 
