@@ -35,12 +35,11 @@ Is set to 950px and centered by default.
 }
 
 /*
-The box containing the logo. By the default the logo is placed
-on the left of the conference title.
+The box containing the logo.
 */
-.confLogoBox {
-  float: left;
-  padding-right: 10px;
+.confLogoBox img {
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 /*
