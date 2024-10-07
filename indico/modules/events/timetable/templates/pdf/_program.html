@@ -97,7 +97,7 @@
                                 </h4>
                                 {% if child.type == 2 and show_contribs %}
                                     <div class="contrib-timeline-content">
-                                        {{ render_nested_contrib(child, show_title, show_affiliation) }}
+                                        {{ render_nested_contrib(child, show_title, show_affiliation, show_length_contribs) }}
                                     </div>
                                 {% endif %}
                             </li>
@@ -149,7 +149,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_nested_contrib(entry, show_title, show_affiliation) %}
+{% macro render_nested_contrib(entry, show_title, show_affiliation, show_length_contribs=false) %}
     {% set contrib = entry.object if entry.object else entry %}
     {% set speakers = contrib.speakers %}
 
@@ -173,16 +173,16 @@
                 {% for subchild in contrib.subcontributions %}
                     <li class="inherited-border-color">
                         <h4>
-                            {# <span class="timebox inherited-bg-color inherited-txt-color"> #}
+                            <span class="timebox inherited-bg-color inherited-txt-color">
                                 {# {{ subchild.start_dt|format_time(timezone=entry.event.tz) }} - {{ subchild.end_dt|format_time(timezone=entry.event.tz) }} #}
-                                {# {% if show_contribs and show_length_contribs %}
-                                    ({{ (subchild.end_dt - subchild.start_dt)|format_human_timedelta(narrow=True) }})
-                                {% endif %} #}
-                            {# </span> #}
+                                {% if show_length_contribs %}
+                                    {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
+                                {% endif %}
+                            </span>
                             {{ subchild.title }}
                         </h4>
                         <div class="contrib-timeline-content">
-                            {{ render_nested_contrib(subchild, show_title, show_affiliation) }}
+                            {{ render_nested_contrib(subchild, show_title, show_affiliation, show_length_contribs) }}
                         </div>
                     </li>
                 {% endfor%}
@@ -206,6 +206,9 @@
     <div class="time">
         <div class="time-from">
             {{ entry.start_dt|format_time(timezone=entry.event.tz) }}
+        </div>
+        <div class="time-divider">
+            {# Line between generated in CSS #}
         </div>
         <div class="time-divider">
             {# Line between generated in CSS #}
