@@ -7,8 +7,9 @@ export:
   #         If set to None (`~`), the column will not be exported. Use this e.g. for
   #         a column containing a UUID or an ID referencing something that is never
   #         exported (such as a category).
+  #         If set to the string `UUID`, the behavior will depend on whether the export
   #         If set to a string, that string is executed as a snippet of Python code.
-  #         It has access to `VALUE`, `MAKE_EVENT_REF()` and `MAKE_ID_REF(target, id)`.
+  #         It has access to `VALUE`, `KEEP_UUIDS`, `MAKE_EVENT_REF()` and `MAKE_ID_REF(target, id)`.
   #         The target of `MAKE_ID_REF` is usually specified as `Model.attr`, but can
   #         also reference a column directly (e.g. using the `secondary` notation
   #         described in the `fks` section below). Any value assigned to a variable
@@ -241,7 +242,7 @@ export:
     order: Abstract.state.in_([5, 6]), Abstract.id
     cols:
       # just track if we had an UUID or not (the code only runs if the column isn't None)
-      uuid: uuid = True
+      uuid: uuid = VALUE if KEEP_UUIDS else True
     fks:
       - AbstractComment.abstract_id
       - AbstractFieldValue.abstract_id
@@ -328,7 +329,7 @@ export:
   RegistrationForm:
     allow_duplicates: true
     cols:
-      uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else None
     fks:
       - RegistrationFormItem.registration_form_id
       - Registration.registration_form_id
@@ -338,8 +339,8 @@ export:
 
   Registration:
     cols:
-      uuid: ~
-      ticket_uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else None
+      ticket_uuid: ticket_uuid = VALUE if KEEP_UUIDS else None
     fks:
       - RegistrationData.registration_id
       - PaymentTransaction.registration_id
@@ -354,7 +355,7 @@ export:
   RegistrationFormFieldData: {}
   RegistrationInvitation:
     cols:
-      uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else None
 
   PaymentTransaction: {}
 
@@ -362,7 +363,7 @@ export:
   # surveys
   Survey:
     cols:
-      uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else None
     fks:
       - SurveyItem.survey_id
       - SurveySubmission.survey_id
@@ -446,7 +447,7 @@ import:
     Abstract:
       uuid: |
         from uuid import uuid4 as _uuid4
-        uuid = str(_uuid4())
+        uuid = str(_uuid4()) if VALUE == True else VALUE
 
 
   # How user references should be handled if the user does not exist.
