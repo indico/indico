@@ -267,13 +267,22 @@ type(
 
     pdf: function() {
       if ($('html').data('static-site')) {
-        window.location = build_url(Indico.Urls.Timetable.default_pdf, {event_id: this.eventInfo.id});
+        window.location = build_url(Indico.Urls.Timetable.default_pdf, {
+          event_id: this.eventInfo.id,
+        });
       } else {
         ajaxDialog({
           url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
           title: $T.gettext('Export to PDF'),
         });
       }
+    },
+
+    weasyprint: function() {
+      ajaxDialog({
+        url: build_url(Indico.Urls.Timetable.weasyprint, {event_id: this.eventInfo.id}),
+        title: $T.gettext('Export to PDF'),
+      });
     },
 
     fullScreen: function() {
@@ -399,6 +408,13 @@ type(
         },
       };
 
+      this.weasyprintButton = {
+        btn: Html.div('buttonWhite', $T('PDF (WeasyPrint)')),
+        onclick: function(btnContainer) {
+          self.weasyprint();
+        },
+      };
+
       this.fullScreenButton = {
         btn: Html.div('buttonWhite', $T('Full screen')),
         onclick: function(btnContainer) {
@@ -435,6 +451,7 @@ type(
       return [
         this.printButton,
         this.pdfButton,
+        this.weasyprintButton,
         this.fullScreenButton,
         this.detailsButton,
         this.filterButton,

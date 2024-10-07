@@ -161,7 +161,7 @@ def get_session_timetable_pdf(sess, **kwargs):
     pdf_format = TimetablePDFFormat(params={'coverPage': False})
     return TimeTablePlain(sess.event, session.user, showSessions=[sess.id], showDays=[],
                           sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',
-                          firstPageNumber=1, showSpeakerAffiliation=False, **kwargs)
+                          showSpeakerAffiliation=False, **kwargs)
 
 
 def render_session_type_row(session_type):

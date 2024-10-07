@@ -1,0 +1,356 @@
+:root {
+  --blue: #09c;
+  --blue-trans: #0099cc55;
+}
+
+* {
+  font-family: Lato;
+}
+
+body {
+  font-size: 0.8em;
+}
+
+.pagebreak {
+  break-before: always;
+}
+
+.cover {
+  counter-reset: program-page 7;
+}
+
+.cover > div.cover-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 5px solid var(--blue);
+  border-radius: 5px;
+}
+
+.cover > div.cover-wrapper > div {
+  text-align: center;
+  width: 100%;
+}
+
+/* TOC */
+
+.toc {
+  page: toc;
+  display: flex;
+  flex-direction: column;
+}
+
+.toc > div {
+  margin-bottom: 5px;
+}
+
+.toc h1 {
+  text-align: center;
+}
+
+.toc .toc-sessions > .toc-item:not(:last-child) {
+  border-bottom: 2px solid var(--blue-trans);
+}
+
+.toc .toc-sessions .toc-item a {
+  display: block;
+  padding: 5px 0;
+}
+
+.toc .toc-sessions .toc-item a::after {
+  margin-left: 3px;
+  margin-right: 10px;
+  text-align: center;
+  content: leader(' ') target-counter(attr(href), page, decimal);
+  margin-bottom: 5px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.toc-item-main {
+  font-size: 1.2em;
+  display: flex;
+  font-weight: bold;
+}
+
+.toc-item-main a::before {
+  display: inline-block;
+  font-size: 1em;
+  padding: 0.6em 0;
+  text-align: center;
+  width: 2.4em;
+  color: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  margin-right: 15px;
+  content: target-counter(attr(href), page, decimal);
+  background-color: var(--blue);
+  color: white;
+}
+
+.toc .toc-item a {
+  text-decoration: none;
+  color: black;
+}
+
+/* Numbering */
+
+#footer {
+  position: running(footer);
+}
+
+#footer::after {
+  content: target-counter('#footer', page, decimal);
+}
+
+.session-block {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: stretch;
+}
+
+/* Main content */
+
+.session-block.contribution .session-block-title {
+  background-color: rgb(175, 69, 113); /* TODO: Replace with contrib color */
+  color: white;
+}
+
+.session-block-wrapper {
+  flex-grow: 1;
+  /* border: 1px solid green; */
+}
+
+.session-block-title {
+  margin: 0;
+  /* border: 1px solid blue; */
+  padding: 10px;
+  border-radius: 5px;
+  flex-grow: 1;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  break-inside: avoid;
+}
+
+.session-block-title > h3 {
+  margin: 0;
+}
+
+.session-block-title-info {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8em;
+}
+
+.session-block-title-info > * {
+  margin: 0;
+  display: block;
+  word-wrap: break-word;
+}
+
+.session-block-title-info > *:not(:last-child)::after {
+  content: '|';
+  opacity: 0.5;
+  margin: 0 5px;
+}
+
+.session-block-title > h2 {
+  margin: 0;
+}
+
+.session-block-content {
+  width: 100%;
+  break-inside: avoid;
+}
+
+.day-title {
+  margin: 40px 0;
+}
+
+.time {
+  margin-right: 10px;
+  width: 60px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.time > div:first-child {
+  padding-bottom: 5px;
+}
+
+.time > div:last-child {
+  padding-top: 5px;
+}
+
+.time > .time-divider {
+  width: 3px;
+  flex-grow: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.contrib-timeline, .sub-contrib-timeline {
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  list-style-type: none;
+}
+
+.contrib-timeline > li {
+  margin: 0;
+  padding: 10px;
+}
+
+.contrib-timeline > li:not(:last-child) {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.contrib-timeline > li > h4 {
+  margin: 0;
+}
+
+.timebox {
+  text-align: center;
+  padding: 0.4em 0.8em 0.4em 1em;
+  font-size: 0.8em;
+  border-radius: 100px;
+  font-weight: normal;
+  margin-right: 10px;
+}
+
+.sub-contrib-timeline .timebox {
+  margin-right: 6px;
+}
+
+.contrib-timeline > li > .contrib-timeline-content {
+  margin-top: 10px;
+  padding: 5px;
+}
+
+.contrib-timeline-content {
+  font-size: 0.8em;
+}
+
+.sub-contrib-timeline .contrib-timeline-content {
+  font-size: 1em;
+  padding: 10px;
+}
+
+.contrib-timeline-content > * {
+  margin: 0;
+}
+
+.contrib-timeline-content > :is(p, div) b {
+  line-height: 2em;
+}
+
+:is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div) {
+  break-inside: avoid;
+  break-before: avoid;
+  break-after: auto;
+}
+
+:is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div):not(:last-child) {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+:is(.contrib-timeline-content, .sub-contrib-timeline) .description > *:last-child {
+  margin: 0;
+  padding: 1px 10px;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.1);
+  word-break: break-all;
+}
+
+.sub-contrib-timeline {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.sub-contrib-timeline > li > p > b {
+  font-style: italic;
+}
+
+.sub-contrib-timeline > li {
+  padding: 5px;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom-width: 3px;
+  border-radius: 3px;
+  display: block;
+}
+
+.sub-contrib-timeline > li:not(:last-child) {
+  margin-bottom: 5px;
+}
+
+.sub-contrib-timeline > li > h4 {
+  margin: 0;
+  font-size: 1em;
+  font-style: normal;
+}
+
+.sub-contrib-timeline .contrib-timeline-content > :is(p, div):not(:last-child) {
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+.pagebreak.pagebreak-children > section:not(:first-of-type) {
+  break-before: always;
+}
+
+.session-block-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 10px 70px;
+}
+
+.session-block-date > .timebox {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+/* Day */
+
+.day {
+  break-inside: avoid;
+}
+
+/* Content box */
+.session-block-content-box {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top: 0;
+}
+
+.session-block-content-box:last-child {
+  border-radius: 0 0 3px 3px;
+}
+
+.session-block-content-box.description {
+  margin-top: 0;
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.session-block-content-box.description li > * {
+  margin: 0;
+}
+
+.session-block-content-box.description li > *:last-child {
+  font-size: 0.8em;
+  line-height: 1.5em;
+  margin: 5px 0 0 0;
+  opacity: 0.8;
+}
