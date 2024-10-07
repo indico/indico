@@ -327,6 +327,8 @@ export:
   # registration & payment
   RegistrationForm:
     allow_duplicates: true
+    cols:
+      uuid: ~
     fks:
       - RegistrationFormItem.registration_form_id
       - Registration.registration_form_id
