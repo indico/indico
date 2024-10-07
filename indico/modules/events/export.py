@@ -48,13 +48,13 @@ from indico.util.string import strict_str
 _notset = object()
 
 
-def export_event(event, target_file):
+def export_event(event, target_file, *, keep_uuids=False):
     """Export the specified event with all its data to a file.
 
     :param event: the `Event` to export
     :param target_file: a file object to write the data to
     """
-    exporter = EventExporter(event, target_file)
+    exporter = EventExporter(event, target_file, keep_uuids=keep_uuids)
     exporter.serialize()
 
 
@@ -144,9 +144,10 @@ def _get_inserted_pk(result):
 
 
 class EventExporter:
-    def __init__(self, event, target_file):
+    def __init__(self, event, target_file, *, keep_uuids=False):
         self.event = event
         self.target_file = target_file
+        self.keep_uuids = keep_uuids
         # XXX we're not using a context manager here since changing that would probably require
         # some refactoring of how this class is used
         self.archive = tarfile.open(mode='w|', fileobj=self.target_file)  # noqa: SIM115
@@ -380,8 +381,8 @@ class EventExporter:
                         def _make_id_ref(target, id_):
                             return self._make_idref(None, id_, target_column=_resolve_col(target))
 
-                        data.update(_exec_custom(col_custom, VALUE=value, MAKE_EVENT_REF=_get_event_idref,
-                                                 MAKE_ID_REF=_make_id_ref))
+                        data.update(_exec_custom(col_custom, VALUE=value, KEEP_UUIDS=self.keep_uuids,
+                                                 MAKE_EVENT_REF=_get_event_idref, MAKE_ID_REF=_make_id_ref))
                 elif col_fullname in self.fk_map:
                     # an FK references this column -> generate a uuid
                     data[col] = self._make_idref(colspec, value, incoming=colspec.primary_key)

@@ -49,12 +49,20 @@ def restore(event_id, user_id, message):
 @cli.command()
 @click.argument('event_id', type=int)
 @click.argument('target_file', type=click.File('wb'))
-def export(event_id, target_file):
+@click.option('-U', '--keep-uuids', is_flag=True,
+              help='Whether to keep UUIDs instead of generating new ones during import.')
+def export(event_id, target_file, keep_uuids):
     """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
     on another other Indico instance.  Importing an event is only
     guaranteed to work if it was exported on the same Indico version.
+
+    When keeping UUIDs, the event cannot be imported again on the same instance unless
+    (in most cases) the original event has been deleted, but it may be useful when you
+    migrate an event to another instance and want to preserve links (usually by using a
+    custom plugin on the source instance to map old IDs to new ones). Unless this is what
+    you are doing, you probably do not want to use this flag.
     """
     event = Event.get(event_id)
     if event is None:
@@ -63,7 +71,7 @@ def export(event_id, target_file):
     elif event.is_deleted:
         click.secho('This event has been deleted', fg='yellow')
         click.confirm('Export it anyway?', abort=True)
-    export_event(event, target_file)
+    export_event(event, target_file, keep_uuids=keep_uuids)
 
 
 @cli.command('import')
