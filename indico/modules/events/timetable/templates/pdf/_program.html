@@ -73,7 +73,7 @@
         {% if entry.children %}
             <div class="session-block-content">
                 {% if show_session_description and session.description %}
-                    <div class="session-block-content-box description">
+                    <div class="session-block-content-box description inherited-border-color">
                         <ul class="contrib-timeline">
                             <li>
                                 <h4>{% trans %}Description{% endtrans %}</h4>
@@ -169,9 +169,9 @@
     {% if contrib.subcontributions %}
         <div>
             <b>{% trans %}Subcontributions{% endtrans %}</b>
-            <ul class="sub-contrib-timeline inherited-border-color">
+            <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
                 {% for subchild in contrib.subcontributions %}
-                    <li>
+                    <li class="inherited-border-color">
                         <h4>
                             {# <span class="timebox inherited-bg-color inherited-txt-color"> #}
                                 {# {{ subchild.start_dt|format_time(timezone=entry.event.tz) }} - {{ subchild.end_dt|format_time(timezone=entry.event.tz) }} #}
@@ -242,10 +242,18 @@
     {{ 'c' ~ entry.type ~ '-' ~ entry.id }}
 {% endmacro %}
 
-{% macro get_color_styles(entry, colors) %}
+{% macro get_color_styles(entry, colors, transhex='00') %}
     {% set c_id = get_custom_id(entry) %}
 
     <style>
+        {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
+            background-color: #{{ colors.background }};
+        }
+
+        {{ '.' ~ c_id  ~ ' .inherited-bg-color-trans' }} {
+            background-color: #{{ colors.background }}66;
+        }
+
         {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
             background-color: #{{ colors.background }};
         }
