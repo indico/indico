@@ -123,7 +123,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
 
             now = now_utc()
             # TODO: (Ajob) Remove list below of settings
-            # 
+            #
             # contribution_info=showContribId
             # contribution_info=showAbstract
             # contribution_info=dontShowPosterAbstract

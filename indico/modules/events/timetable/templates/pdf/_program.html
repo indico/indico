@@ -7,8 +7,8 @@
 
             {% for entry in days[day] %}
                 {% if entry.type == 1 %}
-                    <section class="day">
-                        {{ get_color_styles(entry, entry.object.session.colors) }}
+                    {{ get_color_styles(entry, entry.object.session.colors) }}
+                    <section class="day {{ get_custom_id(entry) }}">
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block">
                             {{ render_time(entry) }}
@@ -24,8 +24,8 @@
                         </section>
                     </section>
                 {% elif entry.type == 3 and show_breaks %}
-                    <section class="day">
-                        {{ get_color_styles(entry, entry.object.colors) }}
+                    {{ get_color_styles(entry, entry.object.colors) }}
+                    <section class="day {{ get_custom_id(entry) }}">
                         {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                         <section class="session-block">
                             {{ render_time(entry) }}
@@ -47,7 +47,7 @@
     <div class="session-block-wrapper">
         <section
             id="entry-{{ entry.id }}"
-            class="session-block-title {{ get_custom_color(entry, 'bg') }} {{ get_custom_color(entry, 'txt') }}"
+            class="session-block-title inherited-bg-color inherited-txt-color"
             style="{{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
         >
             <h3>
@@ -73,7 +73,7 @@
         {% if entry.children %}
             <div class="session-block-content">
                 {% if show_session_description and session.description %}
-                    <div class="session-block-content-box description {{ get_custom_color(entry, 'border') }}">
+                    <div class="session-block-content-box description">
                         <ul class="contrib-timeline">
                             <li>
                                 <h4>{% trans %}Description{% endtrans %}</h4>
@@ -82,12 +82,12 @@
                         </ul>
                     </div>
                 {% endif %}
-                <div class="session-block-content-box {{ get_custom_color(entry, 'border') }}">
+                <div class="session-block-content-box inherited-border-color">
                     <ul class="contrib-timeline">
                         {% for child in entry.children %}
-                            <li class="{{ get_custom_color(entry, 'border') }}">
+                            <li class="inherited-border-color">
                                 <h4>
-                                    <span class="timebox {{ get_custom_color(entry, 'bg') }} {{ get_custom_color(entry, 'txt') }}">
+                                    <span class="timebox inherited-bg-color inherited-txt-color">
                                         {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
                                         {% if show_contribs and show_length_contribs %}
                                             ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
@@ -140,7 +140,7 @@
     {% set break = entry.object %}
 
     <div class="session-block-wrapper">
-        <div class="session-block-title {{ get_custom_color(entry, 'bg') }} {{ get_custom_color(entry, 'txt') }}" id="entry-{{ entry.id }}">
+        <div class="session-block-title inherited-bg-color inherited-txt-color" id="entry-{{ entry.id }}">
             <h3>{{ break.title }}</h3>
             <div class="session-block-title-info">
                 <p><b>{% trans %}Break{% endtrans %}</b></p>
@@ -150,7 +150,7 @@
 {% endmacro %}
 
 {% macro render_nested_contrib(entry, show_title, show_affiliation) %}
-    {% set contrib = entry.object %}
+    {% set contrib = entry.object if entry.object else entry %}
     {% set speakers = contrib.speakers %}
 
     {% if speakers %}
@@ -164,6 +164,29 @@
             <b>{% trans %}Description{% endtrans %}</b>
             {# Description can be markdown #}
             <div>{{ contrib.description }}</div>
+        </div>
+    {% endif %}
+    {% if contrib.subcontributions %}
+        <div>
+            <b>{% trans %}Subcontributions{% endtrans %}</b>
+            <ul class="sub-contrib-timeline inherited-border-color">
+                {% for subchild in contrib.subcontributions %}
+                    <li>
+                        <h4>
+                            {# <span class="timebox inherited-bg-color inherited-txt-color"> #}
+                                {# {{ subchild.start_dt|format_time(timezone=entry.event.tz) }} - {{ subchild.end_dt|format_time(timezone=entry.event.tz) }} #}
+                                {# {% if show_contribs and show_length_contribs %}
+                                    ({{ (subchild.end_dt - subchild.start_dt)|format_human_timedelta(narrow=True) }})
+                                {% endif %} #}
+                            {# </span> #}
+                            {{ subchild.title }}
+                        </h4>
+                        <div class="contrib-timeline-content">
+                            {{ render_nested_contrib(subchild, show_title, show_affiliation) }}
+                        </div>
+                    </li>
+                {% endfor%}
+            </ul>
         </div>
     {% endif %}
 {% endmacro %}
@@ -215,24 +238,24 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro get_color_styles(entry, colors) %}
-    {% set c_id = entry.type ~ '-' ~ entry.id %}
+{% macro get_custom_id(entry) -%}
+    {{ 'c' ~ entry.type ~ '-' ~ entry.id }}
+{% endmacro %}
 
-    <style> 
-        {{ '.c' ~ c_id ~ '-bg-color' }} {
+{% macro get_color_styles(entry, colors) %}
+    {% set c_id = get_custom_id(entry) %}
+
+    <style>
+        {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
             background-color: #{{ colors.background }};
         }
 
-        {{ '.c' ~ c_id ~ '-txt-color' }} {
+        {{ '.' ~ c_id ~ ' .inherited-txt-color' }} {
             color: #{{ colors.text }};
         }
 
-        {{ '.c' ~ c_id ~ '-border-color' }} {
+        {{ '.' ~ c_id ~ ' .inherited-border-color' }} {
             border-color: #{{ colors.background }};
         }
     </style>
-{% endmacro %}
-
-{% macro get_custom_color(entry, attr) %}
-    {{ 'c' ~ entry.type ~ '-' ~ entry.id ~ '-' ~ attr ~ '-color' }}
 {% endmacro %}
