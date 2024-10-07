@@ -135,6 +135,7 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  break-inside: avoid;
 }
 
 .session-block-title > h3 {
@@ -143,11 +144,14 @@ body {
 
 .session-block-title-info {
   display: flex;
+  flex-wrap: wrap;
   font-size: 0.8em;
 }
 
 .session-block-title-info > * {
   margin: 0;
+  display: block;
+  word-wrap: break-word;
 }
 
 .session-block-title-info > *:not(:last-child)::after {
@@ -162,6 +166,7 @@ body {
 
 .session-block-content {
   width: 100%;
+  break-inside: avoid;
 }
 
 .day-title {
@@ -214,11 +219,15 @@ body {
 
 .timebox {
   text-align: center;
-  padding: 4px 8px 4px 10px;
+  padding: 0.4em 0.8em 0.4em 1em;
   font-size: 0.8em;
   border-radius: 100px;
   font-weight: normal;
   margin-right: 10px;
+}
+
+.sub-contrib-timeline .timebox {
+  margin-right: 6px;
 }
 
 .contrib-timeline > li > .contrib-timeline-content {
@@ -243,6 +252,12 @@ body {
   line-height: 2em;
 }
 
+:is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div) {
+  break-inside: avoid;
+  break-before: avoid;
+  break-after: auto;
+}
+
 :is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div):not(:last-child) {
   margin: 0;
   margin-bottom: 10px;
@@ -250,18 +265,20 @@ body {
 
 :is(.contrib-timeline-content, .sub-contrib-timeline) .description > *:last-child {
   margin: 0;
-  padding: 0 10px;
+  padding: 1px 10px;
   border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.1);
-  display: flex;
   word-break: break-all;
 }
 
 .sub-contrib-timeline {
-  font-style: italic;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 3px;
   padding: 10px;
+}
+
+.sub-contrib-timeline > li > p > b {
+  font-style: italic;
 }
 
 .sub-contrib-timeline > li {
