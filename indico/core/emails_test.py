@@ -7,38 +7,49 @@
 
 import pytest
 
-from indico.core.emails import _rewrite_sender
-from indico.vendor.django_mail.message import EmailMessage
+from indico.core.emails import get_actual_sender_address
+from indico.modules.core.settings import core_settings
 
 
 class MockConfig:
     SMTP_ALLOWED_SENDERS = {'*@example.com', 'foo@specific.com'}
-    SMTP_SENDER_FALLBACK = 'noreply@example.com'
+    SMTP_SENDER_FALLBACK = 'sender@example.com'
+    NO_REPLY_EMAIL = 'noreply@example.com'
 
 
-@pytest.mark.parametrize('with_name', (False, True))
-@pytest.mark.parametrize(('from_email', 'sender'), (
-    ('foo@example.com', 'foo@example.com'),
-    ('bar@example.com', 'bar@example.com'),
-    ('test@specific.com', 'noreply@example.com'),
-    ('foo@specific.com', 'foo@specific.com'),
+class SMTPSenderNotSetMockConfig:
+    SMTP_ALLOWED_SENDERS = set()
+    SMTP_SENDER_FALLBACK = None
+    NO_REPLY_EMAIL = 'noreply@example.com'
+
+
+@pytest.mark.usefixtures('db')
+@pytest.mark.parametrize(('sender_email', 'result'), (
+    ('foo@example.com', ('foo@example.com', set())),
+    ('bar@example.com', ('bar@example.com', set())),
+    ('test@specific.com', ('"test@specific.com (via Indico)" <sender@example.com>', {'test@specific.com'})),
+    ('foo@specific.com', ('foo@specific.com', set())),
+    ('Foo <foo@example.com>', ('Foo <foo@example.com>', set())),
+    ('Bar <bar@example.com>', ('Bar <bar@example.com>', set())),
+    ('Test <test@specific.com>', ('"Test (via Indico)" <sender@example.com>', {'test@specific.com'})),
+    ('Foo <foo@specific.com>', ('Foo <foo@specific.com>', set())),
+    ('', ('Indico <noreply@example.com>', set())),
 ))
-def test_rewrite_sender(mocker, with_name, from_email, sender):
+def test_get_actual_sender_address(mocker, sender_email, result):
     mocker.patch('indico.core.emails.config', MockConfig())
-    if with_name:
-        if from_email == sender:
-            # this is a bit ugly, but if we have no rewriting to the fallback,
-            # we need to inject the name in the expected sender address
-            sender = f'Spammer <{sender}>'
-        from_email = f'Spammer <{from_email}>'
-    msg = EmailMessage(from_email=from_email)
-    _rewrite_sender(msg)
-    assert msg.from_email == sender
-    assert msg.message()['From'] == from_email
+    core_settings.set('site_title', 'Indico')
+    assert get_actual_sender_address(sender_email, set()) == result
+    assert get_actual_sender_address(sender_email, {'reply@whatever.com'}) == (result[0], {'reply@whatever.com'})
 
 
-def test_rewrite_sender_notset():
-    msg = EmailMessage(from_email='foo@example.com')
-    _rewrite_sender(msg)
-    assert msg.from_email == 'foo@example.com'
-    assert msg.message()['From'] == 'foo@example.com'
+@pytest.mark.usefixtures('db')
+@pytest.mark.parametrize(('sender_email', 'result'), (
+    ('Foo <foo@example.com>', ('Foo <foo@example.com>', set())),
+    ('Bar <bar@specific.com>', ('Bar <bar@specific.com>', set())),
+    ('', ('Indico <noreply@example.com>', set())),
+))
+def test_smtp_sender_config_notset(mocker, sender_email, result):
+    mocker.patch('indico.core.emails.config', SMTPSenderNotSetMockConfig())
+    core_settings.set('site_title', 'Indico')
+    assert get_actual_sender_address(sender_email, set()) == result
+    assert get_actual_sender_address(sender_email, {'reply@whatever.com'}) == (result[0], {'reply@whatever.com'})

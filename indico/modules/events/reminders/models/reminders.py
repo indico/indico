@@ -205,10 +205,10 @@ class EventReminder(db.Model):
     def is_overdue(self):
         return not self.is_sent and self.scheduled_dt <= now_utc()
 
-    def _make_email(self, recipient, template, attachments):
+    def _make_email(self, sender, recipient, template, attachments):
         email_params = {
             'to_list': recipient,
-            'from_address': self.reply_to_address,
+            'sender_address': sender,
             'template': template,
             'attachments': attachments
         }
@@ -232,9 +232,10 @@ class EventReminder(db.Model):
                                        organizer=(core_settings.get('site_title'), config.NO_REPLY_EMAIL))
             attachments.append(MIMECalendar('event.ics', event_ical))
 
+        sender = self.event.get_verbose_email_sender(self.reply_to_address)
         for recipient in recipients:
             with self.event.force_event_locale():
-                email = self._make_email(recipient, email_tpl, attachments)
+                email = self._make_email(sender, recipient, email_tpl, attachments)
             send_email(email, self.event, 'Reminder', self.creator, log_metadata={'reminder_id': self.id})
 
     def __repr__(self):

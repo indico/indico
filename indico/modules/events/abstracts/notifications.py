@@ -167,8 +167,9 @@ def send_abstract_notifications(abstract):
                     cc_recipients += [author.email for author in abstract.secondary_authors]
 
                 tpl = get_abstract_notification_tpl_module(email_tpl, abstract)
-                email = make_email(to_list=to_recipients, cc_list=cc_recipients,
-                                   reply_address=email_tpl.reply_to_address, template=tpl)
+                reply_address = abstract.event.get_verbose_email_sender(email_tpl.reply_to_address)
+                email = make_email(to_list=to_recipients, cc_list=cc_recipients, reply_address=reply_address,
+                                   template=tpl)
                 send_email(email, abstract.event, 'Abstracts', session.user)
                 abstract.email_logs.append(AbstractEmailLogEntry.create_from_email(email, email_tpl=email_tpl,
                                                                                    user=session.user))
