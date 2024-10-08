@@ -130,5 +130,5 @@ def inject_meeting_body(event, **kwargs):
 def _entry_title_key(entry):
     obj = entry.object
     if entry.type == TimetableEntryType.SESSION_BLOCK:
-        return (obj.code, obj.full_title)
+        return (obj.session.code, obj.full_title)
     return (obj.title,)
