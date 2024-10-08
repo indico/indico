@@ -111,7 +111,7 @@ def inject_meeting_body(event, **kwargs):
         show_children_location[entry.id] = not all(child.object.inherit_location for child in entry.children)
 
     entries.sort(key=attrgetter('end_dt'), reverse=True)
-    entries.sort(key=lambda entry: (entry.start_dt, _entry_title_key(entry)))
+    entries.sort(key=lambda entry: (entry.start_dt, *_entry_title_key(entry)))
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
     theme = theme_settings.themes[get_theme(event, view)[0]]
