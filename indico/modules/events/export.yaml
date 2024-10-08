@@ -137,7 +137,9 @@ export:
   ContributionFieldValue: {}
 
 
-  Track: {}
+  Track:
+    fks:
+      - TrackPrincipal.track_id
 
   TrackGroup: {}
 
@@ -484,6 +486,7 @@ import:
     EventPrincipal.user_id: skip
     EventSettingPrincipal.user_id: skip
     SessionPrincipal.user_id: skip
+    TrackPrincipal.user_id: skip
     ContributionPrincipal.user_id: skip
     AttachmentPrincipal.user_id: skip
     AttachmentFolderPrincipal.user_id: skip
