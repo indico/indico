@@ -266,7 +266,7 @@ class RHLogoDisplay(RHDisplayEventBase):
             raise NotFound
         metadata = self.event.logo_metadata
         return send_file(metadata['filename'], BytesIO(self.event.logo), mimetype=metadata['content_type'],
-                         conditional=True)
+                         conditional=True, no_cache=False)
 
 
 class RHLayoutCSSDisplay(RHDisplayEventBase):
@@ -281,4 +281,5 @@ class RHLayoutCSSDisplay(RHDisplayEventBase):
         if not self.event.has_stylesheet:
             raise NotFound
         data = BytesIO(self.event.stylesheet.encode())
-        return send_file(self.event.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True)
+        return send_file(self.event.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True,
+                         no_cache=False)

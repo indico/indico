@@ -23,6 +23,7 @@ Improvements
 - Improve conference participant list, especially when participants from multiple registration
   forms are shown separately (:issue:`6440`, :pr:`6489`)
 - Include information about attached files in JSON export of abstracts (:pr:`6556`)
+- Enforce browser-side caching of event logos and custom stylesheets (:issue:`6555`, :pr:`6559`)
 
 Bugfixes
 ^^^^^^^^
