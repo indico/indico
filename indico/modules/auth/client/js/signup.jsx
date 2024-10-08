@@ -31,6 +31,7 @@ import {
 import {Fieldset, FinalTextArea, FinalCheckbox} from 'indico/react/forms/fields';
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 function Signup({
   cancelURL,
@@ -262,6 +263,7 @@ function Signup({
                   required
                 />
               </Form.Group>
+              {renderPluginComponents('signup-form-after-password')}
             </Fieldset>
           )}
           {moderated && (
