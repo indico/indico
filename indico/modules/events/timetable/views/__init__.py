@@ -127,7 +127,7 @@ def inject_meeting_body(event, **kwargs):
                            show_children_location=show_children_location, multiple_days=multiple_days, **kwargs)
 
 
-def _entry_title_key(entry):
+def _entry_title_key(entry) -> tuple[str, str]:
     obj = entry.object
     if entry.type == TimetableEntryType.SESSION_BLOCK:
         return (obj.session.code, obj.full_title)
