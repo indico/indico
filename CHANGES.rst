@@ -39,6 +39,7 @@ Bugfixes
   :thanks:`foxbunny`)
 - Fix linebreak display in markdown code blocks in survey section descriptions (:pr:`6553`)
 - Include attached pictures when downloading registration attachments (:pr:`6564`)
+- Disallow mixing an invited rule in the CfA module with other rules (:pr:`6567`)
 
 Accessibility
 ^^^^^^^^^^^^^
