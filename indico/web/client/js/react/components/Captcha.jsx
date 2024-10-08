@@ -158,9 +158,9 @@ function IndicoCaptcha({name, wtf}) {
               <label styleName="captcha-answer">
                 <Translate as="span">Answer</Translate>
                 {wtf ? (
-                  <Input name={name} required style={{maxWidth: 200}} />
+                  <Input name={name} id="input-captcha" required style={{maxWidth: 200}} />
                 ) : (
-                  <FinalInput name={name} required style={{maxWidth: 200}} />
+                  <FinalInput name={name} id="input-captcha" required style={{maxWidth: 200}} />
                 )}
               </label>
             </Form.Field>
