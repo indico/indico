@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
@@ -14,13 +13,32 @@ import {Translate} from 'indico/react/i18n';
 
 import {FinalField} from '../forms';
 
-const isValid = value => /^\S+@\S+\.\S+$/.test(value);
+interface TagListFieldProps {
+  disabled: boolean;
+  onFocus: () => void;
+  onBlur: () => void;
+  isValid?: (value: string) => boolean;
+  searchInputProps?: object;
+}
+
+export interface TagListFieldComponentProps extends TagListFieldProps {
+  value: string[];
+  onChange: (value: string[]) => void;
+}
 
 /**
- * A field that lets the user enter email addresses
+ * A field that lets the user add tags or keywords
  */
-const EmailListField = props => {
-  const {value, disabled, onChange, onFocus, onBlur} = props;
+function TagListField({
+  value,
+  disabled,
+  onChange,
+  onFocus,
+  onBlur,
+  isValid = v => !!v.trim(),
+  searchInputProps = {},
+  ...rest
+}: TagListFieldComponentProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const options = value.filter(isValid).map(x => ({text: x, value: x}));
 
@@ -40,9 +58,9 @@ const EmailListField = props => {
 
   const handleSearchChange = (e, {searchQuery: newSearchQuery}) => {
     if (/[,;]/.test(newSearchQuery)) {
-      const addresses = newSearchQuery.replace(/\s/g, '').split(/[,;]+/);
-      setValue([...value, ...addresses.filter(isValid)]);
-      setSearchQuery(addresses.filter(a => a && !isValid(a)).join(', '));
+      const values = newSearchQuery.split(/[,;]+/).map(v => v.trim());
+      setValue([...value, ...values.filter(isValid)]);
+      setSearchQuery(values.filter(a => a && !isValid(a)).join(', '));
     } else {
       setSearchQuery(newSearchQuery);
     }
@@ -55,47 +73,54 @@ const EmailListField = props => {
     }
   };
 
+  const handleAddItem = (e, {value: newItem}) => {
+    if (isValid(newItem)) {
+      setValue([...value, newItem]);
+      setSearchQuery('');
+    }
+  };
+
   return (
     <Dropdown
       options={options}
       value={value}
       searchQuery={searchQuery}
       disabled={disabled}
-      searchInput={{onFocus, onBlur, type: 'email'}}
+      searchInput={{onFocus, onBlur, ...searchInputProps}}
       search
       selection
       multiple
       allowAdditions
       fluid
       open={isValid(searchQuery)}
-      placeholder={Translate.string('Please enter an email address')}
-      additionLabel={Translate.string('Add email') + ' '} // eslint-disable-line prefer-template
+      additionLabel={Translate.string('Add keyword') + ' '} // eslint-disable-line prefer-template
       onChange={handleChange}
       onSearchChange={handleSearchChange}
       onBlur={handleBlur}
+      onAddItem={handleAddItem}
       selectedLabel={null}
       icon=""
+      {...rest}
     />
   );
-};
-
-EmailListField.propTypes = {
-  value: PropTypes.arrayOf(PropTypes.string).isRequired,
-  disabled: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
-  onBlur: PropTypes.func.isRequired,
-};
-
-export default React.memo(EmailListField);
-
-/**
- * Like `FinalField` but for a `EmailListField`.
- */
-export function FinalEmailList({name, ...rest}) {
-  return <FinalField name={name} component={EmailListField} isEqual={_.isEqual} {...rest} />;
 }
 
-FinalEmailList.propTypes = {
-  name: PropTypes.string.isRequired,
-};
+export default React.memo(TagListField);
+
+export interface FinalTagListProps extends TagListFieldProps {
+  name: string;
+}
+
+export function FinalTagList({name, ...rest}: FinalTagListProps) {
+  return (
+    <FinalField
+      name={name}
+      component={TagListField}
+      isEqual={_.isEqual}
+      description={Translate.string(
+        'Enter keywords separated by commas, semicolons, or by pressing Enter.'
+      )}
+      {...rest}
+    />
+  );
+}

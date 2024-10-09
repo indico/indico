@@ -5,8 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import validateEmailURL from 'indico-url:events.check_email';
+
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
@@ -14,6 +15,7 @@ import {Button, Segment, List, Label, Icon, Popup, Ref} from 'semantic-ui-react'
 
 import {UserSearch} from 'indico/react/components/principals/Search';
 import {PrincipalType} from 'indico/react/components/principals/util';
+import {FinalField} from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import {SortableWrapper, useSortableItem} from 'indico/react/sortable';
 import {snakifyKeys} from 'indico/utils/case';
@@ -26,17 +28,51 @@ import {PrincipalItem} from './principals/items';
 
 import './PersonLinkField.module.scss';
 
+interface PersonType {
+  userId?: number;
+  userIdentifier?: string;
+  firstName: string;
+  lastName: string;
+  name: string;
+  email: string;
+  affiliation: string;
+  avatarURL: string;
+  roles: string[];
+  displayOrder?: number;
+}
+
+interface RoleType {
+  name: string;
+  label: string;
+  plural?: string;
+  icon?: string;
+  default?: boolean;
+  section?: boolean;
+}
+
+interface PersonListItemProps {
+  person: PersonType;
+  roles: RoleType[];
+  canEdit?: boolean;
+  canDelete?: boolean;
+  onDelete?: () => void;
+  onEdit: (scope: string) => void;
+  onClickRole?: (roleIdx: number, roles: RoleType[]) => void;
+  disabled?: boolean;
+  extraParams?: object;
+}
+
 const PersonListItem = ({
   person,
   roles,
-  canEdit,
-  canDelete,
-  onDelete,
+  canEdit = true,
+  canDelete = true,
+  onDelete = null,
   onEdit,
-  onClickRole,
-  disabled,
-  extraParams,
-}) => (
+  onClickRole = null,
+  disabled = false,
+  extraParams = {},
+}: PersonListItemProps) => (
   <PrincipalItem as={List.Item} styleName="principal">
     <PrincipalItem.Icon type={PrincipalType.user} avatarURL={person.avatarURL} styleName="icon" />
     <PrincipalItem.Content
@@ -93,30 +129,14 @@ const PersonListItem = ({
   </PrincipalItem>
 );
 
-PersonListItem.propTypes = {
-  person: PropTypes.object.isRequired,
-  roles: PropTypes.array.isRequired,
-  onDelete: PropTypes.func,
-  canDelete: PropTypes.bool,
-  onEdit: PropTypes.func.isRequired,
-  canEdit: PropTypes.bool,
-  disabled: PropTypes.bool,
-  avatarURL: PropTypes.string,
-  onClickRole: PropTypes.func,
-  extraParams: PropTypes.object,
-};
+interface DraggablePersonProps extends PersonListItemProps {
+  drag?: boolean;
+  dragType: string;
+  onMove: (dragIndex: number, hoverIndex: number) => void;
+  index: number;
+}
 
-PersonListItem.defaultProps = {
-  canEdit: true,
-  canDelete: true,
-  disabled: false,
-  avatarURL: null,
-  onDelete: null,
-  onClickRole: null,
-  extraParams: {},
-};
-
-const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
+const DraggablePerson = ({drag = true, dragType, onMove, index, ...props}: DraggablePersonProps) => {
   const [dragRef, itemRef, style] = useSortableItem({
     type: `person-${dragType}`,
     index,
@@ -135,29 +155,31 @@ const DraggablePerson = ({drag, dragType, onMove, index, ...props}) => {
   );
 };
 
-DraggablePerson.propTypes = {
-  drag: PropTypes.bool,
-  dragType: PropTypes.string.isRequired,
-  onMove: PropTypes.func.isRequired,
-  index: PropTypes.number.isRequired,
-};
-
-DraggablePerson.defaultProps = {
-  drag: true,
-};
+interface PersonLinkSectionProps {
+  label?: string;
+  persons?: PersonType[];
+  defaultRoles?: RoleType[];
+  onChange: (persons: PersonType[]) => void;
+  onEdit: (idx: number, scope: string) => void;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  drag?: boolean;
+  dragType: string;
+  extraParams?: object;
+}
 
 const PersonLinkSection = ({
   label: sectionLabel,
-  persons,
-  defaultRoles,
+  persons = [],
+  defaultRoles = [],
   onChange,
   onEdit,
-  canEdit,
-  canDelete,
-  drag,
+  canEdit = true,
+  canDelete = true,
+  drag = false,
   dragType,
-  extraParams,
-}) => {
+  extraParams = {},
+}: PersonLinkSectionProps) => {
   const onClickRole = (personIndex, roleIndex, value) => {
     const role = defaultRoles[roleIndex];
     const roles = value
@@ -209,52 +231,43 @@ const PersonLinkSection = ({
   );
 };
 
-PersonLinkSection.propTypes = {
-  label: PropTypes.string,
-  persons: PropTypes.array,
-  defaultRoles: PropTypes.array,
-  onChange: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  canEdit: PropTypes.bool,
-  canDelete: PropTypes.bool,
-  drag: PropTypes.bool,
-  dragType: PropTypes.string.isRequired,
-  extraParams: PropTypes.object,
-};
+interface PersonLinkFieldProps {
+  eventId?: number;
+  sessionUser?: PersonType;
+  roles?: RoleType[];
+  emptyMessage?: string;
+  hasPredefinedAffiliations?: boolean;
+  canEnterManually?: boolean;
+  defaultSearchExternal?: boolean;
+  nameFormat?: string;
+  extraParams?: object;
+}
 
-PersonLinkSection.defaultProps = {
-  label: undefined,
-  persons: [],
-  defaultRoles: [],
-  canEdit: true,
-  canDelete: true,
-  drag: false,
-  extraParams: {},
-};
+interface PersonLinkFieldComponentProps extends PersonLinkFieldProps {
+  value: PersonType[];
+  onChange: (value: PersonType[]) => void;
+}
 
 function PersonLinkField({
-  value: persons,
+  value: _persons,
   onChange,
-  eventId,
-  sessionUser,
-  roles,
-  emptyMessage,
-  autoSort,
-  setAutoSort,
-  hasPredefinedAffiliations,
-  canEnterManually,
-  defaultSearchExternal,
-  nameFormat,
-  validateEmailUrl,
-  extraParams,
-}) {
+  eventId = null,
+  sessionUser = null,
+  roles = [],
+  emptyMessage = null,
+  hasPredefinedAffiliations = false,
+  canEnterManually = true,
+  defaultSearchExternal = false,
+  nameFormat = '',
+  extraParams = {},
+}: PersonLinkFieldComponentProps) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
   const [modalOpen, setModalOpen] = useState('');
   const [selected, setSelected] = useState(null);
+  const [autoSort, _setAutoSort] = useState(_persons.every(p => p.displayOrder === 0));
   const sections = roles.filter(x => x.section);
   const sectionKeys = new Set(sections.map(x => x.name));
   const othersCondition = p => !p.roles || !p.roles.find(r => sectionKeys.has(r));
-  const others = persons.filter(othersCondition);
 
   const onClose = () => {
     setSelected(null);
@@ -264,6 +277,11 @@ function PersonLinkField({
   const onEdit = (idx, scope) => {
     setSelected(idx);
     setModalOpen(scope);
+  };
+
+  const setAutoSort = sort => {
+    _setAutoSort(sort);
+    onChange(_persons.map((x, i) => ({...x, displayOrder: sort ? 0 : i})));
   };
 
   const formatName = ({firstName, lastName}) => {
@@ -288,6 +306,12 @@ function PersonLinkField({
       ? `${formattedLastName}, ${formattedFirstName}`
       : `${formattedFirstName} ${formattedLastName}`;
   };
+
+  const persons = (autoSort
+    ? _persons.slice().sort((a, b) => a.name.localeCompare(b.name))
+    : _persons
+  ).map(p => ({name: formatName(p), ...p}));
+  const others = persons.filter(othersCondition);
 
   const onAdd = values => {
     const existing = persons.filter(p => !!p.email).map(p => p.email);
@@ -364,7 +388,7 @@ function PersonLinkField({
             icon="sort alphabet down"
             type="button"
             active={autoSort}
-            onClick={() => setAutoSort && setAutoSort(!autoSort)}
+            onClick={() => setAutoSort(!autoSort)}
           />
           {sessionUser && (
             <Button
@@ -405,7 +429,7 @@ function PersonLinkField({
               person={persons[selected]}
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
-              validateEmailUrl={validateEmailUrl}
+              validateEmailUrl={eventId && validateEmailURL({event_id: eventId})}
               extraParams={extraParams}
             />
           )}
@@ -424,59 +448,106 @@ function PersonLinkField({
   );
 }
 
-PersonLinkField.propTypes = {
-  value: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  emptyMessage: PropTypes.string,
-  sessionUser: PropTypes.object,
-  eventId: PropTypes.number,
-  roles: PropTypes.array,
-  autoSort: PropTypes.bool,
-  setAutoSort: PropTypes.func,
-  hasPredefinedAffiliations: PropTypes.bool,
-  canEnterManually: PropTypes.bool,
-  defaultSearchExternal: PropTypes.bool,
-  nameFormat: PropTypes.string,
-  validateEmailUrl: PropTypes.string,
-  extraParams: PropTypes.object,
-};
+interface FinalPersonLinkFieldProps extends PersonLinkFieldProps {
+  name: string;
+}
 
-PersonLinkField.defaultProps = {
-  emptyMessage: null,
-  sessionUser: null,
-  eventId: null,
-  roles: [],
-  autoSort: true,
-  setAutoSort: null,
-  hasPredefinedAffiliations: false,
-  canEnterManually: true,
-  defaultSearchExternal: false,
-  nameFormat: '',
-  validateEmailUrl: null,
-  extraParams: {},
-};
+export function FinalPersonLinkField({name, ...rest}: FinalPersonLinkFieldProps) {
+  return <FinalField name={name} component={PersonLinkField} {...rest} />;
+}
+
+interface FinalAbstractPersonLinkFieldProps extends FinalPersonLinkFieldProps {
+  allowSpeakers?: boolean;
+}
+
+export function FinalAbstractPersonLinkField({allowSpeakers = false, ...rest}: FinalAbstractPersonLinkFieldProps) {
+  const roles = [
+    {
+      name: 'primary',
+      label: Translate.string('Author'),
+      plural: Translate.string('Authors'),
+      section: true,
+      default: true,
+    },
+    {
+      name: 'secondary',
+      label: Translate.string('Co-author'),
+      plural: Translate.string('Co-authors'),
+      section: true,
+    },
+  ];
+  if (allowSpeakers) {
+    roles.push({name: 'speaker', label: Translate.string('Speaker'), icon: 'microphone'});
+  }
+  return <FinalPersonLinkField roles={roles} {...rest} />;
+}
+
+interface FinalContributionPersonLinkFieldProps extends FinalPersonLinkFieldProps {
+  allowAuthors?: boolean;
+  allowSubmitters?: boolean;
+  defaultIsSubmitter?: boolean;
+}
+
+export function FinalContributionPersonLinkField({
+  allowAuthors = true,
+  allowSubmitters = true,
+  defaultIsSubmitter = true,
+  ...rest
+}: FinalContributionPersonLinkFieldProps) {
+  const roles = [
+    {name: 'speaker', label: Translate.string('Speaker'), icon: 'microphone', default: true},
+  ];
+  if (allowSubmitters) {
+    roles.push({
+      name: 'submitter',
+      label: Translate.string('Submitter'),
+      icon: 'paperclip',
+      default: defaultIsSubmitter,
+    });
+  }
+  if (allowAuthors) {
+    roles.push(
+      {
+        name: 'primary',
+        label: Translate.string('Author'),
+        plural: Translate.string('Authors'),
+        section: true,
+      },
+      {
+        name: 'secondary',
+        label: Translate.string('Co-author'),
+        plural: Translate.string('Co-authors'),
+        section: true,
+      }
+    );
+  }
+  return <FinalPersonLinkField roles={roles} {...rest} />;
+}
+
+interface WTFPersonLinkFieldProps extends PersonLinkFieldProps {
+  fieldId: string;
+  defaultValue?: PersonType[];
+}
 
 export function WTFPersonLinkField({
   fieldId,
-  eventId,
-  defaultValue,
-  roles,
-  sessionUser,
-  emptyMessage,
-  hasPredefinedAffiliations,
-  canEnterManually,
-  defaultSearchExternal,
-  nameFormat,
-  validateEmailUrl,
-  extraParams,
-}) {
+  eventId = null,
+  defaultValue = [],
+  roles = [],
+  sessionUser = null,
+  emptyMessage = null,
+  hasPredefinedAffiliations = false,
+  canEnterManually = true,
+  defaultSearchExternal = false,
+  nameFormat = '',
+  extraParams = {},
+}: WTFPersonLinkFieldProps) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
   );
-  const [autoSort, _setAutoSort] = useState(persons.every(p => p.displayOrder === 0));
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
 
-  const onChange = (value, sort = autoSort) => {
+  const onChange = value => {
     const picked = value.map(p =>
       _.pick(p, [
         'title',
@@ -497,63 +568,24 @@ export function WTFPersonLinkField({
         ..._.flatten(getPluginObjects('personLinkCustomFields')),
       ])
     );
-    inputField.value = JSON.stringify(
-      snakifyKeys(picked.map((x, i) => ({...x, displayOrder: sort ? 0 : i})))
-    );
+    inputField.value = JSON.stringify(snakifyKeys(picked));
     setPersons(value);
     inputField.dispatchEvent(new Event('change', {bubbles: true}));
   };
 
-  const setAutoSort = value => {
-    _setAutoSort(value);
-    onChange(persons, value);
-  };
-
   return (
     <PersonLinkField
-      value={!autoSort ? persons : persons.slice().sort((a, b) => a.name.localeCompare(b.name))}
+      value={persons}
       eventId={eventId}
       onChange={onChange}
       roles={roles}
       sessionUser={sessionUser}
       emptyMessage={emptyMessage}
-      autoSort={autoSort}
-      setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
       canEnterManually={canEnterManually}
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
-      validateEmailUrl={validateEmailUrl}
       extraParams={extraParams}
     />
   );
 }
-
-WTFPersonLinkField.propTypes = {
-  fieldId: PropTypes.string.isRequired,
-  defaultValue: PropTypes.array,
-  eventId: PropTypes.number,
-  roles: PropTypes.array,
-  sessionUser: PropTypes.object,
-  emptyMessage: PropTypes.string,
-  hasPredefinedAffiliations: PropTypes.bool,
-  nameFormat: PropTypes.string,
-  canEnterManually: PropTypes.bool,
-  defaultSearchExternal: PropTypes.bool,
-  validateEmailUrl: PropTypes.string,
-  extraParams: PropTypes.object,
-};
-
-WTFPersonLinkField.defaultProps = {
-  defaultValue: [],
-  eventId: null,
-  roles: [],
-  sessionUser: null,
-  emptyMessage: null,
-  hasPredefinedAffiliations: false,
-  canEnterManually: true,
-  defaultSearchExternal: false,
-  nameFormat: '',
-  validateEmailUrl: null,
-  extraParams: {},
-};

@@ -8,6 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "paths": {
       "indico/modules/core/*": ["./indico/modules/core/client/js/*"],
+      "indico/modules/dev/*": ["./indico/modules/dev/client/js/*"],
       "indico/modules/rb/*": ["./indico/modules/rb/client/js/*"],
       "indico/modules/users/*": ["./indico/modules/users/client/js/*"],
       "indico/modules/search/*": ["./indico/modules/search/client/js/*"],
