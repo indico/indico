@@ -17,8 +17,18 @@ from indico.core.logger import Logger
 
 
 logger = Logger.get('auth')
-login_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT)))
-signup_rate_limiter = LocalProxy(functools.cache(lambda: make_rate_limiter('signup', config.SIGNUP_RATE_LIMIT)))
+login_rate_limiter = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('login', config.FAILED_LOGIN_RATE_LIMIT))
+)
+login_rate_limiter_user = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('login-user', config.FAILED_LOGIN_RATE_LIMIT_USER))
+)
+signup_rate_limiter = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('signup', config.SIGNUP_RATE_LIMIT))
+)
+signup_rate_limiter_email = LocalProxy(
+    functools.cache(lambda: make_rate_limiter('signup-email', config.SIGNUP_RATE_LIMIT_EMAIL))
+)
 
 
 class IndicoMultipass(Multipass):
@@ -104,10 +114,17 @@ class IndicoMultipass(Multipass):
                 raise ValueError('There is no default auth provider')
 
     def handle_auth_error(self, exc, redirect_to_login=False):
-        if isinstance(exc, (NoSuchUser, InvalidCredentials)):
+        if isinstance(exc, NoSuchUser):
             login_rate_limiter.hit()
-            logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
+            # TODO: NoSuchUser should have an identifier so that we can rate limit by it when the user doesn't exist
+            # login_rate_limiter_user.hit(exc.identifier)
+            logger.warning('Invalid identifier (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
+        elif isinstance(exc, InvalidCredentials):
+            login_rate_limiter.hit()
+            login_rate_limiter_user.hit(exc.identifier)
+            logger.warning('Invalid credentials (ip=%s, provider=%s, identifier=%s): %s',
+                           request.remote_addr, exc.provider.name if exc.provider else None, exc.identifier, exc)
         else:
             exc_str = str(exc)
             fn = logger.error

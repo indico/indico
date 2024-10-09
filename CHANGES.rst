@@ -43,6 +43,9 @@ Improvements
   instead of ``8`` for new installations (:issue:`6629`, :pr:`6740`, thanks :user:`amCap1712`)
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
+- Introduce new :data:`FAILED_LOGIN_RATE_LIMIT_USER` and :data:`SIGNUP_RATE_LIMIT_EMAIL`
+  settings for preventing locking out users during brute-force attacks behind a
+  NAT or proxy (:pr:`6576`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
