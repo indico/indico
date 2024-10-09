@@ -18,6 +18,9 @@ Improvements
 - Notify room moderators about new pending bookings in their rooms (:pr:`6823`)
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
+- Introduce new :data:`FAILED_LOGIN_RATE_LIMIT_USER` and :data:`SIGNUP_RATE_LIMIT_EMAIL`
+  settings for preventing locking out users during brute-force attacks behind a
+  NAT or proxy (:pr:`6576`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
