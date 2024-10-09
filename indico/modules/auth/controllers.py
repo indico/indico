@@ -108,13 +108,14 @@ class RHLogin(RH):
         if request.method == 'POST':
             active_provider = provider = _get_provider(request.form['_provider'], False)
             form = provider.login_form()
-            rate_limit_exceeded = not login_rate_limiter.test()
-            if not rate_limit_exceeded and form.validate_on_submit():
-                response = multipass.handle_login_form(provider, form.data)
-                if response:
-                    return response
-                # re-check since a failed login may have triggered the rate limit
-                rate_limit_exceeded = not login_rate_limiter.test()
+            if form.validate_on_submit():
+                rate_limit_exceeded = not login_rate_limiter.test(form.data['identifier'])
+                if not rate_limit_exceeded:
+                    response = multipass.handle_login_form(provider, form.data)
+                    if response:
+                        return response
+                    # re-check since a failed login may have triggered the rate limit
+                    rate_limit_exceeded = not login_rate_limiter.test()
         # Otherwise we show the form for the default provider
         else:
             active_provider = multipass.default_local_auth_provider
@@ -293,16 +294,15 @@ class RHRegister(RH):
     def _process_verify(self, handler):
         email_sent = session.pop('register_verification_email_sent', False)
         form = handler.create_verify_email_form()
-        rate_limit_exceeded = not signup_rate_limiter.test()
-        if not email_sent and rate_limit_exceeded:
-            # tell users that they exceeded the rate limit, but NOT if they just
-            # used their last attempt successfully
-            retry_in = login_rate_limiter.get_reset_delay()
-            delay = format_human_timedelta(retry_in, 'minutes')
-            flash(_('Too many signup attempts. Please wait {}').format(delay), 'error')
-        if not rate_limit_exceeded and form.validate_on_submit():
-            signup_rate_limiter.hit()
-            return self._send_confirmation(form.email.data)
+        if form.validate_on_submit():
+            rate_limit_exceeded = not signup_rate_limiter.test(form.email.data)
+            if not rate_limit_exceeded:
+                signup_rate_limiter.hit(form.email.data)
+                return self._send_confirmation(form.email.data)
+            else:
+                retry_in = login_rate_limiter.get_reset_delay()
+                delay = format_human_timedelta(retry_in, 'minutes')
+                flash(_('Too many signup attempts. Please wait {}').format(delay), 'error')
         return WPSignup.render_template('register_verify.html', form=form, email_sent=email_sent)
 
     def _process_post(self, handler):
