@@ -19,6 +19,9 @@ Improvements
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
 - Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
+- Introduce new :data:`FAILED_LOGIN_RATE_LIMIT_USER` and :data:`SIGNUP_RATE_LIMIT_EMAIL`
+  settings to prevent locking out users during brute-force attacks (or more likely) poorly
+  behaving users behind a NAT or proxy (:pr:`6576`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

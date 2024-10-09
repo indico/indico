@@ -108,6 +108,15 @@ Authentication
 
     Default: ``'5 per 15 minutes; 10 per day'``
 
+.. data:: FAILED_LOGIN_RATE_LIMIT_USER
+
+    Applies a rate limit to failed login attempts by user identifier only after
+    the IP-based rate limiting :data:`FAILED_LOGIN_RATE_LIMIT` has been
+    exceeded.  This setting can be used to prevent well behaving users from being
+    locked out by a brute-force attack behind a NAT or proxy.
+
+    Default: ``None``
+
 .. data:: SIGNUP_RATE_LIMIT
 
     Applies a rate limit to sending verification emails in signup attempts.
@@ -121,6 +130,15 @@ Authentication
     the next 24 hours.  Setting the rate limit to ``None`` disables it.
 
     Default: ``'2 per hour; 5 per day'``
+
+.. data:: SIGNUP_RATE_LIMIT_EMAIL
+
+    Applies a rate limit to sending verification emails in signup attempts after
+    the IP-based rate limiting :data:`SIGNUP_RATE_LIMIT` has been
+    exceeded.  This setting can be used to prevent well behaving users from
+    being locked out by a brute-force attack behind a NAT or proxy.
+
+    Default: ``None``
 
 .. data:: EXTERNAL_REGISTRATION_URL
 
