@@ -23,6 +23,7 @@ Improvements
 - Improve conference participant list, especially when participants from multiple registration
   forms are shown separately (:issue:`6440`, :pr:`6489`)
 - Include information about attached files in JSON export of abstracts (:pr:`6556`)
+- Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
