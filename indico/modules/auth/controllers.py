@@ -788,19 +788,11 @@ class RHResetPassword(RH):
         form = ResetPasswordEmailForm()
         if form.validate_on_submit():
             user = form.user
-            # The only case where someone would have more than one identity is after a merge.
-            # And the worst case that can happen here is that we send the user a different
-            # username than the one he expects. But he still gets back into his profile.
-            alternatives = sorted([
-                {
-                    'name': provider.title,
-                    'identifier': identity.identifier,
-                    'last_login_dt': identity.last_login_dt,
-                }
-                for identity in user.external_identities
-                if (provider := multipass.identity_providers.get(identity.provider)) and identity.last_login_dt
-            ], key=itemgetter('last_login_dt'), reverse=True)
-            if identity := user.local_identity:
+            alternatives = self._get_alternatives(user) if user else None
+            if not user:
+                _send_confirmation(form.email.data, 'register-email', '.register',
+                                   'auth/emails/register_verify_email.txt')
+            elif identity := user.local_identity:
                 _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
                                    {'user': user, 'username': identity.identifier, 'alternatives': alternatives},
                                    data={'id': identity.id, 'hash': crc32(identity.password_hash)})
@@ -810,7 +802,7 @@ class RHResetPassword(RH):
                                    {'user': user, 'alternatives': alternatives}, data={'id': user.id})
             session['resetpass_email_sent'] = True
             logger.info('Password reset requested for user %s', user)
-            return redirect(url_for('.resetpass'))
+            return redirect(url_for('.login'))
         return WPAuth.render_template('reset_password.html', form=form, identity=None, widget_attrs={},
                                       email_sent=session.pop('resetpass_email_sent', False))
 
@@ -827,6 +819,20 @@ class RHResetPassword(RH):
             form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity, email_sent=False,
                                       widget_attrs={'username': {'disabled': True}})
+
+    def _get_alternatives(self, user):
+        # The only case where someone would have more than one identity is after a merge.
+        # And the worst case that can happen here is that we send the user a different
+        # username than the one he expects. But he still gets back into his profile.
+        return sorted([
+            {
+                'name': provider.title,
+                'identifier': identity.identifier,
+                'last_login_dt': identity.last_login_dt,
+            }
+            for identity in user.external_identities
+            if (provider := multipass.identity_providers.get(identity.provider)) and identity.last_login_dt
+        ], key=itemgetter('last_login_dt'), reverse=True)
 
 
 class RHCreateLocalIdentity(RH):

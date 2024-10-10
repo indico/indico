@@ -8,7 +8,7 @@
 import functools
 
 from flask import current_app, request
-from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
+from flask_multipass import InvalidCredentials, Multipass
 from werkzeug.local import LocalProxy
 
 from indico.core.config import config
@@ -104,20 +104,21 @@ class IndicoMultipass(Multipass):
                 raise ValueError('There is no default auth provider')
 
     def handle_auth_error(self, exc, redirect_to_login=False):
-        if isinstance(exc, NoSuchUser):
-            logger.warning('Invalid identifier (ip=%s, provider=%s): %s',
-                           request.remote_addr, exc.provider.name if exc.provider else None, exc)
-        elif isinstance(exc, InvalidCredentials):
-            login_rate_limiter.hit(exc.identifier)
-            logger.warning('Invalid credentials (ip=%s, provider=%s, identifier=%s): %s',
-                           request.remote_addr, exc.provider.name if exc.provider else None, exc.identifier, exc)
+        provider = exc.provider.name if exc.provider else None
+        if isinstance(exc, InvalidCredentials):
+            if exc.identifier:
+                login_rate_limiter.hit(exc.identifier)
+                logger.warning('Invalid credentials (ip=%s, provider=%s, identifier=%s): %s',
+                               request.remote_addr, provider, exc.identifier, exc)
+            else:
+                # TODO: Why not reporting here the identifier that was invalid?
+                logger.warning('Invalid identifier (ip=%s, provider=%s): %s', request.remote_addr, provider, exc)
         else:
             exc_str = str(exc)
             fn = logger.error
             if exc_str.startswith('mismatching_state:'):
                 fn = logger.debug
-            fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc_str,
-               exc.details)
+            fn('Authentication via %s failed: %s (%r)', provider, exc_str, exc.details)
         return super().handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 
