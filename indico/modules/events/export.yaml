@@ -9,7 +9,11 @@ export:
   #         exported (such as a category).
   #         If set to the string `UUID`, the behavior will depend on whether the export
   #         If set to a string, that string is executed as a snippet of Python code.
-  #         It has access to `VALUE`, `KEEP_UUIDS`, `MAKE_EVENT_REF()` and `MAKE_ID_REF(target, id)`.
+  #         It has access to `VALUE`, `SKIP`, `KEEP_UUIDS`, `MAKE_ROOT_REF()`,
+  #         `MAKE_ID_REF(target, id)`, `IS_ROOT_OBJECT` and `CATEGORIES`.
+  #         `CATEGORIES` is a set of category IDs that are exported, or empty when just
+  #         exporting an event.
+  #         Returning `SKIP` will skip the column (just like when setting it to None).
   #         The target of `MAKE_ID_REF` is usually specified as `Model.attr`, but can
   #         also reference a column directly (e.g. using the `secondary` notation
   #         described in the `fks` section below). Any value assigned to a variable
@@ -37,13 +41,42 @@ export:
   #                     have overlaps - do not use this without having a case where you get
   #                     an error due to duplicates!
 
+  Category:
+    cols:
+      parent_id: parent_id = SKIP if IS_ROOT_OBJECT else MAKE_ID_REF(Category.id, VALUE)
+    fks:
+      - Category.parent_id
+      - AttachmentFolder.category_id
+      - CategoryPrincipal.category_id
+      - CategoryLogEntry.category_id
+      - CategoryRole.category_id
+      - CategorySetting.category_id
+      - DesignerTemplate.category_id
+      - Event.category_id
+
+  # category roles
+  categories.role_members: {}
+  CategoryRole:
+    allow_duplicates: true
+    fks:
+      - CategoryRole.members.prop.secondary.c.role_id
+
+  # category acls
+  CategoryPrincipal:
+    skipif: ROW.type.name not in ('user', 'email')
+
+  # misc category stuff
+  CategoryLogEntry: {}
+  CategorySetting: {}
+
+  # events and anything related to it
   Event:
     cols:
       venue_id: venue_name = Location.get(VALUE).name
       room_id: room_name = Room.get(VALUE).full_name
       series_id: ~
       cloned_from_id: ~
-      category_id: ~
+      category_id: category_id = SKIP if VALUE not in CATEGORIES else MAKE_ID_REF(Category.id, VALUE)
       url_shortcut: ~
       label_id: ~
       label_message: ~
@@ -390,7 +423,16 @@ export:
     allow_duplicates: true
     cols:
       # if we have a category id, we associate that template with the event instead
-      category_id: event_id = MAKE_EVENT_REF()
+      category_id: |
+        if VALUE in CATEGORIES:
+          # keep category assignment
+          category_id = MAKE_ID_REF(Category.id, VALUE)
+        elif CATEGORIES:
+          # assign to top-level exported category
+          category_id = MAKE_ROOT_REF()
+        else:
+          # assign to the event (since we're in event export mode when CATEGORIES is empty)
+          event_id = MAKE_ROOT_REF()
     fks:
       - DesignerImageFile.template_id
     fks_out:
@@ -473,6 +515,7 @@ import:
     EditingRevision.user_id: system
     EditingRevisionComment.user_id: system
     # set to none
+    CategoryLogEntry.user_id: none
     EventPerson.user_id: none
     EventLogEntry.user_id: none
     Registration.user_id: none
@@ -482,6 +525,8 @@ import:
     PaperReviewComment.modified_by_id: none
     Editable.editor_id: none
     # skip row
+    CategoryRole.members.prop.secondary.c.user_id: skip
+    CategoryPrincipal.user_id: skip
     EventRole.members.prop.secondary.c.user_id: skip
     EventPrincipal.user_id: skip
     EventSettingPrincipal.user_id: skip
@@ -508,6 +553,7 @@ import:
   # wrapped in `<...>` so it is highlighted differently in the output.
   # Each column present in the row is also available in the format string.
   verbose:
+    Category: <Category> '{title}'
     Event: <Event> '{title}'
     Session: <Session> '{title}' (#{friendly_id})
     Contribution: <Contribution> '{title}' (#{friendly_id})
