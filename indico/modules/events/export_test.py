@@ -62,7 +62,7 @@ def test_event_export(db, dummy_event, monkeypatch):
 
     # check composition of tarfile and data.yaml content
     with tarfile.open(fileobj=f) as tarf:
-        assert tarf.getnames() == ['data.yaml']
+        assert tarf.getnames() == ['data.yaml', 'ids.yaml']
         assert tarf.extractfile('data.yaml').read().decode() == data_yaml_content
 
 
@@ -81,24 +81,24 @@ def test_event_attachment_export(db, dummy_event):
         data_file = tarf.extractfile('data.yaml')
         data = yaml.unsafe_load(data_file)
         objs = data['objects']
-        event_uid = objs[0][1]['id'][1]
+        event_uid = objs[0][2]['id'][1]
 
         # check that the exported metadata contains all the right objects
         assert [obj[0] for obj in objs] == ['events.events', 'events.sessions', 'events.contributions',
                                             'events.contributions', 'attachments.folders', 'attachments.attachments',
                                             'attachments.files']
         # check that the attached file's metadata is included
-        assert objs[5][1]['title'] == 'dummy_attachment'
-        assert objs[5][1]['folder_id'] is not None
-        assert objs[4][1]['title'] == 'dummy_folder'
-        assert objs[4][1]['linked_event_id'][1] == event_uid
-        file_ = objs[6][1]['__file__'][1]
+        assert objs[5][2]['title'] == 'dummy_attachment'
+        assert objs[5][2]['folder_id'] is not None
+        assert objs[4][2]['title'] == 'dummy_folder'
+        assert objs[4][2]['linked_event_id'][1] == event_uid
+        file_ = objs[6][2]['__file__'][1]
         assert file_['filename'] == 'dummy_file.txt'
         assert file_['content_type'] == 'text/plain'
         assert file_['size'] == 11
         assert file_['md5'] == '5eb63bbbe01eeed093cb22bb8f5acdc3'
         # check that the file itself was included (and verify content)
-        assert tarf.getnames() == ['00000000-0000-4000-8000-000000000013', 'data.yaml']
+        assert tarf.getnames() == ['00000000-0000-4000-8000-000000000013', 'data.yaml', 'ids.yaml']
         assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == b'hello world'
 
 
@@ -122,7 +122,7 @@ def test_event_import(db, dummy_user):
         tarf.addfile(tar_info, BytesIO(b'hello world'))
 
     tar_buffer.seek(0)
-    e = import_event(tar_buffer, create_users=False)
+    e = import_event(tar_buffer, create_users=False)[0]
     # Check that event metadata is fine
     assert e.title == 'dummy#0'
     assert e.creator == dummy_user
