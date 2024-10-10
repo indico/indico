@@ -3,6 +3,9 @@ indico_version: 1.3.3.7
 objects:
 - !!python/tuple
   - events.events
+  - !!python/tuple
+    - true
+    - 00000000-0000-4000-8000-000000000000
   - access_key: ''
     address: ''
     created_dt: !!python/tuple
@@ -47,6 +50,9 @@ objects:
     visibility: null
 - !!python/tuple
   - events.sessions
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - address: ''
     background_color: e3f2d3
     code: ''
@@ -73,6 +79,9 @@ objects:
     venue_name: ''
 - !!python/tuple
   - events.contributions
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - abstract_id: null
     address: ''
     board_number: ''
@@ -106,6 +115,9 @@ objects:
     venue_name: ''
 - !!python/tuple
   - events.contributions
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - abstract_id: null
     address: ''
     board_number: ''
