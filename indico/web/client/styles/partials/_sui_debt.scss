@@ -77,3 +77,10 @@
     box-shadow: none;
   }
 }
+
+@mixin missing-geometry-reset() {
+  & {
+    padding: 0;
+    margin: 0;
+  }
+}

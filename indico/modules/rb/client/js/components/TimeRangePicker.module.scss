@@ -5,10 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+@use 'partials/sui_debt';
+
 .time-range-picker {
   display: flex;
   justify-content: space-between;
   width: 200px;
+  gap: 0.5em;
 
   .start-time-dropdown {
     max-width: 100px !important;
@@ -28,11 +32,19 @@
 
   .duration {
     font-size: 0.7em;
-    color: #808c99;
+    color: var(--text-secondary-color);
     white-space: nowrap;
   }
 
-  .end-time-item {
+  [aria-selected] .duration {
+    color: var(--text-inverse_secondary-color);
+  }
+
+  .time-with-duration {
     white-space: nowrap;
+  }
+
+  .prompt {
+    @extend %visually-hidden;
   }
 }
