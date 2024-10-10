@@ -28,6 +28,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.core.storage.backend import get_storage
+from indico.modules.categories import Category, CategoryLogRealm
 from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
@@ -46,20 +47,29 @@ from indico.util.string import strict_str
 
 
 _notset = object()
+_skip = object()
 
 
-def export_event(event, target_file, *, keep_uuids=False):
-    """Export the specified event with all its data to a file.
+class _NoAliasesDumper(yaml.Dumper):
+    def ignore_aliases(self, *args, **kwargs):
+        # Never generate `&id...` refs for duplicte data, it's not a huge
+        # space saver, but makes things harder to read.
+        return True
 
-    :param event: the `Event` to export
+
+def export_event(event_or_category, target_file, *, keep_uuids=False):
+    """Export the specified event/category with all its data to a file.
+
+    :param event: the `Event` to export, or a `Category` to export with all
+                  its event and subcategories
     :param target_file: a file object to write the data to
     """
-    exporter = EventExporter(event, target_file, keep_uuids=keep_uuids)
+    exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids)
     exporter.serialize()
 
 
 def import_event(source_file, category_id=0, create_users=None, create_affiliations=None, verbose=False, force=False):
-    """Import a previously-exported event.
+    """Import a previously-exported event/category.
 
     It is up to the caller of this function to commit the transaction.
 
@@ -74,11 +84,11 @@ def import_event(source_file, category_id=0, create_users=None, create_affiliati
                                 affiliations are encountered.
     :param verbose: Whether to enable verbose output.
     :param force: Whether to ignore version conflicts.
-    :return: The imported event and the ID mapping.
+    :return: The imported event/category and the ID mapping.
     """
     importer = EventImporter(source_file, category_id, create_users, create_affiliations, verbose, force)
-    event = importer.deserialize()
-    return event, dict(importer.source_id_map)
+    event_or_category = importer.deserialize()
+    return event_or_category, dict(importer.source_id_map)
 
 
 def _model_to_table(name):
@@ -144,8 +154,9 @@ def _get_inserted_pk(result):
 
 
 class EventExporter:
-    def __init__(self, event, target_file, *, keep_uuids=False):
-        self.event = event
+    def __init__(self, obj, target_file, *, keep_uuids=False):
+        self.obj = obj
+        self.categories = frozenset(self._fetch_categories())
         self.target_file = target_file
         self.keep_uuids = keep_uuids
         # XXX we're not using a context manager here since changing that would probably require
@@ -160,6 +171,11 @@ class EventExporter:
         self.users = {}
         self.affiliations = {}
 
+    def _fetch_categories(self):
+        if not isinstance(self.obj, Category):
+            return set()
+        return {id_ for id_, in self.obj.deep_children_query.with_entities(Category.id).all()} | {self.obj.id}
+
     def _add_file(self, name, size, data):
         if isinstance(data, bytes):
             data = BytesIO(data)
@@ -170,16 +186,17 @@ class EventExporter:
         self.archive.addfile(info, data)
 
     def serialize(self):
+        model = type(self.obj)
         metadata = {
             'timestamp': now_utc(),
             'indico_version': indico.__version__,
-            'objects': list(self._serialize_objects(Event.__table__, Event.id == self.event.id)),
+            'objects': list(self._serialize_objects(model.__table__, model.id == self.obj.id, is_root_object=True)),
             'users': self.users,
             'affiliations': self.affiliations
         }
-        yaml_data = yaml.dump(metadata, indent=2)
+        yaml_data = yaml.dump(metadata, indent=2, Dumper=_NoAliasesDumper)
         self._add_file('data.yaml', len(yaml_data), yaml_data)
-        ids_data = yaml.dump(dict(self.orig_ids), indent=2)
+        ids_data = yaml.dump(dict(self.orig_ids), indent=2, Dumper=_NoAliasesDumper)
         self._add_file('ids.yaml', len(ids_data), ids_data)
         self.archive.close()
 
@@ -336,7 +353,7 @@ class EventExporter:
         data['__file__'] = ('file', {'uuid': uuid, 'filename': filename, 'content_type': content_type, 'size': size,
                                      'md5': md5})
 
-    def _serialize_objects(self, table, filter_):
+    def _serialize_objects(self, table, filter_, *, is_root_object=False, parent_scope=None):
         spec = self.spec[table.fullname]
         query = db.session.query(table).filter(filter_)
         if spec['order']:
@@ -362,6 +379,7 @@ class EventExporter:
                     raise Exception('Trying to serialize already-serialized row')
             self.seen_rows.add((table.fullname, pk))
             data = {}
+            scope = None
             for col, value in rowdict.items():
                 col = str(col)  # col names are `quoted_name` objects
                 col_fullname = f'{table.fullname}.{col}'
@@ -373,19 +391,26 @@ class EventExporter:
                 elif col_custom is not _notset:
                     # column has custom code to process its value (and possibly name)
                     if value is not None:
-                        def _get_event_idref():
-                            key = f'{Event.__table__.fullname}.{Event.id.name}'
+                        def _get_root_idref():
+                            key = f'{type(self.obj).__table__.fullname}.{type(self.obj).id.name}'
                             assert key in self.id_map
-                            return 'idref', self.id_map[key][self.event.id]
+                            return 'idref', self.id_map[key][self.obj.id]
 
                         def _make_id_ref(target, id_):
                             return self._make_idref(None, id_, target_column=_resolve_col(target))
 
-                        data.update(_exec_custom(col_custom, VALUE=value, KEEP_UUIDS=self.keep_uuids,
-                                                 MAKE_EVENT_REF=_get_event_idref, MAKE_ID_REF=_make_id_ref))
+                        res = _exec_custom(col_custom, VALUE=value, SKIP=_skip, KEEP_UUIDS=self.keep_uuids,
+                                           MAKE_ROOT_REF=_get_root_idref, MAKE_ID_REF=_make_id_ref,
+                                           IS_ROOT_OBJECT=is_root_object, CATEGORIES=self.categories)
+                        if res.get(col) is _skip:
+                            continue
+                        data.update(res)
                 elif col_fullname in self.fk_map:
                     # an FK references this column -> generate a uuid
                     data[col] = self._make_idref(colspec, value, incoming=colspec.primary_key)
+                    if colspec.primary_key:
+                        assert scope is None
+                        scope = data[col][1]
                 elif colspec.foreign_keys:
                     # column is an FK
                     data[col] = self._make_idref(colspec, value)
@@ -396,16 +421,27 @@ class EventExporter:
                     # not an fk
                     data.setdefault(col, self._make_value(value))
             self._process_file(data)
+            # generate new scope if needed or keep parent scope
+            if table in {Event.__table__, Category.__table__}:
+                new_scope = True
+            else:
+                new_scope = False
+                scope = parent_scope
+            assert scope is not None
             # export objects referenced in outgoing FKs before the row
             # itself as the FK column might not be nullable
             for col, fk in spec['fks_out'].items():
                 value = rowdict[col]
-                yield from self._serialize_objects(fk.table, value == fk)
-            yield table.fullname, data
+                yield from self._serialize_objects(fk.table, value == fk, parent_scope=scope)
+            yield table.fullname, (new_scope, scope), data
             # serialize objects referencing the current row, but don't export them yet
             for col, fks in spec['fks'].items():
                 value = rowdict[col]
-                cascaded += [x for fk in fks for x in self._serialize_objects(fk.table, value == fk)]
+                cascaded += [
+                    x
+                    for fk in fks
+                    for x in self._serialize_objects(fk.table, value == fk, parent_scope=scope)
+                ]
         # we only add incoming fks after being done with all objects in case one
         # of the referenced objects references another object from the current table
         # that has not been serialized yet (e.g. abstract reviews proposing as duplicate)
@@ -429,9 +465,10 @@ class EventImporter:
             self.source_ids = None
         self.source_id_map = defaultdict(dict)
         self.id_map = {}
+        self.scope_id_map = {}
         self.user_map = {}
         self.affiliation_map = {}
-        self.event_id = None
+        self.top_level = None
         self.system_user_id = User.get_system_user().id
         self.spec = self._load_spec()
         self.deferred_idrefs = defaultdict(set)
@@ -555,18 +592,18 @@ class EventImporter:
             else:
                 click.secho('Skipping missing affiliations', fg='magenta')
 
-    def deserialize(self):
+    def deserialize(self) -> Event | Category | None:
         if not self.force and self.data['indico_version'] != indico.__version__:
             click.secho('Version mismatch: trying to import event exported with {} to version {}'
                         .format(self.data['indico_version'], indico.__version__), fg='red')
             return None
         self._load_affiliations(self.data)
         self._load_users(self.data)
-        # we need the event first since it generates the event id, which may be needed
-        # in case of outgoing FKs on the event model
-        objects = sorted(self.data['objects'], key=lambda x: x[0] != 'events.events')
-        for tablename, tabledata in objects:
-            self._deserialize_object(db.metadata.tables[tablename], tabledata)
+        # import objects that define a new scope first, since their IDs may be needed to generate
+        # storage file IDs
+        objects = sorted(self.data['objects'], key=lambda x: not x[1][0])
+        for i, (tablename, (new_scope, scope), tabledata) in enumerate(objects):
+            self._deserialize_object(db.metadata.tables[tablename], tabledata, scope, new_scope, is_top_level=(i == 0))
         if self.deferred_idrefs:
             # Any reference to an ID that was exported need to be replaced
             # with an actual ID at some point - either immediately (if the
@@ -579,11 +616,18 @@ class EventImporter:
                 for table, col, pk_value in values:
                     click.secho(f'  - {table.fullname}.{col} ({pk_value})', fg='yellow')
             raise Exception('Not all deferred idrefs have been consumed')
-        event = Event.get(self.event_id)
-        event.log(EventLogRealm.event, LogKind.other, 'Event', 'Event imported from another Indico instance')
-        self._associate_users_by_email(event)
+        obj = self.top_level[0].get(self.top_level[1])
+        match obj:
+            case Event() as event:
+                event.log(EventLogRealm.event, LogKind.other, 'Event', 'Event imported from another Indico instance')
+                self._associate_users_by_email(event)
+            case Category() as cat:
+                cat.log(CategoryLogRealm.category, LogKind.other, 'Category',
+                        'Category imported from another Indico instance')
+                for event in Event.query.filter(Event.category_chain_overlaps([cat.id])):
+                    self._associate_users_by_email(event)
         db.session.flush()
-        return event
+        return obj
 
     def _associate_users_by_email(self, event):
         # link objects to users by email where possible
@@ -654,19 +698,20 @@ class EventImporter:
         else:
             raise ValueError('unknown type: ' + type_)
 
-    def _get_file_storage_path(self, id_, filename):
+    def _get_file_storage_path(self, id_, filename, scope):
         # we use a generic path to store all imported files since we
         # are on the table level here and thus cannot use relationships
         # and the orignal models' logic to construct paths
-        path_segments = ['event', strict_str(self.event_id), 'imported']
+        scope_type, scope_id = self.scope_id_map[scope]
+        path_segments = [scope_type, strict_str(scope_id), 'imported']
         filename = f'{id_}-{filename}'
         return posixpath.join(*path_segments, filename)
 
-    def _process_file(self, id_, data):
+    def _process_file(self, id_, data, scope):
         storage_backend = config.ATTACHMENT_STORAGE
         storage = get_storage(storage_backend)
         extracted = self.archive.extractfile(data['uuid'])
-        path = self._get_file_storage_path(id_, data['filename'])
+        path = self._get_file_storage_path(id_, data['filename'], scope)
         storage_file_id, md5 = storage.save(path, data['content_type'], data['filename'], extracted)
         assert data['size'] == storage.getsize(storage_file_id)
         if data['md5']:
@@ -680,8 +725,7 @@ class EventImporter:
             'md5': md5
         }
 
-    def _deserialize_object(self, table, data):
-        is_event = (table == Event.__table__)
+    def _deserialize_object(self, table, data, scope, new_scope, *, is_top_level=False):
         import_defaults = self.spec['defaults'].get(table.fullname, {})
         import_custom = self.spec['custom'].get(table.fullname, {})
         set_idref = None
@@ -691,10 +735,19 @@ class EventImporter:
         deferred_idrefs = {}
         missing_user_skip = False
         missing_user_exec = set()
-        if is_event:
+        top_level_model = None
+        if is_top_level:
             # the exported data may contain only one event
-            assert self.event_id is None
-            insert_values['category_id'] = self.category_id
+            assert self.top_level is None
+            match table:
+                case Event.__table__:
+                    insert_values['category_id'] = self.category_id
+                    top_level_model = Event
+                case Category.__table__:
+                    insert_values['parent_id'] = self.category_id
+                    top_level_model = Category
+                case _:
+                    raise Exception('Toplevel object is not event/category')
         for col, value in data.items():
             if isinstance(value, tuple):
                 if value[0] == 'idref_set':
@@ -749,9 +802,9 @@ class EventImporter:
                 # get an ID early since we use it in the filename
                 stmt = db.func.nextval(db.func.pg_get_serial_sequence(table.fullname, pk_name))
                 insert_values[pk_name] = pk_value = db.session.query(stmt).scalar()
-                insert_values.update(self._process_file(pk_value, file_data))
+                insert_values.update(self._process_file(pk_value, file_data, scope))
             else:
-                insert_values.update(self._process_file(str(uuid4()), file_data))
+                insert_values.update(self._process_file(str(uuid4()), file_data, scope))
         if self.verbose and table.fullname in self.spec['verbose']:
             fmt = self.spec['verbose'][table.fullname]
             click.echo(fmt.format(**insert_values))
@@ -760,8 +813,12 @@ class EventImporter:
             # if a column was marked as having incoming FKs, store
             # the ID so the reference can be resolved to the ID
             self._set_idref(set_idref, _get_inserted_pk(res), set_idref_fullname)
-        if is_event:
-            self.event_id = _get_inserted_pk(res)
+        if is_top_level:
+            self.top_level = (top_level_model, _get_inserted_pk(res))
+        if new_scope:
+            assert scope not in self.scope_id_map
+            scope_type = {Event.__table__: 'event', Category.__table__: 'category'}[table]
+            self.scope_id_map[scope] = (scope_type, _get_inserted_pk(res))
         for col, uuid in deferred_idrefs.items():
             # store all the data needed to resolve a deferred ID reference
             # later once the ID is available
