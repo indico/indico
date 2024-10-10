@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
-import {topBottomPosition} from 'indico/utils/positioning';
+import * as positioning from 'indico/utils/positioning';
 
 import './ind_combobox.scss';
 
@@ -218,14 +218,9 @@ customElements.define(
         if (isOpen) {
           input.setAttribute('aria-expanded', true);
           listbox.hidden = false;
-          topBottomPosition(listbox, input, {
-            setStyle(target, targetWillFitBottom) {
-              target.toggleAttribute('data-top', !targetWillFitBottom);
-            },
-            expand: () => {
-              indComboBox.toggleAttribute('open', true);
-            },
-          });
+          positioning.position(listbox, input, positioning.dropdownPositionStrategy, () =>
+            indComboBox.toggleAttribute('open', true)
+          );
           listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
         } else {
           input.removeAttribute('aria-expanded');

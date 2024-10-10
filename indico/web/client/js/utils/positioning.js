@@ -5,38 +5,179 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-const DEFAULT_POSITION_OPTIONS = {
-  // Attribute used to simulate the expanded state so that position can be calculated
-  positionPreviewMarkerAttribute: 'data-position-check',
-  // Target bottom style setter
-  setStyle(target, targetWillFitBelow) {
-    target.style.setProperty('--target-bottom', targetWillFitBelow ? 'auto' : '100%');
+import {domReady} from 'indico/utils/domstate';
+
+let viewportWidth = document.documentElement.clientWidth;
+let viewportHeight = document.documentElement.clientHeight;
+
+domReady.then(() => setTimeout(updateClientGeometry));
+window.addEventListener('resize', updateClientGeometry);
+
+function updateClientGeometry() {
+  viewportWidth = document.documentElement.clientWidth;
+  viewportHeight = document.documentElement.clientHeight;
+}
+
+// Positioning strategies
+//
+// The mixins represent the generic positioning methods, while the
+// scenario-specific positioning methods are defined using the mixins.
+// You will notice that mixins are not exported, while scenario-specific
+// positioning strategies are exported.
+//
+// The exported strategies are used by the position() function further
+// below.
+//
+// The code in this module is used in conjunction with the CSS. It relies
+// on the following behavior:
+
+const verticalPreferAbovePosition = {
+  calculateFit() {
+    const targetRect = this.target.getBoundingClientRect();
+    const anchorRect = this.anchor.getBoundingClientRect();
+    this.fitstPreferredDirection = targetRect.height <= anchorRect.top;
   },
-  // Function to reveal the target once position styles are applied
-  // eslint-disable-next-line no-unused-vars
-  expand(target, anchor) {},
+  setPosition() {
+    this.target.style.setProperty('--target-top', this.fitstPreferredDirection ? 'auto' : '100%');
+    this.target.style.setProperty(
+      '--target-bottom',
+      this.fitstPreferredDirection ? '100%' : 'auto'
+    );
+  },
+};
+
+const verticalPreferBelowPosition = {
+  calculateFit() {
+    const targetRect = this.target.getBoundingClientRect();
+    const anchorRect = this.anchor.getBoundingClientRect();
+    this.fitstPreferredDirection = anchorRect.bottom + targetRect.height <= viewportHeight;
+  },
+  setPosition() {
+    this.target.style.setProperty('--target-top', this.fitstPreferredDirection ? '100%' : 'auto');
+    this.target.style.setProperty(
+      '--target-bottom',
+      this.fitstPreferredDirection ? 'auto' : '100%'
+    );
+  },
+};
+
+const unaligned = {
+  calculateAlignment() {},
+  setAlignment() {},
+};
+
+const horizontalFlush = {
+  calculateAlignment() {
+    const targetRect = this.target.getBoundingClientRect();
+    const anchorRect = this.anchor.getBoundingClientRect();
+    this.alignsPreferredSide = anchorRect.left + targetRect.width <= viewportWidth;
+  },
+  setAlignment() {
+    this.target.style.setProperty('--target-left', this.alignsPreferredSide ? '0' : 'auto');
+    this.target.style.setProperty('--target-right', this.alignsPreferredSide ? 'auto' : '0');
+  },
+};
+
+const horizontalTargetPosition = {
+  calculateFit() {
+    const targetRect = this.target.getBoundingClientRect();
+    const anchorRect = this.anchor.getBoundingClientRect();
+    this.fitstPreferredDirection = targetRect.width <= viewportWidth - anchorRect.right;
+  },
+  setPosition() {
+    this.target.style.setProperty('--target-left', this.fitstPreferredDirection ? '100%' : 'auto');
+    this.target.style.setProperty('--target-right', this.fitstPreferredDirection ? 'auto' : '100%');
+  },
+};
+
+const withArrow = {
+  setArrowDirection() {
+    if (this.fitstPreferredDirection) {
+      this.setPreferredArrowDirection();
+    } else {
+      this.setOppositeArrowDirection();
+    }
+  },
+};
+
+const withoutArrow = {
+  setArrowDirection() {},
+};
+
+const verticalArrowPosition = {
+  setPreferredArrowDirection() {
+    const style = this.anchor.style;
+    style.setProperty('--arrow-top', 'auto');
+    style.setProperty('--arrow-direction', '180deg');
+  },
+  setOppositeArrowDirection() {
+    const style = this.anchor.style;
+    style.setProperty('--arrow-top', '100%');
+    style.setProperty('--arrow-direction', '0');
+  },
+};
+
+const horizontalArrowPosition = {
+  setPreferredArrowDirection() {
+    const style = this.anchor.style;
+    style.setProperty('--arrow-left', '100%');
+    style.setProperty('--arrow-direction', '-90deg');
+  },
+  setOppositeArrowDirection() {
+    const style = this.anchor.style;
+    style.setProperty('--arrow-left', 'auto');
+    style.setProperty('--arrow-direction', '90deg');
+  },
+};
+
+export const verticalTooltipPositionStrategy = {
+  ...verticalPreferAbovePosition,
+  ...unaligned,
+  ...withArrow,
+  ...verticalArrowPosition,
+};
+
+export const horizontalTooltipPositionStrategy = {
+  ...horizontalTargetPosition,
+  ...unaligned,
+  ...withArrow,
+  ...horizontalArrowPosition,
+};
+
+export const dropdownPositionStrategy = {
+  ...verticalPreferBelowPosition,
+  ...horizontalFlush,
+  ...withoutArrow,
+};
+
+export const popupPositionStrategy = {
+  ...verticalPreferAbovePosition,
+  ...unaligned,
+  ...withoutArrow,
 };
 
 /**
  * Calculate whether the target element will fit the space below the anchor and apply position styling
  */
-export function topBottomPosition(target, anchor, options = {}) {
-  options = {...DEFAULT_POSITION_OPTIONS, ...options};
+export function position(target, anchor, strategy, callback) {
+  strategy = Object.create(strategy);
+  strategy.target = target;
+  strategy.anchor = anchor;
 
   // Since hidden elements will not have a client rect, we need to first simulate
   // the open state and wait for a reflow. This is done by applying the position
   // preview marker attribute to the target element. It is recommended to visually
   // hide the element while the preview attribute is preset (e.g., opacity: 0) since
   // we are only interested in the client rect and not its other visual properties.
-  target.toggleAttribute(options.positionPreviewMarkerAttribute, true);
+  target.toggleAttribute('data-position-check', true);
 
   requestAnimationFrame(() => {
-    const anchorRect = anchor.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-    const targetBottom = anchorRect.bottom + targetRect.height;
-    const targetWillFitBelow = targetBottom < window.innerHeight;
-    target.removeAttribute(options.positionPreviewMarkerAttribute);
-    options.setStyle(target, targetWillFitBelow);
-    options.expand(target, anchor);
+    strategy.calculateFit();
+    strategy.calculateAlignment();
+    target.removeAttribute('data-position-check');
+    strategy.setPosition();
+    strategy.setAlignment();
+    strategy.setArrowDirection();
+    callback?.(strategy.fitstPreferredDirection);
   });
 }

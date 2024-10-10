@@ -50,21 +50,23 @@ ind-calendar {
 
   dialog[open],
   dialog[data-position-check] {
-    position: absolute;
-    left: 0;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+
+    position: absolute;
+    left: 0;
+    top: var(--target-top);
+    bottom: 100%;
+    z-index: 10;
+
     padding: 0.5em;
     margin: 0;
-    z-index: 10;
 
     border: 0;
   }
 
   dialog[open] {
-    bottom: var(--target-bottom);
-
     box-shadow: var(--control-raised-shadow);
   }
 
