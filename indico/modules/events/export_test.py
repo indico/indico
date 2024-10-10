@@ -81,18 +81,18 @@ def test_event_attachment_export(db, dummy_event):
         data_file = tarf.extractfile('data.yaml')
         data = yaml.unsafe_load(data_file)
         objs = data['objects']
-        event_uid = objs[0][1]['id'][1]
+        event_uid = objs[0][2]['id'][1]
 
         # check that the exported metadata contains all the right objects
         assert [obj[0] for obj in objs] == ['events.events', 'events.sessions', 'events.contributions',
                                             'events.contributions', 'attachments.folders', 'attachments.attachments',
                                             'attachments.files']
         # check that the attached file's metadata is included
-        assert objs[5][1]['title'] == 'dummy_attachment'
-        assert objs[5][1]['folder_id'] is not None
-        assert objs[4][1]['title'] == 'dummy_folder'
-        assert objs[4][1]['linked_event_id'][1] == event_uid
-        file_ = objs[6][1]['__file__'][1]
+        assert objs[5][2]['title'] == 'dummy_attachment'
+        assert objs[5][2]['folder_id'] is not None
+        assert objs[4][2]['title'] == 'dummy_folder'
+        assert objs[4][2]['linked_event_id'][1] == event_uid
+        file_ = objs[6][2]['__file__'][1]
         assert file_['filename'] == 'dummy_file.txt'
         assert file_['content_type'] == 'text/plain'
         assert file_['size'] == 11
