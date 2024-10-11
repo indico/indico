@@ -148,9 +148,11 @@ export default class CustomElementBase extends HTMLElement {
     // listeners that will perform such operations.
 
     domReady.then(() => {
+      this.unmountController = new AbortController();
       this.setup?.();
       this.setup = null;
       this.dispatchEvent(new Event('x-connect'));
+      this.onconnect?.();
     });
   }
 
@@ -159,7 +161,12 @@ export default class CustomElementBase extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this.unmountController.abort();
     this.dispatchEvent(new Event('x-disconnect'));
+  }
+
+  addUnmountEventListener(callback) {
+    this.unmountController.signal.addEventListener('abort', callback);
   }
 
   attributeChangedCallback(name) {
