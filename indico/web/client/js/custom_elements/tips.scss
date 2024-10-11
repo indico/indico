@@ -34,7 +34,7 @@ ind-with-toggletip {
     z-index: 1;
 
     width: max-content;
-    max-width: min(calc(100dvw - 1em), 40ch);
+    max-width: min(calc(100% - 1em), 40ch);
     padding: 0.5em;
 
     // XXX: The transparent border serves as faux margin to reduce the number of HTML elements involved
