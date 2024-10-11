@@ -6,7 +6,7 @@
 {{ render_announcements(legacy=true) }}
 
 <div class="page-header clearfix">
-    <div class="flexrow f-j-space-between f-a-start">
+    <div class="page-header-banner flexrow f-j-space-between f-a-start">
         {% block logo %}
             {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.svg') -%}
             <a id="header-logo"
