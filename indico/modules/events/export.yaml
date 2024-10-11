@@ -29,7 +29,9 @@ export:
   # - fks_out: A list of outgoing foreign keys. The referenced rows are exported before
   #            each row in the current table that has such a reference.
   # - skipif: A python expression that will be evaluated for each row. If it returns
-  #           true, the row is skipped. The current row is available as `ROW`.
+  #           true, the row is skipped. The current row is available as `ROW`, and
+  #           `CAT_ROLE` is either an empty tuple or a tuple containing the string
+  #           `'category_role'` depending on whether categories are being exported.
   #           Note that no cascading happens, so rows that are referenced somewhere
   #           else may not be skipped.
   # - order: A python expression returning something that can be passed to `order_by()`
@@ -60,10 +62,26 @@ export:
     allow_duplicates: true
     fks:
       - CategoryRole.members.prop.secondary.c.role_id
+    cols:
+      # if we have a category id, we associate that role with the event instead
+      category_id: |
+        if VALUE in CATEGORIES:
+          # keep category assignment
+          category_id = MAKE_ID_REF(Category.id, VALUE)
+        elif CATEGORIES:
+          # assign to top-level exported category
+          category_id = MAKE_ROOT_REF()
+        else:
+          # exporting an event w/o categories --> cannot keep category roles as converting them
+          # to event roles would be too cumbersome for something that's not likely be be needed
+          category_id = SKIP
+
 
   # category acls
   CategoryPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
+    skipif: ROW.type.name not in ('user', 'email', 'category_role')
+    fks_out:
+      - category_role_id
 
   # misc category stuff
   CategoryLogEntry: {}
@@ -218,50 +236,58 @@ export:
 
   # acls
   EventPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   EventSettingPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role')
+    skipif: ROW.type.name not in ('user', 'event_role', *CAT_ROLE)
     fks_out:
       - event_role_id
+      - category_role_id
 
   ContributionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   SessionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   AttachmentPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   AttachmentFolderPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   TrackPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role')
+    skipif: ROW.type.name not in ('user', 'event_role', *CAT_ROLE)
     fks_out:
       - event_role_id
+      - category_role_id
 
   MenuEntryPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   # misc stuff
   EventLogEntry: {}

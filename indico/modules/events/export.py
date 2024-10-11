@@ -367,8 +367,9 @@ class EventExporter:
             query = query.order_by(*order)
         query = query.order_by(*table.primary_key.columns)
         cascaded = []
+        cat_role = ('category_role',) if self.categories else ()
         for row in query:
-            if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row)):  # noqa: S307
+            if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row, CAT_ROLE=cat_role)):  # noqa: S307
                 continue
             rowdict = row._asdict()
             pk = tuple(v for k, v in rowdict.items() if table.c[k].primary_key)
