@@ -182,7 +182,7 @@ export function FinalDateRangePicker({name, ...props}) {
       'startDate',
       Translate.string('Please enter the start date using the specified format')
     ),
-    validDate('endDate', Translate.string('Please enter the end date using the spefified format')),
+    validDate('endDate', Translate.string('Please enter the end date using the specified format')),
   ];
 
   if (props.rangeStartMin && props.rangeStartMax) {
