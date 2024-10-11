@@ -111,7 +111,7 @@ def inject_meeting_body(event, **kwargs):
         show_children_location[entry.id] = not all(child.object.inherit_location for child in entry.children)
 
     entries.sort(key=attrgetter('end_dt'), reverse=True)
-    entries.sort(key=lambda entry: (entry.start_dt, _entry_title_key(entry)))
+    entries.sort(key=lambda entry: (entry.start_dt, *_entry_title_key(entry)))
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
     theme = theme_settings.themes[get_theme(event, view)[0]]
@@ -127,6 +127,8 @@ def inject_meeting_body(event, **kwargs):
                            show_children_location=show_children_location, multiple_days=multiple_days, **kwargs)
 
 
-def _entry_title_key(entry):
+def _entry_title_key(entry) -> tuple[str, str]:
     obj = entry.object
-    return obj.full_title if entry.type == TimetableEntryType.SESSION_BLOCK else obj.title
+    if entry.type == TimetableEntryType.SESSION_BLOCK:
+        return (obj.session.code, obj.full_title)
+    return ('', obj.title)
