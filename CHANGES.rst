@@ -23,6 +23,8 @@ Improvements
 - Improve conference participant list, especially when participants from multiple registration
   forms are shown separately (:issue:`6440`, :pr:`6489`)
 - Include information about attached files in JSON export of abstracts (:pr:`6556`)
+- Take session program codes into account when sorting parallel sessions with the same start time
+  in meeting timetable (:pr:`6575`)
 
 Bugfixes
 ^^^^^^^^
