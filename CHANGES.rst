@@ -42,6 +42,7 @@ Accessibility
   thanks :user:`foxbunny`)
 - Fix the semantics for the empty materials text (:pr:`7096`, thanks :user:`foxbunny`)
 - Fix announcements accessibility (:pr:`7098`, thanks :user:`foxbuny`)
+- Improve keyboard focus order and color contrast in session bar (:pr:`6590`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -451,6 +452,7 @@ Accessibility
   keyboard support (:pr:`6621`, thanks :user:`foxbunny`)
 - Improve keyboard accessibility of the timetable sessions field in registration form (:pr:`6639`,
   thanks :user:`foxbunny`)
+- Improve screen reader support for protection details button (:pr:`6590`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

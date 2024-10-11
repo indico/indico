@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import './impersonation';
-import './session_expiry';
-import './top_bars';
+// eslint-disable-next-line import/unambiguous
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('language-selector-inline').onclick = evt => evt.preventDefault();
+});

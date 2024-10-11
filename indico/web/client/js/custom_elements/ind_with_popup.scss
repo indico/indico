@@ -1,0 +1,63 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2025 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+ind-with-popup {
+  --arrow-size: 0.5em;
+
+  position: relative;
+
+  dialog {
+    @extend %text-size-reset;
+
+    z-index: 1;
+
+    width: max-content;
+    margin: 0;
+    padding: var(--arrow-size) 0;
+
+    border: 0;
+    background: none;
+  }
+
+  dialog > :first-child {
+    background: var(--background-primary);
+    box-shadow: var(--control-raised-shadow);
+    border-radius: var(--control-border-radius);
+    font-size: 87.5%;
+  }
+
+  dialog[open],
+  dialog[data-position-check] {
+    @extend %popup-positioned-target;
+    z-index: 2;
+  }
+
+  dialog[data-position-check] {
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  &[shown]:not([data-position-check]) {
+    @extend %popup-arrow;
+    @extend %popup-arrow-vertical;
+    --arrow-color: var(--background-primary);
+  }
+
+  [data-trigger]::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    transition: transform 0.2s;
+    font-size: 120%;
+  }
+
+  [data-trigger][aria-expanded='true']::after {
+    transform: rotateX(180deg);
+  }
+}

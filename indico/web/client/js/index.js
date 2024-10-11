@@ -15,6 +15,7 @@ import './legacy/timetable.js';
 import './custom_elements';
 import './widgets/tz_selector.js';
 import './widgets/dynamic-tips.js';
+import './widgets/lang_selector.js';
 
 import '../styles/screen.scss';
 import '../styles/editor-output.scss';
