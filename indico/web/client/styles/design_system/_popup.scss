@@ -14,6 +14,34 @@
   font-size: var(--text-size-rel-l);
 }
 
+%popup-arrow {
+  // You need to define --arrow-size and --arrow-color in one of the ancestors
+
+  content: '';
+  display: inline-block;
+  position: absolute;
+  z-index: 1;
+
+  // The default appearance of the arrow always has it pointing up
+  // and the actual direction is controlled via rotation
+  border-style: solid;
+  border-color: transparent transparent var(--arrow-color) transparent;
+  border-width: var(--arrow-size);
+  transform: rotate(var(--arrow-direction));
+}
+
+%popup-arrow-horizontal {
+  left: calc(var(--arrow-left) - var(--arrow-size) + 0.1em);
+  right: calc(100% - var(--arrow-size) + 0.1em);
+  top: calc(50% - var(--arrow-size));
+}
+
+%popup-arrow-vertical {
+  top: calc(var(--arrow-top) - var(--arrow-size) + 0.1em);
+  bottom: calc(100% - var(--arrow-size) + 0.1em);
+  left: calc(50% - var(--arrow-size));
+}
+
 // The following placeholder should be extended
 // by the target element used in the positioning.js
 // module. The CSS custom properties used below are
