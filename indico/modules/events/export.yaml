@@ -92,10 +92,12 @@ export:
             'receipt_template_id': ReceiptTemplate.id,
             'attachment_id': Attachment.id,
         }
-        meta = dict(VALUE)
-        for _k, _v in meta.items():
+        meta = {}
+        for _k, _v in VALUE.items():
             if _col := _mapping.get(_k):
-                meta[_k] = MAKE_ID_REF(_col, meta[_k])
+                meta[_k] = (True, MAKE_ID_REF(_col, _v))
+            else:
+                meta[_k] = (False, _v)
 
   CategorySetting: {}
 
@@ -323,10 +325,12 @@ export:
             'session_id': Session.id,
             'subcontribution_id': SubContribution.id,
         }
-        meta = dict(VALUE)
-        for _k, _v in meta.items():
+        meta = {}
+        for _k, _v in VALUE.items():
             if _col := _mapping.get(_k):
-                meta[_k] = MAKE_ID_REF(_col, meta[_k])
+                meta[_k] = (True, MAKE_ID_REF(_col, _v))
+            else:
+                meta[_k] = (False, _v)
 
   EventReminder: {}
   EventSetting: {}
@@ -559,6 +563,9 @@ import:
   # Deferred references and user references are not supported, so make sure
   # to not use this on any column referencing a user or whose referenced
   # row has not been imported yet (ensure such rows are exported earlier).
+  # In cases (usually log entries) where idrefs may never be resolved because
+  # their referenced object has not been exported, TRY_RESOLVE_ID_REF can be
+  # used instead, it returns `None` when encountering a deferred idref.
   # The code must assign exactly one value that does not start with an
   # underscore and has the same name as the original column (names can only
   # be changed at export time)
@@ -581,11 +588,21 @@ import:
 
     CategoryLogEntry:
       meta: |
-        meta = {_k: RESOLVE_ID_REF(_v) for _k, _v in VALUE.items()}
+        _missing = object()
+        meta = {
+            _k: _id if _is_ref else _v
+            for _k, (_is_ref, _v) in VALUE.items()
+            if not _is_ref or (_id := TRY_RESOLVE_ID_REF(_v)) is not None
+        }
 
     EventLogEntry:
       meta: |
-        meta = {_k: RESOLVE_ID_REF(_v) for _k, _v in VALUE.items()}
+        _missing = object()
+        meta = {
+            _k: _id if _is_ref else _v
+            for _k, (_is_ref, _v) in VALUE.items()
+            if not _is_ref or (_id := TRY_RESOLVE_ID_REF(_v)) is not None
+        }
 
 
   # How user references should be handled if the user does not exist.
