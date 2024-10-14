@@ -239,8 +239,8 @@ def _is_office_mimetype(mimetype):
     return False
 
 
-def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True,
-              **kwargs):
+def send_file(name, path_or_fd, mimetype, *, last_modified=None, no_cache=True, inline=None,
+              max_age=86400, conditional=False, safe=True, **kwargs):
     """Send a file to the user.
 
     `name` is required and should be the filename visible to the user.
@@ -255,6 +255,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     the file only if it has been modified (based on mtime and size). Setting it will override `no_cache`.
     `safe` adds some basic security features such a adding a content-security-policy and forcing inline=False for
     text/html mimetypes
+    `max_age` sets the number of seconds to cache a file for in the browser - defaults to 86400 seconds (24 hours). This
+    can only be used in combination with `no_cache=False`.
     """
     name = re.sub(r'\s+', ' ', name).strip()  # get rid of crap like linebreaks
     assert '/' in mimetype
@@ -267,6 +269,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         inline = False
     if safe and mimetype in ('text/html', 'image/svg+xml'):
         inline = False
+    if not no_cache:
+        kwargs['max_age'] = max_age
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=(not inline), download_name=name,
                         conditional=conditional, last_modified=last_modified, **kwargs)
@@ -276,7 +280,6 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         raise NotFound(f'File not found: {path_or_fd}')
     if safe:
         rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
-    # if the request is conditional, then caching shouldn't be disabled
     if not conditional and no_cache:
         del rv.expires
         del rv.cache_control.max_age
