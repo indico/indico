@@ -258,17 +258,6 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
 
   return filteredEditables.length ? (
     <Table basic="very" striped selectable>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell style={{width: '2%'}}>
-            <Icon name="check" />
-          </Table.HeaderCell>
-          <Table.HeaderCell style={{width: '6%'}}>ID</Table.HeaderCell>
-          {codePresent && <Table.HeaderCell style={{width: '10%'}}>Code</Table.HeaderCell>}
-          <Table.HeaderCell>Title</Table.HeaderCell>
-          <Table.HeaderCell style={{width: '18%'}}>Editor</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
       <Table.Body>
         {filteredEditables.map(editable => (
           <Table.Row
@@ -278,7 +267,7 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
             onClick={() => setSelectedEditable(editable)}
             active={selectedEditable?.id === editable.id}
           >
-            <Table.Cell>
+            <Table.Cell width={1}>
               <Checkbox
                 radio
                 disabled={!editable.canAssignSelf}
@@ -287,18 +276,18 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
                 onChange={() => setSelectedEditable(editable)}
               />
             </Table.Cell>
-            <Table.Cell>
-              <a href={editable.timelineURL} target="_blank" rel="noopener noreferrer">
-                {editable.contributionFriendlyId}
-              </a>
-            </Table.Cell>
+            <Table.Cell width={1}>{editable.contributionFriendlyId}</Table.Cell>
             {codePresent && (
-              <Table.Cell>
+              <Table.Cell width={2}>
                 {editable.contributionCode ? editable.contributionCode : Translate.string('n/a')}
               </Table.Cell>
             )}
             <Table.Cell>{editable.contributionTitle}</Table.Cell>
-            <Table.Cell>{editable.editor ? editable.editor.fullName : ''}</Table.Cell>
+            <Table.Cell width={1}>
+              <a href={editable.timelineURL} target="_blank" rel="noopener noreferrer">
+                <Icon name="eye" />
+              </a>
+            </Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>

@@ -199,6 +199,7 @@ class RHFilterEditablesByFileTypes(RHEditableTypeEditorBase):
                         ),
                         Editable.type == self.editable_type,
                         Editable.state == EditableState.ready_for_review,
+                        Editable.editor_id.is_(None),
                         ~Editable.is_deleted,
                     )
                 )
