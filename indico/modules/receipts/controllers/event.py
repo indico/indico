@@ -56,7 +56,7 @@ class RHAllEventTemplates(RHManageRegFormsBase):
             if field['type'] == 'dropdown':
                 try:
                     idx = field['attributes']['options'].index(default)
-                except IndexError:
+                except ValueError:
                     continue
                 field['attributes']['default'] = idx
             else:
