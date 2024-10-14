@@ -41,6 +41,7 @@ Bugfixes
   :thanks:`foxbunny`)
 - Fix linebreak display in markdown code blocks in survey section descriptions (:pr:`6553`)
 - Include attached pictures when downloading registration attachments (:pr:`6564`)
+- Only allow marking unpaid registrations as paid (:issue:`6330`, :pr:`6578`)
 
 Accessibility
 ^^^^^^^^^^^^^

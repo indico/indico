@@ -54,6 +54,7 @@
                                     data-update="#registration-details"
                                     data-method="POST"
                                     data-params="{{ dict(pay=1) | tojson | forceescape }}"
+                                    {{ 'disabled' if registration.state.name != 'unpaid' }}
                                     data-href="{{ url_for('.toggle_registration_payment', registration) }}">
                                 {% trans %}Mark as paid{% endtrans %}
                             </button>
