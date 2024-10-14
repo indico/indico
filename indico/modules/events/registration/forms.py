@@ -54,6 +54,10 @@ def _check_if_payment_required(form, field):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
 
+def _generate_preview_link(text, input_id):
+    return '{} <a id="{}">{}</a>'.format(text, input_id, _('Preview'))
+
+
 class RegistrationFormEditForm(IndicoForm):
     _price_fields = ('currency', 'base_price')
     _registrant_notification_fields = ('notification_sender_address', 'message_pending', 'message_unpaid',
@@ -98,15 +102,18 @@ class RegistrationFormEditForm(IndicoForm):
                                               filters=[lambda x: (x or None)])
     message_pending = TextAreaField(
         _('Message for pending registrations'),
-        description=_('Text included in emails sent to pending registrations (Markdown syntax)')
+        description=_generate_preview_link(_('Text included in emails sent to pending registrations'
+                                             ' (Markdown syntax).'), 'message-pending-preview')
     )
     message_unpaid = TextAreaField(
         _('Message for unpaid registrations'),
-        description=_('Text included in emails sent to unpaid registrations (Markdown syntax)')
+        description=_generate_preview_link(_('Text included in emails sent to unpaid registrations'
+                                             ' (Markdown syntax).'), 'message-unpaid-preview')
     )
     message_complete = TextAreaField(
         _('Message for complete registrations'),
-        description=_('Text included in emails sent to complete registrations (Markdown syntax)')
+        description=_generate_preview_link(_('Text included in emails sent to complete registrations'
+                                             ' (Markdown syntax).'), 'message-complete-preview')
     )
     attach_ical = BooleanField(
         _('Attach iCalendar file'),
