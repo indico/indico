@@ -449,7 +449,7 @@ export:
   RegistrationForm:
     allow_duplicates: true
     cols:
-      uuid: uuid = VALUE if KEEP_UUIDS else None
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - RegistrationFormItem.registration_form_id
       - Registration.registration_form_id
@@ -459,8 +459,8 @@ export:
 
   Registration:
     cols:
-      uuid: uuid = VALUE if KEEP_UUIDS else None
-      ticket_uuid: ticket_uuid = VALUE if KEEP_UUIDS else None
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
+      ticket_uuid: ticket_uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - RegistrationData.registration_id
       - PaymentTransaction.registration_id
@@ -476,7 +476,7 @@ export:
   RegistrationFormFieldData: {}
   RegistrationInvitation:
     cols:
-      uuid: uuid = VALUE if KEEP_UUIDS else None
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
 
   PaymentTransaction: {}
 
@@ -484,7 +484,7 @@ export:
   # surveys
   Survey:
     cols:
-      uuid: uuid = VALUE if KEEP_UUIDS else None
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - SurveyItem.survey_id
       - SurveySubmission.survey_id
