@@ -54,6 +54,7 @@ export:
       - CategoryRole.category_id
       - CategorySetting.category_id
       - DesignerTemplate.category_id
+      - ReceiptTemplate.category_id
       - Event.category_id
 
   # category roles
@@ -127,6 +128,7 @@ export:
       - RegistrationForm.event_id
       - Survey.event_id
       - DesignerTemplate.event_id
+      - ReceiptTemplate.event_id
       - EventPage.event_id
       - MenuEntry.event_id
       - AbstractEmailTemplate.event_id
@@ -386,6 +388,28 @@ export:
   event_editing.revision_tags: {}
 
 
+  # receipt/document templates & files
+  ReceiptFile:
+    fks_out:
+      - file_id
+      - template_id
+
+  ReceiptTemplate:
+    allow_duplicates: true
+    cols:
+      # if we have a category id, we associate that template with the event instead
+      category_id: |
+        if VALUE in CATEGORIES:
+          # keep category assignment
+          category_id = MAKE_ID_REF(Category.id, VALUE)
+        elif CATEGORIES:
+          # assign to top-level exported category
+          category_id = MAKE_ROOT_REF()
+        else:
+          # assign to the event (since we're in event export mode when CATEGORIES is empty)
+          event_id = MAKE_ROOT_REF()
+
+
   # registration & payment
   RegistrationForm:
     allow_duplicates: true
@@ -405,6 +429,7 @@ export:
     fks:
       - RegistrationData.registration_id
       - PaymentTransaction.registration_id
+      - ReceiptFile.registration_id
 
   RegistrationFormItem:
     # top-level items first to satisfy top_level_sections check constraint
@@ -596,3 +621,4 @@ import:
     Survey: <Survey> '{title}'
     SurveySubmission: <Survey submission> (#{friendly_id})
     DesignerTemplate: <Designer template> '{title}' ({type.title})
+    ReceiptTemplate: <Receipt template> '{title}'
