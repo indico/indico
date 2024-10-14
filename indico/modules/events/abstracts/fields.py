@@ -71,10 +71,11 @@ class EmailRuleListField(JSONField):
         if invited_rule_present and len(self.data) > 1:
             raise ValidationError(_('You cannot combine the "Invited" rule with other rules'))
         # disallow changing the rule from/to "invited" since the email template would no longer be suitable
-        has_invitation_link_placeholder = AbstractInvitationURLPlaceholder.is_in(form.email_tpl.body, abstract=None)
-        if invited_rule_present != has_invitation_link_placeholder:
-            raise ValidationError(_('Existing notification templates cannot be changed from/to "Invited"; please '
-                                    'create a new one'))
+        if form.email_tpl:
+            has_invitation_link_placeholder = AbstractInvitationURLPlaceholder.is_in(form.email_tpl.body, abstract=None)
+            if invited_rule_present != has_invitation_link_placeholder:
+                raise ValidationError(_('Existing notification templates cannot be changed from/to "Invited"; please '
+                                        'create a new one'))
 
     def _value(self):
         return super()._value() if self.data else '[]'

@@ -431,7 +431,7 @@ class EditEmailTemplateRuleForm(IndicoForm):
 
     def __init__(self, *args, event, **kwargs):
         self.event = event
-        self.email_tpl = kwargs['obj']
+        self.email_tpl = kwargs.get('obj')
         super().__init__(*args, **kwargs)
         self.rules.event = self.event
 
