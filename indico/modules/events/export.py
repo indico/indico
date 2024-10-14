@@ -600,9 +600,14 @@ class EventImporter:
             return None
         self._load_affiliations(self.data)
         self._load_users(self.data)
-        # import objects that define a new scope first, since their IDs may be needed to generate
-        # storage file IDs
-        objects = sorted(self.data['objects'], key=lambda x: not x[1][0])
+        objects = sorted(self.data['objects'], key=lambda x: (
+            # Import objects that define a new scope first, since their IDs may be needed to generate
+            # storage file IDs
+            not x[1][0],
+            # Import log entries last, since they may reference ids from other objects but will never
+            # be referenced themselves. And by putting them last we avoid having deferred idrefs
+            x[0] in ('categories.logs', 'events.logs')
+        ))
         for i, (tablename, (new_scope, scope), tabledata) in enumerate(objects):
             self._deserialize_object(db.metadata.tables[tablename], tabledata, scope, new_scope, is_top_level=(i == 0))
         if self.deferred_idrefs:
