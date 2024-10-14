@@ -245,7 +245,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   .rc-time-picker-panel-select ul {
     // undo the style changes caused by the `ul:not(.i-dropdown)` rule
     // inside `.action-box`
-    padding-left: 0;
+    padding-left: 0 !important;
     max-height: none;
   }
 
