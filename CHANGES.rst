@@ -48,7 +48,7 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far :(
+- Improve country input accessibility (:pr:`6551`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

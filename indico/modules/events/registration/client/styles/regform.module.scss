@@ -233,8 +233,9 @@
         border-color: #d4d4d5;
       }
 
-      .country-dropdown {
+      [data-input-type='country-dropdown'] {
         max-width: var(--max-form-item-width);
+        width: 100%;
       }
 
       .single-choice-dropdown {
