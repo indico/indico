@@ -429,8 +429,9 @@ class EditEmailTemplateRuleForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     rules = EmailRuleListField(_('Rules'), [DataRequired()])
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
+        self.email_tpl = kwargs['obj']
         super().__init__(*args, **kwargs)
         self.rules.event = self.event
 
@@ -451,8 +452,8 @@ class EditEmailTemplateTextForm(IndicoForm):
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Body'), [DataRequired()])
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
         self.email_tpl = kwargs['obj']
         super().__init__(*args, **kwargs)
         choices = [('', config.NO_REPLY_EMAIL)]
@@ -461,24 +462,20 @@ class EditEmailTemplateTextForm(IndicoForm):
         self.body.description = render_placeholder_info('abstract-notification-email', event=self.event)
 
     def validate_body(self, field):
-        # disallow using the invitation_url placeholder for non-invited email templates
-        # and vice versa
-        has_invited_rule = any(
+        # disallow using the invitation_url placeholder for non-invited email templates and vice versa
+        invited_rule_present = any(
             AbstractState.invited.value in value
             for rule in self.email_tpl.rules
             for value in rule.values()
         )
-        if has_invited_rule and not AbstractInvitationURLPlaceholder.is_in(
-            field.data, abstract=None
-        ):
-            raise ValidationError(_('Invitation email templates must contain the '
-                                    '{{invitation_url}} placeholder'))
+        has_invitation_link_placeholder = AbstractInvitationURLPlaceholder.is_in(field.data, abstract=None)
 
-        if not has_invited_rule and AbstractInvitationURLPlaceholder.is_in(
-            field.data, abstract=None
-        ):
-            raise ValidationError(_('Only invitation email templates may contain the '
-                                    ' {{invitation_url}} placeholder'))
+        if invited_rule_present and not has_invitation_link_placeholder:
+            raise ValidationError(_('Invitation email templates must contain the {placeholder} placeholder')
+                                  .format(placeholder='{invitation_url}'))
+        elif not invited_rule_present and has_invitation_link_placeholder:
+            raise ValidationError(_('Only invitation email templates may contain the {placeholder} placeholder')
+                                  .format(placeholder='{invitation_url}'))
 
 
 class CreateEmailTemplateForm(EditEmailTemplateRuleForm):

@@ -19,6 +19,7 @@ from indico.modules.categories.util import serialize_category_role
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
+from indico.modules.events.abstracts.placeholders import AbstractInvitationURLPlaceholder
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.roles.util import serialize_event_role
@@ -93,7 +94,12 @@ class EmailRuleListField(JSONField):
         )
         # disallow mixing invited rules with other rules
         if invited_rule_present and len(self.data) > 1:
-            raise ValidationError(_('You cannot use the invited rule with other rules'))
+            raise ValidationError(_('You cannot combine the "Invited" rule with other rules'))
+        # disallow changing the rule from/to "invited" since the email template would no longer be suitable
+        has_invitation_link_placeholder = AbstractInvitationURLPlaceholder.is_in(form.email_tpl.body, abstract=None)
+        if invited_rule_present != has_invitation_link_placeholder:
+            raise ValidationError(_('Existing notification templates cannot be changed from/to "Invited"; please '
+                                    'create a new one'))
 
     def _value(self):
         return super()._value() if self.data else '[]'
