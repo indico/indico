@@ -12,7 +12,6 @@ from sqlalchemy.orm import joinedload
 from wtforms import ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_permissions_info
 from indico.modules.categories.util import serialize_category_role
@@ -24,35 +23,11 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.roles.util import serialize_event_role
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import DropdownWidget, JinjaWidget
-
-
-def _serialize_user(user):
-    return {
-        'id': user.id,
-        'name': user.name
-    }
-
-
-def _get_users_in_roles(data):
-    user_ids = {user_id
-                for user_roles in data.values()
-                for users in user_roles.values()
-                for user_id in users}
-    if not user_ids:
-        return []
-    return db.session.query(User.id, User).filter(User.id.in_(user_ids)).all()
-
-
-def _get_users(ids):
-    if not ids:
-        return set()
-    return set(User.query.filter(User.id.in_(ids), ~User.is_deleted))
 
 
 class EmailRuleListField(JSONField):
