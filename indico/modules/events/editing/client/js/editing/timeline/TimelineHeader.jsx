@@ -150,6 +150,12 @@ export default function TimelineHeader({children, contribution, state, submitter
             )}
           </Message>
         )}
+        {editingEnabled && canAssignSelf && (
+          <Message warning>
+            <Icon name="warning sign" />
+            <Translate>This editable is not currently assigned to you.</Translate>
+          </Message>
+        )}
         {children && <div className="review-item-content">{children}</div>}
       </div>
     </>
