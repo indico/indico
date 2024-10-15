@@ -1026,7 +1026,7 @@ def process_registration_picture(source, *, thumbnail=False):
     size_x, size_y = picture.size
     if max(size_x, size_y) > max_size:
         ratio = max_size / max(size_x, size_y)
-        picture = picture.resize((int(ratio * size_x), int(ratio * size_y)), Image.Resampling.BICUBIC)
+        picture = picture.resize((max(1, int(ratio * size_x)), max(1, int(ratio * size_y))), Image.Resampling.BICUBIC)
     image_bytes = BytesIO()
     picture.save(image_bytes, 'JPEG')
     image_bytes.seek(0)
