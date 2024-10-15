@@ -12,6 +12,7 @@ import tarfile
 from collections import defaultdict
 from datetime import date, datetime
 from io import BytesIO
+from itertools import batched
 from operator import itemgetter
 from uuid import uuid4
 
@@ -41,8 +42,9 @@ from indico.modules.logs.models.entries import LogKind
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.util import get_user_by_email
-from indico.util.console import cformat
+from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import now_utc
+from indico.util.iterables import materialize_iterable
 from indico.util.string import strict_str
 
 
@@ -187,13 +189,19 @@ class EventExporter:
 
     def serialize(self):
         model = type(self.obj)
+        all_objects = list(self._serialize_objects(model.__table__, model.id == self.obj.id, is_root_object=True))
         metadata = {
             'timestamp': now_utc(),
             'indico_version': indico.__version__,
-            'objects': list(self._serialize_objects(model.__table__, model.id == self.obj.id, is_root_object=True)),
+            'object_files': [],
             'users': self.users,
             'affiliations': self.affiliations
         }
+        for i, objects in enumerate(batched(all_objects, 5000), 1):
+            object_data = yaml.dump(objects, indent=2, Dumper=_NoAliasesDumper)
+            filename = f'objects-{i}.yaml'
+            metadata['object_files'].append(filename)
+            self._add_file(filename, len(object_data), object_data)
         yaml_data = yaml.dump(metadata, indent=2, Dumper=_NoAliasesDumper)
         self._add_file('data.yaml', len(yaml_data), yaml_data)
         ids_data = yaml.dump(dict(self.orig_ids), indent=2, Dumper=_NoAliasesDumper)
@@ -593,6 +601,13 @@ class EventImporter:
             else:
                 click.secho('Skipping missing affiliations', fg='magenta')
 
+    @materialize_iterable()
+    def _load_objects(self, data):
+        filenames = data['object_files']
+        it = verbose_iterator(filenames, len(filenames), get_title=lambda x: x, print_every=1, print_total_time=True)
+        for filename in it:
+            yield from yaml.unsafe_load(self.archive.extractfile(filename))
+
     def deserialize(self) -> Event | Category | None:
         if not self.force and self.data['indico_version'] != indico.__version__:
             click.secho('Version mismatch: trying to import event exported with {} to version {}'
@@ -600,7 +615,8 @@ class EventImporter:
             return None
         self._load_affiliations(self.data)
         self._load_users(self.data)
-        objects = sorted(self.data['objects'], key=lambda x: (
+        objects = self._load_objects(self.data)
+        objects = sorted(objects, key=lambda x: (
             # Import objects that define a new scope first, since their IDs may be needed to generate
             # storage file IDs
             not x[1][0],
@@ -608,7 +624,8 @@ class EventImporter:
             # be referenced themselves. And by putting them last we avoid having deferred idrefs
             x[0] in ('categories.logs', 'events.logs')
         ))
-        for i, (tablename, (new_scope, scope), tabledata) in enumerate(objects):
+        objects_iter = verbose_iterator(objects, len(objects), print_total_time=True)
+        for i, (tablename, (new_scope, scope), tabledata) in enumerate(objects_iter):
             self._deserialize_object(db.metadata.tables[tablename], tabledata, scope, new_scope, is_top_level=(i == 0))
         if self.deferred_idrefs:
             # Any reference to an ID that was exported need to be replaced
