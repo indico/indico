@@ -260,7 +260,7 @@ const PictureManager = ({
       src={pictureState.imageSrc}
       onCrop={onImageCrop}
       backAction={cropBackAction}
-      minCropSize={minPictureSize || 0}
+      minCropSize={minPictureSize || 25}
     />
   );
 
