@@ -31,6 +31,20 @@ class LastNamePlaceholder(Placeholder):
         return registration.last_name
 
 
+class PicturePlaceholder(Placeholder):
+    name = 'picture'
+    description = _('Picture of the person')
+
+    @classmethod
+    def render(cls, regform, registration):
+        picture_data = registration.get_personal_data_picture()
+        if not picture_data:
+            return _('NO PICTURE')
+        url = url_for('event_registration.registration_picture', picture_data.locator.file,
+                      _external=True, token=registration.uuid)
+        return Markup("<img src='{url}' style='max-height: 100px;' />").format(url=url)
+
+
 class EventTitlePlaceholder(Placeholder):
     name = 'event_title'
     description = _('The title of the event')
@@ -109,7 +123,8 @@ class FieldPlaceholder(ParametrizedPlaceholder):
 
     @classmethod
     def iter_param_info(cls, regform, registration):
-        own_placeholder_types = {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
+        own_placeholder_types = {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name,
+                                 PersonalDataType.picture}
         for field in sorted(regform.active_fields, key=lambda x: (x.parent.position, x.position)):
             if field.personal_data_type in own_placeholder_types:
                 continue
