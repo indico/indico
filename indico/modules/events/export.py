@@ -247,6 +247,7 @@ class EventExporter:
             tablespec.setdefault('fks_out', {})
             tablespec.setdefault('skipif', None)
             tablespec.setdefault('order', None)
+            tablespec.setdefault('python_order', None)
             tablespec.setdefault('allow_duplicates', False)
             fks = {}
             for fk_name in tablespec['fks']:
@@ -406,9 +407,12 @@ class EventExporter:
                 order = (order,)
             query = query.order_by(*order)
         query = query.order_by(*table.primary_key.columns)
+        rows = query.all()
+        if spec['python_order']:
+            rows = _exec_custom(spec['python_order'], ROWS=rows)['rows']
         cascaded = []
         cat_role = ('category_role',) if self.categories else ()
-        for row in query:
+        for row in rows:
             if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row, CAT_ROLE=cat_role)):  # noqa: S307
                 continue
             rowdict = row._asdict()
