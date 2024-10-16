@@ -16,6 +16,8 @@ ind-date-picker {
   align-items: flex-start;
   position: relative;
 
+  text-align: left;
+
   > input {
     padding-right: 2.5em;
   }
@@ -47,6 +49,8 @@ ind-date-picker {
 
 ind-date-range-picker {
   position: relative;
+
+  text-align: left;
 
   fieldset {
     display: flex;
