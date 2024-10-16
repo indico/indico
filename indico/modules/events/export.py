@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import os
+import pickle
 import posixpath
 import re
 import tarfile
@@ -59,14 +60,44 @@ class _NoAliasesDumper(yaml.Dumper):
         return True
 
 
-def export_event(event_or_category, target_file, *, keep_uuids=False):
+class _YamlBackend:
+    ext = 'yaml'
+
+    @staticmethod
+    def dump(data):
+        return yaml.dump(data, indent=2, Dumper=_NoAliasesDumper)
+
+    @staticmethod
+    def load(data):
+        return yaml.unsafe_load(data)
+
+
+class _PickleBackend:
+    ext = 'pickle'
+
+    @staticmethod
+    def dump(data):
+        return pickle.dumps(data)
+
+    @staticmethod
+    def load(fileobj):
+        return pickle.load(fileobj)  # noqa: S301
+
+
+BACKENDS = {'yaml': _YamlBackend, 'pickle': _PickleBackend}
+
+
+def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle=False):
     """Export the specified event/category with all its data to a file.
 
-    :param event: the `Event` to export, or a `Category` to export with all
-                  its event and subcategories
+    :param event_or_category: the `Event` to export, or a `Category` to export with all
+                              its event and subcategories
     :param target_file: a file object to write the data to
+    :param keep_uuids: preserve uuids between the exported and imported events
+    :param use_pickle: use pickle instead of yaml for serializing
     """
-    exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids)
+    backend = 'pickle' if use_pickle else 'yaml'
+    exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids, backend=backend)
     exporter.serialize()
 
 
@@ -156,11 +187,12 @@ def _get_inserted_pk(result):
 
 
 class EventExporter:
-    def __init__(self, obj, target_file, *, keep_uuids=False):
+    def __init__(self, obj, target_file, *, keep_uuids=False, backend='yaml'):
         self.obj = obj
-        self.categories = frozenset(self._fetch_categories())
         self.target_file = target_file
         self.keep_uuids = keep_uuids
+        self.backend = BACKENDS[backend]
+        self.categories = frozenset(self._fetch_categories())
         # XXX we're not using a context manager here since changing that would probably require
         # some refactoring of how this class is used
         self.archive = tarfile.open(mode='w|', fileobj=self.target_file)  # noqa: SIM115
@@ -198,14 +230,14 @@ class EventExporter:
             'affiliations': self.affiliations
         }
         for i, objects in enumerate(batched(all_objects, 5000), 1):
-            object_data = yaml.dump(objects, indent=2, Dumper=_NoAliasesDumper)
-            filename = f'objects-{i}.yaml'
+            object_data = self.backend.dump(objects)
+            filename = f'objects-{i}.{self.backend.ext}'
             metadata['object_files'].append(filename)
             self._add_file(filename, len(object_data), object_data)
-        yaml_data = yaml.dump(metadata, indent=2, Dumper=_NoAliasesDumper)
-        self._add_file('data.yaml', len(yaml_data), yaml_data)
-        ids_data = yaml.dump(dict(self.orig_ids), indent=2, Dumper=_NoAliasesDumper)
-        self._add_file('ids.yaml', len(ids_data), ids_data)
+        dumped_metadata = self.backend.dump(metadata)
+        self._add_file(f'data.{self.backend.ext}', len(dumped_metadata), dumped_metadata)
+        dumped_ids = self.backend.dump(dict(self.orig_ids))
+        self._add_file(f'ids.{self.backend.ext}', len(dumped_ids), dumped_ids)
         self.archive.close()
 
     def _load_spec(self):
@@ -467,9 +499,11 @@ class EventImporter:
         self.verbose = verbose
         self.force = force
         self.archive = tarfile.open(fileobj=source_file)  # noqa: SIM115
-        self.data = yaml.unsafe_load(self.archive.extractfile('data.yaml'))
+        archive_files = set(self.archive.getnames())
+        self.backend = BACKENDS['yaml' if 'data.yaml' in archive_files else 'pickle']
+        self.data = self.backend.load(self.archive.extractfile(f'data.{self.backend.ext}'))
         try:
-            self.source_ids = yaml.unsafe_load(self.archive.extractfile('ids.yaml'))
+            self.source_ids = self.backend.load(self.archive.extractfile(f'ids.{self.backend.ext}'))
         except KeyError:
             self.source_ids = None
         self.source_id_map = defaultdict(dict)
@@ -606,7 +640,7 @@ class EventImporter:
         filenames = data['object_files']
         it = verbose_iterator(filenames, len(filenames), get_title=lambda x: x, print_every=1, print_total_time=True)
         for filename in it:
-            yield from yaml.unsafe_load(self.archive.extractfile(filename))
+            yield from self.backend.load(self.archive.extractfile(filename))
 
     def deserialize(self) -> Event | Category | None:
         if not self.force and self.data['indico_version'] != indico.__version__:
