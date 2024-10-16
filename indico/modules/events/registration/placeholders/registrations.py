@@ -4,7 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
-
+from flask import request
 from markupsafe import Markup
 
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -34,15 +34,21 @@ class LastNamePlaceholder(Placeholder):
 class PicturePlaceholder(Placeholder):
     name = 'picture'
     description = _('Picture of the person')
+    max_size = '250px'
 
     @classmethod
     def render(cls, regform, registration):
         picture_data = registration.get_personal_data_picture()
         if not picture_data:
             return ''
-        style = '"max-height: 250px; max-width: 250px; white-space: normal; padding-bottom: 10px; object-fit: cover;">'
-        return (Markup('<img alt="Registrant picture" src="cid:{url}" style="{style}"')
-                .format(url=picture_data.attachment_cid, style=style))
+        style = f'"max-height: {cls.max_size}; max-width: {cls.max_size};'
+        style += ' white-space: normal; padding-bottom: 10px; object-fit: cover;"'
+        if request.endpoint == 'event_registration.email_registrants_preview':
+            url = url_for('event_registration.registration_picture', picture_data.locator.file,
+                          _external=True, token=registration.uuid)
+        else:
+            url = f'cid:{picture_data.attachment_cid}'
+        return Markup('<img alt="Registrant picture" src="{url}" style="{style}">').format(url=url, style=style)
 
 
 class EventTitlePlaceholder(Placeholder):
