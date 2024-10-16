@@ -36,6 +36,10 @@ export:
   #           else may not be skipped.
   # - order: A python expression returning something that can be passed to `order_by()`
   #          or a tuple of such objects.
+  # - python_order: A python snippet (with access to `ROWS`) that receives the list of
+  #                 rows from the database, and can sort them in whatever way. The sorted
+  #                 list of rows must be returned as `rows`. This should only be used in
+  #                 complex cases where using database-level sorting is not sufficient.
   # - allow_duplicates: By default a row may not be referenced more than once (e.g. from
   #                     different locations / FKs).  If this is set to true, this check is
   #                     disabled (but the row is obviously still exported only once).  Only
@@ -339,9 +343,32 @@ export:
 
   # abstracts
   Abstract:
-    # duplicate/merged abstracts come last to satisfy duplicate_of_id_only_duplicate
-    # and merged_into_id_only_merged check constraints
-    order: Abstract.state.in_([5, 6]), Abstract.id
+    # abstracts can reference another one as their duplicate, which can also reference yet another abstract.
+    # we need to sort them while preserving that relationship in order to avoid violating check constraints
+    # like duplicate_of_id_only_duplicate and merged_into_id_only_merged.
+    python_order: |
+      def _topological_sort(objects):
+          def _get_ref_id(obj):
+              match obj.state:
+                  case 5:
+                      return obj.merged_into_id
+                  case 6:
+                      return obj.duplicate_of_id
+                  case _:
+                      return None
+
+          from graphlib import TopologicalSorter
+          sorter = TopologicalSorter()
+          obj_by_id = {obj.id: obj for obj in objects}  # Mapping from id to object
+          for obj in objects:
+              ref_id = _get_ref_id(obj)
+              if ref_obj := obj_by_id.get(ref_id):
+                  sorter.add(obj, ref_obj)
+              else:
+                  sorter.add(obj)
+          return list(sorter.static_order())
+
+      rows = _topological_sort(ROWS)
     cols:
       # just track if we had an UUID or not (the code only runs if the column isn't None)
       uuid: uuid = VALUE if KEEP_UUIDS else True
