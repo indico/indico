@@ -82,7 +82,9 @@ customElements.define(
           indCalendar.querySelector('dialog'),
           input,
           positioning.dropdownPositionStrategy,
-          () => (indCalendar.open = true)
+          () => {
+            indCalendar.open = true;
+          }
         );
       }
     }
