@@ -187,9 +187,11 @@ def _get_registration_placeholders(sender, regform, registration, **kwargs):
                                                                                EventTitlePlaceholder, FieldPlaceholder,
                                                                                FirstNamePlaceholder, IDPlaceholder,
                                                                                LastNamePlaceholder, LinkPlaceholder,
+                                                                               PicturePlaceholder,
                                                                                RejectionReasonPlaceholder)
     yield FirstNamePlaceholder
     yield LastNamePlaceholder
+    yield PicturePlaceholder
     yield EventTitlePlaceholder
     yield EventLinkPlaceholder
     yield IDPlaceholder
