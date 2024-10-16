@@ -54,7 +54,7 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Make positioning logic from TipBase generic and reusable (:pr:`6577`, thanks :user:`foxbunny`)
 
 
 Version 3.3.4

@@ -7,7 +7,7 @@
 
 import CustomElementBase from 'indico/custom_elements/_base';
 import {Translate} from 'indico/react/i18n';
-import {topBottomPosition} from 'indico/utils/positioning';
+import * as positioning from 'indico/utils/positioning';
 
 import './ind_select.scss';
 
@@ -191,12 +191,9 @@ customElements.define(
         if (shouldOpen) {
           dialog.show();
           indSelect.setAttribute('aria-expanded', true);
-          topBottomPosition(listbox, filter, {
-            setStyle(target, targetWillFitBottom) {
-              target.toggleAttribute('data-top', !targetWillFitBottom);
-              filter.toggleAttribute('data-top', !targetWillFitBottom);
-            },
-          });
+          positioning.position(listbox, filter, positioning.dropdownPositionStrategy, fit =>
+            filter.toggleAttribute('data-top', !fit)
+          );
         } else {
           dialog.close();
           indSelect.setAttribute('aria-expanded', false);
