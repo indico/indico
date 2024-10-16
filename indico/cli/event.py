@@ -53,7 +53,9 @@ def restore(event_id, user_id, message):
 @click.option('-c', '--category', 'is_category', is_flag=True, help='Indicates that the provided ID is a category ID')
 @click.option('-U', '--keep-uuids', is_flag=True,
               help='Whether to keep UUIDs instead of generating new ones during import.')
-def export(id, target_file, is_category, keep_uuids):
+@click.option('-p', '--pickle', 'use_pickle', is_flag=True,
+              help='Use pickle for serializing - this is much faster, but not human-readable.')
+def export(id, target_file, is_category, keep_uuids, use_pickle):
     """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
@@ -79,7 +81,7 @@ def export(id, target_file, is_category, keep_uuids):
     elif obj.is_deleted:
         click.secho(f'This {objtype} has been deleted', fg='yellow')
         click.confirm('Export it anyway?', abort=True)
-    export_event(obj, target_file, keep_uuids=keep_uuids)
+    export_event(obj, target_file, keep_uuids=keep_uuids, use_pickle=use_pickle)
 
 
 @cli.command('import')
