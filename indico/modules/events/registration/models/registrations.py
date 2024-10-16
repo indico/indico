@@ -634,8 +634,11 @@ class Registration(db.Model):
         if rdata and rdata.storage_file_id is not None:
             return rdata
 
-    def get_picture_attachments(self):
-        """Return a list of registration pictures as `MimeImage` attachments."""
+    def get_picture_attachments(self, personal_data_only=False):
+        """Return a list of registration pictures as `MimeImage` attachments.
+
+        If personal_data_only=True, return only the picture in personal data.
+        """
         from indico.modules.events.registration.util import process_registration_picture
         picture_attachements = []
         for data in self.data:
@@ -644,6 +647,8 @@ class Registration(db.Model):
             if data.field_data.field.parent.is_manager_only:
                 continue
             if data.storage_file_id is None:
+                continue
+            if personal_data_only and not data.field_data.field.personal_data_type:
                 continue
             with data.open() as f:
                 if not (thumbnail_bytes := process_registration_picture(f, thumbnail=True)):

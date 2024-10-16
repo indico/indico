@@ -39,10 +39,10 @@ class PicturePlaceholder(Placeholder):
     def render(cls, regform, registration):
         picture_data = registration.get_personal_data_picture()
         if not picture_data:
-            return _('NO PICTURE')
-        url = url_for('event_registration.registration_picture', picture_data.locator.file,
-                      _external=True, token=registration.uuid)
-        return Markup("<img src='{url}' style='max-height: 100px;' />").format(url=url)
+            return ''
+        style = '"max-height: 250px; max-width: 250px; white-space: normal; padding-bottom: 10px; object-fit: cover;">'
+        return (Markup('<img alt="Registrant picture" src="cid:{url}" style="{style}"')
+                .format(url=picture_data.attachment_cid, style=style))
 
 
 class EventTitlePlaceholder(Placeholder):
