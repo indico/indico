@@ -35,14 +35,11 @@ const verticalPreferAbovePosition = {
   calculateFit() {
     const targetRect = this.target.getBoundingClientRect();
     const anchorRect = this.anchor.getBoundingClientRect();
-    this.fitstPreferredDirection = targetRect.height <= anchorRect.top;
+    this.fitsPreferredDirection = targetRect.height <= anchorRect.top;
   },
   setPosition() {
-    this.target.style.setProperty('--target-top', this.fitstPreferredDirection ? 'auto' : '100%');
-    this.target.style.setProperty(
-      '--target-bottom',
-      this.fitstPreferredDirection ? '100%' : 'auto'
-    );
+    this.target.style.setProperty('--target-top', this.fitsPreferredDirection ? 'auto' : '100%');
+    this.target.style.setProperty('--target-bottom', this.fitsPreferredDirection ? '100%' : 'auto');
   },
 };
 
@@ -50,14 +47,11 @@ const verticalPreferBelowPosition = {
   calculateFit() {
     const targetRect = this.target.getBoundingClientRect();
     const anchorRect = this.anchor.getBoundingClientRect();
-    this.fitstPreferredDirection = anchorRect.bottom + targetRect.height <= viewportHeight;
+    this.fitsPreferredDirection = anchorRect.bottom + targetRect.height <= viewportHeight;
   },
   setPosition() {
-    this.target.style.setProperty('--target-top', this.fitstPreferredDirection ? '100%' : 'auto');
-    this.target.style.setProperty(
-      '--target-bottom',
-      this.fitstPreferredDirection ? 'auto' : '100%'
-    );
+    this.target.style.setProperty('--target-top', this.fitsPreferredDirection ? '100%' : 'auto');
+    this.target.style.setProperty('--target-bottom', this.fitsPreferredDirection ? 'auto' : '100%');
   },
 };
 
@@ -82,17 +76,17 @@ const horizontalTargetPosition = {
   calculateFit() {
     const targetRect = this.target.getBoundingClientRect();
     const anchorRect = this.anchor.getBoundingClientRect();
-    this.fitstPreferredDirection = targetRect.width <= viewportWidth - anchorRect.right;
+    this.fitsPreferredDirection = targetRect.width <= viewportWidth - anchorRect.right;
   },
   setPosition() {
-    this.target.style.setProperty('--target-left', this.fitstPreferredDirection ? '100%' : 'auto');
-    this.target.style.setProperty('--target-right', this.fitstPreferredDirection ? 'auto' : '100%');
+    this.target.style.setProperty('--target-left', this.fitsPreferredDirection ? '100%' : 'auto');
+    this.target.style.setProperty('--target-right', this.fitsPreferredDirection ? 'auto' : '100%');
   },
 };
 
 const withArrow = {
   setArrowDirection() {
-    if (this.fitstPreferredDirection) {
+    if (this.fitsPreferredDirection) {
       this.setPreferredArrowDirection();
     } else {
       this.setOppositeArrowDirection();
@@ -178,6 +172,6 @@ export function position(target, anchor, strategy, callback) {
     strategy.setPosition();
     strategy.setAlignment();
     strategy.setArrowDirection();
-    callback?.(strategy.fitstPreferredDirection);
+    callback?.(strategy.fitsPreferredDirection);
   });
 }
