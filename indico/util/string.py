@@ -168,6 +168,7 @@ BLEACH_ALLOWED_STYLES_HTML = [
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', 'unicode-bidi', 'visibility', 'vertical-align',
     'width', 'widows', 'white-space', 'word-spacing', 'word-wrap', 'z-index'
 ]
+BLEACH_ALLOWED_PROTOCOLS_HTML = ['cid']  # used for embedded image
 
 
 LATEX_MATH_PLACEHOLDER = '\uE000'
@@ -615,7 +616,7 @@ class IndicoCSSSanitizer(CSSSanitizer):
 def sanitize_html(string):
     css_sanitizer = IndicoCSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
     return bleach.clean(string, tags=BLEACH_ALLOWED_TAGS_HTML, attributes=BLEACH_ALLOWED_ATTRIBUTES_HTML,
-                        css_sanitizer=css_sanitizer)
+                        protocols=BLEACH_ALLOWED_PROTOCOLS_HTML, css_sanitizer=css_sanitizer)
 
 
 def html_to_plaintext(string):
