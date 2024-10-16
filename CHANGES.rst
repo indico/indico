@@ -26,7 +26,6 @@ Improvements
 - Take session program codes into account when sorting parallel sessions with the same start time
   in meeting timetable (:pr:`6575`)
 - Enforce browser-side caching of event logos and custom stylesheets (:issue:`6555`, :pr:`6559`)
-- Make positioning logic from TipBase generic and reusable (:pr:`6577`,  thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^
@@ -55,7 +54,7 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Make positioning logic from TipBase generic and reusable (:pr:`6577`, thanks :user:`foxbunny`)
 
 
 Version 3.3.4
