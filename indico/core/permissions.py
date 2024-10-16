@@ -20,7 +20,7 @@ class ManagementPermission:
 
     To create a new permission, subclass this class and register
     it using the `acl.get_management_permissions` signal.
-    ManagementPermission classes are never instatiated.
+    ManagementPermission classes are never instantiated.
     """
 
     #: unique name of the permission - must be all-lowercase
@@ -72,6 +72,7 @@ def get_permissions_info(_type):
     from indico.modules.events.contributions import Contribution
     from indico.modules.events.sessions import Session
     from indico.modules.events.tracks import Track
+    from indico.modules.rb.models.locations import Location
     from indico.modules.rb.models.rooms import Room
 
     description_mapping = {
@@ -80,6 +81,7 @@ def get_permissions_info(_type):
             Session: _('Unrestricted management access for the selected session'),
             Contribution: _('Unrestricted management access for the selected contribution'),
             Room: _('Full management access over the room'),
+            Location: _('Full management access over the location'),
             Category: _('Unrestricted management access for this category and all its subcategories/events'),
             Track: None
         },
@@ -88,6 +90,7 @@ def get_permissions_info(_type):
             Session: _('Access the public areas of the selected session'),
             Contribution: _('Access the public areas of the selected contribution'),
             Room: None,
+            Location: None,
             Category: _('View the category and its events'),
             Track: None
         }
