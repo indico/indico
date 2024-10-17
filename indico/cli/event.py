@@ -55,7 +55,9 @@ def restore(event_id, user_id, message):
               help='Whether to keep UUIDs instead of generating new ones during import.')
 @click.option('-p', '--pickle', 'use_pickle', is_flag=True,
               help='Use pickle for serializing - this is much faster, but not human-readable.')
-def export(id, target_file, is_category, keep_uuids, use_pickle):
+@click.option('-D', '--dummy-files', is_flag=True,
+              help='Export files with short dummy content instead of their real data.')
+def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files):
     """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
@@ -69,6 +71,9 @@ def export(id, target_file, is_category, keep_uuids, use_pickle):
     migrate an event to another instance and want to preserve links (usually by using a
     custom plugin on the source instance to map old IDs to new ones). Unless this is what
     you are doing, you probably do not want to use this flag.
+
+    When exporting an event for testing/debugging on a local development instance, you may
+    want to use the `--dummy-files` switch to keep the archive small.
     """
     obj = Category.get(id) if is_category else Event.get(id)
     objtype = 'category' if is_category else 'event'
@@ -81,7 +86,9 @@ def export(id, target_file, is_category, keep_uuids, use_pickle):
     elif obj.is_deleted:
         click.secho(f'This {objtype} has been deleted', fg='yellow')
         click.confirm('Export it anyway?', abort=True)
-    export_event(obj, target_file, keep_uuids=keep_uuids, use_pickle=use_pickle)
+    if dummy_files:
+        click.secho('Dummy files are enabled, DO NOT import the event in a production instance', fg='yellow', bold=True)
+    export_event(obj, target_file, keep_uuids=keep_uuids, use_pickle=use_pickle, dummy_files=dummy_files)
 
 
 @cli.command('import')
@@ -92,7 +99,7 @@ def export(id, target_file, is_category, keep_uuids, use_pickle):
 @click.option('--create-affiliations/--no-create-affiliations', default=None,
               help='Whether to create missing affiliations or skip them.  By default a confirmation prompt is shown '
                    'when the archive contains such affiliations')
-@click.option('--force', is_flag=True, help='Ignore database version mismatches (DANGER)')
+@click.option('-f', '--force', is_flag=True, help='Ignore database version mismatches (DANGER)')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on what is being imported')
 @click.option('-y', '--yes', is_flag=True, help='Always commit the imported event without prompting')
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',

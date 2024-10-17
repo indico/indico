@@ -88,7 +88,7 @@ class _PickleBackend:
 BACKENDS = {'yaml': _YamlBackend, 'pickle': _PickleBackend}
 
 
-def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle=False):
+def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle=False, dummy_files=False):
     """Export the specified event/category with all its data to a file.
 
     :param event_or_category: the `Event` to export, or a `Category` to export with all
@@ -96,9 +96,11 @@ def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle
     :param target_file: a file object to write the data to
     :param keep_uuids: preserve uuids between the exported and imported events
     :param use_pickle: use pickle instead of yaml for serializing
+    :param dummy_files: replace actual file content with short dummy content
     """
     backend = 'pickle' if use_pickle else 'yaml'
-    exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids, backend=backend)
+    exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids, dummy_files=dummy_files,
+                             backend=backend)
     exporter.serialize()
 
 
@@ -192,10 +194,11 @@ def _get_alembic_version() -> list[str]:
 
 
 class EventExporter:
-    def __init__(self, obj, target_file, *, keep_uuids=False, backend='yaml'):
+    def __init__(self, obj, target_file, *, keep_uuids=False, dummy_files=False, backend='yaml'):
         self.obj = obj
         self.target_file = target_file
         self.keep_uuids = keep_uuids
+        self.dummy_files = dummy_files
         self.backend = BACKENDS[backend]
         self.categories = frozenset(self._fetch_categories())
         # XXX we're not using a context manager here since changing that would probably require
@@ -232,9 +235,10 @@ class EventExporter:
             'export_version': CURRENT_EXPORT_VERSION,
             'indico_version': indico.__version__,
             'db_version': _get_alembic_version(),
+            'dummy_files': self.dummy_files,
             'object_files': [],
             'users': self.users,
-            'affiliations': self.affiliations
+            'affiliations': self.affiliations,
         }
         for i, objects in enumerate(batched(all_objects, 5000), 1):
             object_data = self.backend.dump(objects)
@@ -401,8 +405,13 @@ class EventExporter:
         size = data.pop('size')
         md5 = data.pop('md5')
         uuid = self._get_uuid()
-        with get_storage(storage_backend).open(storage_file_id) as f:
-            self._add_file(uuid, size, f)
+        if self.dummy_files:
+            size = 1
+            md5 = '9dd4e461268c8034f5c8564e155c67a6'  # md5('x')
+            self._add_file(uuid, size, 'x')
+        else:
+            with get_storage(storage_backend).open(storage_file_id) as f:
+                self._add_file(uuid, size, f)
         data['__file__'] = ('file', {'uuid': uuid, 'filename': filename, 'content_type': content_type, 'size': size,
                                      'md5': md5})
 
@@ -680,6 +689,12 @@ class EventImporter:
             click.secho('Database schema version mismatch: exported on {}, current schema is {}'
                         .format(','.join(self.data['db_version']), ','.join(alembic_version)), fg='red')
             return None
+        if self.data['dummy_files']:
+            click.secho('Archive has been exported using dummy file content', fg='yellow', bold=True)
+            if not config.DEBUG and not self.force:
+                click.secho('This instance is not running in debug mode, use --force if you really want to import '
+                            'an archive with dummy file content', fg='yellow')
+                return None
         self._load_affiliations(self.data)
         self._load_users(self.data)
         objects = self._load_objects(self.data)
