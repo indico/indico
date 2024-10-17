@@ -49,6 +49,7 @@ from indico.util.iterables import materialize_iterable
 from indico.util.string import strict_str
 
 
+CURRENT_EXPORT_VERSION = 2  # only bump this for backwards-incompatible changes to the export format itself
 _notset = object()
 _skip = object()
 
@@ -116,7 +117,7 @@ def import_event(source_file, category_id=0, create_users=None, create_affiliati
                                 an interactive prompt is shown when such
                                 affiliations are encountered.
     :param verbose: Whether to enable verbose output.
-    :param force: Whether to ignore version conflicts.
+    :param force: Whether to ignore database version conflicts.
     :return: The imported event/category and the ID mapping.
     """
     importer = EventImporter(source_file, category_id, create_users, create_affiliations, verbose, force)
@@ -186,6 +187,10 @@ def _get_inserted_pk(result):
     return result.inserted_primary_key[0]
 
 
+def _get_alembic_version() -> list[str]:
+    return [rev for rev, in db.session.execute('SELECT version_num FROM alembic_version').fetchall()]
+
+
 class EventExporter:
     def __init__(self, obj, target_file, *, keep_uuids=False, backend='yaml'):
         self.obj = obj
@@ -224,7 +229,9 @@ class EventExporter:
         all_objects = list(self._serialize_objects(model.__table__, model.id == self.obj.id, is_root_object=True))
         metadata = {
             'timestamp': now_utc(),
+            'export_version': CURRENT_EXPORT_VERSION,
             'indico_version': indico.__version__,
+            'db_version': _get_alembic_version(),
             'object_files': [],
             'users': self.users,
             'affiliations': self.affiliations
@@ -659,9 +666,19 @@ class EventImporter:
             yield from self.backend.load(self.archive.extractfile(filename))
 
     def deserialize(self) -> Event | Category | None:
-        if not self.force and self.data['indico_version'] != indico.__version__:
-            click.secho('Version mismatch: trying to import event exported with {} to version {}'
-                        .format(self.data['indico_version'], indico.__version__), fg='red')
+        export_version = self.data.get('export_version', 1)
+        if export_version != CURRENT_EXPORT_VERSION:
+            click.secho(f'Unsupported data format: Expected version {CURRENT_EXPORT_VERSION}, but import archive is '
+                        f'version {export_version}', fg='red')
+            return None
+        if self.data['indico_version'] != indico.__version__:
+            click.secho('Indico version mismatch: importing event exported with {} to version {}'
+                        .format(self.data['indico_version'], indico.__version__), fg='yellow')
+            return None
+        alembic_version = _get_alembic_version()
+        if not self.force and self.data['db_version'] != alembic_version:
+            click.secho('Database schema version mismatch: exported on {}, current schema is {}'
+                        .format(','.join(self.data['db_version']), ','.join(alembic_version)), fg='red')
             return None
         self._load_affiliations(self.data)
         self._load_users(self.data)
