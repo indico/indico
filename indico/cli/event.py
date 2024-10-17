@@ -92,7 +92,7 @@ def export(id, target_file, is_category, keep_uuids, use_pickle):
 @click.option('--create-affiliations/--no-create-affiliations', default=None,
               help='Whether to create missing affiliations or skip them.  By default a confirmation prompt is shown '
                    'when the archive contains such affiliations')
-@click.option('--force', is_flag=True, help='Ignore Indico version mismatches (DANGER)')
+@click.option('--force', is_flag=True, help='Ignore database version mismatches (DANGER)')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on what is being imported')
 @click.option('-y', '--yes', is_flag=True, help='Always commit the imported event without prompting')
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
