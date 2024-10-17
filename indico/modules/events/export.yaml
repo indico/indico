@@ -591,8 +591,8 @@ import:
   # to not use this on any column referencing a user or whose referenced
   # row has not been imported yet (ensure such rows are exported earlier).
   # In cases (usually log entries) where idrefs may never be resolved because
-  # their referenced object has not been exported, TRY_RESOLVE_ID_REF can be
-  # used instead, it returns `None` when encountering a deferred idref.
+  # their referenced object has not been exported, a second argument can be passed
+  # to it as the default return value for such cases.
   # The code must assign exactly one value that does not start with an
   # underscore and has the same name as the original column (names can only
   # be changed at export time)
@@ -603,9 +603,9 @@ import:
         for _rule in VALUE:
             _rule = dict(_rule)
             if 'contribution_type' in _rule:
-                _rule['contribution_type'] = [RESOLVE_ID_REF(_x) for _x in _rule['contribution_type']]
+                _rule['contribution_type'] = [RESOLVE_ID_REF(_x, -1) for _x in _rule['contribution_type']]
             if 'track' in _rule:
-                _rule['track'] = [RESOLVE_ID_REF(_x) for _x in _rule['track']]
+                _rule['track'] = [RESOLVE_ID_REF(_x, -1) for _x in _rule['track']]
             rules.append(_rule)
 
     Abstract:
@@ -619,7 +619,7 @@ import:
         meta = {
             _k: _id if _is_ref else _v
             for _k, (_is_ref, _v) in VALUE.items()
-            if not _is_ref or (_id := TRY_RESOLVE_ID_REF(_v)) is not None
+            if not _is_ref or (_id := RESOLVE_ID_REF(_v, None)) is not None
         }
 
     EventLogEntry:
@@ -628,7 +628,7 @@ import:
         meta = {
             _k: _id if _is_ref else _v
             for _k, (_is_ref, _v) in VALUE.items()
-            if not _is_ref or (_id := TRY_RESOLVE_ID_REF(_v)) is not None
+            if not _is_ref or (_id := RESOLVE_ID_REF(_v, None)) is not None
         }
 
 
