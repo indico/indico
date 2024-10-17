@@ -691,6 +691,7 @@ class EventImporter:
                     click.secho(f'  - {table.fullname}.{col} ({pk_value})', fg='yellow')
             raise Exception('Not all deferred idrefs have been consumed')
         obj = self.top_level[0].get(self.top_level[1])
+        click.echo('Associating users by email')
         match obj:
             case Event() as event:
                 event.log(EventLogRealm.event, LogKind.other, 'Event', 'Event imported from another Indico instance')
