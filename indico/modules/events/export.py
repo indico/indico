@@ -699,7 +699,11 @@ class EventImporter:
             case Category() as cat:
                 cat.log(CategoryLogRealm.category, LogKind.other, 'Category',
                         'Category imported from another Indico instance')
-                for event in Event.query.filter(Event.category_chain_overlaps([cat.id])):
+                events = Event.query.filter(Event.category_chain_overlaps([cat.id])).all()
+                for event in verbose_iterator(events, len(events), attrgetter('id'), attrgetter('title'),
+                                              print_total_time=True):
+                    event.log(EventLogRealm.event, LogKind.other, 'Event',
+                              'Event imported from another Indico instance')
                     self._associate_users_by_email(event)
         db.session.flush()
         return obj
