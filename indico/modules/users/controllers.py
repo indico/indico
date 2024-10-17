@@ -374,7 +374,7 @@ class RHSaveProfilePicture(RHUserBase):
     """Update the user's profile picture."""
 
     @use_kwargs({
-        'source': EnumField(ProfilePictureSource)
+        'source': EnumField(ProfilePictureSource, required=True)
     })
     def _process(self, source):
         self.user.picture_source = source
