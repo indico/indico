@@ -1,0 +1,272 @@
+{% macro render_program(event, days, show_contribs, show_length_contribs, show_breaks, new_page_per_session, show_session_description, print_date_close_to_sessions, show_title, show_affiliation) %}
+    {% for day in days %}
+        <div class="pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
+            <div class="day-title">
+                <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
+            </div>
+
+            {% for entry in days[day] %}
+                {% if entry.type == 1 %}
+                    {{ get_color_styles(entry, entry.object.session.colors) }}
+                    <section class="day {{ get_custom_id(entry) }}">
+                        {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                        <section class="session-block">
+                            {{ render_time(entry) }}
+                            {{ render_session_block(entry, show_contribs, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) }}
+                        </section>
+                    </section>
+                {% elif entry.type == 2 and show_contribs %}
+                    <section class="day">
+                        {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                        <section class="session-block contribution">
+                            {{ render_time(entry) }}
+                            {{ render_contrib(entry, show_title, show_affiliation) }}
+                        </section>
+                    </section>
+                {% elif entry.type == 3 and show_breaks %}
+                    {{ get_color_styles(entry, entry.object.colors) }}
+                    <section class="day {{ get_custom_id(entry) }}">
+                        {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                        <section class="session-block">
+                            {{ render_time(entry) }}
+                            {{ render_break(entry) }}
+                        </section>
+                    </section>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_session_block(entry, show_contribs, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) %}
+    {% set session_block = entry.object %}
+    {% set session = session_block.session %}
+    {% set conveners = session_block.person_links %}
+    {% set contributions = session_block.contributions %}
+
+    <div class="session-block-wrapper">
+        <section
+            id="entry-{{ entry.id }}"
+            class="session-block-title inherited-bg-color inherited-txt-color"
+            style="{{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
+        >
+            <h3>
+                {% if session.title and session_block.title %}
+                    {{ session.title }}: {{ session_block.title }}
+                {% else %}
+                    {{ session_block.title or session.title }}
+                {% endif %}
+            </h3>
+            <div class="session-block-title-info">
+                <p><b>{% trans %}Session{% endtrans %}</b></p>
+                {% if entry.object.room_name %}
+                    <p>{{ render_place(entry) }}</p>
+                {% endif %}
+                {% if conveners %}
+                    <p>
+                        <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
+                        {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}
+                    </p>
+                {% endif %}
+            </div>
+        </section>
+        {% if entry.children %}
+            <div class="session-block-content">
+                {% if show_session_description and session.description %}
+                    <div class="session-block-content-box description inherited-border-color">
+                        <ul class="contrib-timeline">
+                            <li>
+                                <h4>{% trans %}Description{% endtrans %}</h4>
+                                {{ session.description }}
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="session-block-content-box inherited-border-color">
+                    <ul class="contrib-timeline">
+                        {% for child in entry.children %}
+                            <li class="inherited-border-color">
+                                <h4>
+                                    <span class="timebox inherited-bg-color inherited-txt-color">
+                                        {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
+                                        {% if show_contribs and show_length_contribs %}
+                                            ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
+                                        {% endif %}
+                                    </span>
+                                    {{ child.object.title }}
+                                </h4>
+                                {% if child.type == 2 and show_contribs %}
+                                    <div class="contrib-timeline-content">
+                                        {{ render_nested_contrib(child, show_title, show_affiliation, show_length_contribs) }}
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_contrib(entry, show_title, show_affiliation) %}
+    {% set contrib = entry.object %}
+    {% set speakers = contrib.speakers %}
+
+    <div class="session-block-wrapper">
+        <div
+            id="entry-{{ entry.id }}"
+            class="session-block-title"
+        >
+            <h3>
+                {{ contrib.title }}
+            </h3>
+            <div class="session-block-title-info">
+                <p><b>{% trans %}Contribution{% endtrans %}</b></p>
+                {% if speakers %}
+                    <p>
+                        <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}:</b>
+                        {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
+                    </p>
+                {% else %}
+                    <p>{% trans %}No convener{% endtrans %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_break(entry) %}
+    {% set break = entry.object %}
+
+    <div class="session-block-wrapper">
+        <div class="session-block-title inherited-bg-color inherited-txt-color" id="entry-{{ entry.id }}">
+            <h3>{{ break.title }}</h3>
+            <div class="session-block-title-info">
+                <p><b>{% trans %}Break{% endtrans %}</b></p>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_nested_contrib(entry, show_title, show_affiliation, show_length_contribs=false) %}
+    {% set contrib = entry.object if entry.object else entry %}
+    {% set speakers = contrib.speakers %}
+
+    {% if speakers %}
+        <p>
+            <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b><br />
+            {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
+        </p>
+    {% endif %}
+    {% if contrib.description %}
+        <div class="description">
+            <b>{% trans %}Description{% endtrans %}</b>
+            {# Description can be markdown #}
+            <div>{{ contrib.description }}</div>
+        </div>
+    {% endif %}
+    {% if contrib.subcontributions %}
+        <div>
+            <b>{% trans %}Subcontributions{% endtrans %}</b>
+            <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
+                {% for subchild in contrib.subcontributions %}
+                    <li class="inherited-border-color">
+                        <h4>
+                            <span class="timebox inherited-bg-color inherited-txt-color">
+                                {# {{ subchild.start_dt|format_time(timezone=entry.event.tz) }} - {{ subchild.end_dt|format_time(timezone=entry.event.tz) }} #}
+                                {% if show_length_contribs %}
+                                    {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
+                                {% endif %}
+                            </span>
+                            {{ subchild.title }}
+                        </h4>
+                        <div class="contrib-timeline-content">
+                            {{ render_nested_contrib(subchild, show_title, show_affiliation, show_length_contribs) }}
+                        </div>
+                    </li>
+                {% endfor%}
+            </ul>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_block_date(entry, day, print_date_close_to_sessions) %}
+    {% if print_date_close_to_sessions %}
+        <p class="session-block-date">
+            <b>{{ day|format_skeleton('EEEEdMMMM') }}</b>
+            <span class="timebox">
+                {{ entry.start_dt|format_time(timezone=entry.event.tz) }} - {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
+            </span>
+        </p>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_time(entry) %}
+    <div class="time">
+        <div class="time-from">
+            {{ entry.start_dt|format_time(timezone=entry.event.tz) }}
+        </div>
+        <div class="time-divider">
+            {# Line between generated in CSS #}
+        </div>
+        <div class="time-divider">
+            {# Line between generated in CSS #}
+        </div>
+        <div class="time-to">
+            {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{# Utilities #}
+
+{% macro render_place(entry) %}
+    <b>{% trans %}Location{% endtrans %}:</b>
+    {% if entry.object.venue_name %}
+        {{ entry.object.venue_name }}{% if entry.object.room_name %},{% endif %}
+    {% endif %}
+    {% if entry.object.room_name %}
+        {{ entry.object.room_name }}
+    {%endif%}
+{% endmacro %}
+
+{% macro render_names(people, show_title=false, show_affiliation=false) %}
+    {% for person in people %}
+        {{
+            person.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) +
+            (' (' + person.affiliation + ')' if show_affiliation and person.affiliation else '') +
+            (',' if not loop.last else '')
+        }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro get_custom_id(entry) -%}
+    {{ 'c' ~ entry.type ~ '-' ~ entry.id }}
+{% endmacro %}
+
+{% macro get_color_styles(entry, colors, transhex='00') %}
+    {% set c_id = get_custom_id(entry) %}
+
+    <style>
+        {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
+            background-color: #{{ colors.background }};
+        }
+
+        {{ '.' ~ c_id  ~ ' .inherited-bg-color-trans' }} {
+            background-color: #{{ colors.background }}66;
+        }
+
+        {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
+            background-color: #{{ colors.background }};
+        }
+
+        {{ '.' ~ c_id ~ ' .inherited-txt-color' }} {
+            color: #{{ colors.text }};
+        }
+
+        {{ '.' ~ c_id ~ ' .inherited-border-color' }} {
+            border-color: #{{ colors.background }};
+        }
+    </style>
+{% endmacro %}

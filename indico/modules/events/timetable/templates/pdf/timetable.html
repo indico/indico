@@ -1,0 +1,77 @@
+{% from 'events/timetable/pdf/_cover_page.html' import render_cover_page %}
+{% from 'events/timetable/pdf/_toc.html' import render_toc %}
+{% from 'events/timetable/pdf/_program.html' import render_program %}
+
+<style>
+    @page {
+        size: {{ page_size }};
+        margin: 10mm;
+    }
+
+    @page :first {
+        counter-reset: toc-page;
+        counter-reset: program-page 0;
+
+        @bottom-center {
+            content: '{{ now|format_date(format='full', timezone=event.tz) }}';
+        }
+    }
+
+    @page toc {
+        counter-increment: toc-page;
+
+        @bottom-center {
+            content: counter(toc-page, lower-roman);
+        }
+    }
+
+    {% for day in days %}
+        @page program-{{ loop.index }} {
+            counter-increment: program-page;
+
+            @bottom-center {
+                content: counter(program-page);
+            }
+
+            @top-left {
+                font-size: 0.8em;
+                color: grey;
+                content: '{{ event.title }} / Programme';
+            }
+
+            @top-right {
+                font-size: 0.8em;
+                color: grey;
+                content: '{{ day|format_skeleton('EEEEdMMMM') }}';
+            }
+        }
+
+        @page program-{{ loop.index }}:first {
+            @top-right {
+                content: 'YYY' !important;
+            }
+        }
+
+        .program-{{ loop.index }} {
+            page: program-{{ loop.index }};
+        }
+    {% endfor %}
+</style>
+{% if show_cover_page %}
+    {{ render_cover_page(event) }}
+{% endif %}
+{% if show_toc %}
+    {{ render_toc(event, days, show_session_toc, show_contribs, show_breaks) }}
+{% endif %}
+{{ render_program(
+    event,
+    days,
+    show_contribs,
+    show_length_contribs,
+    show_breaks,
+    new_page_per_session,
+    show_session_description,
+    print_date_close_to_sessions,
+    show_title,
+    show_affiliation
+) }}
