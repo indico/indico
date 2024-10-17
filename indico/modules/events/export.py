@@ -331,6 +331,8 @@ class EventExporter:
             self.orig_ids[fullname][uuid] = value
         if type_ == 'userref' and uuid not in self.users:
             user = User.get(value)
+            if user.is_deleted:
+                click.secho(f'! Found reference to deleted user in {column}: {user}', fg='yellow')
             self.users[uuid] = None if user.is_system else {
                 'first_name': user.first_name,
                 'last_name': user.last_name,
@@ -341,7 +343,9 @@ class EventExporter:
                 'phone': user.phone,
                 'address': user.address,
                 'email': user.email,
-                'all_emails': list(user.all_emails)
+                'all_emails': list(user.all_emails),
+                'is_deleted': user.is_deleted,
+                'merged_into_id': self._make_idref(None, user.merged_into_id, target_column=_resolve_col('User.id')),
             }
         elif type_ == 'affilref' and uuid not in self.affiliations:
             affiliation = Affiliation.get(value)
@@ -587,6 +591,7 @@ class EventImporter:
                                 affiliation=userdata['affiliation'],
                                 affiliation_id=self._convert_value(None, userdata['affiliation_id']),
                                 title=userdata['title'],
+                                is_deleted=userdata['is_deleted'],
                                 is_pending=True)
                     db.session.add(user)
                     db.session.flush()
@@ -720,8 +725,20 @@ class EventImporter:
             person.user = get_user_by_email(person.email)
 
         # registrations
-        for registration in Registration.query.with_parent(event).filter(Registration.user_id.is_(None)):
-            registration.user = get_user_by_email(registration.email)
+        regform_users_seen = defaultdict(set)
+        for registration in Registration.query.with_parent(event).filter(Registration.user_id.isnot(None)):
+            regform_users_seen[registration.registration_form].add(registration.user)
+        query = (Registration.query
+                 .with_parent(event)
+                 .filter(Registration.user_id.is_(None))
+                 .order_by(Registration.is_deleted))
+        for registration in query:
+            user = get_user_by_email(registration.email)
+            if user in regform_users_seen[registration.registration_form]:
+                click.secho(f'! Cannot link additional registration to same user ({user})', fg='yellow')
+                continue
+            registration.user = user
+            regform_users_seen[registration.registration_form].add(user)
 
     def _convert_value(self, colspec, value):
         if not isinstance(value, tuple):
