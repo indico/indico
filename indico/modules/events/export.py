@@ -587,7 +587,7 @@ class EventImporter:
                 create_users = self.create_users
             if create_users:
                 click.secho('Creating missing users', fg='magenta')
-                for uuid, userdata in missing.items():
+                for uuid, userdata in verbose_iterator(missing.items(), len(missing)):
                     user = User(first_name=userdata['first_name'],
                                 last_name=userdata['last_name'],
                                 email=userdata['email'],
@@ -653,6 +653,7 @@ class EventImporter:
     @materialize_iterable()
     def _load_objects(self, data):
         filenames = data['object_files']
+        click.echo('Loading data files')
         it = verbose_iterator(filenames, len(filenames), get_title=lambda x: x, print_every=1, print_total_time=True)
         for filename in it:
             yield from self.backend.load(self.archive.extractfile(filename))
@@ -673,6 +674,7 @@ class EventImporter:
             # be referenced themselves. And by putting them last we avoid having deferred idrefs
             x[0] in ('categories.logs', 'events.logs')
         ))
+        click.echo('Importing data')
         objects_iter = verbose_iterator(objects, len(objects), print_total_time=True)
         for i, (tablename, (new_scope, scope), tabledata) in enumerate(objects_iter):
             self._deserialize_object(db.metadata.tables[tablename], tabledata, scope, new_scope, is_top_level=(i == 0))
