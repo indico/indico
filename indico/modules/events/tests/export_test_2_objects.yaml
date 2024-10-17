@@ -1,6 +1,4 @@
-affiliations: {}
-indico_version: 1.3.3.7
-objects:
+!!python/tuple
 - !!python/tuple
   - events.events
   - !!python/tuple
@@ -226,16 +224,3 @@ objects:
     user_id: !!python/tuple
     - userref
     - 00000000-0000-4000-8000-00000000000a
-timestamp: 2017-08-24 15:28:43.011442+00:00
-users:
-  00000000-0000-4000-8000-00000000000a:
-    address: ''
-    affiliation: null
-    all_emails:
-    - 1337@example.test
-    email: 1337@example.test
-    first_name: Guinea
-    last_name: Pig
-    phone: ''
-    title: !!python/object/apply:indico.modules.users.models.users.UserTitle
-    - 0
