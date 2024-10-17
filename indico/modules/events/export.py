@@ -824,15 +824,14 @@ class EventImporter:
             colspec = table.c[col]
             if col in import_custom:
                 # custom python code to process the imported value
-                def _resolve_id_ref(value, *, drop_deferred=False):
+                def _resolve_id_ref(value, deferred_fallback=_notset):
                     try:
                         return self._convert_value(colspec, value)  # noqa: B023
                     except IdRefDeferred:
-                        if drop_deferred:
-                            return None
-                        raise
-                rv = _exec_custom(import_custom[col], VALUE=value, RESOLVE_ID_REF=_resolve_id_ref,
-                                  TRY_RESOLVE_ID_REF=lambda value: _resolve_id_ref(value, drop_deferred=True))
+                        if deferred_fallback is _notset:
+                            raise
+                        return deferred_fallback
+                rv = _exec_custom(import_custom[col], VALUE=value, RESOLVE_ID_REF=_resolve_id_ref)
                 assert list(rv.keys()) == [col]
                 insert_values[col] = rv[col]
                 continue
