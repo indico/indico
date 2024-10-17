@@ -14,7 +14,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from io import BytesIO
 from itertools import batched
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 from uuid import uuid4
 
 import click
@@ -249,6 +249,7 @@ class EventExporter:
             tablespec.setdefault('order', None)
             tablespec.setdefault('python_order', None)
             tablespec.setdefault('allow_duplicates', False)
+            tablespec.setdefault('show_progress', False)
             fks = {}
             for fk_name in tablespec['fks']:
                 col = _resolve_col(fk_name)
@@ -416,7 +417,12 @@ class EventExporter:
             rows = _exec_custom(spec['python_order'], ROWS=rows)['rows']
         cascaded = []
         cat_role = ('category_role',) if self.categories else ()
-        for row in rows:
+        if spec['show_progress'] and len(rows) > 1:
+            rows_iter = verbose_iterator(rows, len(rows), get_id=attrgetter('id'), get_title=attrgetter('title'),
+                                        print_every=1, print_total_time=True)
+        else:
+            rows_iter = iter(rows)
+        for row in rows_iter:
             if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row, CAT_ROLE=cat_role)):  # noqa: S307
                 continue
             rowdict = row._asdict()
