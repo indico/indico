@@ -46,8 +46,11 @@ export:
   #                     use this if you need to reference a table from two places that may
   #                     have overlaps - do not use this without having a case where you get
   #                     an error due to duplicates!
+  # - show_progress: Whether to show a progress indicator while exporting from this table.
+  #                  Can only be used on tables that have `id` and `title` columns.
 
   Category:
+    show_progress: true
     cols:
       parent_id: parent_id = SKIP if IS_ROOT_OBJECT else MAKE_ID_REF(Category.id, VALUE)
     fks:
@@ -107,6 +110,7 @@ export:
 
   # events and anything related to it
   Event:
+    show_progress: true
     cols:
       venue_id: venue_name = Location.get(VALUE).name
       room_id: room_name = Room.get(VALUE).full_name
