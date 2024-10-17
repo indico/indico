@@ -741,7 +741,8 @@ class EventImporter:
                  .filter(Registration.user_id.is_(None))
                  .order_by(Registration.is_deleted))
         for registration in query:
-            user = get_user_by_email(registration.email)
+            if not (user := get_user_by_email(registration.email)):
+                continue
             if user in regform_users_seen[registration.registration_form]:
                 click.secho(f'! Cannot link additional registration to same user ({user})', fg='yellow')
                 continue
