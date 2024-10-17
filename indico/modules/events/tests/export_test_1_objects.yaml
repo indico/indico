@@ -1,6 +1,4 @@
-affiliations: {}
-indico_version: 1.3.3.7
-objects:
+!!python/tuple
 - !!python/tuple
   - events.events
   - !!python/tuple
@@ -151,17 +149,3 @@ objects:
     track_id: null
     type_id: null
     venue_name: ''
-timestamp: 2017-08-24 09:00:00+00:00
-users:
-  00000000-0000-4000-8000-000000000001:
-    address: ''
-    affiliation: ''
-    affiliation_id: null
-    all_emails:
-    - 1337@example.test
-    email: 1337@example.test
-    first_name: Guinea
-    last_name: Pig
-    phone: ''
-    title: !!python/object/apply:indico.modules.users.models.users.UserTitle
-    - 0
