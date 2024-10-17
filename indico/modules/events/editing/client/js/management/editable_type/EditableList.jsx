@@ -327,7 +327,7 @@ function EditableListDisplay({
     x => x.editable && x.editable.tags && x.editable.tags.length > 0
   );
   if (tagsExist) {
-    columnHeaders.push(['tags', Translate.string('Tags'), 131]);
+    columnHeaders.push(['tags', Translate.string('Tags'), 136]);
   }
 
   const programCodeKey = contribution => contribution.code;
