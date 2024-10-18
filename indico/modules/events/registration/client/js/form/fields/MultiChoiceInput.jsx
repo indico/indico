@@ -15,7 +15,7 @@ import {Checkbox, Dropdown, Label} from 'semantic-ui-react';
 import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate, PluralTranslate} from 'indico/react/i18n';
 
-import {getCurrency} from '../../form/selectors';
+import {getFormatPrice} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
@@ -39,7 +39,7 @@ function MultiChoiceInputComponent({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const currency = useSelector(getCurrency);
+  const _formatPrice = useSelector(getFormatPrice);
 
   const markTouched = () => {
     onFocus();
@@ -65,7 +65,7 @@ function MultiChoiceInputComponent({
 
   const formatPrice = choice => {
     const val = value[choice.id] || 0;
-    return ((val === 0 ? 0 : choice.extraSlotsPay ? val : 1) * choice.price).toFixed(2);
+    return _formatPrice((val === 0 ? 0 : choice.extraSlotsPay ? val : 1) * choice.price);
   };
 
   const isPaidChoice = choice => choice.price > 0 && paid;
@@ -106,9 +106,7 @@ function MultiChoiceInputComponent({
               </td>
               <td>
                 {choice.isEnabled && !!choice.price && (
-                  <Label pointing="left">
-                    {choice.price.toFixed(2)} {currency}
-                  </Label>
+                  <Label pointing="left">{formatPrice(choice.price)}</Label>
                 )}
               </td>
               <td>
@@ -152,10 +150,7 @@ function MultiChoiceInputComponent({
                 <td>
                   {choice.isEnabled && !!choice.price && (
                     <Label pointing="left">
-                      {Translate.string('Total: {total} {currency}', {
-                        total: formatPrice(choice),
-                        currency,
-                      })}
+                      {Translate.string('Total: {price}', {price: formatPrice(choice)})}
                     </Label>
                   )}
                 </td>
