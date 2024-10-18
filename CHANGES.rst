@@ -85,6 +85,8 @@ Improvements
 - Improve readability of room booking room statistics card (:pr:`6616`)
 - Add option to use flat zip file structure when downloading registration attachments
   (:issue:`6536`, :pr:`6608`, thanks :user:`Moliholy, unconventionaldotdev`)
+- Highlight editables in the editable list that have been updated since the last time
+  they were viewed (:pr:`6500`)
 
 Bugfixes
 ^^^^^^^^
@@ -173,8 +175,6 @@ Improvements
   module (:issue:`6503`, :pr:`6502`)
 - Add quick setup button to configure default notifications in Call for Abstracts
   (:pr:`6454`, thanks :user:`jbtwist`)
-- Highlight editables in the editable list that have been updated since the last time
-  they were viewed (:pr:`6500`)
 
 Bugfixes
 ^^^^^^^^
