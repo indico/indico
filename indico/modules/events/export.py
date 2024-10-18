@@ -764,10 +764,18 @@ class EventImporter:
             ContributionPrincipal.replace_email_with_user(user, 'contribution')
 
         # event persons
+        query = EventPerson.query.with_parent(event).filter(EventPerson.user_id.isnot(None))
+        eventperson_users_seen = {person.user for person in query}
         query = EventPerson.query.with_parent(event).filter(EventPerson.user_id.is_(None),
                                                             EventPerson.email != '')  # noqa: PLC1901
         for person in query:
-            person.user = get_user_by_email(person.email)
+            if not (user := get_user_by_email(person.email)):
+                continue
+            if user in eventperson_users_seen:
+                click.secho(f'! Cannot link additional EventPerson to same user ({user})', fg='yellow')
+                continue
+            person.user = user
+            eventperson_users_seen.add(user)
 
         # registrations
         regform_users_seen = defaultdict(set)
