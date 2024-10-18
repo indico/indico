@@ -13,9 +13,9 @@ import {useSelector} from 'react-redux';
 import {Checkbox, Dropdown, Label} from 'semantic-ui-react';
 
 import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
-import {Translate, PluralTranslate} from 'indico/react/i18n';
+import {Translate, PluralTranslate, Param} from 'indico/react/i18n';
 
-import {getFormatPrice} from '../../form/selectors';
+import {getPriceFormatter} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
@@ -39,7 +39,7 @@ function MultiChoiceInputComponent({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const _formatPrice = useSelector(getFormatPrice);
+  const _formatPrice = useSelector(getPriceFormatter);
 
   const markTouched = () => {
     onFocus();
@@ -150,7 +150,9 @@ function MultiChoiceInputComponent({
                 <td>
                   {choice.isEnabled && !!choice.price && (
                     <Label pointing="left">
-                      {Translate.string('Total: {price}', {price: formatPrice(choice)})}
+                      <Translate>
+                        Total: <Param name="price" value={formatPrice(choice)} />
+                      </Translate>
                     </Label>
                   )}
                 </td>

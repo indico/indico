@@ -27,7 +27,7 @@ export const getCurrency = createSelector(
 );
 
 /** Get the price formatter function. */
-export const getFormatPrice = createSelector(
+export const getPriceFormatter = createSelector(
   getCurrency,
   currency => price =>
     new Intl.NumberFormat(document.documentElement.lang, {

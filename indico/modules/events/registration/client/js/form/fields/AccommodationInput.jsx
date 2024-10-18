@@ -14,10 +14,10 @@ import {Form, Label} from 'semantic-ui-react';
 
 import {DatePeriodField, FinalDatePeriod} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
-import {getFormatPrice} from '../../form/selectors';
+import {getPriceFormatter} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
@@ -41,7 +41,7 @@ function AccommodationInputComponent({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const formatPrice = useSelector(getFormatPrice);
+  const formatPrice = useSelector(getPriceFormatter);
   const selectedChoice = choices.find(c => c.id === value.choice);
 
   const [focusedDateField, setFocusedDateField] = useState(null);
@@ -124,7 +124,9 @@ function AccommodationInputComponent({
                   <td>
                     {c.isEnabled && !!c.price && (
                       <Label pointing="left">
-                        {Translate.string('{price} per night', {price: formatPrice(c.price)})}
+                        <Translate>
+                          <Param name="price" value={formatPrice(c.price)} /> per night
+                        </Translate>
                       </Label>
                     )}
                   </td>
@@ -161,9 +163,9 @@ function AccommodationInputComponent({
           />
           {!!selectedChoice.price && (
             <Label pointing="left" styleName="price-tag">
-              {Translate.string('Total: {price}', {
-                price: formatPrice(nights * selectedChoice.price),
-              })}
+              <Translate>
+                Total: <Param name="price" value={formatPrice(nights * selectedChoice.price)} />
+              </Translate>
             </Label>
           )}
         </div>
