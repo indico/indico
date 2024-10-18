@@ -26,6 +26,8 @@ Improvements
 - Take session program codes into account when sorting parallel sessions with the same start time
   in meeting timetable (:pr:`6575`)
 - Enforce browser-side caching of event logos and custom stylesheets (:issue:`6555`, :pr:`6559`)
+- Highlight editables in the editable list that have been updated since the last time
+  they were viewed (:pr:`6500`)
 
 Bugfixes
 ^^^^^^^^
@@ -99,8 +101,6 @@ Improvements
   module (:issue:`6503`, :pr:`6502`)
 - Add quick setup button to configure default notifications in Call for Abstracts
   (:pr:`6454`, thanks :user:`jbtwist`)
-- Highlight editables in the editable list that have been updated since the last time
-  they were viewed (:pr:`6500`)
 
 Bugfixes
 ^^^^^^^^
