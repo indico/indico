@@ -17,7 +17,7 @@ import {Select} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency} from '../../form/selectors';
+import {getFormatPrice} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
@@ -43,7 +43,7 @@ function SingleChoiceDropdown({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const currency = useSelector(getCurrency);
+  const formatPrice = useSelector(getFormatPrice);
   const selectedChoice = choices.find(c => c.id in value) || {};
   const selectedSeats = value[selectedChoice.id] || 0;
 
@@ -99,11 +99,7 @@ function SingleChoiceDropdown({
           <ChoiceLabel choice={choice} management={management} paid={isPaidChoice(choice)} />
         </div>
         <div styleName="labels">
-          {!!choice.price && (
-            <Label>
-              {choice.price} {currency}
-            </Label>
-          )}
+          {!!choice.price && <Label>{formatPrice(choice.price)}</Label>}
           {choice.placesLimit === 0 ? null : (
             <PlacesLeft
               placesLimit={choice.placesLimit}
@@ -148,11 +144,10 @@ function SingleChoiceDropdown({
         {extraSlotsDropdown}
         {shouldShowExtraSlotsLabel && (
           <Label pointing="left" id={extraSlotsLabelId}>
-            {Translate.string('Total: {total} {currency}', {
-              total: (
+            {Translate.string('Total: {price}', {
+              price: formatPrice(
                 (selectedChoice.extraSlotsPay ? selectedSeats : 1) * selectedChoice.price
-              ).toFixed(2),
-              currency,
+              ),
             })}
           </Label>
         )}
@@ -190,7 +185,7 @@ function SingleChoiceRadioGroup({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const currency = useSelector(getCurrency);
+  const formatPrice = useSelector(getFormatPrice);
   const selectedChoice = choices.find(c => c.id in value) || {id: ''};
   const radioChoices = [...choices];
   if (!isRequired) {
@@ -240,11 +235,7 @@ function SingleChoiceRadioGroup({
                 />
               </td>
               <td>
-                {c.isEnabled && !!c.price && (
-                  <Label pointing="left">
-                    {c.price.toFixed(2)} {currency}
-                  </Label>
-                )}
+                {c.isEnabled && !!c.price && <Label pointing="left">{formatPrice(c.price)}</Label>}
               </td>
               <td>
                 {c.id !== '' && c.placesLimit !== 0 && (
@@ -288,9 +279,8 @@ function SingleChoiceRadioGroup({
                   <td>
                     {c.isEnabled && !!c.price && (
                       <Label pointing="left">
-                        {Translate.string('Total: {total} {currency}', {
-                          total: (value[selectedChoice.id] * c.price).toFixed(2),
-                          currency,
+                        {Translate.string('Total: {price}', {
+                          price: formatPrice(value[selectedChoice.id] * c.price),
                         })}
                       </Label>
                     )}

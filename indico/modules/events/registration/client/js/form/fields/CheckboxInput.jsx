@@ -14,7 +14,7 @@ import {Label} from 'semantic-ui-react';
 import {FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency} from '../../form/selectors';
+import {getFormatPrice} from '../../form/selectors';
 import {getFieldValue} from '../../form_submission/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
@@ -34,7 +34,7 @@ export default function CheckboxInput({
   placesUsed,
   retentionPeriodIcon,
 }) {
-  const currency = useSelector(getCurrency);
+  const formatPrice = useSelector(getFormatPrice);
   const existingValue = useSelector(state => getFieldValue(state, fieldId));
   const checkboxId = `${htmlId}-checkbox`;
 
@@ -52,7 +52,7 @@ export default function CheckboxInput({
         <Field name={htmlName} subscription={{value: true}}>
           {({input: {value: checked}}) => (
             <Label pointing="left" styleName={`price-tag ${!checked ? 'greyed' : ''}`}>
-              {price.toFixed(2)} {currency}
+              {formatPrice(price)}
             </Label>
           )}
         </Field>

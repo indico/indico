@@ -17,7 +17,7 @@ import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
-import {getCurrency} from '../../form/selectors';
+import {getFormatPrice} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
@@ -41,7 +41,7 @@ function AccommodationInputComponent({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const currency = useSelector(getCurrency);
+  const formatPrice = useSelector(getFormatPrice);
   const selectedChoice = choices.find(c => c.id === value.choice);
 
   const [focusedDateField, setFocusedDateField] = useState(null);
@@ -124,10 +124,7 @@ function AccommodationInputComponent({
                   <td>
                     {c.isEnabled && !!c.price && (
                       <Label pointing="left">
-                        {Translate.string('{price} {currency} per night', {
-                          price: c.price.toFixed(2),
-                          currency,
-                        })}
+                        {Translate.string('{price} per night', {price: formatPrice(c.price)})}
                       </Label>
                     )}
                   </td>
@@ -164,9 +161,8 @@ function AccommodationInputComponent({
           />
           {!!selectedChoice.price && (
             <Label pointing="left" styleName="price-tag">
-              {Translate.string('Total: {total} {currency}', {
-                total: (nights * selectedChoice.price).toFixed(2),
-                currency,
+              {Translate.string('Total: {price}', {
+                price: formatPrice(nights * selectedChoice.price),
               })}
             </Label>
           )}

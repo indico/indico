@@ -16,7 +16,7 @@ import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/rea
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 
-import {getCurrency, getItems} from '../selectors';
+import {getFormatPrice, getItems} from '../selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
 
@@ -101,7 +101,7 @@ function AccompanyingPersonsComponent({
   maxPersons,
 }) {
   const [operation, setOperation] = useState({type: null, person: null});
-  const currency = useSelector(getCurrency);
+  const formatPrice = useSelector(getFormatPrice);
   const totalPrice = (value.length * price).toFixed(2);
   const items = useSelector(getItems);
   const formState = useFormState();
@@ -181,7 +181,7 @@ function AccompanyingPersonsComponent({
         </Button>
         {!!price && (
           <Label basic pointing="left" styleName="price-tag" size="small">
-            {price.toFixed(2)} {currency} (Total: {totalPrice} {currency})
+            {formatPrice(price)} (Total: {formatPrice(totalPrice)})
           </Label>
         )}
         {placesLimit !== Infinity && (
