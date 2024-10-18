@@ -10,6 +10,7 @@ import re
 from datetime import datetime, time, timedelta
 from uuid import UUID
 
+import pytz
 import yaml
 from dateutil import parser, relativedelta
 from marshmallow import Schema, ValidationError, fields
@@ -433,6 +434,25 @@ class HumanizedDate(fields.Field):
             today = now_utc(False)
             number = int(m.group('number'))
             return today + relativedelta.relativedelta(**{HUMANIZED_UNIT_MAP[unit]: number})
+
+
+class EventTimezoneDateTimeField(fields.DateTime):
+    """Marshmallow field for dealing with dates in the event's timezone.
+
+    The event should be passed in the schema's context as 'event'.
+    """
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        if value is None:
+            return None
+        new_value = value.astimezone(self.context['event'].tzinfo).replace(tzinfo=None)
+        return super()._serialize(new_value, attr, obj, **kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if value is None:
+            return None
+        dt = super()._deserialize(value, attr, data, **kwargs)
+        return self.context['event'].tzinfo.localize(dt).astimezone(pytz.utc)
 
 
 class FilesField(ModelList):
