@@ -47,7 +47,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import IndicoLinkListField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
-from indico.web.forms.widgets import PrefixedTextWidget, SwitchWidget, TinyMCEWidget
+from indico.web.forms.widgets import DescriptionWidget, PrefixedTextWidget, SwitchWidget, TinyMCEWidget
 
 
 CLONE_REPEAT_CHOICES = (
@@ -59,13 +59,14 @@ CLONE_REPEAT_CHOICES = (
 
 class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
-    description = TextAreaField(_('Description'), widget=TinyMCEWidget(images=True, height=350))
+    description = TextAreaField(_('Description'))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
     def __init__(self, *args, event, **kwargs):
         self.event = event
         self.editor_upload_url = url_for('attachments.upload_editor', event)
         super().__init__(*args, **kwargs)
+        self.description.widget = DescriptionWidget(render_mode=event.render_mode.name)
         prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
                                           'is not case sensitive.').format(prefix)
