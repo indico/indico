@@ -17,7 +17,6 @@ import unassignEditorURL from 'indico-url:event_editing.api_unassign_editor';
 import editableTypeURL from 'indico-url:event_editing.manage_editable_type';
 
 import _ from 'lodash';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
@@ -90,6 +89,15 @@ EditableList.defaultProps = {
   management: true,
 };
 
+const processContribList = contribList =>
+  contribList.map(c => {
+    const lastUpdate = c.editable && localStorage.getItem(`editable-${c.editable.id}-last-update`);
+    return {
+      ...c,
+      hasUpdates: lastUpdate && c.editable.lastUpdateDt !== lastUpdate,
+    };
+  });
+
 function EditableListDisplay({
   initialContribList,
   codePresent,
@@ -102,7 +110,7 @@ function EditableListDisplay({
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
 
-  const [contribList, setContribList] = useState(initialContribList);
+  const [contribList, setContribList] = useState(processContribList(initialContribList));
   const [sortedList, setSortedList] = useState(contribList);
   const contribsWithEditables = contribList.filter(x => x.editable);
   const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
@@ -250,6 +258,18 @@ function EditableListDisplay({
           contrib.c.editable?.tags &&
           selectedOptions.some(tag => contrib.c.editable.tags.map(t => t.code).includes(tag)),
       },
+      {
+        key: 'has_updates',
+        text: Translate.string('Has updates'),
+        options: [
+          {value: 'true', text: Translate.string('Yes'), exclusive: true},
+          {value: 'false', text: Translate.string('No'), exclusive: true},
+        ],
+        isMatch: (contrib, selectedOptions) =>
+          console.debug('contrib', contrib) ||
+          (selectedOptions.includes('true') && contrib.c.hasUpdates) ||
+          (selectedOptions.includes('false') && !contrib.c.hasUpdates),
+      },
     ],
     [contribList, contribsWithEditables]
   );
@@ -333,6 +353,9 @@ function EditableListDisplay({
   };
 
   const patchList = updatedEditables => {
+    updatedEditables.forEach(e => {
+      localStorage.setItem(`editable-${e.id}-last-update`, e.lastUpdateDt);
+    });
     updatedEditables = new Map(updatedEditables.map(x => [x.id, x]));
     const _mapper = contrib => {
       if (!contrib.editable || !updatedEditables.has(contrib.editable.id)) {
@@ -340,8 +363,8 @@ function EditableListDisplay({
       }
       return {...contrib, editable: updatedEditables.get(contrib.editable.id)};
     };
-    setContribList(list => list.map(_mapper));
-    setSortedList(list => list.map(_mapper));
+    setContribList(list => processContribList(list.map(_mapper)));
+    setSortedList(list => processContribList(list.map(_mapper)));
   };
 
   const filterableContribs = useMemo(
@@ -368,22 +391,19 @@ function EditableListDisplay({
     );
   };
 
-  const renderId = (id, editable) => {
-    if (editable) {
-      const lastUpdate = localStorage.getItem(`editable-${editable.id}-last-update`);
-      if (lastUpdate && moment(lastUpdate).isBefore(editable.lastUpdateDt)) {
-        return (
-          <Popup
-            trigger={
-              <div styleName="id-cell">
-                <Icon size="mini" color="red" name="circle" />
-                {id}
-              </div>
-            }
-            content={Translate.string('There has been an update to the latest revision')}
-          />
-        );
-      }
+  const renderId = (id, __, rowIndex) => {
+    if (sortedList[rowIndex].hasUpdates) {
+      return (
+        <Popup
+          trigger={
+            <div styleName="id-cell">
+              <Icon size="mini" color="red" name="circle" />
+              {id}
+            </div>
+          }
+          content={Translate.string('There has been an update to the latest revision')}
+        />
+      );
     }
     return id;
   };
