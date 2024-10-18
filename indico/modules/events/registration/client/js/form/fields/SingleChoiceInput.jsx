@@ -15,9 +15,9 @@ import {Form, Label, Dropdown} from 'semantic-ui-react';
 
 import {Select} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 
-import {getFormatPrice} from '../../form/selectors';
+import {getPriceFormatter} from '../../form/selectors';
 import {getFieldValue, getManagement, getPaid} from '../../form_submission/selectors';
 
 import ChoiceLabel from './ChoiceLabel';
@@ -43,7 +43,7 @@ function SingleChoiceDropdown({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const formatPrice = useSelector(getFormatPrice);
+  const formatPrice = useSelector(getPriceFormatter);
   const selectedChoice = choices.find(c => c.id in value) || {};
   const selectedSeats = value[selectedChoice.id] || 0;
 
@@ -144,11 +144,15 @@ function SingleChoiceDropdown({
         {extraSlotsDropdown}
         {shouldShowExtraSlotsLabel && (
           <Label pointing="left" id={extraSlotsLabelId}>
-            {Translate.string('Total: {price}', {
-              price: formatPrice(
-                (selectedChoice.extraSlotsPay ? selectedSeats : 1) * selectedChoice.price
-              ),
-            })}
+            <Translate>
+              Total:{' '}
+              <Param
+                name="price"
+                value={formatPrice(
+                  (selectedChoice.extraSlotsPay ? selectedSeats : 1) * selectedChoice.price
+                )}
+              />
+            </Translate>
           </Label>
         )}
       </div>
@@ -185,7 +189,7 @@ function SingleChoiceRadioGroup({
 }) {
   const paid = useSelector(getPaid);
   const management = useSelector(getManagement);
-  const formatPrice = useSelector(getFormatPrice);
+  const formatPrice = useSelector(getPriceFormatter);
   const selectedChoice = choices.find(c => c.id in value) || {id: ''};
   const radioChoices = [...choices];
   if (!isRequired) {
@@ -279,9 +283,13 @@ function SingleChoiceRadioGroup({
                   <td>
                     {c.isEnabled && !!c.price && (
                       <Label pointing="left">
-                        {Translate.string('Total: {price}', {
-                          price: formatPrice(value[selectedChoice.id] * c.price),
-                        })}
+                        <Translate>
+                          Total:{' '}
+                          <Param
+                            name="price"
+                            value={formatPrice(value[selectedChoice.id] * c.price)}
+                          />
+                        </Translate>
                       </Label>
                     )}
                   </td>

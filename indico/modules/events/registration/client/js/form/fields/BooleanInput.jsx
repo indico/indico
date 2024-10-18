@@ -13,7 +13,7 @@ import {Button, Label} from 'semantic-ui-react';
 import {FinalDropdown, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getFormatPrice} from '../../form/selectors';
+import {getPriceFormatter} from '../../form/selectors';
 import {getFieldValue} from '../../form_submission/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
@@ -31,7 +31,7 @@ function BooleanInputComponent({
   placesLimit,
   placesUsed,
 }) {
-  const formatPrice = useSelector(getFormatPrice);
+  const formatPrice = useSelector(getPriceFormatter);
   const existingValue = useSelector(state => getFieldValue(state, fieldId));
 
   const makeOnClick = newValue => () => {

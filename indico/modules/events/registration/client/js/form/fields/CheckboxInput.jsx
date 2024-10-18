@@ -14,7 +14,7 @@ import {Label} from 'semantic-ui-react';
 import {FinalCheckbox, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getFormatPrice} from '../../form/selectors';
+import {getPriceFormatter} from '../../form/selectors';
 import {getFieldValue} from '../../form_submission/selectors';
 
 import {PlacesLeft} from './PlacesLeftLabel';
@@ -34,7 +34,7 @@ export default function CheckboxInput({
   placesUsed,
   retentionPeriodIcon,
 }) {
-  const formatPrice = useSelector(getFormatPrice);
+  const formatPrice = useSelector(getPriceFormatter);
   const existingValue = useSelector(state => getFieldValue(state, fieldId));
   const checkboxId = `${htmlId}-checkbox`;
 

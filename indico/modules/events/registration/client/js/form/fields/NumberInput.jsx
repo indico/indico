@@ -13,12 +13,12 @@ import {Form, Label} from 'semantic-ui-react';
 import {FinalInput, FinalField, validators as v, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {getFormatPrice} from '../../form/selectors';
+import {getPriceFormatter} from '../../form/selectors';
 
 import '../../../styles/regform.module.scss';
 
 function NumberInputComponent({id, value, onChange, disabled, price, minValue, maxValue}) {
-  const formatPrice = useSelector(getFormatPrice);
+  const formatPrice = useSelector(getPriceFormatter);
   const total = (value * price).toFixed(2);
 
   return (
