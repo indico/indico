@@ -265,6 +265,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             'active_menu_item': self.sidemenu_option,
             'bg_color_css': f'background: #{bg_color}; border-color: #{bg_color};' if bg_color else '',
             'text_color_css': f'color: #{text_color};' if text_color else '',
+            'logo_as_banner': layout_settings.get(self.event, 'header_logo_as_banner'),
             'announcement': announcement,
         }
 

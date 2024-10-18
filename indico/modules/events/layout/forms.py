@@ -79,6 +79,8 @@ class ConferenceLayoutForm(LoggedLayoutForm):
     # Style
     header_text_color = StringField(_('Text color'), widget=ColorPickerWidget())
     header_background_color = StringField(_('Background color'), widget=ColorPickerWidget())
+    header_logo_as_banner = BooleanField(_('Use logo as banner'), widget=SwitchWidget(),
+                                         description=_('Use the event logo as a full-width banner.'))
 
     # Announcement
     announcement = StringField(_('Announcement'),

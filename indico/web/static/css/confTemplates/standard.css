@@ -44,6 +44,14 @@ on the left of the conference title.
 }
 
 /*
+The box containing the logo when configured in banner mode.
+*/
+.confLogoBannerBox img {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/*
 The style for the title text.
 */
 .conference-title-link {

@@ -13,7 +13,7 @@
                                        'name_format', 'show_vc_rooms')) }}
         {% endcall %}
         {% call form_fieldset(_('Header Style')) %}
-            {{ form_rows(form, fields=('header_text_color', 'header_background_color')) }}
+            {{ form_rows(form, fields=('header_text_color', 'header_background_color', 'header_logo_as_banner')) }}
         {% endcall %}
         {% call form_fieldset(_('Announcement')) %}
             {{ form_rows(form, fields=('announcement', 'show_announcement')) }}

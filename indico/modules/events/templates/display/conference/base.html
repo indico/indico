@@ -11,14 +11,14 @@
                 <div class="confTitle">
                     <h1>
                         <a href="{{ event.url }}">
-                            <span class="conference-title-link" style="{{ conf_layout_params.text_color_css }}">
+                            <div class="conference-title-link" style="{{ conf_layout_params.text_color_css }}">
                                 {% if event.has_logo %}
-                                    <div class="confLogoBox">
+                                    <div class="{{ 'confLogoBannerBox' if conf_layout_params.logo_as_banner else 'confLogoBox' }}">
                                        <img src="{{ event.logo_url }}" alt="{{ event.title }}" border="0" class="confLogo">
                                     </div>
                                 {% endif %}
                                 <span itemprop="title">{{ event.title }}</span>
-                            </span>
+                            </div>
                         </a>
                     </h1>
                </div>

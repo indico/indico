@@ -30,6 +30,7 @@ layout_settings = EventSettingsProxy('layout', {
     'name_format': None,
     'show_banner': False,
     'header_text_color': '',
+    'header_logo_as_banner': True,
     'header_background_color': '',
     'announcement': None,
     'show_announcement': False,
