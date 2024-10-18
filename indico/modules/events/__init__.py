@@ -56,6 +56,7 @@ signals.acl.entry_changed.connect(make_acl_log_fn(Event, EventLogRealm.managemen
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.models.persons import EventPerson
     from indico.modules.events.models.principals import EventPrincipal
+    Event.query.filter_by(creator_id=source.id).update({Event.creator_id: target.id})
     EventPerson.merge_users(target, source)
     EventPrincipal.merge_users(target, source, 'event')
     target.event_roles |= source.event_roles
