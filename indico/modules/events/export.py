@@ -620,6 +620,15 @@ class EventImporter:
                     self.user_map[uuid] = user.id
                     if self.verbose:
                         click.echo(cformat("- %{cyan}User%{blue!} '{}' ({})").format(user.full_name, user.email))
+                if (merged_users := {k: v for k, v in missing.items() if v['merged_into_id'] is not None}):
+                    # Usually there shouldn't be any, but in case we end up having exported a deleted user,
+                    # we want to keep the link between the two
+                    click.secho('Linking merged users', fg='magenta')
+                    for uuid, userdata in verbose_iterator(merged_users.items(), len(merged_users)):
+                        source_user = User.get(self.user_map[uuid])
+                        target_user = User.get(self.user_map[userdata['merged_into_id'][1]])
+                        source_user.merged_into_user = target_user
+                    db.session.flush()
             else:
                 click.secho('Skipping missing users', fg='magenta')
 
