@@ -249,23 +249,23 @@
     {% set c_id = get_custom_id(entry) %}
 
     <style>
-        {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
+        .{{ c_id }} .inherited-bg-color {
             background-color: #{{ colors.background }};
         }
 
-        {{ '.' ~ c_id  ~ ' .inherited-bg-color-trans' }} {
+        .{{ c_id }} .inherited-bg-color-trans {
             background-color: #{{ colors.background }}66;
         }
 
-        {{ '.' ~ c_id  ~ ' .inherited-bg-color' }} {
+        .{{ c_id }} .inherited-bg-color {
             background-color: #{{ colors.background }};
         }
 
-        {{ '.' ~ c_id ~ ' .inherited-txt-color' }} {
+        .{{ c_id }} .inherited-txt-color {
             color: #{{ colors.text }};
         }
 
-        {{ '.' ~ c_id ~ ' .inherited-border-color' }} {
+        .{{ c_id }} .inherited-border-color {
             border-color: #{{ colors.background }};
         }
     </style>
