@@ -294,12 +294,12 @@ customElements.define(
         updateSelectionLimits();
         calendarTriggerLeft.disabled = true;
         calendarTriggerRight.disabled = true;
-        openDialog(indCalendar, rangeStartInput);
+        openDialog(indCalendar, indDateRangePicker);
       }
 
       function handleAltDownToOpen(evt) {
         if (evt.code === 'ArrowDown' && evt.altKey) {
-          openDialog(indCalendar, rangeStartInput);
+          openDialog(indCalendar, indDateRangePicker);
         }
       }
     }
@@ -840,13 +840,14 @@ customElements.define(
   }
 );
 
-function openDialog(indCalendar, input) {
-  positioning.position(
+function openDialog(indCalendar, anchor) {
+  const stopPositioning = positioning.position(
     indCalendar.firstElementChild,
-    input,
+    anchor,
     positioning.dropdownPositionStrategy,
     () => {
       indCalendar.open = true;
     }
   );
+  indCalendar.querySelector('dialog').addEventListener('close', stopPositioning, {once: true});
 }

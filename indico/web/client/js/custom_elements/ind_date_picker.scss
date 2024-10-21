@@ -187,11 +187,13 @@ ind-calendar {
 
   .controls .month-year {
     flex: 1;
-    min-width: 10em;
   }
 
   .month-year :is(select, input[type='number']) {
+    flex: 1;
+
     @include sui_debt.field-override() {
+      width: 2em;
       padding: 0.5em;
       border-radius: var(--control-border-radius);
       border-color: var(--control-border-color);
