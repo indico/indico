@@ -289,7 +289,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0 10px 70px;
+  margin: 20px 0 10px 5px;
 }
 
 .session-block-date > .timebox {
