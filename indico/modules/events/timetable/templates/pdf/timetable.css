@@ -11,9 +11,9 @@ body {
   font-size: 0.8em;
 }
 
-.pagebreak {
+/* .pagebreak {
   break-before: always;
-}
+} */
 
 .cover {
   counter-reset: program-page 7;
@@ -107,11 +107,9 @@ body {
   content: target-counter('#footer', page, decimal);
 }
 
-.session-block {
+/* .session-block {
   display: flex;
-  margin-bottom: 10px;
-  align-items: stretch;
-}
+} */
 
 /* Main content */
 
@@ -121,8 +119,9 @@ body {
 }
 
 .session-block-wrapper {
-  flex-grow: 1;
-  /* border: 1px solid green; */
+  flex-grow: 0;
+  flex-shrink: 1;
+  width: 100%;
 }
 
 .session-block-title {
@@ -135,7 +134,7 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  break-inside: avoid;
+  /* break-inside: avoid; */
 }
 
 .session-block-title > h3 {
@@ -166,35 +165,11 @@ body {
 
 .session-block-content {
   width: 100%;
-  break-inside: avoid;
+  /* break-inside: avoid; */
 }
 
 .day-title {
   margin: 40px 0;
-}
-
-.time {
-  margin-right: 10px;
-  width: 60px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.time > div:first-child {
-  padding-bottom: 5px;
-}
-
-.time > div:last-child {
-  padding-top: 5px;
-}
-
-.time > .time-divider {
-  width: 3px;
-  flex-grow: 1;
-  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .contrib-timeline, .sub-contrib-timeline {
@@ -252,11 +227,12 @@ body {
   line-height: 2em;
 }
 
+/* 
 :is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div) {
   break-inside: avoid;
   break-before: avoid;
   break-after: auto;
-}
+} */
 
 :is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div):not(:last-child) {
   margin: 0;
@@ -305,9 +281,9 @@ body {
   margin-bottom: 5px;
 }
 
-.pagebreak.pagebreak-children > section:not(:first-of-type) {
+/* .pagebreak.pagebreak-children > section:not(:first-of-type) {
   break-before: always;
-}
+} */
 
 .session-block-date {
   display: flex;
@@ -323,9 +299,16 @@ body {
 
 /* Day */
 
-.day {
-  break-inside: avoid;
+.day-entry > section {
+  /* break-inside: avoid; */
+  padding-left: 36px;
+  border-left: 3px solid rgba(0, 0, 0, 0.1);
+  margin-left: 36px;
 }
+
+/* .day-wrapper {
+  break-inside: avoid;
+} */
 
 /* Content box */
 .session-block-content-box {
@@ -353,4 +336,30 @@ body {
   line-height: 1.5em;
   margin: 5px 0 0 0;
   opacity: 0.8;
+}
+
+/* Time */
+
+.day-entry {
+  position: relative;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.time-text {
+  color: rgba(0, 0, 0, 0.5);
+  width: 75px;
+  text-align: center;
+  line-height: 1.4em;
+  font-size: 1em;
+  background-color: white;
+}
+
+.time-from {
+  position: absolute;
+  top: 0;
+}
+
+.time-to {
+  margin-top: -1.4em;
 }
