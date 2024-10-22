@@ -94,8 +94,6 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
             if request.args.get('download') == '1':
                 pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
                                 pagesize=form.pagesize.data, **additional_params)
-                print('PDFFFF')
-                print(pdf)
                 return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
             else:
                 url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))

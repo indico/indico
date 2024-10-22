@@ -4,7 +4,6 @@
             <div class="day-title">
                 <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
             </div>
-
             {% for entry in days[day] %}
                 {% if entry.type == 1 %}
                     <div class="day-entry">
@@ -65,6 +64,7 @@
     {% set is_contribution = entry.type == 2 %}
     {% set presenters = session_block.speakers if is_contribution else session_block.person_links %}
     {% set contributions = session_block.contributions %}
+    {% set show_session_block_content = entry.children or (show_session_description and session.description) or (show_abstract and session_block.description) %}
 
     <div class="session-block-wrapper">
         <section
@@ -98,14 +98,14 @@
                 {% endif %}
             </div>
         </section>
-        {% if entry.children or (show_session_description and session.description) %}
+        {% if show_session_block_content %}
             <div class="session-block-content">
-                {% if show_session_description and session.description %}
+                {% if (show_session_description and session.description) or (show_abstract and session_block.description) %}
                     <div class="session-block-content-box description inherited-border-color">
                         <ul class="contrib-timeline">
                             <li>
                                 <h4>{% trans %}Description{% endtrans %}</h4>
-                                {{ session.description }}
+                                {{ session_block.description or session.description }}
                             </li>
                         </ul>
                     </div>
@@ -178,7 +178,7 @@
                         <div class="contrib-heading">
                             {% if show_length_contribs %}
                                 <span class="timebox inherited-bg-color inherited-txt-color">
-                                        {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
+                                    {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
                                 </span>
                             {% endif %}
                             <h4>{{ subchild.title }}</h4>
@@ -247,7 +247,7 @@
     {{ 'c' ~ entry.type ~ '-' ~ entry.id }}
 {% endmacro %}
 
-{% macro get_color_styles(entry, colors, transhex='00') %}
+{% macro get_color_styles(entry, colors) %}
     {% set c_id = get_custom_id(entry) %}
 
     <style>
@@ -257,10 +257,6 @@
 
         .{{ c_id }} .inherited-bg-color-trans {
             background-color: #{{ colors.background }}66;
-        }
-
-        .{{ c_id }} .inherited-bg-color {
-            background-color: #{{ colors.background }};
         }
 
         .{{ c_id }} .inherited-txt-color {
