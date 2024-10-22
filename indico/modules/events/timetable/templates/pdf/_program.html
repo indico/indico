@@ -114,10 +114,10 @@
                                             ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
                                         {% endif %}
                                     </span>
-                                    <h4>{{ child.object.title }}</h4>
+                                    <h4>{{ child.object.title * 10 }}</h4>
                                 </div>
                                 {% if child.type == 2 and show_contribs %}
-                                    <div class="contrib-timeline-content">
+                                    <div class="contrib-timeline-content" >
                                         {{ render_nested_contrib(child, show_title, show_affiliation, show_length_contribs) }}
                                     </div>
                                 {% endif %}

@@ -209,7 +209,7 @@ body {
 }
 
 .contrib-timeline > li > .contrib-timeline-content {
-  margin-top: 10px;
+  margin-top: 5px;
   padding: 5px;
 }
 
@@ -219,7 +219,7 @@ body {
 
 .sub-contrib-timeline .contrib-timeline-content {
   font-size: 1em;
-  padding: 10px;
+  padding: 0 10px 10px 10px;
 }
 
 .contrib-timeline-content > * {
@@ -240,6 +240,10 @@ body {
 :is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div):not(:last-child) {
   margin: 0;
   margin-bottom: 10px;
+}
+
+.description {
+  break-inside: avoid;
 }
 
 :is(.contrib-timeline-content, .sub-contrib-timeline) .description > *:last-child {
@@ -330,10 +334,12 @@ body {
   border-top: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+  break-inside: avoid;
 }
 
 .session-block-content-box.description li > * {
   margin: 0;
+  break-inside: avoid;
 }
 
 .session-block-content-box.description li > *:last-child {
@@ -371,7 +377,7 @@ body {
 }
 
 .contrib-heading {
-  break-inside: avoid;;
+  break-inside: avoid;
 }
 
 .contrib-heading > :is(h4, span) {
