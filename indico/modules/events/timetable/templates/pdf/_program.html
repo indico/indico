@@ -86,7 +86,7 @@
                 {% if conveners %}
                     <p>
                         <b>{{ ngettext('Convener', 'Conveners', conveners|length)}}:</b>
-                        {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}{{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}
+                        {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}
                     </p>
                 {% endif %}
             </div>
@@ -107,15 +107,15 @@
                     <ul class="contrib-timeline">
                         {% for child in entry.children %}
                             <li class="inherited-border-color">
-                                <h4>
+                                <div class="contrib-heading">
                                     <span class="timebox inherited-bg-color inherited-txt-color">
                                         {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
                                         {% if show_contribs and show_length_contribs %}
                                             ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
                                         {% endif %}
                                     </span>
-                                    {{ child.object.title }}
-                                </h4>
+                                    <h4>{{ child.object.title }}</h4>
+                                </div>
                                 {% if child.type == 2 and show_contribs %}
                                     <div class="contrib-timeline-content">
                                         {{ render_nested_contrib(child, show_title, show_affiliation, show_length_contribs) }}
@@ -193,15 +193,14 @@
             <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
                 {% for subchild in contrib.subcontributions %}
                     <li class="inherited-border-color">
-                        <h4>
+                        <div class="contrib-heading">
                             <span class="timebox inherited-bg-color inherited-txt-color">
-                                {# {{ subchild.start_dt|format_time(timezone=entry.event.tz) }} - {{ subchild.end_dt|format_time(timezone=entry.event.tz) }} #}
                                 {% if show_length_contribs %}
                                     {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
                                 {% endif %}
                             </span>
-                            {{ subchild.title }}
-                        </h4>
+                            <h4>{{ subchild.title }}</h4>
+                        </div>
                         <div class="contrib-timeline-content">
                             {{ render_nested_contrib(subchild, show_title, show_affiliation, show_length_contribs) }}
                         </div>
