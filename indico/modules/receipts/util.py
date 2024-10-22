@@ -139,6 +139,12 @@ def _format_currency(amount, currency, locale=None):
     return format_currency(amount, currency, locale=locale)
 
 
+def _format_html(value, **kwargs):
+    for k, v in kwargs.items():
+        value = value.replace(f'{{{k}}}', v)
+    return value
+
+
 def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = False) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
@@ -149,6 +155,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_datetime': format_datetime,
             'format_time': format_time,
             'format_currency': _format_currency,
+            'format_html': _format_html,
         })
         env.globals.update({
             'format_interval': format_interval,

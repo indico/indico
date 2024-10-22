@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Accordion, Checkbox, Dropdown, Form, Input, TextArea} from 'semantic-ui-react';
 
+import {PlaceholderInfo} from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
 
 import EventImageSelectField from './EventImageSelectField';
@@ -38,6 +39,16 @@ function CustomField({
   loadingImages,
 }) {
   const id = `receipt-custom-${name}`;
+  const placeholderWidget = attributes.placeholders && (
+    <PlaceholderInfo
+      placeholders={Object.entries(attributes.placeholders).map(
+        ([placeholderName, description]) => ({
+          name: placeholderName,
+          description,
+        })
+      )}
+    />
+  );
   if (type === 'input') {
     return (
       <Form.Field required={validations.required}>
@@ -49,6 +60,7 @@ function CustomField({
           required={validations.required}
           onChange={(_, {value: v}) => onChange(v)}
         />
+        {placeholderWidget}
         {attributes.description && <p className="field-description">{attributes.description}</p>}
       </Form.Field>
     );
@@ -63,6 +75,7 @@ function CustomField({
           required={validations.required}
           onChange={(_, {value: v}) => onChange(v)}
         />
+        {placeholderWidget}
         {attributes.description && <p className="field-description">{attributes.description}</p>}
       </Form.Field>
     );
@@ -119,7 +132,14 @@ CustomField.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number]),
   type: PropTypes.string.isRequired,
-  attributes: PropTypes.object.isRequired,
+  attributes: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    options: PropTypes.arrayOf(PropTypes.string),
+    default: PropTypes.number,
+    placeholders: PropTypes.objectOf(PropTypes.string),
+  }).isRequired,
   validations: PropTypes.shape({
     required: PropTypes.bool,
   }).isRequired,
