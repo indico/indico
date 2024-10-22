@@ -112,10 +112,20 @@ body {
 } */
 
 /* Main content */
+.session-block.contribution .inherited-bg-color {
+  background-color: #af4571;
+}
 
-.session-block.contribution .session-block-title {
-  background-color: rgb(175, 69, 113); /* TODO: Replace with contrib color */
+.session-block.contribution .inherited-bg-color-trans {
+  background-color: #af457166;
+}
+
+.session-block.contribution .inherited-txt-color {
   color: white;
+}
+
+.session-block.contribution .inherited-border-color {
+  border-color: #af4571;
 }
 
 .session-block-wrapper {
