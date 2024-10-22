@@ -11,9 +11,9 @@ body {
   font-size: 0.8em;
 }
 
-/* .pagebreak {
+.pagebreak {
   break-before: always;
-} */
+}
 
 .cover {
   counter-reset: program-page 7;
@@ -125,6 +125,7 @@ body {
 }
 
 .session-block-title {
+  break-inside: avoid;
   margin: 0;
   /* border: 1px solid blue; */
   padding: 10px;
@@ -190,6 +191,7 @@ body {
 
 .contrib-timeline > li > h4 {
   margin: 0;
+  break-after: avoid;
 }
 
 .timebox {
@@ -199,6 +201,7 @@ body {
   border-radius: 100px;
   font-weight: normal;
   margin-right: 10px;
+  margin-bottom: 5px;
 }
 
 .sub-contrib-timeline .timebox {
@@ -264,6 +267,7 @@ body {
   border-bottom-width: 3px;
   border-radius: 3px;
   display: block;
+  break-inside: avoid;
 }
 
 .sub-contrib-timeline > li:not(:last-child) {
@@ -281,15 +285,16 @@ body {
   margin-bottom: 5px;
 }
 
-/* .pagebreak.pagebreak-children > section:not(:first-of-type) {
+.pagebreak.pagebreak-children > section:not(:first-of-type) {
   break-before: always;
-} */
+}
 
 .session-block-date {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 20px 0 10px 5px;
+  break-after: avoid;
 }
 
 .session-block-date > .timebox {
@@ -362,4 +367,18 @@ body {
 
 .time-to {
   margin-top: -1.4em;
+  break-before: avoid;
+}
+
+.contrib-heading {
+  break-inside: avoid;;
+}
+
+.contrib-heading > :is(h4, span) {
+  display: inline-block;
+}
+
+.contrib-heading > h4 {
+  margin: 0;
+  line-height: 1.4em;
 }
