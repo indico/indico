@@ -1,0 +1,95 @@
+{% set personal_data = registration.personal_data %}
+{% set today = now_utc() %}
+
+<h1>Certificate of Attendance</h1>
+
+<aside id="title">
+  <div class="title">
+    <!-- Title -->
+    <h2>{{ event.title }}</h2>
+    <!-- Date(s) -->
+    {% if event.start_dt.date() != event.end_dt.date() %}
+      {{ format_interval(event.start_dt, event.end_dt, format='dMMMMy') }}
+    {% else %}
+      {{ event.start_dt | format_date('dd MMM YYYY') }}
+    {% endif %}
+
+    <!-- Venue -->
+    {% if custom_fields.venue %}
+      - {{ custom_fields.venue }}
+    {% elif event.venue_name %}
+      - {{ event.venue_name }}
+    {% endif %}
+
+    {% if custom_fields.add_url %}
+      <p>{{ event.url }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Logo -->
+  {% if custom_fields.logo_url %}
+    <img src="{{ custom_fields.logo_url }}">
+  {% endif %}
+</aside>
+
+<aside id="addresses">
+  <!-- Address of organizer -->
+  <address id="from">
+    {{ custom_fields.address_from }}
+  </address>
+</aside>
+
+{%- if event.start_dt.date() != event.end_dt.date() %}
+  {% set date = 'between {} and {}'.format(event.start_dt | format_date('dd.MM.YYYY'), event.end_dt | format_date('dd.MM.YYYY')) %}
+{%- else %}
+  {% set date = 'on {}'.format(event.start_dt | format_date('dd.MM.YYYY')) %}
+{%- endif -%}
+
+<p>
+  {% autoescape false %}
+    {{ custom_fields.text | format_html(
+      person='<em>{} {}</em>'.format(personal_data.first_name | escape, personal_data.last_name | escape),
+      person_affiliation='<em>{}</em>'.format(personal_data.affiliation | escape),
+      event='<em>{}</em>'.format(event.title | escape),
+      date=date,
+      venue='<em>{}</em>'.format((custom_fields.venue or event.venue_name) | escape)
+    ) }}
+  {% endautoescape %}
+</p>
+
+<p>
+  {% if custom_fields.place %}
+    {{ custom_fields.place }}, {{ today | format_date('long') }}
+  {% else %}
+    {{ today | format_date('full') }}
+  {% endif %}
+</p>
+
+{% macro render_signature(i) %}
+  {% set name = custom_fields['signature_name_' ~ i] %}
+  {% set position = custom_fields['signature_position_' ~ i] %}
+  {% set url = custom_fields['signature_url_' ~ i] %}
+  {% if name or position or url %}
+    <div class="signature">
+      <div>
+        {% if url %}
+          <img src="{{ url }}" />
+        {% else %}
+          _____________
+        {% endif %}
+      </div>
+      <div class="name">
+        {{ name }}
+      </div>
+      <div class="position">
+        {{ position }}
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+<aside id="signatures">
+  {% for i in range(3) %}
+    {{ render_signature(i) }}
+  {% endfor %}
+</aside>

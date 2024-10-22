@@ -1,0 +1,83 @@
+custom_fields:
+  - name: address_from
+    type: textarea
+    attributes:
+      label: Organizer Address
+
+  - name: venue
+    type: input
+    attributes:
+      label: Venue
+
+  - name: logo_url
+    type: image
+    attributes:
+      label: Logo
+
+  - name: add_url
+    type: checkbox
+    attributes:
+      label: Add event URL?
+
+  - name: text
+    type: textarea
+    attributes:
+      label: Certificate Text
+      value: >-
+        The Organizing Comitee certifies that {person} ({person_affiliation}) participated in the event {event}, which took place {date}, at {venue}.
+      placeholders:
+        person: Full name of the participant
+        person_affiliation: Participant's affiliation
+        event: Title of the event
+        date: Start date of the event
+        venue: Venue of the event
+
+  - name: place
+    type: input
+    attributes:
+      label: Place of Signature
+
+  - name: signature_name_0
+    type: input
+    attributes:
+      label: 1st Signature Name
+
+  - name: signature_position_0
+    type: input
+    attributes:
+      label: 1st Signature Position
+
+  - name: signature_url_0
+    type: image
+    attributes:
+      label: 1st Signature Image
+
+  - name: signature_name_1
+    type: input
+    attributes:
+      label: 2nd Signature Name
+
+  - name: signature_position_1
+    type: input
+    attributes:
+      label: 2nd Signature Position
+
+  - name: signature_url_1
+    type: image
+    attributes:
+      label: 2nd Signature Image
+
+  - name: signature_name_2
+    type: input
+    attributes:
+      label: 3rd Signature Name
+
+  - name: signature_position_2
+    type: input
+    attributes:
+      label: 3rd Signature Position
+
+  - name: signature_url_2
+    type: image
+    attributes:
+      label: 3rd Signature Image
