@@ -149,6 +149,8 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                                    show_cover_page=form.document_settings.data['showCoverPage'],
                                    show_toc=form.document_settings.data['showTableContents'],
                                    show_session_toc=form.document_settings.data['showSessionTOC'],
+                                   show_abstract=form.contribution_info.data['showAbstract'],
+                                   dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'] ,
                                    page_size=form.pagesize.data,
                                    show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
                                    show_length_contribs=form.contribution_info.data['showLengthContribs'],

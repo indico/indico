@@ -213,6 +213,10 @@ body {
   padding: 5px;
 }
 
+.sub-contrib-timeline .contrib-timeline-content {
+  margin-top: 10px;
+}
+
 .contrib-timeline-content {
   font-size: 0.8em;
 }
