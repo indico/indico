@@ -139,7 +139,7 @@ def _format_currency(amount, currency, locale=None):
     return format_currency(amount, currency, locale=locale)
 
 
-def _format_html(value, **kwargs):
+def _format_placeholders(value, **kwargs):
     for k, v in kwargs.items():
         value = value.replace(f'{{{k}}}', v)
     return value
@@ -155,7 +155,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_datetime': format_datetime,
             'format_time': format_time,
             'format_currency': _format_currency,
-            'format_html': _format_html,
+            'format_placeholders': _format_placeholders,
         })
         env.globals.update({
             'format_interval': format_interval,

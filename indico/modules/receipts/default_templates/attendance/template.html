@@ -1,7 +1,7 @@
 {% set personal_data = registration.personal_data %}
 {% set today = now_utc() %}
 
-<h1>Certificate of Attendance</h1>
+<h1>{{ custom_fields.document_title }}</h1>
 
 <aside id="title">
   <div class="title">
@@ -27,8 +27,8 @@
   </div>
 
   <!-- Logo -->
-  {% if custom_fields.logo_url %}
-    <img src="{{ custom_fields.logo_url }}">
+  {% if custom_fields.logo %}
+    <img src="{{ custom_fields.logo }}">
   {% endif %}
 </aside>
 
@@ -39,19 +39,27 @@
   </address>
 </aside>
 
+{% set start_date = event.start_dt | format_date('dd.MM.YYYY') %}
+{% set end_date = event.end_dt | format_date('dd.MM.YYYY') %}
 {%- if event.start_dt.date() != event.end_dt.date() %}
-  {% set date = 'between {} and {}'.format(event.start_dt | format_date('dd.MM.YYYY'), event.end_dt | format_date('dd.MM.YYYY')) %}
+  {% set date_range = 'between {} and {}'.format(start_date, end_date) %}
 {%- else %}
-  {% set date = 'on {}'.format(event.start_dt | format_date('dd.MM.YYYY')) %}
+  {% set date_range = 'on {}'.format(event.start_dt | format_date('dd.MM.YYYY')) %}
+{%- endif -%}
+    {%- if custom_fields.show_affiliation and personal_data.affiliation %}
+    {% set person = '<em>{} {}</em> (<em>{}</em>)'.format(personal_data.first_name | escape, personal_data.last_name | escape, personal_data.affiliation | escape) %}
+{%- else %}
+    {% set person = '<em>{} {}</em>'.format(personal_data.first_name | escape, personal_data.last_name | escape) %}
 {%- endif -%}
 
 <p>
   {% autoescape false %}
-    {{ custom_fields.text | format_html(
-      person='<em>{} {}</em>'.format(personal_data.first_name | escape, personal_data.last_name | escape),
-      person_affiliation='<em>{}</em>'.format(personal_data.affiliation | escape),
+    {{ custom_fields.text | format_placeholders(
+      person=person,
       event='<em>{}</em>'.format(event.title | escape),
-      date=date,
+      date_range=date_range,
+      start_date=start_date,
+      end_date=end_date,
       venue='<em>{}</em>'.format((custom_fields.venue or event.venue_name) | escape)
     ) }}
   {% endautoescape %}

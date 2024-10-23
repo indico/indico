@@ -1,36 +1,63 @@
 custom_fields:
+  - name: document_title
+    type: input
+    attributes:
+      label: Document Title
+      value: Certificate of Attendance
+      description: |
+        The title of the document, shown at the top of the page.
+
   - name: address_from
     type: textarea
     attributes:
       label: Organizer Address
+      description: |
+        The address of the entity who is issuing this receipt.
 
   - name: venue
     type: input
     attributes:
       label: Venue
+      description: |
+        A custom venue name instead of the event's venue.
 
-  - name: logo_url
+  - name: logo
     type: image
     attributes:
       label: Logo
+      description: |
+        A logo image to be shown on the receipt.
 
   - name: add_url
     type: checkbox
     attributes:
       label: Add event URL?
+      description: |
+        Whether to include the URL of the event on the receipt.
 
   - name: text
     type: textarea
     attributes:
       label: Certificate Text
-      value: >-
-        The Organizing Comitee certifies that {person} ({person_affiliation}) participated in the event {event}, which took place {date}, at {venue}.
+      value: |
+        The Organizing Commitee certifies that {person} participated in the event {event}, which
+        took place {date_range}, at {venue}.
+      description: |
+        The text to be shown on the certificate.
       placeholders:
         person: Full name of the participant
-        person_affiliation: Participant's affiliation
         event: Title of the event
-        date: Start date of the event
+        date_range: Date range of the event
+        start_date: Start date of the event
+        end_date: End date of the event
         venue: Venue of the event
+
+  - name: show_affiliation
+    type: checkbox
+    attributes:
+      label: Show participant affiliation
+      description: |
+        Whether to include the affiliation of the registrant next to their name.
 
   - name: place
     type: input

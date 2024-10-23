@@ -60,8 +60,8 @@ function CustomField({
           required={validations.required}
           onChange={(_, {value: v}) => onChange(v)}
         />
-        {placeholderWidget}
         {attributes.description && <p className="field-description">{attributes.description}</p>}
+        {placeholderWidget}
       </Form.Field>
     );
   } else if (type === 'textarea') {
@@ -75,8 +75,8 @@ function CustomField({
           required={validations.required}
           onChange={(_, {value: v}) => onChange(v)}
         />
-        {placeholderWidget}
         {attributes.description && <p className="field-description">{attributes.description}</p>}
+        {placeholderWidget}
       </Form.Field>
     );
   } else if (type === 'dropdown') {

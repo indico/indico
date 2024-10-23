@@ -143,7 +143,7 @@ FavoritesProvider.propTypes = {
  */
 export function useIndicoAxios(
   axiosConfig,
-  {camelize = false, unhandledErrors = [], ...hookConfig} = {}
+  {camelize = false, skipCamelize = null, unhandledErrors = [], ...hookConfig} = {}
 ) {
   const lastData = useRef(null);
   const lastError = useRef(null);
@@ -162,7 +162,7 @@ export function useIndicoAxios(
   if (response) {
     data = response.data;
     if (camelize) {
-      data = camelizeKeys(data);
+      data = camelizeKeys(data, skipCamelize);
     }
     lastData.current = data;
   } else if (
