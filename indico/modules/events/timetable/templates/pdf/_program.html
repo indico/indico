@@ -69,7 +69,7 @@
     <div class="session-block-wrapper">
         <section
             id="entry-{{ entry.id }}"
-            class="session-block-title inherited-bg-color inherited-txt-color"
+            class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_session_block_content else ''}}"
             style="{{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if entry.children else ''}}"
         >
             <h3>
@@ -83,13 +83,16 @@
                 <p><b>
                     {% if is_contribution %}
                         {% trans %}Contribution{% endtrans %}
+                    {% elif session.is_poster %}
+                        {% trans %}Poster Session{% endtrans %}
                     {% else %}
                         {% trans %}Session{% endtrans %}
                     {% endif %}
                 </b></p>
-                {% if entry.object.room_name %}
-                    <p>{{ render_place(entry) }}</p>
-                {% endif %}
+                <p>
+                    <b>{% trans %}Location{% endtrans %}:</b>
+                    {{ render_place(entry) }}
+                </p>
                 {% if presenters %}
                     <p>
                         <b>{{ ngettext('Speaker', 'Speakers', presenters|length) if is_contribution else ngettext('Convener', 'Conveners', presenters|length) }}:</b>
@@ -116,12 +119,14 @@
                             {% for child in entry.children %}
                                 <li class="inherited-border-color">
                                     <div class="contrib-heading">
-                                        <span class="timebox inherited-bg-color inherited-txt-color">
-                                            {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
-                                            {% if show_contribs and show_length_contribs %}
-                                                ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
-                                            {% endif %}
-                                        </span>
+                                        {% if not session.is_poster %}
+                                            <span class="timebox inherited-bg-color inherited-txt-color">
+                                                {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
+                                                {% if show_length_contribs %}
+                                                    ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
                                         <h4>{{ child.object.title }}</h4>
                                     </div>
                                     {% if child.type == 2 and show_contribs %}
@@ -162,7 +167,14 @@
             {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
         </p>
     {% endif %}
-    {% if show_abstract and contrib.description %}
+
+    {% if not contrib.inherit_location and contrib.has_location_info %}
+        <p>
+            <b>{% trans %}Location{% endtrans %}</b><br />
+            {{ render_place(contrib) }}
+        </p>
+    {% endif %}
+    {% if show_abstract and (not dont_show_poster_abstract or entry.is_poster) and contrib.description %}
         <div class="description">
             <b>{% trans %}Description{% endtrans %}</b>
             {# Description can be markdown #}
@@ -176,7 +188,7 @@
                 {% for subchild in contrib.subcontributions %}
                     <li class="inherited-border-color">
                         <div class="contrib-heading">
-                            {% if show_length_contribs %}
+                            {% if show_length_contribs and not contrib.session.is_poster %}
                                 <span class="timebox inherited-bg-color inherited-txt-color">
                                     {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
                                 </span>
@@ -224,13 +236,12 @@
 {# Utilities #}
 
 {% macro render_place(entry) %}
-    <b>{% trans %}Location{% endtrans %}:</b>
-    {% if entry.object.venue_name %}
-        {{ entry.object.venue_name }}{% if entry.object.room_name %},{% endif %}
-    {% endif %}
-    {% if entry.object.room_name %}
-        {{ entry.object.room_name }}
-    {%endif%}
+    {% set entry = entry.object if entry.object else entry %}
+    {% set place_arr = [entry.venue_name or '', entry.room_name or '', entry.address or ''] %}
+
+    {% for el in place_arr %}
+        {{ el }}{{ ', ' if el and loop.index0 < place_arr|length-1 and place_arr[loop.index0+1] else '' }}
+    {% endfor %}
 {% endmacro %}
 
 {% macro render_names(people, show_title=false, show_affiliation=false) %}

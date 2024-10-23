@@ -137,7 +137,6 @@ body {
 .session-block-title {
   break-inside: avoid;
   margin: 0;
-  /* border: 1px solid blue; */
   padding: 10px;
   border-radius: 5px;
   flex-grow: 1;
@@ -145,16 +144,21 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  /* break-inside: avoid; */
+}
+
+.session-block-title.only-round-top {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .session-block-title > h3 {
-  margin: 0;
+  margin: 0 0 2px 0;
 }
 
 .session-block-title-info {
   display: flex;
   flex-wrap: wrap;
+  line-height: 1.4em;
   font-size: 0.8em;
 }
 
