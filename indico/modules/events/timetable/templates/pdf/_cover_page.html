@@ -5,14 +5,23 @@
         <div class="cover-wrapper">
             <div>
                 {% if event.logo %}
-                    <img alt="Event logo" src="event://logo" style="max-width: 100%;"></img>
+                    <img alt="Event logo" src="event://logo" style="max-width: 100%;" />
                 {% endif %}
                 <h1>{{ event.title }}</h1>
                 <h3>{{ format_event_date(event) }}</h3>
-                {% if event.venue_name %}
-                    <h2>{{ event.venue_name }}</h2>
-                {% endif %}
                 <h1>{% trans %}Programme{% endtrans %}</h1>
+                <br />
+                {% if event.has_location_info %}
+                    <div>
+                        <b>Location:</b>
+                        <br />
+                        {{ event.venue_name + ', ' + event.room_name if event.venue_name else event.room_name }}
+                        {% if (event.venue_name or event.room_name) and event.address %}
+                            <br />
+                        {% endif %}
+                        {{ event.address or ''}}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
