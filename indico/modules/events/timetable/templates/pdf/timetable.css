@@ -41,8 +41,6 @@ body {
 
 .toc {
   page: toc;
-  display: flex;
-  flex-direction: column;
 }
 
 .toc > div {
