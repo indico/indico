@@ -8,9 +8,11 @@
 from io import BytesIO
 
 from flask import jsonify, request, session
+from flask import render_template
 from werkzeug.exceptions import Forbidden, NotFound
 from weasyprint import CSS, HTML
 
+from indico.core.db import db
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -19,7 +21,9 @@ from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.util import (get_timetable_offline_pdf_generator, render_entry_info_balloon,
                                                   serialize_event_info)
+
 from indico.modules.events.timetable.views import WPDisplayTimetable
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.receipts.util import sandboxed_url_fetcher
@@ -106,9 +110,6 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
     def _process(self):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():
-            from flask import render_template
-            from indico.modules.events.timetable.models.entries import TimetableEntry
-            from indico.core.db import db
 
             days = {}
             for day in self.event.iter_days():
@@ -120,27 +121,6 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 days[day] = entries
 
             now = now_utc()
-            # TODO: (Ajob) Remove list below of settings
-            #
-            # contribution_info=showContribId
-            # contribution_info=showAbstract
-            # contribution_info=dontShowPosterAbstract
-            # contribution_info=showLengthContribs
-            # document_settings=showCoverPage
-            # document_settings=showTableContents
-            # document_settings=showSessionTOC
-            # download=1
-            # firstPageNumber=1
-            # other=showSpeakerTitle
-            # other=showSpeakerAffiliation
-            # pagesize=A4
-            # session_info=newPagePerSession
-            # session_info=useSessionColorCodes
-            # session_info=showSessionDescription
-            # session_info=printDateCloseToSessions
-            # submitted=
-            # visible_entries=showContribsAtConfLevel
-            # visible_entries=showBreaksAtConfLevel
             html = render_template('events/timetable/pdf/timetable.html', event=self.event, days=days, now=now,
                                    show_title=form.other.data['showSpeakerTitle'],
                                    show_affiliation=form.other.data['showSpeakerAffiliation'],
@@ -159,9 +139,6 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                                    )
 
             css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
-
-            # Path('/home/troun/dev/pdf-timetable/index.html').write_text(html)
-            # Path('/home/troun/dev/pdf-timetable/main.css').write_text(css)
 
             if request.args.get('download') == '1':
                 return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')

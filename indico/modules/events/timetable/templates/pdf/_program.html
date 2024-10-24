@@ -129,7 +129,7 @@
                                         {% endif %}
                                         <h4>{{ child.object.title }}</h4>
                                     </div>
-                                    {% if child.type == 2 and show_contribs %}
+                                    {% if child.type == 2 %}
                                         <div class="contrib-timeline-content" >
                                             {{ render_nested_contrib(child, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
                                         </div>
