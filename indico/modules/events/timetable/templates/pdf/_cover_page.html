@@ -15,11 +15,11 @@
                     <div>
                         <b>Location:</b>
                         <br />
-                        {{ event.venue_name + ', ' + event.room_name if event.venue_name else event.room_name }}
+                        {{ event.venue_name + (', ' + event.room_name if event.venue_name and event.room_name else event.room_name) }}
                         {% if (event.venue_name or event.room_name) and event.address %}
                             <br />
+                            {{ event.address }}
                         {% endif %}
-                        {{ event.address or ''}}
                     </div>
                 {% endif %}
             </div>
