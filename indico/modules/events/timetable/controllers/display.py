@@ -121,22 +121,26 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 days[day] = entries
 
             now = now_utc()
-            html = render_template('events/timetable/pdf/timetable.html', event=self.event, days=days, now=now,
-                                   show_title=form.other.data['showSpeakerTitle'],
-                                   show_affiliation=form.other.data['showSpeakerAffiliation'],
-                                   show_cover_page=form.document_settings.data['showCoverPage'],
-                                   show_toc=form.document_settings.data['showTableContents'],
-                                   show_session_toc=form.document_settings.data['showSessionTOC'],
-                                   show_abstract=form.contribution_info.data['showAbstract'],
-                                   dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'] ,
-                                   page_size=form.pagesize.data,
-                                   show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
-                                   show_length_contribs=form.contribution_info.data['showLengthContribs'],
-                                   show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
-                                   new_page_per_session=form.session_info.data['newPagePerSession'],
-                                   show_session_description=form.session_info.data['showSessionDescription'],
-                                   print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
-                                   )
+            html = render_template(
+                'events/timetable/pdf/timetable.html',
+                event=self.event,
+                days=days,
+                now=now,
+                show_title=form.other.data['showSpeakerTitle'],
+                show_affiliation=form.other.data['showSpeakerAffiliation'],
+                show_cover_page=form.document_settings.data['showCoverPage'],
+                show_toc=form.document_settings.data['showTableContents'],
+                show_session_toc=form.document_settings.data['showSessionTOC'],
+                show_abstract=form.contribution_info.data['showAbstract'],
+                dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'] ,
+                page_size=form.pagesize.data,
+                show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
+                show_length_contribs=form.contribution_info.data['showLengthContribs'],
+                show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
+                new_page_per_session=form.session_info.data['newPagePerSession'],
+                show_session_description=form.session_info.data['showSessionDescription'],
+                print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
+            )
 
             css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
 
