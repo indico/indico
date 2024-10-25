@@ -21,6 +21,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
+
 EVENT_BANNER_WIDTH = 950
 EVENT_LOGO_WIDTH = 200
 
