@@ -127,10 +127,8 @@ class LectureMeetingLayoutForm(LoggedLayoutForm):
 
 
 class LogoForm(IndicoForm):
-    logo = EditableFileField(
-        accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
-        add_remove_links=False, handle_flashes=True, get_metadata=get_logo_data
-    )
+    logo = EditableFileField('Logo', accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                             add_remove_links=False, handle_flashes=True, get_metadata=get_logo_data)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
