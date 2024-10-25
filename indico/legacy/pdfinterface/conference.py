@@ -768,10 +768,6 @@ class TimeTablePlain(PDFWithTOC):
             current_day += timedelta(days=1)
 
 
-class _SimplifiedTimeTablePlain:
-    pass
-
-
 class SimplifiedTimeTablePlain(PDFBase):
     def __init__(self, event, user, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None, pagesize='A4',
                  fontsize='normal', tz=None):
