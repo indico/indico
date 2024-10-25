@@ -3,9 +3,6 @@
 {% call simple_form(form, form_header_kwargs={'id': 'timetable-pdf-export-form', 'method': 'get'},
                     submit=_('Generate'), back=_('Cancel'), disabled_until_change=false) %}
     {{ form_rows(form, skip=form._pdf_options_fields) }}
-    {% call form_fieldset(_('PDF Options')) %}
-        {{ form_rows(form, fields=form._pdf_options_fields) }}
-    {% endcall %}
 {% endcall %}
 
 <script>
