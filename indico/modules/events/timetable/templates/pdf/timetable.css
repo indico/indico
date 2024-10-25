@@ -388,9 +388,14 @@ body {
 
 .contrib-heading > :is(h4, span) {
   display: inline-block;
+  margin: 0;
+}
+
+.contrib-heading > span {
+  margin-right: 5px;
 }
 
 .contrib-heading > h4 {
-  margin: 0;
+  margin-right: 5px;
   line-height: 1.4em;
 }
