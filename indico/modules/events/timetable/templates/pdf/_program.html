@@ -2,7 +2,7 @@
     {% for day in days %}
         <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
-                <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
+                <h2>{{ day|format_skeleton('EEEEdMMMM') }}</h2>
             </div>
             {% for entry in days[day] %}
                 {% set should_render = (
