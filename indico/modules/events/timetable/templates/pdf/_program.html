@@ -5,7 +5,7 @@
                 <h2 style="text-align: center;">{{ day|format_skeleton('EEEEdMMMM') }}</h2>
             </div>
             {% for entry in days[day] %}
-                {% if entry.type == 1 %}
+                {% if entry.type.name == 'SESSION_BLOCK' %}
                     <div class="day-entry">
                         {{ get_color_styles(entry, entry.object.session.colors) }}
                         <div class="time-text time-from">
@@ -21,7 +21,7 @@
                             {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
                         </div>
                     </div>
-                {% elif entry.type == 2 and show_contribs %}
+                {% elif entry.type.name == 'CONTRIBUTION' and show_contribs %}
                     <div class="day-entry">
                         <div class="time-text time-from">
                             {{ entry.start_dt|format_time(timezone=entry.event.tz) }}
@@ -36,7 +36,7 @@
                             {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
                         </div>
                     </div>
-                {% elif entry.type == 3 and show_breaks %}
+                {% elif entry.type.name == 'BREAK' and show_breaks %}
                     <div class="day-entry">
                         {{ get_color_styles(entry, entry.object.colors) }}
                         <div class="time-text time-from">
@@ -61,7 +61,7 @@
 {% macro render_session_block(entry, show_abstract, dont_show_poster_abstract, show_contribs, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) %}
     {% set session_block = entry.object %}
     {% set session = session_block.session %}
-    {% set is_contribution = entry.type == 2 %}
+    {% set is_contribution = entry.type.name == 'CONTRIBUTION' %}
     {% set presenters = session_block.speakers if is_contribution else session_block.person_links %}
     {% set contributions = session_block.contributions %}
     {% set show_session_block_content = entry.children or (show_session_description and session.description) or (show_abstract and session_block.description) %}
@@ -129,7 +129,7 @@
                                         {% endif %}
                                         <h4>{{ child.object.title }}</h4>
                                     </div>
-                                    {% if child.type == 2 %}
+                                    {% if child.type.name == 'CONTRIBUTION' %}
                                         <div class="contrib-timeline-content" >
                                             {{ render_nested_contrib(child, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
                                         </div>
