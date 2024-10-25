@@ -22,6 +22,9 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
+EVENT_BANNER_WIDTH = 950
+EVENT_LOGO_WIDTH = 200
+
 logger = Logger.get('events.layout')
 layout_settings = EventSettingsProxy('layout', {
     'is_searchable': True,
@@ -30,6 +33,7 @@ layout_settings = EventSettingsProxy('layout', {
     'name_format': None,
     'show_banner': False,
     'header_text_color': '',
+    'header_logo_as_banner': True,
     'header_background_color': '',
     'announcement': None,
     'show_announcement': False,

@@ -26,6 +26,8 @@ Improvements
 - Take session program codes into account when sorting parallel sessions with the same start time
   in meeting timetable (:pr:`6575`)
 - Enforce browser-side caching of event logos and custom stylesheets (:issue:`6555`, :pr:`6559`)
+- Default to banner-style (full width) logos in newly created conference events (:pr:`6572`,
+  thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

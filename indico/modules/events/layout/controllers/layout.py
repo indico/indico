@@ -17,7 +17,7 @@ from wtforms.validators import DataRequired
 from indico.core.db import db
 from indico.modules.events import EventLogRealm
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
-from indico.modules.events.layout import layout_settings, logger, theme_settings
+from indico.modules.events.layout import EVENT_BANNER_WIDTH, EVENT_LOGO_WIDTH, layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
 from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_js_url, get_logo_data
@@ -39,7 +39,14 @@ from indico.web.util import _pop_injected_js, jsonify_data
 
 
 class RHLayoutBase(RHManageEventBase):
-    pass
+    def _check_and_flash_logo_warnings(self, logo):
+        header_logo_as_banner = layout_settings.get(self.event, 'header_logo_as_banner')
+        if header_logo_as_banner and logo.width < EVENT_BANNER_WIDTH * 0.8:
+            flash(_('The event logo is too small. It is recommended to use a logo with a width of at least {}px.')
+                  .format(EVENT_BANNER_WIDTH), 'warning')
+        if not header_logo_as_banner and logo.width > EVENT_LOGO_WIDTH * 1.2:
+            flash(_('The event logo is too large. It is recommended to use a logo with a width of at most {}px.')
+                  .format(EVENT_LOGO_WIDTH), 'warning')
 
 
 def _make_theme_settings_form(event, theme):
@@ -135,6 +142,9 @@ class RHLayoutEdit(RHLayoutBase):
             if form.theme.data == '_custom':
                 layout_settings.set(self.event, 'use_custom_css', True)
             flash(_('Settings saved'), 'success')
+            if self.event.has_logo:
+                img = Image.open(BytesIO(self.event.logo))
+                self._check_and_flash_logo_warnings(img)
             return redirect(url_for('.index', self.event))
         else:
             if self.event.logo_metadata:
@@ -173,6 +183,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
             'content_type': 'image/png'
         }
         flash(_('New logo saved'), 'success')
+        self._check_and_flash_logo_warnings(img)
         logger.info("New logo '%s' uploaded by %s (%s)", f.filename, session.user, self.event)
         return jsonify_data(content=get_logo_data(self.event))
 
