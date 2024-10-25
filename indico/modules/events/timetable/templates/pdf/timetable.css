@@ -1,10 +1,10 @@
 :root {
   --blue: #09c;
-  --blue-trans: #0099cc55;
+  --blue-trans: #09c5;
 }
 
 * {
-  font-family: Lato;
+  font-family: 'Lato', sans-serif;
 }
 
 body {
@@ -82,7 +82,6 @@ body {
   padding: 0.6em 0;
   text-align: center;
   width: 2.4em;
-  color: rgba(0, 0, 0, 0.4);
   border-radius: 3px;
   margin-right: 15px;
   content: target-counter(attr(href), page, decimal);
@@ -178,14 +177,15 @@ body {
 
 .session-block-content {
   width: 100%;
-  /* break-inside: avoid; */
 }
 
 .day-title {
   margin: 40px 0;
+  text-align: center;
 }
 
-.contrib-timeline, .sub-contrib-timeline {
+.contrib-timeline,
+.sub-contrib-timeline {
   margin: 0;
   padding: 0;
   flex-direction: column;
@@ -227,15 +227,12 @@ body {
 
 .sub-contrib-timeline .contrib-timeline-content {
   margin-top: 10px;
+  font-size: 1em;
+  padding: 0 10px 10px 10px;
 }
 
 .contrib-timeline-content {
   font-size: 0.8em;
-}
-
-.sub-contrib-timeline .contrib-timeline-content {
-  font-size: 1em;
-  padding: 0 10px 10px 10px;
 }
 
 .contrib-timeline-content > * {
@@ -245,13 +242,6 @@ body {
 .contrib-timeline-content > :is(p, div) b {
   line-height: 2em;
 }
-
-/* 
-:is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div) {
-  break-inside: avoid;
-  break-before: avoid;
-  break-after: auto;
-} */
 
 :is(.contrib-timeline-content, .sub-contrib-timeline) > :is(p, div):not(:last-child) {
   margin: 0;
@@ -305,8 +295,8 @@ body {
   margin-bottom: 5px;
 }
 
-.pagebreak.pagebreak-children > section:not(:first-of-type) {
-  break-before: always;
+.pagebreak.pagebreak-children > .day-entry:not(:last-of-type) {
+  break-after: always;
 }
 
 .session-block-date {
