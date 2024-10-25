@@ -224,20 +224,16 @@
     {% set entry = entry.object if entry.object else entry %}
     {% set place_arr = [entry.venue_name or '', entry.room_name or '', entry.address or ''] %}
 
-    {% for el in place_arr %}
-        {% if el %}
-            {{ el + ', ' if loop.nextitem else el }}
-        {% endif %}
-    {% endfor %}
+    {{ place_arr | select | join(', ') }}
 {% endmacro %}
 
 {% macro render_names(people, show_title=false, show_affiliation=false) %}
     {% for person in people %}
-        {{
-            person.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) +
-            (' (' + person.affiliation + ')' if show_affiliation and person.affiliation else '') +
-            (',' if not loop.last else '')
-        }}
+        {{ person.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
+        {%- if show_affiliation and person.affiliation %}
+            ({{ person.affiliation }})
+        {%- endif -%}
+        {%- if not loop.last %},{% endif %}
     {% endfor %}
 {% endmacro %}
 
