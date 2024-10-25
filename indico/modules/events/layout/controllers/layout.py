@@ -42,19 +42,11 @@ class RHLayoutBase(RHManageEventBase):
     def _check_and_flash_logo_warnings(self, logo):
         header_logo_as_banner = layout_settings.get(self.event, 'header_logo_as_banner')
         if header_logo_as_banner and logo.width < EVENT_BANNER_WIDTH * 0.8:
-            flash(self.event_banner_too_small_msg, 'warning')
+            flash(_('The event logo is too small. It is recommended to use a logo with a width of at least {}px.')
+                  .format(EVENT_BANNER_WIDTH), 'warning')
         if not header_logo_as_banner and logo.width > EVENT_LOGO_WIDTH * 1.2:
-            flash(self.event_logo_too_large_msg, 'warning')
-
-    @property
-    def event_banner_too_small_msg(self):
-        return (_('The event logo is too small. It is recommended to use a logo with a width of at least {}px.')
-                .format(EVENT_BANNER_WIDTH))
-
-    @property
-    def event_logo_too_large_msg(self):
-        return (_('The event logo is too large. It is recommended to use a logo with a width of at most {}px.')
-                .format(EVENT_LOGO_WIDTH))
+            flash(_('The event logo is too large. It is recommended to use a logo with a width of at most {}px.')
+                  .format(EVENT_LOGO_WIDTH), 'warning')
 
 
 def _make_theme_settings_form(event, theme):
