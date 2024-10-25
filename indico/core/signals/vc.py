@@ -38,7 +38,7 @@ data) and `old_link` (object which the association was pointing to before, if an
 detached_vc_room = _signals.signal('detached-vc-room', '''
 Called whenever a room is detached from an object (e.g. event, contribution...),
 as a consequence of a direct or indirect user action. This triggers on direct detachment
- of the object a `VCRoomEventAssociation` is linked to. The *sender* is the
+of the object a `VCRoomEventAssociation` is linked to. The *sender* is the
 `VCRoomEventAssociation`, followed by the kwargs `vc_room` (the actual `VCRoom` which
 is being detached), `old_link` (what it is being detached from), `event` (event where the operation
 is being executed) and `data` (form data).
