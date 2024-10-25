@@ -7,10 +7,9 @@
 
 from io import BytesIO
 
-from flask import jsonify, request, session
-from flask import render_template
-from werkzeug.exceptions import Forbidden, NotFound
+from flask import jsonify, render_template, request, session
 from weasyprint import CSS, HTML
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
@@ -19,11 +18,10 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.util import (get_timetable_offline_pdf_generator, render_entry_info_balloon,
                                                   serialize_event_info)
-
 from indico.modules.events.timetable.views import WPDisplayTimetable
-from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.receipts.util import sandboxed_url_fetcher
@@ -132,7 +130,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 show_toc=form.document_settings.data['showTableContents'],
                 show_session_toc=form.document_settings.data['showSessionTOC'],
                 show_abstract=form.contribution_info.data['showAbstract'],
-                dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'] ,
+                dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'],
                 page_size=form.pagesize.data,
                 show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
                 show_length_contribs=form.contribution_info.data['showLengthContribs'],
