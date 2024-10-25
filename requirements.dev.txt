@@ -219,7 +219,7 @@ sqlbag==0.1.1617247075
     # via migra
 sqlparse==0.5.1
     # via -r requirements.dev.in
-starlette==0.38.4
+starlette==0.41.0
     # via sphinx-autobuild
 tomlkit==0.13.2
     # via -r requirements.dev.in
