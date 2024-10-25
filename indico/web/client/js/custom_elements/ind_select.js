@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
+
 import CustomElementBase from 'indico/custom_elements/_base';
 import {Translate} from 'indico/react/i18n';
 import * as positioning from 'indico/utils/positioning';
@@ -211,7 +213,7 @@ customElements.define(
             numMatches++;
           } else {
             const label = getOptionLabel(option).toLowerCase();
-            option.hidden = !label.includes(keyword);
+            option.hidden = !_.deburr(label).includes(_.deburr(keyword));
             numMatches += Number(!option.hidden);
             if (label === keyword && !option.hasAttribute('aria-disabled')) {
               selectableOption = option;

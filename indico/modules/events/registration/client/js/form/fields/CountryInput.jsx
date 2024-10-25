@@ -6,36 +6,63 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
-import {FinalCheckbox, FinalDropdown} from 'indico/react/forms';
+import Select from 'indico/react/components/Select';
+import {FinalCheckbox, FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-
-import '../../../styles/regform.module.scss';
 
 import {getStaticData} from '../selectors';
 
 const isoToFlag = country =>
   String.fromCodePoint(...country.split('').map(c => c.charCodeAt() + 0x1f1a5));
 
-export default function CountryInput({htmlId, htmlName, disabled, isRequired, choices}) {
+function CountryInputComponent({value, onChange, choices, ...inputProps}) {
+  const [options, countryNameToKey, countryKeyToName] = useMemo(() => {
+    const _options = [];
+    const _countryNameToKey = new Map();
+    const _countryKeyToName = new Map();
+    choices.forEach(country => {
+      _options.push([country.caption, `${isoToFlag(country.countryKey)} ${country.caption}`]);
+      _countryNameToKey.set(country.caption, country.countryKey);
+      _countryKeyToName.set(country.countryKey, country.caption);
+    });
+    return [_options, _countryNameToKey, _countryKeyToName];
+  }, [choices]);
+
+  const handleChange = ev => {
+    onChange(countryNameToKey.get(ev.target.value) || ev.target.value);
+  };
+
   return (
-    <FinalDropdown
+    <Select
+      options={options}
+      value={countryKeyToName.get(value) || value}
+      onChange={handleChange}
+      data-input-type="country-dropdown"
+      {...inputProps}
+    />
+  );
+}
+
+CountryInputComponent.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+};
+
+export default function CountryInput({htmlId, htmlName, isRequired, choices, ...inputProps}) {
+  return (
+    <FinalField
       id={htmlId}
       name={htmlName}
+      component={CountryInputComponent}
       required={isRequired}
-      disabled={disabled}
+      choices={choices}
       clearable={!isRequired}
-      styleName="country-dropdown"
-      placeholder={Translate.string('Select a country')}
-      fluid
-      selection
-      options={choices.map(country => ({
-        key: country.countryKey,
-        value: country.countryKey,
-        text: `${isoToFlag(country.countryKey)} ${country.caption}`,
-      }))}
+      parse={x => x}
+      {...inputProps}
     />
   );
 }
@@ -43,13 +70,11 @@ export default function CountryInput({htmlId, htmlName, disabled, isRequired, ch
 CountryInput.propTypes = {
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 
 CountryInput.defaultProps = {
-  disabled: false,
   isRequired: false,
 };
 
