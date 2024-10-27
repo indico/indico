@@ -277,7 +277,7 @@ class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
             case _:
                 raise ValidationError('Invalid state')
         mock_registration = Registration(state=state, registration_form=self.regform, currency='USD',
-                                         email='test@email.com', first_name='Peter', last_name='Higgs',
+                                         email='test@example.com', first_name='Peter', last_name='Higgs',
                                          checked_in=True, friendly_id=-1, event_id=self.event.id,
                                          registration_form_id=self.regform.id)
         tpl = get_template_module('events/registration/emails/registration_creation_to_registrant.html',

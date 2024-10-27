@@ -32,38 +32,20 @@
 
     {% if regform %}
         <script>
-            (function () {
+            (() => {
                 'use strict';
 
-                $('#message-pending-preview').attr('data-href', '{{ url_for('.notification_preview', regform) }}').ajaxDialog({
-                    title: $T('Pending Registration Preview'),
+                $('#message-pending-preview').ajaxDialog({
                     method: 'POST',
-                    data: function () {
-                        return {
-                            message: $('#message_pending').val(),
-                            state: 'pending',
-                        };
-                    }
+                    data: () => ({message: $('#message_pending').val(), state: 'pending'})
                 });
-                $('#message-unpaid-preview').attr('data-href', '{{ url_for('.notification_preview', regform) }}').ajaxDialog({
-                    title: $T('Unpaid Registration Preview'),
+                $('#message-unpaid-preview').ajaxDialog({
                     method: 'POST',
-                    data: function () {
-                        return {
-                            message: $('#message_unpaid').val(),
-                            state: 'unpaid',
-                        };
-                    }
+                    data: () => ({message: $('#message_unpaid').val(), state: 'unpaid'})
                 });
-                $('#message-complete-preview').attr('data-href', '{{ url_for('.notification_preview', regform) }}').ajaxDialog({
-                    title: $T('Complete Registration Preview'),
+                $('#message-complete-preview').ajaxDialog({
                     method: 'POST',
-                    data: function () {
-                        return {
-                            message: $('#message_complete').val(),
-                            state: 'complete',
-                        };
-                    }
+                    data: () => ({message: $('#message_complete').val(), state: 'complete'})
                 });
             })();
         </script>

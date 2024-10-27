@@ -34,6 +34,7 @@ from indico.modules.events.settings import data_retention_settings
 from indico.util.enum import RichStrEnum
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.colors import SUIColorPickerField
@@ -54,8 +55,9 @@ def _check_if_payment_required(form, field):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
 
-def _generate_preview_link(text, input_id):
-    return '{} <a id="{}">{}</a>'.format(text, input_id, _('Preview'))
+def _generate_preview_link(text, input_id, url, title):
+    inner = _('Preview')
+    return f'{text} <a id="{input_id}" data-href="{url}" data-title="{title}">{inner}</a>'
 
 
 class RegistrationFormEditForm(IndicoForm):
@@ -100,21 +102,9 @@ class RegistrationFormEditForm(IndicoForm):
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
-    message_pending = TextAreaField(
-        _('Message for pending registrations'),
-        description=_generate_preview_link(_('Text included in emails sent to pending registrations'
-                                             ' (Markdown syntax).'), 'message-pending-preview')
-    )
-    message_unpaid = TextAreaField(
-        _('Message for unpaid registrations'),
-        description=_generate_preview_link(_('Text included in emails sent to unpaid registrations'
-                                             ' (Markdown syntax).'), 'message-unpaid-preview')
-    )
-    message_complete = TextAreaField(
-        _('Message for complete registrations'),
-        description=_generate_preview_link(_('Text included in emails sent to complete registrations'
-                                             ' (Markdown syntax).'), 'message-complete-preview')
-    )
+    message_pending = TextAreaField(_('Message for pending registrations'))
+    message_unpaid = TextAreaField(_('Message for unpaid registrations'))
+    message_complete = TextAreaField(_('Message for complete registrations'))
     attach_ical = BooleanField(
         _('Attach iCalendar file'),
         widget=SwitchWidget(),
@@ -136,6 +126,7 @@ class RegistrationFormEditForm(IndicoForm):
         self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
         self._set_currencies()
+        self._set_links()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
                                                          'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
@@ -143,6 +134,18 @@ class RegistrationFormEditForm(IndicoForm):
     def _set_currencies(self):
         currencies = [(c['code'], f'{c["code"]} ({c["name"]})') for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
+
+    def _set_links(self):
+        url = url_for('.notification_preview', self.regform)
+        self.message_pending.description = _generate_preview_link(
+            _('Text included in emails sent to pending registrations (Markdown syntax).'),
+            'message-pending-preview', url, _('Pending Registration Preview'))
+        self.message_unpaid.description = _generate_preview_link(
+            _('Text included in emails sent to unpaid registrations (Markdown syntax).'),
+            'message-unpaid-preview', url, _('Unpaid Registration Preview'))
+        self.message_complete.description = _generate_preview_link(
+            _('Text included in emails sent to complete registrations (Markdown syntax).'),
+            'message-complete-preview', url, _('Complete Registration Preview'))
 
 
 class RegistrationFormCreateForm(IndicoForm):
