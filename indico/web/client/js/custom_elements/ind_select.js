@@ -160,7 +160,7 @@ customElements.define(
 
       listbox.addEventListener('pointerdown', evt => {
         // Instead of click we use pointerdown
-        // to intercept focsout that fires before
+        // to intercept focusout that fires before
         // click, closing the dialog and making the
         // target option unavailable before selection.
         const $option = evt.target.closest('[role=option]');
@@ -192,10 +192,10 @@ customElements.define(
         indSelect.open = shouldOpen;
         if (shouldOpen) {
           dialog.show();
-          indSelect.setAttribute('aria-expanded', true);
-          positioning.position(listbox, filter, positioning.dropdownPositionStrategy, fit =>
-            filter.toggleAttribute('data-top', !fit)
-          );
+          positioning.position(listbox, indSelect, positioning.dropdownPositionStrategy, fit => {
+            indSelect.setAttribute('aria-expanded', true);
+            filter.toggleAttribute('data-top', !fit);
+          });
         } else {
           dialog.close();
           indSelect.setAttribute('aria-expanded', false);

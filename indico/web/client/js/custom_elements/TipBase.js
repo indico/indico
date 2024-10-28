@@ -57,7 +57,8 @@ export class TipBase extends HTMLElement {
         ? positioning.horizontalTooltipPositionStrategy
         : positioning.verticalTooltipPositionStrategy;
 
-    positioning.position(this.$tip, this, strategy);
+    const stopPositioning = positioning.position(this.$tip, this, strategy);
+    this.addEventListener('toggle', stopPositioning, {once: true});
   }
 
   dismiss(evt) {
@@ -72,15 +73,6 @@ export class TipBase extends HTMLElement {
     window.addEventListener('keydown', this.dismiss);
     this.$tip.addEventListener('click', evt => {
       evt.preventDefault();
-    });
-    this.addEventListener('toggle', () => {
-      if (this.shown) {
-        window.addEventListener('resize', this.updatePosition);
-        window.addEventListener('scroll', this.updatePosition, {passive: true});
-      } else {
-        window.removeEventListener('resize', this.updatePosition);
-        window.removeEventListener('scroll', this.updatePosition);
-      }
     });
   }
 }

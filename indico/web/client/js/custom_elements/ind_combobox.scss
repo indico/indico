@@ -53,7 +53,7 @@ ind-combo-box {
 
   &[open] [role='listbox'],
   [role='listbox'][data-position-check] {
-    position: absolute;
+    @extend %popup-positioned-target;
     z-index: 10;
     min-width: 100%;
     max-height: min(75vh, 16em);
@@ -71,7 +71,6 @@ ind-combo-box {
   }
 
   [role='listbox'][data-top] {
-    bottom: 100%;
     border-bottom: 0;
     border-bottom-left-radius: 0.28571429rem; // value from semantic UI
     border-bottom-right-radius: 0.28571429rem; // value from semantic UI
