@@ -700,21 +700,11 @@ class RHRegistrationReset(RHManageRegistrationBase):
     """Reset a registration back to a non-approved status."""
 
     def _process(self):
-        if self.registration.has_conflict():
-            raise NoReportError(_('Cannot reset this registration since there is another valid registration for the '
-                                  'same user or email.'))
-        if self.registration.state in (RegistrationState.complete, RegistrationState.unpaid):
-            self.registration.update_state(approved=False)
-        elif self.registration.state == RegistrationState.rejected:
-            self.registration.rejection_reason = ''
-            self.registration.update_state(rejected=False)
-        elif self.registration.state == RegistrationState.withdrawn:
-            self.registration.update_state(withdrawn=False)
-            notify_registration_state_update(self.registration, from_management=True)
-        else:
-            raise BadRequest(_('The registration cannot be reset in its current state.'))
-        self.registration.checked_in = False
-        logger.info('Registration %r was reset by %r', self.registration, session.user)
+        try:
+            self.registration.reset_state(silent=False)
+            logger.info('Registration %r was reset by %r', self.registration, session.user)
+        except Exception as e:
+            flash(str(e), 'error')
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
