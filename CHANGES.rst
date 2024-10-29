@@ -40,8 +40,8 @@ Bugfixes
 - Fix error in unmerged participant list when the picture field is enabled and participant
   list columns have not been customized for that registration form (:pr:`6535`)
 - Fix breakage of the registration form dropdown field (and anything else using a custom
-  element that uses ``ElementInternals``) in older versions of Safari (:pr:`6549`,
-  :thanks:`foxbunny`)
+  element that uses ``ElementInternals``) in older versions of Safari (:pr:`6549`, thanks
+  :user:`foxbunny`)
 - Fix linebreak display in markdown code blocks in survey section descriptions (:pr:`6553`)
 - Include attached pictures when downloading registration attachments (:pr:`6564`)
 - Only allow marking unpaid registrations as paid (:issue:`6330`, :pr:`6578`)
