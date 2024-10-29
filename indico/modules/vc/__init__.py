@@ -92,9 +92,11 @@ def _link_object_deleted(obj: Contribution | SessionBlock, **kwargs):
         return
 
     if isinstance(obj, Contribution):
-        message = _('There was a VC room associated with this contribution. It has been linked to the event instead')
+        message = _('There was a videoconference associated with this contribution. It has been linked to the event '
+                    'instead')
     else:
-        message = _('There was a VC room associated with this session block. It has been linked to the event instead')
+        message = _('There was a videoconference associated with this session block. It has been linked to the event '
+                    'instead')
     flash(message, 'warning')
 
 
