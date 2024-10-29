@@ -80,11 +80,11 @@ def _link_object_deleted(obj: Contribution | SessionBlock, **kwargs):
     assocs = list(obj.vc_room_associations)
     for event_vc_room in assocs:
         # tie the room to the event instead
-        signals.vc.detached_vc_room.send(event_vc_room, vc_room=event_vc_room.vc_room, old_link=obj, event=obj.event)
+        signals.vc.vc_room_detached.send(event_vc_room, vc_room=event_vc_room.vc_room, old_link=obj, event=obj.event)
 
         event_vc_room.link_object = obj.event
 
-        signals.vc.attached_vc_room.send(
+        signals.vc.vc_room_attached.send(
             event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event, data={}, old_link=obj
         )
 

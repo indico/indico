@@ -9,6 +9,7 @@ from collections import defaultdict
 from operator import itemgetter
 
 from flask import flash, jsonify, redirect, request, session
+from marshmallow import fields
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -29,6 +30,7 @@ from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent, WPVCService
 from indico.util.date_time import as_utc, get_day_end, get_day_start, now_utc
 from indico.util.i18n import _
 from indico.util.iterables import group_list
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
@@ -71,10 +73,10 @@ def process_vc_room_association(plugin: IndicoPlugin, event: Event, vc_room: VCR
         return None
     elif assoc_has_changed and not new_room:
         if old_link:
-            signals.vc.detached_vc_room.send(
+            signals.vc.vc_room_detached.send(
                 event_vc_room, vc_room=vc_room, old_link=old_link, event=event, data=form.data
             )
-        signals.vc.attached_vc_room.send(
+        signals.vc.vc_room_attached.send(
             event_vc_room, vc_room=vc_room, event=event, data=form.data, old_link=old_link, new_room=new_room
         )
 
@@ -157,7 +159,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 # avoid flushing the incomplete vc room to the database
                 with db.session.no_autoflush:
                     self.plugin.create_room(vc_room, self.event)
-                    signals.vc.new_vc_room.send(vc_room, event=self.event, assoc=event_vc_room)
+                    signals.vc.vc_room_created.send(vc_room, event=self.event, assoc=event_vc_room)
                 notify_created(self.plugin, vc_room, event_vc_room, self.event, session.user)
             except VCRoomError as err:
                 if err.field is None:
@@ -266,13 +268,14 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 class RHVCManageEventRemove(RHVCSystemEventBase):
     """Remove an existing VC room."""
 
-    def _process(self):
+    @use_kwargs({'delete_all': fields.Bool(load_default=False)}, location='query')
+    def _process(self, delete_all):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to remove {} rooms from this event.').format(self.plugin.friendly_name),
                   'error')
             raise Forbidden
 
-        if request.args.get('delete_all') == '1':
+        if delete_all:
             self.vc_room.delete(session.user, event=self.event)
         else:
             self.event_vc_room.delete(session.user)

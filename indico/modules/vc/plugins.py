@@ -202,9 +202,9 @@ class VCPluginMixin:
 
         return old_link_object != event_vc_room.link_object
 
-    def update_data_vc_room(self, vc_room: VCRoom, data: dict, is_new=False):
+    def update_data_vc_room(self, vc_room: VCRoom, data: dict, *, is_new=False):
         if not is_new:
-            signals.vc.updated_vc_room_data.send(vc_room, data=copy.copy(data))
+            signals.vc.vc_room_data_updated.send(vc_room, data=copy.copy(data))
 
         if 'name' in data:
             vc_room.name = data.pop('name')

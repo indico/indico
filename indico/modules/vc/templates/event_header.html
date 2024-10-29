@@ -1,2 +1,2 @@
 {% from 'vc/list_vc_rooms.html' import render_vc_rooms_list  %}
-{{ render_vc_rooms_list(event, event_vc_rooms) }}
+{{ render_vc_rooms_list(event, event_vc_rooms) if not g.static_site }}

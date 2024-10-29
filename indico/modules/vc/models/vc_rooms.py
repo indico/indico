@@ -133,6 +133,7 @@ class VCRoom(db.Model):
         """Delete a VC room and all its associations.
 
         :param user: the user performing the deletion
+        :param event: the event in which the deletion happened
         """
         for assoc in self.events[:]:
             Logger.get('modules.vc').info('Detaching videoconference %s from event %s (%s)',
@@ -141,7 +142,7 @@ class VCRoom(db.Model):
         db.session.flush()
 
         # send signal
-        signals.vc.deleted_vc_room.send(self, event=event)
+        signals.vc.vc_room_deleted.send(self, event=event)
 
         # process plugin actions
         Logger.get('modules.vc').info(f'Deleting videoconference {self}')
@@ -351,7 +352,7 @@ class VCRoomEventAssociation(db.Model):
                               (no more associations left)
         """
         # send signals
-        signals.vc.detached_vc_room.send(self, vc_room=self.vc_room, old_link=self.link_object, event=self.event)
+        signals.vc.vc_room_detached.send(self, vc_room=self.vc_room, old_link=self.link_object, event=self.event)
 
         Logger.get('modules.vc').info(
             'Detaching videoconference %s from event %s (%s)', self.vc_room, self.event, self.link_object

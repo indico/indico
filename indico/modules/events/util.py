@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-import copy
 import json
 import os
 import random
@@ -775,7 +774,7 @@ def _format_location(data):
 
 def split_log_location_changes(changes: dict) -> dict:
     """Re-process change dict to include readable location information (for logging)."""
-    res = copy.copy(changes)
+    res = dict(changes)
 
     if (location_changes := res.pop('location_data', None)) is None:
         return res
