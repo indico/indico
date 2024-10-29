@@ -317,8 +317,41 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
             json.loads(output)  # just to be sure the JSON is valid
             json_file.write_text(output)
+
+            if loc == 'fr_FR':
+                _get_po_missing_translations(po_file, translations_dir / loc / 'LC_MESSAGES' / 'messages.po')
+
     except subprocess.CalledProcessError as err:
         click.secho('Error: ' + err, fg='red', bold=True, err=True)
+
+
+# TODO: (Ajob) Find appropriate place for function.
+def _parse_po_file(po_file):
+    with po_file.open('rb') as f:
+        return read_po(f)
+
+
+def _get_po_missing_translations(*po_files):
+    po_data_list = [_parse_po_file(po_file) for po_file in po_files]
+    untranslated_ids = []
+    translations = {}
+    
+    for catalog in po_data_list:
+        for msg in catalog:
+            if msg.string:
+                if msg.id in translations:
+                    translations[msg.id].append(msg.string)
+                else:
+                    translations[msg.id] = [msg.string]
+            else:
+                untranslated_ids.append(msg.id)
+
+    necessary_translations = {k: v for k, v in translations.items() if k in untranslated_ids}
+
+    print('Necessary translations:')
+    print(necessary_translations)
+
+# -- END TODO --
 
 
 def extract_messages_react(directory: Path = INDICO_DIR):
