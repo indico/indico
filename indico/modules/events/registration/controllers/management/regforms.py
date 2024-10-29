@@ -27,8 +27,8 @@ from indico.modules.events.registration.forms import (ParticipantsDisplayForm, P
                                                       RegistrationFormCreateForm, RegistrationFormEditForm,
                                                       RegistrationFormScheduleForm, RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import Registration, RegistrationForm, RegistrationState
-from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
+from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationData
 from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
@@ -280,9 +280,18 @@ class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
                                          email='test@example.com', first_name='Peter', last_name='Higgs',
                                          checked_in=True, friendly_id=-1, event_id=self.event.id,
                                          registration_form_id=self.regform.id)
+        for form_item in self.regform.active_fields:
+            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+                value = getattr(mock_registration, form_item.personal_data_type.column)
+            else:
+                value = form_item.field_impl.default_value
+            data_entry = RegistrationData()
+            mock_registration.data.append(data_entry)
+            for attr, field_value in form_item.field_impl.process_form_data(mock_registration, value).items():
+                setattr(data_entry, attr, field_value)
         tpl = get_template_module('events/registration/emails/registration_creation_to_registrant.html',
                                   registration=mock_registration, event=self.event, attach_rejection_reason=True,
-                                  old_price=None)
+                                  old_price=None, diff=None)
         html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
                                body=tpl.get_body())
         return jsonify(html=html)
