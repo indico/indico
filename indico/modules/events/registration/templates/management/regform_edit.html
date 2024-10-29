@@ -29,25 +29,4 @@
             {% trans %}Back{% endtrans %}
         </a>
     {% endcall %}
-
-    {% if regform %}
-        <script>
-            (() => {
-                'use strict';
-
-                $('#message-pending-preview').ajaxDialog({
-                    method: 'POST',
-                    data: () => ({message: $('#message_pending').val(), state: 'pending'})
-                });
-                $('#message-unpaid-preview').ajaxDialog({
-                    method: 'POST',
-                    data: () => ({message: $('#message_unpaid').val(), state: 'unpaid'})
-                });
-                $('#message-complete-preview').ajaxDialog({
-                    method: 'POST',
-                    data: () => ({message: $('#message_complete').val(), state: 'complete'})
-                });
-            })();
-        </script>
-    {% endif %}
 {% endblock %}

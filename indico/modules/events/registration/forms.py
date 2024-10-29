@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 from datetime import time, timedelta
 from decimal import Decimal
 from enum import auto
@@ -16,7 +17,7 @@ from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets import NumberInput
+from wtforms.widgets import NumberInput, html_params
 
 from indico.core import signals
 from indico.core.config import config
@@ -55,9 +56,17 @@ def _check_if_payment_required(form, field):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
 
-def _generate_preview_link(text, input_id, url, title):
+def _generate_preview_link(text, input_selector, state, url, title):
     inner = _('Preview')
-    return f'{text} <a id="{input_id}" data-href="{url}" data-title="{title}">{inner}</a>'
+    params = {
+        'data-ajax-dialog': True,
+        'data-href': url,
+        'data-method': 'POST',
+        'data-title': title,
+        'data-params-selector': json.dumps({'message': input_selector}),
+        'data-params': json.dumps({'state': state}),
+    }
+    return f'{text} <a {html_params(**params)}>{inner}</a>'
 
 
 class RegistrationFormEditForm(IndicoForm):
@@ -139,13 +148,16 @@ class RegistrationFormEditForm(IndicoForm):
         url = url_for('.notification_preview', self.regform)
         self.message_pending.description = _generate_preview_link(
             _('Text included in emails sent to pending registrations (Markdown syntax).'),
-            'message-pending-preview', url, _('Pending Registration Preview'))
+            '#message_pending', 'pending', url, _('Pending Registration Preview')
+        )
         self.message_unpaid.description = _generate_preview_link(
             _('Text included in emails sent to unpaid registrations (Markdown syntax).'),
-            'message-unpaid-preview', url, _('Unpaid Registration Preview'))
+            '#message_unpaid', 'unpaid', url, _('Unpaid Registration Preview')
+        )
         self.message_complete.description = _generate_preview_link(
             _('Text included in emails sent to complete registrations (Markdown syntax).'),
-            'message-complete-preview', url, _('Complete Registration Preview'))
+            '#message_complete', 'complete', url, _('Complete Registration Preview')
+        )
 
 
 class RegistrationFormCreateForm(IndicoForm):
