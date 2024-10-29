@@ -13,3 +13,17 @@
   font-weight: bold;
   font-size: var(--text-size-rel-l);
 }
+
+// The following placeholder should be extended
+// by the target element used in the positioning.js
+// module. The CSS custom properties used below are
+// defined by that module.
+%popup-positioned-target {
+  position: var(--target-position, fixed);
+  left: var(--target-left, auto);
+  right: var(--target-right, auto);
+  top: var(--target-top, auto);
+  bottom: var(--target-bottom, auto);
+  width: var(--target-width, auto);
+  height: var(--target-height, auto);
+}

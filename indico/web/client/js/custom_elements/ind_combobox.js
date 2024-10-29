@@ -213,16 +213,22 @@ customElements.define(
         input.dispatchEvent(new Event('change', {bubbles: true}));
       }
 
+      let abortPositioning;
+
       function toggleListbox(isOpen) {
         // The list box visibility is controlled using CSS based on aria-expanded on the input
         if (isOpen) {
           input.setAttribute('aria-expanded', true);
           listbox.hidden = false;
-          positioning.position(listbox, input, positioning.dropdownPositionStrategy, () =>
-            indComboBox.toggleAttribute('open', true)
+          abortPositioning = positioning.position(
+            listbox,
+            input,
+            positioning.dropdownPositionStrategy,
+            () => indComboBox.toggleAttribute('open', true)
           );
           listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
         } else {
+          abortPositioning?.();
           input.removeAttribute('aria-expanded');
           listbox.hidden = true;
           indComboBox.removeAttribute('open');

@@ -50,14 +50,12 @@ ind-calendar {
 
   dialog[open],
   dialog[data-position-check] {
+    @extend %popup-positioned-target;
+
     display: flex;
     flex-direction: column;
     gap: 0.5em;
 
-    position: absolute;
-    left: 0;
-    top: var(--target-top);
-    bottom: 100%;
     z-index: 10;
 
     padding: 0.5em;

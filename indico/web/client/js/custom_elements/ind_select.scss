@@ -110,12 +110,10 @@ ind-select {
   }
 
   [role='listbox'] {
-    --target-bottom: 'auto';
-
-    position: absolute;
-    min-width: 100%;
+    @extend %popup-positioned-target;
+    left: calc(var(--target-left) - 1px);
+    min-width: var(--anchor-width, 100%);
     max-height: min(75vh, 16em);
-    bottom: var(--target-bottom);
     overflow-y: auto;
 
     @include sui_debt.input-border();

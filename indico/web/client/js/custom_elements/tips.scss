@@ -28,18 +28,10 @@ ind-with-toggletip {
   --tooltip-text-color: #fff;
 
   [data-tip-content] {
+    @extend %popup-positioned-target;
     // The following are set by JavaScript in positioning.js
-    --target-left: auto;
-    --target-right: auto;
-    --target-top: auto;
-    --target-bottom: auto;
-
     display: block;
 
-    // Absolute position primes the tip content for positioning.
-    // The exact position depends on the orientation, so it is
-    // set separately.
-    position: absolute;
     z-index: 1;
 
     width: max-content;
@@ -67,8 +59,6 @@ ind-with-toggletip {
   }
 
   &[orientation='horizontal'] [data-tip-content] {
-    left: var(--target-left);
-    right: var(--target-right);
     border-width: 0 0.5em;
   }
 
@@ -76,8 +66,6 @@ ind-with-toggletip {
   // of testing that [orientation='vertical'] we test that
   // :not([orientation='horizontal'])
   &:not([orientation='horizontal']) [data-tip-content] {
-    top: var(--target-top);
-    bottom: var(--target-bottom);
     border-width: 0.5em 0;
   }
 
