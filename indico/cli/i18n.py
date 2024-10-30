@@ -318,8 +318,8 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
             json.loads(output)  # just to be sure the JSON is valid
             json_file.write_text(output)
 
-            if loc == 'fr_FR':
-                _get_po_missing_translations(po_file, translations_dir / loc / 'LC_MESSAGES' / 'messages.po')
+            print('\n--- LOC: ', loc, '---\n')
+            _get_po_duplicate_translations(po_file, translations_dir / loc / 'LC_MESSAGES' / 'messages.po')
 
     except subprocess.CalledProcessError as err:
         click.secho('Error: ' + err, fg='red', bold=True, err=True)
@@ -350,6 +350,24 @@ def _get_po_missing_translations(*po_files):
 
     print('Necessary translations:')
     print(necessary_translations)
+
+
+def _get_po_duplicate_translations(*po_files):
+    po_data_list = [_parse_po_file(po_file) for po_file in po_files]
+    translations = {}
+    duplicates = {}
+    
+    for catalog in po_data_list:
+        for msg in catalog:
+            if msg.string and msg.id:
+                if msg.id in translations and translations[msg.id][0] != msg.string:
+                    translations[msg.id].append(msg.string)
+                    duplicates[msg.id] = translations[msg.id]
+                else:
+                    translations[msg.id] = [msg.string]
+
+    print(len(duplicates.keys()), 'Duplicates:')
+    print(duplicates)
 
 # -- END TODO --
 
