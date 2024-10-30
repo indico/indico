@@ -3,12 +3,17 @@
         <h1>{% trans %}Table of contents{% endtrans %}</h1>
         {% for day in days %}
             <div class="toc-item toc-item-main">
-                <a href="#day-{{ loop.index }}">{{ day|format_skeleton('EEEEdMMMM') }}</a>
+                <a href="#day-{{ loop.index }}">{{ day|format_date('EEEE, d MMMM', timezone=event.tz) }}</a>
             </div>
             {% if show_sessions %}
                 <div class="toc-sessions">
                     {% for entry in days[day] %}
-                        {% if entry.type == 1 or (entry.type == 2 and show_contribs) or (entry.type == 3 and show_breaks) %}
+                        {% set can_render_item = (
+                            entry.type.name == 'SESSION_BLOCK' or
+                            (entry.type.name == 'CONTRIBUTION' and show_contribs) or
+                            (entry.type.name == 'BREAK' and show_breaks) 
+                        )%}
+                        {% if can_render_item %}
                             {{ render_toc_item(entry) }}
                         {% endif %}
                     {% endfor %}
