@@ -106,7 +106,7 @@ function MultiChoiceInputComponent({
               </td>
               <td>
                 {choice.isEnabled && !!choice.price && (
-                  <Label pointing="left">{formatPrice(choice.price)}</Label>
+                  <Label pointing="left">{formatPrice(choice)}</Label>
                 )}
               </td>
               <td>
