@@ -36,6 +36,8 @@ Improvements
 - Enforce browser-side caching of event logos and custom stylesheets (:issue:`6555`, :pr:`6559`)
 - Default to banner-style (full width) logos in newly created conference events (:pr:`6572`,
   thanks :user:`omegak`)
+- Add email placeholder for the picture associated with a registration (:pr:`6580`, thanks
+  :user:`vtran99`)
 
 Bugfixes
 ^^^^^^^^
