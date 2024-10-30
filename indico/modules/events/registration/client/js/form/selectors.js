@@ -26,6 +26,18 @@ export const getCurrency = createSelector(
   staticData => staticData.currency
 );
 
+/** Get the price formatter function. */
+export const getPriceFormatter = createSelector(
+  getCurrency,
+  currency => price =>
+    new Intl.NumberFormat(document.documentElement.lang, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price)
+);
+
 /** Get a sorted list of enabled top-level sections. */
 const getSections = createSelector(
   getFlatSections,
