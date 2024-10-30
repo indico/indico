@@ -2,7 +2,7 @@
     {% for day in days %}
         <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
-                <h2>{{ day|format_skeleton('EEEEdMMMM') }}</h2>
+                <h2>{{ day|format_date('EEEE, d MMMM', timezone=event.tz)  }}</h2>
             </div>
             {% for entry in days[day] %}
                 {% set should_render = (
@@ -119,7 +119,7 @@
                                     <div class="contrib-heading">
                                         {% if not session.is_poster %}
                                             <span class="timebox inherited-bg-color inherited-txt-color">
-                                                {{ child.start_dt|format_time(timezone=entry.event.tz) }} - {{ child.end_dt|format_time(timezone=entry.event.tz) }}
+                                                {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='hh:mm') }}
                                                 {% if show_length_contribs %}
                                                     ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
                                                 {% endif %}
@@ -193,10 +193,9 @@
 {% macro render_block_date(entry, day, print_date_close_to_sessions) %}
     {% if print_date_close_to_sessions %}
         <p class="session-block-date">
-            <b>{{ day|format_skeleton('EEEEdMMMM') }}</b>
+            <b>{{ day|format_date('EEEE, d MMMM', timezone=entry.event.tz) }}</b>
             <span class="timebox">
-                {{ format_interval(entry.start_dt, entry.end_dt, format='hh:mm a', locale=entry.event.tz) }} <br />
-                {{ entry.start_dt|format_time(timezone=entry.event.tz) }} - {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
+                {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='hh:mm') }}
             </span>
         </p>
     {% endif %}
