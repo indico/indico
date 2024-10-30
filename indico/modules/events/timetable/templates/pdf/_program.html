@@ -195,6 +195,7 @@
         <p class="session-block-date">
             <b>{{ day|format_skeleton('EEEEdMMMM') }}</b>
             <span class="timebox">
+                {{ format_interval(entry.start_dt, entry.end_dt, format='hh:mm a', locale=entry.event.tz) }} <br />
                 {{ entry.start_dt|format_time(timezone=entry.event.tz) }} - {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
             </span>
         </p>
