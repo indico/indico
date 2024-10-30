@@ -39,14 +39,17 @@ class PicturePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, regform, registration):
-        picture_data = registration.get_personal_data_picture()
-        if not picture_data:
+        if not (picture_data := registration.get_personal_data_picture()):
             return ''
-        style = f'"max-height: {cls.max_size}; max-width: {cls.max_size};'
-        style += ' white-space: normal; padding-bottom: 10px; object-fit: cover;"'
+        style = ' '.join([
+            f'max-height: {cls.max_size};',
+            f'max-width: {cls.max_size};',
+            'white-space: normal;',
+            'padding-bottom: 10px;',
+            'object-fit: cover;',
+        ])
         if request.endpoint == 'event_registration.email_registrants_preview':
-            url = url_for('event_registration.registration_picture', picture_data.locator.file,
-                          _external=True, token=registration.uuid)
+            url = url_for('event_registration.manage_registration_file', picture_data.locator.file)
         else:
             url = f'cid:{picture_data.attachment_cid}'
         return Markup('<img alt="Registrant picture" src="{url}" style="{style}">').format(url=url, style=style)
