@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import request
 from markupsafe import Markup
 
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -29,6 +30,29 @@ class LastNamePlaceholder(Placeholder):
     @classmethod
     def render(cls, regform, registration):
         return registration.last_name
+
+
+class PicturePlaceholder(Placeholder):
+    name = 'picture'
+    description = _('Picture of the person')
+    max_size = '250px'
+
+    @classmethod
+    def render(cls, regform, registration):
+        if not (picture_data := registration.get_personal_data_picture()):
+            return ''
+        style = ' '.join([
+            f'max-height: {cls.max_size};',
+            f'max-width: {cls.max_size};',
+            'white-space: normal;',
+            'padding-bottom: 10px;',
+            'object-fit: cover;',
+        ])
+        if request.endpoint == 'event_registration.email_registrants_preview':
+            url = url_for('event_registration.manage_registration_file', picture_data.locator.file)
+        else:
+            url = f'cid:{picture_data.attachment_cid}'
+        return Markup('<img alt="Registrant picture" src="{url}" style="{style}">').format(url=url, style=style)
 
 
 class EventTitlePlaceholder(Placeholder):
@@ -109,7 +133,8 @@ class FieldPlaceholder(ParametrizedPlaceholder):
 
     @classmethod
     def iter_param_info(cls, regform, registration):
-        own_placeholder_types = {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
+        own_placeholder_types = {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name,
+                                 PersonalDataType.picture}
         for field in sorted(regform.active_fields, key=lambda x: (x.parent.position, x.position)):
             if field.personal_data_type in own_placeholder_types:
                 continue

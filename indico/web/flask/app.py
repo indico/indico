@@ -248,7 +248,7 @@ def setup_jinja(app):
     app.add_template_filter(alpha_enum)
     app.add_template_filter(crc32)
     app.add_template_filter(bool)
-    app.add_template_filter(lambda s: Markup(sanitize_html(s or '')), 'sanitize_html')
+    app.add_template_filter(lambda s, **kwargs: Markup(sanitize_html(s or '', **kwargs)), 'sanitize_html')
     app.add_template_filter(RichMarkup, 'rich_markup')
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!

@@ -612,10 +612,13 @@ class IndicoCSSSanitizer(CSSSanitizer):
         return super().sanitize_css(style)
 
 
-def sanitize_html(string):
+def sanitize_html(string, *, allow_cid=False):
     css_sanitizer = IndicoCSSSanitizer(allowed_css_properties=BLEACH_ALLOWED_STYLES_HTML)
+    protocols = set(bleach.ALLOWED_PROTOCOLS)
+    if allow_cid:
+        protocols.add('cid')
     return bleach.clean(string, tags=BLEACH_ALLOWED_TAGS_HTML, attributes=BLEACH_ALLOWED_ATTRIBUTES_HTML,
-                        css_sanitizer=css_sanitizer)
+                        protocols=protocols, css_sanitizer=css_sanitizer)
 
 
 def html_to_plaintext(string):

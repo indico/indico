@@ -50,6 +50,7 @@ from indico.modules.events.registration.models.items import PersonalDataType, Re
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_receipt_created,
                                                               notify_registration_state_update)
+from indico.modules.events.registration.placeholders.registrations import PicturePlaceholder
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
                                                      generate_spreadsheet_from_registrations,
@@ -305,7 +306,9 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                 attach_ticket = (
                     'attach_ticket' in form and form.attach_ticket.data and not is_ticket_blocked
                 )
-                attachments = get_ticket_attachments(registration) if attach_ticket else None
+                attachments = get_ticket_attachments(registration) if attach_ticket else []
+                if PicturePlaceholder.is_in(form.body.data):
+                    attachments += registration.get_picture_attachments(personal_data_only=True)
                 email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
                                    from_address=form.from_address.data, template=template, html=True,
                                    attachments=attachments)
