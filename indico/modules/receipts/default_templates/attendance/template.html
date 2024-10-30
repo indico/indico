@@ -46,23 +46,21 @@
 {%- else %}
   {% set date_range = 'on {}'.format(event.start_dt | format_date('dd.MM.YYYY')) %}
 {%- endif -%}
-    {%- if custom_fields.show_affiliation and personal_data.affiliation %}
-    {% set person = '<em>{} {}</em> (<em>{}</em>)'.format(personal_data.first_name | escape, personal_data.last_name | escape, personal_data.affiliation | escape) %}
+{%- if custom_fields.show_affiliation and personal_data.affiliation %}
+  {% set person = '<em>{} {}</em> (<em>{}</em>)'.format(personal_data.first_name | escape, personal_data.last_name | escape, personal_data.affiliation | escape) %}
 {%- else %}
-    {% set person = '<em>{} {}</em>'.format(personal_data.first_name | escape, personal_data.last_name | escape) %}
+  {% set person = '<em>{} {}</em>'.format(personal_data.first_name | escape, personal_data.last_name | escape) %}
 {%- endif -%}
 
 <p>
-  {% autoescape false %}
-    {{ custom_fields.text | format_placeholders(
-      person=person,
-      event='<em>{}</em>'.format(event.title | escape),
-      date_range=date_range,
-      start_date=start_date,
-      end_date=end_date,
-      venue='<em>{}</em>'.format((custom_fields.venue or event.venue_name) | escape)
-    ) }}
-  {% endautoescape %}
+  {{ custom_fields.text | format_placeholders(
+    person=person,
+    event='<em>{}</em>'.format(event.title | escape),
+    date_range=date_range,
+    start_date=start_date,
+    end_date=end_date,
+    venue='<em>{}</em>'.format((custom_fields.venue or event.venue_name) | escape)
+  ) | safe }}
 </p>
 
 <p>

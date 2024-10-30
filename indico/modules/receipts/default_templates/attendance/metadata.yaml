@@ -40,7 +40,7 @@ custom_fields:
     attributes:
       label: Certificate Text
       value: |
-        The Organizing Commitee certifies that {person} participated in the event {event}, which
+        The Organizing Committee certifies that {person} participated in the event {event}, which
         took place {date_range}, at {venue}.
       description: |
         The text to be shown on the certificate.
