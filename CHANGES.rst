@@ -55,6 +55,7 @@ Bugfixes
 - Only allow marking unpaid registrations as paid (:issue:`6330`, :pr:`6578`)
 - Do not allow mixing notification rules for invited abstracts with other rules (:issue:`6563`,
   :pr:`6567`)
+- Use locale-aware price formatting in registration form fields (:pr:`6586`)
 
 Accessibility
 ^^^^^^^^^^^^^
