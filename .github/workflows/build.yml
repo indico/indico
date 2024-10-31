@@ -11,19 +11,19 @@ on:
       - '!3.0.*'
       - '!3.1.*'
   pull_request:
-      branches:
-        - 'master'
-        - 'a11y'
-        - '*.x'
-        - '!1.*'
-        - '!2.*'
-        - '!3.0.*'
-        - '!3.1.*'
-      types:
-        - opened
-        - reopened
-        - synchronize
-        - labeled
+    branches:
+      - 'master'
+      - 'a11y'
+      - '*.x'
+      - '!1.*'
+      - '!2.*'
+      - '!3.0.*'
+      - '!3.1.*'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
 
 env:
   TZ: Europe/Zurich
