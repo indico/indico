@@ -163,13 +163,14 @@ class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
 def create_pdf(html, css, event) -> BytesIO:
     css_url_fetcher = sandboxed_url_fetcher(event)
     html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
-
     css = CSS(string=css, url_fetcher=css_url_fetcher)
     documents = [
         HTML(string=html, url_fetcher=html_url_fetcher).render(stylesheets=(css,))
     ]
     all_pages = [p for doc in documents for p in doc.pages]
+
     f = BytesIO()
     documents[0].copy(all_pages).write_pdf(f)
     f.seek(0)
+
     return f
