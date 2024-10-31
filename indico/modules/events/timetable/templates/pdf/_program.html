@@ -54,7 +54,7 @@
     {% set presenters = session_block.speakers if is_contribution else session_block.person_links %}
     {% set contributions = session_block.contributions %}
     {% set show_session_block_content = (
-        not entry.type.name == 'BREAK' and
+        entry.type.name != 'BREAK' and
         (
             entry.children or
             (show_session_description and session.description) or
@@ -222,9 +222,8 @@
 
 {% macro render_place(entry) %}
     {% set entry = entry.object if entry.object else entry %}
-    {% set place_arr = [entry.venue_name or '', entry.room_name or '', entry.address or ''] %}
 
-    {{ place_arr | select | join(', ') }}
+    {{ [entry.venue_name, entry.room_name, entry.address] | select | join(', ') }}
 {% endmacro %}
 
 {% macro render_names(people, show_title=false, show_affiliation=false) %}

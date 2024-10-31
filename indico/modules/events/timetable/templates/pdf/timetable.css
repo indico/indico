@@ -33,6 +33,10 @@ body {
   padding: 5px;
 }
 
+.cover .location {
+  margin-bottom: 0;
+}
+
 .cover > div.cover-wrapper {
   position: absolute;
   left: 0;
