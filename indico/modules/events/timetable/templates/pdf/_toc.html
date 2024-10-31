@@ -25,10 +25,8 @@
 
 {% macro render_toc_item(entry) %}
     <div class="toc-item">
-        {% set block = entry.object %}
-
         <a href="#entry-{{ entry.id }}">
-            {{ block.title or block.session.title }}
+            {{ entry.object.title or entry.object.session.title }}
         </a>
     </div>
 {% endmacro %}
