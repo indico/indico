@@ -37,6 +37,10 @@ body {
   margin-bottom: 4px;
 }
 
+.cover .address {
+  display: block;
+}
+
 .cover > div.cover-wrapper {
   position: absolute;
   left: 0;
@@ -122,10 +126,6 @@ body {
 #footer::after {
   content: target-counter('#footer', page, decimal);
 }
-
-/* .session-block {
-  display: flex;
-} */
 
 /* Main content */
 .session-block.contribution .inherited-bg-color {

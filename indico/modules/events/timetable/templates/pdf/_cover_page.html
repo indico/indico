@@ -13,11 +13,12 @@
                 {% if event.has_location_info %}
                     <div>
                         <h4 class="location">Location:</h4>
-                        {{ [event.venue_name, event.room_name] | select | join(', ') }}
-                        {% if (event.venue_name or event.room_name) and event.address %}
-                            <br />
-                            {{ event.address }}
-                        {% endif %}
+                        <p>
+                            {{ [event.venue_name, event.room_name] | select | join(', ') }}
+                            {% if (event.venue_name or event.room_name) and event.address %}
+                                <span class="address">{{ event.address }}</span>
+                            {% endif %}
+                        </p>
                     </div>
                 {% endif %}
             </div>
