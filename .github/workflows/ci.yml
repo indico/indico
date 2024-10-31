@@ -10,11 +10,13 @@ on:
       - master
       - '*.x'
       - a11y
+      - timetable
   pull_request:
     branches:
       - master
       - '*.x'
       - a11y
+      - timetable
 
 jobs:
   setup:
