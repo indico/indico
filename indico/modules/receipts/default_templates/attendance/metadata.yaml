@@ -1,0 +1,110 @@
+custom_fields:
+  - name: document_title
+    type: input
+    attributes:
+      label: Document Title
+      value: Certificate of Attendance
+      description: |
+        The title of the document, shown at the top of the page.
+
+  - name: address_from
+    type: textarea
+    attributes:
+      label: Organizer Address
+      description: |
+        The address of the entity who is issuing this receipt.
+
+  - name: venue
+    type: input
+    attributes:
+      label: Venue
+      description: |
+        A custom venue name instead of the event's venue.
+
+  - name: logo
+    type: image
+    attributes:
+      label: Logo
+      description: |
+        A logo image to be shown on the receipt.
+
+  - name: add_url
+    type: checkbox
+    attributes:
+      label: Add event URL?
+      description: |
+        Whether to include the URL of the event on the receipt.
+
+  - name: text
+    type: textarea
+    attributes:
+      label: Certificate Text
+      value: |
+        The Organizing Committee certifies that {person} participated in the event {event}, which
+        took place {date_range}, at {venue}.
+      description: |
+        The text to be shown on the certificate.
+      placeholders:
+        person: Full name of the participant
+        event: Title of the event
+        date_range: Date range of the event
+        start_date: Start date of the event
+        end_date: End date of the event
+        venue: Venue of the event
+
+  - name: show_affiliation
+    type: checkbox
+    attributes:
+      label: Show participant affiliation
+      description: |
+        Whether to include the affiliation of the registrant next to their name.
+
+  - name: place
+    type: input
+    attributes:
+      label: Place of Signature
+
+  - name: signature_name_0
+    type: input
+    attributes:
+      label: 1st Signature Name
+
+  - name: signature_position_0
+    type: input
+    attributes:
+      label: 1st Signature Position
+
+  - name: signature_url_0
+    type: image
+    attributes:
+      label: 1st Signature Image
+
+  - name: signature_name_1
+    type: input
+    attributes:
+      label: 2nd Signature Name
+
+  - name: signature_position_1
+    type: input
+    attributes:
+      label: 2nd Signature Position
+
+  - name: signature_url_1
+    type: image
+    attributes:
+      label: 2nd Signature Image
+
+  - name: signature_name_2
+    type: input
+    attributes:
+      label: 3rd Signature Name
+
+  - name: signature_position_2
+    type: input
+    attributes:
+      label: 3rd Signature Position
+
+  - name: signature_url_2
+    type: image
+    attributes:
+      label: 3rd Signature Image

@@ -11,20 +11,28 @@ function smartCamelCase(string) {
   return _.camelCase(string).replace(/Url/g, 'URL');
 }
 
-export function camelizeKeys(obj) {
+/**
+ * Camelizes keys of an object recursively.
+ *
+ * @param {Object} obj - Object to camelize
+ * @param {string|null} skip - Key of object to skip
+ */
+export function camelizeKeys(obj, skip = null) {
   if (!_.isPlainObject(obj) && !_.isArray(obj)) {
     return obj;
   }
 
   if (_.isArray(obj)) {
-    return obj.map(camelizeKeys);
+    return obj.map(x => camelizeKeys(x, skip));
   }
 
   return Object.entries(obj).reduce((accum, [key, value]) => {
-    if (key.match(/^[A-Za-z_]+$/)) {
-      return {...accum, [smartCamelCase(key)]: camelizeKeys(value)};
+    if (skip && skip === key) {
+      return {...accum, [smartCamelCase(key)]: value};
+    } else if (key.match(/^[A-Za-z_]+$/)) {
+      return {...accum, [smartCamelCase(key)]: camelizeKeys(value, skip)};
     } else {
-      return {...accum, [key]: camelizeKeys(value)};
+      return {...accum, [key]: camelizeKeys(value, skip)};
     }
   }, {});
 }

@@ -87,6 +87,7 @@ export default function PrintReceiptsModal({onClose, registrationIds, eventId}) 
   const {data: templateList, loading} = useIndicoAxios(allTemplatesURL({event_id: eventId}), {
     trigger: eventId,
     camelize: true,
+    skipCamelize: 'placeholders',
   });
   const ready = !loading && !!templateList;
 

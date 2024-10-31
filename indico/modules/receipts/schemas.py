@@ -47,12 +47,17 @@ class _DropdownAttributesSchema(_AttributesSchemaBase):
             raise ValidationError('The provided value is out of range')
 
 
-class _InputAttributesSchema(_AttributesSchemaBase):
+class _TextAttributesSchemaBase(_AttributesSchemaBase):
     value = fields.String()
+    placeholders = fields.Dict(keys=fields.String(), values=fields.String())
 
 
-class _TextareaAttributesSchema(_AttributesSchemaBase):
-    value = fields.String()
+class _InputAttributesSchema(_TextAttributesSchemaBase):
+    pass
+
+
+class _TextareaAttributesSchema(_TextAttributesSchemaBase):
+    pass
 
 
 class _ImageAttributesSchema(_AttributesSchemaBase):

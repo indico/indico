@@ -38,6 +38,8 @@ Improvements
   thanks :user:`omegak`)
 - Add email placeholder for the picture associated with a registration (:pr:`6580`, thanks
   :user:`vtran99`)
+- Allow setting placeholders for text fields in receipt templates (:pr:`6587`)
+- Add a new receipt template for Certificates of Attendance (:pr:`6587`)
 
 Bugfixes
 ^^^^^^^^
