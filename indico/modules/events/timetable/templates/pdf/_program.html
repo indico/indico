@@ -148,7 +148,7 @@
 
     {% if speakers %}
         <p>
-            <b>{{ ngettext('Speaker', 'Speakers', speakers|length)}}</b><br />
+            <b>{{ ngettext('Speaker', 'Speakers', speakers|length) }}</b><br />
             {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
         </p>
     {% endif %}
