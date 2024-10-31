@@ -162,7 +162,6 @@
     {% if show_abstract and (not dont_show_poster_abstract or entry.is_poster) and contrib.description %}
         <div class="description">
             <b>{% trans %}Description{% endtrans %}</b>
-            {# Description can be markdown #}
             <div>{{ contrib.description }}</div>
         </div>
     {% endif %}
