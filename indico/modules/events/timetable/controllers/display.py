@@ -110,9 +110,12 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
     @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
     def _process(self, download):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
-        if form.validate_on_submit():
 
+        if form.validate_on_submit():
             days = {}
+            now = now_utc()
+            css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
+
             for day in self.event.iter_days():
                 entries = (self.event.timetable_entries
                            .filter(
@@ -121,7 +124,6 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                            .order_by(TimetableEntry.start_dt))
                 days[day] = entries
 
-            now = now_utc()
             html = render_template(
                 'events/timetable/pdf/timetable.html',
                 event=self.event,
@@ -142,8 +144,6 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 show_session_description=form.session_info.data['showSessionDescription'],
                 print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
             )
-
-            css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
 
             if download:
                 return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
