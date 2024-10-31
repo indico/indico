@@ -25,16 +25,10 @@
 
 {% macro render_toc_item(entry) %}
     <div class="toc-item">
-        {% if entry.type.name == 'SESSION_BLOCK' %}
-            {% set session_block = entry.object %}
-            {% set session = session_block.session %}
-            <a href="#entry-{{ entry.id }}">{{ session_block.title or session.title }}</a>
-        {% elif entry.type.name == 'CONTRIBUTION' %}
-            {% set contrib = entry.object %}
-            <a href="#entry-{{ entry.id }}">{{ contrib.title }}</a>
-        {% elif entry.type.name == 'BREAK' %}
-            {% set break = entry.object %}
-            <a href="#entry-{{ entry.id }}">{{ break.title }}</a>
-        {% endif %}
+        {% set block = entry.object %}
+
+        <a href="#entry-{{ entry.id }}">
+            {{ block.title or block.session.title }}
+        </a>
     </div>
 {% endmacro %}
