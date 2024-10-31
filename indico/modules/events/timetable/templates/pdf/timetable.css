@@ -27,6 +27,12 @@ body {
   counter-reset: program-page 7;
 }
 
+.cover .logo {
+  max-width: 80%;
+  max-height: 300px;
+  padding: 5px;
+}
+
 .cover > div.cover-wrapper {
   position: absolute;
   left: 0;
@@ -43,6 +49,7 @@ body {
 .cover > div.cover-wrapper > div {
   text-align: center;
   width: 100%;
+  margin: 20px;
 }
 
 /* TOC */

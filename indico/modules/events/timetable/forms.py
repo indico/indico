@@ -161,7 +161,6 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 
 
 class TimetablePDFExportForm(IndicoForm):
-    _pdf_options_fields = {'pagesize'}
 
     advanced = BooleanField(_('Advanced timetable'), widget=SwitchWidget(),
                             description=_('Advanced customization options'))
@@ -188,8 +187,7 @@ class TimetablePDFExportForm(IndicoForm):
         if not self.advanced.data:
             fields = ('visible_entries',)
         else:
-            fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token',
-                                                                                                     'advanced'}
+            fields = set(get_form_field_names(TimetablePDFExportForm)) - {'csrf_token', 'advanced'}
         data = {}
         for fieldname in fields:
             data.update(getattr(self, fieldname).data)
