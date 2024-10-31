@@ -76,24 +76,26 @@
                 {% endif %}
             </h3>
             <div class="session-block-title-info">
-                <p><b>
-                    {% if entry.type.name == 'CONTRIBUTION' %}
-                        {% trans %}Contribution{% endtrans %}
-                    {% elif entry.type.name == 'BREAK' %}
-                        {% trans %}Break{% endtrans %}
-                    {% elif session.is_poster %}
-                        {% trans %}Poster Session{% endtrans %}
-                    {% else %}
-                        {% trans %}Session{% endtrans %}
-                    {% endif %}
-                </b></p>
                 <p>
-                    <b>{% trans %}Location{% endtrans %}:</b>
+                    <span class="bold">
+                        {% if entry.type.name == 'CONTRIBUTION' %}
+                            {% trans %}Contribution{% endtrans %}
+                        {% elif entry.type.name == 'BREAK' %}
+                            {% trans %}Break{% endtrans %}
+                        {% elif session.is_poster %}
+                            {% trans %}Poster Session{% endtrans %}
+                        {% else %}
+                            {% trans %}Session{% endtrans %}
+                        {% endif %}
+                    </span>
+                </p>
+                <p>
+                    <span class="bold">{% trans %}Location{% endtrans %}:</span>
                     {{ render_place(entry) }}
                 </p>
                 {% if entry.type.name != 'BREAK' and presenters %}
                     <p>
-                        <b>{{ ngettext('Speaker', 'Speakers', presenters|length) if is_contribution else ngettext('Convener', 'Conveners', presenters|length) }}:</b>
+                        <span class="bold">{{ ngettext('Speaker', 'Speakers', presenters|length) if is_contribution else ngettext('Convener', 'Conveners', presenters|length) }}:</span>
                         {{ render_names(presenters, show_title=show_title, show_affiliation=show_affiliation) }}
                     </p>
                 {% endif %}
@@ -148,26 +150,26 @@
 
     {% if speakers %}
         <p>
-            <b>{{ ngettext('Speaker', 'Speakers', speakers|length) }}</b><br />
+            <span class="bold">{{ ngettext('Speaker', 'Speakers', speakers|length) }}</span><br />
             {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
         </p>
     {% endif %}
 
     {% if not contrib.inherit_location and contrib.has_location_info %}
         <p>
-            <b>{% trans %}Location{% endtrans %}</b><br />
+            <span class="bold">{% trans %}Location{% endtrans %}</span><br />
             {{ render_place(contrib) }}
         </p>
     {% endif %}
     {% if show_abstract and (not dont_show_poster_abstract or entry.is_poster) and contrib.description %}
         <div class="description">
-            <b>{% trans %}Description{% endtrans %}</b>
+            <span class="bold">{% trans %}Description{% endtrans %}</span>
             <div>{{ contrib.description }}</div>
         </div>
     {% endif %}
     {% if contrib.subcontributions %}
         <div>
-            <b>{% trans %}Subcontributions{% endtrans %}</b>
+            <span class="bold">{% trans %}Subcontributions{% endtrans %}</span>
             <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
                 {% for subchild in contrib.subcontributions %}
                     <li class="inherited-border-color">
@@ -192,7 +194,7 @@
 {% macro render_block_date(entry, day, print_date_close_to_sessions) %}
     {% if print_date_close_to_sessions %}
         <p class="session-block-date">
-            <b>{{ day|format_date('EEEE, d MMMM', timezone=entry.event.tz) }}</b>
+            <span class="bold">{{ day|format_date('EEEE, d MMMM', timezone=entry.event.tz) }}</span>
             <span class="timebox">
                 {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='hh:mm') }}
             </span>
