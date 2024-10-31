@@ -14,7 +14,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import {NoteEditor} from './NoteEditor';
 
-export default function ManageNotes({icon, title, apiURL, imageUploadURL, getNoteURL}) {
+export default function ManageNotes({icon, title, apiURL, imageUploadURL, getNoteURL, modalTitle}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -81,6 +81,7 @@ export default function ManageNotes({icon, title, apiURL, imageUploadURL, getNot
             }
           }}
           getNoteURL={getNoteURL}
+          modalTitle={modalTitle}
         />
       )}
     </>
@@ -93,6 +94,7 @@ ManageNotes.propTypes = {
   apiURL: PropTypes.string.isRequired,
   imageUploadURL: PropTypes.string.isRequired,
   getNoteURL: PropTypes.string,
+  modalTitle: PropTypes.string,
 };
 
 ManageNotes.defaultProps = {

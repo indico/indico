@@ -29,7 +29,7 @@ import {ConflictModal} from './ConflictModal';
 
 import 'react-markdown-editor-lite/lib/index.css';
 
-export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
+export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL, modalTitle}) {
   const [currentInput, setCurrentInput] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [allowWithoutChange, setAllowWithoutChange] = useState(false);
@@ -184,7 +184,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL}) {
       {!loading && !closeAndReload && currentInput !== undefined && (
         <FinalModalForm
           id="edit-minutes"
-          header={Translate.string('Edit Minutes')}
+          header={modalTitle || Translate.string('Edit Minutes')}
           submitLabel={Translate.string('Save')}
           style={{minWidth: '65vw'}}
           size="large"
@@ -237,6 +237,7 @@ NoteEditor.propTypes = {
   imageUploadURL: PropTypes.string.isRequired,
   closeModal: PropTypes.func.isRequired,
   getNoteURL: PropTypes.string,
+  modalTitle: PropTypes.string,
 };
 
 NoteEditor.defaultProps = {

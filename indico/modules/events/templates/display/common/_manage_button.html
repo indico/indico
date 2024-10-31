@@ -6,11 +6,13 @@
     {% else %}
         {% set title = _('Add minutes') %}
     {% endif %}
+    {% set modal_title = title ~ ": " ~ item.title %}
     <div class="manage-notes-container"
          data-api-url="{{ url_for('event_notes.api', item) }}"
          {% if item.can_manage_attachments(session.user) %}
              data-image-upload-url="{{ url_for('attachments.upload_editor', item) }}"
          {% endif %}
+         data-modal-title="{{ modal_title }}"
          data-title="{{ title }}"></div>
 {%- endmacro %}
 
