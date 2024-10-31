@@ -72,6 +72,8 @@ Internal Changes
 
 - Make positioning logic from TipBase generic and reusable (:pr:`6577`, :pr:`6588`, thanks
   :user:`foxbunny`)
+- Add additional signals related to videoconferences and their event links (:pr:`6475`)
+- Videoconference plugins now need to implement a ``delete_room`` method (:pr:`6475`)
 
 
 Version 3.3.4
