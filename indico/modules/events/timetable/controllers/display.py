@@ -8,6 +8,7 @@
 from io import BytesIO
 
 from flask import jsonify, render_template, request, session
+from marshmallow import fields
 from weasyprint import CSS, HTML
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -27,6 +28,7 @@ from indico.modules.events.views import WPSimpleEventDisplay
 from indico.modules.receipts.util import sandboxed_url_fetcher
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -105,7 +107,8 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
 
 
 class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
-    def _process(self):
+    @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
+    def _process(self, download):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():
 
@@ -142,10 +145,10 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
 
             css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
 
-            if request.args.get('download') == '1':
+            if download:
                 return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
             else:
-                url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
+                url = url_for(request.endpoint, **dict(request.view_args, download=True, **request.args.to_dict(False)))
                 return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
                                 back_url=url_for('.timetable', self.event))
