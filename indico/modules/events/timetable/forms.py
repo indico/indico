@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 from flask import request
 from pytz import utc
-from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
+from wtforms.fields import BooleanField, HiddenField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from indico.modules.events.contributions import contribution_settings
@@ -175,8 +175,6 @@ class TimetablePDFExportForm(IndicoForm):
                                                                [HiddenUnless('advanced')],
                                                                choices=_VISIBLE_ENTRIES_CHOICES)
     other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
-    pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
-                                                    ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
     submitted = HiddenField()
 
     def is_submitted(self):
