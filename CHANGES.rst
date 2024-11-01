@@ -40,6 +40,7 @@ Improvements
   :user:`vtran99`)
 - Allow setting placeholders for text fields in receipt templates (:pr:`6587`)
 - Add a new receipt template for Certificates of Attendance (:pr:`6587`)
+- Show correct repetition details for bookings repeating every n weeks (:pr:`6592`)
 
 Bugfixes
 ^^^^^^^^

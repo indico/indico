@@ -150,7 +150,12 @@ class TimelineItem extends React.Component {
           count: repeatInterval,
         });
       } else if (repeatFrequency === 'WEEK') {
-        return Translate.string('Recurs weekly');
+        return PluralTranslate.string(
+          'Recurs weekly',
+          'Recurs every {count} weeks',
+          repeatInterval,
+          {count: repeatInterval}
+        );
       } else if (repeatFrequency === 'MONTH') {
         return PluralTranslate.string(
           'Recurs monthly',
@@ -207,10 +212,13 @@ class TimelineItem extends React.Component {
           >
             <Message.Content>
               <Translate>
-                Every{' '}
+                On{' '}
                 <Param
                   name="weekdays"
-                  value={renderRecurrenceWeekdays(reservation.recurrenceWeekdays)}
+                  value={renderRecurrenceWeekdays({
+                    weekdays: reservation.recurrenceWeekdays,
+                    weekdaysOnly: true,
+                  })}
                 />
               </Translate>
             </Message.Content>

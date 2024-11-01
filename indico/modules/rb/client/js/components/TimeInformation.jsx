@@ -77,13 +77,13 @@ function TimeInformation({
         {recurrence.type === 'every' && recurrence.interval === 'week' && recurrenceWeekdays && (
           <Segment>
             <div>
-              <div>
+              <strong>
                 <Icon name="sync alternate" />
-                <Translate as="strong">
-                  Every{' '}
-                  <Param name="weekdays" value={renderRecurrenceWeekdays(recurrenceWeekdays)} />
-                </Translate>
-              </div>
+                {renderRecurrenceWeekdays({
+                  weekdays: recurrenceWeekdays,
+                  repetition: recurrence.number,
+                })}
+              </strong>
             </div>
           </Segment>
         )}
