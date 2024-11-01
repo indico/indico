@@ -14,11 +14,8 @@
 
 :global(.ui.form) .recurrence-field:global(.inline.fields) {
   display: flex;
-  justify-content: space-around;
 
   > * {
-    flex: 1;
-
     :global(.ui.input input) {
       width: 100%;
       min-width: 60px;
