@@ -96,8 +96,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 additional_params = {'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
                                      'showSessionDescription': form_data['showSessionDescription']}
             if request.args.get('download') == '1':
-                pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
-                                pagesize=form.pagesize.data, **additional_params)
+                pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, **additional_params)
                 return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
             else:
                 url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
@@ -114,7 +113,7 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
         if form.validate_on_submit():
             days = {}
             now = now_utc()
-            css = render_template('events/timetable/pdf/timetable.css', page_size=form.pagesize.data, event=self.event)
+            css = render_template('events/timetable/pdf/timetable.css')
 
             for day in self.event.iter_days():
                 entries = (self.event.timetable_entries
@@ -136,7 +135,6 @@ class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
                 show_session_toc=form.document_settings.data['showSessionTOC'],
                 show_abstract=form.contribution_info.data['showAbstract'],
                 dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'],
-                page_size=form.pagesize.data,
                 show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
                 show_length_contribs=form.contribution_info.data['showLengthContribs'],
                 show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
