@@ -20,7 +20,7 @@ from pkgutil import walk_packages
 
 import click
 from babel.messages import frontend
-from babel.messages.pofile import read_po
+from babel.messages.pofile import read_po, write_po
 from flask.helpers import get_root_path
 
 import indico
@@ -368,6 +368,23 @@ def _get_po_duplicate_translations(*po_files):
 
     print(len(duplicates.keys()), 'Duplicates:')
     print(duplicates)
+
+
+# -- END TODO --
+# TODO: Ajob concept two
+
+
+def _merge_po(*po_files):
+    po_data_list = [_parse_po_file(po_file) for po_file in po_files]
+    merged_catalog = po_data_list[0]
+    for catalog in po_data_list[1:]:
+        for msg in catalog:
+            if msg.id not in merged_catalog:
+                merged_catalog[msg.id] = msg
+
+    write_po(merged_catalog, po_files[0].open('wb'))
+
+    return merged_catalog
 
 # -- END TODO --
 
