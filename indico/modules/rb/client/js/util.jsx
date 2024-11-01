@@ -238,10 +238,10 @@ export function serializeRecurrenceInfo({type, number, interval}) {
 
 /**
  * Renders the array of recurrence weekdays into a nicely formatted string
- * @param {object} options Options object
- * @param {array} weekdays Array of weekdays
- * @param {number} repetition Recurrence repetition (e.g. every `2` weeks)
- * @param {boolean} [weekdaysOnly=false] Whether to return only the weekdays
+ * @param {object} opts Options
+ * @param {array} opts.weekdays Array of weekdays
+ * @param {number} opts.repetition Recurrence repetition (e.g. every `2` weeks)
+ * @param {boolean} opts.weekdaysOnly Whether to return only the weekdays
  * @returns {string} Formatted string of weekdays
  */
 export function renderRecurrenceWeekdays({weekdays, repetition = null, weekdaysOnly = false}) {
