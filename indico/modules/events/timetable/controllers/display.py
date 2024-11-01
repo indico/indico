@@ -80,7 +80,7 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
         return jsonify(html=html)
 
 
-class RHTimetableExportPDF(RHTimetableProtectionBase):
+class RHTimetableExportPDFLegacy(RHTimetableProtectionBase):
     def _process(self):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():
@@ -105,7 +105,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                                 back_url=url_for('.timetable', self.event))
 
 
-class RHTimetableExportWeasyPrint(RHTimetableProtectionBase):
+class RHTimetableExportPDF(RHTimetableProtectionBase):
     @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
     def _process(self, download):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)

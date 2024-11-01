@@ -265,22 +265,22 @@ type(
       $('body').css('padding', '30px');
     },
 
-    pdf: function() {
+    pdfLegacy: function() {
       if ($('html').data('static-site')) {
         window.location = build_url(Indico.Urls.Timetable.default_pdf, {
           event_id: this.eventInfo.id,
         });
       } else {
         ajaxDialog({
-          url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
+          url: build_url(Indico.Urls.Timetable.pdf_legacy, {event_id: this.eventInfo.id}),
           title: $T.gettext('Export to PDF'),
         });
       }
     },
 
-    weasyprint: function() {
+    pdf: function() {
       ajaxDialog({
-        url: build_url(Indico.Urls.Timetable.weasyprint, {event_id: this.eventInfo.id}),
+        url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
         title: $T.gettext('Export to PDF'),
       });
     },
@@ -404,14 +404,16 @@ type(
       this.pdfButton = {
         btn: Html.div('buttonWhite', $T('PDF')),
         onclick: function(btnContainer) {
+          console.log('we doin it')
           self.pdf();
         },
       };
 
-      this.weasyprintButton = {
-        btn: Html.div('buttonWhite', $T('PDF (WeasyPrint)')),
+
+      this.pdfLegacyButton = {
+        btn: Html.div('buttonWhite', $T('PDF (Legacy)')),
         onclick: function(btnContainer) {
-          self.weasyprint();
+          self.pdfLegacy();
         },
       };
 
@@ -451,7 +453,7 @@ type(
       return [
         this.printButton,
         this.pdfButton,
-        this.weasyprintButton,
+        this.pdfLegacyButton,
         this.fullScreenButton,
         this.detailsButton,
         this.filterButton,

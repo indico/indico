@@ -120,8 +120,8 @@ def generate_global_file():
             'Timetable': {
                 'management': url_rule_to_js('timetable.management'),
                 'default_pdf': url_rule_to_js('timetable.export_default_pdf'),
+                'pdf_legacy': url_rule_to_js('timetable.export_pdf_legacy'),
                 'pdf': url_rule_to_js('timetable.export_pdf'),
-                'weasyprint': url_rule_to_js('timetable.export_weasyprint'),
                 'reschedule': url_rule_to_js('timetable.reschedule'),
                 'breaks': {
                     'add': url_rule_to_js('timetable.add_break')
