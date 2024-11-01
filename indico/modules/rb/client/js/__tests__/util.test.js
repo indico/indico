@@ -117,21 +117,21 @@ describe('can render the recurrence weekdays whilst taking the locale into accou
 });
 
 describe('can render the recurrence weekdays with support for repetition', () => {
-  it('should handle a single weekday with an repetition', () => {
+  it('should handle a single weekday with a repetition', () => {
     const weekdays = ['mon'];
     const repetition = 2;
     const expected = 'Every 2 weeks on Monday';
     expect(renderRecurrenceWeekdays({weekdays, repetition})).toBe(expected);
   });
 
-  it('should handle multiple weekdays with an repetition', () => {
+  it('should handle multiple weekdays with a repetition', () => {
     const weekdays = ['mon', 'tue', 'wed'];
     const repetition = 3;
     const expected = 'Every 3 weeks on Monday, Tuesday, and Wednesday';
     expect(renderRecurrenceWeekdays({weekdays, repetition})).toBe(expected);
   });
 
-  it('should handle all weekdays with an repetition', () => {
+  it('should handle all weekdays with a repetition', () => {
     const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     const repetition = 4;
     const expected =
@@ -139,7 +139,7 @@ describe('can render the recurrence weekdays with support for repetition', () =>
     expect(renderRecurrenceWeekdays({weekdays, repetition})).toBe(expected);
   });
 
-  it('should handle all weekdays in non-sequential order with an repetition', () => {
+  it('should handle all weekdays in non-sequential order with a repetition', () => {
     const weekdays = ['wed', 'mon', 'fri', 'tue', 'sun', 'thu', 'sat'];
     const repetition = 5;
     const expected =

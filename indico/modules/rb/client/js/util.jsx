@@ -279,7 +279,7 @@ export function renderRecurrenceWeekdays({weekdays, repetition = null, weekdaysO
   // only show the repetition if it's greater than 1
   if (repetition && repetition > 1) {
     return PluralTranslate.string(
-      'Every {repetition} week on {weekdays}',
+      'Every week on {weekdays}',
       'Every {repetition} weeks on {weekdays}',
       repetition,
       {
