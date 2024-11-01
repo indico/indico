@@ -7,7 +7,7 @@
 
 from indico.modules.events.timetable.controllers.display import (RHTimetable, RHTimetableEntryInfo,
                                                                  RHTimetableExportDefaultPDF, RHTimetableExportPDF,
-                                                                 RHTimetableExportWeasyPrint)
+                                                                 RHTimetableExportPDFLegacy)
 from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddBreak,
                                                                 RHLegacyTimetableAddContribution,
                                                                 RHLegacyTimetableAddSession,
@@ -70,8 +70,9 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
+# TODO: (Ajob) Remove this route once the old timetable is completely removed
+_bp.add_url_rule('/timetable/pdf-legacy', 'export_pdf_legacy', RHTimetableExportPDFLegacy, methods=('GET', 'POST'))
 _bp.add_url_rule('/timetable/pdf', 'export_pdf', RHTimetableExportPDF, methods=('GET', 'POST'))
-_bp.add_url_rule('/timetable/weasyprint', 'export_weasyprint', RHTimetableExportWeasyPrint, methods=('GET', 'POST'))
 _bp.add_url_rule('/timetable/timetable.pdf', 'export_default_pdf', RHTimetableExportDefaultPDF)
 _bp.add_url_rule('/timetable/entry/<int:entry_id>/info', 'entry_info', RHTimetableEntryInfo)
 
