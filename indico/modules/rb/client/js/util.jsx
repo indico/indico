@@ -238,11 +238,13 @@ export function serializeRecurrenceInfo({type, number, interval}) {
 
 /**
  * Renders the array of recurrence weekdays into a nicely formatted string
+ * @param {object} options Options object
  * @param {array} weekdays Array of weekdays
  * @param {number} repetition Recurrence repetition (e.g. every `2` weeks)
+ * @param {boolean} [weekdaysOnly=false] Whether to return only the weekdays
  * @returns {string} Formatted string of weekdays
  */
-export function renderRecurrenceWeekdays(weekdays, repetition = null) {
+export function renderRecurrenceWeekdays({weekdays, repetition = null, weekdaysOnly = false}) {
   const weekdaysMap = {
     mon: moment.weekdays(1),
     tue: moment.weekdays(2),
@@ -285,6 +287,10 @@ export function renderRecurrenceWeekdays(weekdays, repetition = null) {
         weekdays: formattedWeekdays,
       }
     );
+  }
+
+  if (weekdaysOnly) {
+    return formattedWeekdays;
   }
 
   return Translate.string('Every {weekdays}', {weekdays: formattedWeekdays});
