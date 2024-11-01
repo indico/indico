@@ -206,13 +206,7 @@ class TimelineItem extends React.Component {
             attached="bottom"
           >
             <Message.Content>
-              <Translate>
-                Every{' '}
-                <Param
-                  name="weekdays"
-                  value={renderRecurrenceWeekdays(reservation.recurrenceWeekdays)}
-                />
-              </Translate>
+              {renderRecurrenceWeekdays(reservation.recurrenceWeekdays, reservation.repeatInterval)}
             </Message.Content>
           </Message>
         )}

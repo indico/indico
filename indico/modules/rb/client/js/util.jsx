@@ -239,9 +239,10 @@ export function serializeRecurrenceInfo({type, number, interval}) {
 /**
  * Renders the array of recurrence weekdays into a nicely formatted string
  * @param {array} weekdays Array of weekdays
+ * @param {number} repetition Recurrence repetition (e.g. every `2` weeks)
  * @returns {string} Formatted string of weekdays
  */
-export function renderRecurrenceWeekdays(weekdays) {
+export function renderRecurrenceWeekdays(weekdays, repetition = null) {
   const weekdaysMap = {
     mon: moment.weekdays(1),
     tue: moment.weekdays(2),
@@ -273,7 +274,20 @@ export function renderRecurrenceWeekdays(weekdays) {
     type: 'conjunction',
   }).format(sortedWeekdays.map(weekday => weekdaysMap[weekday]));
 
-  return formattedWeekdays;
+  // only show the repetition if it's greater than 1
+  if (repetition && repetition > 1) {
+    return PluralTranslate.string(
+      'Every {repetition} week on {weekdays}',
+      'Every {repetition} weeks on {weekdays}',
+      repetition,
+      {
+        repetition,
+        weekdays: formattedWeekdays,
+      }
+    );
+  }
+
+  return Translate.string('Every {weekdays}', {weekdays: formattedWeekdays});
 }
 
 const _legendLabels = {
