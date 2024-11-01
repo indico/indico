@@ -150,7 +150,12 @@ class TimelineItem extends React.Component {
           count: repeatInterval,
         });
       } else if (repeatFrequency === 'WEEK') {
-        return Translate.string('Recurs weekly');
+        return PluralTranslate.string(
+          'Recurs weekly',
+          'Recurs every {count} weeks',
+          repeatInterval,
+          {count: repeatInterval}
+        );
       } else if (repeatFrequency === 'MONTH') {
         return PluralTranslate.string(
           'Recurs monthly',
@@ -206,7 +211,7 @@ class TimelineItem extends React.Component {
             attached="bottom"
           >
             <Message.Content>
-              {renderRecurrenceWeekdays(reservation.recurrenceWeekdays, reservation.repeatInterval)}
+              {renderRecurrenceWeekdays(reservation.recurrenceWeekdays)}
             </Message.Content>
           </Message>
         )}
