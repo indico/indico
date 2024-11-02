@@ -131,6 +131,7 @@ class BookingEditForm extends React.Component {
     } = this.props;
 
     const today = moment()
+      .locale('en')
       .format('ddd')
       .toLowerCase();
 
