@@ -149,6 +149,7 @@ def update_event(event, *, update_timetable=False, _extra_log_fields=None, **dat
         # (e.g. because the event had a different type before) we always update them
         # silently.
         start_dt = data.pop('start_dt')
+        changes['start_dt'] = (event.start_dt, start_dt)
         event.move_start_dt(start_dt)
     changes.update(event.populate_from_dict(data))
     # Person links are partially updated when the WTForms field is processed,
