@@ -19,9 +19,9 @@ for lang_dir in "$translations_dir"/*/; do
     if [ -d "$src_lc_messages" ]; then
         mkdir -p "$dest_lc_messages"
 
-        msgcat "$src_lc_messages"/*.po -o "$dest_lc_messages/messages_merged.po"
+        msgcat "$src_lc_messages"/*.po -o "$dest_lc_messages/merged.po"
         
-        echo "Merged .po files in $src_lc_messages into $dest_lc_messages/messages_merged.po"
+        echo "Merged .po files in $src_lc_messages into $dest_lc_messages/merged.po"
     else
         echo "Warning: No LC_MESSAGES folder in $lang_dir. Skipping."
     fi
