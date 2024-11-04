@@ -88,19 +88,19 @@ export default function ContributionEntry({
 
     // TODO: This is not the nicest solution..
     if (elem) {
-      if (isDragging) {
+      if (isDragging || isResizing) {
         elem.style.zIndex = 1000;
-      } else {
+      } else if (!isDragging && !isResizing) {
         elem.style.zIndex = '';
       }
     }
 
     return () => {
-      if (elem && !isDragging) {
+      if (elem && !isDragging && !isResizing) {
         elem.style.zIndex = '';
       }
     };
-  }, [isDragging, blockRef]);
+  }, [isDragging, isResizing, blockRef]);
 
   return (
     <button type="button" styleName={`entry ${type === 'break' ? 'break' : ''}`} style={style}>
