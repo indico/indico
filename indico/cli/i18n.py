@@ -20,7 +20,7 @@ from pkgutil import walk_packages
 
 import click
 from babel.messages import frontend
-from babel.messages.pofile import read_po
+from babel.messages.pofile import read_po, write_po
 from flask.helpers import get_root_path
 
 import indico
@@ -364,6 +364,26 @@ def remove_empty_pot_files(path: Path, python=False, javascript=False, react=Fal
         _get_messages_react_pot(path).unlink()
 
 
+def merge_pot_files(output_file, *input_files):
+    """Merge multiple POT files into a single POT file."""
+    merged_catalog = None
+
+    for input_file in input_files:
+        with input_file.open('rb') as f:
+            catalog = read_po(f)
+
+            if merged_catalog is None:
+                merged_catalog = catalog
+            else:
+                for message in catalog:
+                    if message.id not in merged_catalog:
+                        merged_catalog[message.id] = message
+
+    if merged_catalog:
+        with output_file.open('wb') as f:
+            write_po(f, merged_catalog)
+
+
 @click.group()
 def cli():
     os.chdir(INDICO_DIR)
@@ -421,6 +441,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'ExtractMessages':
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
+        merge_pot_files(TRANSLATIONS_DIR / 'merged.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
 
 
 def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
