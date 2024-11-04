@@ -25,7 +25,8 @@ DUMMY_BMP_IMAGE = (b'BM\x1e\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x0c\x00'
 def create_event(dummy_user, dummy_category, db):
     """Return a callable which lets you create dummy events."""
 
-    def _create_event(id_=None, **kwargs):
+    def _create_event(id_=None, creator=None, creator_has_privileges=False, **kwargs):
+        creator = creator or dummy_user
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
         now = now_utc(exact=False)
@@ -35,7 +36,11 @@ def create_event(dummy_user, dummy_category, db):
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')
         kwargs.setdefault('category', dummy_category)
-        event = Event(id=id_, creator=dummy_user, acl_entries=set(), **kwargs)
+        event = Event(id=id_, creator=creator, acl_entries=set(), **kwargs)
+
+        if creator_has_privileges:
+            event.update_principal(creator, full_access=True)
+
         db.session.flush()
         return event
 

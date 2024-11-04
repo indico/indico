@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.cloning import EventCloner
 from indico.modules.vc import VCRoomEventAssociation
@@ -16,7 +17,7 @@ from indico.util.i18n import _
 class VCCloner(EventCloner):
     name = 'vc'
     friendly_name = _('Videoconference')
-    uses = {'sessions', 'contributions'}
+    uses = {'sessions', 'contributions', 'timetable'}
     is_default = True
 
     @property
@@ -64,6 +65,10 @@ class VCCloner(EventCloner):
             if not plugin:
                 continue
             clone = plugin.clone_room(old_event_vc_room, link_object)
+
             if clone:
                 # the plugin may decide to not clone the room
                 old_event_vc_room.vc_room.events.append(clone)
+                signals.vc.vc_room_cloned.send(
+                    old_event_vc_room, new_assoc=clone, vc_room=old_event_vc_room.vc_room, link_object=link_object
+                )

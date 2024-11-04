@@ -29,6 +29,7 @@ from indico.util.i18n import NullDomain, _
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
+from indico.web.forms.base import IndicoForm
 from indico.web.menu import SideMenuItem
 from indico.web.views import WPJinjaMixin
 
@@ -63,7 +64,7 @@ class IndicoPlugin(Plugin):
 
     #: WTForm for the plugin's settings (requires `configurable=True`).
     #: All fields must return JSON-serializable types.
-    settings_form = None
+    settings_form: IndicoForm | None = None
     #: A dictionary which can contain the kwargs for a specific field in the `settings_form`.
     settings_form_field_opts = {}
     #: A dictionary containing default values for settings

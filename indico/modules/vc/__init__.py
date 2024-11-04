@@ -5,11 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import has_request_context, render_template, session
+from flask import flash, has_request_context, render_template, session
 
 from indico.core import signals
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.util import MenuEntryData
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.users import User
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation
@@ -57,23 +59,45 @@ def _extend_event_management_menu(sender, event, **kwargs):
         return
     if not event.can_manage(session.user):
         return
-    return SideMenuItem('videoconference', _('Videoconference'), url_for('vc.manage_vc_rooms', event),
-                        section='services')
+    return SideMenuItem(
+        'videoconference', _('Videoconference'), url_for('vc.manage_vc_rooms', event), section='services'
+    )
 
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     def _visible(event):
         return bool(get_vc_plugins()) and VCRoomEventAssociation.find_for_event(event).has_rows()
-    return MenuEntryData(_('Videoconference'), 'videoconference_rooms', 'vc.event_videoconference',
-                         position=14, visible=_visible)
+
+    return MenuEntryData(
+        _('Videoconference'), 'videoconference_rooms', 'vc.event_videoconference', position=14, visible=_visible
+    )
 
 
 @signals.event.contribution_deleted.connect
 @signals.event.session_block_deleted.connect
-def _link_object_deleted(obj, **kwargs):
-    for event_vc_room in obj.vc_room_associations:
+def _link_object_deleted(obj: Contribution | SessionBlock, **kwargs):
+    assocs = list(obj.vc_room_associations)
+    for event_vc_room in assocs:
+        # tie the room to the event instead
+        signals.vc.vc_room_detached.send(event_vc_room, vc_room=event_vc_room.vc_room, old_link=obj, event=obj.event)
+
         event_vc_room.link_object = obj.event
+
+        signals.vc.vc_room_attached.send(
+            event_vc_room, vc_room=event_vc_room.vc_room, event=obj.event, data={}, old_link=obj
+        )
+
+    if not assocs:
+        return
+
+    if isinstance(obj, Contribution):
+        message = _('There was a videoconference associated with this contribution. It has been linked to the event '
+                    'instead')
+    else:
+        message = _('There was a videoconference associated with this session block. It has been linked to the event '
+                    'instead')
+    flash(message, 'warning')
 
 
 @signals.event.session_deleted.connect
@@ -99,6 +123,7 @@ def _topmenu_items(sender, **kwargs):
 @signals.event_management.get_cloners.connect
 def _get_vc_cloner(sender, **kwargs):
     from indico.modules.vc.clone import VCCloner
+
     return VCCloner
 
 

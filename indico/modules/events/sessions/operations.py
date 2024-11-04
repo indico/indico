@@ -43,9 +43,9 @@ def create_session_block(session_, data):
 
 def update_session(event_session, data):
     """Update a session based on the information in the `data`."""
-    event_session.populate_from_dict(data)
+    changes = event_session.populate_from_dict(data)
     db.session.flush()
-    signals.event.session_updated.send(event_session)
+    signals.event.session_updated.send(event_session, changes=changes)
     event_session.event.log(EventLogRealm.management, LogKind.change, 'Sessions',
                             f'Session "{event_session.title}" has been updated', session.user,
                             meta={'session_id': event_session.id})
@@ -54,12 +54,15 @@ def update_session(event_session, data):
 
 def delete_session(event_session):
     """Delete session from the event."""
+    signals.event.session_deleted.send(event_session)
     event_session.is_deleted = True
-    for contribution in event_session.contributions[:]:
-        contribution.session = None
+
     for block in list(event_session.blocks):
         delete_session_block(block, delete_empty_session=False, log=False)
-    signals.event.session_deleted.send(event_session)
+
+    for contribution in event_session.contributions[:]:
+        contribution.session = None
+
     event_session.event.log(EventLogRealm.management, LogKind.negative, 'Sessions',
                             f'Session "{event_session.title}" has been deleted', session.user,
                             meta={'session_id': event_session.id})
@@ -74,9 +77,9 @@ def update_session_block(session_block, data):
     if start_dt is not None:
         session_block.timetable_entry.move(start_dt)
         update_timetable_entry(session_block.timetable_entry, {'start_dt': start_dt})
-    session_block.populate_from_dict(data)
+    changes = session_block.populate_from_dict(data)
     db.session.flush()
-    signals.event.session_block_updated.send(session_block)
+    signals.event.session_block_updated.send(session_block, changes=changes)
     session_block.event.log(EventLogRealm.management, LogKind.change, 'Sessions',
                             f'Session block "{session_block.title}" has been updated', session.user,
                             meta={'session_block_id': session_block.id})

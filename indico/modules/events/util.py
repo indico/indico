@@ -432,6 +432,11 @@ def track_time_changes(auto_extend=False, user=None):
         for obj, obj_changes in changes.items():
             entry = None if isinstance(obj, Event) else obj.timetable_entry
             signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
+            if isinstance(obj, Event):
+                # remove duration from the changes dict, as the event updated signal doesn't want/need it
+                signals.event.updated.send(
+                    obj, changes={k: v for k, v in obj_changes.items() if k in {'start_dt', 'end_dt'}}
+                )
 
 
 def register_time_change(entry):
@@ -772,15 +777,20 @@ def _format_location(data):
         return None
 
 
-def split_log_location_changes(changes):
-    location_changes = changes.pop('location_data', None)
-    if location_changes is None:
-        return
+def split_log_location_changes(changes: dict) -> dict:
+    """Re-process change dict to include readable location information (for logging)."""
+    res = dict(changes)
+
+    if (location_changes := res.pop('location_data', None)) is None:
+        return res
+
     if location_changes[0]['address'] != location_changes[1]['address']:
-        changes['address'] = (location_changes[0]['address'], location_changes[1]['address'])
+        res['address'] = (location_changes[0]['address'], location_changes[1]['address'])
     venue_room_changes = (_get_venue_room_name(location_changes[0]), _get_venue_room_name(location_changes[1]))
     if venue_room_changes[0] != venue_room_changes[1]:
-        changes['venue_room'] = list(map(_format_location, venue_room_changes))
+        res['venue_room'] = list(map(_format_location, venue_room_changes))
+
+    return res
 
 
 def format_log_person(data):

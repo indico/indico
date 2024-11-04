@@ -22,23 +22,20 @@
   }
 }
 
-.i-selection.note-visibility-toggle input[type='checkbox'] {
-  & + label {
-    border-style: dashed !important;
-  }
-
+.note-visibility-toggle input[type='checkbox'] {
   &:not(:checked) + label,
   &:not(:checked) + label:hover {
     background: transparent;
   }
 
   &:checked + label {
+    &:hover {
+      background: $postit-yellow !important;
+      color: $black !important;
+    }
+
     background: $postit-yellow !important;
     color: $light-black !important;
-  }
-
-  &:checked + label:hover {
-    color: $black !important;
   }
 }
 

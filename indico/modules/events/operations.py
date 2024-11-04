@@ -159,7 +159,9 @@ def update_event(event, *, update_timetable=False, _extra_log_fields=None, **dat
     if visible_person_link_changes or 'person_link_data' in data:
         changes['person_links'] = (old_person_links, event.sorted_person_links)
     db.session.flush()
-    signals.event.updated.send(event, changes=changes)
+    if no_time_changes := {k: v for k, v in changes.items() if k not in {'start_dt', 'end_dt'}}:
+        # time changes will be handled separately
+        signals.event.updated.send(event, changes=no_time_changes)
     logger.info('Event %r updated with %r by %r', event, data, session.user)
     _log_event_update(event, changes, _extra_log_fields, visible_person_link_changes=visible_person_link_changes)
 
@@ -259,7 +261,7 @@ def _log_event_update(event, changes, extra_log_fields, visible_person_link_chan
         'enforce_locale': 'Enforce language',
         **(extra_log_fields or {})
     }
-    split_log_location_changes(changes)
+    changes = split_log_location_changes(changes)
     if not visible_person_link_changes:
         # Don't log a person link change with no visible changes (changes
         # on an existing link or reordering). It would look quite weird in

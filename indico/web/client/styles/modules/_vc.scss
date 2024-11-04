@@ -58,3 +58,45 @@ input[type='radio']:disabled + label {
 input[type='text']#vc-name.highlight {
   animation: text-changed 0.75s linear;
 }
+
+.vc-room-list {
+  display: flex;
+  flex-direction: column;
+
+  &:not(.attached) {
+    gap: 0.2em;
+  }
+}
+
+.ui.icon.message.vc-room-list-message {
+  display: flex;
+
+  > .icon {
+    width: 5%;
+  }
+
+  .content {
+    max-width: 90%;
+  }
+}
+
+.vc-room-management-table {
+  .vc-room-entry img {
+    height: 1em;
+    width: auto;
+  }
+}
+
+.vc-management-button-toolbar {
+  gap: 0.2em;
+}
+
+.ui.label.vc-room-info {
+  padding: 0.1em;
+  margin-right: 1em;
+
+  img {
+    width: 2em;
+    height: auto;
+  }
+}

@@ -12,14 +12,18 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listen
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
+from indico.modules.events.models.events import Event
+from indico.modules.users.models.users import User
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoIntEnum
+from indico.util.string import format_repr
 
 
 class VCRoomLinkType(IndicoIntEnum):
@@ -124,6 +128,28 @@ class VCRoom(db.Model):
 
     def __repr__(self):
         return f'<VCRoom({self.id}, {self.name}, {self.type})>'
+
+    def delete(self, user: User, event: Event | None = None):
+        """Delete a VC room and all its associations.
+
+        :param user: the user performing the deletion
+        :param event: the event in which the deletion happened
+        """
+        for assoc in self.events[:]:
+            Logger.get('modules.vc').info('Detaching videoconference %s from event %s (%s)',
+                                          self, assoc.event, assoc.link_object)
+            assoc.delete(user, check_vc_room=False)
+        db.session.flush()
+
+        # send signal
+        signals.vc.vc_room_deleted.send(self, event=event)
+
+        # process plugin actions
+        Logger.get('modules.vc').info(f'Deleting videoconference {self}')
+        if self.status != VCRoomStatus.deleted:
+            self.plugin.delete_room(self, event)
+            notify_deleted(self.plugin, self, self, event, user)
+        db.session.delete(self)
 
 
 class VCRoomEventAssociation(db.Model):
@@ -289,7 +315,7 @@ class VCRoomEventAssociation(db.Model):
         return _LinkObjectComparator(cls)
 
     def __repr__(self):
-        return f'<VCRoomEventAssociation({self.event_id}, {self.vc_room})>'
+        return format_repr(self, 'id', 'link_object', 'vc_room')
 
     @classmethod
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
@@ -316,32 +342,35 @@ class VCRoomEventAssociation(db.Model):
         """Get a dict mapping link objects to event vc rooms."""
         return {vcr.link_object: vcr for vcr in cls.find_for_event(event)}
 
-    def delete(self, user, delete_all=False):
+    def delete(self, user: User, *, check_vc_room: bool = True):
         """Delete a VC room from an event.
 
         If the room is not used anywhere else, the room itself is also deleted.
 
         :param user: the user performing the deletion
-        :param delete_all: if True, the room is detached from all
-                           events and deleted.
+        :param check_vc_room: whether to check as well if the VCRoom can be deleted
+                              (no more associations left)
         """
+        # send signals
+        signals.vc.vc_room_detached.send(self, vc_room=self.vc_room, old_link=self.link_object, event=self.event)
+
+        Logger.get('modules.vc').info(
+            'Detaching videoconference %s from event %s (%s)', self.vc_room, self.event, self.link_object
+        )
+
+        # do the actual deletion from the DB
         vc_room = self.vc_room
-        if delete_all:
-            for assoc in vc_room.events[:]:
-                Logger.get('modules.vc').info('Detaching videoconference %s from event %s (%s)',
-                                              vc_room, assoc.event, assoc.link_object)
-                vc_room.events.remove(assoc)
-        else:
-            Logger.get('modules.vc').info('Detaching videoconference %s from event %s (%s)',
-                                          vc_room, self.event, self.link_object)
-            vc_room.events.remove(self)
+        self.vc_room.events.remove(self)
         db.session.flush()
-        if vc_room.plugin and not vc_room.events:
-            Logger.get('modules.vc').info(f'Deleting videoconference {vc_room}')
-            if vc_room.status != VCRoomStatus.deleted:
-                vc_room.plugin.delete_room(vc_room, self.event)
-                notify_deleted(vc_room.plugin, vc_room, self, self.event, user)
-            db.session.delete(vc_room)
+
+        # process plugin actions
+        if plugin := vc_room.plugin:
+            plugin.detach_room(self, vc_room, self.event)
+
+        # if there are no associations left,
+        if check_vc_room and not vc_room.events:
+            # delete also the VCRoom itself
+            vc_room.delete(user, event=self.event)
 
 
 VCRoomEventAssociation.register_link_events()

@@ -9,14 +9,18 @@ from collections import defaultdict
 from operator import itemgetter
 
 from flask import flash, jsonify, redirect, request, session
+from marshmallow import fields
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.core.plugins import IndicoPlugin
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.models.events import Event
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.forms import VCRoomListFilterForm
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
@@ -26,44 +30,57 @@ from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent, WPVCService
 from indico.util.date_time import as_utc, get_day_end, get_day_start, now_utc
 from indico.util.i18n import _
 from indico.util.iterables import group_list
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RHProtected
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
-def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
+def process_vc_room_association(plugin: IndicoPlugin, event: Event, vc_room: VCRoom, form,
+                                event_vc_room: VCRoomEventAssociation | None = None,
+                                allow_same_room: bool = False, new_room: bool = False):
     # disable autoflush, so that the new event_vc_room does not influence the result
     with db.session.no_autoflush:
         if event_vc_room is None:
             event_vc_room = VCRoomEventAssociation()
+            old_link = None
+        else:
+            old_link = event_vc_room.link_object
 
-        plugin.update_data_association(event, vc_room, event_vc_room, form.data)
+        # set the actual link_object on the association
+        assoc_has_changed = plugin.update_data_association(event, vc_room, event_vc_room, form.data)
 
-        existing = set()
-        if event_vc_room.link_object is not None:
-            # check whether there is a room-event association already present
-            # for the given event, room and plugin
-            q = (VCRoomEventAssociation.query
-                 .filter(VCRoomEventAssociation.event == event,
-                         VCRoomEventAssociation.link_object == event_vc_room.link_object)
-                 .join(VCRoom))
-            if allow_same_room:
-                q = q.filter(VCRoom.id != vc_room.id)
-            existing = {x.vc_room for x in q}
+        # check whether there is a room-event association already present
+        # for the given event, room and plugin
+        q = (VCRoomEventAssociation.query
+             .filter(VCRoomEventAssociation.event == event,
+                     VCRoomEventAssociation.link_object == event_vc_room.link_object)
+             .join(VCRoom))
+        if allow_same_room:
+            q = q.filter(VCRoom.id != vc_room.id)
+        existing = {x.vc_room for x in q}
 
     if event_vc_room.link_type != VCRoomLinkType.event and existing:
-        db.session.rollback()
         flash(_("There is already a videoconference attached to '{link_object_title}'.").format(
             link_object_title=resolve_title(event_vc_room.link_object)), 'error')
+        db.session.rollback()
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
-        db.session.rollback()
         flash(_('This {plugin_name} room is already attached to the event.').format(plugin_name=plugin.friendly_name),
               'error')
+        db.session.rollback()
         return None
-    else:
-        return event_vc_room
+    elif assoc_has_changed and not new_room:
+        if old_link:
+            signals.vc.vc_room_detached.send(
+                event_vc_room, vc_room=vc_room, old_link=old_link, event=event, data=form.data
+            )
+        signals.vc.vc_room_attached.send(
+            event_vc_room, vc_room=vc_room, event=event, data=form.data, old_link=old_link, new_room=new_room
+        )
+
+    return event_vc_room
 
 
 class RHVCManageEventBase(RHManageEventBase):
@@ -131,7 +148,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
             vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
 
-            event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
+            event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form, new_room=True)
             if not event_vc_room:
                 return jsonify_data(flash=False)
 
@@ -142,6 +159,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 # avoid flushing the incomplete vc room to the database
                 with db.session.no_autoflush:
                     self.plugin.create_room(vc_room, self.event)
+                    signals.vc.vc_room_created.send(vc_room, event=self.event, assoc=event_vc_room)
                 notify_created(self.plugin, vc_room, event_vc_room, self.event, session.user)
             except VCRoomError as err:
                 if err.field is None:
@@ -250,14 +268,18 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 class RHVCManageEventRemove(RHVCSystemEventBase):
     """Remove an existing VC room."""
 
-    def _process(self):
+    @use_kwargs({'delete_all': fields.Bool(load_default=False)}, location='query')
+    def _process(self, delete_all):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
             flash(_('You are not allowed to remove {} rooms from this event.').format(self.plugin.friendly_name),
                   'error')
             raise Forbidden
 
-        delete_all = request.args.get('delete_all') == '1'
-        self.event_vc_room.delete(session.user, delete_all=delete_all)
+        if delete_all:
+            self.vc_room.delete(session.user, event=self.event)
+        else:
+            self.event_vc_room.delete(session.user)
+
         flash(_("{plugin_name} room '{room.name}' removed").format(
             plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
