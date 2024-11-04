@@ -149,7 +149,6 @@ def update_event(event, *, update_timetable=False, _extra_log_fields=None, **dat
         # (e.g. because the event had a different type before) we always update them
         # silently.
         start_dt = data.pop('start_dt')
-        changes['start_dt'] = (event.start_dt, start_dt)
         event.move_start_dt(start_dt)
     changes.update(event.populate_from_dict(data))
     # Person links are partially updated when the WTForms field is processed,
@@ -159,7 +158,9 @@ def update_event(event, *, update_timetable=False, _extra_log_fields=None, **dat
     if visible_person_link_changes or 'person_link_data' in data:
         changes['person_links'] = (old_person_links, event.sorted_person_links)
     db.session.flush()
-    signals.event.updated.send(event, changes=changes)
+    if no_time_changes := {k: v for k, v in changes.items() if k not in {'start_dt', 'end_dt'}}:
+        # time changes will be handled separately
+        signals.event.updated.send(event, changes=no_time_changes)
     logger.info('Event %r updated with %r by %r', event, data, session.user)
     _log_event_update(event, changes, _extra_log_fields, visible_person_link_changes=visible_person_link_changes)
 

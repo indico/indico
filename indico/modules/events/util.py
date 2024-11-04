@@ -432,6 +432,9 @@ def track_time_changes(auto_extend=False, user=None):
         for obj, obj_changes in changes.items():
             entry = None if isinstance(obj, Event) else obj.timetable_entry
             signals.event.times_changed.send(type(obj), entry=entry, obj=obj, changes=obj_changes)
+            if isinstance(obj, Event):
+                # remove duration from the changes dict, as the event updated signal doesn't want/need it
+                signals.event.updated.send(obj, changes={k: v for k, v in obj_changes.items() if k != 'duration'})
 
 
 def register_time_change(entry):
