@@ -20,7 +20,7 @@ from pkgutil import walk_packages
 
 import click
 from babel.messages import frontend
-from babel.messages.pofile import read_po, write_po
+from babel.messages.pofile import read_po
 from flask.helpers import get_root_path
 
 import indico
@@ -317,76 +317,8 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
             json.loads(output)  # just to be sure the JSON is valid
             json_file.write_text(output)
-
-            print('\n--- LOC: ', loc, '---\n')
-            _get_po_duplicate_translations(po_file, translations_dir / loc / 'LC_MESSAGES' / 'messages.po')
-
     except subprocess.CalledProcessError as err:
         click.secho('Error: ' + err, fg='red', bold=True, err=True)
-
-
-# TODO: (Ajob) Find appropriate place for function.
-def _parse_po_file(po_file):
-    with po_file.open('rb') as f:
-        return read_po(f)
-
-
-def _get_po_missing_translations(*po_files):
-    po_data_list = [_parse_po_file(po_file) for po_file in po_files]
-    untranslated_ids = []
-    translations = {}
-    
-    for catalog in po_data_list:
-        for msg in catalog:
-            if msg.string:
-                if msg.id in translations:
-                    translations[msg.id].append(msg.string)
-                else:
-                    translations[msg.id] = [msg.string]
-            else:
-                untranslated_ids.append(msg.id)
-
-    necessary_translations = {k: v for k, v in translations.items() if k in untranslated_ids}
-
-    print('Necessary translations:')
-    print(necessary_translations)
-
-
-def _get_po_duplicate_translations(*po_files):
-    po_data_list = [_parse_po_file(po_file) for po_file in po_files]
-    translations = {}
-    duplicates = {}
-    
-    for catalog in po_data_list:
-        for msg in catalog:
-            if msg.string and msg.id:
-                if msg.id in translations and translations[msg.id][0] != msg.string:
-                    translations[msg.id].append(msg.string)
-                    duplicates[msg.id] = translations[msg.id]
-                else:
-                    translations[msg.id] = [msg.string]
-
-    print(len(duplicates.keys()), 'Duplicates:')
-    print(duplicates)
-
-
-# -- END TODO --
-# TODO: Ajob concept two
-
-
-def _merge_po(*po_files):
-    po_data_list = [_parse_po_file(po_file) for po_file in po_files]
-    merged_catalog = po_data_list[0]
-    for catalog in po_data_list[1:]:
-        for msg in catalog:
-            if msg.id not in merged_catalog:
-                merged_catalog[msg.id] = msg
-
-    write_po(merged_catalog, po_files[0].open('wb'))
-
-    return merged_catalog
-
-# -- END TODO --
 
 
 def extract_messages_react(directory: Path = INDICO_DIR):
