@@ -52,7 +52,7 @@ def export_user_data(user, options, include_files):
     _export_user_data(user, options, include_files)
 
 
-@celery.periodic_task(name='user_data_export_cleanup', run_every=crontab(hour='4', day_of_week='monday'))
+@celery.periodic_task(name='user_data_export_cleanup', run_every=crontab(minute='0', hour='4', day_of_week='monday'))
 def user_data_export_cleanup(days=30):
     """Clean up old user data exports.
 
