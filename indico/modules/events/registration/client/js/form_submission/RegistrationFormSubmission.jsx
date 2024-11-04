@@ -41,14 +41,12 @@ import '../../styles/regform.module.scss';
 
 function PrivacyPolicy({url}) {
   const label = (
-    <label>
-      <Translate>
-        I have read and agree to the{' '}
-        <Param name="url" wrapper={<a href={url} target="_blank" rel="noreferrer" />}>
-          Privacy policy
-        </Param>
-      </Translate>
-    </label>
+    <Translate>
+      I have read and agree to the{' '}
+      <Param name="url" wrapper={<a href={url} target="_blank" rel="noreferrer" />}>
+        Privacy policy
+      </Param>
+    </Translate>
   );
 
   return (
@@ -57,7 +55,7 @@ function PrivacyPolicy({url}) {
         <Translate>Privacy policy</Translate>
       </Message.Header>
       <Form as="div" style={{marginTop: 10}}>
-        <FinalCheckbox required label={label} name="agreed_to_privacy_policy" toggle />
+        <FinalCheckbox required label={label} name="agreed_to_privacy_policy" showAsToggle />
       </Form>
     </Message>
   );

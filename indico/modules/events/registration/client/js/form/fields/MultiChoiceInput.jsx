@@ -10,8 +10,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Checkbox, Dropdown, Label} from 'semantic-ui-react';
+import {Dropdown, Label} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate, PluralTranslate, Param} from 'indico/react/i18n';
 
@@ -80,8 +81,6 @@ function MultiChoiceInputComponent({
               <td>
                 <Checkbox
                   id={id ? `${id}-${index}` : ''}
-                  styleName="checkbox"
-                  style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
                   value={choice.id}
                   disabled={
                     !choice.isEnabled ||
@@ -93,15 +92,13 @@ function MultiChoiceInputComponent({
                   }
                   checked={!!value[choice.id]}
                   onChange={makeHandleChange(choice)}
-                  label={{
-                    children: (
-                      <ChoiceLabel
-                        choice={choice}
-                        management={management}
-                        paid={isPaidChoice(choice)}
-                      />
-                    ),
-                  }}
+                  label={
+                    <ChoiceLabel
+                      choice={choice}
+                      management={management}
+                      paid={isPaidChoice(choice)}
+                    />
+                  }
                 />
               </td>
               <td>

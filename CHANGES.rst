@@ -66,6 +66,7 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve country input accessibility (:pr:`6551`, thanks :user:`foxbunny`)
+- Reimplement Checkbox to make it programmatically focusable (:pr:`6528`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
