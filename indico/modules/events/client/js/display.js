@@ -42,6 +42,7 @@ import './favorite';
           apiURL: container.dataset.apiUrl,
           imageUploadURL: container.dataset.imageUploadUrl,
           getNoteURL: container.dataset.getNoteUrl,
+          modalTitle: container.dataset.modalTitle,
         }),
         container
       );

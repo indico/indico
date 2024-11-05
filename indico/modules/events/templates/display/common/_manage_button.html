@@ -11,6 +11,7 @@
          {% if item.can_manage_attachments(session.user) %}
              data-image-upload-url="{{ url_for('attachments.upload_editor', item) }}"
          {% endif %}
+         data-modal-title="{{ title ~ ': ' ~ item.title }}"
          data-title="{{ title }}"></div>
 {%- endmacro %}
 
@@ -30,13 +31,15 @@
         {% set note_item = item.session if item_type == 'SESSION_BLOCK' else item %}
         {{ _render_note_editor(note_item) }}
     {%- elif opt == 'notes_compile' -%}
+        {% set title = _('Compile Minutes')%}
         <div class="manage-notes-container"
              data-get-note-url="{{ url_for('event_notes.compile', item) }}"
              data-api-url="{{ url_for('event_notes.api', item) }}"
              {% if item.can_manage_attachments(session.user) %}
                  data-image-upload-url="{{ url_for('attachments.upload_editor', item) }}"
              {% endif %}
-             data-title="{% trans %}Compile minutes{% endtrans %}"></div>
+             data-modal-title="{{ title }}"
+             data-title="{{ title }}"></div>
     {%- elif opt == 'attachments_edit' -%}
         {% set attachment_item = item.session if item_type == 'SESSION_BLOCK' else item %}
         <a href="" class="js-material-editor"
