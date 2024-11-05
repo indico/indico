@@ -71,9 +71,11 @@
         <a href="{{ _note_link(note, anchor) }}" target="_blank"
            class="permalink icon-link" title="{% trans %}Permanent link{% endtrans %}"></a>
         {% if can_edit %}
+        {% set title = _('Edit minutes') if event.has_note is not none else _('Add minutes') %}
             <span class="manage-notes-container hide-if-locked"
                   data-icon
                   data-api-url="{{ url_for('event_notes.api', note) }}"
+                  data-modal-title="{{ title ~ ': ' ~ note.object.title }}"
                   {% if note.event.can_manage_attachments(session.user) %}
                       data-image-upload-url="{{ url_for('attachments.upload_editor', note) }}"
                   {% endif %}></span>
