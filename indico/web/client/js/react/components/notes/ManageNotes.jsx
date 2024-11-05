@@ -94,7 +94,7 @@ ManageNotes.propTypes = {
   apiURL: PropTypes.string.isRequired,
   imageUploadURL: PropTypes.string.isRequired,
   getNoteURL: PropTypes.string,
-  modalTitle: PropTypes.string,
+  modalTitle: PropTypes.string.isRequired,
 };
 
 ManageNotes.defaultProps = {

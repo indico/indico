@@ -184,7 +184,7 @@ export function NoteEditor({apiURL, imageUploadURL, closeModal, getNoteURL, moda
       {!loading && !closeAndReload && currentInput !== undefined && (
         <FinalModalForm
           id="edit-minutes"
-          header={modalTitle || Translate.string('Edit Minutes')}
+          header={modalTitle}
           submitLabel={Translate.string('Save')}
           style={{minWidth: '65vw'}}
           size="large"
@@ -237,7 +237,7 @@ NoteEditor.propTypes = {
   imageUploadURL: PropTypes.string.isRequired,
   closeModal: PropTypes.func.isRequired,
   getNoteURL: PropTypes.string,
-  modalTitle: PropTypes.string,
+  modalTitle: PropTypes.string.isRequired,
 };
 
 NoteEditor.defaultProps = {
