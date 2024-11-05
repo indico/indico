@@ -367,7 +367,7 @@ ul.day-list {
     .timetable-title {
       font-weight: bold;
       font-size: 1.1em;
-      padding-top: 0.5rem;
+      padding-top: 0.7rem;
       @include font-family-title();
       flex: auto;
       line-height: 1rem;
@@ -485,6 +485,7 @@ ul.day-list {
   color: $tt-primary-color !important;
   flex-shrink: 0;
   line-height: 2rem;
+  margin-top: 0.2rem;
 
   &.top-level {
     .start-time {
