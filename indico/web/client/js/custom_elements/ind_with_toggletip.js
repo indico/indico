@@ -31,23 +31,21 @@ customElements.define(
     setup() {
       super.setup();
 
-      // NB: The tip is an aria-live region. Because of this, it is necessary to clear the content.
-      // Live regions are (usually) only announced when content changes. (See also the hide() method.)
-      this.tipContent = this.$tip.innerHTML;
-      this.$tip.innerHTML = '';
-
       this.addEventListener('click', evt => {
-        // NB: The toggletip button can trigger the toggle tip even when it is still open,
-        // so we must clean up just in case.
-        this.removeEventListener('focusout', this.hide);
-        this.hide();
-
         const $target = evt.target.closest('button');
         if (!$target || !this.contains($target)) {
           return;
         }
-        this.show();
-        this.addEventListener('focusout', this.hide, {once: true});
+
+        if (this.shown) {
+          $target.removeAttribute('aria-expanded');
+          this.removeEventListener('focusout', this.hide);
+          this.hide();
+        } else {
+          $target.setAttribute('aria-expanded', true);
+          this.show();
+          this.addEventListener('focusout', this.hide, {once: true});
+        }
       });
     }
   }
