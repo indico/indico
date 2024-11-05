@@ -37,7 +37,13 @@ export default function ResizeHandle({
 
       let dy = e.clientY - resizeStartRef.current;
       dy = Math.ceil(dy / gridSize) * gridSize;
-      const newDuration = duration + pixelsToMinutes(dy);
+      let newDuration = duration + pixelsToMinutes(dy);
+
+      if (maxDuration !== undefined) {
+        // Prevent resizing beyond the end of the parent block
+        newDuration = Math.min(newDuration, maxDuration);
+      }
+
       if (newDuration >= 10) {
         setLocalDuration(newDuration);
       } else {
