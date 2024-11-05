@@ -21,7 +21,7 @@
         <input type="checkbox" class="js-toggle-note-cb" id="toggle-note-{{ note.id }}-{{ hash }}" style="display:none;" {% if not note_is_hidden %}checked{% endif %}>
         <label for="toggle-note-{{ note.id }}-{{ hash }}" class="ui basic mini icon button js-show-note-toggle"
                title="{% trans %}Minutes{% endtrans %}">
-            <i class="icon file alternate outline"></i>
+            <i class="icon list"></i>
         </label>
     </div>
 {% endmacro %}
@@ -29,7 +29,9 @@
 
 {% macro _render_note_box(note, event=none, hidden=false, can_edit=false, anchor=none) %}
     <div class="padded-box">
-        <div class="padded-box-pad icon-file-text"></div>
+        <div class="padded-box-pad">
+            <i class="icon list"></i>
+        </div>
         <div class="padded-box-content">
             {{ _render_note_actions(note=note, event=event, hidden=hidden, can_edit=can_edit, anchor=anchor) }}
             <div class="note-text editor-output {% if event %}{{ _togglable_classes(hidden=hidden) }}{% endif %}">
