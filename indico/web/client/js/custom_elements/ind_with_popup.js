@@ -66,6 +66,9 @@ customElements.define(
         trigger.setAttribute('aria-controls', dialog.id);
 
         trigger.addEventListener('click', () => {
+          if (this.shown) {
+            return;
+          }
           positioning.position(dialog, this, positioning.popupPositionStrategy, () => {
             this.shown = true;
           });
