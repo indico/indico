@@ -17,6 +17,8 @@ ind-with-popup {
   position: relative;
 
   dialog {
+    @extend %text-size-reset;
+
     z-index: 1;
 
     width: max-content;
@@ -31,6 +33,7 @@ ind-with-popup {
     background: var(--background-color);
     box-shadow: var(--control-raised-shadow);
     border-radius: var(--control-border-radius);
+    font-size: 87.5%;
   }
 
   dialog[open],
