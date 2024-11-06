@@ -15,6 +15,7 @@
 {% block javascript %}
     <script>
         setupPrincipalListWidget({
+            formContext: {{ [field.get_form().__class__.__name__, field.id] | tojson }},
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field._event.id if field._event else none) | tojson }},
             withGroups: {{  field.allow_groups | tojson }},
@@ -23,7 +24,6 @@
             withCategoryRoles: {{ field.allow_category_roles | tojson }},
             withRegistrants: {{ field.allow_registration_forms | tojson }},
             withEmails: {{ field.allow_emails | tojson }},
-            importExport: {{ field.allow_import_export | tojson }},
             protectedFieldId: {{ field.protected_field_id | default(none) | tojson }},
         });
     </script>

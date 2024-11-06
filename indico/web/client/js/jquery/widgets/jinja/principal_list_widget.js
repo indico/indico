@@ -20,7 +20,6 @@ window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ..
       withCategoryRoles: false,
       withRegistrants: false,
       withEmails: false,
-      importExport: false,
     },
     ...options,
   };

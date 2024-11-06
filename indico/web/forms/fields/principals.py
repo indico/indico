@@ -76,7 +76,6 @@ class PrincipalListField(HiddenField):
         self.allow_category_roles = kwargs.pop('allow_category_roles', False)
         self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_emails = kwargs.pop('allow_emails', False)
-        self.allow_import_export = kwargs.pop('allow_import_export', False)
         self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super().__init__(*args, **kwargs)
 
