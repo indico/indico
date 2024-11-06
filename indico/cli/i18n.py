@@ -364,9 +364,12 @@ def remove_empty_pot_files(path: Path, python=False, javascript=False, react=Fal
         _get_messages_react_pot(path).unlink()
 
 
+# Merge after generating all the .pot files
 def merge_pot_files(output_file, *input_files):
     """Merge multiple POT files into a single POT file."""
     merged_catalog = None
+
+    print('\n🗨  Merging POT files...\n')
 
     for input_file in input_files:
         with input_file.open('rb') as f:
@@ -382,6 +385,45 @@ def merge_pot_files(output_file, *input_files):
     if merged_catalog:
         with output_file.open('wb') as f:
             write_po(f, merged_catalog)
+
+    print('\n✔  Done merging pot files!\n')
+
+
+# Filter merged.po files by removing messages that are not in the given .pot file
+def filter_po_by_pot(merged_po_path, pot_path, output_po_path):
+    with merged_po_path.open('rb') as f:
+        merged_catalog = read_po(f)
+    
+    with pot_path.open('rb') as f:
+        pot_catalog = read_po(f)
+
+    pot_message_ids = {message.id for message in pot_catalog}
+
+    for message in list(merged_catalog):
+        if message.id not in pot_message_ids:
+            merged_catalog.delete(message.id)
+
+    with output_po_path.open('wb') as f:
+        write_po(f, merged_catalog)
+
+
+def filter_all_po_files():
+    translations_dir = Path('indico/translations')
+    merged_translations_dir = Path('indico/merged_translations')
+
+    print('\n🗨  Generating split PO files from merged PO files...\n')
+
+    for lang_dir in merged_translations_dir.iterdir():
+        if lang_dir.is_dir():
+            lc_messages_dir = lang_dir / 'LC_MESSAGES'
+            merged_po_path = lc_messages_dir / 'merged.po'
+            if merged_po_path.exists():
+                for pot_file in translations_dir.glob('*.pot'):
+                    if pot_file.name != 'merged.pot':
+                        output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
+                        filter_po_by_pot(merged_po_path, pot_file, output_po_path)
+
+    print('\n✔  Done generating split PO files!\n')
 
 
 @click.group()
@@ -442,6 +484,8 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
     if babel_cmd == 'ExtractMessages':
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
         merge_pot_files(TRANSLATIONS_DIR / 'merged.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
+    elif babel_cmd == 'CompileCatalog':
+        filter_all_po_files()
 
 
 def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
