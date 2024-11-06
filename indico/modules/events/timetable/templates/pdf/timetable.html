@@ -15,7 +15,7 @@
         counter-reset: program-page 0;
 
         @bottom-center {
-            content: '{{ now|format_date(format='full', timezone=event.tz) }}';
+            content: '{{ now|format_skeleton('EEEEdMMMMyyyy', timezone=event.tz) }}';
         }
     }
 
@@ -38,7 +38,7 @@
             @top-right {
                 font-size: 0.8em;
                 color: grey;
-                content: '{{ day|format_date('EEEE, d MMMM', timezone=event.tz) }}';
+                content: '{{ day|format_skeleton('EEEEdMMMM', timezone=event.timezone) }}';
             }
         }
 

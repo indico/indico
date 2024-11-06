@@ -3,7 +3,7 @@
         <h1>{% trans %}Table of contents{% endtrans %}</h1>
         {% for day in days %}
             <div class="toc-item toc-item-main">
-                <a href="#day-{{ loop.index }}">{{ day|format_date('EEEE, d MMMM', timezone=event.tz) }}</a>
+                <a href="#day-{{ loop.index }}">{{ day|format_skeleton('EEEEdMMM') }}</a>
             </div>
             {% if show_sessions %}
                 <div class="toc-sessions">
