@@ -13,7 +13,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState, useMemo, useRef} from 'react';
 import {useHistory} from 'react-router-dom';
-import {Button, Loader, Modal, Table, Checkbox, Dimmer} from 'semantic-ui-react';
+import {Button, Loader, Modal, Table, Checkbox, Dimmer, Icon} from 'semantic-ui-react';
 
 import {ListFilter} from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
@@ -257,20 +257,17 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
   const codePresent = Object.values(filteredEditables).some(c => c.contributionCode);
 
   return filteredEditables.length ? (
-    <Table basic="very" striped>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell style={{width: '2%'}} />
-          <Table.HeaderCell style={{width: '6%'}}>ID</Table.HeaderCell>
-          {codePresent && <Table.HeaderCell style={{width: '10%'}}>Code</Table.HeaderCell>}
-          <Table.HeaderCell>Title</Table.HeaderCell>
-          <Table.HeaderCell style={{width: '18%'}}>Editor</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
+    <Table basic="very" striped selectable>
       <Table.Body>
         {filteredEditables.map(editable => (
-          <Table.Row key={editable.id} style={editable.canAssignSelf ? {} : {opacity: '50%'}}>
-            <Table.Cell>
+          <Table.Row
+            key={editable.id}
+            style={editable.canAssignSelf ? {} : {opacity: '50%'}}
+            styleName="editable"
+            onClick={() => setSelectedEditable(editable)}
+            active={selectedEditable?.id === editable.id}
+          >
+            <Table.Cell width={1}>
               <Checkbox
                 radio
                 disabled={!editable.canAssignSelf}
@@ -279,18 +276,18 @@ function NextEditableTable({filteredEditables, selectedEditable, setSelectedEdit
                 onChange={() => setSelectedEditable(editable)}
               />
             </Table.Cell>
-            <Table.Cell>{editable.contributionFriendlyId}</Table.Cell>
+            <Table.Cell width={1}>{editable.contributionFriendlyId}</Table.Cell>
             {codePresent && (
-              <Table.Cell>
+              <Table.Cell width={2}>
                 {editable.contributionCode ? editable.contributionCode : Translate.string('n/a')}
               </Table.Cell>
             )}
-            <Table.Cell>
+            <Table.Cell>{editable.contributionTitle}</Table.Cell>
+            <Table.Cell width={1}>
               <a href={editable.timelineURL} target="_blank" rel="noopener noreferrer">
-                {editable.contributionTitle}
+                <Icon name="eye" />
               </a>
             </Table.Cell>
-            <Table.Cell>{editable.editor ? editable.editor.fullName : ''}</Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
