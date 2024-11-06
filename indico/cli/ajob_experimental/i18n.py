@@ -278,6 +278,7 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
     """Compile react catalogs."""
     translations_dir = _get_translations_dir(directory)
     locales = [locale] if locale else [x.name for x in translations_dir.iterdir() if x.is_dir()]
+    dups_txt = ''
     try:
         dup_count = 0
         unique_dups = {}
@@ -292,15 +293,21 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
             json_file.write_text(output)
 
             print('\n--- LOC: ', loc, '---\n')
-            duplicates = _get_po_duplicate_translations(po_file, translations_dir / loc / 'LC_MESSAGES' / 'messages.po')
+            duplicates = _get_po_duplicate_translations(
+                po_file,
+                translations_dir / loc / 'LC_MESSAGES' / 'messages.po',
+                translations_dir / loc / 'LC_MESSAGES' / 'messages-js.po'
+            )
             dup_count += len(duplicates.keys())
             unique_dups.update(duplicates)
 
-            print(len(duplicates.keys()), 'Duplicates:')
-            print(duplicates)
+            dups_txt += f'\n\n{loc} {len(duplicates.keys())} duplicates found:\n'
+            dups_txt += '\n'.join([f'{k}: {v}' for k, v in duplicates.items()])
 
-        print('Total of duplicates:', dup_count)
-        print('Unique duplicates count:', len(unique_dups.keys()))
+        dups_txt += f'\n\nTotal of duplicates: {dup_count}\n'
+        dups_txt += f'Unique duplicates count: {len(unique_dups.keys())}\n'
+
+        Path('duplicates_log.txt').write_text(dups_txt)
 
     except subprocess.CalledProcessError as err:
         click.secho('Error: ' + err, fg='red', bold=True, err=True)
