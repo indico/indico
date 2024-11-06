@@ -66,7 +66,6 @@
         <section
             id="entry-{{ entry.id }}"
             class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_session_block_content else ''}}"
-            style="{{'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;' if show_session_block_content else ''}}"
         >
             <h3>
                 {% if session.title and session_block.title %}
@@ -95,7 +94,13 @@
                 </p>
                 {% if entry.type.name != 'BREAK' and presenters %}
                     <p>
-                        <span class="bold">{{ ngettext('Speaker', 'Speakers', presenters|length) if is_contribution else ngettext('Convener', 'Conveners', presenters|length) }}:</span>
+                        <span class="bold">
+                            {% if is_contribution %}
+                                {{ ngettext('Speaker:', 'Speakers:', presenters|length) }}
+                            {% else %}
+                                {{ ngettext('Convener:', 'Conveners:', presenters|length) }}
+                            {% endif %}
+                        </span>
                         {{ render_names(presenters, show_title=show_title, show_affiliation=show_affiliation) }}
                     </p>
                 {% endif %}
@@ -121,7 +126,7 @@
                                     <div class="contrib-heading">
                                         {% if not session.is_poster %}
                                             <span class="timebox inherited-bg-color inherited-txt-color">
-                                                {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='hh:mm') }}
+                                                {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='HHmm') }}
                                                 {% if show_length_contribs %}
                                                     ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
                                                 {% endif %}
@@ -196,7 +201,7 @@
         <p class="session-block-date">
             <span class="bold">{{ day|format_date('EEEE, d MMMM', timezone=entry.event.tz) }}</span>
             <span class="timebox">
-                {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='hh:mm') }}
+                {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='HHmm') }}
             </span>
         </p>
     {% endif %}
