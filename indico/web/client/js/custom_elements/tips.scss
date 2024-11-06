@@ -94,7 +94,7 @@ ind-with-toggletip {
   }
 
   // Arrows
-  &[shown]::after {
+  &[shown]:not([data-position-check])::after {
     --arrow-size: 0.5em;
 
     content: '';

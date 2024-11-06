@@ -31,6 +31,11 @@ customElements.define(
     setup() {
       super.setup();
 
+      // NB: The tip is an aria-live region. Because of this, it is necessary to clear the content.
+      // Live regions are (usually) only announced when content changes. (See also the hide() method.)
+      this.tipContent = this.$tip.innerHTML;
+      this.$tip.innerHTML = '';
+
       this.addEventListener('click', evt => {
         const $target = evt.target.closest('button');
         if (!$target || !this.contains($target)) {
