@@ -234,7 +234,10 @@
 
 {% macro render_names(people, show_title=false, show_affiliation=false) %}
     {% for person in people %}
-        {{ person.get_full_name(show_title=show_title, abbrev_first_name=false, last_name_first=false, last_name_upper=false) }}
+        {%- if show_title %}
+            {{ person.title }}
+        {%- endif %}
+        {{ person.display_full_name }}
         {%- if show_affiliation and person.affiliation %}
             ({{ person.affiliation }})
         {%- endif -%}
