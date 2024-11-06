@@ -5,11 +5,6 @@
 
 {% macro render_subcontribution(subcontrib, event, theme_settings, theme_context, show_notes=true) %}
     <li class="timetable-subcontrib timetable-item" id="{{ subcontrib.slug }}">
-        <span class="timetable-time nested subcontrib-time">
-            <span class="start-time">
-                {{ subcontrib.start_dt | format_time(timezone=event.tz) }}
-            </span>
-        </span>
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title" data-anchor="{{ subcontrib.slug }}" data-anchor-strip-arg="note">
