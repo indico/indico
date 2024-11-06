@@ -66,6 +66,8 @@ Bugfixes
 - Do not allow mixing notification rules for invited abstracts with other rules (:issue:`6563`,
   :pr:`6567`)
 - Use locale-aware price formatting in registration form fields (:pr:`6586`)
+- Handle badge designer items exceeding the canvas boundaries more gracefully (:pr:`6603`,
+  thanks :user:`SegiNyn`)
 
 Accessibility
 ^^^^^^^^^^^^^

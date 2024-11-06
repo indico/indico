@@ -184,8 +184,8 @@ import {$T} from 'indico/utils/i18n';
       },
       stop: function(e, ui) {
         var itemId = $(this).data('id');
-        items[itemId].x = unzoom(ui.position.left);
-        items[itemId].y = unzoom(ui.position.top);
+        items[itemId].x = Math.max(0, unzoom(ui.position.left));
+        items[itemId].y = Math.max(0, unzoom(ui.position.top));
       },
     });
 
@@ -569,14 +569,20 @@ import {$T} from 'indico/utils/i18n';
         $fixedTextField.val(selectedItem.text);
       },
       width: function() {
-        selectedItem.width = Math.round($('.js-element-width').val() * pixelsPerCm);
+        selectedItem.width = Math.min(
+          templateDimensions.width,
+          Math.round($('.js-element-width').val() * pixelsPerCm)
+        );
         if (selectedItem.type === 'ticket_qr_code') {
           $('.js-element-height').val($('.js-element-width').val());
           selectedItem.height = selectedItem.width;
         }
       },
       height: function() {
-        selectedItem.height = Math.round($('.js-element-height').val() * pixelsPerCm);
+        selectedItem.height = Math.min(
+          templateDimensions.height,
+          Math.round($('.js-element-height').val() * pixelsPerCm)
+        );
         if (selectedItem.type === 'ticket_qr_code') {
           $('.js-element-width').val($('.js-element-height').val());
           selectedItem.width = selectedItem.height;
