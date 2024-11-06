@@ -221,6 +221,11 @@ div.session-bar {
     }
   }
 
+  // popup
+  [shown] > .i-button::after {
+    transform: rotate(180deg);
+  }
+
   &.sticky-scrolling {
     background-color: transparent;
     box-shadow: none;
