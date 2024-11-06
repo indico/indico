@@ -2,7 +2,7 @@
     {% for day in days %}
         <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
-                <h2>{{ day|format_date('EEEE, d MMMM', timezone=event.tz)  }}</h2>
+                <h2>{{ day|format_skeleton('EEEEdMMMM', timezone=event.timezone) }}</h2>
             </div>
             {% for entry in days[day] %}
                 {% set should_render = (
@@ -17,7 +17,7 @@
                             {{ get_color_styles(entry) }}
                         {% endif %}
                         <div class="time-text time-from">
-                            {{ entry.start_dt|format_time(timezone=entry.event.tz) }}
+                            {{ entry.start_dt|format_time(timezone=event.timezone) }}
                         </div>
                         <section class="{{ get_custom_id(entry) }}">
                             {{ render_block_date(entry, day, print_date_close_to_sessions) }}
@@ -38,7 +38,7 @@
                             </section>
                         </section>
                         <div class="time-text time-to">
-                            {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
+                            {{ entry.end_dt|format_time(timezone=event.timezone) }}
                         </div>
                     </div>
                 {% endif %}
@@ -199,7 +199,7 @@
 {% macro render_block_date(entry, day, print_date_close_to_sessions) %}
     {% if print_date_close_to_sessions %}
         <p class="session-block-date">
-            <span class="bold">{{ day|format_date('EEEE, d MMMM', timezone=entry.event.tz) }}</span>
+            <span class="bold">{{ day|format_skeleton('EEEEdMMMM', timezone=entry.event.timezone) }}</span>
             <span class="timebox">
                 {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='HHmm') }}
             </span>
@@ -210,7 +210,7 @@
 {% macro render_time(entry) %}
     <div class="time">
         <div class="time-from">
-            {{ entry.start_dt|format_time(timezone=entry.event.tz) }}
+            {{ entry.start_dt|format_time(timezone=entry.event.timezone) }}
         </div>
         <div class="time-divider">
             {# Line between generated in CSS #}
@@ -219,7 +219,7 @@
             {# Line between generated in CSS #}
         </div>
         <div class="time-to">
-            {{ entry.end_dt|format_time(timezone=entry.event.tz) }}
+            {{ entry.end_dt|format_time(timezone=entry.event.timezone) }}
         </div>
     </div>
 {% endmacro %}
