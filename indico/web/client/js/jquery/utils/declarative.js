@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 /* eslint-disable max-len */
-/* global getParamsFromSelectors:false, inlineAjaxForm:false, updateHtml:false */
+/* global inlineAjaxForm:false, updateHtml:false */
 
 import {$T} from '../../utils/i18n';
 
@@ -21,18 +21,22 @@ import {$T} from '../../utils/i18n';
     setupToggleLinks();
   });
 
-  global.getParamsFromSelectors = function getParamsFromSelectors() {
-    var fieldParams = {};
-    _.each(arguments, function(selector) {
+  function getParamsFromSelectors(selector) {
+    const fieldParams = {};
+    if ($.isPlainObject(selector)) {
+      Object.entries(selector).forEach(([key, value]) => {
+        fieldParams[key] = $(value).val();
+      });
+    } else {
       $(selector).each(function() {
         if (!(this.name in fieldParams)) {
           fieldParams[this.name] = [];
         }
         fieldParams[this.name].push($(this).val());
       });
-    });
+    }
     return fieldParams;
-  };
+  }
 
   global.getFormParams = function getFormParams($form) {
     return getParamsFromSelectors(

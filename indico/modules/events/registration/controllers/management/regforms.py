@@ -8,12 +8,15 @@
 from datetime import timedelta
 from operator import itemgetter
 
-from flask import flash, redirect, session
+from flask import flash, jsonify, redirect, render_template, session
+from marshmallow import validate
 from sqlalchemy.orm import undefer
 from webargs import fields
+from wtforms.validators import ValidationError
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
@@ -23,9 +26,9 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
                                                       RegistrationFormCreateForm, RegistrationFormEditForm,
                                                       RegistrationFormScheduleForm, RegistrationManagersForm)
-from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
+from indico.modules.events.registration.models.forms import Registration, RegistrationForm, RegistrationState
+from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
+from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, RegistrationData
 from indico.modules.events.registration.operations import update_registration_form_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
@@ -39,6 +42,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import format_human_timedelta, now_utc
 from indico.util.i18n import _, force_locale, orig_string
 from indico.web.args import use_kwargs
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -250,6 +254,47 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
             return redirect(url_for('.manage_regform', self.regform))
         return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,
                                                     regform=self.regform)
+
+
+class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
+    """Preview registration emails."""
+
+    @use_kwargs({
+        'message': fields.String(load_default=''),
+        'state': fields.Enum(RegistrationState, required=True, validate=validate.OneOf(
+            [RegistrationState.pending, RegistrationState.unpaid, RegistrationState.complete]))
+    })
+    @no_autoflush
+    def _process(self, message, state):
+        self.commit = False
+        match state:
+            case RegistrationState.pending:
+                self.regform.message_pending = message
+            case RegistrationState.unpaid:
+                self.regform.message_unpaid = message
+            case RegistrationState.complete:
+                self.regform.message_complete = message
+            case _:
+                raise ValidationError('Invalid state')
+        mock_registration = Registration(state=state, registration_form=self.regform, currency='USD',
+                                         email='test@example.com', first_name='Peter', last_name='Higgs',
+                                         checked_in=True, friendly_id=-1, event_id=self.event.id,
+                                         registration_form_id=self.regform.id)
+        for form_item in self.regform.active_fields:
+            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+                value = getattr(mock_registration, form_item.personal_data_type.column)
+            else:
+                value = form_item.field_impl.default_value
+            data_entry = RegistrationData()
+            mock_registration.data.append(data_entry)
+            for attr, field_value in form_item.field_impl.process_form_data(mock_registration, value).items():
+                setattr(data_entry, attr, field_value)
+        tpl = get_template_module('events/registration/emails/registration_creation_to_registrant.html',
+                                  registration=mock_registration, event=self.event, attach_rejection_reason=True,
+                                  old_price=None, diff=None)
+        html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
+                               body=tpl.get_body())
+        return jsonify(html=html)
 
 
 class RHRegistrationFormDelete(RHManageRegFormBase):

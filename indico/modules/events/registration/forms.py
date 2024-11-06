@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 from datetime import time, timedelta
 from decimal import Decimal
 from enum import auto
@@ -16,7 +17,7 @@ from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
 from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets import NumberInput
+from wtforms.widgets import NumberInput, html_params
 
 from indico.core import signals
 from indico.core.config import config
@@ -34,6 +35,7 @@ from indico.modules.events.settings import data_retention_settings
 from indico.util.enum import RichStrEnum
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
 from indico.web.forms.fields.colors import SUIColorPickerField
@@ -52,6 +54,19 @@ def _check_if_payment_required(form, field):
         return
     if not is_feature_enabled(form.event, 'payment'):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
+
+
+def _generate_preview_link(text, input_selector, state, url, title):
+    inner = _('Preview')
+    params = {
+        'data-ajax-dialog': True,
+        'data-href': url,
+        'data-method': 'POST',
+        'data-title': title,
+        'data-params-selector': json.dumps({'message': input_selector}),
+        'data-params': json.dumps({'state': state}),
+    }
+    return f'{text} <a {html_params(**params)}>{inner}</a>'
 
 
 class RegistrationFormEditForm(IndicoForm):
@@ -96,18 +111,9 @@ class RegistrationFormEditForm(IndicoForm):
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
-    message_pending = TextAreaField(
-        _('Message for pending registrations'),
-        description=_('Text included in emails sent to pending registrations (Markdown syntax)')
-    )
-    message_unpaid = TextAreaField(
-        _('Message for unpaid registrations'),
-        description=_('Text included in emails sent to unpaid registrations (Markdown syntax)')
-    )
-    message_complete = TextAreaField(
-        _('Message for complete registrations'),
-        description=_('Text included in emails sent to complete registrations (Markdown syntax)')
-    )
+    message_pending = TextAreaField(_('Message for pending registrations'))
+    message_unpaid = TextAreaField(_('Message for unpaid registrations'))
+    message_complete = TextAreaField(_('Message for complete registrations'))
     attach_ical = BooleanField(
         _('Attach iCalendar file'),
         widget=SwitchWidget(),
@@ -129,6 +135,7 @@ class RegistrationFormEditForm(IndicoForm):
         self.regform = kwargs.pop('regform', None)
         super().__init__(*args, **kwargs)
         self._set_currencies()
+        self._set_links()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
                                                          'then {email} is used.').format(email=config.NO_REPLY_EMAIL)
@@ -136,6 +143,21 @@ class RegistrationFormEditForm(IndicoForm):
     def _set_currencies(self):
         currencies = [(c['code'], f'{c["code"]} ({c["name"]})') for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
+
+    def _set_links(self):
+        url = url_for('.notification_preview', self.regform)
+        self.message_pending.description = _generate_preview_link(
+            _('Text included in emails sent to pending registrations (Markdown syntax).'),
+            '#message_pending', 'pending', url, _('Pending Registration Preview')
+        )
+        self.message_unpaid.description = _generate_preview_link(
+            _('Text included in emails sent to unpaid registrations (Markdown syntax).'),
+            '#message_unpaid', 'unpaid', url, _('Unpaid Registration Preview')
+        )
+        self.message_complete.description = _generate_preview_link(
+            _('Text included in emails sent to complete registrations (Markdown syntax).'),
+            '#message_complete', 'complete', url, _('Complete Registration Preview')
+        )
 
 
 class RegistrationFormCreateForm(IndicoForm):
