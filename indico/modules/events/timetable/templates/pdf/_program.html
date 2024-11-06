@@ -136,7 +136,7 @@
                                     </div>
                                     {% if child.type.name == 'CONTRIBUTION' %}
                                         <div class="contrib-timeline-content" >
-                                            {{ render_nested_contrib(child, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
+                                            {{ render_subcontrib(child, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
                                         </div>
                                     {% endif %}
                                 </li>
@@ -149,7 +149,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_nested_contrib(entry, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs=false) %}
+{% macro render_subcontrib(entry, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs=false) %}
     {% set contrib = entry.object if entry.object else entry %}
     {% set speakers = contrib.speakers %}
 
@@ -176,18 +176,18 @@
         <div>
             <span class="bold">{% trans %}Subcontributions{% endtrans %}</span>
             <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
-                {% for subchild in contrib.subcontributions %}
+                {% for subcontrib in contrib.subcontributions %}
                     <li class="inherited-border-color">
                         <div class="contrib-heading">
                             {% if show_length_contribs and not contrib.session.is_poster %}
                                 <span class="timebox inherited-bg-color inherited-txt-color">
-                                    {{ (subchild.duration)|format_human_timedelta(narrow=True) }}
+                                    {{ (subcontrib.duration)|format_human_timedelta(narrow=True) }}
                                 </span>
                             {% endif %}
-                            <h4>{{ subchild.title }}</h4>
+                            <h4>{{ subcontrib.title }}</h4>
                         </div>
                         <div class="contrib-timeline-content">
-                            {{ render_nested_contrib(subchild, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
+                            {{ render_subcontrib(subcontrib, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
                         </div>
                     </li>
                 {% endfor%}
