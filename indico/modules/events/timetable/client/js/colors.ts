@@ -1,3 +1,10 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
 export const ENTRY_COLORS = [
   // childColor is baed on the backgroundColor of the parent
   // If the parent textColor is dark, the childColor is lighter than the parent backgroundColor
