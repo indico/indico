@@ -23,6 +23,7 @@ from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.core.settings import core_settings
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.util.string import truncate
 from indico.vendor.django_mail import get_connection
 from indico.vendor.django_mail.message import EmailMessage
@@ -66,7 +67,7 @@ def send_email_task(task, email, log_entry=None):
             db.session.commit()
 
 
-def get_actual_sender_address(sender_address: str, reply_address: set) -> tuple[str, set]:
+def get_actual_sender_address(sender_address: str, reply_address: set[str]) -> tuple[str, set]:
     site_title = core_settings.get('site_title')
     if not sender_address:
         return f'{site_title} <{config.NO_REPLY_EMAIL}>', reply_address
@@ -81,7 +82,8 @@ def get_actual_sender_address(sender_address: str, reply_address: set) -> tuple[
     # rewrite sender address to the fallback, and try to keep the relevant part of the original one
     # if we have a name we use the name (the address already goes into reply-to), otherwise we use
     # the address which looks ugly but is (probably?) better than just using the site name
-    display_name = f'{orig_name or orig_address} (via {site_title})'
+    display_name = _('{sender_name} (via {site_title})').format(sender_name=(orig_name or orig_address),
+                                                                site_title=site_title)
     from_address = formataddr((display_name, fallback))
     if not reply_address:
         reply_address = {orig_address}
