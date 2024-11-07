@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-09-24 17:19+0200\n"
+"POT-Creation-Date: 2024-11-24 12:52+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -951,6 +951,10 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx
 msgid "Since you are a manager you can edit anyway."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx
+msgid "This editable is not currently assigned to you."
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx
@@ -2403,7 +2407,7 @@ msgid "These fields won't be displayed to registrants"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
-msgid "{price} {currency} per night"
+msgid "{price} per night"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
@@ -2417,7 +2421,7 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
-msgid "Total: {total} {currency}"
+msgid "Total: {price}"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
@@ -2586,10 +2590,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
 msgid "Enable choice"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx
-msgid "Select a country"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/CountryInput.jsx
@@ -3867,7 +3867,9 @@ msgstr[1] ""
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 msgid "Recurs weekly"
-msgstr ""
+msgid_plural "Recurs every {count} weeks"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 msgid "Recurs monthly"
@@ -3880,8 +3882,7 @@ msgid "From {startTime} to {endTime}"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
-#: indico/modules/rb/client/js/components/TimeInformation.jsx
-msgid "Every {weekdays}"
+msgid "On {weekdays}"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
@@ -5080,6 +5081,16 @@ msgid "Once"
 msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx
+msgid "Every week on {weekdays}"
+msgid_plural "Every {repetition} weeks on {weekdays}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/util.jsx
+msgid "Every {weekdays}"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx
 msgid "Available"
 msgstr ""
 
@@ -6078,6 +6089,10 @@ msgid "{size} MB"
 msgstr ""
 
 #: indico/web/client/js/react/components/files/FileArea.jsx
+msgid "There were some problems with your file"
+msgstr ""
+
+#: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "Drag file(s) here"
 msgstr ""
 
@@ -6168,10 +6183,6 @@ msgstr ""
 
 #: indico/web/client/js/react/components/notes/ManageNotes.jsx
 msgid "Are you sure you want to delete these minutes?"
-msgstr ""
-
-#: indico/web/client/js/react/components/notes/NoteEditor.jsx
-msgid "Edit Minutes"
 msgstr ""
 
 #: indico/web/client/js/react/components/notes/NoteEditor.jsx

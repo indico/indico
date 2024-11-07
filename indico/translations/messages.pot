@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-09-26 17:18+0200\n"
+"POT-Creation-Date: 2024-11-07 12:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -246,12 +246,9 @@ msgid "Importers"
 msgstr ""
 
 #: indico/core/plugins/__init__.py indico/modules/vc/__init__.py indico/modules/vc/clone.py
-#: indico/modules/vc/templates/conference_home.html indico/modules/vc/templates/event_header.html
-#: indico/modules/vc/views.py
+#: indico/modules/vc/templates/list_vc_rooms.html indico/modules/vc/views.py
 msgid "Videoconference"
-msgid_plural "Videoconferences"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: indico/core/plugins/__init__.py
 msgid "Other"
@@ -4378,6 +4375,14 @@ msgstr ""
 msgid "Rules may not be empty"
 msgstr ""
 
+#: indico/modules/events/abstracts/fields.py
+msgid "You cannot combine the \"Invited\" rule with other rules"
+msgstr ""
+
+#: indico/modules/events/abstracts/fields.py
+msgid "Existing notification templates cannot be changed from/to \"Invited\"; please create a new one"
+msgstr ""
+
 #: indico/modules/events/abstracts/fields.py indico/modules/events/contributions/fields.py
 #: indico/modules/events/persons/controllers.py
 msgid "Author"
@@ -4853,6 +4858,14 @@ msgstr ""
 #: indico/modules/events/abstracts/forms.py indico/modules/events/registration/templates/management/email_preview.html
 #: indico/modules/events/reminders/templates/preview.html indico/modules/logs/templates/entry_email.html
 msgid "Body"
+msgstr ""
+
+#: indico/modules/events/abstracts/forms.py
+msgid "Invitation email templates must contain the {placeholder} placeholder"
+msgstr ""
+
+#: indico/modules/events/abstracts/forms.py
+msgid "Only invitation email templates may contain the {placeholder} placeholder"
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py
@@ -8206,6 +8219,14 @@ msgid "Background color"
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
+msgid "Use logo as banner"
+msgstr ""
+
+#: indico/modules/events/layout/forms.py
+msgid "Use the event logo as a full-width banner."
+msgstr ""
+
+#: indico/modules/events/layout/forms.py
 msgid "Short message shown below the title"
 msgstr ""
 
@@ -8260,7 +8281,10 @@ msgid "Timetable theme"
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
-msgid "Logo to be displayed next to the event's title"
+msgid ""
+"Logo to be displayed in the event page. When configured as banner, the logo will be displayed above the event title "
+"and the optimal width is {}px. Otherwise, the logo will be displayed to left of the event title and the optimal width"
+" is {}px."
 msgstr ""
 
 #: indico/modules/events/layout/forms.py
@@ -8305,6 +8329,14 @@ msgstr ""
 
 #: indico/modules/events/layout/controllers/images.py
 msgid "The image '{}' has been deleted"
+msgstr ""
+
+#: indico/modules/events/layout/controllers/layout.py
+msgid "The event logo is too small. It is recommended to use a logo with a width of at least {}px."
+msgstr ""
+
+#: indico/modules/events/layout/controllers/layout.py
+msgid "The event logo is too large. It is recommended to use a logo with a width of at most {}px."
 msgstr ""
 
 #: indico/modules/events/layout/controllers/layout.py
@@ -8443,7 +8475,7 @@ msgstr ""
 msgid "Timetable"
 msgstr ""
 
-#: indico/modules/events/layout/templates/layout_conference.html
+#: indico/modules/events/layout/templates/layout_conference.html indico/modules/events/registration/forms.py
 msgid "Preview"
 msgstr ""
 
@@ -9559,6 +9591,10 @@ msgstr ""
 
 #: indico/modules/events/notes/templates/_note.html
 msgid "Permanent link"
+msgstr ""
+
+#: indico/modules/events/notes/templates/_note.html indico/modules/events/templates/display/common/_manage_button.html
+msgid "Edit minutes"
 msgstr ""
 
 #: indico/modules/events/papers/__init__.py
@@ -11256,23 +11292,11 @@ msgid "Message for pending registrations"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
-msgid "Text included in emails sent to pending registrations (Markdown syntax)"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
 msgid "Message for unpaid registrations"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
-msgid "Text included in emails sent to unpaid registrations (Markdown syntax)"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
 msgid "Message for complete registrations"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Text included in emails sent to complete registrations (Markdown syntax)"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py indico/modules/events/reminders/forms.py
@@ -11284,7 +11308,7 @@ msgid "Attach an iCalendar file to the mail sent once a registration is complete
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
-msgid "Enable notifications to managers about registrations"
+msgid "Enable e-mail notifications about registrations to organizers"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -11297,6 +11321,30 @@ msgstr ""
 
 #: indico/modules/events/registration/forms.py
 msgid "Email address set as the sender of all notifications sent to users. If empty, then {email} is used."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Text included in emails sent to pending registrations (Markdown syntax)."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Pending Registration Preview"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Text included in emails sent to unpaid registrations (Markdown syntax)."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Unpaid Registration Preview"
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Text included in emails sent to complete registrations (Markdown syntax)."
+msgstr ""
+
+#: indico/modules/events/registration/forms.py
+msgid "Complete Registration Preview"
 msgstr ""
 
 #: indico/modules/events/registration/forms.py
@@ -11810,6 +11858,10 @@ msgstr ""
 msgid "Row {}: an invitation for this user already exists"
 msgstr ""
 
+#: indico/modules/events/registration/controllers/__init__.py
+msgid "Could not process image, it may be corrupted or too big"
+msgstr ""
+
 #: indico/modules/events/registration/controllers/display.py
 msgid "This registration form is private."
 msgstr ""
@@ -12177,6 +12229,10 @@ msgstr ""
 
 #: indico/modules/events/registration/placeholders/invitations.py
 msgid "Link to accept/decline the invitation"
+msgstr ""
+
+#: indico/modules/events/registration/placeholders/registrations.py
+msgid "Picture of the person"
 msgstr ""
 
 #: indico/modules/events/registration/placeholders/registrations.py
@@ -13493,7 +13549,7 @@ msgid "Notifications for registrants"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_edit.html
-msgid "Notifications for managers"
+msgid "Notifications for organizers"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_invitations.html
@@ -15618,10 +15674,6 @@ msgid "from <strong>%(start_date)s (%(start_time)s)</strong> to <strong>%(end_da
 msgstr ""
 
 #: indico/modules/events/templates/display/common/_manage_button.html
-msgid "Edit minutes"
-msgstr ""
-
-#: indico/modules/events/templates/display/common/_manage_button.html
 msgid "Add minutes"
 msgstr ""
 
@@ -15630,7 +15682,7 @@ msgid "Edit Event"
 msgstr ""
 
 #: indico/modules/events/templates/display/common/_manage_button.html
-msgid "Compile minutes"
+msgid "Compile Minutes"
 msgstr ""
 
 #: indico/modules/events/templates/display/common/_manage_button.html
@@ -16441,6 +16493,14 @@ msgstr ""
 
 #: indico/modules/events/tracks/templates/management.html
 msgid "Add track"
+msgstr ""
+
+#: indico/modules/files/controllers.py
+msgid "The uploaded file is too large"
+msgstr ""
+
+#: indico/modules/files/controllers.py
+msgid "The uploaded file is not allowed"
 msgstr ""
 
 #: indico/modules/groups/__init__.py
@@ -18490,6 +18550,14 @@ msgid ""
 "this action."
 msgstr ""
 
+#: indico/modules/vc/__init__.py
+msgid "There was a videoconference associated with this contribution. It has been linked to the event instead"
+msgstr ""
+
+#: indico/modules/vc/__init__.py
+msgid "There was a videoconference associated with this session block. It has been linked to the event instead"
+msgstr ""
+
 #: indico/modules/vc/clone.py
 msgid "The target event already has a videoconference"
 msgstr ""
@@ -18644,16 +18712,8 @@ msgstr ""
 msgid "{} (session block)"
 msgstr ""
 
-#: indico/modules/vc/templates/conference_home.html
-msgid "There is a videoconference for this event."
-msgstr ""
-
 #: indico/modules/vc/templates/event_vc.html
 msgid "There are no bookings associated with this event."
-msgstr ""
-
-#: indico/modules/vc/templates/list_vc_rooms.html
-msgid "More info"
 msgstr ""
 
 #: indico/modules/vc/templates/manage_event.html
