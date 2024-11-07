@@ -22,19 +22,23 @@
                         <section class="{{ get_custom_id(entry) }}">
                             {{ render_block_date(entry, day, print_date_close_to_sessions) }}
                             <section class="session-block {{ 'contribution' if entry.type.name == 'CONTRIBUTION' else '' }}">
-                                {{
-                                    render_session_block(
-                                        entry,
-                                        show_abstract,
-                                        dont_show_poster_abstract,
-                                        show_contribs,
-                                        show_length_contribs,
-                                        new_page_per_session,
-                                        show_session_description,
-                                        show_title,
-                                        show_affiliation
-                                    )
-                                }}
+                                {% if entry.type.name == 'BREAK' %}
+                                    {{ render_break(entry) }}
+                                {% else %}
+                                    {{
+                                        render_session_block(
+                                            entry,
+                                            show_abstract,
+                                            dont_show_poster_abstract,
+                                            show_contribs,
+                                            show_length_contribs,
+                                            new_page_per_session,
+                                            show_session_description,
+                                            show_title,
+                                            show_affiliation
+                                        )
+                                    }}
+                                {% endif %}
                             </section>
                         </section>
                         <div class="time-text time-to">
@@ -45,6 +49,30 @@
             {% endfor %}
         </div>
     {% endfor %}
+{% endmacro %}
+
+{% macro render_break(entry) %}
+    {% set break = entry.object %}
+
+    <div class="session-block-wrapper">
+        <section
+            id="entry-{{ entry.id }}"
+            class="session-block-title inherited-bg-color inherited-txt-color"
+        >
+            <h3>{{ break.title }}</h3>
+            <div class="session-block-title-info">
+                <p>
+                    <span class="bold">
+                        {% trans %}Break{% endtrans %}
+                    </span>
+                </p>
+                <p>
+                    <span class="bold">{% trans %}Location{% endtrans %}:</span>
+                    {{ render_place(entry) }}
+                </p>
+            </div>
+        </section>
+    </div>
 {% endmacro %}
 
 {% macro render_session_block(entry, show_abstract, dont_show_poster_abstract, show_contribs, show_length_contribs, new_page_per_session, show_session_description, show_title, show_affiliation) %}
