@@ -58,7 +58,7 @@ describe('date_selection', () => {
     [new Date('Apr 24 2024')],
     [new Date()],
     [new Date('Jan 12 2088')],
-  ])('should clear the date when the same date is selected twice', selectedDate => {
+  ])('should not clear the date when the same date is selected twice', selectedDate => {
     {
       // left
       const s = ds.newSelection();
@@ -67,7 +67,7 @@ describe('date_selection', () => {
       const {selection: s2} = ds.select(s1, selectedDate);
       const result = ds.select(s2, selectedDate);
 
-      assertResult(result, [undefined, undefined]);
+      assertResult(result, [selectedDate, selectedDate], true);
     }
 
     {
@@ -78,7 +78,7 @@ describe('date_selection', () => {
       const {selection: s2} = ds.select(s1, selectedDate);
       const result = ds.select(s2, selectedDate);
 
-      assertResult(result, [undefined, undefined]);
+      assertResult(result, [selectedDate, selectedDate], true);
     }
   });
 
@@ -88,7 +88,7 @@ describe('date_selection', () => {
     [new Date()],
     [new Date('Jan 12 2088')],
   ])(
-    'should clear the opposite when a date like %s is selected, regardless of the trigger',
+    'should not clear the opposite when a date like %s is selected, regardless of the trigger',
     selectedDate => {
       {
         // left then right
@@ -97,7 +97,7 @@ describe('date_selection', () => {
         const s1 = ds.triggerRight(s);
         const result = ds.select(s1, selectedDate);
 
-        assertResult(result, [undefined, undefined]);
+        assertResult(result, [selectedDate, selectedDate], true);
       }
 
       {
@@ -107,7 +107,7 @@ describe('date_selection', () => {
         const s1 = ds.triggerLeft(s);
         const result = ds.select(s1, selectedDate);
 
-        assertResult(result, [undefined, undefined]);
+        assertResult(result, [selectedDate, selectedDate], true);
       }
     }
   );
