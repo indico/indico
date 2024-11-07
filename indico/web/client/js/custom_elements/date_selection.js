@@ -8,7 +8,7 @@
 // This module implements the date selection algorithm for
 // the date range picker.
 
-import {DateRange, isSameDate} from 'indico/utils/date';
+import {DateRange} from 'indico/utils/date';
 
 /**
  * Represents a selection of dates in a range date picker
@@ -90,14 +90,6 @@ export function select(selection, date) {
   const close = updatedSelection => ({selection: updatedSelection, close: true});
   const keepOpen = updatedSelection => ({selection: updatedSelection, close: false});
   const selectionState = selection.getSelectionState();
-
-  // Either end of the range is clicked -> clear that end
-  if (isSameDate(date, selection.left)) {
-    return keepOpen(selection.copy({left: null}));
-  }
-  if (isSameDate(date, selection.right)) {
-    return keepOpen(selection.copy({right: null}));
-  }
 
   // No selection -> select left
   if (selectionState === NONE) {
