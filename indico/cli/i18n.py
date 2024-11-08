@@ -32,6 +32,7 @@ LANGUAGE_RENAMES = {'zh_Hans_CN': 'zh_CN.GB2312'}
 
 INDICO_DIR = Path(get_root_path('indico')).parent
 TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'translations'
+MERGED_TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'merged_translations'
 MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
@@ -386,10 +387,10 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
 # Filter merged.po files by removing messages that are not in the given .pot file
 def filter_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
     with merged_po_path.open('rb') as f:
-        merged_catalog: Catalog = read_po(f)
+        merged_catalog = read_po(f)
 
     with pot_path.open('rb') as f:
-        pot_catalog: Catalog = read_po(f)
+        pot_catalog = read_po(f)
 
     merged_catalog.update(pot_catalog)
 
@@ -398,13 +399,10 @@ def filter_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path)
 
 
 def filter_all_po_files():
-    translations_dir = Path('indico/translations')
-    merged_translations_dir = Path('indico/merged_translations')
-
-    for lc_messages_dir in merged_translations_dir.glob('*/LC_MESSAGES'):
+    for lc_messages_dir in MERGED_TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
         merged_po_path = lc_messages_dir / 'merged.po'
         if merged_po_path.exists():
-            for pot_file in translations_dir.glob('*.pot'):
+            for pot_file in TRANSLATIONS_DIR.glob('*.pot'):
                 if pot_file.name != 'merged.pot':
                     output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
                     filter_po_by_pot(merged_po_path, pot_file, output_po_path)
