@@ -146,7 +146,7 @@ class VCRoom(db.Model):
 
         # process plugin actions
         Logger.get('modules.vc').info(f'Deleting videoconference {self}')
-        if self.status != VCRoomStatus.deleted:
+        if self.status != VCRoomStatus.deleted and self.plugin:
             self.plugin.delete_room(self, event)
             notify_deleted(self.plugin, self, self, event, user)
         db.session.delete(self)
