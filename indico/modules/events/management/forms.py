@@ -20,6 +20,7 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
@@ -66,7 +67,13 @@ class EventDataForm(IndicoForm):
         self.event = event
         self.editor_upload_url = url_for('attachments.upload_editor', event)
         super().__init__(*args, **kwargs)
-        self.description.widget = DescriptionWidget(render_mode=event.render_mode.name)
+        if self.event.description:
+            render_mode = self.event.render_mode
+        elif session.user.settings.get('use_markdown_for_description'):
+            render_mode = RenderMode.markdown
+        else:
+            render_mode = RenderMode.html
+        self.description.widget = DescriptionWidget(render_mode=render_mode.name)
         prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
                                           'is not case sensitive.').format(prefix)
