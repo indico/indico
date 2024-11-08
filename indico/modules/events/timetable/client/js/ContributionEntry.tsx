@@ -110,7 +110,7 @@ export default function ContributionEntry({
   }, [isDragging, isResizing, blockRef]);
 
   return (
-    <button type="button" styleName={`entry ${type === 'break' ? 'break' : ''}`} style={style}>
+    <div role="button" styleName={`entry ${type === 'break' ? 'break' : ''}`} style={style}>
       <div
         styleName="drag-handle"
         ref={setNodeRef}
@@ -135,7 +135,7 @@ export default function ContributionEntry({
         setGlobalDuration={_setDuration}
         setIsResizing={setIsResizing}
       />
-    </button>
+    </div>
   );
 }
 
