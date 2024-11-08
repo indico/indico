@@ -494,7 +494,7 @@ class RHRegistrationsImport(RHRegistrationsActionBase):
             if self.regform.is_purged:
                 raise Forbidden(_('Registration is disabled due to an expired retention period'))
             skip_moderation = self.regform.moderation_enabled and form.skip_moderation.data
-            delimiter = form.delimiter.data
+            delimiter = form.delimiter.data.delimiter
             registrations = import_registrations_from_csv(self.regform, form.source_file.data,
                                                           skip_moderation=skip_moderation,
                                                           notify_users=form.notify_users.data,
