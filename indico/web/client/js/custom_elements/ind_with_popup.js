@@ -45,12 +45,7 @@ customElements.define(
         trigger.setAttribute('aria-controls', dialog.id);
 
         trigger.addEventListener('click', () => {
-          if (this.shown) {
-            return;
-          }
-          positioning.position(dialog, this, positioning.popupPositionStrategy, () => {
-            this.shown = true;
-          });
+          this.shown = !this.shown;
         });
 
         this.addEventListener('keydown', evt => {
@@ -69,26 +64,22 @@ customElements.define(
       };
     }
 
-    attributeChangedCallback(name) {
-      switch (name) {
-        case 'shown':
-          domReady.then(() => {
-            const trigger = this.querySelector('[data-trigger]');
-            const dialog = this.querySelector('[data-dialog]');
+    attributeChangedCallback() {
+      const trigger = this.querySelector('[data-trigger]');
+      const dialog = this.querySelector('[data-dialog]');
 
-            trigger.setAttribute('aria-expanded', this.shown);
+      trigger.setAttribute('aria-expanded', this.shown);
 
-            if (this.shown) {
-              dialog.show();
-              dialog.firstElementChild.focus();
-            } else {
-              dialog.close();
-            }
-
-            this.dispatchEvent(new Event('toggle', {bubbles: true}));
-          });
-          break;
+      if (this.shown) {
+        positioning.position(dialog, this, positioning.popupPositionStrategy, () => {
+          dialog.show();
+          dialog.firstElementChild.focus();
+        });
+      } else {
+        dialog.close();
       }
+
+      this.dispatchEvent(new Event('toggle', {bubbles: true}));
     }
   }
 );

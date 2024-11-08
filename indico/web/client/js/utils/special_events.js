@@ -17,5 +17,5 @@ export function focusLost(target, callback) {
 
   document.body.addEventListener('click', triggerCallbackIfOutsideTarget, listenerOptions);
   document.body.addEventListener('focusin', triggerCallbackIfOutsideTarget, listenerOptions);
-  return () => abortFocusLost.signal.abort();
+  return () => abortFocusLost.abort();
 }
