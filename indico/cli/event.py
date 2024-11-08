@@ -57,7 +57,9 @@ def restore(event_id, user_id, message):
               help='Use pickle for serializing - this is much faster, but not human-readable.')
 @click.option('-D', '--dummy-files', is_flag=True,
               help='Export files with short dummy content instead of their real data.')
-def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files):
+@click.option('-X', '--external-files', is_flag=True,
+              help='Keep references to file storage instead of exporting file content.')
+def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files, external_files):
     """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
@@ -74,6 +76,12 @@ def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files):
 
     When exporting an event for testing/debugging on a local development instance, you may
     want to use the `--dummy-files` switch to keep the archive small.
+
+    When you are exporting large amounts of data, and the file storage backend is accessible
+    from the target system as well (typically the case when you use some kind of shared file
+    system or S3), you may use `--external-files` to avoid actually adding all the file
+    contents to the export archive. When importing such an archive you will be prompted to
+    provide the necessary file storage backend configuration to read the file contents.
     """
     obj = Category.get(id) if is_category else Event.get(id)
     objtype = 'category' if is_category else 'event'
@@ -88,7 +96,8 @@ def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files):
         click.confirm('Export it anyway?', abort=True)
     if dummy_files:
         click.secho('Dummy files are enabled, DO NOT import the event in a production instance', fg='yellow', bold=True)
-    export_event(obj, target_file, keep_uuids=keep_uuids, use_pickle=use_pickle, dummy_files=dummy_files)
+    export_event(obj, target_file, keep_uuids=keep_uuids, use_pickle=use_pickle, dummy_files=dummy_files,
+                 external_files=external_files)
 
 
 @cli.command('import')

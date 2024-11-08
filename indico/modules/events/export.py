@@ -5,10 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import ast
 import os
 import pickle
 import posixpath
 import re
+import sys
 import tarfile
 from collections import defaultdict
 from datetime import date, datetime
@@ -29,7 +31,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_all_models
-from indico.core.storage.backend import get_storage
+from indico.core.storage.backend import get_storage, get_storage_backends
 from indico.modules.categories import Category, CategoryLogRealm
 from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.contributions import Contribution
@@ -88,7 +90,8 @@ class _PickleBackend:
 BACKENDS = {'yaml': _YamlBackend, 'pickle': _PickleBackend}
 
 
-def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle=False, dummy_files=False):
+def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle=False, dummy_files=False,
+                 external_files=False):
     """Export the specified event/category with all its data to a file.
 
     :param event_or_category: the `Event` to export, or a `Category` to export with all
@@ -97,10 +100,12 @@ def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle
     :param keep_uuids: preserve uuids between the exported and imported events
     :param use_pickle: use pickle instead of yaml for serializing
     :param dummy_files: replace actual file content with short dummy content
+    :param external_files: keep a reference to the original file storage instead of
+                           exporting file content
     """
     backend = 'pickle' if use_pickle else 'yaml'
     exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids, dummy_files=dummy_files,
-                             backend=backend)
+                             external_files=external_files, backend=backend)
     exporter.serialize()
 
 
@@ -194,11 +199,13 @@ def _get_alembic_version() -> list[str]:
 
 
 class EventExporter:
-    def __init__(self, obj, target_file, *, keep_uuids=False, dummy_files=False, backend='yaml'):
+    def __init__(self, obj, target_file, *, keep_uuids=False, dummy_files=False, external_files=False, backend='yaml'):
         self.obj = obj
         self.target_file = target_file
         self.keep_uuids = keep_uuids
         self.dummy_files = dummy_files
+        self.external_files = external_files
+        self.used_storage_backends = set()
         self.backend = BACKENDS[backend]
         self.categories = frozenset(self._fetch_categories())
         # XXX we're not using a context manager here since changing that would probably require
@@ -237,6 +244,7 @@ class EventExporter:
             'db_version': _get_alembic_version(),
             'dummy_files': self.dummy_files,
             'object_files': [],
+            'external_storage_backends': sorted(self.used_storage_backends),
             'users': self.users,
             'affiliations': self.affiliations,
         }
@@ -405,15 +413,19 @@ class EventExporter:
         size = data.pop('size')
         md5 = data.pop('md5')
         uuid = self._get_uuid()
+        storage_data = {}
         if self.dummy_files:
             size = 1
             md5 = '9dd4e461268c8034f5c8564e155c67a6'  # md5('x')
             self._add_file(uuid, size, 'x')
+        elif self.external_files:
+            storage_data = {'storage': {'backend': storage_backend, 'file_id': storage_file_id}}
+            self.used_storage_backends.add(storage_backend)
         else:
             with get_storage(storage_backend).open(storage_file_id) as f:
                 self._add_file(uuid, size, f)
         data['__file__'] = ('file', {'uuid': uuid, 'filename': filename, 'content_type': content_type, 'size': size,
-                                     'md5': md5})
+                                     'md5': md5, **storage_data})
 
     def _serialize_objects(self, table, filter_, *, is_root_object=False, parent_scope=None):
         spec = self.spec[table.fullname]
@@ -526,6 +538,7 @@ class EventImporter:
         self.category_id = category_id
         self.create_users = create_users
         self.create_affiliations = create_affiliations
+        self.source_backends = {}
         self.verbose = verbose
         self.force = force
         self.archive = tarfile.open(fileobj=source_file)  # noqa: SIM115
@@ -564,6 +577,39 @@ class EventImporter:
         spec['missing_users'] = {_resolve_col_name(k): v for k, v in spec.get('missing_users', {}).items()}
         spec['verbose'] = {_model_to_table(k): _process_format(v) for k, v in spec.get('verbose', {}).items()}
         return spec
+
+    def _setup_external_storage(self, data):
+        if not (backend_names := set(data['external_storage_backends'])):
+            return
+        all_backends = get_storage_backends()
+        click.echo(f'Some files reference external storage backends: {', '.join(sorted(backend_names))}')
+        while True:
+            click.echo('Paste a Python dict literal with the config of those backends, and confirm with CTRL+D.')
+            click.echo("You may be able to take it from the source instance's STORAGE_BACKENDS config setting.")
+            mapping = ast.literal_eval(sys.stdin.read())
+            if not isinstance(mapping, dict):
+                click.echo('Invalid data, not a dict')
+                click.echo()
+                continue
+            elif missing := sorted(backend_names - set(mapping)):
+                click.echo(f'Missing keys: {', '.join(missing)}')
+                click.echo()
+                continue
+
+            backends = {}
+            for name in backend_names:
+                storage_name, storage_config = mapping[name].split(':', 1)
+                if not (backend := all_backends.get(storage_name)):
+                    click.echo(f'Invalid backend: {storage_name}')
+                    click.echo()
+                    backends = None
+                    break
+                backends[name] = backend(storage_config)
+            # This is a bit ugly, but we can't `continue` the outer loop above so we use this trick instead...
+            if backends is not None:
+                break
+
+        self.source_backends = backends
 
     def _load_users(self, data):
         if not data['users']:
@@ -704,6 +750,7 @@ class EventImporter:
                 click.secho('This instance is not running in debug mode, use --force if you really want to import '
                             'an archive with dummy file content', fg='yellow')
                 return None
+        self._setup_external_storage(self.data)
         self._load_affiliations(self.data)
         self._load_users(self.data)
         objects = self._load_objects(self.data)
@@ -851,7 +898,12 @@ class EventImporter:
     def _process_file(self, id_, data, scope):
         storage_backend = config.ATTACHMENT_STORAGE
         storage = get_storage(storage_backend)
-        extracted = self.archive.extractfile(data['uuid'])
+        if source_storage_data := data.get('storage'):
+            source_storage = self.source_backends[source_storage_data['backend']]
+            with source_storage.open(source_storage_data['file_id']) as f:
+                extracted = f.read()
+        else:
+            extracted = self.archive.extractfile(data['uuid'])
         path = self._get_file_storage_path(id_, data['filename'], scope)
         storage_file_id, md5 = storage.save(path, data['content_type'], data['filename'], extracted)
         assert data['size'] == storage.getsize(storage_file_id)
