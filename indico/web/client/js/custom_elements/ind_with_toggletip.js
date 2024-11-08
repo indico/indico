@@ -33,6 +33,7 @@ customElements.define(
     attributeChangedCallback() {
       const tip = this.querySelector('[data-tip-content]');
 
+      this.stopHandlingFocusLost?.();
       this.stopPositioning?.();
 
       if (this.shown) {
@@ -47,6 +48,9 @@ customElements.define(
             this.removeAttribute('data-position-check');
           }
         );
+        this.stopHandlingFocusLost = focusLost(this, () => {
+          this.shown = false;
+        });
       } else {
         tip.innerHTML = '';
         tip.hidden = true;
@@ -66,13 +70,19 @@ customElements.define(
         trigger.addEventListener('click', () => {
           this.shown = !this.shown;
         });
+
+        this.addEventListener('keydown', evt => {
+          if (evt.code === 'Escape') {
+            this.shown = false;
+          }
+        });
       });
 
       this.onconnect = () => {
-        const stopHandlingFocusLost = focusLost(this, () => {
-          this.shown = false;
+        this.addUnmountEventListener(() => {
+          this.stopHandlingFocusLost?.();
+          this.stopPositioning?.();
         });
-        this.addUnmountEventListener(stopHandlingFocusLost);
       };
     }
   }
