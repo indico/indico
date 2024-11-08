@@ -19,7 +19,7 @@ from pathlib import Path
 from pkgutil import walk_packages
 
 import click
-from babel.messages import frontend
+from babel.messages import Catalog, frontend
 from babel.messages.pofile import read_po, write_po
 from flask.helpers import get_root_path
 
@@ -365,41 +365,33 @@ def remove_empty_pot_files(path: Path, python=False, javascript=False, react=Fal
 
 
 # Merge after generating all the .pot files
-def merge_pot_files(output_file, *input_files):
+def merge_pot_files(output_file: Path, *input_files: list[Path]):
     """Merge multiple POT files into a single POT file."""
-    merged_catalog = None
+    merged_catalog = Catalog(project='Indico', version=indico.__version__)
 
     for input_file in input_files:
         with input_file.open('rb') as f:
             catalog = read_po(f)
 
-            if merged_catalog is None:
-                merged_catalog = catalog
-            else:
-                for message in catalog:
-                    if message.id not in merged_catalog:
-                        merged_catalog[message.id] = message
+            for message in catalog:
+                if message.id not in merged_catalog:
+                    merged_catalog[message.id] = message
 
-    if merged_catalog:
-        with output_file.open('wb') as f:
-            write_po(f, merged_catalog)
+    with output_file.open('wb') as f:
+        write_po(f, merged_catalog, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
 
-    print('\n✔  Done merging pot files!\n')
+    click.secho('✔  Done merging pot files!', fg='green', bold=True)
 
 
 # Filter merged.po files by removing messages that are not in the given .pot file
-def filter_po_by_pot(merged_po_path, pot_path, output_po_path):
+def filter_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
     with merged_po_path.open('rb') as f:
-        merged_catalog = read_po(f)
+        merged_catalog: Catalog = read_po(f)
 
     with pot_path.open('rb') as f:
-        pot_catalog = read_po(f)
+        pot_catalog: Catalog = read_po(f)
 
-    pot_message_ids = {message.id for message in pot_catalog}
-
-    for message in list(merged_catalog):
-        if message.id not in pot_message_ids:
-            merged_catalog.delete(message.id)
+    merged_catalog.update(pot_catalog)
 
     with output_po_path.open('wb') as f:
         write_po(f, merged_catalog)
@@ -409,17 +401,15 @@ def filter_all_po_files():
     translations_dir = Path('indico/translations')
     merged_translations_dir = Path('indico/merged_translations')
 
-    for lang_dir in merged_translations_dir.iterdir():
-        if lang_dir.is_dir():
-            lc_messages_dir = lang_dir / 'LC_MESSAGES'
-            merged_po_path = lc_messages_dir / 'merged.po'
-            if merged_po_path.exists():
-                for pot_file in translations_dir.glob('*.pot'):
-                    if pot_file.name != 'merged.pot':
-                        output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
-                        filter_po_by_pot(merged_po_path, pot_file, output_po_path)
+    for lc_messages_dir in merged_translations_dir.glob('*/LC_MESSAGES'):
+        merged_po_path = lc_messages_dir / 'merged.po'
+        if merged_po_path.exists():
+            for pot_file in translations_dir.glob('*.pot'):
+                if pot_file.name != 'merged.pot':
+                    output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
+                    filter_po_by_pot(merged_po_path, pot_file, output_po_path)
 
-    print('\n✔  Done generating split PO files!\n')
+    click.secho('✔  Done generating split PO files!', fg='green', bold=True)
 
 
 @click.group()
