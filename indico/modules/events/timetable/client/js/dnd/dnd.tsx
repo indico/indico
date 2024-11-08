@@ -324,17 +324,27 @@ export function DnDProvider({
     [modifier, draggables]
   );
 
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && state.current.state !== 'idle') {
+      state.current.state = 'idle';
+      setDraggableData(d => resetDraggableState(d, state.current.activeDraggable));
+      state.current.activeDraggable = null;
+    }
+  }, []);
+
   useEffect(() => {
     document.addEventListener('mouseup', onMouseUp);
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('scroll', onScroll, true);
+    document.addEventListener('keydown', onKeyDown, true);
 
     return () => {
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('scroll', onScroll, true);
+      document.removeEventListener('keydown', onKeyDown, true);
     };
-  }, [onMouseUp, onMouseMove, onScroll]);
+  }, [onMouseUp, onMouseMove, onScroll, onKeyDown]);
 
   const value = useMemo(
     () => ({
