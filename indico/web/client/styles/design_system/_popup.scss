@@ -16,6 +16,7 @@
 
 %popup-arrow {
   // You need to define --arrow-size and --arrow-color in one of the ancestors
+  --arrow-position-adjust: 0.2em; // nudge the arrow so that it overlaps with popup
 
   content: '';
   display: inline-block;
@@ -31,14 +32,14 @@
 }
 
 %popup-arrow-horizontal {
-  left: calc(var(--arrow-left) - var(--arrow-size) + 0.1em);
-  right: calc(100% - var(--arrow-size) + 0.1em);
+  left: calc(var(--arrow-left) - var(--arrow-size) + var(--arrow-position-adjust));
+  right: calc(100% - var(--arrow-size) + var(--arrow-position-adjust));
   top: calc(50% - var(--arrow-size));
 }
 
 %popup-arrow-vertical {
-  top: calc(var(--arrow-top) - var(--arrow-size) + 0.1em);
-  bottom: calc(100% - var(--arrow-size) + 0.1em);
+  top: calc(var(--arrow-top) - var(--arrow-size) + var(--arrow-position-adjust));
+  bottom: calc(100% - var(--arrow-size) + var(--arrow-position-adjust));
   left: calc(50% - var(--arrow-size));
 }
 
