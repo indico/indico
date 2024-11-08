@@ -5,53 +5,75 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {TipBase} from 'indico/custom_elements/TipBase';
+import CustomElementBase from 'indico/custom_elements/_base';
+import {domReady} from 'indico/utils/domstate';
+import * as positioning from 'indico/utils/positioning';
+import {focusLost} from 'indico/utils/special_events';
 
-const liveRegionUpdateDelay = 100;
+import './tips.scss';
 
 customElements.define(
   'ind-with-toggletip',
-  class extends TipBase {
-    show() {
-      // XXX: We add a slight delay to ensure that the screen readers will be able to pick up
-      // the change to the live region.
-      setTimeout(() => {
-        this.$tip.innerHTML = this.tipContent;
-        this.shown = true;
-        this.updatePosition();
-      }, liveRegionUpdateDelay);
+  class extends CustomElementBase {
+    constructor() {
+      super();
+
+      Object.defineProperty(this, 'shown', {
+        get() {
+          return this.hasAttribute('shown');
+        },
+        set(val) {
+          this.toggleAttribute('shown', val);
+        },
+      });
     }
 
-    hide() {
-      this.shown = false;
-      this.$tip.hidden = true;
-      this.$tip.innerHTML = '';
+    static observedAttributes = ['shown'];
+
+    attributeChangedCallback() {
+      const tip = this.querySelector('[data-tip-content]');
+
+      this.stopPositioning?.();
+
+      if (this.shown) {
+        this.toggleAttribute('data-position-check', true);
+        tip.innerHTML = this._tipHTML;
+        tip.hidden = false;
+        this.stopPositioning = positioning.position(
+          tip,
+          this,
+          positioning.verticalTooltipPositionStrategy,
+          () => {
+            this.removeAttribute('data-position-check');
+          }
+        );
+      } else {
+        tip.innerHTML = '';
+        tip.hidden = true;
+      }
     }
 
     setup() {
-      super.setup();
+      domReady.then(() => {
+        const trigger = this.querySelector('button');
+        const tip = this.querySelector('[data-tip-content]');
+        this._tipHTML = tip.innerHTML;
 
-      // NB: The tip is an aria-live region. Because of this, it is necessary to clear the content.
-      // Live regions are (usually) only announced when content changes. (See also the hide() method.)
-      this.tipContent = this.$tip.innerHTML;
-      this.$tip.innerHTML = '';
+        // Clear the tip initially so that the screen reader will announce it
+        // correctly when the tip is opened.
+        tip.innerHTML = '';
 
-      this.addEventListener('click', evt => {
-        const $target = evt.target.closest('button');
-        if (!$target || !this.contains($target)) {
-          return;
-        }
-
-        if (this.shown) {
-          $target.removeAttribute('aria-expanded');
-          this.removeEventListener('focusout', this.hide);
-          this.hide();
-        } else {
-          $target.setAttribute('aria-expanded', true);
-          this.show();
-          this.addEventListener('focusout', this.hide, {once: true});
-        }
+        trigger.addEventListener('click', () => {
+          this.shown = !this.shown;
+        });
       });
+
+      this.onconnect = () => {
+        const stopHandlingFocusLost = focusLost(this, () => {
+          this.shown = false;
+        });
+        this.addUnmountEventListener(stopHandlingFocusLost);
+      };
     }
   }
 );

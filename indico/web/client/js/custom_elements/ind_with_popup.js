@@ -8,6 +8,7 @@
 import CustomElementBase from 'indico/custom_elements/_base';
 import {domReady} from 'indico/utils/domstate';
 import * as positioning from 'indico/utils/positioning';
+import {focusLost} from 'indico/utils/special_events';
 
 import './ind_with_popup.scss';
 
@@ -32,28 +33,6 @@ customElements.define(
     }
 
     setup() {
-      this.onconnect = () => {
-        document.body.addEventListener(
-          'focusin',
-          () => {
-            setTimeout(() => {
-              if (this.contains(document.activeElement)) {
-                return;
-              }
-              this.shown = false;
-            });
-          },
-          {signal: this.unmountController.signal}
-        );
-        document.body.addEventListener('click', evt => {
-          const dialog = this.querySelector('[data-dialog]');
-          if (dialog?.contains(evt.target)) {
-            return;
-          }
-          this.shown = false;
-        });
-      };
-
       domReady.then(() => {
         const trigger = this.querySelector('[data-trigger]');
         const dialog = this.querySelector('[data-dialog]');
@@ -81,6 +60,13 @@ customElements.define(
           }
         });
       });
+
+      this.onconnect = () => {
+        const stopHandlingFocusLost = focusLost(this, () => {
+          this.shown = false;
+        });
+        this.addUnmountEventListener(stopHandlingFocusLost);
+      };
     }
 
     attributeChangedCallback(name) {

@@ -40,8 +40,12 @@ export default class CustomElementBase extends HTMLElement {
     throw Error('Custom element must implement a setup() method');
   }
 
-  disconnectedCallbasck() {
+  disconnectedCallback() {
     this.unmountController.abort();
     this.dispatchEvent(new Event('x-disconnect'));
+  }
+
+  addUnmountEventListener(callback) {
+    this.unmountController.signal.addEventListener('abort', callback);
   }
 }
