@@ -494,9 +494,11 @@ class RHRegistrationsImport(RHRegistrationsActionBase):
             if self.regform.is_purged:
                 raise Forbidden(_('Registration is disabled due to an expired retention period'))
             skip_moderation = self.regform.moderation_enabled and form.skip_moderation.data
+            delimiter = form.delimiter.data
             registrations = import_registrations_from_csv(self.regform, form.source_file.data,
                                                           skip_moderation=skip_moderation,
-                                                          notify_users=form.notify_users.data)
+                                                          notify_users=form.notify_users.data,
+                                                          delimiter=delimiter)
             flash(ngettext('{} registration has been imported.',
                            '{} registrations have been imported.',
                            len(registrations)).format(len(registrations)), 'success')

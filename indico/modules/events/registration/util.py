@@ -864,10 +864,10 @@ def create_invitation(regform, user, email_sender, email_subject, email_body, *,
     return invitation
 
 
-def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
+def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False, delimiter=','):
     """Import event registrants from a CSV file into a form."""
     columns = ['first_name', 'last_name', 'affiliation', 'position', 'phone', 'email']
-    user_records = import_user_records_from_csv(fileobj, columns=columns)
+    user_records = import_user_records_from_csv(fileobj, columns=columns, delimiter=delimiter)
 
     reg_data = (db.session.query(Registration.user_id, Registration.email)
                 .with_parent(regform)

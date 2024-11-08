@@ -582,6 +582,8 @@ class ImportRegistrationsForm(IndicoForm):
                                                    'event is access-restricted.'))
     notify_users = BooleanField(_('E-mail users'), widget=SwitchWidget(),
                                 description=_('Whether the imported users should receive an e-mail notification'))
+    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter,
+                                      default=CSVFieldDelimiter.comma.name)
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
