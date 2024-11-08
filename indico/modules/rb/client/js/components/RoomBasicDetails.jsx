@@ -155,7 +155,10 @@ export default class RoomBasicDetails extends React.PureComponent {
             <li className="has-icon">
               {site && (
                 <>
-                  <AnnotatedIcon name="street view" text={Translate.string('Site')} />
+                  <AnnotatedIcon
+                    name="street view"
+                    text={Translate.string('Site', 'Building site/location')}
+                  />
                   {site}
                 </>
               )}

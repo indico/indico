@@ -20,7 +20,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_check_if_visible
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
 
@@ -124,7 +124,7 @@ def _event_deleted(event, user, **kwargs):
 
 class BookPermission(ManagementPermission):
     name = 'book'
-    friendly_name = _('Book')
+    friendly_name = pgettext('Room booking permission name', 'Book')
     description = _('Allows booking the room')
     user_selectable = True
     color = 'green'
@@ -132,7 +132,7 @@ class BookPermission(ManagementPermission):
 
 class PrebookPermission(ManagementPermission):
     name = 'prebook'
-    friendly_name = _('Prebook')
+    friendly_name = pgettext('Room booking permission name', 'Prebook')
     description = _('Allows prebooking the room')
     user_selectable = True
     default = True
@@ -141,7 +141,7 @@ class PrebookPermission(ManagementPermission):
 
 class OverridePermission(ManagementPermission):
     name = 'override'
-    friendly_name = _('Override')
+    friendly_name = pgettext('Room booking permission name', 'Override')
     description = _('Allows overriding restrictions when booking the room')
     user_selectable = True
     color = 'pink'
@@ -149,7 +149,7 @@ class OverridePermission(ManagementPermission):
 
 class ModeratePermission(ManagementPermission):
     name = 'moderate'
-    friendly_name = _('Moderate')
+    friendly_name = pgettext('Room booking permission name', 'Moderate')
     description = _('Allows moderating bookings (approving/rejecting/editing)')
     user_selectable = True
     color = 'purple'

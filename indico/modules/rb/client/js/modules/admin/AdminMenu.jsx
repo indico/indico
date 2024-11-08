@@ -56,7 +56,7 @@ function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clea
     <Menu size="large" styleName="admin-menu" vertical fluid>
       <Menu.Item>
         <NavLink exact to="/admin">
-          <Translate>General settings</Translate>
+          <Translate>General Settings</Translate>
         </NavLink>
       </Menu.Item>
       {isMapEnabled && (

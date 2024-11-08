@@ -35,11 +35,15 @@ export default function RoomEditPermissions({
           </Translate>
         </p>
         <Form.Group>
-          <FinalRadio name="protection_mode" value="public" label={Translate.string('Public')} />
+          <FinalRadio
+            name="protection_mode"
+            value="public"
+            label={Translate.string('Public', 'Booking mode')}
+          />
           <FinalRadio
             name="protection_mode"
             value="protected"
-            label={Translate.string('Restricted')}
+            label={Translate.string('Restricted', 'Booking mode')}
           />
         </Form.Group>
       </Form.Field>

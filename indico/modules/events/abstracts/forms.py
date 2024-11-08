@@ -28,7 +28,7 @@ from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users.util import get_user_by_email
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenEnumField, HiddenFieldList,
@@ -223,11 +223,12 @@ class AbstractJudgmentFormBase(IndicoForm):
     session = QuerySelectField(_('Session'), [HiddenUnless('judgment', AbstractAction.accept)],
                                get_label='title', allow_blank=True, blank_text=_('You may choose a session...'),
                                description=_('The generated contribution will be allocated in this session'))
-    duplicate_of = AbstractField(_('Duplicate of'),
+    duplicate_of = AbstractField(pgettext('Abstract', 'Duplicate of'),
                                  [HiddenUnless('judgment', AbstractAction.mark_as_duplicate), DataRequired()],
                                  description=_('The current abstract will be marked as duplicate of the selected one'),
                                  ajax_endpoint='abstracts.other_abstracts')
-    merged_into = AbstractField(_('Merge into'), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
+    merged_into = AbstractField(pgettext('Abstract', 'Merge into'),
+                                [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
                                 description=_('The current abstract will be merged into the selected one'),
                                 ajax_endpoint='abstracts.other_abstracts')
     merge_persons = BooleanField(_('Merge persons'), [HiddenUnless('judgment', AbstractAction.merge)],

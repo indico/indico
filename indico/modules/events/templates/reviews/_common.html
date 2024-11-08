@@ -6,11 +6,11 @@
     {% if user %}
         <span class="review-comment-edited"
             title="{% trans dt=dt|format_human_date, name=user.name %}On {{ dt }} by {{ name }}{% endtrans %}">
-            · {% trans %}edited{% endtrans %}
+            · {% trans "Review comment" %}edited{% endtrans %}
         </span>
     {% else %}
         <span class="review-comment-edited" title="{{ dt|format_human_date }}">
-            · {% trans %}edited{% endtrans %}
+            · {% trans "Review comment" %}edited{% endtrans %}
         </span>
     {% endif %}
 {% endmacro %}

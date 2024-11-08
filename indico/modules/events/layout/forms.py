@@ -15,7 +15,7 @@ from indico.modules.events.layout import EVENT_BANNER_WIDTH, EVENT_LOGO_WIDTH, t
 from indico.modules.events.layout.models.menu import MenuEntry
 from indico.modules.events.layout.util import get_css_file_data, get_logo_data, get_plugin_conference_themes
 from indico.modules.users import NameFormat
-from indico.util.i18n import _, orig_string
+from indico.util.i18n import _, orig_string, pgettext
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField, IndicoProtectionField
 from indico.web.forms.fields.principals import PrincipalListField
@@ -24,8 +24,8 @@ from indico.web.forms.widgets import ColorPickerWidget, SwitchWidget, TinyMCEWid
 
 
 THEMES = [('', _('No theme selected')),
-          ('orange.css', _('Orange')),
-          ('brown.css', _('Brown')),
+          ('orange.css', pgettext('Theme name', 'Orange')),
+          ('brown.css', pgettext('Theme name', 'Brown')),
           ('right_menu.css', _('Right menu'))]
 
 

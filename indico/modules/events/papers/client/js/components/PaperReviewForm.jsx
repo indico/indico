@@ -68,7 +68,7 @@ export default function PaperReviewForm() {
             text={
               unsortedArraysEqual(reviewGroups, reviewedGroups)
                 ? Translate.string('Change reviews')
-                : Translate.string('Review')
+                : Translate.string('Review', 'Review papers (verb)')
             }
             button
           >

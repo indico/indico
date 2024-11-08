@@ -84,7 +84,7 @@ export function PictureSettings() {
       name="minPictureSize"
       type="number"
       label={Translate.string('Minimum picture size')}
-      placeholder={Translate.string('Unlimited')}
+      placeholder={Translate.string('Unlimited', 'Minimum picture size')}
       description={Translate.string(
         'Minimum picture size that can be uploaded in pixels. Leave empty for no min size validation.'
       )}

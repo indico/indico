@@ -1068,7 +1068,7 @@ type(
               self.managementActions.addContribution();
             })
         : $('<a href="#" id="add_new" class="arrow hide-if-locked" data-toggle="dropdown">').text(
-            $T('Add new')
+            $T.pgettext('Timetable entry', 'Add new')
           );
 
       this.rescheduleLink = $('<a href="#" class="hide-if-locked" data-toggle="menu_select">').text(

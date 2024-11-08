@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.modules.networks.fields import MultiIPNetworkField
 from indico.modules.networks.models.networks import IPNetworkGroup
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -26,7 +26,7 @@ class IPNetworkGroupForm(IndicoForm):
     name = StringField(_('Name'), [DataRequired()])
     description = TextAreaField(_('Description'))
     networks = MultiIPNetworkField(_('Subnets'), description=_('IPv4 or IPv6 subnets in CIDR notation'))
-    hidden = BooleanField(_('Hidden'), widget=SwitchWidget(),
+    hidden = BooleanField(pgettext('IP network', 'Hidden'), widget=SwitchWidget(),
                           description=_('Hidden IP networks cannot be added to ACLs by users'))
     attachment_access_override = BooleanField(_('Full attachment access'),
                                               widget=SwitchWidget(confirm_enable=attachment_access_override_warning),

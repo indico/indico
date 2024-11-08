@@ -31,7 +31,7 @@ export default function RoomEditLocation({active, roomNameFormat}) {
         <Form.Field width={8}>
           <FinalInput
             name="site"
-            label={Translate.string('Site')}
+            label={Translate.string('Site', 'Building site/location')}
             required={isPlaceholderRequired(roomNameFormat, 'site')}
           />
         </Form.Field>
@@ -47,7 +47,7 @@ export default function RoomEditLocation({active, roomNameFormat}) {
         />
         <FinalInput
           name="number"
-          label={Translate.string('Number')}
+          label={Translate.string('Number', 'Room number')}
           required={isPlaceholderRequired(roomNameFormat, 'number')}
         />
       </Form.Group>

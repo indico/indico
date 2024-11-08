@@ -140,7 +140,7 @@ export default function ReviewForm() {
             </span>
             <Dropdown
               className="judgment-btn"
-              text={Translate.string('Judge')}
+              text={Translate.string('Judge', 'Judge editable (verb)')}
               direction="left"
               button
               floating
@@ -258,7 +258,7 @@ export default function ReviewForm() {
                   <FinalTagInput name="tags" options={tagOptions} />
                   <div styleName="judgment-submit-button">
                     <FinalSubmitButton
-                      label={Translate.string('Judge')}
+                      label={Translate.string('Judge', 'Judge editable (verb)')}
                       disabledUntilChange={judgmentType !== EditingReviewAction.accept}
                       // XXX: For some reason the button does not properly update with the correct
                       // `dirty` state after setting the `comment` value programmatically, but by

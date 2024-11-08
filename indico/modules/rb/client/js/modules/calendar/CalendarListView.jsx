@@ -199,7 +199,9 @@ class CalendarListView extends React.Component {
           }}
           onOpen={e => e.stopPropagation()}
           cancelButton={<Button content={Translate.string('Cancel')} />}
-          confirmButton={<Button content={Translate.string('Link')} />}
+          confirmButton={
+            <Button content={Translate.string('Link', 'Link a booking to an event (verb)')} />
+          }
           closeIcon
         />
         <div style={{position: 'absolute', top: '35%', right: '5px'}}>

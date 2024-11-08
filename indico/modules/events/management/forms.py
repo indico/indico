@@ -36,7 +36,7 @@ from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_P
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
-from indico.util.i18n import _, get_all_locales
+from indico.util.i18n import _, get_all_locales, pgettext
 from indico.util.string import validate_email
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -191,7 +191,7 @@ class EventPersonsForm(IndicoForm):
 class EventContactInfoForm(IndicoForm):
     _contact_fields = ('contact_title', 'contact_emails', 'contact_phones')
 
-    contact_title = StringField(_('Title'), [DataRequired()])
+    contact_title = StringField(pgettext("Salutation, e.g., 'Mr.' or 'Mrs.'", 'Title'), [DataRequired()])
     contact_emails = MultiStringField(_('Emails'), field=('email', _('email')), unique=True, flat=True, sortable=True)
     contact_phones = MultiStringField(_('Phone numbers'), field=('phone', _('number')), unique=True, flat=True,
                                       sortable=True)
@@ -425,7 +425,8 @@ class CloneRepeatUntilFormBase(CloneRepeatOnceForm):
 
 
 class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
-    recurrence = RelativeDeltaField(_('Every'), [DataRequired()],
+    recurrence = RelativeDeltaField(pgettext("Repetition, e.g., 'Every year', 'Every month', etc.", 'Every'),
+                                    [DataRequired()],
                                     units=('years', 'months', 'weeks', 'days'),
                                     default=relativedelta(weeks=1))
 
@@ -435,7 +436,7 @@ class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
 
 
 class CloneRepeatPatternForm(CloneRepeatUntilFormBase):
-    week_day = IndicoWeekDayRepetitionField(_('Every'))
+    week_day = IndicoWeekDayRepetitionField(pgettext("Repetition, e.g., 'Every year', 'Every month', etc.", 'Every'))
     num_months = IntegerField(_('Months'), [DataRequired(), NumberRange(min=1)], default=1,
                               description=_('Number of months between repetitions'))
 

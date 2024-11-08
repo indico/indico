@@ -119,7 +119,7 @@ export function Choices({
         </p>
       )}
       <Button type="button" onClick={handleAdd} disabled={disabled}>
-        <Translate>Add new</Translate>
+        <Translate context="Choice">Add new</Translate>
       </Button>
     </>
   );

@@ -25,7 +25,7 @@ from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.enum import IndicoStrEnum
-from indico.util.i18n import NullDomain, _
+from indico.util.i18n import NullDomain, _, pgettext
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -35,12 +35,12 @@ from indico.web.views import WPJinjaMixin
 
 
 class PluginCategory(IndicoStrEnum):
-    search = _('Search')
+    search = pgettext('Plugin category title', 'Search')
     synchronization = _('Synchronization')
     payment = _('Payment')
     importers = _('Importers')
     videoconference = _('Videoconference')
-    other = _('Other')
+    other = pgettext('Plugin category title', 'Other')
 
     def __str__(self):
         return self.value

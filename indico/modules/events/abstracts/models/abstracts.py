@@ -26,14 +26,15 @@ from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.models.reviews import ProposalMixin, ProposalRevisionMixin
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoIntEnum, RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, text_to_repr
 
 
 class AbstractState(RichIntEnum):
-    __titles__ = [None, _('Submitted'), _('Withdrawn'), _('Accepted'), _('Rejected'), _('Merged'), _('Duplicate'),
-                  _('Invited')]
+    __titles__ = [None, pgettext('Abstract', 'Submitted'), pgettext('Abstract', 'Withdrawn'),
+                  pgettext('Abstract', 'Accepted'), pgettext('Abstract', 'Rejected'), pgettext('Abstract', 'Merged'),
+                  pgettext('Abstract', 'Duplicate'), pgettext('Abstract', 'Invited')]
     __css_classes__ = [None, '', 'outline dashed', 'success', 'error', 'visited', 'strong', 'warning']
     submitted = 1
     withdrawn = 2

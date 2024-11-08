@@ -19,7 +19,7 @@ from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -105,7 +105,7 @@ class PaperManagerPermission(ManagementPermission):
 
 class PaperJudgePermission(ManagementPermission):
     name = 'paper_judge'
-    friendly_name = _('Judge')
+    friendly_name = pgettext('Paper judgment rights', 'Judge')
     description = _('Grants paper judgment rights for assigned papers.')
 
 

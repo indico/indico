@@ -26,13 +26,13 @@ from indico.modules.attachments.util import can_manage_attachments
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.string import strict_str
 from indico.web.flask.util import url_for
 
 
 class AttachmentType(RichIntEnum):
-    __titles__ = [None, _('File'), _('Link')]
+    __titles__ = [None, _('File'), pgettext('Attachment type (noun)', 'Link')]
     file = 1
     link = 2
 

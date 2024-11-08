@@ -236,7 +236,7 @@ export default function TemplateListPane({
             labeled
             title={Translate.string('Add a new template')}
             icon="plus"
-            text={Translate.string('Add new')}
+            text={Translate.string('Add new', 'Custom template')}
             className="mini primary icon"
             direction="left"
           >

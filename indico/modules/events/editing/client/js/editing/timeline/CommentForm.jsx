@@ -86,7 +86,9 @@ export default function CommentForm({
                   />
                 )}
                 <Form.Group styleName="submit-buttons" inline>
-                  <FinalSubmitButton label={Translate.string('Comment')} />
+                  <FinalSubmitButton
+                    label={Translate.string('Comment', 'Leave a comment (verb)')}
+                  />
                   <Button
                     disabled={fprops.submitting}
                     content={Translate.string('Cancel')}

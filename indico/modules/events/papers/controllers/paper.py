@@ -26,7 +26,7 @@ from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _, ngettext, pgettext
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -178,7 +178,7 @@ class RHJudgePapers(RHPapersActionBase):
                                'are in a final state.',
                                num_not_submitted_papers).format(num=num_not_submitted_papers), 'warning')
             return jsonify_data(**self.list_generator.render_list())
-        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
+        return jsonify_form(form=form, submit=pgettext('Judge abstracts (verb)', 'Judge'), disabled_until_change=False)
 
 
 class RHAssignPapersBase(RHPapersActionBase):

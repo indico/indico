@@ -13,11 +13,12 @@ from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.modules.events.requests import get_request_definitions
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import pgettext
 
 
 class RequestState(RichIntEnum):
-    __titles__ = [_('Pending'), _('Accepted'), _('Rejected'), _('Withdrawn')]
+    __titles__ = [pgettext('Event request', 'Pending'), pgettext('Event request', 'Accepted'),
+                  pgettext('Event request', 'Rejected'), pgettext('Event request', 'Withdrawn')]
     pending = 0
     accepted = 1
     rejected = 2

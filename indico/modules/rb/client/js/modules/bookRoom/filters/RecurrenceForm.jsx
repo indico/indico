@@ -123,7 +123,10 @@ export default class RecurrenceForm extends FilterFormComponent {
               value="every"
               name="type"
               checked={type === 'every'}
-              label={Translate.string('Every')}
+              label={Translate.string(
+                'Every',
+                "Repetition, e.g., 'Every year', 'Every month', etc."
+              )}
               onChange={this.onTypeChange}
             />
           </Form.Field>
