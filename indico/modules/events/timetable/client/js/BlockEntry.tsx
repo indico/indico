@@ -52,7 +52,7 @@ export default function BlockEntry({
   renderChildren = true,
 }: DraggableBlockEntryProps) {
   const dispatch = useDispatch();
-  const blockRef = useRef<HTMLButtonElement | null>(null);
+  const blockRef = useRef<HTMLDivElement | null>(null);
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const resizeStartRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -124,8 +124,8 @@ export default function BlockEntry({
   }, [_children, setChildDuration]);
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
       styleName={`entry block ${renderChildren ? '' : 'simple'}`}
       style={style}
       ref={blockRef}
@@ -179,7 +179,7 @@ export default function BlockEntry({
         setGlobalDuration={_setDuration}
         setIsResizing={setIsResizing}
       />
-    </button>
+    </div>
   );
 }
 
