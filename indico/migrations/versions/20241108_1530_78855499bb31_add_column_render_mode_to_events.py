@@ -1,7 +1,7 @@
 """Add column render_mode to events.
 
 Revision ID: 78855499bb31
-Revises: 85f58503310c
+Revises: 379ba72f4096
 Create Date: 2024-07-22 18:37:15.333299
 """
 
@@ -14,7 +14,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 
 
 revision = '78855499bb31'
-down_revision = '85f58503310c'
+down_revision = '379ba72f4096'
 branch_labels = None
 depends_on = None
 
