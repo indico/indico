@@ -900,6 +900,13 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
 class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportBase):
     """Export registration attachments in a zip file."""
 
+    @use_kwargs({
+        'flatten': fields.Boolean(load_default=True),
+    })
+    def _process_args(self, flatten):
+        RHRegistrationsExportBase._process_args(self)
+        self.flatten = flatten
+
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
@@ -909,7 +916,8 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
             f'{attachment.field_data.field.title}_{attachment.field_data.field_id}_{attachment.filename}',
             attachment.filename
         )
-        return os.path.join(*self._adjust_path_length([regform_title, registrant_name, file_name]))
+        full_file_name = [f'{registrant_name}_{file_name}'] if self.flatten else [registrant_name, file_name]
+        return os.path.join(*self._adjust_path_length([regform_title, *full_file_name]))
 
     def _iter_items(self, attachments):
         for reg_attachments in attachments.values():
