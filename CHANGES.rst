@@ -53,6 +53,8 @@ Improvements
 - Allow alternative CSV delimiters everywhere when importing content from CSV files (:pr:`6607`,
   thanks :user:`Moliholy, unconventionaldotdev`)
 - Improve readability of room booking room statistics card (:pr:`6616`)
+- Add option to use flat zip file structure when downloading registration attachments
+  (:issue:`6536`, :pr:`6608`, thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
