@@ -78,8 +78,9 @@ class ActionMenuEntry:
 def import_user_records_from_csv(fileobj, columns, delimiter=','):
     """Parse and do basic validation of user data from a CSV file.
 
-    :param fileobj: the CSV file to be read
+    :param fileobj: the CSV file to be read.
     :param columns: A list of column names, 'first_name', 'last_name', & 'email' are compulsory.
+    :param delimiter: the CSV separator.
     :return: A list dictionaries each representing one row,
              the keys of which are given by the column names.
     """

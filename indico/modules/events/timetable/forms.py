@@ -19,9 +19,10 @@ from indico.modules.events.sessions.forms import SessionBlockForm
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.util import find_next_start_dt
 from indico.util.i18n import _
+from indico.util.spreadsheets import CSVFieldDelimiter
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import (FileField, IndicoLocationField, IndicoPalettePickerField,
+from indico.web.forms.fields import (FileField, IndicoEnumSelectField, IndicoLocationField, IndicoPalettePickerField,
                                      IndicoSelectMultipleCheckboxBooleanField, IndicoTimeField)
 from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.util import get_form_field_names
@@ -203,3 +204,4 @@ class TimetablePDFExportForm(IndicoForm):
 class ImportContributionsForm(IndicoForm):
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
                             accepted_file_types='.csv')
+    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter, default=CSVFieldDelimiter.comma)
