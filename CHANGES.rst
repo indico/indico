@@ -50,6 +50,8 @@ Improvements
   :data:`SMTP_SENDER_FALLBACK` config settings. Instead, the *From* address will be rewritten
   to the fallback whenever the requested address is not an allowed sender (:pr:`6231`, thanks
   :user:`SegiNyn`)
+- Allow alternative CSV delimiters everywhere when importing content from CSV files (:pr:`6607`,
+  thanks :user:`Moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
