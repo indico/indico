@@ -14,6 +14,7 @@ import sys
 import tarfile
 from collections import defaultdict
 from datetime import date, datetime
+from importlib import import_module
 from io import BytesIO
 from itertools import batched
 from operator import attrgetter, itemgetter
@@ -109,7 +110,8 @@ def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle
     exporter.serialize()
 
 
-def import_event(source_file, category_id=0, create_users=None, create_affiliations=None, verbose=False, force=False):
+def import_event(source_file, category_id=0, create_users=None, create_affiliations=None, verbose=False, force=False,
+                 skip_external_files=False):
     """Import a previously-exported event/category.
 
     It is up to the caller of this function to commit the transaction.
@@ -125,11 +127,64 @@ def import_event(source_file, category_id=0, create_users=None, create_affiliati
                                 affiliations are encountered.
     :param verbose: Whether to enable verbose output.
     :param force: Whether to ignore database version conflicts.
-    :return: The imported event/category and the ID mapping.
+    :param skip_external_files: Whether to skip copying external files, and write
+                                them to the file mapping instead.
+    :return: The imported event/category, the ID mapping and the file mapping.
     """
-    importer = EventImporter(source_file, category_id, create_users, create_affiliations, verbose, force)
+    importer = EventImporter(source_file, category_id, create_users, create_affiliations, verbose, force,
+                             skip_external_files)
     event_or_category = importer.deserialize()
-    return event_or_category, dict(importer.source_id_map)
+    return event_or_category, dict(importer.source_id_map), list(importer.files_to_copy)
+
+
+def import_event_files(handler_import_path, mapping_file):
+    """Import files after an event import."""
+    try:
+        module_path, class_name = handler_import_path.rsplit('.', 1)
+    except ValueError:
+        print(f"{handler_import_path} doesn't look like a module path")
+        return
+    module = import_module(module_path)
+    try:
+        handler_func = getattr(module, class_name)
+    except AttributeError:
+        print(f'Module "{module_path}" does not define a "{class_name}" attribute')
+        return
+
+    mapping = pickle.load(mapping_file)  # noqa: S301
+    backend_names = {x[0][0] for x in mapping}
+    click.echo(f'Config is needed for external storage backends: {', '.join(sorted(backend_names))}')
+    backends = _prompt_storage_backend_config(backend_names)
+    handler_func(mapping, backends)
+
+
+def _prompt_storage_backend_config(backend_names):
+    all_backends = get_storage_backends()
+    while True:
+        click.echo('Paste a Python dict literal with the config of those backends, and confirm with CTRL+D.')
+        click.echo("You may be able to take it from the source instance's STORAGE_BACKENDS config setting.")
+        mapping = ast.literal_eval(sys.stdin.read())
+        if not isinstance(mapping, dict):
+            click.echo('Invalid data, not a dict')
+            click.echo()
+            continue
+        elif missing := sorted(backend_names - set(mapping)):
+            click.echo(f'Missing keys: {', '.join(missing)}')
+            click.echo()
+            continue
+
+        backends = {}
+        for name in backend_names:
+            storage_name, storage_config = mapping[name].split(':', 1)
+            if not (backend := all_backends.get(storage_name)):
+                click.echo(f'Invalid backend: {storage_name}')
+                click.echo()
+                backends = None
+                break
+            backends[name] = backend(storage_config)
+        # This is a bit ugly, but we can't `continue` the outer loop above so we use this trick instead...
+        if backends is not None:
+            return backends
 
 
 def _model_to_table(name):
@@ -533,7 +588,7 @@ class EventExporter:
 
 class EventImporter:
     def __init__(self, source_file, category_id=0, create_users=None, create_affiliations=None, verbose=False,
-                 force=False):
+                 force=False, skip_external_files=False):
         self.source_file = source_file
         self.category_id = category_id
         self.create_users = create_users
@@ -541,6 +596,7 @@ class EventImporter:
         self.source_backends = {}
         self.verbose = verbose
         self.force = force
+        self.skip_external_files = skip_external_files
         self.archive = tarfile.open(fileobj=source_file)  # noqa: SIM115
         archive_files = set(self.archive.getnames())
         self.backend = BACKENDS['yaml' if 'data.yaml' in archive_files else 'pickle']
@@ -558,6 +614,7 @@ class EventImporter:
         self.system_user_id = User.get_system_user().id
         self.spec = self._load_spec()
         self.deferred_idrefs = defaultdict(set)
+        self.files_to_copy = set()
 
     def _load_spec(self):
         def _resolve_col_name(col):
@@ -579,37 +636,13 @@ class EventImporter:
         return spec
 
     def _setup_external_storage(self, data):
+        if self.skip_external_files:
+            return
         if not (backend_names := set(data['external_storage_backends'])):
             return
-        all_backends = get_storage_backends()
         click.echo(f'Some files reference external storage backends: {', '.join(sorted(backend_names))}')
-        while True:
-            click.echo('Paste a Python dict literal with the config of those backends, and confirm with CTRL+D.')
-            click.echo("You may be able to take it from the source instance's STORAGE_BACKENDS config setting.")
-            mapping = ast.literal_eval(sys.stdin.read())
-            if not isinstance(mapping, dict):
-                click.echo('Invalid data, not a dict')
-                click.echo()
-                continue
-            elif missing := sorted(backend_names - set(mapping)):
-                click.echo(f'Missing keys: {', '.join(missing)}')
-                click.echo()
-                continue
-
-            backends = {}
-            for name in backend_names:
-                storage_name, storage_config = mapping[name].split(':', 1)
-                if not (backend := all_backends.get(storage_name)):
-                    click.echo(f'Invalid backend: {storage_name}')
-                    click.echo()
-                    backends = None
-                    break
-                backends[name] = backend(storage_config)
-            # This is a bit ugly, but we can't `continue` the outer loop above so we use this trick instead...
-            if backends is not None:
-                break
-
-        self.source_backends = backends
+        self.source_backends = _prompt_storage_backend_config(backend_names)
+        click.echo('Storage backends configured')
 
     def _load_users(self, data):
         if not data['users']:
@@ -629,13 +662,16 @@ class EventImporter:
                 self.user_map[uuid] = user.id
         if missing:
             click.secho('The following users from the import data could not be mapped to existing users:', fg='yellow')
-            table_data = [['First Name', 'Last Name', 'Email', 'Affiliation']]
-            table_data.extend(
-                [userdata['first_name'], userdata['last_name'], userdata['email'], userdata['affiliation']]
-                for userdata in sorted(missing.values(), key=itemgetter('first_name', 'last_name', 'email'))
-            )
-            table = AsciiTable(table_data)
-            click.echo(table.table)
+            if len(missing) > 1000:
+                click.echo(f'({len(missing)} users are a lot; not displaying table)')
+            else:
+                table_data = [['First Name', 'Last Name', 'Email', 'Affiliation']]
+                table_data.extend(
+                    [userdata['first_name'], userdata['last_name'], userdata['email'], userdata['affiliation']]
+                    for userdata in sorted(missing.values(), key=itemgetter('first_name', 'last_name', 'email'))
+                )
+                table = AsciiTable(table_data)
+                click.echo(table.table)
             if self.create_users is None:
                 click.echo('Do you want to create these users now?')
                 click.echo('If you choose to not create them, the behavior depends on where the user would be used:')
@@ -899,23 +935,32 @@ class EventImporter:
         storage_backend = config.ATTACHMENT_STORAGE
         storage = get_storage(storage_backend)
         if source_storage_data := data.get('storage'):
-            source_storage = self.source_backends[source_storage_data['backend']]
-            with source_storage.open(source_storage_data['file_id']) as f:
-                extracted = f.read()
+            if self.skip_external_files:
+                extracted = None
+            else:
+                source_storage = self.source_backends[source_storage_data['backend']]
+                with source_storage.open(source_storage_data['file_id']) as f:
+                    extracted = f.read()
         else:
             extracted = self.archive.extractfile(data['uuid'])
         path = self._get_file_storage_path(id_, data['filename'], scope)
-        storage_file_id, md5 = storage.save(path, data['content_type'], data['filename'], extracted)
-        assert data['size'] == storage.getsize(storage_file_id)
-        if data['md5']:
-            assert data['md5'] == md5
+        if extracted is not None:
+            storage_file_id, md5 = storage.save(path, data['content_type'], data['filename'], extracted)
+            assert data['size'] == storage.getsize(storage_file_id)
+            if data['md5']:
+                assert data['md5'] == md5
+        else:
+            md5 = data['md5']
+            storage_file_id = storage.save(path, data['content_type'], data['filename'], b'', dry_run=True)[0]
+            self.files_to_copy.add(((source_storage_data['backend'], source_storage_data['file_id']),
+                                    (storage_backend, storage_file_id)))
         return {
             'storage_backend': storage_backend,
             'storage_file_id': storage_file_id,
             'content_type': data['content_type'],
             'filename': data['filename'],
             'size': data['size'],
-            'md5': md5
+            'md5': md5,
         }
 
     def _deserialize_object(self, table, data, scope, new_scope, *, is_top_level=False):
