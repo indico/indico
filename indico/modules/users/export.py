@@ -349,7 +349,7 @@ def build_filename(file):
 
 
 def secure_path(path):
-    parts = (secure_filename(p, uuid4()) for p in Path(path).parts)
+    parts = (secure_filename(p, str(uuid4())) for p in Path(path).parts)
     return Path(*parts)
 
 
