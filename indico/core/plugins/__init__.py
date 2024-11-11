@@ -36,10 +36,10 @@ from indico.web.views import WPJinjaMixin
 
 class PluginCategory(IndicoStrEnum):
     search = pgettext('Plugin category title', 'Search')
-    synchronization = _('Synchronization')
-    payment = _('Payment')
-    importers = _('Importers')
-    videoconference = _('Videoconference')
+    synchronization = pgettext('Plugin category title', 'Synchronization')
+    payment = pgettext('Plugin category title', 'Payment')
+    importers = pgettext('Plugin category title', 'Importers')
+    videoconference = pgettext('Plugin category title', 'Videoconference')
     other = pgettext('Plugin category title', 'Other')
 
     def __str__(self):
