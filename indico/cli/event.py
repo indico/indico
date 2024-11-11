@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import pickle
 import sys
 from pathlib import Path
 
@@ -16,7 +17,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
-from indico.modules.events.export import export_event, import_event
+from indico.modules.events.export import export_event, import_event, import_event_files
 from indico.modules.events.models.series import EventSeries
 from indico.modules.users.models.users import User
 
@@ -115,12 +116,18 @@ def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files, ex
               help='ID of the target category. Defaults to the root category.')
 @click.option('-m', '--id-map', 'id_map_path', type=click.Path(dir_okay=False, path_type=Path),
               help='Store the mapping between old and new IDs in this YAML file')
+@click.option('-X', '--files-map', 'files_map_path', type=click.Path(dir_okay=False, path_type=Path),
+              help='When importing an export done with `--external-files`, do not actually copy files '
+                   'but write them mapping to the indicated Pickle file to be processed afterwards. This is '
+                   'an unsupported feature for very advanced use-cases; you almost certainly do not need '
+                   'to use it.')
 def import_(source_file, create_users, create_affiliations, force, verbose, yes, category_id,
-            id_map_path: Path | None = None):
+            id_map_path: Path | None = None, files_map_path: Path | None = None):
     """Import an event exported from another Indico instance."""
     click.echo('Importing event/category...')
-    obj, id_map = import_event(source_file, category_id, create_users=create_users,
-                               create_affiliations=create_affiliations, verbose=verbose, force=force)
+    obj, id_map, files_map = import_event(source_file, category_id, create_users=create_users,
+                                          create_affiliations=create_affiliations, verbose=verbose, force=force,
+                                          skip_external_files=(files_map_path is not None))
     if obj is None:
         click.secho('Import failed.', fg='red')
         sys.exit(1)
@@ -132,6 +139,32 @@ def import_(source_file, create_users, create_affiliations, force, verbose, yes,
     if id_map_path:
         id_map_path.write_text(yaml.dump(id_map, indent=2))
         click.echo(f'ID mapping written to {id_map_path}')
+    if files_map_path:
+        files_map_path.write_bytes(pickle.dumps(files_map))
+        click.echo(f'File mapping written to {files_map_path}')
+
+
+@cli.command('import-files')
+@click.argument('handler')
+@click.argument('mapping_file', type=click.File('rb'))
+def import_files(handler, mapping_file):
+    """Import files from an event import.
+
+    This command is meant to be used after having imported an event or
+    more likely a whole category tree using `indico event import` with
+    the `--files-map` option.
+
+    The `handler` needs to point to an importable Python function that
+    implements the import logic for the involved backends.
+
+    Currently the only available backend is part of the S3 storage plugin
+    to perform an efficient server-side copy on S3 using rclone. If you
+    use S3 using that plugin, you may use this handler:
+
+    \b
+        indico_storage_s3.import_event_files.copy_files
+    """
+    import_event_files(handler, mapping_file)
 
 
 @cli.command('create-series')
