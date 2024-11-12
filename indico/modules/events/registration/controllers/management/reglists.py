@@ -119,6 +119,16 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 'attachment',
                 type='href-custom',
                 url=url_for('.registrations_attachments_export', regform),
+                params={'flatten': False},
+                weight=60,
+                extra_classes='js-submit-list-form regform-download-attachments',
+            ),
+            ActionMenuEntry(
+                _('Download Attachments (flat)'),
+                'attachment',
+                type='href-custom',
+                url=url_for('.registrations_attachments_export', regform),
+                params={'flatten': True},
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
             ),
@@ -901,7 +911,7 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
     """Export registration attachments in a zip file."""
 
     @use_kwargs({
-        'flatten': fields.Boolean(load_default=True),
+        'flatten': fields.Boolean(load_default=False),
     })
     def _process_args(self, flatten):
         RHRegistrationsExportBase._process_args(self)

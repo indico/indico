@@ -132,6 +132,7 @@
                                        data-callback="{{ item.callback }}"
                                    {% elif item.type == "href-custom" %}
                                        data-href="{{ item.url }}"
+                                       data-method="POST"
                                    {% elif item.type == "ajax-dialog" %}
                                        data-href="{{ item.url }}"
                                        data-title="{{ item.dialog_title or item.text }}"
