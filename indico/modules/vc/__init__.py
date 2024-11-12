@@ -36,7 +36,7 @@ def _inject_conference_home(event, **kwargs):
         return render_template('vc/conference_home.html', event=event, event_vc_rooms=event_vc_rooms)
 
 
-@template_hook('event-header')
+@template_hook('event-header', priority=100)
 def _inject_event_header(event, **kwargs):
     res = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True)
     event_vc_rooms = [event_vc_room for event_vc_room in res.all() if event_vc_room.vc_room.plugin is not None]

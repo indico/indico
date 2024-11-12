@@ -42,8 +42,6 @@
         </div>
     {% endif %}
 
-    {{ hook_event_header }}
-
     {% if event.contact_emails or event.contact_phones %}
         <div class="event-details-row">
             <div class="event-details-label">{{ event.contact_title }}</div>
@@ -63,4 +61,6 @@
             </div>
         </div>
     {% endif %}
+
+    {{ hook_event_header }}
 </div>
