@@ -923,16 +923,16 @@ class EventImporter:
         else:
             raise ValueError('unknown type: ' + type_)
 
-    def _get_file_storage_path(self, id_, filename, scope):
+    def _get_file_storage_path(self, id_, filename, scope, tablename):
         # we use a generic path to store all imported files since we
         # are on the table level here and thus cannot use relationships
         # and the orignal models' logic to construct paths
         scope_type, scope_id = self.scope_id_map[scope]
-        path_segments = [scope_type, strict_str(scope_id), 'imported']
+        path_segments = [scope_type, strict_str(scope_id), 'imported', tablename]
         filename = secure_filename(filename, 'file')
         return posixpath.join(*path_segments, f'{id_}-{filename}')
 
-    def _process_file(self, id_, data, scope):
+    def _process_file(self, id_, data, scope, tablename):
         storage_backend = config.ATTACHMENT_STORAGE
         storage = get_storage(storage_backend)
         if source_storage_data := data.get('storage'):
@@ -944,7 +944,7 @@ class EventImporter:
                     extracted = f.read()
         else:
             extracted = self.archive.extractfile(data['uuid'])
-        path = self._get_file_storage_path(id_, data['filename'], scope)
+        path = self._get_file_storage_path(id_, data['filename'], scope, tablename)
         if extracted is not None:
             storage_file_id, md5 = storage.save(path, data['content_type'], data['filename'], extracted)
             assert data['size'] == storage.getsize(storage_file_id)
@@ -1046,9 +1046,9 @@ class EventImporter:
                 # get an ID early since we use it in the filename
                 stmt = db.func.nextval(db.func.pg_get_serial_sequence(table.fullname, pk_name))
                 insert_values[pk_name] = pk_value = db.session.query(stmt).scalar()
-                insert_values.update(self._process_file(pk_value, file_data, scope))
+                insert_values.update(self._process_file(pk_value, file_data, scope, table.fullname))
             else:
-                insert_values.update(self._process_file(str(uuid4()), file_data, scope))
+                insert_values.update(self._process_file(str(uuid4()), file_data, scope, table.fullname))
         if self.verbose and table.fullname in self.spec['verbose']:
             fmt = self.spec['verbose'][table.fullname]
             click.echo(fmt.format(**insert_values))
