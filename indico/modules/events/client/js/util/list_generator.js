@@ -203,9 +203,29 @@
       e.preventDefault();
       const $this = $(this);
       if (!$this.hasClass('disabled')) {
-        $('.list form')
-          .attr('action', $this.data('href'))
-          .submit();
+        const form = $('.list form');
+        const params = $this.data('params') || {};
+        const inputs = [];
+        $.each(params, (name, value) => {
+          const existingInput = form.find(`input[name="${name}"]`);
+          if (existingInput.length) {
+            existingInput.val(value);
+          } else {
+            const input = $('<input>', {type: 'hidden', name, value});
+            inputs.push(input);
+            form.append(input);
+          }
+        });
+        form.attr('action', $this.data('href')).submit();
+        form.on('submit', () => {
+          // This is a hack to prevent inputs from being removed before
+          // the form is actually submitted.
+          setTimeout(() => {
+            for (const input of inputs) {
+              input.remove();
+            }
+          }, 0);
+        });
       }
     });
 
