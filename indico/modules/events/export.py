@@ -48,6 +48,7 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import now_utc
+from indico.util.fs import secure_filename
 from indico.util.iterables import materialize_iterable
 from indico.util.string import strict_str
 
@@ -928,8 +929,8 @@ class EventImporter:
         # and the orignal models' logic to construct paths
         scope_type, scope_id = self.scope_id_map[scope]
         path_segments = [scope_type, strict_str(scope_id), 'imported']
-        filename = f'{id_}-{filename}'
-        return posixpath.join(*path_segments, filename)
+        filename = secure_filename(filename, 'file')
+        return posixpath.join(*path_segments, f'{id_}-{filename}')
 
     def _process_file(self, id_, data, scope):
         storage_backend = config.ATTACHMENT_STORAGE
