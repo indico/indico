@@ -10,6 +10,11 @@ on:
       - '!v3.1.*'
       - '!*\+docs'
 
+env:
+  TZ: Europe/Zurich
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '22.x'
+
 jobs:
   build:
     name: Build package 📦
@@ -19,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         name: Set up Python 🐍
         with:
-          python-version: '3.12'
+          python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: |
             requirements.txt
@@ -35,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         name: Setup Node
         with:
-          node-version: 18.x
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install Indico + Python deps 🔧
         run: pip install --user -e '.[dev]'
       - name: Install npm deps ☕
