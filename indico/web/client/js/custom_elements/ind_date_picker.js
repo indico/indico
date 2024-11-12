@@ -515,12 +515,15 @@ for (let p of paths) {
     let localeName = parts[0] + '-' + parts.at(-1)
 
     // Convert to week info
-    const weekInfo = new Intl.Locale(localeName).weekInfo
+    try {
+      const weekInfo = new Intl.Locale(localeName).weekInfo
 
-    // To save bandwidth, we store fallback only for non-ISO-8601 weeks
-    if (weekInfo.firstDay !== MONDAY || weekInfo.weekend[0] !== SATURDAY) {
-      localeData[localeName] = weekInfo;
-    }
+
+      // To save bandwidth, we store fallback only for non-ISO-8601 weeks
+      if (weekInfo.firstDay !== MONDAY || weekInfo.weekend[0] !== SATURDAY) {
+        localeData[localeName] = weekInfo;
+      }
+    } catch (e) { /* Ignore unofficial and breaking locales during development */ }
   }
 }
 
