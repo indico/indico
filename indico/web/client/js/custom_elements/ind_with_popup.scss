@@ -10,10 +10,6 @@
 ind-with-popup {
   --arrow-size: 0.5em;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
   position: relative;
 
   dialog {
@@ -39,6 +35,7 @@ ind-with-popup {
   dialog[open],
   dialog[data-position-check] {
     @extend %popup-positioned-target;
+    z-index: 2;
   }
 
   dialog[data-position-check] {
@@ -47,9 +44,20 @@ ind-with-popup {
     opacity: 0;
   }
 
-  &[shown]::after {
+  &[shown]:not([data-position-check]) {
     @extend %popup-arrow;
     @extend %popup-arrow-vertical;
     --arrow-color: var(--background-color);
+  }
+
+  [data-trigger]::after {
+    @extend %icon;
+    @extend %icon-arrow-down;
+    transition: transform 0.2s;
+    font-size: 120%;
+  }
+
+  [data-trigger][aria-expanded='true']::after {
+    transform: rotateX(180deg);
   }
 }
