@@ -118,8 +118,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 _('Download Attachments'),
                 'attachment',
                 type='href-custom',
-                url=url_for('.registrations_attachments_export', regform),
-                params={'flatten': False},
+                url=url_for('.registrations_attachments_export', regform, flatten=False),
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
             ),
@@ -127,8 +126,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 _('Download Attachments (flat)'),
                 'attachment',
                 type='href-custom',
-                url=url_for('.registrations_attachments_export', regform),
-                params={'flatten': True},
+                url=url_for('.registrations_attachments_export', regform, flatten=True),
                 weight=60,
                 extra_classes='js-submit-list-form regform-download-attachments',
             ),
@@ -912,7 +910,7 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
 
     @use_kwargs({
         'flatten': fields.Boolean(load_default=False),
-    })
+    }, location='query')
     def _process_args(self, flatten):
         RHRegistrationsExportBase._process_args(self)
         self.flatten = flatten
