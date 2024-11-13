@@ -516,9 +516,7 @@ class BookRoomModal extends React.Component {
         </Translate>
       ),
     };
-    const label = this.hasLinkConflict
-      ? {children: replaceMessages[link.type]}
-      : assignMessages[link.type];
+    const label = this.hasLinkConflict ? replaceMessages[link.type] : assignMessages[link.type];
     return (
       <BookingObjectLink link={link}>
         {!this.alreadyLinked && (
