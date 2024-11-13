@@ -12,12 +12,15 @@
   font-size: 1rem;
 }
 
-.type-switch {
-  margin-right: 0.5rem;
-}
+.type-switch:global(.field) {
+  align-self: center;
+  font-size: 1em;
+  margin: 0 !important;
 
-.switch-toolbar {
-  align-items: center;
+  label {
+    margin: 0 !important;
+    font-size: 1em !important;
+  }
 }
 
 .disabled {

@@ -64,7 +64,7 @@ export function EmailSurveyParticipants({eventId, surveyId, onClose}) {
           <FinalCheckbox
             name="email_all_participants"
             label={Translate.string('Send email to all event participants')}
-            toggle
+            showAsToggle
           />
         </>
       }

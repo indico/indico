@@ -13,8 +13,9 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Button, Checkbox, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
+import {Button, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -298,10 +299,10 @@ class BookingEdit extends React.Component {
         {numberOfCandidates > 0 && numberOfConflicts > 0 && (
           <Segment attached="bottom">
             <Checkbox
-              toggle
-              defaultChecked={skipConflicts}
+              showAsToggle
+              checked={skipConflicts}
               label={Translate.string(
-                'I understand, please skip any days with conflicting ' + 'occurrences.'
+                'I understand, please skip any days with conflicting occurrences.'
               )}
               onChange={(__, {checked}) => {
                 this.setState({

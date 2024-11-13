@@ -9,8 +9,8 @@ import publicationURL from 'indico-url:contributions.manage_publication';
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Checkbox} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
@@ -30,8 +30,8 @@ export default function PublicationSwitch({eventId}) {
   const trigger = (
     <Checkbox
       label={published ? Translate.string('Published') : Translate.string('Draft')}
-      toggle
-      onClick={() => setModalOpen(true)}
+      showAsToggle
+      onChange={() => setModalOpen(true)}
       checked={published}
       disabled={saving}
     />

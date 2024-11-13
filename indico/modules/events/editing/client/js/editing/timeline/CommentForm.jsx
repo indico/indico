@@ -82,7 +82,7 @@ export default function CommentForm({
                       'Restrict visibility of this comment to other editors only'
                     )}
                     name="internal"
-                    toggle
+                    showAsToggle
                   />
                 )}
                 <Form.Group styleName="submit-buttons" inline>

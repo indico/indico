@@ -269,7 +269,11 @@ class MapAreasPage extends React.Component {
               />
             </Form.Group>
             <Form.Group>
-              <FinalCheckbox name="default" label={Translate.string('Default map area')} toggle />
+              <FinalCheckbox
+                name="default"
+                label={Translate.string('Default map area')}
+                showAsToggle
+              />
             </Form.Group>
             <Form.Group>
               <FinalInput

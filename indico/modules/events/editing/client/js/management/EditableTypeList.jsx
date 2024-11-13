@@ -13,8 +13,9 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Link} from 'react-router-dom';
-import {Button, Checkbox, Form, Loader, Popup} from 'semantic-ui-react';
+import {Button, Form, Loader, Popup} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {FinalCheckbox, FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -22,7 +23,7 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import {editableTypeOrder, EditableTypeTitles} from '../models';
 
-import './EditableTypeList.module.scss';
+import styles from './EditableTypeList.module.scss';
 
 export default function EditableTypeList({eventId}) {
   const [editMode, setEditMode] = useState(false);
@@ -69,9 +70,12 @@ export default function EditableTypeList({eventId}) {
                     <div className="text">
                       <div className="label">{EditableTypeTitles[type]}</div>
                     </div>
-                    <div className="toolbar" styleName="switch-toolbar">
-                      <FinalCheckbox name={type} toggle label="" styleName="type-switch" />
-                    </div>
+                    <FinalCheckbox
+                      name={type}
+                      showAsToggle
+                      label=""
+                      fieldProps={{className: styles['type-switch']}}
+                    />
                   </div>
                 ))}
               </div>
@@ -131,7 +135,14 @@ export default function EditableTypeList({eventId}) {
         </h3>
         <Popup
           content={Translate.string('Toggle editable types')}
-          trigger={<Checkbox checked={editMode} toggle onClick={() => setEditMode(!editMode)} />}
+          trigger={
+            <Checkbox
+              checked={editMode}
+              showAsToggle
+              label=""
+              onChange={() => setEditMode(!editMode)}
+            />
+          }
         />
       </div>
       {editMode ? renderEditMode() : renderListMode()}

@@ -7,8 +7,9 @@
 
 import React from 'react';
 import {connect} from 'react-redux';
-import {Checkbox, Icon} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
 import {FilterFormComponent} from '../../../common/filters';
@@ -41,12 +42,16 @@ class ShowOnlyForm extends FilterFormComponent {
               onChange={(__, {checked}) => setParentField('onlyFavorites', checked)}
               disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
               checked={newOnlyFavorites}
-              toggle
+              showAsToggle
+              label={
+                <>
+                  <Icon name="star" />
+                  <span>
+                    <Translate>My favorite rooms</Translate>
+                  </span>
+                </>
+              }
             />
-            <Icon name="star" />
-            <span>
-              <Translate>My favorite rooms</Translate>
-            </span>
           </div>
         )}
         {(hasOwnedRooms || onlyMine) && (
@@ -55,12 +60,16 @@ class ShowOnlyForm extends FilterFormComponent {
               onChange={(__, {checked}) => setParentField('onlyMine', checked)}
               disabled={disabled}
               checked={newOnlyMine}
-              toggle
+              showAsToggle
+              label={
+                <>
+                  <Icon name="user" />
+                  <span>
+                    <Translate>Rooms I manage</Translate>
+                  </span>
+                </>
+              }
             />
-            <Icon name="user" />
-            <span>
-              <Translate>Rooms I manage</Translate>
-            </span>
           </div>
         )}
         {showOnlyAuthorizedFilter && (hasUnbookableRooms || onlyAuthorized) && (
@@ -69,12 +78,16 @@ class ShowOnlyForm extends FilterFormComponent {
               onChange={(__, {checked}) => setParentField('onlyAuthorized', checked)}
               disabled={disabled}
               checked={newOnlyAuthorized}
-              toggle
+              showAsToggle
+              label={
+                <>
+                  <Icon name="lock open" />
+                  <span>
+                    <Translate>Rooms I am authorized to book</Translate>
+                  </span>
+                </>
+              }
             />
-            <Icon name="lock open" />
-            <span>
-              <Translate>Rooms I am authorized to book</Translate>
-            </span>
           </div>
         )}
       </>

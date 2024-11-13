@@ -234,7 +234,7 @@ export default function ReviewForm() {
                     <FinalCheckbox
                       name="upload_changes"
                       label={Translate.string('Upload files')}
-                      toggle
+                      showAsToggle
                     />
                   )}
                   <Field name="upload_changes" subscription={{value: true}}>

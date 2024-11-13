@@ -73,17 +73,17 @@ function ManagementOptions({isUpdateMode}) {
       </Message.Header>
       <div>
         <FinalCheckbox
-          style={{marginTop: 10}}
+          fieldProps={{style: {marginTop: 10}}}
           label={Translate.string('Send an email notification to the user')}
           name="notify_user"
-          toggle
+          showAsToggle
         />
         {!isUpdateMode && (
           <FinalCheckbox
-            style={{marginTop: 10}}
+            fieldProps={{style: {marginTop: 10}}}
             label={Translate.string('Ignore field requirements for custom fields')}
             name="override_required"
-            toggle
+            showAsToggle
           />
         )}
       </div>

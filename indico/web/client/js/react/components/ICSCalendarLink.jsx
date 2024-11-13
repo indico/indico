@@ -9,11 +9,13 @@ import signURL from 'indico-url:core.sign_url';
 
 import PropTypes from 'prop-types';
 import React, {useReducer, useState} from 'react';
-import {Button, Icon, Input, Label, Grid, Popup, Header, Checkbox} from 'semantic-ui-react';
+import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+
+import Checkbox from './Checkbox';
 
 import './ICSCalendarLink.module.scss';
 
@@ -200,7 +202,7 @@ export default function ICSCalendarLink({
               }}
             >
               <Translate>Export all events in this event series</Translate>
-              <Checkbox toggle checked={exportEventSeries} />
+              <Checkbox showAsToggle label="" checked={exportEventSeries} />
             </div>
           </>
         )}

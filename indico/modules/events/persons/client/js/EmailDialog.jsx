@@ -175,7 +175,7 @@ export function EmailDialog({
         <FinalCheckbox
           name="copy_for_sender"
           label={Translate.string('Send a copy of each email to my mailbox')}
-          toggle
+          showAsToggle
         />
       </Form.Field>
     </>

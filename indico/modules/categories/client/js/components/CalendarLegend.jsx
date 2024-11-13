@@ -7,9 +7,11 @@
 
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
-import {Checkbox, Select} from 'semantic-ui-react';
+import {Select} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+
 import './CalendarLegend.module.scss';
 
 function LegendItem({

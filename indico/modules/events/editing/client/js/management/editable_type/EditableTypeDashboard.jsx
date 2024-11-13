@@ -23,10 +23,10 @@ import manageReviewConditionsURL from 'indico-url:event_editing.manage_review_co
 
 import React, {useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
-import {Checkbox, Loader} from 'semantic-ui-react';
+import {Loader} from 'semantic-ui-react';
 
 import {EmailContribAbstractRolesButton} from 'indico/modules/events/persons/EmailContribAbstractRolesButton';
-import {ManagementPageSubTitle, ManagementPageBackButton} from 'indico/react/components';
+import {ManagementPageSubTitle, ManagementPageBackButton, Checkbox} from 'indico/react/components';
 import {useIndicoAxios, useTogglableValue} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {useNumericParam} from 'indico/react/util/routing';
@@ -169,9 +169,9 @@ export default function EditableTypeDashboard() {
             >
               <Checkbox
                 styleName="toolbar-checkbox"
-                toggle
+                showAsToggle
                 checked={anonymousTeamEnabled}
-                onClick={!anonymousTeamSaving ? toggleAnonymousTeam : null}
+                onChange={!anonymousTeamSaving ? toggleAnonymousTeam : null}
                 label={Translate.string('Keep editing team members anonymous')}
               />
               <button className="i-button icon-mail" onClick={contactEditingTeam} type="button">
@@ -195,9 +195,9 @@ export default function EditableTypeDashboard() {
             >
               <Checkbox
                 styleName="toolbar-checkbox"
-                toggle
+                showAsToggle
                 checked={selfAssignEnabled}
-                onClick={!selfAssignSaving ? toggleSelfAssign : null}
+                onChange={!selfAssignSaving ? toggleSelfAssign : null}
                 label={Translate.string('Allow editors to self-assign editables')}
               />
               <Link

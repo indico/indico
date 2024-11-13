@@ -14,9 +14,9 @@ import {Form as FinalForm} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Button, Checkbox, Form, Grid, Icon, List, Message, Modal, Segment} from 'semantic-ui-react';
+import {Button, Form, Grid, Icon, List, Message, Modal, Segment} from 'semantic-ui-react';
 
-import {FinalPrincipal} from 'indico/react/components';
+import {Checkbox, FinalPrincipal} from 'indico/react/components';
 import {
   FinalCheckbox,
   FinalDropdown,
@@ -211,9 +211,9 @@ class BookRoomModal extends React.Component {
         </Message>
         <Segment attached="bottom">
           <Checkbox
-            toggle
+            showAsToggle
             disabled={disabled}
-            defaultChecked={skipConflicts}
+            checked={skipConflicts}
             label={Translate.string(
               'I understand, please skip any days with conflicting occurrences.'
             )}
@@ -437,7 +437,7 @@ class BookRoomModal extends React.Component {
           <span styleName="description">{event.description}</span>
           {this.renderEventLink(links[event.value])}
           <Checkbox
-            toggle
+            showaAsToggle
             disabled={disabled}
             styleName="checkbox"
             onChange={(__, {checked}) => {
@@ -520,7 +520,7 @@ class BookRoomModal extends React.Component {
     return (
       <BookingObjectLink link={link}>
         {!this.alreadyLinked && (
-          <FinalCheckbox name="linkBack" disabled={disabled} toggle label={label} />
+          <FinalCheckbox name="linkBack" disabled={disabled} showAsToggle label={label} />
         )}
       </BookingObjectLink>
     );

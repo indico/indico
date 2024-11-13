@@ -267,7 +267,7 @@ TimetableSessionsInput.defaultProps = {
 export function TimetableSessionsSettings() {
   return (
     <>
-      <FinalCheckbox name="collapseDays" label={Translate.string('Collapse days')} toggle />
+      <FinalCheckbox name="collapseDays" label={Translate.string('Collapse days')} showAsToggle />
       <FinalInput
         name="minimum"
         type="number"

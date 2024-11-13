@@ -10,7 +10,15 @@ import React, {useEffect, useRef} from 'react';
 
 import './Checkbox.module.scss';
 
-export default function Checkbox({label, onChange, indeterminate, showAsToggle, ...inputProps}) {
+export default function Checkbox({
+  label,
+  onChange,
+  indeterminate,
+  showAsToggle,
+  className,
+  style,
+  ...inputProps
+}) {
   const checkbox = useRef();
 
   useEffect(() => {
@@ -24,11 +32,13 @@ export default function Checkbox({label, onChange, indeterminate, showAsToggle, 
   }
 
   const handleChange = evt => {
-    onChange(evt, {checked: evt.target.checked});
+    if (onChange) {
+      onChange(evt, {checked: evt.target.checked});
+    }
   };
 
   return (
-    <label>
+    <label className={className} style={style}>
       <span styleName="checkbox-label">
         <input ref={checkbox} styleName="checkbox" onChange={handleChange} {...inputProps} />
         <span>{label}</span>
@@ -39,12 +49,16 @@ export default function Checkbox({label, onChange, indeterminate, showAsToggle, 
 
 Checkbox.propTypes = {
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   indeterminate: PropTypes.bool,
   showAsToggle: PropTypes.bool,
+  className: PropTypes.string,
+  style: PropTypes.object,
 };
 
 Checkbox.defaultProps = {
   indeterminate: false,
   showAsToggle: false,
+  className: '',
+  style: {},
 };
