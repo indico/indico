@@ -1,14 +1,14 @@
-{% macro render_program(event, days, show_abstract, dont_show_poster_abstract, show_contribs, show_length_contribs, show_breaks, new_page_per_session, show_session_description, print_date_close_to_sessions, show_title, show_affiliation) %}
+{% macro render_program(event, days, config) %}
     {% for day in days %}
-        <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if new_page_per_session else '' }}" id="day-{{ loop.index }}">
+        <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if config.new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
                 <h2>{{ day|format_skeleton('EEEEdMMMM', timezone=event.timezone) }}</h2>
             </div>
             {% for entry in days[day] %}
                 {% set should_render = (
                     entry.type.name == 'SESSION_BLOCK' or
-                    (entry.type.name == 'CONTRIBUTION' and show_contribs) or
-                    (entry.type.name == 'BREAK' and show_breaks)
+                    (entry.type.name == 'CONTRIBUTION' and config.show_contribs) or
+                    (entry.type.name == 'BREAK' and config.show_breaks)
                 ) %}
 
                 {% if should_render %}
@@ -20,24 +20,18 @@
                             {{ entry.start_dt|format_time(timezone=event.timezone) }}
                         </div>
                         <section class="{{ get_custom_id(entry) }}">
-                            {{ render_block_date(entry, day, print_date_close_to_sessions) }}
+                            {{ render_block_date(entry, day, config.print_date_close_to_sessions) }}
                             <section class="session-block {{ 'contribution' if entry.type.name == 'CONTRIBUTION' else '' }}">
                                 <div class="session-block-wrapper">
                                     {% if entry.type.name == 'BREAK' %}
                                         {{ render_break(entry) }}
                                     {% elif entry.type.name == 'CONTRIBUTION' %}
-                                        {{ render_contrib(entry, show_abstract, show_title, show_affiliation) }}
+                                        {{ render_contrib(entry, config) }}
                                     {% else %}
                                         {{
                                             render_session_block(
                                                 entry,
-                                                show_abstract,
-                                                dont_show_poster_abstract,
-                                                show_contribs,
-                                                show_length_contribs,
-                                                show_session_description,
-                                                show_title,
-                                                show_affiliation
+                                                config
                                             )
                                         }}
                                     {% endif %}
@@ -76,7 +70,7 @@
     </section>
 {% endmacro %}
 
-{% macro render_contrib(entry, show_abstract, show_title, show_affiliation) %}
+{% macro render_contrib(entry, config) %}
     {% set contrib = entry.object %}
     {% set speakers = contrib.speakers %}
 
@@ -100,28 +94,31 @@
                     <span class="bold">
                         {{ ngettext('Speaker:', 'Speakers:', speakers|length) }}
                     </span>
-                    {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
+                    {{ render_names(speakers, show_title=config.show_title, show_affiliation=config.show_affiliation) }}
                 </p>
             {% endif %}
         </div>
     </section>
-    {% if show_abstract and contrib.description %}
+    {% if config.show_abstract and contrib.description %}
         <div class="session-block-content">
             {{ render_description(contrib.description) }}
         </div>
     {% endif %}
+    {% if contrib.subcontributions %}
+        {{ render_subcontribs(contrib, config) }}
+    {% endif %}
 {% endmacro %}
 
-{% macro render_session_block(entry, show_abstract, dont_show_poster_abstract, show_contribs, show_length_contribs, show_session_description, show_title, show_affiliation) %}
+{% macro render_session_block(entry, config) %}
     {% set session_block = entry.object %}
     {% set sess = session_block.session %}
     {% set conveners = session_block.person_links %}
     {% set contributions = session_block.contributions %}
-    {% set show_session_block_content = entry.children or (show_session_description and session.description) %}
+    {% set show_session_block_content = entry.children or (config.show_session_description and session.description) %}
 
     <section
         id="entry-{{ entry.id }}"
-        class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_session_block_content else ''}}"
+        class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if config.show_session_block_content else ''}}"
     >
         <h3>{{ sess.title }}: {{ session_block.title }}</h3>
         <div class="session-block-title-info">
@@ -150,47 +147,50 @@
     </section>
     {% if show_session_block_content %}
         <div class="session-block-content">
-            {% if show_session_description and sess.description %}
+            {% if config.show_session_description and sess.description %}
                 {{ render_description(sess.description) }}
             {% endif %}
             {% if entry.children %}
-                <div class="session-block-content-box inherited-border-color">
-                    <ul class="contrib-timeline">
-                        {% for child in entry.children %}
-                            <li class="inherited-border-color">
-                                <div class="contrib-heading">
-                                    {% if not session.is_poster %}
-                                        <span class="timebox inherited-bg-color inherited-txt-color">
-                                            {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='HHmm') }}
-                                            {% if show_length_contribs %}
-                                                ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
-                                            {% endif %}
-                                        </span>
-                                    {% endif %}
-                                    <h4>{{ child.object.title }}</h4>
-                                </div>
-                                {% if child.type.name == 'CONTRIBUTION' %}
-                                    <div class="contrib-timeline-content" >
-                                        {{ render_subcontrib(child, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
-                                    </div>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                {{ render_child_entries(sess, entry.children, config) }}
             {% endif %}
         </div>
     {% endif %}
 {% endmacro %}
 
-{% macro render_subcontrib(entry, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs=false) %}
-    {% set contrib = entry.object if entry.object else entry %}
+{% macro render_child_entries(sess, children, config) %}
+    <div class="session-block-content-box inherited-border-color">
+        <ul class="contrib-timeline">
+            {% for child in children %}
+                <li class="inherited-border-color">
+                    <div class="contrib-heading">
+                        {% if not sess.is_poster %}
+                            <span class="timebox inherited-bg-color inherited-txt-color">
+                                {{ format_interval(child.start_dt.astimezone(child.event.tzinfo), child.end_dt.astimezone(child.event.tzinfo), format='HHmm') }}
+                                {% if config.show_length_contribs %}
+                                    ({{ (child.end_dt - child.start_dt)|format_human_timedelta(narrow=True) }})
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                        <h4>{{ child.object.title }}</h4>
+                    </div>
+                    {% if child.type.name == 'CONTRIBUTION' %}
+                        <div class="contrib-timeline-content" >
+                            {{ render_child_contrib(child.object, config) }}
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{% macro render_child_contrib(contrib, config) %}
     {% set speakers = contrib.speakers %}
 
     {% if speakers %}
         <p>
             <span class="bold">{{ ngettext('Speaker', 'Speakers', speakers|length) }}</span><br />
-            {{ render_names(speakers, show_title=show_title, show_affiliation=show_affiliation) }}
+            {{ render_names(speakers, show_title=config.show_title, show_affiliation=config.show_affiliation) }}
         </p>
     {% endif %}
 
@@ -200,35 +200,44 @@
             {{ render_place(contrib) }}
         </p>
     {% endif %}
-    {% if show_abstract and (not dont_show_poster_abstract or entry.is_poster) and contrib.description %}
+    {% if config.show_abstract and (not config.dont_show_poster_abstract or contrib.session.is_poster) and contrib.description %}
         <div class="description">
             <span class="bold">{% trans %}Description{% endtrans %}</span>
             <div>{{ contrib.description }}</div>
         </div>
     {% endif %}
     {% if contrib.subcontributions %}
-        <div>
-            <span class="bold">{% trans %}Subcontributions{% endtrans %}</span>
-            <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
-                {% for subcontrib in contrib.subcontributions %}
-                    <li class="inherited-border-color">
-                        <div class="contrib-heading">
-                            {% if show_length_contribs and not contrib.session.is_poster %}
-                                <span class="timebox inherited-bg-color inherited-txt-color">
-                                    {{ (subcontrib.duration)|format_human_timedelta(narrow=True) }}
-                                </span>
-                            {% endif %}
-                            <h4>{{ subcontrib.title }}</h4>
-                        </div>
-                        <div class="contrib-timeline-content">
-                            {{ render_subcontrib(subcontrib, show_abstract, dont_show_poster_abstract, show_title, show_affiliation, show_length_contribs) }}
-                        </div>
-                    </li>
-                {% endfor%}
-            </ul>
-        </div>
+        {{ render_subcontribs(contrib, config) }}
     {% endif %}
 {% endmacro %}
+
+{% macro render_subcontribs(contrib, config) %}
+    <div>
+        <span class="bold">{% trans %}Subcontributions{% endtrans %}</span>
+        <ul class="sub-contrib-timeline inherited-bg-color-trans inherited-border-color">
+            {% for subcontrib in contrib.subcontributions %}
+                <li class="inherited-border-color">
+                    <div class="contrib-heading">
+                        {% if config.show_length_contribs and not contrib.session.is_poster %}
+                            <span class="timebox inherited-bg-color inherited-txt-color">
+                                {{ (subcontrib.duration)|format_human_timedelta(narrow=True) }}
+                            </span>
+                        {% endif %}
+                        <h4>{{ subcontrib.title }}</h4>
+                    </div>
+                    <div class="contrib-timeline-content">
+                        {{ render_subcontrib(subcontrib, config) }}
+                    </div>
+                </li>
+            {% endfor%}
+        </ul>
+    </div>
+{% endmacro %}
+
+{% macro render_subcontrib(subcontrib, config) %}
+    {{ render_child_contrib(subcontrib, config) }}
+{% endmacro %}
+
 
 {% macro render_block_date(entry, day, print_date_close_to_sessions) %}
     {% if print_date_close_to_sessions %}

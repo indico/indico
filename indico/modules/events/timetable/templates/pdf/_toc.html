@@ -1,17 +1,17 @@
-{% macro render_toc(event, days, show_sessions=true, show_contribs=true, show_breaks=true) %}
+{% macro render_toc(event, days, config) %}
     <nav class="pagebreak toc">
         <h1>{% trans %}Table of contents{% endtrans %}</h1>
         {% for day in days %}
             <div class="toc-item toc-item-main">
                 <a href="#day-{{ loop.index }}">{{ day|format_skeleton('EEEEdMMM') }}</a>
             </div>
-            {% if show_sessions %}
+            {% if config.show_session_toc %}
                 <div class="toc-sessions">
                     {% for entry in days[day] %}
                         {% set can_render_item = (
                             entry.type.name == 'SESSION_BLOCK' or
-                            (entry.type.name == 'CONTRIBUTION' and show_contribs) or
-                            (entry.type.name == 'BREAK' and show_breaks) 
+                            (entry.type.name == 'CONTRIBUTION' and config.show_contribs) or
+                            (entry.type.name == 'BREAK' and config.show_breaks) 
                         )%}
                         {% if can_render_item %}
                             {{ render_toc_item(entry) }}
