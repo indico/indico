@@ -47,23 +47,13 @@
         }
     {% endfor %}
 </style>
-{% if show_cover_page %}
+
+{% if config.show_cover_page %}
     {{ render_cover_page(event) }}
 {% endif %}
-{% if show_toc %}
-    {{ render_toc(event, days, show_session_toc, show_contribs, show_breaks) }}
+
+{% if config.show_toc %}
+    {{ render_toc(event, days, config) }}
 {% endif %}
-{{ render_program(
-    event,
-    days,
-    show_abstract,
-    dont_show_poster_abstract,
-    show_contribs,
-    show_length_contribs,
-    show_breaks,
-    new_page_per_session,
-    show_session_description,
-    print_date_close_to_sessions,
-    show_title,
-    show_affiliation
-) }}
+
+{{ render_program(event, days, config) }}

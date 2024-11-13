@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from dataclasses import dataclass
 from io import BytesIO
 
 from flask import jsonify, render_template, request, session
@@ -105,6 +106,23 @@ class RHTimetableExportPDFLegacy(RHTimetableProtectionBase):
                                 back_url=url_for('.timetable', self.event))
 
 
+@dataclass(frozen=True)
+class TimetableExportConfig:
+    show_title: bool
+    show_affiliation: bool
+    show_cover_page: bool
+    show_toc: bool
+    show_session_toc: bool
+    show_abstract: bool
+    dont_show_poster_abstract: bool
+    show_contribs: bool
+    show_length_contribs: bool
+    show_breaks: bool
+    new_page_per_session: bool
+    show_session_description: bool
+    print_date_close_to_sessions: bool
+
+
 class RHTimetableExportPDF(RHTimetableProtectionBase):
     @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
     def _process(self, download):
@@ -123,11 +141,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                            .order_by(TimetableEntry.start_dt))
                 days[day] = entries
 
-            html = render_template(
-                'events/timetable/pdf/timetable.html',
-                event=self.event,
-                days=days,
-                now=now,
+            config = TimetableExportConfig(
                 show_title=form.other.data['showSpeakerTitle'],
                 show_affiliation=form.other.data['showSpeakerAffiliation'],
                 show_cover_page=form.document_settings.data['showCoverPage'],
@@ -142,6 +156,9 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 show_session_description=form.session_info.data['showSessionDescription'],
                 print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
             )
+
+            html = render_template('events/timetable/pdf/timetable.html', event=self.event,
+                                   days=days, now=now, config=config)
 
             if download:
                 return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
