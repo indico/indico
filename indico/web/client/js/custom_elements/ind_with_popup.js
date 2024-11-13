@@ -71,9 +71,11 @@ customElements.define(
       trigger.setAttribute('aria-expanded', this.shown);
 
       if (this.shown) {
+        this.toggleAttribute('data-position-check', true);
         positioning.position(dialog, this, positioning.popupPositionStrategy, () => {
           dialog.show();
           dialog.firstElementChild.focus();
+          this.removeAttribute('data-position-check');
         });
       } else {
         dialog.close();

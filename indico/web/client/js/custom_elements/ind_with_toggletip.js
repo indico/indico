@@ -15,6 +15,8 @@ import './tips.scss';
 customElements.define(
   'ind-with-toggletip',
   class extends CustomElementBase {
+    static observedAttributes = ['shown'];
+
     constructor() {
       super();
 
@@ -28,13 +30,14 @@ customElements.define(
       });
     }
 
-    static observedAttributes = ['shown'];
-
     attributeChangedCallback() {
+      const trigger = this.querySelector('[data-trigger]');
       const tip = this.querySelector('[data-tip-content]');
 
       this.stopHandlingFocusLost?.();
       this.stopPositioning?.();
+
+      trigger.setAttribute('aria-expanded', this.shown);
 
       if (this.shown) {
         this.toggleAttribute('data-position-check', true);
@@ -59,7 +62,7 @@ customElements.define(
 
     setup() {
       domReady.then(() => {
-        const trigger = this.querySelector('button');
+        const trigger = this.querySelector('[data-trigger]');
         const tip = this.querySelector('[data-tip-content]');
         this._tipHTML = tip.innerHTML;
 
