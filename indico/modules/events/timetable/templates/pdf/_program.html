@@ -55,18 +55,7 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color"
     >
-        <h3>{{ break.title }}</h3>
-        <div class="session-block-title-info">
-            <p>
-                <span class="bold">
-                    {% trans %}Break{% endtrans %}
-                </span>
-            </p>
-            <p>
-                <span class="bold">{% trans %}Location{% endtrans %}:</span>
-                {{ render_place(entry) }}
-            </p>
-        </div>
+        {{ render_entry_header(entry) }}
     </section>
 {% endmacro %}
 
@@ -80,26 +69,7 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_contrib_content else ''}}"
     >
-        <h3>{{ contrib.title }}</h3>
-        <div class="session-block-title-info">
-            <p>
-                <span class="bold">
-                    {% trans %}Contribution{% endtrans %}
-                </span>
-            </p>
-            <p>
-                <span class="bold">{% trans %}Location{% endtrans %}:</span>
-                {{ render_place(entry) }}
-            </p>
-            {% if speakers %}
-                <p>
-                    <span class="bold">
-                        {{ ngettext('Speaker:', 'Speakers:', speakers|length) }}
-                    </span>
-                    {{ render_names(speakers, show_title=config.show_title, show_affiliation=config.show_affiliation) }}
-                </p>
-            {% endif %}
-        </div>
+        {{ render_entry_header(entry) }}
     </section>
     {% if show_contrib_content %}
         <div class="session-block-content">
@@ -116,39 +86,13 @@
     {% set sess = session_block.session %}
     {% set conveners = session_block.person_links %}
     {% set contributions = session_block.contributions %}
-    {% set show_session_block_content = entry.children or (config.show_session_description and session.description) %}
+    {% set show_session_block_content = entry.children or (config.show_session_description and sess.description) %}
 
     <section
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_session_block_content else ''}}"
     >
-        <h3>
-            {{ sess.title }}
-            {% if session_block.title %}: {{ session_block.title }}{% endif %}
-        </h3>
-        <div class="session-block-title-info">
-            <p>
-                <span class="bold">
-                    {% if session.is_poster %}
-                        {% trans %}Poster Session{% endtrans %}
-                    {% else %}
-                        {% trans %}Session{% endtrans %}
-                    {% endif %}
-                </span>
-            </p>
-            <p>
-                <span class="bold">{% trans %}Location{% endtrans %}:</span>
-                {{ render_place(entry) }}
-            </p>
-            {% if conveners %}
-                <p>
-                    <span class="bold">
-                        {{ ngettext('Convener:', 'Conveners:', conveners|length) }}
-                    </span>
-                    {{ render_names(conveners, show_title=show_title, show_affiliation=show_affiliation) }}
-                </p>
-            {% endif %}
-        </div>
+        {{ render_entry_header(entry) }}
     </section>
     {% if show_session_block_content %}
         <div class="session-block-content">
@@ -255,6 +199,50 @@
     {{ render_child_contrib(subcontrib, config) }}
 {% endmacro %}
 
+{% macro render_entry_header(entry) %}
+    {% set object = entry.object %}
+    {% set sess = object.session %}
+    {% set type = entry.type.name %}
+
+    <h3>
+        {% if type == 'SESSION_BLOCK' %}
+            {{ render_block_title(object) }}
+        {% else %}
+            {{ object.title }}
+        {% endif %}
+    </h3>
+    <div class="session-block-title-info">
+        <p>
+            <span class="bold">
+                {% if type == 'BREAK' %}
+                    {% trans %}Break{% endtrans %}
+                {% elif type == 'CONTRIBUTION' %}
+                    {% trans %}Contribution{% endtrans %}
+                {% elif sess.is_poster %}
+                    {% trans %}Poster Session{% endtrans %}
+                {% else %}
+                    {% trans %}Session{% endtrans %}
+                {% endif %}
+            </span>
+        </p>
+        <p>
+            <span class="bold">{% trans %}Location{% endtrans %}:</span>
+            {{ render_place(entry) }}
+        </p>
+        {% if type != 'BREAK' %}
+            {% set people = object.person_links if type == 'SESSION_BLOCK' else object.speakers %}
+            <span class="bold">
+                {% if type == 'SESSION_BLOCK' %}
+                    {{ ngettext('Convener:', 'Conveners:', people|length) }}
+                {% else %}
+                    {{ ngettext('Speaker:', 'Speakers:', people|length) }}
+                {% endif %}
+            </span>
+            {{ render_names(people, show_title=config.show_title, show_affiliation=config.show_affiliation) }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% macro render_block_date(entry, day, print_date_close_to_sessions) %}
     {% if print_date_close_to_sessions %}
         <p class="session-block-date">
@@ -341,4 +329,11 @@
             </li>
         </ul>
     </div>
+{% endmacro %}
+
+{% macro render_block_title(block) %}
+    <h3>
+        {{ block.session.title }}
+        {% if block.title %}: {{ block.title }}{% endif %}
+    </h3>
 {% endmacro %}
