@@ -68,7 +68,8 @@ ind-with-toggletip {
     border-width: 0.5em 0;
   }
 
-  &:not([shown]) [data-tip-content] {
+  &:not([shown]) [data-tip-content],
+  &[data-position-check] [data-tip-content] {
     opacity: 0;
     pointer-events: none;
   }
@@ -93,20 +94,20 @@ ind-with-toggletip {
   }
 
   // Arrows
-  &[shown]:not([data-position-check])::after {
+  &[shown]:not([data-position-check]) {
     @extend %popup-arrow;
     --arrow-color: var(--tooltip-surface-color);
     --arrow-size: 0.5em;
   }
 
-  &[orientation='horizontal']::after {
+  &[orientation='horizontal'] {
     @extend %popup-arrow-horizontal;
   }
 
   // The orientation attribute may be unset, so instead
   // of testing that [orientation='vertical'] we test that
   // :not([orientation='horizontal'])
-  &:not([orientation='horizontal'])::after {
+  &:not([orientation='horizontal']) {
     @extend %popup-arrow-vertical;
   }
 }
