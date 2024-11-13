@@ -11,7 +11,7 @@
 .room-stats {
   display: flex;
   justify-content: space-around;
-  color: $gray;
+  color: $light-black;
   @media (min-width: $tablet-width) {
     padding: 0 3em;
   }
@@ -24,7 +24,8 @@
     .title {
       font-weight: bold;
       padding: 0.5em 1em;
-      background-color: lighten($dark-highlight-color, 45%);
+      color: $black;
+      background-color: lighten($raincloud-gray, 10%);
     }
 
     .value-box {
