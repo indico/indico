@@ -407,7 +407,7 @@ def split_all_po_files():
         merged_po_path = lc_messages_dir / 'merged.po'
         if merged_po_path.exists():
             for pot_file in TRANSLATIONS_DIR.glob('*.pot'):
-                if pot_file.name != 'merged.pot':
+                if pot_file.name != 'messages-all.pot':
                     output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
                     split_po_by_pot(merged_po_path, pot_file, output_po_path)
 
@@ -471,7 +471,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'ExtractMessages':
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
-        merge_pot_files(TRANSLATIONS_DIR / 'merged.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
+        merge_pot_files(TRANSLATIONS_DIR / 'messages-all.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
     elif babel_cmd == 'CompileCatalog':
         split_all_po_files()
 
