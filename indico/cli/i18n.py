@@ -392,8 +392,6 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
     with pot_path.open('rb') as f:
         pot_catalog = read_po(f)
 
-    assert None not in (merged_catalog, pot_catalog)
-
     merged_catalog.update(pot_catalog)
 
     with output_po_path.open('wb') as f:
