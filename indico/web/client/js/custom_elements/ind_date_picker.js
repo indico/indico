@@ -523,7 +523,7 @@ for (let p of paths) {
       if (weekInfo.firstDay !== MONDAY || weekInfo.weekend[0] !== SATURDAY) {
         localeData[localeName] = weekInfo;
       }
-    } catch (e) { /* Ignore unofficial and breaking locales during development */ }
+    } catch (e) { /* Ignore unofficial (zh_CN.GB2312) and breaking locales during development */ }
   }
 }
 
