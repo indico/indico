@@ -104,7 +104,7 @@ class MultipleItemsField(HiddenField):
     :param sortable: Whether items should be sortable.
     """
 
-    widget = JinjaWidget('forms/multiple_items_widget.html')
+    widget = JinjaWidget('forms/multiple_items_widget.html', single_kwargs=True)
 
     def __init__(self, *args, **kwargs):
         self.fields = getattr(self, 'fields', None) or kwargs.pop('fields')

@@ -3,7 +3,7 @@
 
 {% block html %}
     {% set value_json = field._value() | tojson %}
-    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}" {{ input_args | html_params }}>
     <div id="{{ field.id }}-widget" class="multiple-items-widget">
         <table class="i-table-widget">
             <thead data-tooltip-anchor>
