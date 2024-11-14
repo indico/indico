@@ -62,7 +62,7 @@ from indico.util.string import camelize_keys, validate_email, validate_email_ver
 class ActionMenuEntry:
     text: str
     icon_name: str
-    # _: dataclasses.KW_ONLY  # TODO uncomment once we require python3.10+; until then consider everything below kw-only
+    _: dataclasses.KW_ONLY
     weight: int = 0
     dialog_title: str = None  # defaults to `text`
     type: str = 'ajax-dialog'  # use 'callback' to call a global JS function or 'href-custom' for a data-href
