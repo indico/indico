@@ -375,11 +375,8 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
         with input_file.open('rb') as f:
             catalog = read_po(f)
 
-        assert catalog is not None
-
         for message in catalog:
-            if message.id not in merged_catalog:
-                merged_catalog[message.id] = message
+            merged_catalog[message.id] = message
 
     with output_file.open('wb') as f:
         write_po(f, merged_catalog, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
