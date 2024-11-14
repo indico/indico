@@ -32,7 +32,6 @@ LANGUAGE_RENAMES = {'zh_Hans_CN': 'zh_CN.GB2312'}
 
 INDICO_DIR = Path(get_root_path('indico')).parent
 TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'translations'
-MERGED_TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'merged_translations'
 MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
@@ -312,10 +311,12 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
         for loc in locales:
             po_file = translations_dir / loc / 'LC_MESSAGES' / 'messages-react.po'
             json_file = translations_dir / loc / 'LC_MESSAGES' / 'messages-react.json'
+
             if not po_file.exists():
                 continue
             with _chdir(INDICO_DIR):
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
+
             json.loads(output)  # just to be sure the JSON is valid
             json_file.write_text(output)
     except subprocess.CalledProcessError as err:
@@ -403,8 +404,8 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
 
 
 def split_all_po_files():
-    for lc_messages_dir in MERGED_TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
-        merged_po_path = lc_messages_dir / 'merged.po'
+    for lc_messages_dir in TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
+        merged_po_path = lc_messages_dir / 'messages-all.po'
         if merged_po_path.exists():
             for pot_file in TRANSLATIONS_DIR.glob('*.pot'):
                 if pot_file.name != 'messages-all.pot':
@@ -456,6 +457,9 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
                         err=True)
             sys.exit(1)
     try:
+        if babel_cmd == 'CompileCatalog':
+            split_all_po_files()
+
         if python:
             _run_command(babel_cmd, extra=extra)
         if javascript:
@@ -470,10 +474,10 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'ExtractMessages':
+        if python == javascript == react:
+            merge_pot_files(TRANSLATIONS_DIR / 'messages-all.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
+
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
-        merge_pot_files(TRANSLATIONS_DIR / 'messages-all.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
-    elif babel_cmd == 'CompileCatalog':
-        split_all_po_files()
 
 
 def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plugin_dir):
