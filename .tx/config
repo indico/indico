@@ -18,3 +18,9 @@ file_filter = indico/translations/<lang>/LC_MESSAGES/messages.po
 source_file = indico/translations/messages.pot
 source_lang = en
 type        = PO
+
+[o:indico:p:indico:r:messages-all]
+file_filter = indico/translations/<lang>/LC_MESSAGES/messages-all.po
+source_file = indico/translations/messages-all.pot
+source_lang = en
+type        = PO
