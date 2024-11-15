@@ -473,8 +473,8 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
             else:
                 _run_command(f'{babel_cmd}_react', extra=extra)
 
-        if python == javascript == react:
-            merge_pot_files(TRANSLATIONS_DIR / MESSAGES_ALL_POT, MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
+        if python and javascript and react:
+            merge_pot_files(MESSAGES_ALL_POT, MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'ExtractMessages':
