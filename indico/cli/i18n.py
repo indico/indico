@@ -35,6 +35,7 @@ TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'translations'
 MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
+MESSAGES_ALL_POT = TRANSLATIONS_DIR / 'messages-all.pot'
 
 TRANSLATOR_COMMENT_TAG = 'i18n:'
 
@@ -369,14 +370,18 @@ def remove_empty_pot_files(path: Path, python=False, javascript=False, react=Fal
 # Merge after generating all the .pot files
 def merge_pot_files(output_file: Path, *input_files: list[Path]):
     """Merge multiple POT files into a single POT file."""
-    merged_catalog = Catalog(project='Indico', version=indico.__version__)
+    merged_catalog = Catalog(
+        project=DEFAULT_OPTIONS['ExtractMessages']['project'],
+        version=DEFAULT_OPTIONS['ExtractMessages']['version']
+    )
 
     for input_file in input_files:
         with input_file.open('rb') as f:
             catalog = read_po(f)
 
         for message in catalog:
-            merged_catalog[message.id] = message
+            if message.id:
+                merged_catalog[message.id] = message
 
     with output_file.open('wb') as f:
         write_po(f, merged_catalog, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
@@ -403,7 +408,7 @@ def split_all_po_files():
         merged_po_path = lc_messages_dir / 'messages-all.po'
         if merged_po_path.exists():
             for pot_file in TRANSLATIONS_DIR.glob('*.pot'):
-                if pot_file.name != 'messages-all.pot':
+                if pot_file.name != MESSAGES_ALL_POT:
                     output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
                     split_po_by_pot(merged_po_path, pot_file, output_po_path)
 
@@ -442,6 +447,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
     extra = {}
     if locale:
         extra['locale'] = locale
+
     if not no_check:
         if not _check_format_strings():
             click.secho('Exiting compile command for indico due to invalid format strings.', fg='red', bold=True,
@@ -466,12 +472,12 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
                 extract_messages_react()
             else:
                 _run_command(f'{babel_cmd}_react', extra=extra)
+
+        if python == javascript == react:
+            merge_pot_files(TRANSLATIONS_DIR / MESSAGES_ALL_POT, MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'ExtractMessages':
-        if python == javascript == react:
-            merge_pot_files(TRANSLATIONS_DIR / 'messages-all.pot', MESSAGES_POT, MESSAGES_JS_POT, MESSAGES_REACT_POT)
-
         remove_empty_pot_files(INDICO_DIR, python=python, javascript=javascript, react=react)
 
 
