@@ -386,7 +386,7 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
     with output_file.open('wb') as f:
         write_po(f, merged_catalog, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
 
-    click.secho('✔  Done merging pot files!', fg='green', bold=True)
+    click.secho('Done merging pot files!', fg='green', bold=True)
 
 
 # Filter merged.po files by removing messages that are not in the given .pot file
@@ -398,6 +398,7 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
         pot_catalog = read_po(f)
 
     merged_catalog.update(pot_catalog)
+    merged_catalog.obsolete.clear()
 
     with output_po_path.open('wb') as f:
         write_po(f, merged_catalog)
@@ -412,7 +413,7 @@ def split_all_po_files():
                     output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
                     split_po_by_pot(merged_po_path, pot_file, output_po_path)
 
-    click.secho('✔  Done generating split PO files!', fg='green', bold=True)
+    click.secho('Done generating split PO files!', fg='green', bold=True)
 
 
 @click.group()
