@@ -13,7 +13,7 @@
 
                 {% if should_render %}
                     <div class="day-entry">
-                        {% if entry.type.name != 'CONTRIBUTION' %} 
+                        {% if entry.type.name != 'CONTRIBUTION' %}
                             {{ get_color_styles(entry) }}
                         {% endif %}
                         <div class="time-text time-from">
@@ -149,7 +149,7 @@
             {{ render_place(contrib) }}
         </p>
     {% endif %}
-    {% if config.show_abstract and (not config.dont_show_poster_abstract or contrib.session.is_poster) and contrib.description %}
+    {% if config.show_abstract and (not contrib.session.is_poster or not config.dont_show_poster_abstract) and contrib.description %}
         <div class="description">
             <span class="bold">{% trans %}Description{% endtrans %}</span>
             <div>{{ contrib.description }}</div>
