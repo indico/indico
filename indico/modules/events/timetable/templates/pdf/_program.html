@@ -229,8 +229,8 @@
             <span class="bold">{% trans %}Location{% endtrans %}:</span>
             {{ render_place(entry) }}
         </p>
-        {% if type != 'BREAK' %}
-            {% set people = object.person_links if type == 'SESSION_BLOCK' else object.speakers %}
+        {% set people = object.person_links if type == 'SESSION_BLOCK' else object.speakers %}
+        {% if type != 'BREAK' and people %}
             <span class="bold">
                 {% if type == 'SESSION_BLOCK' %}
                     {{ ngettext('Convener:', 'Conveners:', people|length) }}
