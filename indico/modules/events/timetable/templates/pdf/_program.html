@@ -237,6 +237,7 @@
                 {% else %}
                     {{ ngettext('Speaker:', 'Speakers:', people|length) }}
                 {% endif %}
+                &nbsp;
             </span>
             {{ render_names(people, show_title=config.show_title, show_affiliation=config.show_affiliation) }}
         {% endif %}
