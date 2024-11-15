@@ -404,7 +404,6 @@ type(
       this.pdfButton = {
         btn: Html.div('buttonWhite', $T('PDF')),
         onclick: function(btnContainer) {
-          console.log('we doin it')
           self.pdf();
         },
       };
