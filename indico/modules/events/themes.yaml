@@ -1,3 +1,15 @@
+_:
+  inline_minutes_setting: &user_setting_inline_minutes
+    inline_minutes:
+      caption: Inline minutes
+      description: Show minutes by default
+      type: BooleanField
+  numbered_contributions_setting: &user_setting_numbered_contributions
+    numbered_contributions:
+      caption: Numbered contributions
+      description: Show numbered contributions instead of times
+      type: BooleanField
+
 defaults:
     conference: ~
     lecture: lecture

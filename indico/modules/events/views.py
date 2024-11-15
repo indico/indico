@@ -14,7 +14,7 @@ from werkzeug.utils import cached_property
 from indico.modules.admin.views import WPAdmin
 from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
-from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.layout import get_theme_global_settings, layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_js_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.modules.events.management.settings import privacy_settings
@@ -234,7 +234,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                                event=self.event,
                                category=(self.event.category.title if self.event.category else None),
                                timezone=self.event.display_tzinfo,
-                               theme_settings=self.theme.get('settings', {}),
+                               theme_settings=get_theme_global_settings(self.event, self.theme_id),
                                theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
                                files=files,
                                folders=folders,

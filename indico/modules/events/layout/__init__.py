@@ -52,6 +52,31 @@ layout_settings = EventSettingsProxy('layout', {
 theme_settings = ThemeSettingsProxy()
 
 
+def get_theme_global_settings(event, theme):
+    """Get the global settings for a theme.
+
+    Some global theme settings such as 'show_notes' may be overridden by the
+    event-specific user settings ('user_settings' in themes.yaml).
+    These are saved in the event's layout settings under timetable_theme_settings.
+    """
+    settings = theme_settings.themes[theme].get('settings', {})
+    # Ignore user settings when the selected theme does not match the event's theme
+    if event.theme != theme:
+        return settings
+
+    # Override global settings with user settings, if present
+    settings = settings.copy()
+    event_settings = layout_settings.get(event, 'timetable_theme_settings')
+    if event_settings.get('inline_minutes'):
+        settings['show_notes'] = True
+    if event_settings.get('numbered_contributions'):
+        settings['hide_duration'] = True
+        settings['hide_session_block_time'] = True
+        settings['hide_end_time'] = True
+        settings['number_contributions'] = True
+    return settings
+
+
 @signals.event.created.connect
 def _event_created(event, **kwargs):
     defaults = event.category.default_event_themes if event.category else None
