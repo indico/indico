@@ -161,30 +161,6 @@ class Paragraph(platypus.Paragraph):
         return self._part
 
 
-class SimpleParagraph(platypus.Flowable):
-    """Simple and fast paragraph.
-
-    WARNING! This paragraph cannot break the line and doesn't have almost any formatting methods.
-             It's used only to increase PDF performance in places where normal paragraph is not needed.
-    """
-
-    def __init__(self, text, fontSize=10, indent=0, spaceAfter=2):
-        platypus.Flowable.__init__(self)
-        self.text = text
-        self.height = fontSize + spaceAfter
-        self.fontSize = fontSize
-        self.spaceAfter = spaceAfter
-        self.indent = indent
-
-    def __repr__(self):
-        return ''
-
-    def draw(self):
-        # centre the text
-        self.canv.setFont('Times-Roman', self.fontSize)
-        self.canv.drawString(self.indent, self.spaceAfter, self.text)
-
-
 class TableOfContentsEntry(Paragraph):
     """Class used to create table of contents entry with its number.
 
