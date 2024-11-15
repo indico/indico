@@ -17,7 +17,8 @@
 
 {% block content %}
     <section>
-        {{ details_table_row(pgettext("Salutation, e.g., 'Mr.' or 'Mrs.'", 'Title:'), author.title) if author.contribution.event.show_titles }}
+        {# i18n: Salutation, e.g., 'Mr.' or 'Mrs.' #}
+        {{ details_table_row(pgettext('Salutation', 'Title:'), author.title) if author.contribution.event.show_titles }}
         {{ details_table_row(_('Affiliation:'), author.affiliation) }}
     </section>
     {% if contribs -%}

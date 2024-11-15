@@ -81,7 +81,7 @@ function PersonalDataForm({
               options={titleOptions}
               selection
               parse={p.nullIfEmpty}
-              label={Translate.string('Title', "Salutation, e.g., 'Mr.' or 'Mrs.'")}
+              label={Translate.string('Title', 'Salutation')}
               placeholder={Translate.string('None')}
             />
             <Form.Group widths="equal">

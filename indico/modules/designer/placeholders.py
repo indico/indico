@@ -252,7 +252,8 @@ class RegistrationFullNameNoTitlePlaceholderD(FullNamePlaceholderBase):
 
 class RegistrationTitlePlaceholder(RegistrationPDPlaceholder):
     name = 'title'
-    description = pgettext("Salutation, e.g., 'Mr.' or 'Mrs.'", 'Title')
+    # i18n: Salutation, e.g., 'Mr.' or 'Mrs.'
+    description = pgettext('Salutation', 'Title')
     field = 'title'
 
 

@@ -355,9 +355,7 @@ class BookingBootstrapForm extends React.Component {
         )}
         {type === 'every' && (
           <Form.Group inline styleName="recurrence-field">
-            <label>
-              {Translate.string('Every', "Repetition, e.g., 'Every year', 'Every month', etc.")}
-            </label>
+            <label>{Translate.string('Every', 'Repetition')}</label>
             <Form.Input
               type="number"
               value={number}
