@@ -265,19 +265,6 @@ type(
       $('body').css('padding', '30px');
     },
 
-    pdfLegacy: function() {
-      if ($('html').data('static-site')) {
-        window.location = build_url(Indico.Urls.Timetable.default_pdf, {
-          event_id: this.eventInfo.id,
-        });
-      } else {
-        ajaxDialog({
-          url: build_url(Indico.Urls.Timetable.pdf_legacy, {event_id: this.eventInfo.id}),
-          title: $T.gettext('Export to PDF'),
-        });
-      }
-    },
-
     pdf: function() {
       ajaxDialog({
         url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
@@ -408,14 +395,6 @@ type(
         },
       };
 
-
-      this.pdfLegacyButton = {
-        btn: Html.div('buttonWhite', $T('PDF (Legacy)')),
-        onclick: function(btnContainer) {
-          self.pdfLegacy();
-        },
-      };
-
       this.fullScreenButton = {
         btn: Html.div('buttonWhite', $T('Full screen')),
         onclick: function(btnContainer) {
@@ -452,7 +431,6 @@ type(
       return [
         this.printButton,
         this.pdfButton,
-        this.pdfLegacyButton,
         this.fullScreenButton,
         this.detailsButton,
         this.filterButton,

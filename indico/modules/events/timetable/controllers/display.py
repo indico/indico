@@ -14,7 +14,6 @@ from weasyprint import CSS, HTML
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
-from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
@@ -79,31 +78,6 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
     def _process(self):
         html = render_entry_info_balloon(self.entry)
         return jsonify(html=html)
-
-
-class RHTimetableExportPDFLegacy(RHTimetableProtectionBase):
-    def _process(self):
-        form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
-        if form.validate_on_submit():
-            form_data = form.data_for_format
-            pdf_format = TimetablePDFFormat(form_data)
-            if not form.advanced.data:
-                pdf_format.contribsAtConfLevel = True
-                pdf_format.breaksAtConfLevel = True
-                pdf_class = SimplifiedTimeTablePlain
-                additional_params = {}
-            else:
-                pdf_class = TimeTablePlain
-                additional_params = {'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
-                                     'showSessionDescription': form_data['showSessionDescription']}
-            if request.args.get('download') == '1':
-                pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, **additional_params)
-                return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
-            else:
-                url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
-                return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
-        return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
-                                back_url=url_for('.timetable', self.event))
 
 
 @dataclass(frozen=True)
