@@ -405,13 +405,15 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
 
 
 def split_all_po_files():
+    pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'messages-all.pot']
+
     for lc_messages_dir in TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
         merged_po_path = lc_messages_dir / 'messages-all.po'
-        if merged_po_path.exists():
-            for pot_file in TRANSLATIONS_DIR.glob('*.pot'):
-                if pot_file.name != 'messages-all.pot':
-                    output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
-                    split_po_by_pot(merged_po_path, pot_file, output_po_path)
+        assert merged_po_path.exists()
+
+        for pot_file in pot_files:
+            output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
+            split_po_by_pot(merged_po_path, pot_file, output_po_path)
 
     click.secho('Done generating split PO files!', fg='green', bold=True)
 
