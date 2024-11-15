@@ -409,7 +409,7 @@ def split_all_po_files():
         merged_po_path = lc_messages_dir / 'messages-all.po'
         if merged_po_path.exists():
             for pot_file in TRANSLATIONS_DIR.glob('*.pot'):
-                if pot_file.name != MESSAGES_ALL_POT:
+                if pot_file.name != 'messages-all.pot':
                     output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
                     split_po_by_pot(merged_po_path, pot_file, output_po_path)
 
