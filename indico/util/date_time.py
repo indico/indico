@@ -150,8 +150,32 @@ def format_interval(start_dt, end_dt, format='yMd', locale=None):
 
 
 def _adjust_skeleton(format, skeleton):
-    for char, count in Counter(skeleton).items():
-        format = re.sub(fr'{re.escape(char)}+', char * count, format)
+    """If possible, expand pattern fields to match the requested skeleton.
+
+    For example if the requested skeleton is 'yMM' and the format is 'yM' we can expand
+    this back to 'yMM'. Note that we are not allowed to expand numeric fields to
+    alphanumeric fields and vice versa.
+
+    For example, 'MM' cannot be expanded to 'MMMM'.
+
+    Fields for hours, minutes and seconds should not be expanded at all.
+
+    See: https://cldr-smoke.unicode.org/spec/main/ldml/tr35-dates.html#Matching_Skeletons
+    """
+    skeleton_counter = Counter(skeleton)
+    format_counter = Counter(format)
+
+    for char in skeleton_counter:
+        skeleton_count = skeleton_counter[char]
+        format_count = format_counter[char]
+
+        # Hours, minutes and seconds should not be expanded
+        if char in 'Hhms':
+            continue
+
+        if (format_count <= 2 and skeleton_count <= 2) or (format_count > 2 and skeleton_count > 2):
+            format = re.sub(fr'{re.escape(char)}+', char * skeleton_count, format)
+
     return format
 
 

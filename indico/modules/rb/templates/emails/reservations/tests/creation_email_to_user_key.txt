@@ -2,7 +2,7 @@ Dear Guinea,
 
 The conference room 1/2-3
 has been booked for Guinea Pig
-on Friday, 11/11/2022 from 13:37 to 14:37.
+on Fri, 11/11/2022 from 13:37 to 14:37.
 Reason: Testing
 
 If you end up not needing this room, please cancel the

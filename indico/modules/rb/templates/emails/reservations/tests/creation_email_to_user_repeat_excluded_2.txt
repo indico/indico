@@ -2,7 +2,7 @@ Dear Guinea,
 
 The conference room 1/2-3
 has been booked for Guinea Pig
-daily booking from Friday, 11/11/2022 to Monday, 21/11/2022 between 13:37 and 14:37.
+daily booking from Fri, 11/11/2022 to Mon, 21/11/2022 between 13:37 and 14:37.
 Reason: Testing
 (Note that there are 2 excluded days. For further info, check your reservation.)
 
