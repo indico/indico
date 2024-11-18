@@ -282,10 +282,10 @@ def serialize_contribution_for_ical(contrib):
     }
 
 
-def import_contributions_from_csv(event, f):
+def import_contributions_from_csv(event, f, delimiter=','):
     """Import timetable contributions from a CSV file into an event."""
     with csv_text_io_wrapper(f) as ftxt:
-        reader = csv.reader(ftxt.read().splitlines())
+        reader = csv.reader(ftxt.read().splitlines(), delimiter=delimiter)
 
     contrib_data = []
     for num_row, row in enumerate(reader, 1):

@@ -599,7 +599,9 @@ class RHContributionsImportCSV(RHManageContributionsBase):
         form = ImportContributionsForm()
 
         if form.validate_on_submit():
-            contributions, changes = import_contributions_from_csv(self.event, form.source_file.data)
+            delimiter = form.delimiter.data.delimiter
+            contributions, changes = import_contributions_from_csv(self.event, form.source_file.data,
+                                                                   delimiter=delimiter)
             flash(ngettext('{} contribution has been imported.',
                            '{} contributions have been imported.',
                            len(contributions)).format(len(contributions)), 'success')

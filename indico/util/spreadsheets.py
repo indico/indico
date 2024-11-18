@@ -9,6 +9,7 @@ import csv
 import re
 from contextlib import contextmanager
 from datetime import datetime
+from enum import auto
 from io import BytesIO, TextIOWrapper
 
 from markupsafe import Markup
@@ -17,8 +18,33 @@ from xlsxwriter import Workbook
 
 from indico.core.errors import UserValueError
 from indico.util.date_time import format_datetime
+from indico.util.enum import RichStrEnum
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
+
+
+class CSVFieldDelimiter(RichStrEnum):
+    __titles__ = {
+        'comma': _('Comma'),
+        'semicolon': _('Semicolon'),
+        'tab': _('Tab'),
+        'space': _('Space')
+    }
+    __delimiters__ = {
+        'comma': ',',
+        'semicolon': ';',
+        'tab': '\t',
+        'space': ' ',
+    }
+
+    comma = auto()
+    semicolon = auto()
+    tab = auto()
+    space = auto()
+
+    @property
+    def delimiter(self):
+        return self.__delimiters__[self.name]
 
 
 def unique_col(name, id_):

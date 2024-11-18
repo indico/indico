@@ -8,7 +8,6 @@
 import json
 from datetime import time, timedelta
 from decimal import Decimal
-from enum import auto
 from operator import itemgetter
 
 import jsonschema
@@ -32,9 +31,9 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.settings import data_retention_settings
-from indico.util.enum import RichStrEnum
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
+from indico.util.spreadsheets import CSVFieldDelimiter
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField
@@ -319,30 +318,6 @@ class InvitationFormExisting(InvitationFormBase):
                                   .format(emails=', '.join(sorted(existing))))
 
 
-class CSVFieldDelimiter(RichStrEnum):
-    __titles__ = {
-        'comma': _('Comma'),
-        'semicolon': _('Semicolon'),
-        'tab': _('Tab'),
-        'space': _('Space')
-    }
-    __delimiters__ = {
-        'comma': ',',
-        'semicolon': ';',
-        'tab': '\t',
-        'space': ' ',
-    }
-
-    comma = auto()
-    semicolon = auto()
-    tab = auto()
-    space = auto()
-
-    @property
-    def delimiter(self):
-        return self.__delimiters__[self.name]
-
-
 class ImportInvitationsForm(InvitationFormBase):
     _invitation_fields = ('source_file', 'delimiter', 'skip_existing', *InvitationFormBase._invitation_fields)
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV file.'))],
@@ -582,6 +557,8 @@ class ImportRegistrationsForm(IndicoForm):
                                                    'event is access-restricted.'))
     notify_users = BooleanField(_('E-mail users'), widget=SwitchWidget(),
                                 description=_('Whether the imported users should receive an e-mail notification'))
+    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter,
+                                      default=CSVFieldDelimiter.comma.name)
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')

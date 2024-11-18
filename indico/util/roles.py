@@ -29,9 +29,9 @@ class ImportRoleMembersMixin:
     logger = None
     log_realm = None
 
-    def import_members_from_csv(self, f):
+    def import_members_from_csv(self, f, delimiter):
         with csv_text_io_wrapper(f) as ftxt:
-            reader = csv.reader(ftxt.read().splitlines())
+            reader = csv.reader(ftxt.read().splitlines(), delimiter=delimiter)
 
         emails = set()
         for num_row, row in enumerate(reader, 1):
@@ -55,7 +55,8 @@ class ImportRoleMembersMixin:
         form = ImportMembersCSVForm()
 
         if form.validate_on_submit():
-            new_members, users, unknown_emails = self.import_members_from_csv(form.source_file.data)
+            delimiter = form.delimiter.data.delimiter
+            new_members, users, unknown_emails = self.import_members_from_csv(form.source_file.data, delimiter)
             if form.remove_existing.data:
                 deleted_members = self.role.members - users
                 for member in deleted_members:

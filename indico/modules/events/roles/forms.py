@@ -10,9 +10,10 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 from indico.modules.events.models.roles import EventRole
 from indico.util.i18n import _
+from indico.util.spreadsheets import CSVFieldDelimiter
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_role_colors
-from indico.web.forms.fields import FileField, IndicoSinglePalettePickerField
+from indico.web.forms.fields import FileField, IndicoEnumSelectField, IndicoSinglePalettePickerField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -42,3 +43,5 @@ class ImportMembersCSVForm(IndicoForm):
     source_file = FileField(_('Source File'), [DataRequired(_('You need to upload a CSV or TXT file.'))],
                             accepted_file_types='.csv,.txt')
     remove_existing = BooleanField(_('Remove existing members'), widget=SwitchWidget())
+    delimiter = IndicoEnumSelectField(_('CSV field delimiter'), enum=CSVFieldDelimiter,
+                                      default=CSVFieldDelimiter.comma.name)
