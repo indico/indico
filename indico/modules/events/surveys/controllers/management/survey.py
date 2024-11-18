@@ -177,7 +177,7 @@ class RHEmailEventSurveyPreview(RHManageSurveyBase):
 
 class RHAPIEmailEventSurveySend(RHManageSurveyBase):
     @use_kwargs({
-        'from_address': fields.String(required=True, validate=not_empty),
+        'sender_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[
             not_empty,
             no_relative_urls,
@@ -189,10 +189,10 @@ class RHAPIEmailEventSurveySend(RHManageSurveyBase):
         'email_all_participants': fields.Bool(load_default=False),
         'recipients_addresses': fields.List(LowercaseString(validate=validate.Email())),
     })
-    def _process(self, from_address, body, subject, bcc_addresses, copy_for_sender,
+    def _process(self, sender_address, body, subject, bcc_addresses, copy_for_sender,
                  email_all_participants, recipients_addresses):
-        if from_address not in self.event.get_allowed_sender_emails():
-            abort(422, messages={'from_address': ['Invalid sender address']})
+        if not (sender_address := self.event.get_verbose_email_sender(sender_address)):
+            abort(422, messages={'sender_address': ['Invalid sender address']})
         self.recipients = set()
         if email_all_participants:
             registrations = Registration.get_all_for_event(self.event)
@@ -206,7 +206,7 @@ class RHAPIEmailEventSurveySend(RHManageSurveyBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=recipient, bcc_list=bcc, from_address=from_address,
+                email = make_email(to_list=recipient, bcc_list=bcc, sender_address=sender_address,
                                    template=tpl, html=True)
             send_email(email, self.event, 'Surveys')
         return jsonify(count=len(self.recipients))

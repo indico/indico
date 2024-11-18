@@ -111,7 +111,7 @@ class RequestDefinitionBase:
         reply_addr = cls.get_notification_reply_email(req, to_request_managers=to_request_managers)
         if not recipients:
             return None
-        return make_email(recipients, from_address=from_addr, reply_address=reply_addr, template=template)
+        return make_email(recipients, sender_address=from_addr, reply_address=reply_addr, template=template)
 
     @classmethod
     def get_manager_notification_emails(cls, req):

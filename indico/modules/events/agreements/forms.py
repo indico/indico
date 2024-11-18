@@ -23,7 +23,7 @@ class AgreementForm(IndicoForm):
 
 
 class AgreementEmailForm(IndicoForm):
-    from_address = SelectField(_('From'), [DataRequired()])
+    sender_address = SelectField(_('Sender'), [DataRequired()])
     cc_addresses = EmailField(_('CC'), [Optional(), Email()],
                               description=_('Warning: this email address will be able to sign the agreement!'))
     body = TextAreaField(_('Email body'), [NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
@@ -32,7 +32,7 @@ class AgreementEmailForm(IndicoForm):
         self._definition = kwargs.pop('definition')
         event = kwargs.pop('event')
         super().__init__(*args, **kwargs)
-        self.from_address.choices = list(event.get_allowed_sender_emails().items())
+        self.sender_address.choices = list(event.get_allowed_sender_emails().items())
         self.body.description = render_placeholder_info('agreement-email', definition=self._definition, agreement=None)
 
     def validate_body(self, field):

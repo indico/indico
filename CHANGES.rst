@@ -46,6 +46,10 @@ Improvements
 - Streamline "get next editable" UI and only show editables that still unassigned (:pr:`6583`)
 - Add preview link for custom text snippets in registration notification emails (:issue:`6539`,
   :pr:`6560`, thanks :user:`Moliholy, unconventionaldotdev`)
+- Stop spoofing email sender addresses when using the :data:`SMTP_ALLOWED_SENDERS` and
+  :data:`SMTP_SENDER_FALLBACK` config settings. Instead, the *From* address will be rewritten
+  to the fallback whenever the requested address is not an allowed sender (:pr:`6231`, thanks
+  :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

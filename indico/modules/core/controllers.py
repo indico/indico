@@ -75,7 +75,7 @@ class RHReportErrorAPI(RH):
                                        comment=comment,
                                        error_data=self.error_data,
                                        server_name=urlsplit(config.BASE_URL).netloc)
-        send_email(make_email(config.SUPPORT_EMAIL, from_address=(email or config.NO_REPLY_EMAIL), template=template))
+        send_email(make_email(config.SUPPORT_EMAIL, sender_address=(email or config.NO_REPLY_EMAIL), template=template))
 
     @use_kwargs({
         'email': fields.Email(load_default=None),

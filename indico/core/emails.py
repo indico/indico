@@ -9,8 +9,7 @@ import os
 import pickle
 import tempfile
 from datetime import date
-from email.headerregistry import parser
-from email.utils import make_msgid
+from email.utils import formataddr, make_msgid, parseaddr
 from fnmatch import fnmatch
 from urllib.parse import urlsplit
 
@@ -22,7 +21,9 @@ from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.modules.core.settings import core_settings
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.util.string import truncate
 from indico.vendor.django_mail import get_connection
 from indico.vendor.django_mail.message import EmailMessage
@@ -66,15 +67,27 @@ def send_email_task(task, email, log_entry=None):
             db.session.commit()
 
 
-def _rewrite_sender(msg: EmailMessage):
-    if not config.SMTP_SENDER_FALLBACK:
-        # no fallback set, cannot rewrite. let's hope all emails go through...
-        return
-
-    from_email_raw = parser.get_mailbox(msg.from_email)[0].addr_spec  # just the addr without a name part
-    if not any(fnmatch(from_email_raw, pattern) for pattern in config.SMTP_ALLOWED_SENDERS):
-        msg.extra_headers['From'] = msg.from_email
-        msg.from_email = config.SMTP_SENDER_FALLBACK
+def get_actual_sender_address(sender_address: str, reply_address: set[str]) -> tuple[str, set]:
+    site_title = core_settings.get('site_title')
+    if not sender_address:
+        return f'{site_title} <{config.NO_REPLY_EMAIL}>', reply_address
+    if not config.SMTP_ALLOWED_SENDERS:
+        # this may result in spoofing
+        return sender_address, reply_address
+    orig_name, orig_address = parseaddr(sender_address)
+    fallback = config.SMTP_SENDER_FALLBACK
+    if any(fnmatch(orig_address, pattern) for pattern in config.SMTP_ALLOWED_SENDERS):
+        # valid sender address for which we are authorized to send emails
+        return sender_address, reply_address
+    # rewrite sender address to the fallback, and try to keep the relevant part of the original one
+    # if we have a name we use the name (the address already goes into reply-to), otherwise we use
+    # the address which looks ugly but is (probably?) better than just using the site name
+    display_name = _('{sender_name} (via {site_title})').format(sender_name=(orig_name or orig_address),
+                                                                site_title=site_title)
+    from_address = formataddr((display_name, fallback))
+    if not reply_address:
+        reply_address = {orig_address}
+    return from_address, reply_address
 
 
 def do_send_email(email, log_entry=None, _from_task=False):
@@ -100,7 +113,6 @@ def do_send_email(email, log_entry=None, _from_task=False):
                            attachments=email['attachments'], connection=conn)
         if not msg.to:
             msg.extra_headers['To'] = 'Undisclosed-recipients:;'
-        _rewrite_sender(msg)
         if email['html']:
             msg.content_subtype = 'html'
         msg.extra_headers['message-id'] = make_msgid(domain=urlsplit(config.BASE_URL).hostname)
