@@ -28,7 +28,7 @@ customElements.define(
 
       // Copy the input's own label as the label of the completion list.
       // This label is only spoken out when user uses the cursor key to
-      // select candidates.
+      // select candidates
       const inputLabel = input.labels?.[0]?.textContent.trim();
       if (inputLabel) {
         listbox.setAttribute('aria-label', inputLabel);
@@ -96,47 +96,52 @@ customElements.define(
         const charactersWereAdded = !evt.inputType?.startsWith('delete'); // Manually triggered events don't have `evt.inputType`.
         const filterKeyword = input.value;
         const filterKeywordLC = filterKeyword.toLowerCase();
-        let topRank = 0;
-        let topCandidate;
+        let topAutocompleteRankScore = 0;
+        let topAutocompleteCandidate;
         let candidateCount = 0;
 
+        // Filter the candidates
         for (const option of listbox.children) {
           const optionValue = option.dataset.value;
           const optionValueLC = optionValue.toLowerCase();
 
-          // We use the option rank to determine the most likely candidate.
-          // This is not used for sorting the candidates. Candidates retain
-          // their original sort order.
-          let optionRank = 0;
+          // We use the autocomplete candidate rank to determine the most
+          // likely candidate. The most likely candidate will be inserted
+          // into the input as an autocomplete candiate when autocomplete
+          // is enabled. The rank does not affect sorting. A candidate with
+          // the autocomplete ranking of 0 is taken out of the list of
+          // suggestions.
+          let autocompleteCandiateRanking = 0;
 
           // Skip if no filter keyword
           if (filterKeyword && !option.hasAttribute('aria-disabled')) {
             // Exact initial match
-            optionRank += optionValue.startsWith(filterKeyword) * 1000;
+            autocompleteCandiateRanking += optionValue.startsWith(filterKeyword) * 1000;
             // Case-insensitive initial match
-            optionRank += optionValueLC.startsWith(filterKeywordLC) * 100;
+            autocompleteCandiateRanking += optionValueLC.startsWith(filterKeywordLC) * 100;
             if (!useAutocomplete) {
               // Case-insensitive match anywhere in the string
-              optionRank += optionValueLC.includes(filterKeywordLC);
+              autocompleteCandiateRanking += optionValueLC.includes(filterKeywordLC);
               // Exact match anywhere in the string
-              optionRank += optionValue.includes(filterKeyword) * 10;
+              autocompleteCandiateRanking += optionValue.includes(filterKeyword) * 10;
             }
           }
 
-          option.hidden = filterKeyword && !optionRank;
+          option.hidden = filterKeyword && !autocompleteCandiateRanking;
           if (!option.hidden) {
             candidateCount++;
           }
 
-          if (optionRank > topRank) {
-            topRank = optionRank;
-            topCandidate = option;
+          if (autocompleteCandiateRanking > topAutocompleteRankScore) {
+            topAutocompleteRankScore = autocompleteCandiateRanking;
+            topAutocompleteCandidate = option;
           }
         }
 
-        const shouldAutocomplete = useAutocomplete && charactersWereAdded && topCandidate;
+        const shouldAutocomplete =
+          useAutocomplete && charactersWereAdded && topAutocompleteCandidate;
         if (shouldAutocomplete) {
-          selectOption(topCandidate);
+          selectOption(topAutocompleteCandidate);
           moveVirtualCursorToOption();
           // Select the portion of the input text that is ahead of the user-inputted filter keyword
           // (this presents the type-ahead autocomplete)
@@ -245,6 +250,9 @@ customElements.define(
       }
 
       function selectOptionViaKeyboard(option) {
+        if (!option) {
+          return;
+        }
         selectOption(option);
         moveVirtualCursorToOption(option);
         selectInputText();

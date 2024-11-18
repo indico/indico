@@ -8,26 +8,23 @@
 import PropTypes from 'prop-types';
 import React, {useRef} from 'react';
 
-import {useNativeEvent} from 'indico/react/hooks';
-import {Translate} from 'indico/react/i18n';
-
 import 'indico/custom_elements/ind_combobox';
 
-export default function ComboBox({options, value, onChange, ...inputProps}) {
-  const uncontrolledInputProps = {...inputProps, defaultValue: value};
+export default function ComboBox({options, onChange, autocomplete, ...inputProps}) {
   const inputRef = useRef();
 
-  useNativeEvent(inputRef, 'input', onChange);
-  useNativeEvent(inputRef, 'change', onChange);
+  const ariaAutocomplete = autocomplete ? 'both' : 'none';
 
   return (
     <ind-combo-box>
       <input
+        {...inputProps}
+        onChange={onChange}
         ref={inputRef}
-        {...uncontrolledInputProps}
         type="text"
         role="combobox"
         autoComplete="off"
+        aria-autocomplete={ariaAutocomplete}
       />
       <ul role="listbox">
         {options.map(function(option) {
@@ -55,11 +52,6 @@ export default function ComboBox({options, value, onChange, ...inputProps}) {
           );
         })}
       </ul>
-      {inputProps.required ? null : (
-        <button type="button" value="clear" disabled={inputProps.disabled}>
-          <Translate as="span">Clear the combobox</Translate>
-        </button>
-      )}
     </ind-combo-box>
   );
 }
@@ -67,8 +59,9 @@ export default function ComboBox({options, value, onChange, ...inputProps}) {
 ComboBox.propTypes = {
   options: PropTypes.arrayOf(
     PropTypes.oneOfType([
-      PropTypes.any,
-      PropTypes.arrayOf(PropTypes.any),
+      PropTypes.element,
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.element])),
       PropTypes.shape({
         value: PropTypes.any,
         label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
@@ -81,10 +74,12 @@ ComboBox.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
+  autocomplete: PropTypes.bool,
 };
 
 ComboBox.defaultProps = {
   disabled: false,
   onFocus: undefined,
   onBlur: undefined,
+  autocomplete: false,
 };
