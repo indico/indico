@@ -52,6 +52,7 @@ Improvements
   :user:`SegiNyn`)
 - Allow alternative CSV delimiters everywhere when importing content from CSV files (:pr:`6607`,
   thanks :user:`Moliholy, unconventionaldotdev`)
+- Improve readability of room booking room statistics card (:pr:`6616`)
 
 Bugfixes
 ^^^^^^^^
