@@ -36,6 +36,8 @@ MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
 
+TRANSLATOR_COMMENT_TAG = 'i18n:'
+
 DEFAULT_OPTIONS = {
     'InitCatalog': {
         'input_file': MESSAGES_POT,
@@ -49,6 +51,8 @@ DEFAULT_OPTIONS = {
         'mapping_file': 'babel.cfg',
         'input_paths': ['indico'],
         'add_location': 'file',
+        'add_comments': TRANSLATOR_COMMENT_TAG,  # Extract translator comments starting with 'i18n:'
+        'strip_comments': True,  # Strip the comment tag ('i18n:') from the extracted comments
         'project': 'Indico',
         'version': indico.__version__,
     },
@@ -76,6 +80,8 @@ DEFAULT_OPTIONS = {
         'no_default_keywords': True,
         'input_paths': ['indico'],
         'add_location': 'file',
+        'add_comments': TRANSLATOR_COMMENT_TAG,  # Extract translator comments starting with 'i18n:'
+        'strip_comments': True,  # Strip the comment tag ('i18n:') from the extracted comments
         'project': 'Indico',
         'version': indico.__version__,
     },
