@@ -35,7 +35,7 @@ TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'translations'
 MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
-MESSAGES_ALL_POT = TRANSLATIONS_DIR / 'messages-all.pot'
+MESSAGES_ALL_POT = TRANSLATIONS_DIR / 'core-messages-all.pot'
 
 TRANSLATOR_COMMENT_TAG = 'i18n:'
 
@@ -398,18 +398,21 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
         pot_catalog = read_po(f)
 
     merged_catalog.update(pot_catalog, no_fuzzy_matching=True)
-    merged_catalog.obsolete.clear()
 
     with output_po_path.open('wb') as f:
-        write_po(f, merged_catalog)
+        write_po(f, merged_catalog, ignore_obsolete=True, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
 
 
 def split_all_po_files():
-    pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'messages-all.pot']
+    pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'core-messages-all.pot']
 
     for lc_messages_dir in TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
-        merged_po_path = lc_messages_dir / 'messages-all.po'
-        assert merged_po_path.exists()
+        if lc_messages_dir.parent.name == 'en_US':
+            continue
+
+        merged_po_path = lc_messages_dir / 'core-messages-all.po'
+
+        assert merged_po_path.exists(), f'{merged_po_path} does not exist!'
 
         for pot_file in pot_files:
             output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
