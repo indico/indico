@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 12:52+0100\n"
+"POT-Creation-Date: 2024-11-24 17:02+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -2237,7 +2237,7 @@ msgid "Email body"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
-msgid "From"
+msgid "Sender"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx

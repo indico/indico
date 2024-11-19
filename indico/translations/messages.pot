@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-07 12:52+0100\n"
+"POT-Creation-Date: 2024-11-19 17:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
+
+#: indico/core/emails.py
+msgid "{sender_name} (via {site_title})"
+msgstr ""
 
 #: indico/core/errors.py
 msgid "You are not allowed to access this page."
@@ -6679,8 +6683,8 @@ msgid "Reason"
 msgstr ""
 
 #: indico/modules/events/agreements/forms.py indico/modules/events/registration/forms.py
-#: indico/modules/logs/templates/entry_email.html
-msgid "From"
+#: indico/modules/events/reminders/forms.py
+msgid "Sender"
 msgstr ""
 
 #: indico/modules/events/agreements/forms.py
@@ -11466,22 +11470,6 @@ msgstr ""
 msgid "There are already registrations with the following email addresses: {emails}"
 msgstr ""
 
-#: indico/modules/events/registration/forms.py
-msgid "Comma"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Semicolon"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Tab"
-msgstr ""
-
-#: indico/modules/events/registration/forms.py
-msgid "Space"
-msgstr ""
-
 #: indico/modules/events/registration/forms.py indico/modules/events/roles/forms.py
 #: indico/modules/events/timetable/forms.py
 msgid "Source File"
@@ -11491,7 +11479,8 @@ msgstr ""
 msgid "You need to upload a CSV file."
 msgstr ""
 
-#: indico/modules/events/registration/forms.py
+#: indico/modules/events/registration/forms.py indico/modules/events/roles/forms.py
+#: indico/modules/events/timetable/forms.py
 msgid "CSV field delimiter"
 msgstr ""
 
@@ -13938,10 +13927,6 @@ msgstr ""
 
 #: indico/modules/events/reminders/forms.py
 msgid "Send the reminder to all speakers/chairpersons of the event."
-msgstr ""
-
-#: indico/modules/events/reminders/forms.py
-msgid "Sender"
 msgstr ""
 
 #: indico/modules/events/reminders/forms.py
@@ -16757,6 +16742,10 @@ msgid "Sending this email failed."
 msgstr ""
 
 #: indico/modules/logs/templates/entry_email.html
+msgid "From"
+msgstr ""
+
+#: indico/modules/logs/templates/entry_email.html
 msgid "To"
 msgstr ""
 
@@ -18988,6 +18977,22 @@ msgid "There is no user with this email address: {}"
 msgid_plural "There are no users with these email addresses: {}"
 msgstr[0] ""
 msgstr[1] ""
+
+#: indico/util/spreadsheets.py
+msgid "Comma"
+msgstr ""
+
+#: indico/util/spreadsheets.py
+msgid "Semicolon"
+msgstr ""
+
+#: indico/util/spreadsheets.py
+msgid "Tab"
+msgstr ""
+
+#: indico/util/spreadsheets.py
+msgid "Space"
+msgstr ""
 
 #: indico/util/spreadsheets.py
 msgid "The CSV file must be saved in UTF-8 encoding"
