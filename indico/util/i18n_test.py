@@ -34,6 +34,8 @@ DICTIONARIES = {
     'fr_CH': {  # monty python french (some of it), but babel doesn't like fr_MP :(
         'Fetch the cow': 'Fetchez la vache',
         'The wheels': 'Les wheels',
+        _to_msgid('Monty Python', 'Fetch the cow'): 'Fetchez la vache',
+        _to_msgid('Monty Python', 'The wheels'): 'Les wheels',
         ('{} cow', 0): '{} vache',
         ('{} cow', 1): '{} vaches',
         'I need a drink.': 'Booze, svp.',
@@ -93,15 +95,23 @@ def test_lazy_translation(monkeypatch):
     monkeypatch.setattr('indico.util.i18n.has_request_context', lambda: False)
     a = _('Fetch the cow')
     b = _('The wheels')
+    a_with_context = pgettext('Monty Python', 'Fetch the cow')
+    b_with_context = pgettext('Monty Python', 'The wheels')
     monkeypatch.setattr('indico.util.i18n.has_request_context', lambda: True)
 
     assert isinstance(a, _LazyString)
     assert isinstance(b, _LazyString)
+    assert isinstance(a_with_context, _LazyString)
+    assert isinstance(b_with_context, _LazyString)
+    assert a_with_context._args == ('Monty Python', 'Fetch the cow')
+    assert b_with_context._args == ('Monty Python', 'The wheels')
 
     session.lang = 'fr_CH'
 
     assert str(a) == 'Fetchez la vache'
     assert str(b) == 'Les wheels'
+    assert str(a_with_context) == 'Fetchez la vache'
+    assert str(b_with_context) == 'Les wheels'
 
 
 @pytest.mark.usefixtures('mock_translations')
