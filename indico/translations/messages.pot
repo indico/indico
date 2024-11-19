@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-19 17:02+0100\n"
+"POT-Creation-Date: 2024-11-19 17:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18870,46 +18870,60 @@ msgstr ""
 msgid "tomorrow"
 msgstr ""
 
+#. keep the single quotes around the string
 #: indico/util/date_time.py
 msgid "'Yesterday'"
 msgstr ""
 
+#. keep the single quotes around the string
 #: indico/util/date_time.py
 msgid "'Today'"
 msgstr ""
 
+#. keep the single quotes around the string
 #: indico/util/date_time.py
 msgid "'Tomorrow'"
 msgstr ""
 
+#. keep the single quotes around the string, and only translate the "Last".
+#. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
 msgid "'Last' EEEE"
 msgstr ""
 
+#. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
 msgid "EEEE"
 msgstr ""
 
+#. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
 msgid "'Yesterday' 'at' {time_fmt}"
 msgstr ""
 
+#. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
 msgid "'Today' 'at' {time_fmt}"
 msgstr ""
 
+#. keep the single quotes around the strings, and only translate the text inside
 #: indico/util/date_time.py
 msgid "'Tomorrow' 'at' {time_fmt}"
 msgstr ""
 
+#. keep the single quotes around the strings, and only translate the text inside.
+#. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
 msgid "'Last' EEEE 'at' {time_fmt}"
 msgstr ""
 
+#. keep the single quotes around the string, and only translate the text inside.
+#. EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
 #: indico/util/date_time.py
 msgid "EEEE 'at' {time_fmt}"
 msgstr ""
 
+#. keep the single quotes around the string, and only translate the text inside
 #: indico/util/date_time.py
 msgid "{date_fmt} 'at' {time_fmt}"
 msgstr ""

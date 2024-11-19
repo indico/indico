@@ -310,10 +310,16 @@ def format_pretty_date(dt, locale=None, tzinfo=None):
     if not isinstance(dt, datetime):
         dt = datetime.combine(dt, dt_time())
     return _format_pretty_datetime(dt, locale, tzinfo, {
+        # i18n: keep the single quotes around the string
         'last_day': _("'Yesterday'"),
+        # i18n: keep the single quotes around the string
         'same_day': _("'Today'"),
+        # i18n: keep the single quotes around the string
         'next_day': _("'Tomorrow'"),
+        # i18n: keep the single quotes around the string, and only translate the "Last".
+        # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
         'last_week': _("'Last' EEEE"),
+        # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
         'next_week': _('EEEE'),
         'other': '{date_fmt}'
     })
@@ -329,11 +335,19 @@ def format_pretty_datetime(dt, locale=None, tzinfo=None):
     :param tzinfo: the timezone to use
     """
     return _format_pretty_datetime(dt, locale, tzinfo, {
+        # i18n: keep the single quotes around the strings, and only translate the text inside
         'last_day': _("'Yesterday' 'at' {time_fmt}"),
+        # i18n: keep the single quotes around the strings, and only translate the text inside
         'same_day': _("'Today' 'at' {time_fmt}"),
+        # i18n: keep the single quotes around the strings, and only translate the text inside
         'next_day': _("'Tomorrow' 'at' {time_fmt}"),
+        # i18n: keep the single quotes around the strings, and only translate the text inside.
+        # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
         'last_week': _("'Last' EEEE 'at' {time_fmt}"),
+        # i18n: keep the single quotes around the string, and only translate the text inside.
+        # i18n: EEEE is a babel-style placeholder for the long weekday (you should probably keep this as-is)
         'next_week': _("EEEE 'at' {time_fmt}"),
+        # i18n: keep the single quotes around the string, and only translate the text inside
         'other': _("{date_fmt} 'at' {time_fmt}")
     })
 
