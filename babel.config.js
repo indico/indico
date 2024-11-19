@@ -14,7 +14,6 @@ const process = require('process');
 const plugins = [
   '@babel/plugin-transform-runtime',
   '@babel/plugin-proposal-class-properties',
-  'lodash',
   [
     '@dr.pogodin/react-css-modules',
     {
