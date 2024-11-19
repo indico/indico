@@ -89,6 +89,7 @@ Internal Changes
   :user:`foxbunny`)
 - Add additional signals related to videoconferences and their event links (:pr:`6475`)
 - Videoconference plugins now need to implement a ``delete_room`` method (:pr:`6475`)
+- Support translator comments when extracting translatable strings (:pr:`6620`)
 
 
 Version 3.3.4
