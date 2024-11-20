@@ -15,7 +15,7 @@ from indico.web.forms.widgets import SwitchWidget, TinyMCEWidget
 
 
 class NewsSettingsForm(IndicoForm):
-    show_recent = BooleanField('Show headlines', widget=SwitchWidget(),
+    show_recent = BooleanField(_('Show headlines'), widget=SwitchWidget(),
                                description=_('Whether to show the latest news headlines on the Indico home page.'))
     max_entries = IntegerField(_('Max. headlines'), [HiddenUnless('show_recent'), DataRequired(), NumberRange(min=1)],
                                description=_('The maximum number of news headlines to show on the Indico home page.'))
