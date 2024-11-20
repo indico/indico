@@ -15,6 +15,7 @@ from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields import IntegerField, URLField
+from wtforms.fields.simple import HiddenField
 from wtforms.validators import URL, DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
@@ -62,6 +63,7 @@ class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
     description = TextAreaField(_('Description'))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
+    render_mode = HiddenField(filters=[lambda x: int(x) if x else None])
 
     def __init__(self, *args, event, **kwargs):
         self.event = event

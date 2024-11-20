@@ -15,7 +15,7 @@ import WTFDescriptionField from "indico/react/components/WTFDescriptionField";
   fieldId,
   required,
   disabled,
-  renderMode,
+  currentRenderMode,
   imageUploadURL,
   height
   }) {
@@ -23,7 +23,7 @@ import WTFDescriptionField from "indico/react/components/WTFDescriptionField";
   const div = $(`#descriptionWidget-${fieldId}`);
   const currentInput = field.value
   ReactDOM.render(
-    <WTFDescriptionField fieldId={fieldId} required={required} disabled={disabled} renderMode={renderMode}
+    <WTFDescriptionField fieldId={fieldId} required={required} disabled={disabled} currentRenderMode={currentRenderMode}
                          imageUploadURL={imageUploadURL} height={height} currentInput={currentInput} />,
     div[0]
   );

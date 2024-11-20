@@ -6,68 +6,100 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React, {useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {Form} from 'semantic-ui-react';
 
-import {MarkdownEditor, TinyMCETextEditor} from 'indico/react/components';
+import {ConfirmButton, MarkdownEditor, TinyMCETextEditor} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 
 export default function WTFDescriptionField({
   fieldId,
   required,
   disabled,
-  renderMode,
+  currentRenderMode,
   imageUploadURL,
   height,
   currentInput,
 }) {
   const [inputValue, setInputValue] = useState(currentInput);
+  const [renderMode, setRenderMode] = useState(currentRenderMode);
+  const markdownEditorRef = useRef(null);
 
-  useEffect(() => {
-    setInputValue(currentInput);
-  }, [currentInput]);
+  const updateHiddenField = value => {
+    const descriptionField = document.getElementById(fieldId);
+    if (descriptionField) {
+      descriptionField.value = value;
+      descriptionField.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+  };
+
+  const updateRenderMode = newRenderMode => {
+    const renderModeField = document.getElementById('render_mode');
+    renderModeField.value = newRenderMode === 'html' ? '1' : '2';
+    renderModeField.dispatchEvent(new Event('change', {bubbles: true}));
+  };
 
   const handleHTMLChange = newValue => {
     setInputValue(newValue);
-    const descriptionField = $(`#${fieldId}`);
-    // Update the hidden input field directly using jQuery
-    descriptionField.val(newValue);
-    descriptionField.trigger('change');
+    updateHiddenField(newValue);
   };
 
   const handleMarkdownChange = newValue => {
-    setInputValue(newValue['text']);
-    const descriptionField = $(`#${fieldId}`);
-    // Update the hidden input field directly using jQuery
-    descriptionField.val(newValue['text']);
-    descriptionField.trigger('change');
+    setInputValue(newValue);
+    updateRenderMode('markdown');
+    updateHiddenField(newValue.text);
+  };
+
+  const convertToHTML = () => {
+    setRenderMode('html');
+    updateRenderMode('html');
+    updateHiddenField(inputValue.html || inputValue);
   };
 
   return (
     <Form.Field>
       {renderMode === 'markdown' && (
-        <MarkdownEditor
-          name={fieldId}
-          fieldId={fieldId}
-          imageUploadURL={imageUploadURL}
-          height={height}
-          required={required}
-          disabled={disabled}
-          value={inputValue}
-          onChange={handleMarkdownChange}
-        />
+        <>
+          <MarkdownEditor
+            key="markdown-editor"
+            ref={markdownEditorRef}
+            name={fieldId}
+            fieldId={fieldId}
+            imageUploadURL={imageUploadURL}
+            height={height}
+            required={required}
+            disabled={disabled}
+            value={typeof inputValue === 'object' ? inputValue.text || '' : inputValue || ''}
+            onChange={handleMarkdownChange}
+          />
+          <div className="convert-button-container" style={{marginTop: '1rem'}}>
+            <ConfirmButton
+              type="button"
+              onClick={convertToHTML}
+              basic
+              disabled={!inputValue.html}
+              popupContent={Translate.string(
+                'You cannot switch back to Markdown after switching to HTML.'
+              )}
+            >
+              <Translate>Use rich-text (HTML) editor</Translate>
+            </ConfirmButton>
+          </div>
+        </>
       )}
       {renderMode === 'html' && (
         <TinyMCETextEditor
+          key="html-editor"
           name={fieldId}
           fieldId={fieldId}
-          value={inputValue}
+          value={typeof inputValue === 'object' ? inputValue.html || '' : inputValue || ''}
           parse={v => v}
           config={{images: true, imageUploadURL, fullScreen: false}}
           height={height}
           required={required}
           disabled={disabled}
-          onBlur={v => v}
           onChange={handleHTMLChange}
+          onBlur={v => v}
           onFocus={v => v}
         />
       )}
@@ -79,7 +111,7 @@ WTFDescriptionField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
-  renderMode: PropTypes.string.isRequired,
+  currentRenderMode: PropTypes.string.isRequired,
   imageUploadURL: PropTypes.string,
   height: PropTypes.string,
   currentInput: PropTypes.string,
