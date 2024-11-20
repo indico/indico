@@ -380,6 +380,7 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
             catalog = read_po(f)
 
         for message in catalog:
+            # We do not want to ever modify the empty ID as this is the file header
             if message.id:
                 merged_catalog[message.id] = message
 
