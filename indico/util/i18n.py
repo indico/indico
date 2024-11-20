@@ -63,6 +63,12 @@ def lazy_gettext(string, plugin_name=None):
     return make_lazy_string(_indico_gettext, string, plugin_name=plugin_name)
 
 
+def lazy_pgettext(context, string, plugin_name=None):
+    if is_lazy_string(string):
+        return string
+    return make_lazy_string(_indico_gettext, context, string, func_name='pgettext', plugin_name=plugin_name)
+
+
 def orig_string(lazy_string):
     """Get the original string from a lazy string."""
     return lazy_string._args[0] if is_lazy_string(lazy_string) else lazy_string
@@ -74,12 +80,14 @@ def smart_func(func_name, plugin_name=None):
         Return either a translated string or a lazy-translatable object,
         depending on whether there is a session language or not (respectively).
         """
-        if has_request_context() or func_name != 'gettext':
+        if has_request_context() or func_name not in {'gettext', 'pgettext'}:
             # straight translation
             return _indico_gettext(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
-        else:
             # otherwise, defer translation to eval time
+        elif func_name == 'gettext':
             return lazy_gettext(*args, plugin_name=plugin_name)
+        else:
+            return lazy_pgettext(*args, plugin_name=plugin_name)
 
     if plugin_name is _use_context:
         _wrap.__name__ = f'<smart {func_name}>'
