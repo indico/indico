@@ -123,6 +123,14 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 extra_classes='js-submit-list-form regform-download-attachments',
             ),
             ActionMenuEntry(
+                _('Download Attachments (flat)'),
+                'attachment',
+                type='href-custom',
+                url=url_for('.registrations_attachments_export', regform, flat=True),
+                weight=59,
+                extra_classes='js-submit-list-form regform-download-attachments',
+            ),
+            ActionMenuEntry(
                 _('Edit Tags'),
                 'tag',
                 url=url_for('.manage_registration_tags_assign', regform),
@@ -900,6 +908,13 @@ class RHRegistrationsBasePrice(RHRegistrationsActionBase):
 class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportBase):
     """Export registration attachments in a zip file."""
 
+    @use_kwargs({
+        'flat': fields.Boolean(load_default=False),
+    }, location='query')
+    def _process_args(self, flat):
+        RHRegistrationsExportBase._process_args(self)
+        self.flat = flat
+
     def _prepare_folder_structure(self, attachment):
         registration = attachment.registration
         regform_title = secure_filename(attachment.registration.registration_form.title, 'registration_form')
@@ -909,7 +924,8 @@ class RHRegistrationsExportAttachments(ZipGeneratorMixin, RHRegistrationsExportB
             f'{attachment.field_data.field.title}_{attachment.field_data.field_id}_{attachment.filename}',
             attachment.filename
         )
-        return os.path.join(*self._adjust_path_length([regform_title, registrant_name, file_name]))
+        full_file_name = [f'{registrant_name}_{file_name}'] if self.flat else [registrant_name, file_name]
+        return os.path.join(*self._adjust_path_length([regform_title, *full_file_name]))
 
     def _iter_items(self, attachments):
         for reg_attachments in attachments.values():
