@@ -390,7 +390,7 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
     click.secho('Done merging pot files!', fg='green', bold=True)
 
 
-# Filter merged.po files by removing messages that are not in the given .pot file
+# Filter core-messages-all.po files by removing messages that are not in the given .pot file
 def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
     with merged_po_path.open('rb') as f:
         merged_catalog = read_po(f)
