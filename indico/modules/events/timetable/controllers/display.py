@@ -7,21 +7,20 @@
 
 from dataclasses import dataclass
 from io import BytesIO
+from itertools import groupby
 
 from flask import jsonify, render_template, request, session
 from marshmallow import fields
 from weasyprint import CSS, HTML
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core.db import db
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.timetable.util import (get_timetable_offline_pdf_generator, render_entry_info_balloon,
-                                                  serialize_event_info)
+from indico.modules.events.timetable.util import (get_nested_timetable, get_timetable_offline_pdf_generator,
+                                                  render_entry_info_balloon, serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
@@ -103,17 +102,17 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
 
         if form.validate_on_submit():
-            days = {}
+            if not download:
+                url = url_for(request.endpoint, **dict(request.view_args, download=True, **request.args.to_dict(False)))
+                return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
+
             now = now_utc()
             css = render_template('events/timetable/pdf/timetable.css')
-
-            for day in self.event.iter_days():
-                entries = (self.event.timetable_entries
-                           .filter(
-                               db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
-                               TimetableEntry.parent_id.is_(None))
-                           .order_by(TimetableEntry.start_dt))
-                days[day] = entries
+            event = self.event
+            entries = get_nested_timetable(event)
+            days = {day: list(e) for day, e in groupby(
+                entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
+            )}
 
             config = TimetableExportConfig(
                 show_title=form.other.data['showSpeakerTitle'],
@@ -134,11 +133,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
             html = render_template('events/timetable/pdf/timetable.html', event=self.event,
                                    days=days, now=now, config=config)
 
-            if download:
-                return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
-            else:
-                url = url_for(request.endpoint, **dict(request.view_args, download=True, **request.args.to_dict(False)))
-                return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
+            return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
                                 back_url=url_for('.timetable', self.event))
 
