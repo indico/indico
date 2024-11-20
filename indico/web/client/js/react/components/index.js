@@ -40,6 +40,7 @@ export {default as FileSubmission} from './files/FileSubmission';
 export {default as FinalPictureManager} from './pictures/PictureManager';
 export {default as FinalSingleFileManager} from './files/SingleFileManager';
 export {default as ClipboardButton} from './ClipboardButton';
+export {default as RadioButton} from './RadioButton';
 export {default as RequestConfirm, RequestConfirmDelete} from './RequestConfirm';
 export {default as ReviewRating} from './ReviewRating';
 export {default as ManagementPageBackButton} from './ManagementPageBackButton';

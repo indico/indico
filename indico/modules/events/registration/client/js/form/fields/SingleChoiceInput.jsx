@@ -13,7 +13,7 @@ import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Label, Dropdown} from 'semantic-ui-react';
 
-import {Select} from 'indico/react/components';
+import {RadioButton, Select} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
@@ -216,15 +216,9 @@ function SingleChoiceRadioGroup({
           return (
             <tr key={c.id} styleName="row">
               <td>
-                <Form.Radio
+                <RadioButton
                   id={id ? `${id}-${index}` : ''}
-                  style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
-                  styleName="radio"
-                  label={{
-                    children: (
-                      <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
-                    ),
-                  }}
+                  label={<ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />}
                   key={c.id}
                   value={c.id}
                   disabled={

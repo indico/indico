@@ -69,7 +69,8 @@ Available keys:
 - hasPrice: optional; show price field if the whole field can have a price attached
 - noRetentionPeriod: optional; hide the retention period setting
 - renderAsFieldset: optional; whether the field should be rendered in a fieldset; applies
-  to fields that use multiple controls, like radios, checkboxes, multi-button controls
+  to fields that use multiple controls, like radios, checkboxes, multi-button controls;
+  can either be a Boolean or a function that takes field options and returns a Boolean
 */
 
 const fieldRegistry = {
@@ -158,6 +159,7 @@ const fieldRegistry = {
     settingsFormDecorators: [choiceFieldsSettingsFormDecorator, singleChoiceSettingsFormDecorator],
     settingsFormInitialData: singleChoiceSettingsInitialData,
     icon: 'dropmenu',
+    renderAsFieldset: options => options.itemType === 'radiogroup',
   },
   multi_choice: {
     title: Translate.string('Multiple Choice'),

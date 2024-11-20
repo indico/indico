@@ -10,9 +10,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Form, Label} from 'semantic-ui-react';
+import {Label} from 'semantic-ui-react';
 
-import {DatePeriodField, FinalDatePeriod} from 'indico/react/components';
+import {DatePeriodField, FinalDatePeriod, RadioButton} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
@@ -98,17 +98,11 @@ function AccommodationInputComponent({
               return (
                 <tr key={c.id} styleName="row">
                   <td>
-                    <Form.Radio
+                    <RadioButton
                       id={id ? `${id}-${index}` : ''}
-                      style={{pointerEvents: 'auto'}} // keep label tooltips working when disabled
-                      styleName="radio"
-                      label={{
-                        children: (
-                          <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
-                        ),
-                      }}
                       key={c.id}
                       value={c.id}
+                      checked={!isPurged && c.id === value.choice}
                       disabled={
                         !c.isEnabled ||
                         disabled ||
@@ -117,7 +111,9 @@ function AccommodationInputComponent({
                           (placesUsed[c.id] || 0) >= c.placesLimit &&
                           c.id !== existingValue.choice)
                       }
-                      checked={!isPurged && c.id === value.choice}
+                      label={
+                        <ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />
+                      }
                       onChange={makeHandleChange(c)}
                     />
                   </td>

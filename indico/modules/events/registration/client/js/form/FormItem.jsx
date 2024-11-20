@@ -63,6 +63,13 @@ ItemLocked.propTypes = {
   reason: PropTypes.string.isRequired,
 };
 
+function renderAsFieldset(fieldOptions, meta) {
+  if (typeof meta.renderAsFieldset === 'function') {
+    return meta.renderAsFieldset(fieldOptions);
+  }
+  return meta.renderAsFieldset;
+}
+
 export default function FormItem({
   id,
   title,
@@ -89,6 +96,23 @@ export default function FormItem({
   const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
+
+  const fieldOptions = {
+    id,
+    title,
+    description,
+    retentionPeriod,
+    inputType,
+    isEnabled,
+    isRequired,
+    isPurged,
+    lockedReason,
+    sortHandle,
+    setupMode,
+    setupActions,
+    ...rest,
+    meta,
+  };
 
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
@@ -149,8 +173,8 @@ export default function FormItem({
             />
           ) : (
             <Form.Field required={showAsRequired} styleName="field">
-              {meta.renderAsFieldset ? (
-                <fieldset>
+              {renderAsFieldset(fieldOptions, meta) ? (
+                <fieldset id={htmlId}>
                   <legend style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>
                     {title}
                   </legend>

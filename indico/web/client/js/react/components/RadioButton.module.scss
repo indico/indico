@@ -1,0 +1,55 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+.radio-label {
+  display: inline-flex;
+  gap: var(--content-gap-normal);
+  align-items: center;
+}
+
+.radio {
+  --radio-size: 1.2em;
+
+  appearance: none;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--radio-size);
+  height: var(--radio-size);
+  margin: 0;
+
+  // XXX: We cannot use sui_debt here because of `appearance:none`.
+  // Since we need this element to match the appearance of the SUI
+  // controls, we have to hard-code the styles here.
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 50%;
+
+  &:disabled {
+    border-color: 1px solid rgba(34, 36, 38, 0.15);
+  }
+
+  &:focus {
+    border: 1px solid #85b7d9;
+  }
+
+  &::before {
+    content: '';
+
+    display: inline-block;
+    width: calc(0.5 * var(--radio-size));
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+  }
+
+  &:checked::before {
+    background-color: currentcolor;
+  }
+}
