@@ -7,15 +7,14 @@
 
 import posixpath
 from itertools import groupby
-from operator import attrgetter
 
-from flask import render_template, request, session
-from sqlalchemy.orm import joinedload
+from flask import render_template, request
 
 from indico.core import signals
 from indico.modules.events.layout import get_theme_global_settings, theme_settings
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.util import get_nested_timetable
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplayBase
@@ -44,74 +43,14 @@ class WPDisplayTimetable(WPConferenceDisplayBase):
 @template_hook('meeting-body')
 def inject_meeting_body(event, **kwargs):
     event.preload_all_acl_entries()
+
     event_tz = event.display_tzinfo
     show_date = request.args.get('showDate') or 'all'
     show_session = request.args.get('showSession') or 'all'
     detail_level = request.args.get('detailLevel') or 'contribution'
     view = request.args.get('view')
 
-    children_strategy = joinedload('children')
-    children_strategy.joinedload('session_block').joinedload('person_links')
-    children_strategy.joinedload('break_')
-
-    children_contrib_strategy = children_strategy.subqueryload('contribution')
-    children_contrib_strategy.joinedload('person_links')
-    children_contrib_strategy.joinedload('subcontributions')
-    children_contrib_strategy.joinedload('references')
-    children_contrib_strategy.joinedload('own_room')
-    children_contrib_strategy.joinedload('note')
-
-    children_subcontrib_strategy = children_contrib_strategy.joinedload('subcontributions')
-    children_subcontrib_strategy.joinedload('person_links')
-    children_subcontrib_strategy.joinedload('references')
-
-    contrib_strategy = joinedload('contribution')
-    contrib_strategy.joinedload('person_links')
-    contrib_strategy.joinedload('references')
-    contrib_strategy.joinedload('note')
-
-    subcontrib_strategy = contrib_strategy.joinedload('subcontributions')
-    subcontrib_strategy.joinedload('person_links')
-    subcontrib_strategy.joinedload('references')
-    subcontrib_strategy.joinedload('note')
-
-    # try to minimize the number of DB queries
-    options = [contrib_strategy,
-               children_strategy,
-               joinedload('session_block').joinedload('person_links'),
-               joinedload('session_block').joinedload('own_room'),
-               joinedload('break_')]
-
-    entries = []
-    show_siblings_location = False
-    show_children_location = {}
-    for entry in event.timetable_entries.filter_by(parent=None).options(*options):
-        if show_date != 'all' and entry.start_dt.astimezone(event_tz).date().isoformat() != show_date:
-            continue
-        if (entry.type == TimetableEntryType.CONTRIBUTION and
-                (detail_level not in ('contribution', 'all') or show_session != 'all')):
-            continue
-        elif (entry.type == TimetableEntryType.SESSION_BLOCK and show_session != 'all' and
-                str(entry.object.session.friendly_id) != show_session):
-            continue
-
-        if entry.type == TimetableEntryType.BREAK:
-            entries.append(entry)
-        elif entry.object.can_access(session.user):
-            entries.append(entry)
-        if (
-            # the object itself does not inherit
-            not entry.object.inherit_location or
-            # the object is a session block and inherits from a session with a custom location
-            (entry.type == TimetableEntryType.SESSION_BLOCK and
-                entry.object.inherit_location and
-                not entry.object.session.inherit_location)
-        ):
-            show_siblings_location = True
-        show_children_location[entry.id] = not all(child.object.inherit_location for child in entry.children)
-
-    entries.sort(key=attrgetter('end_dt'), reverse=True)
-    entries.sort(key=lambda entry: (entry.start_dt, *_entry_title_key(entry)))
+    entries = get_nested_timetable(event, include_notes=True, show_date=show_date, show_session=show_session)
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
     theme_id = get_theme(event, view)[0]
@@ -122,6 +61,24 @@ def inject_meeting_body(event, **kwargs):
               if (plugin and tpl_name[0] == ':')
               else posixpath.join('events/timetable/display', tpl_name))
     multiple_days = event.start_dt.astimezone(event_tz).date() != event.end_dt.astimezone(event_tz).date()
+    show_siblings_location = False
+    show_children_location = {}
+
+    for entry in entries:
+        show_children_location[entry.id] = not all(
+            child.object.inherit_location for child in entry.children
+        )
+        if (
+            not show_siblings_location and
+            # the object itself does not inherit
+            (not entry.object.inherit_location or
+            # the object is a session block and inherits from a session with a custom location
+            (entry.type == TimetableEntryType.SESSION_BLOCK and
+                entry.object.inherit_location and
+                not entry.object.session.inherit_location))
+        ):
+            show_siblings_location = True
+
     return render_template(tt_tpl, event=event, entries=entries, days=days,
                            timezone=event_tz.zone, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
                            theme_settings=get_theme_global_settings(event, theme_id),
