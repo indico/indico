@@ -1,10 +1,10 @@
 {% macro render_program(event, days, config) %}
-    {% for day in days %}
+    {% for day, entries in days.items() %}
         <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if config.new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
                 <h2>{{ day|format_skeleton('EEEEdMMMM', timezone=event.timezone) }}</h2>
             </div>
-            {% for entry in days[day] %}
+            {% for entry in entries %}
                 {% set should_render = (
                     entry.type.name == 'SESSION_BLOCK' or
                     (entry.type.name == 'CONTRIBUTION' and config.show_contribs) or
@@ -206,13 +206,7 @@
     {% set sess = object.session %}
     {% set type = entry.type.name %}
 
-    <h3>
-        {% if type == 'SESSION_BLOCK' %}
-            {{ _render_block_title(object) }}
-        {% else %}
-            {{ object.title }}
-        {% endif %}
-    </h3>
+    <h3>{{ object.full_title or object.title }}</h3>
     <div class="session-block-title-info">
         <p>
             <b>
@@ -255,23 +249,6 @@
             </span>
         </p>
     {% endif %}
-{% endmacro %}
-
-{% macro _render_time(entry) %}
-    <div class="time">
-        <div class="time-from">
-            {{ entry.start_dt|format_time(timezone=entry.event.timezone) }}
-        </div>
-        <div class="time-divider">
-            {# Line between generated in CSS #}
-        </div>
-        <div class="time-divider">
-            {# Line between generated in CSS #}
-        </div>
-        <div class="time-to">
-            {{ entry.end_dt|format_time(timezone=entry.event.timezone) }}
-        </div>
-    </div>
 {% endmacro %}
 
 {# Utilities #}
@@ -332,11 +309,4 @@
             </li>
         </ul>
     </div>
-{% endmacro %}
-
-{% macro _render_block_title(block) %}
-    <h3>
-        {{ block.session.title }}
-        {% if block.title %}: {{ block.title }}{% endif %}
-    </h3>
 {% endmacro %}
