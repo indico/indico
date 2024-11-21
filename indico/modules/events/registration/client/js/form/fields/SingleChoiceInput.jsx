@@ -218,7 +218,8 @@ function SingleChoiceRadioGroup({
               <td>
                 <RadioButton
                   id={id ? `${id}-${index}` : ''}
-                  label={<ChoiceLabel choice={c} management={management} paid={isPaidChoice(c)} />}
+                  name={id}
+                  label={c.caption}
                   key={c.id}
                   value={c.id}
                   disabled={

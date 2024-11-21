@@ -94,7 +94,8 @@
     flex-grow: 1;
 
     :global(.field.disabled) {
-      opacity: 0.8;
+      opacity: 1;
+      pointer-events: auto;
     }
 
     // Prevent stacking opacity on SUI Buttons
@@ -321,6 +322,14 @@
       }
     }
 
+    .field legend {
+      display: inline-block;
+    }
+
+    .field fieldset:disabled legend {
+      opacity: 0.8;
+    }
+
     > .description {
       max-width: var(--max-form-item-width);
       padding-left: 2px;
@@ -477,4 +486,10 @@
 .dropdown-item:hover {
   background: rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.95);
+}
+
+// FIXME: Semantic UI hack
+:global(.ui.form) :global(.field) fieldset:disabled {
+  pointer-events: auto;
+  opacity: 0.8;
 }

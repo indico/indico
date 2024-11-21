@@ -174,10 +174,8 @@ export default function FormItem({
           ) : (
             <Form.Field required={showAsRequired} styleName="field">
               {renderAsFieldset(fieldOptions, meta) ? (
-                <fieldset id={htmlId}>
-                  <legend style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}>
-                    {title}
-                  </legend>
+                <fieldset id={htmlId} disabled={disabled}>
+                  <legend>{title}</legend>
                   {fieldControls}
                 </fieldset>
               ) : (

@@ -100,6 +100,7 @@ function AccommodationInputComponent({
                   <td>
                     <RadioButton
                       id={id ? `${id}-${index}` : ''}
+                      name={id}
                       key={c.id}
                       value={c.id}
                       checked={!isPurged && c.id === value.choice}
