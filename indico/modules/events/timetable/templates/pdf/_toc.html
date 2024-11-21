@@ -11,10 +11,10 @@
                         {% set can_render_item = (
                             entry.type.name == 'SESSION_BLOCK' or
                             (entry.type.name == 'CONTRIBUTION' and config.show_contribs) or
-                            (entry.type.name == 'BREAK' and config.show_breaks) 
+                            (entry.type.name == 'BREAK' and config.show_breaks)
                         )%}
                         {% if can_render_item %}
-                            {{ render_toc_item(entry) }}
+                            {{ _render_toc_item(entry) }}
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -23,7 +23,7 @@
     </nav>
 {% endmacro %}
 
-{% macro render_toc_item(entry) %}
+{% macro _render_toc_item(entry) %}
     <div class="toc-item">
         <a href="#entry-{{ entry.id }}">
             {{ entry.object.title or entry.object.session.title }}
