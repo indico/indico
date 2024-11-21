@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-19 17:07+0100\n"
+"POT-Creation-Date: 2024-11-21 10:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11970,6 +11970,10 @@ msgid "Download Attachments"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/management/reglists.py
+msgid "Download Attachments (flat)"
+msgstr ""
+
+#: indico/modules/events/registration/controllers/management/reglists.py
 msgid "Edit Tags"
 msgstr ""
 
@@ -16866,6 +16870,10 @@ msgstr ""
 
 #: indico/modules/news/controllers.py
 msgid "News '{title}' has been deleted"
+msgstr ""
+
+#: indico/modules/news/forms.py
+msgid "Show headlines"
 msgstr ""
 
 #: indico/modules/news/forms.py

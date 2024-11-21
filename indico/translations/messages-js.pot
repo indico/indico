@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-19 17:02+0100\n"
+"POT-Creation-Date: 2024-11-21 10:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -318,6 +318,46 @@ msgstr ""
 
 #: indico/modules/events/client/js/util/static_filters.js
 msgid "There are no entries that match your search criteria."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Filter sessions"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Assign new session"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Add new session"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "No session"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Not scheduled"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "'{0}' has been unscheduled due to the session change."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Undo successful! Timetable entry and session have been restored."
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Filter tracks"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "Add new track"
+msgstr ""
+
+#: indico/modules/events/contributions/client/js/index.jsx
+msgid "No track"
 msgstr ""
 
 #: indico/modules/events/management/client/js/index.js
