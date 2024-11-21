@@ -19,8 +19,7 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import (get_nested_timetable, get_timetable_offline_pdf_generator,
-                                                  render_entry_info_balloon, serialize_event_info)
+from indico.modules.events.timetable.util import get_nested_timetable, render_entry_info_balloon, serialize_event_info
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
@@ -138,10 +137,36 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                                 back_url=url_for('.timetable', self.event))
 
 
-class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
+class RHTimetableExportDefaultPDF(RHTimetableExportPDF):
     def _process(self):
-        pdf = get_timetable_offline_pdf_generator(self.event)
-        return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+        now = now_utc()
+        css = render_template('events/timetable/pdf/timetable.css')
+        event = self.event
+        entries = get_nested_timetable(event)
+        days = {day: list(e) for day, e in groupby(
+            entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
+        )}
+
+        config = TimetableExportConfig(
+            show_title=True,
+            show_affiliation=False,
+            show_cover_page=True,
+            show_toc=True,
+            show_session_toc=True,
+            show_abstract=False,
+            dont_show_poster_abstract=False,
+            show_contribs=False,
+            show_length_contribs=False,
+            show_breaks=False,
+            new_page_per_session=False,
+            show_session_description=False,
+            print_date_close_to_sessions=False
+        )
+
+        html = render_template('events/timetable/pdf/timetable.html', event=self.event,
+                                days=days, now=now, config=config)
+
+        return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
 
 
 def create_pdf(html, css, event) -> BytesIO:
