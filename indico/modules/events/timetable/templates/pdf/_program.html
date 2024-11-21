@@ -254,8 +254,6 @@
 {# Utilities #}
 
 {% macro _render_place(entry) %}
-    {% set entry = entry.object if entry.object else entry %}
-
     {{ [entry.venue_name, entry.room_name, entry.address] | select | join(', ') }}
 {% endmacro %}
 
