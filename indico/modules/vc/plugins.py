@@ -23,7 +23,7 @@ from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults, IndicoForm
 
 
-PREFIX_RE = re.compile('^vc_')
+PREFIX_RE = re.compile(r'^vc_')
 
 
 class VCPluginMixin:
