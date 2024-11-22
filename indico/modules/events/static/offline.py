@@ -144,7 +144,7 @@ class StaticEventCreator:
             used_assets |= used_urls
             self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
         for file_path in used_assets - css_files:
-            if not re.match('^static/(images|fonts|dist)/(?!js/ckeditor/)', file_path):
+            if not re.match(r'^static/(images|fonts|dist)/(?!js/ckeditor/)', file_path):
                 continue
             self._copy_file(os.path.join(self._content_dir, file_path),
                             os.path.join(self._web_dir, file_path))

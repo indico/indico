@@ -16,7 +16,7 @@ from indico.modules.events.payment.models.transactions import PaymentTransaction
 from indico.modules.events.registration.notifications import notify_registration_state_update
 
 
-remove_prefix_re = re.compile('^payment_')
+remove_prefix_re = re.compile(r'^payment_')
 
 
 def get_payment_plugins():

@@ -46,6 +46,7 @@ ignore = [
     'RUF015',  # not always more readable, and we don't do it for huge lists
     'RUF022',  # autofix messes up our formatting instead of just sorting
     'RUF027',  # also triggers on i18n functions -> too noisy for now
+    'RUF035',  # somewhat noisy and many FPs: see https://github.com/astral-sh/ruff/issues/14523
     'UP038',   # it looks kind of weird and it slower than a tuple
     'D205',    # too many docstrings which have no summary line
     'D301',    # https://github.com/astral-sh/ruff/issues/8696
@@ -65,8 +66,6 @@ ignore = [
     'B904',    # possibly useful but too noisy
     'COM812',  # trailing commas on multiline lists are nice, but we have 2.5k violations
     'PIE807',  # `lambda: []` is much clearer for `load_default` in schemas
-    'PT004',   # pretty weird + not a pytest convention: https://github.com/astral-sh/ruff/issues/8796
-    'PT005',   # ^ likewise
     'PT011',   # very noisy
     'PT015',   # nice for tests but not so nice elsewhere
     'PT018',   # ^ likewise
@@ -96,6 +95,7 @@ ignore = [
     'PERF203', # noisy, false positives, and not applicable for 3.11+
     'FURB113', # less readable
     'FURB140', # less readable and actually slower in 3.12+
+    'FURB189', # we pass those objects to code that may expect the real thing
 ]
 
 extend-safe-fixes = [
