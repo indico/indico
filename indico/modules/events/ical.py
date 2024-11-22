@@ -145,7 +145,7 @@ def generate_event_component(
     if data['description']:
         component['description'] = data['description']
 
-    # If the user exists and the add_icloud_alerts preference isn't blank
+    # If the user exists and the add_ical_alerts preference isn't blank
     if user and user.settings.get('add_ical_alerts'):
         alarm = icalendar.Alarm()
         alarm.add('action', 'DISPLAY')
