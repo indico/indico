@@ -51,6 +51,8 @@ function SidebarMenu({
   gotoMyRoomsList,
   gotoMyBlockings,
   gotoRBAdminArea,
+  gotoRBLocationArea,
+  isRBLocationManager,
   toggleAdminOverride,
   visible,
   onClickOption,
@@ -84,6 +86,13 @@ function SidebarMenu({
       text: Translate.string('My Blockings'),
       onClick: gotoMyBlockings,
       onlyIf: !hideOptions.myBlockings,
+    },
+    {
+      key: 'my_locations',
+      icon: 'location arrow',
+      text: Translate.string('My Locations'),
+      onClick: gotoRBLocationArea,
+      onlyIf: isRBLocationManager,
     },
     {
       key: 'isAdmin',
@@ -162,6 +171,8 @@ SidebarMenu.propTypes = {
   gotoMyRoomsList: PropTypes.func.isRequired,
   gotoMyBlockings: PropTypes.func.isRequired,
   gotoRBAdminArea: PropTypes.func.isRequired,
+  gotoRBLocationArea: PropTypes.func.isRequired,
+  isRBLocationManager: PropTypes.bool.isRequired,
   toggleAdminOverride: PropTypes.func.isRequired,
   visible: PropTypes.bool,
   onClickOption: PropTypes.func,
@@ -180,6 +191,7 @@ export default connect(
     isAdmin: userSelectors.isUserRBAdmin(state),
     isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     hasOwnedRooms: userSelectors.hasOwnedRooms(state),
+    isRBLocationManager: userSelectors.isUserRBLocationManager(state),
   }),
   dispatch => ({
     // ATTENTION: this is **intentionally** passed as a prop, despite not being used,
@@ -225,6 +237,9 @@ export default connect(
     },
     gotoRBAdminArea() {
       dispatch(pushRoute('/admin'));
+    },
+    gotoRBLocationArea() {
+      dispatch(pushRoute('/admin/locations'));
     },
     toggleAdminOverride() {
       dispatch(userActions.toggleAdminOverride());

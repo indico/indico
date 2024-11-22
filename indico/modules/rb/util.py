@@ -26,6 +26,7 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
+from indico.modules.rb.operations.locations import has_managed_locations
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.i18n import _
@@ -48,7 +49,7 @@ def rb_check_user_access(user):
         return True
     if not rb_settings.acls.get('authorized_principals'):  # everyone has access
         return True
-    return rb_settings.acls.contains_user('authorized_principals', user)
+    return rb_is_location_manager(user) or rb_settings.acls.contains_user('authorized_principals', user)
 
 
 @memoize_request
@@ -60,6 +61,13 @@ def rb_is_admin(user):
     if user.is_admin:
         return True
     return rb_settings.acls.contains_user('admin_principals', user)
+
+
+@memoize_request
+def rb_is_location_manager(user):
+    if user is None:
+        return False
+    return has_managed_locations(user)
 
 
 def rb_check_if_visible(user):

@@ -13,6 +13,7 @@ export const hasLoadedUserInfo = ({user}) => user.requests.info.state === Reques
 export const getUserInfo = ({user}) => user.info;
 export const isUserRBAdmin = state => getUserInfo(state).isRBAdmin;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
+export const isUserRBLocationManager = state => getUserInfo(state).isRBLocationManager;
 export const isUserAdminOverrideEnabled = state => getUserInfo(state).isAdminOverrideEnabled;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
 export const getRealUserRoomPermissions = ({user}) => user.roomPermissions;

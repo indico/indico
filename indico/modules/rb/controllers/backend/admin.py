@@ -11,13 +11,14 @@ from operator import itemgetter
 from flask import jsonify, request, session
 from marshmallow import missing, validate
 from PIL import Image
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, load_only
 from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import UserValueError
+from indico.core.permissions import get_unified_permissions, update_principals_permissions
 from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.rooms import RHRoomsPermissions
@@ -37,7 +38,7 @@ from indico.modules.rb.schemas import (AdminRoomSchema, EquipmentTypeArgs, Featu
                                        map_areas_schema, nonbookable_periods_admin_schema, room_attribute_schema,
                                        room_equipment_schema, room_feature_schema, room_update_schema)
 from indico.modules.rb.util import (WEEKDAYS, build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
-                                    remove_room_spritesheet_photo)
+                                    rb_is_location_manager, remove_room_spritesheet_photo)
 from indico.util.date_time import overlaps
 from indico.util.i18n import _
 from indico.util.iterables import group_list
@@ -71,6 +72,8 @@ class RHSettings(RHRoomBookingAdminBase):
 
 class RHLocations(RHRoomBookingAdminBase):
     def _skip_admin_check(self):
+        if rb_is_location_manager(session.user):
+            return True
         # GET on this endpoint does not expose anything sensitive, so
         # we allow any room manager to use it if they can edit rooms
         return request.method == 'GET' and rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user)
@@ -83,8 +86,10 @@ class RHLocations(RHRoomBookingAdminBase):
         return jsonify(admin_locations_schema.dump(location, many=False))
 
     def _jsonify_many(self):
-        query = Location.query.filter_by(is_deleted=False)
-        return jsonify(admin_locations_schema.dump(query.all()))
+        query = Location.query.filter(~Location.is_deleted).options(load_only('id'),
+                                                                    joinedload('acl_entries'))
+        locations = [loc for loc in query if loc.can_manage(session.user, allow_admin=True)]
+        return jsonify(admin_locations_schema.dump(locations))
 
     def _process_GET(self):
         if self.location:
@@ -109,20 +114,25 @@ class RHLocations(RHRoomBookingAdminBase):
         return '', 204
 
     @use_rh_kwargs(LocationArgs)
-    def _process_POST(self, name, room_name_format, map_url_template):
+    def _process_POST(self, name, room_name_format, map_url_template, acl_entries):
         loc = Location(name=name, room_name_format=room_name_format, map_url_template=(map_url_template or ''))
+        if acl_entries:
+            update_principals_permissions(loc, {}, acl_entries)
         db.session.add(loc)
         db.session.flush()
         return self._jsonify_one(loc), 201
 
     @use_rh_kwargs(LocationArgs, partial=True)
-    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing):
+    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing, acl_entries=None):
         if name is not None:
             self.location.name = name
         if room_name_format is not None:
             self.location.room_name_format = room_name_format
         if map_url_template is not missing:
             self.location.map_url_template = map_url_template or ''
+        if acl_entries is not None:
+            current = {e.principal: get_unified_permissions(e) for e in self.location.acl_entries}
+            update_principals_permissions(self.location, current, acl_entries)
         db.session.flush()
         return self._jsonify_one(self.location)
 
@@ -231,6 +241,8 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
 class RHAttributes(RHRoomBookingAdminBase):
     def _skip_admin_check(self):
+        if rb_is_location_manager(session.user):
+            return True
         # GET on this endpoint does not expose anything sensitive, so
         # we allow any room manager to use it if they can edit rooms
         return request.method == 'GET' and rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user)
@@ -298,7 +310,8 @@ class RHRoomAdminBase(RHRoomBookingAdminBase):
         self.room = Room.get_or_404(request.view_args['room_id'], is_deleted=False)
 
     def _skip_admin_check(self):
-        return rb_settings.get('managers_edit_rooms') and self.room.can_manage(session.user)
+        return self.room.location.can_manage(session.user) or (rb_settings.get('managers_edit_rooms')
+                                                               and self.room.can_manage(session.user))
 
 
 class RHRoomAttributes(RHRoomAdminBase):
@@ -422,6 +435,9 @@ class RHRoomPhoto(RHRoomAdminBase):
 
 
 class RHRooms(RHRoomBookingAdminBase):
+    def _skip_admin_check(self):
+        return rb_is_location_manager(session.user)
+
     def _process_GET(self):
         rooms = Room.query.filter_by(is_deleted=False).order_by(db.func.indico.natsort(Room.full_name)).all()
         return AdminRoomSchema().jsonify(rooms, many=True)
