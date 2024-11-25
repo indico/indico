@@ -98,7 +98,7 @@ class TimetableExportConfig:
 
 @dataclass(frozen=True)
 class TimetableExportProgramConfig:
-    show_sibling_location: bool
+    show_siblings_location: bool
     show_children_location: bool
 
 
@@ -138,7 +138,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
 
             show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
             program_config = TimetableExportProgramConfig(
-                show_sibling_location=show_siblings_location,
+                show_siblings_location=show_siblings_location,
                 show_children_location=show_children_location
             )
 
