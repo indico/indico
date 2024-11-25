@@ -27,12 +27,20 @@
                                     {% if entry.type.name == 'BREAK' %}
                                         {{ _render_break(entry, config) }}
                                     {% elif entry.type.name == 'CONTRIBUTION' %}
-                                        {{ _render_contrib(entry, config, show_children_location) }}
+                                        {{
+                                            _render_contrib(
+                                                entry,
+                                                config,
+                                                program_config,
+                                                show_children_location
+                                            )
+                                        }}
                                     {% else %}
                                         {{
                                             _render_session_block(
                                                 entry,
                                                 config,
+                                                program_config,
                                                 show_children_location
                                             )
                                         }}
@@ -57,11 +65,11 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color"
     >
-        {{ _render_entry_header(entry, config) }}
+        {{ _render_entry_header(entry, config, {}) }}
     </section>
 {% endmacro %}
 
-{% macro _render_contrib(entry, config, show_children_location) %}
+{% macro _render_contrib(entry, config, program_config, show_children_location) %}
     {% set contrib = entry.object %}
     {% set speakers = contrib.speakers %}
     {% set subcontribs = contrib.subcontributions %}
@@ -71,7 +79,7 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_contrib_content else ''}}"
     >
-        {{ _render_entry_header(entry, config) }}
+        {{ _render_entry_header(entry, config, program_config) }}
     </section>
     {% if show_contrib_content %}
         <div class="session-block-content">
@@ -83,7 +91,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_session_block(entry, config, show_children_location) %}
+{% macro _render_session_block(entry, config, program_config, show_children_location) %}
     {% set session_block = entry.object %}
     {% set sess = session_block.session %}
     {% set conveners = session_block.person_links %}
@@ -94,7 +102,7 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_session_block_content else ''}}"
     >
-        {{ _render_entry_header(entry, config) }}
+        {{ _render_entry_header(entry, config, program_config) }}
     </section>
     {% if show_session_block_content %}
         <div class="session-block-content">
@@ -203,7 +211,7 @@
     {{ _render_child_contrib(subcontrib, config, show_children_location) }}
 {% endmacro %}
 
-{% macro _render_entry_header(entry, config) %}
+{% macro _render_entry_header(entry, config, program_config) %}
     {% set object = entry.object %}
     {% set sess = object.session %}
     {% set type = entry.type.name %}
@@ -223,7 +231,7 @@
                 {% endif %}
             </b>
         </p>
-        {% if config.show_siblings_location %}
+        {% if program_config.show_siblings_location %}
             <p>
                 <b>{% trans %}Location{% endtrans %}:</b>
                 {{ _render_place(entry) }}
