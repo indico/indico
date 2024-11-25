@@ -14,7 +14,7 @@ from indico.core import signals
 from indico.modules.events.layout import get_theme_global_settings, theme_settings
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.util import get_nested_timetable
+from indico.modules.events.timetable.util import get_nested_timetable, get_nested_timetable_location_conditions
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPConferenceDisplayBase
@@ -51,7 +51,7 @@ def inject_meeting_body(event, **kwargs):
     view = request.args.get('view')
 
     entries = get_nested_timetable(event, include_notes=True, show_date=show_date, show_session=show_session)
-
+    show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
     theme_id = get_theme(event, view)[0]
     theme = theme_settings.themes[theme_id]
@@ -61,23 +61,6 @@ def inject_meeting_body(event, **kwargs):
               if (plugin and tpl_name[0] == ':')
               else posixpath.join('events/timetable/display', tpl_name))
     multiple_days = event.start_dt.astimezone(event_tz).date() != event.end_dt.astimezone(event_tz).date()
-    show_siblings_location = False
-    show_children_location = {}
-
-    for entry in entries:
-        show_children_location[entry.id] = not all(
-            child.object.inherit_location for child in entry.children
-        )
-        if (
-            not show_siblings_location and
-            # the object itself does not inherit
-            (not entry.object.inherit_location or
-            # the object is a session block and inherits from a session with a custom location
-            (entry.type == TimetableEntryType.SESSION_BLOCK and
-                entry.object.inherit_location and
-                not entry.object.session.inherit_location))
-        ):
-            show_siblings_location = True
 
     return render_template(tt_tpl, event=event, entries=entries, days=days,
                            timezone=event_tz.zone, tz_object=event_tz, hide_contribs=(detail_level == 'session'),

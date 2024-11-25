@@ -1,10 +1,11 @@
-{% macro render_program(event, days, config) %}
+{% macro render_program(event, days, config, program_config) %}
     {% for day, entries in days.items() %}
         <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if config.new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
                 <h2>{{ day|format_skeleton('EEEEdMMMM', timezone=event.tzinfo) }}</h2>
             </div>
             {% for entry in entries %}
+                {% set show_children_location = program_config.show_children_location[entry.id] %}
                 {% set should_render = (
                     entry.type.name == 'SESSION_BLOCK' or
                     (entry.type.name == 'CONTRIBUTION' and config.show_contribs) or
@@ -24,14 +25,15 @@
                             <section class="session-block {{ 'contribution' if entry.type.name == 'CONTRIBUTION' else '' }}">
                                 <div class="session-block-wrapper">
                                     {% if entry.type.name == 'BREAK' %}
-                                        {{ _render_break(entry) }}
+                                        {{ _render_break(entry, config) }}
                                     {% elif entry.type.name == 'CONTRIBUTION' %}
-                                        {{ _render_contrib(entry, config) }}
+                                        {{ _render_contrib(entry, config, show_children_location) }}
                                     {% else %}
                                         {{
                                             _render_session_block(
                                                 entry,
-                                                config
+                                                config,
+                                                show_children_location
                                             )
                                         }}
                                     {% endif %}
@@ -48,18 +50,18 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro _render_break(entry) %}
+{% macro _render_break(entry, config) %}
     {% set break = entry.object %}
 
     <section
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color"
     >
-        {{ _render_entry_header(entry) }}
+        {{ _render_entry_header(entry, config) }}
     </section>
 {% endmacro %}
 
-{% macro _render_contrib(entry, config) %}
+{% macro _render_contrib(entry, config, show_children_location) %}
     {% set contrib = entry.object %}
     {% set speakers = contrib.speakers %}
     {% set subcontribs = contrib.subcontributions %}
@@ -69,19 +71,19 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_contrib_content else ''}}"
     >
-        {{ _render_entry_header(entry) }}
+        {{ _render_entry_header(entry, config) }}
     </section>
     {% if show_contrib_content %}
         <div class="session-block-content">
             {{ _render_description(contrib.description) }}
             {% if subcontribs %}
-                {{ _render_subcontribs(contrib, config) }}
+                {{ _render_subcontribs(contrib, config, show_children_location) }}
             {% endif %}
         </div>
     {% endif %}
 {% endmacro %}
 
-{% macro _render_session_block(entry, config) %}
+{% macro _render_session_block(entry, config, show_children_location) %}
     {% set session_block = entry.object %}
     {% set sess = session_block.session %}
     {% set conveners = session_block.person_links %}
@@ -92,7 +94,7 @@
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color {{ 'only-round-top' if show_session_block_content else ''}}"
     >
-        {{ _render_entry_header(entry) }}
+        {{ _render_entry_header(entry, config) }}
     </section>
     {% if show_session_block_content %}
         <div class="session-block-content">
@@ -100,13 +102,13 @@
                 {{ _render_description(sess.description) }}
             {% endif %}
             {% if entry.children %}
-                {{ _render_block_child_entries(sess, entry.children, config) }}
+                {{ _render_block_child_entries(sess, entry.children, config, show_children_location) }}
             {% endif %}
         </div>
     {% endif %}
 {% endmacro %}
 
-{% macro _render_block_child_entries(sess, children, config) %}
+{% macro _render_block_child_entries(sess, children, config, show_children_location) %}
     <div class="session-block-content-box inherited-border-color">
         <ul class="contrib-timeline">
             {% for child in children %}
@@ -124,7 +126,7 @@
                     </div>
                     {% if child.type.name == 'CONTRIBUTION' %}
                         <div class="contrib-timeline-content" >
-                            {{ _render_child_contrib(child.object, config) }}
+                            {{ _render_child_contrib(child.object, config, show_children_location) }}
                         </div>
                     {% endif %}
                 </li>
@@ -133,7 +135,7 @@
     </div>
 {% endmacro %}
 
-{% macro _render_child_contrib(contrib, config) %}
+{% macro _render_child_contrib(contrib, config, show_location) %}
     {% set speakers = contrib.speakers %}
 
     {% if speakers %}
@@ -144,7 +146,7 @@
         </p>
     {% endif %}
 
-    {% if not contrib.inherit_location and contrib.has_location_info %}
+    {% if show_location %}
         <p>
             <b>{% trans %}Location{% endtrans %}</b>
             <br>
@@ -158,11 +160,11 @@
         </div>
     {% endif %}
     {% if contrib.subcontributions %}
-        {{ _render_subcontribs(contrib, config) }}
+        {{ _render_subcontribs(contrib, config, show_location) }}
     {% endif %}
 {% endmacro %}
 
-{% macro _render_subcontribs(contrib, config) %}
+{% macro _render_subcontribs(contrib, config, show_children_location) %}
     {% set subcontribs %}
         {% for subcontrib in contrib.subcontributions %}
             <li class="inherited-border-color">
@@ -175,7 +177,7 @@
                     <h4>{{ subcontrib.title }}</h4>
                 </div>
                 <div class="contrib-timeline-content">
-                    {{ _render_subcontrib(subcontrib, config) }}
+                    {{ _render_subcontrib(subcontrib, config, show_children_location) }}
                 </div>
             </li>
         {% endfor%}
@@ -197,11 +199,11 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_subcontrib(subcontrib, config) %}
-    {{ _render_child_contrib(subcontrib, config) }}
+{% macro _render_subcontrib(subcontrib, config, show_children_location) %}
+    {{ _render_child_contrib(subcontrib, config, show_children_location) }}
 {% endmacro %}
 
-{% macro _render_entry_header(entry) %}
+{% macro _render_entry_header(entry, config) %}
     {% set object = entry.object %}
     {% set sess = object.session %}
     {% set type = entry.type.name %}
@@ -221,10 +223,12 @@
                 {% endif %}
             </b>
         </p>
-        <p>
-            <b>{% trans %}Location{% endtrans %}:</b>
-            {{ _render_place(entry) }}
-        </p>
+        {% if config.show_siblings_location %}
+            <p>
+                <b>{% trans %}Location{% endtrans %}:</b>
+                {{ _render_place(entry) }}
+            </p>
+        {% endif %}
         {% set people = object.person_links if type == 'SESSION_BLOCK' else object.speakers %}
         {% if type != 'BREAK' and people %}
             <b>
@@ -254,6 +258,8 @@
 {# Utilities #}
 
 {% macro _render_place(entry) %}
+    {# Entry argument could be both an entry or a data object attached to an entry #}
+    {% set entry = entry.object or entry %}
     {{ [entry.venue_name, entry.room_name, entry.address] | select | join(', ') }}
 {% endmacro %}
 
