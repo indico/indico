@@ -6,12 +6,10 @@
 # LICENSE file for more details.
 
 from dataclasses import dataclass
-from io import BytesIO
 from itertools import groupby
 
 from flask import jsonify, render_template, request, session
 from marshmallow import fields
-from weasyprint import CSS, HTML
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.contributions import contribution_settings
@@ -19,12 +17,12 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import (get_nested_timetable, get_nested_timetable_location_conditions,
-                                                  render_entry_info_balloon, serialize_event_info)
+from indico.modules.events.timetable.util import (create_pdf, get_nested_timetable,
+                                                  get_nested_timetable_location_conditions, render_entry_info_balloon,
+                                                  serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
-from indico.modules.receipts.util import sandboxed_url_fetcher
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
@@ -176,23 +174,13 @@ class RHTimetableExportDefaultPDF(RHTimetableExportPDF):
             print_date_close_to_sessions=False
         )
 
+        show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
+        program_config = TimetableExportProgramConfig(
+            show_siblings_location=show_siblings_location,
+            show_children_location=show_children_location
+        )
+
         html = render_template('events/timetable/pdf/timetable.html', event=self.event,
-                                days=days, now=now, config=config)
+                                days=days, now=now, config=config, program_config=program_config)
 
         return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
-
-
-def create_pdf(html, css, event) -> BytesIO:
-    css_url_fetcher = sandboxed_url_fetcher(event)
-    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
-    css = CSS(string=css, url_fetcher=css_url_fetcher)
-    documents = [
-        HTML(string=html, url_fetcher=html_url_fetcher).render(stylesheets=(css,))
-    ]
-    all_pages = [p for doc in documents for p in doc.pages]
-
-    f = BytesIO()
-    documents[0].copy(all_pages).write_pdf(f)
-    f.seek(0)
-
-    return f
