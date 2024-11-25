@@ -25,7 +25,7 @@
                             <section class="session-block {{ 'contribution' if entry.type.name == 'CONTRIBUTION' else '' }}">
                                 <div class="session-block-wrapper">
                                     {% if entry.type.name == 'BREAK' %}
-                                        {{ _render_break(entry, config) }}
+                                        {{ _render_break(entry, config, program_config) }}
                                     {% elif entry.type.name == 'CONTRIBUTION' %}
                                         {{
                                             _render_contrib(
@@ -58,14 +58,14 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro _render_break(entry, config) %}
+{% macro _render_break(entry, config, program_config) %}
     {% set break = entry.object %}
 
     <section
         id="entry-{{ entry.id }}"
         class="session-block-title inherited-bg-color inherited-txt-color"
     >
-        {{ _render_entry_header(entry, config, {}) }}
+        {{ _render_entry_header(entry, config, program_config) }}
     </section>
 {% endmacro %}
 
