@@ -19,7 +19,8 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import get_nested_timetable, render_entry_info_balloon, serialize_event_info
+from indico.modules.events.timetable.util import (get_nested_timetable, get_nested_timetable_location_conditions,
+                                                  render_entry_info_balloon, serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
@@ -95,6 +96,12 @@ class TimetableExportConfig:
     print_date_close_to_sessions: bool
 
 
+@dataclass(frozen=True)
+class TimetableExportProgramConfig:
+    show_sibling_location: bool
+    show_children_location: bool
+
+
 class RHTimetableExportPDF(RHTimetableProtectionBase):
     @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
     def _process(self, download):
@@ -126,11 +133,17 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
                 new_page_per_session=form.session_info.data['newPagePerSession'],
                 show_session_description=form.session_info.data['showSessionDescription'],
-                print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions']
+                print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions'],
             )
 
-            html = render_template('events/timetable/pdf/timetable.html', event=self.event,
-                                   days=days, now=now, config=config)
+            show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
+            program_config = TimetableExportProgramConfig(
+                show_sibling_location=show_siblings_location,
+                show_children_location=show_children_location
+            )
+
+            html = render_template('events/timetable/pdf/timetable.html',
+                                   event=self.event, days=days, now=now, config=config, program_config=program_config)
 
             return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,

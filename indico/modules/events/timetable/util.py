@@ -413,6 +413,29 @@ def get_nested_timetable(event, *, include_notes=True, show_date='all', show_ses
     return entries
 
 
+def get_nested_timetable_location_conditions(entries):
+    show_siblings_location = False
+    show_children_location = {}
+
+    for entry in entries:
+        show_children_location[entry.id] = not all(
+            child.object.inherit_location for child in entry.children
+        )
+
+        if (
+            not show_siblings_location and
+            # the object itself does not inherit
+            (not entry.object.inherit_location or
+            # the object is a session block and inherits from a session with a custom location
+            (entry.type == TimetableEntryType.SESSION_BLOCK and
+                entry.object.inherit_location and
+                not entry.object.session.inherit_location))
+        ):
+            show_siblings_location = True
+
+    return show_siblings_location, show_children_location
+
+
 @memoize_request
 def get_top_level_entries(event):
     return event.timetable_entries.filter_by(parent_id=None).all()
