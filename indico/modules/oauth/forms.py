@@ -39,7 +39,7 @@ class ApplicationForm(IndicoForm):
                                                    'redirect_uri sent by the OAuth client must use the same protocol '
                                                    "and host/port. If an entry contains a path, the redirect_uri's "
                                                    'path must start with this path.'))
-    allowed_scopes = IndicoSelectMultipleCheckboxField('Allowed scopes', [DataRequired()],
+    allowed_scopes = IndicoSelectMultipleCheckboxField(_('Allowed scopes'), [DataRequired()],
                                                        choices=sorted(SCOPES.items(), key=itemgetter(1)),
                                                        description=_('Only scopes from this list may be requested by '
                                                                      'the app.'))
@@ -71,7 +71,7 @@ class ApplicationForm(IndicoForm):
 
 class PersonalTokenForm(IndicoForm):
     name = StringField(_('Name'), [DataRequired()], description=_("What's this token used for?"))
-    scopes = IndicoSelectMultipleCheckboxField('Scopes', [DataRequired()],
+    scopes = IndicoSelectMultipleCheckboxField(_('Scopes'), [DataRequired()],
                                                choices=sorted(SCOPES.items(), key=itemgetter(1)),
                                                description=_('Scopes define what kind of access the token has.'))
 
