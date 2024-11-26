@@ -15,13 +15,14 @@ from indico.modules.events.models.reviews import ProposalRevisionMixin
 from indico.modules.events.papers.models.reviews import PaperJudgmentProxy, PaperReviewType
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import pgettext
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
 class PaperRevisionState(RichIntEnum):
-    __titles__ = [None, _('Submitted'), _('Accepted'), _('Rejected'), _('To be corrected')]
+    __titles__ = [None, pgettext('Paper revision', 'Submitted'), pgettext('Paper revision', 'Accepted'),
+                  pgettext('Paper revision', 'Rejected'), pgettext('Paper revision', 'To be corrected')]
     __css_classes__ = [None, 'highlight', 'success', 'error', 'warning']
     submitted = 1
     accepted = 2

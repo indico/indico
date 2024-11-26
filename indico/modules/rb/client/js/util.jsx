@@ -310,10 +310,10 @@ const _legendLabels = {
     style: 'conflicting-candidate',
   },
   other: {label: Translate.string('Other booking'), style: 'other'},
-  rejections: {label: Translate.string('Rejected'), style: 'rejection'},
-  cancellations: {label: Translate.string('Cancelled'), style: 'cancellation'},
+  rejections: {label: Translate.string('Rejected', 'Booking'), style: 'rejection'},
+  cancellations: {label: Translate.string('Cancelled', 'Booking'), style: 'cancellation'},
   pendingCancellations: {
-    label: Translate.string('Will be cancelled'),
+    label: Translate.string('Will be cancelled', 'Booking'),
     style: 'pending-cancellation',
   },
   blockings: {label: Translate.string('Blocking'), style: 'blocking'},

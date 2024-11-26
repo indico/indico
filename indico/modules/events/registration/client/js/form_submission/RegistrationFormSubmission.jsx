@@ -52,7 +52,7 @@ function PrivacyPolicy({url}) {
   return (
     <Message info style={{marginTop: 25}}>
       <Message.Header>
-        <Translate>Privacy policy</Translate>
+        <Translate>Privacy Policy</Translate>
       </Message.Header>
       <Form as="div" style={{marginTop: 10}}>
         <FinalCheckbox required label={label} name="agreed_to_privacy_policy" showAsToggle />

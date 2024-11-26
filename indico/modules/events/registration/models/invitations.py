@@ -12,13 +12,14 @@ from sqlalchemy.dialects.postgresql import UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import L_
+from indico.util.i18n import pgettext
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
 
 
 class InvitationState(RichIntEnum):
-    __titles__ = [L_('Pending'), L_('Accepted'), L_('Declined')]
+    __titles__ = [pgettext('Invitation', 'Pending'), pgettext('Invitation', 'Accepted'),
+                  pgettext('Invitation', 'Declined')]
     pending = 0
     accepted = 1
     declined = 2

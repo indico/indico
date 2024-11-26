@@ -15,11 +15,13 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import pgettext
 
 
 class AgreementState(RichIntEnum):
-    __titles__ = [_('Pending'), _('Accepted'), _('Rejected'), _('Accepted on behalf'), _('Rejected on behalf')]
+    __titles__ = [pgettext('Agreement', 'Pending'), pgettext('Agreement', 'Accepted'),
+                  pgettext('Agreement', 'Rejected'), pgettext('Agreement', 'Accepted on behalf'),
+                  pgettext('Agreement', 'Rejected on behalf')]
     pending = 0
     accepted = 1
     rejected = 2

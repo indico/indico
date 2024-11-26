@@ -33,7 +33,7 @@ from indico.modules.events.persons.util import get_event_person_for_user
 from indico.modules.events.registration.util import get_registered_event_persons
 from indico.modules.events.util import get_field_values
 from indico.modules.users.models.users import User
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _, ngettext, pgettext
 from indico.web.args import use_kwargs
 from indico.web.util import jsonify_data, jsonify_form
 
@@ -99,7 +99,8 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
                                'track.',
                                num_skipped_abstracts).format(num=num_skipped_abstracts), 'warning')
             return jsonify_data(**self.list_generator.render_list())
-        return jsonify_form(form=form, fields=form._order, submit=_('Judge'), disabled_until_change=False)
+        return jsonify_form(form=form, fields=form._order, submit=pgettext('Judge abstracts (verb)', 'Judge'),
+                            disabled_until_change=False)
 
 
 class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):

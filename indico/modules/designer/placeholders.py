@@ -12,7 +12,7 @@ from babel.numbers import format_currency
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime, format_interval
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.placeholders import Placeholder
 from indico.util.string import format_full_name
 
@@ -252,7 +252,8 @@ class RegistrationFullNameNoTitlePlaceholderD(FullNamePlaceholderBase):
 
 class RegistrationTitlePlaceholder(RegistrationPDPlaceholder):
     name = 'title'
-    description = _('Title')
+    # i18n: Salutation, e.g., 'Mr.' or 'Mrs.'
+    description = pgettext('Salutation', 'Title')
     field = 'title'
 
 

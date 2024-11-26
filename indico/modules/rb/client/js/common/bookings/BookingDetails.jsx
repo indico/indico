@@ -486,7 +486,7 @@ class BookingDetails extends React.Component {
     } else if (isRejected) {
       icon = <Icon name="calendar minus" />;
       color = 'red';
-      status = Translate.string('Rejected');
+      status = Translate.string('Rejected', 'Booking');
       message = (
         <>
           <Translate>The booking was rejected.</Translate>
@@ -504,7 +504,7 @@ class BookingDetails extends React.Component {
     } else if (isAccepted) {
       icon = <Icon name="checkmark" />;
       color = 'green';
-      status = Translate.string('Accepted');
+      status = Translate.string('Accepted', 'Booking');
       message = Translate.string('The booking was accepted');
     }
 

@@ -291,7 +291,7 @@ function Signup({
             </Fieldset>
           )}
           {termsRequireAccept && !!privacyPolicy && !privacyPolicyUrl && (
-            <Fieldset legend={Translate.string('Privacy policy')}>
+            <Fieldset legend={Translate.string('Privacy Policy')}>
               <div
                 className="field policy editor-output"
                 dangerouslySetInnerHTML={{__html: privacyPolicy}}

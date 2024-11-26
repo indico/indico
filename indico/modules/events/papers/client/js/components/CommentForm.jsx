@@ -105,7 +105,9 @@ export default function CommentForm({onSubmit, onToggleExpand, comment, expanded
                 <Form.Group style={{marginBottom: 0}} inline>
                   <FinalSubmitButton
                     label={
-                      comment ? Translate.string('Update comment') : Translate.string('Comment')
+                      comment
+                        ? Translate.string('Update comment')
+                        : Translate.string('Comment', 'Leave a comment (verb)')
                     }
                   />
                   <Button

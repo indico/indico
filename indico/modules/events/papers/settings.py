@@ -9,11 +9,11 @@ from indico.core.settings.converters import DatetimeConverter, SettingConverter
 from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 
 
 class PaperReviewingRole(RichIntEnum):
-    __titles__ = [None, _('Judge'), _('Layout Reviewer'), _('Content Reviewer')]
+    __titles__ = [None, pgettext('Paper reviewing role', 'Judge'), _('Layout Reviewer'), _('Content Reviewer')]
     __acl_permissions__ = [None, 'paper_judge', 'paper_layout_reviewer', 'paper_content_reviewer']
     __review_types__ = [None, None, PaperReviewType.layout, PaperReviewType.content]
 

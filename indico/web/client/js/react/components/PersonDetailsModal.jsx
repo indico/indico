@@ -129,7 +129,9 @@ export default function PersonDetailsModal({
       )}
       <Form.Group widths="equal">
         <Form.Field>
-          <Translate as="label">Title</Translate>
+          <Translate as="label" context="Salutation">
+            Title
+          </Translate>
           <FinalDropdown
             name="title"
             fluid

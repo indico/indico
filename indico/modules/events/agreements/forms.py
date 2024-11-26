@@ -8,7 +8,7 @@
 from wtforms.fields import BooleanField, EmailField, FileField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, InputRequired, Optional, ValidationError
 
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
@@ -42,7 +42,8 @@ class AgreementEmailForm(IndicoForm):
 
 
 class AgreementAnswerSubmissionForm(IndicoForm):
-    answer = IndicoRadioField(_('Answer'), [InputRequired()], coerce=lambda x: bool(int(x)),
+    answer = IndicoRadioField(pgettext('Agreement answer (noun)', 'Answer'), [InputRequired()],
+                              coerce=lambda x: bool(int(x)),
                               choices=[(1, _('Agreement')), (0, _('Disagreement'))])
     document = FileField(_('Document'), [UsedIf(lambda form, field: form.answer.data), DataRequired()])
     upload_confirm = BooleanField(_("I confirm that I'm uploading a document that clearly shows this person's answer"),

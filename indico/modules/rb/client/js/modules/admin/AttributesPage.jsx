@@ -81,7 +81,7 @@ class AttributesPage extends React.PureComponent {
         autoFocus
       />
       <FinalInput name="title" required label={Translate.string('Title')} />
-      <FinalCheckbox name="hidden" label={Translate.string('Hidden')} />
+      <FinalCheckbox name="hidden" label={Translate.string('Hidden', 'Room attribute')} />
     </>
   );
 

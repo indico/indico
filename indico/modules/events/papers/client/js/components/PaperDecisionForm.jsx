@@ -90,7 +90,10 @@ export default function PaperDecisionForm() {
                   name="comment"
                   placeholder={Translate.string('Leave a comment for the submitter...')}
                 />
-                <FinalSubmitButton label={Translate.string('Judge')} disabledUntilChange={false} />
+                <FinalSubmitButton
+                  label={Translate.string('Judge', 'Judge paper (verb)')}
+                  disabledUntilChange={false}
+                />
               </Form>
             )}
           </FinalForm>

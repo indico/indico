@@ -18,7 +18,7 @@
                 <ul class="group-list with-buttons content-after">
                     <li>
                         <span><strong>{{ user.email }}</strong></span>
-                        <span class="ui label">{% trans %}Primary{% endtrans %}</span>
+                        <span class="ui label">{% trans "E-mail" %}Primary{% endtrans %}</span>
                     </li>
                     {% for email in user.secondary_emails|sort %}
                         <li class="flexrow f-a-center js-email-row">

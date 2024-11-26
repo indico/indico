@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
 
 {{ form_header(form) }}
-{% call form_fieldset(_('General settings')) %}
+{% call form_fieldset(_('General Settings')) %}
     {{ form_rows(form, skip=form._notification_fields) }}
 {% endcall %}
 {% call form_fieldset(_('Notifications')) %}

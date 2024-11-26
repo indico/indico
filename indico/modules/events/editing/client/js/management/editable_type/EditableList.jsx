@@ -155,19 +155,37 @@ function EditableListDisplay({
         key: 'state',
         text: Translate.string('Status'),
         options: [
-          {value: 'not_submitted', text: Translate.string('Not submitted'), color: 'default'},
-          {value: 'ready_for_review', text: Translate.string('Ready for review'), color: 'grey'},
-          {value: 'accepted', text: Translate.string('Accepted'), exclusive: true, color: 'green'},
-          {value: 'rejected', text: Translate.string('Rejected'), exclusive: true, color: 'black'},
+          {
+            value: 'not_submitted',
+            text: Translate.string('Not submitted', 'Editable'),
+            color: 'default',
+          },
+          {
+            value: 'ready_for_review',
+            text: Translate.string('Ready for review', 'Editable'),
+            color: 'grey',
+          },
+          {
+            value: 'accepted',
+            text: Translate.string('Accepted', 'Editable'),
+            exclusive: true,
+            color: 'green',
+          },
+          {
+            value: 'rejected',
+            text: Translate.string('Rejected', 'Editable'),
+            exclusive: true,
+            color: 'black',
+          },
           {
             value: 'needs_submitter_changes',
-            text: Translate.string('Needs submitter changes'),
+            text: Translate.string('Needs submitter changes', 'Editable'),
             exclusive: true,
             color: 'red',
           },
           {
             value: 'needs_submitter_confirmation',
-            text: Translate.string('Needs submitter confirmation'),
+            text: Translate.string('Needs submitter confirmation', 'Editable'),
             exclusive: true,
             color: 'yellow',
           },
@@ -561,7 +579,7 @@ function EditableListDisplay({
                   disabled={
                     !checkedContribsWithEditables.some(x => x.editable.editor) || !!activeRequest
                   }
-                  content={Translate.string('Unassign')}
+                  content={Translate.string('Unassign', 'Editable')}
                   onClick={unassignEditor}
                   loading={activeRequest === 'unassign'}
                 />

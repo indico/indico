@@ -22,7 +22,7 @@ from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.groups.util import serialize_group
 from indico.modules.groups.views import WPGroupsAdmin
 from indico.modules.users import User
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -44,7 +44,7 @@ class RHGroups(RHAdminBase):
         elif not providers:
             del form.provider
         else:
-            choices = [('', _('All'))]
+            choices = [('', pgettext('User groups', 'All'))]
             if config.LOCAL_GROUPS:
                 choices.append(('indico', _('Local Groups')))
             choices += [(p.name, p.title) for p in sorted(providers, key=attrgetter('title'))]

@@ -13,7 +13,7 @@ from sqlalchemy.sql import select
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _, orig_string
+from indico.util.i18n import _, orig_string, pgettext
 from indico.util.locators import locator_property
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
@@ -32,8 +32,9 @@ class EditableType(RichIntEnum):
 
 
 class EditableState(RichIntEnum):
-    __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation'), _('Needs Changes'),
-                  _('Accepted'), _('Rejected')]
+    __titles__ = [None, pgettext('Editable', 'New'), pgettext('Editable', 'Ready for Review'),
+                  pgettext('Editable', 'Needs Confirmation'), pgettext('Editable', 'Needs Changes'),
+                  pgettext('Editable', 'Accepted'), pgettext('Editable', 'Rejected')]
     __css_classes__ = [None, 'highlight', 'ready', 'editing-make-changes', 'editing-request-changes',
                        'success', 'editing-rejected']
 

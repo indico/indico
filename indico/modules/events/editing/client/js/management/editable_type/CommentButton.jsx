@@ -26,7 +26,7 @@ export default function CommentButton({onSubmit, loading, disabled}) {
   return (
     <>
       <Button
-        content={Translate.string('Comment')}
+        content={Translate.string('Comment', 'Leave a comment (verb)')}
         loading={loading}
         disabled={disabled}
         onClick={() => setModalOpen(true)}
@@ -46,7 +46,7 @@ function CommentModal({onSubmit, onClose}) {
   return (
     <FinalModalForm
       id="comment-form"
-      header={Translate.string('Comment')}
+      header={Translate.string('Comment', 'Comment modal title')}
       onSubmit={onSubmit}
       onClose={onClose}
     >
