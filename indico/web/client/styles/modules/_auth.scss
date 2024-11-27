@@ -129,17 +129,6 @@
           border-color: #55acee;
         }
       }
-
-      &.external-provider-github {
-        color: white !important;
-        background-color: #666;
-        border-color: #666;
-
-        &:hover {
-          background: #999;
-          border-color: #999;
-        }
-      }
     }
 
     .i-button ~ .i-button {
