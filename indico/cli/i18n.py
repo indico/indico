@@ -105,10 +105,33 @@ DEFAULT_OPTIONS = {
 }
 
 
+def _get_pyproject_version(plugin_dir: Path, data: dict):
+    # try a static version
+    try:
+        return data['project']['version']
+    except KeyError:
+        pass
+    # lookup dynamic version
+    if 'version' not in data['project'].get('dynamic', ()):
+        raise Exception('Version is missing and not dynamic')
+    if data['build-system']['build-backend'] != 'hatchling.build':
+        raise Exception('Dynamic versions are only supported for hatchling build backend')
+    try:
+        version_file_path = data['tool']['hatch']['version']['path']
+    except KeyError:
+        raise Exception('Version file path is not defined')
+    version_file_pattern = data['tool']['hatch']['version'].get('pattern', True)
+    # local import because `indico i18n` exists outside dev setups, even though it is not
+    # meant to be used there, and hatchling is only guaranteed to be available in a dev setup
+    from hatchling.version.core import VersionFile
+    vf = VersionFile(plugin_dir, version_file_path)
+    return vf.read(pattern=version_file_pattern)
+
+
 def _get_plugin_options(cmd_name, plugin_dir: Path):
     pyproject = tomllib.loads((plugin_dir / 'pyproject.toml').read_text())
     plugin_name = pyproject['project']['name']
-    plugin_version = pyproject['project']['version']
+    plugin_version = _get_pyproject_version(plugin_dir, pyproject)
     packages = [x.parent.name for x in plugin_dir.glob('*/__init__.py')]
     assert len(packages) == 1
     return {
