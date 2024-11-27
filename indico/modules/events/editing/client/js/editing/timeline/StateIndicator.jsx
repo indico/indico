@@ -21,6 +21,7 @@ const colors = {
   needs_submitter_confirmation: 'yellow',
   rejected: 'black',
   accepted: 'green',
+  accepted_submitter: 'olive',
   needs_submitter_changes: 'red',
   ready_for_review: 'grey',
 };
@@ -30,6 +31,7 @@ const labelColors = {
   needs_submitter_confirmation: Palette.yellow,
   rejected: Palette.black,
   accepted: Palette.green,
+  accepted_submitter: Palette.olive,
   needs_submitter_changes: Palette.red,
   not_submitted: Palette.black,
   ready_for_review: Palette.blue,
