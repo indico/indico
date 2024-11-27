@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-21 10:06+0100\n"
+"POT-Creation-Date: 2024-11-27 09:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -358,6 +358,11 @@ msgstr ""
 
 #: indico/modules/events/contributions/client/js/index.jsx
 msgid "No track"
+msgstr ""
+
+#: indico/modules/events/contributions/templates/display/contribution_author.html
+msgctxt "Salutation"
+msgid "Title:"
 msgstr ""
 
 #: indico/modules/events/management/client/js/index.js
@@ -1018,6 +1023,7 @@ msgid "Add poster"
 msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js
+msgctxt "Timetable entry"
 msgid "Add new"
 msgstr ""
 

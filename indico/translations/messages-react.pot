@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 10:06+0100\n"
+"POT-Creation-Date: 2024-11-24 09:40+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -101,10 +101,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
-#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx
-#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx
 #: indico/modules/events/management/client/js/EventMove.jsx
-#: indico/modules/events/papers/client/js/components/CommentForm.jsx
 #: indico/modules/events/papers/client/js/components/RevisionJudgment.jsx
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx
 msgid "Comment"
@@ -122,7 +119,8 @@ msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
-msgid "Privacy policy"
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx
+msgid "Privacy Policy"
 msgstr ""
 
 #: indico/modules/auth/client/js/signup.jsx
@@ -893,12 +891,6 @@ msgid "Request changes"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-#: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx
-msgid "Judge"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
 msgid "Upload files"
 msgstr ""
 
@@ -1188,39 +1180,6 @@ msgid "Status"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-msgid "Not submitted"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-#: indico/modules/events/editing/client/js/models.js
-msgid "Ready for review"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-#: indico/modules/events/editing/client/js/models.js
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
-msgid "Accepted"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-#: indico/modules/events/editing/client/js/models.js
-#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
-#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
-#: indico/modules/rb/client/js/util.jsx
-msgid "Rejected"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-#: indico/modules/events/editing/client/js/models.js
-msgid "Needs submitter changes"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-#: indico/modules/events/editing/client/js/models.js
-msgid "Needs submitter confirmation"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "Editor"
 msgstr ""
 
@@ -1276,8 +1235,6 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
 #: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx
 #: indico/modules/receipts/client/js/templates/Editor.jsx
-#: indico/modules/users/client/js/PersonalDataForm.jsx
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/WTFLinkListField.jsx
 msgid "Title"
 msgstr ""
@@ -1301,7 +1258,7 @@ msgid "Assign to myself"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
-msgid "Unassign"
+msgid "Judge"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
@@ -1658,10 +1615,6 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/models.js
 msgid "Poster"
-msgstr ""
-
-#: indico/modules/events/editing/client/js/models.js
-msgid "New"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/models.js
@@ -2257,10 +2210,6 @@ msgid "Send"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/PersonList.jsx
-msgid "Primary"
-msgstr ""
-
-#: indico/modules/events/persons/client/js/PersonList.jsx
 msgid "This person is a speaker"
 msgstr ""
 
@@ -2567,11 +2516,6 @@ msgid "All prices are per night"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
-#: indico/modules/receipts/client/js/templates/TemplateListPane.jsx
-msgid "Add new"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
 msgid "No accommodation"
 msgstr ""
 
@@ -2709,10 +2653,6 @@ msgid "Minimum picture size"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
-msgid "Unlimited"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgid ""
 "Minimum picture size that can be uploaded in pixels. Leave empty for no min "
 "size validation."
@@ -2817,7 +2757,6 @@ msgid "Text area"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
 msgid "Number"
 msgstr ""
 
@@ -3185,7 +3124,6 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
-#: indico/modules/rb/client/js/util.jsx
 msgid "Cancelled"
 msgstr ""
 
@@ -3356,8 +3294,6 @@ msgid "Recurring booking"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx
-#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx
-#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx
 msgid "Every"
 msgstr ""
 
@@ -3618,11 +3554,6 @@ msgid "Location"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
-#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx
-msgid "Site"
-msgstr ""
-
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
 #: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx
 #: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx
 msgid "Building"
@@ -3774,14 +3705,6 @@ msgstr ""
 msgid "Restricted rooms can only be booked by users defined in the room ACL"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
-msgid "Public"
-msgstr ""
-
-#: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
-msgid "Restricted"
-msgstr ""
-
 #: indico/modules/rb/client/js/common/rooms/edit/RoomPhoto.jsx
 #: indico/modules/users/client/js/ProfilePicture.jsx
 msgid "Upload"
@@ -3907,6 +3830,10 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 msgid "This occurrence will be cancelled"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
+msgid "Rejected"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
@@ -4036,10 +3963,6 @@ msgid "Terms and Conditions"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx
-msgid "Privacy Policy"
-msgstr ""
-
-#: indico/modules/rb/client/js/components/SidebarFooter.jsx
 msgid "If you need support, you can contact the following email address:"
 msgstr ""
 
@@ -4109,7 +4032,8 @@ msgid "There are no rooms for the specified location."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx
-msgid "General settings"
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
+msgid "General Settings"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx
@@ -4154,10 +4078,6 @@ msgid "Used in {count}1{/count} room"
 msgid_plural "Used in {count} rooms"
 msgstr[0] ""
 msgstr[1] ""
-
-#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
-msgid "Hidden"
-msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
 msgid "Are you sure you want to delete the attribute {name}?"
@@ -4349,10 +4269,6 @@ msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Not for events"
-msgstr ""
-
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
-msgid "General Settings"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
@@ -4974,10 +4890,6 @@ msgid "Are you sure you want to link this event?"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
-msgid "Link"
-msgstr ""
-
-#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
 msgid "Link to {bookedFor}"
 msgstr ""
 
@@ -5116,10 +5028,6 @@ msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx
 msgid "Other booking"
-msgstr ""
-
-#: indico/modules/rb/client/js/util.jsx
-msgid "Will be cancelled"
 msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx
@@ -6536,9 +6444,154 @@ msgstr ""
 msgid "Black"
 msgstr ""
 
+#: indico/modules/events/editing/client/js/editing/timeline/CommentForm.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx
+#: indico/modules/events/papers/client/js/components/CommentForm.jsx
+msgctxt "Leave a comment (verb)"
+msgid "Comment"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
+msgctxt "Judge editable (verb)"
+msgid "Judge"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx
+msgctxt "Comment modal title"
+msgid "Comment"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgctxt "Editable"
+msgid "Not submitted"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
+msgid "Ready for review"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
+msgid "Accepted"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
+msgid "Rejected"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
+msgid "Needs submitter changes"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
+msgid "Needs submitter confirmation"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgctxt "Editable"
+msgid "Unassign"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
+msgid "New"
+msgstr ""
+
+#: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx
+msgctxt "Judge paper (verb)"
+msgid "Judge"
+msgstr ""
+
+#: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx
+msgctxt "Review papers (verb)"
+msgid "Review"
+msgstr ""
+
+#: indico/modules/events/persons/client/js/PersonList.jsx
+msgctxt "Author"
+msgid "Primary"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
+msgctxt "Choice"
+msgid "Add new"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 msgctxt "Number of choices"
 msgid "Unlimited"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
+msgctxt "Minimum size"
+msgid "Unlimited"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
+#: indico/modules/rb/client/js/util.jsx
+msgctxt "Booking"
+msgid "Rejected"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
+msgctxt "Booking"
+msgid "Accepted"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx
+msgctxt "Booking"
+msgid "Cancelled"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx
+msgctxt "Booking"
+msgid "Will be cancelled"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx
+msgctxt "Building site/location"
+msgid "Site"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
+msgctxt "Room number"
+msgid "Number"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
+msgctxt "Booking mode"
+msgid "Public"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
+msgctxt "Booking mode"
+msgid "Restricted"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx
+#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx
+msgctxt "Repetition"
+msgid "Every"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
+msgctxt "Room attribute"
+msgid "Hidden"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
+msgctxt "Link a booking to an event (verb)"
+msgid "Link"
 msgstr ""
 
 #: indico/modules/rb/client/js/util.jsx
@@ -6573,6 +6626,11 @@ msgstr ""
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "monthly booking shortcut"
 msgid "{number}M"
+msgstr ""
+
+#: indico/modules/receipts/client/js/templates/TemplateListPane.jsx
+msgctxt "Custom template"
+msgid "Add new"
 msgstr ""
 
 #: indico/modules/users/client/js/DataExport.jsx
@@ -6627,4 +6685,10 @@ msgstr ""
 #: indico/modules/users/client/js/DataExport.jsx
 msgctxt "user data export request date"
 msgid "Requested on"
+msgstr ""
+
+#: indico/modules/users/client/js/PersonalDataForm.jsx
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx
+msgctxt "Salutation"
+msgid "Title"
 msgstr ""
