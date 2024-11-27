@@ -1,7 +1,9 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% block subtitle %}
-    {% trans friendly_id=registration.friendly_id, registrant_name=registration.full_name, regform_title=registration.registration_form.title -%}
+    {% trans friendly_id=registration.friendly_id,
+             registrant_name=registration.full_name,
+             regform_title=registration.registration_form.title -%}
         Details for #{{ friendly_id }}: {{ registrant_name }} in "{{ regform_title }}"
     {%- endtrans %}
 {% endblock %}
