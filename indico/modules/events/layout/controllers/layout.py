@@ -161,8 +161,8 @@ class RHLayoutLogoUpload(RHLayoutBase):
         f = request.files['logo']
         try:
             img = Image.open(f)
-        except OSError:
-            flash(_('You cannot upload this file as a logo.'), 'error')
+        except (OSError, Image.DecompressionBombError):
+            flash(_('You cannot upload this file as a logo, it may be corrupted or too big.'), 'error')
             return jsonify_data(content=None)
         if img.format.lower() not in {'jpeg', 'png', 'gif'}:
             flash(_('The file has an invalid format ({format})').format(format=img.format), 'error')
