@@ -53,11 +53,11 @@ class RHLayoutBase(RHManageEventBase):
 def _make_theme_settings_form(event, theme):
     theme_global_settings = theme_settings.themes[theme].get('settings', {})
     try:
-        settings = theme_settings.themes[theme]['user_settings']
+        theme_user_settings = theme_settings.themes[theme]['user_settings']
     except KeyError:
         return None
     form_class = type('ThemeSettingsForm', (IndicoForm,), {})
-    for name, field_data in settings.items():
+    for name, field_data in theme_user_settings.items():
         field_type = field_data['type']
         field_class = getattr(indico_fields, field_type, None) or getattr(wtforms_fields, field_type, None)
         if not field_class:
@@ -68,11 +68,11 @@ def _make_theme_settings_form(event, theme):
         field = field_class(label, validators, description=description, **field_data.get('kwargs', {}))
         setattr(form_class, name, field)
 
-    defaults = {name: field_data.get('defaults') for name, field_data in settings.items()}
-    for event_key, theme_keys in OVERRIDABLE_THEME_SETTINGS.items():
-        if event_key not in settings:
+    defaults = {name: field_data.get('defaults') for name, field_data in theme_user_settings.items()}
+    for user_key, theme_keys in OVERRIDABLE_THEME_SETTINGS.items():
+        if user_key not in theme_user_settings:
             continue
-        defaults[event_key] = all(theme_global_settings.get(key) for key in theme_keys)
+        defaults[user_key] = all(theme_global_settings.get(key) for key in theme_keys)
     if theme == event.theme:
         defaults.update(layout_settings.get(event, 'timetable_theme_settings'))
 

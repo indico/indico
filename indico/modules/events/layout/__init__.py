@@ -74,11 +74,11 @@ def get_theme_global_settings(event, theme):
 
     # Override global settings with user settings, if present
     settings = settings.copy()
-    event_settings = layout_settings.get(event, 'timetable_theme_settings')
-    for event_key, theme_keys in OVERRIDABLE_THEME_SETTINGS.items():
-        if event_key not in event_settings:
+    event_user_settings = layout_settings.get(event, 'timetable_theme_settings')
+    for user_key, theme_keys in OVERRIDABLE_THEME_SETTINGS.items():
+        if user_key not in event_user_settings:
             continue
-        settings.update(dict.fromkeys(theme_keys, event_settings[event_key]))
+        settings.update(dict.fromkeys(theme_keys, event_user_settings[user_key]))
     return settings
 
 
