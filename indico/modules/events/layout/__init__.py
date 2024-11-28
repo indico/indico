@@ -25,6 +25,14 @@ from indico.web.menu import SideMenuItem
 EVENT_BANNER_WIDTH = 950
 EVENT_LOGO_WIDTH = 200
 
+# Theme settings that can be overridden via theme user settings. This works bidirectionally,
+# ie if a theme's settings has all the keys set to True, then the user setting will default
+# to True as well.
+OVERRIDABLE_THEME_SETTINGS = {
+    'inline_minutes': {'show_notes'},
+    'numbered_contributions': {'hide_duration', 'hide_session_block_time', 'hide_end_time', 'number_contributions'}
+}
+
 logger = Logger.get('events.layout')
 layout_settings = EventSettingsProxy('layout', {
     'is_searchable': True,
@@ -50,6 +58,28 @@ layout_settings = EventSettingsProxy('layout', {
 })
 
 theme_settings = ThemeSettingsProxy()
+
+
+def get_theme_global_settings(event, theme):
+    """Get the global settings for a theme.
+
+    Some global theme settings such as 'show_notes' may be overridden by the
+    event-specific user settings ('user_settings' in themes.yaml).
+    These are saved in the event's layout settings under timetable_theme_settings.
+    """
+    settings = theme_settings.themes[theme].get('settings', {})
+    # Ignore user settings when the selected theme does not match the event's theme
+    if event.theme != theme:
+        return settings
+
+    # Override global settings with user settings, if present
+    settings = settings.copy()
+    event_user_settings = layout_settings.get(event, 'timetable_theme_settings')
+    for user_key, theme_keys in OVERRIDABLE_THEME_SETTINGS.items():
+        if user_key not in event_user_settings:
+            continue
+        settings.update(dict.fromkeys(theme_keys, event_user_settings[user_key]))
+    return settings
 
 
 @signals.event.created.connect

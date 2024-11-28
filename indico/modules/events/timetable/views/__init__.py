@@ -13,7 +13,7 @@ from flask import render_template, request, session
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
-from indico.modules.events.layout import theme_settings
+from indico.modules.events.layout import get_theme_global_settings, theme_settings
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
@@ -114,7 +114,8 @@ def inject_meeting_body(event, **kwargs):
     entries.sort(key=lambda entry: (entry.start_dt, *_entry_title_key(entry)))
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
-    theme = theme_settings.themes[get_theme(event, view)[0]]
+    theme_id = get_theme(event, view)[0]
+    theme = theme_settings.themes[theme_id]
     plugin = theme.get('plugin')
     tpl_name = theme.get('tt_template', theme['template'])
     tt_tpl = ((plugin.name + tpl_name)
@@ -123,8 +124,9 @@ def inject_meeting_body(event, **kwargs):
     multiple_days = event.start_dt.astimezone(event_tz).date() != event.end_dt.astimezone(event_tz).date()
     return render_template(tt_tpl, event=event, entries=entries, days=days,
                            timezone=event_tz.zone, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
-                           theme_settings=theme.get('settings', {}), show_siblings_location=show_siblings_location,
-                           show_children_location=show_children_location, multiple_days=multiple_days, **kwargs)
+                           theme_settings=get_theme_global_settings(event, theme_id),
+                           show_siblings_location=show_siblings_location, show_children_location=show_children_location,
+                           multiple_days=multiple_days, **kwargs)
 
 
 def _entry_title_key(entry) -> tuple[str, str]:
