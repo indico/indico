@@ -96,6 +96,7 @@ Internal Changes
 - Support translator comments when extracting translatable strings (:pr:`6620`)
 - ``renderAsFieldset`` option in the registration field registry can now be a function that
   returns a boolean (:pr:`6621`, thanks :user:`foxbunny`)
+- Allow overriding global theme settings for custom meeting themes (:pr:`6622`)
 
 
 Version 3.3.4
