@@ -162,7 +162,7 @@ export default class FilterDropdown extends React.Component {
         {form(fieldValues, this.setFieldValue, this.handleClose)}
         <Button.Group size="small" floated="right" styleName="filter-dropdown-actions">
           <Button
-            content={Translate.string('Apply')}
+            content={Translate.string('Apply', 'Filters')}
             onClick={this.handleClose}
             disabled={!this.hasValuesChanged()}
             positive

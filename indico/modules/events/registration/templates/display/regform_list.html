@@ -35,7 +35,8 @@
             {% for regform in regforms %}
                 {% set button_text -%}
                     {% if regform.moderation_enabled %}
-                        {%- trans %}Apply{% endtrans %}
+                        {# i18n: Apply for participation (analogous to 'Register' but 'Apply' is used when the registration form is moderated) #}
+                        {%- trans "Registration" %}Apply{% endtrans %}
                     {%- else %}
                         {%- trans %}Register{% endtrans %}
                     {%- endif %}
