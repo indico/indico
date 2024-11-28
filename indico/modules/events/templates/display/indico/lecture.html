@@ -11,7 +11,7 @@
                        or event.contact_emails or event.contact_phones
                        or (event.references and event.type == 'meeting') or hook_event_header %}
 
-<div class="event-wrapper">
+<div class="event-wrapper {% block event_classes %}{% endblock %}">
     {% block header %}
         <div class="event-header event-header-lecture {%- if not has_subheader %} round-bottom-corners{% endif %}">
             <div class="event-title">
