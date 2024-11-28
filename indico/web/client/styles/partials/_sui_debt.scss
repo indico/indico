@@ -33,6 +33,18 @@
   border: 1px solid #85b7d9;
 }
 
+@mixin input-border-default {
+  border: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+@mixin input-disabled-border {
+  border: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+@mixin input-disabled-mark-background {
+  background-color: rgba(34, 36, 38, 0.15);
+}
+
 @mixin input-background {
   background: white;
 }

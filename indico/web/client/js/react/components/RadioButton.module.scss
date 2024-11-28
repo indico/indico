@@ -1,0 +1,58 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/sui_debt';
+
+.radio-label {
+  display: inline-flex;
+  gap: var(--content-gap-normal);
+  align-items: center;
+}
+
+.radio {
+  --radio-size: 1.2em;
+
+  flex: none;
+
+  appearance: none;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--radio-size);
+  aspect-ratio: 1;
+  margin: 0;
+
+  @include sui_debt.input-border-default();
+  border-radius: 50%;
+
+  &:disabled {
+    @include sui_debt.input-disabled-border();
+  }
+
+  &:focus {
+    border: 1px solid #85b7d9;
+  }
+
+  &::before {
+    content: '';
+
+    display: inline-block;
+    width: calc(0.5 * var(--radio-size));
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+  }
+
+  &:checked::before {
+    background-color: currentcolor;
+  }
+
+  &:disabled:checked::before {
+    @include sui_debt.input-disabled-mark-background();
+  }
+}

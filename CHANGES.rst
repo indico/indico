@@ -83,6 +83,8 @@ Accessibility
 
 - Improve country input accessibility (:pr:`6551`, thanks :user:`foxbunny`)
 - Reimplement Checkbox to make it programmatically focusable (:pr:`6528`, thanks :user:`foxbunny`)
+- Implement a ``RadioButton`` component to replace the SUI radio button in order to improve
+  keyboard support (:pr:`6621`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -92,6 +94,8 @@ Internal Changes
 - Add additional signals related to videoconferences and their event links (:pr:`6475`)
 - Videoconference plugins now need to implement a ``delete_room`` method (:pr:`6475`)
 - Support translator comments when extracting translatable strings (:pr:`6620`)
+- ``renderAsFieldset`` option in the registration field registry can now be a function that
+  returns a boolean (:pr:`6621`, thanks :user:`foxbunny`)
 
 
 Version 3.3.4

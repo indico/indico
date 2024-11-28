@@ -46,6 +46,11 @@ summary {
   cursor: pointer;
 }
 
+:disabled label,
+label:has(:disabled) {
+  cursor: default;
+}
+
 summary {
   list-style: none;
 }
