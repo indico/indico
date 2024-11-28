@@ -193,7 +193,7 @@ function SingleChoiceRadioGroup({
   const selectedChoice = choices.find(c => c.id in value) || {id: ''};
   const radioChoices = [...choices];
   if (!isRequired) {
-    radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None')});
+    radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None', 'Choice')});
   }
 
   const handleChange = newValue => {

@@ -5,7 +5,8 @@
         {{ render_track(track, full_title=full_title) -}}
         {%- if not loop.last -%},{% endif %}
     {% else %}
-        <em>{% trans %}None{% endtrans %}</em>
+        {# i18n: No tracks #}
+        <em>{% trans "Tracks" %}None{% endtrans %}</em>
     {% endfor %}
 {%- endmacro %}
 

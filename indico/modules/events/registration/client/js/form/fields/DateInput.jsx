@@ -270,7 +270,7 @@ export function DateSettings() {
             name="timeFormat"
             label={Translate.string('Time format')}
             options={timeOptions}
-            placeholder={Translate.string('None')}
+            placeholder={Translate.string('None', 'Time format')}
             disabled={!dateFormat.includes('%d')}
             parse={p.nullIfEmpty}
             selection

@@ -138,7 +138,7 @@ export default function PersonDetailsModal({
             search
             selection
             options={titles}
-            placeholder={Translate.string('None')}
+            placeholder={Translate.string('None', 'Title (salutation)')}
           />
         </Form.Field>
         {!extraParams?.disableAffiliations && (

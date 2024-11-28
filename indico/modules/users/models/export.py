@@ -14,13 +14,15 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.enum import RichIntEnum, RichStrEnum
-from indico.util.i18n import L_
+from indico.util.i18n import _, pgettext
 from indico.util.string import format_repr
 from indico.web.flask.util import url_for
 
 
 class DataExportRequestState(RichIntEnum):
-    __titles__ = [L_('None'), L_('Running'), L_('Success'), L_('Failed'), L_('Expired')]
+    __titles__ = [pgettext('Export request state', 'None'), pgettext('Export request state', 'Running'),
+                  pgettext('Export request state', 'Success'), pgettext('Export request state', 'Failed'),
+                  pgettext('Export request state', 'Expired')]
     none = 0  # Default value when there is no request
     running = 1
     success = 2
@@ -30,17 +32,17 @@ class DataExportRequestState(RichIntEnum):
 
 class DataExportOptions(RichStrEnum):
     __titles__ = {
-        'personal_data': L_('Personal data'),
-        'settings': L_('Settings'),
-        'contribs': L_('Contributions'),
-        'note_revisions': L_('Minutes'),
-        'registrations': L_('Registrations'),
-        'room_booking': L_('Room booking'),
-        'abstracts_papers': L_('Abstracts & Papers'),
-        'survey_submissions': L_('Survey submissions'),
-        'attachments': L_('Attachments & Materials'),
-        'editables': L_('Editables'),
-        'misc': L_('Miscellaneous'),
+        'personal_data': _('Personal data'),
+        'settings': _('Settings'),
+        'contribs': _('Contributions'),
+        'note_revisions': _('Minutes'),
+        'registrations': _('Registrations'),
+        'room_booking': _('Room booking'),
+        'abstracts_papers': _('Abstracts & Papers'),
+        'survey_submissions': _('Survey submissions'),
+        'attachments': _('Attachments & Materials'),
+        'editables': _('Editables'),
+        'misc': _('Miscellaneous'),
     }
     personal_data = auto()
     settings = auto()
