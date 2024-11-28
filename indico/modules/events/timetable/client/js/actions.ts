@@ -25,6 +25,7 @@ export const SCROLL_NAVBAR = 'Scroll toolbar';
 export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
+export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
 export const ADD_ENTRY = 'Add entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
@@ -137,6 +138,10 @@ export function setDisplayMode(mode) {
 
 export function toggleShowUnscheduled() {
   return {type: TOGGLE_SHOW_UNSCHEDULED};
+}
+
+export function toggleShowAllTimeslots() {
+  return {type: TOGGLE_SHOW_ALL_TIMESLOTS};
 }
 
 export function addEntry(entryType) {
