@@ -17,7 +17,8 @@ from wtforms.validators import DataRequired
 from indico.core.db import db
 from indico.modules.events import EventLogRealm
 from indico.modules.events.controllers.base import RegistrationRequired, RHDisplayEventBase
-from indico.modules.events.layout import EVENT_BANNER_WIDTH, EVENT_LOGO_WIDTH, layout_settings, logger, theme_settings
+from indico.modules.events.layout import (EVENT_BANNER_WIDTH, EVENT_LOGO_WIDTH, OVERRIDABLE_THEME_SETTINGS,
+                                          layout_settings, logger, theme_settings)
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
 from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_js_url, get_logo_data
@@ -50,6 +51,7 @@ class RHLayoutBase(RHManageEventBase):
 
 
 def _make_theme_settings_form(event, theme):
+    theme_global_settings = theme_settings.themes[theme].get('settings', {})
     try:
         settings = theme_settings.themes[theme]['user_settings']
     except KeyError:
@@ -67,6 +69,10 @@ def _make_theme_settings_form(event, theme):
         setattr(form_class, name, field)
 
     defaults = {name: field_data.get('defaults') for name, field_data in settings.items()}
+    for event_key, theme_keys in OVERRIDABLE_THEME_SETTINGS.items():
+        if event_key not in settings:
+            continue
+        defaults[event_key] = all(theme_global_settings.get(key) for key in theme_keys)
     if theme == event.theme:
         defaults.update(layout_settings.get(event, 'timetable_theme_settings'))
 
