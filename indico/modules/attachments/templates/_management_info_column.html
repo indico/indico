@@ -8,7 +8,7 @@
                data-attachment-editor>
                 {% if not obj.attachment_count %}
                     {# i18n: No attachments #}
-                    <em>{% trans 'Attachments' %}None{% endtrans %}</em>
+                    <em>{% trans "Attachments" %}None{% endtrans %}</em>
                 {% else %}
                     <span class="label">
                         {% trans count=obj.attachment_count -%}
