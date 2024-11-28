@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
@@ -309,14 +308,6 @@ export const updateState = (
   });
   return changeMap.length > 0 ? addNewChange(newState, Object.fromEntries(changeMap)) : state;
 };
-
-/**
- * Get the number of days between two dates
- * @param {Date} start Starting date
- * @param {Date} end Ending date
- * @returns {number} Number of days between two dates
- */
-export const getNumDays = (start, end) => moment(end).diff(moment(start), 'days');
 
 // TODO remove
 // eslint-disable-next-line no-alert

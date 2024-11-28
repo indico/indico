@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment from 'moment';
+import moment, {Moment} from 'moment';
 
 import {ChildEntry, DayEntries, Session} from './types';
 
@@ -29,7 +29,10 @@ export function preprocessSessionData(data: Record<string, any>): Record<number,
   );
 }
 
-export function preprocessTimetableData(
+const dateToMoment = (dt: {date: string; time: string}) =>
+  moment.tz(`${dt.date} ${dt.time}`, dt.tz);
+
+export function preprocessTimetableEntries(
   data: any,
   eventInfo: any
 ): {dayEntries: DayEntries; unscheduled: any[]} {
@@ -73,7 +76,7 @@ export function preprocessTimetableData(
             type: entryTypeMapping[_id[0]],
             id: childId,
             title: _childEntry.title,
-            startDt: moment(`${_childEntry.startDate.date} ${_childEntry.startDate.time}`),
+            startDt: dateToMoment(_childEntry.startDate),
             duration: _childEntry.duration,
             parentId: dayEntries[day].at(-1).id,
             x: 0,
