@@ -51,11 +51,12 @@ class RHLayoutBase(RHManageEventBase):
 
 
 def _make_theme_settings_form(event, theme):
-    theme_global_settings = theme_settings.themes[theme].get('settings', {})
     try:
-        theme_user_settings = theme_settings.themes[theme]['user_settings']
+        theme_data = theme_settings.themes[theme]
+        theme_user_settings = theme_data['user_settings']
     except KeyError:
         return None
+    theme_global_settings = theme_data.get('settings', {})
     form_class = type('ThemeSettingsForm', (IndicoForm,), {})
     for name, field_data in theme_user_settings.items():
         field_type = field_data['type']
