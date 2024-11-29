@@ -437,6 +437,10 @@ def _plugin_command(babel_cmd, python, javascript, react, locale, no_check, plug
                 click.secho(f'Exiting compile command for {plugin_dir} due to invalid format strings.', fg='red',
                             bold=True, err=True)
                 return
+            if not _check_mismatched_html_tags(translations_dir):
+                click.secho(f'Exiting compile command for {plugin_dir} due to invalid format strings.', fg='red',
+                            bold=True, err=True)
+                return
         try:
             if python:
                 _run_command(babel_cmd, extra=extra)
