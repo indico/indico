@@ -98,6 +98,7 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: indico-wheel/
+          attestations: false
       - name: Publish to PyPI 🚀
         uses: pypa/gh-action-pypi-publish@v1.12.2
         with:
