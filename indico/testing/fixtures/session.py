@@ -18,8 +18,8 @@ from indico.util.date_time import now_utc
 def create_session(db):
     """Return a callable that lets you create a session."""
 
-    def _create_session(event, title):
-        entry = Session(event=event, title=title)
+    def _create_session(event, title, **kwargs):
+        entry = Session(event=event, title=title, **kwargs)
         db.session.add(entry)
         db.session.flush()
         return entry
@@ -31,8 +31,8 @@ def create_session(db):
 def create_session_block(db, create_timetable_entry):
     """Return a callable that lets you create a session block."""
 
-    def _create_session_block(session, title, duration, start_dt):
-        block = SessionBlock(session=session, title=title, duration=duration)
+    def _create_session_block(session, title, duration, start_dt, **kwargs):
+        block = SessionBlock(session=session, title=title, duration=duration, **kwargs)
         db.session.add(block)
         db.session.flush()
         create_timetable_entry(session.event, block, start_dt)
