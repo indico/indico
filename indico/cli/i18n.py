@@ -339,7 +339,7 @@ def extract_messages_react(directory: Path = INDICO_DIR):
             '--base', directory,
             '--add-location', 'file',
             *paths
-        ], env=dict(os.environ, FORCE_COLOR='1'))
+        ], env=dict(os.environ, FORCE_COLOR='1', MOCK_FLASK_URLS='1'))
     _get_messages_react_pot(directory).write_bytes(output)
 
 

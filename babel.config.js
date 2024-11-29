@@ -31,7 +31,7 @@ const plugins = [
   'macros',
 ];
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'test' || process.env.MOCK_FLASK_URLS === '1') {
   plugins.push(['flask-urls', {importPrefix: 'indico-url', mock: true}]);
 } else {
   // if there is a valid build config, we can use it to generate proper URLs
