@@ -292,13 +292,15 @@ import Palette from '../../utils/palette';
       }
 
       if (forSubcategory) {
+        const catCount = $T
+          .ngettext('{0} category', '{0} categories', category.deep_category_count)
+          .format(category.deep_category_count);
+        const eventCount = $T
+          .ngettext('{0} event', '{0} events', category.deep_event_count)
+          .format(category.deep_event_count);
         const $info = $('<div>', {
           class: 'stats icon-list',
-          title: `${$T
-            .ngettext('{0} category', '{0} categories', category.deep_category_count)
-            .format(category.deep_category_count)} | ${$T
-            .ngettext('{0} event', '{0} events', category.deep_event_count)
-            .format(category.deep_event_count)}`,
+          title: `${catCount} | ${eventCount}`,
         });
         const $categories = $('<span>', {
           class: 'categories-count',
