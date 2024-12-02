@@ -85,6 +85,8 @@ Accessibility
 - Reimplement Checkbox to make it programmatically focusable (:pr:`6528`, thanks :user:`foxbunny`)
 - Implement a ``RadioButton`` component to replace the SUI radio button in order to improve
   keyboard support (:pr:`6621`, thanks :user:`foxbunny`)
+- Improve keyboard accessibility of the timetable sessions field in registration form (:pr:`6639`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

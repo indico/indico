@@ -1,0 +1,33 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.timetablesessions-field {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 0;
+  padding: 0 0.5em;
+
+  .accordion-title,
+  .accordion-title-checkbox {
+    display: flex;
+    align-items: center;
+  }
+
+  .session-block {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.35rem;
+    margin-left: 2.8em;
+  }
+
+  .selection-count {
+    margin-left: 1.8em;
+    color: rgba(0, 0, 0, 0.4);
+  }
+}

@@ -12,8 +12,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
-import {Checkbox, Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
+import {Form, Accordion, AccordionTitle, AccordionContent, Icon} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {FinalCheckbox, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate, Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
@@ -22,6 +23,8 @@ import {getManagement} from '../../form_submission/selectors';
 import {getStaticData} from '../selectors';
 
 import '../../../styles/regform.module.scss';
+
+import './TimetableSessions.module.scss';
 
 const sessionDataSchema = PropTypes.arrayOf(
   PropTypes.shape({
@@ -72,14 +75,18 @@ function TimetableSessionsComponent({
     _onChange(val.filter(x => validBlockIds.has(x)));
   };
 
-  const handleValueChange = (e, data) => {
+  const handleValueChange = evt => {
     markTouched();
-    const id = data.value;
+    const id = Number(evt.target.value);
     const newValue = _.xor(value, [id]);
     onChange(newValue);
   };
 
-  const handleHeaderClick = date => () => {
+  const handleHeaderClick = date => evt => {
+    if (evt.target.closest('label')) {
+      // Interacted with the checkbox, don't toggle
+      return;
+    }
     setExpandedHeaders({...expandedHeaders, [date]: !expandedHeaders[date]});
   };
 
@@ -149,15 +156,21 @@ function SessionBlockHeader({
 
   return (
     <>
-      <AccordionTitle active={isExpanded} index={index} onClick={onClick}>
+      <AccordionTitle
+        styleName="accordion-title"
+        active={isExpanded}
+        index={index}
+        onClick={onClick}
+      >
         <Icon name="dropdown" />
         <Checkbox
+          styleName="accordion-title-checkbox"
           checked={isAllChecked}
           onChange={handleHeaderChange}
           indeterminate={isAnyChecked && !isAllChecked}
           label={label}
         />
-        <span>
+        <span styleName="selection-count">
           (
           <PluralTranslate count={selectedBlocks}>
             <Singular>
@@ -169,16 +182,16 @@ function SessionBlockHeader({
           </PluralTranslate>
         </span>
       </AccordionTitle>
-      <AccordionContent active={isExpanded}>
+      <AccordionContent as="ul" active={isExpanded}>
         {data.map(({time, fullTitle, id}) => (
-          <dd className="grouped-fields" key={id}>
+          <li styleName="session-block" className="grouped-fields" key={id}>
             <Checkbox
               value={id}
               onChange={handleValueChange}
               checked={value.includes(id)}
               label={`${time} - ${fullTitle}`}
             />
-          </dd>
+          </li>
         ))}
       </AccordionContent>
     </>
