@@ -1,0 +1,25 @@
+affiliations: {}
+db_version:
+- feeddeadbeef
+dummy_files: false
+export_version: 2
+external_storage_backends: []
+indico_version: 1.3.3.7
+object_files:
+- objects-1.yaml
+timestamp: 2017-08-24 15:28:43.011442+00:00
+users:
+  00000000-0000-4000-8000-00000000000a:
+    address: ''
+    affiliation: ''
+    affiliation_id: null
+    all_emails:
+    - 1337@example.test
+    email: 1337@example.test
+    first_name: Guinea
+    is_deleted: false
+    last_name: Pig
+    merged_into_id: null
+    phone: ''
+    title: !!python/object/apply:indico.modules.users.models.users.UserTitle
+    - 0
