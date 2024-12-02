@@ -141,8 +141,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
             )
         ]
 
-        # the regform has at least one ticket template
-        if any(tpl.is_ticket for tpl in badge_templates):
+        # the regform has at least one badge template
+        if any(not tpl.is_ticket for tpl in badge_templates):
             action_menu_items.append(ActionMenuEntry(
                 _('Print Badges'),
                 'id-badge',
@@ -150,8 +150,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
                 weight=90,
             ))
 
-        # the regform has at least one badge template
-        if any(not tpl.is_ticket for tpl in badge_templates):
+        # the regform has at least one ticket template
+        if any(tpl.is_ticket for tpl in badge_templates):
             action_menu_items.append(ActionMenuEntry(
                 _('Print Tickets'),
                 'ticket',
