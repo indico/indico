@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.5-dev\n"
+"Project-Id-Version: Indico 3.3.6-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-27 09:40+0100\n"
+"POT-Creation-Date: 2024-12-02 19:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3554,9 +3554,11 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: indico/modules/designer/placeholders.py
+#: indico/modules/designer/placeholders.py indico/modules/events/registration/templates/management/regform_stats.html
 msgid "Country"
-msgstr ""
+msgid_plural "Countries"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/designer/placeholders.py indico/modules/events/management/templates/_settings.html
 msgid "Phone"
@@ -8407,7 +8409,7 @@ msgid "The event logo is too large. It is recommended to use a logo with a width
 msgstr ""
 
 #: indico/modules/events/layout/controllers/layout.py
-msgid "You cannot upload this file as a logo."
+msgid "You cannot upload this file as a logo, it may be corrupted or too big."
 msgstr ""
 
 #: indico/modules/events/layout/controllers/layout.py
@@ -11240,8 +11242,11 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/_regform_base.html
 #: indico/modules/events/registration/templates/management/regform_list.html
 #: indico/modules/events/registration/templates/management/regform_reglist.html
+#: indico/modules/events/registration/templates/management/regform_stats.html
 msgid "Registration"
-msgstr ""
+msgid_plural "Registrations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/registration/__init__.py
 msgid "Participant List"
@@ -11270,7 +11275,7 @@ msgid "The target event already has registration forms"
 msgstr ""
 
 #: indico/modules/events/registration/clone.py indico/modules/events/registration/templates/management/regform_list.html
-#: indico/modules/events/registration/templates/management/regform_stats.html indico/modules/users/models/export.py
+#: indico/modules/users/models/export.py
 msgid "Registrations"
 msgstr ""
 
@@ -13874,12 +13879,10 @@ msgid "Currency: {}"
 msgstr ""
 
 #: indico/modules/events/registration/templates/management/regform_stats.html
-msgid "Days left<br>to register"
-msgstr ""
-
-#: indico/modules/events/registration/templates/management/regform_stats.html
-msgid "Countries"
-msgstr ""
+msgid "Day left<br>to register"
+msgid_plural "Days left<br>to register"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/events/registration/templates/management/regform_stats.html
 msgid "Availability"
