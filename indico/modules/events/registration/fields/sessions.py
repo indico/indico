@@ -93,6 +93,8 @@ class SessionsField(RegistrationFormFieldBase):
         blocks = (SessionBlock.query
                   .filter(SessionBlock.id.in_(registration_data.data))
                   .options(joinedload(SessionBlock.timetable_entry).raiseload('*'))
+                  .join(Session)
+                  .order_by(SessionBlock.start_dt, Session.title, SessionBlock.title, SessionBlock.id)
                   .all())
         if for_humans or for_search:
             return '; '.join(b.full_title for b in blocks)
