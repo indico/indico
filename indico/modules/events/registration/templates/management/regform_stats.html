@@ -34,9 +34,11 @@
 
 {% macro render_overview(stats) %}
     {% set height = stats.countries|length * 24 + 28 %}
-    {% set badges = [(_("Registrations"),  stats.registrations|length),
-                     (_("Days left<br>to register"), stats.days_left),
-                     (_("Countries"), stats.num_countries)] %}
+    {% set badges = [
+        (ngettext('Registration', 'Registrations', stats.registrations|length), stats.registrations|length),
+        (ngettext('Day left<br>to register', 'Days left<br>to register', stats.days_left), stats.days_left),
+        (ngettext('Country', 'Countries', stats.num_countries), stats.num_countries)
+    ] %}
     {% set taken, total, progress = stats.availability %}
 
     {% call stats_box(title=stats.title, subtitle=stats.subtitle,
