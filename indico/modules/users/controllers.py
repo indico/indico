@@ -511,6 +511,7 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
             if not self.category.can_access(self.user):
                 raise Forbidden
             self.user.favorite_categories.add(self.category)
+            signals.users.favorite_category_added.send(self.user, category=self.category)
             if self.suggestion:
                 self.user.suggested_categories.remove(self.suggestion)
         return jsonify(success=True)
@@ -523,6 +524,7 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
             except StaleDataError:
                 # Deleted in another transaction
                 db.session.rollback()
+            signals.users.favorite_category_removed.send(self.user, category=self.category)
             suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
             if suggestion:
                 self.user.suggested_categories.remove(suggestion)
