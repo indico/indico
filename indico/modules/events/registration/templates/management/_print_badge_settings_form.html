@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
 
-{% macro render_badge_print_settings_form(form, submit=_('Download PDF'), templates=none, registrations=()) %}
-    {% call simple_form(form, form_header_kwargs={'id': 'badge-settings-form'}, back=_('Cancel'),
+{% macro render_badge_print_settings_form(form, submit=_('Download PDF'), templates=none, registrations=(), form_action=none) %}
+    {% call simple_form(form, form_header_kwargs={'id': 'badge-settings-form', 'action': form_action}, back=_('Cancel'),
                         submit=submit, disabled_until_change=false, disable_if_locked=false) %}
         {% for legend, fieldset in form._fieldsets %}
             {% call form_fieldset(legend, render_as_fieldset=(legend is not none)) %}
