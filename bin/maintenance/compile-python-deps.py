@@ -68,7 +68,8 @@ def _update_pyproject(pyproject_path: Path, context: str):
 @click.command()
 @click.option('-U', '--upgrade', is_flag=True, help='Upgrade all packages')
 @click.option('-P', '--upgrade-package', 'upgrade_packages', multiple=True, help='Upgrade the specified packages')
-def main(upgrade, upgrade_packages):
+@click.option('-N', '--no-plugins', is_flag=True, help='Do not touch plugin pyproject.toml files')
+def main(upgrade, upgrade_packages, no_plugins):
     """Compiles/upgrades the transitive Python dependencies.
 
     This tool is a simple wrapper for `uv pip compile` that handles all the
@@ -94,8 +95,9 @@ def main(upgrade, upgrade_packages):
             failed = True
 
     _update_pyproject(Path('pyproject.toml'), 'Indico')
-    for plugin_pyproject in Path('../plugins').glob('**/pyproject.toml'):
-        _update_pyproject(plugin_pyproject, plugin_pyproject.parent.name)
+    if not no_plugins:
+        for plugin_pyproject in Path('../plugins').glob('**/pyproject.toml'):
+            _update_pyproject(plugin_pyproject, plugin_pyproject.parent.name)
 
     sys.exit(1 if failed else 0)
 
