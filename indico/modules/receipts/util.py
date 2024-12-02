@@ -146,6 +146,19 @@ def _format_placeholders(value, **kwargs):
     return value
 
 
+def _format_interval(start_dt, end_dt, format=None, locale=None, *, skeleton=None):
+    """Basically a wrapper around Babel's own format_interval.
+
+    The `format` parameter is kept for backwards compatibility with the default
+    document templates which use `format_interval`. Prefer using the `skeleton`
+    parameter instead.
+    """
+    if format:
+        skeleton = format
+
+    return format_interval(start_dt, end_dt, skeleton, locale=locale)
+
+
 def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = False) -> str:
     """Compile Jinja template of receipt in a sandboxed environment."""
     try:
@@ -159,7 +172,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_placeholders': _format_placeholders,
         })
         env.globals.update({
-            'format_interval': format_interval,
+            'format_interval': _format_interval,
         })
         return env.from_string(code).render(
             **template_context,
