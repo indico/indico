@@ -8,7 +8,7 @@
 # Ajob Kustra, 2024
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2018,2020-2021
 # Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021-2024
-# Marcin Miłek, 2021-2022
+# Marcin Miłek, 2021-2022,2024
 # Michito <crossner90@gmail.com>, 2018
 # Michito <crossner90@gmail.com>, 2019
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2018
@@ -21,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-11-27 09:40+0100\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: Ajob Kustra, 2024\n"
+"Last-Translator: Marcin Miłek, 2021-2022,2024\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/indico/indico/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -211,7 +211,7 @@ msgstr "Wydarzenie"
 #: indico/modules/rb/templates/booking_list.html indico/modules/vc/forms.py
 #: indico/modules/vc/templates/list_vc_rooms.html
 msgid "Contribution"
-msgstr "Wykład"
+msgstr "Wkład"
 
 #: indico/core/db/sqlalchemy/links.py
 msgid "Subcontribution"
@@ -284,17 +284,17 @@ msgstr "Wszystko (wszystkie metody)"
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Search"
-msgstr ""
+msgstr "Szukaj"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Synchronization"
-msgstr ""
+msgstr "Synchronizacja"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Payment"
-msgstr ""
+msgstr "Płatność"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
@@ -304,12 +304,12 @@ msgstr ""
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Videoconference"
-msgstr ""
+msgstr "Wideokonferencja"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Other"
-msgstr ""
+msgstr "Inne"
 
 #: indico/core/plugins/__init__.py indico/core/plugins/templates/index.html
 msgid "Plugins"
@@ -1307,7 +1307,7 @@ msgstr "Wykorzystaj materiał z wybranych sesji"
 #: indico/modules/events/timetable/templates/display/_weeks.html
 #: indico/modules/users/models/export.py
 msgid "Contributions"
-msgstr "Kontrybucje"
+msgstr "Wkłady"
 
 #: indico/modules/attachments/forms.py
 msgid "Include materials from selected contributions"
@@ -1409,12 +1409,12 @@ msgstr "Uprawnienia przesyłania plików zmienione pomyślnie"
 #: indico/modules/attachments/models/attachments.py
 msgctxt "Attachment type (noun)"
 msgid "File"
-msgstr ""
+msgstr "Plik"
 
 #: indico/modules/attachments/models/attachments.py
 msgctxt "Attachment type (noun)"
 msgid "Link"
-msgstr ""
+msgstr "Odnośnik"
 
 #: indico/modules/attachments/templates/_attachments.html
 msgid ""
@@ -1591,7 +1591,7 @@ msgstr "Zarządzaj materiałami dla '%(title)s'"
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/modules/rb/settings.py indico/modules/users/models/export.py
 msgid "None"
-msgstr "Brak"
+msgstr "Żaden"
 
 #: indico/modules/attachments/templates/_management_info_column.html
 #, python-format
@@ -1673,7 +1673,7 @@ msgstr "Pobrać"
 #: indico/modules/events/sessions/templates/management/types_dialog.html
 #: indico/modules/events/templates/reviewing_questions_management.html
 msgid "Close"
-msgstr "Zamknąć"
+msgstr "Zamknij"
 
 #: indico/modules/attachments/templates/upload.html
 #: indico/modules/categories/templates/management/settings.html
@@ -1832,7 +1832,7 @@ msgstr "Nazwisko"
 #: indico/modules/users/forms.py
 #: indico/modules/users/templates/registration_requests.html
 msgid "Affiliation"
-msgstr "Jednostka organizacyjna "
+msgstr "Afiliacja"
 
 #: indico/modules/auth/forms.py
 msgid "There is no profile with this email address."
@@ -2484,19 +2484,19 @@ msgstr ""
 
 #: indico/modules/categories/forms.py
 msgid "Certificate"
-msgstr ""
+msgstr "Certyfikat"
 
 #: indico/modules/categories/forms.py
 msgid "Your certificate in PEM format"
-msgstr ""
+msgstr "Twój certyfikat w formacie PEM"
 
 #: indico/modules/categories/forms.py
 msgid "Private Key"
-msgstr ""
+msgstr "Klucz prywatny"
 
 #: indico/modules/categories/forms.py
 msgid "Your private key in PEM format"
-msgstr ""
+msgstr "Twój klucz prywatny w formacie PEM"
 
 #: indico/modules/categories/forms.py
 msgid "Passphrase"
@@ -2571,7 +2571,7 @@ msgstr "Logo wyświetlane przy opisie kategorii. Reformatowane do rozmiaru 200 x
 #: indico/modules/events/sessions/forms.py
 #: indico/web/templates/forms/permissions_widget.html
 msgid "Permissions"
-msgstr "Zezwolenia"
+msgstr "Uprawnienia"
 
 #: indico/modules/categories/forms.py
 #: indico/modules/events/contributions/forms.py indico/modules/events/forms.py
@@ -3099,7 +3099,7 @@ msgstr[3] "W przeszłości jest %(count)s wydarzeń."
 #: indico/modules/events/surveys/templates/management/survey.html
 #: indico/modules/events/surveys/templates/management/survey_questionnaire.html
 msgid "Export"
-msgstr "Wyeksportuj"
+msgstr "Eksportuj"
 
 #: indico/modules/categories/templates/display/event_list.html
 msgid "You have favorited this event."
@@ -3560,7 +3560,7 @@ msgstr "Strona domowa"
 #: indico/modules/events/surveys/templates/management/edit_survey.html
 #: indico/modules/events/surveys/templates/management/survey.html
 msgid "General Settings"
-msgstr "ogólne ustawienia"
+msgstr "Ogólne ustawienia"
 
 #: indico/modules/core/captcha.py
 msgid "Incorrect answer"
@@ -3720,7 +3720,7 @@ msgstr "Utworzono kopię szablonu '{}'"
 
 #: indico/modules/designer/controllers.py
 msgid "Go to category"
-msgstr ""
+msgstr "Przejdź do kategorii"
 
 #: indico/modules/designer/controllers.py
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
@@ -4103,7 +4103,7 @@ msgstr "Odziedziczone szablony"
 #: indico/modules/designer/templates/_list.html
 #: indico/modules/designer/templates/backside_list.html
 msgid "Custom templates"
-msgstr "Szablony dostosowujące"
+msgstr "Własne szablony"
 
 #: indico/modules/designer/templates/_list.html
 msgid "Add a new blank designer template"
@@ -4361,7 +4361,7 @@ msgstr "Wstaw"
 
 #: indico/modules/designer/templates/template.html
 msgid "The back side is empty."
-msgstr "Rewers jest pusty."
+msgstr "Tylna strona jest pusta."
 
 #: indico/modules/designer/templates/template.html
 #, python-format
@@ -5266,7 +5266,7 @@ msgstr "Komentarz"
 #: indico/modules/events/abstracts/forms.py
 #: indico/modules/events/papers/forms.py
 msgid "Leave a comment for the submitter..."
-msgstr "Zostaw komentarz dla wysyłającego..."
+msgstr "Zostaw komentarz dla zgłaszającego..."
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Send notifications to submitter"
@@ -5526,7 +5526,7 @@ msgstr "Ostateczny termin modyfikowania zgłoszonych abstraktów"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Leave a comment..."
-msgstr "Skomentuj..."
+msgstr "Zostaw komentarz..."
 
 #: indico/modules/events/abstracts/forms.py
 #: indico/modules/events/contributions/contrib_fields.py
@@ -5713,7 +5713,7 @@ msgstr "Tytuł wysyłającego (Dr, Prof., itd.)"
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "Contribution URL"
-msgstr "URL kontrybucji"
+msgstr "URL wkładu"
 
 #: indico/modules/events/abstracts/placeholders.py
 msgid "The ID of the target abstract (merge or duplicate)"
@@ -5967,7 +5967,7 @@ msgstr ""
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Rejected"
-msgstr ""
+msgstr "Odrzucony"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
@@ -6155,7 +6155,7 @@ msgstr "Dostosuj szerokość kolumn"
 
 #: indico/modules/events/abstracts/templates/display/abstracts.html
 msgid "Search by #id or string"
-msgstr ""
+msgstr "Wyszukaj po #id lub ciągu znaków"
 
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html
 msgid "My abstracts"
@@ -6170,7 +6170,7 @@ msgstr "Moje abstrakty"
 #: indico/modules/events/papers/templates/display/reviewing_area.html
 #: indico/modules/events/sessions/templates/management/session_list.html
 msgid "Enter #id or search string"
-msgstr "Wprowadź #id lub szukany łańcuch"
+msgstr "Wprowadź #id lub wyszukiwany ciąg"
 
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html
 #: indico/modules/events/contributions/templates/display/contribution_display.html
@@ -6178,7 +6178,7 @@ msgstr "Wprowadź #id lub szukany łańcuch"
 #: indico/modules/events/sessions/templates/display/session_display.html
 #: indico/modules/events/templates/header.html
 msgid "Export to PDF"
-msgstr "Wyeksportuj do PDF"
+msgstr "Eksportuj do PDF"
 
 #: indico/modules/events/abstracts/templates/display/submission.html
 msgid "Submission instructions"
@@ -6511,7 +6511,7 @@ msgstr "Czy jesteś pewien że chcesz usunąć ten szablon?"
 
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html
 msgid "Show preview"
-msgstr "Pokaż podgląd "
+msgstr "Pokaż podgląd"
 
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html
 msgid "This email will be sent when the abstract is:"
@@ -6583,7 +6583,7 @@ msgstr "Czy naprawdę chcesz usunąć wybrane streszczenia?"
 #: indico/modules/events/sessions/templates/management/_types_table.html
 #: indico/modules/events/templates/reviewing_questions_management.html
 msgid "Confirm deletion"
-msgstr "Potwierdź kasowanie"
+msgstr "Potwierdź usunięcie"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgid ""
@@ -7449,7 +7449,7 @@ msgstr ""
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected"
-msgstr ""
+msgstr "Odrzucony"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
@@ -8387,7 +8387,7 @@ msgstr "Paczka materiałów"
 
 #: indico/modules/events/contributions/templates/management/contributions.html
 msgid "Export data"
-msgstr "Wyeksportuj dane"
+msgstr "Eksportuj dane"
 
 #: indico/modules/events/contributions/templates/management/contributions.html
 #: indico/modules/events/surveys/templates/management/survey.html
@@ -8776,7 +8776,7 @@ msgstr ""
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Rejected"
-msgstr ""
+msgstr "Odrzucony"
 
 #: indico/modules/events/editing/templates/emails/base_email.txt
 msgid "You can view details on the following URL:"
@@ -10810,7 +10810,7 @@ msgstr ""
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Rejected"
-msgstr ""
+msgstr "Odrzucony"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
@@ -10953,7 +10953,7 @@ msgstr "Odrzuć wybrane artykuły"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgctxt "Paper"
 msgid "Rejected"
-msgstr ""
+msgstr "Odrzucony"
 
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "Mark to be corrected selected papers"
@@ -15216,7 +15216,7 @@ msgstr ""
 
 #: indico/modules/events/registration/wallets/apple.py
 msgid "Link"
-msgstr "Link"
+msgstr "Odnośnik"
 
 #: indico/modules/events/registration/wallets/google.py
 msgid "Could not generate ticket"
@@ -15476,7 +15476,7 @@ msgstr ""
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Rejected"
-msgstr ""
+msgstr "Odrzucony"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
@@ -15613,7 +15613,7 @@ msgstr "Terminy:"
 
 #: indico/modules/events/requests/templates/emails/base_to_request_managers.txt
 msgid "Location:"
-msgstr "Położenie:"
+msgstr "Lokalizacja:"
 
 #: indico/modules/events/requests/templates/emails/base_to_request_managers.txt
 msgid "Requested by"
@@ -15989,7 +15989,7 @@ msgstr "Zarządzaj sesjami wydarzenia z poniższej listy lub skonfiguruj <strong
 
 #: indico/modules/events/sessions/templates/management/session_list.html
 msgid "Add new session"
-msgstr " Dodaj nową sesję "
+msgstr " Dodaj nową sesję"
 
 #: indico/modules/events/sessions/templates/management/session_list.html
 msgid "Remove selected sessions"
@@ -17044,7 +17044,7 @@ msgstr "Niewymienione wydarzenia pozwalają użytkownikom na konfigurowanie i do
 #: indico/modules/events/templates/display/access_key.html
 #: indico/web/flask/errors.py
 msgid "Access Denied"
-msgstr "Dostęp zakazany"
+msgstr "Brak dostępu"
 
 #: indico/modules/events/templates/display/access_key.html
 msgid "This event is protected with an access key."
@@ -17323,11 +17323,11 @@ msgstr "Własności bloku"
 
 #: indico/modules/events/templates/management/_create_event_button.html
 msgid "Create new lecture"
-msgstr "Utwórz nowy wykład "
+msgstr "Utwórz nowy wykład"
 
 #: indico/modules/events/templates/management/_create_event_button.html
 msgid "Create new meeting"
-msgstr "Utwórz nowe spotkanie "
+msgstr "Utwórz nowe spotkanie"
 
 #: indico/modules/events/templates/management/_create_event_button.html
 msgid "Create new conference"
@@ -17669,7 +17669,7 @@ msgstr "Obecnie na tym poziomie"
 
 #: indico/modules/events/timetable/templates/move_entry.html
 msgid "Move here"
-msgstr "Przesuń tutaj"
+msgstr "Przenieś tutaj"
 
 #: indico/modules/events/timetable/templates/session_management.html
 #, python-format
@@ -18265,7 +18265,7 @@ msgstr "Ten e-mail czeka i niedługo zostanie wysłany."
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "This email has been sent."
-msgstr "Ten e-mail wysłano."
+msgstr "Wiadomość została wysłana."
 
 #: indico/modules/logs/templates/entry_email.html
 msgid "Sending this email failed."
@@ -18977,7 +18977,7 @@ msgstr ""
 
 #: indico/modules/rb/templates/booking_list.html
 msgid "See reservation details"
-msgstr ""
+msgstr "Zobacz szczegóły rezerwacji"
 
 #: indico/modules/rb/templates/emails/email_footer.txt
 msgid "Best regards,"
@@ -19393,7 +19393,7 @@ msgstr ""
 #: indico/modules/search/templates/search.html indico/modules/search/views.py
 msgctxt "Page title"
 msgid "Search"
-msgstr ""
+msgstr "Szukaj"
 
 #: indico/modules/search/templates/category_search.html
 #, python-format
@@ -19858,7 +19858,7 @@ msgstr "nazwisko"
 
 #: indico/modules/users/models/users.py
 msgid "affiliation"
-msgstr "instytucja"
+msgstr "Afiliacja"
 
 #: indico/modules/users/models/users.py
 msgid "address"
@@ -20886,7 +20886,7 @@ msgstr "Wartośc minimalna musi być mniejsza od maksymalnej."
 
 #: indico/web/fields/simple.py
 msgid "Number"
-msgstr "Liczba"
+msgstr "Numer"
 
 #: indico/web/fields/simple.py
 msgid "Yes/No"
@@ -20910,7 +20910,7 @@ msgstr "Nieprawidłowy lub przeterminowany żeton."
 
 #: indico/web/flask/errors.py
 msgid "Something went wrong"
-msgstr "Coś poszło nie tak "
+msgstr "Coś poszło nie tak"
 
 #: indico/web/flask/errors.py
 msgid "There was a database error while processing your request."
@@ -20936,7 +20936,7 @@ msgstr[3] "To pole wyklucza się wzajemnie z innymi polami: {}"
 
 #: indico/web/forms/validators.py
 msgid "The passwords do not match."
-msgstr "Hasła nie są zgodne"
+msgstr "Hasła nie są zgodne."
 
 #: indico/web/forms/validators.py
 msgid "Invalid email address list"
@@ -21294,11 +21294,11 @@ msgstr "Wykonaj"
 
 #: indico/web/templates/confirmation_dialog.html
 msgid "I've changed my mind!"
-msgstr "Zmieniłem zdanie"
+msgstr "Zmieniłem zdanie!"
 
 #: indico/web/templates/error.html
 msgid "Report Error"
-msgstr "Zgłoś problem"
+msgstr "Zgłoś błąd"
 
 #: indico/web/templates/footer.html
 #, python-format

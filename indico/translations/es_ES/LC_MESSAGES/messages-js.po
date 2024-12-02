@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-27 09:40+0100\n"
+"POT-Creation-Date: 2024-12-01 19:59+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2021,2024\n"
 "Language-Team: Spanish (Spain) (http://app.transifex.com/indico/indico/language/es_ES/)\n"
@@ -72,6 +72,7 @@ msgid "empty"
 msgstr "vacío"
 
 #: indico/modules/categories/client/js/display.js
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} evento"
@@ -707,6 +708,13 @@ msgstr "Esta categoría está protegida"
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "Go to parent: {0}"
 msgstr "Ir a categoría superior: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
+msgid "{0} category"
+msgid_plural "{0} categories"
+msgstr[0] "{0} categoría"
+msgstr[1] "{0} categorías"
+msgstr[2] "{0} categorías"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."

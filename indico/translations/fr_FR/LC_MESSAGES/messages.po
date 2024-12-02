@@ -32,7 +32,7 @@ msgstr ""
 
 #: indico/core/emails.py
 msgid "{sender_name} (via {site_title})"
-msgstr ""
+msgstr "{sender_name} (via {site_title})"
 
 #: indico/core/errors.py
 msgid "You are not allowed to access this page."
@@ -289,27 +289,27 @@ msgstr "Rechercher"
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Synchronization"
-msgstr ""
+msgstr "Synchronisation"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Payment"
-msgstr ""
+msgstr "Paiement"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Importers"
-msgstr ""
+msgstr "Importateurs"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Videoconference"
-msgstr ""
+msgstr "Visioconférence"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Other"
-msgstr ""
+msgstr "Autre"
 
 #: indico/core/plugins/__init__.py indico/core/plugins/templates/index.html
 msgid "Plugins"
@@ -1399,12 +1399,12 @@ msgstr "Autorisations de télédépôt modifiées avec succès"
 #: indico/modules/attachments/models/attachments.py
 msgctxt "Attachment type (noun)"
 msgid "File"
-msgstr ""
+msgstr "Fichier"
 
 #: indico/modules/attachments/models/attachments.py
 msgctxt "Attachment type (noun)"
 msgid "Link"
-msgstr ""
+msgstr "Lien"
 
 #: indico/modules/attachments/templates/_attachments.html
 msgid ""
@@ -3243,7 +3243,7 @@ msgstr "Créer une sous-catégorie"
 #: indico/modules/categories/templates/management/_events_list.html
 msgctxt "Event"
 msgid "Hidden"
-msgstr ""
+msgstr "Caché"
 
 #: indico/modules/categories/templates/management/_events_list.html
 msgid "Event has a pending move request to another category"
@@ -3862,7 +3862,7 @@ msgstr "Nom complet D (abbrévié, sans titre)"
 #: indico/modules/events/management/forms.py
 msgctxt "Salutation"
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/registration/templates/management/import_invitations.html
@@ -4089,7 +4089,7 @@ msgstr "Ajouter un nouveau modèle "
 #: indico/modules/designer/templates/_list.html
 msgctxt "Custom template"
 msgid "Add new"
-msgstr ""
+msgstr "Ajouter un nouveau"
 
 #: indico/modules/designer/templates/_list.html
 #: indico/modules/designer/templates/backside_list.html
@@ -4836,13 +4836,13 @@ msgstr "Les conditions ne peuvent pas être vides"
 
 #: indico/modules/events/abstracts/fields.py
 msgid "You cannot combine the \"Invited\" rule with other rules"
-msgstr ""
+msgstr "Vous ne pouvez pas combiner la rêgle \"Invité\" avec d'autres rêgles"
 
 #: indico/modules/events/abstracts/fields.py
 msgid ""
 "Existing notification templates cannot be changed from/to \"Invited\"; "
 "please create a new one"
-msgstr ""
+msgstr "Les modèles de notification existants ne peuvent pas être modifiés de/vers \"Invité\"; veuillez en créer un nouveau"
 
 #: indico/modules/events/abstracts/fields.py
 #: indico/modules/events/contributions/fields.py
@@ -5199,7 +5199,7 @@ msgstr "La contribution générée sera assignée à cette session"
 #: indico/modules/events/abstracts/forms.py
 msgctxt "Abstract"
 msgid "Duplicate of"
-msgstr ""
+msgstr "Doublon de"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "The current abstract will be marked as duplicate of the selected one"
@@ -5208,7 +5208,7 @@ msgstr "Le résumé courant sera marqué comme un doublon de celui qui est séle
 #: indico/modules/events/abstracts/forms.py
 msgctxt "Abstract"
 msgid "Merge into"
-msgstr ""
+msgstr "Fusionner dans"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "The current abstract will be merged into the selected one"
@@ -5373,12 +5373,12 @@ msgstr "Corps du message"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Invitation email templates must contain the {placeholder} placeholder"
-msgstr ""
+msgstr "Les modèles de courriel d'invitation doivent contenir le paramètre de substitution {placeholder}"
 
 #: indico/modules/events/abstracts/forms.py
 msgid ""
 "Only invitation email templates may contain the {placeholder} placeholder"
-msgstr ""
+msgstr "Seuls les modèles de courriel d'invitation peuvent contenir le paramètre de substitution {placeholder}"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Email template"
@@ -5810,7 +5810,7 @@ msgstr[2] "{num} résumés ont été omis car ils étaient en cours d'évaluatio
 #: indico/modules/events/papers/controllers/paper.py
 msgctxt "Judge abstracts (verb)"
 msgid "Judge"
-msgstr ""
+msgstr "Juger"
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
 msgid "Abstract '{}' created successfully"
@@ -5876,7 +5876,7 @@ msgstr "Votre résumé '{}' a été déposé avec succès. Il est enregistré av
 msgid ""
 "Default notification templates added. You may customize them using the "
 "\"Notifications\" button."
-msgstr ""
+msgstr "Des modèles de notification par défaut ont été ajoutés. Vous pouvez les personnaliser en utilisant le bouton \"Notifications\"."
 
 #: indico/modules/events/abstracts/controllers/management.py
 msgid "Call for abstracts has been rescheduled"
@@ -5921,37 +5921,37 @@ msgstr "La thématique a été effacée."
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Submitted"
-msgstr ""
+msgstr "Déposé"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Withdrawn"
-msgstr ""
+msgstr "Retiré"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Merged"
-msgstr ""
+msgstr "Fusionné"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Duplicate"
-msgstr ""
+msgstr "Doublon"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Invited"
-msgstr ""
+msgstr "Invité"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgid "Awaiting Review"
@@ -6300,13 +6300,13 @@ msgstr "Nous avons reçu votre résumé \"{abstract_title}\" auquel nous avons a
 
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
 msgid "Abstract Withdrawn notification (#{abstract_id})"
-msgstr ""
+msgstr "Notification de retrait de résumé (#{abstract_id})"
 
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
 msgid ""
 "We're sorry to let you know that your abstract \"{abstract_title}\" with ID "
 "#{abstract_id} has been withdrawn."
-msgstr ""
+msgstr "Nous sommes désolés de vous informer que votre résumé \"{abstract_title}\" avec l'ID #{abstract_id} a été retiré."
 
 #: indico/modules/events/abstracts/templates/forms/edit_review_tracks.html
 msgid "The abstract is being reviewed for the following tracks:"
@@ -6533,7 +6533,7 @@ msgstr "Liste des résumés"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgctxt "Abstract"
 msgid "New"
-msgstr ""
+msgstr "Nouveau"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgid "Do you really want to delete the selected abstracts?"
@@ -6645,11 +6645,11 @@ msgid ""
 "No email notifications templates are configured for this event. You can add "
 "the default templates using the button below and customize them, or use the "
 "\"Notifications\" dialog to set up custom notification templates."
-msgstr ""
+msgstr "Aucun modèle de courriel de notification n'a été configuré pour cet événement. Vous pouvez ajouter les modèles par défaut en utilisant le bouton ci-dessous et les personnaliser, ou utiliser le dialogue \"Notifications\" pour mettre en place des modèles de notification personnalisés."
 
 #: indico/modules/events/abstracts/templates/management/overview.html
 msgid "Setup default notifications"
-msgstr ""
+msgstr "Configurer les notifications par défaut"
 
 #: indico/modules/events/abstracts/templates/management/overview.html
 msgid ""
@@ -7359,7 +7359,7 @@ msgstr "Paramètres de substitution manquants: {}"
 #: indico/modules/events/agreements/forms.py
 msgctxt "Agreement answer (noun)"
 msgid "Answer"
-msgstr ""
+msgstr "Réponse"
 
 #: indico/modules/events/agreements/forms.py indico/modules/legal/views.py
 msgid "Agreement"
@@ -7398,27 +7398,27 @@ msgstr "Lien vers la page du consentement"
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Pending"
-msgstr ""
+msgstr "En attente"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Accepted on behalf"
-msgstr ""
+msgstr "Accepté au nom de"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected on behalf"
-msgstr ""
+msgstr "Refusé au nom de"
 
 #: indico/modules/events/agreements/templates/agreement_form.html
 #, python-format
@@ -8031,7 +8031,7 @@ msgstr "Détails pour %(full_name)s"
 #: indico/modules/events/contributions/templates/display/contribution_author.html
 msgctxt "Salutation"
 msgid "Title:"
-msgstr ""
+msgstr "Titre:"
 
 #: indico/modules/events/contributions/templates/display/contribution_author.html
 #: indico/modules/users/templates/emails/profile_registered_admins.txt
@@ -8704,32 +8704,32 @@ msgstr "Article"
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "New"
-msgstr ""
+msgstr "Nouveau"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Ready for Review"
-msgstr ""
+msgstr "Prêt pour la Relecture"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Needs Confirmation"
-msgstr ""
+msgstr "Confirmation requise"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Needs Changes"
-msgstr ""
+msgstr "Modifications Requises"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/editing/templates/emails/base_email.txt
 msgid "You can view details on the following URL:"
@@ -8933,12 +8933,12 @@ msgstr "Aucun thème sélectionné"
 #: indico/modules/events/layout/forms.py
 msgctxt "Theme name"
 msgid "Orange"
-msgstr ""
+msgstr "Orange"
 
 #: indico/modules/events/layout/forms.py
 msgctxt "Theme name"
 msgid "Brown"
-msgstr ""
+msgstr "Marron"
 
 #: indico/modules/events/layout/forms.py
 msgid "Right menu"
@@ -8998,11 +8998,11 @@ msgstr "Couleur de fond"
 
 #: indico/modules/events/layout/forms.py
 msgid "Use logo as banner"
-msgstr ""
+msgstr "Utiliser le logo comme bandeau"
 
 #: indico/modules/events/layout/forms.py
 msgid "Use the event logo as a full-width banner."
-msgstr ""
+msgstr "Utiliser le logo de l'événement comme bandeau pleine largeur."
 
 #: indico/modules/events/layout/forms.py
 msgid "Short message shown below the title"
@@ -9066,7 +9066,7 @@ msgid ""
 "will be displayed above the event title and the optimal width is {}px. "
 "Otherwise, the logo will be displayed to left of the event title and the "
 "optimal width is {}px."
-msgstr ""
+msgstr "Logo à afficher sur la page de l'événement. Quand configuré comme bandeau, le logo sera affiché au-dessus du titre de l'événement et la largeur optimale est {}px. Sinon, le logo sera affiché à gauche du titre et la largeur optimale est {}px."
 
 #: indico/modules/events/layout/forms.py
 msgid "Custom CSS file"
@@ -9122,13 +9122,13 @@ msgstr "L'image '{}' a été supprimée"
 msgid ""
 "The event logo is too small. It is recommended to use a logo with a width of"
 " at least {}px."
-msgstr ""
+msgstr "Le logo de l'événement est trop petit. Il est recommandé d'utiliser un logo avec une largeur d'au moins {}px."
 
 #: indico/modules/events/layout/controllers/layout.py
 msgid ""
 "The event logo is too large. It is recommended to use a logo with a width of"
 " at most {}px."
-msgstr ""
+msgstr "Le logo de l'événement est trop large. Il est recommandé d'utiliser un logo d'une largeur d'au plus {}px."
 
 #: indico/modules/events/layout/controllers/layout.py
 msgid "You cannot upload this file as a logo."
@@ -9647,7 +9647,7 @@ msgstr "Vous pouvez créer un maximum de 100 clones à la fois"
 #: indico/modules/events/management/forms.py
 msgctxt "Repetition"
 msgid "Every"
-msgstr ""
+msgstr "Tous les"
 
 #: indico/modules/events/management/forms.py
 msgid "The time period must be positive"
@@ -10509,7 +10509,7 @@ msgstr "Donne les droits d'administration pour l'examen par les pairs des articl
 #: indico/modules/events/papers/__init__.py
 msgctxt "Paper judgment rights"
 msgid "Judge"
-msgstr ""
+msgstr "Juger"
 
 #: indico/modules/events/papers/__init__.py
 msgid "Grants paper judgment rights for assigned papers."
@@ -10624,7 +10624,7 @@ msgstr "Non assigné"
 #: indico/modules/events/papers/settings.py
 msgctxt "Paper reviewing role"
 msgid "Judge"
-msgstr ""
+msgstr "Juge"
 
 #: indico/modules/events/papers/settings.py
 msgid "Layout Reviewer"
@@ -10744,17 +10744,17 @@ msgstr "Visible pour les contributeurs, les réviseurs et les juges"
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Submitted"
-msgstr ""
+msgstr "Déposé"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/papers/models/revisions.py
 msgctxt "Paper revision"
@@ -10888,7 +10888,7 @@ msgstr "Accepter les articles sélectionnés"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgctxt "Paper"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "Reject selected papers"
@@ -10897,7 +10897,7 @@ msgstr "Refuser les articles sélectionnés"
 #: indico/modules/events/papers/templates/_paper_list.html
 msgctxt "Paper"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/papers/templates/_paper_list.html
 msgid "Mark to be corrected selected papers"
@@ -12367,7 +12367,7 @@ msgstr "Attacher un fichier iCalendar au mail envoyé lorsqu'une inscription est
 
 #: indico/modules/events/registration/forms.py
 msgid "Enable e-mail notifications about registrations to organizers"
-msgstr ""
+msgstr "Activer les notifications par courriel aux organisateurs a propos des inscriptions"
 
 #: indico/modules/events/registration/forms.py
 msgid "List of recipients"
@@ -12386,29 +12386,29 @@ msgstr "Adresse électronique utilisée comme l'expéditeur de toutes les notifi
 #: indico/modules/events/registration/forms.py
 msgid ""
 "Text included in emails sent to pending registrations (Markdown syntax)."
-msgstr ""
+msgstr "Texte inclus dans les courriels envoyés aux inscrits en attente (syntaxe Markdown)."
 
 #: indico/modules/events/registration/forms.py
 msgid "Pending Registration Preview"
-msgstr ""
+msgstr "Aperçu des inscriptions en attente"
 
 #: indico/modules/events/registration/forms.py
 msgid ""
 "Text included in emails sent to unpaid registrations (Markdown syntax)."
-msgstr ""
+msgstr "Texte inclus dans les courriels envoyés aux inscriptions impayées (syntaxe Markdown)."
 
 #: indico/modules/events/registration/forms.py
 msgid "Unpaid Registration Preview"
-msgstr ""
+msgstr "Aperçu des inscriptions non payées"
 
 #: indico/modules/events/registration/forms.py
 msgid ""
 "Text included in emails sent to complete registrations (Markdown syntax)."
-msgstr ""
+msgstr "Texte inclus dans les courriels envoyés aux inscriptions finalisées (syntaxe Markdown)."
 
 #: indico/modules/events/registration/forms.py
 msgid "Complete Registration Preview"
-msgstr ""
+msgstr "Aperçu des inscriptions finalisées"
 
 #: indico/modules/events/registration/forms.py
 msgid "Participant list visibility"
@@ -12949,7 +12949,7 @@ msgstr "Ligne {}: une invitation pour cet utilisateur existe déjà"
 
 #: indico/modules/events/registration/controllers/__init__.py
 msgid "Could not process image, it may be corrupted or too big"
-msgstr ""
+msgstr "Impossible de traiter l'image, elle pourrait être corrompue ou trop grosse"
 
 #: indico/modules/events/registration/controllers/display.py
 msgid "This registration form is private."
@@ -13084,7 +13084,7 @@ msgstr "Télécharger les pièces jointes"
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "Download Attachments (flat)"
-msgstr ""
+msgstr "Télécharger les pièces jointes (à plat)"
 
 #: indico/modules/events/registration/controllers/management/reglists.py
 msgid "Edit Tags"
@@ -13320,17 +13320,17 @@ msgstr "Jusqu'à l'approbation"
 #: indico/modules/events/registration/models/invitations.py
 msgctxt "Invitation"
 msgid "Pending"
-msgstr ""
+msgstr "En attente"
 
 #: indico/modules/events/registration/models/invitations.py
 msgctxt "Invitation"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/registration/models/invitations.py
 msgctxt "Invitation"
 msgid "Declined"
-msgstr ""
+msgstr "Décliné"
 
 #: indico/modules/events/registration/models/registrations.py
 msgid "Completed"
@@ -13382,7 +13382,7 @@ msgstr "Lien pour accepter/décliner l'invitation"
 
 #: indico/modules/events/registration/placeholders/registrations.py
 msgid "Picture of the person"
-msgstr ""
+msgstr "Photo de la personne"
 
 #: indico/modules/events/registration/placeholders/registrations.py
 msgid "The ID of the registration"
@@ -14798,7 +14798,7 @@ msgstr "Notifications pour les participants"
 
 #: indico/modules/events/registration/templates/management/regform_edit.html
 msgid "Notifications for organizers"
-msgstr ""
+msgstr "Notifications pour les organisateurs"
 
 #: indico/modules/events/registration/templates/management/regform_invitations.html
 #, python-format
@@ -15042,7 +15042,7 @@ msgstr "Ajouter des inscriptions"
 #: indico/modules/events/registration/templates/management/registration_details.html
 #, python-format
 msgid "Details for #%(friendly_id)s: %(registrant_name)s in \"%(regform_title)s\""
-msgstr ""
+msgstr "Détails pour #%(friendly_id)s: %(registrant_name)s dans \"%(regform_title)s\""
 
 #: indico/modules/events/registration/templates/management/registration_details.html
 msgid ""
@@ -15085,7 +15085,7 @@ msgstr "Il n'y a pas d'étiquette."
 
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 msgid "Customize registration list"
-msgstr ""
+msgstr "Personnaliser la liste des inscriptions"
 
 #: indico/modules/events/registration/templates/management/reglist_filter.html
 #, python-format
@@ -15386,22 +15386,22 @@ msgstr "Vous avez retiré votre demande ({0})"
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Pending"
-msgstr ""
+msgstr "En attente"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/requests/models/requests.py
 msgctxt "Event request"
 msgid "Withdrawn"
-msgstr ""
+msgstr "Retiré"
 
 #: indico/modules/events/requests/templates/event_request_details.html
 msgid "Send request"
@@ -15986,12 +15986,12 @@ msgstr "Copie hors connexion existantes"
 #: indico/modules/events/static/templates/static_sites.html
 msgctxt "Offline copy of an event"
 msgid "Requested by"
-msgstr ""
+msgstr "Demandée par"
 
 #: indico/modules/events/static/templates/static_sites.html
 msgctxt "Offline copy of an event"
 msgid "Requested on"
-msgstr ""
+msgstr "Demandée le"
 
 #: indico/modules/events/static/templates/static_sites.html
 msgid "There are no offline copies of this event."
@@ -16139,7 +16139,7 @@ msgstr "Le titre de la section."
 
 #: indico/modules/events/surveys/forms.py
 msgid "You may use Markdown for formatting."
-msgstr ""
+msgstr "Vous pouvez utiliser le Markdown pour la mise en forme."
 
 #: indico/modules/events/surveys/forms.py
 msgid "The text that should be displayed."
@@ -16267,7 +16267,7 @@ msgstr "Le titre de la question"
 msgid ""
 "The description (shown below the question's field). You may use Markdown for"
 " formatting."
-msgstr ""
+msgstr "La description (affichée sous le champ de la question). Vous pouvez formatter en Markdown. "
 
 #: indico/modules/events/surveys/fields/base.py
 msgid "If the user has to answer the question."
@@ -17268,7 +17268,7 @@ msgstr "Le %(dt)s par %(name)s"
 #: indico/modules/events/templates/reviews/_common.html
 msgctxt "Review comment"
 msgid "edited"
-msgstr ""
+msgstr "modifié"
 
 #: indico/modules/events/templates/reviews/_common.html
 #, python-format
@@ -17342,7 +17342,7 @@ msgstr "Modifier le commentaire"
 #: indico/modules/events/templates/reviews/forms.html
 msgctxt "Leave a comment (verb)"
 msgid "Comment"
-msgstr ""
+msgstr "Commenter"
 
 #: indico/modules/events/templates/reviews/forms.html
 msgid "Rating this question is mandatory"
@@ -17893,11 +17893,11 @@ msgstr "Ajouter une thématique"
 
 #: indico/modules/files/controllers.py
 msgid "The uploaded file is too large"
-msgstr ""
+msgstr "Le fichier télédéposé est trop gros"
 
 #: indico/modules/files/controllers.py
 msgid "The uploaded file is not allowed"
-msgstr ""
+msgstr "Le fichier télédéposé n'est pas autorisé"
 
 #: indico/modules/groups/__init__.py
 msgid "Groups"
@@ -17906,7 +17906,7 @@ msgstr "Groupes"
 #: indico/modules/groups/controllers.py
 msgctxt "User groups"
 msgid "All"
-msgstr ""
+msgstr "Tous"
 
 #: indico/modules/groups/controllers.py
 msgid "Local Groups"
@@ -18220,7 +18220,7 @@ msgstr "Sous-réseaux IPv4 ou IPv6 en notation CIDR"
 #: indico/modules/networks/forms.py
 msgctxt "IP network"
 msgid "Hidden"
-msgstr ""
+msgstr "Caché"
 
 #: indico/modules/networks/forms.py
 msgid "Hidden IP networks cannot be added to ACLs by users"
@@ -18323,7 +18323,7 @@ msgstr "La nouvelle '{title}' a été supprimée"
 
 #: indico/modules/news/forms.py
 msgid "Show headlines"
-msgstr ""
+msgstr "Montrer les titres"
 
 #: indico/modules/news/forms.py
 msgid "Whether to show the latest news headlines on the Indico home page."
@@ -18443,7 +18443,7 @@ msgstr "Plus d'un URL peut être spécifié en ajoutant de nouvelles lignes. Le 
 
 #: indico/modules/oauth/forms.py
 msgid "Allowed scopes"
-msgstr ""
+msgstr "Périmètres autorisés:"
 
 #: indico/modules/oauth/forms.py
 msgid "Only scopes from this list may be requested by the app."
@@ -18485,7 +18485,7 @@ msgstr "Quelle est l'utilisation de ce jeton ?"
 
 #: indico/modules/oauth/forms.py
 msgid "Scopes"
-msgstr ""
+msgstr "Périmètres"
 
 #: indico/modules/oauth/forms.py
 msgid "Scopes define what kind of access the token has."
@@ -18692,7 +18692,7 @@ msgstr "Réservations de salle"
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Book"
-msgstr ""
+msgstr "Réserver"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows booking the room"
@@ -18701,7 +18701,7 @@ msgstr "Autorise la réservation de cette salle"
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Prebook"
-msgstr ""
+msgstr "Préréserver"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows prebooking the room"
@@ -18710,7 +18710,7 @@ msgstr "Autorise la pré-réservation de cette salle"
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Override"
-msgstr ""
+msgstr "Contourner"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows overriding restrictions when booking the room"
@@ -18719,7 +18719,7 @@ msgstr "Autorise le contournement des restrictions pour la réservation de la sa
 #: indico/modules/rb/__init__.py
 msgctxt "Room booking permission name"
 msgid "Moderate"
-msgstr ""
+msgstr "Modérer"
 
 #: indico/modules/rb/__init__.py
 msgid "Allows moderating bookings (approving/rejecting/editing)"
@@ -19910,7 +19910,7 @@ msgstr "Votre <strong>adresse principale</strong> sera utilisée pour des notifi
 #: indico/modules/users/templates/emails.html
 msgctxt "E-mail"
 msgid "Primary"
-msgstr ""
+msgstr "Principal"
 
 #: indico/modules/users/templates/emails.html
 msgid "Set as primary"
@@ -20109,13 +20109,13 @@ msgstr "Visioconférence"
 msgid ""
 "There was a videoconference associated with this contribution. It has been "
 "linked to the event instead"
-msgstr ""
+msgstr "Il existait une visioconférence associée à cette contribution. Elle a été liée à l'événement."
 
 #: indico/modules/vc/__init__.py
 msgid ""
 "There was a videoconference associated with this session block. It has been "
 "linked to the event instead"
-msgstr ""
+msgstr "Il existait une visioconférence associée à ce bloc de session. Elle a été liée à l'événement."
 
 #: indico/modules/vc/clone.py
 msgid "The target event already has a videoconference"
@@ -21095,7 +21095,7 @@ msgstr "Le fuseau horaire de votre profil:"
 
 #: indico/web/templates/_session_bar.html
 msgid "Use timezone based on:"
-msgstr ""
+msgstr "Utiliser le fuseau horaire basé sur:"
 
 #: indico/web/templates/_session_bar.html
 msgid "Use the event/category timezone"

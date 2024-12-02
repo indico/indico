@@ -24,7 +24,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-11-27 09:40+0100\n"
 "PO-Revision-Date: 2011-07-07 13:41+0000\n"
-"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2017-2018,2020-2024\n"
 "Language-Team: Spanish (Spain) (http://app.transifex.com/indico/indico/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +35,7 @@ msgstr ""
 
 #: indico/core/emails.py
 msgid "{sender_name} (via {site_title})"
-msgstr ""
+msgstr "{sender_name} (vía {site_title})"
 
 #: indico/core/errors.py
 msgid "You are not allowed to access this page."
@@ -287,32 +287,32 @@ msgstr "Todo (todos los métodos)"
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Search"
-msgstr ""
+msgstr "Buscar"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Synchronization"
-msgstr ""
+msgstr "Sincronización"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Payment"
-msgstr ""
+msgstr "Pago"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Importers"
-msgstr ""
+msgstr "Importadores"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Videoconference"
-msgstr ""
+msgstr "Videoconferencia"
 
 #: indico/core/plugins/__init__.py
 msgctxt "Plugin category title"
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 #: indico/core/plugins/__init__.py indico/core/plugins/templates/index.html
 msgid "Plugins"
@@ -1402,12 +1402,12 @@ msgstr "Los permisos de carga cambiaron correctamente"
 #: indico/modules/attachments/models/attachments.py
 msgctxt "Attachment type (noun)"
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
 #: indico/modules/attachments/models/attachments.py
 msgctxt "Attachment type (noun)"
 msgid "Link"
-msgstr ""
+msgstr "Enlace"
 
 #: indico/modules/attachments/templates/_attachments.html
 msgid ""
@@ -1454,7 +1454,7 @@ msgstr "Eliminar"
 msgid ""
 "Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
 "attachment permanently."
-msgstr ""
+msgstr "¿Está seguro de querer borrar &quot;%(name)s&quot;? Esto eliminará el archivo adjunto de forma permanente."
 
 #: indico/modules/attachments/templates/_attachments.html
 msgid ""
@@ -1484,7 +1484,7 @@ msgstr "Editar carpeta"
 msgid ""
 "Are you sure you want to remove &quot;%(name)s&quot;? This will remove the "
 "folder and its contents permanently."
-msgstr ""
+msgstr "¿Está seguro de querer borrar &quot;%(name)s&quot;? Esto eliminará la carpeta de forma permanente."
 
 #: indico/modules/attachments/templates/_attachments.html
 msgid "empty folder"
@@ -1721,7 +1721,7 @@ msgstr "Ha validado con éxito su dirección de correo electrónico y ahora pued
 msgid ""
 "Please finish or cancel your pending registration before attempting to "
 "register with another email address."
-msgstr ""
+msgstr "Finalice o cancele su registro pendiente antes de intentar registrarse con otra dirección de correo electrónico."
 
 #: indico/modules/auth/controllers.py
 msgid "Too many signup attempts. Please wait {}"
@@ -2084,7 +2084,7 @@ msgid ""
 "indeed your email address.  This is a one-time action. Afterwards, you will "
 "be able to log in using the same authentication method without going through"
 " this step."
-msgstr ""
+msgstr "Intentó iniciar sesión en su perfil \"%(name)s\" con un nuevo método de autenticación. Para finalizar el proceso de inicio de sesión, debe verificar que %(email)s sea su dirección de correo electrónico. Esta es una acción que se realiza una sola vez. Luego, podrá iniciar sesión con el mismo método de autenticación sin tener que realizar este paso."
 
 #: indico/modules/auth/templates/emails/link_identity_verify_email.txt
 msgid "Please click the following link to finish the login process:"
@@ -2099,7 +2099,7 @@ msgstr "Estimado usuario,"
 msgid ""
 "You started the Indico profile creation process. To continue, you need to "
 "verify that %(email)s is indeed your email address."
-msgstr ""
+msgstr "Ha iniciado el proceso de creación de perfil en Indico. Para continuar, debe verificar que %(email)s sea efectivamente su dirección de correo electrónico."
 
 #: indico/modules/auth/templates/emails/register_verify_email.txt
 msgid "Please click the following link to continue the registration process:"
@@ -2386,7 +2386,7 @@ msgstr "Permita que los usuarios vean todos los eventos que cuelgan de esta cate
 
 #: indico/modules/categories/forms.py
 msgid "Future months threshold"
-msgstr ""
+msgstr "Umbral de meses próximos"
 
 #: indico/modules/categories/forms.py
 msgid ""
@@ -2434,114 +2434,114 @@ msgid ""
 "The Google Wallet configuration is, by default, inherited from the parent "
 "category. You can also explicitly disable it or provide your own "
 "configuration instead."
-msgstr ""
+msgstr "La configuración de Google Wallet se hereda de la categoría principal de forma predeterminada. También puede desactivarla explícitamente o proporcionar su propia configuración."
 
 #: indico/modules/categories/forms.py
 msgid "Google Credentials"
-msgstr ""
+msgstr "Credenciales de Google"
 
 #: indico/modules/categories/forms.py
 msgid "JSON key credentials for the Google Service Account"
-msgstr ""
+msgstr "Credenciales de clave JSON para la cuenta de servicio de Google"
 
 #: indico/modules/categories/forms.py
 msgid "Issuer Name"
-msgstr ""
+msgstr "Nombre del emisor"
 
 #: indico/modules/categories/forms.py
 msgid ""
 "Issuer name that will appear in the Google Wallet ticket top header. Google "
 "recommends a maximum length of 20 chars to ensure readability on all "
 "devices."
-msgstr ""
+msgstr "Nombre del emisor que aparecerá en el encabezado superior del ticket de Google Wallet. Google recomienda una longitud máxima de 20 caracteres para garantizar la legibilidad en todos los dispositivos."
 
 #: indico/modules/categories/forms.py
 msgid "Issuer ID"
-msgstr ""
+msgstr "ID del emisor"
 
 #: indico/modules/categories/forms.py
 msgid ""
 "Issuer ID assigned in the \"Google Pay & Wallet\" console. The same Issuer "
 "ID must never be used on more than one Indico server. Changing it will also "
 "break updates to any existing tickets."
-msgstr ""
+msgstr "ID de emisor asignado en la consola \"Google Pay & Wallet\". Nunca se debe utilizar el mismo ID de emisor en más de un servidor de Indico. Si lo cambia, también se interrumpirán las actualizaciones de los tickets existentes."
 
 #: indico/modules/categories/forms.py
 msgid ""
 "The Apple Wallet configuration is, by default, inherited from the parent "
 "category. You can also explicitly disable it or provide your own "
 "configuration instead."
-msgstr ""
+msgstr "La configuración de Apple Wallet se hereda de la categoría principal de forma predeterminada. También puede desactivarla explícitamente o proporcionar su propia configuración."
 
 #: indico/modules/categories/forms.py
 msgid "Certificate"
-msgstr ""
+msgstr "Certificado"
 
 #: indico/modules/categories/forms.py
 msgid "Your certificate in PEM format"
-msgstr ""
+msgstr "Su certificado en formato PEM"
 
 #: indico/modules/categories/forms.py
 msgid "Private Key"
-msgstr ""
+msgstr "Clave privada"
 
 #: indico/modules/categories/forms.py
 msgid "Your private key in PEM format"
-msgstr ""
+msgstr "Su clave privada en formato PEM"
 
 #: indico/modules/categories/forms.py
 msgid "Passphrase"
-msgstr ""
+msgstr "Frase de contraseña"
 
 #: indico/modules/categories/forms.py
 msgid ""
 "The passphrase used to decrypt the private key. Leave this empty if the "
 "private key is not encrypted."
-msgstr ""
+msgstr "La contraseña utilizada para descifrar la clave privada. Déjela en blanco si la clave privada no está cifrada."
 
 #: indico/modules/categories/forms.py
 msgid "The credentials could not be loaded."
-msgstr ""
+msgstr "No se pudieron cargar las credenciales."
 
 #: indico/modules/categories/forms.py
 msgid ""
 "The credentials are invalid or have no access to the Google Wallet API."
-msgstr ""
+msgstr "Las credenciales no son válidas o no tienen acceso a la API de Google Wallet."
 
 #: indico/modules/categories/forms.py
 msgid ""
 "There was an error validating your credentials. Contact your Indico "
 "administrator for details."
-msgstr ""
+msgstr "Se produjo un error al validar sus credenciales. Comuníquese con su administrador de Indico para obtener más detalles."
 
 #: indico/modules/categories/forms.py
 msgid "The Issuer ID is invalid or not linked to your credentials."
-msgstr ""
+msgstr "El ID del emisor no es válido o no está vinculado a sus credenciales."
 
 #: indico/modules/categories/forms.py
 msgid "The provided certificate is malformed."
-msgstr ""
+msgstr "El certificado proporcionado está mal formado."
 
 #: indico/modules/categories/forms.py
 msgid "The private key is malformed."
-msgstr ""
+msgstr "La clave privada está mal formada."
 
 #: indico/modules/categories/forms.py
 msgid "The private key is invalid."
-msgstr ""
+msgstr "La clave privada no es válida."
 
 #: indico/modules/categories/forms.py
 msgid "The provided key is not encrypted, do not specify a password."
-msgstr ""
+msgstr "La clave proporcionada no está encriptada, no especifique una contraseña."
 
 #: indico/modules/categories/forms.py
 msgid ""
 "The provided key is encrypted, you must specify the password to decrypt it."
-msgstr ""
+msgstr "La clave proporcionada está encriptada, debe especificar la contraseña para desencriptarla."
 
 #: indico/modules/categories/forms.py
 msgid "The provided password is incorrect."
-msgstr ""
+msgstr "La contraseña proporcionada es incorrecta."
 
 #: indico/modules/categories/forms.py
 msgid ""
@@ -2925,19 +2925,19 @@ msgstr "Sin restricciones"
 
 #: indico/modules/categories/models/categories.py
 msgid "Disabled: Ignore any inherited configuration"
-msgstr ""
+msgstr "Desactivado: ignora cualquier configuración heredada"
 
 #: indico/modules/categories/models/categories.py
 msgid "Enabled: Use configuration from this category"
-msgstr ""
+msgstr "Habilitado: utilizar la configuración de esta categoría"
 
 #: indico/modules/categories/models/categories.py
 msgid "Inheriting: Use value from parent category (Enabled)"
-msgstr ""
+msgstr "Herencia: utilizar el valor de la categoría principal (habilitado)"
 
 #: indico/modules/categories/models/categories.py
 msgid "Inheriting: Use value from parent category (Disabled)"
-msgstr ""
+msgstr "Herencia: utilizar el valor de la categoría principal (deshabilitado)"
 
 #: indico/modules/categories/templates/category_statistics.html
 msgid "Category page"
@@ -3043,12 +3043,12 @@ msgstr "Regrese a la vista de categoría única."
 
 #: indico/modules/categories/templates/display/category_list.html
 msgid "Skip to category list"
-msgstr ""
+msgstr "Saltar a la lista de categorías"
 
 #: indico/modules/categories/templates/display/category_list.html
 #, python-format
 msgid "Categories in %(category_title)s"
-msgstr ""
+msgstr "Categorías en %(category_title)s"
 
 #: indico/modules/categories/templates/display/event_list.html
 msgid "Some events in the list below have been hidden."
@@ -3246,7 +3246,7 @@ msgstr "Crear subcategoría"
 #: indico/modules/categories/templates/management/_events_list.html
 msgctxt "Event"
 msgid "Hidden"
-msgstr ""
+msgstr "Oculto"
 
 #: indico/modules/categories/templates/management/_events_list.html
 msgid "Event has a pending move request to another category"
@@ -3307,7 +3307,7 @@ msgstr "No hay eventos en esta categoría"
 #: indico/modules/categories/templates/management/base.html
 #, python-format
 msgid "Do you really want to delete the category &quot;%(category)s&quot;?"
-msgstr ""
+msgstr "¿Realmente quieres eliminar la categoría &quot;%(category)s&quot;?"
 
 #: indico/modules/categories/templates/management/base.html
 #: indico/modules/categories/templates/management/delete_categories.html
@@ -3409,11 +3409,11 @@ msgstr "Borrar"
 #: indico/modules/events/registration/templates/display/conference_home.html
 #: indico/modules/events/registration/templates/display/registration_summary.html
 msgid "Google Wallet"
-msgstr ""
+msgstr "Google Wallet"
 
 #: indico/modules/categories/templates/management/settings.html
 msgid "Apple Wallet"
-msgstr ""
+msgstr "Cartera Apple"
 
 #: indico/modules/categories/templates/management/settings.html
 msgid "Event Header"
@@ -3569,7 +3569,7 @@ msgstr "La organización que sostiene este sitio Indico."
 
 #: indico/modules/core/forms.py
 msgid "Show a share widget in the footer of event pages."
-msgstr ""
+msgstr "Mostrar un widget para compartir en el pie de página de las páginas de eventos."
 
 #: indico/modules/core/forms.py
 msgid "Site"
@@ -3701,7 +3701,7 @@ msgstr "La copia de la plantilla '{}' ha sido creada"
 
 #: indico/modules/designer/controllers.py
 msgid "Go to category"
-msgstr ""
+msgstr "Ir a la categoría"
 
 #: indico/modules/designer/controllers.py
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html
@@ -3725,11 +3725,11 @@ msgstr "El archivo de imagen no pertenece a esta plantilla."
 
 #: indico/modules/designer/controllers.py
 msgid "Invalid color in field \"{}\": {}"
-msgstr ""
+msgstr "Color no válido en el campo \"{}\": {}"
 
 #: indico/modules/designer/controllers.py
 msgid "Invalid background color in field \"{}\": {}"
-msgstr ""
+msgstr "Color de fondo no válido en el campo \"{}\": {}"
 
 #: indico/modules/designer/controllers.py
 msgid "Template successfully saved."
@@ -3737,11 +3737,11 @@ msgstr "Plantilla guardada satisfactoriamente."
 
 #: indico/modules/designer/controllers.py
 msgid "Template successfully linked."
-msgstr ""
+msgstr "Plantilla vinculada correctamente."
 
 #: indico/modules/designer/controllers.py
 msgid "Template successfully unlinked."
-msgstr ""
+msgstr "Plantilla desvinculada con éxito."
 
 #: indico/modules/designer/controllers.py
 #: indico/modules/events/layout/controllers/images.py
@@ -3781,11 +3781,11 @@ msgstr "Datos fijos"
 
 #: indico/modules/designer/placeholders.py
 msgid "Common Registrant Data"
-msgstr ""
+msgstr "Datos comunes del inscrito"
 
 #: indico/modules/designer/placeholders.py
 msgid "Custom Registrant Data"
-msgstr ""
+msgstr "Datos de registro personalizados"
 
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/layout/templates/layout_conference.html
@@ -3865,7 +3865,7 @@ msgstr "Nombre completo D (abrev. sin título)"
 #: indico/modules/events/management/forms.py
 msgctxt "Salutation"
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/registration/templates/management/import_invitations.html
@@ -3881,7 +3881,7 @@ msgstr "Apellidos"
 
 #: indico/modules/designer/placeholders.py
 msgid "Last Name (uppercase)"
-msgstr ""
+msgstr "Apellido (mayúsculas)"
 
 #: indico/modules/designer/placeholders.py
 #: indico/modules/events/registration/controllers/management/reglists.py
@@ -3900,15 +3900,15 @@ msgstr "Precio (con moneda)"
 
 #: indico/modules/designer/placeholders.py
 msgid "Number of accompanying persons"
-msgstr ""
+msgstr "Número de acompañantes"
 
 #: indico/modules/designer/placeholders.py
 msgid "Accompanying persons"
-msgstr ""
+msgstr "Acompañantes"
 
 #: indico/modules/designer/placeholders.py
 msgid "Accompanying persons (abbrev.)"
-msgstr ""
+msgstr "Acompañantes (abreviado)"
 
 #: indico/modules/designer/placeholders.py
 msgid "Registration ID"
@@ -3940,7 +3940,7 @@ msgstr "Teléfono"
 
 #: indico/modules/designer/placeholders.py
 msgid "Picture"
-msgstr ""
+msgstr "Fotografía"
 
 #: indico/modules/designer/placeholders.py
 msgid "Ticket QR Code"
@@ -3957,7 +3957,7 @@ msgstr "Imagen fija"
 
 #: indico/modules/designer/placeholders.py
 msgid "No accommodation"
-msgstr ""
+msgstr "Sin alojamiento"
 
 #: indico/modules/designer/templates/_list.html
 msgid "Registration Form has no registrations"
@@ -3983,19 +3983,19 @@ msgstr "Vinculado a"
 
 #: indico/modules/designer/templates/_list.html
 msgid "Unlink registration form"
-msgstr ""
+msgstr "Desvincular formulario de inscripción"
 
 #: indico/modules/designer/templates/_list.html
 msgid ""
 "This template cannot be unlinked because it contains placeholders "
 "referencing the linked registration form."
-msgstr ""
+msgstr "Esta plantilla no puede desvincularse porque contiene marcadores de posición que hacen referencia al formulario de registro vinculado."
 
 #: indico/modules/designer/templates/_list.html
 msgid ""
 "Link to a registration form. This will enable you to use all registration "
 "form fields in the template."
-msgstr ""
+msgstr "Enlace a un formulario de registro. Esto le permitirá utilizar todos los campos del formulario de registro en la plantilla."
 
 #: indico/modules/designer/templates/_list.html
 msgid "This is the inherited default ticket template"
@@ -4037,7 +4037,7 @@ msgstr "¿Está seguro de querer clonar la plantilla '%(title)s'?"
 #: indico/modules/designer/templates/_list.html
 #, python-format
 msgid "Clone '%(title)s' template into a category"
-msgstr ""
+msgstr "Clonar plantilla '%(title)s' en una categoría"
 
 #: indico/modules/designer/templates/_list.html
 msgid "Edit template"
@@ -4092,7 +4092,7 @@ msgstr "Añadir una nueva plantilla de diseño en blanco"
 #: indico/modules/designer/templates/_list.html
 msgctxt "Custom template"
 msgid "Add new"
-msgstr ""
+msgstr "Añadir nuevo"
 
 #: indico/modules/designer/templates/_list.html
 #: indico/modules/designer/templates/backside_list.html
@@ -4101,11 +4101,11 @@ msgstr "Sin plantillas"
 
 #: indico/modules/designer/templates/backside_list.html
 msgid "This template has different dimensions than your template"
-msgstr ""
+msgstr "Esta plantilla tiene dimensiones diferentes a las de su plantilla"
 
 #: indico/modules/designer/templates/backside_list.html
 msgid "This template is linked to a different registration form"
-msgstr ""
+msgstr "Esta plantilla está vinculada a un formulario de registro diferente"
 
 #: indico/modules/designer/templates/backside_list.html
 msgid ""
@@ -4377,7 +4377,7 @@ msgstr "Etiquetas de eventos"
 
 #: indico/modules/events/__init__.py
 msgid "Event Keywords"
-msgstr ""
+msgstr "Palabras clave del evento"
 
 #: indico/modules/events/__init__.py
 #: indico/modules/events/templates/admin/unlisted_events.html
@@ -4386,11 +4386,11 @@ msgstr "Eventos no listados"
 
 #: indico/modules/events/__init__.py
 msgid "Auto-linker"
-msgstr ""
+msgstr "Autoenlace"
 
 #: indico/modules/events/__init__.py
 msgid "Data Retention"
-msgstr ""
+msgstr "Conservación de datos"
 
 #: indico/modules/events/__init__.py
 msgid "Create lecture"
@@ -4481,11 +4481,11 @@ msgstr "Agregar a la serie de eventos"
 #: indico/modules/events/clone.py
 #: indico/modules/events/registration/templates/management/regform.html
 msgid "Privacy settings"
-msgstr ""
+msgstr "Configuración de privacidad"
 
 #: indico/modules/events/clone.py
 msgid "The target event already has privacy settings"
-msgstr ""
+msgstr "El evento de destino ya tiene configuración de privacidad"
 
 #: indico/modules/events/cloning.py
 msgid "Importing data is not supported"
@@ -4558,13 +4558,13 @@ msgstr "La plantilla de URL debe contener el marcador '{value}'."
 
 #: indico/modules/events/forms.py
 msgid "Event does not happen"
-msgstr ""
+msgstr "El evento no se produce"
 
 #: indico/modules/events/forms.py
 msgid ""
 "Enable this to indicate that an event with this label does not happen (e.g. "
 "cancelled or postponed). This will prevent event reminders from being sent."
-msgstr ""
+msgstr "Active esta opción para indicar que un evento con esta etiqueta no se celebra (por ejemplo, cancelado o pospuesto). Esto evitará que se envíen recordatorios de eventos."
 
 #: indico/modules/events/forms.py indico/modules/events/registration/forms.py
 msgid "This title is already in use."
@@ -4649,18 +4649,18 @@ msgstr "Estos usuarios pueden crear eventos no listados."
 
 #: indico/modules/events/forms.py
 msgid "Minimum data retention period"
-msgstr ""
+msgstr "Período mínimo de conservación de datos"
 
 #: indico/modules/events/forms.py
 msgid ""
 "Specify the minimum data retention period (in weeks) configurable for "
 "registrations. This includes the retention period of individual registration"
 " form fields."
-msgstr ""
+msgstr "Especifique el periodo mínimo de conservación de datos (en semanas) configurable para las inscripciones. Esto incluye el periodo de retención de los campos individuales del formulario de registro."
 
 #: indico/modules/events/forms.py
 msgid "Maximum data retention period"
-msgstr ""
+msgstr "Periodo máximo de conservación de datos"
 
 #: indico/modules/events/forms.py
 msgid ""
@@ -4668,19 +4668,19 @@ msgid ""
 "registrations. This includes the retention period of individual registration"
 " form fields. Note that setting this value will make the retention period "
 "field mandatory during registration form setup."
-msgstr ""
+msgstr "Especifique el periodo máximo de conservación de datos (en semanas) configurable para las inscripciones. Esto incluye el período de retención de los campos individuales del formulario de registro. Tenga en cuenta que si establece este valor, el campo de periodo de retención será obligatorio durante la configuración del formulario de registro."
 
 #: indico/modules/events/forms.py indico/modules/events/registration/forms.py
 msgid "Indefinite"
-msgstr ""
+msgstr "Indefinido"
 
 #: indico/modules/events/forms.py
 msgid "The retention period cannot be zero or negative."
-msgstr ""
+msgstr "El periodo de conservación no puede ser cero ni negativo."
 
 #: indico/modules/events/forms.py
 msgid "The minimum retention period cannot be greater than the maximum."
-msgstr ""
+msgstr "El periodo mínimo de conservación no puede ser mayor que el máximo."
 
 #: indico/modules/events/abstracts/placeholders.py
 #: indico/modules/events/placeholders.py
@@ -4697,7 +4697,7 @@ msgstr "Enlace al evento"
 #: indico/modules/events/registration/placeholders/registrations.py
 #: indico/modules/events/surveys/placeholders.py
 msgid "Custom link text instead of the full URL"
-msgstr ""
+msgstr "Texto de enlace personalizado en lugar de la URL completa"
 
 #: indico/modules/events/reviewing_questions_fields.py
 msgid "Exclude from score"
@@ -4709,23 +4709,23 @@ msgstr "Evaluación"
 
 #: indico/modules/events/schemas.py
 msgid "Empty regex"
-msgstr ""
+msgstr "Expresión regular vacía"
 
 #: indico/modules/events/schemas.py
 msgid "Invalid regex: {}"
-msgstr ""
+msgstr "Expresión regular no válida: {}"
 
 #: indico/modules/events/schemas.py
 msgid "The regex needs to have at least one group"
-msgstr ""
+msgstr "La expresión regular debe tener al menos un grupo"
 
 #: indico/modules/events/schemas.py
 msgid "Not all captured regex groups used ({})"
-msgstr ""
+msgstr "No se utilizaron todos los grupos de expresiones regulares capturados ({})"
 
 #: indico/modules/events/schemas.py
 msgid "Placeholder not known: {}"
-msgstr ""
+msgstr "Marcador de posición desconocido: {}"
 
 #: indico/modules/events/util.py
 msgid "This event has been locked so no modifications are possible."
@@ -4839,13 +4839,13 @@ msgstr "Las reglas no pueden estar vacías"
 
 #: indico/modules/events/abstracts/fields.py
 msgid "You cannot combine the \"Invited\" rule with other rules"
-msgstr ""
+msgstr "No se puede combinar la regla \"Invitado\" con otras reglas"
 
 #: indico/modules/events/abstracts/fields.py
 msgid ""
 "Existing notification templates cannot be changed from/to \"Invited\"; "
 "please create a new one"
-msgstr ""
+msgstr "Las plantillas de notificación existentes no pueden cambiarse de/a \"Invitado\"; cree una nueva."
 
 #: indico/modules/events/abstracts/fields.py
 #: indico/modules/events/contributions/fields.py
@@ -5097,13 +5097,13 @@ msgstr "Habilitar esto permite a los coordinadores de pistas actualizar la pista
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Force track selection on judgment"
-msgstr ""
+msgstr "Forzar la selección de pistas según el criterio"
 
 #: indico/modules/events/abstracts/forms.py
 msgid ""
 "Enabling this makes the track selection mandatory when accepting an "
 "abstract. This does not affect bulk judgment by managers."
-msgstr ""
+msgstr "Activar esta opción hace que la selección de pista sea obligatoria al aceptar un resumen. Esto no afecta a la valoración del volumen por parte de los administradores."
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Allow comments"
@@ -5202,7 +5202,7 @@ msgstr "La aportación generada será colocada en esta sesión"
 #: indico/modules/events/abstracts/forms.py
 msgctxt "Abstract"
 msgid "Duplicate of"
-msgstr ""
+msgstr "Duplicado de"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "The current abstract will be marked as duplicate of the selected one"
@@ -5211,7 +5211,7 @@ msgstr "El resumen actual será marcado como duplicado del seleccionado"
 #: indico/modules/events/abstracts/forms.py
 msgctxt "Abstract"
 msgid "Merge into"
-msgstr ""
+msgstr "Fusionar en"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "The current abstract will be merged into the selected one"
@@ -5376,12 +5376,12 @@ msgstr "Cuerpo"
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Invitation email templates must contain the {placeholder} placeholder"
-msgstr ""
+msgstr "Las plantillas de correo de invitación deben contener el marcador de posición {placeholder} "
 
 #: indico/modules/events/abstracts/forms.py
 msgid ""
 "Only invitation email templates may contain the {placeholder} placeholder"
-msgstr ""
+msgstr "Solo las plantillas de correo de invitación pueden contener el marcador de posición {placeholder} "
 
 #: indico/modules/events/abstracts/forms.py
 msgid "Email template"
@@ -5573,7 +5573,7 @@ msgstr "Fecha de modificación"
 
 #: indico/modules/events/abstracts/lists.py
 msgid "Submission comment"
-msgstr ""
+msgstr "Comentario del envío"
 
 #: indico/modules/events/abstracts/lists.py
 msgid ""
@@ -5777,7 +5777,7 @@ msgstr "Ponentes y autores"
 
 #: indico/modules/events/abstracts/settings.py
 msgid "Speakers, authors and co-authors"
-msgstr ""
+msgstr "Ponentes, autores y coautores"
 
 #: indico/modules/events/abstracts/controllers/abstract.py
 msgid "Abstract modified successfully"
@@ -5805,15 +5805,15 @@ msgid ""
 msgid_plural ""
 "{num} abstracts have been skipped since they were under review for more than"
 " one track."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{num} resumen se ha omitido ya que estaba siendo revisada por más de una vía."
+msgstr[1] "{num} resúmenes se han omitido por estar en revisión más de una vía."
+msgstr[2] "{num} resúmenes se han omitido por estar en revisión en más de una vía."
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
 #: indico/modules/events/papers/controllers/paper.py
 msgctxt "Judge abstracts (verb)"
 msgid "Judge"
-msgstr ""
+msgstr "Juez"
 
 #: indico/modules/events/abstracts/controllers/abstract_list.py
 msgid "Abstract '{}' created successfully"
@@ -5873,13 +5873,13 @@ msgstr "Su resumen '{}' ha sido enviado correctamente. Ha sido registrado con el
 msgid ""
 "Your abstract '{}' has been successfully submitted. It is registered with "
 "the number #{}."
-msgstr ""
+msgstr "Su resumen '{}' se ha enviado correctamente. Está registrado con el número #{}."
 
 #: indico/modules/events/abstracts/controllers/email_templates.py
 msgid ""
 "Default notification templates added. You may customize them using the "
 "\"Notifications\" button."
-msgstr ""
+msgstr "Plantillas de notificación por defecto añadidas. Puede personalizarlas utilizando el botón \"Notificaciones\"."
 
 #: indico/modules/events/abstracts/controllers/management.py
 msgid "Call for abstracts has been rescheduled"
@@ -5924,37 +5924,37 @@ msgstr "El track ha sido eliminado"
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Submitted"
-msgstr ""
+msgstr "Enviado"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Withdrawn"
-msgstr ""
+msgstr "Retirado"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Accepted"
-msgstr ""
+msgstr "Aceptado"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Rejected"
-msgstr ""
+msgstr "Rechazado"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Merged"
-msgstr ""
+msgstr "Fusionado"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Duplicate"
-msgstr ""
+msgstr "Duplicar"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgctxt "Abstract"
 msgid "Invited"
-msgstr ""
+msgstr "Invitado"
 
 #: indico/modules/events/abstracts/models/abstracts.py
 msgid "Awaiting Review"
@@ -6126,7 +6126,7 @@ msgstr "Adaptar el ancho de las columnas"
 
 #: indico/modules/events/abstracts/templates/display/abstracts.html
 msgid "Search by #id or string"
-msgstr ""
+msgstr "Búsqueda por #id o cadena"
 
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html
 msgid "My abstracts"
@@ -6253,7 +6253,7 @@ msgstr "Para obtener un resumen más detallado, visite la página de su resumen:
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
 #, python-format
 msgid "Kind regards,%(linebreak)s The organizers of {event_title}"
-msgstr ""
+msgstr "Un cordial saludo,%(linebreak)s Los organizadores de {event_title}"
 
 #: indico/modules/events/abstracts/templates/emails/default_invite_notification.txt
 msgid "Invitation to submit an abstract"
@@ -6303,13 +6303,13 @@ msgstr "Hemos recibido su resumen \"{abstract_title}\" a lo que hemos asignado i
 
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
 msgid "Abstract Withdrawn notification (#{abstract_id})"
-msgstr ""
+msgstr "Resumen de notificación retirada (#{abstract_id})"
 
 #: indico/modules/events/abstracts/templates/emails/default_withdrawn_notification.txt
 msgid ""
 "We're sorry to let you know that your abstract \"{abstract_title}\" with ID "
 "#{abstract_id} has been withdrawn."
-msgstr ""
+msgstr "Sentimos comunicarle que su resumen \"{abstract_title}\" con ID #{abstract_id} ha sido retirado."
 
 #: indico/modules/events/abstracts/templates/forms/edit_review_tracks.html
 msgid "The abstract is being reviewed for the following tracks:"
@@ -6536,7 +6536,7 @@ msgstr "Lista de resúmenes"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgctxt "Abstract"
 msgid "New"
-msgstr ""
+msgstr "Nuevo"
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html
 msgid "Do you really want to delete the selected abstracts?"
@@ -6648,11 +6648,11 @@ msgid ""
 "No email notifications templates are configured for this event. You can add "
 "the default templates using the button below and customize them, or use the "
 "\"Notifications\" dialog to set up custom notification templates."
-msgstr ""
+msgstr "No hay plantillas de correo de notificaciones configuradas para este evento. Puede añadir las plantillas predeterminadas utilizando el botón inferior y personalizarlas, o utilizar el cuadro de diálogo \"Notificaciones\" para configurar plantillas de notificación personalizadas."
 
 #: indico/modules/events/abstracts/templates/management/overview.html
 msgid "Setup default notifications"
-msgstr ""
+msgstr "Configurar notificaciones por defecto"
 
 #: indico/modules/events/abstracts/templates/management/overview.html
 msgid ""
@@ -7362,7 +7362,7 @@ msgstr "Marcadores desaparecidos: {}"
 #: indico/modules/events/agreements/forms.py
 msgctxt "Agreement answer (noun)"
 msgid "Answer"
-msgstr ""
+msgstr "Respuesta"
 
 #: indico/modules/events/agreements/forms.py indico/modules/legal/views.py
 msgid "Agreement"
@@ -7401,27 +7401,27 @@ msgstr "Enlace a la página del acuerdo"
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Pending"
-msgstr ""
+msgstr "Pendiente"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Accepted"
-msgstr ""
+msgstr "Aceptado"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected"
-msgstr ""
+msgstr "Rechazado"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Accepted on behalf"
-msgstr ""
+msgstr "Aceptado en nombre de"
 
 #: indico/modules/events/agreements/models/agreements.py
 msgctxt "Agreement"
 msgid "Rejected on behalf"
-msgstr ""
+msgstr "Rechazado en nombre de"
 
 #: indico/modules/events/agreements/templates/agreement_form.html
 #, python-format
@@ -7661,7 +7661,7 @@ msgstr[2] "Se le han concedido privilegios de administrador / envío para {} apo
 
 #: indico/modules/events/contributions/__init__.py
 msgid "Grants management rights for contributions."
-msgstr ""
+msgstr "Concede derechos de administración para las contribuciones."
 
 #: indico/modules/events/contributions/__init__.py
 msgid "Grants management rights for materials and minutes."
@@ -7999,7 +7999,7 @@ msgstr "Opciones de filtrado disponibles"
 
 #: indico/modules/events/contributions/templates/contrib_list_filter.html
 msgid "Available filters for custom fields"
-msgstr ""
+msgstr "Filtros disponibles para los campos personalizados"
 
 #: indico/modules/events/contributions/templates/display/_contribution_list.html
 #: indico/modules/events/contributions/templates/management/_contribution_list.html
@@ -8494,7 +8494,7 @@ msgstr "La etiqueta de evento \"{}\" se creó correctamente"
 
 #: indico/modules/events/controllers/admin.py
 msgid "Allowed keywords have been saved"
-msgstr ""
+msgstr "Se han guardado las palabras clave permitidas"
 
 #: indico/modules/events/controllers/admin.py
 msgid "Event label '{}' successfully updated"
@@ -8680,7 +8680,7 @@ msgstr "El envío falló. Vuelva a intentarlo más tarde."
 
 #: indico/modules/events/editing/controllers/backend/timeline.py
 msgid "Deletion failed, please try again later."
-msgstr ""
+msgstr "Borrado fallido, por favor inténtelo de nuevo más tarde."
 
 #: indico/modules/events/editing/controllers/backend/timeline.py
 #: indico/modules/events/editing/controllers/backend/util.py
@@ -8707,32 +8707,32 @@ msgstr "Ponencia"
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "New"
-msgstr ""
+msgstr "Nuevo"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Ready for Review"
-msgstr ""
+msgstr "Listo para revisión"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Needs Confirmation"
-msgstr ""
+msgstr "Necesita confirmación"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Needs Changes"
-msgstr ""
+msgstr "Necesita cambios"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Accepted"
-msgstr ""
+msgstr "Aceptado"
 
 #: indico/modules/events/editing/models/editable.py
 msgctxt "Editable"
 msgid "Rejected"
-msgstr ""
+msgstr "Rechazado"
 
 #: indico/modules/events/editing/templates/emails/base_email.txt
 msgid "You can view details on the following URL:"
@@ -8741,95 +8741,95 @@ msgstr "Puede ver los detalles en la siguiente URL:"
 #: indico/modules/events/editing/templates/emails/comment_notification.txt
 #, python-format
 msgid "New comment on contribution %(title)s"
-msgstr ""
+msgstr "Nuevo comentario sobre la contribución %(title)s"
 
 #: indico/modules/events/editing/templates/emails/comment_notification.txt
 #, python-format
 msgid "%(author_name)s has posted a new comment on contribution %(title)s:"
-msgstr ""
+msgstr "%(author_name)s ha publicado un nuevo comentario sobre la contribución %(title)s:"
 
 #: indico/modules/events/editing/templates/emails/comment_notification.txt
 #, python-format
 msgid "Someone has posted a new comment on contribution %(title)s."
-msgstr ""
+msgstr "Alguien ha publicado un nuevo comentario sobre la contribución %(title)s."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 msgid "Someone"
-msgstr ""
+msgstr "Alguien"
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #, python-format
 msgid "New editor judgment for contribution %(title)s"
-msgstr ""
+msgstr "Nuevo juicio del editor por su contribución %(title)s"
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #, python-format
 msgid "%(name)s has changed and accepted an editable you are submitter of."
-msgstr ""
+msgstr "%(name)s ha cambiado y aceptado un editable del que usted es remitente."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #, python-format
 msgid "%(name)s has accepted an editable you are submitter of."
-msgstr ""
+msgstr "%(name)s tiene aceptado un editable del que usted es remitente."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #, python-format
 msgid "%(name)s has rejected an editable you are submitter of."
-msgstr ""
+msgstr "%(name)s ha rechazado un editable del que usted es remitente."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #, python-format
 msgid "%(name)s has made changes to an editable you are submitter of."
-msgstr ""
+msgstr "%(name)s ha realizado cambios en un editable del que usted es remitente."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #, python-format
 msgid "%(name)s has requested changes to an editable you are submitter of."
-msgstr ""
+msgstr "%(name)s ha solicitado cambios en un editable del que usted es remitente."
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #: indico/modules/events/editing/templates/emails/submitter_confirmation_notification.txt
 #: indico/modules/events/editing/templates/emails/submitter_rejection_notification.txt
 #, python-format
 msgid "Contribution: %(title)s"
-msgstr ""
+msgstr "Contribución: %(title)s"
 
 #: indico/modules/events/editing/templates/emails/editor_judgment_notification.txt
 #: indico/modules/events/editing/templates/emails/submitter_confirmation_notification.txt
 #: indico/modules/events/editing/templates/emails/submitter_rejection_notification.txt
 #, python-format
 msgid "%(name)s also left a comment:"
-msgstr ""
+msgstr "%(name)s también ha dejado un comentario:"
 
 #: indico/modules/events/editing/templates/emails/submitter_confirmation_notification.txt
 #, python-format
 msgid "Submitter confirmed changes for contribution %(title)s"
-msgstr ""
+msgstr "El remitente ha confirmado los cambios para la contribución %(title)s"
 
 #: indico/modules/events/editing/templates/emails/submitter_confirmation_notification.txt
 #, python-format
 msgid "Your revision changes have been confirmed by %(name)s."
-msgstr ""
+msgstr "Sus cambios de revisión han sido confirmados por %(name)s."
 
 #: indico/modules/events/editing/templates/emails/submitter_rejection_notification.txt
 #, python-format
 msgid "Submitter rejected changes on contribution %(title)s"
-msgstr ""
+msgstr "El remitente rechazó cambios en la contribución %(title)s"
 
 #: indico/modules/events/editing/templates/emails/submitter_rejection_notification.txt
 #, python-format
 msgid "Your revision changes have been rejected by %(name)s."
-msgstr ""
+msgstr "Sus cambios de revisión han sido rechazados por %(name)s."
 
 #: indico/modules/events/editing/templates/emails/submitter_upload_notification.txt
 #, python-format
 msgid "New submitter upload on contribution %(title)s"
-msgstr ""
+msgstr "Nuevo envío de remitentes en la contribución %(title)s"
 
 #: indico/modules/events/editing/templates/emails/submitter_upload_notification.txt
 #, python-format
 msgid "%(name)s has uploaded a new revision to an editable you are editor of."
-msgstr ""
+msgstr "%(name)s ha subido una nueva revisión a un editable del que usted es editor."
 
 #: indico/modules/events/editing/templates/management/disabled.html
 msgid "Editing disabled"
@@ -8936,12 +8936,12 @@ msgstr "Ningún tema seleccionado"
 #: indico/modules/events/layout/forms.py
 msgctxt "Theme name"
 msgid "Orange"
-msgstr ""
+msgstr "Naranja"
 
 #: indico/modules/events/layout/forms.py
 msgctxt "Theme name"
 msgid "Brown"
-msgstr ""
+msgstr "Marrón"
 
 #: indico/modules/events/layout/forms.py
 msgid "Right menu"
@@ -9001,11 +9001,11 @@ msgstr "Color del fondo"
 
 #: indico/modules/events/layout/forms.py
 msgid "Use logo as banner"
-msgstr ""
+msgstr "Utilizar el logotipo como banner"
 
 #: indico/modules/events/layout/forms.py
 msgid "Use the event logo as a full-width banner."
-msgstr ""
+msgstr "Utilice el logotipo del evento como banner de ancho completo."
 
 #: indico/modules/events/layout/forms.py
 msgid "Short message shown below the title"
@@ -9069,7 +9069,7 @@ msgid ""
 "will be displayed above the event title and the optimal width is {}px. "
 "Otherwise, the logo will be displayed to left of the event title and the "
 "optimal width is {}px."
-msgstr ""
+msgstr "Logo que se mostrará en la página del evento. Cuando se configura como banner, el logo se mostrará encima del título del evento y el ancho óptimo es {}px. De lo contrario, el logotipo se mostrará a la izquierda del título del evento y el ancho óptimo es {}px."
 
 #: indico/modules/events/layout/forms.py
 msgid "Custom CSS file"
@@ -9080,7 +9080,7 @@ msgid ""
 "If you want to fully customize your conference page you can create your own "
 "stylesheet and upload it. An example stylesheet can be downloaded "
 "{link}here{endlink}"
-msgstr ""
+msgstr "Si desea personalizar completamente la página de su conferencia, puede crear su propia hoja de estilo y cargarla. Puede descargarse una hoja de estilo de ejemplo {link}aquí{endlink}"
 
 #: indico/modules/events/layout/forms.py
 msgid "Custom title"
@@ -9105,7 +9105,7 @@ msgstr ""
 msgid ""
 "In addition to anyone listed in the Access control list, speakers will have "
 "access."
-msgstr ""
+msgstr "Además de todos los que figuran en la lista de control de acceso, los oradores también lo tendrán."
 
 #: indico/modules/events/layout/forms.py
 msgid "Custom CSS file ({name})"
@@ -13915,7 +13915,7 @@ msgstr "Ya no se puede retirar la inscripción. Póngase en contacto con un orga
 
 #: indico/modules/events/registration/templates/display/registration_summary.html
 msgid "Add to Wallet"
-msgstr ""
+msgstr "añadir a Wallet"
 
 #: indico/modules/events/registration/templates/display/registration_summary.html
 msgid "Apple Wallet/Passbook"
@@ -13923,7 +13923,7 @@ msgstr ""
 
 #: indico/modules/events/registration/templates/display/registration_summary.html
 msgid "Save to Google Wallet"
-msgstr ""
+msgstr "Guardar en Google Wallet"
 
 #: indico/modules/events/registration/templates/display/registration_summary.html
 msgid "Save to Apple Wallet/Passbook"
@@ -13951,7 +13951,7 @@ msgstr "Utilice este enlace para volver a esta página.<br> Asegúrese de manten
 #: indico/modules/events/registration/templates/emails/base_registration.html
 #, python-format
 msgid "ref: #%(id)s"
-msgstr ""
+msgstr "ref: #%(id)s"
 
 #: indico/modules/events/registration/templates/emails/base_registration.html
 msgid "Event Registration"
@@ -13963,7 +13963,7 @@ msgstr "Total:"
 
 #: indico/modules/events/registration/templates/emails/base_registration_details.html
 msgid "Registrant picture"
-msgstr ""
+msgstr "Fotografía del inscrito"
 
 #: indico/modules/events/registration/templates/emails/custom_email_default.html
 #, python-format
@@ -13997,7 +13997,7 @@ msgstr "Nuevo registro pendiente para %(title)s"
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html
 #, python-format
 msgid "New registration for %(title)s"
-msgstr ""
+msgstr "Nuevo registro para %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html
 msgid "Dear organizer,"
@@ -14025,7 +14025,7 @@ msgstr "Administrar formulario de inscripción"
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_manager.txt
 #: indico/modules/rb/templates/emails/reservations/rejection_email_to_user.txt
 msgid "Rejection reason:"
-msgstr ""
+msgstr "Motivo del rechazo:"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_managers.html
 msgid "Please note that it's waiting for manual approval by a manager."
@@ -14039,7 +14039,7 @@ msgstr "Puedes gestionar este registro %(link)saquí%(endlink)s."
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html
 #, python-format
 msgid "Registration for %(title)s"
-msgstr ""
+msgstr "Inscripción para %(title)s"
 
 #: indico/modules/events/registration/templates/emails/registration_creation_to_registrant.html
 #, python-format

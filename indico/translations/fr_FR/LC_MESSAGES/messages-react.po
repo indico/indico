@@ -1010,7 +1010,7 @@ msgstr "Comme vous êtes un administrateur vous pouvez quand même modifier."
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineHeader.jsx
 msgid "This editable is not currently assigned to you."
-msgstr ""
+msgstr "Cet éditable ne vous est pas assigné."
 
 #: indico/modules/events/editing/client/js/editing/timeline/TimelineItem.jsx
 msgid "{submitterName} has submitted files"
@@ -2348,7 +2348,7 @@ msgstr "Corps du message"
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 msgid "Sender"
-msgstr ""
+msgstr "Expéditeur"
 
 #: indico/modules/events/persons/client/js/EmailDialog.jsx
 msgid "BCC addresses"
@@ -2458,38 +2458,38 @@ msgstr "Ajouter des étiquettes"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
 msgid "Participants"
-msgstr ""
+msgstr "Participants"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
 msgid "There are no published registrations."
-msgstr ""
+msgstr "Aucune inscription publiée."
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantAccordion.tsx
 msgid "There are no registrations yet."
-msgstr ""
+msgstr "Il n'y a pas encore d'inscription."
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
 msgid "Show registered participant view instead"
-msgstr ""
+msgstr "Montrer la vue des participants inscrits à la place"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantList.tsx
 msgid "Show unregistered guest view instead"
-msgstr ""
+msgstr "Montrer la vue des invités non inscrits à la place"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantSharedTranslations.tsx
 msgid "{count} participant registered anonymously."
 msgid_plural "{count} participants registered anonymously."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{count} participant inscrit anonymement."
+msgstr[1] "{count} participants inscrits anonymement."
+msgstr[2] "{count} participants inscrits anonymement."
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "Check-in status"
-msgstr ""
+msgstr "Status de l'enregistrement"
 
 #: indico/modules/events/registration/client/js/components/participant-list/ParticipantTable.tsx
 msgid "No participants registered."
-msgstr ""
+msgstr "Aucun participant inscrit."
 
 #: indico/modules/events/registration/client/js/form/FormItem.jsx
 msgid "This field is locked since changing it could trigger a price change."
@@ -2537,7 +2537,7 @@ msgstr "Ces champs ne seront pas montrés aux participants"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "{price} per night"
-msgstr ""
+msgstr "{price} par nuit"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Arrival"
@@ -2551,7 +2551,7 @@ msgstr "Départ"
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
 msgid "Total: {price}"
-msgstr ""
+msgstr "Total: {price}"
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "You must select an option"
@@ -4060,7 +4060,7 @@ msgstr "De {startTime} à {endTime}"
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 msgid "On {weekdays}"
-msgstr ""
+msgstr "Les {weekdays}"
 
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx
 msgid "Space blocked: {reason}"
@@ -5342,9 +5342,9 @@ msgstr "Une fois"
 #: indico/modules/rb/client/js/util.jsx
 msgid "Every week on {weekdays}"
 msgid_plural "Every {repetition} weeks on {weekdays}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Toutes les semaines les {weekdays}"
+msgstr[1] "Toutes les {repetition} semaines les {weekdays}"
+msgstr[2] "Toutes les {repetition} semaines les {weekdays}"
 
 #: indico/modules/rb/client/js/util.jsx
 msgid "Every {weekdays}"
@@ -6410,7 +6410,7 @@ msgstr "{size} MB"
 
 #: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "There were some problems with your file"
-msgstr ""
+msgstr "Il y avait des problèmes avec votre fichier"
 
 #: indico/web/client/js/react/components/files/FileArea.jsx
 msgid "Drag file(s) here"
@@ -6883,82 +6883,82 @@ msgstr "Noir"
 #: indico/modules/events/papers/client/js/components/CommentForm.jsx
 msgctxt "Leave a comment (verb)"
 msgid "Comment"
-msgstr ""
+msgstr "Commenter"
 
 #: indico/modules/events/editing/client/js/editing/timeline/ReviewForm.jsx
 msgctxt "Judge editable (verb)"
 msgid "Judge"
-msgstr ""
+msgstr "Juger"
 
 #: indico/modules/events/editing/client/js/management/editable_type/CommentButton.jsx
 msgctxt "Comment modal title"
 msgid "Comment"
-msgstr ""
+msgstr "Commentaire"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgctxt "Editable"
 msgid "Not submitted"
-msgstr ""
+msgstr "Pas déposé"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Ready for review"
-msgstr ""
+msgstr "Prêt pour la relecture"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Needs submitter changes"
-msgstr ""
+msgstr "Modifications demandées au déposant"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Needs submitter confirmation"
-msgstr ""
+msgstr "Nécessite la confirmation du déposant"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgctxt "Editable"
 msgid "Unassign"
-msgstr ""
+msgstr "Dissocier"
 
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "New"
-msgstr ""
+msgstr "Nouveau"
 
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx
 msgctxt "Judge paper (verb)"
 msgid "Judge"
-msgstr ""
+msgstr "Juger"
 
 #: indico/modules/events/papers/client/js/components/PaperReviewForm.jsx
 msgctxt "Review papers (verb)"
 msgid "Review"
-msgstr ""
+msgstr "Relire"
 
 #: indico/modules/events/persons/client/js/PersonList.jsx
 msgctxt "Author"
 msgid "Primary"
-msgstr ""
+msgstr "Principal"
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
 msgctxt "Choice"
 msgid "Add new"
-msgstr ""
+msgstr "Ajouter un nouveau"
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 msgctxt "Number of choices"
@@ -6968,65 +6968,65 @@ msgstr "Illimité"
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgctxt "Minimum size"
 msgid "Unlimited"
-msgstr ""
+msgstr "Sans limite"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Rejected"
-msgstr ""
+msgstr "Refusé"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
 msgctxt "Booking"
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Cancelled"
-msgstr ""
+msgstr "Annulé"
 
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Will be cancelled"
-msgstr ""
+msgstr "Sera annulé"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
 #: indico/modules/rb/client/js/components/RoomBasicDetails.jsx
 msgctxt "Building site/location"
 msgid "Site"
-msgstr ""
+msgstr "Site"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
 msgctxt "Room number"
 msgid "Number"
-msgstr ""
+msgstr "Numéro"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
 msgctxt "Booking mode"
 msgid "Public"
-msgstr ""
+msgstr "Publique"
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
 msgctxt "Booking mode"
 msgid "Restricted"
-msgstr ""
+msgstr "Privée"
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx
 #: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx
 msgctxt "Repetition"
 msgid "Every"
-msgstr ""
+msgstr "Tous les"
 
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
 msgctxt "Room attribute"
 msgid "Hidden"
-msgstr ""
+msgstr "Caché"
 
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
 msgctxt "Link a booking to an event (verb)"
 msgid "Link"
-msgstr ""
+msgstr "Lier"
 
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "single booking shortcut"
@@ -7067,7 +7067,7 @@ msgstr "{number}M"
 #: indico/modules/receipts/client/js/templates/TemplateListPane.jsx
 msgctxt "Custom template"
 msgid "Add new"
-msgstr ""
+msgstr "Ajouter un nouveau"
 
 #: indico/modules/users/client/js/DataExport.jsx
 msgctxt "user data export"
@@ -7131,4 +7131,4 @@ msgstr "Demandé le"
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgctxt "Salutation"
 msgid "Title"
-msgstr ""
+msgstr "Titre"

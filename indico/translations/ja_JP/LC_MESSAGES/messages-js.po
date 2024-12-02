@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-26 16:44+0100\n"
+"POT-Creation-Date: 2024-12-01 19:59+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Ken <ken.oyama.nagasaki@gmail.com>, 2024\n"
 "Language-Team: Japanese (Japan) (http://app.transifex.com/indico/indico/language/ja_JP/)\n"
@@ -74,6 +74,7 @@ msgid "empty"
 msgstr "空"
 
 #: indico/modules/categories/client/js/display.js
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} 件のイベント"
@@ -671,6 +672,11 @@ msgstr "このカテゴリーは保護されています"
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "Go to parent: {0}"
 msgstr "親{0}へ"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
+msgid "{0} category"
+msgid_plural "{0} categories"
+msgstr[0] ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."

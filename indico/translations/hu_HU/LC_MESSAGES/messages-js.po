@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-26 16:44+0100\n"
+"POT-Creation-Date: 2024-12-01 19:59+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Anna Szabó, 2024\n"
 "Language-Team: Hungarian (Hungary) (http://app.transifex.com/indico/indico/language/hu_HU/)\n"
@@ -72,6 +72,7 @@ msgid "empty"
 msgstr "nincs esemény"
 
 #: indico/modules/categories/client/js/display.js
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} esemény"
@@ -688,6 +689,12 @@ msgstr "Ez a kategória védett"
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "Go to parent: {0}"
 msgstr "Ugrás a szülőhöz: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
+msgid "{0} category"
+msgid_plural "{0} categories"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."

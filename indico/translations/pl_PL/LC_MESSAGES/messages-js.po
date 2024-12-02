@@ -4,8 +4,8 @@
 # 
 # Translators:
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2018,2020
-# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
-# Marcin Miłek, 2021-2022
+# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021,2024
+# Marcin Miłek, 2021-2022,2024
 # Patryk Bełzak <patryk.belzak@pwr.edu.pl>, 2018-2019
 # Pedro Lourenço <pedroob221@gmail.com>, 2021
 # rlalik, 2024
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-26 16:44+0100\n"
+"POT-Creation-Date: 2024-12-01 19:59+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
-"Last-Translator: Tomáš Roun <tomas.roun8@gmail.com>, 2024\n"
+"Last-Translator: Marcin Miłek, 2021-2022,2024\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/indico/indico/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,6 +76,7 @@ msgid "empty"
 msgstr "pusty"
 
 #: indico/modules/categories/client/js/display.js
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "wydarzenie {0}"
@@ -280,7 +281,7 @@ msgstr "Proszę wybrać nazwę dla szablonu"
 
 #: indico/modules/designer/client/js/index.js
 msgid "Warning"
-msgstr "Uwaga"
+msgstr "Ostrzeżenie"
 
 #: indico/modules/designer/client/js/index.js
 msgid "The template cannot be empty. Add some elements or a background image."
@@ -318,7 +319,7 @@ msgstr "Odłącz odwrotną stronę"
 
 #: indico/modules/designer/client/js/index.js
 msgid "The back side is empty."
-msgstr "Ta odwrotna strona jest pusta."
+msgstr "Tylna strona jest pusta."
 
 #: indico/modules/designer/client/js/index.js
 msgid "Error"
@@ -406,7 +407,7 @@ msgstr "Dodaj nową ścieżkę"
 
 #: indico/modules/events/contributions/client/js/index.jsx
 msgid "No track"
-msgstr "Brak ścieżki tematycznej"
+msgstr "Brak ścieżki"
 
 #: indico/modules/events/contributions/templates/display/contribution_author.html
 msgctxt "Salutation"
@@ -420,7 +421,7 @@ msgstr "Wycofuję poprzednie działanie..."
 #: indico/modules/events/registration/client/js/index.js
 #: indico/modules/events/registration/client/js/registration.js
 msgid "Terms and Conditions"
-msgstr "Warunki"
+msgstr "Regulamin"
 
 #: indico/modules/events/registration/client/js/reglists.js
 msgid "Email Preview"
@@ -498,7 +499,7 @@ msgstr "E-mail"
 
 #: indico/modules/users/templates/users_merge.html
 msgid "Affiliation"
-msgstr "Jednostka organizacyjna"
+msgstr "Afiliacja"
 
 #: indico/modules/users/templates/users_merge.html
 msgid "Are you sure you want to merge those two users?"
@@ -583,11 +584,11 @@ msgstr "Poprzedni"
 #: indico/web/client/js/jquery/utils/errors.js
 #: indico/web/client/js/utils/axios.js
 msgid "Something went wrong"
-msgstr "Coś się nie udało"
+msgstr "Coś poszło nie tak"
 
 #: indico/web/client/js/jquery/utils/forms.js
 msgid "The passwords do not match."
-msgstr "Błędne hasła"
+msgstr "Hasła nie są zgodne."
 
 #: indico/web/client/js/jquery/utils/forms.js
 msgid "Field must be at least {0} character long."
@@ -631,7 +632,7 @@ msgstr "Pole musi zawierać od {0} do {1} słów."
 
 #: indico/web/client/js/jquery/utils/forms.js
 msgid "Save now"
-msgstr "Składuj"
+msgstr "Zapisz teraz"
 
 #: indico/web/client/js/jquery/utils/forms.js
 msgid "Saving..."
@@ -730,6 +731,14 @@ msgstr "Ta kategoria jest chroniona"
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "Go to parent: {0}"
 msgstr "Idź do nadrzędnego: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
+msgid "{0} category"
+msgid_plural "{0} categories"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
@@ -1013,7 +1022,7 @@ msgstr "Wersja do druku"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js
 msgid "Go back"
-msgstr "Wróć"
+msgstr "Powrót"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js
 msgid "Print"
@@ -1107,7 +1116,7 @@ msgstr "Blok sesji"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js
 msgid "Contribution"
-msgstr "Kontrybucja"
+msgstr "Wkład"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js
 msgid "Break"
@@ -1295,7 +1304,7 @@ msgstr "Wybierz: "
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "Add Contribution"
-msgstr "Dodaj kontrybucję"
+msgstr "Dodaj wkład"
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js
 msgid "Add selected"

@@ -7,12 +7,12 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2023
 # Arturo Diaz Rosemberg <arturo@diazrosemberg.net>, 2023
 # Pedro Ferreira <pedro.ferreira@cern.ch>, 2023
-# Jesús Martín <jesusmartin@sallep.net>, 2023
+# Jesús Martín <jesusmartin@sallep.net>, 2024
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-11-24 16:44+0100\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2023\n"
+"POT-Creation-Date: 2024-11-24 09:40+0100\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2024\n"
 "Language-Team: Spanish (Spain) (https://app.transifex.com/indico/teams/6478/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -6786,13 +6786,13 @@ msgstr ""
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Accepted"
-msgstr ""
+msgstr "Aceptado"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "Rejected"
-msgstr ""
+msgstr "Rechazado"
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
@@ -6814,7 +6814,7 @@ msgstr ""
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
 msgid "New"
-msgstr ""
+msgstr "Nuevo"
 
 #: indico/modules/events/papers/client/js/components/PaperDecisionForm.jsx
 msgctxt "Judge paper (verb)"
@@ -6943,7 +6943,7 @@ msgstr "{number}M"
 #: indico/modules/receipts/client/js/templates/TemplateListPane.jsx
 msgctxt "Custom template"
 msgid "Add new"
-msgstr ""
+msgstr "Añadir nuevo"
 
 #: indico/modules/users/client/js/DataExport.jsx
 msgctxt "user data export"
@@ -7003,4 +7003,4 @@ msgstr ""
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgctxt "Salutation"
 msgid "Title"
-msgstr ""
+msgstr "Título"

@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-27 09:40+0100\n"
+"POT-Creation-Date: 2024-12-01 19:59+0100\n"
 "PO-Revision-Date: 2011-07-07 13:45+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2015,2017-2024\n"
 "Language-Team: French (France) (http://app.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -74,6 +74,7 @@ msgid "empty"
 msgstr "vide"
 
 #: indico/modules/categories/client/js/display.js
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} événement"
@@ -398,7 +399,7 @@ msgstr "Aucune thématique"
 #: indico/modules/events/contributions/templates/display/contribution_author.html
 msgctxt "Salutation"
 msgid "Title:"
-msgstr ""
+msgstr "Titre:"
 
 #: indico/modules/events/management/client/js/index.js
 msgid "Undoing previous operation..."
@@ -709,6 +710,13 @@ msgstr "Cette catégorie est protégée"
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "Go to parent: {0}"
 msgstr "Aller au parent: {0}"
+
+#: indico/web/client/js/jquery/widgets/categorynavigator.js
+msgid "{0} category"
+msgid_plural "{0} categories"
+msgstr[0] "{0} catégorie"
+msgstr[1] "{0} catégories"
+msgstr[2] "{0} catégories"
 
 #: indico/web/client/js/jquery/widgets/categorynavigator.js
 msgid "You can only <a class=\"js-action\" data-category-id=\"{0}\">{1}</a> this one."
@@ -1096,7 +1104,7 @@ msgstr "Ajouter un poster"
 #: indico/web/client/js/legacy/libs/timetable/Base.js
 msgctxt "Timetable entry"
 msgid "Add new"
-msgstr ""
+msgstr "Ajouter un nouveau"
 
 #: indico/web/client/js/legacy/libs/timetable/Base.js
 #: indico/web/client/js/legacy/libs/timetable/Management.js
