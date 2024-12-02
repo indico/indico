@@ -12,7 +12,7 @@ import pytz
 from babel.dates import get_timezone
 from sqlalchemy import Date, Time, or_
 from sqlalchemy.sql import cast
-from werkzeug.datastructures import MultiDict, OrderedMultiDict
+from werkzeug.datastructures import MultiDict
 
 from indico.core.config import config
 from indico.core.db import db
@@ -73,7 +73,7 @@ class RoomHook(RoomBookingHookBase):
         # Retrieve reservations
         reservations = None
         if self._detail == 'reservations':
-            reservations = OrderedMultiDict(_export_reservations(self, True, False, [
+            reservations = MultiDict(_export_reservations(self, True, False, [
                 Reservation.room_id.in_(x.id for x in rooms_data)
             ]))
 
