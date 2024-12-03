@@ -148,7 +148,13 @@
 
     {% if speakers %}
         <p>
-            <b>{{ ngettext('Speaker', 'Speakers', speakers|length) }}</b>
+            <b>
+                {% trans count=speakers|length -%}
+                    Speaker:
+                {%- pluralize -%}
+                    Speakers:
+                {%- endtrans -%}
+            </b>
             <br>
             {{ _render_names(speakers, show_title=config.show_title, show_affiliation=config.show_affiliation) }}
         </p>
@@ -241,9 +247,17 @@
         {% if type != 'BREAK' and people %}
             <b>
                 {%- if type == 'SESSION_BLOCK' -%}
-                    {{ ngettext('Convener:', 'Conveners:', people|length) }}
+                    {% trans count=people|length -%}
+                        Convener:
+                    {%- pluralize -%}
+                        Conveners:
+                    {%- endtrans -%}
                 {%- else -%}
-                    {{ ngettext('Speaker:', 'Speakers:', people|length) }}
+                    {% trans count=people|length -%}
+                        Speaker:
+                    {%- pluralize -%}
+                        Speakers:
+                    {%- endtrans -%}
                 {%- endif -%}
                 &nbsp;
             </b>
