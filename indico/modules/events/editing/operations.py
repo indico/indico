@@ -148,7 +148,7 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
                                    comment=comment,
                                    tags=set(tags))
     revision.editable.revisions.append(new_revision)
-    if action in (EditingReviewAction.accept):
+    if action == EditingReviewAction.accept:
         _ensure_publishable_files(new_revision)
     submitters = revision.editable.contribution.get_manager_list(include_groups=False, permission='submit',
                                                                  explicit=True)
