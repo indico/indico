@@ -34,10 +34,10 @@ class EditableType(RichIntEnum):
 class EditableState(RichIntEnum):
     __titles__ = [None, pgettext('Editable', 'New'), pgettext('Editable', 'Ready for Review'),
                   pgettext('Editable', 'Needs Confirmation'), pgettext('Editable', 'Needs Changes'),
-                  pgettext('Editable', 'Accepted'), pgettext('Editable', 'Accepted by Submitter'),
-                  pgettext('Editable', 'Rejected')]
+                  pgettext('Editable', 'Accepted'), pgettext('Editable', 'Rejected'), 
+                  pgettext('Editable', 'Accepted by Submitter')]
     __css_classes__ = [None, 'highlight', 'ready', 'editing-make-changes', 'editing-request-changes',
-                       'success', 'editing-rejected']
+                       'success', 'editing-rejected', 'editing-accepted-submitter']
 
     new = 1
     ready_for_review = 2
