@@ -166,9 +166,11 @@
         {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}
     {% endif %}
     {% call form_footer(form, skip_label=skip_labels, align_right=footer_align_right) %}
-        <a id="form-submit-button" class="i-button big highlight {{ 'hide-if-locked' if disable_if_locked }}"
-            {%- if disabled_until_change %} data-disabled-until-change{% endif %}
-            {%- if save_reminder %} data-save-reminder{% endif %}>{{ submit }}+</a>
+        {% if form_header_kwargs.get('id') == 'badge-settings-form' %}
+            <a id="form-submit-button" class="i-button big highlight {{ 'hide-if-locked' if disable_if_locked }}"
+                {%- if disabled_until_change %} data-disabled-until-change{% endif %}
+                {%- if save_reminder %} data-save-reminder{% endif %}>{{ submit }}+</a>
+        {% endif %}
         <input class="i-button big highlight {{ 'hide-if-locked' if disable_if_locked }}" type="submit"
                value="{{ submit }}"
                {%- if disabled_until_change %} data-disabled-until-change{% endif %}
@@ -181,21 +183,18 @@
             {% endif %}
         {% endif %}
     {% endcall %}
-    <script>
-        document.getElementById('form-submit-button').addEventListener('click', event => {
-            const button = event.target;
-            if (!button.getAttribute('href')) {
-                event.preventDefault();
+    {% if form_header_kwargs.get('id') == 'badge-settings-form' %}
+        <script>
+            document.getElementById('form-submit-button').addEventListener('click', event => {
+                const button = event.target;
                 const formElement = document.getElementById('{{ form_header_kwargs['id'] }}');
-                fetch(formElement.getAttribute('action'), {
-                    method: formElement.getAttribute('method').toUpperCase(),
-                    body: new FormData(formElement)
-                }).then(response => response.json()).then(response => {
-                    button.setAttribute('href', response['redirect']);
-                    button.setAttribute('target', '_blank');
-                    button.click();
-                });
-            }
-        })
-    </script>
+                const request = new XMLHttpRequest();
+                request.open(formElement.getAttribute('method').toUpperCase(), formElement.getAttribute('action'), false);
+                request.send(new FormData(formElement));
+                const responseData = JSON.parse(request.responseText);
+                button.setAttribute('href', responseData['redirect']);
+                button.setAttribute('target', '_blank');
+            })
+        </script>
+    {% endif %}
 {% endmacro %}
