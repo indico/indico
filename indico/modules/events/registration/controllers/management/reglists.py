@@ -700,11 +700,8 @@ class RHRegistrationReset(RHManageRegistrationBase):
     """Reset a registration back to a non-approved status."""
 
     def _process(self):
-        try:
-            self.registration.reset_state(silent=False)
-            logger.info('Registration %r was reset by %r', self.registration, session.user)
-        except Exception as e:
-            flash(str(e), 'error')
+        self.registration.reset_state()
+        logger.info('Registration %r was reset by %r', self.registration, session.user)
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
