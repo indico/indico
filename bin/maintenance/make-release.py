@@ -33,6 +33,11 @@ Bugfixes
 
 - Nothing so far :)
 
+Accessibility
+^^^^^^^^^^^^^
+
+- Nothing so far
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
