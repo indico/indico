@@ -10,12 +10,14 @@ Version 3.3.6
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add a new "Accepted by Submitter" state for editables when a submitter approved
+  the changes proposed by the editor (:issue:`6185`, :pr:`6186`)
 
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix error when using the "Request approval" editing action on an editable that
+  does not have publishable files (:pr:`6186`)
 
 Accessibility
 ^^^^^^^^^^^^^

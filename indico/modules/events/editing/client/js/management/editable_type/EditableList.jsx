@@ -172,6 +172,12 @@ function EditableListDisplay({
             color: 'green',
           },
           {
+            value: 'accepted_submitter',
+            text: Translate.string('Accepted by Submitter', 'Editable'),
+            exclusive: true,
+            color: 'olive',
+          },
+          {
             value: 'rejected',
             text: Translate.string('Rejected', 'Editable'),
             exclusive: true,

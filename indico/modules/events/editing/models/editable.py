@@ -32,11 +32,26 @@ class EditableType(RichIntEnum):
 
 
 class EditableState(RichIntEnum):
-    __titles__ = [None, pgettext('Editable', 'New'), pgettext('Editable', 'Ready for Review'),
-                  pgettext('Editable', 'Needs Confirmation'), pgettext('Editable', 'Needs Changes'),
-                  pgettext('Editable', 'Accepted'), pgettext('Editable', 'Rejected')]
-    __css_classes__ = [None, 'highlight', 'ready', 'editing-make-changes', 'editing-request-changes',
-                       'success', 'editing-rejected']
+    __titles__ = [
+        None,
+        pgettext('Editable', 'New'),
+        pgettext('Editable', 'Ready for Review'),
+        pgettext('Editable', 'Needs Confirmation'),
+        pgettext('Editable', 'Needs Changes'),
+        pgettext('Editable', 'Accepted'),
+        pgettext('Editable', 'Rejected'),
+        pgettext('Editable', 'Accepted by Submitter'),
+    ]
+    __css_classes__ = [
+        None,
+        'highlight',
+        'ready',
+        'editing-make-changes',
+        'editing-request-changes',
+        'success',
+        'editing-rejected',
+        'editing-accepted-submitter',
+    ]
 
     new = 1
     ready_for_review = 2
@@ -44,6 +59,7 @@ class EditableState(RichIntEnum):
     needs_submitter_changes = 4
     accepted = 5
     rejected = 6
+    accepted_submitter = 7
 
 
 class Editable(db.Model):
@@ -300,7 +316,7 @@ def _mappers_configured():
         RevisionType.new: EditableState.new,
         RevisionType.ready_for_review: EditableState.ready_for_review,
         RevisionType.needs_submitter_confirmation: EditableState.needs_submitter_confirmation,
-        RevisionType.changes_acceptance: EditableState.accepted,
+        RevisionType.changes_acceptance: EditableState.accepted_submitter,
         RevisionType.changes_rejection: EditableState.needs_submitter_changes,
         RevisionType.needs_submitter_changes: EditableState.needs_submitter_changes,
         RevisionType.acceptance: EditableState.accepted,

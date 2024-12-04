@@ -26,6 +26,7 @@ export const EditableState = {
   needs_submitter_confirmation: 'needs_submitter_confirmation',
   needs_submitter_changes: 'needs_submitter_changes',
   accepted: 'accepted',
+  accepted_submitter: 'accepted_submitter',
   rejected: 'rejected',
 };
 
@@ -33,7 +34,7 @@ export const RevisionTypeStates = {
   [RevisionType.new]: 'new',
   [RevisionType.ready_for_review]: 'ready_for_review',
   [RevisionType.needs_submitter_confirmation]: 'needs_submitter_confirmation',
-  [RevisionType.changes_acceptance]: 'accepted',
+  [RevisionType.changes_acceptance]: 'accepted_submitter',
   [RevisionType.changes_rejection]: 'needs_submitter_changes',
   [RevisionType.needs_submitter_changes]: 'needs_submitter_changes',
   [RevisionType.acceptance]: 'accepted',
@@ -71,6 +72,7 @@ export const EditableStatus = {
     'Editable'
   ),
   [EditableState.accepted]: Translate.string('Accepted', 'Editable'),
+  [EditableState.accepted_submitter]: Translate.string('Accepted by Submitter', 'Editable'),
   [EditableState.needs_submitter_changes]: Translate.string('Needs submitter changes', 'Editable'),
   [EditableState.rejected]: Translate.string('Rejected', 'Editable'),
 };

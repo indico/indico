@@ -18,6 +18,7 @@ $semantic-color-map: (
   editing-rejected: $midnight-black,
   editing-make-changes: $bright-yellow,
   editing-request-changes: $dark-red,
+  editing-accepted-submitter: $olive,
 );
 
 // styles that are prefixed with 'editing-' are used exclusively
@@ -32,7 +33,8 @@ $semantic-styles: (
   strong,
   editing-rejected,
   editing-make-changes,
-  editing-request-changes
+  editing-request-changes,
+  editing-accepted-submitter
 );
 
 @mixin _semantic-background($color) {
