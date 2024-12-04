@@ -16,6 +16,7 @@ from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
 from PIL import Image
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
@@ -24,6 +25,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
@@ -48,10 +50,11 @@ from indico.modules.users.models.users import ProfilePictureSource, UserTitle
 from indico.modules.users.operations import create_user
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
-from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
-                                       get_mastodon_server_name, get_related_categories, get_suggested_categories,
-                                       get_unlisted_events, get_user_by_email, get_user_titles, merge_users,
-                                       search_users, send_avatar, serialize_user, set_user_avatar)
+from indico.modules.users.util import (anonymize_user, get_avatar_url_from_name, get_gravatar_for_user,
+                                       get_linked_events, get_mastodon_server_name, get_related_categories,
+                                       get_suggested_categories, get_unlisted_events, get_user_by_email,
+                                       get_user_titles, merge_users, search_users, send_avatar, serialize_user,
+                                       set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
@@ -238,7 +241,8 @@ class RHPersonalData(RHUserBase):
                                                   titles=titles, user_values=user_values, locked_fields=locked_fields,
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
-                                                  has_predefined_affiliations=has_predefined_affiliations)
+                                                  has_predefined_affiliations=has_predefined_affiliations,
+                                                  delete_user_from_ui_enabled=config.ENABLE_DELETE_USER_FROM_UI)
 
 
 class RHUserDataExport(RHUserBase):
@@ -1008,3 +1012,37 @@ class RHUserBlock(RHUserBase):
         logger.info('User %s unblocked %s', session.user, self.user)
         flash(_('{name} has been unblocked.').format(name=self.user.name), 'success')
         return jsonify(success=True)
+
+
+class RHUserDelete(RHUserBase):
+    """Delete a user.
+
+    This will completely remove the user and everything
+    they are connected to. If the deletion is unsuccessful
+    then it fallsback to annonymize the user.
+    """
+
+    def _check_access(self):
+        RHUserBase._check_access(self)
+        if not session.user.is_admin or not config.ENABLE_DELETE_USER_FROM_UI:
+            raise Forbidden
+        if self.user == session.user:
+            raise Forbidden(_('You cannot delete your own account'))
+
+    def _process(self):
+        name = self.user.name
+        signals.users.db_deleted.send(self.user, flushed=False)
+        try:
+            db.session.delete(self.user)
+            db.session.flush()
+        except IntegrityError as exc:
+            db.session.rollback()
+            logger.info('User %s could not be deleted %s', name, str(exc))
+            anonymize_user(self.user)
+            logger.info('User %s annonymized %s', session.user, name)
+            flash(_('User account of {name} has been annonymized.').format(name=name), 'success')
+        else:
+            signals.users.db_deleted.send(self.user, flushed=True)
+            logger.info('User %s deleted %s', session.user, name)
+            flash(_('User account of {name} has been deleted.').format(name=name), 'success')
+        return jsonify(redirect=url_for('users.user_dashboard', session.user))
