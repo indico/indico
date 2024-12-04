@@ -271,7 +271,7 @@ type(
       } else {
         ajaxDialog({
           url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
-          title: $T.gettext('Export to PxDF'),
+          title: $T.gettext('Export to PDF'),
         });
       }
     },
