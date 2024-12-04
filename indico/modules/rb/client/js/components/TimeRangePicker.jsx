@@ -12,7 +12,7 @@ import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Translate, PluralTranslate} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
@@ -26,9 +26,9 @@ function _humanizeDuration(duration) {
   if (hours === 1 && minutes === 0) {
     return Translate.string('1 hour');
   } else if (hours !== 0) {
-    return Translate.string('{time} hours', {time: hours + minutes / 60});
+    return PluralTranslate.string('{time} hour', '{time} hours', hours + minutes / 60, {time: hours + minutes / 60});
   } else {
-    return Translate.string('{time} min', {time: minutes});
+    return PluralTranslate.string('{time} min', '{time} min', minutes, {time: minutes});
   }
 }
 
