@@ -83,7 +83,9 @@
     </section>
     {% if show_contrib_content %}
         <div class="session-block-content">
-            {{ _render_description(contrib.description) }}
+            {% if contrib.description %}
+                {{ _render_description(contrib.description) }}
+            {% endif %}
             {% if subcontribs %}
                 {{ _render_subcontribs(contrib, config, show_children_location) }}
             {% endif %}
