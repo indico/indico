@@ -5,23 +5,27 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from io import BytesIO
+from dataclasses import dataclass
+from itertools import groupby
 
-from flask import jsonify, request, session
+from flask import jsonify, render_template, request, session
+from marshmallow import fields
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import (get_timetable_offline_pdf_generator, render_entry_info_balloon,
+from indico.modules.events.timetable.util import (create_pdf, get_nested_timetable,
+                                                  get_nested_timetable_location_conditions, render_entry_info_balloon,
                                                   serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -73,34 +77,110 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
         return jsonify(html=html)
 
 
+@dataclass(frozen=True)
+class TimetableExportConfig:
+    show_title: bool
+    show_affiliation: bool
+    show_cover_page: bool
+    show_toc: bool
+    show_session_toc: bool
+    show_abstract: bool
+    dont_show_poster_abstract: bool
+    show_contribs: bool
+    show_length_contribs: bool
+    show_breaks: bool
+    new_page_per_session: bool
+    show_session_description: bool
+    print_date_close_to_sessions: bool
+
+
+@dataclass(frozen=True)
+class TimetableExportProgramConfig:
+    show_siblings_location: bool
+    show_children_location: bool
+
+
 class RHTimetableExportPDF(RHTimetableProtectionBase):
-    def _process(self):
+    @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
+    def _process(self, download):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
+
         if form.validate_on_submit():
-            form_data = form.data_for_format
-            pdf_format = TimetablePDFFormat(form_data)
-            if not form.advanced.data:
-                pdf_format.contribsAtConfLevel = True
-                pdf_format.breaksAtConfLevel = True
-                pdf_class = SimplifiedTimeTablePlain
-                additional_params = {}
-            else:
-                pdf_class = TimeTablePlain
-                additional_params = {'firstPageNumber': form.firstPageNumber.data,
-                                     'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
-                                     'showSessionDescription': form_data['showSessionDescription']}
-            if request.args.get('download') == '1':
-                pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
-                                pagesize=form.pagesize.data, **additional_params)
-                return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
-            else:
-                url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
+            if not download:
+                url = url_for(request.endpoint, **dict(request.view_args, download=True, **request.args.to_dict(False)))
                 return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
+
+            now = now_utc()
+            css = render_template('events/timetable/pdf/timetable.css')
+            event = self.event
+            entries = get_nested_timetable(event)
+            days = {day: list(e) for day, e in groupby(
+                entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
+            )}
+
+            config = TimetableExportConfig(
+                show_title=form.other.data['showSpeakerTitle'],
+                show_affiliation=form.other.data['showSpeakerAffiliation'],
+                show_cover_page=form.document_settings.data['showCoverPage'],
+                show_toc=form.document_settings.data['showTableContents'],
+                show_session_toc=form.document_settings.data['showSessionTOC'],
+                show_abstract=form.contribution_info.data['showAbstract'],
+                dont_show_poster_abstract=form.contribution_info.data['dontShowPosterAbstract'],
+                show_contribs=form.visible_entries.data['showContribsAtConfLevel'],
+                show_length_contribs=form.contribution_info.data['showLengthContribs'],
+                show_breaks=form.visible_entries.data['showBreaksAtConfLevel'],
+                new_page_per_session=form.session_info.data['newPagePerSession'],
+                show_session_description=form.session_info.data['showSessionDescription'],
+                print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions'],
+            )
+
+            show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
+            program_config = TimetableExportProgramConfig(
+                show_siblings_location=show_siblings_location,
+                show_children_location=show_children_location
+            )
+
+            html = render_template('events/timetable/pdf/timetable.html',
+                                   event=self.event, days=days, now=now, config=config, program_config=program_config)
+
+            return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
                                 back_url=url_for('.timetable', self.event))
 
 
-class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
+class RHTimetableExportDefaultPDF(RHTimetableExportPDF):
     def _process(self):
-        pdf = get_timetable_offline_pdf_generator(self.event)
-        return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+        now = now_utc()
+        css = render_template('events/timetable/pdf/timetable.css')
+        event = self.event
+        entries = get_nested_timetable(event)
+        days = {day: list(e) for day, e in groupby(
+            entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
+        )}
+
+        config = TimetableExportConfig(
+            show_title=True,
+            show_affiliation=False,
+            show_cover_page=True,
+            show_toc=True,
+            show_session_toc=True,
+            show_abstract=False,
+            dont_show_poster_abstract=False,
+            show_contribs=False,
+            show_length_contribs=False,
+            show_breaks=False,
+            new_page_per_session=False,
+            show_session_description=False,
+            print_date_close_to_sessions=False
+        )
+
+        show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
+        program_config = TimetableExportProgramConfig(
+            show_siblings_location=show_siblings_location,
+            show_children_location=show_children_location
+        )
+
+        html = render_template('events/timetable/pdf/timetable.html', event=self.event,
+                                days=days, now=now, config=config, program_config=program_config)
+
+        return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')

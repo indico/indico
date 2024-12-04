@@ -6,12 +6,14 @@
 # LICENSE file for more details.
 
 from collections import defaultdict
+from io import BytesIO
 from operator import attrgetter
 
 from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import contains_eager, joinedload, subqueryload, undefer
+from weasyprint import CSS, HTML
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -22,6 +24,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.receipts.util import sandboxed_url_fetcher
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_time, get_day_end, get_day_start, iterdays
 from indico.util.i18n import _
@@ -344,6 +347,111 @@ def get_time_changes_notifications(changes, tzinfo, entry=None):
         if msg:
             notifications.append(msg.format(format_time(new_time, timezone=tzinfo)))
     return notifications
+
+
+def get_nested_timetable(event, *, include_notes=True, show_date='all', show_session='all', detail_level='all'):
+    def _entry_title_key(entry) -> tuple[str, str]:
+        obj = entry.object
+        if entry.type == TimetableEntryType.SESSION_BLOCK:
+            return (obj.session.code, obj.full_title)
+        return ('', obj.title)
+
+    event.preload_all_acl_entries()
+    event_tz = event.display_tzinfo
+
+    children_strategy = joinedload('children')
+    children_strategy.joinedload('session_block').joinedload('person_links')
+    children_strategy.joinedload('break_')
+
+    children_contrib_strategy = children_strategy.subqueryload('contribution')
+    children_contrib_strategy.joinedload('person_links')
+    children_contrib_strategy.joinedload('subcontributions')
+    children_contrib_strategy.joinedload('references')
+    children_contrib_strategy.joinedload('own_room')
+
+    children_subcontrib_strategy = children_contrib_strategy.joinedload('subcontributions')
+    children_subcontrib_strategy.joinedload('person_links')
+    children_subcontrib_strategy.joinedload('references')
+
+    contrib_strategy = joinedload('contribution')
+    contrib_strategy.joinedload('person_links')
+    contrib_strategy.joinedload('references')
+
+    subcontrib_strategy = contrib_strategy.joinedload('subcontributions')
+    subcontrib_strategy.joinedload('person_links')
+    subcontrib_strategy.joinedload('references')
+
+    if include_notes:
+        children_contrib_strategy.joinedload('note')
+        contrib_strategy.joinedload('note')
+        subcontrib_strategy.joinedload('note')
+
+    # try to minimize the number of DB queries
+    options = [contrib_strategy,
+               children_strategy,
+               joinedload('session_block').joinedload('person_links'),
+               joinedload('session_block').joinedload('own_room'),
+               joinedload('break_')]
+
+    entries = []
+
+    for entry in event.timetable_entries.filter_by(parent=None).options(*options):
+        if show_date != 'all' and entry.start_dt.astimezone(event_tz).date().isoformat() != show_date:
+            continue
+        if (entry.type == TimetableEntryType.CONTRIBUTION and
+                (detail_level not in ('contribution', 'all') or show_session != 'all')):
+            continue
+        elif (entry.type == TimetableEntryType.SESSION_BLOCK and show_session != 'all' and
+                str(entry.object.session.friendly_id) != show_session):
+            continue
+
+        if entry.type == TimetableEntryType.BREAK:
+            entries.append(entry)
+        elif entry.object.can_access(session.user):
+            entries.append(entry)
+
+    entries.sort(key=attrgetter('end_dt'), reverse=True)
+    entries.sort(key=lambda entry: (entry.start_dt, *_entry_title_key(entry)))
+
+    return entries
+
+
+def get_nested_timetable_location_conditions(entries):
+    show_siblings_location = False
+    show_children_location = {}
+
+    show_siblings_location = any(
+        not entry.object.inherit_location or (
+            # the object is a session block and inherits from a session with a custom location
+            entry.type == TimetableEntryType.SESSION_BLOCK
+            and entry.object.inherit_location
+            and not entry.object.session.inherit_location
+        )
+        for entry in entries
+    )
+
+    show_children_location = {
+        entry.id: not all(child.object.inherit_location for child in entry.children)
+        for entry in entries
+    }
+
+    return show_siblings_location, show_children_location
+
+
+def create_pdf(html, css, event) -> BytesIO:
+    css_url_fetcher = sandboxed_url_fetcher(event)
+    html_url_fetcher = sandboxed_url_fetcher(event, allow_event_images=True)
+    css = CSS(string=css, url_fetcher=css_url_fetcher)
+    documents = [
+        HTML(string=html, url_fetcher=html_url_fetcher).render(stylesheets=(css,))
+    ]
+    all_pages = [p for doc in documents for p in doc.pages]
+
+    f = BytesIO()
+    documents[0].copy(all_pages).write_pdf(f)
+    f.seek(0)
+
+    return f
 
 
 @memoize_request
