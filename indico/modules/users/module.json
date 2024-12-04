@@ -5,6 +5,7 @@
     "profile_picture": "./ProfilePicture.jsx",
     "personal_data": "./PersonalDataForm.jsx",
     "favorites": "./Favorites.jsx",
-    "data_export": "./DataExport.jsx"
+    "data_export": "./DataExport.jsx",
+    "user_delete": "./UserDelete.jsx"
   }
 }
