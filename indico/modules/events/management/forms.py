@@ -15,11 +15,13 @@ from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields import IntegerField, URLField
+from wtforms.fields.simple import HiddenField
 from wtforms.validators import URL, DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
@@ -47,7 +49,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import IndicoLinkListField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
-from indico.web.forms.widgets import PrefixedTextWidget, SwitchWidget, TinyMCEWidget
+from indico.web.forms.widgets import DescriptionWidget, PrefixedTextWidget, SwitchWidget, TinyMCEWidget
 
 
 CLONE_REPEAT_CHOICES = (
@@ -59,13 +61,21 @@ CLONE_REPEAT_CHOICES = (
 
 class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
-    description = TextAreaField(_('Description'), widget=TinyMCEWidget(images=True, height=350))
+    description = TextAreaField(_('Description'))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
+    render_mode = HiddenField(filters=[lambda x: int(x) if x else None])
 
     def __init__(self, *args, event, **kwargs):
         self.event = event
         self.editor_upload_url = url_for('attachments.upload_editor', event)
         super().__init__(*args, **kwargs)
+        if self.event.description:
+            render_mode = self.event.render_mode
+        elif session.user.settings.get('use_markdown_for_description'):
+            render_mode = RenderMode.markdown
+        else:
+            render_mode = RenderMode.html
+        self.description.widget = DescriptionWidget(render_mode=render_mode.name)
         prefix = f'{config.BASE_URL}/e/'
         self.url_shortcut.description = _('The URL shortcut must be unique within this Indico instance and '
                                           'is not case sensitive.').format(prefix)

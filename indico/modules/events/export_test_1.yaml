@@ -32,6 +32,8 @@ objects:
     no_access_contact: ''
     protection_mode: !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode
     - 1
+    render_mode: !!python/object/apply:indico.core.db.sqlalchemy.descriptions.RenderMode
+    - 1
     room_name: ''
     start_dt: !!python/tuple
     - datetime
