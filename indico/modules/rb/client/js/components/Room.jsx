@@ -34,13 +34,13 @@ class Room extends React.Component {
     isCheckingUserRoomPermissions: PropTypes.bool.isRequired,
     addFavoriteRoom: PropTypes.func.isRequired,
     delFavoriteRoom: PropTypes.func.isRequired,
-    customRenderer: PropTypes.func,
+    customRoomComponent: PropTypes.elementType,
   };
 
   static defaultProps = {
     showFavoriteButton: false,
     children: null,
-    customRenderer: null,
+    customRoomComponent: null,
   };
 
   shouldComponentUpdate(nextProps) {
@@ -152,13 +152,13 @@ class Room extends React.Component {
       addFavoriteRoom,
       delFavoriteRoom,
       isCheckingUserRoomPermissions,
-      customRenderer,
+      customRoomComponent: CustomRoom,
       ...restProps
     } = this.props;
     const {content, actions} = Slot.split(children);
 
-    if (customRenderer) {
-      return customRenderer(this);
+    if (CustomRoom) {
+      return <CustomRoom roomInstance={this} {...this.props} />;
     }
 
     return (
