@@ -26,7 +26,8 @@ function _humanizeDuration(duration) {
   if (hours === 1 && minutes === 0) {
     return Translate.string('1 hour');
   } else if (hours !== 0) {
-    return PluralTranslate.string('{time} hour', '{time} hours', hours + minutes / 60, {time: hours + minutes / 60});
+    return PluralTranslate.string('{time} hour', '{time} hours',
+                                  hours + minutes / 60, {time: hours + minutes / 60});
   } else {
     return PluralTranslate.string('{time} min', '{time} min', minutes, {time: minutes});
   }
