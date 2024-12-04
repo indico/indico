@@ -28,3 +28,4 @@ export {
   handleSubmitError,
 } from './final-form';
 export {default as UnloadPrompt, FinalUnloadPrompt} from './unload';
+export {default as FormContext} from './context';

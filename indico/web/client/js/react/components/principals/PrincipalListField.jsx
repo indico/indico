@@ -11,6 +11,7 @@ import React from 'react';
 import {Button, Dropdown, List} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {FinalField} from '../../forms';
 
@@ -79,6 +80,10 @@ const PrincipalListField = props => {
   };
   const handleAddItems = data => {
     onChange([...value, ...data.map(x => x.identifier)]);
+    markTouched();
+  };
+  const handlePluginChange = identifiers => {
+    onChange(identifiers);
     markTouched();
   };
 
@@ -164,6 +169,11 @@ const PrincipalListField = props => {
               )}
             </>
           )}
+          {renderPluginComponents('principal-list-field-add-buttons', {
+            eventId,
+            entries,
+            onChange: handlePluginChange,
+          })}
         </Button.Group>
       )}
     </>
