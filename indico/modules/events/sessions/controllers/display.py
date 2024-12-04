@@ -90,14 +90,17 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
         now = now_utc()
         css = render_template('events/timetable/pdf/timetable.css')
         event = self.event
-        entries = filter(
-            lambda e: self.session.id == e.id or (
-                e.session_block and self.session.id == e.session_block.session.id
-            ), get_nested_timetable(event)
-        )
-        days = {day: list(e) for day, e in groupby(
-            entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
-        )}
+        entries = [
+            e for e in get_nested_timetable(event)
+            if e.type.name == 'SESSION_BLOCK' and (
+                e.id == self.session.id or (e.session_block and self.session.id == e.session_block.session.id)
+            )
+        ]
+        days = {
+            day: list(e) for day, e in groupby(
+                entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
+            )
+        }
         config = TimetableExportConfig(
             show_title=True,
             show_affiliation=False,
