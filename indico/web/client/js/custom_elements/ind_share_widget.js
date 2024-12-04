@@ -321,7 +321,7 @@ function ShareWidget({
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMastodonOpen, setMastodonOpen] = useState(false);
-  const shareText = `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
+  const shareText = encodeURIComponent(`${eventName} (${eventStartDt}) · Indico (${eventUrl})`);
   return (
     <Popup
       trigger={
