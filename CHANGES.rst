@@ -18,6 +18,8 @@ Bugfixes
 
 - Fix error when using the "Request approval" editing action on an editable that
   does not have publishable files (:pr:`6186`)
+- Ensure the event name is correctly encoded to prevent issues with special characters
+  in the share event widget (:pr:`6649`)
 
 Accessibility
 ^^^^^^^^^^^^^
