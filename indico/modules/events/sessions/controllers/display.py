@@ -90,7 +90,7 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
     def _process(self):
         now = now_utc()
         css = render_template('events/timetable/pdf/timetable.css')
-        event = self.eventTimetableEntryType.SESSION_BLOCK
+        event = self.event
         entries = [
             e for e in get_nested_timetable(event)
             if e.type == TimetableEntryType.SESSION_BLOCK and (
