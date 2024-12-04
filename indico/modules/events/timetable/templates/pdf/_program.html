@@ -27,22 +27,9 @@
                                     {% if entry.type.name == 'BREAK' %}
                                         {{ _render_break(entry, config, program_config) }}
                                     {% elif entry.type.name == 'CONTRIBUTION' %}
-                                        {{
-                                            _render_contrib(
-                                                entry,
-                                                config,
-                                                program_config
-                                            )
-                                        }}
+                                        {{  _render_contrib(entry, config, program_config) }}
                                     {% else %}
-                                        {{
-                                            _render_session_block(
-                                                entry,
-                                                config,
-                                                program_config,
-                                                show_children_location
-                                            )
-                                        }}
+                                        {{ _render_session_block(entry, config, program_config, show_children_location) }}
                                     {% endif %}
                                 </div>
                             </section>
@@ -233,7 +220,7 @@
                     {% trans %}Contribution{% endtrans %}
                 {% elif sess.is_poster %}
                     {% trans %}Poster Session{% endtrans %}
-                {% else %}
+                {% elif type == 'SESSION_BLOCK' %}
                     {% trans %}Session{% endtrans %}
                 {% endif %}
             </b>
