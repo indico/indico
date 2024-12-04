@@ -31,8 +31,7 @@
                                             _render_contrib(
                                                 entry,
                                                 config,
-                                                program_config,
-                                                show_children_location
+                                                program_config
                                             )
                                         }}
                                     {% else %}
@@ -69,7 +68,7 @@
     </section>
 {% endmacro %}
 
-{% macro _render_contrib(entry, config, program_config, show_children_location) %}
+{% macro _render_contrib(entry, config, program_config) %}
     {% set contrib = entry.object %}
     {% set speakers = contrib.speakers %}
     {% set subcontribs = contrib.subcontributions %}
@@ -87,7 +86,7 @@
                 {{ _render_description(contrib.description) }}
             {% endif %}
             {% if subcontribs %}
-                {{ _render_subcontribs(contrib, config, show_children_location) }}
+                {{ _render_subcontribs(contrib, config) }}
             {% endif %}
         </div>
     {% endif %}
@@ -145,7 +144,7 @@
     </div>
 {% endmacro %}
 
-{% macro _render_child_contrib(contrib, config, show_location) %}
+{% macro _render_child_contrib(contrib, config, show_location=false) %}
     {% set speakers = contrib.speakers %}
 
     {% if speakers %}
@@ -176,11 +175,11 @@
         </div>
     {% endif %}
     {% if contrib.subcontributions %}
-        {{ _render_subcontribs(contrib, config, show_location) }}
+        {{ _render_subcontribs(contrib, config) }}
     {% endif %}
 {% endmacro %}
 
-{% macro _render_subcontribs(contrib, config, show_children_location) %}
+{% macro _render_subcontribs(contrib, config) %}
     {% set subcontribs %}
         {% for subcontrib in contrib.subcontributions %}
             <li class="inherited-border-color">
@@ -193,7 +192,7 @@
                     <h4>{{ subcontrib.title }}</h4>
                 </div>
                 <div class="contrib-timeline-content">
-                    {{ _render_subcontrib(subcontrib, config, show_children_location) }}
+                    {{ _render_subcontrib(subcontrib, config) }}
                 </div>
             </li>
         {% endfor%}
@@ -215,8 +214,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_subcontrib(subcontrib, config, show_children_location) %}
-    {{ _render_child_contrib(subcontrib, config, show_children_location) }}
+{% macro _render_subcontrib(subcontrib, config) %}
+    {{ _render_child_contrib(subcontrib, config) }}
 {% endmacro %}
 
 {% macro _render_entry_header(entry, config, program_config) %}

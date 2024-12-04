@@ -19,6 +19,7 @@ from indico.modules.events.sessions.util import get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
 from indico.modules.events.timetable.controllers.display import (RHTimetableExportPDF, TimetableExportConfig,
                                                                  TimetableExportProgramConfig)
+from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.util import (create_pdf, get_nested_timetable,
                                                   get_nested_timetable_location_conditions)
 from indico.util.date_time import now_utc
@@ -89,10 +90,10 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
     def _process(self):
         now = now_utc()
         css = render_template('events/timetable/pdf/timetable.css')
-        event = self.event
+        event = self.eventTimetableEntryType.SESSION_BLOCK
         entries = [
             e for e in get_nested_timetable(event)
-            if e.type.name == 'SESSION_BLOCK' and (
+            if e.type == TimetableEntryType.SESSION_BLOCK and (
                 e.id == self.session.id or (e.session_block and self.session.id == e.session_block.session.id)
             )
         ]

@@ -266,10 +266,14 @@ type(
     },
 
     pdf: function() {
-      ajaxDialog({
-        url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
-        title: $T.gettext('Export to PDF'),
-      });
+      if ($('html').data('static-site')) {
+        window.location = build_url(Indico.Urls.Timetable.default_pdf, {event_id: this.eventInfo.id});
+      } else {
+        ajaxDialog({
+          url: build_url(Indico.Urls.Timetable.pdf, {event_id: this.eventInfo.id}),
+          title: $T.gettext('Export to PxDF'),
+        });
+      }
     },
 
     fullScreen: function() {

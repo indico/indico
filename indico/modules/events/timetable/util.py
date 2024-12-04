@@ -420,21 +420,20 @@ def get_nested_timetable_location_conditions(entries):
     show_siblings_location = False
     show_children_location = {}
 
-    for entry in entries:
-        show_children_location[entry.id] = not all(
-            child.object.inherit_location for child in entry.children
-        )
-
-        if (
-            not show_siblings_location and
-            # the object itself does not inherit
-            (not entry.object.inherit_location or
+    show_siblings_location = any(
+        not entry.object.inherit_location or (
             # the object is a session block and inherits from a session with a custom location
-            (entry.type == TimetableEntryType.SESSION_BLOCK and
-                entry.object.inherit_location and
-                not entry.object.session.inherit_location))
-        ):
-            show_siblings_location = True
+            entry.type == TimetableEntryType.SESSION_BLOCK
+            and entry.object.inherit_location
+            and not entry.object.session.inherit_location
+        )
+        for entry in entries
+    )
+
+    show_children_location = {
+        entry.id: not all(child.object.inherit_location for child in entry.children)
+        for entry in entries
+    }
 
     return show_siblings_location, show_children_location
 

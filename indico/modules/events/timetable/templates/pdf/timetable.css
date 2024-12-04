@@ -240,14 +240,28 @@ body {
 }
 
 .contrib-timeline > li > .contrib-timeline-content {
+  padding: 0 5px;
+}
+
+.contrib-timeline > li > .contrib-timeline-content > *:first-child {
   margin-top: 5px;
-  padding: 5px;
+}
+
+.contrib-timeline > li > .contrib-timeline-content > *:last-child {
+  margin-top: 5px;
 }
 
 .sub-contrib-timeline .contrib-timeline-content {
-  margin-top: 10px;
   font-size: 1em;
-  padding: 0 10px 10px 10px;
+  padding: 0 10px;
+}
+
+.sub-contrib-timeline .contrib-timeline-content > *:first-child {
+  margin-top: 10px;
+}
+
+.sub-contrib-timeline .contrib-timeline-content > *:last-child {
+  padding-bottom: 10px;
 }
 
 .contrib-timeline-content {
