@@ -19,12 +19,14 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import column_property, mapper
+from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
+from indico.core.errors import NoReportError
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -35,7 +37,7 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
-from indico.util.i18n import L_
+from indico.util.i18n import L_, _
 from indico.util.locators import locator_property
 from indico.util.signals import values_from_signal
 from indico.util.string import format_full_name, format_repr, strict_str
@@ -752,6 +754,29 @@ class Registration(db.Model):
                 self.state = RegistrationState.complete
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
+
+    def reset_state(self, *, silent=False):
+        """Reset the state of the registration back to pending."""
+        initial_state = self.state
+        if self.has_conflict():
+            if silent:
+                return False
+            raise NoReportError(_('Cannot reset this registration since there is another valid registration for the '
+                                  'same user or email.'))
+        if self.state in (RegistrationState.complete, RegistrationState.unpaid):
+            self.update_state(approved=False)
+        elif self.state == RegistrationState.rejected:
+            self.rejection_reason = ''
+            self.update_state(rejected=False)
+        elif self.state == RegistrationState.withdrawn:
+            self.update_state(withdrawn=False)
+            signals.event.registration_state_updated.send(self, previous_state=initial_state)
+        elif silent:
+            return False
+        else:
+            raise BadRequest(_('The registration cannot be reset in its current state.'))
+        self.checked_in = False
+        return True
 
     def has_conflict(self):
         """Check if there are other valid registrations for the same user.
