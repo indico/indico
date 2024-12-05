@@ -8,6 +8,7 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Card, Icon, Label, Loader, Popup, Button} from 'semantic-ui-react';
@@ -33,11 +34,13 @@ class Room extends React.Component {
     isCheckingUserRoomPermissions: PropTypes.bool.isRequired,
     addFavoriteRoom: PropTypes.func.isRequired,
     delFavoriteRoom: PropTypes.func.isRequired,
+    customRoomComponent: PropTypes.elementType,
   };
 
   static defaultProps = {
     showFavoriteButton: false,
     children: null,
+    customRoomComponent: null,
   };
 
   shouldComponentUpdate(nextProps) {
@@ -149,9 +152,14 @@ class Room extends React.Component {
       addFavoriteRoom,
       delFavoriteRoom,
       isCheckingUserRoomPermissions,
+      customRoomComponent: CustomRoom,
       ...restProps
     } = this.props;
     const {content, actions} = Slot.split(children);
+
+    if (CustomRoom) {
+      return <CustomRoom roomInstance={this} {...this.props} />;
+    }
 
     return (
       <Card styleName="room-card" {...restProps}>
@@ -204,4 +212,4 @@ export default connect(
       },
       dispatch
     )
-)(Room);
+)(Overridable.component('Room', Room));

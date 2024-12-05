@@ -28,6 +28,7 @@ class RoomRenderer extends React.Component {
     selectedRooms: PropTypes.object,
     inSelectionMode: PropTypes.bool,
     children: PropTypes.func,
+    containerComponent: PropTypes.elementType,
   };
 
   static defaultProps = {
@@ -35,6 +36,7 @@ class RoomRenderer extends React.Component {
     selectedRooms: {},
     inSelectionMode: false,
     children: null,
+    containerComponent: Card.Group,
   };
 
   RoomComponent = withHoverListener(({room, ...restProps}) => {
@@ -72,9 +74,14 @@ class RoomRenderer extends React.Component {
   });
 
   render() {
-    const {rooms, inSelectionMode, selectedRooms} = this.props;
+    const {
+      rooms,
+      inSelectionMode,
+      selectedRooms,
+      containerComponent: ContainerComponent,
+    } = this.props;
     return (
-      <Card.Group>
+      <ContainerComponent>
         {rooms.map(room => (
           <this.RoomComponent
             key={room.id}
@@ -83,7 +90,7 @@ class RoomRenderer extends React.Component {
             selectedRooms={selectedRooms}
           />
         ))}
-      </Card.Group>
+      </ContainerComponent>
     );
   }
 }
