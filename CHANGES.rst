@@ -18,6 +18,7 @@ Bugfixes
 
 - Fix error when using the "Request approval" editing action on an editable that
   does not have publishable files (:pr:`6186`)
+- Do not fail if a user has an invalid timezone stored in the database (:pr:`6647`)
 
 Accessibility
 ^^^^^^^^^^^^^

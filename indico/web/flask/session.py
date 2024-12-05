@@ -131,7 +131,7 @@ class IndicoSession(BaseSession):
     def timezone(self, tz):
         self['_timezone'] = tz
 
-    @property
+    @cached_property
     def tzinfo(self):
         """The tzinfo of the user's current timezone.
 
