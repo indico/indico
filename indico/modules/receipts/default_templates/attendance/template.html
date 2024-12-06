@@ -9,7 +9,7 @@
     <h2>{{ event.title }}</h2>
     <!-- Date(s) -->
     {% if event.start_dt.date() != event.end_dt.date() %}
-      {{ format_interval(event.start_dt, event.end_dt, format='dMMMMy') }}
+      {{ format_interval(event.start_dt, event.end_dt, skeleton='dMMMMy') }}
     {% else %}
       {{ event.start_dt | format_date('dd MMM YYYY') }}
     {% endif %}
