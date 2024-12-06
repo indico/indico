@@ -7,7 +7,8 @@
                data-locator="{{ obj.locator|tojson|forceescape }}"
                data-attachment-editor>
                 {% if not obj.attachment_count %}
-                    <em>{% trans %}None{% endtrans %}</em>
+                    {# i18n: No attachments #}
+                    <em>{% trans 'Attachments' %}None{% endtrans %}</em>
                 {% else %}
                     <span class="label">
                         {% trans count=obj.attachment_count -%}

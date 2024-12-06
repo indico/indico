@@ -9,7 +9,7 @@ from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.settings.converters import DatetimeConverter, EnumConverter
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.enum import RichEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 
 
 class BOASortField(RichEnum):
@@ -70,7 +70,7 @@ BOASortField.__titles__ = {
 
 
 BOACorrespondingAuthorType.__titles__ = {
-    BOACorrespondingAuthorType.none: _('None'),
+    BOACorrespondingAuthorType.none: pgettext('Author type', 'None'),
     BOACorrespondingAuthorType.submitter: _('Submitter'),
     BOACorrespondingAuthorType.speakers: _('Speakers')
 }

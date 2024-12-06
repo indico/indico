@@ -28,7 +28,7 @@ from indico.modules.logs.models.entries import CategoryLogEntry, CategoryLogReal
 from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, text_to_repr
 from indico.web.flask.util import url_for
@@ -49,7 +49,8 @@ def _get_default_event_themes():
 
 
 class EventMessageMode(RichIntEnum):
-    __titles__ = [_('None'), _('Info'), _('Warning'), _('Danger')]
+    __titles__ = [pgettext('Message type', 'None'), pgettext('Message type', 'Info'),
+                  pgettext('Message type', 'Warning'), pgettext('Message type', 'Danger')]
     disabled = 0
     info = 1
     warning = 2

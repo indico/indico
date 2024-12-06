@@ -46,7 +46,8 @@
                 {% block category_filter_extra %}{% endblock %}
             </div>
             <span id="applyButtonWrapper">
-                <input class="i-button" type="submit" value="{% trans %}Apply{% endtrans %}">
+                {# i18n: A button that applies filtering options to some items #}
+                <input class="i-button" type="submit" value="{% trans 'Filters' %}Apply{% endtrans %}">
             </span>
         </form>
         {% if subcategories %}

@@ -27,11 +27,11 @@ import './EditableList.module.scss';
 const MAP_TEMPLATE_OPTIONS = [
   {
     value: 'none',
-    text: Translate.string('None'),
+    text: Translate.string('None', 'Map template'),
   },
   {
     value: 'custom',
-    text: Translate.string('Custom'),
+    text: Translate.string('Custom', 'Map template'),
   },
   {
     value: 'https://www.google.com/maps/place/{lat},{lng}',

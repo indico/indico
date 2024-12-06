@@ -8,11 +8,12 @@
 from indico.core.settings.converters import EnumConverter, ModelListConverter
 from indico.modules.users import UserSettingsProxy
 from indico.util.enum import RichIntEnum
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 
 
 class RoomEmailMode(RichIntEnum):
-    __titles__ = (_('None'), _('Rooms I own'), _('Rooms I manage'), _('Rooms I own or manage'))
+    __titles__ = (pgettext('Room notifications', 'None'), _('Rooms I own'),
+                  _('Rooms I manage'), _('Rooms I own or manage'))
     none = 0
     owned = 1
     managed = 2

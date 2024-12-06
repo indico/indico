@@ -82,7 +82,7 @@ function PersonalDataForm({
               selection
               parse={p.nullIfEmpty}
               label={Translate.string('Title', 'Salutation')}
-              placeholder={Translate.string('None')}
+              placeholder={Translate.string('None', 'Title (salutation)')}
             />
             <Form.Group widths="equal">
               <SyncedFinalInput
