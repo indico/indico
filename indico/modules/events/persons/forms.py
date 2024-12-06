@@ -14,9 +14,9 @@ from indico.web.forms.widgets import SwitchWidget
 
 
 class ManagePersonListsForm(IndicoForm):
-    disallow_custom_persons = BooleanField(_('Disallow manually entering persons'), widget=SwitchWidget(),
-                                           description=_('Prohibit submitters from adding new speakers/authors '
-                                                         'manually and only allow searching for existing users.'))
+    enforce_user_search = BooleanField(_('Enforce user search'), widget=SwitchWidget(),
+                                       description=_('Prevent submitters from adding new speakers/authors '
+                                                     'manually before searching for existing users.'))
     default_search_external = BooleanField(_('Include users with no Indico account by default'), widget=SwitchWidget(),
                                            description=_('If enabled, searching people for speakers/authors will '
                                                          'include those with no Indico account by default.'))

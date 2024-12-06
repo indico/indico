@@ -243,6 +243,7 @@ function PersonLinkField({
   setAutoSort,
   hasPredefinedAffiliations,
   canEnterManually,
+  requiredPersonFields,
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
@@ -380,6 +381,7 @@ function PersonLinkField({
             favorites={favoriteUsers}
             existing={persons.map(p => p.userIdentifier)}
             onAddItems={onAdd}
+            onEnterManually={() => setModalOpen('details')}
             triggerFactory={props => (
               <Button type="button" {...props}>
                 <Icon name="search" />
@@ -404,6 +406,7 @@ function PersonLinkField({
               onSubmit={onSubmit}
               person={persons[selected]}
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
+              requiredPersonFields={requiredPersonFields}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
               validateEmailUrl={validateEmailUrl}
               extraParams={extraParams}
@@ -435,6 +438,7 @@ PersonLinkField.propTypes = {
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
   canEnterManually: PropTypes.bool,
+  requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
   nameFormat: PropTypes.string,
   validateEmailUrl: PropTypes.string,
@@ -450,6 +454,7 @@ PersonLinkField.defaultProps = {
   setAutoSort: null,
   hasPredefinedAffiliations: false,
   canEnterManually: true,
+  requiredPersonFields: [],
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,
@@ -465,6 +470,7 @@ export function WTFPersonLinkField({
   emptyMessage,
   hasPredefinedAffiliations,
   canEnterManually,
+  requiredPersonFields,
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
@@ -521,6 +527,7 @@ export function WTFPersonLinkField({
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
       canEnterManually={canEnterManually}
+      requiredPersonFields={requiredPersonFields}
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
       validateEmailUrl={validateEmailUrl}
@@ -539,6 +546,7 @@ WTFPersonLinkField.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool,
   nameFormat: PropTypes.string,
   canEnterManually: PropTypes.bool,
+  requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
@@ -552,6 +560,7 @@ WTFPersonLinkField.defaultProps = {
   emptyMessage: null,
   hasPredefinedAffiliations: false,
   canEnterManually: true,
+  requiredPersonFields: [],
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,
