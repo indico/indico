@@ -30,6 +30,7 @@ Improvements
 - Add a new setting (:data:`ALLOW_ADMIN_USER_DELETION`) to let administrators permanently
   delete Indico users from the user management UI (:pr:`6652`, thanks :user:`SegiNyn`)
 - Support ``==text==`` to highlight text in markdown (:issue:`6731`, :pr:`6732`)
+- Replace the "Disallow custom persons" event setting with "Enforce user search" (:pr:`6689`)
 
 Bugfixes
 ^^^^^^^^

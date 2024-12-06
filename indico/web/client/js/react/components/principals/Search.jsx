@@ -235,6 +235,7 @@ const searchFactory = config => {
     loading,
     onAdd,
     onRemove,
+    onEnterManually,
     isAdded,
     favorites,
     // eslint-disable-next-line no-shadow
@@ -264,7 +265,24 @@ const searchFactory = config => {
           {total > results.length && <Message info>{tooManyText}</Message>}
         </>
       ) : (
-        <Divider horizontal>{noResultsText}</Divider>
+        <>
+          <Divider horizontal>{noResultsText}</Divider>
+          {onEnterManually && (
+            <Message>
+              <div style={{display: 'flex'}}>
+                <div>
+                  <Translate as={Message.Header}>Add a new person</Translate>
+                  <Translate as="p">Add a person by manually entering their details</Translate>
+                </div>
+                <Button
+                  className="right"
+                  content={Translate.string('Add')}
+                  onClick={onEnterManually}
+                />
+              </div>
+            </Message>
+          )}
+        </>
       )}
     </div>
   );
@@ -272,6 +290,7 @@ const searchFactory = config => {
   const SearchContent = ({
     onAdd,
     onRemove,
+    onEnterManually,
     isAdded,
     favorites,
     single,
@@ -321,6 +340,7 @@ const searchFactory = config => {
             favorites={favorites}
             onAdd={onAdd}
             onRemove={onRemove}
+            onEnterManually={onEnterManually}
             isAdded={isAdded}
             getResultsText={total =>
               resultDisplay.results === favoriteResults
@@ -385,6 +405,7 @@ const searchFactory = config => {
     alwaysConfirm,
     onOpen,
     onClose,
+    onEnterManually,
     withEventPersons,
     eventId,
   }) => {
@@ -407,6 +428,13 @@ const searchFactory = config => {
     const handleRemove = item => {
       setStaged(prev => prev.filter(it => it.identifier !== item.identifier));
     };
+
+    const handleEnterManually =
+      onEnterManually &&
+      (() => {
+        setOpen(false);
+        onEnterManually();
+      });
 
     const handleAddButtonClick = () => {
       onAddItems(single ? staged[0] : staged);
@@ -476,6 +504,7 @@ const searchFactory = config => {
             favorites={favorites}
             onAdd={handleAdd}
             onRemove={handleRemove}
+            onEnterManually={handleEnterManually}
             isAdded={isAdded}
             single={single}
             withEventPersons={withEventPersons}
@@ -507,6 +536,7 @@ const searchFactory = config => {
     alwaysConfirm: PropTypes.bool,
     onOpen: PropTypes.func,
     onClose: PropTypes.func,
+    onEnterManually: PropTypes.func,
     withEventPersons: PropTypes.bool,
     eventId: PropTypes.number,
   };
@@ -520,6 +550,7 @@ const searchFactory = config => {
     alwaysConfirm: false,
     onOpen: () => {},
     onClose: () => {},
+    onEnterManually: null,
     withEventPersons: false,
     eventId: null,
   };

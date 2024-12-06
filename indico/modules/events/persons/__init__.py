@@ -50,7 +50,7 @@ def _get_placeholders(sender, person, event, contribution=None, abstract=None, r
 
 
 persons_settings = EventSettingsProxy('persons', {
-    'disallow_custom_persons': False,  # Disallow manually entering persons on person lists
+    'enforce_user_search': False,  # Prevent submitters from adding people manually before searching
     'default_search_external': False,  # Enable "Users with no Indico account" by default
     'show_titles': True,  # Whether to show titles for people in the event
 })

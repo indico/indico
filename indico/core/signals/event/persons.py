@@ -22,3 +22,7 @@ field in the person details modal.
 All parameters are camelized and passed to the `personListItemActions` and
 `personLinkFieldModals` React hooks.
 ''')
+
+person_required_fields = _signals.signal('person-required-fields', '''
+Get a set of fields that are required for a person. The *sender* is the form.
+''')
