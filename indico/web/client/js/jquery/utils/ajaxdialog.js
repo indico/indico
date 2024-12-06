@@ -323,10 +323,18 @@
               savedFiles = {};
               closeDialog(data, true);
               if (data.redirect) {
-                if (!data.redirect_no_loading) {
-                  IndicoUI.Dialogs.Util.progress();
+                if (data.target) {
+                  const link = document.createElement("a");
+                  link.setAttribute('href', data.redirect);
+                  link.setAttribute('target', data.target);
+                  this.parentElement.appendChild(link);
+                  link.click();
+                } else {
+                  if (!data.redirect_no_loading) {
+                    IndicoUI.Dialogs.Util.progress();
+                  }
+                  location.href = data.redirect;
                 }
-                location.href = data.redirect;
               }
             } else if (data.html) {
               popup.contentContainer.html(data.html);

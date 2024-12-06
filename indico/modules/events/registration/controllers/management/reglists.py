@@ -592,7 +592,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _process(self):
         all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
         badge_templates = {tpl.id: {
-            'data': tpl.data,
+            # 'data': tpl.data,
             'backside_tpl_id': tpl.backside_template_id,
             'orientation': 'landscape' if tpl.data['width'] > tpl.data['height'] else 'portrait',
             'format': get_badge_format(tpl)
@@ -623,10 +623,11 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             key = str(uuid.uuid4())
             badge_cache.set(key, data, timeout=1800)
             download_url = url_for('.registrations_print_badges', self.regform, template_id=template_id, uuid=key)
-            return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
+            return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True, target='_blank')
         return jsonify_template('events/registration/management/print_badges.html', event=self.event,
                                 regform=self.regform, settings_form=form, templates=badge_templates,
-                                registrations=registrations, all_registrations=all_registrations)
+                                registrations=registrations, all_registrations=all_registrations,
+                                form_action=url_for('.registrations_config_badges', self.regform))
 
 
 class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
