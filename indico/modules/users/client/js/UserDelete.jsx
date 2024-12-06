@@ -31,6 +31,7 @@ function UserDeleteDialogBody({
   disabled,
   inProgress,
   onDelete,
+  onClose,
 }) {
   return (
     <>
@@ -86,6 +87,7 @@ function UserDeleteDialogBody({
         )}
       </Modal.Content>
       <Modal.Actions>
+        <Button onClick={onClose} content={Translate.string('Cancel')} />
         {currentState === InfoState && (
           <Button color="red" onClick={gotToNextState}>
             <Translate>Yes, I want to delete this user</Translate>
@@ -107,6 +109,7 @@ UserDeleteDialogBody.propTypes = {
   disabled: PropTypes.bool.isRequired,
   inProgress: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 function UserDelete({userId, firstName: initialFirstName, lastName: initialLastName}) {
@@ -190,6 +193,7 @@ function UserDelete({userId, firstName: initialFirstName, lastName: initialLastN
             disabled={deleting || !firstNameVerified || !lastNameVerified}
             inProgress={deleting}
             onDelete={handleDelete}
+            onClose={handleCloseDialog}
           />
         </Modal>
       )}
