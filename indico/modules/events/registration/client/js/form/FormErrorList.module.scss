@@ -1,0 +1,49 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/icons';
+
+.form-error-list {
+  @extend %text-size-reset;
+  @extend %message-box;
+  --msgbox-key-color: var(--msgbox-alert-key-color);
+  --msgbox-sub-color: var(--msgbox-alert-sub-color);
+
+  font-family: 'Muli', sans-serif;
+
+  h4 {
+    @extend %message-box-heading;
+    font-family: 'Muli', sans-serif;
+  }
+
+  ul {
+    margin-left: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--content-gap-normal);
+  }
+
+  li a {
+    @extend %link;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+
+    color: var(--msgbox-key-color);
+
+    &::after {
+      @extend %icon;
+      @extend %icon-edit;
+    }
+  }
+
+  li::marker {
+    color: var(--msgbox-alert-key-color);
+  }
+}
