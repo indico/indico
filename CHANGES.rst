@@ -23,6 +23,7 @@ Improvements
 - Make the event export/import util much more flexible to support exporting whole
   category subtrees, add better support for dealing with files, and add various things
   that were not correctly exported before (:pr:`6446`)
+- Replace the "Disallow custom persons" event setting with "Enforce user search" (:pr:`6689`)
 
 Bugfixes
 ^^^^^^^^
