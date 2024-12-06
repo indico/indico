@@ -12,7 +12,7 @@ import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
-import {Translate, PluralTranslate} from 'indico/react/i18n';
+import {PluralTranslate} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
