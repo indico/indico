@@ -22,7 +22,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make field validation error messages more accessible in the registration form
+  (:pr:`6324`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -202,7 +203,6 @@ Accessibility
 ^^^^^^^^^^^^^
 
 - Improve registration form single choice input accessibility (:pr:`6310`, thanks :user:`foxbunny`)
-- Make error messages accessible in the registration form (:pr:`6324`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
