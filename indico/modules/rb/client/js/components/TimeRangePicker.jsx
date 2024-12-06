@@ -23,9 +23,7 @@ const START_HOUR = '06:00';
 function _humanizeDuration(duration) {
   const hours = duration.hours();
   const minutes = duration.minutes();
-  if (hours === 1 && minutes === 0) {
-    return Translate.string('1 hour');
-  } else if (hours !== 0) {
+  if (hours !== 0) {
     return PluralTranslate.string('{count} hour', '{count} hours', hours + minutes / 60, {
       count: hours + minutes / 60,
     });
