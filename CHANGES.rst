@@ -27,6 +27,7 @@ Improvements
   linked to them or their rooms (:pr:`6704`)
 - Add shortcuts to the past and closest events in a category (:pr:`6710`)
 - Improve the appearance of the date pickers (:issue:`6719`, :pr:`6720`, thanks :user:`foxbunny`)
+- Replace the "Disallow custom persons" event setting with "Enforce user search" (:pr:`6689`)
 
 Bugfixes
 ^^^^^^^^
