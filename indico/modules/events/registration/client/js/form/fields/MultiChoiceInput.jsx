@@ -192,7 +192,7 @@ export default function MultiChoiceInput({
       id={htmlId}
       name={htmlName}
       component={MultiChoiceInputComponent}
-      required={isRequired}
+      required={isRequired ? 'no-validator' : false}
       disabled={disabled}
       choices={choices}
       withExtraSlots={withExtraSlots}
@@ -200,6 +200,9 @@ export default function MultiChoiceInput({
       existingValue={existingValue}
       isEqual={_.isEqual}
       validate={value => {
+        if (isRequired && !_.keys(value).length) {
+          return Translate.string('This field is required');
+        }
         if (maxChoices && _.keys(value).length > maxChoices) {
           return PluralTranslate.string(
             'At most {n} option can be selected',
