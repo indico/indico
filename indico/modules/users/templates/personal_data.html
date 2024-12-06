@@ -38,6 +38,18 @@
                 <div id="personal-details-form-container"></div>
             </div>
         </div>
+        {% if session.user.is_admin and delete_user_from_ui_enabled %}
+            <div class="i-box">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        {%- trans %}Delete User{% endtrans -%}
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    <div id="user-delete-container"></div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     <script>
@@ -51,5 +63,12 @@
             {{ locked_field_message | tojson }},
             {{ has_predefined_affiliations | tojson }}
         );
+        {% if session.user.is_admin and delete_user_from_ui_enabled %}
+            setupUserDelete(
+                {{ (user.id if user != session.user else none) | tojson }},
+                {{ user_values.first_name | tojson }},
+                {{ user_values.last_name | tojson }},
+            );
+        {% endif %}
     </script>
 {% endblock %}
