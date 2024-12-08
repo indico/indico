@@ -30,7 +30,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                          Must return the updated query object.
     """
     own_room_strategy = joinedload('own_room')
-    own_room_strategy.load_only('building', 'floor', 'number', 'verbose_name')
+    own_room_strategy.load_only('location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
     own_room_strategy.lazyload('owner')
     own_venue_strategy = joinedload('own_venue').load_only('name')
     query = (Event.query
@@ -38,8 +38,10 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                      ~Event.is_deleted,
                      event_filter)
              .options(load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',
-                                'own_room_name', 'protection_mode', 'access_key'),
+                                'own_room_name', 'protection_mode', 'access_key', 'label_id', 'logo_metadata',
+                                'effective_protection_mode'),
                       subqueryload('acl_entries'),
+                      subqueryload('vc_room_associations'),
                       joinedload('person_links'),
                       own_room_strategy,
                       own_venue_strategy)
