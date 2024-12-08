@@ -7,7 +7,7 @@
 {% block text %}
     {% set tz = event.timezone %}
     {% trans date=cfp.end_dt|format_date(timezone=tz), time=cfp.end_dt|format_time(timezone=tz) -%}
-        Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }}).
+        Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
     {%- endtrans %}
 {% endblock %}
 
