@@ -15,6 +15,7 @@ from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
+from indico.web.util import get_request_user
 
 
 _DEFAULT_RESTRICTED_DISCLAIMER = ('Circulation to people other than the intended audience is not authorized. '
@@ -117,6 +118,9 @@ def confirm_rh_terms_required():
         return
 
     if request.method != 'GET' or request.is_xhr or request.is_json:
+        return
+
+    if get_request_user()[1] in {'oauth', 'signed_url'}:
         return
 
     # Everything else gets redirected to the terms page
