@@ -266,7 +266,6 @@ function EditableListDisplay({
           {value: 'false', text: Translate.string('No'), exclusive: true},
         ],
         isMatch: (contrib, selectedOptions) =>
-          console.debug('contrib', contrib) ||
           (selectedOptions.includes('true') && contrib.c.hasUpdates) ||
           (selectedOptions.includes('false') && !contrib.c.hasUpdates),
       },
