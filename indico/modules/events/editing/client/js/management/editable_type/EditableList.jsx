@@ -21,7 +21,17 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm} from 'semantic-ui-react';
+import {
+  Button,
+  Icon,
+  Loader,
+  Checkbox,
+  Message,
+  Dropdown,
+  Confirm,
+  Label,
+  Popup,
+} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -35,6 +45,7 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import Palette from 'indico/utils/palette';
+// import {getPluginObjects} from 'indico/utils/plugins';
 import {natSortCompare} from 'indico/utils/sort';
 
 import StateIndicator from '../../editing/timeline/StateIndicator';
@@ -289,6 +300,13 @@ function EditableListDisplay({
     ['editor', Translate.string('Editor'), 400],
   ];
 
+  const tagsExist = sortedList.some(
+    x => x.editable && x.editable.tags && x.editable.tags.length > 0
+  );
+  if (tagsExist) {
+    columnHeaders.push(['tags', Translate.string('Tags'), 136]);
+  }
+
   const programCodeKey = contribution => contribution.code;
   const titleKey = contribution => contribution.title.toLowerCase();
   const revisionKey = contribution => contribution.editable && contribution.editable.revisionCount;
@@ -399,22 +417,50 @@ function EditableListDisplay({
       />
     );
   };
+  const renderTags = editable => {
+    return (
+      // <div style={{display: 'flex', flexWrap: 'wrap', gap: '4px'}}>
+      <div>
+        {editable.tags.map(t => {
+          return (
+            <Label key={t.code} size="small" color={t.color}>
+              {t.code}
+            </Label>
+          );
+        })}
+      </div>
+    );
+  };
   const renderFuncs = {
     title: renderTitle,
     code: renderCode,
     revision: editable => (editable ? editable.revisionCount : ''),
     status: renderStatus,
     editor: renderEditor,
+    tags: renderTags,
   };
 
   // eslint-disable-next-line react/prop-types
   const renderCell = ({dataKey, rowIndex}) => {
     let data = sortedList[rowIndex][dataKey];
-    if (['editor', 'revision', 'status'].includes(dataKey)) {
+    if (['editor', 'revision', 'status', 'tags'].includes(dataKey)) {
       data = sortedList[rowIndex].editable;
     }
     const fn = renderFuncs[dataKey] || (x => x);
-    return (
+    return dataKey === 'tags' && data.tags.length > 1 ? (
+      <Popup
+        content={fn(data, rowIndex)}
+        trigger={
+          <div styleName="rowcolumn-tooltip" role="gridcell">
+            <div className="more-indicator">
+              <Icon name="ellipsis horizontal" />
+            </div>
+            {fn(data, rowIndex)}
+          </div>
+        }
+        on="hover"
+      />
+    ) : (
       <TooltipIfTruncated>
         <div
           styleName="rowcolumn-tooltip"
@@ -532,6 +578,8 @@ function EditableListDisplay({
       document.body.classList.remove('full-width-content-wrapper');
     };
   }, []);
+
+  // const getNewColumn = getPluginObjects('editing-qa-column');
 
   return (
     <>
