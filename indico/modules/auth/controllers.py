@@ -58,8 +58,8 @@ def _get_provider(name, external):
 
 
 def _sort_providers(providers: list[AuthProvider]) -> list[AuthProvider]:
-    """Sort providers by order and title."""
-    return sorted(providers, key=lambda p: (p.settings.get('order', math.inf), p.title))
+    """Sort providers by display order and title."""
+    return sorted(providers, key=lambda p: (p.settings.get('display_order', math.inf), p.title))
 
 
 class RHLogin(RH):
