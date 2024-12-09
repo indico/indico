@@ -451,7 +451,7 @@ def strftime_all_years(dt, fmt):
 
 
 @memoize_request
-def get_display_tz(obj=None, as_timezone=False):
+def get_display_tz(obj=None):
     display_tz = session_tz = session.timezone if has_request_context() else 'LOCAL'
     if display_tz == 'LOCAL':
         if obj is None:
@@ -461,8 +461,8 @@ def get_display_tz(obj=None, as_timezone=False):
     if not display_tz:
         display_tz = config.DEFAULT_TIMEZONE
     try:
-        return pytz.timezone(display_tz) if as_timezone else display_tz
+        return pytz.timezone(display_tz)
     except pytz.UnknownTimeZoneError:
         # Avoid failing in a rather ugly way (unformatted error page) when a user has an invalid timezone
         Logger.get('date_time').warning('Invalid timezone: %s (obj=%r, session_tz=%s)', display_tz, obj, session_tz)
-        return pytz.timezone(config.DEFAULT_TIMEZONE) if as_timezone else config.DEFAULT_TIMEZONE
+        return pytz.timezone(config.DEFAULT_TIMEZONE)

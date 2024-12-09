@@ -138,7 +138,7 @@ class IndicoSession(BaseSession):
         This should only be used in places where no other timezone
         such as from an event or category is available.
         """
-        return get_display_tz(as_timezone=True)
+        return get_display_tz()
 
     @property
     def hard_expiry(self):
