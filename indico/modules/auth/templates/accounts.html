@@ -32,6 +32,7 @@
                         <div id="credentials-form" {%- if not form.is_submitted() %} style="display: none;"{% endif %}>
                             {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                             {{ form_rows(form) }}
+                            {{ template_hook('below-account-form', include_form_style=false) }}
                             {% call form_footer(form) %}
                                 <input class="ui primary button" type="submit"
                                        value="{% trans %}Create account{% endtrans %}" data-disabled-until-change>
@@ -43,6 +44,7 @@
                     {% else %}
                         {{ form_header(form, orientation='vertical', classes='no-block-padding') }}
                         {{ form_rows(form) }}
+                        {{ template_hook('below-account-form', new_prefix=true, include_form_style=false) }}
                         {% call form_footer(form) %}
                             <input class="ui primary button" type="submit" value="{% trans %}Modify credentials{% endtrans %}" data-disabled-until-change>
                         {% endcall %}
