@@ -311,6 +311,10 @@ customElements.define(
       }
     }
 
+    focus() {
+      this.click();
+    }
+
     static observedAttributes = ['value'];
 
     attributeChangedCallback(name, previousValue, newValue) {

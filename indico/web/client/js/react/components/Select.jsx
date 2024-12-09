@@ -13,7 +13,15 @@ import {Translate} from 'indico/react/i18n';
 
 import 'indico/custom_elements/ind_select';
 
-export default function Select({options, value, onChange, disabled, required, ...inputProps}) {
+export default function Select({
+  options,
+  value,
+  onChange,
+  disabled,
+  required,
+  className,
+  ...inputProps
+}) {
   const indSelectRef = useRef();
 
   // Boolean attributes need special treatment because React
@@ -23,6 +31,9 @@ export default function Select({options, value, onChange, disabled, required, ..
   }
   if (required) {
     inputProps.required = required;
+  }
+  if (className) {
+    inputProps.class = className;
   }
 
   useNativeEvent(indSelectRef, 'change', onChange);
@@ -96,6 +107,7 @@ Select.propTypes = {
   required: PropTypes.bool,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  className: PropTypes.string,
 };
 
 Select.defaultProps = {

@@ -100,8 +100,17 @@
     padding: 0 0 0 5px;
     vertical-align: top;
 
+    &.field {
+      padding: 0.5em;
+      padding-left: 5px;
+    }
+
     ul {
       margin-left: 1.2em;
+    }
+
+    &.field ul {
+      margin-left: 0;
     }
 
     .regform-participant-visibility {

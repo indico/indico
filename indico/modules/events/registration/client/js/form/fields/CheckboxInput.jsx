@@ -36,11 +36,10 @@ export default function CheckboxInput({
 }) {
   const formatPrice = useSelector(getPriceFormatter);
   const existingValue = useSelector(state => getFieldValue(state, fieldId));
-  const checkboxId = `${htmlId}-checkbox`;
 
   return (
     <FinalCheckbox
-      id={checkboxId}
+      id={htmlId}
       fieldProps={{className: `${styles.field} ${showAsRequired ? 'required' : ''}`}}
       name={htmlName}
       label={title}

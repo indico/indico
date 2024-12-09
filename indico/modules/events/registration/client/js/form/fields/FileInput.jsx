@@ -20,7 +20,7 @@ import {getStaticData} from '../selectors';
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function FileInput({htmlName, disabled, isRequired}) {
+export default function FileInput({htmlId, htmlName, disabled, isRequired}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isManagement = useSelector(getManagement);
@@ -46,7 +46,7 @@ export default function FileInput({htmlName, disabled, isRequired}) {
   }
 
   return (
-    <div styleName="file-field">
+    <div styleName="file-field" id={htmlId}>
       <FinalSingleFileManager
         name={htmlName}
         disabled={disabled}
@@ -59,6 +59,7 @@ export default function FileInput({htmlName, disabled, isRequired}) {
 }
 
 FileInput.propTypes = {
+  htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   isRequired: PropTypes.bool,
