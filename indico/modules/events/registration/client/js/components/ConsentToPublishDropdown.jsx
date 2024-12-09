@@ -12,7 +12,7 @@ import {Select} from 'indico/react/components';
 import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import css from './ConsentToPublishDropdown.module.scss';
+import './ConsentToPublishDropdown.module.scss';
 
 export const publishModePropType = PropTypes.oneOf(['hide_all', 'show_with_consent', 'show_all']);
 
@@ -64,7 +64,7 @@ export default function ConsentToPublishDropdown({
     }
     return useFinalForms ? (
       <FinalField
-        class={css.select} /* underlying element is a custom element, it has to be 'class' */
+        styleName="select"
         component={Select}
         options={options}
         required
@@ -74,7 +74,7 @@ export default function ConsentToPublishDropdown({
       />
     ) : (
       <Select
-        class={css.select} /* underlying element is a custom element, it has to be 'class' */
+        styleName="select"
         options={options}
         value={value}
         {...extraProps}
