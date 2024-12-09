@@ -12,7 +12,7 @@ from flask import session
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.email_logs import AbstractEmailLogEntry
-from indico.util.i18n import _
+from indico.util.i18n import _, pgettext
 from indico.util.placeholders import replace_placeholders
 from indico.util.rules import Condition, check_rule
 from indico.web.flask.templating import get_template_module
@@ -21,9 +21,9 @@ from indico.web.flask.templating import get_template_module
 class EmailNotificationCondition(Condition):
     #: Override if you want to customize the text
     #: that shouls up for "Any"
-    any_caption = _('any')
+    any_caption = pgettext('Email notification condition', 'any')
     #: same for text that shows up for "none"
-    none_caption = _('none')
+    none_caption = pgettext('Email notification condition', 'none')
     #: Text that will show inline in rule descriptions
     label_text = None
 

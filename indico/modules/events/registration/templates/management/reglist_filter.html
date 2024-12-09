@@ -61,8 +61,8 @@
             <button class="i-button icon-checkbox-checked arrow left icon-only"
                     aria-hidden="true" data-toggle="dropdown"></button>
             <ul class="i-dropdown">
-                <li><a href="#" id="list-filter-select-all">{% trans %}All{% endtrans %}</a></li>
-                <li><a href="#" id="list-filter-select-none">{% trans %}None{% endtrans %}</a></li>
+                <li><a href="#" id="list-filter-select-all">{% trans 'Selection' %}All{% endtrans %}</a></li>
+                <li><a href="#" id="list-filter-select-none">{% trans 'Selection' %}None{% endtrans %}</a></li>
             </ul>
             <button class="i-button js-reset-btn icon-close warning" type="button">
                 {%- trans %}Clear filters{% endtrans -%}
@@ -110,7 +110,7 @@
     </div>
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
-               value="{% trans %}Apply{% endtrans %}">
+               value="{% trans 'Filters' %}Apply{% endtrans %}">
         <button class="i-button big" type="button" data-button-back>{% trans %}Cancel{% endtrans %}</button>
     </div>
 </form>

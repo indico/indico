@@ -12,8 +12,8 @@ type(
     draw: function() {
       var self = this;
       var lastSort = 'friendly_id';
-      var selectAll = Html.span('fake-link', $T('All'));
-      var selectNone = Html.span('fake-link', $T('None'));
+      var selectAll = Html.span('fake-link', $T.pgettext('Selection', 'All'));
+      var selectNone = Html.span('fake-link', $T.pgettext('Selection', 'None'));
       var sortById = Html.span(
         {className: 'fake-link', id: 'sortById', style: {fontWeight: 'bold'}},
         $T('ID')

@@ -91,7 +91,7 @@ export function CheckboxSettings() {
       name="placesLimit"
       type="number"
       label={Translate.string('Places limit')}
-      placeholder={Translate.string('None')}
+      placeholder={Translate.string('None', 'Places limit')}
       step="1"
       min="1"
       validate={v.optional(v.min(0))}

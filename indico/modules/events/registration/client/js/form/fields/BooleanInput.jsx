@@ -162,7 +162,7 @@ export function BooleanSettings() {
         name="placesLimit"
         type="number"
         label={Translate.string('Places limit')}
-        placeholder={Translate.string('None')}
+        placeholder={Translate.string('None', 'Places limit')}
         step="1"
         min="1"
         validate={v.optional(v.min(0))}
@@ -173,7 +173,7 @@ export function BooleanSettings() {
         name="defaultValue"
         label={Translate.string('Default value')}
         options={options}
-        placeholder={Translate.string('None')}
+        placeholder={Translate.string('None', 'Default value')}
         selection
       />
     </>
