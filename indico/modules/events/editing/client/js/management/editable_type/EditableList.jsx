@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {Column, Table, SortDirection, WindowScroller} from 'react-virtualized';
-import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm} from 'semantic-ui-react';
+import {Button, Icon, Loader, Checkbox, Message, Dropdown, Confirm, Popup} from 'semantic-ui-react';
 
 import {
   TooltipIfTruncated,
@@ -89,6 +89,15 @@ EditableList.defaultProps = {
   management: true,
 };
 
+const processContribList = contribList =>
+  contribList.map(c => {
+    const lastUpdate = c.editable && localStorage.getItem(`editable-${c.editable.id}-last-update`);
+    return {
+      ...c,
+      hasUpdates: lastUpdate && c.editable.lastUpdateDt !== lastUpdate,
+    };
+  });
+
 function EditableListDisplay({
   initialContribList,
   codePresent,
@@ -101,7 +110,7 @@ function EditableListDisplay({
   const [sortBy, setSortBy] = useState('friendly_id');
   const [sortDirection, setSortDirection] = useState('ASC');
 
-  const [contribList, setContribList] = useState(initialContribList);
+  const [contribList, setContribList] = useState(processContribList(initialContribList));
   const [sortedList, setSortedList] = useState(contribList);
   const contribsWithEditables = contribList.filter(x => x.editable);
   const contribIdSet = new Set(contribsWithEditables.map(x => x.id));
@@ -249,6 +258,17 @@ function EditableListDisplay({
           contrib.c.editable?.tags &&
           selectedOptions.some(tag => contrib.c.editable.tags.map(t => t.code).includes(tag)),
       },
+      {
+        key: 'has_updates',
+        text: Translate.string('Has updates'),
+        options: [
+          {value: 'true', text: Translate.string('Yes'), exclusive: true},
+          {value: 'false', text: Translate.string('No'), exclusive: true},
+        ],
+        isMatch: (contrib, selectedOptions) =>
+          (selectedOptions.includes('true') && contrib.c.hasUpdates) ||
+          (selectedOptions.includes('false') && !contrib.c.hasUpdates),
+      },
     ],
     [contribList, contribsWithEditables]
   );
@@ -332,6 +352,9 @@ function EditableListDisplay({
   };
 
   const patchList = updatedEditables => {
+    updatedEditables.forEach(e => {
+      localStorage.setItem(`editable-${e.id}-last-update`, e.lastUpdateDt);
+    });
     updatedEditables = new Map(updatedEditables.map(x => [x.id, x]));
     const _mapper = contrib => {
       if (!contrib.editable || !updatedEditables.has(contrib.editable.id)) {
@@ -339,8 +362,8 @@ function EditableListDisplay({
       }
       return {...contrib, editable: updatedEditables.get(contrib.editable.id)};
     };
-    setContribList(list => list.map(_mapper));
-    setSortedList(list => list.map(_mapper));
+    setContribList(list => processContribList(list.map(_mapper)));
+    setSortedList(list => processContribList(list.map(_mapper)));
   };
 
   const filterableContribs = useMemo(
@@ -367,8 +390,24 @@ function EditableListDisplay({
     );
   };
 
+  const renderId = (id, __, rowIndex) => {
+    if (sortedList[rowIndex].hasUpdates) {
+      return (
+        <Popup
+          trigger={
+            <div styleName="id-cell">
+              <Icon size="mini" color="red" name="circle" />
+              {id}
+            </div>
+          }
+          content={Translate.string('There has been an update to the latest revision')}
+        />
+      );
+    }
+    return id;
+  };
   const renderCode = code => code || Translate.string('n/a');
-  const renderEditor = editable => {
+  const renderEditor = (__, editable) => {
     return editable && editable.editor ? (
       <div>
         <Icon name="user outline" />
@@ -379,7 +418,7 @@ function EditableListDisplay({
     );
   };
   // eslint-disable-next-line no-shadow
-  const renderTitle = (title, index) => {
+  const renderTitle = (title, __, index) => {
     if (sortedList[index].editable) {
       return management ? (
         <a href={sortedList[index].editable.timelineURL}>{title}</a>
@@ -389,7 +428,7 @@ function EditableListDisplay({
     }
     return <div>{title}</div>;
   };
-  const renderStatus = (editable, rowIndex) => {
+  const renderStatus = (__, editable, rowIndex) => {
     return (
       <StateIndicator
         state={editable ? editable.state : 'not_submitted'}
@@ -400,6 +439,7 @@ function EditableListDisplay({
     );
   };
   const renderFuncs = {
+    friendlyId: renderId,
     title: renderTitle,
     code: renderCode,
     revision: editable => (editable ? editable.revisionCount : ''),
@@ -409,11 +449,8 @@ function EditableListDisplay({
 
   // eslint-disable-next-line react/prop-types
   const renderCell = ({dataKey, rowIndex}) => {
-    let data = sortedList[rowIndex][dataKey];
-    if (['editor', 'revision', 'status'].includes(dataKey)) {
-      data = sortedList[rowIndex].editable;
-    }
-    const fn = renderFuncs[dataKey] || (x => x);
+    const row = sortedList[rowIndex];
+    const fn = renderFuncs[dataKey];
     return (
       <TooltipIfTruncated>
         <div
@@ -421,7 +458,7 @@ function EditableListDisplay({
           role="gridcell"
           style={dataKey === 'title' ? {display: 'block'} : {}}
         >
-          {fn(data, rowIndex)}
+          {fn(row[dataKey], row.editable, rowIndex)}
         </div>
       </TooltipIfTruncated>
     );

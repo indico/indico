@@ -12,6 +12,8 @@ Improvements
 
 - Add a new "Accepted by Submitter" state for editables when a submitter approved
   the changes proposed by the editor (:issue:`6185`, :pr:`6186`)
+- Highlight editables in the editable list that have been updated since the last time
+  they were viewed (:pr:`6500`)
 
 Bugfixes
 ^^^^^^^^
