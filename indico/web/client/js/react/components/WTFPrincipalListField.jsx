@@ -9,11 +9,13 @@ import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {PrincipalListField} from 'indico/react/components/principals';
+import {FormContext} from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
 
 import './WTFPrincipalListField.module.scss';
 
 export default function WTFPrincipalListField({
+  formContext,
   fieldId,
   defaultValue,
   protectedFieldId,
@@ -49,20 +51,23 @@ export default function WTFPrincipalListField({
   );
 
   return (
-    <PrincipalListField
-      favoriteUsersController={favoriteUsersController}
-      disabled={disabled}
-      onChange={onChangePrincipal}
-      onFocus={() => {}}
-      onBlur={() => {}}
-      value={value}
-      styleName="opaque"
-      {...otherProps}
-    />
+    <FormContext.Provider value={formContext}>
+      <PrincipalListField
+        favoriteUsersController={favoriteUsersController}
+        disabled={disabled}
+        onChange={onChangePrincipal}
+        onFocus={() => {}}
+        onBlur={() => {}}
+        value={value}
+        styleName="opaque"
+        {...otherProps}
+      />
+    </FormContext.Provider>
   );
 }
 
 WTFPrincipalListField.propTypes = {
+  formContext: PropTypes.arrayOf(PropTypes.string).isRequired,
   fieldId: PropTypes.string.isRequired,
   defaultValue: PropTypes.arrayOf(PropTypes.string),
   protectedFieldId: PropTypes.string,

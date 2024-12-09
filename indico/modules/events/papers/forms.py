@@ -39,16 +39,18 @@ class PaperTeamsForm(IndicoForm):
                                   event=lambda form: form.event,
                                   description=_('List of users allowed to manage the call for papers'))
     judges = PrincipalListField(_('Judges'),
+                                event=lambda form: form.event,
                                 description=_('List of users allowed to judge papers'))
     content_reviewers = PrincipalListField(_('Content reviewers'),
+                                           event=lambda form: form.event,
                                            description=_('List of users allowed to review the content of '
                                                          'the assigned papers'))
     layout_reviewers = PrincipalListField(_('Layout reviewers'),
                                           description=_('List of users allowed to review the layout of the '
                                                         'assigned papers'))
 
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
+    def __init__(self, *args, event, **kwargs):
+        self.event = event
         super().__init__(*args, **kwargs)
         if not self.event.cfp.content_reviewing_enabled:
             del self.content_reviewers
