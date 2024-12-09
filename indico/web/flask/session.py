@@ -131,14 +131,14 @@ class IndicoSession(BaseSession):
     def timezone(self, tz):
         self['_timezone'] = tz
 
-    @property
+    @cached_property
     def tzinfo(self):
         """The tzinfo of the user's current timezone.
 
         This should only be used in places where no other timezone
         such as from an event or category is available.
         """
-        return get_display_tz(as_timezone=True)
+        return get_display_tz()
 
     @property
     def hard_expiry(self):

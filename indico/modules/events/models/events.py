@@ -640,7 +640,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def display_tzinfo(self):
         """The tzinfo of the event as preferred by the current user."""
-        return get_display_tz(self, as_timezone=True)
+        return get_display_tz(self)
 
     @property
     def editable_types(self):

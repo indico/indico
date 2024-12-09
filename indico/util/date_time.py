@@ -24,6 +24,8 @@ from dateutil.rrule import DAILY, FR, MO, TH, TU, WE, rrule
 from flask import has_request_context, session
 
 from indico.core.config import config
+from indico.core.logger import Logger
+from indico.util.caching import memoize_request
 from indico.util.i18n import IndicoLocale, _, get_current_locale, ngettext, parse_locale
 
 
@@ -448,8 +450,9 @@ def strftime_all_years(dt, fmt):
         return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', str(dt.year))
 
 
-def get_display_tz(obj=None, as_timezone=False):
-    display_tz = session.timezone if has_request_context() else 'LOCAL'
+@memoize_request
+def get_display_tz(obj=None):
+    display_tz = session_tz = session.timezone if has_request_context() else 'LOCAL'
     if display_tz == 'LOCAL':
         if obj is None:
             display_tz = config.DEFAULT_TIMEZONE
@@ -457,4 +460,9 @@ def get_display_tz(obj=None, as_timezone=False):
             display_tz = getattr(obj, 'timezone', 'UTC')
     if not display_tz:
         display_tz = config.DEFAULT_TIMEZONE
-    return pytz.timezone(display_tz) if as_timezone else display_tz
+    try:
+        return pytz.timezone(display_tz)
+    except pytz.UnknownTimeZoneError:
+        # Avoid failing in a rather ugly way (unformatted error page) when a user has an invalid timezone
+        Logger.get('date_time').warning('Invalid timezone: %s (obj=%r, session_tz=%s)', display_tz, obj, session_tz)
+        return pytz.timezone(config.DEFAULT_TIMEZONE)

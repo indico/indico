@@ -354,7 +354,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def display_tzinfo(self):
         """The tzinfo of the category or the one specified by the user."""
-        return get_display_tz(self, as_timezone=True)
+        return get_display_tz(self)
 
     def log(self, realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
         """Create a new log entry for the category.
