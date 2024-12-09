@@ -5,7 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import math
+
 from flask import flash, jsonify, redirect, render_template, request, session
+from flask_multipass import AuthProvider
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
 from marshmallow import RAISE, ValidationError, post_load, pre_load, validate, validates, validates_schema
@@ -52,6 +55,11 @@ def _get_provider(name, external):
     if provider.is_external != external:
         raise NotFound('Invalid provider')
     return provider
+
+
+def _sort_providers(providers: list[AuthProvider]) -> list[AuthProvider]:
+    """Sort providers by `display_order` and `title`."""
+    return sorted(providers, key=lambda p: (p.settings.get('display_order', math.inf), p.title))
 
 
 class RHLogin(RH):
@@ -110,7 +118,7 @@ class RHLogin(RH):
             active_provider = multipass.default_local_auth_provider
             form = active_provider.login_form() if active_provider else None
 
-        providers = list(multipass.auth_providers.values())
+        providers = _sort_providers(multipass.auth_providers.values())
         retry_in = login_rate_limiter.get_reset_delay() if rate_limit_exceeded else None
         return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
                                login_reason=login_reason, retry_in=retry_in, force=(force or None))

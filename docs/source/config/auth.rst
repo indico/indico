@@ -41,6 +41,9 @@ The following keys are available in the provider data:
   page so it should be the provider that most people use.
 - ``logo_url`` -- If set, the referenced image will be used as the
   background image of this provider's login button (on the login page).
+- ``display_order`` -- Controls the order of the provider login buttons
+  on the login page. Providers are sorted by this value in ascending
+  order.
 - Any provider-specific settings.
 
 
