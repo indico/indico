@@ -12,7 +12,7 @@ import React from 'react';
 import {Dropdown} from 'semantic-ui-react';
 
 import {FinalField} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
@@ -23,12 +23,12 @@ const START_HOUR = '06:00';
 function _humanizeDuration(duration) {
   const hours = duration.hours();
   const minutes = duration.minutes();
-  if (hours === 1 && minutes === 0) {
-    return Translate.string('1 hour');
-  } else if (hours !== 0) {
-    return Translate.string('{time} hours', {time: hours + minutes / 60});
+  if (hours !== 0) {
+    return PluralTranslate.string('{count} hour', '{count} hours', hours + minutes / 60, {
+      count: hours + minutes / 60,
+    });
   } else {
-    return Translate.string('{time} min', {time: minutes});
+    return PluralTranslate.string('{count} min', '{count} min', minutes, {count: minutes});
   }
 }
 
