@@ -44,7 +44,7 @@ export default function ConsentToPublishEditor({
       <ConsentToPublishDropdown
         publishToParticipants={publishToParticipants}
         publishToPublic={publishToPublic}
-        onChange={(evt, {value}) => editConsentToPublish(value)}
+        onChange={evt => editConsentToPublish(evt.target.value)}
         value={consentToPublish}
         loading={status === 'loading'}
         disabled={status === 'loading'}

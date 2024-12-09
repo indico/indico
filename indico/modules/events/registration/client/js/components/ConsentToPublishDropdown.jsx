@@ -77,6 +77,7 @@ export default function ConsentToPublishDropdown({
         styleName="select"
         options={options}
         value={value}
+        required
         {...extraProps}
         id="input-consent-to-publish"
       />
