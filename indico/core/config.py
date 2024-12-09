@@ -51,6 +51,7 @@ DEFAULTS = {
     'ENABLE_APPLE_WALLET': False,
     'ENABLE_GOOGLE_WALLET': False,
     'ENABLE_ROOMBOOKING': False,
+    'ENABLE_DELETE_USER_FROM_UI': False,
     'EXPERIMENTAL_EDITING_SERVICE': False,
     'EXTERNAL_REGISTRATION_URL': None,
     'HELP_URL': 'https://learn.getindico.io',
