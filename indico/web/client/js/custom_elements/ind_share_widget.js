@@ -112,7 +112,7 @@ function TwitterButton({shareText}) {
     <GridColumn styleName="share-button-column">
       <Button
         as="a"
-        href={`https://twitter.com/intent/tweet?text=${shareText}`}
+        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
         target="_blank"
         basic
         color="blue"
@@ -131,7 +131,7 @@ TwitterButton.propTypes = {
 
 function MastodonButton({shareText, setMastodonOpen}) {
   const href = Indico.User.mastodonServerURL
-    ? `${Indico.User.mastodonServerURL}/share?text=${shareText}`
+    ? `${Indico.User.mastodonServerURL}/share?text=${encodeURIComponent(shareText)}`
     : null;
   const isLoggedIn = !_.isEmpty(Indico.User);
   const hasMastodonServer = !_.isEmpty(Indico.User.mastodonServerName);
@@ -289,7 +289,7 @@ function SetupMastodonServer({setMastodonOpen, button, shareText}) {
             <Button
               as="a"
               target="_blank"
-              href={`${serverURL}/share?text=${shareText}`}
+              href={`${serverURL}/share?text=${encodeURIComponent(shareText)}`}
               icon="share square"
               content={Translate.string('Share on {mastodonServerName}', {
                 mastodonServerName,
@@ -321,7 +321,7 @@ function ShareWidget({
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isMastodonOpen, setMastodonOpen] = useState(false);
-  const shareText = encodeURIComponent(`${eventName} (${eventStartDt}) · Indico (${eventUrl})`);
+  const shareText = `${eventName} (${eventStartDt}) · Indico (${eventUrl})`;
   return (
     <Popup
       trigger={
