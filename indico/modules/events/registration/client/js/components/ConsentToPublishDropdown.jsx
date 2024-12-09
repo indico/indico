@@ -7,10 +7,12 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Dropdown} from 'semantic-ui-react';
 
-import {FinalDropdown} from 'indico/react/forms';
+import {Select} from 'indico/react/components';
+import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+
+import css from './ConsentToPublishDropdown.module.scss';
 
 export const publishModePropType = PropTypes.oneOf(['hide_all', 'show_with_consent', 'show_all']);
 
@@ -43,27 +45,41 @@ export default function ConsentToPublishDropdown({
       options.push({
         key: 'nobody',
         value: 'nobody',
-        text: Translate.string('Do not display my participation to anyone'),
+        label: Translate.string('Do not display my participation to anyone'),
         disabled: publishToParticipants !== 'show_with_consent',
       });
     }
     options.push({
       key: 'participants',
       value: 'participants',
-      text: Translate.string('Display my participation only to other participants of this event'),
+      label: Translate.string('Display my participation only to other participants of this event'),
     });
     if (publishToPublic === 'show_with_consent' || value === 'all') {
       options.push({
         key: 'all',
         value: 'all',
-        text: Translate.string('Display my participation to everyone who can see this event'),
+        label: Translate.string('Display my participation to everyone who can see this event'),
         disabled: publishToPublic !== 'show_with_consent',
       });
     }
     return useFinalForms ? (
-      <FinalDropdown options={options} selection required fluid {...extraProps} />
+      <FinalField
+        class={css.select} /* underlying element is a custom element, it has to be 'class' */
+        component={Select}
+        options={options}
+        required
+        value={value}
+        {...extraProps}
+        id="input-consent-to-publish"
+      />
     ) : (
-      <Dropdown options={options} selection fluid value={value} {...extraProps} />
+      <Select
+        class={css.select} /* underlying element is a custom element, it has to be 'class' */
+        options={options}
+        value={value}
+        {...extraProps}
+        id="input-consent-to-publish"
+      />
     );
   }
 }

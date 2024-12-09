@@ -20,6 +20,10 @@ const SPECIAL_FIELDS = {
     label: Translate.string('Privacy policy'),
     id: 'finalfield-agreed_to_privacy_policy',
   },
+  consent_to_publish: {
+    label: Translate.string('Participant list'),
+    id: 'input-consent-to-publish',
+  },
 };
 
 export default function FormErrorList() {
