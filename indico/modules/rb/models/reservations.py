@@ -15,7 +15,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import cast
-from werkzeug.datastructures import OrderedMultiDict
+from werkzeug.datastructures import MultiDict
 
 from indico.core import signals
 from indico.core.db import db
@@ -365,10 +365,10 @@ class Reservation(db.Model):
         result = {r.id: {'reservation': r} for r in query}
 
         if 'occurrences' in args:
-            occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
-                                                                ReservationOccurrence)
-                                               .filter(ReservationOccurrence.reservation_id.in_(result.keys()))
-                                               .order_by(ReservationOccurrence.start_dt))
+            occurrence_data = MultiDict(db.session.query(ReservationOccurrence.reservation_id,
+                                                        ReservationOccurrence)
+                                        .filter(ReservationOccurrence.reservation_id.in_(result.keys()))
+                                        .order_by(ReservationOccurrence.start_dt))
             for id_, data in result.items():
                 data['occurrences'] = occurrence_data.getlist(id_)
 
