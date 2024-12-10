@@ -21,6 +21,7 @@ from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
+from indico.modules.users.models.sessions import UserSession
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -110,6 +111,15 @@ def login_user(user, identity=None, admin_impersonation=False):
             session.pop('login_identity', None)
         user.synchronize_data()
     signals.users.logged_in.send(user, identity=identity, admin_impersonation=admin_impersonation)
+
+
+def delete_old_user_sessions(user, *skip_sids):
+    """Invalidates a user session.
+    
+    :param user: The :class:`~indico.modules.users.User` to delete sessions.
+    :param skip_sids: A tuple of session ids that should not be deleted.
+    """
+    UserSession.query.with_parent(user).filter(UserSession.sid.notin_(skip_sids)).delete()
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
