@@ -120,6 +120,7 @@ def configure_multipass(app, config):
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
     app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'categories.display'
     app.config['MULTIPASS_FAILURE_MESSAGE'] = _('Login failed: {error}')
+    app.config['MULTIPASS_HIDE_NO_SUCH_USER'] = True
 
 
 def configure_multipass_local(app):
