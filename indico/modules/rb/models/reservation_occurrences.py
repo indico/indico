@@ -220,7 +220,7 @@ class ReservationOccurrence(db.Model):
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:
                 raise IndicoError('Unsupported interval')
-            position = int(ceil(start.day / 7.0))
+            position = ceil(start.day / 7.0)
             if position == 5:
                 # The fifth weekday of the month will always be the last one
                 position = -1

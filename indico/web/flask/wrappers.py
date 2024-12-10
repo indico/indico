@@ -20,7 +20,6 @@ from flask_webpackext import current_webpack
 from jinja2 import FileSystemLoader, TemplateNotFound
 from jinja2.runtime import StrictUndefined
 from ua_parser import user_agent_parser
-from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.user_agent import UserAgent
 from werkzeug.utils import cached_property
 
@@ -57,7 +56,6 @@ class ParsedUserAgent(UserAgent):
 
 
 class IndicoRequest(Request):
-    parameter_storage_class = ImmutableOrderedMultiDict
     user_agent_class = ParsedUserAgent
 
     def __init__(self, *args, **kwargs):
