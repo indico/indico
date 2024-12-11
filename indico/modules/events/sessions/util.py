@@ -180,7 +180,7 @@ def get_session_timetable_pdf(sess):
         show_toc=False,
         show_session_toc=True,
         show_abstract=False,
-        show_poster_abstract=True,
+        show_poster_abstract=False,
         show_contribs=False,
         show_length_contribs=False,
         show_breaks=False,
