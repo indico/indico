@@ -7,7 +7,7 @@
 {% block header -%}
 <p>
     {% trans link='<a href="%s">'|format(event.external_url)|safe, endlink='</a>'|safe, title=event.title -%}
-        A videoconferencing room has just been created for the event "{{ link }}{{ title }}{{ endlink }}".
+        A videoconference has just been created for the event "{{ link }}{{ title }}{{ endlink }}".
     {%- endtrans %}
 </p>
 
@@ -20,7 +20,7 @@
 </p>
 <br>
 <p>
-    <strong>{% trans %}Room information{% endtrans %}</strong>
+    <strong>{% trans %}Videoconference information{% endtrans %}</strong>
     <br>
     <ul>
         <li><strong>{% trans %}Name:{% endtrans %}</strong> {{ vc_room.name }}</li>

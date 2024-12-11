@@ -76,9 +76,9 @@ class VCRoomLinkFormBase(IndicoForm):
                         [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()],
                         coerce=lambda x: int(x) if x else None)
 
-    show = BooleanField(_('Show room'),
+    show = BooleanField(_('Show in event'),
                         widget=SwitchWidget(),
-                        description=_('Display this room on the event page'))
+                        description=_('Display this videoconference on the event page'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -102,9 +102,10 @@ class VCRoomLinkFormBase(IndicoForm):
 
 class VCRoomAttachFormBase(VCRoomLinkFormBase):
     room = VCRoomField(
-        _('Room to link'), [DataRequired()],
-        description=_('Please start writing the name of the room you would like to attach. '
-                      'Indico will suggest existing rooms. Only rooms created through Indico can be attached.'))
+        _('Videoconference to link'), [DataRequired()],
+        description=_('Please start writing the name of the videoconference you would like to attach. '
+                      'Indico will suggest existing videoconferences. Only those created through Indico can be '
+                      'attached.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -115,14 +116,15 @@ class VCRoomFormBase(VCRoomLinkFormBase):
     advanced_fields = {'show'}
     skip_fields = advanced_fields | VCRoomLinkFormBase.conditional_fields
 
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60)], description=_('The name of the room.'))
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60)],
+                       description=_('The name of the videoconference.'))
 
     def validate_name(self, field):
         if field.data:
             room = VCRoom.query.filter(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
                                        VCRoom.type == self.service_name).first()
             if room and room != self.vc_room:
-                raise ValidationError(_('There is already a room with this name'))
+                raise ValidationError(_('There is already a videoconference with this name'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
