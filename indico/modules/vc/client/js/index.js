@@ -81,7 +81,7 @@ import {$T} from 'indico/utils/i18n';
 
     $('.vc-room-entry.deleted').qtip({
       content: $T(
-        'This room has been deleted and cannot be used. You can detach it from the event, however.'
+        'This videoconference has been deleted and cannot be used. You can detach it from the event, however.'
       ),
       position: {
         my: 'top center',

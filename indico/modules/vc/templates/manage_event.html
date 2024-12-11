@@ -46,7 +46,7 @@
                                                 <button class="ui button js-vcroom-edit hide-if-locked"
                                                         data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
                                                         title="{% trans %}Edit{% endtrans %}"
-                                                        data-title="{% trans %}Edit room{% endtrans %}"
+                                                        data-title="{% trans %}Edit videoconference{% endtrans %}"
                                                         data-ajax-dialog
                                                         data-reload-after>
                                                     <i class="icon edit"></i>
@@ -86,11 +86,11 @@
                     <button class="ui icon button js-create-room"
                             data-vc-system="{{ plugins[0].service_name }}"
                             data-href="{{ url_for('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}"
-                            data-title="{% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}"
+                            data-title="{% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} videoconference{% endtrans %}"
                             data-ajax-dialog
                             data-reload-after>
                         <img src="{{ plugins[0].icon_url }}" alt="{{ plugins[0].service_name }}">
-                        {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
+                        {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} videoconference{% endtrans %}
                     </button>
                 {% elif plugins|length > 1 %}
                     <button class="ui button js-create-room"
@@ -99,7 +99,7 @@
                             data-ajax-dialog
                             data-reload-after>
                         <i class="icon plus"></i>
-                        {%- trans %}Create new room{% endtrans -%}
+                        {%- trans %}Create new videoconference{% endtrans -%}
                     </button>
                 {% endif %}
                 <span>
@@ -107,7 +107,7 @@
                        class="ui icon button"
                        {% if plugins|length == 1 %}
                            data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=plugins[0].service_name) }}"
-                           data-title="{% trans plugin_name=plugins[0].friendly_name %}Attach {{ plugin_name }} room{% endtrans %}"
+                           data-title="{% trans plugin_name=plugins[0].friendly_name %}Attach {{ plugin_name }} videoconference{% endtrans %}"
                        {% else %}
                            data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_search_form', attach=True)}}"
                            data-title="{% trans %}Attach videoconference{% endtrans %}"
@@ -115,7 +115,7 @@
                        data-ajax-dialog
                        data-reload-after>
                         <i class="icon plus"></i>
-                        {% trans %}Add existing room{% endtrans %}
+                        {% trans 'Videoconference' %}Add existing one{% endtrans %}
                     </a>
                 </span>
             </div>
