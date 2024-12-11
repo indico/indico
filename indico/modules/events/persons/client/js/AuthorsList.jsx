@@ -50,7 +50,7 @@ const FILTER_OPTIONS = {
     isMatch: person => person.speaker,
   },
   primaryAuthor: {
-    text: Translate.string('Primary authors'),
+    text: Translate.string('Authors'),
     isMatch: person => person.primaryAuthor,
   },
   secondaryAuthor: {

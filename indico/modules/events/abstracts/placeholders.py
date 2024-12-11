@@ -115,7 +115,7 @@ class ContributionTypePlaceholder(Placeholder):
 
 class PrimaryAuthorsPlaceholder(Placeholder):
     name = 'primary_authors'
-    description = _('The names of the primary authors (separated by commas)')
+    description = _('The names of the authors (separated by commas)')
 
     @classmethod
     def render(cls, abstract):
