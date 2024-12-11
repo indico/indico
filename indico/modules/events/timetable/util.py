@@ -312,44 +312,6 @@ def shift_following_entries(entry, shift, session_=None):
         sibling.move(sibling.start_dt + shift)
 
 
-def get_timetable_offline_pdf_generator(event):
-    from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
-                                                      get_nested_timetable, get_nested_timetable_location_conditions)
-
-    css = render_template('events/timetable/pdf/timetable.css')
-    entries = get_nested_timetable(event)
-    days = {
-        day: list(e) for day, e in groupby(
-            entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
-        )
-    }
-    config = TimetableExportConfig(
-        show_title=True,
-        show_affiliation=False,
-        show_cover_page=True,
-        show_toc=True,
-        show_session_toc=True,
-        show_abstract=False,
-        dont_show_poster_abstract=True,
-        show_contribs=False,
-        show_length_contribs=False,
-        show_breaks=False,
-        new_page_per_session=False,
-        show_session_description=False,
-        print_date_close_to_sessions=False
-    )
-
-    show_children_location = get_nested_timetable_location_conditions(entries)[1]
-    program_config = TimetableExportProgramConfig(
-        show_siblings_location=True,
-        show_children_location=show_children_location
-    )
-
-    html = render_template('events/timetable/pdf/timetable.html', event=event,
-                            days=days, config=config, program_config=program_config)
-    return create_pdf(html, css, event)
-
-
 def get_time_changes_notifications(changes, tzinfo, entry=None):
     notifications = []
     for obj, change in changes.items():
@@ -508,6 +470,41 @@ def create_pdf(html, css, event) -> BytesIO:
     f.seek(0)
 
     return f
+
+
+def get_timetable_offline_pdf_generator(event):
+    css = render_template('events/timetable/pdf/timetable.css')
+    entries = get_nested_timetable(event)
+    days = {
+        day: list(e) for day, e in groupby(
+            entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
+        )
+    }
+    config = TimetableExportConfig(
+        show_title=True,
+        show_affiliation=False,
+        show_cover_page=True,
+        show_toc=True,
+        show_session_toc=True,
+        show_abstract=False,
+        dont_show_poster_abstract=True,
+        show_contribs=False,
+        show_length_contribs=False,
+        show_breaks=False,
+        new_page_per_session=False,
+        show_session_description=False,
+        print_date_close_to_sessions=False
+    )
+
+    show_children_location = get_nested_timetable_location_conditions(entries)[1]
+    program_config = TimetableExportProgramConfig(
+        show_siblings_location=True,
+        show_children_location=show_children_location
+    )
+
+    html = render_template('events/timetable/pdf/timetable.html', event=event,
+                            days=days, config=config, program_config=program_config)
+    return create_pdf(html, css, event)
 
 
 @memoize_request
