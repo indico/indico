@@ -14,7 +14,7 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import get_session_timetable_pdf, get_sessions_for_user
+from indico.modules.events.sessions.util import generate_session_pdf_timetable, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
 from indico.web.flask.util import send_file
 from indico.web.rh import allow_signed_url
@@ -81,5 +81,5 @@ class RHExportSessionToICAL(RHDisplaySessionBase):
 
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase):
     def _process(self):
-        pdf = get_session_timetable_pdf(self.session)
+        pdf = generate_session_pdf_timetable(self.session)
         return send_file('session-timetable.pdf', pdf, 'application/pdf')

@@ -36,7 +36,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
 from indico.modules.events.sessions.ical import session_to_ical
-from indico.modules.events.sessions.util import get_session_timetable_pdf
+from indico.modules.events.sessions.util import generate_session_pdf_timetable
 from indico.modules.events.static.util import collect_static_files, override_request_endpoint, rewrite_css_urls
 from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConferenceDisplay,
                                                 WPStaticConferencePrivacyDisplay, WPStaticConferenceProgram,
@@ -369,7 +369,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
                           {'event_id': self.event.id, 'session_id': session.id}, session)
 
-        pdf = get_session_timetable_pdf(session)
+        pdf = generate_session_pdf_timetable(session)
         self._add_pdf(session, 'sessions.export_session_timetable', pdf)
 
         self._add_file(session_to_ical(session), 'sessions.export_ics', session)

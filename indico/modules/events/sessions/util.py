@@ -155,7 +155,7 @@ def has_sessions_for_user(event, user):
     return _query_sessions_for_user(event, user).has_rows()
 
 
-def get_session_timetable_pdf(sess):
+def generate_session_pdf_timetable(sess):
     from indico.modules.events.timetable.util import TimetableExportConfig, generate_pdf_timetable
     config = TimetableExportConfig(show_toc=False)
     return generate_pdf_timetable(sess.event, config, only_session=sess)
