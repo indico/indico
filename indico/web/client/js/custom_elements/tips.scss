@@ -31,7 +31,6 @@ ind-with-toggletip {
     @extend %popup-positioned-target;
     // The following are set by JavaScript in positioning.js
     display: block;
-
     z-index: 1;
 
     width: max-content;

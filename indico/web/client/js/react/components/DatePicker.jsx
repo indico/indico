@@ -9,6 +9,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatePickerCalendar from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
@@ -35,7 +36,11 @@ export default function DatePicker({
   const formattedValue = formatDate(format, fromISOLocalDate(value));
 
   return (
-    <ind-date-picker>
+    <ind-date-picker
+      min={fromISOLocalDate(min)?.toDateString()}
+      max={fromISOLocalDate(max)?.toDateString()}
+      format={format}
+    >
       <input
         type="text"
         onChange={handleDateChange}
@@ -43,47 +48,13 @@ export default function DatePicker({
         {...inputProps}
         placeholder={format}
       />
-      <button type="button" disabled={inputProps.disabled}>
+      <button type="button" disabled={inputProps.disabled} aria-haspopup="dialog">
         <Translate as="span">Open a calendar</Translate>
       </button>
-      <ind-calendar
-        min={fromISOLocalDate(min)?.toDateString()}
-        max={fromISOLocalDate(max)?.toDateString()}
-      >
-        <dialog>
-          <div className="controls">
-            <button type="button" value="previous-year">
-              <Translate as="span">Previous year</Translate>
-            </button>
-            <button type="button" value="previous-month">
-              <Translate as="span">Previous month</Translate>
-            </button>
 
-            <div className="month-year">
-              <select />
-              <input type="number" required />
-            </div>
-
-            <button type="button" value="next-month">
-              <Translate as="span">Next month</Translate>
-            </button>
-            <button type="button" value="next-year">
-              <Translate as="span">Next year</Translate>
-            </button>
-          </div>
-
-          <div className="weekdays">
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
-          <div role="listbox" />
-        </dialog>
-      </ind-calendar>
+      <DatePickerCalendar>
+        <DatePickerCalendar.Grid />
+      </DatePickerCalendar>
 
       <span className="date-format" data-format>
         <Translate>
