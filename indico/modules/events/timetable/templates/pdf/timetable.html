@@ -13,10 +13,6 @@
     @page :first {
         counter-reset: toc-page;
         counter-reset: program-page 0;
-
-        @bottom-center {
-            content: '{{ now|format_skeleton('EEEEdMMMMyyyy', timezone=event.tz) }}';
-        }
     }
 
     @page toc {

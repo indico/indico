@@ -110,7 +110,6 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 url = url_for(request.endpoint, **dict(request.view_args, download=True, **request.args.to_dict(False)))
                 return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
 
-            now = now_utc()
             css = render_template('events/timetable/pdf/timetable.css')
             event = self.event
             entries = get_nested_timetable(event)
@@ -141,7 +140,7 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
             )
 
             html = render_template('events/timetable/pdf/timetable.html',
-                                   event=self.event, days=days, now=now, config=config, program_config=program_config)
+                                   event=self.event, days=days, config=config, program_config=program_config)
 
             return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
