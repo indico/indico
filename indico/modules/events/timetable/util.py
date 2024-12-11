@@ -472,24 +472,29 @@ def create_pdf(html, css, event) -> BytesIO:
     return f
 
 
-def generate_default_pdf_timetable(event):
+def generate_pdf_timetable(
+    event: Event,
+    config=TimetableExportConfig(),  # noqa: B008 (frozen dataclass)
+    *,
+    only_session: Session | None = None,
+):
     css = render_template('events/timetable/pdf/timetable.css')
     entries = get_nested_timetable(event)
-    days = {
-        day: list(e) for day, e in groupby(
-            entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
-        )
-    }
-    config = TimetableExportConfig()
+    if only_session:
+        entries = [
+            e for e in entries
+            if e.type == TimetableEntryType.SESSION_BLOCK and e.session_block.session == only_session
+        ]
 
-    show_children_location = get_nested_timetable_location_conditions(entries)[1]
+    days = {day: list(e) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event.tzinfo).date())}
+    show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
     program_config = TimetableExportProgramConfig(
-        show_siblings_location=True,
+        show_siblings_location=bool(show_siblings_location or only_session),
         show_children_location=show_children_location
     )
 
-    html = render_template('events/timetable/pdf/timetable.html', event=event,
-                            days=days, config=config, program_config=program_config)
+    html = render_template('events/timetable/pdf/timetable.html', event=event, days=days, config=config,
+                           program_config=program_config, only_session=only_session)
     return create_pdf(html, css, event)
 
 

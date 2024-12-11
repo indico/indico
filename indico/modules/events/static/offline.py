@@ -45,7 +45,7 @@ from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConf
                                                 WPStaticSessionDisplay, WPStaticSimpleEventDisplay, WPStaticSpeakerList,
                                                 WPStaticSubcontributionDisplay, WPStaticTimetable)
 from indico.modules.events.timetable.controllers.display import RHTimetable
-from indico.modules.events.timetable.util import generate_default_pdf_timetable
+from indico.modules.events.timetable.util import generate_pdf_timetable
 from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.util.fs import chmod_umask
 from indico.util.string import strip_tags
@@ -271,7 +271,7 @@ class StaticConferenceCreator(StaticEventCreator):
         # Getting all menu items
         self._get_menu_items()
         # Getting conference timetable in PDF
-        self._add_pdf(self.event, 'timetable.export_default_pdf', generate_default_pdf_timetable(self.event))
+        self._add_pdf(self.event, 'timetable.export_default_pdf', generate_pdf_timetable(self.event))
         if config.LATEX_ENABLED:
             # Generate contributions in PDF
             self._add_pdf(self.event, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,

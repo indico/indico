@@ -7,9 +7,7 @@
 
 from collections import defaultdict
 from io import BytesIO
-from itertools import groupby
 
-from flask import render_template
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
@@ -158,32 +156,9 @@ def has_sessions_for_user(event, user):
 
 
 def get_session_timetable_pdf(sess):
-    from indico.modules.events.timetable.models.entries import TimetableEntryType
-    from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
-                                                      get_nested_timetable, get_nested_timetable_location_conditions)
-
-    event = sess.event
-    css = render_template('events/timetable/pdf/timetable.css')
-    entries = [
-        e for e in get_nested_timetable(event)
-        if e.type == TimetableEntryType.SESSION_BLOCK and e.session_block.session == sess
-    ]
-    days = {
-        day: list(e) for day, e in groupby(
-            entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
-        )
-    }
+    from indico.modules.events.timetable.util import TimetableExportConfig, generate_pdf_timetable
     config = TimetableExportConfig(show_toc=False)
-
-    show_children_location = get_nested_timetable_location_conditions(entries)[1]
-    program_config = TimetableExportProgramConfig(
-        show_siblings_location=True,
-        show_children_location=show_children_location
-    )
-
-    html = render_template('events/timetable/pdf/timetable.html', event=event, only_session=sess,
-                            days=days, config=config, program_config=program_config)
-    return create_pdf(html, css, event)
+    return generate_pdf_timetable(sess.event, config, only_session=sess)
 
 
 def render_session_type_row(session_type):

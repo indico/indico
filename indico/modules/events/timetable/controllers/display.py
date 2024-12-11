@@ -5,9 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from itertools import groupby
 
-from flask import jsonify, render_template, request, session
+from flask import jsonify, request, session
 from marshmallow import fields
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -16,10 +15,8 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
-                                                  generate_default_pdf_timetable, get_nested_timetable,
-                                                  get_nested_timetable_location_conditions, render_entry_info_balloon,
-                                                  serialize_event_info)
+from indico.modules.events.timetable.util import (TimetableExportConfig, generate_pdf_timetable,
+                                                  render_entry_info_balloon, serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
@@ -88,13 +85,6 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 url = url_for(request.endpoint, **dict(request.view_args, download=True, **request.args.to_dict(False)))
                 return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
 
-            css = render_template('events/timetable/pdf/timetable.css')
-            event = self.event
-            entries = get_nested_timetable(event)
-            days = {day: list(e) for day, e in groupby(
-                entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
-            )}
-
             config = TimetableExportConfig(
                 show_title=form.other.data['showSpeakerTitle'],
                 show_affiliation=form.other.data['showSpeakerAffiliation'],
@@ -111,16 +101,8 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                 print_date_close_to_sessions=form.session_info.data['printDateCloseToSessions'],
             )
 
-            show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
-            program_config = TimetableExportProgramConfig(
-                show_siblings_location=show_siblings_location,
-                show_children_location=show_children_location
-            )
-
-            html = render_template('events/timetable/pdf/timetable.html',
-                                   event=self.event, days=days, config=config, program_config=program_config)
-
-            return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
+            pdf = generate_pdf_timetable(self.event, config)
+            return send_file('timetable.pdf', pdf, 'application/pdf')
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
                                 back_url=url_for('.timetable', self.event))
 
@@ -129,5 +111,5 @@ class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
     """Generate a PDF timetable with default settings."""
 
     def _process(self):
-        pdf = generate_default_pdf_timetable(self.event)
+        pdf = generate_pdf_timetable(self.event)
         return send_file('timetable.pdf', pdf, 'application/pdf')
