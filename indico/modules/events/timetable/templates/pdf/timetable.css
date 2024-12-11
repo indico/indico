@@ -33,6 +33,11 @@ body {
   padding: 5px;
 }
 
+.cover h1 > i {
+  margin-top: 20px;
+  display: block;
+}
+
 .cover h4.location {
   margin-bottom: 4px;
 }

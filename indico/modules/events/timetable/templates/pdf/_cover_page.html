@@ -4,17 +4,23 @@
     <div class="pagebreak cover">
         <div class="cover-wrapper">
             <div>
+                {% if only_session %}
+                    <h2>{% trans 'Timetable' %}Session Program{% endtrans %}</h2>
+                {% else %}
+                    <h2>{% trans 'Timetable' %}Program{% endtrans %}</h2>
+                {% endif %}
+                <h3>{{ format_event_date(event) }}</h3>
                 {% if event.logo %}
                     <img alt="Event logo" src="event://logo" class="logo">
-                {% endif %}
-                <h1>{{ event.title }}</h1>
-                <h3>{{ format_event_date(event) }}</h3>
-                {% if only_session %}
-                    <h1>{% trans %}Session Program{% endtrans %}</h1>
-                    <h2>{{ only_session.title }}</h2>
                 {% else %}
-                    <h1>{% trans %}Program{% endtrans %}</h1>
+                    <br>
                 {% endif %}
+                <h1>
+                    {{ event.title }}
+                    {% if only_session %}
+                        <i>{{ only_session.title }}</i>
+                    {% endif %}
+                </h1>
                 {% if event.has_location_info %}
                     <p>
                         {{ [event.venue_name, event.room_name] | select | join(', ') }}
