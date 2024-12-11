@@ -22,7 +22,6 @@ from indico.modules.events.timetable.controllers.display import (RHTimetableExpo
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.util import (create_pdf, get_nested_timetable,
                                                   get_nested_timetable_location_conditions)
-from indico.util.date_time import now_utc
 from indico.web.flask.util import send_file
 from indico.web.rh import allow_signed_url
 
@@ -88,7 +87,6 @@ class RHExportSessionToICAL(RHDisplaySessionBase):
 
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
     def _process(self):
-        now = now_utc()
         css = render_template('events/timetable/pdf/timetable.css')
         event = self.event
         entries = [
@@ -123,6 +121,6 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
         )
 
         html = render_template('events/timetable/pdf/timetable.html', event=self.event,
-                                days=days, now=now, config=config, program_config=program_config)
+                                days=days, config=config, program_config=program_config)
 
         return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
