@@ -8,7 +8,7 @@
                     {%- trans %}Details{% endtrans -%}
                 </div>
                 {% if session.user.is_admin %}
-                    <div class="i-box-buttons">
+                    <div class="i-box-buttons i-box-align-buttons">
                         {% if not user.is_blocked %}
                             <div {%- if user == session.user %} title="{% trans %}You cannot block yourself{% endtrans %}"{% endif %}>
                                 <button class="ui negative small button"
@@ -31,6 +31,9 @@
                                 {% trans %}Unblock User{% endtrans %}
                             </button>
                         {% endif %}
+                        {% if delete_user_from_ui_enabled %}
+                            <div id="user-delete-container"></div>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
@@ -38,18 +41,6 @@
                 <div id="personal-details-form-container"></div>
             </div>
         </div>
-        {% if session.user.is_admin and delete_user_from_ui_enabled %}
-            <div class="i-box">
-                <div class="i-box-header">
-                    <div class="i-box-title">
-                        {%- trans %}Delete User{% endtrans -%}
-                    </div>
-                </div>
-                <div class="i-box-content">
-                    <div id="user-delete-container"></div>
-                </div>
-            </div>
-        {% endif %}
     </div>
 
     <script>
@@ -67,7 +58,7 @@
             setupUserDelete(
                 {{ (user.id if user != session.user else none) | tojson }},
                 {{ user_values.first_name | tojson }},
-                {{ user_values.last_name | tojson }},
+                {{ user_values.last_name | tojson }}
             );
         {% endif %}
     </script>

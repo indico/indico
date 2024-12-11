@@ -233,6 +233,13 @@ $i-box-padding: 10px;
       padding: 0;
     }
 
+    .i-box-align-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
+    }
+
     .i-box-metadata {
       float: right;
       line-height: $toolbar-thin-height;

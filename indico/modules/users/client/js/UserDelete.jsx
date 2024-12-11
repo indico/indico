@@ -8,94 +8,103 @@
 import userDeleteURL from 'indico-url:users.user_delete';
 
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Button, Message, Modal, Icon, Input, Popup} from 'semantic-ui-react';
+import {Button, Message, Modal, Icon, List, Popup} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
-const InfoState = 1;
-const VerificationState = 2;
+function UserDeleteDialogBody({firstName, lastName, disabled, inProgress, onDelete, onClose}) {
+  const [countdown, setCountdown] = useState(10);
+  const [isButtonDisabled, setButtonDisabled] = useState(true);
 
-function UserDeleteDialogBody({
-  dialogState: {currentState, gotToNextState},
-  nameActions: {
-    initialFirstName,
-    initialLastName,
-    firstName,
-    lastName,
-    onFirstNameChange,
-    onLastNameChange,
-  },
-  disabled,
-  inProgress,
-  onDelete,
-  onClose,
-}) {
+  useEffect(() => {
+    setCountdown(10);
+    setButtonDisabled(true);
+    const timer = setInterval(() => {
+      setCountdown(prevCountdown => {
+        if (prevCountdown <= 1) {
+          clearInterval(timer);
+          setButtonDisabled(false);
+          return 0;
+        }
+        return prevCountdown - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <>
       <Modal.Header>
-        <Translate>Delete user account</Translate>
+        <Translate>
+          Delete <Param name="first_name" value={firstName} />{' '}
+          <Param name="last_name" value={lastName} />?
+        </Translate>
       </Modal.Header>
       <Modal.Content>
-        {currentState === InfoState && (
-          <div>
-            <Message negative>
-              <Icon name="warning sign" />
-              <Translate>Important notice</Translate>
-            </Message>
-            <p>
+        <Message negative icon>
+          <Icon name="warning sign" />
+          <Message.Content>
+            <Message.Header>
+              <Translate>This action is irreversible</Translate>
+            </Message.Header>
+            <Translate>Deleted user accounts cannot be restored.</Translate>
+          </Message.Content>
+        </Message>
+        <Translate as="p">Once deleted, the following will happen:</Translate>
+        <List style={{marginTop: 0}}>
+          <List.Item>
+            <List.Icon name="minus circle" />
+            <List.Content>
               <Translate>
-                Are you sure you want to delete this user account? This is a destructive and
-                permanent action. Once you delete this user, it cannot be recovered.
+                <Param name="first_name" value={firstName} /> will no longer be able to access
+                Indico.
               </Translate>
-            </p>
-            <p>
-              <Translate>To continue, click the button below.</Translate>
-            </p>
-          </div>
-        )}
-
-        {currentState === VerificationState && (
-          <div>
-            <p>
+            </List.Content>
+          </List.Item>
+          <List.Item>
+            <List.Icon name="times circle outline" />
+            <List.Content>
               <Translate>
-                To confirm that you understand and accept the consequences of what you are about to
-                do, type the first name "
-                <Param name="fistName" wrapper={<strong />} value={initialFirstName} />" and the
-                last name "<Param name="lastName" wrapper={<strong />} value={initialLastName} />"
-                of the user below.
+                <Param name="first_name" value={firstName} /> will be removed from all events,
+                contributions, and other areas of Indico.
               </Translate>
-            </p>
-            <Translate as="label">First Name</Translate>
-            <Input
-              placeholder={Translate.string('First name')}
-              value={firstName}
-              onChange={onFirstNameChange}
-              fluid
-            />
-            <br />
-            <Translate as="label">Last Name</Translate>
-            <Input
-              placeholder={Translate.string('Last name')}
-              value={lastName}
-              onChange={onLastNameChange}
-              fluid
-            />
-          </div>
-        )}
+            </List.Content>
+          </List.Item>
+          <List.Item>
+            <List.Icon name="trash alternate outline" />
+            <List.Content>
+              <Translate>
+                Where it is not possible to delete <Param name="first_name" value={firstName} />,
+                they will be anonymized and all personal data associated with the user will be
+                removed from Indico.
+              </Translate>
+            </List.Content>
+          </List.Item>
+        </List>
+        <p>
+          <Translate as="strong">
+            Are you sure you want to delete <Param name="first_name" value={firstName} />{' '}
+            <Param name="last_name" value={lastName} />?
+          </Translate>
+        </p>
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={onClose} content={Translate.string('Cancel')} />
-        {currentState === InfoState && (
-          <Button color="red" onClick={gotToNextState}>
-            <Translate>Yes, I want to delete this user</Translate>
+        <Button onClick={onClose} content={Translate.string("No, I don't")} />
+        {isButtonDisabled ? (
+          <Button color="red" disabled>
+            <Translate>
+              Yes, I want to delete <Param name="first_name" value={firstName} /> (
+              <Param name="countdown_seconds" value={countdown} />)
+            </Translate>
           </Button>
-        )}
-        {currentState === VerificationState && (
+        ) : (
           <Button color="red" onClick={onDelete} disabled={disabled} loading={inProgress}>
-            <Translate>Delete user</Translate>
+            <Translate>
+              Yes, I want to delete <Param name="first_name" value={firstName} />
+            </Translate>
           </Button>
         )}
       </Modal.Actions>
@@ -104,31 +113,20 @@ function UserDeleteDialogBody({
 }
 
 UserDeleteDialogBody.propTypes = {
-  dialogState: PropTypes.object.isRequired,
-  nameActions: PropTypes.object.isRequired,
+  firstName: PropTypes.string.isRequired,
+  lastName: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   inProgress: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-function UserDelete({userId, firstName: initialFirstName, lastName: initialLastName}) {
+function UserDelete({userId, firstName, lastName}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [currentState, setCurrentState] = useState(InfoState);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-
-  const firstNameVerified = firstName === initialFirstName;
-  const lastNameVerified = lastName === initialLastName;
   const isSameUser = userId === null;
 
-  const gotToNextState = () => setCurrentState(VerificationState);
-
   const handleCloseDialog = () => {
-    setCurrentState(InfoState);
-    setFirstName('');
-    setLastName('');
     setIsDialogOpen(false);
   };
 
@@ -148,67 +146,52 @@ function UserDelete({userId, firstName: initialFirstName, lastName: initialLastN
     location.href = resp.data.redirect;
   };
 
-  const dialogState = {
-    currentState,
-    gotToNextState,
-  };
-
-  const nameActions = {
-    initialFirstName,
-    initialLastName,
-    firstName,
-    lastName,
-    onFirstNameChange: (_, {value}) => setFirstName(value),
-    onLastNameChange: (_, {value}) => setLastName(value),
-  };
-
   return (
     <div>
-      <p>
-        <Translate>
-          Once you delete this account, there is no going back. Please be certain. If you're not
-          sure, consider using the "Block User" button above instead.
-        </Translate>
-      </p>
-      <Popup
-        position="top center"
-        trigger={
-          <span>
-            <Button color="red" onClick={() => setIsDialogOpen(true)} disabled={isSameUser}>
-              <Translate>Delete User</Translate>
-            </Button>
-          </span>
-        }
-        content={
-          isSameUser
-            ? Translate.string('You cannot delete your own account')
-            : Translate.string('Delete user')
-        }
-      />
-      {!isSameUser && (
-        <Modal size="tiny" open={isDialogOpen} onClose={handleCloseDialog}>
-          <UserDeleteDialogBody
-            dialogState={dialogState}
-            nameActions={nameActions}
-            disabled={deleting || !firstNameVerified || !lastNameVerified}
-            inProgress={deleting}
-            onDelete={handleDelete}
-            onClose={handleCloseDialog}
-          />
-        </Modal>
+      {isSameUser ? (
+        <Popup
+          trigger={
+            <span>
+              <Button size="small" color="red" disabled>
+                <Translate>Delete User</Translate>
+              </Button>
+            </span>
+          }
+          size="small"
+          wide
+          content={Translate.string('You cannot delete your own account')}
+          position="bottom center"
+        />
+      ) : (
+        <>
+          <Button
+            size="small"
+            color="red"
+            onClick={() => setIsDialogOpen(true)}
+            disabled={isSameUser}
+          >
+            <Translate>Delete User</Translate>
+          </Button>
+          <Modal size="small" open={isDialogOpen} onClose={handleCloseDialog} closeIcon>
+            <UserDeleteDialogBody
+              firstName={firstName}
+              lastName={lastName}
+              disabled={deleting}
+              inProgress={deleting}
+              onDelete={handleDelete}
+              onClose={handleCloseDialog}
+            />
+          </Modal>
+        </>
       )}
     </div>
   );
 }
 
 UserDelete.propTypes = {
-  userId: PropTypes.number,
+  userId: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([null])]),
   firstName: PropTypes.string.isRequired,
   lastName: PropTypes.string.isRequired,
-};
-
-UserDelete.defaultProps = {
-  userId: null,
 };
 
 window.setupUserDelete = function setupUserDelete(userId, firstName, lastName) {

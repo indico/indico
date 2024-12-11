@@ -1017,9 +1017,8 @@ class RHUserBlock(RHUserBase):
 class RHUserDelete(RHUserBase):
     """Delete a user.
 
-    This will completely remove the user and everything
-    they are connected to. If the deletion is unsuccessful
-    then it fallsback to annonymize the user.
+    Deletes the user, and all their associated data. If it is not possible to delete the user, it will
+    instead fallback to anonymizing the user.
     """
 
     def _check_access(self):
@@ -1039,10 +1038,10 @@ class RHUserDelete(RHUserBase):
             db.session.rollback()
             logger.info('User %s could not be deleted %s', name, str(exc))
             anonymize_user(self.user)
-            logger.info('User %s annonymized %s', session.user, name)
-            flash(_('User account of {name} has been annonymized.').format(name=name), 'success')
+            logger.info('User %s anonymized %s', session.user, name)
+            flash(_('{name} has been anonymized.').format(name=name), 'success')
         else:
             signals.users.db_deleted.send(self.user, flushed=True)
             logger.info('User %s deleted %s', session.user, name)
-            flash(_('User account of {name} has been deleted.').format(name=name), 'success')
+            flash(_('{name} has been deleted.').format(name=name), 'success')
         return jsonify(redirect=url_for('users.user_dashboard', session.user))
