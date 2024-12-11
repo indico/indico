@@ -82,4 +82,4 @@ class RHExportSessionToICAL(RHDisplaySessionBase):
 class RHExportSessionTimetableToPDF(RHDisplaySessionBase):
     def _process(self):
         pdf = get_session_timetable_pdf(self.session)
-        return send_file('timetable.pdf', pdf, 'application/pdf')
+        return send_file('session-timetable.pdf', pdf, 'application/pdf')
