@@ -852,6 +852,12 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
     """Accept a registration request."""
 
     def _process(self):
+        user_exists = User.query.filter(User.all_emails == self.request.email).has_rows()
+        if user_exists:
+            db.session.delete(self.request)
+            flash(_('A user with this email address already exists.'), 'error')
+            return jsonify_data()
+
         user = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
                              self.request.identity_data, self.request.settings)[0]
         with user.force_user_locale():
