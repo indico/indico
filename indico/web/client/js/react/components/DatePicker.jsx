@@ -23,6 +23,7 @@ export default function DatePicker({
   onChange,
   value,
   format = moment.localeData().longDateFormat('L'),
+  invalidValue = INVALID,
   min,
   max,
   ...inputProps
@@ -30,7 +31,7 @@ export default function DatePicker({
   function handleDateChange(ev) {
     const {date} = ev.target.closest('ind-date-picker');
     const invalid = !!ev.target.value && !date;
-    onChange(invalid ? INVALID : formatDate(ISO_FORMAT, date));
+    onChange(invalid ? invalidValue : formatDate(ISO_FORMAT, date));
   }
 
   const formattedValue = formatDate(format, fromISOLocalDate(value));
@@ -69,6 +70,7 @@ DatePicker.propTypes = {
   format: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any,
+  invalidValue: PropTypes.any,
   min: PropTypes.string,
   max: PropTypes.string,
 };
