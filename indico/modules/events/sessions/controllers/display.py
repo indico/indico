@@ -6,22 +6,16 @@
 # LICENSE file for more details.
 
 from io import BytesIO
-from itertools import groupby
 
-from flask import render_template, request, session
+from flask import request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import get_sessions_for_user
+from indico.modules.events.sessions.util import get_session_timetable_pdf, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
-from indico.modules.events.timetable.controllers.display import (RHTimetableExportPDF, TimetableExportConfig,
-                                                                 TimetableExportProgramConfig)
-from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.util import (create_pdf, get_nested_timetable,
-                                                  get_nested_timetable_location_conditions)
 from indico.web.flask.util import send_file
 from indico.web.rh import allow_signed_url
 
@@ -85,42 +79,7 @@ class RHExportSessionToICAL(RHDisplaySessionBase):
                          'text/calendar')
 
 
-class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
+class RHExportSessionTimetableToPDF(RHDisplaySessionBase):
     def _process(self):
-        css = render_template('events/timetable/pdf/timetable.css')
-        event = self.event
-        entries = [
-            e for e in get_nested_timetable(event)
-            if e.type == TimetableEntryType.SESSION_BLOCK and e.session_block.session == self.session
-        ]
-        days = {
-            day: list(e) for day, e in groupby(
-                entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
-            )
-        }
-        config = TimetableExportConfig(
-            show_title=True,
-            show_affiliation=False,
-            show_cover_page=True,
-            show_toc=False,
-            show_session_toc=True,
-            show_abstract=False,
-            dont_show_poster_abstract=False,
-            show_contribs=False,
-            show_length_contribs=False,
-            show_breaks=False,
-            new_page_per_session=False,
-            show_session_description=False,
-            print_date_close_to_sessions=False
-        )
-
-        show_children_location = get_nested_timetable_location_conditions(entries)[1]
-        program_config = TimetableExportProgramConfig(
-            show_siblings_location=True,
-            show_children_location=show_children_location
-        )
-
-        html = render_template('events/timetable/pdf/timetable.html', event=self.event, only_session=self.session,
-                                days=days, config=config, program_config=program_config)
-
-        return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
+        pdf = get_session_timetable_pdf(self.session)
+        return send_file('timetable.pdf', pdf, 'application/pdf')

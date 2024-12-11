@@ -10,6 +10,7 @@ import itertools
 import os
 import posixpath
 import re
+from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
@@ -369,7 +370,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
                           {'event_id': self.event.id, 'session_id': session.id}, session)
 
-        pdf = get_session_timetable_pdf(session, tz=self._display_tz)
+        pdf = get_session_timetable_pdf(session)
         self._add_pdf(session, 'sessions.export_session_timetable', pdf)
 
         self._add_file(session_to_ical(session), 'sessions.export_ics', session)
@@ -380,7 +381,9 @@ class StaticConferenceCreator(StaticEventCreator):
         else:
             pdf = generator_class_or_instance
 
-        if hasattr(pdf, 'getPDFBin'):
+        if isinstance(pdf, BytesIO):
+            self._add_file(pdf, uh_or_endpoint, target)
+        elif hasattr(pdf, 'getPDFBin'):
             # Got legacy reportlab PDF generator instead of the LaTex-based one
             self._add_file(pdf.getPDFBin(), uh_or_endpoint, target)
         else:

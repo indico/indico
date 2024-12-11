@@ -5,7 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from dataclasses import dataclass
 from itertools import groupby
 
 from flask import jsonify, render_template, request, session
@@ -17,13 +16,12 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import (create_pdf, get_nested_timetable,
-                                                  get_nested_timetable_location_conditions, render_entry_info_balloon,
-                                                  serialize_event_info)
+from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
+                                                  get_nested_timetable, get_nested_timetable_location_conditions,
+                                                  render_entry_info_balloon, serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
-from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.args import use_kwargs
 from indico.web.flask.util import send_file, url_for
@@ -77,29 +75,6 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
         return jsonify(html=html)
 
 
-@dataclass(frozen=True)
-class TimetableExportConfig:
-    show_title: bool
-    show_affiliation: bool
-    show_cover_page: bool
-    show_toc: bool
-    show_session_toc: bool
-    show_abstract: bool
-    dont_show_poster_abstract: bool
-    show_contribs: bool
-    show_length_contribs: bool
-    show_breaks: bool
-    new_page_per_session: bool
-    show_session_description: bool
-    print_date_close_to_sessions: bool
-
-
-@dataclass(frozen=True)
-class TimetableExportProgramConfig:
-    show_siblings_location: bool
-    show_children_location: bool
-
-
 class RHTimetableExportPDF(RHTimetableProtectionBase):
     @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
     def _process(self, download):
@@ -147,9 +122,8 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
                                 back_url=url_for('.timetable', self.event))
 
 
-class RHTimetableExportDefaultPDF(RHTimetableExportPDF):
+class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
     def _process(self):
-        now = now_utc()
         css = render_template('events/timetable/pdf/timetable.css')
         event = self.event
         entries = get_nested_timetable(event)
@@ -180,6 +154,6 @@ class RHTimetableExportDefaultPDF(RHTimetableExportPDF):
         )
 
         html = render_template('events/timetable/pdf/timetable.html', event=self.event,
-                               days=days, now=now, config=config, program_config=program_config)
+                               days=days, config=config, program_config=program_config)
 
         return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')

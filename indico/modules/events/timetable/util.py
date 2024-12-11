@@ -6,7 +6,9 @@
 # LICENSE file for more details.
 
 from collections import defaultdict
+from dataclasses import dataclass
 from io import BytesIO
+from itertools import groupby
 from operator import attrgetter
 
 from flask import render_template, session
@@ -311,10 +313,41 @@ def shift_following_entries(entry, shift, session_=None):
 
 
 def get_timetable_offline_pdf_generator(event):
-    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
-    pdf_format = TimetablePDFFormat()
-    return TimeTablePlain(event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4',
-                          fontsize='normal')
+    from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
+                                                      get_nested_timetable, get_nested_timetable_location_conditions)
+
+    css = render_template('events/timetable/pdf/timetable.css')
+    entries = get_nested_timetable(event)
+    days = {
+        day: list(e) for day, e in groupby(
+            entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
+        )
+    }
+    config = TimetableExportConfig(
+        show_title=True,
+        show_affiliation=False,
+        show_cover_page=True,
+        show_toc=True,
+        show_session_toc=True,
+        show_abstract=False,
+        dont_show_poster_abstract=True,
+        show_contribs=False,
+        show_length_contribs=False,
+        show_breaks=False,
+        new_page_per_session=False,
+        show_session_description=False,
+        print_date_close_to_sessions=False
+    )
+
+    show_children_location = get_nested_timetable_location_conditions(entries)[1]
+    program_config = TimetableExportProgramConfig(
+        show_siblings_location=True,
+        show_children_location=show_children_location
+    )
+
+    html = render_template('events/timetable/pdf/timetable.html', event=event,
+                            days=days, config=config, program_config=program_config)
+    return create_pdf(html, css, event)
 
 
 def get_time_changes_notifications(changes, tzinfo, entry=None):
@@ -436,6 +469,29 @@ def get_nested_timetable_location_conditions(entries):
     }
 
     return show_siblings_location, show_children_location
+
+
+@dataclass(frozen=True)
+class TimetableExportConfig:
+    show_title: bool
+    show_affiliation: bool
+    show_cover_page: bool
+    show_toc: bool
+    show_session_toc: bool
+    show_abstract: bool
+    dont_show_poster_abstract: bool
+    show_contribs: bool
+    show_length_contribs: bool
+    show_breaks: bool
+    new_page_per_session: bool
+    show_session_description: bool
+    print_date_close_to_sessions: bool
+
+
+@dataclass(frozen=True)
+class TimetableExportProgramConfig:
+    show_siblings_location: bool
+    show_children_location: bool
 
 
 def create_pdf(html, css, event) -> BytesIO:

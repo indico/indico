@@ -7,8 +7,9 @@
 
 from collections import defaultdict
 from io import BytesIO
+from itertools import groupby
 
-from flask import session
+from flask import render_template
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
@@ -156,12 +157,47 @@ def has_sessions_for_user(event, user):
     return _query_sessions_for_user(event, user).has_rows()
 
 
-def get_session_timetable_pdf(sess, **kwargs):
-    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
-    pdf_format = TimetablePDFFormat(params={'coverPage': False})
-    return TimeTablePlain(sess.event, session.user, showSessions=[sess.id], showDays=[],
-                          sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',
-                          showSpeakerAffiliation=False, **kwargs)
+def get_session_timetable_pdf(sess):
+    from indico.modules.events.timetable.models.entries import TimetableEntryType
+    from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
+                                                      get_nested_timetable, get_nested_timetable_location_conditions)
+
+    event = sess.event
+    css = render_template('events/timetable/pdf/timetable.css')
+    entries = [
+        e for e in get_nested_timetable(event)
+        if e.type == TimetableEntryType.SESSION_BLOCK and e.session_block.session == sess
+    ]
+    days = {
+        day: list(e) for day, e in groupby(
+            entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
+        )
+    }
+    config = TimetableExportConfig(
+        show_title=True,
+        show_affiliation=False,
+        show_cover_page=True,
+        show_toc=False,
+        show_session_toc=True,
+        show_abstract=False,
+        dont_show_poster_abstract=False,
+        show_contribs=False,
+        show_length_contribs=False,
+        show_breaks=False,
+        new_page_per_session=False,
+        show_session_description=False,
+        print_date_close_to_sessions=False
+    )
+
+    show_children_location = get_nested_timetable_location_conditions(entries)[1]
+    program_config = TimetableExportProgramConfig(
+        show_siblings_location=True,
+        show_children_location=show_children_location
+    )
+
+    html = render_template('events/timetable/pdf/timetable.html', event=event, only_session=sess,
+                            days=days, config=config, program_config=program_config)
+    return create_pdf(html, css, event)
 
 
 def render_session_type_row(session_type):
