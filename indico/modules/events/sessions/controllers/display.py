@@ -101,7 +101,7 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
         config = TimetableExportConfig(
             show_title=True,
             show_affiliation=False,
-            show_cover_page=False,
+            show_cover_page=True,
             show_toc=False,
             show_session_toc=True,
             show_abstract=False,
@@ -120,7 +120,7 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
             show_children_location=show_children_location
         )
 
-        html = render_template('events/timetable/pdf/timetable.html', event=self.event,
+        html = render_template('events/timetable/pdf/timetable.html', event=self.event, only_session=self.session,
                                 days=days, config=config, program_config=program_config)
 
         return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')

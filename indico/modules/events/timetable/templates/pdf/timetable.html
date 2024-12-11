@@ -45,7 +45,7 @@
 </style>
 
 {% if config.show_cover_page %}
-    {{ render_cover_page(event) }}
+    {{ render_cover_page(event, only_session|default(none)) }}
 {% endif %}
 
 {% if config.show_toc %}

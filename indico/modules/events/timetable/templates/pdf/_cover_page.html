@@ -1,6 +1,6 @@
 {% from 'events/display/conference/_util.html' import format_event_date %}
 
-{% macro render_cover_page(event) %}
+{% macro render_cover_page(event, only_session=none) %}
     <div class="pagebreak cover">
         <div class="cover-wrapper">
             <div>
@@ -9,7 +9,12 @@
                 {% endif %}
                 <h1>{{ event.title }}</h1>
                 <h3>{{ format_event_date(event) }}</h3>
-                <h1>{% trans %}Program{% endtrans %}</h1>
+                {% if only_session %}
+                    <h1>{% trans %}Session Program{% endtrans %}</h1>
+                    <h2>{{ only_session.title }}</h2>
+                {% else %}
+                    <h1>{% trans %}Program{% endtrans %}</h1>
+                {% endif %}
                 {% if event.has_location_info %}
                     <p>
                         {{ [event.venue_name, event.room_name] | select | join(', ') }}
