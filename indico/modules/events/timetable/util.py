@@ -441,7 +441,7 @@ class TimetableExportConfig:
     show_toc: bool
     show_session_toc: bool
     show_abstract: bool
-    dont_show_poster_abstract: bool
+    show_poster_abstract: bool
     show_contribs: bool
     show_length_contribs: bool
     show_breaks: bool
@@ -487,7 +487,7 @@ def get_timetable_offline_pdf_generator(event):
         show_toc=True,
         show_session_toc=True,
         show_abstract=False,
-        dont_show_poster_abstract=True,
+        show_poster_abstract=False,
         show_contribs=False,
         show_length_contribs=False,
         show_breaks=False,

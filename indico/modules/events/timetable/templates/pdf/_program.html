@@ -156,7 +156,7 @@
             {{ _render_place(contrib) }}
         </p>
     {% endif %}
-    {% if config.show_abstract and (not contrib.session.is_poster or not config.dont_show_poster_abstract) and contrib.description %}
+    {% if config.show_abstract and (not contrib.session.is_poster or config.show_poster_abstract) and contrib.description %}
         <div class="description">
             <b>{% trans %}Description{% endtrans %}</b>
             <div>{{ contrib.description }}</div>
