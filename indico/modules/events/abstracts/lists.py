@@ -42,7 +42,7 @@ class AbstractListGeneratorBase(ListGeneratorBase):
             'state': {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}},
             'submitter': {'title': _('Submitter')},
             'speakers': {'title': _('Speakers')},
-            'authors': {'title': _('Primary authors')},
+            'authors': {'title': _('Authors')},
             'coauthors': {'title': _('Co-authors')},
             'accepted_track': {'title': _('Accepted track'), 'filter_choices': track_empty | track_choices},
             'submitted_for_tracks': {'title': _('Submitted for tracks'), 'filter_choices': track_empty | track_choices},

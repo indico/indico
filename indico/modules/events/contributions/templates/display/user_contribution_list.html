@@ -7,7 +7,7 @@
 
 {% block content -%}
     {{ render_contribution_section(contributions.speaker, title=_('Speaker')) }}
-    {{ render_contribution_section(contributions.primary, title=_('Primary author')) }}
+    {{ render_contribution_section(contributions.primary, title=_('Author')) }}
     {{ render_contribution_section(contributions.secondary, title=_('Co-author')) }}
     {{ render_contribution_section(contributions.submitter, title=_('Submitter')) }}
     {% if event.type != 'conference' -%}

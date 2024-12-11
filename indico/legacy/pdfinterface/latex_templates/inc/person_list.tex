@@ -23,7 +23,7 @@
 
 
 \JINJA{macro render_person_lists(obj)}
-    \VAR{render_person_list(ngettext('Primary author', 'Primary authors', obj.primary_authors|length), obj.primary_authors) | rawlatex}
+    \VAR{render_person_list(ngettext('Author', 'Authors', obj.primary_authors|length), obj.primary_authors) | rawlatex}
     \VAR{render_person_list(ngettext('Co-author', 'Co-authors', obj.secondary_authors|length), obj.secondary_authors) | rawlatex}
     \VAR{render_person_list(ngettext('Presenter', 'Presenters', obj.speakers|length), obj.speakers) | rawlatex}
 \JINJA{endmacro}

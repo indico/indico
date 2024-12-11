@@ -199,7 +199,7 @@ def test_email_content(monkeypatch, abstract_objects, create_email_template, dum
             Conference: {event.title}
             Submitted by: Guinea Pig
             Title: Broken Symmetry and the Mass of Gauge Vector Mesons
-            Primary Authors: John Doe, Pocahontas Silva, John Smith
+            Authors: John Doe, Pocahontas Silva, John Smith
             Co-authors:
             Track classification: Dummy Track
             Presentation type: Poster

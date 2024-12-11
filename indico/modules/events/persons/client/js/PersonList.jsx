@@ -47,10 +47,7 @@ function personListReducer(state, action) {
 
 const makeAuthorType = ({primaryAuthor, secondaryAuthor}) => {
   return (
-    [
-      primaryAuthor && Translate.string('Primary', 'Author'),
-      secondaryAuthor && Translate.string('Co-author'),
-    ]
+    [primaryAuthor && Translate.string('Author'), secondaryAuthor && Translate.string('Co-author')]
       .filter(t => t)
       .join(', ') || '-'
   );
