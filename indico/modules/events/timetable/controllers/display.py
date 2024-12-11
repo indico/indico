@@ -181,6 +181,6 @@ class RHTimetableExportDefaultPDF(RHTimetableExportPDF):
         )
 
         html = render_template('events/timetable/pdf/timetable.html', event=self.event,
-                                days=days, now=now, config=config, program_config=program_config)
+                               days=days, now=now, config=config, program_config=program_config)
 
         return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
