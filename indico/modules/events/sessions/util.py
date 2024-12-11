@@ -173,21 +173,7 @@ def get_session_timetable_pdf(sess):
             entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
         )
     }
-    config = TimetableExportConfig(
-        show_title=True,
-        show_affiliation=False,
-        show_cover_page=True,
-        show_toc=False,
-        show_session_toc=True,
-        show_abstract=False,
-        show_poster_abstract=False,
-        show_contribs=False,
-        show_length_contribs=False,
-        show_breaks=False,
-        new_page_per_session=False,
-        show_session_description=False,
-        print_date_close_to_sessions=False
-    )
+    config = TimetableExportConfig(show_toc=False)
 
     show_children_location = get_nested_timetable_location_conditions(entries)[1]
     program_config = TimetableExportProgramConfig(

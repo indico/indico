@@ -435,19 +435,19 @@ def get_nested_timetable_location_conditions(entries):
 
 @dataclass(frozen=True)
 class TimetableExportConfig:
-    show_title: bool
-    show_affiliation: bool
-    show_cover_page: bool
-    show_toc: bool
-    show_session_toc: bool
-    show_abstract: bool
-    show_poster_abstract: bool
-    show_contribs: bool
-    show_length_contribs: bool
-    show_breaks: bool
-    new_page_per_session: bool
-    show_session_description: bool
-    print_date_close_to_sessions: bool
+    show_title: bool = True
+    show_affiliation: bool = False
+    show_cover_page: bool = True
+    show_toc: bool = True
+    show_session_toc: bool = True
+    show_abstract: bool = False
+    show_poster_abstract: bool = False
+    show_contribs: bool = False
+    show_length_contribs: bool = False
+    show_breaks: bool = False
+    new_page_per_session: bool = False
+    show_session_description: bool = False
+    print_date_close_to_sessions: bool = False
 
 
 @dataclass(frozen=True)
@@ -480,21 +480,7 @@ def generate_default_pdf_timetable(event):
             entries, lambda e: e.start_dt.astimezone(event.tzinfo).date()
         )
     }
-    config = TimetableExportConfig(
-        show_title=True,
-        show_affiliation=False,
-        show_cover_page=True,
-        show_toc=True,
-        show_session_toc=True,
-        show_abstract=False,
-        show_poster_abstract=False,
-        show_contribs=False,
-        show_length_contribs=False,
-        show_breaks=False,
-        new_page_per_session=False,
-        show_session_description=False,
-        print_date_close_to_sessions=False
-    )
+    config = TimetableExportConfig()
 
     show_children_location = get_nested_timetable_location_conditions(entries)[1]
     program_config = TimetableExportProgramConfig(
