@@ -28,7 +28,7 @@
                                         {{ _render_break(entry, config, program_config) }}
                                     {% elif entry.type.name == 'CONTRIBUTION' %}
                                         {{  _render_contrib(entry, config, program_config) }}
-                                    {% else %}
+                                    {% elif entry.type.name == 'SESSION_BLOCK' %}
                                         {{ _render_session_block(entry, config, program_config, show_children_location) }}
                                     {% endif %}
                                 </div>
@@ -97,8 +97,9 @@
             {% if config.show_session_description and sess.description %}
                 {{ _render_description(sess.description) }}
             {% endif %}
-            {% if entry.children %}
-                {{ _render_block_child_entries(sess, entry.children, config, show_children_location) }}
+            {% set accessible_children = entry.children | selectattr('object', 'can_access', user=session.user) | list %}
+            {% if accessible_children %}
+                {{ _render_block_child_entries(sess, accessible_children, config, show_children_location) }}
             {% endif %}
         </div>
     {% endif %}
