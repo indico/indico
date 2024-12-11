@@ -161,7 +161,6 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 
 
 class TimetablePDFExportForm(IndicoForm):
-
     advanced = BooleanField(_('Advanced timetable'), widget=SwitchWidget(),
                             description=_('Advanced customization options'))
     document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'), [HiddenUnless('advanced')],
