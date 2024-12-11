@@ -17,8 +17,9 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.util import (TimetableExportConfig, TimetableExportProgramConfig, create_pdf,
-                                                  get_nested_timetable, get_nested_timetable_location_conditions,
-                                                  render_entry_info_balloon, serialize_event_info)
+                                                  generate_default_pdf_timetable, get_nested_timetable,
+                                                  get_nested_timetable_location_conditions, render_entry_info_balloon,
+                                                  serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
@@ -76,6 +77,8 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
 
 
 class RHTimetableExportPDF(RHTimetableProtectionBase):
+    """Generate a PDF timetable with customizable settings."""
+
     @use_kwargs({'download': fields.Bool(load_default=False)}, location='query')
     def _process(self, download):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
@@ -123,37 +126,8 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
 
 
 class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
+    """Generate a PDF timetable with default settings."""
+
     def _process(self):
-        css = render_template('events/timetable/pdf/timetable.css')
-        event = self.event
-        entries = get_nested_timetable(event)
-        days = {day: list(e) for day, e in groupby(
-            entries, lambda e: e.start_dt.astimezone(self.event.tzinfo).date()
-        )}
-
-        config = TimetableExportConfig(
-            show_title=True,
-            show_affiliation=False,
-            show_cover_page=True,
-            show_toc=True,
-            show_session_toc=True,
-            show_abstract=False,
-            show_poster_abstract=False,
-            show_contribs=False,
-            show_length_contribs=False,
-            show_breaks=False,
-            new_page_per_session=False,
-            show_session_description=False,
-            print_date_close_to_sessions=False
-        )
-
-        show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
-        program_config = TimetableExportProgramConfig(
-            show_siblings_location=show_siblings_location,
-            show_children_location=show_children_location
-        )
-
-        html = render_template('events/timetable/pdf/timetable.html', event=self.event,
-                               days=days, config=config, program_config=program_config)
-
-        return send_file('timetable.pdf', create_pdf(html, css, self.event), 'application/pdf')
+        pdf = generate_default_pdf_timetable(self.event)
+        return send_file('timetable.pdf', pdf, 'application/pdf')

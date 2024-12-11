@@ -472,7 +472,7 @@ def create_pdf(html, css, event) -> BytesIO:
     return f
 
 
-def get_timetable_offline_pdf_generator(event):
+def generate_default_pdf_timetable(event):
     css = render_template('events/timetable/pdf/timetable.css')
     entries = get_nested_timetable(event)
     days = {
