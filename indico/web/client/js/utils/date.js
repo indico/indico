@@ -55,6 +55,15 @@ export function createDT(date, time) {
   return moment([...momentDate.toArray().splice(0, 3), ...momentTime.toArray().splice(3)]);
 }
 
+export function getBookingRangeMinDate(isAdminOverrideEnabled, gracePeriod) {
+  if (isAdminOverrideEnabled) {
+    return '';
+  } else if (gracePeriod === null) {
+    return serializeDate(moment());
+  }
+  return serializeDate(moment().subtract(gracePeriod, 'hour'));
+}
+
 export function isBookingStartDateValid(date, isAdminOverrideEnabled, gracePeriod) {
   if (!date || !date.isValid()) {
     return false;
