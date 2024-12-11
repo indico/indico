@@ -93,9 +93,7 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
         event = self.event
         entries = [
             e for e in get_nested_timetable(event)
-            if e.type == TimetableEntryType.SESSION_BLOCK and (
-                e.id == self.session.id or (e.session_block and self.session.id == e.session_block.session.id)
-            )
+            if e.type == TimetableEntryType.SESSION_BLOCK and e.session_block.session == self.session
         ]
         days = {
             day: list(e) for day, e in groupby(
@@ -118,9 +116,9 @@ class RHExportSessionTimetableToPDF(RHDisplaySessionBase, RHTimetableExportPDF):
             print_date_close_to_sessions=False
         )
 
-        show_siblings_location, show_children_location = get_nested_timetable_location_conditions(entries)
+        show_children_location = get_nested_timetable_location_conditions(entries)[1]
         program_config = TimetableExportProgramConfig(
-            show_siblings_location=show_siblings_location,
+            show_siblings_location=True,
             show_children_location=show_children_location
         )
 

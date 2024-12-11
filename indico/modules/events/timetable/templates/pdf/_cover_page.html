@@ -9,7 +9,7 @@
                 {% endif %}
                 <h1>{{ event.title }}</h1>
                 <h3>{{ format_event_date(event) }}</h3>
-                <h1>{% trans %}Programme{% endtrans %}</h1>
+                <h1>{% trans %}Program{% endtrans %}</h1>
                 {% if event.has_location_info %}
                     <p>
                         {{ [event.venue_name, event.room_name] | select | join(', ') }}
