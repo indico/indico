@@ -94,7 +94,7 @@ class IndicoModel(Model):
     query_class = IndicoBaseQuery
 
     @classmethod
-    def get(cls, oid, is_deleted=None) -> Self | None:
+    def get(cls, oid, is_deleted: bool | None = None) -> Self | None:
         """Get an object based on its primary key.
 
         :param oid: The primary key of the object
