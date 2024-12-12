@@ -24,8 +24,7 @@ from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (FileField, IndicoEnumSelectField, IndicoLocationField, IndicoPalettePickerField,
                                      IndicoSelectMultipleCheckboxBooleanField, IndicoTimeField)
 from indico.web.forms.fields.datetime import IndicoDurationField
-from indico.web.forms.util import get_form_field_names
-from indico.web.forms.validators import HiddenUnless, MaxDuration
+from indico.web.forms.validators import MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -161,34 +160,19 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 
 
 class TimetablePDFExportForm(IndicoForm):
-    advanced = BooleanField(_('Advanced timetable'), widget=SwitchWidget(),
-                            description=_('Advanced customization options'))
-    document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'), [HiddenUnless('advanced')],
+    document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'),
                                                                  choices=_DOCUMENT_SETTINGS_CHOICES)
     contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions related info'),
-                                                                 [HiddenUnless('advanced')],
                                                                  choices=_CONTRIBUTION_CHOICES)
-    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions related info'), [HiddenUnless('advanced')],
+    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions related info'),
                                                             choices=_SESSION_CHOICES)
     visible_entries = IndicoSelectMultipleCheckboxBooleanField(_('Breaks and contributions'),
-                                                               [HiddenUnless('advanced')],
                                                                choices=_VISIBLE_ENTRIES_CHOICES)
     other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
     submitted = HiddenField()
 
     def is_submitted(self):
         return 'submitted' in request.args
-
-    @property
-    def data_for_format(self):
-        if not self.advanced.data:
-            fields = ('visible_entries',)
-        else:
-            fields = set(get_form_field_names(TimetablePDFExportForm)) - {'csrf_token', 'advanced'}
-        data = {}
-        for fieldname in fields:
-            data.update(getattr(self, fieldname).data)
-        return data
 
 
 class ImportContributionsForm(IndicoForm):
