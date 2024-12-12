@@ -5,14 +5,13 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'react-dates/initialize';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 
-import {SingleDatePicker} from 'indico/react/components';
+import {DatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {toMoment} from 'indico/utils/date';
+import {serializeDate, toMoment} from 'indico/utils/date';
 
 function triggerChange(id) {
   document.getElementById(id).dispatchEvent(new Event('change', {bubbles: true}));
@@ -32,14 +31,16 @@ export default function WTFDateField({
     () => linkedField && document.getElementById(`${linkedField.id}-datestorage`),
     [linkedField]
   );
-  const [date, setDate] = useState(toMoment(dateField.value, 'DD/MM/YYYY', true));
-  const earliestMoment = earliest ? moment(earliest) : null;
-  const latestMoment = latest ? moment(latest) : null;
+  const [linkedMoment, setLinkedMoment] = useState(
+    linkedFieldDateElem ? moment(linkedFieldDateElem.value, 'DD/MM/YYYY') : null
+  );
+  const [date, setDate] = useState(toMoment(dateField.value, 'DD/MM/YYYY'));
   const clearRef = useRef(null);
 
   const updateDate = useCallback(
     value => {
-      dateField.value = value ? value.format('DD/MM/YYYY') : '';
+      dateField.value = value ? moment(value).format('DD/MM/YYYY') : '';
+      dateField.parentElement.querySelector('ind-date-picker > input').value = dateField.value;
       setDate(value);
       triggerChange(dateId);
     },
@@ -52,6 +53,7 @@ export default function WTFDateField({
     }
     function handleDateChange() {
       const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
+      setLinkedMoment(linkedDate);
       if (
         (linkedField.notBefore && linkedDate.isAfter(date, 'day')) ||
         (linkedField.notAfter && linkedDate.isBefore(date, 'day'))
@@ -71,38 +73,21 @@ export default function WTFDateField({
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
 
-  const isOutsideRange = useCallback(
-    value => {
-      if (linkedField) {
-        const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
-        if (
-          (linkedField.notBefore && value.isBefore(linkedDate, 'day')) ||
-          (linkedField.notAfter && value.isAfter(linkedDate, 'day'))
-        ) {
-          return true;
-        }
-      }
-      return (
-        (earliestMoment && value.isBefore(earliestMoment, 'day')) ||
-        (latestMoment && value.isAfter(latestMoment, 'day'))
-      );
-    },
-    [earliestMoment, latestMoment, linkedField, linkedFieldDateElem]
-  );
+  const min =
+    linkedField?.notBefore && linkedMoment.isValid() ? serializeDate(linkedMoment) : earliest;
+  const max =
+    linkedField?.notAfter && linkedMoment.isValid() ? serializeDate(linkedMoment) : latest;
 
   return (
     <>
-      <SingleDatePicker
-        id=""
-        date={date}
-        onDateChange={updateDate}
-        placeholder={moment.localeData().longDateFormat('L')}
-        isOutsideRange={isOutsideRange}
+      <DatePicker
+        value={serializeDate(date)}
+        onChange={updateDate}
+        min={min}
+        max={max}
         required={required}
-        verticalSpacing={10}
-        showDefaultInputIcon={false}
         disabled={disabled}
-        noBorder
+        invalidValue={null}
       />
       {date && allowClear && (
         <span
