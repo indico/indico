@@ -66,10 +66,10 @@ customElements.define(
 
       indCalendar.format = this.format;
       indCalendar.rangeStart = indCalendar.rangeEnd = toDateString(parseDate(this.value));
-      indCalendar.min = this.min;
-      indCalendar.max = this.max;
       formatDescription.id = `${id}-format`;
       input.setAttribute('aria-describedby', formatDescription.id);
+
+      updateRange();
 
       // This property is defined here rather than in the class because it
       // relies on the parseDate() function created in this scope.
