@@ -141,7 +141,9 @@
             <div class="toolbar">
                 {{ render_displayed_entries_fragment(persons|length, persons|length) }}
                 <div id="person-filters" class="group list-filter">
-                    <button class="i-button arrow highlight js-dropdown" data-toggle="dropdown">Filter role</button>
+                    <button class="i-button arrow highlight js-dropdown" data-toggle="dropdown">
+                        {% trans %}Filter role{% endtrans %}
+                    </button>
                     <ul class="i-dropdown">
                         {% if event.type != 'lecture' %}
                             <li class="enabled">
