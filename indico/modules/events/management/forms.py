@@ -219,8 +219,8 @@ class EventClassificationForm(IndicoForm):
 
     # The 'keywords' field is dynamically added when creating the form.
     references = ReferencesField(_('External IDs'), reference_class=EventReference)
-    label = QuerySelectField(_('Label'), allow_blank=True, get_label='title')
-    label_message = TextAreaField(_('Label message'),
+    label = QuerySelectField(pgettext('Classification', 'Label'), allow_blank=True, get_label='title')
+    label_message = TextAreaField(pgettext('Classification', 'Label message'),
                                   description=_('You can optionally provide a message that is shown when hovering '
                                                 'the selected label.'))
 
