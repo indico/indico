@@ -34,6 +34,8 @@ export default function DateRangePicker({
   max,
   readOnly,
   disabled,
+  startDisabled,
+  endDisabled,
   onChange,
 }) {
   format ??= moment.localeData().longDateFormat('L');
@@ -70,6 +72,8 @@ export default function DateRangePicker({
       range-start-max={rangeStartMax}
       range-end-min={rangeEndMin}
       range-end-max={rangeEndMax}
+      start-disabled={startDisabled || undefined}
+      end-disabled={endDisabled || undefined}
       onChange={handleChange}
     >
       <fieldset>
@@ -81,10 +85,10 @@ export default function DateRangePicker({
             data-range-start
             placeholder={format}
             readOnly={readOnly}
-            disabled={disabled}
+            disabled={disabled || startDisabled}
           />
         </label>
-        <button type="button" data-calendar-trigger="left">
+        <button type="button" data-calendar-trigger="left" disabled={disabled || startDisabled}>
           <Translate as="span">Open a calendar</Translate>
         </button>
         <span className="arrow" />
@@ -95,10 +99,10 @@ export default function DateRangePicker({
             data-range-end
             placeholder={format}
             readOnly={readOnly}
-            disabled={disabled}
+            disabled={disabled || endDisabled}
           />
         </label>
-        <button type="button" data-calendar-trigger="right">
+        <button type="button" data-calendar-trigger="right" disabled={disabled || endDisabled}>
           <Translate as="span">Open a calendar</Translate>
         </button>
 
@@ -124,6 +128,8 @@ DateRangePicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
   disabled: PropTypes.bool,
+  startDisabled: PropTypes.bool,
+  endDisabled: PropTypes.bool,
   value: PropTypes.object,
   label: PropTypes.string,
   rangeStartLabel: PropTypes.string.isRequired,
@@ -141,6 +147,8 @@ DateRangePicker.defaultProps = {
   value: {startDate: '', endDate: ''},
   readOnly: false,
   disabled: false,
+  startDisabled: false,
+  endDisabled: false,
   label: Translate.string('Select a date range'),
   rangeStartMin: '',
   rangeStartMax: '',
@@ -230,6 +238,8 @@ FinalDateRangePicker.propTypes = {
   rangeStartMax: PropTypes.string,
   rangeEndMin: PropTypes.string,
   rangeEndMax: PropTypes.string,
+  startDisabled: PropTypes.bool,
+  endDisabled: PropTypes.bool,
 };
 
 FinalDateRangePicker.defaultProps = {
@@ -238,4 +248,6 @@ FinalDateRangePicker.defaultProps = {
   rangeStartMax: '',
   rangeEndMin: '',
   rangeEndMax: '',
+  startDisabled: false,
+  endDisabled: false,
 };
