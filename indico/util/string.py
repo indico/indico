@@ -378,22 +378,6 @@ def strip_control_chars(text):
     return re.sub(r'[\x0B-\x1F]', '', text)
 
 
-def html_color_to_rgb(hexcolor):
-    """Convert #RRGGBB to an (R, G, B) tuple."""
-    if not hexcolor.startswith('#'):
-        raise ValueError(f"Invalid color string '{hexcolor}' (should start with '#')")
-
-    hexcolor = hexcolor[1:]
-
-    if len(hexcolor) not in {3, 6}:
-        raise ValueError(f"'#{hexcolor}'' is not in #RRGGBB or #RGB format")
-
-    if len(hexcolor) == 3:
-        hexcolor = ''.join(c * 2 for c in hexcolor)
-
-    return tuple(float(int(hexcolor[i:i + 2], 16)) / 255 for i in range(0, 6, 2))
-
-
 def strip_whitespace(s):
     """Remove trailing/leading whitespace if a string was passed.
 

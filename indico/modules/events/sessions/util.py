@@ -8,7 +8,6 @@
 from collections import defaultdict
 from io import BytesIO
 
-from flask import session
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
@@ -156,12 +155,10 @@ def has_sessions_for_user(event, user):
     return _query_sessions_for_user(event, user).has_rows()
 
 
-def get_session_timetable_pdf(sess, **kwargs):
-    from indico.legacy.pdfinterface.conference import TimetablePDFFormat, TimeTablePlain
-    pdf_format = TimetablePDFFormat(params={'coverPage': False})
-    return TimeTablePlain(sess.event, session.user, showSessions=[sess.id], showDays=[],
-                          sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',
-                          firstPageNumber=1, showSpeakerAffiliation=False, **kwargs)
+def generate_session_pdf_timetable(sess):
+    from indico.modules.events.timetable.util import TimetableExportConfig, generate_pdf_timetable
+    config = TimetableExportConfig(show_toc=False)
+    return generate_pdf_timetable(sess.event, config, only_session=sess)
 
 
 def render_session_type_row(session_type):

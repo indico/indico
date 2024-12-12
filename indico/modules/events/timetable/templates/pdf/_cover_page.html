@@ -1,0 +1,35 @@
+{% from 'events/display/conference/_util.html' import format_event_date %}
+
+{% macro render_cover_page(event, only_session) %}
+    <div class="pagebreak cover">
+        <div class="cover-wrapper">
+            <div>
+                {% if only_session %}
+                    <h2>{% trans 'Timetable' %}Session Program{% endtrans %}</h2>
+                {% else %}
+                    <h2>{% trans 'Timetable' %}Program{% endtrans %}</h2>
+                {% endif %}
+                <h3>{{ format_event_date(event) }}</h3>
+                {% if event.logo %}
+                    <img alt="Event logo" src="event://logo" class="logo">
+                {% else %}
+                    <br>
+                {% endif %}
+                <h1>
+                    {{ event.title }}
+                    {% if only_session %}
+                        <i>{{ only_session.title }}</i>
+                    {% endif %}
+                </h1>
+                {% if event.has_location_info %}
+                    <p>
+                        {{ [event.venue_name, event.room_name] | select | join(', ') }}
+                        {% if (event.venue_name or event.room_name) and event.address %}
+                            <span class="address">{{ event.address }}</span>
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}

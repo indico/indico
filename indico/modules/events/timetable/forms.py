@@ -9,9 +9,8 @@ from datetime import datetime, timedelta
 
 from flask import request
 from pytz import utc
-from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
-from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
-from wtforms.widgets import NumberInput
+from wtforms.fields import BooleanField, HiddenField, StringField, TextAreaField
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.forms import ContributionForm
@@ -25,8 +24,7 @@ from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (FileField, IndicoEnumSelectField, IndicoLocationField, IndicoPalettePickerField,
                                      IndicoSelectMultipleCheckboxBooleanField, IndicoTimeField)
 from indico.web.forms.fields.datetime import IndicoDurationField
-from indico.web.forms.util import get_form_field_names
-from indico.web.forms.validators import HiddenUnless, MaxDuration
+from indico.web.forms.validators import MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -149,12 +147,10 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
 _DOCUMENT_SETTINGS_CHOICES = [('showCoverPage', _('Include cover page')),
                               ('showTableContents', _('Include table of contents')),
                               ('showSessionTOC', _('Show list of sessions in the table of contents'))]
-_CONTRIBUTION_CHOICES = [('showContribId', _('Print the ID of each contribution')),
-                         ('showAbstract', _('Print abstract content of all contributions')),
+_CONTRIBUTION_CHOICES = [('showAbstract', _('Print abstract content of all contributions')),
                          ('dontShowPosterAbstract', _('Do not print the abstract content for poster sessions')),
                          ('showLengthContribs', _('Include length of the contributions'))]
 _SESSION_CHOICES = [('newPagePerSession', _('Print each session on a separate page')),
-                    ('useSessionColorCodes', _('Use session color codes')),
                     ('showSessionDescription', _('Include session description')),
                     ('printDateCloseToSessions', _('Print the start date close to session title'))]
 _VISIBLE_ENTRIES_CHOICES = [('showContribsAtConfLevel', _('Include top-level contributions')),
@@ -164,41 +160,19 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 
 
 class TimetablePDFExportForm(IndicoForm):
-    _pdf_options_fields = {'pagesize', 'firstPageNumber'}
-
-    advanced = BooleanField(_('Advanced timetable'), widget=SwitchWidget(),
-                            description=_('Advanced customization options'))
-    document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'), [HiddenUnless('advanced')],
+    document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'),
                                                                  choices=_DOCUMENT_SETTINGS_CHOICES)
-    contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions related info'),
-                                                                 [HiddenUnless('advanced')],
+    contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions'),
                                                                  choices=_CONTRIBUTION_CHOICES)
-    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions related info'), [HiddenUnless('advanced')],
+    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions'),
                                                             choices=_SESSION_CHOICES)
-    visible_entries = IndicoSelectMultipleCheckboxBooleanField(_('Breaks and contributions'),
-                                                               [HiddenUnless('advanced')],
+    visible_entries = IndicoSelectMultipleCheckboxBooleanField(_('Top-level items'),
                                                                choices=_VISIBLE_ENTRIES_CHOICES)
     other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
-    pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
-                                                    ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
-    firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,  # noqa: N815
-                                   widget=NumberInput(step=1))
     submitted = HiddenField()
 
     def is_submitted(self):
         return 'submitted' in request.args
-
-    @property
-    def data_for_format(self):
-        if not self.advanced.data:
-            fields = ('visible_entries',)
-        else:
-            fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token',
-                                                                                                     'advanced'}
-        data = {}
-        for fieldname in fields:
-            data.update(getattr(self, fieldname).data)
-        return data
 
 
 class ImportContributionsForm(IndicoForm):

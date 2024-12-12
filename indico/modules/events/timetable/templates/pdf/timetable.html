@@ -1,0 +1,55 @@
+{% from 'events/timetable/pdf/_cover_page.html' import render_cover_page %}
+{% from 'events/timetable/pdf/_toc.html' import render_toc %}
+{% from 'events/timetable/pdf/_program.html' import render_program %}
+
+<title>{{ event.title }}</title>
+
+<style>
+    @page {
+        size: 'A4';
+        margin: 10mm;
+    }
+
+    @page :first {
+        counter-reset: toc-page;
+        counter-reset: program-page 0;
+    }
+
+    @page toc {
+        counter-increment: toc-page;
+
+        @bottom-center {
+            content: counter(toc-page, lower-roman);
+        }
+    }
+
+    {% for day in days %}
+        @page program-{{ loop.index }} {
+            counter-increment: program-page;
+
+            @bottom-center {
+                content: counter(program-page);
+            }
+
+            @top-right {
+                font-size: 0.8em;
+                color: grey;
+                content: '{{ day|format_skeleton('EEEEdMMMM', timezone=event.timezone) }}';
+            }
+        }
+
+        .program-{{ loop.index }} {
+            page: program-{{ loop.index }};
+        }
+    {% endfor %}
+</style>
+
+{% if config.show_cover_page %}
+    {{ render_cover_page(event, only_session) }}
+{% endif %}
+
+{% if config.show_toc %}
+    {{ render_toc(event, days, config) }}
+{% endif %}
+
+{{ render_program(event, days, config, program_config) }}

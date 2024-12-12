@@ -10,6 +10,7 @@ import itertools
 import os
 import posixpath
 import re
+from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
@@ -35,7 +36,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
 from indico.modules.events.sessions.ical import session_to_ical
-from indico.modules.events.sessions.util import get_session_timetable_pdf
+from indico.modules.events.sessions.util import generate_session_pdf_timetable
 from indico.modules.events.static.util import collect_static_files, override_request_endpoint, rewrite_css_urls
 from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConferenceDisplay,
                                                 WPStaticConferencePrivacyDisplay, WPStaticConferenceProgram,
@@ -44,7 +45,7 @@ from indico.modules.events.static.views import (WPStaticAuthorList, WPStaticConf
                                                 WPStaticSessionDisplay, WPStaticSimpleEventDisplay, WPStaticSpeakerList,
                                                 WPStaticSubcontributionDisplay, WPStaticTimetable)
 from indico.modules.events.timetable.controllers.display import RHTimetable
-from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
+from indico.modules.events.timetable.util import generate_pdf_timetable
 from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.util.fs import chmod_umask
 from indico.util.string import strip_tags
@@ -270,8 +271,7 @@ class StaticConferenceCreator(StaticEventCreator):
         # Getting all menu items
         self._get_menu_items()
         # Getting conference timetable in PDF
-        self._add_pdf(self.event, 'timetable.export_default_pdf',
-                      get_timetable_offline_pdf_generator(self.event))
+        self._add_pdf(self.event, 'timetable.export_default_pdf', generate_pdf_timetable(self.event))
         if config.LATEX_ENABLED:
             # Generate contributions in PDF
             self._add_pdf(self.event, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
@@ -369,7 +369,7 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
                           {'event_id': self.event.id, 'session_id': session.id}, session)
 
-        pdf = get_session_timetable_pdf(session, tz=self._display_tz)
+        pdf = generate_session_pdf_timetable(session)
         self._add_pdf(session, 'sessions.export_session_timetable', pdf)
 
         self._add_file(session_to_ical(session), 'sessions.export_ics', session)
@@ -380,7 +380,9 @@ class StaticConferenceCreator(StaticEventCreator):
         else:
             pdf = generator_class_or_instance
 
-        if hasattr(pdf, 'getPDFBin'):
+        if isinstance(pdf, BytesIO):
+            self._add_file(pdf, uh_or_endpoint, target)
+        elif hasattr(pdf, 'getPDFBin'):
             # Got legacy reportlab PDF generator instead of the LaTex-based one
             self._add_file(pdf.getPDFBin(), uh_or_endpoint, target)
         else:

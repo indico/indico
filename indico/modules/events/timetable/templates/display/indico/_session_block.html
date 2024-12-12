@@ -10,7 +10,6 @@
                               show_children_location=false) %}
     {% set session_ = block.session %}
     {% set entries = block.timetable_entry.children %}
-
     <li class="timetable-item timetable-block" id="{{ block.slug }}">
         <span class="timetable-time top-level">
             {% if not theme_settings.hide_session_block_time %}

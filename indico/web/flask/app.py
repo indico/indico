@@ -253,6 +253,7 @@ def setup_jinja(app):
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
     app.add_template_test(subclassof)  # only use this test if you really have to!
+    app.add_template_test(lambda x, **kw: x.can_access(**kw), 'can_access')
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True,
