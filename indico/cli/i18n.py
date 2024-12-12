@@ -19,8 +19,8 @@ from pathlib import Path
 from pkgutil import walk_packages
 
 import click
-from babel.messages import frontend
-from babel.messages.pofile import read_po
+from babel.messages import Catalog, frontend
+from babel.messages.pofile import read_po, write_po
 from flask.helpers import get_root_path
 
 import indico
@@ -35,6 +35,7 @@ TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'translations'
 MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
+MESSAGES_ALL_POT = TRANSLATIONS_DIR / 'messages-all.pot'
 
 TRANSLATOR_COMMENT_TAG = 'i18n:'
 
@@ -311,10 +312,12 @@ def compile_catalog_react(directory: Path = INDICO_DIR, locale=''):
         for loc in locales:
             po_file = translations_dir / loc / 'LC_MESSAGES' / 'messages-react.po'
             json_file = translations_dir / loc / 'LC_MESSAGES' / 'messages-react.json'
+
             if not po_file.exists():
                 continue
             with _chdir(INDICO_DIR):
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], encoding='utf-8')
+
             json.loads(output)  # just to be sure the JSON is valid
             json_file.write_text(output)
     except subprocess.CalledProcessError as err:
@@ -364,6 +367,61 @@ def remove_empty_pot_files(path: Path, python=False, javascript=False, react=Fal
         _get_messages_react_pot(path).unlink()
 
 
+# Merge after generating all the .pot files
+def merge_pot_files(output_file: Path, *input_files: list[Path]):
+    """Merge multiple POT files into a single POT file."""
+    merged_catalog = Catalog(
+        project=DEFAULT_OPTIONS['ExtractMessages']['project'],
+        version=DEFAULT_OPTIONS['ExtractMessages']['version']
+    )
+
+    for input_file in input_files:
+        with input_file.open('rb') as f:
+            catalog = read_po(f)
+
+        for message in catalog:
+            # We do not want to ever modify the empty ID as this is the file header
+            if message.id:
+                merged_catalog[message.id] = message
+
+    with output_file.open('wb') as f:
+        write_po(f, merged_catalog, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
+
+    click.secho('Done merging pot files!', fg='green', bold=True)
+
+
+# Filter messages-all.po files by removing messages that are not in the given .pot file
+def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
+    with merged_po_path.open('rb') as f:
+        merged_catalog = read_po(f)
+
+    with pot_path.open('rb') as f:
+        pot_catalog = read_po(f)
+
+    merged_catalog.update(pot_catalog, no_fuzzy_matching=True)
+
+    with output_po_path.open('wb') as f:
+        write_po(f, merged_catalog, ignore_obsolete=True, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
+
+
+def split_all_po_files():
+    pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'messages-all.pot']
+
+    for lc_messages_dir in TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
+        if lc_messages_dir.parent.name == 'en_US':
+            continue
+
+        merged_po_path = lc_messages_dir / 'messages-all.po'
+
+        assert merged_po_path.exists(), f'{merged_po_path} does not exist!'
+
+        for pot_file in pot_files:
+            output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
+            split_po_by_pot(merged_po_path, pot_file, output_po_path)
+
+    click.secho('Done generating split PO files!', fg='green', bold=True)
+
+
 @click.group()
 def cli():
     os.chdir(INDICO_DIR)
@@ -396,6 +454,7 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
     extra = {}
     if locale:
         extra['locale'] = locale
+
     if not no_check:
         if not _check_format_strings():
             click.secho('Exiting compile command for indico due to invalid format strings.', fg='red', bold=True,
@@ -406,6 +465,9 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
                         err=True)
             sys.exit(1)
     try:
+        if babel_cmd == 'CompileCatalog':
+            split_all_po_files()
+
         if python:
             _run_command(babel_cmd, extra=extra)
         if javascript:
@@ -417,6 +479,9 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
                 extract_messages_react()
             else:
                 _run_command(f'{babel_cmd}_react', extra=extra)
+
+        if python and javascript and react:
+            merge_pot_files(MESSAGES_ALL_POT, MESSAGES_REACT_POT, MESSAGES_POT, MESSAGES_JS_POT)
     except Exception as err:
         click.secho(f'Error running {babel_cmd} for indico - {err}', fg='red', bold=True, err=True)
     if babel_cmd == 'ExtractMessages':
