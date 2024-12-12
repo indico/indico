@@ -84,3 +84,13 @@ favorite_event_removed = _signals.signal('favorite-event-removed', '''
 Called when a new event is removed from a user's favorites. The *sender* is
 the user object and the event is passed in the `event` kwarg.
 ''')
+
+favorite_category_added = _signals.signal('favorite-category-added', '''
+Called when a new category is added to a user's favorites. The *sender* is
+the user object and the category is passed in the `category` kwarg.
+''')
+
+favorite_category_removed = _signals.signal('favorite-category-removed', '''
+Called when a new category is removed from a user's favorites. The *sender* is
+the user object and the category is passed in the `category` kwarg.
+''')
