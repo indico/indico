@@ -162,11 +162,11 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 class TimetablePDFExportForm(IndicoForm):
     document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'),
                                                                  choices=_DOCUMENT_SETTINGS_CHOICES)
-    contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions related info'),
+    contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions'),
                                                                  choices=_CONTRIBUTION_CHOICES)
-    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions related info'),
+    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions'),
                                                             choices=_SESSION_CHOICES)
-    visible_entries = IndicoSelectMultipleCheckboxBooleanField(_('Breaks and contributions'),
+    visible_entries = IndicoSelectMultipleCheckboxBooleanField(_('Top-level items'),
                                                                choices=_VISIBLE_ENTRIES_CHOICES)
     other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
     submitted = HiddenField()
