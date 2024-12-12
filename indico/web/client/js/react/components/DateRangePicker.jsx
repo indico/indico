@@ -41,11 +41,11 @@ export default function DateRangePicker({
   format ??= moment.localeData().longDateFormat('L');
 
   if (min) {
-    rangeStartMin = rangeStartMax = min;
+    rangeStartMin = rangeEndMin = min;
   }
 
   if (max) {
-    rangeEndMin = rangeEndMax = max;
+    rangeEndMax = rangeEndMax = max;
   }
 
   function handleChange(ev) {
