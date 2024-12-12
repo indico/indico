@@ -6,9 +6,9 @@
 # LICENSE file for more details.
 
 import os
-import typing as t
 from copy import copy
 from importlib import import_module
+from typing import Self
 
 from flask import g
 from flask_sqlalchemy.model import Model
@@ -24,9 +24,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.core import signals
 from indico.util.packaging import get_package_root_path
 from indico.util.signals import values_from_signal
-
-
-_ModelT = t.TypeVar('_ModelT', bound='IndicoModel')
 
 
 class IndicoQueryPagination(QueryPagination):
@@ -97,7 +94,7 @@ class IndicoModel(Model):
     query_class = IndicoBaseQuery
 
     @classmethod
-    def get(cls: type[_ModelT], oid, is_deleted=None) -> _ModelT:
+    def get(cls, oid, is_deleted=None) -> Self | None:
         """Get an object based on its primary key.
 
         :param oid: The primary key of the object
