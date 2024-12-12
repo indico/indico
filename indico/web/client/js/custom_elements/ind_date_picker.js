@@ -137,6 +137,8 @@ customElements.define(
       rangeStartMax: Date, // Maximum allowed value for the start of the range (inclusive)
       rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
       rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
+      startDisabled: Boolean, // Keep the start date disabled/locked
+      endDisabled: Boolean, // Keep the end date disabled/locked
     };
 
     static observedAttributes = [
@@ -254,8 +256,8 @@ customElements.define(
         openCalendar();
       });
       indCalendar.addEventListener('close', () => {
-        calendarTriggerLeft.disabled = false;
-        calendarTriggerRight.disabled = false;
+        calendarTriggerLeft.disabled = this.startDisabled;
+        calendarTriggerRight.disabled = this.endDisabled;
       });
       indCalendar.addEventListener('x-select', evt => {
         const result = ds.select(selection, new Date(evt.target.value));
