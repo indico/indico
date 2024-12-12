@@ -16,8 +16,8 @@ import {getToday} from './date';
 const WEEK_INFO = preval`
 const fs = require('node:fs');
 const path = require('node:path');
-const MONDAY = 1
-const SATURDAY = 6
+const MONDAY = 1;
+const SATURDAY = 6;
 
 // Traverse up to package.json and then calculate
 // translations path from there
@@ -28,19 +28,25 @@ while (packageJsonDir !== path.dirname(packageJsonDir)) {
   }
   packageJsonDir = path.dirname(packageJsonDir);
 }
-const translationDir = path.resolve(packageJsonDir, 'indico/translations')
+const translationDir = path.resolve(packageJsonDir, 'indico/translations');
 
-const localeData = {}
+const localeData = {};
 const paths = fs.readdirSync(translationDir, {withFileTypes: true});
 
-for (let p of paths) {
+for (const p of paths) {
   if (p.isDirectory()) {
     // Transform locale to a browser-compatible version
-    let parts = p.name.split('_')
-    let localeName = parts[0] + '-' + parts.at(-1)
+    const parts = p.name.split('_');
+    const localeName = parts[0] + '-' + parts.at(-1);
 
     // Convert to week info
-    const weekInfo = new Intl.Locale(localeName).weekInfo
+    let weekInfo;
+    try {
+      weekInfo = new Intl.Locale(localeName).weekInfo;
+    } catch (e) {
+      // Ignore unofficial (zh_CN.GB2312) and breaking locales during development
+      continue;
+    }
 
     // To save bandwidth, we store fallback only for non-ISO-8601 weeks
     if (weekInfo.firstDay !== MONDAY || weekInfo.weekend[0] !== SATURDAY) {
