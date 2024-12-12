@@ -82,16 +82,36 @@ DatePicker.defaultProps = {
   max: undefined,
 };
 
+/** LikeDatePicker, but using a range-like value */
+function RangedDatePicker({value, onChange, ...rest}) {
+  const handleChange = newDate => {
+    onChange({
+      startDate: newDate,
+      endDate: null,
+    });
+  };
+  return <DatePicker value={value.startDate} onChange={handleChange} {...rest} />;
+}
+
+RangedDatePicker.propTypes = {
+  value: PropTypes.shape({
+    startDate: PropTypes.string.isRequired,
+    // endDate: null  -- not supported by propTypes :(
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 /**
  * Like `FinalField` but for a `DatePicker`.
  */
-export function FinalDatePicker({name, ...rest}) {
+export function FinalDatePicker({name, asRange, ...rest}) {
+  const getRealVal = val => (asRange ? val.startDate : val);
   const validDate = val =>
-    val === INVALID ? Translate.string('The entered date is not valid.') : undefined;
+    getRealVal(val) === INVALID ? Translate.string('The entered date is not valid.') : undefined;
   const validators = [validDate];
   if (rest.min) {
     validators.push(val =>
-      val < rest.min
+      getRealVal(val) < rest.min
         ? Translate.string('The entered date cannot be earlier than {min}.', {
             min: moment(rest.min).format('L'),
           })
@@ -100,7 +120,7 @@ export function FinalDatePicker({name, ...rest}) {
   }
   if (rest.max) {
     validators.push(val =>
-      val > rest.max
+      getRealVal(val) > rest.max
         ? Translate.string('The entered date cannot be later than {max}.', {
             max: moment(rest.max).format('L'),
           })
@@ -111,7 +131,12 @@ export function FinalDatePicker({name, ...rest}) {
     validators.push(rest.validate);
   }
   return (
-    <FinalField name={name} component={DatePicker} {...rest} validate={v.chain(...validators)} />
+    <FinalField
+      name={name}
+      component={asRange ? RangedDatePicker : DatePicker}
+      {...rest}
+      validate={v.chain(...validators)}
+    />
   );
 }
 
@@ -119,9 +144,11 @@ FinalDatePicker.propTypes = {
   name: PropTypes.string.isRequired,
   min: PropTypes.string,
   max: PropTypes.string,
+  asRange: PropTypes.bool,
 };
 
 FinalDatePicker.defaultProps = {
   min: undefined,
   max: undefined,
+  asRange: false,
 };
