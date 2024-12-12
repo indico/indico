@@ -35,7 +35,7 @@ TRANSLATIONS_DIR = INDICO_DIR / 'indico' / 'translations'
 MESSAGES_POT = TRANSLATIONS_DIR / 'messages.pot'
 MESSAGES_JS_POT = TRANSLATIONS_DIR / 'messages-js.pot'
 MESSAGES_REACT_POT = TRANSLATIONS_DIR / 'messages-react.pot'
-MESSAGES_ALL_POT = TRANSLATIONS_DIR / 'core-messages-all.pot'
+MESSAGES_ALL_POT = TRANSLATIONS_DIR / 'messages-all.pot'
 
 TRANSLATOR_COMMENT_TAG = 'i18n:'
 
@@ -390,7 +390,7 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
     click.secho('Done merging pot files!', fg='green', bold=True)
 
 
-# Filter core-messages-all.po files by removing messages that are not in the given .pot file
+# Filter messages-all.po files by removing messages that are not in the given .pot file
 def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
     with merged_po_path.open('rb') as f:
         merged_catalog = read_po(f)
@@ -405,13 +405,13 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
 
 
 def split_all_po_files():
-    pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'core-messages-all.pot']
+    pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'messages-all.pot']
 
     for lc_messages_dir in TRANSLATIONS_DIR.glob('*/LC_MESSAGES'):
         if lc_messages_dir.parent.name == 'en_US':
             continue
 
-        merged_po_path = lc_messages_dir / 'core-messages-all.po'
+        merged_po_path = lc_messages_dir / 'messages-all.po'
 
         assert merged_po_path.exists(), f'{merged_po_path} does not exist!'
 
