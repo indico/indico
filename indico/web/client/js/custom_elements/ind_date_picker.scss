@@ -38,6 +38,11 @@ ind-date-picker {
     @extend %icon-calendar;
   }
 
+  > button:disabled {
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
   > button span {
     @extend %visually-hidden;
   }
