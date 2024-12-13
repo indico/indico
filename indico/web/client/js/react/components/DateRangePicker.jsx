@@ -130,7 +130,10 @@ DateRangePicker.propTypes = {
   disabled: PropTypes.bool,
   startDisabled: PropTypes.bool,
   endDisabled: PropTypes.bool,
-  value: PropTypes.object,
+  value: PropTypes.shape({
+    startDate: PropTypes.string.isRequired,
+    endDate: PropTypes.string.isRequired,
+  }),
   label: PropTypes.string,
   rangeStartLabel: PropTypes.string.isRequired,
   rangeEndLabel: PropTypes.string.isRequired,
