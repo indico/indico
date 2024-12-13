@@ -337,7 +337,7 @@ class EmailRegistrantsForm(IndicoForm):
     body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
-                                   description=_('Send copy of each email to my mailbox'))
+                                   description=_('Send a copy of each email to my mailbox'))
     attach_ticket = BooleanField(_('Attach ticket'), widget=SwitchWidget(),
                                  description=_('Attach tickets to emails'))
     registration_id = HiddenFieldList()
