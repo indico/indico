@@ -51,8 +51,8 @@ from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema
                                           UserPersonalDataSchema)
 from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
                                        get_mastodon_server_name, get_related_categories, get_suggested_categories,
-                                       get_unlisted_events, get_user_titles, merge_users, search_users, send_avatar,
-                                       serialize_user, set_user_avatar)
+                                       get_unlisted_events, get_user_by_email, get_user_titles, merge_users,
+                                       search_users, send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
@@ -854,6 +854,11 @@ class RHAcceptRegistrationRequest(RHRegistrationRequestBase):
     """Accept a registration request."""
 
     def _process(self):
+        if get_user_by_email(self.request.email):
+            db.session.delete(self.request)
+            flash(_('A user with this email address already exists.'), 'error')
+            return jsonify_data()
+
         user = register_user(self.request.email, self.request.extra_emails, self.request.user_data,
                              self.request.identity_data, self.request.settings)[0]
         with user.force_user_locale():
