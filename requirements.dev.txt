@@ -153,6 +153,7 @@ python-dateutil==2.9.0.post0
 pyyaml==6.0.2
     # via
     #   -c requirements.txt
+    #   responses
     #   sphinxcontrib-mermaid
     #   unbeheader
 redis==5.2.1
@@ -163,7 +164,10 @@ requests==2.32.3
     # via
     #   -c requirements.txt
     #   plantweb
+    #   responses
     #   sphinx
+responses==0.25.3
+    # via -r requirements.dev.in
 ruff==0.8.2
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
@@ -237,6 +241,7 @@ urllib3==1.26.20
     # via
     #   -c requirements.txt
     #   requests
+    #   responses
 uv==0.5.7
     # via -r requirements.dev.in
 uvicorn==0.32.1
