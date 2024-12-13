@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-12-24 19:45+0100\n"
+"POT-Creation-Date: 2024-12-24 11:25+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -619,6 +619,7 @@ msgid "Book of Abstracts"
 msgstr ""
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
@@ -627,6 +628,7 @@ msgid "No"
 msgstr ""
 
 #: indico/modules/events/contributions/client/js/PublicationModal.jsx
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/papers/client/js/components/GroupReviewForm.jsx
 #: indico/modules/events/papers/client/js/components/RevisionReview.jsx
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
@@ -1190,6 +1192,10 @@ msgid "Session"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "Has updates"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "List of papers"
 msgstr ""
 
@@ -1241,6 +1247,10 @@ msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 msgid "Rev."
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+msgid "There has been an update to the latest revision"
 msgstr ""
 
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
@@ -2065,7 +2075,7 @@ msgid "Speakers"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx
-msgid "Primary authors"
+msgid "Authors"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/AuthorsList.jsx
@@ -2114,6 +2124,7 @@ msgid "Speaker"
 msgstr ""
 
 #: indico/modules/events/persons/client/js/EmailContribAbstractRoles.jsx
+#: indico/modules/events/persons/client/js/PersonList.jsx
 msgid "Author"
 msgstr ""
 
@@ -2321,6 +2332,27 @@ msgstr ""
 msgid "No participants registered."
 msgstr ""
 
+#: indico/modules/events/registration/client/js/form/FormErrorList.jsx
+msgid "Privacy policy"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormErrorList.jsx
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
+msgid "Participant list"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormErrorList.jsx
+msgid "You need to review some of the fields"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormErrorList.jsx
+msgid "Fields with errors"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/FormErrorList.jsx
+msgid "Visit incomplete field {field}: {error}"
+msgstr ""
+
 #: indico/modules/events/registration/client/js/form/FormItem.jsx
 msgid "This field is locked since changing it could trigger a price change."
 msgstr ""
@@ -2453,16 +2485,6 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
 #: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
 msgid "Places limit"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
-#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
-#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
-#: indico/modules/users/client/js/PersonalDataForm.jsx
-#: indico/web/client/js/react/components/PersonDetailsModal.jsx
-msgid "None"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
@@ -2616,6 +2638,11 @@ msgid "The registration will be associated with the Indico account {name}."
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
+msgid "This field is required"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
 msgid "At most {n} option can be selected"
 msgid_plural "At most {n} options can be selected"
 msgstr[0] ""
@@ -2670,10 +2697,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
 msgid "Select extra slots"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
-msgid "This field is required"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
@@ -2807,6 +2830,10 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js
 msgid "Timetable Sessions"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/selectors.js
+msgid "Captcha"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_setup/DisabledSectionsModal.jsx
@@ -2959,10 +2986,6 @@ msgid "Ignore field requirements for custom fields"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
-msgid "Participant list"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
 msgid ""
 "Specify whether you consent to being included in the event's list of "
 "participants"
@@ -2970,11 +2993,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
 msgid "Modify"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
-#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx
-msgid "Apply"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
@@ -4004,16 +4022,16 @@ msgid "See on timeline"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/TimeRangePicker.jsx
-msgid "1 hour"
-msgstr ""
+msgid "{count} hour"
+msgid_plural "{count} hours"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/rb/client/js/components/TimeRangePicker.jsx
-msgid "{time} hours"
-msgstr ""
-
-#: indico/modules/rb/client/js/components/TimeRangePicker.jsx
-msgid "{time} min"
-msgstr ""
+msgid "{count} min"
+msgid_plural "{count} min"
+msgstr[0] ""
+msgstr[1] ""
 
 #: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx
 msgid "This location does not exist."
@@ -4132,10 +4150,6 @@ msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx
 msgid "Add equipment type"
-msgstr ""
-
-#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
-msgid "Custom"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
@@ -6481,6 +6495,12 @@ msgstr ""
 #: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
 #: indico/modules/events/editing/client/js/models.js
 msgctxt "Editable"
+msgid "Accepted by Submitter"
+msgstr ""
+
+#: indico/modules/events/editing/client/js/management/editable_type/EditableList.jsx
+#: indico/modules/events/editing/client/js/models.js
+msgctxt "Editable"
 msgid "Rejected"
 msgstr ""
 
@@ -6516,14 +6536,30 @@ msgctxt "Review papers (verb)"
 msgid "Review"
 msgstr ""
 
-#: indico/modules/events/persons/client/js/PersonList.jsx
-msgctxt "Author"
-msgid "Primary"
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
+#: indico/modules/events/registration/client/js/form/fields/CheckboxInput.jsx
+msgctxt "Places limit"
+msgid "None"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/BooleanInput.jsx
+msgctxt "Default value"
+msgid "None"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/ChoicesSetup.jsx
 msgctxt "Choice"
 msgid "Add new"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/SingleChoiceInput.jsx
+msgctxt "Choice"
+msgid "None"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/DateInput.jsx
+msgctxt "Time format"
+msgid "None"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/MultiChoiceInput.jsx
@@ -6534,6 +6570,11 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgctxt "Minimum size"
 msgid "Unlimited"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
+msgctxt "Registration"
+msgid "Apply"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx
@@ -6555,6 +6596,11 @@ msgstr ""
 #: indico/modules/rb/client/js/util.jsx
 msgctxt "Booking"
 msgid "Will be cancelled"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx
+msgctxt "Filters"
+msgid "Apply"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditLocation.jsx
@@ -6587,6 +6633,16 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx
 msgctxt "Room attribute"
 msgid "Hidden"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
+msgctxt "Map template"
+msgid "None"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
+msgctxt "Map template"
+msgid "Custom"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
@@ -6691,4 +6747,10 @@ msgstr ""
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 msgctxt "Salutation"
 msgid "Title"
+msgstr ""
+
+#: indico/modules/users/client/js/PersonalDataForm.jsx
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx
+msgctxt "Title (salutation)"
+msgid "None"
 msgstr ""

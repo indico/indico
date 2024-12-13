@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.6-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-12-02 19:44+0100\n"
+"POT-Creation-Date: 2024-12-13 11:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -474,7 +474,7 @@ msgid "Confirm user merge"
 msgstr ""
 
 #: indico/modules/vc/client/js/index.js
-msgid "This room has been deleted and cannot be used. You can detach it from the event, however."
+msgid "This videoconference has been deleted and cannot be used. You can detach it from the event, however."
 msgstr ""
 
 #: indico/modules/vc/client/js/index.js
@@ -1196,10 +1196,12 @@ msgid "Reset filter"
 msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js
+msgctxt "Selection"
 msgid "All"
 msgstr ""
 
 #: indico/web/client/js/legacy/libs/timetable/Management.js
+msgctxt "Selection"
 msgid "None"
 msgstr ""
 
