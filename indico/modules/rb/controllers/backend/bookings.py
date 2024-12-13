@@ -231,6 +231,15 @@ class RHBookingStateActions(RHBookingBase):
                  'reject': self.booking.can_reject,
                  'cancel': self.booking.can_cancel}
 
+        # The `can_*` methods contain both access and state checks, but it's nicer to show
+        # something more verbose in case e.g. someone accepted a conflicting booking which
+        # auto-rejected another one, and they then try to reject that from another tab.
+        match self.action:
+            case 'approve' if not self.booking.is_pending:
+                raise ExpectedError(_('This booking has already been approved or rejected.'))
+            case 'reject' | 'cancel' if self.booking.is_rejected or self.booking.is_cancelled:
+                raise ExpectedError(_('This booking has already been cancelled or rejected.'))
+
         if self.action not in funcs or not funcs[self.action](session.user):
             raise Forbidden
 
