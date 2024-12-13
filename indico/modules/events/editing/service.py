@@ -137,7 +137,7 @@ def service_get_status(event):
 def service_handle_new_editable(editable, user):
     revision = editable.latest_revision
     data = {
-        'editable': EditableBasicSchema(exclude=['tags']).dump(editable),
+        'editable': EditableBasicSchema(exclude=['tags', 'last_update_dt']).dump(editable),
         'revision': EditingRevisionSignedSchema().dump(revision),
         'endpoints': _get_revision_endpoints(revision),
         'user': ServiceUserSchema(context={'editable': editable}).dump(user),
