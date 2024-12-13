@@ -222,3 +222,8 @@ $text-yellow: lighten($yellow, 15%);
 .scrolling-disabled {
   overflow-y: hidden;
 }
+
+// UI modal fixup so it does not throw off positioned controls like the date picker or tooltips
+.ui.modal.visible {
+  will-change: auto !important;
+}
