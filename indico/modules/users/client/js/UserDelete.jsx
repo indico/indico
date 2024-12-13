@@ -86,8 +86,9 @@ function UserDeleteDialogBody({firstName, lastName, disabled, inProgress, onDele
         </List>
         <p>
           <Translate as="strong">
-            Are you sure you want to delete <Param name="first_name" value={firstName} />{' '}
-            <Param name="last_name" value={lastName} />?
+            Are you sure you want to delete "<Param name="first_name" value={firstName} />{' '}
+            <Param name="last_name" value={lastName} />
+            "?
           </Translate>
         </p>
       </Modal.Content>
@@ -194,11 +195,18 @@ UserDelete.propTypes = {
   lastName: PropTypes.string.isRequired,
 };
 
-window.setupUserDelete = function setupUserDelete(userId, firstName, lastName) {
-  document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(
-      <UserDelete userId={userId} firstName={firstName} lastName={lastName} />,
-      document.querySelector('#user-delete-container')
-    );
-  });
-};
+customElements.define(
+  'ind-user-delete-button',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <UserDelete
+          userId={JSON.parse(this.getAttribute('user-id'))}
+          firstName={this.getAttribute('user-first-name')}
+          lastName={this.getAttribute('user-last-name')}
+        />,
+        this
+      );
+    }
+  }
+);
