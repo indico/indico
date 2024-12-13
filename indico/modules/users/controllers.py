@@ -1026,22 +1026,23 @@ class RHUserDelete(RHUserBase):
         if not session.user.is_admin or not config.ENABLE_DELETE_USER_FROM_UI:
             raise Forbidden
         if self.user == session.user:
-            raise Forbidden(_('You cannot delete your own account'))
+            raise Forbidden('You cannot delete your own account')
 
     def _process(self):
-        name = self.user.name
+        user_name = self.user.name
+        user_repr = repr(self.user)
         signals.users.db_deleted.send(self.user, flushed=False)
         try:
             db.session.delete(self.user)
             db.session.flush()
         except IntegrityError as exc:
             db.session.rollback()
-            logger.info('User %s could not be deleted %s', name, str(exc))
+            logger.info('User %r could not be deleted %s', self.user, str(exc))
             anonymize_user(self.user)
-            logger.info('User %s anonymized %s', session.user, name)
-            flash(_('{name} has been anonymized.').format(name=name), 'success')
+            logger.info('User %r anonymized %s', session.user, user_repr)
+            flash(_('{user_name} has been anonymized.').format(user_name=user_name), 'success')
         else:
             signals.users.db_deleted.send(self.user, flushed=True)
-            logger.info('User %s deleted %s', session.user, name)
-            flash(_('{name} has been deleted.').format(name=name), 'success')
+            logger.info('User %r deleted %s', session.user, user_repr)
+            flash(_('{user_name} has been deleted.').format(user_name=user_name), 'success')
         return jsonify(redirect=url_for('users.user_dashboard', session.user))
