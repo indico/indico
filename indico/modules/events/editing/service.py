@@ -266,9 +266,9 @@ def _get_event_endpoints(event):
 def _get_revision_endpoints(revision):
     return {
         'revisions': {
-            'details': url_for('.api_editable', revision, _external=True),
-            'replace': url_for('.api_replace_revision', revision, _external=True),
-            'undo': url_for('.api_review_editable', revision, _external=True),
+            'details': url_for('event_editing.api_editable', revision.editable, _external=True),
+            'replace': url_for('event_editing.api_replace_revision', revision, _external=True),
+            'undo': url_for('event_editing.api_review_editable', revision, _external=True),
         },
-        'file_upload': url_for('.api_upload', revision, _external=True)
+        'file_upload': url_for('event_editing.api_upload', revision.editable, _external=True)
     }
