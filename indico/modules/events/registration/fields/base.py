@@ -11,8 +11,8 @@ from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
-from indico.util.marshmallow import not_empty
 from indico.util.i18n import _
+from indico.util.marshmallow import not_empty
 
 
 class BillableFieldDataSchema(mm.Schema):
