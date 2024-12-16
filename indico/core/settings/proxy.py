@@ -48,6 +48,7 @@ class SettingsProxyBase:
 
     acl_proxy_class = None
     default_sentinel = object()
+    allow_cache_outside_request = False
 
     def __init__(self, module, defaults=None, strict=True, acls=None, converters=None):
         self.module = module
@@ -150,7 +151,7 @@ class SettingsProxyBase:
 
     @property
     def _cache(self):
-        if not has_request_context():
+        if not self.allow_cache_outside_request and not has_request_context():
             return {}  # new dict everytime, this effectively disables the cache
         try:
             return g.settings_cache
