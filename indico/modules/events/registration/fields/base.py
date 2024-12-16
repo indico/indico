@@ -183,8 +183,7 @@ class RegistrationFormFieldBase:
         return registration_data.data
 
     def iter_placeholder_info(self):
-        yield None, _('Value of "{form_item}" ({parent_form_item})')
-                    .format(form_item=self.form_item.title, parent_form_item=self.form_item.parent.title)
+        yield None, _('Value of "{form_item}" ({parent_form_item})').format(form_item=self.form_item.title, parent_form_item=self.form_item.parent.title)
 
     def render_placeholder(self, data, key=None):
         return self.get_friendly_data(data)
