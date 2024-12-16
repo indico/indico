@@ -137,8 +137,6 @@ customElements.define(
       rangeStartMax: Date, // Maximum allowed value for the start of the range (inclusive)
       rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
       rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
-      startDisabled: Boolean, // Keep the start date disabled/locked
-      endDisabled: Boolean, // Keep the end date disabled/locked
     };
 
     static observedAttributes = [
@@ -190,7 +188,17 @@ customElements.define(
       const calendarTriggerRight = this.querySelector('[data-calendar-trigger=right]');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
-      let selection = ds.newSelection(this.rangeStart, this.rangeEnd);
+
+      const leftTriggerLocked = calendarTriggerLeft.disabled;
+      const rightTriggerLocked = calendarTriggerRight.disabled;
+
+      let selection = ds.newSelection(
+        this.rangeStart,
+        this.rangeEnd,
+        undefined,
+        leftTriggerLocked,
+        rightTriggerLocked
+      );
 
       const dateFormat = formatDescription.textContent
         .split(':')[1]
@@ -256,8 +264,8 @@ customElements.define(
         openCalendar();
       });
       indCalendar.addEventListener('close', () => {
-        calendarTriggerLeft.disabled = this.startDisabled;
-        calendarTriggerRight.disabled = this.endDisabled;
+        calendarTriggerLeft.disabled = leftTriggerLocked;
+        calendarTriggerRight.disabled = rightTriggerLocked;
       });
       indCalendar.addEventListener('x-select', evt => {
         const result = ds.select(selection, new Date(evt.target.value));

@@ -40,6 +40,9 @@ export default function DateRangePicker({
 }) {
   format ??= moment.localeData().longDateFormat('L');
 
+  const startLocked = disabled || (value.startDate && startDisabled);
+  const endLocked = disabled || (value.endDate && endDisabled);
+
   if (min) {
     rangeStartMin = rangeEndMin = min;
   }
@@ -72,8 +75,6 @@ export default function DateRangePicker({
       range-start-max={rangeStartMax}
       range-end-min={rangeEndMin}
       range-end-max={rangeEndMax}
-      start-disabled={startDisabled || undefined}
-      end-disabled={endDisabled || undefined}
       onChange={handleChange}
     >
       <fieldset>
@@ -85,10 +86,10 @@ export default function DateRangePicker({
             data-range-start
             placeholder={format}
             readOnly={readOnly}
-            disabled={disabled || startDisabled}
+            disabled={startLocked}
           />
         </label>
-        <button type="button" data-calendar-trigger="left" disabled={disabled || startDisabled}>
+        <button type="button" data-calendar-trigger="left" disabled={startLocked}>
           <Translate as="span">Open a calendar</Translate>
         </button>
         <span className="arrow" />
@@ -99,10 +100,10 @@ export default function DateRangePicker({
             data-range-end
             placeholder={format}
             readOnly={readOnly}
-            disabled={disabled || endDisabled}
+            disabled={endLocked}
           />
         </label>
-        <button type="button" data-calendar-trigger="right" disabled={disabled || endDisabled}>
+        <button type="button" data-calendar-trigger="right" disabled={endLocked}>
           <Translate as="span">Open a calendar</Translate>
         </button>
 
