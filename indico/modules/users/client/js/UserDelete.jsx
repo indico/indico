@@ -68,8 +68,9 @@ function UserDeleteDialogBody({firstName, lastName, disabled, inProgress, onDele
             <List.Icon name="times circle outline" />
             <List.Content>
               <Translate>
-                <Param name="first_name" value={firstName} /> will be removed from all events,
-                contributions, and other areas of Indico.
+                <Param name="first_name" value={firstName} /> will be removed from all areas of
+                Indico - this does not affect their presence in events as a speaker or other role;
+                they will still be listed in such capacities where applicable.
               </Translate>
             </List.Content>
           </List.Item>
@@ -84,13 +85,11 @@ function UserDeleteDialogBody({firstName, lastName, disabled, inProgress, onDele
             </List.Content>
           </List.Item>
         </List>
-        <p>
-          <Translate as="strong">
-            Are you sure you want to delete "<Param name="first_name" value={firstName} />{' '}
-            <Param name="last_name" value={lastName} />
-            "?
-          </Translate>
-        </p>
+        <Translate as="p">
+          Are you sure you want to delete{' '}
+          <Param wrapper={<strong />} name="first_name" value={firstName} />{' '}
+          <Param wrapper={<strong />} name="last_name" value={lastName} />?
+        </Translate>
       </Modal.Content>
       <Modal.Actions>
         <Button onClick={onClose} content={Translate.string("No, I don't")} />

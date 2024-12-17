@@ -27,6 +27,8 @@ Improvements
   linked to them or their rooms (:pr:`6704`)
 - Add shortcuts to the past and closest events in a category (:pr:`6710`)
 - Improve the appearance of the date pickers (:issue:`6719`, :pr:`6720`, thanks :user:`foxbunny`)
+- Allow administrators to delete users from the user management UI (:pr:`6652`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
