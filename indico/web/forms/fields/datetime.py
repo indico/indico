@@ -20,7 +20,7 @@ from wtforms_dateutil import DateField, DateTimeField
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.util.date_time import localize_as_utc, relativedelta
-from indico.util.i18n import _, get_current_locale
+from indico.util.i18n import _, get_current_locale, pgettext
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateRange, DateTimeRange, LinkedDate, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget
@@ -39,13 +39,12 @@ class TimeDeltaField(Field):
     """
 
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
-    # XXX: do not translate, "Minutes" is ambiguous without context
     unit_names = {
-        'seconds': 'Seconds',
-        'minutes': 'Minutes',
-        'hours': 'Hours',
-        'days': 'Days',
-        'weeks': 'Weeks',
+        'seconds': _('Seconds'),
+        'minutes': pgettext('Time', 'Minutes'),
+        'hours': _('Hours'),
+        'days': _('Days'),
+        'weeks': _('Weeks'),
     }
     magnitudes = {
         'weeks': 7*86400,
@@ -120,15 +119,14 @@ class RelativeDeltaField(Field):
     """
 
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
-    # XXX: do not translate, "Minutes" is ambiguous without context
     unit_names = {
-        'seconds': 'Seconds',
-        'minutes': 'Minutes',
-        'hours': 'Hours',
-        'days': 'Days',
-        'weeks': 'Weeks',
-        'months': 'Months',
-        'years': 'Years'
+        'seconds': _('Seconds'),
+        'minutes': pgettext('Time', 'Minutes'),
+        'hours': _('Hours'),
+        'days': _('Days'),
+        'weeks': _('Weeks'),
+        'months': _('Months'),
+        'years': _('Years')
     }
     magnitudes = {
         'years': relativedelta(years=1),
