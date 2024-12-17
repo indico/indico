@@ -128,6 +128,20 @@ class TinyMCEWidget(JinjaWidget):
         super().__init__('forms/tinymce_widget.html', images=images, absolute_urls=absolute_urls, height=height)
 
 
+class DescriptionWidget(JinjaWidget):
+    """Render a TinyMCE WYSIWYG editor.
+
+    :param render_mode: HTML or markdown.
+    :param height: The height of the editor.
+
+    If the form has a ``editor_upload_url`` attribute the editor will allow pasting/selecting images
+    and upload them using that URL.
+    """
+
+    def __init__(self, *, render_mode, height='50vh'):
+        super().__init__('forms/description_widget.html', render_mode=render_mode, height=height)
+
+
 class SwitchWidget(JinjaWidget):
     """Render a switch widget.
 

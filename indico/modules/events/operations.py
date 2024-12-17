@@ -235,6 +235,7 @@ def _log_event_update(event, changes, extra_log_fields, visible_person_link_chan
         'address': 'Address',
         'venue_room': {'title': 'Location', 'type': 'string'},
         'keywords': 'Keywords',
+        'render_mode': {'title': 'Render Mode'},
         'references': {
             'title': 'External IDs',
             'convert': lambda changes: [list(map(format_log_ref, refs)) for refs in changes]
