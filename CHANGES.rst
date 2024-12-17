@@ -23,6 +23,8 @@ Improvements
 - Make the event export/import util much more flexible to support exporting whole
   category subtrees, add better support for dealing with files, and add various things
   that were not correctly exported before (:pr:`6446`)
+- Allow administrators to delete users from the user management UI (:pr:`6652`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
