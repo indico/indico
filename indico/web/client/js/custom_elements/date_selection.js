@@ -54,7 +54,6 @@ export function newSelection(left, right, trigger, leftLocked, rightLocked) {
     rightLocked,
 
     get unlocked() {
-      console.log(leftLocked, rightLocked);
       return !leftLocked && !rightLocked;
     },
 
