@@ -16,7 +16,12 @@ from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 
 
-class BillableFieldDataSchema(mm.Schema):
+class FieldSetupSchemaBase(mm.Schema):
+    show_if_field_id = fields.Integer()
+    show_if_field_value = fields.String()
+
+
+class BillableFieldDataSchema(FieldSetupSchemaBase):
     price = fields.Float(load_default=0)
 
 
@@ -38,7 +43,7 @@ class RegistrationFormFieldBase:
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
     #: whether this field is associated with a file instead of normal data
@@ -245,7 +250,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
