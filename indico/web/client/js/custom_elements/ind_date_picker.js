@@ -822,7 +822,9 @@ customElements.define(
           const focusableButton = listbox.querySelector(
             '[role=option]:is([aria-selected=true],[data-current-month=true]:not([aria-disabled]))'
           );
-          focusableButton.tabIndex = 0;
+          if (focusableButton) {
+            focusableButton.tabIndex = 0;
+          }
           indDateGrid.dispatchEvent(new Event('x-update-grid'));
         });
       }
