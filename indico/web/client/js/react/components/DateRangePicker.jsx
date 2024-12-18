@@ -40,6 +40,12 @@ export default function DateRangePicker({
 }) {
   format ??= moment.localeData().longDateFormat('L');
 
+  if (startDisabled && !value.startDate) {
+    console.warn('startDisabled is ignored because value.startDate is not specified');
+  }
+  if (endDisabled && !value.endDate) {
+    console.warn('endDisabled is ignored because value.endDate is not specified');
+  }
   const startLocked = disabled || (value.startDate && startDisabled);
   const endLocked = disabled || (value.endDate && endDisabled);
 

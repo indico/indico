@@ -661,7 +661,6 @@ customElements.define(
             focusableButtons.push(button);
           }
         }
-        console.log(focusableButtons);
         return (
           focusableButtons.find(button => button.dataset.currentMonth === 'true') ||
           focusableButtons[0]
