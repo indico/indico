@@ -92,7 +92,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     person_link_backref_name = 'event'
     location_backref_name = 'events'
     allow_location_inheritance = False
-    possible_render_modes = {RenderMode.html}
+    possible_render_modes = {RenderMode.html, RenderMode.markdown}
     default_render_mode = RenderMode.html
     __logging_disabled = False
 

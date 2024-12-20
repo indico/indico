@@ -37,6 +37,7 @@ user_settings = UserSettingsProxy('users', {
     'add_ical_alerts': False,
     'add_ical_alerts_mins': 5,
     'use_markdown_for_minutes': False,
+    'use_markdown_for_description': False,
     'synced_fields': None,  # None to synchronize all fields, empty set to not synchronize
     'suggest_categories': False,  # whether the user should receive category suggestions
     'mastodon_server_url': None,
