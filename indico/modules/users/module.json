@@ -6,6 +6,7 @@
     "personal_data": "./PersonalDataForm.jsx",
     "favorites": "./Favorites.jsx",
     "data_export": "./DataExport.jsx",
-    "user_delete": "./UserDelete.jsx"
+    "user_delete": "./UserDelete.jsx",
+    "user_block": "./UserBlock.jsx"
   }
 }
