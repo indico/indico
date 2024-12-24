@@ -916,6 +916,17 @@ System
 
     Default: ``False``
 
+.. data:: ENABLE_DELETE_USER_FROM_UI
+
+    Whether to enable administrators to delete users from the UI.
+
+    Enable Indico administrators to delete a user from the UI along with
+    all their associated data. If it is not possible to delete the user
+    (e.g. because they are listed as a speaker at an event), the user
+    will be anonymized instead.
+
+    Default: ``False``
+
 .. data:: PLUGINS
 
     The list of :ref:`Indico plugins <installation-plugins>` to enable.

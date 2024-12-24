@@ -15,6 +15,8 @@ Improvements
 - Highlight editables in the editable list that have been updated since the last time
   they were viewed (:pr:`6500`)
 - Refresh the looks of the PDF timetable (:issue:`6554`, :pr:`6558`)
+- Allow administrators to delete users from the user management UI (:pr:`6652`,
+  thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
