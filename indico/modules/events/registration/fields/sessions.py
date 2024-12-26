@@ -12,9 +12,8 @@ from marshmallow import ValidationError, fields, validate, validates_schema
 from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy import db
-from indico.core.marshmallow import mm
 from indico.modules.events.registration.controllers.display import RHRegistrationForm
-from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
+from indico.modules.events.registration.fields.base import FieldSetupSchemaBase, RegistrationFormFieldBase
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
@@ -22,7 +21,7 @@ from indico.util.date_time import format_interval, format_skeleton
 from indico.util.i18n import _
 
 
-class SessionsFieldDataSchema(mm.Schema):
+class SessionsFieldDataSchema(FieldSetupSchemaBase):
     minimum = fields.Integer(load_default=0, validate=validate.Range(0))
     maximum = fields.Integer(load_default=0, validate=validate.Range(0))
     collapse_days = fields.Bool(load_default=False)

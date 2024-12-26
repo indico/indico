@@ -19,6 +19,7 @@ import {
   getValuesForFields,
   validators as v,
   parsers as p,
+  FinalDropdown,
 } from 'indico/react/forms';
 import {Fieldset} from 'indico/react/forms/fields';
 import {FinalModalForm} from 'indico/react/forms/final-form';
@@ -26,7 +27,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {getFieldRegistry} from '../form/fields/registry';
-import {getStaticData, getItemById} from '../form/selectors';
+import {getStaticData, getItemById, getItemsForConditionalDisplay} from '../form/selectors';
 
 import * as actions from './actions';
 import ItemTypeDropdown from './ItemTypeDropdown';
@@ -48,6 +49,7 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
   const isUnsupportedField = !(inputType in fieldRegistry);
   const meta = fieldRegistry[inputType] || {};
   const SettingsComponent = meta.settingsComponent;
+  const itemsForConditionalDisplay = useSelector(state => getItemsForConditionalDisplay(state));
 
   const handleSubmit = async (formData, form) => {
     const data = getValuesForFields(formData, form);
@@ -153,6 +155,32 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
+          <Fieldset legend={Translate.string('Show if')}>
+            <FinalDropdown
+              name="showIfFieldId"
+              label={Translate.string('Field')}
+              placeholder={Translate.string('Select field...')}
+              options={itemsForConditionalDisplay.map(({title, id: fieldId}) => ({
+                value: fieldId,
+                text: title,
+              }))}
+              closeOnChange
+              selection
+            />
+            {/* TODO: Display only if showIfFieldId is not empty */}
+            <FinalDropdown
+              name="showIfFieldValue"
+              label={Translate.string('Has value')}
+              placeholder={Translate.string('Select value...')}
+              // TODO: Get possible values from the field selected in showIfFieldId
+              options={[
+                {value: '1', text: Translate.string('Yes')},
+                {value: '0', text: Translate.string('No')},
+              ]}
+              closeOnChange
+              selection
+            />
+          </Fieldset>
           {!meta.noRetentionPeriod && !fieldIsRequired && (
             <Fieldset legend={Translate.string('Privacy')} compact>
               <FinalInput
