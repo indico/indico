@@ -1,5 +1,7 @@
 {% extends 'overview/base.html' %}
-{% block title %}Videoconference{% endblock %}
+{% block title %}
+    {% trans %}Videoconference{% endtrans %}
+{% endblock %}
 
 {% macro result_group_title(key) %}
     {{ key | format_human_date(format='full') | title }}
