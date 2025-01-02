@@ -393,7 +393,7 @@ type(
         style: {verticalAlign: 'middle'},
       });
       var startTimeRescheduleExample = Html.a(
-        {href: Indico.Urls.ImagesBase + '/resched_ex_1.png', title: 'Starting Time Example'},
+        {href: Indico.Urls.ImagesBase + '/resched_ex_1.png', title: $T('Starting Time Example')},
         $T('See an example')
       );
       $(startTimeRescheduleExample.dom).colorbox();
@@ -430,7 +430,7 @@ type(
         style: {verticalAlign: 'middle'},
       });
       var durationRescheduleExample = Html.a(
-        {href: Indico.Urls.ImagesBase + '/resched_ex_2.png', title: 'Duration Example'},
+        {href: Indico.Urls.ImagesBase + '/resched_ex_2.png', title: $T('Duration Example')},
         $T('See an example')
       );
       $(durationRescheduleExample.dom).colorbox();
@@ -536,7 +536,7 @@ type(
         {style: {width: '3em', textAlign: 'right', marginTop: pixels(5), marginBottom: pixels(5)}},
         '0'
       );
-      var timeInputLabel = Html.span({style: {marginLeft: pixels(5)}}, '(minutes)');
+      var timeInputLabel = Html.span({style: {marginLeft: pixels(5)}}, $T('(minutes)'));
       var intervalInputDiv = Html.div(
         {style: {textAlign: 'center'}},
         this.minuteInput,
@@ -573,7 +573,7 @@ type(
 
       var fitInnerLabel = Html.label(
         {htmlFor: 'fitInnerCheckBox', className: 'rescheduleLabelTitle'},
-        'Fit all the sessions contained on ' + this.__getCurrentDayText() + ' to their content.'
+        $T('Fit all the sessions contained on ') + this.__getCurrentDayText() + $T(' to their content.')
       );
       var fitInnerDiv = Html.div(
         {style: {textAlign: 'center'}},
@@ -586,11 +586,11 @@ type(
         style: {paddingLeft: pixels(30), paddingTop: pixels(8)},
       });
       this.fitInnerExplanationDiv.set(
-        'This changes the start and end times of the session blocks occurring on ' +
+        $T('This changes the start and end times of the session blocks occurring on ') +
           this.__getCurrentDayText() +
-          ' in order to fit their respective content ',
-        Html.strong({}, 'before'),
-        ' performing the rescheduling.'
+          $T(' in order to fit their respective content '),
+        Html.strong({}, $T('before')),
+        $T(' performing the rescheduling.')
       );
 
       this.fitInnerCheckBox.observeEvent('change', function(event) {
