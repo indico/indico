@@ -18,6 +18,9 @@ Improvements
 - Redact session cookie value in error emails (:pr:`6666`)
 - Allow creating a new local account during password reset if the user does not have
   one yet (:pr:`6688`)
+- Make the event export/import util much more flexible to support exporting whole
+  category subtrees, add better support for dealing with files, and add various things
+  that were not correctly exported before (:pr:`6446`)
 
 Bugfixes
 ^^^^^^^^
