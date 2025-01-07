@@ -24,6 +24,7 @@
     is_deleted: false
     is_locked: false
     keywords: []
+    label_message: ''
     last_friendly_contribution_id: 2
     last_friendly_registration_id: 0
     last_friendly_session_id: 1

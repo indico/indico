@@ -118,8 +118,7 @@ export:
       cloned_from_id: ~
       category_id: category_id = SKIP if VALUE not in CATEGORIES else MAKE_ID_REF(Category.id, VALUE)
       url_shortcut: ~
-      label_id: ~
-      label_message: ~
+      label_id: label_id = EventLabel.get(VALUE).title
     fks:
       - EventPerson.event_id
       - EventPersonLink.event_id
@@ -601,6 +600,12 @@ import:
   # underscore and has the same name as the original column (names can only
   # be changed at export time)
   custom:
+    Event:
+      label_id: |
+        label_id = None
+        if _label := EventLabel.query.filter_by(title=VALUE).first():
+          label_id = _label.id
+
     AbstractEmailTemplate:
       rules: |
         rules = []
