@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2024 CERN
+// Copyright (C) 2002 - 2025 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -39,22 +39,118 @@ export const RIGHT_ONLY = 'R';
 export const BOTH = 'B';
 export const CLOSE = true;
 
+const close = updatedSelection => ({selection: updatedSelection, close: true});
+const keepOpen = updatedSelection => ({selection: updatedSelection, close: false});
+
+export const SELECTION_RANGE_WITH_TRIGGERS = 'rangeWithTriggers';
+export const SELECTION_SIMPLE_RANGE = 'simpleRange';
+const SELECTION_DEFAULT_STRATEGY = SELECTION_RANGE_WITH_TRIGGERS;
+const SELECTION_STRATEGIES = {
+  [SELECTION_RANGE_WITH_TRIGGERS]: (selection, date) => {
+    if (!selection.trigger) {
+      return {selection, close: true};
+    }
+
+    const selectionState = selection.getSelectionState();
+
+    if (selection.unlocked) {
+      // No selection -> select left
+      if (selectionState === NONE) {
+        return keepOpen(selection.copy({left: date, trigger: RIGHT}));
+      }
+
+      switch (selectionState + selection.trigger) {
+        case 'LL':
+          return keepOpen(selection.copy({left: date, trigger: RIGHT}));
+        case 'RR':
+          if (date > selection.right) {
+            return keepOpen(selection.copy({left: date, right: null}));
+          }
+          return close(selection.copy({right: date}));
+        case 'LR':
+          if (date < selection.left) {
+            return keepOpen(selection.copy({left: date}));
+          }
+          return close(selection.copy({right: date}));
+        case 'RL':
+          if (date > selection.right) {
+            return keepOpen(selection.copy({left: date, right: null}));
+          }
+          return close(selection.copy({left: date}));
+        case 'BL':
+          if (date > selection.right) {
+            return keepOpen(selection.copy({left: date, right: null, trigger: RIGHT}));
+          }
+          return keepOpen(selection.copy({left: date, trigger: RIGHT}));
+        case 'BR':
+          if (date < selection.left) {
+            return keepOpen(selection.copy({left: date, right: null}));
+          }
+          return close(selection.copy({right: date}));
+        default:
+          console.warn(`Invalid state-trigger combination ${selectionState + selection.trigger}`);
+          return keepOpen(selection);
+      }
+    }
+
+    if (selection.leftLocked) {
+      return close(selection.copy({right: date, trigger: RIGHT}));
+    }
+
+    if (selection.rightLocked) {
+      return close(selection.copy({left: date, trigger: LEFT}));
+    }
+
+    console.warn(`Invalid lock state ${selection.leftLocked}, ${selection.rightLocked}`);
+    return keepOpen(selection);
+  },
+  [SELECTION_SIMPLE_RANGE]: (selection, date) => {
+    const selectionState = selection.getSelectionState();
+    switch (selectionState) {
+      case NONE:
+        return keepOpen(selection.copy({left: date}));
+      case LEFT_ONLY:
+        return keepOpen(selection.copy({right: date}));
+      case RIGHT_ONLY:
+        return close(selection.copy({left: date}));
+      case BOTH:
+        return keepOpen(selection.copy({left: date, right: null}));
+      default:
+        throw Error(
+          `simple range selection: selection.getSelectionState() returned invalid state ${selectionState}`
+        );
+    }
+  },
+};
+
 /**
  * Create a selection object
  *
  * The object is immutable, and each operation creates a new
  * copy.
  */
-export function newSelection(left, right, trigger, leftLocked, rightLocked) {
+export function newSelection(
+  left,
+  right,
+  trigger,
+  leftLocked,
+  rightLocked,
+  type = SELECTION_DEFAULT_STRATEGY
+) {
   return Object.freeze({
     left,
     right,
     trigger,
     leftLocked,
     rightLocked,
+    type,
 
     get unlocked() {
       return !leftLocked && !rightLocked;
+    },
+
+    get completed() {
+      return this.getSelectionState() === BOTH;
     },
 
     getSelectionState() {
@@ -71,7 +167,7 @@ export function newSelection(left, right, trigger, leftLocked, rightLocked) {
     },
 
     copy({left: newLeft = left, right: newRight = right, trigger: newTrigger = trigger} = {}) {
-      return newSelection(newLeft, newRight, newTrigger, leftLocked, rightLocked);
+      return newSelection(newLeft, newRight, newTrigger, leftLocked, rightLocked, type);
     },
 
     toDateRange() {
@@ -95,62 +191,6 @@ export function triggerRight(selection) {
 }
 
 export function select(selection, date) {
-  if (!selection.trigger) {
-    return;
-  }
-
-  const close = updatedSelection => ({selection: updatedSelection, close: true});
-  const keepOpen = updatedSelection => ({selection: updatedSelection, close: false});
-  const selectionState = selection.getSelectionState();
-
-  if (selection.unlocked) {
-    // No selection -> select left
-    if (selectionState === NONE) {
-      return keepOpen(selection.copy({left: date, trigger: RIGHT}));
-    }
-
-    switch (selectionState + selection.trigger) {
-      case 'LL':
-        return keepOpen(selection.copy({left: date, trigger: RIGHT}));
-      case 'RR':
-        if (date > selection.right) {
-          return keepOpen(selection.copy({left: date, right: null}));
-        }
-        return close(selection.copy({right: date}));
-      case 'LR':
-        if (date < selection.left) {
-          return keepOpen(selection.copy({left: date}));
-        }
-        return close(selection.copy({right: date}));
-      case 'RL':
-        if (date > selection.right) {
-          return keepOpen(selection.copy({left: date, right: null}));
-        }
-        return close(selection.copy({left: date}));
-      case 'BL':
-        if (date > selection.right) {
-          return keepOpen(selection.copy({left: date, right: null, trigger: RIGHT}));
-        }
-        return keepOpen(selection.copy({left: date, trigger: RIGHT}));
-      case 'BR':
-        if (date < selection.left) {
-          return keepOpen(selection.copy({left: date, right: null}));
-        }
-        return close(selection.copy({right: date}));
-      default:
-        console.warn(`Invalid state-trigger combination ${selectionState + selection.trigger}`);
-        return keepOpen(selection);
-    }
-  }
-
-  if (selection.leftLocked) {
-    return close(selection.copy({right: date, trigger: RIGHT}));
-  }
-
-  if (selection.rightLocked) {
-    return close(selection.copy({left: date, trigger: LEFT}));
-  }
-
-  console.warn(`Invalid lock state ${selection.leftLocked}, ${selection.rightLocked}`);
-  return keepOpen(selection);
+  const selectionStrategy = SELECTION_STRATEGIES[selection.type];
+  return selectionStrategy(selection, date);
 }

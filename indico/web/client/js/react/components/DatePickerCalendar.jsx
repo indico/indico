@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2024 CERN
+// Copyright (C) 2002 - 2025 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -7,14 +7,16 @@
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
 
 import {Translate} from 'indico/react/i18n';
+import {OpenDateRange} from 'indico/utils/date';
+import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 
 const NUM_DAYS_PER_WEEK = 7;
 const NUM_CALENDAR_CELLS = 42; // 6 weeks x 7 days
 
-function DatePickerCalendarGrid({includeMonthHeader = false}) {
+export function DatePickerGrid({includeMonthHeader = false}) {
   return (
     <ind-date-grid data-grid>
       {includeMonthHeader ? <div className="month-label" data-month-label /> : null}
@@ -32,18 +34,19 @@ function DatePickerCalendarGrid({includeMonthHeader = false}) {
   );
 }
 
-DatePickerCalendarGrid.propTypes = {
+DatePickerGrid.propTypes = {
   includeMonthHeader: PropTypes.bool,
 };
 
-DatePickerCalendarGrid.defaultProps = {
+DatePickerGrid.defaultProps = {
   includeMonthHeader: false,
 };
 
-export default function DatePickerCalendar({children}) {
+export const DatePickerCalendar = React.forwardRef(({inline = false, children, ...props}, ref) => {
+  const Wrapper = inline ? 'div' : 'dialog';
   return (
-    <ind-calendar>
-      <dialog>
+    <ind-calendar ref={ref} {...props}>
+      <Wrapper>
         <div className="controls">
           <button type="button" value="previous-year">
             <Translate as="span">Previous year</Translate>
@@ -66,13 +69,76 @@ export default function DatePickerCalendar({children}) {
         </div>
 
         {children}
-      </dialog>
+      </Wrapper>
     </ind-calendar>
   );
-}
+});
+
+DatePickerCalendar.displayName = 'DatePickerCalendar';
 
 DatePickerCalendar.propTypes = {
+  inline: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
 
-DatePickerCalendar.Grid = DatePickerCalendarGrid;
+DatePickerCalendar.defaultProps = {
+  inline: false,
+};
+
+export function DatePickerInlineCalendar({
+  onChange,
+  children,
+  rangeStart,
+  rangeEnd,
+  minDate,
+  maxDate,
+}) {
+  const calendarRef = useRef();
+
+  useEffect(() => {
+    const selectionRange = new OpenDateRange(minDate, maxDate);
+    calendarRef.current.setAllowableSelectionRange(selectionRange);
+  }, [minDate, maxDate]);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    calendarRef.current.addEventListener(
+      'x-select',
+      evt => {
+        onChange(formatDate(ISO_FORMAT, new Date(evt.target.value)));
+      },
+      {signal: abortController.signal}
+    );
+    return () => abortController.abort();
+  }, [onChange]);
+
+  return (
+    <DatePickerCalendar
+      inline
+      ref={calendarRef}
+      open
+      range-start={rangeStart?.toDateString()}
+      range-end={rangeEnd?.toDateString()}
+      onChange={onChange}
+    >
+      {children}
+    </DatePickerCalendar>
+  );
+}
+
+DatePickerInlineCalendar.propTypes = {
+  onChange: PropTypes.func,
+  children: PropTypes.node.isRequired,
+  rangeStart: PropTypes.instanceOf(Date),
+  rangeEnd: PropTypes.instanceOf(Date),
+  minDate: PropTypes.instanceOf(Date),
+  maxDate: PropTypes.instanceOf(Date),
+};
+
+DatePickerInlineCalendar.defaultProps = {
+  onChange: () => {},
+  rangeStart: undefined,
+  rangeEnd: undefined,
+  minDate: undefined,
+  maxDate: undefined,
+};

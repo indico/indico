@@ -9,7 +9,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import DatePickerCalendar from 'indico/react/components/DatePickerCalendar';
+import {DatePickerCalendar, DatePickerGrid} from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
@@ -28,9 +28,9 @@ export default function DatePicker({
   max,
   ...inputProps
 }) {
-  function handleDateChange(ev) {
-    const {date} = ev.target.closest('ind-date-picker');
-    const invalid = !!ev.target.value && !date;
+  function handleDateChange(evt) {
+    const {date} = evt.target.closest('ind-date-picker');
+    const invalid = !!evt.target.value && !date;
     onChange(invalid ? invalidValue : formatDate(ISO_FORMAT, date));
   }
 
@@ -54,7 +54,7 @@ export default function DatePicker({
       </button>
 
       <DatePickerCalendar>
-        <DatePickerCalendar.Grid />
+        <DatePickerGrid />
       </DatePickerCalendar>
 
       <span className="date-format" data-format>

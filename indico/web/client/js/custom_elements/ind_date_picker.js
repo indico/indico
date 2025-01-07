@@ -19,6 +19,7 @@ import {createDateParser} from 'indico/utils/date_parser';
 import {getWeekInfoForLocale, getFirstDayOfWeek, getWeekdayNames} from 'indico/utils/l10n';
 import * as positioning from 'indico/utils/positioning';
 import {setNativeInputValue} from 'indico/utils/react_integration';
+import {DelayedAutoToggleController} from 'indico/utils/timing';
 
 import * as ds from './date_selection';
 
@@ -209,7 +210,7 @@ customElements.define(
       indCalendar.format = dateFormat;
       indCalendar.rangeStart = this.rangeStart;
       indCalendar.rangeEnd = this.rangeEnd;
-      indCalendar.selectionPreview = selection.copy();
+      indCalendar.setSelectionPreview(selection);
       rangeStartInput.defaultValue = formatDate(dateFormat, this.rangeStart);
       rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
       updateSelectionLimits();
@@ -286,8 +287,8 @@ customElements.define(
           rangeEndInput.dispatchEvent(new Event('change', {bubbles: true}));
         }
 
-        // Update the selection range restriction
-        indCalendar.selectionPreview = selection.copy();
+        // Update the selection preview and range restriction
+        indCalendar.setSelectionPreview(selection);
         updateSelectionLimits();
       });
 
@@ -300,7 +301,7 @@ customElements.define(
       }
 
       function openCalendar() {
-        indCalendar.selectionPreview = selection.copy();
+        indCalendar.setSelectionPreview(selection);
         updateSelectionLimits();
         calendarTriggerLeft.disabled = true;
         calendarTriggerRight.disabled = true;
@@ -315,6 +316,173 @@ customElements.define(
     }
   }
 );
+
+customElements.define(
+  'ind-inline-date-range-picker',
+  class extends CustomElementBase {
+    static attributes = {
+      rangeStart: Date,
+      rangeEnd: Date,
+    };
+
+    static observedAttributes = ['range-start', 'range-end'];
+
+    setup() {
+      const indCalendar = this.querySelector('ind-calendar');
+      let selection = ds.newSelection(
+        this.rangeStart,
+        this.rangeEnd,
+        undefined,
+        undefined,
+        undefined,
+        ds.SELECTION_SIMPLE_RANGE
+      );
+
+      indCalendar.setSelectionPreview(selection);
+
+      indCalendar.addEventListener('x-select', evt => {
+        const result = ds.select(selection, new Date(evt.target.value));
+        selection = result.selection;
+        indCalendar.setSelectionPreview(selection);
+        if (selection.completed) {
+          indCalendar.pausePreview();
+        } else {
+          indCalendar.resumePreview();
+        }
+        if (selection.getSelectionState() === ds.BOTH) {
+          this.dispatchEvent(
+            new CustomEvent('change', {
+              bubbles: true,
+              detail: {
+                left: selection.left,
+                right: selection.right,
+              },
+            })
+          );
+        }
+      });
+    }
+  }
+);
+
+/**
+ * Implements dialog mode events
+ *
+ * This class contains all behavior specific to the use of the <ind-calendar>
+ * element within a dialog. For other use cases, provide a class of the identical
+ * interface that implements different behavior.
+ **/
+class DialogModeController {
+  constructor(calendar, options) {
+    this.calendar = calendar;
+    this.dialog = this.calendar.firstElementChild;
+    this.options = options;
+  }
+
+  setUpEvents() {
+    this.dialog.addEventListener('pointerdown', () => {
+      // Because Safari does not focus buttons (and other elements) when they
+      // are clicked, we need to mark the dialog as having received such clicks
+      // and test for it in the close handler.
+      this.dialog.noImmediateClose = true;
+      setTimeout(() => {
+        // Unset with a delay to allow focusout handler to see this flag.
+        // It must still be unset so it doesn't linger on forever. The delay
+        // was chosen based on trial and error. In general, you don't want
+        // to make it shorter, but you may increase it if some browser/OS
+        // combination unsets the flag too quickly.
+        delete this.dialog.noImmediateClose;
+      }, 100);
+    });
+    this.dialog.addEventListener('focusout', () => {
+      // The focusout event is triggered on the dialog or somewhere in it.
+      // We use requestAnimationFrame to allow the target element to get
+      // focused so we know where the focus is going.
+      requestAnimationFrame(() => {
+        // When a button in the dialog is clicked, `noImmediateClose` is set on
+        // the dialog element. We test for the absence of this flag as well as
+        // focus escaping from the dialog as two cues to close it.
+        if (!this.dialog.noImmediateClose && !this.dialog.contains(document.activeElement)) {
+          this.calendar.open = false;
+        }
+      });
+      // Handle closing/opening the dialog by clicking outside
+      this.dialog.addEventListener('keydown', evt => {
+        if (evt.code !== 'Escape') {
+          return;
+        }
+        this.calendar.open = false;
+        this.calendar.dispatchEvent(new Event('x-keyclose'));
+      });
+    });
+    // Handle dialog open/close initialized through the ind-calendar `open` attribute
+    this.calendar.addEventListener('x-attrchange.open', () => {
+      if (!this.dialog) {
+        console.warn(
+          'ind-calendar: Attempt to open or close dialog with no dialog element present'
+        );
+        return;
+      }
+      if (this.calendar.open) {
+        if (this.dialog.open) {
+          return;
+        }
+        this.options.updateCalendar();
+        this.dialog.show();
+        this.dialog.focus();
+        this.dialog.dispatchEvent(new Event('open', {bubbles: true}));
+      } else {
+        if (!this.dialog.open) {
+          return;
+        }
+        this.dialog.close();
+        this.options.onclose?.();
+        this.dialog.dispatchEvent(new Event('close', {bubbles: true}));
+      }
+    });
+  }
+
+  setUpGlobalEvent() {
+    this.abortController = new AbortController();
+
+    // Note that this may not work on iOS Safari. We are not currently explicitly
+    // targeting this browser, so we'll leave this as is.
+    window.addEventListener(
+      'click',
+      evt => {
+        if (!this.calendar.open) {
+          return;
+        }
+        if (evt.target.closest('dialog') === this.dialog) {
+          return;
+        }
+        setTimeout(() => {
+          this.calendar.open = false;
+        });
+      },
+      {signal: this.abortController.signal}
+    );
+  }
+
+  tearDownGlobalEvents() {
+    this.abortController.abort();
+  }
+}
+
+/**
+ * Implements inline mode events
+ *
+ * This is (currently) a dummy version of the dialog mode controller, which does
+ * nothing at all. It is used for completely static calendars that don't wrap a
+ * <dialog> element.
+ */
+class InlineModeController {
+  setUpEvents() {}
+
+  setUpGlobalEvents() {}
+
+  tearDownGlobalEvents() {}
+}
 
 customElements.define(
   'ind-calendar',
@@ -332,6 +500,16 @@ customElements.define(
     constructor() {
       super();
       this.allowableSelectionRange = new OpenDateRange();
+      this.previewPaused = false;
+      this.previewToggleController = new DelayedAutoToggleController(
+        () => {
+          this.previewPaused = true;
+        },
+        () => {
+          this.previewPaused = false;
+        },
+        3000
+      );
     }
 
     setAllowableSelectionRange(dateRange) {
@@ -339,15 +517,36 @@ customElements.define(
       this.dispatchEvent(new Event('x-rangechange'));
     }
 
+    setSelectionPreview(selection) {
+      this.selectionPreview = selection.copy();
+    }
+
+    pausePreview() {
+      this.previewToggleController.activate();
+    }
+
+    resumePreview() {
+      this.previewToggleController.reset();
+    }
+
     setup() {
+      let calendarDisplayDate, hoverCursor;
+
       const indCalendar = this;
-      const dialog = this.firstElementChild;
+      const BehaviorController =
+        this.firstElementChild.tagName === 'DIALOG' ? DialogModeController : InlineModeController;
+      const behaviorController = new BehaviorController(this, {
+        onclose: () => {
+          calendarDisplayDate = undefined;
+          updateCalendar();
+        },
+        updateCalendar,
+      });
       const monthYearGroup = this.querySelector('.month-year');
       const editMonthSelect = monthYearGroup.querySelector('select');
       const editYearInput = monthYearGroup.querySelector('input');
       const calendars = this.querySelector('.calendars');
       const dateGrids = this.querySelectorAll('ind-date-grid');
-      let calendarDisplayDate, hoverCursor;
 
       // Populate month names in the select list
       for (let i = 0; i < 12; i++) {
@@ -366,57 +565,14 @@ customElements.define(
         grid.hideDatesFromOtherMonths = dateGrids.length > 1;
       }
 
-      this.addEventListener('x-attrchange.open', () => {
-        if (this.open) {
-          show();
-        } else {
-          close();
-        }
-      });
       this.addEventListener('x-attrchange.range-start', updateCalendar);
       this.addEventListener('x-attrchange.range-end', updateCalendar);
       this.addEventListener('x-rangechange', updateCalendar);
 
-      dialog.addEventListener('pointerdown', () => {
-        // Because Safari does not focus buttons (and other elements) when they
-        // are clicked, we need to mark the dialog as having received such clicks
-        // and test for it in the close handler.
-        dialog.noImmediateClose = true;
-        setTimeout(() => {
-          // Unset with a delay to allow focusout handler to see this flag.
-          // It must still be unset so it doesn't linger on forever. The delay
-          // was chosen based on trial and error. In general, you don't want
-          // to make it shorter, but you may increase it if some browser/OS
-          // combination unsets the flag too quickly.
-          delete dialog.noImmediateClose;
-        }, 100);
-      });
-
-      dialog.addEventListener('focusout', () => {
-        // The focusout event is triggered on the dialog or somewhere in it.
-        // We use requestAnimationFrame to allow the target element to get
-        // focused so we know where the focus is going.
-        requestAnimationFrame(() => {
-          // When a button in the dialog is clicked, `noImmediateClose` is set on
-          // the dialog element. We test for the absence of this flag as well as
-          // focus escaping from the dialog as two cues to close it.
-          if (!dialog.noImmediateClose && !dialog.contains(document.activeElement)) {
-            this.open = false;
-          }
-        });
-      });
-
-      // Handle open/close to prep the dialog state
-      dialog.addEventListener('open', () => {
-        dialog.focus();
-      });
-      dialog.addEventListener('close', () => {
-        calendarDisplayDate = undefined;
-        updateCalendar();
-      });
+      behaviorController.setUpEvents();
 
       // Handle calendar interaction
-      dialog.addEventListener('click', evt => {
+      indCalendar.addEventListener('click', evt => {
         const button = evt.target.closest('button[value]');
         if (!button) {
           return;
@@ -460,15 +616,6 @@ customElements.define(
       editMonthSelect.addEventListener('change', () => {
         calendarDisplayDate.setMonth(editMonthSelect.value);
         updateCalendar();
-      });
-
-      // Handle closing/opening the dialog by clicking outside
-      indCalendar.addEventListener('keydown', evt => {
-        if (evt.code !== 'Escape') {
-          return;
-        }
-        this.open = false;
-        this.dispatchEvent(new Event('x-keyclose'));
       });
 
       // Grid calendar month change
@@ -541,64 +688,20 @@ customElements.define(
         updateGrids();
       });
 
-      // Note that this may not work on iOS Safari. We are not currently explicitly
-      // targeting this browser, so we'll leave this as is.
-      this.addEventListener('x-connect', () => {
-        window.addEventListener('click', handleDialogClose);
-      });
-      this.addEventListener('x-disconnect', () => {
-        window.removeEventListener('click', handleDialogClose);
-      });
-
-      function handleDialogClose(evt) {
-        if (!indCalendar.open) {
-          return;
-        }
-        if (evt.target.closest('dialog') === dialog) {
-          return;
-        }
-        setTimeout(() => {
-          indCalendar.open = false;
-        });
-      }
-
-      function show() {
-        if (!dialog) {
-          return;
-        }
-        if (dialog.open) {
-          return;
-        }
-        updateCalendar();
-        dialog.show();
-        dialog.dispatchEvent(new Event('open'));
-      }
-
-      function close() {
-        if (!dialog) {
-          return;
-        }
-        if (!dialog.open) {
-          return;
-        }
-        dialog.close();
-        indCalendar.dispatchEvent(new Event('close'));
-      }
-
       function getSelectionRange() {
         return new DateRange(indCalendar.rangeStart, indCalendar.rangeEnd);
       }
 
       function getHoverRange() {
         // A component that wishes to display the preview must set
-        // the `selectionPreview` property on the <ind-calendar> element
-        // and the value must be a `Selection` object (see
-        // `date_selection.js`).
+        // the `selectionPreview` property by calling `setSelectionPreview()`
+        // on the <ind-calendar> element and the value must be a `Selection`
+        // object (see `date_selection.js`).
         //
-        // When no valid preview can be created an empty `DateRange` is
-        // returned.
+        // When no valid preview can be created, or the preview is paused
+        // an empty `DateRange` is returned.
 
-        if (!indCalendar.selectionPreview) {
+        if (!indCalendar.selectionPreview || indCalendar.previewPaused) {
           return new DateRange();
         }
 

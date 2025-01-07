@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2024 CERN
+// Copyright (C) 2002 - 2025 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,7 +9,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import DatePickerCalendar from 'indico/react/components/DatePickerCalendar';
+import {DatePickerCalendar, DatePickerGrid} from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {DateRange} from 'indico/utils/date';
@@ -57,8 +57,8 @@ export default function DateRangePicker({
     rangeEndMax = rangeEndMax = max;
   }
 
-  function handleChange(ev) {
-    const picker = ev.currentTarget;
+  function handleChange(evt) {
+    const picker = evt.currentTarget;
     const [start, end] = picker.dateRange;
     const rangeStartInput = picker.querySelector('[data-range-start]');
     const rangeEndInput = picker.querySelector('[data-range-end]');
@@ -122,8 +122,8 @@ export default function DateRangePicker({
 
       <DatePickerCalendar>
         <div className="calendars">
-          <DatePickerCalendar.Grid includeMonthHeader />
-          <DatePickerCalendar.Grid includeMonthHeader />
+          <DatePickerGrid includeMonthHeader />
+          <DatePickerGrid includeMonthHeader />
         </div>
       </DatePickerCalendar>
     </ind-date-range-picker>

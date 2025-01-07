@@ -47,3 +47,13 @@
   height: 33px !important;
   width: auto !important;
 }
+
+ind-calendar .month-year {
+  min-width: 9.2em;
+}
+
+ind-calendar .calendars {
+  display: flex;
+  align-items: flex-start;
+  gap: 1em;
+}

@@ -19,6 +19,7 @@ export default class DateForm extends FilterFormComponent {
     startDate: PropTypes.string,
     endDate: PropTypes.string,
     isRange: PropTypes.bool.isRequired,
+    minDate: PropTypes.object,
     disabledDate: PropTypes.func,
     ...FilterFormComponent.propTypes,
   };
@@ -26,6 +27,7 @@ export default class DateForm extends FilterFormComponent {
   static defaultProps = {
     startDate: null,
     endDate: null,
+    minDate: null,
     disabledDate: null,
   };
 
@@ -64,28 +66,31 @@ export default class DateForm extends FilterFormComponent {
   }
 
   render() {
-    const {isRange, disabledDate} = this.props;
+    const {isRange, minDate} = this.props;
     const {startDate, endDate} = this.state;
+
     const picker = isRange ? (
       <CalendarRangeDatePicker
-        startDate={startDate}
-        endDate={endDate}
-        onDatesChange={async ({startDate: sd, endDate: ed}) => {
-          await this.setDates(sd, ed);
-        }}
-        disabledDate={disabledDate || this.disabledDate}
-        noBorder
+        startDate={startDate?.toDate()}
+        endDate={endDate?.toDate()}
+        minDate={minDate?.toDate()}
+        maxDate={moment()
+          .add(1, 'years')
+          .endOf('year')
+          .toDate()}
+        onChange={({startDate: sd, endDate: ed}) =>
+          this.setDates(moment(sd, 'YYYY-MM-DD'), moment(ed, 'YYYY-MM-DD'))
+        }
       />
     ) : (
       <CalendarSingleDatePicker
-        date={startDate}
-        yearsBefore={0}
-        yearsAfter={1}
-        onDateChange={async date => {
-          await this.setDates(date, null);
-        }}
-        disabledDate={disabledDate || this.disabledDate}
-        noBorder
+        date={startDate?.toDate()}
+        minDate={minDate?.toDate()}
+        maxDate={moment()
+          .add(1, 'years')
+          .endOf('year')
+          .toDate()}
+        onChange={date => this.setDates(moment(date, 'YYYY-MM-DD'), null)}
       />
     );
 
