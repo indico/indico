@@ -70,7 +70,7 @@ def send_email_task(task, email, log_entry=None):
 def get_actual_sender_address(sender_address: str, reply_address: set[str]) -> tuple[str, set]:
     site_title = core_settings.get('site_title')
     if not sender_address:
-        return f'{site_title} <{config.NO_REPLY_EMAIL}>', reply_address
+        return formataddr((site_title, config.NO_REPLY_EMAIL)), reply_address
     if not config.SMTP_ALLOWED_SENDERS:
         # this may result in spoofing
         return sender_address, reply_address

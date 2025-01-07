@@ -34,6 +34,7 @@ def app(request):
         'ENABLE_ROOMBOOKING': True,
         'SECRET_KEY': os.urandom(16),
         'SMTP_USE_CELERY': False,
+        'NO_REPLY_EMAIL': 'noreply@example.com',
     }
     return make_app(testing=True, config_override=config_override)
 
