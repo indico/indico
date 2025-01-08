@@ -82,7 +82,7 @@ DatePicker.defaultProps = {
   max: undefined,
 };
 
-/** LikeDatePicker, but using a range-like value */
+/** Like DatePicker, but using a range-like value */
 function RangedDatePicker({value, onChange, ...rest}) {
   const handleChange = newDate => {
     onChange({
