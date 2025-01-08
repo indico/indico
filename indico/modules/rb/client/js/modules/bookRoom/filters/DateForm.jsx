@@ -71,13 +71,13 @@ export default class DateForm extends FilterFormComponent {
 
     const picker = isRange ? (
       <CalendarRangeDatePicker
-        startDate={startDate?.toDate()}
-        endDate={endDate?.toDate()}
-        minDate={minDate?.toDate()}
+        startDate={startDate?.format('YYYY-MM-DD')}
+        endDate={endDate?.format('YYYY-MM-DD')}
+        minDate={minDate?.format('YYYY-MM-DD')}
         maxDate={moment()
           .add(1, 'years')
           .endOf('year')
-          .toDate()}
+          .format('YYYY-MM-DD')}
         onChange={({startDate: sd, endDate: ed}) =>
           this.setDates(moment(sd, 'YYYY-MM-DD'), moment(ed, 'YYYY-MM-DD'))
         }
