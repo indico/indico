@@ -28,9 +28,9 @@ export default function CalendarSingleDatePicker({date, minDate, maxDate, ...pro
 }
 
 CalendarSingleDatePicker.propTypes = {
-  date: PropTypes.object,
-  minDate: PropTypes.object,
-  maxDate: PropTypes.object,
+  date: PropTypes.string,
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
   yearsBefore: PropTypes.number,
   yearsAfter: PropTypes.number,
 };
