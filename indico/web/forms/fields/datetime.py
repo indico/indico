@@ -41,7 +41,7 @@ class TimeDeltaField(Field):
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
     unit_names = {
         'seconds': _('Seconds'),
-        'minutes': pgettext('Time', 'Minutes'),
+        'minutes': pgettext('Duration', 'Minutes'),
         'hours': _('Hours'),
         'days': _('Days'),
         'weeks': _('Weeks'),
@@ -121,7 +121,7 @@ class RelativeDeltaField(Field):
     widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
     unit_names = {
         'seconds': _('Seconds'),
-        'minutes': pgettext('Time', 'Minutes'),
+        'minutes': pgettext('Duration', 'Minutes'),
         'hours': _('Hours'),
         'days': _('Days'),
         'weeks': _('Weeks'),
