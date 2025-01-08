@@ -19,7 +19,7 @@ export default class DateForm extends FilterFormComponent {
     startDate: PropTypes.string,
     endDate: PropTypes.string,
     isRange: PropTypes.bool.isRequired,
-    minDate: PropTypes.object,
+    minDate: PropTypes.string,
     disabledDate: PropTypes.func,
     ...FilterFormComponent.propTypes,
   };
@@ -71,26 +71,28 @@ export default class DateForm extends FilterFormComponent {
 
     const picker = isRange ? (
       <CalendarRangeDatePicker
-        startDate={startDate?.format('YYYY-MM-DD')}
-        endDate={endDate?.format('YYYY-MM-DD')}
-        minDate={minDate?.format('YYYY-MM-DD')}
-        maxDate={moment()
-          .add(1, 'years')
-          .endOf('year')
-          .format('YYYY-MM-DD')}
+        startDate={serializeDate(startDate)}
+        endDate={serializeDate(endDate)}
+        minDate={serializeDate(minDate)}
+        maxDate={serializeDate(
+          moment()
+            .add(1, 'years')
+            .endOf('year')
+        )}
         onChange={({startDate: sd, endDate: ed}) =>
-          this.setDates(moment(sd, 'YYYY-MM-DD'), moment(ed, 'YYYY-MM-DD'))
+          this.setDates(toMoment(sd, 'YYYY-MM-DD'), toMoment(ed, 'YYYY-MM-DD'))
         }
       />
     ) : (
       <CalendarSingleDatePicker
-        date={startDate?.toDate()}
-        minDate={minDate?.toDate()}
-        maxDate={moment()
-          .add(1, 'years')
-          .endOf('year')
-          .toDate()}
-        onChange={date => this.setDates(moment(date, 'YYYY-MM-DD'), null)}
+        date={serializeDate(startDate)}
+        minDate={serializeDate(minDate)}
+        maxDate={serializeDate(
+          moment()
+            .add(1, 'years')
+            .endOf('year')
+        )}
+        onChange={date => this.setDates(toMoment(date, 'YYYY-MM-DD'), null)}
       />
     );
 
