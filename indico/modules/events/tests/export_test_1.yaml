@@ -17,6 +17,7 @@ users:
     - 1337@example.test
     email: 1337@example.test
     first_name: Guinea
+    identities: []
     is_deleted: false
     last_name: Pig
     merged_into_id: null

@@ -60,7 +60,10 @@ def restore(event_id, user_id, message):
               help='Export files with short dummy content instead of their real data.')
 @click.option('-X', '--external-files', is_flag=True,
               help='Keep references to file storage instead of exporting file content.')
-def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files, external_files):
+@click.option('-I', '--identities', multiple=True, metavar='NAME',
+              help='Include identities for the given identity provider when exporting users; for local accounts use '
+                    'indico. This option can be provided multiple times.')
+def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files, external_files, identities):
     """Export all data associated with an event.
 
     This exports the whole event as an archive which can be imported
@@ -98,7 +101,7 @@ def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files, ex
     if dummy_files:
         click.secho('Dummy files are enabled, DO NOT import the event in a production instance', fg='yellow', bold=True)
     export_event(obj, target_file, keep_uuids=keep_uuids, use_pickle=use_pickle, dummy_files=dummy_files,
-                 external_files=external_files)
+                 external_files=external_files, identities=identities)
 
 
 @cli.command('import')

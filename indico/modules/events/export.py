@@ -33,6 +33,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_all_models
 from indico.core.storage.backend import get_storage, get_storage_backends
+from indico.modules.auth.models.identities import Identity
 from indico.modules.categories import Category, CategoryLogRealm
 from indico.modules.events import Event, EventLogRealm
 from indico.modules.events.contributions import Contribution
@@ -93,7 +94,7 @@ BACKENDS = {'yaml': _YamlBackend, 'pickle': _PickleBackend}
 
 
 def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle=False, dummy_files=False,
-                 external_files=False):
+                 external_files=False, identities=None):
     """Export the specified event/category with all its data to a file.
 
     :param event_or_category: the `Event` to export, or a `Category` to export with all
@@ -107,7 +108,7 @@ def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle
     """
     backend = 'pickle' if use_pickle else 'yaml'
     exporter = EventExporter(event_or_category, target_file, keep_uuids=keep_uuids, dummy_files=dummy_files,
-                             external_files=external_files, backend=backend)
+                             external_files=external_files, backend=backend, identities=identities)
     exporter.serialize()
 
 
@@ -255,7 +256,8 @@ def _get_alembic_version() -> list[str]:
 
 
 class EventExporter:
-    def __init__(self, obj, target_file, *, keep_uuids=False, dummy_files=False, external_files=False, backend='yaml'):
+    def __init__(self, obj, target_file, *, keep_uuids=False, dummy_files=False, external_files=False, backend='yaml',
+                 identities=None):
         self.obj = obj
         self.target_file = target_file
         self.keep_uuids = keep_uuids
@@ -263,6 +265,7 @@ class EventExporter:
         self.external_files = external_files
         self.used_storage_backends = set()
         self.backend = BACKENDS[backend]
+        self.identities = frozenset(identities or set())
         self.categories = frozenset(self._fetch_categories())
         # XXX we're not using a context manager here since changing that would probably require
         # some refactoring of how this class is used
@@ -422,6 +425,17 @@ class EventExporter:
                 'all_emails': list(user.all_emails),
                 'is_deleted': user.is_deleted,
                 'merged_into_id': self._make_idref(None, user.merged_into_id, target_column=_resolve_col('User.id')),
+                'identities': [
+                    {
+                        'provider': identity.provider,
+                        'identifier': identity.identifier,
+                        'multipass_data': identity.multipass_data,
+                        '_data': identity._data,
+                        'password_hash': identity.password_hash,
+                    }
+                    for identity in user.identities
+                    if identity.provider in self.identities
+                ],
             }
         elif type_ == 'affilref' and uuid not in self.affiliations:
             affiliation = Affiliation.get(value)
@@ -698,6 +712,9 @@ class EventImporter:
                                 title=userdata['title'],
                                 is_deleted=userdata['is_deleted'],
                                 is_pending=True)
+                    if identities := userdata['identities']:
+                        user.is_pending = False
+                        user.identities = {Identity(**identitydata) for identitydata in identities}
                     db.session.add(user)
                     db.session.flush()
                     self.user_map[uuid] = user.id
