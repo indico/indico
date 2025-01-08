@@ -52,10 +52,10 @@ export default function CalendarRangeDatePicker({
 
 CalendarRangeDatePicker.propTypes = {
   onChange: PropTypes.func.isRequired,
-  startDate: PropTypes.object,
-  endDate: PropTypes.object,
-  minDate: PropTypes.object,
-  maxDate: PropTypes.object,
+  startDate: PropTypes.string,
+  endDate: PropTypes.string,
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
   yearsBefore: PropTypes.number,
   yearsAfter: PropTypes.number,
 };
