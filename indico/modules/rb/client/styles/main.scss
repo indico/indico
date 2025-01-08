@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@forward 'base/reset';
+
 @use 'base/palette' as *;
 @use 'rb:styles/sui_fixes' as *;
 @use 'rb:styles/palette' as *;
