@@ -1,0 +1,18 @@
+{% extends 'emails/base_i18n.txt' %}
+
+{% block subject -%}
+    {% trans %}Create local account{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {{ user.first_name }}
+{%- endblock %}
+
+{% block body -%}
+{% trans %}We heard that you forgot your Indico username or password.{% endtrans %}
+
+{% trans %}We found an Indico account, but it has no username/password set.{% endtrans %}
+{% trans %}To set one, simply use the following link within an hour:{% endtrans %}
+
+{{ url }}
+{%- endblock %}

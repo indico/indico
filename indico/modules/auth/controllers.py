@@ -780,10 +780,13 @@ class RHResetPassword(RH):
             # username than the one he expects. But he still gets back into his profile.
             # Showing a list of usernames would be a little bit more user-friendly but less
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
-            identity = next(iter(user.local_identities))
-            _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
-                               {'user': user, 'username': identity.identifier},
-                               data={'id': identity.id, 'hash': crc32(identity.password_hash)})
+            if identity := user.local_identity:
+                _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
+                                   {'user': user, 'username': identity.identifier},
+                                   data={'id': identity.id, 'hash': crc32(identity.password_hash)})
+            else:
+                _send_confirmation(form.email.data, 'create-local-identity', '.create_local_identity',
+                                   'auth/emails/create_local_identity.txt', {'user': user}, data={'id': user.id})
             session['resetpass_email_sent'] = True
             logger.info('Password reset requested for user %s', user)
             return redirect(url_for('.resetpass'))
@@ -802,6 +805,38 @@ class RHResetPassword(RH):
         form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity, email_sent=False,
                                       widget_attrs={'username': {'disabled': True}})
+
+
+class RHCreateLocalIdentity(RH):
+    """Create a new local identity from a password reset email."""
+
+    def _process_args(self):
+        if not config.LOCAL_IDENTITIES:
+            raise Forbidden('Local identities are disabled')
+
+    def _process(self):
+        if not (token := request.args.get('token')):
+            return redirect(url_for('.resetpass'))
+        data = secure_serializer.loads(token, max_age=3600, salt='create-local-identity')
+        user = User.get(data['id'], is_deleted=False)
+        if not user:
+            raise BadData('User does not exist')
+        elif user.local_identity:
+            raise BadData('User already has a local identity')
+        return self._create_local_identity(user)
+
+    def _create_local_identity(self, user):
+        form = AddLocalIdentityForm()
+        if form.validate_on_submit():
+            identity = Identity(provider='indico', identifier=form.username.data, password=form.password.data)
+            user.identities.add(identity)
+            flash(_('Local account added successfully'), 'success')
+            login_user(identity.user, identity)
+            logger.info('Password reset confirmed for user %s; local identity created', user)
+            # We usually come here from a multipass login page so we should have a target url
+            return multipass.redirect_success()
+
+        return WPAuth.render_template('create_local_identity.html', form=form)
 
 
 class RHAdminImpersonate(RHAdminBase):

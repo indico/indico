@@ -16,6 +16,8 @@ Improvements
   they were viewed (:pr:`6500`)
 - Refresh the looks of the PDF timetable (:issue:`6554`, :pr:`6558`)
 - Redact session cookie value in error emails (:pr:`6666`)
+- Allow creating a new local account during password reset if the user does not have
+  one yet (:pr:`6688`)
 
 Bugfixes
 ^^^^^^^^
