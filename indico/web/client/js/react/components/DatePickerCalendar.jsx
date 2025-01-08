@@ -12,6 +12,7 @@ import React, {useRef, useEffect} from 'react';
 import {Translate} from 'indico/react/i18n';
 import {OpenDateRange} from 'indico/utils/date';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
+import {fromISOLocalDate} from 'indico/utils/date_parser';
 
 const NUM_DAYS_PER_WEEK = 7;
 const NUM_CALENDAR_CELLS = 42; // 6 weeks x 7 days
@@ -96,7 +97,7 @@ export function DatePickerInlineCalendar({
   const calendarRef = useRef();
 
   useEffect(() => {
-    const selectionRange = new OpenDateRange(minDate, maxDate);
+    const selectionRange = new OpenDateRange(fromISOLocalDate(minDate), fromISOLocalDate(maxDate));
     calendarRef.current.setAllowableSelectionRange(selectionRange);
   }, [minDate, maxDate]);
 
@@ -117,8 +118,8 @@ export function DatePickerInlineCalendar({
       inline
       ref={calendarRef}
       open
-      range-start={rangeStart?.toDateString()}
-      range-end={rangeEnd?.toDateString()}
+      range-start={fromISOLocalDate(rangeStart)?.toDateString()}
+      range-end={fromISOLocalDate(rangeEnd)?.toDateString()}
       onChange={onChange}
     >
       {children}
@@ -129,10 +130,10 @@ export function DatePickerInlineCalendar({
 DatePickerInlineCalendar.propTypes = {
   onChange: PropTypes.func,
   children: PropTypes.node.isRequired,
-  rangeStart: PropTypes.instanceOf(Date),
-  rangeEnd: PropTypes.instanceOf(Date),
-  minDate: PropTypes.instanceOf(Date),
-  maxDate: PropTypes.instanceOf(Date),
+  rangeStart: PropTypes.string,
+  rangeEnd: PropTypes.string,
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
 };
 
 DatePickerInlineCalendar.defaultProps = {
