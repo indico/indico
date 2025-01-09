@@ -79,12 +79,13 @@ def test_service_handle_new_editable(dummy_editable, dummy_user, mocked_response
 def test_service_handle_review_editable(dummy_editable, dummy_user, dummy_editing_revision, mocked_responses, snapshot):
     from indico.modules.events.editing.schemas import EditingReviewAction
     from indico.modules.events.editing.service import service_handle_review_editable
-    mock = Mock()
+    mock_parent_revision = Mock()
     resp = mocked_responses.post(f'{MOCK_SVC}/event/dummy/editable/paper/420/420', json={'comment': 'foobar'})
-    service_handle_review_editable(dummy_editable, dummy_user, EditingReviewAction.accept, mock, dummy_editing_revision)
+    service_handle_review_editable(dummy_editable, dummy_user, EditingReviewAction.accept, mock_parent_revision,
+                                   dummy_editing_revision)
     req_payload = json.loads(resp.calls[0].request.body)
     _assert_yaml_snapshot(snapshot, req_payload, 'service_review_editable.yml')
-    assert mock.comment == 'foobar'
+    assert mock_parent_revision.comment == 'foobar'
 
 
 def test_service_handle_delete_editable(dummy_editable, mocked_responses, snapshot):
