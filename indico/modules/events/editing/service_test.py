@@ -103,7 +103,7 @@ def test_service_get_custom_action(dummy_editable, dummy_editing_revision, dummy
     _assert_yaml_snapshot(snapshot, req_payload, 'service_get_custom_action.yml')
 
 
-@pytest.mark.usefixtures('request_context')
+@pytest.mark.usefixtures('request_context', 'dummy_editing_tag')
 def test_service_handle_custom_action(dummy_editable, dummy_editing_revision, dummy_user, mocked_responses, snapshot):
     from indico.modules.events.editing.service import service_handle_custom_action
     resp = mocked_responses.post(
@@ -111,14 +111,19 @@ def test_service_handle_custom_action(dummy_editable, dummy_editing_revision, du
         json={
             'publish': True,
             'comments': [{'text': 'foobar'}],
-            'tags': [1],
+            'tags': [420],
             'redirect': 'https://foo.bar',
             'reset': False
         }
     )
-    service_handle_custom_action(
+    assert not dummy_editing_revision.tags
+    assert not dummy_editing_revision.comments
+    rv = service_handle_custom_action(
         dummy_editable, dummy_editing_revision, dummy_user,
         {'name': 'foobar_action', 'title': 'Foobar Action'},
     )
     req_payload = json.loads(resp.calls[0].request.body)
     _assert_yaml_snapshot(snapshot, req_payload, 'service_custom_action.yml')
+    assert len(dummy_editing_revision.tags) == 1
+    assert len(dummy_editing_revision.comments) == 1
+    assert rv['redirect'] == 'https://foo.bar'

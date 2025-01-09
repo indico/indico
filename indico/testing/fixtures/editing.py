@@ -11,6 +11,7 @@ from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.file_types import EditingFileType
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, RevisionType
+from indico.modules.events.editing.models.tags import EditingTag
 from indico.util.date_time import now_utc
 
 
@@ -79,3 +80,11 @@ def create_editing_revision_file(db):
 def dummy_editing_revision_file(dummy_editing_revision, dummy_file, create_editing_revision_file):
     """Create a dummy editing revision file."""
     return create_editing_revision_file(dummy_editing_revision, dummy_file)
+
+
+@pytest.fixture
+def dummy_editing_tag(db, dummy_event):
+    """Create a dummy editing tag."""
+    tag = EditingTag(id=420, event=dummy_event, title='Dummy', code='DUM', color='red')
+    db.session.flush()
+    return tag
