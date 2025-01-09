@@ -19,6 +19,7 @@ export default class DateForm extends FilterFormComponent {
     startDate: PropTypes.string,
     endDate: PropTypes.string,
     isRange: PropTypes.bool.isRequired,
+    minDate: PropTypes.string,
     disabledDate: PropTypes.func,
     ...FilterFormComponent.propTypes,
   };
@@ -26,6 +27,7 @@ export default class DateForm extends FilterFormComponent {
   static defaultProps = {
     startDate: null,
     endDate: null,
+    minDate: null,
     disabledDate: null,
   };
 
@@ -64,28 +66,33 @@ export default class DateForm extends FilterFormComponent {
   }
 
   render() {
-    const {isRange, disabledDate} = this.props;
+    const {isRange, minDate} = this.props;
     const {startDate, endDate} = this.state;
+
     const picker = isRange ? (
       <CalendarRangeDatePicker
-        startDate={startDate}
-        endDate={endDate}
-        onDatesChange={async ({startDate: sd, endDate: ed}) => {
-          await this.setDates(sd, ed);
-        }}
-        disabledDate={disabledDate || this.disabledDate}
-        noBorder
+        startDate={serializeDate(startDate)}
+        endDate={serializeDate(endDate)}
+        minDate={serializeDate(minDate)}
+        maxDate={serializeDate(
+          moment()
+            .add(1, 'years')
+            .endOf('year')
+        )}
+        onChange={({startDate: sd, endDate: ed}) =>
+          this.setDates(toMoment(sd, 'YYYY-MM-DD'), toMoment(ed, 'YYYY-MM-DD'))
+        }
       />
     ) : (
       <CalendarSingleDatePicker
-        date={startDate}
-        yearsBefore={0}
-        yearsAfter={1}
-        onDateChange={async date => {
-          await this.setDates(date, null);
-        }}
-        disabledDate={disabledDate || this.disabledDate}
-        noBorder
+        date={serializeDate(startDate)}
+        minDate={serializeDate(minDate)}
+        maxDate={serializeDate(
+          moment()
+            .add(1, 'years')
+            .endOf('year')
+        )}
+        onChange={date => this.setDates(toMoment(date, 'YYYY-MM-DD'), null)}
       />
     );
 

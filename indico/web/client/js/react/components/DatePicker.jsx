@@ -9,6 +9,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {DatePickerCalendar, DatePickerGrid} from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
@@ -22,20 +23,25 @@ export default function DatePicker({
   onChange,
   value,
   format = moment.localeData().longDateFormat('L'),
+  invalidValue = INVALID,
   min,
   max,
   ...inputProps
 }) {
-  function handleDateChange(ev) {
-    const {date} = ev.target.closest('ind-date-picker');
-    const invalid = !!ev.target.value && !date;
-    onChange(invalid ? INVALID : formatDate(ISO_FORMAT, date));
+  function handleDateChange(evt) {
+    const {date} = evt.target.closest('ind-date-picker');
+    const invalid = !!evt.target.value && !date;
+    onChange(invalid ? invalidValue : formatDate(ISO_FORMAT, date));
   }
 
   const formattedValue = formatDate(format, fromISOLocalDate(value));
 
   return (
-    <ind-date-picker>
+    <ind-date-picker
+      min={fromISOLocalDate(min)?.toDateString()}
+      max={fromISOLocalDate(max)?.toDateString()}
+      format={format}
+    >
       <input
         type="text"
         onChange={handleDateChange}
@@ -43,47 +49,13 @@ export default function DatePicker({
         {...inputProps}
         placeholder={format}
       />
-      <button type="button" disabled={inputProps.disabled}>
+      <button type="button" disabled={inputProps.disabled} aria-haspopup="dialog">
         <Translate as="span">Open a calendar</Translate>
       </button>
-      <ind-calendar
-        min={fromISOLocalDate(min)?.toDateString()}
-        max={fromISOLocalDate(max)?.toDateString()}
-      >
-        <dialog>
-          <div className="controls">
-            <button type="button" value="previous-year">
-              <Translate as="span">Previous year</Translate>
-            </button>
-            <button type="button" value="previous-month">
-              <Translate as="span">Previous month</Translate>
-            </button>
 
-            <div className="month-year">
-              <select />
-              <input type="number" required />
-            </div>
-
-            <button type="button" value="next-month">
-              <Translate as="span">Next month</Translate>
-            </button>
-            <button type="button" value="next-year">
-              <Translate as="span">Next year</Translate>
-            </button>
-          </div>
-
-          <div className="weekdays">
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
-          <div role="listbox" />
-        </dialog>
-      </ind-calendar>
+      <DatePickerCalendar>
+        <DatePickerGrid />
+      </DatePickerCalendar>
 
       <span className="date-format" data-format>
         <Translate>
@@ -98,6 +70,7 @@ DatePicker.propTypes = {
   format: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   value: PropTypes.any,
+  invalidValue: PropTypes.any,
   min: PropTypes.string,
   max: PropTypes.string,
 };
@@ -109,16 +82,36 @@ DatePicker.defaultProps = {
   max: undefined,
 };
 
+/** Like DatePicker, but using a range-like value */
+function RangedDatePicker({value, onChange, ...rest}) {
+  const handleChange = newDate => {
+    onChange({
+      startDate: newDate,
+      endDate: null,
+    });
+  };
+  return <DatePicker value={value.startDate} onChange={handleChange} {...rest} />;
+}
+
+RangedDatePicker.propTypes = {
+  value: PropTypes.shape({
+    startDate: PropTypes.string.isRequired,
+    // endDate: null  -- not supported by propTypes :(
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 /**
  * Like `FinalField` but for a `DatePicker`.
  */
-export function FinalDatePicker({name, ...rest}) {
+export function FinalDatePicker({name, asRange, ...rest}) {
+  const getRealVal = val => (asRange ? val.startDate : val);
   const validDate = val =>
-    val === INVALID ? Translate.string('The entered date is not valid.') : undefined;
+    getRealVal(val) === INVALID ? Translate.string('The entered date is not valid.') : undefined;
   const validators = [validDate];
   if (rest.min) {
     validators.push(val =>
-      val < rest.min
+      getRealVal(val) < rest.min
         ? Translate.string('The entered date cannot be earlier than {min}.', {
             min: moment(rest.min).format('L'),
           })
@@ -127,7 +120,7 @@ export function FinalDatePicker({name, ...rest}) {
   }
   if (rest.max) {
     validators.push(val =>
-      val > rest.max
+      getRealVal(val) > rest.max
         ? Translate.string('The entered date cannot be later than {max}.', {
             max: moment(rest.max).format('L'),
           })
@@ -138,7 +131,12 @@ export function FinalDatePicker({name, ...rest}) {
     validators.push(rest.validate);
   }
   return (
-    <FinalField name={name} component={DatePicker} {...rest} validate={v.chain(...validators)} />
+    <FinalField
+      name={name}
+      component={asRange ? RangedDatePicker : DatePicker}
+      {...rest}
+      validate={v.chain(...validators)}
+    />
   );
 }
 
@@ -146,9 +144,11 @@ FinalDatePicker.propTypes = {
   name: PropTypes.string.isRequired,
   min: PropTypes.string,
   max: PropTypes.string,
+  asRange: PropTypes.bool,
 };
 
 FinalDatePicker.defaultProps = {
   min: undefined,
   max: undefined,
+  asRange: false,
 };
