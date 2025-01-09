@@ -8,7 +8,7 @@
 from fnmatch import fnmatch
 
 from flask import session
-from wtforms import HiddenField
+from wtforms import BooleanField, HiddenField
 from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
@@ -18,7 +18,8 @@ from indico.modules.core.captcha import WTFCaptchaField
 from indico.modules.users import User, user_management_settings
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.validators import ConfirmPassword, SecurePassword
+from indico.web.forms.validators import ConfirmPassword, HiddenUnless, SecurePassword
+from indico.web.forms.widgets import SwitchWidget
 
 
 def _tolower(s):
@@ -69,6 +70,9 @@ class EditLocalIdentityForm(IndicoForm):
                                  render_kw={'autocomplete': 'new-password'})
     confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')],
                                          render_kw={'autocomplete': 'new-password'})
+    force_logout = BooleanField(_('Logout of other devices'), [HiddenUnless('new_password')], widget=SwitchWidget(),
+                                description=_('This will log you out of all other devices and sessions '
+                                              'where you are currently logged in.'))
 
     def __init__(self, *args, **kwargs):
         self.identity = kwargs.pop('identity', None)
@@ -151,3 +155,6 @@ class ResetPasswordForm(IndicoForm):
     password = PasswordField(_('New password'), [DataRequired(), SecurePassword('set-user-password',
                                                                                 username_field='username')])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+    force_logout = BooleanField(_('Logout of other devices'), widget=SwitchWidget(), 
+                                description=_('This will log you out of all other devices and sessions '
+                                              'where you are currently logged in.'))

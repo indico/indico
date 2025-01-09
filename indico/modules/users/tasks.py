@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime
+
 from celery.schedules import crontab
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -14,6 +16,7 @@ from indico.modules.users import logger
 from indico.modules.users.export import export_user_data as _export_user_data
 from indico.modules.users.export import get_old_requests
 from indico.modules.users.models.export import DataExportRequestState
+from indico.modules.users.models.sessions import UserSession
 from indico.modules.users.models.users import ProfilePictureSource, User
 from indico.modules.users.util import get_gravatar_for_user, set_user_avatar
 from indico.util.iterables import committing_iterator
@@ -69,4 +72,11 @@ def user_data_export_cleanup(days=30):
         request.state = DataExportRequestState.expired
         if request.file:
             request.file.claimed = False
+    db.session.commit()
+
+
+@celery.periodic_task(name='delete_user_sessions', run_every=crontab(minute='0'))
+def delete_user_sessions():
+    """Delete expired user sessions from postgres."""
+    UserSession.query.filter(UserSession.ttl < datetime.now()).delete()
     db.session.commit()

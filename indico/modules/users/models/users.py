@@ -492,6 +492,7 @@ class User(PersonMixin, db.Model):
     # - reservations (Reservation.created_by_user)
     # - reservations_booked_for (Reservation.booked_for_user)
     # - review_comments (PaperReviewComment.user)
+    # - sessions (UserSession.user)
     # - static_sites (StaticSite.creator)
     # - survey_submissions (SurveySubmission.user)
     # - vc_rooms (VCRoom.created_by_user)
