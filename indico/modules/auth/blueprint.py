@@ -7,8 +7,9 @@
 
 from flask import request
 
-from indico.modules.auth.controllers import (RHAccounts, RHAdminImpersonate, RHLinkAccount, RHLogin, RHLoginForm,
-                                             RHLogout, RHRegister, RHRemoveAccount, RHResetPassword)
+from indico.modules.auth.controllers import (RHAccounts, RHAdminImpersonate, RHCreateLocalIdentity, RHLinkAccount,
+                                             RHLogin, RHLoginForm, RHLogout, RHRegister, RHRemoveAccount,
+                                             RHResetPassword)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -26,6 +27,7 @@ _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), 
 _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/reset-password/', 'resetpass', RHResetPassword, methods=('GET', 'POST'))
+_bp.add_url_rule('/create-local-account/', 'create_local_identity', RHCreateLocalIdentity, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/admin/users/impersonate', 'admin_impersonate', RHAdminImpersonate, methods=('POST',))
 
