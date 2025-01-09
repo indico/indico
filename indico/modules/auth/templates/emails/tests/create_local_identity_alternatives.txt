@@ -1,0 +1,18 @@
+Dear Guinea,
+
+You requested a password reset for your Indico account.
+
+Currently there is no username/password set, but you can use the link below
+(within an hour) to set one:
+
+<link>
+
+You also have the following alternative login options configured on your account, which
+you can use instead:
+
+- SSO "foo.bar" (last used: 09/01/2025, 13:37)
+- Something "foo@bar" (last used: 24/12/2024, 12:00)
+
+--
+Indico :: Email Notifier
+http://localhost/
