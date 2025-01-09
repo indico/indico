@@ -118,10 +118,7 @@ def test_service_handle_custom_action(dummy_editable, dummy_editing_revision, du
     )
     assert not dummy_editing_revision.tags
     assert not dummy_editing_revision.comments
-    rv = service_handle_custom_action(
-        dummy_editable, dummy_editing_revision, dummy_user,
-        {'name': 'foobar_action', 'title': 'Foobar Action'},
-    )
+    rv = service_handle_custom_action(dummy_editable, dummy_editing_revision, dummy_user, 'foobar')
     req_payload = json.loads(resp.calls[0].request.body)
     _assert_yaml_snapshot(snapshot, req_payload, 'service_custom_action.yml')
     assert len(dummy_editing_revision.tags) == 1

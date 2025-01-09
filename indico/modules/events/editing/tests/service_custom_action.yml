@@ -1,6 +1,4 @@
-action:
-  name: foobar_action
-  title: Foobar Action
+action: foobar
 endpoints:
   file_upload: http://localhost/event/0/api/contributions/420/editing/paper/upload
   revisions:
