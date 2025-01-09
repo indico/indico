@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import hashlib
+import re
 import sys
 from datetime import datetime
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
@@ -127,7 +128,7 @@ class ExpectedError(ImATeapot):
         self.data = dict(data, message=message)
 
 
-def _format_request_data(data, hide_passwords=False):
+def _format_request_data(data, *, hide_passwords=False, strip_session_cookie=False):
     if not hasattr(data, 'lists'):
         data = ((k, [v]) for k, v in data.items())
     else:
@@ -136,6 +137,8 @@ def _format_request_data(data, hide_passwords=False):
     for key, values in data:
         if hide_passwords and 'password' in key:
             values = [v if not v else f'<{len(v)} chars hidden>' for v in values]
+        if strip_session_cookie and key.lower() == 'cookie':
+            values = [re.sub(r'(indico_session)=[a-f0-9-]+', r'\1=<redacted>', v) for v in values]
         rv[key] = values if len(values) != 1 else values[0]
     return rv
 
@@ -184,7 +187,7 @@ def get_request_info(hide_passwords=True):
         'data': {
             'url': _format_request_data(request.view_args) if request.view_args is not None else None,
             **request_data,
-            'headers': _format_request_data(request.headers, False),
+            'headers': _format_request_data(request.headers, strip_session_cookie=True),
         }
     }
 
