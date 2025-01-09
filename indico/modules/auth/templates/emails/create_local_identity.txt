@@ -9,7 +9,7 @@
 {%- endblock %}
 
 {% block body -%}
-{% trans %}We heard that you forgot your Indico username or password.{% endtrans %}
+{% trans %}We heard that you forgot your Indico password.{% endtrans %}
 
 {% trans %}We found an Indico account, but it has no username/password set.{% endtrans %}
 {% trans %}To set one, simply use the following link within an hour:{% endtrans %}
