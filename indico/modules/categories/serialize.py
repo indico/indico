@@ -14,6 +14,7 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.ical import events_to_ical
+from indico.modules.events.settings import event_contact_settings
 from indico.util.string import sanitize_html
 
 
@@ -52,6 +53,8 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     if event_filter_fn:
         it = filter(event_filter_fn, it)
     events = list(it)
+    # avoid query spam from accessing contact names/emails
+    event_contact_settings.preload_bulk({e.id for e in events})
     # make sure the parent categories are in sqlalchemy's identity cache.
     # this avoids query spam from `protection_parent` lookups
     _parent_categs = (Category._get_chain_query(Category.id.in_({e.category_id for e in events}))  # noqa: F841,RUF100
