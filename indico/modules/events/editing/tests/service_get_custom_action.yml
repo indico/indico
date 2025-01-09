@@ -1,0 +1,32 @@
+revision:
+  comment: ''
+  comment_html: ''
+  comments: []
+  confirm_url: null
+  create_comment_url: /event/0/api/contributions/420/editing/paper/420/comments/
+  created_dt: <timestamp>
+  custom_action_url: /event/0/api/contributions/420/editing/paper/420/custom-action
+  custom_actions: []
+  download_files_url: /event/0/contributions/420/editing/paper/420/files.zip
+  files: []
+  id: <id>
+  is_editor_revision: true
+  is_undone: false
+  modified_dt: null
+  review_url: /event/0/api/contributions/420/editing/paper/420/review
+  tags: []
+  type:
+    name: acceptance
+  user:
+    avatar_url: /user/1337/picture-default/signature
+    full_name: Guinea Pig
+    id: <id>
+    identifier: User:1337
+user:
+  editor: false
+  email: 1337@example.test
+  full_name: Guinea Pig
+  id: <id>
+  manager: false
+  roles: []
+  submitter: false

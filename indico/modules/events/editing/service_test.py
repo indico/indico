@@ -7,6 +7,7 @@
 
 import json
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 from itsdangerous import URLSafeSerializer
@@ -40,6 +41,26 @@ def _assert_yaml_snapshot(snapshot, data, name):
     assert_yaml_snapshot(snapshot, data, name, strip_dynamic_data=True)
 
 
+def test_service_handle_enabled(dummy_event, mocked_responses, snapshot):
+    from indico.modules.events.editing.service import service_handle_enabled
+    resp = mocked_responses.put(f'{MOCK_SVC}/event/dummy')
+    service_handle_enabled(dummy_event)
+    req_payload = json.loads(resp.calls[0].request.body)
+    _assert_yaml_snapshot(snapshot, req_payload, 'service_enabled.yml')
+
+
+def test_service_handle_disconnected(dummy_event, mocked_responses):
+    from indico.modules.events.editing.service import service_handle_disconnected
+    mocked_responses.delete(f'{MOCK_SVC}/event/dummy')
+    service_handle_disconnected(dummy_event)
+
+
+def test_service_get_status(dummy_event, mocked_responses):
+    from indico.modules.events.editing.service import service_get_status
+    mocked_responses.get(f'{MOCK_SVC}/event/dummy', json={})
+    service_get_status(dummy_event)
+
+
 @pytest.mark.parametrize('set_ready_for_review', (False, True))
 def test_service_handle_new_editable(dummy_editable, dummy_user, mocked_responses, snapshot, set_ready_for_review,
                                      dummy_editing_revision):
@@ -53,3 +74,50 @@ def test_service_handle_new_editable(dummy_editable, dummy_user, mocked_response
         assert dummy_editing_revision.type == RevisionType.ready_for_review
     else:
         assert dummy_editing_revision.type != RevisionType.ready_for_review
+
+
+def test_service_handle_review_editable(dummy_editable, dummy_user, dummy_editing_revision, mocked_responses, snapshot):
+    from indico.modules.events.editing.schemas import EditingReviewAction
+    from indico.modules.events.editing.service import service_handle_review_editable
+    mock = Mock()
+    resp = mocked_responses.post(f'{MOCK_SVC}/event/dummy/editable/paper/420/420', json={'comment': 'foobar'})
+    service_handle_review_editable(dummy_editable, dummy_user, EditingReviewAction.accept, mock, dummy_editing_revision)
+    req_payload = json.loads(resp.calls[0].request.body)
+    _assert_yaml_snapshot(snapshot, req_payload, 'service_review_editable.yml')
+    assert mock.comment == 'foobar'
+
+
+def test_service_handle_delete_editable(dummy_editable, mocked_responses, snapshot):
+    from indico.modules.events.editing.service import service_handle_delete_editable
+    resp = mocked_responses.delete(f'{MOCK_SVC}/event/dummy/editable/paper/420')
+    service_handle_delete_editable(dummy_editable)
+    _assert_yaml_snapshot(snapshot, resp.calls[0].request.body, 'service_delete_editable.yml')
+
+
+def test_service_get_custom_action(dummy_editable, dummy_editing_revision, dummy_user, mocked_responses, snapshot):
+    from indico.modules.events.editing.service import service_get_custom_actions
+    resp = mocked_responses.post(f'{MOCK_SVC}/event/dummy/editable/paper/420/420/actions', json={})
+    service_get_custom_actions(dummy_editable, dummy_editing_revision, dummy_user)
+    req_payload = json.loads(resp.calls[0].request.body)
+    _assert_yaml_snapshot(snapshot, req_payload, 'service_get_custom_action.yml')
+
+
+@pytest.mark.usefixtures('request_context')
+def test_service_handle_custom_action(dummy_editable, dummy_editing_revision, dummy_user, mocked_responses, snapshot):
+    from indico.modules.events.editing.service import service_handle_custom_action
+    resp = mocked_responses.post(
+        f'{MOCK_SVC}/event/dummy/editable/paper/420/420/action',
+        json={
+            'publish': True,
+            'comments': [{'text': 'foobar'}],
+            'tags': [1],
+            'redirect': 'https://foo.bar',
+            'reset': False
+        }
+    )
+    service_handle_custom_action(
+        dummy_editable, dummy_editing_revision, dummy_user,
+        {'name': 'foobar_action', 'title': 'Foobar Action'},
+    )
+    req_payload = json.loads(resp.calls[0].request.body)
+    _assert_yaml_snapshot(snapshot, req_payload, 'service_custom_action.yml')
