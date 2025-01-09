@@ -785,8 +785,18 @@ class RHResetPassword(RH):
                                    {'user': user, 'username': identity.identifier},
                                    data={'id': identity.id, 'hash': crc32(identity.password_hash)})
             else:
+                alternatives = []
+                for identity in user.external_identities:
+                    provider = multipass.identity_providers.get(identity.provider)
+                    if not provider or not identity.last_login_dt:
+                        continue
+                    alternatives.append({
+                        'name': provider.title,
+                        'last_login_dt': identity.last_login_dt,
+                    })
                 _send_confirmation(form.email.data, 'create-local-identity', '.create_local_identity',
-                                   'auth/emails/create_local_identity.txt', {'user': user}, data={'id': user.id})
+                                   'auth/emails/create_local_identity.txt',
+                                   {'user': user, 'alternatives': alternatives}, data={'id': user.id})
             session['resetpass_email_sent'] = True
             logger.info('Password reset requested for user %s', user)
             return redirect(url_for('.resetpass'))
