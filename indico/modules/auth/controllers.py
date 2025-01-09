@@ -845,7 +845,7 @@ class RHCreateLocalIdentity(RH):
             # We usually come here from a multipass login page so we should have a target url
             return multipass.redirect_success()
 
-        return WPAuth.render_template('create_local_identity.html', form=form)
+        return WPAuth.render_template('create_local_identity.html', form=form, user=user)
 
 
 class RHAdminImpersonate(RHAdminBase):
