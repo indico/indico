@@ -97,6 +97,7 @@
         {% set disabled_sections = regform.disabled_sections|selectattr('available_fields')|list %}
         {% if disabled_sections %}
             <h1 class="disabled-caption">
+                {# i18n: Refers to sections in registration forms #}
                 {%- trans %}Disabled sections{% endtrans -%}
                 <a class="button icon-next js-toggle-disabled"
                    title="{% trans %}Click to show/hide disabled sections{% endtrans %}"></a>
