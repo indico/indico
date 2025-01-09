@@ -98,7 +98,7 @@ def export_event(event_or_category, target_file, *, keep_uuids=False, use_pickle
     """Export the specified event/category with all its data to a file.
 
     :param event_or_category: the `Event` to export, or a `Category` to export with all
-                              its event and subcategories
+                              its events and subcategories
     :param target_file: a file object to write the data to
     :param keep_uuids: preserve uuids between the exported and imported events
     :param use_pickle: use pickle instead of yaml for serializing
@@ -517,7 +517,7 @@ class EventExporter:
         cat_role = ('category_role',) if self.categories else ()
         if spec['show_progress'] and len(rows) > 1:
             rows_iter = verbose_iterator(rows, len(rows), get_id=attrgetter('id'), get_title=attrgetter('title'),
-                                        print_every=1, print_total_time=True)
+                                         print_every=1, print_total_time=True)
         else:
             rows_iter = iter(rows)
         for row in rows_iter:

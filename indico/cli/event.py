@@ -121,7 +121,7 @@ def export(id, target_file, is_category, keep_uuids, use_pickle, dummy_files, ex
               help='Store the mapping between old and new IDs in this YAML file')
 @click.option('-X', '--files-map', 'files_map_path', type=click.Path(dir_okay=False, path_type=Path),
               help='When importing an export done with `--external-files`, do not actually copy files '
-                   'but write them mapping to the indicated Pickle file to be processed afterwards. This is '
+                   'but write the mapping to the indicated Pickle file to be processed afterwards. This is '
                    'an unsupported feature for very advanced use-cases; you almost certainly do not need '
                    'to use it.')
 def import_(source_file, create_users, create_affiliations, force, verbose, yes, category_id,
