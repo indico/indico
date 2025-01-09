@@ -1,35 +1,12 @@
-{% extends 'emails/base_i18n.txt' %}
+{% extends 'auth/emails/reset_password.txt' %}
 
 {% block subject -%}
     {% trans %}Create local account{% endtrans %}
 {%- endblock %}
 
-{% block header_recipient -%}
-    {% trans name=user.first_name %}Dear {{ name }},{% endtrans %}
-{%- endblock %}
-
-{% block body -%}
-    {%- filter dedent -%}
-        {%- filter wordwrap(width=88, break_long_words=false) -%}
-            {% trans %}
-                You requested a password reset for your Indico account. Currently there is no username/password set,
-                but you can use the link below (within an hour) to set one:
-            {% endtrans %}
-        {%- endfilter %}
-
-        {{ url }}
-
-        {%- if alternatives %}
-
-            {% filter wordwrap(width=88, break_long_words=false) -%}
-                {% trans -%}
-                    You also have the following alternative login options configured on your account, which you can
-                    use instead:
-                {%- endtrans %}
-            {%- endfilter %}
-            {% for alt in alternatives %}
-                - {{ alt.name }} (last used: {{ alt.last_login_dt | format_datetime('short') }})
-            {%- endfor -%}
-        {%- endif -%}
-    {%- endfilter %}
+{% block local_identity_details -%}
+    {%- trans %}
+        Currently there is no username/password set, but you can use the link below (within an hour)
+        to set one:
+    {% endtrans -%}
 {%- endblock %}

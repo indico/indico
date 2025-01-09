@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import math
+from operator import itemgetter
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from flask_multipass import AuthProvider
@@ -778,22 +779,20 @@ class RHResetPassword(RH):
             # The only case where someone would have more than one identity is after a merge.
             # And the worst case that can happen here is that we send the user a different
             # username than the one he expects. But he still gets back into his profile.
-            # Showing a list of usernames would be a little bit more user-friendly but less
-            # secure as we'd expose valid usernames for a specific user to an untrusted person.
+            alternatives = sorted([
+                {
+                    'name': provider.title,
+                    'identifier': identity.identifier,
+                    'last_login_dt': identity.last_login_dt,
+                }
+                for identity in user.external_identities
+                if (provider := multipass.identity_providers.get(identity.provider)) and identity.last_login_dt
+            ], key=itemgetter('last_login_dt'), reverse=True)
             if identity := user.local_identity:
                 _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
-                                   {'user': user, 'username': identity.identifier},
+                                   {'user': user, 'username': identity.identifier, 'alternatives': alternatives},
                                    data={'id': identity.id, 'hash': crc32(identity.password_hash)})
             else:
-                alternatives = []
-                for identity in user.external_identities:
-                    provider = multipass.identity_providers.get(identity.provider)
-                    if not provider or not identity.last_login_dt:
-                        continue
-                    alternatives.append({
-                        'name': provider.title,
-                        'last_login_dt': identity.last_login_dt,
-                    })
                 _send_confirmation(form.email.data, 'create-local-identity', '.create_local_identity',
                                    'auth/emails/create_local_identity.txt',
                                    {'user': user, 'alternatives': alternatives}, data={'id': user.id})
