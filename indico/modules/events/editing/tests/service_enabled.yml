@@ -1,0 +1,18 @@
+endpoints:
+  editable_types: http://localhost/event/0/editing/api/enabled-editable-types
+  file_types:
+    paper:
+      create: http://localhost/event/0/editing/api/paper/file-types
+      list: http://localhost/event/0/editing/api/paper/file-types
+    poster:
+      create: http://localhost/event/0/editing/api/poster/file-types
+      list: http://localhost/event/0/editing/api/poster/file-types
+    slides:
+      create: http://localhost/event/0/editing/api/slides/file-types
+      list: http://localhost/event/0/editing/api/slides/file-types
+  tags:
+    create: http://localhost/event/0/editing/api/tags
+    list: http://localhost/event/0/editing/api/tags
+title: dummy#0
+token: null
+url: http://localhost/event/0/

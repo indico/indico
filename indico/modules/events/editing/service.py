@@ -250,14 +250,14 @@ def service_handle_custom_action(editable, revision, user, action):
 def _get_event_endpoints(event):
     return {
         'tags': {
-            'create': url_for('.api_create_tag', event, _external=True),
-            'list': url_for('.api_tags', event, _external=True)
+            'create': url_for('event_editing.api_create_tag', event, _external=True),
+            'list': url_for('event_editing.api_tags', event, _external=True)
         },
-        'editable_types': url_for('.api_enabled_editable_types', event, _external=True),
+        'editable_types': url_for('event_editing.api_enabled_editable_types', event, _external=True),
         'file_types': {
             t.name: {
-                'create': url_for('.api_add_file_type', event, type=t.name, _external=True),
-                'list': url_for('.api_file_types', event, type=t.name, _external=True),
+                'create': url_for('event_editing.api_add_file_type', event, type=t.name, _external=True),
+                'list': url_for('event_editing.api_file_types', event, type=t.name, _external=True),
             } for t in EditableType
         }
     }
@@ -266,9 +266,9 @@ def _get_event_endpoints(event):
 def _get_revision_endpoints(revision):
     return {
         'revisions': {
-            'details': url_for('.api_editable', revision, _external=True),
-            'replace': url_for('.api_replace_revision', revision, _external=True),
-            'undo': url_for('.api_review_editable', revision, _external=True),
+            'details': url_for('event_editing.api_editable', revision.editable, _external=True),
+            'replace': url_for('event_editing.api_replace_revision', revision, _external=True),
+            'undo': url_for('event_editing.api_review_editable', revision, _external=True),
         },
-        'file_upload': url_for('.api_upload', revision, _external=True)
+        'file_upload': url_for('event_editing.api_upload', revision.editable, _external=True)
     }
