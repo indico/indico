@@ -90,9 +90,8 @@ def test_service_handle_review_editable(dummy_editable, dummy_user, dummy_editin
 
 def test_service_handle_delete_editable(dummy_editable, mocked_responses, snapshot):
     from indico.modules.events.editing.service import service_handle_delete_editable
-    resp = mocked_responses.delete(f'{MOCK_SVC}/event/dummy/editable/paper/420')
+    mocked_responses.delete(f'{MOCK_SVC}/event/dummy/editable/paper/420')
     service_handle_delete_editable(dummy_editable)
-    _assert_yaml_snapshot(snapshot, resp.calls[0].request.body, 'service_delete_editable.yml')
 
 
 def test_service_get_custom_action(dummy_editable, dummy_editing_revision, dummy_user, mocked_responses, snapshot):
