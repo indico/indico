@@ -7,6 +7,7 @@
 
 from warnings import warn
 
+from flask import g
 from flask_multipass import MultipassException
 from werkzeug.utils import cached_property
 
@@ -219,6 +220,12 @@ class _MultipassGroupProxy(GroupProxy):
         if not user:
             return False
         key = f'{self.provider}:{self.name}:{user.id}'
+        # Before hitting the redis-based cache, check if we have it cached on `g`; that way
+        # we greatly improve performance whenever we have a very large amount of membership
+        # checks, e.g. when someone exports a large category to iCal, and the Indico instance
+        # makes heavy use of multipass groups for event/category access control.
+        if (rv := g.setdefault('group_membership_cache', {}).get(key)) is not None:
+            return rv
         rv = group_membership_cache.get(key)
         if rv is not None:
             return rv
@@ -227,6 +234,7 @@ class _MultipassGroupProxy(GroupProxy):
             rv = False
         else:
             rv = any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
+        g.group_membership_cache[key] = rv
         if ttl := self.get_membership_cache_ttl(rv):
             group_membership_cache.set(key, rv, timeout=ttl)
         return rv
