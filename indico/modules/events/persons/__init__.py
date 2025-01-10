@@ -10,6 +10,8 @@ from flask import session
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.users import EnumConverter
+from indico.util.enum import RichIntEnum
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -49,8 +51,15 @@ def _get_placeholders(sender, person, event, contribution=None, abstract=None, r
         yield person_placeholders.ContributionsPlaceholder
 
 
+class CustomPersonsMode(RichIntEnum):
+    __titles__ = [None, _('Always'), _('After search'), _('Never')]
+    always = 1
+    after_search = 2
+    never = 3
+
+
 persons_settings = EventSettingsProxy('persons', {
-    'enforce_user_search': False,  # Prevent submitters from adding people manually before searching
+    'custom_persons_mode': CustomPersonsMode.always,  # Prevent submitters from adding people manually before searching
     'default_search_external': False,  # Enable "Users with no Indico account" by default
     'show_titles': True,  # Whether to show titles for people in the event
-})
+}, converters={'custom_persons_mode': EnumConverter(CustomPersonsMode)})

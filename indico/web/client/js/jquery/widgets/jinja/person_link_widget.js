@@ -19,7 +19,7 @@ import {camelizeKeys} from 'indico/utils/case';
       roles,
       sessionUser,
       hasPredefinedAffiliations,
-      canEnterManually,
+      customPersonsMode,
       requiredPersonFields,
       defaultSearchExternal,
       nameFormat,
@@ -53,7 +53,7 @@ import {camelizeKeys} from 'indico/utils/case';
         roles={roles || []}
         sessionUser={user}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
-        canEnterManually={canEnterManually}
+        customPersonsMode={customPersonsMode}
         requiredPersonFields={requiredPersonFields}
         defaultSearchExternal={defaultSearchExternal}
         nameFormat={nameFormat}
