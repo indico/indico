@@ -18,6 +18,7 @@ Improvements
 - Redact session cookie value in error emails (:pr:`6666`)
 - Allow creating a new local account during password reset if the user does not have
   one yet (:pr:`6688`)
+- Replace the "Disallow custom persons" event setting with "Enforce user search" (:pr:`6689`)
 
 Bugfixes
 ^^^^^^^^
