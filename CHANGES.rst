@@ -18,6 +18,8 @@ Improvements
 - Redact session cookie value in error emails (:pr:`6666`)
 - Allow creating a new local account during password reset if the user does not have
   one yet (:pr:`6688`)
+- Set session cookies with ``SameSite=Lax`` so they are not sent when Indico is embedded
+  in a third-party iframe (:pr:`6690`)
 
 Bugfixes
 ^^^^^^^^
