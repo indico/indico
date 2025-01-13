@@ -144,7 +144,7 @@ export default function PersonDetailsModal({
           <FinalAffiliationField
             label={Translate.string('Affiliation')}
             hasPredefinedAffiliations={hasPredefinedAffiliations}
-            required={requiredPersonFields?.includes('title')}
+            required={requiredPersonFields?.includes('affiliation')}
           />
         )}
       </Form.Group>
