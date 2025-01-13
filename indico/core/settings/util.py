@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from copy import copy
+from operator import attrgetter
 
 
 _not_in_db = object()
@@ -25,6 +26,27 @@ def _preload_settings(cls, proxy, cache, **kwargs):
         cache_key = _get_cache_key(proxy, name, kwargs)
         cache[cache_key] = _not_in_db
     return settings
+
+
+def preload_settings_bulk(proxy, filter_col, filter_values):
+    """Preload settings in bulk for a given SettingsProxy.
+
+    This is useful for scoped settings proxies such as event or category settings
+    when you want to preload settings for many objects in a single query.
+    """
+    settings = proxy.query.filter(filter_col.in_(filter_values)).all()
+    cache = proxy._cache
+    get_kwargs_val = attrgetter(filter_col.key)
+    for setting in settings:
+        kwargs = {filter_col.key: get_kwargs_val(setting)}
+        cache_key = _get_cache_key(proxy, setting.name, kwargs)
+        cache[cache_key] = setting.value
+    # cache missing entries as not in db
+    for name in proxy.defaults:
+        for id in filter_values:
+            kwargs = {filter_col.key: id}
+            cache_key = _get_cache_key(proxy, name, kwargs)
+            cache.setdefault(cache_key, _not_in_db)
 
 
 def get_all_settings(cls, acl_cls, proxy, no_defaults, **kwargs):

@@ -17,7 +17,7 @@ from indico.core import signals
 from indico.core.settings import ACLProxyBase, SettingProperty, SettingsProxyBase
 from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
 from indico.core.settings.proxy import SettingsProxy
-from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
+from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl, preload_settings_bulk
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.util.caching import memoize
 from indico.util.signals import values_from_signal
@@ -184,6 +184,13 @@ class EventSettingsProxy(SettingsProxyBase):
         EventSetting.delete_all(self.module, event_id=event)
         EventSettingPrincipal.delete_all(self.module, event_id=event)
         self._flush_cache()
+
+    def preload_bulk(self, event_ids):
+        """Preload all settings for the specified event ids.
+
+        :param event_ids: List of event IDs
+        """
+        preload_settings_bulk(self, EventSetting.event_id, event_ids)
 
 
 class EventSettingProperty(SettingProperty):

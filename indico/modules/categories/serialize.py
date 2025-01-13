@@ -14,6 +14,7 @@ from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.events.ical import events_to_ical
+from indico.modules.events.settings import event_contact_settings
 from indico.util.string import sanitize_html
 
 
@@ -30,7 +31,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                          Must return the updated query object.
     """
     own_room_strategy = joinedload('own_room')
-    own_room_strategy.load_only('building', 'floor', 'number', 'verbose_name')
+    own_room_strategy.load_only('location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
     own_room_strategy.lazyload('owner')
     own_venue_strategy = joinedload('own_venue').load_only('name')
     query = (Event.query
@@ -38,8 +39,10 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                      ~Event.is_deleted,
                      event_filter)
              .options(load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'description', 'own_venue_name',
-                                'own_room_name', 'protection_mode', 'access_key'),
+                                'own_room_name', 'protection_mode', 'access_key', 'label_id', 'logo_metadata',
+                                'effective_protection_mode'),
                       subqueryload('acl_entries'),
+                      subqueryload('vc_room_associations'),
                       joinedload('person_links'),
                       own_room_strategy,
                       own_venue_strategy)
@@ -50,6 +53,8 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     if event_filter_fn:
         it = filter(event_filter_fn, it)
     events = list(it)
+    # avoid query spam from accessing contact names/emails
+    event_contact_settings.preload_bulk({e.id for e in events})
     # make sure the parent categories are in sqlalchemy's identity cache.
     # this avoids query spam from `protection_parent` lookups
     _parent_categs = (Category._get_chain_query(Category.id.in_({e.category_id for e in events}))  # noqa: F841,RUF100
