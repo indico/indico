@@ -465,9 +465,8 @@ def _indico_command(babel_cmd, python, javascript, react, locale, no_check):
                         err=True)
             sys.exit(1)
     try:
-        # TODO: Re-enable once we actually moved to the merged translation file on transifex
-        # if babel_cmd == 'CompileCatalog':
-        #     split_all_po_files()
+        if babel_cmd == 'CompileCatalog':
+            split_all_po_files()
 
         if python:
             _run_command(babel_cmd, extra=extra)
