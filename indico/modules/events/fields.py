@@ -149,7 +149,7 @@ class PersonLinkListFieldBase(PrincipalListField):
                 raise UserValueError('Manually entered persons are not allowed')
             required_fields = values_from_signal(signals.event.person_required_fields.send(self.get_form()),
                                                  multi_value_types=list)
-            if any(not data.get(field) for field in required_fields):
+            if not all(data.get(field) for field in required_fields):
                 raise UserValueError('Missing required person fields')
         if identifier and identifier.startswith('ExternalUser:'):
             # if the data came from an external user, look up their affiliation if the names still match;

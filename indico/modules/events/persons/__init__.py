@@ -53,13 +53,13 @@ def _get_placeholders(sender, person, event, contribution=None, abstract=None, r
 
 class CustomPersonsMode(RichIntEnum):
     __titles__ = [None, _('Always'), _('After search'), _('Never')]
-    always = 1
-    after_search = 2
-    never = 3
+    always = 1  # Allow submitters to add people manually
+    after_search = 2  # Prevent submitters from adding people manually before searching
+    never = 3  # Disallow submitters from adding people manually
 
 
 persons_settings = EventSettingsProxy('persons', {
-    'custom_persons_mode': CustomPersonsMode.always,  # Prevent submitters from adding people manually before searching
+    'custom_persons_mode': CustomPersonsMode.always,
     'default_search_external': False,  # Enable "Users with no Indico account" by default
     'show_titles': True,  # Whether to show titles for people in the event
 }, converters={'custom_persons_mode': EnumConverter(CustomPersonsMode)})
