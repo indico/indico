@@ -135,7 +135,7 @@ class Storage:
                 tmpfile.flush()
                 yield tmpfile.name
 
-    def save(self, name, content_type, filename, fileobj):  # pragma: no cover
+    def save(self, name, content_type, filename, fileobj, *, dry_run=False):  # pragma: no cover
         """Create a new file in the storage.
 
         This returns a a string identifier which can be used later to
@@ -159,6 +159,11 @@ class Storage:
                          not be used depending on the backend).
         :param fileobj: A file-like object containing the file data as
                         bytes or a bytestring.
+        :param dry_run: Whether to skip actually saving the file and
+                        just return the storage file identifier with
+                        which the file would be saved. When this is
+                        set to True, the returned checksum will
+                        always be ``None``.
         :return: (unicode, unicode) -- A tuple containing a unique
                         identifier for the file and an MD5 checksum.
         """
@@ -206,7 +211,7 @@ class Storage:
 class ReadOnlyStorageMixin:
     """Mixin that makes write operations fail with an error."""
 
-    def save(self, name, content_type, filename, fileobj):
+    def save(self, name, content_type, filename, fileobj, *, dry_run=False):
         raise StorageReadOnlyError('Cannot write to read-only storage')
 
     def delete(self, file_id):
@@ -236,7 +241,9 @@ class FileSystemStorage(Storage):
     def get_local_path(self, file_id):
         yield self._resolve_path(file_id)
 
-    def save(self, name, content_type, filename, fileobj):
+    def save(self, name, content_type, filename, fileobj, *, dry_run=False):
+        if dry_run:
+            return name, None
         try:
             fileobj = self._ensure_fileobj(fileobj)
             filepath = self._resolve_path(name)

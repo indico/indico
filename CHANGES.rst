@@ -20,6 +20,9 @@ Improvements
   one yet (:pr:`6688`)
 - Set session cookies with ``SameSite=Lax`` so they are not sent when Indico is embedded
   in a third-party iframe (:pr:`6690`)
+- Make the event export/import util much more flexible to support exporting whole
+  category subtrees, add better support for dealing with files, and add various things
+  that were not correctly exported before (:pr:`6446`)
 
 Bugfixes
 ^^^^^^^^

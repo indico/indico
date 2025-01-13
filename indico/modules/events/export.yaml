@@ -7,8 +7,13 @@ export:
   #         If set to None (`~`), the column will not be exported. Use this e.g. for
   #         a column containing a UUID or an ID referencing something that is never
   #         exported (such as a category).
+  #         If set to the string `UUID`, the behavior will depend on whether the export
   #         If set to a string, that string is executed as a snippet of Python code.
-  #         It has access to `VALUE`, `MAKE_EVENT_REF()` and `MAKE_ID_REF(target, id)`.
+  #         It has access to `VALUE`, `SKIP`, `KEEP_UUIDS`, `MAKE_ROOT_REF()`,
+  #         `MAKE_ID_REF(target, id)`, `IS_ROOT_OBJECT` and `CATEGORIES`.
+  #         `CATEGORIES` is a set of category IDs that are exported, or empty when just
+  #         exporting an event.
+  #         Returning `SKIP` will skip the column (just like when setting it to None).
   #         The target of `MAKE_ID_REF` is usually specified as `Model.attr`, but can
   #         also reference a column directly (e.g. using the `secondary` notation
   #         described in the `fks` section below). Any value assigned to a variable
@@ -24,28 +29,96 @@ export:
   # - fks_out: A list of outgoing foreign keys. The referenced rows are exported before
   #            each row in the current table that has such a reference.
   # - skipif: A python expression that will be evaluated for each row. If it returns
-  #           true, the row is skipped. The current row is available as `ROW`.
+  #           true, the row is skipped. The current row is available as `ROW`, and
+  #           `CAT_ROLE` is either an empty tuple or a tuple containing the string
+  #           `'category_role'` depending on whether categories are being exported.
   #           Note that no cascading happens, so rows that are referenced somewhere
   #           else may not be skipped.
   # - order: A python expression returning something that can be passed to `order_by()`
   #          or a tuple of such objects.
+  # - python_order: A python snippet (with access to `ROWS`) that receives the list of
+  #                 rows from the database, and can sort them in whatever way. The sorted
+  #                 list of rows must be returned as `rows`. This should only be used in
+  #                 complex cases where using database-level sorting is not sufficient.
   # - allow_duplicates: By default a row may not be referenced more than once (e.g. from
   #                     different locations / FKs).  If this is set to true, this check is
   #                     disabled (but the row is obviously still exported only once).  Only
   #                     use this if you need to reference a table from two places that may
   #                     have overlaps - do not use this without having a case where you get
   #                     an error due to duplicates!
+  # - show_progress: Whether to show a progress indicator while exporting from this table.
+  #                  Can only be used on tables that have `id` and `title` columns.
 
+  Category:
+    show_progress: true
+    cols:
+      parent_id: parent_id = SKIP if IS_ROOT_OBJECT else MAKE_ID_REF(Category.id, VALUE)
+    fks:
+      - Category.parent_id
+      - AttachmentFolder.category_id
+      - CategoryPrincipal.category_id
+      - CategoryLogEntry.category_id
+      - CategoryRole.category_id
+      - CategorySetting.category_id
+      - DesignerTemplate.category_id
+      - ReceiptTemplate.category_id
+      - Event.category_id
+
+  # category roles
+  categories.role_members: {}
+  CategoryRole:
+    allow_duplicates: true
+    fks:
+      - CategoryRole.members.prop.secondary.c.role_id
+    cols:
+      # if we have a category id, we associate that role with the event instead
+      category_id: |
+        if VALUE in CATEGORIES:
+          # keep category assignment
+          category_id = MAKE_ID_REF(Category.id, VALUE)
+        elif CATEGORIES:
+          # assign to top-level exported category
+          category_id = MAKE_ROOT_REF()
+        else:
+          # exporting an event w/o categories --> cannot keep category roles as converting them
+          # to event roles would be too cumbersome for something that's not likely be be needed
+          category_id = SKIP
+
+
+  # category acls
+  CategoryPrincipal:
+    skipif: ROW.type.name not in ('user', 'email', 'category_role')
+    fks_out:
+      - category_role_id
+
+  # misc category stuff
+  CategoryLogEntry:
+    cols:
+      meta: |
+        _mapping = {
+            'receipt_template_id': ReceiptTemplate.id,
+            'attachment_id': Attachment.id,
+        }
+        meta = {}
+        for _k, _v in VALUE.items():
+            if _col := _mapping.get(_k):
+                meta[_k] = (True, MAKE_ID_REF(_col, _v))
+            else:
+                meta[_k] = (False, _v)
+
+  CategorySetting: {}
+
+  # events and anything related to it
   Event:
+    show_progress: true
     cols:
       venue_id: venue_name = Location.get(VALUE).name
       room_id: room_name = Room.get(VALUE).full_name
       series_id: ~
       cloned_from_id: ~
-      category_id: ~
+      category_id: category_id = SKIP if VALUE not in CATEGORIES else MAKE_ID_REF(Category.id, VALUE)
       url_shortcut: ~
-      label_id: ~
-      label_message: ~
+      label_id: label_id = EventLabel.get(VALUE).title
     fks:
       - EventPerson.event_id
       - EventPersonLink.event_id
@@ -75,6 +148,7 @@ export:
       - RegistrationForm.event_id
       - Survey.event_id
       - DesignerTemplate.event_id
+      - ReceiptTemplate.event_id
       - EventPage.event_id
       - MenuEntry.event_id
       - AbstractEmailTemplate.event_id
@@ -136,7 +210,9 @@ export:
   ContributionFieldValue: {}
 
 
-  Track: {}
+  Track:
+    fks:
+      - TrackPrincipal.track_id
 
   TrackGroup: {}
 
@@ -182,53 +258,87 @@ export:
 
   # acls
   EventPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   EventSettingPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role')
+    skipif: ROW.type.name not in ('user', 'event_role', *CAT_ROLE)
     fks_out:
       - event_role_id
+      - category_role_id
 
   ContributionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   SessionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   AttachmentPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   AttachmentFolderPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   TrackPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role')
+    skipif: ROW.type.name not in ('user', 'event_role', *CAT_ROLE)
     fks_out:
       - event_role_id
+      - category_role_id
 
   MenuEntryPrincipal:
-    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form')
+    skipif: ROW.type.name not in ('user', 'event_role', 'registration_form', *CAT_ROLE)
     fks_out:
       - registration_form_id
       - event_role_id
+      - category_role_id
 
   # misc stuff
-  EventLogEntry: {}
+  EventLogEntry:
+    cols:
+      meta: |
+        _mapping = {
+            'abstract_id': Abstract.id,
+            'attachment_id': Attachment.id,
+            'contribution_id': Contribution.id,
+            'editable_id': Editable.id,
+            'editing_file_type_id': EditingFileType.id,
+            'editing_tag_id': EditingTag.id,
+            'folder_id': AttachmentFolder.id,
+            'receipt_template_id': ReceiptTemplate.id,
+            'registration_form_id': RegistrationForm.id,
+            'registration_form_item_id': RegistrationFormItem.id,
+            'registration_id': Registration.id,
+            'reminder_id': EventReminder.id,
+            'session_block_id': SessionBlock.id,
+            'session_id': Session.id,
+            'subcontribution_id': SubContribution.id,
+        }
+        meta = {}
+        for _k, _v in VALUE.items():
+            if _col := _mapping.get(_k):
+                meta[_k] = (True, MAKE_ID_REF(_col, _v))
+            else:
+                meta[_k] = (False, _v)
+
   EventReminder: {}
   EventSetting: {}
   ImageFile: {}
@@ -236,12 +346,35 @@ export:
 
   # abstracts
   Abstract:
-    # duplicate/merged abstracts come last to satisfy duplicate_of_id_only_duplicate
-    # and merged_into_id_only_merged check constraints
-    order: Abstract.state.in_([5, 6]), Abstract.id
+    # abstracts can reference another one as their duplicate, which can also reference yet another abstract.
+    # we need to sort them while preserving that relationship in order to avoid violating check constraints
+    # like duplicate_of_id_only_duplicate and merged_into_id_only_merged.
+    python_order: |
+      def _topological_sort(objects):
+          def _get_ref_id(obj):
+              match obj.state:
+                  case 5:
+                      return obj.merged_into_id
+                  case 6:
+                      return obj.duplicate_of_id
+                  case _:
+                      return None
+
+          from graphlib import TopologicalSorter
+          sorter = TopologicalSorter()
+          obj_by_id = {obj.id: obj for obj in objects}  # Mapping from id to object
+          for obj in objects:
+              ref_id = _get_ref_id(obj)
+              if ref_obj := obj_by_id.get(ref_id):
+                  sorter.add(obj, ref_obj)
+              else:
+                  sorter.add(obj)
+          return list(sorter.static_order())
+
+      rows = _topological_sort(ROWS)
     cols:
       # just track if we had an UUID or not (the code only runs if the column isn't None)
-      uuid: uuid = True
+      uuid: uuid = VALUE if KEEP_UUIDS else True
     fks:
       - AbstractComment.abstract_id
       - AbstractFieldValue.abstract_id
@@ -324,9 +457,33 @@ export:
   event_editing.revision_tags: {}
 
 
+  # receipt/document templates & files
+  ReceiptFile:
+    fks_out:
+      - file_id
+      - template_id
+
+  ReceiptTemplate:
+    allow_duplicates: true
+    cols:
+      # if we have a category id, we associate that template with the event instead
+      category_id: |
+        if VALUE in CATEGORIES:
+          # keep category assignment
+          category_id = MAKE_ID_REF(Category.id, VALUE)
+        elif CATEGORIES:
+          # assign to top-level exported category
+          category_id = MAKE_ROOT_REF()
+        else:
+          # assign to the event (since we're in event export mode when CATEGORIES is empty)
+          event_id = MAKE_ROOT_REF()
+
+
   # registration & payment
   RegistrationForm:
     allow_duplicates: true
+    cols:
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - RegistrationFormItem.registration_form_id
       - Registration.registration_form_id
@@ -336,11 +493,12 @@ export:
 
   Registration:
     cols:
-      uuid: ~
-      ticket_uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
+      ticket_uuid: ticket_uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - RegistrationData.registration_id
       - PaymentTransaction.registration_id
+      - ReceiptFile.registration_id
 
   RegistrationFormItem:
     # top-level items first to satisfy top_level_sections check constraint
@@ -352,7 +510,7 @@ export:
   RegistrationFormFieldData: {}
   RegistrationInvitation:
     cols:
-      uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
 
   PaymentTransaction: {}
 
@@ -360,7 +518,7 @@ export:
   # surveys
   Survey:
     cols:
-      uuid: ~
+      uuid: uuid = VALUE if KEEP_UUIDS else SKIP
     fks:
       - SurveyItem.survey_id
       - SurveySubmission.survey_id
@@ -385,7 +543,16 @@ export:
     allow_duplicates: true
     cols:
       # if we have a category id, we associate that template with the event instead
-      category_id: event_id = MAKE_EVENT_REF()
+      category_id: |
+        if VALUE in CATEGORIES:
+          # keep category assignment
+          category_id = MAKE_ID_REF(Category.id, VALUE)
+        elif CATEGORIES:
+          # assign to top-level exported category
+          category_id = MAKE_ROOT_REF()
+        else:
+          # assign to the event (since we're in event export mode when CATEGORIES is empty)
+          event_id = MAKE_ROOT_REF()
     fks:
       - DesignerImageFile.template_id
     fks_out:
@@ -426,25 +593,52 @@ import:
   # Deferred references and user references are not supported, so make sure
   # to not use this on any column referencing a user or whose referenced
   # row has not been imported yet (ensure such rows are exported earlier).
+  # In cases (usually log entries) where idrefs may never be resolved because
+  # their referenced object has not been exported, a second argument can be passed
+  # to it as the default return value for such cases.
   # The code must assign exactly one value that does not start with an
   # underscore and has the same name as the original column (names can only
   # be changed at export time)
   custom:
+    Event:
+      label_id: |
+        label_id = None
+        if _label := EventLabel.query.filter_by(title=VALUE).first():
+          label_id = _label.id
+
     AbstractEmailTemplate:
       rules: |
         rules = []
         for _rule in VALUE:
             _rule = dict(_rule)
             if 'contribution_type' in _rule:
-                _rule['contribution_type'] = [RESOLVE_ID_REF(_x) for _x in _rule['contribution_type']]
+                _rule['contribution_type'] = [RESOLVE_ID_REF(_x, -1) for _x in _rule['contribution_type']]
             if 'track' in _rule:
-                _rule['track'] = [RESOLVE_ID_REF(_x) for _x in _rule['track']]
+                _rule['track'] = [RESOLVE_ID_REF(_x, -1) for _x in _rule['track']]
             rules.append(_rule)
 
     Abstract:
       uuid: |
         from uuid import uuid4 as _uuid4
-        uuid = str(_uuid4())
+        uuid = str(_uuid4()) if VALUE == True else VALUE
+
+    CategoryLogEntry:
+      meta: |
+        _missing = object()
+        meta = {
+            _k: _id if _is_ref else _v
+            for _k, (_is_ref, _v) in VALUE.items()
+            if not _is_ref or (_id := RESOLVE_ID_REF(_v, None)) is not None
+        }
+
+    EventLogEntry:
+      meta: |
+        _missing = object()
+        meta = {
+            _k: _id if _is_ref else _v
+            for _k, (_is_ref, _v) in VALUE.items()
+            if not _is_ref or (_id := RESOLVE_ID_REF(_v, None)) is not None
+        }
 
 
   # How user references should be handled if the user does not exist.
@@ -466,7 +660,9 @@ import:
     PaperRevision.submitter_id: system
     PaperRevision.judge_id: system
     EditingRevision.user_id: system
+    EditingRevisionComment.user_id: system
     # set to none
+    CategoryLogEntry.user_id: none
     EventPerson.user_id: none
     EventLogEntry.user_id: none
     Registration.user_id: none
@@ -475,12 +671,14 @@ import:
     AbstractEmailLogEntry.user_id: none
     PaperReviewComment.modified_by_id: none
     Editable.editor_id: none
-    EditingRevisionComment.user_id: none
     # skip row
+    CategoryRole.members.prop.secondary.c.user_id: skip
+    CategoryPrincipal.user_id: skip
     EventRole.members.prop.secondary.c.user_id: skip
     EventPrincipal.user_id: skip
     EventSettingPrincipal.user_id: skip
     SessionPrincipal.user_id: skip
+    TrackPrincipal.user_id: skip
     ContributionPrincipal.user_id: skip
     AttachmentPrincipal.user_id: skip
     AttachmentFolderPrincipal.user_id: skip
@@ -502,6 +700,7 @@ import:
   # wrapped in `<...>` so it is highlighted differently in the output.
   # Each column present in the row is also available in the format string.
   verbose:
+    Category: <Category> '{title}'
     Event: <Event> '{title}'
     Session: <Session> '{title}' (#{friendly_id})
     Contribution: <Contribution> '{title}' (#{friendly_id})
@@ -518,3 +717,4 @@ import:
     Survey: <Survey> '{title}'
     SurveySubmission: <Survey submission> (#{friendly_id})
     DesignerTemplate: <Designer template> '{title}' ({type.title})
+    ReceiptTemplate: <Receipt template> '{title}'

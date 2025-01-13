@@ -47,7 +47,8 @@ def prompt_pass(prompt='Password', min_length=8, confirm=True):
 
 
 def terminal_size():
-    h, w, _hp, _wp = struct.unpack(b'HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack(b'HHHH', 0, 0, 0, 0)))
+    stream = sys.stderr
+    h, w, _hp, _wp = struct.unpack(b'HHHH', fcntl.ioctl(stream, termios.TIOCGWINSZ, struct.pack(b'HHHH', 0, 0, 0, 0)))
     return w, h
 
 
@@ -56,7 +57,7 @@ def clear_line():
     print('\r', ' ' * terminal_size()[0], '\r', end='', sep='')
 
 
-def verbose_iterator(iterable, total, get_id, get_title=None, print_every=10, print_total_time=False):
+def verbose_iterator(iterable, total, get_id=None, get_title=None, print_every=10, print_total_time=False):
     """Iterate large iterables verbosely.
 
     :param iterable: An iterable
@@ -88,7 +89,7 @@ def verbose_iterator(iterable, total, get_id, get_title=None, print_every=10, pr
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             minutes, seconds = divmod(remaining_seconds, 60)
             remaining = f'{minutes:02}:{seconds:02}'
-            id_ = get_id(item)
+            id_ = get_id(item) if get_id else ''
             title = get_title(item).replace('\n', ' ') if get_title else ''
             text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)
             _print_text(text)

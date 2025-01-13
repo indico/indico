@@ -1,8 +1,9 @@
-affiliations: {}
-indico_version: 1.3.3.7
-objects:
+!!python/tuple
 - !!python/tuple
   - events.events
+  - !!python/tuple
+    - true
+    - 00000000-0000-4000-8000-000000000000
   - access_key: ''
     address: ''
     created_dt: !!python/tuple
@@ -45,6 +46,9 @@ objects:
     visibility: null
 - !!python/tuple
   - events.sessions
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - address: ''
     background_color: e3f2d3
     code: ''
@@ -71,6 +75,9 @@ objects:
     venue_name: ''
 - !!python/tuple
   - events.contributions
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - abstract_id: null
     address: ''
     board_number: ''
@@ -105,6 +112,9 @@ objects:
     venue_name: ''
 - !!python/tuple
   - events.contributions
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - abstract_id: null
     address: ''
     board_number: ''
@@ -137,6 +147,9 @@ objects:
     venue_name: ''
 - !!python/tuple
   - attachments.folders
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - category_id: null
     contribution_id: null
     description: a dummy folder
@@ -161,6 +174,9 @@ objects:
     title: dummy_folder
 - !!python/tuple
   - attachments.attachments
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - description: ''
     file_id: !!python/tuple
     - idref
@@ -186,6 +202,9 @@ objects:
     - 00000000-0000-4000-8000-00000000000a
 - !!python/tuple
   - attachments.files
+  - !!python/tuple
+    - false
+    - 00000000-0000-4000-8000-000000000000
   - __file__: !!python/tuple
     - file
     - content_type: text/plain
@@ -205,16 +224,3 @@ objects:
     user_id: !!python/tuple
     - userref
     - 00000000-0000-4000-8000-00000000000a
-timestamp: 2017-08-24 15:28:43.011442+00:00
-users:
-  00000000-0000-4000-8000-00000000000a:
-    address: ''
-    affiliation: null
-    all_emails:
-    - 1337@example.test
-    email: 1337@example.test
-    first_name: Guinea
-    last_name: Pig
-    phone: ''
-    title: !!python/object/apply:indico.modules.users.models.users.UserTitle
-    - 0
