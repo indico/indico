@@ -74,6 +74,7 @@ def configure_app(app):
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['TRAP_HTTP_EXCEPTIONS'] = False
     app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
     app.config['RATELIMIT_STORAGE_URI'] = config.REDIS_CACHE_URL or 'memory://'
