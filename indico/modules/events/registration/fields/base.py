@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from copy import deepcopy
+from decimal import Decimal
 
 from marshmallow import fields, validate
 
@@ -202,7 +203,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
         return super().process_field_data(data, old_data, old_versioned_data)
 
     def calculate_price(self, reg_data, versioned_data):
-        return versioned_data.get('price', 0)
+        return Decimal(str(versioned_data.get('price', 0)))
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):

@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from decimal import Decimal
 from uuid import uuid4
 
 from marshmallow import ValidationError, fields, post_load, pre_load, validate
@@ -83,7 +84,7 @@ class AccompanyingPersonsField(RegistrationFormBillableField):
         return max(count, 0)
 
     def calculate_price(self, reg_data, versioned_data):
-        return versioned_data.get('price', 0) * len(reg_data)
+        return Decimal(str(versioned_data.get('price', 0))) * len(reg_data)
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         reg_data = registration_data.data

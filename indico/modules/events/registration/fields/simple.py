@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from datetime import datetime
+from decimal import Decimal
 
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 from PIL import Image
@@ -81,7 +82,7 @@ class NumberField(RegistrationFormBillableField):
                               max=self.form_item.data.get('max_value') or None)
 
     def calculate_price(self, reg_data, versioned_data):
-        return versioned_data.get('price', 0) * int(reg_data or 0)
+        return Decimal(str(versioned_data.get('price', 0) * int(reg_data or 0)))
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         if registration_data.data is None:
@@ -112,7 +113,7 @@ class CheckboxField(RegistrationFormBillableField):
     def calculate_price(self, reg_data, versioned_data):
         if not reg_data:
             return 0
-        return versioned_data.get('price', 0)
+        return Decimal(str(versioned_data.get('price', 0)))
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         return self.friendly_data_mapping[registration_data.data]
@@ -298,7 +299,7 @@ class BooleanField(RegistrationFormBillableField):
         return places_used
 
     def calculate_price(self, reg_data, versioned_data):
-        return versioned_data.get('price', 0) if reg_data else 0
+        return Decimal(str(versioned_data.get('price', 0))) if reg_data else 0
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         return self.friendly_data_mapping[registration_data.data]
