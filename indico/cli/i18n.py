@@ -399,6 +399,9 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
         pot_catalog = read_po(f)
 
     merged_catalog.update(pot_catalog, no_fuzzy_matching=True)
+    # For some reason we receive catalogs marked as fuzzy from transifex, and babel skips
+    # those by default, even though they are perfectly fine to use...
+    merged_catalog.fuzzy = False
 
     with output_po_path.open('wb') as f:
         write_po(f, merged_catalog, ignore_obsolete=True, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
