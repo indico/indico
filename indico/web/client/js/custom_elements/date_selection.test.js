@@ -16,7 +16,7 @@ describe('date_selection', () => {
   };
 
   it('should not apply any selection if trigger is not active', () => {
-    const s = ds.newSelection();
+    const s = ds.newRangeSelection();
 
     const res = ds.select(s, new Date('Apr 24 2024'));
 
@@ -33,7 +33,7 @@ describe('date_selection', () => {
     selectedDate => {
       {
         // left
-        const s = ds.newSelection();
+        const s = ds.newRangeSelection();
 
         const s1 = ds.triggerLeft(s);
         const result = ds.select(s1, selectedDate);
@@ -43,7 +43,7 @@ describe('date_selection', () => {
 
       {
         // right
-        const s = ds.newSelection();
+        const s = ds.newRangeSelection();
 
         const s1 = ds.triggerRight(s);
         const result = ds.select(s1, selectedDate);
@@ -61,7 +61,7 @@ describe('date_selection', () => {
   ])('should not clear the date when the same date is selected twice', selectedDate => {
     {
       // left
-      const s = ds.newSelection();
+      const s = ds.newRangeSelection();
 
       const s1 = ds.triggerLeft(s);
       const {selection: s2} = ds.select(s1, selectedDate);
@@ -72,7 +72,7 @@ describe('date_selection', () => {
 
     {
       // right
-      const s = ds.newSelection();
+      const s = ds.newRangeSelection();
 
       const s1 = ds.triggerRight(s);
       const {selection: s2} = ds.select(s1, selectedDate);
@@ -92,7 +92,7 @@ describe('date_selection', () => {
     selectedDate => {
       {
         // left then right
-        const s = ds.newSelection(selectedDate);
+        const s = ds.newRangeSelection(selectedDate);
 
         const s1 = ds.triggerRight(s);
         const result = ds.select(s1, selectedDate);
@@ -102,7 +102,7 @@ describe('date_selection', () => {
 
       {
         // right then left
-        const s = ds.newSelection(undefined, selectedDate);
+        const s = ds.newRangeSelection(undefined, selectedDate);
 
         const s1 = ds.triggerLeft(s);
         const result = ds.select(s1, selectedDate);
@@ -113,7 +113,7 @@ describe('date_selection', () => {
   );
 
   it('should move the selection if the left date is selected and an earlier date is selected afterwards', () => {
-    const s = ds.newSelection(new Date('Apr 24 2024'));
+    const s = ds.newRangeSelection(new Date('Apr 24 2024'));
 
     const s1 = ds.triggerLeft(s);
     const result = ds.select(s1, new Date('Apr 12 2024'));
@@ -122,7 +122,7 @@ describe('date_selection', () => {
   });
 
   it('should move the selection when left date is selected and left trigger is used again to set the left date', () => {
-    const s = ds.newSelection(new Date('Apr 24 2024'));
+    const s = ds.newRangeSelection(new Date('Apr 24 2024'));
 
     const s1 = ds.triggerLeft(s);
     const result = ds.select(s1, new Date('Apr 29 2024'));
@@ -132,7 +132,7 @@ describe('date_selection', () => {
   });
 
   it('should clear the selection and select left if the right date is selected and a later date is selected afterwards', () => {
-    const s = ds.newSelection(undefined, new Date('Apr 24 2024'));
+    const s = ds.newRangeSelection(undefined, new Date('Apr 24 2024'));
 
     const s1 = ds.triggerRight(s);
     const result = ds.select(s1, new Date('Apr 29 2024'));
@@ -141,7 +141,7 @@ describe('date_selection', () => {
   });
 
   it('should move the selection if the right date is selected and then the right trigger is used to set an earlier date', () => {
-    const s = ds.newSelection(undefined, new Date('Apr 24 2024'));
+    const s = ds.newRangeSelection(undefined, new Date('Apr 24 2024'));
 
     const s1 = ds.triggerRight(s);
     const result = ds.select(s1, new Date('Apr 12 2024'));
@@ -150,7 +150,7 @@ describe('date_selection', () => {
   });
 
   it('should select both ends of the range if the left trigger is used and then two dates are selected where second date is later', () => {
-    const s = ds.newSelection();
+    const s = ds.newRangeSelection();
 
     const s1 = ds.triggerLeft(s);
     const {selection: s2} = ds.select(s1, new Date('Apr 24 2024'));
@@ -160,7 +160,7 @@ describe('date_selection', () => {
   });
 
   it('should select the left date if right date is already selected and left trigger is used to select an earlier date', () => {
-    const s = ds.newSelection(undefined, new Date('Apr 24 2024'));
+    const s = ds.newRangeSelection(undefined, new Date('Apr 24 2024'));
 
     const s1 = ds.triggerLeft(s);
     const result = ds.select(s1, new Date('Apr 12 2024'));
@@ -169,7 +169,7 @@ describe('date_selection', () => {
   });
 
   it('should move the left selection if both ends are selected and left trigger is used to set a date earlier than left', () => {
-    const s = ds.newSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
+    const s = ds.newRangeSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
 
     const s1 = ds.triggerLeft(s);
     const result = ds.select(s1, new Date('Apr 19 2024'));
@@ -179,7 +179,7 @@ describe('date_selection', () => {
   });
 
   it('should clear the right date if both dates are selected and left trigger is used to select a date that is later than the right date', () => {
-    const s = ds.newSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
+    const s = ds.newRangeSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
 
     const s1 = ds.triggerLeft(s);
     const result = ds.select(s1, new Date('May 2 2024'));
@@ -188,7 +188,7 @@ describe('date_selection', () => {
   });
 
   it('should move the right date if both dates are selected and right trigger is used to select a date later than the left', () => {
-    const s = ds.newSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
+    const s = ds.newRangeSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
 
     const s1 = ds.triggerRight(s);
     const result = ds.select(s1, new Date('Apr 27 2024'));
@@ -197,7 +197,7 @@ describe('date_selection', () => {
   });
 
   it('should select the left date and clear the right date if both dates are selected and the right trigger is used to select a date earlier than left', () => {
-    const s = ds.newSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
+    const s = ds.newRangeSelection(new Date('Apr 24 2024'), new Date('Apr 29 2024'));
 
     const s1 = ds.triggerRight(s);
     const result = ds.select(s1, new Date('Apr 12 2024'));
@@ -206,7 +206,7 @@ describe('date_selection', () => {
   });
 
   it('should copy an existing instance', () => {
-    const s = ds.newSelection(new Date('Apr 12 2024'), new Date('Apr 29 2024'), ds.LEFT);
+    const s = ds.newRangeSelection(new Date('Apr 12 2024'), new Date('Apr 29 2024'), ds.LEFT);
 
     const s1 = s.copy();
 
