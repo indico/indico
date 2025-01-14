@@ -16,10 +16,14 @@ logging.yaml
 *.egg-info
 
 # generated stuff
-*.mo
 indico/web/static/dist
 url_map.json
-messages-react.json
+indico/translations/*/LC_MESSAGES/messages.po
+indico/translations/*/LC_MESSAGES/messages-js.po
+indico/translations/*/LC_MESSAGES/messages-react.po
+indico/translations/*/LC_MESSAGES/*.mo
+indico/translations/*/LC_MESSAGES/messages-react.json
+!indico/translations/en_US/LC_MESSAGES/messages.po
 
 # fetched external dependencies
 indico/htdocs/*/lib/
