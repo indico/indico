@@ -193,7 +193,7 @@ customElements.define(
       const leftTriggerLocked = calendarTriggerLeft.disabled;
       const rightTriggerLocked = calendarTriggerRight.disabled;
 
-      let selection = ds.newSelection(
+      let selection = ds.newRangeSelection(
         this.rangeStart,
         this.rangeEnd,
         undefined,
@@ -318,6 +318,42 @@ customElements.define(
 );
 
 customElements.define(
+  'ind-inline-date-picker',
+  class extends CustomElementBase {
+    static attributes = {
+      value: Date,
+    };
+
+    static observedAttributes = ['value'];
+
+    setup() {
+      const indCalendar = this.querySelector('ind-calendar');
+      let selection = ds.newSingleSelection(this.value, false, ds.SELECTION_SINGLE);
+
+      indCalendar.setSelectionPreview(selection);
+      indCalendar.rangeStart = this.value;
+      indCalendar.rangeEnd = this.value;
+
+      indCalendar.addEventListener('x-select', evt => {
+        const result = ds.select(selection, new Date(evt.target.value));
+        selection = result.selection;
+        indCalendar.setSelectionPreview(selection);
+        this.dispatchEvent(
+          new CustomEvent('change', {
+            bubbles: true,
+            detail: {date: selection.date},
+          })
+        );
+      });
+
+      this.addEventListener('x-attrchange.value', () => {
+        indCalendar.rangeStart = indCalendar.rangeEnd = this.value;
+      });
+    }
+  }
+);
+
+customElements.define(
   'ind-inline-date-range-picker',
   class extends CustomElementBase {
     static attributes = {
@@ -329,7 +365,7 @@ customElements.define(
 
     setup() {
       const indCalendar = this.querySelector('ind-calendar');
-      let selection = ds.newSelection(
+      let selection = ds.newRangeSelection(
         this.rangeStart,
         this.rangeEnd,
         undefined,
@@ -427,7 +463,7 @@ class DialogModeController {
         if (this.dialog.open) {
           return;
         }
-        this.options.updateCalendar();
+        this.options.onopen();
         this.dialog.show();
         this.dialog.focus();
         this.dialog.dispatchEvent(new Event('open', {bubbles: true}));
@@ -497,6 +533,8 @@ customElements.define(
       rangeEnd: Date,
     };
 
+    static observedAttributes = ['range-start', 'range-end', 'open'];
+
     constructor() {
       super();
       this.allowableSelectionRange = new OpenDateRange();
@@ -540,7 +578,10 @@ customElements.define(
           calendarDisplayDate = undefined;
           updateCalendar();
         },
-        updateCalendar,
+        onopen: () => {
+          calendarDisplayDate = undefined;
+          updateCalendar();
+        },
       });
       const monthYearGroup = this.querySelector('.month-year');
       const editMonthSelect = monthYearGroup.querySelector('select');
@@ -790,6 +831,8 @@ customElements.define(
       hideDatesFromOtherMonths: Boolean,
     };
 
+    static observedAttributes = ['year', 'month', 'range-start', 'range-end'];
+
     constructor() {
       super();
       this.allowableSelectionRange = new OpenDateRange();
@@ -931,12 +974,6 @@ customElements.define(
           indDateGrid.dispatchEvent(new Event('x-update-grid'));
         });
       }
-    }
-
-    static observedAttributes = ['year', 'month', 'range-start', 'range-end'];
-
-    attributeChangedCallback() {
-      this.dispatchEvent(new Event('x-attrchange'));
     }
 
     makeFocusable(dateString) {

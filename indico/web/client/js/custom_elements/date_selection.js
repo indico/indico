@@ -44,6 +44,7 @@ const keepOpen = updatedSelection => ({selection: updatedSelection, close: false
 
 export const SELECTION_RANGE_WITH_TRIGGERS = 'rangeWithTriggers';
 export const SELECTION_SIMPLE_RANGE = 'simpleRange';
+export const SELECTION_SINGLE = 'single';
 const SELECTION_DEFAULT_STRATEGY = SELECTION_RANGE_WITH_TRIGGERS;
 const SELECTION_STRATEGIES = {
   [SELECTION_RANGE_WITH_TRIGGERS]: (selection, date) => {
@@ -121,6 +122,9 @@ const SELECTION_STRATEGIES = {
         );
     }
   },
+  [SELECTION_SINGLE]: (selection, date) => {
+    return close(selection.copy({date}));
+  },
 };
 
 /**
@@ -129,7 +133,7 @@ const SELECTION_STRATEGIES = {
  * The object is immutable, and each operation creates a new
  * copy.
  */
-export function newSelection(
+export function newRangeSelection(
   left,
   right,
   trigger,
@@ -167,11 +171,39 @@ export function newSelection(
     },
 
     copy({left: newLeft = left, right: newRight = right, trigger: newTrigger = trigger} = {}) {
-      return newSelection(newLeft, newRight, newTrigger, leftLocked, rightLocked, type);
+      return newRangeSelection(newLeft, newRight, newTrigger, leftLocked, rightLocked, type);
     },
 
     toDateRange() {
       return new DateRange(left, right);
+    },
+  });
+}
+
+export function newSingleSelection(date, locked, type = SELECTION_SINGLE) {
+  return Object.freeze({
+    date,
+    locked,
+    type,
+
+    get unlocked() {
+      return !locked;
+    },
+
+    get completed() {
+      return this.getSelectionState() === BOTH;
+    },
+
+    getSelectionState() {
+      return date ? BOTH : NONE;
+    },
+
+    copy({date: newDate = date, locked: newLocked = locked} = {}) {
+      return newSingleSelection(newDate, newLocked, type);
+    },
+
+    toDateRange() {
+      return new DateRange(date, date);
     },
   });
 }
