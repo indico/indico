@@ -323,9 +323,7 @@ function EditableListDisplay({
     ['editor', Translate.string('Editor'), 400],
   ];
 
-  const tagsExist = sortedList.some(
-    x => x.editable && x.editable.tags && x.editable.tags.length > 0
-  );
+  const tagsExist = sortedList.some(x => x.editable?.tags?.length > 0);
   if (tagsExist) {
     columnHeaders.push(['tags', Translate.string('Tags'), 136]);
   }
