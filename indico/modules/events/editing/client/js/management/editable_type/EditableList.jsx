@@ -486,7 +486,7 @@ function EditableListDisplay({
     const row = sortedList[rowIndex];
     const fn = renderFuncs[dataKey];
 
-    return dataKey === 'tags' && row.editable.tags.length > 1 ? (
+    return dataKey === 'tags' && row.editable?.tags?.length > 1 ? (
       <Popup
         content={fn(row[dataKey], row.editable, rowIndex)}
         trigger={
