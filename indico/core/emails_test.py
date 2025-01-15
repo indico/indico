@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -40,6 +40,12 @@ def test_get_actual_sender_address(mocker, sender_email, result):
     core_settings.set('site_title', 'Indico')
     assert get_actual_sender_address(sender_email, set()) == result
     assert get_actual_sender_address(sender_email, {'reply@whatever.com'}) == (result[0], {'reply@whatever.com'})
+
+
+def test_get_actual_sender_address_weird_site_name(mocker):
+    mocker.patch('indico.core.emails.config', MockConfig())
+    core_settings.set('site_title', 'Indico @ Test')
+    assert get_actual_sender_address('', set())[0] == '"Indico @ Test" <noreply@example.com>'
 
 
 @pytest.mark.usefixtures('db')

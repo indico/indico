@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -24,7 +24,8 @@ pytest_plugins = ('indico.testing.fixtures.abstract', 'indico.testing.fixtures.a
                   'indico.testing.fixtures.person', 'indico.testing.fixtures.user', 'indico.testing.fixtures.event',
                   'indico.testing.fixtures.rb', 'indico.testing.fixtures.smtp', 'indico.testing.fixtures.storage',
                   'indico.testing.fixtures.timetable', 'indico.testing.fixtures.util',
-                  'indico.testing.fixtures.session', 'indico.testing.fixtures.receipt')
+                  'indico.testing.fixtures.session', 'indico.testing.fixtures.receipt',
+                  'indico.testing.fixtures.requests')
 
 
 def pytest_configure(config):

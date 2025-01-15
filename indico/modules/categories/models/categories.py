@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -323,6 +323,10 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def url(self):
         return url_for('categories.display', self)
+
+    @property
+    def external_url(self):
+        return url_for('categories.display', self, _external=True)
 
     @hybrid_property
     def is_root(self):

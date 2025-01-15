@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -34,6 +34,7 @@ def app(request):
         'ENABLE_ROOMBOOKING': True,
         'SECRET_KEY': os.urandom(16),
         'SMTP_USE_CELERY': False,
+        'NO_REPLY_EMAIL': 'noreply@example.com',
     }
     return make_app(testing=True, config_override=config_override)
 

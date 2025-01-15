@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -231,6 +231,7 @@ class IndicoSessionInterface(SessionInterface):
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
         secure = self.get_cookie_secure(app)
+        samesite = self.get_cookie_samesite(app)
         refresh_sid = self.should_refresh_sid(app, session)
         if not session and not session.new:
             # empty session, delete it from storage and cookie
@@ -268,5 +269,5 @@ class IndicoSessionInterface(SessionInterface):
         session['_secure'] = request.is_secure
         self.storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
         response.set_cookie(app.session_cookie_name, session.sid, expires=cookie_lifetime, httponly=True,
-                            secure=secure)
+                            secure=secure, samesite=samesite)
         response.vary.add('Cookie')

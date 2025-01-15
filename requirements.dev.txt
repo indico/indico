@@ -87,7 +87,7 @@ itsdangerous==2.2.0
     # via
     #   -c requirements.txt
     #   flask
-jinja2==3.1.4
+jinja2==3.1.5
     # via
     #   -c requirements.txt
     #   flask
@@ -153,6 +153,7 @@ python-dateutil==2.9.0.post0
 pyyaml==6.0.2
     # via
     #   -c requirements.txt
+    #   responses
     #   sphinxcontrib-mermaid
     #   unbeheader
 redis==5.2.1
@@ -163,8 +164,11 @@ requests==2.32.3
     # via
     #   -c requirements.txt
     #   plantweb
+    #   responses
     #   sphinx
-ruff==0.8.2
+responses==0.25.3
+    # via -r requirements.dev.in
+ruff==0.9.0
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
     # via migra
@@ -237,7 +241,8 @@ urllib3==1.26.20
     # via
     #   -c requirements.txt
     #   requests
-uv==0.5.7
+    #   responses
+uv==0.5.16
     # via -r requirements.dev.in
 uvicorn==0.32.1
     # via sphinx-autobuild

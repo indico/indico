@@ -1,0 +1,12 @@
+{% extends 'auth/emails/reset_password.txt' %}
+
+{% block subject -%}
+    {% trans %}Create local account{% endtrans %}
+{%- endblock %}
+
+{% block local_identity_details -%}
+    {%- trans %}
+        Currently there is no username/password set, but you can use the link below (within an hour)
+        to set one:
+    {% endtrans -%}
+{%- endblock %}

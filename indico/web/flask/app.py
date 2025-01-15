@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -74,6 +74,7 @@ def configure_app(app):
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['TRAP_HTTP_EXCEPTIONS'] = False
     app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
     app.config['RATELIMIT_STORAGE_URI'] = config.REDIS_CACHE_URL or 'memory://'

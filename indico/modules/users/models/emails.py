@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2024 CERN
+# Copyright (C) 2002 - 2025 CERN
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
@@ -7,6 +7,7 @@
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
+from indico.util.string import format_repr
 
 
 class UserEmail(db.Model):
@@ -52,7 +53,7 @@ class UserEmail(db.Model):
     # - user (User._all_emails)
 
     def __repr__(self):
-        return f'<UserEmail({self.id}, {self.email}, {self.is_primary})>'
+        return format_repr(self, 'user_id', is_primary=None, is_user_deleted=False, _rawtext=self.email)
 
 
 define_unaccented_lowercase_index(UserEmail.email)

@@ -15,6 +15,14 @@ Improvements
 - Highlight editables in the editable list that have been updated since the last time
   they were viewed (:pr:`6500`)
 - Refresh the looks of the PDF timetable (:issue:`6554`, :pr:`6558`)
+- Redact session cookie value in error emails (:pr:`6666`)
+- Allow creating a new local account during password reset if the user does not have
+  one yet (:pr:`6688`)
+- Set session cookies with ``SameSite=Lax`` so they are not sent when Indico is embedded
+  in a third-party iframe (:pr:`6690`)
+- Make the event export/import util much more flexible to support exporting whole
+  category subtrees, add better support for dealing with files, and add various things
+  that were not correctly exported before (:pr:`6446`)
 
 Bugfixes
 ^^^^^^^^
@@ -24,6 +32,7 @@ Bugfixes
 - Do not fail if a user has an invalid timezone stored in the database (:pr:`6647`)
 - Ensure the event name is correctly encoded to prevent issues with special characters
   in the share event widget (:pr:`6649`)
+- Fix sending emails if site name contains an ``@`` character (:pr:`6687`)
 
 Accessibility
 ^^^^^^^^^^^^^
