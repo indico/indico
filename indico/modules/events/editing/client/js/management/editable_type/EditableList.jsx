@@ -460,8 +460,7 @@ function EditableListDisplay({
   const renderTags = (__, editable) => {
     const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
     return (
-      // <div style={{display: 'flex', flexWrap: 'wrap', gap: '4px'}}>
-      <div>
+      <div style={{display: 'flex', flexWrap: 'nowrap'}}>
         {tags.map(t => {
           return (
             <Label key={t.code} size="small" color={t.color}>
@@ -487,14 +486,17 @@ function EditableListDisplay({
     const row = sortedList[rowIndex];
     const fn = renderFuncs[dataKey];
 
-    return dataKey === 'tags' && row.editable?.tags?.length > 1 ? (
+    return dataKey === 'tags' && row.editable?.tags ? (
       <Popup
+        position="top center"
         content={fn(row[dataKey], row.editable, rowIndex)}
         trigger={
           <div styleName="rowcolumn-tooltip" role="gridcell">
-            <div className="more-indicator">
-              <Icon name="ellipsis horizontal" />
-            </div>
+            {row.editable.tags.length > 1 ? (
+              <div className="more-indicator">
+                <span>...</span>
+              </div>
+            ) : null}
             {fn(row[dataKey], row.editable, rowIndex)}
           </div>
         }
