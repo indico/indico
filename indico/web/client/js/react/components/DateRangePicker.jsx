@@ -37,17 +37,19 @@ export default function DateRangePicker({
   startDisabled,
   endDisabled,
   onChange,
+  onFocus,
+  onBlur,
 }) {
   format ??= moment.localeData().longDateFormat('L');
 
-  if (startDisabled && !value.startDate) {
+  if (startDisabled && !value?.startDate) {
     console.warn('startDisabled is ignored because value.startDate is not specified');
   }
-  if (endDisabled && !value.endDate) {
+  if (endDisabled && !value?.endDate) {
     console.warn('endDisabled is ignored because value.endDate is not specified');
   }
-  const startLocked = disabled || (value.startDate && startDisabled);
-  const endLocked = disabled || (value.endDate && endDisabled);
+  const startLocked = disabled || (value?.startDate && startDisabled);
+  const endLocked = disabled || (value?.endDate && endDisabled);
 
   if (min) {
     rangeStartMin = rangeEndMin = min;
@@ -73,10 +75,17 @@ export default function DateRangePicker({
     });
   }
 
+  const markTouched = () => {
+    if (onFocus && onBlur) {
+      onFocus();
+      onBlur();
+    }
+  };
+
   return (
     <ind-date-range-picker
-      range-start={fromISOLocalDate(value.startDate)?.toDateString() || ''}
-      range-end={fromISOLocalDate(value.endDate)?.toDateString() || ''}
+      range-start={fromISOLocalDate(value?.startDate)?.toDateString() || ''}
+      range-end={fromISOLocalDate(value?.endDate)?.toDateString() || ''}
       range-start-min={rangeStartMin}
       range-start-max={rangeStartMax}
       range-end-min={rangeEndMin}
@@ -93,9 +102,16 @@ export default function DateRangePicker({
             placeholder={format}
             readOnly={readOnly}
             disabled={startLocked}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
         </label>
-        <button type="button" data-calendar-trigger="left" disabled={startLocked}>
+        <button
+          type="button"
+          data-calendar-trigger="left"
+          disabled={startLocked}
+          onClick={markTouched}
+        >
           <Translate as="span">Open a calendar</Translate>
         </button>
         <span className="arrow" />
@@ -107,9 +123,16 @@ export default function DateRangePicker({
             placeholder={format}
             readOnly={readOnly}
             disabled={endLocked}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
         </label>
-        <button type="button" data-calendar-trigger="right" disabled={endLocked}>
+        <button
+          type="button"
+          data-calendar-trigger="right"
+          disabled={endLocked}
+          onClick={markTouched}
+        >
           <Translate as="span">Open a calendar</Translate>
         </button>
 
@@ -133,13 +156,15 @@ export default function DateRangePicker({
 DateRangePicker.propTypes = {
   format: PropTypes.string,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
   readOnly: PropTypes.bool,
   disabled: PropTypes.bool,
   startDisabled: PropTypes.bool,
   endDisabled: PropTypes.bool,
   value: PropTypes.shape({
-    startDate: PropTypes.string.isRequired,
-    endDate: PropTypes.string.isRequired,
+    startDate: PropTypes.string,
+    endDate: PropTypes.string,
   }),
   label: PropTypes.string,
   rangeStartLabel: PropTypes.string.isRequired,
@@ -168,19 +193,22 @@ DateRangePicker.defaultProps = {
   max: '',
 };
 
-function validDate(key, message) {
-  return function(values) {
+function validDate(key, required, invalidMessage, missingMessage) {
+  return values => {
     const value = values[key];
+    if (!value && required) {
+      return missingMessage;
+    }
     if (value !== INVALID) {
       return;
     }
-    return message;
+    return invalidMessage;
   };
 }
 
 function validDateRange(min, max, key, message) {
   const range = new DateRange(min, max);
-  return function(values) {
+  return values => {
     const value = values[key];
     if (!value || value === INVALID) {
       return;
@@ -198,9 +226,16 @@ export function FinalDateRangePicker({name, ...props}) {
   const validators = [
     validDate(
       'startDate',
-      Translate.string('Please enter the start date using the specified format')
+      props.required,
+      Translate.string('Please enter the start date using the specified format'),
+      Translate.string('Please provide the start date')
     ),
-    validDate('endDate', Translate.string('Please enter the end date using the specified format')),
+    validDate(
+      'endDate',
+      props.required,
+      Translate.string('Please enter the end date using the specified format'),
+      Translate.string('Please provide the end date')
+    ),
   ];
 
   if (props.rangeStartMin && props.rangeStartMax) {
@@ -236,7 +271,11 @@ export function FinalDateRangePicker({name, ...props}) {
       name={name}
       {...props}
       component={DateRangePicker}
-      validate={v.chain(...validators)}
+      validate={val => {
+        const res = v.chain(...validators)(val);
+        console.log('validating', val, res);
+        return res;
+      }}
     />
   );
 }
@@ -244,6 +283,7 @@ export function FinalDateRangePicker({name, ...props}) {
 FinalDateRangePicker.propTypes = {
   name: PropTypes.string.isRequired,
   format: PropTypes.string,
+  required: PropTypes.bool,
   rangeStartMin: PropTypes.string,
   rangeStartMax: PropTypes.string,
   rangeEndMin: PropTypes.string,
@@ -254,6 +294,7 @@ FinalDateRangePicker.propTypes = {
 
 FinalDateRangePicker.defaultProps = {
   format: undefined,
+  required: false,
   rangeStartMin: '',
   rangeStartMax: '',
   rangeEndMin: '',
