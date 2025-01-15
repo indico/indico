@@ -38,7 +38,6 @@ export default function Timetable() {
 
   // const draggedContribs = useSelector(selectors.getDraggedContribs);
   const [date, setDate] = useState(eventStartDt);
-  const [placeholderEntry, setPlaceholderEntry] = useState(null);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
 
   let selectedEntry = currentDateEntries.find(e => e.id === selectedId);
@@ -69,7 +68,11 @@ export default function Timetable() {
           ? Object.values(entries)
               .flat()
               .map(e => e.startDt.add(e.duration, 'minutes').hour())
-          : currentDateEntries.map(e => e.startDt.add(e.duration, 'minutes').hour()))
+          : currentDateEntries.map(e =>
+              moment(e.startDt)
+                .add(e.duration, 'minutes')
+                .hour()
+            ))
       );
 
   useEffect(() => {

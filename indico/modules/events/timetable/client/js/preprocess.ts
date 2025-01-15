@@ -6,9 +6,33 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 
-import {ChildEntry, DayEntries, Session} from './types';
+import {ChildEntry, DayEntries, Session, UnscheduledContrib} from './types';
+
+interface SchemaDate {
+  date: string;
+  time: string;
+  tz: string;
+}
+
+interface SchemaEntry {
+  id: string;
+  title: string;
+  textColor?: string;
+  color?: string;
+}
+
+interface SchemaSession extends SchemaEntry {
+  isPoster: boolean;
+}
+
+interface SchemaBlock extends SchemaEntry {
+  startDate: SchemaDate;
+  duration: number;
+  sessionId?: number;
+  entries?: Record<string, SchemaEntry>;
+}
 
 const entryTypeMapping = {
   s: 'block',
@@ -16,7 +40,9 @@ const entryTypeMapping = {
   b: 'break',
 };
 
-export function preprocessSessionData(data: Record<string, any>): Record<number, Session> {
+export function preprocessSessionData(
+  data: Record<string, SchemaSession>
+): Record<number, Session> {
   return Object.fromEntries(
     Object.entries(data).map(([, s]) => [
       s.id,
@@ -29,13 +55,12 @@ export function preprocessSessionData(data: Record<string, any>): Record<number,
   );
 }
 
-const dateToMoment = (dt: {date: string; time: string}) =>
-  moment.tz(`${dt.date} ${dt.time}`, dt.tz);
+const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.tz);
 
 export function preprocessTimetableEntries(
-  data: any,
-  eventInfo: any
-): {dayEntries: DayEntries; unscheduled: any[]} {
+  data: Record<string, Record<string, SchemaBlock>>,
+  eventInfo: {contributions?: {uniqueId: number; title: string; duration: number}[]}
+): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   // console.log(data);
   // console.log('einfo', eventInfo);
   const dayEntries = {};
@@ -50,7 +75,7 @@ export function preprocessTimetableEntries(
         type,
         id,
         title: entry.title,
-        startDt: moment(`${entry.startDate.date} ${entry.startDate.time}`),
+        startDt: dateToMoment(entry.startDate),
         duration: entry.duration,
         x: 0,
         y: 0,
@@ -69,44 +94,41 @@ export function preprocessTimetableEntries(
       }
 
       if (type === 'block') {
-        const children = Object.entries(entry.entries).map(([_id, _childEntry]) => {
-          const childId = parseInt(_id.slice(1), 10);
+        const children = Object.entries(entry.entries).map(
+          ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
+            const childEntry: ChildEntry = {
+              type: entryTypeMapping[childId[0]],
+              id: parseInt(childId.slice(1), 10),
+              title,
+              startDt: dateToMoment(startDate),
+              duration,
+              parentId: dayEntries[day].at(-1).id,
+              x: 0,
+              y: 0,
+              width: 0,
+              column: 0,
+              maxColumn: 0,
+            };
 
-          const childEntry: ChildEntry = {
-            type: entryTypeMapping[_id[0]],
-            id: childId,
-            title: _childEntry.title,
-            startDt: dateToMoment(_childEntry.startDate),
-            duration: _childEntry.duration,
-            parentId: dayEntries[day].at(-1).id,
-            x: 0,
-            y: 0,
-            width: 0,
-            column: 0,
-            maxColumn: 0,
-          };
+            if (entry.sessionId) {
+              childEntry.sessionId = entry.sessionId;
+            }
 
-          if (entry.sessionId) {
-            childEntry.sessionId = entry.sessionId;
+            return childEntry;
           }
-
-          return childEntry;
-        });
+        );
         dayEntries[day].at(-1).children = children;
       }
     }
   }
 
-  const unscheduled = (eventInfo.contributions || []).map(c => ({
-    type: 'contrib',
-    id: c.uniqueId,
-    title: c.title,
-    duration: c.duration,
-    x: 0,
-    y: 0,
-    width: 0,
-    column: 0,
-    maxColumn: 0,
-  }));
-  return {dayEntries, unscheduled};
+  return {
+    dayEntries,
+    unscheduled: (eventInfo.contributions || []).map(c => ({
+      type: 'contrib',
+      id: c.uniqueId,
+      title: c.title,
+      duration: c.duration,
+    })),
+  };
 }

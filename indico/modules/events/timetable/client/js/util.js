@@ -18,12 +18,12 @@ export const entryColorSchema = PropTypes.shape({
 export const formatTitle = (title, code) => (code ? `${title} (${code})` : title);
 
 export const entryTypes = {
-  session: {
+  block: {
     title: Translate.string('Session block'),
     icon: 'calendar alternate outline',
     formatTitle: e => `${formatTitle(e.title, e.code)}: ${formatTitle(e.slotTitle, e.sessionCode)}`,
   },
-  contribution: {
+  contrib: {
     title: Translate.string('Contribution'),
     icon: 'file alternate outline',
     formatTitle: e => formatTitle(e.title, e.code),
@@ -33,11 +33,10 @@ export const entryTypes = {
     icon: 'coffee',
     formatTitle: e => formatTitle(e.title, e.code),
   },
-  placeholder: {},
 };
 
 export const entrySchema = PropTypes.shape({
-  id: PropTypes.string.isRequired,
+  id: PropTypes.number.isRequired,
   type: PropTypes.oneOf(Object.keys(entryTypes)).isRequired,
   title: PropTypes.string, // required for all types except placeholder
   slotTitle: PropTypes.string, // only for sessions (required then)
