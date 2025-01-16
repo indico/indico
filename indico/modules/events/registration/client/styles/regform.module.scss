@@ -72,6 +72,16 @@
     );
   }
 
+  &.management-hidden {
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(200, 200, 200, 0.5),
+      rgba(200, 200, 200, 0.5) 10px,
+      rgba(240, 240, 240, 0.7) 10px,
+      rgba(240, 240, 240, 0.7) 20px
+    );
+  }
+
   legend {
     // XXX: Copy styles from Semantic UI
     margin: 0 0 0.28571429rem 0;
