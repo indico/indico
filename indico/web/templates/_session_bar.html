@@ -68,10 +68,12 @@
                     <div>
                         <h2 id="tz-selector">{% trans %}Choose timezone{% endtrans %}</h2>
 
-                        <div id="tz-profile-setting">
-                            <span>{% trans %}Your profile timezone:{% endtrans %}</span>
-                            <span>{{ profile_timezone }}</span>
-                        </div>
+                        {% if profile_timezone %}
+                            <div id="tz-profile-setting">
+                                <span>{% trans %}Your profile timezone:{% endtrans %}</span>
+                                <span>{{ profile_timezone }}</span>
+                            </div>
+                        {% endif %}
 
                         <form id="tz-mode-form" action="{{ url_for('core.change_tz') }}" method="post">
                             <fieldset id="tz-modes">
