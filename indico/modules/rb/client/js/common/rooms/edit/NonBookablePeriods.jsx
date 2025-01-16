@@ -9,10 +9,9 @@ import moment from 'moment';
 import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {ANCHOR_RIGHT} from 'react-dates/constants';
 import {Icon, Button} from 'semantic-ui-react';
 
-import {DateRangePicker} from 'indico/react/components';
+import {DateRangePicker2} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
@@ -50,9 +49,7 @@ export default class NonBookablePeriods extends React.Component {
     const {value, onChange} = this.props;
     onChange(
       value.map((v, vIndex) =>
-        vIndex === index
-          ? {...v, start_dt: serializeDate(startDate), end_dt: serializeDate(endDate)}
-          : v
+        vIndex === index ? {...v, start_dt: startDate, end_dt: endDate} : v
       )
     );
     this.setTouched();
@@ -71,13 +68,10 @@ export default class NonBookablePeriods extends React.Component {
     const key = nanoid();
     return (
       <div key={key} className="flex-container">
-        <DateRangePicker
-          small
-          minimumNights={0}
-          anchorDirection={ANCHOR_RIGHT}
-          startDate={startDt === null ? null : moment(startDt)}
-          endDate={endDt === null ? null : moment(endDt)}
-          onDatesChange={dates => this.handleDatesChange(dates, index)}
+        <DateRangePicker2
+          value={{startDate: startDt, endDate: endDt}}
+          onChange={dates => this.handleDatesChange(dates, index)}
+          min={serializeDate(moment())}
         />
         <Icon
           floated="right"
