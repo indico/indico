@@ -13,7 +13,7 @@ import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {Button, Form, Select} from 'semantic-ui-react';
 
-import {DatePicker, DateRangePicker2} from 'indico/react/components';
+import {DatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {
   serializeDate,
@@ -379,7 +379,7 @@ class BookingBootstrapForm extends React.Component {
         )}
         {['every', 'daily'].includes(type) && (
           <Form.Group inline>
-            <DateRangePicker2
+            <DateRangePicker
               rangeStartMin={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
               value={{startDate: serializeDate(startDate), endDate: serializeDate(endDate)}}
               onChange={({startDate: sd, endDate: ed}) =>

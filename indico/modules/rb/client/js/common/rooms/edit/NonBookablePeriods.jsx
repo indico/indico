@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Button} from 'semantic-ui-react';
 
-import {DateRangePicker2} from 'indico/react/components';
+import {DateRangePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
@@ -68,7 +68,7 @@ export default class NonBookablePeriods extends React.Component {
     const key = nanoid();
     return (
       <div key={key} className="flex-container">
-        <DateRangePicker2
+        <DateRangePicker
           value={{startDate: startDt, endDate: endDt}}
           onChange={dates => this.handleDatesChange(dates, index)}
           min={serializeDate(moment())}
