@@ -17,8 +17,8 @@ from indico.util.marshmallow import not_empty
 
 
 class FieldSetupSchemaBase(mm.Schema):
-    show_if_field_id = fields.Integer()
-    show_if_field_value = fields.String()
+    show_if_field_id = fields.Integer(required=False, load_default=None)
+    show_if_field_value = fields.String(required=False, load_default=None)
 
 
 class BillableFieldDataSchema(FieldSetupSchemaBase):
