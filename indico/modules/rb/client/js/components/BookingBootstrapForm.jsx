@@ -381,8 +381,6 @@ class BookingBootstrapForm extends React.Component {
           <Form.Group inline>
             <DateRangePicker2
               rangeStartMin={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
-              rangeStartLabel={Translate.string('Start')}
-              rangeEndLabel={Translate.string('End')}
               value={{startDate: serializeDate(startDate), endDate: serializeDate(endDate)}}
               onChange={({startDate: sd, endDate: ed}) =>
                 this.updateDates(toMoment(sd), toMoment(ed))

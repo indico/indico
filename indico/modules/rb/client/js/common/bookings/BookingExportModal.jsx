@@ -64,8 +64,6 @@ export default function BookingExportModal({rooms, onClose}) {
             <FinalDateRangePicker
               name="dates"
               label={Translate.string('Period')}
-              rangeStartLabel={Translate.string('Start')}
-              rangeEndLabel={Translate.string('End')}
               required
               allowNull
             />

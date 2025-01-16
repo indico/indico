@@ -302,8 +302,6 @@ class BookingEditForm extends React.Component {
           ) : (
             <FinalDateRangePicker
               name="dates"
-              rangeStartLabel={Translate.string('Start')}
-              rangeEndLabel={Translate.string('End')}
               onChange={newDates => {
                 onBookingPeriodChange(newDates, timeSlot, this.clearWeekdays(recurrence.interval));
               }}

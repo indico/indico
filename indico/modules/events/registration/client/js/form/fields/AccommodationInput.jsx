@@ -281,18 +281,10 @@ export function accommodationSettingsFormValidator({arrival, departure}) {
 export function AccommodationSettings() {
   return (
     <>
-      <FinalDateRangePicker
-        name="arrival"
-        label={Translate.string('Arrival')}
-        rangeStartLabel={Translate.string('Start')}
-        rangeEndLabel={Translate.string('End')}
-        required
-      />
+      <FinalDateRangePicker name="arrival" label={Translate.string('Arrival')} required />
       <FinalDateRangePicker
         name="departure"
         label={Translate.string('Departure')}
-        rangeStartLabel={Translate.string('Start')}
-        rangeEndLabel={Translate.string('End')}
         extraPickerProps={{noBorder: true}}
         required
       />
