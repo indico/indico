@@ -12,7 +12,7 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {Label} from 'semantic-ui-react';
 
-import {DateRangePicker2, RadioButton} from 'indico/react/components';
+import {DateRangePicker, RadioButton} from 'indico/react/components';
 import {FinalDateRangePicker} from 'indico/react/components/DateRangePicker';
 import {FinalField} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
@@ -121,7 +121,7 @@ function AccommodationInputComponent({
       </table>
       {value.choice !== null && !value.isNoAccommodation && (
         <div styleName="date-picker">
-          <DateRangePicker2
+          <DateRangePicker
             label={Translate.string('Pick the arrival and departure dates')}
             onChange={handleDateChange}
             value={{
