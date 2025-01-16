@@ -154,7 +154,9 @@ export default function ItemSettingsModal({id, sectionId, defaultNewItemType, on
           )}
           {SettingsComponent && <SettingsComponent {...itemData} />}
           {renderPluginComponents(`regform-${inputType}-field-settings`, {...itemData})}
-          <ShowIfInput hasValueSelected={!!initialValues.showIfFieldValue} />
+          {!fieldIsRequired && (
+            <ShowIfInput hasValueSelected={!!(initialValues ?? {}).showIfFieldValue} />
+          )}
           {!meta.noRetentionPeriod && !fieldIsRequired && (
             <Fieldset legend={Translate.string('Privacy')} compact>
               <FinalInput
