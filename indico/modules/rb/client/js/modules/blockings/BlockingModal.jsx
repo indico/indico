@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
@@ -13,10 +14,11 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
 
-import {FinalDatePeriod, FinalPrincipalList} from 'indico/react/components';
+import {FinalDateRangePicker, FinalPrincipalList} from 'indico/react/components';
 import {FinalTextArea} from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
 
 import {selectors as userSelectors} from '../../common/user';
 import FinalRoomSelector from '../../components/RoomSelector';
@@ -354,11 +356,13 @@ class BlockingModal extends React.Component {
                     </Translate>
                   </Message.Content>
                 </Message>
-                <FinalDatePeriod
+                <FinalDateRangePicker
                   name="dates"
                   label={Translate.string('Period')}
                   required={mode === 'create'}
-                  readOnly={mode !== 'create' || submitSucceeded}
+                  readOnly={mode !== 'create'}
+                  disabled={submitSucceeded}
+                  min={serializeDate(moment())}
                   allowNull
                 />
                 <FinalTextArea
