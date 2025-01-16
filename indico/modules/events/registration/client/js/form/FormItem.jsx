@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {useFormState} from 'react-final-form';
+import {useForm, useFormState} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Icon, Popup} from 'semantic-ui-react';
 
@@ -18,8 +18,8 @@ import {renderPluginComponents} from 'indico/utils/plugins';
 import {getManagement, getUpdateMode, isPaidItemLocked} from '../form_submission/selectors';
 
 import {getFieldRegistry} from './fields/registry';
-import '../../styles/regform.module.scss';
 import {getItemById} from './selectors';
+import '../../styles/regform.module.scss';
 
 function PaidItemLocked({management}) {
   const lockedMsg = (
@@ -94,6 +94,7 @@ export default function FormItem({
   const isUpdateMode = useSelector(getUpdateMode);
   const conditionalField = useSelector(state => getItemById(state, showIfFieldId));
   const formState = useFormState();
+  const form = useForm();
 
   const {htmlName} = rest;
   const fieldRegistry = getFieldRegistry();
@@ -129,7 +130,6 @@ export default function FormItem({
   const toBoolean = value => {
     return value !== '0';
   };
-  const show = conditionalValue === undefined || toBoolean(showIfFieldValue) === conditionalValue;
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
     retentionPeriodIcon = (
@@ -150,6 +150,7 @@ export default function FormItem({
   const showAsRequired = meta.alwaysRequired || isRequired;
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
+  const show = conditionalValue === undefined || toBoolean(showIfFieldValue) === conditionalValue;
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
@@ -165,68 +166,71 @@ export default function FormItem({
       </>
     ) : null;
 
+  if (!show && !setupMode) {
+    form.change(rest.htmlName, null);
+    return null;
+  }
+
   return (
-    show && (
-      <div
-        data-html-name={htmlName}
-        styleName={`form-item ${toClasses({
-          'disabled': !isEnabled || paidItemLocked,
-          'purged-disabled': showPurged,
-          'paid-disabled': !showPurged && paidItemLocked,
-          'editable': setupMode,
-        })}`}
-      >
-        {sortHandle}
-        <div styleName="content">
-          {InputComponent ? (
-            meta.customFormItem ? (
-              <InputComponent
-                showAsRequired={showAsRequired}
-                isRequired={inputRequired}
-                disabled={disabled}
-                isPurged={showPurged}
-                retentionPeriodIcon={retentionPeriodIcon}
-                htmlId={htmlId}
-                {...inputProps}
-              />
-            ) : (
-              <Form.Field required={showAsRequired} styleName="field">
-                {renderAsFieldset(fieldOptions, meta) ? (
-                  <fieldset id={htmlId} disabled={disabled}>
-                    <legend>{title}</legend>
-                    {fieldControls}
-                  </fieldset>
-                ) : (
-                  <>
-                    <label
-                      htmlFor={htmlId}
-                      style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}
-                    >
-                      {title}
-                    </label>
-                    {fieldControls}
-                  </>
-                )}
-              </Form.Field>
-            )
+    <div
+      data-html-name={htmlName}
+      styleName={`form-item ${toClasses({
+        'disabled': !isEnabled || paidItemLocked || !show,
+        'purged-disabled': showPurged,
+        'paid-disabled': !showPurged && paidItemLocked,
+        'editable': setupMode,
+      })}`}
+    >
+      {sortHandle}
+      <div styleName="content">
+        {InputComponent ? (
+          meta.customFormItem ? (
+            <InputComponent
+              showAsRequired={showAsRequired}
+              isRequired={inputRequired}
+              disabled={disabled}
+              isPurged={showPurged}
+              retentionPeriodIcon={retentionPeriodIcon}
+              htmlId={htmlId}
+              {...inputProps}
+            />
           ) : (
-            `Unknown input type: ${inputType}`
-          )}
-          {description && (
-            <div styleName="description">
-              <Markdown targetBlank>{description}</Markdown>
-            </div>
-          )}
-          {renderPluginComponents(`regform-${inputType}-field-item`, inputProps)}
-        </div>
-        {setupActions && <div styleName="actions">{setupActions}</div>}
-        {lockedReason && <ItemLocked reason={lockedReason} />}
-        {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
-        {!lockedReason && !showPurged && paidItemLocked && (
-          <PaidItemLocked management={isManagement} />
+            <Form.Field required={showAsRequired} styleName="field">
+              {renderAsFieldset(fieldOptions, meta) ? (
+                <fieldset id={htmlId} disabled={disabled}>
+                  <legend>{title}</legend>
+                  {fieldControls}
+                </fieldset>
+              ) : (
+                <>
+                  <label
+                    htmlFor={htmlId}
+                    style={{opacity: disabled ? 0.8 : 1, display: 'inline-block'}}
+                  >
+                    {title}
+                  </label>
+                  {fieldControls}
+                </>
+              )}
+            </Form.Field>
+          )
+        ) : (
+          `Unknown input type: ${inputType}`
         )}
+        {description && (
+          <div styleName="description">
+            <Markdown targetBlank>{description}</Markdown>
+          </div>
+        )}
+        {renderPluginComponents(`regform-${inputType}-field-item`, inputProps)}
       </div>
-    )
+      {setupActions && <div styleName="actions">{setupActions}</div>}
+      {lockedReason && <ItemLocked reason={lockedReason} />}
+      {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+      {!lockedReason && !showPurged && paidItemLocked && (
+        <PaidItemLocked management={isManagement} />
+      )}
+    </div>
   );
 }
 
@@ -258,7 +262,7 @@ FormItem.propTypes = {
   setupMode: PropTypes.bool,
   /** Actions available during form setup */
   setupActions: PropTypes.node,
-  /** The ID of the the field to use as condition for display */
+  /** The ID of the field to use as condition for display */
   showIfFieldId: PropTypes.number,
   /** The value of the field to use as condition for display */
   showIfFieldValue: PropTypes.string,
