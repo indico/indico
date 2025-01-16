@@ -64,6 +64,14 @@ ItemLocked.propTypes = {
   reason: PropTypes.string.isRequired,
 };
 
+function ItemHidden({reason}) {
+  return <Popup trigger={<Icon name="hide" />}>{reason}</Popup>;
+}
+
+ItemHidden.propTypes = {
+  reason: PropTypes.string.isRequired,
+};
+
 function renderAsFieldset(fieldOptions, meta) {
   if (typeof meta.renderAsFieldset === 'function') {
     return meta.renderAsFieldset(fieldOptions);
@@ -227,6 +235,9 @@ export default function FormItem({
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
       {lockedReason && <ItemLocked reason={lockedReason} />}
+      {!!showIfFieldId && (
+        <ItemHidden reason={Translate.string('This field is conditionally shown')} />
+      )}
       {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
       {!lockedReason && !showPurged && paidItemLocked && (
         <PaidItemLocked management={isManagement} />
