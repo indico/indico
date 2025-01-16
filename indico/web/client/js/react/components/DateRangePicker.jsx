@@ -101,7 +101,7 @@ export default function DateRangePicker({
             data-range-start
             placeholder={format}
             readOnly={readOnly}
-            disabled={startLocked}
+            disabled={startLocked || disabled}
             onFocus={onFocus}
             onBlur={onBlur}
           />
@@ -109,7 +109,7 @@ export default function DateRangePicker({
         <button
           type="button"
           data-calendar-trigger="left"
-          disabled={startLocked}
+          disabled={startLocked || readOnly || disabled}
           onClick={markTouched}
         >
           <Translate as="span">Open a calendar</Translate>
@@ -122,7 +122,7 @@ export default function DateRangePicker({
             data-range-end
             placeholder={format}
             readOnly={readOnly}
-            disabled={endLocked}
+            disabled={endLocked || disabled}
             onFocus={onFocus}
             onBlur={onBlur}
           />
@@ -130,7 +130,7 @@ export default function DateRangePicker({
         <button
           type="button"
           data-calendar-trigger="right"
-          disabled={endLocked}
+          disabled={endLocked || readOnly || disabled}
           onClick={markTouched}
         >
           <Translate as="span">Open a calendar</Translate>
