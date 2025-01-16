@@ -14,6 +14,8 @@ import {DateRangePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
+import './NonBookablePeriods.module.scss';
+
 export default class NonBookablePeriods extends React.Component {
   static propTypes = {
     onFocus: PropTypes.func.isRequired,
@@ -72,7 +74,7 @@ export default class NonBookablePeriods extends React.Component {
   renderEntry = (dateRangeItem, index) => {
     const {start_dt: startDt, end_dt: endDt} = dateRangeItem;
     return (
-      <div key={`${startDt}-${endDt}`} className="flex-container">
+      <div key={`${startDt}-${endDt}`} className="flex-container" styleName="NonBookablePeriods">
         <DateRangePicker
           value={{startDate: startDt, endDate: endDt}}
           onChange={dates => this.handleDatesChange(dates, index)}
