@@ -286,7 +286,6 @@ export function AccommodationSettings() {
         label={Translate.string('Arrival')}
         rangeStartLabel={Translate.string('Start')}
         rangeEndLabel={Translate.string('End')}
-        disabledDate={() => false}
         required
       />
       <FinalDateRangePicker
@@ -294,7 +293,6 @@ export function AccommodationSettings() {
         label={Translate.string('Departure')}
         rangeStartLabel={Translate.string('Start')}
         rangeEndLabel={Translate.string('End')}
-        disabledDate={() => false}
         extraPickerProps={{noBorder: true}}
         required
       />

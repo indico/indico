@@ -20,7 +20,6 @@ export default class DateForm extends FilterFormComponent {
     endDate: PropTypes.string,
     isRange: PropTypes.bool.isRequired,
     minDate: PropTypes.string,
-    disabledDate: PropTypes.func,
     ...FilterFormComponent.propTypes,
   };
 
@@ -28,7 +27,6 @@ export default class DateForm extends FilterFormComponent {
     startDate: null,
     endDate: null,
     minDate: null,
-    disabledDate: null,
   };
 
   static getDerivedStateFromProps({startDate, endDate}, prevState) {
@@ -57,12 +55,6 @@ export default class DateForm extends FilterFormComponent {
         }
       );
     });
-  }
-
-  disabledDate(current) {
-    if (current) {
-      return current.isBefore(moment(), 'day');
-    }
   }
 
   render() {
