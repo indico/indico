@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Button} from 'semantic-ui-react';
@@ -29,11 +28,18 @@ export default class NonBookablePeriods extends React.Component {
 
   handleAddDates = () => {
     const {value, onChange} = this.props;
+    const date = moment();
+    // find the first date that is NOT in the list yet to avoid react key collisions
+    while (
+      value.some(v => v.start_dt === serializeDate(date) && v.end_dt === serializeDate(date))
+    ) {
+      date.add(1, 'day');
+    }
     onChange([
       ...value,
       {
-        start_dt: serializeDate(moment()),
-        end_dt: serializeDate(moment()),
+        start_dt: serializeDate(date),
+        end_dt: serializeDate(date),
       },
     ]);
     this.setTouched();
@@ -65,9 +71,8 @@ export default class NonBookablePeriods extends React.Component {
 
   renderEntry = (dateRangeItem, index) => {
     const {start_dt: startDt, end_dt: endDt} = dateRangeItem;
-    const key = nanoid();
     return (
-      <div key={key} className="flex-container">
+      <div key={`${startDt}-${endDt}`} className="flex-container">
         <DateRangePicker
           value={{startDate: startDt, endDate: endDt}}
           onChange={dates => this.handleDatesChange(dates, index)}
