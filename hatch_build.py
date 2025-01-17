@@ -10,6 +10,7 @@ import os
 import subprocess
 from pathlib import Path
 
+from babel.messages.pofile import read_po, write_po
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
 
@@ -17,8 +18,42 @@ class CustomBuildHook(BuildHookInterface):
     def initialize(self, version, build_data):
         if os.environ.get('READTHEDOCS') == 'True' or version == 'editable':
             return
+        _split_all_po_files()
         _compile_languages()
         _compile_languages_react()
+
+
+def _split_all_po_files():
+    translations_dir = Path('indico/translations')
+    pot_files = [f for f in translations_dir.glob('*.pot') if f.name != 'messages-all.pot']
+
+    for lc_messages_dir in translations_dir.glob('*/LC_MESSAGES'):
+        if lc_messages_dir.parent.name == 'en_US':
+            continue
+
+        merged_po_path = lc_messages_dir / 'messages-all.po'
+
+        assert merged_po_path.exists(), f'{merged_po_path} does not exist!'
+
+        for pot_file in pot_files:
+            output_po_path = lc_messages_dir / pot_file.name.replace('.pot', '.po')
+            _split_po_by_pot(merged_po_path, pot_file, output_po_path)
+
+
+def _split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
+    with merged_po_path.open('rb') as f:
+        merged_catalog = read_po(f)
+
+    with pot_path.open('rb') as f:
+        pot_catalog = read_po(f)
+
+    merged_catalog.update(pot_catalog, no_fuzzy_matching=True)
+    # For some reason we receive catalogs marked as fuzzy from transifex, and babel skips
+    # those by default, even though they are perfectly fine to use...
+    merged_catalog.fuzzy = False
+
+    with output_po_path.open('wb') as f:
+        write_po(f, merged_catalog, ignore_obsolete=True, width=120)
 
 
 def _compile_languages():
