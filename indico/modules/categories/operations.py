@@ -38,14 +38,15 @@ def create_category(parent, data):
     return category
 
 
-def delete_category(category):
+def delete_category(category: Category):
     category.is_deleted = True
     db.session.flush()
     signals.category.deleted.send(category)
-    logger.info('Category %s deleted by %s', category, session.user)
-    category.log(CategoryLogRealm.category, LogKind.negative, 'Category', 'Category deleted', session.user)
+    user = session.user if session else None
+    logger.info('Category %s deleted by %s', category, user)
+    category.log(CategoryLogRealm.category, LogKind.negative, 'Category', 'Category deleted', user)
     category.parent.log(CategoryLogRealm.category, LogKind.negative, 'Content',
-                        f'Subcategory deleted: "{category.title}"', session.user)
+                        f'Subcategory deleted: "{category.title}"', user)
 
 
 def move_category(category, target_category):
