@@ -62,6 +62,7 @@ exclude = [
 ]
 artifacts = [
     'indico/translations/**/messages-react.json',
+    'indico/translations/**/messages-js.po',
     'indico/translations/**/*.mo',
     'indico/web/static/dist/',
 ]
