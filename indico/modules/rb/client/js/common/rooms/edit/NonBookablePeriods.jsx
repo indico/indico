@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import {nanoid} from 'nanoid';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Button} from 'semantic-ui-react';
@@ -38,7 +39,7 @@ export default class NonBookablePeriods extends React.Component {
    * an existing date range item object). Otherwise it defaults to a random string that
    * looks like '0.an017nf0jas'.
    */
-  setIdField(dateRangeItem, value = Math.random().toString(36)) {
+  setIdField(dateRangeItem, value = nanoid()) {
     dateRangeItem[idField] = value;
     return dateRangeItem;
   }
@@ -112,10 +113,9 @@ export default class NonBookablePeriods extends React.Component {
   };
 
   renderEntry = (dateRangeItem, index) => {
-    const {start_dt: startDt, end_dt: endDt} = dateRangeItem;
-    const id = dateRangeItem[idField];
+    const {start_dt: startDt, end_dt: endDt, [idField]: key} = dateRangeItem;
     return (
-      <div key={id} className="flex-container" styleName="NonBookablePeriods">
+      <div key={key} className="flex-container" styleName="NonBookablePeriods">
         <DateRangePicker
           value={{startDate: startDt, endDate: endDt}}
           onChange={dates => this.handleDatesChange(dates, index)}
