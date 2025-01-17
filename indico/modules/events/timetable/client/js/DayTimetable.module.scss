@@ -83,6 +83,8 @@
   font-size: 15px;
   width: 100%;
   flex-grow: 1;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .resize-handle {
