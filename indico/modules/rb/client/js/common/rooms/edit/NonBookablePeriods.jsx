@@ -16,6 +16,8 @@ import {serializeDate} from 'indico/utils/date';
 
 import './NonBookablePeriods.module.scss';
 
+const idField = Symbol('id');
+
 export default class NonBookablePeriods extends React.Component {
   static propTypes = {
     onFocus: PropTypes.func.isRequired,
@@ -28,6 +30,44 @@ export default class NonBookablePeriods extends React.Component {
     value: [],
   };
 
+  /**
+   * Set an internal identifier for the date range item that will be used to identify
+   * the associated form control.
+   *
+   * The value can be specified if you want to use a specific value (e.g., when copying
+   * an existing date range item object). Otherwise it defaults to a random string that
+   * looks like '0.an017nf0jas'.
+   */
+  setIdField(dateRangeItem, value = Math.random().toString(36)) {
+    dateRangeItem[idField] = value;
+    return dateRangeItem;
+  }
+
+  /**
+   * Inject ids into the existing values if necessary.
+   *
+   * This fixup is necessary when dealing with two cases:
+   *
+   * 1. On initial load, when there's already data in the backend.
+   * 2. After form submission when the data in the local state store is refreshed.
+   *
+   * The date range items in the 'value' prop will be given an Symbol('id') field,
+   * which will be used internally te track the UI-data association. This is usually
+   * missing/destroyed in the cases mentioned before.
+   *
+   * This mutates the objects in-place, and relies on the fact that the rest of the app
+   * won't care about that. It's a reasonable assumption because we're using a Symbol
+   * as the key.
+   */
+  fixValues() {
+    const {value} = this.props;
+    for (const dateRangeItem of value) {
+      if (!dateRangeItem[idField]) {
+        this.setIdField(dateRangeItem);
+      }
+    }
+  }
+
   handleAddDates = () => {
     const {value, onChange} = this.props;
     const date = moment();
@@ -39,10 +79,10 @@ export default class NonBookablePeriods extends React.Component {
     }
     onChange([
       ...value,
-      {
+      this.setIdField({
         start_dt: serializeDate(date),
         end_dt: serializeDate(date),
-      },
+      }),
     ]);
     this.setTouched();
   };
@@ -57,7 +97,7 @@ export default class NonBookablePeriods extends React.Component {
     const {value, onChange} = this.props;
     onChange(
       value.map((v, vIndex) =>
-        vIndex === index ? {...v, start_dt: startDate, end_dt: endDate} : v
+        vIndex === index ? this.setIdField({start_dt: startDate, end_dt: endDate}, v[idField]) : v
       )
     );
     this.setTouched();
@@ -73,8 +113,9 @@ export default class NonBookablePeriods extends React.Component {
 
   renderEntry = (dateRangeItem, index) => {
     const {start_dt: startDt, end_dt: endDt} = dateRangeItem;
+    const id = dateRangeItem[idField];
     return (
-      <div key={`${startDt}-${endDt}`} className="flex-container" styleName="NonBookablePeriods">
+      <div key={id} className="flex-container" styleName="NonBookablePeriods">
         <DateRangePicker
           value={{startDate: startDt, endDate: endDt}}
           onChange={dates => this.handleDatesChange(dates, index)}
@@ -91,6 +132,8 @@ export default class NonBookablePeriods extends React.Component {
   };
 
   render() {
+    this.fixValues();
+
     const {value} = this.props;
     return (
       <>
