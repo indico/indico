@@ -51,10 +51,10 @@ export default function ResizeHandle({
         newDuration = Math.min(newDuration, maxDuration);
       }
 
-      if (newDuration >= 10) {
+      if (newDuration > minDuration) {
         setLocalDuration(newDuration);
       } else {
-        setLocalDuration(10);
+        setLocalDuration(minDuration);
       }
     }
 
