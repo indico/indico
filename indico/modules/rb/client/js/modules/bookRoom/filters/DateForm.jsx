@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -66,11 +65,6 @@ export default class DateForm extends FilterFormComponent {
         startDate={serializeDate(startDate)}
         endDate={serializeDate(endDate)}
         minDate={serializeDate(minDate)}
-        maxDate={serializeDate(
-          moment()
-            .add(1, 'years')
-            .endOf('year')
-        )}
         onChange={({startDate: sd, endDate: ed}) =>
           this.setDates(toMoment(sd, 'YYYY-MM-DD'), toMoment(ed, 'YYYY-MM-DD'))
         }
@@ -79,11 +73,6 @@ export default class DateForm extends FilterFormComponent {
       <CalendarSingleDatePicker
         date={serializeDate(startDate)}
         minDate={serializeDate(minDate)}
-        maxDate={serializeDate(
-          moment()
-            .add(1, 'years')
-            .endOf('year')
-        )}
         onChange={date => this.setDates(toMoment(date, 'YYYY-MM-DD'), null)}
       />
     );
