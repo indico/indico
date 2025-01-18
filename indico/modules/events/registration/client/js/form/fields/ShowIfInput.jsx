@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {useForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
@@ -12,7 +13,6 @@ import {useSelector} from 'react-redux';
 import {FinalDropdown} from 'indico/react/forms';
 import {Fieldset} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
-import PropTypes from 'indico/react/util/propTypes';
 
 import {getItemsForConditionalDisplay} from '../selectors';
 
@@ -20,6 +20,20 @@ export function ShowIfInput({hasValueSelected}) {
   const itemsForConditionalDisplay = useSelector(state => getItemsForConditionalDisplay(state));
   const form = useForm();
   const [showValue, setShowValue] = useState(hasValueSelected);
+  let options = [];
+  const showIfFieldId = form.getState().values.showIfFieldId;
+  if (showValue) {
+    const [{choices}] = itemsForConditionalDisplay.filter(({id}) => id === showIfFieldId);
+    if (!choices) {
+      options = [
+        {value: '1', text: Translate.string('Yes')},
+        {value: '0', text: Translate.string('No')},
+      ];
+    } else {
+      options = choices.map(({caption, id}) => ({value: id, text: caption}));
+    }
+  }
+
   return (
     <Fieldset legend={Translate.string('Show if')}>
       <FinalDropdown
@@ -33,9 +47,9 @@ export function ShowIfInput({hasValueSelected}) {
         closeOnChange
         selection
         onChange={value => {
+          form.change('showIfFieldValue', null);
           if (!value) {
             form.change('showIfFieldId', null);
-            form.change('showIfFieldValue', null);
           }
           setShowValue(!!value);
         }}
@@ -46,11 +60,7 @@ export function ShowIfInput({hasValueSelected}) {
           name="showIfFieldValue"
           label={Translate.string('Has value')}
           placeholder={Translate.string('Select value...')}
-          // TODO: Get possible values from the field selected in showIfFieldId
-          options={[
-            {value: '1', text: Translate.string('Yes')},
-            {value: '0', text: Translate.string('No')},
-          ]}
+          options={options}
           closeOnChange
           selection
         />

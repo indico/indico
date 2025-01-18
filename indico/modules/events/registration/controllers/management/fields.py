@@ -174,7 +174,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
-        changes = _fill_form_field_with_data(self.field, field_data, context={'regform': self.regform})
+        changes = _fill_form_field_with_data(self.field, field_data,
+                                             context={'regform': self.regform, 'field': self.field})
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
