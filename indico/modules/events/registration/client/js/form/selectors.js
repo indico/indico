@@ -23,7 +23,7 @@ export const getItemById = createSelector(
 );
 
 /** Get items that can be used for conditional fields */
-const inputTypesForConditionalFields = ['bool', 'checkbox'];
+const inputTypesForConditionalFields = ['bool', 'checkbox', 'single_choice', 'accommodation'];
 export const getItemsForConditionalDisplay = createSelector(
   getItems,
   items =>
