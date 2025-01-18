@@ -89,7 +89,7 @@ class TextDataSchema(GeneralFieldDataSchema):
         exclude = ('is_required', 'retention_period', 'input_type')
 
 
-def _fill_form_field_with_data(field, field_data, is_static_text=False):
+def _fill_form_field_with_data(field, field_data, is_static_text=False, context=None):
     schema_cls = TextDataSchema if is_static_text else GeneralFieldDataSchema
     schema = schema_cls(context={'field': field})
     general_data, raw_field_specific_data = schema.load(field_data)
@@ -100,7 +100,7 @@ def _fill_form_field_with_data(field, field_data, is_static_text=False):
             changes[key] = (old_value, value)
         setattr(field, key, value)
     if not is_static_text:
-        schema = field.field_impl.create_setup_schema()
+        schema = field.field_impl.create_setup_schema(context=context)
         field_specific_data = schema.load(raw_field_specific_data)
         if field.id is None:  # new field
             field.data, field.versioned_data = field.field_impl.process_field_data(field_specific_data)
@@ -174,7 +174,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
-        changes = _fill_form_field_with_data(self.field, field_data)
+        changes = _fill_form_field_with_data(self.field, field_data, context={'regform': self.regform})
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
