@@ -8,7 +8,7 @@
 from copy import deepcopy
 from decimal import Decimal
 
-from marshmallow import fields, validate
+from marshmallow import ValidationError, fields, validate, validates
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -17,8 +17,18 @@ from indico.util.marshmallow import not_empty
 
 
 class FieldSetupSchemaBase(mm.Schema):
-    show_if_field_id = fields.Integer(required=False, load_default=None)
-    show_if_field_value = fields.String(required=False, load_default=None)
+    show_if_field_id = fields.Integer(required=False)
+    show_if_field_value = fields.String(required=False)
+
+    @validates('show_if_field_id')
+    def _check_if_field_id(self, field_id, **kwargs):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
+
+        regform = self.context['regform']
+        is_same_regform = (RegistrationFormItem.query.filter_by(
+            id=field_id, registration_form_id=regform.id).scalar() is not None)
+        if not is_same_regform:
+            raise ValidationError('The field to show does not belong to the same registration form.')
 
 
 class BillableFieldDataSchema(FieldSetupSchemaBase):
@@ -119,10 +129,10 @@ class RegistrationFormFieldBase:
         """
         return RegistrationData.data.op('#>>')('{}').in_(data_list)
 
-    def create_setup_schema(self):
+    def create_setup_schema(self, context=None):
         name = f'{type(self).__name__}SetupDataSchema'
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
-        return schema()
+        return schema(context=context)
 
     def create_mm_field(self, registration=None, override_required=False):
         """
