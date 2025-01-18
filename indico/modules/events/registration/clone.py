@@ -45,8 +45,10 @@ class RegistrationFormCloner(EventCloner):
         self._form_map = {}
         for old_form in self.old_event.registration_forms:
             new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
-            self._clone_form_items(old_form, new_form, clone_all_revisions)
+            db.session.add(new_form)
             new_event.registration_forms.append(new_form)
+            db.session.add(new_event)
+            self._clone_form_items(old_form, new_form, clone_all_revisions)
             signals.event.registration.after_registration_form_clone.send(old_form, new_form=new_form)
             db.session.flush()
             self._form_map[old_form] = new_form
@@ -59,6 +61,7 @@ class RegistrationFormCloner(EventCloner):
     def _clone_form_items(self, old_form, new_form, clone_all_revisions):
         old_sections = RegistrationFormSection.query.filter(RegistrationFormSection.registration_form_id == old_form.id)
         items_attrs = get_attrs_to_clone(RegistrationFormSection, skip={'is_purged'})
+        item_map = {}
         for old_section in old_sections:
             new_section = RegistrationFormSection(**{attr: getattr(old_section, attr) for attr in items_attrs})
             for old_item in old_section.children:
@@ -73,8 +76,17 @@ class RegistrationFormCloner(EventCloner):
                         new_item.current_data = field_data
                         self._field_data_map[old_item.current_data] = field_data
                 new_section.children.append(new_item)
+                item_map[old_item.id] = new_item
+                db.session.add(new_item)
             new_form.form_items.append(new_section)
+            db.session.add(new_section)
             db.session.flush()
+        # adapt the show_if-related fields to the newly generated ids
+        for new_item in item_map.values():
+            show_if_field_id = new_item.data.get('show_if_field_id')
+            if show_if_field_id is not None:
+                new_item.data['show_if_field_id'] = item_map[show_if_field_id].id
+        db.session.flush()
 
     def _clone_all_field_versions(self, old_item, new_item):
         for old_version in old_item.data_versions:
