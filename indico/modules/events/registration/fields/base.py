@@ -24,6 +24,9 @@ class FieldSetupSchemaBase(mm.Schema):
     def _check_if_field_id(self, field_id, **kwargs):
         from indico.modules.events.registration.models.form_fields import RegistrationFormItem
 
+        field = self.context['field']
+        if field.id == field_id:
+            raise ValueError('The field cannot conditionally depend on itself to be shown')
         regform = self.context['regform']
         is_same_regform = (RegistrationFormItem.query.filter_by(
             id=field_id, registration_form_id=regform.id).scalar() is not None)
