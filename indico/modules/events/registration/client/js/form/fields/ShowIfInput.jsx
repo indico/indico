@@ -20,6 +20,7 @@ export function ShowIfInput({hasValueSelected}) {
   const itemsForConditionalDisplay = useSelector(state => getItemsForConditionalDisplay(state));
   const form = useForm();
   const [showValue, setShowValue] = useState(hasValueSelected);
+  const [, setSelectedField] = useState(null);
   let options = [];
   const showIfFieldId = form.getState().values.showIfFieldId;
   if (showValue) {
@@ -50,6 +51,9 @@ export function ShowIfInput({hasValueSelected}) {
           form.change('showIfFieldValue', null);
           if (!value) {
             form.change('showIfFieldId', null);
+            setSelectedField(null);
+          } else {
+            setSelectedField(value);
           }
           setShowValue(!!value);
         }}

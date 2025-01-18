@@ -135,6 +135,9 @@ export default function FormItem({
     if (typeof value === 'boolean') {
       return value ? '1' : '0';
     } else if (typeof value === 'object') {
+      if (value.choice) {
+        return value.choice;
+      }
       const [selected] = Object.entries(value)
         .filter(([, enabled]) => enabled === 1)
         .map(([key]) => key);
