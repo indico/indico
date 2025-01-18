@@ -131,13 +131,21 @@ export default function FormItem({
     meta,
   };
 
-  const conditionalValue = conditionalField
-    ? formState.values[conditionalField.htmlName]
-    : undefined;
-  // FIXME: it's late
-  const toBoolean = value => {
-    return value !== '0';
+  const parseConditionalValue = value => {
+    if (typeof value === 'boolean') {
+      return value ? '1' : '0';
+    } else if (typeof value === 'object') {
+      const [selected] = Object.entries(value)
+        .filter(([, enabled]) => enabled === 1)
+        .map(([key]) => key);
+      return selected || '';
+    }
+    return value;
   };
+
+  const conditionalValue = conditionalField
+    ? parseConditionalValue(formState.values[conditionalField.htmlName])
+    : undefined;
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
     retentionPeriodIcon = (
@@ -158,7 +166,7 @@ export default function FormItem({
   const showAsRequired = meta.alwaysRequired || isRequired;
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
-  const show = conditionalValue === undefined || toBoolean(showIfFieldValue) === conditionalValue;
+  const show = conditionalValue === undefined || showIfFieldValue === conditionalValue;
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
