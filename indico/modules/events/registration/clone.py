@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from sqlalchemy.orm.attributes import flag_modified
+
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -86,6 +88,7 @@ class RegistrationFormCloner(EventCloner):
             show_if_field_id = new_item.data.get('show_if_field_id')
             if show_if_field_id is not None:
                 new_item.data['show_if_field_id'] = item_map[show_if_field_id].id
+                flag_modified(new_item, 'data')
         db.session.flush()
 
     def _clone_all_field_versions(self, old_item, new_item):
