@@ -390,8 +390,11 @@ def merge_pot_files(output_file: Path, *input_files: list[Path]):
     click.secho('Done merging pot files!', fg='green', bold=True)
 
 
-# Filter messages-all.po files by removing messages that are not in the given .pot file
+# Note: Nearly the same code exists in hatch_build.py since it needs to be available w/o
+# having the indico package itself installed, e.g. during CI wheel builds. If you make
+# changes here, you most likely need to make the same changes in that file!
 def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
+    """Filter messages-all.po files by removing messages that are not in the given .pot file."""
     with merged_po_path.open('rb') as f:
         merged_catalog = read_po(f)
 
@@ -407,6 +410,9 @@ def split_po_by_pot(merged_po_path: Path, pot_path: Path, output_po_path: Path):
         write_po(f, merged_catalog, ignore_obsolete=True, width=DEFAULT_OPTIONS['ExtractMessages']['width'])
 
 
+# Note: Nearly the same code exists in hatch_build.py since it needs to be available w/o
+# having the indico package itself installed, e.g. during CI wheel builds. If you make
+# changes here, you most likely need to make the same changes in that file!
 def split_all_po_files():
     pot_files = [f for f in TRANSLATIONS_DIR.glob('*.pot') if f.name != 'messages-all.pot']
 
