@@ -7,6 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
@@ -209,4 +210,4 @@ export default connect(
       },
     };
   }
-)(BookFromListModal);
+)(Overridable.component('BookFromListModal', BookFromListModal));
