@@ -792,7 +792,6 @@ class EventImporter:
         if self.data['indico_version'] != indico.__version__:
             click.secho('Indico version mismatch: importing event exported with {} to version {}'
                         .format(self.data['indico_version'], indico.__version__), fg='yellow')
-            return None
         alembic_version = _get_alembic_version()
         if not self.force and self.data['db_version'] != alembic_version:
             click.secho('Database schema version mismatch: exported on {}, current schema is {}'
