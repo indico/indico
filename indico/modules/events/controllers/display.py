@@ -8,7 +8,6 @@
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
-from marshmallow_enum import EnumField
 from webargs import fields
 
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
@@ -27,7 +26,7 @@ from indico.web.rh import RHProtected, allow_signed_url
 @allow_signed_url
 class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
-        'scope': EnumField(CalendarScope, load_default=None),
+        'scope': fields.Enum(CalendarScope, load_default=None),
         'detail': fields.String(load_default=None),
         'series': fields.Boolean(load_default=False)  # Export the full event series
     }, location='query')

@@ -9,7 +9,6 @@ import hashlib
 from operator import attrgetter
 
 from marshmallow import fields, post_dump
-from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.marshmallow import mm
@@ -38,7 +37,7 @@ class ContributionTypeSchema(mm.SQLAlchemyAutoSchema):
 
 
 class ContributionFieldSchema(mm.Schema):
-    visibility = EnumField(ContributionFieldVisibility)
+    visibility = fields.Enum(ContributionFieldVisibility)
 
     class Meta:
         model = ContributionField

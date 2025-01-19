@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from marshmallow import EXCLUDE, ValidationError, fields
-from marshmallow_enum import EnumField
 from marshmallow_oneofschema import OneOfSchema
 
 from indico.core.db.sqlalchemy.links import LinkType
@@ -63,7 +62,7 @@ def require_search_target(target):
 
 
 class CategoryResultSchema(ResultSchemaBase):
-    type = EnumField(SearchTarget, validate=require_search_target(SearchTarget.category))
+    type = fields.Enum(SearchTarget, validate=require_search_target(SearchTarget.category))
     category_id = fields.Int(required=True)
     title = fields.String(required=True)
     url = fields.Method('_get_url')
@@ -83,7 +82,7 @@ class LocationResultSchema(mm.Schema):
 
 class EventResultSchema(ResultSchemaBase):
     #: The record type
-    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event))
+    type: SearchTarget = fields.Enum(SearchTarget, validate=require_search_target(SearchTarget.event))
     #: The event id
     event_id = fields.Int(required=True)
     #: The event title
@@ -91,7 +90,7 @@ class EventResultSchema(ResultSchemaBase):
     #: The event description
     description = fields.String(required=True)
     #: The event type
-    event_type = EnumField(EventType, required=True)
+    event_type = fields.Enum(EventType, required=True)
     #: The event start date time
     start_dt = fields.DateTime(required=True)
     #: The event end date time
@@ -111,7 +110,7 @@ class EventResultSchema(ResultSchemaBase):
 
 class ContributionResultSchema(ResultSchemaBase):
     #: The record type
-    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.contribution))
+    type: SearchTarget = fields.Enum(SearchTarget, validate=require_search_target(SearchTarget.contribution))
     #: The contribution id
     contribution_id = fields.Int(required=True)
     #: The contribution event id
@@ -150,7 +149,7 @@ class ContributionResultSchema(ResultSchemaBase):
 
 class SubContributionResultSchema(ContributionResultSchema):
     #: The record type
-    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.subcontribution))
+    type: SearchTarget = fields.Enum(SearchTarget, validate=require_search_target(SearchTarget.subcontribution))
     #: The sub-contribution id
     subcontribution_id = fields.Int(required=True)
 
@@ -188,7 +187,7 @@ def _get_event_path(obj):
 
 class AttachmentResultSchema(ResultSchemaBase):
     #: The record type
-    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.attachment))
+    type: SearchTarget = fields.Enum(SearchTarget, validate=require_search_target(SearchTarget.attachment))
     #: The attachment id
     attachment_id = fields.Int(required=True)
     #: The attachment folder id
@@ -206,7 +205,7 @@ class AttachmentResultSchema(ResultSchemaBase):
     #: The attachment author
     user: PersonSchema = fields.Nested(PersonSchema, load_default=None)
     #: The attachment type
-    attachment_type: AttachmentType = EnumField(AttachmentType, required=True)
+    attachment_type: AttachmentType = fields.Enum(AttachmentType, required=True)
     #: The attachment last modified date time
     modified_dt = fields.DateTime(required=True)
     # extra fields that are not taken from the data returned by the search engine
@@ -227,7 +226,7 @@ class AttachmentResultSchema(ResultSchemaBase):
 
 class EventNoteResultSchema(ResultSchemaBase):
     #: The record type
-    type: SearchTarget = EnumField(SearchTarget, validate=require_search_target(SearchTarget.event_note))
+    type: SearchTarget = fields.Enum(SearchTarget, validate=require_search_target(SearchTarget.event_note))
     #: The note id
     note_id = fields.Int(required=True)
     #: The note event id

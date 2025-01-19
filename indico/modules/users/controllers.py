@@ -15,7 +15,6 @@ from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
-from marshmallow_enum import EnumField
 from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
@@ -337,7 +336,7 @@ class RHProfilePicturePreview(RHUserBase):
 
     flash_user_status = False
 
-    @use_kwargs({'source': EnumField(ProfilePictureSource)}, location='view_args')
+    @use_kwargs({'source': fields.Enum(ProfilePictureSource)}, location='view_args')
     def _process(self, source):
         if source == ProfilePictureSource.standard:
             first_name = self.user.first_name[0].upper() if self.user.first_name else ''
@@ -374,7 +373,7 @@ class RHSaveProfilePicture(RHUserBase):
     """Update the user's profile picture."""
 
     @use_kwargs({
-        'source': EnumField(ProfilePictureSource, required=True)
+        'source': fields.Enum(ProfilePictureSource, required=True)
     })
     def _process(self, source):
         self.user.picture_source = source
@@ -885,7 +884,7 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
 class UserSearchResultSchema(mm.SQLAlchemyAutoSchema):
     affiliation_id = fields.Integer(attribute='_affiliation.affiliation_id')
     affiliation_meta = fields.Nested(AffiliationSchema, attribute='_affiliation.affiliation_link')
-    title = EnumField(UserTitle, attribute='_title')
+    title = fields.Enum(UserTitle, attribute='_title')
 
     class Meta:
         model = User

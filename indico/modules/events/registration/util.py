@@ -15,7 +15,6 @@ from operator import attrgetter
 
 from flask import json, session
 from marshmallow import RAISE, ValidationError, fields, validates
-from marshmallow_enum import EnumField
 from PIL import Image, ImageOps
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
@@ -349,7 +348,7 @@ def make_registration_schema(
         schema['notify_user'] = fields.Boolean()
         schema['override_required'] = fields.Boolean()
     elif regform.needs_publish_consent:
-        schema['consent_to_publish'] = EnumField(RegistrationVisibility)
+        schema['consent_to_publish'] = fields.Enum(RegistrationVisibility)
 
     if captcha_required:
         schema['captcha'] = CaptchaField()

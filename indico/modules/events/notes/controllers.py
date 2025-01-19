@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from flask import jsonify, redirect, request, session
-from marshmallow_enum import EnumField
 from webargs import fields
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -70,7 +69,7 @@ class RHApiNote(RHManageNoteBase):
         return EventNoteSchema().dump(note.current_revision)
 
     @use_kwargs({
-        'render_mode': EnumField(RenderMode, load_default=RenderMode.html),
+        'render_mode': fields.Enum(RenderMode, load_default=RenderMode.html),
         'source': fields.String(required=True),
         'revision_id': fields.Integer(),
     })

@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from marshmallow import validate
-from marshmallow_enum import EnumField
 from webargs import fields
 
 from indico.modules.rb.models.reservations import RepeatFrequency
@@ -23,7 +22,7 @@ search_room_args = {
     'division': fields.Str(),
     'start_dt': fields.DateTime(),
     'end_dt': fields.DateTime(),
-    'repeat_frequency': EnumField(RepeatFrequency),
+    'repeat_frequency': fields.Enum(RepeatFrequency),
     'repeat_interval': fields.Int(load_default=0),
     'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS))),
     'building': fields.Str(),

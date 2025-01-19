@@ -14,7 +14,6 @@ import yaml
 from dateutil import parser, relativedelta
 from marshmallow import Schema, ValidationError, fields
 from marshmallow.utils import from_iso_datetime
-from marshmallow_enum import EnumField
 from pytz import timezone
 from speaklater import _LazyString
 from sqlalchemy import inspect
@@ -500,7 +499,7 @@ class LowercaseString(fields.String):
         return super()._deserialize(value, attr, data, **kwargs).lower()
 
 
-class NoneValueEnumField(EnumField):
+class NoneValueEnumField(fields.Enum):
     """
     Like the normal EnumField, but when receiving a None value,
     this is mapped to a specific enum member.

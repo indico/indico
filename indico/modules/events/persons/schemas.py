@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from marshmallow import fields, post_dump, post_load, pre_load
-from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.persons import EventPerson
@@ -24,7 +23,7 @@ class PersonLinkSchema(mm.Schema):
     name = fields.String(attribute='display_full_name', dump_only=True)
     first_name = fields.String(load_default='')
     last_name = fields.String(required=True)
-    _title = EnumField(UserTitle, data_key='title')
+    _title = fields.Enum(UserTitle, data_key='title')
     affiliation = fields.String(load_default='')
     affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None, load_only=True)
     affiliation_id = fields.Integer(load_default=None, dump_only=True)
@@ -100,4 +99,4 @@ class EventPersonUpdateSchema(EventPersonSchema):
     class Meta(EventPersonSchema.Meta):
         fields = ('title', 'first_name', 'last_name', 'address', 'phone', 'affiliation', 'affiliation_link')
 
-    title = EnumField(UserTitle)
+    title = fields.Enum(UserTitle)
