@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2024 CERN
+// Copyright (C) 2002 - 2025 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -51,10 +51,10 @@ export default function ResizeHandle({
         newDuration = Math.min(newDuration, maxDuration);
       }
 
-      if (newDuration >= 10) {
+      if (newDuration > minDuration) {
         setLocalDuration(newDuration);
       } else {
-        setLocalDuration(10);
+        setLocalDuration(minDuration);
       }
     }
 
