@@ -164,12 +164,7 @@ function UserDelete({userId, firstName, lastName}) {
         />
       ) : (
         <>
-          <Button
-            size="small"
-            color="red"
-            onClick={() => setIsDialogOpen(true)}
-            disabled={isSameUser}
-          >
+          <Button size="small" color="red" onClick={() => setIsDialogOpen(true)}>
             <Translate>Delete User</Translate>
           </Button>
           <Modal size="small" open={isDialogOpen} onClose={handleCloseDialog} closeIcon>
