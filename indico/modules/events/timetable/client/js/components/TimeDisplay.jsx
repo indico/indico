@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2024 CERN
+// Copyright (C) 2002 - 2025 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -16,7 +16,7 @@ import {Accordion, Form, Icon} from 'semantic-ui-react';
 import {FinalCheckbox, FinalField, FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {entrySchema, getEndDt, handleUnimplemented} from '../util';
+import {entrySchema, handleUnimplemented} from '../util';
 
 function TimePickerField({value, onChange, uses24HourFormat}) {
   return (
