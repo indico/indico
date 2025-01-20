@@ -10,7 +10,7 @@ from itertools import groupby
 
 from flask import request, session
 from wtforms.fields import BooleanField, EmailField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
-from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, InputRequired, Length, NumberRange, Optional, ValidationError
 from wtforms.widgets import Select
 from wtforms_sqlalchemy.fields import QuerySelectField
 
@@ -450,7 +450,7 @@ class EditEmailTemplateTextForm(IndicoForm):
     include_authors = BooleanField(_('Send to primary authors'), widget=SwitchWidget())
     include_coauthors = BooleanField(_('Send to co-authors'), widget=SwitchWidget())
     extra_cc_emails = EmailListField(_('CC'), description=_('Additional CC e-mail addresses (one per line)'))
-    subject = StringField(_('Subject'), [DataRequired()])
+    subject = StringField(_('Subject'), [DataRequired(), Length(max=200)])
     body = TextAreaField(_('Body'), [DataRequired()])
 
     def __init__(self, *args, event, **kwargs):
