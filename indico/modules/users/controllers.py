@@ -1026,7 +1026,9 @@ class RHUserDelete(RHUserBase):
         if not session.user.is_admin or not config.ENABLE_DELETE_USER_FROM_UI:
             raise Forbidden
         if self.user == session.user:
-            raise Forbidden('You cannot delete your own account')
+            raise Forbidden('You cannot delete your own account.')
+        if self.user.is_admin:
+            raise Forbidden('You cannot delete an admin account.')
 
     def _process(self):
         user_name = self.user.name

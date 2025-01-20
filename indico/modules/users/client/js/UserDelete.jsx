@@ -121,7 +121,7 @@ UserDeleteDialogBody.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-function UserDelete({userId, firstName, lastName}) {
+function UserDelete({userId, isAdmin, firstName, lastName}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const isSameUser = userId === null;
@@ -145,6 +145,24 @@ function UserDelete({userId, firstName, lastName}) {
     handleCloseDialog();
     location.href = resp.data.redirect;
   };
+
+  if (isAdmin && !isSameUser) {
+    return (
+      <Popup
+        trigger={
+          <span>
+            <Button size="small" color="red" disabled>
+              <Translate>Delete User</Translate>
+            </Button>
+          </span>
+        }
+        size="small"
+        wide
+        content={Translate.string('You cannot delete an admin account')}
+        position="bottom center"
+      />
+    );
+  }
 
   return (
     <div>
@@ -185,6 +203,7 @@ function UserDelete({userId, firstName, lastName}) {
 
 UserDelete.propTypes = {
   userId: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf([null])]),
+  isAdmin: PropTypes.bool.isRequired,
   firstName: PropTypes.string.isRequired,
   lastName: PropTypes.string.isRequired,
 };
@@ -196,6 +215,7 @@ customElements.define(
       ReactDOM.render(
         <UserDelete
           userId={JSON.parse(this.getAttribute('user-id'))}
+          isAdmin={JSON.parse(this.getAttribute('user-is-admin'))}
           firstName={this.getAttribute('user-first-name')}
           lastName={this.getAttribute('user-last-name')}
         />,
