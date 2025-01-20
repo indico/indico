@@ -111,9 +111,17 @@ const SELECTION_STRATEGIES = {
       case NONE:
         return keepOpen(selection.copy({left: date}));
       case LEFT_ONLY:
-        return keepOpen(selection.copy({right: date}));
+        if (selection.left > date) {
+          return close(selection.copy({left: date, right: selection.left}));
+        } else {
+          return close(selection.copy({right: date}));
+        }
       case RIGHT_ONLY:
-        return close(selection.copy({left: date}));
+        if (selection.right < date) {
+          return close(selection.copy({right: date, left: selection.right}));
+        } else {
+          return close(selection.copy({left: date}));
+        }
       case BOTH:
         return keepOpen(selection.copy({left: date, right: null}));
       default:
