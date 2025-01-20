@@ -1001,8 +1001,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def move(self, category, *, log_meta=None):
         from indico.modules.events import EventLogRealm
         from indico.modules.logs import LogKind
+        user = session.user if session else None
         if self.pending_move_request:
-            self.pending_move_request.withdraw(user=session.user)
+            self.pending_move_request.withdraw(user=user)
         old_category = self.category
         self.category = category
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
@@ -1011,18 +1012,18 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
         if old_category:
-            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', session.user,
+            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event moved', user,
                      data={'From': old_path, 'To': new_path}, meta=log_meta)
             old_category.log(CategoryLogRealm.events, LogKind.negative, 'Content', f'Event moved out: "{self.title}"',
-                             session.user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
+                             user, data={'ID': self.id, 'To': new_path}, meta=log_meta)
             category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event moved in: "{self.title}"',
-                         session.user, data={'From': old_path}, meta=log_meta)
+                         user, data={'From': old_path}, meta=log_meta)
         else:
             notify_event_creation(self)
-            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event published', session.user,
+            self.log(EventLogRealm.management, LogKind.change, 'Category', 'Event published', user,
                      data={'To': new_path}, meta=log_meta)
             category.log(CategoryLogRealm.events, LogKind.positive, 'Content', f'Event published here: "{self.title}"',
-                         session.user, meta=log_meta)
+                         user, meta=log_meta)
 
     def delete(self, reason, user=None):
         from indico.modules.events import EventLogRealm, logger
