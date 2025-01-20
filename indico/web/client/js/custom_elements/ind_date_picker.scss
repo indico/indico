@@ -288,6 +288,10 @@ ind-date-grid {
       background: var(--background-secondary);
     }
 
+    &[data-current-month='false']:empty {
+      pointer-events: none;
+    }
+
     &[aria-selected] {
       background-color: var(--surface-accent-color);
       color: var(--text-inverse-color);
