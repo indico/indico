@@ -43,7 +43,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Remove the `marshmallow-enum` dependency (:issue:`6701`, :pr:`6703`, thanks
+  :user:`federez-tba`)
 
 
 Version 3.3.5
