@@ -101,7 +101,7 @@ class RHRegistrationFormRemindersSend(RHManageRegFormBase):
     @use_kwargs({
         'sender_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[not_empty, no_relative_urls]),
-        'subject': fields.String(required=True, validate=not_empty),
+        'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
     })
@@ -149,7 +149,7 @@ class RHRegistrationFormRemindersPreview(RHManageRegFormBase):
 
     @use_kwargs({
         'body': fields.String(required=True),
-        'subject': fields.String(required=True),
+        'subject': fields.String(required=True, validate=validate.Length(max=200)),
     })
     def _process(self, body, subject):
         invitations = _query_pending_invitations(self.regform)

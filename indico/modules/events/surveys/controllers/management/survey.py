@@ -165,7 +165,7 @@ class RHEmailEventSurveyPreview(RHManageSurveyBase):
 
     @use_kwargs({
         'body': fields.String(required=True),
-        'subject': fields.String(required=True),
+        'subject': fields.String(required=True, validate=validate.Length(max=200)),
     })
     def _process(self, body, subject):
         email_body = replace_placeholders('survey-link-email', body, event=self.event, survey=self.survey)
@@ -183,7 +183,7 @@ class RHAPIEmailEventSurveySend(RHManageSurveyBase):
             no_relative_urls,
             make_validate_indico_placeholders('survey-link-email'),
         ]),
-        'subject': fields.String(required=True, validate=not_empty),
+        'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email())),
         'copy_for_sender': fields.Bool(load_default=False),
         'email_all_participants': fields.Bool(load_default=False),
