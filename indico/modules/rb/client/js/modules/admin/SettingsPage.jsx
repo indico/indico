@@ -136,6 +136,16 @@ const SettingsPage = props => {
               }
             />
             <FinalCheckbox
+              name="hide_booking_details"
+              label={Translate.string('Hide booking details')}
+              description={
+                <Translate>
+                  If enabled, only room managers and people involved in a booking can see details
+                  such as who made the booking and its history.
+                </Translate>
+              }
+            />
+            <FinalCheckbox
               name="hide_module_if_unauthorized"
               label={Translate.string('Hide the Room Booking system from unauthorized users')}
               description={

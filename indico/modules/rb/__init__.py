@@ -39,6 +39,7 @@ class BookingReasonRequiredOptions(RichIntEnum):
 
 rb_settings = SettingsProxy('roombooking', {
     'managers_edit_rooms': False,
+    'hide_booking_details': False,
     'hide_module_if_unauthorized': False,
     'excluded_categories': [],
     'notification_before_days': 2,
