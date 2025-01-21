@@ -21,7 +21,7 @@ export default function NewEntryDropdown(props) {
     <Dropdown {...props}>
       <Dropdown.Menu>
         <Dropdown.Header content={Translate.string('Add new')} />
-        {['session', 'contribution', 'break'].map(newType => {
+        {['block', 'contrib', 'break'].map(newType => {
           const {title, icon} = entryTypes[newType];
           const handleClick = () => dispatch(actions.addEntry(newType));
           return <Dropdown.Item key={newType} text={title} icon={icon} onClick={handleClick} />;
