@@ -663,6 +663,13 @@ class ReservationLegacyAPISchema(ReservationSchema):
                   'location_name', 'contact_email')
 
     @post_dump(pass_original=True)
+    def _hide_sensitive_data(self, data, booking, **kwargs):
+        if not booking.can_see_details(self.context.get('user')):
+            data['booked_for_name'] = None
+            data['contact_email'] = None
+        return data
+
+    @post_dump(pass_original=True)
     def _rename_keys(self, data, orig, **kwargs):
         data['startDT'] = _add_server_tz(orig.start_dt)
         data['endDT'] = _add_server_tz(orig.end_dt)

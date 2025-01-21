@@ -75,7 +75,7 @@ class RoomHook(RoomBookingHookBase):
         if self._detail == 'reservations':
             reservations = MultiDict(_export_reservations(self, True, False, [
                 Reservation.room_id.in_(x.id for x in rooms_data)
-            ]))
+            ], user=user))
 
         for result in rooms_data:
             yield _serializable_room(result, reservations)
@@ -143,7 +143,7 @@ class ReservationHook(RoomBookingHookBase):
         if not locations:
             return
 
-        for _room_id, reservation in _export_reservations(self, False, True):
+        for _room_id, reservation in _export_reservations(self, False, True, user=user):
             yield reservation
 
 
@@ -222,7 +222,7 @@ class BookRoomHook(HTTPAPIHook):
         return {'reservationID': reservation.id}
 
 
-def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None):
+def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None, user=None):
     """Export reservations.
 
     :param hook: The HTTPAPIHook instance
@@ -256,7 +256,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
     reservations_data = Reservation.get_with_data(*data, filters=filters, limit=hook._limit, offset=hook._offset,
                                                   order=order, limit_per_room=limit_per_room, occurs_on=occurs)
     for result in reservations_data:
-        yield result['reservation'].room_id, _serializable_reservation(result, include_rooms)
+        yield result['reservation'].room_id, _serializable_reservation(result, include_rooms, user=user)
 
 
 def _serializable_room(room, reservations=None):
@@ -284,7 +284,7 @@ def _serializable_room_minimal(room):
     return data
 
 
-def _serializable_reservation(reservation_data, include_room=False):
+def _serializable_reservation(reservation_data, include_room=False, user=None):
     """Serializable reservation (standalone or inside room).
 
     :param reservation_data: Reservation data
@@ -292,7 +292,7 @@ def _serializable_reservation(reservation_data, include_room=False):
     """
     from indico.modules.rb.schemas import ReservationLegacyAPISchema, ReservationOccurrenceLegacyAPISchema
     reservation = reservation_data['reservation']
-    data = ReservationLegacyAPISchema().dump(reservation)
+    data = ReservationLegacyAPISchema(context={'user': user}).dump(reservation)
     data['_type'] = 'Reservation'
     data['repeatability'] = None
     if reservation.repeat_frequency:
