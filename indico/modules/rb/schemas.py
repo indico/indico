@@ -142,6 +142,13 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
                   'is_repeating', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays')
 
     @post_dump(pass_original=True)
+    def _hide_sensitive_data(self, data, booking, **kwargs):
+        user = session.user if session else None
+        if not booking.can_see_details(user):
+            data['booked_for_name'] = None
+        return data
+
+    @post_dump(pass_original=True)
     def _add_missing_weekdays(self, data, booking, **kwargs):
         if booking.repeat_frequency == RepeatFrequency.WEEK and booking.recurrence_weekdays is None:
             # Weekly booking created before the recurrence weekdays have been implemented
@@ -283,8 +290,13 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
 
     @post_dump(pass_original=True)
     def _hide_sensitive_data(self, data, booking, **kwargs):
-        if not booking.room.can_manage(session.user):
+        user = session.user if session else None
+        if not booking.room.can_manage(user):
             del data['internal_note']
+        if not booking.can_see_details(user):
+            data['booked_for_user'] = None
+            data['created_by_user'] = None
+            data['edit_logs'] = None
         return data
 
     @post_dump(pass_original=True)

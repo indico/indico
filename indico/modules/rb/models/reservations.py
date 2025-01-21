@@ -474,6 +474,19 @@ class Reservation(db.Model):
             return False
         return allow_admin and rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
 
+    def can_see_details(self, user, *, allow_admin=True):
+        from indico.modules.rb import rb_settings
+        if not rb_settings.get('hide_booking_details'):
+            return True
+        if user is None:
+            return False
+        return (
+            self.is_owned_by(user)
+            or self.is_booked_for(user)
+            or self.room.can_manage(user, permission='moderate', allow_admin=allow_admin)
+            or (allow_admin and rb_is_admin(user))
+        )
+
     def create_occurrences(self, skip_conflicts, user=None, allow_admin=True):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
