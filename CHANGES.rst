@@ -23,6 +23,8 @@ Improvements
 - Make the event export/import util much more flexible to support exporting whole
   category subtrees, add better support for dealing with files, and add various things
   that were not correctly exported before (:pr:`6446`)
+- Add a setting to limit the information room booking users can see for bookings not
+  linked to them or their rooms (:pr:`6704`)
 
 Bugfixes
 ^^^^^^^^
