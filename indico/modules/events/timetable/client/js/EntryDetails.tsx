@@ -24,7 +24,7 @@ import './EntryDetails.module.scss';
 
 const entryIcons = {
   session: 'calendar alternate outline', // XXX: users also looks nice
-  contribution: 'file alternate outline',
+  contrib: 'file alternate outline',
   break: 'coffee',
 };
 
@@ -68,7 +68,7 @@ function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
                 entry={contrib}
                 uses24HourFormat={uses24HourFormat}
                 dispatch={dispatch}
-                title={entryTypes.contribution.formatTitle(contrib)}
+                title={entryTypes.contrib.formatTitle(contrib)}
               />
             )),
           },
