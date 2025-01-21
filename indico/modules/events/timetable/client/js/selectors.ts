@@ -8,7 +8,7 @@
 import {createSelector} from 'reselect';
 
 import {ReduxState} from './reducers';
-import {appendSessionAttributes, getNumDays, mergeChanges} from './util';
+import {appendSessionAttributes, mergeChanges} from './util';
 
 export const getStaticData = state => state.staticData;
 export const getEntries = (state: ReduxState) => state.entries;
@@ -36,7 +36,7 @@ export const getEventEndDt = createSelector(
 export const getEventNumDays = createSelector(
   getEventStartDt,
   getEventEndDt,
-  (startDt, endDt) => getNumDays(startDt, endDt) + 1
+  (startDt, endDt) => endDt.diff(startDt, 'days') + 1
 );
 
 export const getBlocks = createSelector(
@@ -111,6 +111,10 @@ export const getDisplayMode = createSelector(
 export const showUnscheduled = createSelector(
   getDisplay,
   display => display.showUnscheduled
+);
+export const showAllTimeslots = createSelector(
+  getDisplay,
+  display => display.showAllTimeslots
 );
 
 export const getModalType = createSelector(

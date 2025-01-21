@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
@@ -15,7 +15,6 @@ import {Translate} from 'indico/react/i18n';
 import * as actions from './actions';
 import NewEntryDropdown from './components/NewEntryDropdown';
 import * as selectors from './selectors';
-import {getNumDays} from './util';
 
 import './Toolbar.module.scss';
 
@@ -57,8 +56,9 @@ export default function Toolbar({
   const maxDays = useSelector(selectors.getNavbarMaxDays);
   const offset = useSelector(selectors.getNavbarOffset);
   const displayMode = useSelector(selectors.getDisplayMode);
+  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
   const showUnscheduled = useSelector(selectors.showUnscheduled);
-  const currentDayIdx = getNumDays(eventStart, date);
+  const currentDayIdx = date.diff(eventStart, 'days');
 
   const handleResize = useCallback(() => {
     dispatch(actions.resizeWindow(ref.current.clientWidth, currentDayIdx));
@@ -72,7 +72,7 @@ export default function Toolbar({
     };
   }, [handleResize]);
 
-  const getDateFromIdx = idx => moment(eventStart.getTime() + idx * 24 * 60 * 60 * 1000);
+  const getDateFromIdx = idx => eventStart.clone().add(idx, 'days');
 
   const makeScrollHandler = (newOffset, navigateTo = null, mouseDown = false) => e => {
     if (mouseDown && e.buttons !== 1) {
@@ -201,16 +201,30 @@ export default function Toolbar({
           className={numDays <= maxDays ? 'right' : undefined}
           direction="left"
           title={Translate.string('Display mode')}
-          value={displayMode}
-          options={displayModes.map(({name, title, icon}) => ({
-            key: name,
-            value: name,
-            text: title,
-            icon,
-            onClick: () => dispatch(actions.setDisplayMode(name)),
-          }))}
           item
-        />
+        >
+          <Dropdown.Menu>
+            {displayModes.map(({name, title, icon}) => (
+              <Dropdown.Item
+                key={name}
+                text={title}
+                icon={icon}
+                onClick={() => dispatch(actions.setDisplayMode(name))}
+                active={displayMode === name}
+              />
+            ))}
+            <Dropdown.Divider />
+            <Dropdown.Item
+              text={Translate.string('Show all timeslots')}
+              icon="clock outline"
+              onClick={e => {
+                e.stopPropagation();
+                dispatch(actions.toggleShowAllTimeslots());
+              }}
+              active={showAllTimeslots}
+            />
+          </Dropdown.Menu>
+        </Dropdown>
         <NewEntryDropdown
           icon="add"
           styleName="action"

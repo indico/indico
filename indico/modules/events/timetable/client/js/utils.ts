@@ -44,7 +44,3 @@ function gcd(a: number, b: number) {
   }
   return a;
 }
-
-export function getEarliestDate(dates: string[]): string {
-  return dates.reduce((earliest, date) => (date < earliest ? date : earliest), dates[0]);
-}
