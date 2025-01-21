@@ -18,7 +18,7 @@ import {
   changeBreakColor,
   dropUnscheduledContribs,
 } from './operations';
-import {preprocessSessionData, preprocessTimetableData} from './preprocess';
+import {preprocessSessionData, preprocessTimetableEntries} from './preprocess';
 import {DayEntries} from './types';
 
 interface Change {
@@ -57,7 +57,7 @@ export default {
   ) => {
     switch (action.type) {
       case actions.SET_TIMETABLE_DATA: {
-        const {dayEntries, unscheduled} = preprocessTimetableData(action.data, action.eventInfo);
+        const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};
       }
       case actions.MOVE_ENTRY: {
@@ -226,12 +226,14 @@ export default {
         return state;
     }
   },
-  display: (state = {mode: 'compact', showUnscheduled: false}, action) => {
+  display: (state = {mode: 'compact', showUnscheduled: false, showAllTimeslots: false}, action) => {
     switch (action.type) {
       case actions.SET_DISPLAY_MODE:
         return {...state, mode: action.mode};
       case actions.TOGGLE_SHOW_UNSCHEDULED:
         return {...state, showUnscheduled: !state.showUnscheduled};
+      case actions.TOGGLE_SHOW_ALL_TIMESLOTS:
+        return {...state, showAllTimeslots: !state.showAllTimeslots};
       default:
         return state;
     }
