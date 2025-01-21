@@ -325,7 +325,7 @@ function EditableListDisplay({
 
   const tagsExist = sortedList.some(x => x.editable?.tags?.length > 0);
   if (tagsExist) {
-    columnHeaders.push(['tags', Translate.string('Tags'), 136]);
+    columnHeaders.push(['tags', Translate.string('Tags'), 135]);
   }
 
   const programCodeKey = contribution => contribution.code;
@@ -459,17 +459,31 @@ function EditableListDisplay({
   };
   const renderTags = (__, editable) => {
     const tags = editable.tags.sort((a, b) => a.code.localeCompare(b.code));
-    return (
-      <div style={{display: 'flex', flexWrap: 'nowrap'}}>
-        {tags.map(t => {
-          return (
-            <Label key={t.code} size="small" color={t.color}>
-              {t.code}
-            </Label>
-          );
-        })}
-      </div>
-    );
+    const labelTags = () => {
+      return (
+        <div style={{display: 'flex', flexWrap: 'nowrap'}}>
+          {tags.map(t => {
+            return (
+              <Label key={t.code} size="small" color={t.color}>
+                {t.code}
+              </Label>
+            );
+          })}
+        </div>
+      );
+    };
+
+    const colorTags = () => {
+      return (
+        <div>
+          {tags.map(t => {
+            return <Label key={`${t.code}-dot`} circular empty color={t.color} />;
+          })}
+        </div>
+      );
+    };
+
+    return [labelTags(), colorTags()];
   };
   const renderFuncs = {
     friendlyId: renderId,
@@ -489,16 +503,20 @@ function EditableListDisplay({
     return dataKey === 'tags' && row.editable?.tags ? (
       <Popup
         position="top center"
-        content={fn(row[dataKey], row.editable, rowIndex)}
+        content={fn(row[dataKey], row.editable, rowIndex)[0]}
         trigger={
-          <div styleName="rowcolumn-tooltip" role="gridcell">
-            {row.editable.tags.length > 1 ? (
-              <div className="more-indicator">
-                <span>...</span>
-              </div>
-            ) : null}
-            {fn(row[dataKey], row.editable, rowIndex)}
-          </div>
+          row.editable.tags.length > 1 ? (
+            <div styleName="rowcolumn-tooltip" role="gridcell">
+              {fn(row[dataKey], row.editable, rowIndex)[1]}
+              {row.editable.tags.length > 5 ? (
+                <div className="more-indicator">
+                  <Icon name="plus circle" color="grey" />
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div>{fn(row[dataKey], row.editable, rowIndex)[0]}</div>
+          )
         }
         on="hover"
       />
