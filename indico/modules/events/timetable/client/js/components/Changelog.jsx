@@ -15,7 +15,7 @@ import {Icon, Label, List, Modal} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import * as selectors from '../selectors';
-import {entryColorSchema, entrySchema, entryTypes, getNumDays, isChildOf} from '../util';
+import {entryColorSchema, entrySchema, entryTypes, isChildOf} from '../util';
 
 import DetailsSegment from './DetailsSegment';
 
@@ -36,7 +36,7 @@ DiffLabel.propTypes = {
 };
 
 const renderDateDiff = (oldValue, newValue) => {
-  const diff = getNumDays(oldValue, newValue);
+  const diff = newValue.diff(oldValue, 'days');
   return (
     <DiffLabel diff={diff}>
       <PluralTranslate count={Math.abs(diff)}>
