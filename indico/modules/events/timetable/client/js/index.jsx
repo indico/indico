@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
@@ -28,8 +29,18 @@ const DEBUG_MODE = false; //TODO: remove
       const initialData = {
         staticData: {
           eventId: parseInt(eventInfo.id, 10),
-          startDt: DEBUG_MODE ? new Date(2023, 4, 8) : new Date(eventInfo.startDate.date), // TODO handle tz
-          endDt: DEBUG_MODE ? new Date(2023, 4, 12) : new Date(eventInfo.endDate.date), // TODO handle tz
+          startDt: DEBUG_MODE
+            ? moment(2023, 4, 8)
+            : moment.tz(
+                `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
+                eventInfo.startDate.tz
+              ),
+          endDt: DEBUG_MODE
+            ? moment(2023, 4, 12)
+            : moment.tz(
+                `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,
+                eventInfo.endDate.tz
+              ),
         },
       };
       const store = createReduxStore('regform-submission', reducers, initialData);

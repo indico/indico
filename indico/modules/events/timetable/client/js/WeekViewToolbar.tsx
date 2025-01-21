@@ -6,13 +6,10 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {useCallback, useEffect, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import React from 'react';
+import {useSelector} from 'react-redux';
 
-import * as actions from './actions';
 import * as selectors from './selectors';
-import {getNumDays} from './util';
 
 import './WeekViewToolbar.module.scss';
 
@@ -27,7 +24,7 @@ export default function Toolbar({
   const numDays = useSelector(selectors.getEventNumDays);
   const offset = useSelector(selectors.getNavbarOffset);
 
-  const getDateFromIdx = idx => moment(eventStart.getTime() + idx * 24 * 60 * 60 * 1000);
+  const getDateFromIdx = idx => moment(eventStart).add(idx, 'days');
 
   return (
     <div style={{marginLeft: 50, display: 'flex', fontSize: 18, paddingBottom: 10}}>

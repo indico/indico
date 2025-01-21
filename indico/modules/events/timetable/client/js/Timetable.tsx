@@ -16,7 +16,6 @@ import EntryDetails from './EntryDetails';
 import ContributionEntryForm from './forms/ContributionEntryForm';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {getEarliestDate} from './utils';
 import {WeekTimetable} from './WeekTimetable';
 import WeekViewToolbar from './WeekViewToolbar';
 
@@ -29,14 +28,16 @@ import './Timetable.module.scss';
 export default function Timetable() {
   const dispatch = useDispatch();
   const entries = useSelector(selectors.getDayEntries);
+  const eventStartDt = useSelector(selectors.getEventStartDt);
+  const eventEndDt = useSelector(selectors.getEventEndDt);
+  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
 
   // const blocks = useSelector(selectors.getBlocks);
   const selectedId = useSelector(selectors.getSelectedId);
   // const selectedId = null;
 
   // const draggedContribs = useSelector(selectors.getDraggedContribs);
-  const [date, setDate] = useState(moment(getEarliestDate(Object.keys(entries))));
-  const [placeholderEntry, setPlaceholderEntry] = useState(null);
+  const [date, setDate] = useState(eventStartDt);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
 
   let selectedEntry = currentDateEntries.find(e => e.id === selectedId);
@@ -49,36 +50,33 @@ export default function Timetable() {
 
   const useWeekView = false;
 
-  const minHour = Math.max(
-    0,
-    useWeekView
-      ? Math.min(
-          ...Object.values(entries)
-            .flat()
-            .map(e => moment(e.startDt).hour())
-        ) - 1
-      : Math.min(...currentDateEntries.map(e => moment(e.startDt).hour())) - 1
-  );
-  const maxHour = Math.min(
-    24,
-    useWeekView
-      ? Math.max(
-          ...Object.values(entries)
-            .flat()
-            .map(e =>
+  const minHour = showAllTimeslots
+    ? 0
+    : Math.max(
+        Math.min(
+          eventStartDt.hour(),
+          ...(useWeekView
+            ? Object.values(entries)
+                .flat()
+                .map(e => e.startDt.hour())
+            : currentDateEntries.map(e => e.startDt.hour()))
+        ) - 1,
+        0
+      );
+  const maxHour = showAllTimeslots
+    ? 24
+    : Math.max(
+        eventEndDt.hour(),
+        ...(useWeekView
+          ? Object.values(entries)
+              .flat()
+              .map(e => e.startDt.add(e.duration, 'minutes').hour())
+          : currentDateEntries.map(e =>
               moment(e.startDt)
                 .add(e.duration, 'minutes')
                 .hour()
-            )
-        ) + 1
-      : Math.max(
-          ...currentDateEntries.map(e =>
-            moment(e.startDt)
-              .add(e.duration, 'minutes')
-              .hour()
-          )
-        ) + 1
-  );
+            ))
+      );
 
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
@@ -94,7 +92,7 @@ export default function Timetable() {
   }, [dispatch]);
 
   return (
-    <div styleName={`timetable`}>
+    <div styleName="timetable">
       {/* <div style={{height: 50}}>
         <Checkbox
           toggle
@@ -108,7 +106,12 @@ export default function Timetable() {
       <div styleName="content">
         {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}
         {!useWeekView && (
-          <DayTimetable dt={date} minHour={0} maxHour={24} entries={currentDateEntries} />
+          <DayTimetable
+            dt={date}
+            minHour={minHour}
+            maxHour={maxHour}
+            entries={currentDateEntries}
+          />
         )}
         {!popupsEnabled && selectedEntry && <EntryDetails entry={selectedEntry} />}
         <ContributionEntryForm />
