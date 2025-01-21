@@ -20,8 +20,11 @@ interface BaseEntry {
   type: 'contrib' | 'block' | 'break';
   id: number;
   title: string;
-  startDt: Moment;
   duration: number;
+}
+
+interface ScheduledMixin {
+  startDt: Moment;
   // position information
   x: number;
   y: number;
@@ -30,18 +33,14 @@ interface BaseEntry {
   maxColumn: number;
 }
 
-export interface ContribEntry extends BaseEntry {
+export interface UnscheduledContrib extends BaseEntry {
   type: 'contrib';
   sessionId?: number;
 }
 
-export interface BlockEntry extends BaseEntry {
-  type: 'block';
-  sessionId: number;
-  children: ChildEntry[];
-}
+export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {}
 
-export interface BreakEntry extends BaseEntry {
+export interface BreakEntry extends BaseEntry, ScheduledMixin {
   type: 'break';
   sessionId?: number;
   textColor: string;
@@ -56,7 +55,14 @@ export interface ChildBreakEntry extends BreakEntry {
   parentId: number;
 }
 
-export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
+
+export interface BlockEntry extends BaseEntry, ScheduledMixin {
+  type: 'block';
+  sessionId: number;
+  children: ChildEntry[];
+}
+
+export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
