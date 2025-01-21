@@ -17,9 +17,6 @@ from indico.modules.rb.util import (format_weekdays, get_booking_params_for_even
 from indico.testing.util import bool_matrix
 
 
-pytest_plugins = 'indico.modules.events.timetable.testing.fixtures'
-
-
 @pytest.mark.parametrize(('is_rb_admin', 'acl_empty', 'in_acl', 'expected'), bool_matrix('...', expect=any))
 def test_rb_check_user_access(db, mocker, dummy_user, dummy_group, is_rb_admin, acl_empty, in_acl, expected):
     if is_rb_admin:
@@ -79,7 +76,7 @@ def test_get_booking_params_for_all_days(create_event, dummy_room, start_dt, end
     # end time < start time
     (time(15), time(13), {}),
 ))
-def test_get_booking_params_for_each_day(create_event, create_contribution, create_entry, dummy_room,
+def test_get_booking_params_for_each_day(create_event, create_contribution, create_timetable_entry, dummy_room,
                                          start_time, end_time, expected_params):
     start_dt = pytz.utc.localize(datetime.combine(date(2019, 8, 16), start_time))
     end_dt = pytz.utc.localize(datetime.combine(date(2019, 8, 18), end_time))
@@ -87,9 +84,9 @@ def test_get_booking_params_for_each_day(create_event, create_contribution, crea
     c1 = create_contribution(event, 'C1', timedelta(minutes=30))
     c2 = create_contribution(event, 'C2', timedelta(minutes=120))
     c3 = create_contribution(event, 'C3', timedelta(minutes=30))
-    create_entry(c1, pytz.utc.localize(datetime(2019, 8, 17, 9, 0)))
-    create_entry(c2, pytz.utc.localize(datetime(2019, 8, 17, 18, 0)))
-    create_entry(c3, pytz.utc.localize(datetime(2019, 8, 17, 19, 0)))
+    create_timetable_entry(event, c1, pytz.utc.localize(datetime(2019, 8, 17, 9, 0)))
+    create_timetable_entry(event, c2, pytz.utc.localize(datetime(2019, 8, 17, 18, 0)))
+    create_timetable_entry(event, c3, pytz.utc.localize(datetime(2019, 8, 17, 19, 0)))
     params = get_booking_params_for_event(event)
     assert params['params'] == {
         'link_type': 'event',
