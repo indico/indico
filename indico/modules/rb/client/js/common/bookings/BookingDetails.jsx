@@ -917,7 +917,7 @@ class BookingDetails extends React.Component {
                   {bookingReason && this.renderReason(bookingReason)}
                   {room.canUserViewInternalNotes && this.renderNotes(internalNote)}
                   {isLinkedToObjects && <LazyBookingLinks id={id} />}
-                  {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
+                  {editLogs && this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                   {this.renderMessages(error, newBookingId)}
                 </>
               </Grid.Column>
