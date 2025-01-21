@@ -15,7 +15,7 @@ from babel.numbers import format_currency
 from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
-from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, InputRequired, Length, NumberRange, Optional, ValidationError
 from wtforms.widgets import NumberInput, html_params
 
 from indico.core import signals
@@ -333,7 +333,7 @@ class EmailRegistrantsForm(IndicoForm):
     cc_addresses = EmailListField(_('CC'),
                                   description=_('Beware, addresses in this field will receive one mail per '
                                                 'registrant.'))
-    subject = StringField(_('Subject'), [DataRequired()])
+    subject = StringField(_('Subject'), [DataRequired(), Length(max=200)])
     body = TextAreaField(_('Email body'), [DataRequired(), NoRelativeURLs()], widget=TinyMCEWidget(absolute_urls=True))
     recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),

@@ -154,7 +154,7 @@ export function EmailDialog({
           options={senders.map(([value, text]) => ({value, text}))}
           required
         />
-        <FinalInput name="subject" label={Translate.string('Subject')} required />
+        <FinalInput name="subject" label={Translate.string('Subject')} required maxLength={200} />
         <FinalTinyMCETextEditor
           name="body"
           label={Translate.string('Email body')}

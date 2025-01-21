@@ -51,7 +51,7 @@ class EmailRolesPreviewMixin:
 
     @use_kwargs({
         'body': fields.String(required=True),
-        'subject': fields.String(required=True),
+        'subject': fields.String(required=True, validate=validate.Length(max=200)),
     })
     def _process(self, body, subject):
         kwargs = self.get_placeholder_kwargs()
@@ -92,7 +92,7 @@ class EmailRolesSendMixin:
     @use_kwargs({
         'sender_address': fields.String(required=True, validate=not_empty),
         'body': fields.String(required=True, validate=[not_empty, no_relative_urls]),
-        'subject': fields.String(required=True, validate=not_empty),
+        'subject': fields.String(required=True, validate=[not_empty, validate.Length(max=200)]),
         'bcc_addresses': fields.List(LowercaseString(validate=validate.Email()), load_default=lambda: []),
         'copy_for_sender': fields.Bool(load_default=False),
         'recipient_roles': fields.List(
