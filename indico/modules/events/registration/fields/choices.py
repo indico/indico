@@ -9,6 +9,7 @@ import sys
 from collections import Counter
 from copy import deepcopy
 from datetime import date, datetime
+from decimal import Decimal
 from uuid import uuid4
 
 from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
@@ -204,9 +205,10 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         billable_choices = [x for x in versioned_data['choices'] if x['id'] in reg_data and x['price']]
         price = 0
         for billable_field in billable_choices:
-            price += billable_field['price']
+            field_price = Decimal(str(billable_field['price']))
+            price += field_price
             if billable_field.get('extra_slots_pay'):
-                price += (reg_data[billable_field['id']] - 1) * billable_field['price']
+                price += (reg_data[billable_field['id']] - 1) * field_price
         return price
 
 
@@ -607,7 +609,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
         if not item:
             return 0
         nights = (_to_date(reg_data['departure_date']) - _to_date(reg_data['arrival_date'])).days
-        return item['price'] * nights
+        return Decimal(str(item['price'])) * nights
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False, new_data_version=None):
         if billable_items_locked and old_data.price:
