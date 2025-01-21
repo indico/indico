@@ -103,13 +103,12 @@ $border: 1px solid $pastel-gray;
   :global(.more-indicator) {
     position: absolute;
     right: 0;
-    top: 50%;
+    top: 48%;
     transform: translateY(-50%);
     z-index: 1;
     background-color: white;
     padding-top: 0.9em;
     padding-bottom: 0.9em;
-    padding-left: 0.2em;
     cursor: pointer;
   }
 }
