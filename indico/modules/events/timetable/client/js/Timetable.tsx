@@ -52,13 +52,16 @@ export default function Timetable() {
 
   const minHour = showAllTimeslots
     ? 0
-    : Math.min(
-        eventStartDt.hour(),
-        ...(useWeekView
-          ? Object.values(entries)
-              .flat()
-              .map(e => e.startDt.hour())
-          : currentDateEntries.map(e => e.startDt.hour()))
+    : Math.max(
+        Math.min(
+          eventStartDt.hour(),
+          ...(useWeekView
+            ? Object.values(entries)
+                .flat()
+                .map(e => e.startDt.hour())
+            : currentDateEntries.map(e => e.startDt.hour()))
+        ) - 1,
+        0
       );
   const maxHour = showAllTimeslots
     ? 24
