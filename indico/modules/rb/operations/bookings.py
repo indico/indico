@@ -160,12 +160,14 @@ def get_room_candidates(candidates, conflicts):
             if not (any(candidate.overlaps(conflict) for conflict in conflicts))]
 
 
-def _bookings_query(filters, noload_room=False):
+def _bookings_query(filters, *, noload_room=False, load_room_acl=False):
     reservation_strategy = contains_eager('reservation')
     if noload_room:
         reservation_strategy.raiseload('room')
     else:
-        reservation_strategy.joinedload('room')
+        room_strategy = reservation_strategy.joinedload('room')
+        if load_room_acl:
+            room_strategy.selectinload('acl_entries')
     reservation_strategy.noload('booked_for_user')
     reservation_strategy.noload('created_by_user')
 
@@ -206,7 +208,8 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
     start_dt = datetime.combine(start_date, time(hour=0, minute=0))
     end_dt = datetime.combine(end_date, time(hour=23, minute=59))
     query = _bookings_query(dict(filters, start_dt=start_dt, end_dt=end_dt, room_ids=room_ids,
-                                 include_inactive=include_inactive))
+                                 include_inactive=include_inactive),
+                            load_room_acl=rb_settings.get('hide_booking_details'))
     bookings = query.order_by(db.func.indico.natsort(Room.full_name)).all()
     rooms = set()
     if room_ids:
