@@ -7,7 +7,7 @@
 
 from flask import redirect, session
 from flask.helpers import flash
-from marshmallow_enum import EnumField
+from marshmallow import fields
 
 from indico.core.db import db
 from indico.modules.events import EventLogRealm
@@ -64,7 +64,7 @@ class RHRegistrationPrivacy(RHManageRegFormBase):
 class RHAPIRegistrationChangeConsent(RHRegistrationFormRegistrationBase):
     """Internal API to change registration consent to publish."""
 
-    @use_kwargs({'consent_to_publish': EnumField(RegistrationVisibility)})
+    @use_kwargs({'consent_to_publish': fields.Enum(RegistrationVisibility)})
     def _process_POST(self, consent_to_publish):
         update_registration_consent_to_publish(self.registration, consent_to_publish)
         return '', 204

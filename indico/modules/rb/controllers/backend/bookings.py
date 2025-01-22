@@ -11,7 +11,6 @@ from datetime import date, datetime, time
 import dateutil
 from flask import jsonify, request, session
 from marshmallow import fields, validate
-from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -65,7 +64,7 @@ class RHTimeline(RHRoomBookingBase):
     @use_kwargs({
         'start_dt': fields.DateTime(required=True),
         'end_dt': fields.DateTime(required=True),
-        'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
+        'repeat_frequency': fields.Enum(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
         'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None),
         'skip_conflicts_with': fields.List(fields.Int(), load_default=None),
@@ -311,7 +310,7 @@ class RHBookingEditCalendars(RHBookingBase):
     @use_kwargs({
         'start_dt': fields.DateTime(required=True),
         'end_dt': fields.DateTime(required=True),
-        'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
+        'repeat_frequency': fields.Enum(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
         'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None)
     }, location='query')
@@ -395,7 +394,7 @@ class RHMatchingEvents(RHRoomBookingBase):
     @use_kwargs({
         'start_dt': fields.DateTime(),
         'end_dt': fields.DateTime(),
-        'repeat_frequency': EnumField(RepeatFrequency, load_default='NEVER'),
+        'repeat_frequency': fields.Enum(RepeatFrequency, load_default='NEVER'),
         'repeat_interval': fields.Int(load_default=1),
         'recurrence_weekdays': fields.List(fields.Str(validate=validate.OneOf(WEEKDAYS)), load_default=None)
     }, location='query')

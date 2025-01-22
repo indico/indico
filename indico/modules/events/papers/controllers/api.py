@@ -6,7 +6,6 @@
 # LICENSE file for more details.
 
 from flask import request, session
-from marshmallow_enum import EnumField
 from webargs import fields, validate
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
@@ -50,7 +49,7 @@ class RHCreatePaperComment(RHPaperBase):
 
     @use_kwargs({
         'comment': fields.String(validate=not_empty),
-        'visibility': EnumField(PaperCommentVisibility, load_default=None)
+        'visibility': fields.Enum(PaperCommentVisibility, load_default=None)
     })
     def _process(self, comment, visibility):
         create_comment(self.paper, comment, visibility, session.user)
@@ -82,7 +81,7 @@ class RHCommentActions(RHPaperBase):
 
     @use_kwargs({
         'comment': fields.String(validate=not_empty),
-        'visibility': EnumField(PaperCommentVisibility)
+        'visibility': fields.Enum(PaperCommentVisibility)
     }, partial=True)
     def _process_PATCH(self, comment=None, visibility=None):
         update_comment(self.comment, comment, visibility)
@@ -94,7 +93,7 @@ class RHJudgePaper(RHPaperBase):
         return self.paper.can_judge(session.user, check_state=True)
 
     @use_kwargs({
-        'action': EnumField(PaperAction, required=True),
+        'action': fields.Enum(PaperAction, required=True),
         'comment': fields.String()
     })
     def _process(self, action, comment):
@@ -122,7 +121,7 @@ class RHSubmitNewRevision(RHPaperBase):
 
 def _parse_review_args(event, review_type):
     args_schema = {
-        'proposed_action': EnumField(PaperAction, required=True),
+        'proposed_action': fields.Enum(PaperAction, required=True),
         'comment': fields.String(load_default='')
     }
 

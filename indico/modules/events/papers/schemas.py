@@ -7,8 +7,7 @@
 
 from markupsafe import escape
 from marshmallow import post_dump
-from marshmallow.fields import Boolean, Decimal, Field, Function, Integer, List, Method, Nested, String
-from marshmallow_enum import EnumField
+from marshmallow.fields import Boolean, Decimal, Enum, Field, Function, Integer, List, Method, Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import BasicContributionSchema
@@ -100,7 +99,7 @@ class PaperRevisionSchema(mm.SQLAlchemyAutoSchema):
     judge = Nested(BasicUserSchema)
     spotlight_file = Nested(PaperFileSchema)
     files = List(Nested(PaperFileSchema))
-    state = EnumField(PaperRevisionState)
+    state = Enum(PaperRevisionState)
     timeline = PaperRevisionTimelineField()
     judgment_comment_html = Function(lambda revision: escape(revision.judgment_comment))
     reviewer_data = Method('_get_reviewer_data')

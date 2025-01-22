@@ -205,13 +205,10 @@ marshmallow==3.23.1
     #   -r requirements.in
     #   flask-marshmallow
     #   marshmallow-dataclass
-    #   marshmallow-enum
     #   marshmallow-oneofschema
     #   marshmallow-sqlalchemy
     #   webargs
 marshmallow-dataclass==8.7.1
-    # via -r requirements.in
-marshmallow-enum==1.5.1
     # via -r requirements.in
 marshmallow-oneofschema==3.1.1
     # via -r requirements.in

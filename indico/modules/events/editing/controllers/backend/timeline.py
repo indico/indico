@@ -13,7 +13,6 @@ from zipfile import ZipFile, ZipInfo
 
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, fields
-from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServiceUnavailable
 
@@ -248,7 +247,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
         return self.editable.can_perform_submitter_actions(session.user)
 
     @use_kwargs({
-        'action': EnumField(EditingConfirmationAction, required=True),
+        'action': fields.Enum(EditingConfirmationAction, required=True),
         'comment': fields.String(load_default='')
     })
     def _process(self, action, comment):
@@ -267,7 +266,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
 
     @use_kwargs({
         'comment': fields.String(load_default=''),
-        'revision_type': EnumField(RevisionType)
+        'revision_type': fields.Enum(RevisionType)
     })
     def _process(self, comment, revision_type):
         args = parser.parse({

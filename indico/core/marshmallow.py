@@ -10,7 +10,6 @@ from inspect import getmro
 from flask_marshmallow import Marshmallow
 from flask_marshmallow.sqla import SQLAlchemyAutoSchemaOpts
 from marshmallow import fields, post_dump, post_load, pre_load
-from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelConverter
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema as MSQLASQLAlchemyAutoSchema
 from sqlalchemy.orm import ColumnProperty
@@ -33,7 +32,7 @@ class IndicoModelConverter(ModelConverter):
     SQLA_TYPE_MAPPING = ModelConverter.SQLA_TYPE_MAPPING.copy()
     SQLA_TYPE_MAPPING.update({
         UTCDateTime: fields.DateTime,
-        PyIntEnum: EnumField
+        PyIntEnum: fields.Enum
     })
 
     def _get_field_kwargs_for_property(self, prop):

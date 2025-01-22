@@ -7,7 +7,6 @@
 
 from flask import jsonify, session
 from marshmallow import INCLUDE, fields
-from marshmallow_enum import EnumField
 
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -46,7 +45,7 @@ class RHAPISearch(RH):
     @use_kwargs({
         'page': fields.Int(load_default=None),
         'q': fields.String(required=True),
-        'type': fields.List(EnumField(SearchTarget), required=True),
+        'type': fields.List(fields.Enum(SearchTarget), required=True),
         'admin_override_enabled': fields.Bool(
             load_default=False,
             validate=validate_with_message(lambda value: session.user and session.user.is_admin,

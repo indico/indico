@@ -10,7 +10,6 @@ from operator import itemgetter
 
 from markupsafe import escape
 from marshmallow import ValidationError, fields, post_dump, validate, validates, validates_schema
-from marshmallow_enum import EnumField
 from sqlalchemy import func
 
 from indico.core.marshmallow import mm
@@ -251,7 +250,7 @@ class EditableBasicSchema(mm.SQLAlchemyAutoSchema):
         model = Editable
         fields = ('id', 'type', 'state', 'editor', 'timeline_url', 'revision_count', 'tags', 'last_update_dt')
 
-    state = EnumField(EditableState)
+    state = fields.Enum(EditableState)
     editor = fields.Nested(EditingUserSchema)
     timeline_url = fields.String()
     tags = fields.List(fields.Nested(EditingTagSchema, only=('id', 'code', 'title', 'color')),
@@ -295,7 +294,7 @@ class FilteredEditableSchema(mm.SQLAlchemyAutoSchema):
                                        attribute='contribution.person_links')
     contribution_keywords = fields.List(fields.String(), attribute='contribution.keywords')
     contribution_session = fields.Nested(SessionBasicSchema, attribute='contribution.session')
-    state = EnumField(EditableState)
+    state = fields.Enum(EditableState)
     timeline_url = fields.String()
     editor = fields.Nested(EditingUserSchema)
     can_assign_self = fields.Function(lambda editable, ctx: editable.can_assign_self(ctx.get('user')))
@@ -318,7 +317,7 @@ class EditingReviewAction(IndicoEnum):
 
 
 class ReviewEditableArgs(mm.Schema):
-    action = EnumField(EditingReviewAction, required=True)
+    action = fields.Enum(EditingReviewAction, required=True)
     comment = fields.String(load_default='')
 
     @validates_schema(skip_on_field_errors=True)
@@ -437,7 +436,7 @@ class EditingMenuItemSchema(mm.Schema):
 
 
 class EditableTypeArgs(mm.Schema):
-    editable_types = fields.List(EnumField(EditableType), required=True)
+    editable_types = fields.List(fields.Enum(EditableType), required=True)
 
 
 class EditableTypePrincipalsSchema(mm.Schema):

@@ -36,7 +36,6 @@ lxml[html5]
 markdown
 markupsafe
 marshmallow-dataclass
-marshmallow-enum
 marshmallow-oneofschema
 marshmallow-sqlalchemy
 marshmallow

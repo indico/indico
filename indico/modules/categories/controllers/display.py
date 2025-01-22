@@ -17,7 +17,6 @@ import dateutil
 from dateutil.parser import ParserError
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
-from marshmallow_enum import EnumField
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, selectinload, subqueryload, undefer, undefer_group
 from webargs import fields, validate
@@ -575,7 +574,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         room = auto()
         keywords = auto()
 
-    @use_kwargs({'group_by': EnumField(GroupBy, load_default=GroupBy.category)}, location='query')
+    @use_kwargs({'group_by': fields.Enum(GroupBy, load_default=GroupBy.category)}, location='query')
     def _process_args(self, group_by):
         RHDisplayCategoryBase._process_args(self)
         tz = self.category.display_tzinfo
