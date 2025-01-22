@@ -638,15 +638,18 @@ def set_custom_fields(obj, custom_fields_data):
 
 def check_permissions(event, field, allow_networks=False):
     for principal_fossil, permissions in field.data:
-        principal = principal_from_identifier(principal_fossil['identifier'],
-                                              allow_external_users=True,
-                                              allow_groups=True,
-                                              allow_category_roles=True,
-                                              allow_event_roles=True,
-                                              allow_emails=True,
-                                              allow_registration_forms=True,
-                                              allow_networks=allow_networks,
-                                              event_id=event.id)
+        try:
+            principal = principal_from_identifier(principal_fossil['identifier'],
+                                                  allow_external_users=True,
+                                                  allow_groups=True,
+                                                  allow_category_roles=True,
+                                                  allow_event_roles=True,
+                                                  allow_emails=True,
+                                                  allow_registration_forms=True,
+                                                  allow_networks=allow_networks,
+                                                  event_id=event.id)
+        except ValueError as exc:
+            return _('Invalid ACL entry: {}').format(exc)
         if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
             return _('IP networks cannot have management permissions: {}').format(principal.name)
         if isinstance(principal, RegistrationForm) and set(permissions) - {READ_ACCESS_PERMISSION}:
