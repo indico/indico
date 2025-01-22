@@ -66,3 +66,7 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;
 export type Entry = TopLevelEntry | ChildEntry;
 export type DayEntries = Record<string, TopLevelEntry[]>;
+
+export function isChildEntry(entry: Entry): entry is ChildEntry {
+  return 'parentId' in entry;
+}
