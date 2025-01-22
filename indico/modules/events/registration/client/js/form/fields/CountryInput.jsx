@@ -52,7 +52,7 @@ CountryInputComponent.propTypes = {
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 
-export default function CountryInput({htmlId, htmlName, isRequired, choices, ...inputProps}) {
+export default function CountryInput({htmlId, htmlName, isRequired, choices, disabled}) {
   return (
     <FinalField
       id={htmlId}
@@ -62,7 +62,7 @@ export default function CountryInput({htmlId, htmlName, isRequired, choices, ...
       choices={choices}
       clearable={!isRequired}
       parse={x => x}
-      {...inputProps}
+      disabled={disabled}
     />
   );
 }
@@ -71,11 +71,13 @@ CountryInput.propTypes = {
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,
+  disabled: PropTypes.bool,
   choices: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
 };
 
 CountryInput.defaultProps = {
   isRequired: false,
+  disabled: false,
 };
 
 export function CountrySettings({htmlName}) {
