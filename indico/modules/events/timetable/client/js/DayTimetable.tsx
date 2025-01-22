@@ -16,7 +16,7 @@ import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
-import {TopLevelEntry, BlockEntry} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {minutesToPixels, pixelsToMinutes} from './utils';
 
@@ -243,10 +243,11 @@ function layoutAfterDropOnCalendar(
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
-  let entry = entries.find(e => e.id === id);
+  let fromEntry: Entry | undefined = entries.find(e => e.id === id);
   let fromBlock: BlockEntry | undefined;
-  if (!entry) {
-    // maybe a break from inside a block
+  if (!fromEntry) {
+    // If we didn't find the entry in the top level,
+    // it must be a break inside a session block.
     fromBlock = entries
       .filter(e => e.type === 'block')
       .find(b => b.children.find(c => c.id === id));
@@ -255,48 +256,50 @@ function layoutAfterDropOnCalendar(
       return;
     }
 
-    entry = fromBlock.children.find(c => c.id === id);
-    if (!entry || entry.type !== 'break') {
+    fromEntry = fromBlock.children.find(c => c.id === id);
+    if (!fromEntry || fromEntry.type !== 'break') {
       return;
     }
   }
 
-  if (entry.type === 'contrib' && entry.sessionId) {
+  if (fromEntry.type === 'contrib' && fromEntry.sessionId) {
     return; // contributions with sessions assigned cannot be scheduled at the top level
   }
 
-  entry = {
-    ...entry,
-    startDt: moment(entry.startDt).add(deltaMinutes, 'minutes'),
-    x: entry.x + x,
+  const newEntry = {
+    ...fromEntry,
+    startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
+    x: fromEntry.x + x,
     y: minutesToPixels(
-      moment(entry.startDt)
+      moment(fromEntry.startDt)
         .add(deltaMinutes, 'minutes')
-        .diff(moment(entry.startDt).startOf('day'), 'minutes')
+        .diff(moment(fromEntry.startDt).startOf('day'), 'minutes')
     ),
   };
-  if (entry.type === 'block') {
-    entry = {
-      ...entry,
-      children: entry.children.map(e => ({
-        ...e,
-        startDt: moment(e.startDt).add(deltaMinutes, 'minutes'),
-      })),
-    };
+
+  if (isChildEntry(newEntry)) {
+    delete newEntry.parentId;
   }
 
-  const groupIds = getGroup(entry, entries.filter(e => e.id !== entry.id));
+  if (newEntry.type === 'block') {
+    newEntry.children = newEntry.children.map(e => ({
+      ...e,
+      startDt: moment(e.startDt).add(deltaMinutes, 'minutes'),
+    }));
+  }
+
+  const groupIds = getGroup(newEntry, entries.filter(e => e.id !== newEntry.id));
   let group = entries.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, entry, mousePosition);
+  group = layoutGroupAfterMove(group, newEntry, mousePosition);
 
   if (!fromBlock) {
-    const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== entry.id);
+    const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== newEntry.id);
     return layout([...otherEntries, ...group]);
   } else {
     const otherEntries = entries.filter(
-      e => !groupIds.has(e.id) && e.id !== entry.id && e.id !== fromBlock.id
+      e => !groupIds.has(e.id) && e.id !== newEntry.id && e.id !== fromBlock.id
     );
-    const fromChildren = fromBlock.children.filter(e => e.id !== entry.id);
+    const fromChildren = fromBlock.children.filter(e => e.id !== newEntry.id);
     group = group.filter(e => e.id !== fromBlock.id); // might contain the block
     return layout([...otherEntries, ...group, {...fromBlock, children: fromChildren}]);
   }
