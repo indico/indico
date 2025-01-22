@@ -33,6 +33,7 @@ Bugfixes
 - Ensure the event name is correctly encoded to prevent issues with special characters
   in the share event widget (:pr:`6649`)
 - Fix sending emails if site name contains an ``@`` character (:pr:`6687`)
+- Do not show country field description twice in registration forms (:pr:`6708`)
 
 Accessibility
 ^^^^^^^^^^^^^
