@@ -111,36 +111,3 @@ So if by any reason it doesn't work for you, feel free to :ref:`ask us <contact>
 
 .. |zh_Hant_TW| replace:: ``zh_Hant_TW``
 .. _zh_Hant_TW: https://www.localeplanet.com/icu/zh-Hant-TW/index.html
-
-
-File Organisation
-=================
-
-The relationship between
-
-- transifex resources names (core.js, core.py, core.react.js)
-- PO file names (messages-js.po, messages.po, messages-react.po) and
-- the actual place, where the strings are found
-
-is not always obvious. Starting with the resource names, the files ending in
-
-- ``.py`` refer to translations used with python and jinja templates,
-- ``.js`` refer to translations used with generic or legacy javascript,
-- ``react.js`` refer to translations used with the new react-based javascript.
-
-These contain a relationship to PO files, as defined in the following example extracted
-from ``src/.tx/config``.
-
-.. code-block:: none
-
-    [indico.<transifex resource slug>]
-    file_filter = indico/translations/<lang>/LC_MESSAGES/<PO file name>.po
-    source_file = indico/translations/<source file name>.pot
-    source_lang = en
-    type = PO
-
-.. note::
-
-    The transifex resource slug is a name-like alias that identifies a particular file.
-
-For more information regarding this subject a `thread has started here <https://talk.getindico.io/t/relationship-between-resources-and-po-files-in-transifex/1890>`_.

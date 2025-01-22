@@ -70,9 +70,9 @@ Translating
 
 When you first start translating, you will notice that each language has a list
 of `resources`. Each resource contains messages which need to be translated. We
-recommend focusing on resources called `core.py`, `core.js` and `core.react.js`
-which contain messages from core Indico. The remaining resources contain
-messages from various Indico plugins and have lower priority.
+recommend focusing on a resource called `core` which contains messages from core
+Indico. The remaining resources contain messages from various Indico plugins and
+have lower priority.
 
 .. image:: ../images/translations/resources.png
 
@@ -89,12 +89,13 @@ translating.
 .. image:: ../images/translations/suggestions.png
 
 
-Message context
-+++++++++++++++
+Translator comments & Message context
++++++++++++++++++++++++++++++++++++++
 
-Some messages might contain additional context. You can use it to improve your
-translations.
+Some messages might contain comments and additional context. You can use these
+to improve your translations.
 
+.. image:: ../images/translations/comments.png
 .. image:: ../images/translations/ctx.png
 
 Variables
