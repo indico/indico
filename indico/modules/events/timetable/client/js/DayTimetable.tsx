@@ -329,71 +329,72 @@ function layoutAfterDropOnBlock(
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
-  let entry: TopLevelEntry | undefined;
+  let fromEntry: Entry | undefined;
   if (!fromBlock) {
-    entry = entries.find(e => e.id === id);
-    if (!entry) {
+    fromEntry = entries.find(e => e.id === id);
+    if (!fromEntry) {
       return;
     }
   } else {
-    entry = fromBlock.children.find(e => e.id === id);
+    fromEntry = fromBlock.children.find(e => e.id === id);
   }
 
-  if (!entry) {
+  if (!fromEntry) {
     return;
   }
 
-  if (entry.type === 'contrib') {
-    if (!entry.sessionId) {
+  if (fromEntry.type === 'contrib') {
+    if (!fromEntry.sessionId) {
       // Allow top level contributions being dropped on blocks to be treated as if they
       // were dropped directly on the calendar instead
       return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
     }
-    if (entry.sessionId !== toBlock.sessionId) {
+    if (fromEntry.sessionId !== toBlock.sessionId) {
       return; // contributions cannot be moved to blocks of different sessions
     }
-  } else if (entry.type === 'block') {
+  } else if (fromEntry.type === 'block') {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
     return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
   }
 
-  if (entry.duration > toBlock.duration) {
+  if (fromEntry.duration > toBlock.duration) {
     return; // TODO: auto-resize the block?
   }
 
-  entry = {
-    ...entry,
-    startDt: moment(entry.startDt).add(deltaMinutes, 'minutes'),
-    x: entry.x + x,
+  const newEntry = {
+    ...fromEntry,
+    startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
+    x: fromEntry.x + x,
     y: minutesToPixels(
-      moment(entry.startDt)
+      moment(fromEntry.startDt)
         .add(deltaMinutes, 'minutes')
         .diff(moment(toBlock.startDt), 'minutes')
     ),
+    parentId: toBlock.id,
   };
 
-  if (entry.startDt.isBefore(moment(toBlock.startDt))) {
+  if (newEntry.startDt.isBefore(moment(toBlock.startDt))) {
     // move start time to the start of the block
-    entry.startDt = moment(toBlock.startDt);
+    newEntry.startDt = moment(toBlock.startDt);
   } else if (
-    moment(entry.startDt)
-      .add(entry.duration, 'minutes')
+    moment(newEntry.startDt)
+      .add(newEntry.duration, 'minutes')
       .isAfter(moment(toBlock.startDt).add(toBlock.duration, 'minutes'))
   ) {
     // move end time to the end of the block
-    entry.startDt = moment(toBlock.startDt).add(toBlock.duration - entry.duration, 'minutes');
+    newEntry.startDt = moment(toBlock.startDt).add(toBlock.duration - newEntry.duration, 'minutes');
   }
 
-  const groupIds = getGroup(entry, toBlock.children.filter(e => e.id !== entry.id));
+  const groupIds = getGroup(newEntry, toBlock.children.filter(e => e.id !== newEntry.id));
   let group = toBlock.children.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, entry, mousePosition);
+  group = layoutGroupAfterMove(group, newEntry, mousePosition);
 
-  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== entry.id);
+  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== newEntry.id);
 
   if (!fromBlock) {
     return layout([
-      ...entries.filter(e => e.id !== entry.id && e.id !== toBlock.id),
+      ...entries.filter(e => e.id !== newEntry.id && e.id !== toBlock.id),
       {...toBlock, children: [...otherChildren, ...group]},
     ]);
   } else if (toBlock.id === fromBlock.id) {
@@ -401,7 +402,7 @@ function layoutAfterDropOnBlock(
     return layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]);
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
-    const fromChildren = fromBlock.children.filter(e => e.id !== entry.id);
+    const fromChildren = fromBlock.children.filter(e => e.id !== newEntry.id);
     return layout([
       ...otherEntries,
       {...fromBlock, children: fromChildren},
