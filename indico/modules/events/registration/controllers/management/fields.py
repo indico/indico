@@ -9,6 +9,7 @@ from datetime import timedelta
 
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
+from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
@@ -158,6 +159,11 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             raise BadRequest
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
+        db.session.add(self.field)
+        if 'show_if_field_id' in (self.field.data or {}):
+            self.field.data.pop('show_if_field_id')
+            self.field.data.pop('show_if_field_value')
+            flag_modified(self.field, 'data')
         update_regform_item_positions(self.regform)
         db.session.flush()
         self.field.log(
