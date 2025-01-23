@@ -23,6 +23,8 @@ Improvements
 - Make the event export/import util much more flexible to support exporting whole
   category subtrees, add better support for dealing with files, and add various things
   that were not correctly exported before (:pr:`6446`)
+- Add an event setting to allow enforcing search before entering a person manually to
+  a persons list in abstracts and contributions (:pr:`6689`)
 
 Bugfixes
 ^^^^^^^^
