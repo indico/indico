@@ -37,6 +37,7 @@ Bugfixes
   in the share event widget (:pr:`6649`)
 - Fix sending emails if site name contains an ``@`` character (:pr:`6687`)
 - Do not show country field description twice in registration forms (:pr:`6708`)
+- Do not show "other" receipt templates from deleted events/categories (:pr:`6711`)
 
 Accessibility
 ^^^^^^^^^^^^^
