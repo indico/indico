@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import jsonify, request, session
+from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -73,6 +74,16 @@ class RHRegistrationFormModifySection(RHManageRegFormSectionBase):
         if self.section.type == RegistrationFormItemType.section_pd and changes.get('is_manager_only'):
             raise BadRequest
         changes = self.section.populate_from_dict(changes)
+        if changes.get('is_manager_only') == (False, True):
+            # Check no conditional fields depend on this section if it is becoming manager-only now
+            critical_fields_ids = {field.id for field in self.section.children if not field.is_deleted} - {None}
+            for section in self.regform.sections:
+                if section.is_deleted:
+                    continue
+                fields_ids = {(field.data or {}).get('show_if_field_id')
+                              for field in section.children if not field.is_deleted} - {None}
+                if bool(critical_fields_ids.intersection(fields_ids)):
+                    raise ValidationError('Cannot make section management-only due to conditional field relations')
         db.session.flush()
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
