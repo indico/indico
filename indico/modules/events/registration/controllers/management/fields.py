@@ -222,7 +222,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
         form_field = RegistrationFormField(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data)
+        _fill_form_field_with_data(form_field, field_data, context={'regform': self.regform, 'field': form_field})
         db.session.add(form_field)
         db.session.flush()
         form_field.log(
