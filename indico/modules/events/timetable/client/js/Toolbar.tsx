@@ -7,13 +7,13 @@
 
 import {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import NewEntryDropdown from './components/NewEntryDropdown';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import * as selectors from './selectors';
 
 import './Toolbar.module.scss';
@@ -45,23 +45,23 @@ export default function Toolbar({
   date: Moment;
   onNavigate: (dt: Moment) => void;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const ref = useRef(null);
-  const eventStart = useSelector(selectors.getEventStartDt);
-  const numDays = useSelector(selectors.getEventNumDays);
-  const numUnscheduled = useSelector(selectors.getNumUnscheduled);
-  const canUndo = useSelector(selectors.canUndo);
-  const canRedo = useSelector(selectors.canRedo);
-  const error = useSelector(selectors.getError);
-  const maxDays = useSelector(selectors.getNavbarMaxDays);
-  const offset = useSelector(selectors.getNavbarOffset);
-  const displayMode = useSelector(selectors.getDisplayMode);
-  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
-  const showUnscheduled = useSelector(selectors.showUnscheduled);
+  const eventStart = useTimetableSelector(selectors.getEventStartDt);
+  const numDays = useTimetableSelector(selectors.getEventNumDays);
+  const numUnscheduled = useTimetableSelector(selectors.getNumUnscheduled);
+  const canUndo = useTimetableSelector(selectors.canUndo);
+  const canRedo = useTimetableSelector(selectors.canRedo);
+  const error = useTimetableSelector(selectors.getError);
+  const maxDays = useTimetableSelector(selectors.getNavbarMaxDays);
+  const offset = useTimetableSelector(selectors.getNavbarOffset);
+  const displayMode = useTimetableSelector(selectors.getDisplayMode);
+  const showAllTimeslots = useTimetableSelector(selectors.showAllTimeslots);
+  const showUnscheduled = useTimetableSelector(selectors.showUnscheduled);
   const currentDayIdx = date.diff(eventStart, 'days');
 
   const handleResize = useCallback(() => {
-    dispatch(actions.resizeWindow(ref.current.clientWidth, currentDayIdx));
+    dispatch(actions.resizeWindow({newSize: ref.current.clientWidth, dayIdx: currentDayIdx}));
   }, [currentDayIdx, dispatch]);
 
   useEffect(() => {

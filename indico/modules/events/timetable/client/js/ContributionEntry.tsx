@@ -7,11 +7,11 @@
 
 import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
@@ -51,11 +51,11 @@ export default function ContributionEntry({
   parentEndDt,
 }: DraggableEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const sessionData = useSelector(state => state.sessions[sessionId]);
+  const sessionData = useTimetableSelector(state => state.sessions[sessionId]);
   let style: Record<string, string | number | undefined> = transform
     ? {
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 10px)`,

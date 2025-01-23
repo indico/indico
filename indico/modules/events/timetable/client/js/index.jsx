@@ -10,42 +10,34 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
-import createReduxStore from 'indico/utils/redux';
+// import createReduxStore from 'indico/utils/redux';
 
-import {setSessionData, setTimetableData} from './actions';
-import reducers from './reducers';
-// import {timetableData as tData, eventInfo as eInfo} from './sample-data';
+import {setSessionData, setStaticData, setTimetableData} from './actions';
+import {store} from './store';
 import Timetable from './Timetable';
-
-const DEBUG_MODE = false; //TODO: remove
 
 (function(global) {
   global.setupTimetable = function setupTimetable() {
     const root = document.querySelector('#timetable-container');
     if (root) {
       const {customLinks} = root.dataset;
-      const timetableData = DEBUG_MODE ? tData : JSON.parse(root.dataset.timetableData);
-      const eventInfo = DEBUG_MODE ? eInfo : JSON.parse(root.dataset.eventInfo);
-      const initialData = {
-        staticData: {
-          eventId: parseInt(eventInfo.id, 10),
-          startDt: DEBUG_MODE
-            ? moment(2023, 4, 8)
-            : moment.tz(
-                `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
-                eventInfo.startDate.tz
-              ),
-          endDt: DEBUG_MODE
-            ? moment(2023, 4, 12)
-            : moment.tz(
-                `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,
-                eventInfo.endDate.tz
-              ),
-        },
+      const timetableData = JSON.parse(root.dataset.timetableData);
+      const eventInfo = JSON.parse(root.dataset.eventInfo);
+      const staticData = {
+        eventId: parseInt(eventInfo.id, 10),
+        startDt: moment.tz(
+          `${eventInfo.startDate.date} ${eventInfo.startDate.time}`,
+          eventInfo.startDate.tz
+        ),
+        endDt: moment.tz(
+          `${eventInfo.endDate.date} ${eventInfo.endDate.time}`,
+          eventInfo.endDate.tz
+        ),
       };
-      const store = createReduxStore('regform-submission', reducers, initialData);
+      // const store = createReduxStore('regform-submission', reducers, initialData);
       console.debug(customLinks); // TODO find out what these are
-      store.dispatch(setTimetableData(timetableData, eventInfo));
+      store.dispatch(setStaticData(staticData));
+      store.dispatch(setTimetableData({data: timetableData, eventInfo}));
       store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(
         <Provider store={store}>

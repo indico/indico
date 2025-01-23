@@ -7,16 +7,16 @@
 
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, UnscheduledContrib} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {minutesToPixels, pixelsToMinutes} from './utils';
 
@@ -28,14 +28,14 @@ interface DayTimetableProps {
 }
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
-  const dispatch = useDispatch();
-  const selectedId = useSelector(selectors.getSelectedId);
+  const dispatch = useTimetableDispatch();
+  const selectedId = useTimetableSelector(selectors.getSelectedId);
 
   const setDurations = useMemo(() => {
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (duration: number) =>
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), e.id, duration));
+        dispatch(actions.resizeEntry({date: dt.format('YYYYMMDD'), id: e.id, duration}));
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -44,7 +44,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     const obj = {};
     for (const e of entries) {
       obj[e.id] = (id: number) => (duration: number) =>
-        dispatch(actions.resizeEntry(dt.format('YYYYMMDD'), id, duration, e.id));
+        dispatch(actions.resizeEntry({date: dt.format('YYYYMMDD'), id, duration, parentId: e.id}));
     }
     return obj;
   }, [entries, dispatch, dt]);
@@ -72,9 +72,9 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
 export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
-  const unscheduled = useSelector(selectors.getUnscheduled);
+  const unscheduled = useTimetableSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
@@ -117,7 +117,13 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     if (!newLayout) {
       return;
     }
-    dispatch(actions.scheduleEntry(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
+    dispatch(
+      actions.scheduleEntry({
+        date: dt.format('YYYYMMDD'),
+        entries: newLayout,
+        unscheduled: newUnscheduled,
+      })
+    );
   }
 
   function handleDropOnCalendar(who: UniqueId, over: Over, delta: Transform, mouse: MousePosition) {
@@ -125,7 +131,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     if (!newLayout) {
       return;
     }
-    dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
+    dispatch(actions.moveEntry({date: dt.format('YYYYMMDD'), entries: newLayout}));
   }
 
   function handleDropOnBlock(
@@ -139,7 +145,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     if (!newLayout) {
       return;
     }
-    dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
+    dispatch(actions.moveEntry({date: dt.format('YYYYMMDD'), entries: newLayout}));
   }
 
   useEffect(() => {
@@ -424,13 +430,13 @@ function layoutAfterDropOnBlock(
 
 function layoutAfterUnscheduledDrop(
   dt: Moment,
-  unscheduled: TopLevelEntry[],
+  unscheduled: UnscheduledContrib[],
   entries: TopLevelEntry[],
   who: UniqueId,
   over: Over,
   delta: Transform,
   mouse: MousePosition
-) {
+): [TopLevelEntry[], UnscheduledContrib[]] {
   const id = parseInt(who.slice('unscheduled-'.length), 10);
   const {x, y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;

@@ -1,28 +1,31 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2025 CERN
+// Copyright (C) 2002 - 2024 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, Label, Segment} from 'semantic-ui-react';
+import {Icon, Label, Segment, SemanticICONS} from 'semantic-ui-react';
 
 import {toClasses} from 'indico/react/util';
 
-import {entryColorSchema, entrySchema} from '../util';
+import {Entry} from '../types';
 
 import './DetailsSegment.module.scss';
 
-const actionShape = {
-  icon: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
-  wrapper: PropTypes.elementType,
-};
+interface Action {
+  icon: SemanticICONS;
+  title: string;
+  onClick: (e: React.MouseEvent) => void;
+  wrapper?: React.ComponentType<{trigger: React.ReactElement; entry: Entry}>;
+}
 
-function ActionIcon({icon, onClick, title, color}) {
+interface ActionIconProps extends Action {
+  color?: {text: string; background: string};
+}
+
+function ActionIcon({icon, onClick, title, color}: ActionIconProps) {
   return (
     <Icon
       name={icon}
@@ -37,15 +40,6 @@ function ActionIcon({icon, onClick, title, color}) {
   );
 }
 
-ActionIcon.propTypes = {
-  ...actionShape,
-  color: entryColorSchema,
-};
-
-ActionIcon.defaultProps = {
-  color: null,
-};
-
 export default function DetailsSegment({
   title,
   subtitle,
@@ -55,8 +49,16 @@ export default function DetailsSegment({
   children,
   entry,
   selected,
-  dispatch,
   ...rest
+}: {
+  title: string;
+  subtitle?: string;
+  color?: {text: string; background: string};
+  icon?: SemanticICONS;
+  actions: Action[];
+  children: React.ReactNode;
+  entry: Entry;
+  selected?: boolean;
 }) {
   return (
     <Segment style={{borderColor: color?.background}} {...rest}>
@@ -75,7 +77,6 @@ export default function DetailsSegment({
                 key={action.icon}
                 trigger={<ActionIcon {...action} color={color} />}
                 entry={entry}
-                dispatch={dispatch}
               />
             ) : (
               <ActionIcon key={action.icon} {...action} color={color} />
@@ -87,25 +88,3 @@ export default function DetailsSegment({
     </Segment>
   );
 }
-
-DetailsSegment.propTypes = {
-  title: PropTypes.string.isRequired,
-  subtitle: PropTypes.string,
-  color: entryColorSchema,
-  icon: PropTypes.string,
-  actions: PropTypes.arrayOf(PropTypes.shape(actionShape)),
-  children: PropTypes.node.isRequired,
-  entry: entrySchema,
-  selected: PropTypes.bool,
-  dispatch: PropTypes.func,
-};
-
-DetailsSegment.defaultProps = {
-  subtitle: '',
-  icon: null,
-  actions: [],
-  color: {},
-  entry: null,
-  selected: false,
-  dispatch: () => {},
-};

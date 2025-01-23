@@ -7,8 +7,8 @@
 
 import moment, {Moment} from 'moment';
 import React from 'react';
-import {useSelector} from 'react-redux';
 
+import {useTimetableSelector} from './hooks';
 import * as selectors from './selectors';
 
 import './WeekViewToolbar.module.scss';
@@ -20,9 +20,9 @@ export default function Toolbar({
   date: Moment;
   onNavigate: (dt: Moment) => void;
 }) {
-  const eventStart = useSelector(selectors.getEventStartDt);
-  const numDays = useSelector(selectors.getEventNumDays);
-  const offset = useSelector(selectors.getNavbarOffset);
+  const eventStart = useTimetableSelector(selectors.getEventStartDt);
+  const numDays = useTimetableSelector(selectors.getEventNumDays);
+  const offset = useTimetableSelector(selectors.getNavbarOffset);
 
   const getDateFromIdx = idx => moment(eventStart).add(idx, 'days');
 

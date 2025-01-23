@@ -7,26 +7,26 @@
 
 import moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
 import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import NewEntryDropdown from './components/NewEntryDropdown';
 import {TimetablePopup} from './entry_popups';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import * as selectors from './selectors';
 import {entrySchema, entryTypes, getEndDt, isChildOf} from './util';
 
 import './Entry.module.scss';
 
 export default function Entry({event: entry}) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {type, title} = entry;
-  const contributions = useSelector(selectors.getVisibleChildren);
-  const displayMode = useSelector(selectors.getDisplayMode);
+  const contributions = useTimetableSelector(selectors.getVisibleChildren);
+  const displayMode = useTimetableSelector(selectors.getDisplayMode);
   const ref = useRef();
-  const selected = useSelector(selectors.getSelectedEntry);
+  const selected = useTimetableSelector(selectors.getSelectedEntry);
   const [open, setOpen] = useState(!!selected);
-  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
+  const popupsEnabled = useTimetableSelector(selectors.getPopupsEnabled);
 
   const closePopup = () => {
     setOpen(false);
