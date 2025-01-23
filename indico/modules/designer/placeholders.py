@@ -120,7 +120,7 @@ class EventDatesPlaceholder(DesignerPlaceholder):
         if start_dt.date() == end_dt.date():
             interval = format_datetime(start_dt)
         elif start_dt.date().replace(day=1) == end_dt.date().replace(day=1):
-            interval = format_interval(start_dt, end_dt, 'dMMMMy')
+            interval = format_interval(start_dt, end_dt, skeleton='dMMMMy')
         return interval
 
 
