@@ -27,6 +27,8 @@ class FieldSetupSchemaBase(mm.Schema):
             return
         used_field_ids = {field_id}
         field = self.context['field']
+        if field.parent is not None and field.parent.is_manager_only:
+            raise ValueError('Manager-only fields cannot be conditionally shown')
         if field.id is not None:
             if field.id == field_id:
                 raise ValueError('The field cannot conditionally depend on itself to be shown')
@@ -43,6 +45,8 @@ class FieldSetupSchemaBase(mm.Schema):
             if not next_field:
                 # TODO: there is a field that does not exist in the chain. Should we raise an error in this case?
                 break
+            if next_field.parent is not None and next_field.parent.is_manager_only:
+                raise ValidationError('Field conditions may not depend on fields in manager-only sections')
             next_field_id = next_field.data.get('show_if_field_id')
             if next_field_id is not None:
                 if next_field_id in used_field_ids:
