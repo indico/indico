@@ -476,7 +476,7 @@ function EditableListDisplay({
       return (
         <div>
           {tags.map(t => {
-            return <Label key={`${t.code}-dot`} circular empty color={t.color} />;
+            return <Label key={t.code} circular empty color={t.color} />;
           })}
         </div>
       );
