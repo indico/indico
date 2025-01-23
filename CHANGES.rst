@@ -23,6 +23,7 @@ Improvements
 - Make the event export/import util much more flexible to support exporting whole
   category subtrees, add better support for dealing with files, and add various things
   that were not correctly exported before (:pr:`6446`)
+- Add a new column in the editable list for the contribution tags (:pr:`6615`)
 
 Bugfixes
 ^^^^^^^^
