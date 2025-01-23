@@ -5,9 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import PropTypes from 'prop-types';
 import React from 'react';
-import {useDispatch} from 'react-redux';
 import {Accordion, Divider, Header, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -17,8 +15,9 @@ import AttachmentsDisplay from './components/AttachmentsDisplay';
 import DetailsSegment from './components/DetailsSegment';
 import EntryColorPicker from './components/EntryColorPicker';
 import TimeDisplay from './components/TimeDisplay';
+import {useTimetableDispatch} from './hooks';
 import {Entry} from './types';
-import {entrySchema, entryTypes, formatTitle, handleUnimplemented} from './util';
+import {entryTypes, formatTitle, handleUnimplemented} from './util';
 
 import './EntryDetails.module.scss';
 
@@ -28,13 +27,13 @@ const entryIcons = {
   break: 'coffee',
 };
 
-const detailsPropTypes = {
-  entry: entrySchema.isRequired,
-  uses24HourFormat: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
-};
+interface DetailsProps {
+  entry: Entry;
+  uses24HourFormat: boolean;
+  dispatch: React.Dispatch<actions.Action>;
+}
 
-function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
+function ContributionsDisplay({entry, uses24HourFormat, dispatch}: DetailsProps) {
   const contribs = entry.children;
 
   if (contribs.length === 0) {
@@ -78,9 +77,7 @@ function ContributionsDisplay({entry, uses24HourFormat, dispatch}) {
   );
 }
 
-ContributionsDisplay.propTypes = detailsPropTypes;
-
-function SessionDetails({entry, uses24HourFormat, dispatch}) {
+function SessionDetails({entry, uses24HourFormat, dispatch}: DetailsProps) {
   const {title, slotTitle, code, sessionCode, color} = entry;
   return (
     <>
@@ -126,9 +123,17 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
   );
 }
 
-SessionDetails.propTypes = detailsPropTypes;
+interface ContributionDetailsProps extends DetailsProps {
+  children?: React.ReactNode;
+}
 
-export function ContributionDetails({entry, uses24HourFormat, dispatch, children, ...rest}) {
+export function ContributionDetails({
+  entry,
+  uses24HourFormat,
+  dispatch,
+  children,
+  ...rest
+}: ContributionDetailsProps) {
   const contribActions = [
     {
       icon: 'edit',
@@ -171,15 +176,6 @@ export function ContributionDetails({entry, uses24HourFormat, dispatch, children
   );
 }
 
-ContributionDetails.propTypes = {
-  ...detailsPropTypes,
-  children: PropTypes.node,
-};
-
-ContributionDetails.defaultProps = {
-  children: null,
-};
-
 function BreakDetails({entry, uses24HourFormat, dispatch}) {
   return (
     <DetailsSegment
@@ -205,7 +201,7 @@ function BreakDetails({entry, uses24HourFormat, dispatch}) {
 BreakDetails.propTypes = detailsPropTypes;
 
 export default function EntryDetails({entry}: {entry: Entry}) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {title, slotTitle, description, code, sessionCode, type} = entry;
   // TODO figure this out:
   const uses24HourFormat = true;

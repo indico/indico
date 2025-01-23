@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 
 import {Entry, TopLevelEntry, DayEntries} from './types.ts';
 import {lcm, minutesToPixels} from './utils.ts';

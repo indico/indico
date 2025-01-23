@@ -57,9 +57,14 @@ export function preprocessSessionData(
 
 const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.tz);
 
+export type TimetableData = Record<string, Record<string, SchemaBlock>>;
+export interface EventInfo {
+  contributions?: {uniqueId: number; title: string; duration: number}[];
+}
+
 export function preprocessTimetableEntries(
-  data: Record<string, Record<string, SchemaBlock>>,
-  eventInfo: {contributions?: {uniqueId: number; title: string; duration: number}[]}
+  data: TimetableData,
+  eventInfo: EventInfo
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   // console.log(data);
   // console.log('einfo', eventInfo);
