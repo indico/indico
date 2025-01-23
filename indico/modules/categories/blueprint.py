@@ -10,8 +10,9 @@ from flask import redirect, request
 from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryCalendarViewEvents,
-                                                           RHCategoryIcon, RHCategoryInfo, RHCategoryLogo,
-                                                           RHCategoryManagedEventSearch, RHCategoryOverview,
+                                                           RHCategoryClosestEvent, RHCategoryIcon, RHCategoryInfo,
+                                                           RHCategoryLogo, RHCategoryManagedEventSearch,
+                                                           RHCategoryOverview, RHCategoryPreviousEvent,
                                                            RHCategorySearch, RHCategoryStatistics,
                                                            RHCategoryStatisticsJSON, RHCategoryUpcomingEvent,
                                                            RHDisplayCategory, RHEventList, RHExportCategoryAtom,
@@ -97,7 +98,9 @@ _bp.add_url_rule('/statistics.json', 'statistics_json', RHCategoryStatisticsJSON
 _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)
 _bp.add_url_rule('/calendar', 'calendar', RHCategoryCalendarView)
 _bp.add_url_rule('/calendar/events', 'calendar_events', RHCategoryCalendarViewEvents)
+_bp.add_url_rule('/previous', 'previous_event', RHCategoryPreviousEvent)
 _bp.add_url_rule('/upcoming', 'upcoming_event', RHCategoryUpcomingEvent)
+_bp.add_url_rule('/closest', 'closest_event', RHCategoryClosestEvent)
 
 # Event creation - redirect to anchor page opening the dialog
 _bp.add_url_rule('/create/event/<any(lecture,meeting,conference):event_type>', view_func=_redirect_event_creation)

@@ -685,24 +685,63 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         return template.render_ongoing_events(ongoing_events, self.category.display_tzinfo)
 
 
-class RHCategoryUpcomingEvent(RHDisplayCategoryBase):
-    """Redirect to the upcoming event of a category."""
+class RHCategoryRelativeEventBase(RHDisplayCategoryBase):
+    """Redirect to a close event in a category."""
+
+    _no_event_message = None
 
     def _process(self):
-        event = self._get_upcoming_event()
+        event = self._get_event()
         if event:
             return redirect(event.url)
         else:
-            flash(_('There are no upcoming events for this category'))
+            flash(self._no_event_message)
             return redirect(self.category.url)
 
-    def _get_upcoming_event(self):
+    def _get_query_opts(self):
+        raise NotImplementedError
+
+    def _get_event(self):
+        filter_, order = self._get_query_opts()
         query = (Event.query
                  .filter(Event.is_visible_in(self.category.id),
-                         Event.start_dt > now_utc(),
+                         filter_,
                          ~Event.is_deleted)
                  .options(subqueryload('acl_entries'))
-                 .order_by(Event.start_dt, Event.id))
+                 .order_by(*order))
         res = get_n_matching(query, 1, lambda event: event.can_access(session.user))
         if res:
             return res[0]
+
+
+class RHCategoryPreviousEvent(RHCategoryRelativeEventBase):
+    """Redirect to the previous event of a category."""
+
+    _no_event_message = _('There are no previous events for this category')
+
+    def _get_query_opts(self):
+        filter_ = Event.end_dt < now_utc()
+        order = Event.end_dt.desc(), Event.id
+        return filter_, order
+
+
+class RHCategoryUpcomingEvent(RHCategoryRelativeEventBase):
+    """Redirect to the upcoming event of a category."""
+
+    _no_event_message = _('There are no upcoming events for this category')
+
+    def _get_query_opts(self):
+        filter_ = Event.start_dt > now_utc()
+        order = Event.start_dt, Event.id
+        return filter_, order
+
+
+class RHCategoryClosestEvent(RHCategoryRelativeEventBase):
+    """Redirect to the closest event of a category."""
+
+    _no_event_message = _('There are no close events for this category')
+
+    def _get_query_opts(self):
+        filter_ = True
+        order = db.func.abs(db.func.extract('epoch', now_utc() - Event.start_dt)), Event.id
+        return filter_, order

@@ -25,6 +25,7 @@ Improvements
   that were not correctly exported before (:pr:`6446`)
 - Add a setting to limit the information room booking users can see for bookings not
   linked to them or their rooms (:pr:`6704`)
+- Add shortcuts to the past and closest events in a category (:pr:`6710`)
 
 Bugfixes
 ^^^^^^^^
