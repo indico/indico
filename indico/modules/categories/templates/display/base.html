@@ -58,7 +58,13 @@
                                 </li>
                             {% endif %}
                             <li>
+                                <a href="{{ url_for('.previous_event', category) }}">{% trans %}Previous event{% endtrans %}</a>
+                            </li>
+                            <li>
                                 <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('.closest_event', category) }}">{% trans %}Closest event{% endtrans %}</a>
                             </li>
                             <li>
                                 <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
