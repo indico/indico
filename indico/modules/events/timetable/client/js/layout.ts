@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 
 import {Entry, TopLevelEntry, DayEntries} from './types.ts';
 import {lcm, minutesToPixels} from './utils.ts';
@@ -32,10 +32,12 @@ export function layout<T extends Entry>(entries: T[]) {
   return newEntries;
 }
 
-export function layoutGroup<T extends Entry>(group: T[]) {
-  group = group.map(entry =>
-    entry.type === 'block' ? {...entry, children: layout(entry.children)} : entry
-  );
+export function layoutGroup<T extends Entry>(group: T[], {layoutChildren = true} = {}) {
+  if (layoutChildren) {
+    group = group.map(entry =>
+      entry.type === 'block' ? {...entry, children: layout(entry.children)} : entry
+    );
+  }
   const sortedGroup = [...group].sort((a, b) => a.column - b.column);
   const newGroup: T[] = [];
   for (const entry of sortedGroup) {
