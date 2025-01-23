@@ -25,10 +25,10 @@ class FieldSetupSchemaBase(mm.Schema):
         from indico.modules.events.registration.models.form_fields import RegistrationFormItem
         if field_id is None:
             return
-        used_field_ids = {field_id}
         field = self.context['field']
-        if field.parent is not None and field.parent.is_manager_only:
+        if field.is_manager_only or (field.parent is not None and field.parent.is_manager_only):
             raise ValueError('Manager-only fields cannot be conditionally shown')
+        used_field_ids = set()
         if field.id is not None:
             if field.id == field_id:
                 raise ValueError('The field cannot conditionally depend on itself to be shown')
@@ -41,18 +41,17 @@ class FieldSetupSchemaBase(mm.Schema):
         # Avoid cycles
         next_field_id = field_id
         while next_field_id is not None:
+            if next_field_id in used_field_ids:
+                raise ValidationError('Field conditions may not have cycles (a -> b -> c -> a)')
+            else:
+                used_field_ids.add(next_field_id)
             next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one_or_none()
             if not next_field:
                 # TODO: there is a field that does not exist in the chain. Should we raise an error in this case?
                 break
-            if next_field.parent is not None and next_field.parent.is_manager_only:
+            if next_field.is_manager_only or (next_field.parent is not None and next_field.parent.is_manager_only):
                 raise ValidationError('Field conditions may not depend on fields in manager-only sections')
             next_field_id = next_field.data.get('show_if_field_id')
-            if next_field_id is not None:
-                if next_field_id in used_field_ids:
-                    raise ValidationError('Field conditions may not have cycles (a -> b -> c -> a)')
-                else:
-                    used_field_ids.add(next_field_id)
 
 
 class BillableFieldDataSchema(FieldSetupSchemaBase):
