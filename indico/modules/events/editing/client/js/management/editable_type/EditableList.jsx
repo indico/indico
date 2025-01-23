@@ -45,7 +45,6 @@ import {useNumericParam} from 'indico/react/util/routing';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import Palette from 'indico/utils/palette';
-// import {getPluginObjects} from 'indico/utils/plugins';
 import {natSortCompare} from 'indico/utils/sort';
 
 import StateIndicator from '../../editing/timeline/StateIndicator';
@@ -638,8 +637,6 @@ function EditableListDisplay({
       document.body.classList.remove('full-width-content-wrapper');
     };
   }, []);
-
-  // const getNewColumn = getPluginObjects('editing-qa-column');
 
   return (
     <>
