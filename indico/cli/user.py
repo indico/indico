@@ -21,6 +21,7 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import anonymize_user, search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.date_time import utc_to_server
+from indico.util.string import validate_email
 
 
 @cli_group()
@@ -130,6 +131,9 @@ def create(grant_admin):
     print()
     while True:
         username = click.prompt('Enter username').lower().strip()
+        if validate_email(username, check_dns=False):
+            click.secho('The username cannot be an email address.', fg='red')
+            continue
         if not Identity.query.filter_by(provider='indico', identifier=username).has_rows():
             break
         click.secho('Username already exists', fg='red')

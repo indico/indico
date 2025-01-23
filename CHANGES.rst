@@ -101,6 +101,7 @@ Improvements
 - Improve readability of room booking room statistics card (:pr:`6616`)
 - Add option to use flat zip file structure when downloading registration attachments
   (:issue:`6536`, :pr:`6608`, thanks :user:`Moliholy, unconventionaldotdev`)
+- Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
