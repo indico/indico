@@ -142,6 +142,13 @@ class ReservationSchema(mm.SQLAlchemyAutoSchema):
                   'is_repeating', 'repeat_frequency', 'repeat_interval', 'recurrence_weekdays')
 
     @post_dump(pass_original=True)
+    def _hide_sensitive_data(self, data, booking, **kwargs):
+        user = session.user if session else None
+        if not booking.can_see_details(user):
+            data['booked_for_name'] = None
+        return data
+
+    @post_dump(pass_original=True)
     def _add_missing_weekdays(self, data, booking, **kwargs):
         if booking.repeat_frequency == RepeatFrequency.WEEK and booking.recurrence_weekdays is None:
             # Weekly booking created before the recurrence weekdays have been implemented
@@ -283,8 +290,13 @@ class ReservationDetailsSchema(mm.SQLAlchemyAutoSchema):
 
     @post_dump(pass_original=True)
     def _hide_sensitive_data(self, data, booking, **kwargs):
-        if not booking.room.can_manage(session.user):
+        user = session.user if session else None
+        if not booking.room.can_manage(user):
             del data['internal_note']
+        if not booking.can_see_details(user):
+            data['booked_for_user'] = None
+            data['created_by_user'] = None
+            data['edit_logs'] = None
         return data
 
     @post_dump(pass_original=True)
@@ -557,6 +569,7 @@ class SettingsSchema(mm.Schema):
     admin_principals = PrincipalList(allow_groups=True)
     authorized_principals = PrincipalList(allow_groups=True)
     managers_edit_rooms = fields.Bool()
+    hide_booking_details = fields.Bool()
     hide_module_if_unauthorized = fields.Bool()
     tileserver_url = fields.String(validate=validate.URL(schemes={'http', 'https'}), allow_none=True)
     booking_limit = fields.Int(validate=not_empty)
@@ -648,6 +661,13 @@ class ReservationLegacyAPISchema(ReservationSchema):
         fields = ('id', 'repeat_frequency', 'repeat_interval', 'booked_for_name',
                   'external_details_url', 'booking_reason', 'is_accepted', 'is_cancelled', 'is_rejected',
                   'location_name', 'contact_email')
+
+    @post_dump(pass_original=True)
+    def _hide_sensitive_data(self, data, booking, **kwargs):
+        if not booking.can_see_details(self.context.get('user')):
+            data['booked_for_name'] = None
+            data['contact_email'] = None
+        return data
 
     @post_dump(pass_original=True)
     def _rename_keys(self, data, orig, **kwargs):
