@@ -499,37 +499,42 @@ function EditableListDisplay({
     const row = sortedList[rowIndex];
     const fn = renderFuncs[dataKey];
 
-    return dataKey === 'tags' && row.editable?.tags ? (
-      <Popup
-        position="top center"
-        content={fn(row[dataKey], row.editable, rowIndex)[0]}
-        trigger={
-          row.editable.tags.length > 1 ? (
-            <div styleName="rowcolumn-tooltip" role="gridcell">
-              {fn(row[dataKey], row.editable, rowIndex)[1]}
-              {row.editable.tags.length > 5 ? (
-                <div className="more-indicator">
-                  <Icon name="plus circle" color="grey" />
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <div>{fn(row[dataKey], row.editable, rowIndex)[0]}</div>
-          )
-        }
-        on="hover"
-      />
-    ) : (
-      <TooltipIfTruncated>
-        <div
-          styleName="rowcolumn-tooltip"
-          role="gridcell"
-          style={dataKey === 'title' ? {display: 'block'} : {}}
-        >
-          {fn(row[dataKey], row.editable, rowIndex)}
-        </div>
-      </TooltipIfTruncated>
-    );
+    if (dataKey !== 'tags') {
+      return (
+        <TooltipIfTruncated>
+          <div
+            styleName="rowcolumn-tooltip"
+            role="gridcell"
+            style={dataKey === 'title' ? {display: 'block'} : {}}
+          >
+            {fn(row[dataKey], row.editable, rowIndex)}
+          </div>
+        </TooltipIfTruncated>
+      );
+    } else if (row.editable?.tags) {
+      const [labels, colors] = fn(row[dataKey], row.editable, rowIndex);
+      return (
+        <Popup
+          position="top center"
+          content={labels}
+          trigger={
+            row.editable.tags.length > 1 ? (
+              <div styleName="rowcolumn-tooltip" role="gridcell">
+                {colors}
+                {row.editable.tags.length > 5 ? (
+                  <div className="more-tags-indicator">
+                    <Icon name="plus circle" color="grey" />
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div>{labels}</div>
+            )
+          }
+          on="hover"
+        />
+      );
+    }
   };
 
   const toggleSelectAll = dataChecked => {
