@@ -9,6 +9,7 @@ import dataclasses
 import typing as t
 from datetime import datetime
 from io import BytesIO
+from operator import attrgetter
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -24,6 +25,7 @@ from PIL import Image
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.python import PythonLexer
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import or_
 from weasyprint import CSS, HTML, default_url_fetcher
 from webargs.flaskparser import abort
@@ -123,14 +125,20 @@ def get_inherited_templates(obj: Event | Category) -> set[ReceiptTemplate]:
     return get_all_templates(obj) - set(obj.receipt_templates)
 
 
-def get_other_templates(obj: Event | Category, user) -> set[ReceiptTemplate]:
+def get_other_templates(obj: Event | Category, user) -> list[ReceiptTemplate]:
     """Get all templates not owned or inherited by a given event/category."""
     # XXX the can_manage check here causes some amount of query spam, but this is acceptable because
     # - usually only admins have access to manage templates (where access checks are short-circuited)
     # - the total amount of templates in an indico instance is usually not too high
-    return ({t for t in ReceiptTemplate.query.filter_by(is_deleted=False) if t.owner.can_manage(user)}
-            - get_all_templates(obj)
-            - set(obj.receipt_templates))
+    query = (ReceiptTemplate.query
+             .filter(~ReceiptTemplate.is_deleted,
+                     ~ReceiptTemplate.event.has(Event.is_deleted),
+                     ~ReceiptTemplate.category.has(Category.is_deleted))
+             .options(joinedload('event')))
+    templates = ({t for t in query if t.owner.can_manage(user)} - get_all_templates(obj) - set(obj.receipt_templates))
+    now = now_utc()
+    templates = sorted(templates, key=lambda x: x.event.start_dt if x.event else now, reverse=True)
+    return sorted(templates, key=attrgetter('title'))
 
 
 def _format_currency(amount, currency, locale=None):
