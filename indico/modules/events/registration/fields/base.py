@@ -17,21 +17,38 @@ from indico.util.marshmallow import not_empty
 
 
 class FieldSetupSchemaBase(mm.Schema):
-    show_if_field_id = fields.Integer(required=False)
+    show_if_field_id = fields.Integer(required=False, load_default=None)
     show_if_field_value = fields.String(required=False)
 
     @validates('show_if_field_id')
     def _check_if_field_id(self, field_id, **kwargs):
         from indico.modules.events.registration.models.form_fields import RegistrationFormItem
-
+        if field_id is None:
+            return
+        used_field_ids = {field_id}
         field = self.context['field']
-        if field.id == field_id:
-            raise ValueError('The field cannot conditionally depend on itself to be shown')
+        if field.id is not None:
+            if field.id == field_id:
+                raise ValueError('The field cannot conditionally depend on itself to be shown')
+            used_field_ids.add(field.id)
         regform = self.context['regform']
         is_same_regform = (RegistrationFormItem.query.filter_by(
             id=field_id, registration_form_id=regform.id).scalar() is not None)
         if not is_same_regform:
             raise ValidationError('The field to show does not belong to the same registration form.')
+        # Avoid cycles
+        next_field_id = field_id
+        while next_field_id is not None:
+            next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one_or_none()
+            if not next_field:
+                # TODO: there is a field that does not exist in the chain. Should we raise an error in this case?
+                break
+            next_field_id = next_field.data.get('show_if_field_id')
+            if next_field_id is not None:
+                if next_field_id in used_field_ids:
+                    raise ValidationError('Field conditions may not have cycles (a -> b -> c -> a)')
+                else:
+                    used_field_ids.add(next_field_id)
 
 
 class BillableFieldDataSchema(FieldSetupSchemaBase):
