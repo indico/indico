@@ -22,7 +22,7 @@ export function ShowIfInput({hasValueSelected}) {
   const [showValue, setShowValue] = useState(hasValueSelected);
   const [, setSelectedField] = useState(null);
   let options = [];
-  const showIfFieldId = form.getState().values.showIfFieldId;
+  const {showIfFieldId, id: thisFieldId} = form.getState().values;
   if (showValue) {
     const [{choices}] = itemsForConditionalDisplay.filter(({id}) => id === showIfFieldId);
     if (!choices) {
@@ -41,10 +41,12 @@ export function ShowIfInput({hasValueSelected}) {
         name="showIfFieldId"
         label={Translate.string('Field')}
         placeholder={Translate.string('Select field...')}
-        options={itemsForConditionalDisplay.map(({title, id: fieldId}) => ({
-          value: fieldId,
-          text: title,
-        }))}
+        options={itemsForConditionalDisplay
+          .filter(({id}) => id !== thisFieldId)
+          .map(({title, id: fieldId}) => ({
+            value: fieldId,
+            text: title,
+          }))}
         closeOnChange
         selection
         onChange={value => {
