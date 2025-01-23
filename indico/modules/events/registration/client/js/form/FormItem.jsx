@@ -134,7 +134,7 @@ export default function FormItem({
   const parseConditionalValue = value => {
     if (typeof value === 'boolean') {
       return value ? '1' : '0';
-    } else if (typeof value === 'object') {
+    } else if (value !== null && typeof value === 'object') {
       if (value.choice) {
         return value.choice;
       }
@@ -246,7 +246,7 @@ export default function FormItem({
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
       {lockedReason && <ItemLocked reason={lockedReason} />}
-      {!!showIfFieldId && (
+      {!!showIfFieldId && setupMode && (
         <ItemHidden reason={Translate.string('This field is conditionally shown')} />
       )}
       {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
