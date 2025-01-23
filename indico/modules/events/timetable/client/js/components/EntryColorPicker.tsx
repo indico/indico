@@ -1,18 +1,17 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2025 CERN
+// Copyright (C) 2002 - 2024 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Button, Grid, Popup} from 'semantic-ui-react';
 
 import {toClasses} from 'indico/react/util';
 
 import * as actions from '../actions';
-import {entrySchema} from '../util';
+import {Entry} from '../types';
 
 import './EntryColorPicker.module.scss';
 
@@ -47,11 +46,21 @@ const AVAILABLE_COLORS = [
   ],
 ];
 
-export default function EntryColorPicker({entry, trigger, dispatch}) {
+export default function EntryColorPicker({
+  entry: {sessionId, color},
+  trigger,
+  dispatch,
+}: {
+  entry: Entry;
+  trigger: React.ReactNode;
+  dispatch: React.Dispatch<actions.Action>;
+}) {
   const [open, setOpen] = useState(false);
 
   const makePickHandler = color => () => {
-    dispatch(actions.changeColor(entry.sessionId, color));
+    dispatch(
+      sessionId ? actions.changeSessionColor({sessionId, color}) : actions.changeBreakColor(color)
+    );
     setOpen(false);
   };
 
@@ -67,15 +76,15 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
           {AVAILABLE_COLORS.map((row, idx) => (
             // eslint-disable-next-line react/no-array-index-key
             <Grid.Row key={idx}>
-              {row.map(color => (
-                <Grid.Column key={color.text}>
+              {row.map(newColor => (
+                <Grid.Column key={newColor.text}>
                   <Button
-                    onClick={makePickHandler(color)}
-                    style={{color: color.text, backgroundColor: color.background}}
+                    onClick={makePickHandler(newColor)}
+                    style={{color: newColor.text, backgroundColor: newColor.background}}
                     icon="paint brush"
                     styleName={toClasses({
                       choice: true,
-                      selected: color.background === entry.color?.background,
+                      selected: newColor.background === (color ? color.background : undefined),
                     })}
                     circular
                   />
@@ -88,9 +97,3 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
     />
   );
 }
-
-EntryColorPicker.propTypes = {
-  entry: entrySchema.isRequired,
-  trigger: PropTypes.node.isRequired,
-  dispatch: PropTypes.func.isRequired,
-};

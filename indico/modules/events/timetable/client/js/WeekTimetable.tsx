@@ -7,7 +7,6 @@
 
 import moment from 'moment';
 import React, {useEffect, useMemo, useRef} from 'react';
-import {useDispatch} from 'react-redux';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
@@ -15,6 +14,7 @@ import {TimeGutter, Lines} from './DayTimetable';
 import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
+import {useTimetableDispatch} from './hooks';
 import {computeYoffset, getGroup, layout, layoutGroupAfterMove} from './layout';
 import {TopLevelEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
@@ -29,7 +29,7 @@ export function WeekTimetable({
   minHour: number;
   maxHour: number;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 

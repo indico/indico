@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 
 // import {
 //   ContributionCreateForm,
@@ -14,13 +13,14 @@ import {useDispatch, useSelector} from 'react-redux';
 // } from 'indico/modules/events/contributions/ContributionForm';
 
 import * as actions from '../actions';
+import {useTimetableDispatch, useTimetableSelector} from '../hooks';
 import * as selectors from '../selectors';
 
 export default function ContributionEntryForm() {
-  const dispatch = useDispatch();
-  const {eventId} = useSelector(selectors.getStaticData);
-  const entryType = useSelector(selectors.getModalType);
-  const entry = useSelector(selectors.getModalEntry);
+  const dispatch = useTimetableDispatch();
+  const {eventId} = useTimetableSelector(selectors.getStaticData);
+  const entryType = useTimetableSelector(selectors.getModalType);
+  const entry = useTimetableSelector(selectors.getModalEntry);
   const personLinkFieldParams = {}; // TODO
 
   const handleClose = () => dispatch(actions.closeModal());
