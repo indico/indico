@@ -91,7 +91,7 @@ input[type='time'] {
   }
 }
 
-input[type='number'],
+input[type='number']:not([data-internal]),
 input[type='time'] {
   -moz-appearance: textfield;
   padding-right: 0;
@@ -110,7 +110,7 @@ textarea {
   resize: vertical;
 }
 
-select {
+select:not([data-internal]) {
   @include text-input-base();
   background: white;
 
@@ -308,8 +308,29 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 }
 
+.date-widget > span {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
 .date-widget .clear-pickers {
-  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: static;
+  border: 0;
+  background: none;
+  height: 1em !important; /* Hack to suppress the _form.scss styling */
+  aspect-ratio: 1;
+
+  & > span {
+    position: absolute;
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
 }
 
 .i-form .form-group .form-field {

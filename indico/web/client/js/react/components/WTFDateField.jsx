@@ -90,12 +90,9 @@ export default function WTFDateField({
         invalidValue={null}
       />
       {date && allowClear && (
-        <span
-          onClick={clearFields}
-          className="clear-pickers"
-          title={Translate.string('Clear date')}
-          ref={clearRef}
-        />
+        <button type="button" onClick={clearFields} className="clear-pickers" ref={clearRef}>
+          <span>{Translate.string('Clear date')}</span>
+        </button>
       )}
     </>
   );

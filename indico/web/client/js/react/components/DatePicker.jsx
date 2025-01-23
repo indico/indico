@@ -49,7 +49,12 @@ export default function DatePicker({
         {...inputProps}
         placeholder={format}
       />
-      <button type="button" disabled={inputProps.disabled} aria-haspopup="dialog">
+      <button
+        type="button"
+        disabled={inputProps.disabled}
+        aria-haspopup="dialog"
+        data-calendar-trigger
+      >
         <Translate as="span">Open a calendar</Translate>
       </button>
 
