@@ -14,7 +14,7 @@ import * as actions from './actions';
 import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
-import {computeYoffset, getGroup, layout, layoutGroupAfterMove} from './layout';
+import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
@@ -293,15 +293,26 @@ function layoutAfterDropOnCalendar(
   group = layoutGroupAfterMove(group, newEntry, mousePosition);
 
   if (!fromBlock) {
-    const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== newEntry.id);
-    return layout([...otherEntries, ...group]);
+    const oldGroupIds = getGroup(fromEntry, entries.filter(e => e.id !== fromEntry.id));
+    let oldGroup = entries.filter(e => oldGroupIds.has(e.id));
+    const otherEntries = entries.filter(
+      e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== newEntry.id
+    );
+    oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
+    return [...otherEntries, ...oldGroup, ...group];
   } else {
     const otherEntries = entries.filter(
       e => !groupIds.has(e.id) && e.id !== newEntry.id && e.id !== fromBlock.id
     );
-    const fromChildren = fromBlock.children.filter(e => e.id !== newEntry.id);
-    group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    return layout([...otherEntries, ...group, {...fromBlock, children: fromChildren}]);
+    if (groupIds.has(fromBlock.id)) {
+      fromBlock = group.find(e => e.id === fromBlock.id);
+      group = group.filter(e => e.id !== fromBlock.id);
+    }
+    fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== newEntry.id)};
+    fromBlock = {...fromBlock, children: layout(fromBlock.children)};
+    // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
+    console.log([...otherEntries, ...group, fromBlock]);
+    return [...otherEntries, ...group, fromBlock];
   }
 }
 
