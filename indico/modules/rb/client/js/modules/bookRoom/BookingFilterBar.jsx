@@ -12,7 +12,7 @@ import {connect} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {isBookingStartDateValid, getMinimumBookingStartTime, createDT} from 'indico/utils/date';
+import {getMinimumBookingStartTime, createDT, getBookingRangeMinDate} from 'indico/utils/date';
 
 import {selectors as configSelectors} from '../../common/config';
 import {actions as filtersActions} from '../../common/filters';
@@ -73,6 +73,7 @@ class BookingFilterBar extends React.Component {
       isAdminOverrideEnabled,
       bookingGracePeriod
     );
+    const minDate = getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod);
 
     return (
       <Button.Group size="small" styleName="recurrence-bar">
@@ -105,9 +106,7 @@ class BookingFilterBar extends React.Component {
               <DateForm
                 setParentField={setParentField}
                 isRange={recurrence.type !== 'single'}
-                disabledDate={dt =>
-                  !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod)
-                }
+                minDate={minDate}
                 {...dates}
               />
             )}

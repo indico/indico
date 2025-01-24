@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@forward 'base/reset';
+
 @use 'base/palette' as *;
 @use 'rb:styles/sui_fixes' as *;
 @use 'rb:styles/palette' as *;
@@ -221,4 +223,9 @@ $text-yellow: lighten($yellow, 15%);
 
 .scrolling-disabled {
   overflow-y: hidden;
+}
+
+// UI modal fixup so it does not throw off positioned controls like the date picker or tooltips
+.ui.modal.visible {
+  will-change: auto !important;
 }

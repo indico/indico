@@ -5,17 +5,37 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import preval from 'preval.macro';
-
 import CustomElementBase from 'indico/custom_elements/_base';
+import {
+  DateRange,
+  OpenDateRange,
+  SparseDateRange,
+  getToday,
+  isSameDate,
+  toDateString,
+} from 'indico/utils/date';
 import {formatDate} from 'indico/utils/date_format';
 import {createDateParser} from 'indico/utils/date_parser';
+import {getWeekInfoForLocale, getFirstDayOfWeek, getWeekdayNames} from 'indico/utils/l10n';
 import * as positioning from 'indico/utils/positioning';
+import {setNativeInputValue} from 'indico/utils/react_integration';
+import {DelayedAutoToggleController} from 'indico/utils/timing';
+
+import * as ds from './date_selection';
 
 import './ind_date_picker.scss';
 
 const DEFAULT_LOCALE = document.documentElement.dataset.canonicalLocale;
-const CALENDAR_CELL_COUNT = 42; // 6 rows, 7 days each
+const KEYBOARD_MOVEMENT = {
+  ArrowRight: 'nextday',
+  ArrowLeft: 'previousday',
+  ArrowDown: 'nextweek',
+  ArrowUp: 'previousweek',
+};
+// States used when determining the next action in range picker
+const START_NEEDED = 0;
+const END_NEEDED = 1;
+const BOTH_POPULATED = 2;
 
 customElements.define(
   'ind-date-picker',
@@ -23,29 +43,34 @@ customElements.define(
     // Last value of the internal id used in the widgets
     static lastId = 0;
 
+    static attributes = {
+      min: Date, // Minimum selectable date (inclusive)
+      max: Date, // Maximum selectable date (inclusive)
+      format: String, // Date format
+    };
+
+    static observedAttributes = ['min', 'max'];
+
     get value() {
       return this.querySelector('input').value;
     }
 
     setup() {
+      const indDatePicker = this;
       const id = `date-picker-${this.constructor.lastId++}`;
       const input = this.querySelector('input');
       const openCalendarButton = this.querySelector('button');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
 
-      const dateFormat = formatDescription.textContent
-        .split(':')[1]
-        .trim()
-        .toLowerCase();
-      const parseDate = createDateParser(dateFormat);
+      const parseDate = createDateParser(this.format);
 
-      indCalendar.format = dateFormat;
-      indCalendar.value = toDateString(parseDate(this.value));
+      indCalendar.format = this.format;
+      indCalendar.rangeStart = indCalendar.rangeEnd = toDateString(parseDate(this.value));
       formatDescription.id = `${id}-format`;
       input.setAttribute('aria-describedby', formatDescription.id);
-      openCalendarButton.setAttribute('aria-haspopup', 'dialog');
-      openCalendarButton.setAttribute('aria-controls', true);
+
+      updateRange();
 
       // This property is defined here rather than in the class because it
       // relies on the parseDate() function created in this scope.
@@ -54,8 +79,10 @@ customElements.define(
       });
 
       openCalendarButton.addEventListener('click', () => {
+        // Disable the button to prevent re-opening when clicking
+        // the button while the dialog is open
         openCalendarButton.disabled = true;
-        requestAnimationFrame(openDialog);
+        openDialog(indCalendar, input);
       });
       indCalendar.addEventListener('close', () => {
         openCalendarButton.disabled = false;
@@ -64,29 +91,34 @@ customElements.define(
         openCalendarButton.disabled = false;
         openCalendarButton.focus();
       });
-      indCalendar.addEventListener('x-select', () => {
-        CustomElementBase.setValue(input, formatDate(dateFormat, new Date(indCalendar.value)));
+      indCalendar.addEventListener('x-select', evt => {
+        setValue(new Date(evt.target.value));
+        indCalendar.open = false;
         input.select();
         input.focus();
-        input.dispatchEvent(new Event('input', {bubbles: true}));
       });
       input.addEventListener('keydown', evt => {
         if (evt.code === 'ArrowDown' && evt.altKey) {
-          openDialog();
+          openDialog(indCalendar, input);
         }
       });
       input.addEventListener('input', () => {
-        indCalendar.value = toDateString(parseDate(this.value));
+        indCalendar.rangeStart = indCalendar.rangeEnd = toDateString(parseDate(this.value));
       });
+      this.addEventListener('x-attrchange.min', updateRange);
+      this.addEventListener('x-attrchange.max', updateRange);
 
-      function openDialog() {
-        positioning.position(
-          indCalendar.querySelector('dialog'),
-          input,
-          positioning.dropdownPositionStrategy,
-          () => {
-            indCalendar.open = true;
-          }
+      function setValue(date) {
+        if (isSameDate(indDatePicker.date, date)) {
+          return;
+        }
+        CustomElementBase.setValue(input, formatDate(indDatePicker.format, date));
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+      }
+
+      function updateRange() {
+        indCalendar.setAllowableSelectionRange(
+          new OpenDateRange(indDatePicker.min, indDatePicker.max)
         );
       }
     }
@@ -94,61 +126,468 @@ customElements.define(
 );
 
 customElements.define(
-  'ind-calendar',
+  'ind-date-range-picker',
   class extends CustomElementBase {
+    // Last value of the internal id used in the widgets
     static lastId = 0;
 
-    constructor() {
-      super();
-      this.calendarId = this.constructor.lastId++;
-      this.weekInfo = getWeekInfoForLocale(this.locale);
-    }
+    static attributes = {
+      rangeStart: Date, // Start of the selected range (inclusive)
+      rangeEnd: Date, // End of the selected range (inclusive)
+      rangeStartMin: Date, // Minimum allowed value for the start of the range (inclusive)
+      rangeStartMax: Date, // Maximum allowed value for the start of the range (inclusive)
+      rangeEndMin: Date, // Minimum allowed value for the end of the range (inclusive)
+      rangeEndMax: Date, // Minimum allowed value for the end of the range (inclusive)
+    };
 
-    get open() {
-      return this.hasAttribute('open');
-    }
-
-    set open(isOpen) {
-      this.toggleAttribute('open', isOpen);
-    }
-
-    get locale() {
-      return this.getAttribute('lang') || DEFAULT_LOCALE;
-    }
+    static observedAttributes = [
+      'range-start',
+      'range-end',
+      'range-start-min',
+      'range-start-max',
+      'range-end-min',
+      'range-end-max',
+    ];
 
     get value() {
-      return this.getAttribute('value');
+      const rangeStartInput = this.querySelector('input[data-range-start]');
+      const rangeEndInput = this.querySelector('input[data-range-end]');
+      return `${rangeStartInput.value}:${rangeEndInput.value}`;
     }
 
-    set value(value) {
-      this.setAttribute('value', value || '');
+    get selectionState() {
+      if (!this.rangeStart) {
+        return START_NEEDED;
+      }
+
+      if (!this.rangeEnd) {
+        return END_NEEDED;
+      }
+
+      return BOTH_POPULATED;
     }
 
-    get min() {
-      return this.getAttribute('min');
+    get startRange() {
+      return new OpenDateRange(this.rangeStartMin, this.rangeStartMax);
     }
 
-    set min(dateString) {
-      this.setAttribute('min', dateString);
+    get endRange() {
+      return new OpenDateRange(this.rangeEndMin, this.rangeEndMax);
     }
 
-    get max() {
-      return this.getAttribute('max');
-    }
-
-    set max(dateString) {
-      this.setAttribute('max', dateString);
+    get combinedRange() {
+      return new SparseDateRange(this.startRange, this.endRange);
     }
 
     setup() {
+      const indDateRangePicker = this;
+      const id = `date-range-picker-${this.constructor.lastId++}`;
+      const fieldset = this.querySelector('fieldset');
+      const rangeStartInput = this.querySelector('input[data-range-start]');
+      const rangeEndInput = this.querySelector('input[data-range-end]');
+      const calendarTriggerLeft = this.querySelector('[data-calendar-trigger=left]');
+      const calendarTriggerRight = this.querySelector('[data-calendar-trigger=right]');
+      const formatDescription = this.querySelector('[data-format]');
+      const indCalendar = this.querySelector('ind-calendar');
+
+      const leftTriggerLocked = calendarTriggerLeft.disabled;
+      const rightTriggerLocked = calendarTriggerRight.disabled;
+
+      let selection = ds.newRangeSelection(
+        this.rangeStart,
+        this.rangeEnd,
+        undefined,
+        leftTriggerLocked,
+        rightTriggerLocked
+      );
+
+      const dateFormat = formatDescription.textContent
+        .split(':')[1]
+        .trim()
+        .toLowerCase();
+      const parseDate = createDateParser(dateFormat);
+
+      indCalendar.format = dateFormat;
+      indCalendar.rangeStart = this.rangeStart;
+      indCalendar.rangeEnd = this.rangeEnd;
+      indCalendar.setSelectionPreview(selection);
+      rangeStartInput.defaultValue = formatDate(dateFormat, this.rangeStart);
+      rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
+      updateSelectionLimits();
+
+      formatDescription.id = `${id}-format`;
+      rangeStartInput.setAttribute('aria-describedby', formatDescription.id);
+      rangeEndInput.setAttribute('aria-describedby', formatDescription.id);
+
+      // This property is defined here rather than in the class because it
+      // relies on the parseDate() function created in this scope.
+      Object.defineProperty(this, 'dateRange', {
+        get: () => {
+          return [parseDate(rangeStartInput.value), parseDate(rangeEndInput.value)];
+        },
+      });
+      this.addEventListener('click', evt => {
+        if (evt.target === evt.currentTarget || evt.target === fieldset) {
+          rangeStartInput.focus();
+          rangeStartInput.select();
+        }
+      });
+      this.addEventListener('x-attrchange.range-start', () => {
+        indCalendar.rangeStart = this.rangeStart;
+        rangeStartInput.defaultValue = formatDate(dateFormat, this.rangeStart);
+      });
+      this.addEventListener('x-attrchange.range-end', () => {
+        indCalendar.rangeEnd = this.rangeEnd;
+        rangeEndInput.defaultValue = formatDate(dateFormat, this.rangeEnd);
+      });
+      this.addEventListener('x-attrchange.range-start-min', updateSelectionLimits);
+      this.addEventListener('x-attrchange.range-start-max', updateSelectionLimits);
+      this.addEventListener('x-attrchange.range-end-min', updateSelectionLimits);
+      this.addEventListener('x-attrchange.range-end-max', updateSelectionLimits);
+      rangeStartInput.addEventListener('input', () => {
+        const date = parseDate(rangeStartInput.value);
+        indCalendar.rangeStart = date;
+        selection = selection.copy({left: date});
+      });
+      rangeEndInput.addEventListener('input', () => {
+        const date = parseDate(rangeEndInput.value);
+        indCalendar.rangeEnd = date;
+        selection = selection.copy({right: date});
+      });
+      rangeStartInput.addEventListener('keydown', handleAltDownToOpen);
+      rangeEndInput.addEventListener('keydown', handleAltDownToOpen);
+      calendarTriggerLeft.addEventListener('click', () => {
+        selection = ds.triggerLeft(selection);
+        openCalendar();
+      });
+      calendarTriggerRight.addEventListener('click', () => {
+        selection = ds.triggerRight(selection);
+        openCalendar();
+      });
+      indCalendar.addEventListener('close', () => {
+        calendarTriggerLeft.disabled = leftTriggerLocked;
+        calendarTriggerRight.disabled = rightTriggerLocked;
+      });
+      indCalendar.addEventListener('x-select', evt => {
+        const result = ds.select(selection, new Date(evt.target.value));
+        selection = result.selection;
+
+        // Close the calendar if needed
+        if (result.close) {
+          indCalendar.open = false;
+        }
+
+        // Set the input values where the value changed
+        if (!isSameDate(selection.left, indCalendar.rangeStart)) {
+          setNativeInputValue(rangeStartInput, formatDate(dateFormat, selection.left));
+          rangeStartInput.dispatchEvent(new Event('input', {bubbles: true}));
+        }
+        if (!isSameDate(selection.right, indCalendar.rangeEnd)) {
+          setNativeInputValue(rangeEndInput, formatDate(dateFormat, selection.right));
+          rangeEndInput.dispatchEvent(new Event('change', {bubbles: true}));
+        }
+
+        // Update the selection preview and range restriction
+        indCalendar.setSelectionPreview(selection);
+        updateSelectionLimits();
+      });
+
+      function updateSelectionLimits() {
+        if (selection.trigger === ds.LEFT) {
+          indCalendar.setAllowableSelectionRange(indDateRangePicker.startRange);
+        } else {
+          indCalendar.setAllowableSelectionRange(indDateRangePicker.endRange);
+        }
+      }
+
+      function openCalendar() {
+        indCalendar.setSelectionPreview(selection);
+        updateSelectionLimits();
+        calendarTriggerLeft.disabled = true;
+        calendarTriggerRight.disabled = true;
+        openDialog(indCalendar, indDateRangePicker);
+      }
+
+      function handleAltDownToOpen(evt) {
+        if (evt.code === 'ArrowDown' && evt.altKey) {
+          openDialog(indCalendar, indDateRangePicker);
+        }
+      }
+    }
+  }
+);
+
+customElements.define(
+  'ind-inline-date-picker',
+  class extends CustomElementBase {
+    static attributes = {
+      value: Date,
+    };
+
+    static observedAttributes = ['value'];
+
+    setup() {
+      const indCalendar = this.querySelector('ind-calendar');
+      let selection = ds.newSingleSelection(this.value, false, ds.SELECTION_SINGLE);
+
+      indCalendar.setSelectionPreview(selection);
+      indCalendar.rangeStart = this.value;
+      indCalendar.rangeEnd = this.value;
+
+      indCalendar.addEventListener('x-select', evt => {
+        const result = ds.select(selection, new Date(evt.target.value));
+        selection = result.selection;
+        indCalendar.setSelectionPreview(selection);
+        this.dispatchEvent(
+          new CustomEvent('change', {
+            bubbles: true,
+            detail: {date: selection.date},
+          })
+        );
+      });
+
+      this.addEventListener('x-attrchange.value', () => {
+        indCalendar.rangeStart = indCalendar.rangeEnd = this.value;
+      });
+    }
+  }
+);
+
+customElements.define(
+  'ind-inline-date-range-picker',
+  class extends CustomElementBase {
+    static attributes = {
+      rangeStart: Date,
+      rangeEnd: Date,
+    };
+
+    static observedAttributes = ['range-start', 'range-end'];
+
+    setup() {
+      const indCalendar = this.querySelector('ind-calendar');
+      let selection = ds.newRangeSelection(
+        this.rangeStart,
+        this.rangeEnd,
+        undefined,
+        undefined,
+        undefined,
+        ds.SELECTION_SIMPLE_RANGE
+      );
+
+      indCalendar.setSelectionPreview(selection);
+
+      indCalendar.addEventListener('x-select', evt => {
+        const result = ds.select(selection, new Date(evt.target.value));
+        selection = result.selection;
+        indCalendar.setSelectionPreview(selection);
+        if (selection.completed) {
+          indCalendar.pausePreview();
+        } else {
+          indCalendar.resumePreview();
+        }
+        if (selection.getSelectionState() === ds.BOTH) {
+          this.dispatchEvent(
+            new CustomEvent('change', {
+              bubbles: true,
+              detail: {
+                left: selection.left,
+                right: selection.right,
+              },
+            })
+          );
+        }
+      });
+    }
+  }
+);
+
+/**
+ * Implements dialog mode events
+ *
+ * This class contains all behavior specific to the use of the <ind-calendar>
+ * element within a dialog. For other use cases, provide a class of the identical
+ * interface that implements different behavior.
+ **/
+class DialogModeController {
+  constructor(calendar, options) {
+    this.calendar = calendar;
+    this.dialog = this.calendar.firstElementChild;
+    this.options = options;
+  }
+
+  setUpEvents() {
+    this.dialog.addEventListener('pointerdown', () => {
+      // Because Safari does not focus buttons (and other elements) when they
+      // are clicked, we need to mark the dialog as having received such clicks
+      // and test for it in the close handler.
+      this.dialog.noImmediateClose = true;
+      setTimeout(() => {
+        // Unset with a delay to allow focusout handler to see this flag.
+        // It must still be unset so it doesn't linger on forever. The delay
+        // was chosen based on trial and error. In general, you don't want
+        // to make it shorter, but you may increase it if some browser/OS
+        // combination unsets the flag too quickly.
+        delete this.dialog.noImmediateClose;
+      }, 100);
+    });
+    this.dialog.addEventListener('focusout', () => {
+      // The focusout event is triggered on the dialog or somewhere in it.
+      // We use requestAnimationFrame to allow the target element to get
+      // focused so we know where the focus is going.
+      requestAnimationFrame(() => {
+        // When a button in the dialog is clicked, `noImmediateClose` is set on
+        // the dialog element. We test for the absence of this flag as well as
+        // focus escaping from the dialog as two cues to close it.
+        if (!this.dialog.noImmediateClose && !this.dialog.contains(document.activeElement)) {
+          this.calendar.open = false;
+        }
+      });
+      // Handle closing/opening the dialog by clicking outside
+      this.dialog.addEventListener('keydown', evt => {
+        if (evt.code !== 'Escape') {
+          return;
+        }
+        this.calendar.open = false;
+        this.calendar.dispatchEvent(new Event('x-keyclose'));
+      });
+    });
+    // Handle dialog open/close initialized through the ind-calendar `open` attribute
+    this.calendar.addEventListener('x-attrchange.open', () => {
+      if (!this.dialog) {
+        console.warn(
+          'ind-calendar: Attempt to open or close dialog with no dialog element present'
+        );
+        return;
+      }
+      if (this.calendar.open) {
+        if (this.dialog.open) {
+          return;
+        }
+        this.options.onopen();
+        this.dialog.show();
+        this.dialog.focus();
+        this.dialog.dispatchEvent(new Event('open', {bubbles: true}));
+      } else {
+        if (!this.dialog.open) {
+          return;
+        }
+        this.dialog.close();
+        this.options.onclose?.();
+        this.dialog.dispatchEvent(new Event('close', {bubbles: true}));
+      }
+    });
+  }
+
+  setUpGlobalEvent() {
+    this.abortController = new AbortController();
+
+    // Note that this may not work on iOS Safari. We are not currently explicitly
+    // targeting this browser, so we'll leave this as is.
+    window.addEventListener(
+      'click',
+      evt => {
+        if (!this.calendar.open) {
+          return;
+        }
+        if (evt.target.closest('dialog') === this.dialog) {
+          return;
+        }
+        setTimeout(() => {
+          this.calendar.open = false;
+        });
+      },
+      {signal: this.abortController.signal}
+    );
+  }
+
+  tearDownGlobalEvents() {
+    this.abortController.abort();
+  }
+}
+
+/**
+ * Implements inline mode events
+ *
+ * This is (currently) a dummy version of the dialog mode controller, which does
+ * nothing at all. It is used for completely static calendars that don't wrap a
+ * <dialog> element.
+ */
+class InlineModeController {
+  setUpEvents() {}
+
+  setUpGlobalEvents() {}
+
+  tearDownGlobalEvents() {}
+}
+
+customElements.define(
+  'ind-calendar',
+  class extends CustomElementBase {
+    static attributes = {
+      open: Boolean,
+      locale: {
+        type: String,
+        default: DEFAULT_LOCALE,
+      },
+      rangeStart: Date,
+      rangeEnd: Date,
+    };
+
+    static observedAttributes = ['range-start', 'range-end', 'open'];
+
+    constructor() {
+      super();
+      this.allowableSelectionRange = new OpenDateRange();
+      this.previewPaused = false;
+      this.previewToggleController = new DelayedAutoToggleController(
+        () => {
+          this.previewPaused = true;
+        },
+        () => {
+          this.previewPaused = false;
+        },
+        3000
+      );
+    }
+
+    setAllowableSelectionRange(dateRange) {
+      this.allowableSelectionRange = dateRange;
+      this.dispatchEvent(new Event('x-rangechange'));
+    }
+
+    setSelectionPreview(selection) {
+      this.selectionPreview = selection.copy();
+    }
+
+    pausePreview() {
+      this.previewToggleController.activate();
+    }
+
+    resumePreview() {
+      this.previewToggleController.reset();
+    }
+
+    setup() {
+      let calendarDisplayDate, hoverCursor;
+
       const indCalendar = this;
-      const dialog = this.firstElementChild;
+      const BehaviorController =
+        this.firstElementChild.tagName === 'DIALOG' ? DialogModeController : InlineModeController;
+      const behaviorController = new BehaviorController(this, {
+        onclose: () => {
+          calendarDisplayDate = undefined;
+          updateCalendar();
+        },
+        onopen: () => {
+          calendarDisplayDate = undefined;
+          updateCalendar();
+        },
+      });
       const monthYearGroup = this.querySelector('.month-year');
       const editMonthSelect = monthYearGroup.querySelector('select');
       const editYearInput = monthYearGroup.querySelector('input');
-      const weekdaysGroup = dialog.querySelector('.weekdays');
-      const listbox = dialog.querySelector('[role=listbox]');
-      let calendarDisplayDate;
+      const calendars = this.querySelector('.calendars');
+      const dateGrids = this.querySelectorAll('ind-date-grid');
 
       // Populate month names in the select list
       for (let i = 0; i < 12; i++) {
@@ -160,76 +599,21 @@ customElements.define(
         monthOption.textContent = monthName;
         editMonthSelect.append(monthOption);
       }
+      // Populate year
+      editYearInput.value = new Date().getFullYear();
 
-      // Populate weekday names in the calendar header
-      getWeekdayNames(this.weekInfo, this.locale).forEach(({full, short}, i) => {
-        const headerCell = weekdaysGroup.children[i];
-        headerCell.setAttribute('aria-label', full);
-        headerCell.textContent = short;
-        headerCell.id = `calendar-${this.calendarId}-wkd-${i + 1}`;
-      });
-
-      // Populate calendar with blank buttons
-      for (let i = 0; i < CALENDAR_CELL_COUNT; i++) {
-        const calendarButton = document.createElement('button');
-        calendarButton.setAttribute('role', 'option');
-        calendarButton.setAttribute('aria-describedby', weekdaysGroup.children[i % 6].id);
-        calendarButton.tabIndex = -1;
-        calendarButton.type = 'button';
-        listbox.append(calendarButton);
+      for (const grid of dateGrids) {
+        grid.hideDatesFromOtherMonths = dateGrids.length > 1;
       }
 
-      this.addEventListener('attrchange.open', () => {
-        if (this.open) {
-          show();
-        } else {
-          close();
-        }
-      });
-      this.addEventListener('attrchange.value', updateCalendar);
+      this.addEventListener('x-attrchange.range-start', updateCalendar);
+      this.addEventListener('x-attrchange.range-end', updateCalendar);
+      this.addEventListener('x-rangechange', updateCalendar);
 
-      dialog.addEventListener('pointerdown', () => {
-        // Because Safari does not focus buttons (and other elements) when they
-        // are clicked, we need to mark the dialog as having received such clicks
-        // and test for it in the close handler.
-        dialog.noImmediateClose = true;
-        setTimeout(() => {
-          // Unset with a delay to allow focusout handler to see this flag.
-          // It must still be unset so it doesn't linger on forever. The delay
-          // was chosen based on trial and error. In general, you don't want
-          // to make it shorter, but you may increase it if some browser/OS
-          // combination unsets the flag too quickly.
-          delete dialog.noImmediateClose;
-        }, 100);
-      });
-
-      dialog.addEventListener('focusout', () => {
-        // The focusout event is triggered on the dialog or somewhere in it.
-        // We use requestAnimationFrame to allow the target element to get
-        // focused so we know where the focus is going.
-        requestAnimationFrame(() => {
-          // When a button in the dialog is clicked, `noImmediateClose` is set on
-          // the dialog element. We test for the absence of this flag as well as
-          // focus escaping from the dialog as two cues to close it.
-          if (!dialog.noImmediateClose && !dialog.contains(document.activeElement)) {
-            this.open = false;
-          }
-        });
-      });
-
-      // Handle open/close to prep the dialog state
-      dialog.addEventListener('open', () => {
-        calendarDisplayDate = toOptionalDate(this.value) || getToday();
-        const focusTarget = dialog.querySelector('[aria-selected=true]') || dialog;
-        focusTarget.focus();
-      });
-      dialog.addEventListener('close', () => {
-        calendarDisplayDate = undefined;
-        updateCalendar();
-      });
+      behaviorController.setUpEvents();
 
       // Handle calendar interaction
-      dialog.addEventListener('click', evt => {
+      indCalendar.addEventListener('click', evt => {
         const button = evt.target.closest('button[value]');
         if (!button) {
           return;
@@ -252,10 +636,13 @@ customElements.define(
             updateCalendar();
             break;
           default:
-            // Date selection
-            this.open = false;
-            this.value = button.value;
-            this.dispatchEvent(new Event('x-select'));
+            // The only remaining option is a calendar button - date selection.
+            // We dispatch the x-select event on the button itself, and the
+            // input component will handle updating its value.
+            if (button.hasAttribute('aria-disabled')) {
+              return;
+            }
+            button.dispatchEvent(new Event('x-select', {bubbles: true}));
         }
       });
       editYearInput.addEventListener('input', () => {
@@ -271,127 +658,118 @@ customElements.define(
         calendarDisplayDate.setMonth(editMonthSelect.value);
         updateCalendar();
       });
-      listbox.addEventListener('keydown', evt => {
-        const currentDate = listbox.querySelector(':focus');
-        const currentDateIndex = Array.prototype.indexOf.call(listbox.children, currentDate);
-        switch (evt.code) {
-          case 'ArrowRight': {
-            evt.preventDefault();
-            let nextDate = currentDate?.nextElementSibling;
-            if (!nextDate) {
-              // We've reached the end. Flip to next month and start from the beginning.
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
-              updateCalendar();
-              nextDate = listbox.firstElementChild;
-            }
-            focusCalendarButton(nextDate);
+
+      // Grid calendar month change
+      indCalendar.addEventListener('x-datechange.next', () => {
+        calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
+        updateCalendar();
+      });
+      indCalendar.addEventListener('x-datechange.previous', () => {
+        calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
+        updateCalendar();
+      });
+
+      // Grid cursor movement
+      indCalendar.addEventListener('x-move', evt => {
+        const {direction, currentDate} = evt.detail;
+        const nextDate = new Date(currentDate);
+
+        switch (direction) {
+          case 'nextday':
+            nextDate.setDate(nextDate.getDate() + 1);
             break;
-          }
-          case 'ArrowLeft': {
-            evt.preventDefault();
-            let previousDate = currentDate?.previousElementSibling;
-            if (!previousDate) {
-              // We've reached the end. Flip to previous month and start from the end.
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
-              updateCalendar();
-              previousDate = listbox.lastElementChild;
-            }
-            focusCalendarButton(previousDate);
+          case 'previousday':
+            nextDate.setDate(nextDate.getDate() - 1);
             break;
-          }
-          case 'ArrowUp': {
-            evt.preventDefault();
-            let nextIndex = currentDateIndex - 7;
-            if (nextIndex < 1) {
-              // We've reached the end. Flip to previous month and start from last row.
-              nextIndex = listbox.children.length - 7 + currentDateIndex;
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
-              updateCalendar();
-            }
-            focusCalendarButton(listbox.children[nextIndex] || listbox.lastElementChild);
+          case 'nextweek':
+            nextDate.setDate(nextDate.getDate() + 7);
             break;
-          }
-          case 'ArrowDown': {
-            evt.preventDefault();
-            let nextIndex = currentDateIndex + 7;
-            if (nextIndex > listbox.children.length - 1) {
-              // We've reached the end. Flip to next month and start from the first row.
-              nextIndex = currentDateIndex % 7;
-              calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
-              updateCalendar();
-            }
-            focusCalendarButton(listbox.children[nextIndex] || listbox.firstElementChild);
+          case 'previousweek':
+            nextDate.setDate(nextDate.getDate() - 7);
             break;
+        }
+
+        const nextDateString = nextDate.toDateString();
+        const targetButton = findFocusableButton(nextDateString);
+        if (targetButton) {
+          targetButton.focus();
+        } else {
+          if (direction.startsWith('next')) {
+            calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() + 1);
+            updateCalendar();
+          } else {
+            calendarDisplayDate.setMonth(calendarDisplayDate.getMonth() - 1);
+            updateCalendar();
           }
+          setTimeout(() => {
+            findFocusableButton(nextDateString).focus();
+          });
         }
       });
 
-      // Handle closing/opening the dialog by clicking outside
-      this.addEventListener('keydown', evt => {
-        if (evt.code !== 'Escape') {
+      calendars?.addEventListener('focusin', evt => {
+        if (evt.target.matches('[aria-disabled]')) {
           return;
         }
-        this.open = false;
-        this.dispatchEvent(new Event('x-keyclose'));
+        hoverCursor = evt.target.value;
+        updateGrids();
+      });
+      calendars?.addEventListener('focusout', () => {
+        hoverCursor = undefined;
+        updateGrids();
+      });
+      calendars?.addEventListener('mouseover', evt => {
+        if (evt.target.matches('button[value]:not([aria-disabled])')) {
+          hoverCursor = evt.target.value;
+          updateGrids();
+        }
+      });
+      calendars?.addEventListener('mouseout', () => {
+        hoverCursor = undefined;
+        updateGrids();
       });
 
-      // Note that this may not work on iOS Safari. We are not currently explicitly
-      // targeting this browser, so we'll leave this as is.
-      this.addEventListener('x-connect', () => {
-        window.addEventListener('click', handleDialogClose);
-      });
-      this.addEventListener('x-disconnect', () => {
-        window.removeEventListener('click', handleDialogClose);
-      });
-
-      function handleDialogClose(ev) {
-        if (!indCalendar.open) {
-          return;
-        }
-        if (ev.target.closest('dialog') === dialog) {
-          return;
-        }
-        setTimeout(() => {
-          indCalendar.open = false;
-        });
+      function getSelectionRange() {
+        return new DateRange(indCalendar.rangeStart, indCalendar.rangeEnd);
       }
 
-      function focusCalendarButton(calendarButton) {
-        const currentlyFocusable = listbox.querySelector('[tabindex="0"]');
-        if (currentlyFocusable) {
-          currentlyFocusable.tabIndex = -1;
-        }
-        calendarButton.tabIndex = 0;
-        calendarButton.focus();
-      }
+      function getHoverRange() {
+        // A component that wishes to display the preview must set
+        // the `selectionPreview` property by calling `setSelectionPreview()`
+        // on the <ind-calendar> element and the value must be a `Selection`
+        // object (see `date_selection.js`).
+        //
+        // When no valid preview can be created, or the preview is paused
+        // an empty `DateRange` is returned.
 
-      function show() {
-        if (!dialog) {
-          return;
+        if (!indCalendar.selectionPreview || indCalendar.previewPaused) {
+          return new DateRange();
         }
-        if (dialog.open) {
-          return;
-        }
-        dialog.show();
-        dialog.dispatchEvent(new Event('open'));
-      }
 
-      function close() {
-        if (!dialog) {
-          return;
+        // Obtain the cursor position
+        const cursorDate = hoverCursor && new Date(hoverCursor);
+        if (!cursorDate) {
+          return new DateRange();
         }
-        if (!dialog.open) {
-          return;
-        }
-        dialog.close();
-        indCalendar.dispatchEvent(new Event('close'));
+
+        // Create a preview
+        const {selection: preview} = ds.select(indCalendar.selectionPreview, cursorDate);
+        return preview.toDateRange();
       }
 
       function updateCalendar() {
-        const selectedDate = toOptionalDate(indCalendar.value);
-        const firstDayOfMonth = new Date(calendarDisplayDate || selectedDate || getToday());
+        const selectedRange = getSelectionRange();
+        const firstDayOfMonth = new Date(
+          calendarDisplayDate ||
+            selectedRange.start ||
+            indCalendar.allowableSelectionRange.start ||
+            getToday()
+        );
         firstDayOfMonth.setDate(1);
-        const firstDayOfCalendar = getFirstDayOfWeek(indCalendar.weekInfo, firstDayOfMonth);
+
+        // If the calendar display date is not set, set it to the computed
+        // first day of month
+        calendarDisplayDate ??= firstDayOfMonth;
 
         // Populate the year/month controls
 
@@ -399,163 +777,228 @@ customElements.define(
         editYearInput.value = firstDayOfMonth.getFullYear();
 
         // Populate the calendar cells
+        updateGrids(firstDayOfMonth.getFullYear(), firstDayOfMonth.getMonth());
+      }
 
-        const min = toOptionalDate(indCalendar.min);
-        const max = toOptionalDate(indCalendar.max);
-        const month = firstDayOfMonth.getMonth();
+      function updateGrids(year, month) {
+        const selectionRange = getSelectionRange();
+        const hoverRange = getHoverRange();
+        const markedRange = hoverRange.isInvalid ? selectionRange : hoverRange;
+        dateGrids.forEach((grid, i) => {
+          if (year !== undefined && month !== undefined) {
+            const gridDate = new Date(year, month);
+            gridDate.setMonth(gridDate.getMonth() + i);
+            grid.year = gridDate.getFullYear();
+            grid.month = gridDate.getMonth();
+          }
+          grid.rangeStart = markedRange.start?.toString() || '';
+          grid.rangeEnd = markedRange.end?.toString() || '';
+          grid.setAllowableSelectionRange(indCalendar.allowableSelectionRange);
+        });
+      }
 
-        for (let i = 0; i < CALENDAR_CELL_COUNT; i++) {
-          const date = new Date(firstDayOfCalendar);
-          date.setDate(date.getDate() + i);
-          const calendarButton = listbox.querySelector(`button:nth-of-type(${i + 1})`);
-          calendarButton.textContent = date.getDate();
-          calendarButton.dataset.currentMonth = date.getMonth() === month;
-          calendarButton.setAttribute(
-            'aria-label',
-            date.toLocaleDateString(indCalendar.locale, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-          );
-          calendarButton.toggleAttribute(
-            'data-weekend',
-            indCalendar.weekInfo.weekend.includes(date.getDay() + 1)
-          );
-          calendarButton.tabIndex = -1; // reset tabIndex
-          calendarButton.value = toDateString(date);
-
-          // Mark range
-          calendarButton.disabled = date < min || date > max;
-
-          // Mark selected
-          if (calendarButton.value === indCalendar.value) {
-            calendarButton.setAttribute('aria-selected', true);
-          } else {
-            calendarButton.removeAttribute('aria-selected');
+      function findFocusableButton(dateString) {
+        const focusableButtons = [];
+        for (const grid of dateGrids) {
+          const button = grid.makeFocusable(dateString);
+          if (button) {
+            focusableButtons.push(button);
           }
         }
-
-        const focusableButton =
-          listbox.querySelector('[aria-selected]') ||
-          listbox.querySelector('button:not(:disabled)');
-        focusableButton.tabIndex = 0;
-      }
-    }
-
-    static observedAttributes = ['open', 'value', 'min', 'max'];
-
-    attributeChangedCallback(name) {
-      switch (name) {
-        case 'open':
-          this.dispatchEvent(new Event('attrchange.open'));
-          break;
-        case 'value':
-        case 'min':
-        case 'max':
-          this.dispatchEvent(new Event('attrchange.value'));
-          break;
+        return (
+          focusableButtons.find(button => button.dataset.currentMonth === 'true') ||
+          focusableButtons[0]
+        );
       }
     }
   }
 );
 
-// Date functions
+customElements.define(
+  'ind-date-grid',
+  class extends CustomElementBase {
+    static lastId = 0;
 
-function getToday() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now;
-}
+    static attributes = {
+      rangeStart: Date,
+      rangeEnd: Date,
+      year: Number,
+      month: Number,
+      locale: {
+        type: String,
+        default: DEFAULT_LOCALE,
+      },
+      hideDatesFromOtherMonths: Boolean,
+    };
 
-function toDateString(date) {
-  // We do not use ISO date format because it will be interpreted as UTC
-  return date?.toDateString();
-}
+    static observedAttributes = ['year', 'month', 'range-start', 'range-end'];
 
-function toOptionalDate(dateString) {
-  const date = new Date(dateString);
-  if (!date.getTime()) {
-    return;
-  }
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
+    constructor() {
+      super();
+      this.allowableSelectionRange = new OpenDateRange();
+    }
 
-// Localization
+    setAllowableSelectionRange(range) {
+      this.allowableSelectionRange = range;
+      this.dispatchEvent(new Event('x-rangechange'));
+    }
 
-// This is used in browsers that do not support Intl API.
-// Only those items where the data differs from the generic
-// fallback are listed.
-// language=JavaScript
-const WEEK_INFO = preval`
-const fs = require('node:fs');
-const path = require('node:path');
-const MONDAY = 1
-const SATURDAY = 6
+    setup() {
+      const indDateGrid = this;
+      const weekInfo = getWeekInfoForLocale(this.locale);
+      const listbox = this.querySelector('[role=listbox]');
+      const calendarButtons = listbox.querySelectorAll('[role=option]');
+      const weekdayLabels = this.querySelectorAll('[data-weekday-labels] abbr');
+      const monthLabel = this.querySelector('[data-month-label]');
+      const id = `date-grid-${this.constructor.lastId++}`;
 
-// Traverse up to package.json and then calculate
-// translations path from there
-let packageJsonDir = __dirname;
-while (packageJsonDir !== path.dirname(packageJsonDir)) {
-  if (fs.existsSync(path.join(packageJsonDir, 'package.json'))) {
-    break;
-  }
-  packageJsonDir = path.dirname(packageJsonDir);
-}
-const translationDir = path.resolve(packageJsonDir, 'indico/translations')
+      // Populate weekday names in the calendar header
+      getWeekdayNames(weekInfo, this.locale).forEach(({full, short}, i) => {
+        const headerCell = weekdayLabels[i];
+        headerCell.setAttribute('aria-label', full);
+        headerCell.setAttribute('title', full);
+        headerCell.textContent = short;
+        headerCell.id = `${id}-wkd-${i + 1}`;
+      });
 
-const localeData = {}
-const paths = fs.readdirSync(translationDir, {withFileTypes: true});
+      // Prepare the initial button states
+      calendarButtons.forEach((calendarButton, i) => {
+        calendarButton.setAttribute('aria-describedby', weekdayLabels[i % 7].id);
+        calendarButton.tabIndex = -1;
+        calendarButton.type = 'button';
+      });
 
-for (let p of paths) {
-  if (p.isDirectory()) {
-    // Transform locale to a browser-compatible version
-    let parts = p.name.split('_')
-    let localeName = parts[0] + '-' + parts.at(-1)
+      indDateGrid.addEventListener('x-attrchange', updateGridDates);
 
-    // Convert to week info
-    try {
-      const weekInfo = new Intl.Locale(localeName).weekInfo
+      listbox.addEventListener('keydown', evt => {
+        // Movement keyboard commands simply translate the keyboard
+        // events to custom x-move events. These are handled by
+        // <ind-calendar> because that's the first common ancestor
+        // of all the grids, and can facilitate cross-grid movement.
 
+        const currentDate = listbox.querySelector(':focus').value;
 
-      // To save bandwidth, we store fallback only for non-ISO-8601 weeks
-      if (weekInfo.firstDay !== MONDAY || weekInfo.weekend[0] !== SATURDAY) {
-        localeData[localeName] = weekInfo;
+        const movementDirection = KEYBOARD_MOVEMENT[evt.code];
+        if (movementDirection) {
+          evt.preventDefault();
+          indDateGrid.dispatchEvent(
+            new CustomEvent('x-move', {
+              detail: {direction: movementDirection, currentDate},
+              bubbles: true,
+            })
+          );
+        }
+      });
+
+      let debounceTimer;
+
+      function updateGridDates() {
+        // This function is debounced as sometimes we may set multiple
+        // properties on the ind-date-grid element, and we only want the
+        // DOM to update once.
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const firstDayOfMonth = new Date(indDateGrid.year, indDateGrid.month, 1);
+          const firstDayOfCalendar = getFirstDayOfWeek(weekInfo, firstDayOfMonth);
+          const calendarMonth = firstDayOfMonth.getMonth();
+
+          if (monthLabel) {
+            monthLabel.textContent = firstDayOfMonth.toLocaleDateString(indDateGrid.locale, {
+              month: 'long',
+              year: 'numeric',
+            });
+          }
+
+          const selectedRange = new DateRange(indDateGrid.rangeStart, indDateGrid.rangeEnd);
+
+          calendarButtons.forEach((calendarButton, i) => {
+            const date = new Date(firstDayOfCalendar);
+            date.setDate(date.getDate() + i);
+            const belongsToCurrentMonth = date.getMonth() === calendarMonth;
+            const isRenderable = !indDateGrid.hideDatesFromOtherMonths || belongsToCurrentMonth;
+
+            calendarButton.dataset.currentMonth = belongsToCurrentMonth;
+            calendarButton.disabled = !isRenderable;
+
+            if (!isRenderable) {
+              calendarButton.textContent = '';
+              calendarButton.removeAttribute('aria-label');
+              calendarButton.removeAttribute('aria-selected');
+              calendarButton.removeAttribute('data-week');
+              calendarButton.removeAttribute('data-range-start');
+              calendarButton.removeAttribute('data-range-end');
+              calendarButton.value = '';
+              calendarButton.tabIndex = -1;
+              calendarButton.disabled = true;
+              return;
+            }
+
+            // Update button attributes
+            calendarButton.textContent = date.getDate();
+            calendarButton.setAttribute(
+              'aria-label',
+              date.toLocaleDateString(indDateGrid.locale, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+            );
+            calendarButton.toggleAttribute(
+              'data-weekend',
+              weekInfo.weekend.includes(date.getDay() + 1)
+            );
+            calendarButton.tabIndex = -1;
+            calendarButton.value = toDateString(date);
+
+            if (this.allowableSelectionRange.includes(date)) {
+              calendarButton.removeAttribute('aria-disabled');
+            } else {
+              calendarButton.setAttribute('aria-disabled', true);
+            }
+
+            if (selectedRange.includes(date)) {
+              calendarButton.setAttribute('aria-selected', true);
+            } else {
+              calendarButton.removeAttribute('aria-selected');
+            }
+            calendarButton.toggleAttribute('data-range-start', selectedRange.startsWith(date));
+            calendarButton.toggleAttribute('data-range-end', selectedRange.endsWith(date));
+          });
+
+          const focusableButton = listbox.querySelector(
+            '[role=option]:is([aria-selected=true],[data-current-month=true]:not([aria-disabled]))'
+          );
+          if (focusableButton) {
+            focusableButton.tabIndex = 0;
+          }
+          indDateGrid.dispatchEvent(new Event('x-update-grid'));
+        });
       }
-    } catch (e) { /* Ignore unofficial (zh_CN.GB2312) and breaking locales during development */ }
+    }
+
+    makeFocusable(dateString) {
+      const calendarButton = this.querySelector(`[value="${dateString}"]`);
+      if (!calendarButton) {
+        return;
+      }
+      const currentlyFocusable = this.querySelector('[tabindex="0"]');
+      if (currentlyFocusable) {
+        currentlyFocusable.tabIndex = -1;
+      }
+      calendarButton.tabIndex = 0;
+      return calendarButton;
+    }
   }
-}
+);
 
-module.exports = localeData;
-`;
-const ISO_WEEK_INFO = {firstDay: 1, weekend: [6, 7]};
-
-function getWeekInfoForLocale(locale) {
-  const weekInfo = WEEK_INFO[locale] ?? ISO_WEEK_INFO;
-  weekInfo.weekDays = [];
-  for (let i = weekInfo.firstDay, end = i + 7; i < end; i++) {
-    weekInfo.weekDays.push(i % 7 || 7);
-  }
-  return weekInfo;
-}
-
-function getFirstDayOfWeek(weekInfo, date) {
-  const offset = weekInfo.weekDays.indexOf(date.getDay() || 7);
-  const firstDayOfWeek = new Date(date);
-  firstDayOfWeek.setDate(firstDayOfWeek.getDate() - offset);
-  return firstDayOfWeek;
-}
-
-function getWeekdayNames(weekInfo, locale) {
-  const date = getFirstDayOfWeek(weekInfo, getToday());
-  const weekdayNames = [];
-  for (let i = 0; i < 7; i++) {
-    weekdayNames.push({
-      full: date.toLocaleDateString(locale, {weekday: 'long'}),
-      short: date.toLocaleDateString(locale, {weekday: 'narrow'}),
-    });
-    date.setDate(date.getDate() + 1);
-  }
-  return weekdayNames;
+function openDialog(indCalendar, anchor) {
+  const stopPositioning = positioning.position(
+    indCalendar.firstElementChild,
+    anchor,
+    positioning.dropdownPositionStrategy,
+    () => {
+      indCalendar.open = true;
+    }
+  );
+  indCalendar.querySelector('dialog').addEventListener('close', stopPositioning, {once: true});
 }

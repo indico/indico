@@ -5,47 +5,41 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'react-dates/initialize';
 import PropTypes from 'prop-types';
-import React from 'react';
-import {DayPickerSingleDateController as DayPicker} from 'react-dates';
+import React, {useRef} from 'react';
 
-import {renderMonthElement, responsiveReactDates} from './util';
+import {DatePickerGrid, DatePickerInlineCalendar} from 'indico/react/components/DatePickerCalendar';
+import {useNativeEvent} from 'indico/react/hooks';
 
-import 'react-dates/lib/css/_datepicker.css';
 import '../style/dates.scss';
 
-export default class CalendarSingleDatePicker extends React.Component {
-  static propTypes = {
-    disabledDate: PropTypes.func,
-    yearsBefore: PropTypes.number,
-    yearsAfter: PropTypes.number,
-  };
+export default function CalendarSingleDatePicker({onChange, date, minDate, maxDate, ...props}) {
+  const calendarRef = useRef();
 
-  static defaultProps = {
-    disabledDate: () => false,
-    yearsBefore: 5,
-    yearsAfter: 5,
-  };
+  useNativeEvent(calendarRef, 'change', evt => {
+    onChange(evt.detail.date);
+  });
 
-  state = {
-    focused: true,
-  };
-
-  onFocusChange = ({focused}) => {
-    this.setState({focused});
-  };
-
-  render() {
-    const {focused} = this.state;
-    const {disabledDate, yearsBefore, yearsAfter, ...props} = this.props;
-    return responsiveReactDates(DayPicker, {
-      ...props,
-      focused,
-      onFocusChange: this.onFocusChange,
-      isOutsideRange: disabledDate,
-      hideKeyboardShortcutsPanel: true,
-      renderMonthElement: params => renderMonthElement(yearsBefore, yearsAfter, params),
-    });
-  }
+  return (
+    <ind-inline-date-picker ref={calendarRef} value={date}>
+      <DatePickerInlineCalendar minDate={minDate} maxDate={maxDate} {...props}>
+        <DatePickerGrid />
+      </DatePickerInlineCalendar>
+    </ind-inline-date-picker>
+  );
 }
+
+CalendarSingleDatePicker.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  date: PropTypes.string,
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
+  yearsBefore: PropTypes.number,
+  yearsAfter: PropTypes.number,
+};
+
+CalendarSingleDatePicker.defaultProps = {
+  date: null,
+  minDate: null,
+  maxDate: null,
+};

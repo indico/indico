@@ -43,6 +43,8 @@ Accessibility
 
 - Make field validation error messages more accessible in the registration form
   (:pr:`6324`, thanks :user:`foxbunny`)
+- Implement a new date range picker and use it in the Room Booking module
+  (:pr:`6464`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -8,11 +8,12 @@
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux';
 import {Label} from 'semantic-ui-react';
 
-import {DatePeriodField, FinalDatePeriod, RadioButton} from 'indico/react/components';
+import {DateRangePicker, RadioButton} from 'indico/react/components';
+import {FinalDateRangePicker} from 'indico/react/components/DateRangePicker';
 import {FinalField} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
@@ -44,13 +45,6 @@ function AccommodationInputComponent({
   const formatPrice = useSelector(getPriceFormatter);
   const selectedChoice = choices.find(c => c.id === value.choice);
 
-  const [focusedDateField, setFocusedDateField] = useState(null);
-
-  const arrivalDateFrom = toMoment(arrival.startDate, moment.HTML5_FMT.DATE);
-  const arrivalDateTo = toMoment(arrival.endDate, moment.HTML5_FMT.DATE);
-  const departureDateFrom = toMoment(departure.startDate, moment.HTML5_FMT.DATE);
-  const departureDateTo = toMoment(departure.endDate, moment.HTML5_FMT.DATE);
-
   const makeHandleChange = choice => () => {
     const newValue = {...value, choice: choice.id, isNoAccommodation: choice.isNoAccommodation};
     if (choice.isNoAccommodation) {
@@ -60,25 +54,9 @@ function AccommodationInputComponent({
     onChange(newValue);
   };
 
-  const handleDateChange = ({startDate, endDate}) => {
+  const handleDateChange = ({startDate = null, endDate = null}) => {
     onChange({...value, arrivalDate: startDate, departureDate: endDate});
   };
-
-  const isDateDisabled = date => {
-    // for the arrival date we allow selecting from the start date range, but for the
-    // departure date we allow both ranges to avoid the highlighted range looking very
-    // broken (disabled dates do not get any highlighting when included in the range)
-    if (focusedDateField === 'startDate') {
-      return !date.isBetween(arrivalDateFrom, arrivalDateTo, 'day', '[]');
-    }
-    return !date.isBetween(arrivalDateFrom, departureDateTo, 'day', '[]');
-  };
-
-  // calculate minimum days so the user can only select a departure date
-  // in the allowed departure date range
-  const minimumDays = !value.arrivalDate
-    ? 1
-    : Math.max(1, moment(departureDateFrom).diff(moment(value.arrivalDate), 'days') + 1);
 
   const nights =
     value.arrivalDate && value.departureDate
@@ -143,25 +121,25 @@ function AccommodationInputComponent({
       </table>
       {value.choice !== null && !value.isNoAccommodation && (
         <div styleName="date-picker">
-          <DatePeriodField
+          <DateRangePicker
+            label={Translate.string('Pick the arrival and departure dates')}
             onChange={handleDateChange}
-            onFocus={() => undefined}
-            onBlur={() => undefined}
-            disabledDate={isDateDisabled}
-            initialVisibleMonth={() => arrivalDateFrom}
-            onFieldFocusChange={setFocusedDateField}
-            minimumDays={minimumDays}
-            value={{startDate: value.arrivalDate, endDate: value.departureDate}}
-            extraPickerProps={{
-              block: false,
-              startDatePlaceholderText: Translate.string('Arrival'),
-              endDatePlaceholderText: Translate.string('Departure'),
+            value={{
+              startDate: value.arrivalDate || '',
+              endDate: value.departureDate || '',
             }}
+            rangeStartLabel={Translate.string('Arrival')}
+            rangeEndLabel={Translate.string('Departure')}
+            rangeStartMin={arrival.startDate}
+            rangeStartMax={arrival.endDate}
+            rangeEndMin={departure.startDate}
+            rangeEndMax={departure.endDate}
           />
           {!!selectedChoice.price && (
             <Label pointing="left" styleName="price-tag">
               <Translate>
-                Total: <Param name="price" value={formatPrice(nights * selectedChoice.price)} />
+                Total:{' '}
+                <Param name="price" value={formatPrice((nights || 0) * selectedChoice.price)} />
               </Translate>
             </Label>
           )}
@@ -303,17 +281,10 @@ export function accommodationSettingsFormValidator({arrival, departure}) {
 export function AccommodationSettings() {
   return (
     <>
-      <FinalDatePeriod
-        name="arrival"
-        label={Translate.string('Arrival')}
-        disabledDate={() => false}
-        extraPickerProps={{noBorder: true}}
-        required
-      />
-      <FinalDatePeriod
+      <FinalDateRangePicker name="arrival" label={Translate.string('Arrival')} required />
+      <FinalDateRangePicker
         name="departure"
         label={Translate.string('Departure')}
-        disabledDate={() => false}
         extraPickerProps={{noBorder: true}}
         required
       />

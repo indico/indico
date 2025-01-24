@@ -13,17 +13,17 @@ import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {Button, Form, Select} from 'semantic-ui-react';
 
-import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
+import {DatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {
   serializeDate,
   serializeTime,
   isBookingStartDTValid,
   createDT,
-  isBookingStartDateValid,
   getMinimumBookingStartTime,
   toMoment,
   initialEndTime,
+  getBookingRangeMinDate,
 } from 'indico/utils/date';
 
 import {selectors as configSelectors} from '../common/config';
@@ -380,27 +380,21 @@ class BookingBootstrapForm extends React.Component {
         {['every', 'daily'].includes(type) && (
           <Form.Group inline>
             <DateRangePicker
-              startDate={startDate}
-              endDate={endDate}
-              onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)}
-              isOutsideRange={dt => {
-                return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
-              }}
-              withFullScreenPortal={window.innerHeight < 730}
+              min={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
+              value={{startDate: serializeDate(startDate), endDate: serializeDate(endDate)}}
+              onChange={({startDate: sd, endDate: ed}) =>
+                this.updateDates(toMoment(sd), toMoment(ed))
+              }
             />
           </Form.Group>
         )}
         {type === 'single' && (
           <Form.Group inline>
-            <SingleDatePicker
-              date={startDate}
-              yearsBefore={0}
-              yearsAfter={1}
-              onDateChange={date => this.updateDates(date, null)}
-              disabledDate={dt => {
-                return !isBookingStartDateValid(dt, isAdminOverrideEnabled, bookingGracePeriod);
-              }}
-              withFullScreenPortal={window.innerHeight < 730} // Temporary fix to ensure vertical responsiveness
+            <DatePicker
+              min={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
+              value={serializeDate(startDate)}
+              invalidValue={null}
+              onChange={date => this.updateDates(toMoment(date), null)}
             />
           </Form.Group>
         )}

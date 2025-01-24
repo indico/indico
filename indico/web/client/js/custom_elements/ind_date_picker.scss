@@ -16,6 +16,8 @@ ind-date-picker {
   align-items: flex-start;
   position: relative;
 
+  text-align: left;
+
   > input {
     padding-right: 2.5em;
   }
@@ -36,12 +38,86 @@ ind-date-picker {
     @extend %icon-calendar;
   }
 
+  > button:disabled {
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
   > button span {
     @extend %visually-hidden;
   }
 
   .date-format {
     @extend %visually-hidden;
+  }
+}
+
+ind-date-range-picker {
+  position: relative;
+
+  text-align: left;
+
+  fieldset {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
+    @include sui_debt.input();
+
+    &:focus-within {
+      @include sui_debt.field-override() {
+        @include sui_debt.input-border();
+      }
+    }
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: var(--control-padding);
+  }
+
+  label span {
+    font-weight: bold;
+  }
+
+  fieldset button {
+    @extend %button-icon-only;
+    padding: var(--control-padding);
+
+    &::before {
+      @extend %icon;
+      @extend %icon-calendar;
+    }
+  }
+
+  input[type='text'] {
+    @include sui_debt.nested-input-font-weight();
+    @include sui_debt.field-override() {
+      max-width: 9em !important;
+      padding: 0;
+      border: 0;
+    }
+  }
+
+  legend {
+    @extend %visually-hidden;
+  }
+
+  .arrow::before {
+    @extend %icon;
+    @extend %icon-arrow-right-sparse;
+    color: var(--text-secondary-color);
+  }
+
+  .date-format {
+    @extend %visually-hidden;
+  }
+
+  .calendars {
+    display: flex;
+    align-items: flex-start;
+    gap: 1em;
   }
 }
 
@@ -62,6 +138,7 @@ ind-calendar {
     margin: 0;
 
     border: 0;
+    border-radius: var(--control-border-radius);
   }
 
   dialog[open] {
@@ -77,6 +154,10 @@ ind-calendar {
   .month-year {
     display: flex;
     gap: 0.5em;
+  }
+
+  .controls {
+    justify-content: space-between;
   }
 
   .controls > button {
@@ -110,47 +191,61 @@ ind-calendar {
   }
 
   .controls .month-year {
-    width: 10em;
+    flex: 1;
   }
 
-  .month-year {
-    select,
-    input[type='number'] {
-      @include sui_debt.field-override() {
-        padding: 0.5em;
-        border-radius: var(--control-border-radius);
-        border-color: var(--control-border-color);
+  .month-year :is(select, input[type='number']) {
+    flex: 1;
+
+    @include sui_debt.field-override() {
+      width: 2em;
+      padding: 0.5em;
+      border-radius: var(--control-border-radius);
+      border-color: var(--control-border-color);
+      -webkit-appearance: auto;
+
+      &:focus-visible {
+        outline: revert;
         -webkit-appearance: auto;
-
-        &:focus-visible {
-          outline: revert;
-          -webkit-appearance: auto;
-        }
-
-        // Override for _input.scss select:-foz-focusring
-        &:-moz-focusring {
-          color: unset !important;
-          text-shadow: unset !important;
-          outline: revert;
-        }
       }
 
-      @include sui_debt.field-error-override() {
-        border-color: var(--control-border-color);
-        background: transparent;
-        color: inherit;
-        -webkit-appearance: auto;
-
-        &:focus-visible {
-          outline: solid;
-          -webkit-appearance: auto;
-        }
+      // Override for _input.scss select:-foz-focusring
+      &:-moz-focusring {
+        color: unset !important;
+        text-shadow: unset !important;
+        outline: revert;
       }
     }
+
+    @include sui_debt.field-error-override() {
+      border-color: var(--control-border-color);
+      background: transparent;
+      color: inherit;
+      -webkit-appearance: auto;
+
+      &:focus-visible {
+        outline: solid;
+        -webkit-appearance: auto;
+      }
+    }
+  }
+}
+
+ind-date-grid {
+  width: 20em;
+
+  .month-label {
+    font-weight: bold;
+    padding: 0.5em 0.5em 0.2em;
+  }
+
+  &:not(:first-child) .month-label {
+    text-align: right;
   }
 
   [role='listbox'],
   .weekdays {
+    flex: none;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     row-gap: 0.2em;
@@ -161,9 +256,10 @@ ind-calendar {
     aspect-ratio: 7/6; // 7 cells across x 6 rows
   }
 
-  .weekdays span {
+  .weekdays > * {
     @extend %flex-inline-center;
     aspect-ratio: 1;
+    text-decoration: none;
   }
 
   [role='listbox'] button {
@@ -171,49 +267,58 @@ ind-calendar {
 
     background-color: transparent;
     border: none;
+    transition: all 0.2s;
 
-    &:hover {
+    &[data-range-start] {
+      border-top-left-radius: var(--control-border-radius);
+      border-bottom-left-radius: var(--control-border-radius);
+    }
+
+    &[data-range-end] {
+      border-top-right-radius: var(--control-border-radius);
+      border-bottom-right-radius: var(--control-border-radius);
+    }
+
+    &[data-current-month='true'] {
+      color: var(--control-text-color);
+    }
+
+    &[data-current-month='false'] {
+      color: var(--text-secondary-color);
+      background: var(--background-secondary);
+    }
+
+    &[data-current-month='false']:empty {
+      pointer-events: none;
+    }
+
+    &[aria-selected] {
+      background-color: var(--surface-accent-color);
+      color: var(--text-inverse-color);
+    }
+
+    &[aria-disabled] {
+      cursor: not-allowed;
+    }
+
+    &[aria-disabled]:not([aria-selected]) {
+      opacity: 0.2;
+    }
+
+    &:hover,
+    &:focus-visible {
       background-color: var(--control-clickable-surface-focus-color);
+      color: var(--control-text-color);
+    }
+
+    &[aria-selected]:hover,
+    &[aria-selected]:focus-visible {
+      background-color: var(--control-alt-clickable-surface-focus-color);
+      color: var(--control-alt-text-color);
     }
 
     &:focus-visible {
       z-index: 1;
     }
-  }
-
-  [role='listbox'] :is([data-range-start], [data-range-end], [data-range]) {
-    background-color: var(--surface-accent-secondary-color);
-  }
-
-  [role='listbox'] [data-range-end] {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  [role='listbox'] [data-range-start] {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  [role='listbox'] [data-range] {
-    border-radius: 0;
-  }
-
-  [role='listbox'] [aria-selected] {
-    background-color: var(--surface-accent-color);
-    color: var(--text-inverse-color);
-  }
-
-  button[disabled] {
-    opacity: 0.5;
-  }
-
-  button[data-current-month='true'] {
-    color: var(--control-text-color);
-  }
-
-  button[data-current-month='false'] {
-    color: var(--text-secondary-color);
-    background: var(--background-secondary);
   }
 }

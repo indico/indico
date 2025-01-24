@@ -47,3 +47,23 @@
   height: 33px !important;
   width: auto !important;
 }
+
+ind-date-grid button {
+  /* Workaround for design system's _utils.scss not applying in all cases */
+  font: inherit;
+  font-size: 1.143rem;
+}
+
+ind-calendar .month-year {
+  min-width: 11em;
+}
+
+ind-calendar .month-year select {
+  font: inherit;
+}
+
+ind-calendar .calendars {
+  display: flex;
+  align-items: flex-start;
+  gap: 1em;
+}
