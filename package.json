@@ -10,6 +10,7 @@
     "@babel/runtime": "^7.24.0",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
     "@monaco-editor/react": "^4.6.0",
+    "@reduxjs/toolkit": "^2.5.0",
     "@tinymce/tinymce-react": "^4.3.0",
     "ajv": "^8.11.0",
     "axios": "^1.7.4",

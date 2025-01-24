@@ -7,13 +7,13 @@
 
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
 import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import {computeYoffset, getGroup, layout, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
@@ -28,8 +28,8 @@ interface DayTimetableProps {
 }
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
-  const dispatch = useDispatch();
-  const selectedId = useSelector(selectors.getSelectedId);
+  const dispatch = useTimetableDispatch();
+  const selectedId = useTimetableSelector(selectors.getSelectedId);
 
   const setDurations = useMemo(() => {
     const obj = {};
@@ -72,9 +72,9 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
 export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
-  const unscheduled = useSelector(selectors.getUnscheduled);
+  const unscheduled = useTimetableSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);

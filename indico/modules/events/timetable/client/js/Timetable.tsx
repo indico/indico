@@ -7,13 +7,13 @@
 
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 // import {Checkbox} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import EntryDetails from './EntryDetails';
 import ContributionEntryForm from './forms/ContributionEntryForm';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
 import {WeekTimetable} from './WeekTimetable';
@@ -26,17 +26,17 @@ import './Timetable.module.scss';
 // const DnDCalendar = withDragAndDrop(Calendar);
 
 export default function Timetable() {
-  const dispatch = useDispatch();
-  const entries = useSelector(selectors.getDayEntries);
-  const eventStartDt = useSelector(selectors.getEventStartDt);
-  const eventEndDt = useSelector(selectors.getEventEndDt);
-  const showAllTimeslots = useSelector(selectors.showAllTimeslots);
+  const dispatch = useTimetableDispatch();
+  const entries = useTimetableSelector(selectors.getDayEntries);
+  const eventStartDt = useTimetableSelector(selectors.getEventStartDt);
+  const eventEndDt = useTimetableSelector(selectors.getEventEndDt);
+  const showAllTimeslots = useTimetableSelector(selectors.showAllTimeslots);
 
-  // const blocks = useSelector(selectors.getBlocks);
-  const selectedId = useSelector(selectors.getSelectedId);
+  // const blocks = useTimetableSelector(selectors.getBlocks);
+  const selectedId = useTimetableSelector(selectors.getSelectedId);
   // const selectedId = null;
 
-  // const draggedContribs = useSelector(selectors.getDraggedContribs);
+  // const draggedContribs = useTimetableSelector(selectors.getDraggedContribs);
   const [date, setDate] = useState(eventStartDt);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
 
@@ -46,7 +46,7 @@ export default function Timetable() {
       .flatMap(e => (e.type === 'block' ? e.children : []))
       .find(e => e.id === selectedId);
   }
-  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
+  const popupsEnabled = useTimetableSelector(selectors.getPopupsEnabled);
 
   const useWeekView = false;
 

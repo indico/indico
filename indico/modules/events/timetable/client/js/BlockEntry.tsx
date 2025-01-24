@@ -7,12 +7,12 @@
 
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {useDroppable} from './dnd';
 import {DraggableEntry} from './Entry';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import {formatTimeRange} from './i18n';
 import ResizeHandle from './ResizeHandle';
 import {BlockEntry as _BlockEntry} from './types';
@@ -51,13 +51,13 @@ export default function BlockEntry({
   isDragging,
   renderChildren = true,
 }: DraggableBlockEntryProps) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const blockRef = useRef<HTMLDivElement | null>(null);
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const resizeStartRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
   const [duration, setDuration] = useState(_duration);
-  const sessionData = useSelector(state => state.sessions[sessionId]);
+  const sessionData = useTimetableSelector(state => state.sessions[sessionId]);
   const {setNodeRef: setDroppableNodeRef} = useDroppable({
     id: `${id}`,
     // disabled: true,

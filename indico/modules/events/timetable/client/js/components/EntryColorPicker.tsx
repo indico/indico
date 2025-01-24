@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2025 CERN
+// Copyright (C) 2002 - 2024 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -12,6 +12,7 @@ import {Button, Grid, Popup} from 'semantic-ui-react';
 import {toClasses} from 'indico/react/util';
 
 import * as actions from '../actions';
+import {Entry} from '../types';
 import {entrySchema} from '../util';
 
 import './EntryColorPicker.module.scss';
@@ -47,7 +48,15 @@ const AVAILABLE_COLORS = [
   ],
 ];
 
-export default function EntryColorPicker({entry, trigger, dispatch}) {
+export default function EntryColorPicker({
+  entry,
+  trigger,
+  dispatch,
+}: {
+  entry: Entry;
+  trigger: React.ReactNode;
+  dispatch: React.Dispatch<actions.Action>;
+}) {
   const [open, setOpen] = useState(false);
 
   const makePickHandler = color => () => {
@@ -75,7 +84,8 @@ export default function EntryColorPicker({entry, trigger, dispatch}) {
                     icon="paint brush"
                     styleName={toClasses({
                       choice: true,
-                      selected: color.background === entry.color?.background,
+                      selected:
+                        color.background === (entry.color ? entry.color.background : undefined),
                     })}
                     circular
                   />
