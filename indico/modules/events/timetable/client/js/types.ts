@@ -14,7 +14,7 @@ export interface Session {
   backgroundColor: string;
 }
 
-interface BaseEntry {
+export interface BaseEntry {
   type: 'contrib' | 'block' | 'break';
   id: number;
   title: string;
