@@ -6,12 +6,12 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
-import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
+import {createRestrictToElement, Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
@@ -19,6 +19,9 @@ import * as selectors from './selectors';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {minutesToPixels, pixelsToMinutes} from './utils';
+
+// TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
+type UniqueId = string;
 
 interface DayTimetableProps {
   dt: Moment;
@@ -76,6 +79,9 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [newEntry, setNewEntry] = useState<BaseEntry | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -153,6 +159,73 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     };
   }, []);
 
+  useEffect(() => {
+    function onMouseDown(event: MouseEvent) {
+      // TODO: Ajob, uncomment this after checking why this is invalid all the time
+      // if (event.target !== calendarRef.current) {
+      //   return;
+      // }
+      setIsDragging(true);
+      const rect = calendarRef.current.getBoundingClientRect();
+      const minuteStepSize = 5;
+      const y = Math.floor((event.clientY - rect.top) / minuteStepSize) * minuteStepSize;
+      const startDt = moment(dt)
+        .startOf('day')
+        .add(y, 'minutes');
+
+      setNewEntry({
+        id: -1,
+        type: 'contrib',
+        startDt,
+        duration: 0,
+        x: 0,
+        y,
+        title: 'New entry',
+        width: '100%',
+        column: 0,
+        maxColumn: 0,
+      });
+    }
+
+    function onMouseMove(event: MouseEvent) {
+      if (!isDragging || !newEntry) {
+        return;
+      }
+      const rect = calendarRef.current.getBoundingClientRect();
+      const y = event.clientY - rect.top;
+      const duration = Math.max(
+        0,
+        pixelsToMinutes(y) -
+          pixelsToMinutes(newEntry.startDt.diff(moment(dt).startOf('day'), 'minutes'))
+      );
+
+      const newDuration = Math.max(Math.floor(duration / 5) * 5, 5);
+      if (duration === newDuration) {
+        return;
+      }
+      setNewEntry({...newEntry, duration: newDuration});
+    }
+
+    function onMouseUp() {
+      if (isDragging && newEntry) {
+        // TODO: (Ajob) Move to actual place to create and uncomment once implemented
+        // dispatch(actions.createEntry(newEntry));
+        setIsDragging(false);
+        setNewEntry(null);
+      }
+    }
+
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDragging, newEntry, dt, dispatch]);
+
   const restrictToCalendar = useMemo(() => createRestrictToElement(calendarRef), [calendarRef]);
 
   return (
@@ -165,6 +238,14 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
+              <div>
+                <p>Wee</p>
+              </div>
+              {newEntry && (
+                <div style={{opacity: 0.5}}>
+                  <MemoizedTopLevelEntries dt={dt} entries={[newEntry]} />
+                </div>
+              )}
             </div>
           </DnDCalendar>
         </div>
