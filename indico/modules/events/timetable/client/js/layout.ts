@@ -109,25 +109,7 @@ export function layoutGroupAfterMove<T extends Entry>(
     },
   ];
 
-  const sortedGroup = [...group].sort((a, b) => a.column - b.column);
-  const newGroup: T[] = [];
-  for (const entry of sortedGroup) {
-    const overlappingEntries = newGroup.filter(e => overlap(e, entry));
-    const maxColumn = Math.max(...overlappingEntries.map(e => e.column), 0);
-    const newColumn = overlappingEntries.length === 0 ? 0 : maxColumn + 1;
-    newGroup.push({
-      ...entry,
-      column: newColumn,
-    });
-  }
-  const maxColumn = getMaximumParallelEntries(newGroup);
-  const columnWidth = 100 / (maxColumn + 1);
-  return newGroup.map(entry => ({
-    ...entry,
-    width: `${columnWidth}%`,
-    x: `${entry.column * columnWidth}%`,
-    maxColumn,
-  }));
+  return layoutGroup(group);
 }
 
 export function getGroups(entries: TopLevelEntry[]) {
