@@ -100,6 +100,7 @@
                             <option value="business_card" data-width="8.5" data-height="5.4">
                                 {%- trans %}Business card{% endtrans -%}
                             </option>
+                            {{ template_hook('extra-designer-tpl-page-size', template=template, landscape=true) }}
                         </optgroup>
                         <optgroup label="{% trans %}Portrait orientation{% endtrans %}">
                             <option value="a6" data-width="10.5" data-height="14.8">A6</option>
@@ -107,6 +108,7 @@
                             <option value="business_card" data-width="5.4" data-height="8.5">
                                 {%- trans %}Business card{% endtrans -%}
                             </option>
+                            {{ template_hook('extra-designer-tpl-page-size', template=template, landscape=false) }}
                         </optgroup>
                     </select>
                 </div>
