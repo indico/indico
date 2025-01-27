@@ -6,13 +6,19 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+import TimePicker from 'rc-time-picker';
 import React from 'react';
 import {Field, useFormState} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
 import {Button, Dropdown, Form, Input, Popup, Radio, TextArea, Icon} from 'semantic-ui-react';
 
 import Checkbox from 'indico/react/components/Checkbox';
+
+import {toMoment} from 'indico/utils/date';
+
+import {DatePicker} from '../components';
 
 import formatters from './formatters';
 import parsers from './parsers';
@@ -350,6 +356,151 @@ ComboDropdownAdapter.defaultProps = {
   includeMeta: false,
 };
 
+function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
+  // TODO: Make more props overridable
+  console.log('start_dt', value);
+
+  const markTouched = () => {
+    onFocus();
+    onBlur();
+  };
+
+  function handleOnChange(v) {
+    markTouched();
+    onChange(v.toISOString());
+  }
+
+  return (
+    <Input styleName="time-picker">
+      <TimePicker
+        showSecond={false}
+        value={value ? moment(value) : null}
+        focusOnOpen
+        format="H:mm"
+        onChange={handleOnChange}
+        allowEmpty={false}
+        placeholder="h:mm"
+        {...rest}
+      />
+    </Input>
+  );
+}
+
+TimePickerComponent.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+};
+
+function DurationComponent({value, onChange, max, ...rest}) {
+  return (
+    <TimePickerComponent
+      value={moment()
+        .startOf('day')
+        .seconds(value)
+        .toISOString()}
+      onChange={v => onChange(moment(v).diff(moment().startOf('day'), 'seconds'))}
+      disabledHours={max ? () => [...Array(24).keys()].filter(h => h > max / (60 * 60)) : undefined}
+      disabledMinutes={
+        max
+          ? h =>
+              [...Array(60).keys()].filter(
+                m => h === Math.floor(max / (60 * 60)) && m > (max / 60) % 60
+              )
+          : undefined
+      }
+      {...rest}
+    />
+  );
+}
+
+DurationComponent.propTypes = {
+  value: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+  max: PropTypes.number,
+};
+
+DurationComponent.defaultProps = {
+  max: null,
+};
+
+function DateTimePickerComponent({
+  value,
+  disabled,
+  onChange,
+  onBlur,
+  onFocus,
+  minStartDt,
+  maxEndDt,
+}) {
+  const [dateValue, timeValue] = value.split('T');
+  console.log('start_dt split', value, dateValue, timeValue);
+
+  const handleDateChange = newDate => onChange(`${newDate || ''}T${timeValue}`);
+  const handleTimeChange = newTime =>
+    onChange(`${dateValue}T${moment(newTime).format('HH:mm:00')}`);
+
+  return (
+    <Form.Group>
+      <Form.Field>
+        <DatePicker
+          value={dateValue}
+          onChange={handleDateChange}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          disabled={disabled}
+        />
+      </Form.Field>
+      <Form.Field>
+        <TimePickerComponent
+          value={toMoment(timeValue, 'HH:mm:ss', true).toISOString()}
+          onChange={handleTimeChange}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          disabled={disabled}
+          disabledHours={
+            minStartDt || maxEndDt
+              ? () =>
+                  [...Array(24).keys()].filter(
+                    h => (minStartDt && h < minStartDt.hour()) || (maxEndDt && h > maxEndDt.hour())
+                  )
+              : undefined
+          }
+          disabledMinutes={
+            minStartDt || maxEndDt
+              ? h =>
+                  [...Array(60).keys()].filter(
+                    m =>
+                      (minStartDt &&
+                        (h < minStartDt.hour() ||
+                          (h === minStartDt.hour() && m < minStartDt.minute()))) ||
+                      (maxEndDt &&
+                        (h > maxEndDt.hour() || (h === maxEndDt.hour() && m > maxEndDt.minute())))
+                  )
+              : undefined
+          }
+        />
+      </Form.Field>
+    </Form.Group>
+  );
+}
+
+DateTimePickerComponent.propTypes = {
+  value: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  minStartDt: PropTypes.object,
+  maxEndDt: PropTypes.object,
+};
+
+DateTimePickerComponent.defaultProps = {
+  minStartDt: null,
+  maxEndDt: null,
+};
+
 /**
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
@@ -622,6 +773,81 @@ FinalComboDropdown.propTypes = {
 FinalComboDropdown.defaultProps = {
   label: null,
   allowAdditions: true,
+};
+
+export function FinalTimePicker({name, label, defaultValue, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      component={TimePickerComponent}
+      label={label}
+      defaultValue={defaultValue}
+      {...rest}
+    />
+  );
+}
+
+FinalTimePicker.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  defaultValue: PropTypes.string,
+};
+
+FinalTimePicker.defaultProps = {
+  label: null,
+  defaultValue: moment()
+    .startOf('day')
+    .minutes(20)
+    .toISOString(),
+};
+
+export function FinalDuration({name, label, defaultValue, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      component={DurationComponent}
+      label={label}
+      defaultValue={defaultValue}
+      {...rest}
+    />
+  );
+}
+
+FinalDuration.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  defaultValue: PropTypes.number,
+};
+
+FinalDuration.defaultProps = {
+  label: null,
+  defaultValue: 1200, // 20 minutes
+};
+
+export function FinalDateTimePicker({name, label, defaultValue, ...rest}) {
+  return (
+    <FinalField
+      name={name}
+      component={DateTimePickerComponent}
+      label={label}
+      defaultValue={defaultValue}
+      {...rest}
+    />
+  );
+}
+
+FinalDateTimePicker.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  defaultValue: PropTypes.string,
+};
+
+FinalDateTimePicker.defaultProps = {
+  label: null,
+  defaultValue: moment()
+    .startOf('day')
+    .minutes(20)
+    .toISOString(),
 };
 
 /**

@@ -60,7 +60,7 @@ _bp.add_url_rule('/manage/contributions/import', 'contributions_import',
 
 # Single contribution
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>', 'manage_contrib_rest', management.RHContributionREST,
-                 methods=('DELETE', 'PATCH'))
+                 methods=('GET', 'DELETE', 'PATCH'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/edit', 'manage_update_contrib',
                  management.RHEditContribution, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/protection', 'manage_contrib_protection',
@@ -74,6 +74,20 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/acl-message', 'acl_mess
                  management.RHContributionACLMessage)
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/clone', 'clone_contribution', management.RHCloneContribution,
                  methods=('POST',))
+
+_bp.add_url_rule('/api/contributions/<int:contrib_id>', 'api_manage_contrib', management.RHAPIContribution,
+                 methods=('GET', 'PATCH'))
+_bp.add_url_rule('/api/contributions/create', 'api_create_contrib', management.RHAPIContributionCreate,
+                 methods=('POST',))
+_bp.add_url_rule('/api/contributions/location-parent', 'api_contribs_location_parent',
+                 management.RHAPIContributionsInheritedLocation)
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/location-parent', 'api_contrib_location_parent',
+                 management.RHAPIContributionInheritedLocation)
+_bp.add_url_rule('/api/contributions/duration', 'api_contribs_duration',
+                 management.RHAPIContributionDefaultDuration)
+_bp.add_url_rule('/api/contributions/fields', 'api_contrib_fields', management.RHAPIContributionFields)
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/person-link-params', 'api_contrib_person_link_params',
+                 management.RHAPIContributionPersonLinkFieldParams)
 
 # Contribution RESTful endpoints
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/references/', 'create_contrib_reference_rest',
