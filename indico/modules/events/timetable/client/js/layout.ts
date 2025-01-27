@@ -50,11 +50,8 @@ export function layoutGroup<T extends Entry>(group: T[], {layoutChildren = true}
     });
   }
   const maxColumn = getMaximumParallelEntries(newGroup);
-  const columnWidth = 100 / (maxColumn + 1);
   return newGroup.map(entry => ({
     ...entry,
-    width: `${columnWidth}%`,
-    x: `${entry.column * columnWidth}%`,
     maxColumn,
   }));
 }
@@ -178,4 +175,12 @@ export function computeYoffset(entries: TopLevelEntry[], startHour: number): Top
     }));
     return {...entry, y: minutesToPixels(offsetMinutes), children};
   });
+}
+
+export function getWidthAndOffset(column, maxColumn) {
+  const columnWidth = 100 / (maxColumn + 1);
+  return {
+    width: `${columnWidth}%`,
+    offset: `${column * columnWidth}%`,
+  };
 }

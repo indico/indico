@@ -239,7 +239,7 @@ function layoutAfterDropOnCalendar(
   mouse: MousePosition
 ) {
   const id = parseInt(who, 10);
-  const {x, y} = delta;
+  const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
@@ -269,7 +269,6 @@ function layoutAfterDropOnCalendar(
   const newEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
-    x: fromEntry.x + x,
     y: minutesToPixels(
       moment(fromEntry.startDt)
         .add(deltaMinutes, 'minutes')
@@ -341,7 +340,7 @@ function layoutAfterDropOnBlock(
     .filter(e => e.type === 'block')
     .find(entry => !!entry.children.find(c => c.id === id));
 
-  const {x, y} = delta;
+  const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
@@ -381,7 +380,6 @@ function layoutAfterDropOnBlock(
   const newEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
-    x: fromEntry.x + x,
     y: minutesToPixels(
       moment(fromEntry.startDt)
         .add(deltaMinutes, 'minutes')
