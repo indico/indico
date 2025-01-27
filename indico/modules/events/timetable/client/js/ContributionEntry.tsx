@@ -13,6 +13,7 @@ import {Icon} from 'semantic-ui-react';
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
 import {formatTimeRange} from './i18n';
+import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import {ContribEntry, BreakEntry} from './types';
 import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes} from './utils';
@@ -39,18 +40,17 @@ export default function ContributionEntry({
   textColor,
   backgroundColor,
   selected,
-  x,
   y,
   listeners,
   setNodeRef,
   transform,
   isDragging,
-  width,
   column,
   maxColumn,
   setDuration: _setDuration,
   parentEndDt,
 }: DraggableEntryProps) {
+  const {width, offset} = getWidthAndOffset(column, maxColumn);
   const dispatch = useDispatch();
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -66,7 +66,7 @@ export default function ContributionEntry({
     ...style,
     position: 'absolute',
     top: y,
-    left: x,
+    left: offset,
     width: `calc(${width} - 6px)`,
     height: minutesToPixels(Math.max(duration, minutesToPixels(5)) - 2),
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
