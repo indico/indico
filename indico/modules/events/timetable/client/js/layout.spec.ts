@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 
-import {getGroup, computeYoffset, getGroups, layoutGroup} from './layout';
+import {getGroup, computeYoffset, getGroups, layoutGroup, getWidthAndOffset} from './layout';
 import {
   BlockEntry,
   BreakEntry,
@@ -16,10 +16,6 @@ import {
   ChildEntry,
   ContribEntry,
 } from './types';
-
-function p(value: number) {
-  return `${100 * value}%`;
-}
 
 function makeCounter() {
   let id = 0;
@@ -225,7 +221,7 @@ describe('getGroups()', () => {
   ];
 
   for (const [i, c] of cases.entries()) {
-    it(`Should compute groups ${i}`, () => {
+    it(`(${i}) Should compute groups`, () => {
       expect(getGroups(c.entries)).toEqual(c.groups);
     });
   }
@@ -278,7 +274,7 @@ describe('getGroup()', () => {
   ];
 
   for (const [i, c] of cases.entries()) {
-    it(`Should compute the group ${i}`, () => {
+    it(`(${i}) Should compute the group`, () => {
       expect(getGroup(c.entries[0], c.entries.slice(1))).toEqual(c.group);
     });
   }
@@ -292,9 +288,9 @@ describe('layoutGroup()', () => {
       contrib({time: '14:00', duration: 60}),
     ];
     const expected = [
-      {...entries[0], x: '0%', y: 0, width: '100%', column: 0, maxColumn: 0},
-      {...entries[1], x: '0%', y: 0, width: '100%', column: 0, maxColumn: 0},
-      {...entries[2], x: '0%', y: 0, width: '100%', column: 0, maxColumn: 0},
+      {...entries[0], y: 0, column: 0, maxColumn: 0},
+      {...entries[1], y: 0, column: 0, maxColumn: 0},
+      {...entries[2], y: 0, column: 0, maxColumn: 0},
     ];
 
     const newEntries = layoutGroup(entries);
@@ -309,10 +305,10 @@ describe('layoutGroup()', () => {
       contrib({time: '10:00', duration: 60}),
     ];
     const expected = [
-      {...entries[0], x: p(0 / 4), y: 0, width: p(1 / 4), column: 0, maxColumn: 3},
-      {...entries[1], x: p(1 / 4), y: 0, width: p(1 / 4), column: 1, maxColumn: 3},
-      {...entries[2], x: p(2 / 4), y: 0, width: p(1 / 4), column: 2, maxColumn: 3},
-      {...entries[3], x: p(3 / 4), y: 0, width: p(1 / 4), column: 3, maxColumn: 3},
+      {...entries[0], y: 0, column: 0, maxColumn: 3},
+      {...entries[1], y: 0, column: 1, maxColumn: 3},
+      {...entries[2], y: 0, column: 2, maxColumn: 3},
+      {...entries[3], y: 0, column: 3, maxColumn: 3},
     ];
 
     const newEntries = layoutGroup(entries);
@@ -326,9 +322,9 @@ describe('layoutGroup()', () => {
       contrib({time: '10:00', duration: 120}),
     ];
     const expected = [
-      {...entries[0], x: p(0 / 2), y: 0, width: p(1 / 2), column: 0, maxColumn: 1},
-      {...entries[1], x: p(0 / 2), y: 0, width: p(1 / 2), column: 0, maxColumn: 1},
-      {...entries[2], x: p(1 / 2), y: 0, width: p(1 / 2), column: 1, maxColumn: 1},
+      {...entries[0], y: 0, column: 0, maxColumn: 1},
+      {...entries[1], y: 0, column: 0, maxColumn: 1},
+      {...entries[2], y: 0, column: 1, maxColumn: 1},
     ];
 
     const newEntries = layoutGroup(entries);
@@ -343,10 +339,10 @@ describe('layoutGroup()', () => {
       contrib({time: '11:00', duration: 60}),
     ];
     const expected = [
-      {...entries[0], x: p(0 / 4), y: 0, width: p(1 / 4), column: 0, maxColumn: 3},
-      {...entries[1], x: p(1 / 4), y: 0, width: p(1 / 4), column: 1, maxColumn: 3},
-      {...entries[2], x: p(2 / 4), y: 0, width: p(1 / 4), column: 2, maxColumn: 3},
-      {...entries[3], x: p(3 / 4), y: 0, width: p(1 / 4), column: 3, maxColumn: 3},
+      {...entries[0], y: 0, column: 0, maxColumn: 3},
+      {...entries[1], y: 0, column: 1, maxColumn: 3},
+      {...entries[2], y: 0, column: 2, maxColumn: 3},
+      {...entries[3], y: 0, column: 3, maxColumn: 3},
     ];
 
     const newEntries = layoutGroup(entries);
@@ -396,5 +392,14 @@ describe('computeYOffset()', () => {
     copy[1].children[1].y = 60;
 
     expect(copy).toEqual(JSON.parse(JSON.stringify(newEntries)));
+  });
+});
+
+describe('getWidthAndOffset()', () => {
+  it('Should compute width and offset from column/maxColumn', () => {
+    expect(getWidthAndOffset(0, 0)).toEqual({width: '100%', offset: '0%'});
+    expect(getWidthAndOffset(1, 1)).toEqual({width: '50%', offset: '50%'});
+    expect(getWidthAndOffset(0, 1)).toEqual({width: '50%', offset: '0%'});
+    expect(getWidthAndOffset(3, 3)).toEqual({width: '25%', offset: '75%'});
   });
 });
