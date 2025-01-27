@@ -9,8 +9,14 @@
           reloadManagementAttachmentInfoColumn */
 
 import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 import {$T} from 'indico/utils/i18n';
+
+import {EditSessionBlockButton} from './SessionBlockForm';
+import {AddSessionButton, EditSessionButton} from './SessionForm';
+
 import 'indico/modules/events/util/types_dialog';
 
 import './session_display';
@@ -158,4 +164,53 @@ import './session_display';
       });
     });
   }
+
+  global.setupSessionForm = function setupSessionForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, sessionId, eventType, eventTitle} = element.dataset;
+    console.log(eventId, sessionId, eventTitle, eventType);
+
+    ReactDOM.render(
+      <EditSessionButton
+        eventId={+eventId}
+        sessionId={sessionId && +sessionId}
+        eventTitle={eventTitle}
+        eventType={eventType}
+        triggerSelector={trigger}
+      />,
+      element
+    );
+  };
+
+  global.setupSessionCreateForm = function setupSessionCreateForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, eventType} = element.dataset;
+    console.log(eventId, eventType);
+
+    ReactDOM.render(
+      <AddSessionButton eventId={+eventId} eventType={eventType} triggerSelector={trigger} />,
+      element
+    );
+  };
+
+  global.setupSessionBlockForm = function setupSessionBlockForm(field, trigger) {
+    const element = document.querySelector(field);
+    const {eventId, sessionId, blockId, eventType, eventTitle} = element.dataset;
+    console.log(eventId, blockId, eventTitle, eventType);
+
+    const portal = document.createElement('div');
+    document.body.appendChild(portal);
+
+    ReactDOM.render(
+      <EditSessionBlockButton
+        eventId={+eventId}
+        sessionId={sessionId && +sessionId}
+        blockId={blockId && +blockId}
+        eventTitle={eventTitle}
+        eventType={eventType}
+        triggerSelector={trigger}
+      />,
+      portal
+    );
+  };
 })(window);
