@@ -78,6 +78,19 @@
                                        data-colors="{{ default_colors | tojson | forceescape }}"
                                        data-color="{{ sess.colors | tojson | forceescape }}"
                                        title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}"></a>
+                                    <a href="#" id="session-{{ sess.id }}-edit-trigger"
+                                           class="icon-edit i-link highlight"
+                                           title="{% trans %}NEW Edit this session{% endtrans %}"></a>
+                                    <div
+                                        id="session-{{ sess.id }}-edit"
+                                        data-event-id="{{ event.id }}"
+                                        data-session-id="{{ sess.id }}"
+                                        data-event-type="{{ event.type }}"
+                                        data-event-title="{{ event.title }}">
+                                    </div>
+                                    <script>
+                                        setupSessionForm('#session-{{ sess.id }}-edit', '#session-{{ sess.id }}-edit-trigger');
+                                    </script>
                                     <a href="#" class="i-link highlight icon-edit edit-session hide-if-locked"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"

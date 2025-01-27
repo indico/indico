@@ -17,7 +17,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Accordion, Dropdown, Icon, Label} from 'semantic-ui-react';
+import {Dropdown, Icon, Label, Accordion} from 'semantic-ui-react';
 
 import {RequestConfirmDelete} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';

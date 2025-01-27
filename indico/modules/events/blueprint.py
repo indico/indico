@@ -10,7 +10,8 @@ from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerC
                                                      RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
                                                      RHEventLabels, RHReferenceTypes, RHUnlistedEvents,
                                                      RHUpdateAllowedKeywords)
-from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
+from indico.modules.events.controllers.api import (RHAPIPersonLinkFieldParams, RHAPIReferenceTypes, RHEventCheckEmail,
+                                                   RHSingleEventAPI)
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import (RHAutoLinkerRules, RHDisplayPrivacyPolicy, RHEventAccessKey,
                                                        RHExportEventICAL)
@@ -48,6 +49,10 @@ _bp.add_url_rule('/admin/event-labels/<int:event_label_id>', 'delete_event_label
 
 # Auto-linker rules
 _bp.add_url_rule('/api/autolinker-rules', 'autolinker_rules', RHAutoLinkerRules)
+# Reference types
+_bp.add_url_rule('/api/external-id-types', 'api_reference_types', RHAPIReferenceTypes)
+# Person links
+_bp.add_url_rule('/api/event/<int:event_id>/person-link-params', 'api_person_link_params', RHAPIPersonLinkFieldParams)
 
 # Event ICS/iCal
 _bp.add_url_rule('/event/<int:event_id>/event.ics', 'export_event_ical', RHExportEventICAL)
