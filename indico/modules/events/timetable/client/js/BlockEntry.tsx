@@ -14,6 +14,7 @@ import * as actions from './actions';
 import {useDroppable} from './dnd';
 import {DraggableEntry} from './Entry';
 import {formatTimeRange} from './i18n';
+import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import {BlockEntry as _BlockEntry} from './types';
 import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes} from './utils';
@@ -37,9 +38,7 @@ export default function BlockEntry({
   title,
   sessionId,
   selected,
-  x,
   y,
-  width,
   column,
   maxColumn,
   children: _children,
@@ -51,6 +50,7 @@ export default function BlockEntry({
   isDragging,
   renderChildren = true,
 }: DraggableBlockEntryProps) {
+  const {width, offset} = getWidthAndOffset(column, maxColumn);
   const dispatch = useDispatch();
   const blockRef = useRef<HTMLDivElement | null>(null);
   const mouseEventRef = useRef<MouseEvent | null>(null);
@@ -71,7 +71,7 @@ export default function BlockEntry({
     ...style,
     position: 'absolute',
     top: y,
-    left: x,
+    left: offset,
     width: `calc(${width} - 6px)`,
     height: minutesToPixels(duration - 2),
     textAlign: 'left',
