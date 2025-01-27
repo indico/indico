@@ -294,6 +294,12 @@ function layoutAfterDropOnCalendar(
 
   if (!fromBlock) {
     const oldGroupIds = getGroup(fromEntry, entries.filter(e => e.id !== fromEntry.id));
+    if (oldGroupIds.intersection(groupIds).size > 0) {
+      const otherEntries = entries.filter(
+        e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== newEntry.id
+      );
+      return [...otherEntries, ...group];
+    }
     let oldGroup = entries.filter(e => oldGroupIds.has(e.id));
     const otherEntries = entries.filter(
       e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== newEntry.id
@@ -311,7 +317,6 @@ function layoutAfterDropOnCalendar(
     fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== newEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
-    console.log([...otherEntries, ...group, fromBlock]);
     return [...otherEntries, ...group, fromBlock];
   }
 }
