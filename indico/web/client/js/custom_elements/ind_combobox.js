@@ -229,7 +229,10 @@ customElements.define(
             listbox,
             input,
             positioning.dropdownPositionStrategy,
-            () => indComboBox.toggleAttribute('open', true)
+            fitsPreferredDirection => {
+              indComboBox.toggleAttribute('open', true);
+              indComboBox.toggleAttribute('data-top', !fitsPreferredDirection);
+            }
           );
           listbox.querySelector('[aria-selected=true]')?.scrollIntoView({block: 'nearest'});
         } else {

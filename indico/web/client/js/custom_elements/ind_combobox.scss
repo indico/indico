@@ -10,8 +10,11 @@
 @use 'partials/sui_debt';
 
 ind-combo-box {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   position: relative;
+  width: auto;
+  max-width: 100%;
 
   input[role='combobox'] {
     @include sui_debt.field-override() {
@@ -25,10 +28,15 @@ ind-combo-box {
     }
   }
 
-  [role='combobox'][aria-expanded='true'] {
+  &[open]:not([data-top]) [role='combobox'] {
     // Quick hack due to high specificicity of the underlying styles
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+  }
+
+  &[open][data-top] [role='combobox'] {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
   }
 
   &::after {
@@ -55,7 +63,8 @@ ind-combo-box {
   [role='listbox'][data-position-check] {
     @extend %popup-positioned-target;
     z-index: 10;
-    min-width: 100%;
+    width: max-content;
+    min-width: var(--anchor-width);
     max-height: min(75vh, 16em);
     overflow-y: auto;
 
@@ -65,14 +74,12 @@ ind-combo-box {
     @include sui_debt.missing-geometry-reset();
   }
 
-  [role='listbox']:not([data-top]) {
-    border-top: 0;
+  &[data-top] [role='listbox'] {
     border-top-left-radius: 0.28571429rem; // value from semantic UI
     border-top-right-radius: 0.28571429rem; // value from semantic UI
   }
 
-  [role='listbox'][data-top] {
-    border-bottom: 0;
+  &:not([data-top]) [role='listbox'] {
     border-bottom-left-radius: 0.28571429rem; // value from semantic UI
     border-bottom-right-radius: 0.28571429rem; // value from semantic UI
   }
