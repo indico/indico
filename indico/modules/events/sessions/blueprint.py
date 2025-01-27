@@ -10,15 +10,21 @@ from functools import partial
 from indico.modules.events.sessions.controllers.compat import compat_session
 from indico.modules.events.sessions.controllers.display import (RHDisplaySession, RHDisplaySessionList,
                                                                 RHExportSessionTimetableToPDF, RHExportSessionToICAL)
-from indico.modules.events.sessions.controllers.management.sessions import (RHCreateSession, RHCreateSessionType,
-                                                                            RHDeleteSessions, RHDeleteSessionType,
-                                                                            RHEditSessionType, RHExportSessionsCSV,
-                                                                            RHExportSessionsExcel, RHExportSessionsPDF,
-                                                                            RHManageSessionBlock, RHManageSessionTypes,
-                                                                            RHModifySession, RHSessionACL,
-                                                                            RHSessionACLMessage, RHSessionBlocks,
-                                                                            RHSessionPersonList, RHSessionProtection,
-                                                                            RHSessionREST, RHSessionsList)
+from indico.modules.events.sessions.controllers.management.sessions import (RHAPICreateSession, RHAPISession,
+                                                                            RHAPISessionBlock,
+                                                                            RHAPISessionBlocksInheritedLocation,
+                                                                            RHAPISessionColors, RHAPISessionRandomColor,
+                                                                            RHAPISessionsInheritedLocation,
+                                                                            RHAPISessionTypes, RHCreateSession,
+                                                                            RHCreateSessionType, RHDeleteSessions,
+                                                                            RHDeleteSessionType, RHEditSessionType,
+                                                                            RHExportSessionsCSV, RHExportSessionsExcel,
+                                                                            RHExportSessionsPDF, RHManageSessionBlock,
+                                                                            RHManageSessionTypes, RHModifySession,
+                                                                            RHSessionACL, RHSessionACLMessage,
+                                                                            RHSessionBlocks, RHSessionPersonList,
+                                                                            RHSessionProtection, RHSessionREST,
+                                                                            RHSessionsList)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -50,6 +56,7 @@ _bp.add_url_rule('/manage/sessions/types/<int:session_type_id>', 'manage_type', 
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/sessions/types/<int:session_type_id>/delete', 'delete_type', RHDeleteSessionType,
                  methods=('POST',))
+_bp.add_url_rule('/api/sessions/types/', 'types_rest', RHAPISessionTypes)
 
 
 # Display
@@ -72,3 +79,18 @@ _compat_bp.add_url_rule('!/sessionDisplay.py', 'session_modpython',
                         make_compat_redirect_func(_compat_bp, 'session',
                                                   view_args_conv={'confId': 'event_id',
                                                                   'sessionId': 'legacy_session_id'}))
+
+# API
+_bp.add_url_rule('/api/sessions/colors', 'api_session_colors', RHAPISessionColors)
+_bp.add_url_rule('/api/sessions/random-color', 'api_random_session_color', RHAPISessionRandomColor)
+_bp.add_url_rule('/api/sessions/create', 'api_create_session', RHAPICreateSession, methods=('POST',))
+_bp.add_url_rule('/api/sessions/<int:session_id>', 'api_manage_session', RHAPISession,
+                 methods=('GET', 'DELETE', 'PATCH'))
+_bp.add_url_rule('/api/sessions/location-parent', 'api_sessions_location_parent', RHAPISessionsInheritedLocation)
+_bp.add_url_rule('/api/sessions/<int:session_id>/blocks/location-parent', 'api_blocks_location_parent',
+                 RHAPISessionBlocksInheritedLocation)
+_bp.add_url_rule('/api/sessions/<int:session_id>/blocks/create', 'api_create_block', RHAPICreateSession,
+                 methods=('POST',))
+
+_bp.add_url_rule('/api/sessions/<int:session_id>/blocks/<int:block_id>/', 'api_manage_block', RHAPISessionBlock,
+                 methods=('GET', 'DELETE', 'PATCH'))

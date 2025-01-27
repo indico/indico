@@ -18,6 +18,7 @@ from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
@@ -40,10 +41,11 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             delete_contribution, delete_subcontribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
-from indico.modules.events.contributions.schemas import ContributionFieldSchema
+from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionSchema,
+                                                         FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
-                                                      get_boa_export_formats, import_contributions_from_csv,
-                                                      make_contribution_form)
+                                                      get_boa_export_formats, get_contribution_person_link_field_params,
+                                                      import_contributions_from_csv, make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.controllers.base import EditEventSettingsMixin
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -53,6 +55,7 @@ from indico.modules.events.management.controllers.emails import (EmailRolesMetad
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.schemas import LocationParentSchema
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
@@ -63,7 +66,7 @@ from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
-from indico.web.args import use_kwargs
+from indico.web.args import use_args, use_args_schema_context, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -294,26 +297,32 @@ class RHContributionACLMessage(RHManageContributionBase):
 
 
 class RHContributionREST(RHManageContributionBase):
+    def _process_GET(self):
+        return FullContributionSchema().jsonify(self.contrib)
+
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
-    def _process_PATCH(self):
-        data = request.json
-        updates = {}
-        if set(data.keys()) > {'session_id', 'track_id'}:
-            raise BadRequest
-        if not self.event.can_manage(session.user):
-            raise Forbidden
-        if 'session_id' in data:
-            updates.update(self._get_contribution_session_updates(data['session_id']))
-        if 'track_id' in data:
-            updates.update(self._get_contribution_track_updates(data['track_id']))
+    @use_args(FullContributionSchema, partial=True)
+    def _process_PATCH(self, data):
+        updates = {k: v for k, v in data.items() if k in {'title', 'description', 'keywords', 'board_number', 'code'}}
+        if session := data.get('session'):
+            if not self._can_update_scheduling():
+                raise Forbidden
+            updates.update(self._get_contribution_session_updates(session.get('id')))
+        if track := data.get('track'):
+            if not self._can_update_scheduling():
+                raise Forbidden
+            updates.update(self._get_contribution_track_updates(track.get('id')))
         rv = {}
         if updates:
             rv = update_contribution(self.contrib, updates)
         return jsonify(unscheduled=rv.get('unscheduled', False), undo_unschedule=rv.get('undo_unschedule'))
+
+    def _can_update_scheduling(self):
+        return self.event.can_manage(session.user)
 
     def _get_contribution_session_updates(self, session_id):
         updates = {}
@@ -338,6 +347,92 @@ class RHContributionREST(RHManageContributionBase):
             if track_id != self.contrib.track_id:
                 updates['track'] = track
         return updates
+
+
+class RHAPIContribution(RHManageContributionBase):
+    def _process_GET(self):
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+
+    # @use_args(ContributionSchema)
+    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event, 'object': self.contrib})
+    def _process_PATCH(self, data):
+        # from indico.web.args import parser
+        # data = parser.parse(ContributionSchema(context={'event': self.event, 'object': self.contrib}))
+        if (references := data.get('references')) is not None:
+            data['references'] = self._get_references(references)
+
+        # TODO: quick hack to get the person_link data in the right format
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        with (track_time_changes(), track_location_changes()):
+            # TODO: custom fields logs
+            update_contribution(self.contrib, data)
+
+    @no_autoflush
+    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
+        references = []
+        for entry in data:
+            reference_type = ReferenceType.get(entry['reference_type_id'])
+            if not reference_type:
+                raise BadRequest('Invalid reference type')
+            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
+                                                    value=entry['value']))
+        return references
+
+
+class RHAPIContributionCreate(RHManageContributionsBase):
+    # @use_args(ContributionSchema)
+    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
+    def _process_POST(self, data):
+        if (references := data.get('references')) is not None:
+            data['references'] = self._get_references(references)
+        # TODO: quick hack to get the person_link data in the right format
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        print('create contribution', data)
+        create_contribution(self.event, data)
+
+    @no_autoflush
+    def _get_references(self, data: list[dict]) -> list[ContributionReference]:
+        references = []
+        for entry in data:
+            reference_type = ReferenceType.get(entry['reference_type_id'])
+            if not reference_type:
+                raise BadRequest('Invalid reference type')
+            references.append(ContributionReference(reference_type=reference_type, contribution=self.contrib,
+                                                    value=entry['value']))
+        return references
+
+
+class RHAPIContributionsInheritedLocation(RHManageContributionsBase):
+    """API for the location parent of the event."""
+
+    def _process_GET(self):
+        if Contribution.allow_location_inheritance:
+            return LocationParentSchema().jsonify(self.event)
+        return jsonify(None)
+
+
+class RHAPIContributionInheritedLocation(RHManageContributionBase):
+    """API for the location parent of the event."""
+
+    def _process_GET(self):
+        if self.contrib.allow_location_inheritance:
+            return LocationParentSchema().jsonify(self.contrib.location_parent)
+        return jsonify(None)
+
+
+class RHAPIContributionDefaultDuration(RHManageContributionsBase):
+    def _process(self):
+        return jsonify(contribution_settings.get(self.event, 'default_duration').seconds)
+
+
+class RHAPIContributionFields(RHManageContributionsBase):
+    def _process(self):
+        return ContributionFieldSchema(many=True).jsonify(self.event.contribution_fields.filter_by(is_active=True))
+
+
+class RHAPIContributionPersonLinkFieldParams(RHManageContributionBase):
+    def _process_GET(self):
+        return jsonify(get_contribution_person_link_field_params(self.contrib))
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
