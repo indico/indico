@@ -23,6 +23,20 @@
             {% if editable and can_manage_blocks %}
                 {% set title="'%s'" | format(block.title) if block.title else '' %}
                 <div class="group right entry-action-buttons hide-if-locked">
+                    <a href="#" id="block-{{ block.id }}-edit-trigger"
+                            class="icon-edit i-link highlight"
+                            title="{% trans %}NEW Edit session block{% endtrans %}"></a>
+                    <div
+                        id="block-{{ block.id }}-edit"
+                        data-event-id="{{ event.id }}"
+                        data-session-id="{{ block.session.id }}"
+                        data-block-id="{{ block.id }}"
+                        data-event-type="{{ event.type }}"
+                        data-event-title="{{ event.title }}">
+                    </div>
+                    <script>
+                        setupSessionBlockForm('#block-{{ block.id }}-edit', '#block-{{ block.id }}-edit-trigger');
+                    </script>
                     <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"
                        title="{% trans %}Edit session block{% endtrans %}"
                        data-title="{% trans %}Edit session block {{ title }}{% endtrans %}"></a>

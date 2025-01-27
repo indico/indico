@@ -6,8 +6,8 @@
 # LICENSE file for more details.
 
 from indico.modules.events import event_management_object_url_prefixes
-from indico.modules.events.management.controllers import (actions, cloning, posters, privacy, program_codes, protection,
-                                                          settings)
+from indico.modules.events.management.controllers import (actions, api, cloning, posters, privacy, program_codes,
+                                                          protection, settings)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -71,6 +71,8 @@ _bp.add_url_rule('/program-codes/assign/subcontributions', 'assign_program_codes
 _bp.add_url_rule('/api/program-codes/contributions', 'api_program_codes_contributions',
                  program_codes.RHProgramCodesAPIContributions, methods=('GET', 'PATCH'))
 
+# API
+_bp.add_url_rule('!/api/locations', 'api_locations', api.RHLocations)
 
 for object_type, prefixes in event_management_object_url_prefixes.items():
     if object_type == 'subcontribution':
