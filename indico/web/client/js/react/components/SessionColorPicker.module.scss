@@ -1,0 +1,27 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.choice-box {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin: 0 -5px;
+  gap: 0.5em;
+
+  & > .choice:global(.ui.button) {
+    margin: 0;
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+
+    &.selected {
+      outline: 2px solid black;
+      outline-offset: 2px;
+    }
+  }
+}
