@@ -7,8 +7,6 @@
 
 import {Moment} from 'moment';
 
-type PercentWidth = number;
-
 export interface Session {
   title: string;
   isPoster: boolean;
@@ -26,9 +24,7 @@ interface BaseEntry {
 interface ScheduledMixin {
   startDt: Moment;
   // position information
-  x: number;
   y: number;
-  width: PercentWidth | string;
   column: number;
   maxColumn: number;
 }
