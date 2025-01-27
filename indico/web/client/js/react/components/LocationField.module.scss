@@ -1,0 +1,27 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.room-dropdown :global(.ui.search.selection.dropdown .menu > .disabled.header.item) {
+  opacity: 1;
+  margin: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.room-dropdown :global(.ui.disabled.search),
+.venue-dropdown :global(.ui.disabled.search) {
+  opacity: 1;
+}
+
+:global(.ui.form .disabled.field) {
+  &.venue-field,
+  &.room-field {
+    opacity: 1;
+  }
+}

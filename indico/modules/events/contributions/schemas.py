@@ -9,19 +9,24 @@ import hashlib
 from operator import attrgetter
 
 from marshmallow import fields, post_dump
+from marshmallow import ValidationError, post_load, validates
 from marshmallow_sqlalchemy import column2field
 
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import (ContributionField, ContributionFieldValue,
                                                                ContributionFieldVisibility)
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
+from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.sessions.schemas import BasicSessionSchema, SessionBlockSchema
+from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema, LocationDataSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.marshmallow import SortedList
+from indico.util.marshmallow import EventTimezoneDateTimeField, SortedList
 
 
 class BasicContributionSchema(mm.SQLAlchemyAutoSchema):
@@ -55,14 +60,24 @@ class ContributionFieldValueSchema(mm.Schema):
         fields = ('id', 'name', 'value')
 
 
+def _get_principal_roles(principal):
+    roles = [principal.author_type.name]
+    if principal.is_speaker:
+        roles.append('speaker')
+    if principal.contribution and principal.is_submitter:
+        roles.append('submitter')
+    return roles
+
+
 class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
     affiliation_link = fields.Nested(AffiliationSchema)
     email_hash = fields.Function(lambda x: hashlib.md5(x.email.encode()).hexdigest() if x.email else None)
+    roles = fields.Function(_get_principal_roles, load_only=True)
 
     class Meta:
         model = ContributionPersonLink
         fields = ('id', 'person_id', 'email', 'email_hash', 'first_name', 'last_name', 'full_name', 'title',
-                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type')
+                  'affiliation', 'affiliation_link', 'address', 'phone', 'is_speaker', 'author_type', 'roles')
 
     @post_dump
     def _hide_sensitive_data(self, data, **kwargs):
@@ -71,6 +86,14 @@ class ContributionPersonLinkSchema(mm.SQLAlchemyAutoSchema):
             del data['address']
             del data['phone']
         return data
+
+
+class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionReference
+        fields = ('id', 'type', 'value')
+
+    type = fields.Integer(attribute='reference_type_id')
 
 
 class FullContributionSchema(mm.SQLAlchemyAutoSchema):
@@ -82,7 +105,7 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
                   'session', 'session_block', 'track', 'type', 'custom_fields', 'persons')
 
     session = fields.Nested(BasicSessionSchema, only=('id', 'title', 'friendly_id', 'code'))
-    session_block = fields.Nested(SessionBlockSchema, only=('id', 'title', 'code'))
+    session_block = fields.Nested(BasicSessionBlockSchema, only=('id', 'title', 'code'))
     track = fields.Nested(TrackSchema, only=('id', 'title', 'code'))
     type = fields.Nested(ContributionTypeSchema, only=('id', 'name'))
     custom_fields = fields.List(fields.Nested(ContributionFieldValueSchema), attribute='field_values')
@@ -102,3 +125,52 @@ class FullContributionSchema(mm.SQLAlchemyAutoSchema):
 
 contribution_type_schema = ContributionTypeSchema()
 contribution_type_schema_basic = ContributionTypeSchema(only=('id', 'name'))
+
+
+class ContribFieldSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionField
+        fields = ('title', 'description', 'is_required', 'field_data')
+
+
+class ContribFieldValueSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = ContributionFieldValue
+        fields = ('id', 'data')
+
+    id = fields.Integer(attribute='contribution_field_id', required=True)
+    data = fields.Raw(load_default=None)
+
+    @validates('id')
+    def _check_contribution_field(self, id, **kwargs):
+        if not ContributionField.get(id):
+            raise ValidationError('Invalid contribution field')
+
+    @post_load()
+    @no_autoflush
+    def make_instance(self, data, **kwargs):
+        return ContributionFieldValue(contribution_field_id=data['contribution_field_id'], data=data['data'])
+
+
+class TimezoneAwareSessionBlockSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = SessionBlock
+        fields = ('start_dt', 'end_dt')
+
+    start_dt = EventTimezoneDateTimeField()
+    end_dt = EventTimezoneDateTimeField()
+
+
+class ContributionSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Contribution
+        fields = ('id', 'title', 'description', 'code', 'board_number', 'keywords', 'location_data',
+                  'start_dt', 'duration', 'references', 'custom_fields', 'person_links', 'session_block')
+
+    start_dt = EventTimezoneDateTimeField()
+    # TODO: filter inactive and resitricted contrib fields
+    custom_fields = fields.List(fields.Nested(ContribFieldValueSchema), attribute='field_values')
+    person_links = fields.Nested(_ContributionPersonLinkSchema(many=True, partial=False), partial=False)
+    references = fields.List(fields.Nested(ContributionReferenceSchema))
+    location_data = fields.Nested(LocationDataSchema)
+    session_block = fields.Nested(TimezoneAwareSessionBlockSchema)
