@@ -16,9 +16,10 @@ import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, BaseEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {minutesToPixels, pixelsToMinutes} from './utils';
+import {ContributionCreateForm} from '../../../contributions/client/js/ContributionForm';
 
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
@@ -80,6 +81,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
+  const [blockModal, setOpenBlockModal] = useState<ContributionCreateForm | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [newEntry, setNewEntry] = useState<BaseEntry | null>(null);
 
@@ -160,6 +162,23 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   }, []);
 
   useEffect(() => {
+    function onCloseModal() {
+      setOpenBlockModal(null);
+      setNewEntry(null);
+    }
+
+    function handler() {
+      setOpenBlockModal(<ContributionCreateForm eventId={4} onClose={onCloseModal} />);
+    }
+
+    document.addEventListener('click', handler);
+
+    return () => {
+      document.removeEventListener('click', handler);
+    };
+  }, [blockModal]);
+
+  useEffect(() => {
     function onMouseDown(event: MouseEvent) {
       // TODO: Ajob, uncomment this after checking why this is invalid all the time
       // if (event.target !== calendarRef.current) {
@@ -238,14 +257,12 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
-              <div>
-                <p>Wee</p>
-              </div>
               {newEntry && (
                 <div style={{opacity: 0.5}}>
                   <MemoizedTopLevelEntries dt={dt} entries={[newEntry]} />
                 </div>
               )}
+              {blockModal}
             </div>
           </DnDCalendar>
         </div>
