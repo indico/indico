@@ -410,14 +410,15 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         self.parent = target
         db.session.flush()
         signals.category.moved.send(self, old_parent=old_parent)
+        user = session.user if session else None
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        self.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Category moved', session.user,
+        self.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Category moved', user,
                  data={'From': sep.join(old_parent.chain_titles),
                        'To': sep.join(target.chain_titles)})
         old_parent.log(CategoryLogRealm.category, LogKind.negative, 'Content', f'Subcategory moved out: "{self.title}"',
-                       session.user, data={'To': sep.join(target.chain_titles)})
+                       user, data={'To': sep.join(target.chain_titles)})
         target.log(CategoryLogRealm.category, LogKind.positive, 'Content',
-                   f'Subcategory moved in: "{self.title}"', session.user,
+                   f'Subcategory moved in: "{self.title}"', user,
                    data={'From': sep.join(old_parent.chain_titles)})
 
     @classmethod
