@@ -78,13 +78,31 @@ export function layoutGroupAfterMove<T extends Entry>(
   const selectedColumn = Math.floor(newColumnCount * mousePosition);
 
   const rightToLeft = selectedColumn < newEntry.column;
-  if (selectedColumn === 0) {
+  if (newColumnCount === 1) {
+    if (mousePosition <= 0.5) {
+      group = group.map(entry => ({
+        ...entry,
+        column: entry.column + 1,
+      }));
+      return layoutGroup([...group, newEntry]);
+    } else {
+      newEntry = {
+        ...newEntry,
+        column: 1,
+        maxColumn: newColumnCount,
+      };
+      return layoutGroup([...group, newEntry]);
+    }
+  } else if (selectedColumn === 0) {
     group = group.map(entry => ({
       ...entry,
       column: entry.column + 1,
     }));
   } else if (selectedColumn === newColumnCount - 1) {
-    // TODO
+    newEntry = {
+      ...newEntry,
+      column: newEntry.column + 1,
+    };
   } else if (rightToLeft) {
     group = group.map(entry => ({
       ...entry,
