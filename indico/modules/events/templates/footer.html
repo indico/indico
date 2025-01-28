@@ -6,7 +6,7 @@
     {% if show_social %}
         <ind-share-widget
             event-name="{{ event.title }}"
-            event-start-dt="{{ event.start_dt | format_datetime(format='d MMMM YYYY') }}"
+            event-start-dt="{{ event.start_dt | format_datetime(format='d MMMM yyyy') }}"
             event-url="{{ url }}"
             share-icon="{{ url_for('assets.image', filename='share-widget.svg') }}"
             google-cal-params="{{ google_calendar_params|urlencode }}"

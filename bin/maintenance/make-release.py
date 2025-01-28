@@ -101,7 +101,7 @@ def _set_changelog_date(new_version, dry_run=False):
     version_line = f'Version {new_version}'
     underline = '-' * len(version_line)
     unreleased = re.escape('Unreleased')
-    release_date = format_date(format='MMMM dd, YYYY', locale='en')
+    release_date = format_date(format='MMMM dd, yyyy', locale='en')
     content = re.sub(fr'(?<={re.escape(version_line)}\n{underline}\n\n\*){unreleased}(?=\*\n)',
                      f'Released on {release_date}',
                      content,

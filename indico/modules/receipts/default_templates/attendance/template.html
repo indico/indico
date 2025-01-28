@@ -11,7 +11,7 @@
     {% if event.start_dt.date() != event.end_dt.date() %}
       {{ format_interval(event.start_dt, event.end_dt, format='dMMMMy') }}
     {% else %}
-      {{ event.start_dt | format_date('dd MMM YYYY') }}
+      {{ event.start_dt | format_date('dd MMM yyyy') }}
     {% endif %}
 
     <!-- Venue -->
@@ -39,12 +39,12 @@
   </address>
 </aside>
 
-{% set start_date = event.start_dt | format_date('dd.MM.YYYY') %}
-{% set end_date = event.end_dt | format_date('dd.MM.YYYY') %}
+{% set start_date = event.start_dt | format_date('dd.MM.yyyy') %}
+{% set end_date = event.end_dt | format_date('dd.MM.yyyy') %}
 {%- if event.start_dt.date() != event.end_dt.date() %}
   {% set date_range = 'between {} and {}'.format(start_date, end_date) %}
 {%- else %}
-  {% set date_range = 'on {}'.format(event.start_dt | format_date('dd.MM.YYYY')) %}
+  {% set date_range = 'on {}'.format(event.start_dt | format_date('dd.MM.yyyy')) %}
 {%- endif -%}
 {%- if custom_fields.show_affiliation and personal_data.affiliation %}
   {% set person = '<em>{} {}</em> (<em>{}</em>)'.format(personal_data.first_name | escape, personal_data.last_name | escape, personal_data.affiliation | escape) %}
