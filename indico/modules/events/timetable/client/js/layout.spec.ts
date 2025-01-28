@@ -7,7 +7,14 @@
 
 import moment from 'moment';
 
-import {getGroup, computeYoffset, getGroups, layoutGroup, getWidthAndOffset} from './layout';
+import {
+  getGroup,
+  computeYoffset,
+  getGroups,
+  layoutGroup,
+  getWidthAndOffset,
+  layoutGroupAfterMove,
+} from './layout';
 import {
   BlockEntry,
   BreakEntry,
@@ -32,14 +39,22 @@ function t(time: string) {
   return moment(dt);
 }
 
-function scheduleMixin(time: string) {
+function scheduleMixin({
+  time,
+  column,
+  maxColumn,
+}: {
+  time: string;
+  column: number;
+  maxColumn: number;
+}) {
   return {
     startDt: t(time),
     x: 0,
     y: 0,
     width: 0,
-    column: 0,
-    maxColumn: 0,
+    column,
+    maxColumn,
   };
 }
 
@@ -48,11 +63,15 @@ function contrib({
   title,
   time,
   duration,
+  column = 0,
+  maxColumn = 0,
 }: {
   id?: number;
   title?: string;
   time: string;
   duration: number;
+  column?: number;
+  maxColumn?: number;
 }): ContribEntry {
   if (id === undefined) {
     id = nextId();
@@ -65,7 +84,7 @@ function contrib({
     title,
     type: 'contrib',
     duration,
-    ...scheduleMixin(time),
+    ...scheduleMixin({time, column, maxColumn}),
   };
 }
 
@@ -75,14 +94,18 @@ function childContrib({
   title,
   time,
   duration,
+  column = 0,
+  maxColumn = 0,
 }: {
   id?: number;
   parentId: number;
   title?: string;
   time: string;
   duration: number;
+  column?: number;
+  maxColumn?: number;
 }): ChildContribEntry {
-  return {...contrib({id, title, time, duration}), parentId};
+  return {...contrib({id, title, time, duration, column, maxColumn}), parentId};
 }
 
 function break_({
@@ -90,11 +113,15 @@ function break_({
   title,
   time,
   duration,
+  column = 0,
+  maxColumn = 0,
 }: {
   id?: number;
   title?: string;
   time: string;
   duration: number;
+  column?: number;
+  maxColumn?: number;
 }): BreakEntry {
   if (id === undefined) {
     id = nextId();
@@ -109,7 +136,7 @@ function break_({
     duration,
     textColor: 'black',
     backgroundColor: 'white',
-    ...scheduleMixin(time),
+    ...scheduleMixin({time, column, maxColumn}),
   };
 }
 
@@ -135,12 +162,16 @@ function block({
   children,
   time,
   duration,
+  column = 0,
+  maxColumn = 0,
 }: {
   id?: number;
   title?: string;
   children: ChildEntry[];
   time: string;
   duration: number;
+  column?: number;
+  maxColumn?: number;
 }): BlockEntry {
   if (id === undefined) {
     id = nextId();
@@ -155,8 +186,22 @@ function block({
     sessionId: 0,
     duration,
     children,
-    ...scheduleMixin(time),
+    ...scheduleMixin({time, column, maxColumn}),
   };
+}
+
+function parallelContribs({
+  count,
+  time,
+  duration,
+}: {
+  count: number;
+  time: string;
+  duration: number;
+}) {
+  return Array.from({length: count}, (_, i) =>
+    contrib({time, duration, column: i, maxColumn: count - 1})
+  );
 }
 
 beforeEach(() => {
@@ -346,6 +391,138 @@ describe('layoutGroup()', () => {
     ];
 
     const newEntries = layoutGroup(entries);
+    expect(newEntries).toEqual(expected);
+  });
+});
+
+describe('layoutGroupAfterMove()', () => {
+  it('No overlapping entries', () => {
+    const group = [];
+    const entry = contrib({time: '10:00', duration: 60});
+    const mousePosition = 0.25;
+
+    const expected = [{...entry, y: 0, column: 0, maxColumn: 0}];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('1 existing entry, mouse on the left side', () => {
+    const group = [contrib({time: '10:00', duration: 60})];
+    const entry = contrib({time: '10:00', duration: 60});
+    const mousePosition = 0.25; // Mouse is in the left half of the timetable
+
+    // The new entry should be placed in the first column (on the left)
+    const expected = [
+      {...entry, y: 0, column: 0, maxColumn: 1},
+      {...group[0], y: 0, column: 1, maxColumn: 1},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('1 existing entry, mouse on the right side', () => {
+    const group = [contrib({time: '10:00', duration: 60})];
+    const entry = contrib({time: '10:00', duration: 60});
+    const mousePosition = 0.75; // Mouse is in the right half of the timetable
+
+    // The new entry should be placed in the second column (on the right)
+    const expected = [
+      {...group[0], y: 0, column: 0, maxColumn: 1},
+      {...entry, y: 0, column: 1, maxColumn: 1},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('2 existing entries, selected column == 0', () => {
+    const group = parallelContribs({count: 2, time: '10:00', duration: 60});
+    const entry = contrib({time: '10:00', duration: 40});
+    const mousePosition = 0.1; // The selected column is 0
+
+    // The new entry should be placed in the first column
+    const expected = [
+      {...entry, y: 0, column: 0, maxColumn: 2},
+      {...group[0], y: 0, column: 1, maxColumn: 2},
+      {...group[1], y: 0, column: 2, maxColumn: 2},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('2 existing entries, selected column == 1', () => {
+    const group = parallelContribs({count: 2, time: '10:00', duration: 60});
+    const entry = contrib({time: '10:00', duration: 40});
+    const mousePosition = 0.9; // The selected column is 1
+
+    // The new entry should be placed in the last column
+    const expected = [
+      {...group[0], y: 0, column: 0, maxColumn: 2},
+      {...group[1], y: 0, column: 1, maxColumn: 2},
+      {...entry, y: 0, column: 2, maxColumn: 2},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('3 existing entries, selected column == 0', () => {
+    const group = parallelContribs({count: 3, time: '10:00', duration: 60});
+    const entry = contrib({time: '10:00', duration: 40});
+    const mousePosition = 0.1;
+
+    const expected = [
+      {...entry, y: 0, column: 0, maxColumn: 3},
+      {...group[0], y: 0, column: 1, maxColumn: 3},
+      {...group[1], y: 0, column: 2, maxColumn: 3},
+      {...group[2], y: 0, column: 3, maxColumn: 3},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('3 existing entries, selected column == 1', () => {
+    const group = parallelContribs({count: 3, time: '10:00', duration: 60});
+    const entry = contrib({time: '10:00', duration: 40});
+    const mousePosition = 0.5;
+
+    const expected = [
+      {...group[0], y: 0, column: 0, maxColumn: 3},
+      {...entry, y: 0, column: 1, maxColumn: 3},
+      {...group[1], y: 0, column: 2, maxColumn: 3},
+      {...group[2], y: 0, column: 3, maxColumn: 3},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('3 existing entries, selected column == 2', () => {
+    const group = parallelContribs({count: 3, time: '10:00', duration: 60});
+    const entry = contrib({time: '10:00', duration: 40});
+    const mousePosition = 0.8;
+
+    const expected = [
+      {...group[0], y: 0, column: 0, maxColumn: 3},
+      {...group[1], y: 0, column: 1, maxColumn: 3},
+      {...group[2], y: 0, column: 2, maxColumn: 3},
+      {...entry, y: 0, column: 3, maxColumn: 3},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
+    expect(newEntries).toEqual(expected);
+  });
+
+  it('Right to left', () => {
+    const group = [
+      contrib({time: '10:00', duration: 40, column: 0, maxColumn: 2}),
+      contrib({time: '10:00', duration: 40, column: 1, maxColumn: 2}),
+    ];
+    const entry = contrib({time: '10:00', duration: 40, column: 2, maxColumn: 2});
+    const mousePosition = 0.5;
+
+    const expected = [
+      {...group[0], y: 0, column: 0, maxColumn: 2},
+      {...entry, y: 0, column: 1, maxColumn: 2},
+      {...group[1], y: 0, column: 2, maxColumn: 2},
+    ];
+    const newEntries = layoutGroupAfterMove(group, entry, mousePosition);
     expect(newEntries).toEqual(expected);
   });
 });
