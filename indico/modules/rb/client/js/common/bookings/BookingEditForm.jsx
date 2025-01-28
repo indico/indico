@@ -110,18 +110,6 @@ class BookingEditForm extends React.Component {
     return {...recurrence, weekdays: updatedWeekdays};
   };
 
-  isDateDisabled = dt => {
-    const {
-      booking: {startDt},
-    } = this.props;
-    const today = moment();
-    if (today.isSameOrBefore(startDt, 'day') || today.isAfter(startDt, 'day')) {
-      return !dt.isSameOrAfter(today, 'day');
-    }
-
-    return !dt.isSameOrAfter(startDt, 'day');
-  };
-
   getMinDate = () => {
     // XXX why don't we support admin override here?
     return serializeDate(moment());
