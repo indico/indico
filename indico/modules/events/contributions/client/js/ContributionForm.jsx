@@ -47,6 +47,8 @@ function ContributionForm({
   loading,
   ...rest
 }) {
+  console.log('THE CUSTOM FIELDS');
+  console.log(customFields);
   const handleSubmit = formData => {
     // formData = _.omit(formData, ['person_links']); // TODO person links
     const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
@@ -93,6 +95,8 @@ function ContributionForm({
 
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
+      console.log('OUR CUSTOM FIELDZZZ');
+      console.log(id, fieldType, title, description, isRequired, fieldData);
       const key = `custom_field_${id}`;
       const name = `custom_fields.field_${id}`;
       if (fieldType === 'text') {
@@ -308,7 +312,12 @@ ContributionEditForm.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export function ContributionCreateForm({eventId, onClose}) {
+export function ContributionCreateForm({
+  eventId,
+  onClose,
+  customFields = {},
+  customInitialValues = {},
+}) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     personLinkFieldParamsURL({event_id: eventId}),
     {camelize: true}
@@ -344,27 +353,34 @@ export function ContributionCreateForm({eventId, onClose}) {
     fieldsLoading ||
     personLinkFieldParamsLoading;
 
+  const initialValues = loading
+    ? {}
+    : {
+        duration: defaultDuration,
+        person_links: [],
+        keywords: [],
+        references: [],
+        location_data: locationData,
+        custom_fields: {
+          ...Object.fromEntries(fields.map(field => [`field_${field.id}`, ''])),
+          ...customFields,
+        },
+        ...customInitialValues,
+      };
+
+  console.log('initial valuess');
+  console.log(initialValues);
+
   return (
     <ContributionForm
       eventId={eventId}
       personLinkFieldParams={personLinkFieldParams}
       locationParent={locationParent}
-      customFields={fields}
+      customFields={(fields ?? []).concat(Object.values(customFields))}
       header={Translate.string('Add new contribution')}
       onSubmit={handleSubmit}
       onClose={onClose}
-      initialValues={
-        loading
-          ? {}
-          : {
-              duration: defaultDuration,
-              person_links: [],
-              keywords: [],
-              references: [],
-              location_data: locationData,
-              custom_fields: Object.fromEntries(fields.map(field => [`field_${field.id}`, ''])),
-            }
-      }
+      initialValues={initialValues}
       loading={loading}
     />
   );
@@ -373,6 +389,8 @@ export function ContributionCreateForm({eventId, onClose}) {
 ContributionCreateForm.propTypes = {
   eventId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
+  customInitialValues: PropTypes.object,
+  customFields: PropTypes.array,
 };
 
 export function EditContributionButton({eventId, contribId, eventTitle, triggerSelector, ...rest}) {
@@ -438,7 +456,14 @@ export function CreateContributionButton({eventId, triggerSelector, ...rest}) {
           <Translate>Edit contribution</Translate>
         </Button>
       )}
-      {open && <ContributionCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
+      {open && (
+        <ContributionCreateForm
+          eventId={eventId}
+          onClose={() => setOpen(false)}
+          customFields={{}}
+          customInitialValues={{}}
+        />
+      )}
     </>
   );
 }

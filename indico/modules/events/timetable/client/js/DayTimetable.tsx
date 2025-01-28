@@ -10,6 +10,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
+import {ContributionCreateForm} from '../../../contributions/client/js/ContributionForm';
+
 import * as actions from './actions';
 import {createRestrictToElement, Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
@@ -19,7 +21,6 @@ import * as selectors from './selectors';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry, BaseEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {minutesToPixels, pixelsToMinutes} from './utils';
-import {ContributionCreateForm} from '../../../contributions/client/js/ContributionForm';
 
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
@@ -168,19 +169,35 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     }
 
     function handler() {
-      setOpenBlockModal(<ContributionCreateForm eventId={4} onClose={onCloseModal} />);
+      setOpenBlockModal(
+        <ContributionCreateForm
+          eventId={5}
+          onClose={onCloseModal}
+          customFields={[
+            {
+              id: 'fields_test',
+              fieldType: 'text',
+              title: 'test',
+              description: 'Field for testing',
+              isRequired: false,
+              fieldData: {},
+            },
+          ]}
+          customInitialValues={{duration: 50000}}
+        />
+      );
     }
 
-    document.addEventListener('click', handler);
+    calendarRef.current.addEventListener('click', handler);
 
     return () => {
-      document.removeEventListener('click', handler);
+      calendarRef.current.removeEventListener('click', handler);
     };
   }, [blockModal]);
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      // TODO: Ajob, uncomment this after checking why this is invalid all the time
+      // TODO: (Ajob) uncomment this after checking why this is invalid all the time
       // if (event.target !== calendarRef.current) {
       //   return;
       // }
@@ -212,11 +229,9 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
       }
       const rect = calendarRef.current.getBoundingClientRect();
       const y = event.clientY - rect.top;
-      const duration = Math.max(
-        0,
+      const duration =
         pixelsToMinutes(y) -
-          pixelsToMinutes(newEntry.startDt.diff(moment(dt).startOf('day'), 'minutes'))
-      );
+        pixelsToMinutes(newEntry.startDt.diff(moment(dt).startOf('day'), 'minutes'));
 
       const newDuration = Math.max(Math.floor(duration / 5) * 5, 5);
       if (duration === newDuration) {
@@ -234,14 +249,14 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
       }
     }
 
-    document.addEventListener('mousedown', onMouseDown);
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    calendarRef.current.addEventListener('mousedown', onMouseDown);
+    calendarRef.current.addEventListener('mousemove', onMouseMove);
+    calendarRef.current.addEventListener('mouseup', onMouseUp);
 
     return () => {
-      document.removeEventListener('mousedown', onMouseDown);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      calendarRef.current.removeEventListener('mousedown', onMouseDown);
+      calendarRef.current.removeEventListener('mousemove', onMouseMove);
+      calendarRef.current.removeEventListener('mouseup', onMouseUp);
     };
   }, [isDragging, newEntry, dt, dispatch]);
 
