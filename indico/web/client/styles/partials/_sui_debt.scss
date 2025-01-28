@@ -89,3 +89,11 @@
     box-shadow: none;
   }
 }
+
+@mixin nested-input-font-weight {
+  @include field-override() {
+    label input {
+      font-size: revert;
+    }
+  }
+}

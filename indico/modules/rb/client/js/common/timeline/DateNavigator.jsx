@@ -119,14 +119,6 @@ export default class DateNavigator extends React.Component {
     }
   }
 
-  calendarDisabledDate = date => {
-    const {dateRange} = this.props;
-    if (!date) {
-      return false;
-    }
-    return dateRange.length !== 0 && !isDateWithinRange(date, dateRange, toMoment);
-  };
-
   onSelect = date => {
     const {mode, dateRange} = this.props;
     const freeRange = dateRange.length === 0;
@@ -231,6 +223,9 @@ export default class DateNavigator extends React.Component {
     const {mode} = this.props;
     const {datePickerVisible} = this.state;
 
+    const dateBounds = this.dateBounds;
+    const minDate = dateBounds ? serializeDate(dateBounds[0]) : null;
+    const maxDate = dateBounds ? serializeDate(dateBounds[1]) : null;
     const calendarPicker = (
       <Popup
         on="click"
@@ -251,9 +246,10 @@ export default class DateNavigator extends React.Component {
         content={
           <div className="ui form">
             <CalendarSingleDatePicker
-              date={this.selectedDate}
-              onDateChange={this.onSelect}
-              disabledDate={this.calendarDisabledDate}
+              date={serializeDate(this.selectedDate)}
+              onChange={date => this.onSelect(toMoment(date))}
+              minDate={minDate}
+              maxDate={maxDate}
               noBorder
             />
           </div>

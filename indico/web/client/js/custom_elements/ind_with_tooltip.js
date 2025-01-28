@@ -24,7 +24,6 @@ customElements.define(
     hide() {
       clearTimeout(this.timer);
       this.shown = false;
-      window.removeEventListener('resize', this.updatePosition);
     }
 
     setup() {

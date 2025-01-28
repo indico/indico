@@ -55,6 +55,15 @@ export function createDT(date, time) {
   return moment([...momentDate.toArray().splice(0, 3), ...momentTime.toArray().splice(3)]);
 }
 
+export function getBookingRangeMinDate(isAdminOverrideEnabled, gracePeriod) {
+  if (isAdminOverrideEnabled) {
+    return '';
+  } else if (gracePeriod === null) {
+    return serializeDate(moment());
+  }
+  return serializeDate(moment().subtract(gracePeriod, 'hour'));
+}
+
 export function isBookingStartDateValid(date, isAdminOverrideEnabled, gracePeriod) {
   if (!date || !date.isValid()) {
     return false;
@@ -171,4 +180,183 @@ export function getWeekday(date = undefined) {
     .locale('en')
     .format('ddd')
     .toLocaleLowerCase();
+}
+
+export function getToday() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+}
+
+export function toDateString(date) {
+  // We do not use ISO date format because it will be interpreted as UTC
+  return date?.toDateString() || '';
+}
+
+export function toOptionalDate(dateString) {
+  const date = new Date(dateString);
+  if (!date.getTime()) {
+    return;
+  }
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+export function isSameDate(x, y) {
+  return x?.toDateString() === y?.toDateString();
+}
+
+/**
+ * Date range
+ *
+ * The base implementation is strict. If the range is not
+ * specified, it will not count any date as being part of
+ * the range, and if only one of the extremes is specified,
+ * it will behave as if the date range includes only that
+ * date. See OpenDateRange for a more lax version.
+ */
+export class DateRange {
+  constructor(start, end) {
+    this.start = toOptionalDate(start);
+    this.end = toOptionalDate(end);
+  }
+
+  get isInvalid() {
+    return !this.start && !this.end;
+  }
+
+  startsWith(date) {
+    return isSameDate(date, this.start);
+  }
+
+  endsWith(date) {
+    return isSameDate(date, this.end);
+  }
+
+  includes(date) {
+    if (this.isInvalid) {
+      return false;
+    }
+    if (!this.start) {
+      return isSameDate(date, this.end);
+    }
+    if (!this.end) {
+      return isSameDate(date, this.start);
+    }
+    return date >= this.start && date <= this.end;
+  }
+
+  clamp(date) {
+    if (this.isInvalid) {
+      return;
+    }
+    if (!this.start) {
+      return new Date(this.end);
+    }
+    if (!this.end) {
+      return new Date(this.start);
+    }
+    return new Date(Math.min(this.end, Math.max(this.start, date)));
+  }
+
+  toString() {
+    return `${this.start}_${this.end}`;
+  }
+}
+
+/**
+ * Open date range
+ *
+ * Less strict version of DateRange which allows any date
+ * if the range is not completely specified. Constructing
+ * an empty open date range counts any date as being in
+ * the range.
+ */
+export class OpenDateRange extends DateRange {
+  includes(date) {
+    if (this.isInvalid) {
+      return true;
+    }
+
+    return date >= (this.start || -Infinity) && date <= (this.end || Infinity);
+  }
+
+  clamp(date) {
+    if (!this.start && !this.end) {
+      return date;
+    }
+    const start = this.start ?? -Infinity;
+    const end = this.end ?? Infinity;
+    return new Date(Math.min(end, Math.max(start, date)));
+  }
+}
+
+/**
+ * Sparse date range
+ *
+ * Takes multiple DateRange objects and provides a DateRange interface
+ * that tests against all provided range. This allows us to have sparse
+ * ranges.
+ */
+export class SparseDateRange {
+  constructor(...ranges) {
+    console.assert(ranges.every(r => r instanceof DateRange));
+    this.ranges = ranges;
+  }
+
+  get startDate() {
+    if (this.ranges.length) {
+      return new Date(Math.min(...this.ranges.map(r => r.startDate).filter(Boolean)));
+    }
+    return undefined;
+  }
+
+  get endDate() {
+    if (this.ranges.length) {
+      return new Date(Math.max(...this.ranges.map(r => r.endDate).filter(Boolean)));
+    }
+    return undefined;
+  }
+
+  get isInvalid() {
+    // Multi-range can never be invalid
+    return false;
+  }
+
+  starsWith(date) {
+    return this.ranges.any(r => r.startsWith(date));
+  }
+
+  endsWith(date) {
+    return this.range.any(r => r.endsWith(date));
+  }
+
+  includes(date) {
+    return this.ranges.some(r => r.includes(date));
+  }
+
+  clamp(date) {
+    // Unlike clamp in other ranges, we are dealing with a sparse range,
+    // so the date needs to fit within the closest one. We therefore first
+    // need to identify which range is the closest.
+    let minDist = Infinity;
+    let closestRange;
+
+    if (isNaN(date)) {
+      return date;
+    }
+
+    for (const range of this.ranges) {
+      if (range.includes(date)) {
+        // if it's already in the range, stop
+        return date;
+      }
+      const dist = Math.min(Math.abs(range.start - date), Math.abs(range.end - date));
+      if (dist < minDist) {
+        minDist = dist;
+        closestRange = range;
+      }
+    }
+    return closestRange.clamp(date);
+  }
 }

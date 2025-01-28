@@ -8,13 +8,12 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {START_DATE} from 'react-dates/constants';
 import {Field, FormSpy} from 'react-final-form';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {Form, Message, Segment, Icon} from 'semantic-ui-react';
 
-import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
+import {FinalPrincipal, FinalDatePicker, FinalDateRangePicker} from 'indico/react/components';
 import {
   FieldCondition,
   FinalDropdown,
@@ -111,16 +110,9 @@ class BookingEditForm extends React.Component {
     return {...recurrence, weekdays: updatedWeekdays};
   };
 
-  isDateDisabled = dt => {
-    const {
-      booking: {startDt},
-    } = this.props;
-    const today = moment();
-    if (today.isSameOrBefore(startDt, 'day') || today.isAfter(startDt, 'day')) {
-      return !dt.isSameOrAfter(today, 'day');
-    }
-
-    return !dt.isSameOrAfter(startDt, 'day');
+  getMinDate = () => {
+    // XXX why don't we support admin override here?
+    return serializeDate(moment());
   };
 
   preselectWeekdayToday = (form, force = false) => {
@@ -284,26 +276,26 @@ class BookingEditForm extends React.Component {
             </Form.Group>
           )}
           {recurrence.type === 'single' ? (
-            <FinalSingleDatePicker
+            <FinalDatePicker
               name="dates"
               asRange
               onChange={newDates => {
-                onBookingPeriodChange(newDates, timeSlot, recurrence);
+                if (newDates.startDate !== '__invalid__') {
+                  onBookingPeriodChange(newDates, timeSlot, recurrence);
+                }
               }}
               disabled={submitSucceeded || bookingFinished}
-              disabledDate={this.isDateDisabled}
-              initialVisibleMonth={() => moment(endDt)}
+              min={this.getMinDate()}
             />
           ) : (
-            <FinalDatePeriod
+            <FinalDateRangePicker
               name="dates"
               onChange={newDates => {
                 onBookingPeriodChange(newDates, timeSlot, this.clearWeekdays(recurrence.interval));
               }}
               disabled={submitSucceeded || bookingFinished}
-              disabledDateFields={bookingStarted ? START_DATE : null}
-              disabledDate={this.isDateDisabled}
-              initialVisibleMonth={() => moment(endDt)}
+              startDisabled={bookingStarted}
+              min={this.getMinDate()}
             />
           )}
           {!hideOptions.timeSlot && (

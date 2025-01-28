@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -19,14 +18,14 @@ export default class DateForm extends FilterFormComponent {
     startDate: PropTypes.string,
     endDate: PropTypes.string,
     isRange: PropTypes.bool.isRequired,
-    disabledDate: PropTypes.func,
+    minDate: PropTypes.string,
     ...FilterFormComponent.propTypes,
   };
 
   static defaultProps = {
     startDate: null,
     endDate: null,
-    disabledDate: null,
+    minDate: null,
   };
 
   static getDerivedStateFromProps({startDate, endDate}, prevState) {
@@ -57,35 +56,24 @@ export default class DateForm extends FilterFormComponent {
     });
   }
 
-  disabledDate(current) {
-    if (current) {
-      return current.isBefore(moment(), 'day');
-    }
-  }
-
   render() {
-    const {isRange, disabledDate} = this.props;
+    const {isRange, minDate} = this.props;
     const {startDate, endDate} = this.state;
+
     const picker = isRange ? (
       <CalendarRangeDatePicker
-        startDate={startDate}
-        endDate={endDate}
-        onDatesChange={async ({startDate: sd, endDate: ed}) => {
-          await this.setDates(sd, ed);
-        }}
-        disabledDate={disabledDate || this.disabledDate}
-        noBorder
+        startDate={serializeDate(startDate)}
+        endDate={serializeDate(endDate)}
+        minDate={serializeDate(minDate)}
+        onChange={({startDate: sd, endDate: ed}) =>
+          this.setDates(toMoment(sd, 'YYYY-MM-DD'), toMoment(ed, 'YYYY-MM-DD'))
+        }
       />
     ) : (
       <CalendarSingleDatePicker
-        date={startDate}
-        yearsBefore={0}
-        yearsAfter={1}
-        onDateChange={async date => {
-          await this.setDates(date, null);
-        }}
-        disabledDate={disabledDate || this.disabledDate}
-        noBorder
+        date={serializeDate(startDate)}
+        minDate={serializeDate(minDate)}
+        onChange={date => this.setDates(toMoment(date, 'YYYY-MM-DD'), null)}
       />
     );
 

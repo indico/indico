@@ -13,7 +13,7 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
 
-import {FinalDatePeriod} from 'indico/react/components';
+import {FinalDateRangePicker} from 'indico/react/components';
 import {
   validators as v,
   FinalRadio,
@@ -61,10 +61,9 @@ export default function BookingExportModal({rooms, onClose}) {
               <FinalRadio name="format" value="csv" validate={v.required} label="CSV" />
               <FinalRadio name="format" value="xlsx" validate={v.required} label="XLSX" />
             </Form.Group>
-            <FinalDatePeriod
+            <FinalDateRangePicker
               name="dates"
               label={Translate.string('Period')}
-              disabledDate={() => false}
               required
               allowNull
             />
