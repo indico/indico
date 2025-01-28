@@ -80,14 +80,14 @@ const geometry = {
     const scrollOffset = window.pageYOffset - this.initialPageYOffset;
     this.target.style.setProperty(
       '--target-top',
-      `clamp(0px, ${top - scrollOffset}px, calc(100dvh - ${this.targetHeight}px))`
+      `clamp(0px, ${top - scrollOffset}px, calc(100% - ${this.targetHeight}px))`
     );
   },
   setLeft(left) {
     const scrollOffset = window.pageXOffset - this.initialPageXOffset;
     this.target.style.setProperty(
       '--target-left',
-      `clamp(0px, ${left - scrollOffset}px, calc(100dvw - ${this.targetWidth}px))`
+      `clamp(0px, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px))`
     );
   },
 };
