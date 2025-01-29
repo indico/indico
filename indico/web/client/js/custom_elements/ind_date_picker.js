@@ -592,6 +592,7 @@ customElements.define(
       // Populate month names in the select list
       for (let i = 0; i < 12; i++) {
         const date = new Date();
+        date.setDate(1);
         date.setMonth(i);
         const monthName = date.toLocaleDateString(this.locale, {month: 'short'});
         const monthOption = document.createElement('option');
