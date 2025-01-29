@@ -853,11 +853,12 @@ customElements.define(
       const id = `date-grid-${this.constructor.lastId++}`;
 
       // Populate weekday names in the calendar header
-      getWeekdayNames(weekInfo, this.locale).forEach(({full, short}, i) => {
+      getWeekdayNames(weekInfo, this.locale).forEach(({full, short, isWeekend}, i) => {
         const headerCell = weekdayLabels[i];
         headerCell.setAttribute('aria-label', full);
         headerCell.setAttribute('title', full);
         headerCell.textContent = short;
+        headerCell.toggleAttribute('data-weekend', isWeekend);
         headerCell.id = `${id}-wkd-${i + 1}`;
       });
 
