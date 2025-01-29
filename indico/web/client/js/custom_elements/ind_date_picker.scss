@@ -232,7 +232,7 @@ ind-calendar {
 }
 
 ind-date-grid {
-  width: 20em;
+  min-width: 20em;
 
   .month-label {
     font-weight: bold;
@@ -256,10 +256,18 @@ ind-date-grid {
     aspect-ratio: 7/6; // 7 cells across x 6 rows
   }
 
+  .weekdays {
+    font-weight: bold;
+  }
+
   .weekdays > * {
     @extend %flex-inline-center;
     aspect-ratio: 1;
     text-decoration: none;
+  }
+
+  .weekdays [data-weekend] {
+    color: var(--text-secondary-color);
   }
 
   [role='listbox'] button {
@@ -293,6 +301,11 @@ ind-date-grid {
     }
 
     &[aria-selected] {
+      background-color: var(--surface-accent-secondary-color);
+    }
+
+    &[aria-selected][data-range-start],
+    &[aria-selected][data-range-end] {
       background-color: var(--surface-accent-color);
       color: var(--text-inverse-color);
     }

@@ -26,6 +26,7 @@ Improvements
 - Add a setting to limit the information room booking users can see for bookings not
   linked to them or their rooms (:pr:`6704`)
 - Add shortcuts to the past and closest events in a category (:pr:`6710`)
+- Improve the appearance of the date pickers (:issue:`6719`, :pr:`6720`, thanks :user:`foxbunny`)
 
 Bugfixes
 ^^^^^^^^

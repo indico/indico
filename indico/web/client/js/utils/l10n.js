@@ -83,6 +83,7 @@ export function getWeekdayNames(weekInfo, locale) {
     weekdayNames.push({
       full: date.toLocaleDateString(locale, {weekday: 'long'}),
       short: date.toLocaleDateString(locale, {weekday: 'narrow'}),
+      isWeekend: weekInfo.weekend.includes(((date.getDay() + 6) % 7) + 1), // Sunday=0 -> Sunday=7
     });
     date.setDate(date.getDate() + 1);
   }
