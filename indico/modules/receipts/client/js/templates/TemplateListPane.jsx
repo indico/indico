@@ -208,7 +208,7 @@ export default function TemplateListPane({
                   content: (
                     <table className="i-table-widget">
                       <tbody>
-                        {_.sortBy(otherTemplates, 'title').map(tpl => (
+                        {otherTemplates.map(tpl => (
                           <TemplateRow
                             key={tpl.id}
                             template={tpl}
