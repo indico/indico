@@ -8,7 +8,6 @@
 import CustomElementBase from 'indico/custom_elements/_base';
 import {domReady} from 'indico/utils/domstate';
 import * as positioning from 'indico/utils/positioning';
-import {focusLost} from 'indico/utils/special_events';
 
 import './ind_with_popup.scss';
 
@@ -55,13 +54,6 @@ customElements.define(
           }
         });
       });
-
-      this.onconnect = () => {
-        const stopHandlingFocusLost = focusLost(this, () => {
-          this.shown = false;
-        });
-        this.addUnmountEventListener(stopHandlingFocusLost);
-      };
     }
 
     attributeChangedCallback() {

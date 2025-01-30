@@ -11,6 +11,7 @@
            data-protection-mode="{{mode}}"
            data-trigger
            class="popup-trigger">
+            <span class="protection-mode-label">{% trans %}Page access restriction:{% endtrans %}</span>
             {% if mode == 'public' %}
                 {% trans %}Public{% endtrans %}
             {% elif mode == 'network' %}
@@ -22,9 +23,10 @@
             {% elif mode == 'restricted' %}
                 {% trans %}Restricted{% endtrans %}
             {% endif %}
+            <span class="protection-mode-label">{% trans %}(activate for details){% endtrans %}</span>
         </button>
 
-        <div data-tip-content id="protection-details">
+        <div data-tip-content id="protection-details" aria-live="polite">
             <div class="protectionWidgetSection">
                 {% if mode == 'public' %}
                 {% trans %}The information on this page is visible to anyone{% endtrans %}
@@ -55,7 +57,10 @@
     {% set active_tz_label = timezone_data.active_tz %}
 
     <ind-with-popup>
-        <button id="tz-selector-link" data-trigger class="popup-trigger">{{ timezone_data.active_tz }}</button>
+        <button id="tz-selector-link" data-trigger class="popup-trigger">
+            <span class="tz-selector-label">{% trans %}Page timezone:{% endtrans %}</span>
+            {{ timezone_data.active_tz }}
+        </button>
 
         <dialog data-dialog>
             {% if timezone_data.disabled %}
@@ -138,6 +143,7 @@
 {% macro _render_user_settings(languages, force_locale, force_locale_alts) %}
     <ind-with-popup>
         <button id="user-settings-link" data-trigger class="popup-trigger">
+            <span class="user-settings-link-label">{% trans %}Your profile:{% endtrans %}</span>
             {{ session.user.get_full_name(last_name_first=false, last_name_upper=false, abbrev_first_name=true) }}
         </button>
 
