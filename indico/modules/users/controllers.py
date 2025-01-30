@@ -1047,4 +1047,4 @@ class RHUserDelete(RHUserBase):
             signals.users.db_deleted.send(self.user, flushed=True)
             logger.info('User %r deleted %s', session.user, user_repr)
             flash(_('{user_name} has been deleted.').format(user_name=user_name), 'success')
-        return jsonify(redirect=url_for('users.users_admin'))
+        return '', 204

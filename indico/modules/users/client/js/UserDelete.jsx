@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import userDeleteURL from 'indico-url:users.user_delete';
+import usersAdminURL from 'indico-url:users.users_admin';
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
@@ -132,18 +133,15 @@ function UserDelete({userId, isAdmin, firstName, lastName}) {
 
   const handleDelete = async () => {
     setDeleting(true);
-    let resp;
     try {
-      resp = await indicoAxios.delete(userDeleteURL({user_id: userId}));
+      await indicoAxios.delete(userDeleteURL({user_id: userId}));
     } catch (err) {
       setDeleting(false);
       handleCloseDialog();
       handleAxiosError(err);
       return;
     }
-    setDeleting(false);
-    handleCloseDialog();
-    location.href = resp.data.redirect;
+    location.href = usersAdminURL();
   };
 
   if (isAdmin && !isSameUser) {
