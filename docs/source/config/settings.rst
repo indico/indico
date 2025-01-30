@@ -921,7 +921,7 @@ System
     Whether to allow administrators to permanently delete users from the
     Indico UI.
 
-    If enabled, any Indico administrator can permenently delete a user from Indico,
+    If enabled, any Indico administrator can permanently delete a user from Indico,
     along with all their associated user data. If it is not possible to delete the user
     (e.g. because they are listed as a speaker at an event), the user will be anonymized
     instead.
