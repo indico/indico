@@ -11,7 +11,7 @@
                     <div class="i-box-buttons i-box-align-buttons">
                         {% if not user.is_blocked %}
                             <div {%- if user == session.user %} title="{% trans %}You cannot block yourself{% endtrans %}"{% endif %}>
-                                <button class="ui negative small button"
+                                <button class="ui orange small button"
                                         data-href="{{ url_for('.user_block') }}"
                                         data-method="PUT"
                                         data-confirm="{% trans %}This user will no longer have access to Indico.
