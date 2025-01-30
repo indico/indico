@@ -34,7 +34,7 @@ const titles = [
   {text: Translate.string('Mx'), value: 'mx'},
 ];
 
-const FinalAffiliationField = ({hasPredefinedAffiliations}) => {
+const FinalAffiliationField = ({hasPredefinedAffiliations, ...rest}) => {
   const formState = useFormState();
   const currentAffiliation = formState.values.affiliationMeta;
   const [_affiliationResults, setAffiliationResults] = useState([]);
@@ -86,9 +86,10 @@ const FinalAffiliationField = ({hasPredefinedAffiliations}) => {
       renderCustomOptionContent={value => (
         <Header content={value} subheader={Translate.string('You entered this option manually')} />
       )}
+      {...rest}
     />
   ) : (
-    <FinalInput name="affiliation" />
+    <FinalInput name="affiliation" {...rest} />
   );
 };
 
@@ -104,6 +105,7 @@ export default function PersonDetailsModal({
   otherPersons,
   hideEmailField,
   validateEmailUrl,
+  requiredPersonFields,
   extraParams,
 }) {
   return (
@@ -128,51 +130,52 @@ export default function PersonDetailsModal({
         </Translate>
       )}
       <Form.Group widths="equal">
-        <Form.Field>
-          <Translate as="label" context="Salutation">
-            Title
-          </Translate>
-          <FinalDropdown
-            name="title"
-            fluid
-            search
-            selection
-            options={titles}
-            placeholder={Translate.string('None', 'Title (salutation)')}
-          />
-        </Form.Field>
+        <FinalDropdown
+          name="title"
+          label={Translate.string('Title', 'Salutation')}
+          fluid
+          search
+          selection
+          options={titles}
+          placeholder={Translate.string('None', 'Title (salutation)')}
+          required={requiredPersonFields?.includes('title')}
+        />
         {!extraParams?.disableAffiliations && (
-          <Form.Field>
-            <Translate as="label">Affiliation</Translate>
-            <FinalAffiliationField hasPredefinedAffiliations={hasPredefinedAffiliations} />
-          </Form.Field>
+          <FinalAffiliationField
+            label={Translate.string('Affiliation')}
+            hasPredefinedAffiliations={hasPredefinedAffiliations}
+            required={requiredPersonFields?.includes('affiliation')}
+          />
         )}
       </Form.Group>
       <Form.Group widths="equal">
-        <Form.Field>
-          <Translate as="label">First Name</Translate>
-          <FinalInput name="firstName" />
-        </Form.Field>
-        <Form.Field>
-          <Translate as="label">Family Name</Translate>
-          <FinalInput name="lastName" required />
-        </Form.Field>
+        <FinalInput
+          name="firstName"
+          label={Translate.string('First Name')}
+          required={requiredPersonFields?.includes('first_name')}
+        />
+        <FinalInput label={Translate.string('Family Name')} name="lastName" required />
       </Form.Group>
       {!hideEmailField && (
-        <Form.Field>
-          <Translate as="label">Email</Translate>
-          <EmailField validateUrl={validateEmailUrl} person={person} otherPersons={otherPersons} />
-        </Form.Field>
+        <EmailField
+          label={Translate.string('Email')}
+          validateUrl={validateEmailUrl}
+          person={person}
+          otherPersons={otherPersons}
+          required={requiredPersonFields?.includes('email')}
+        />
       )}
       <Form.Group widths="equal">
-        <Form.Field>
-          <Translate as="label">Address</Translate>
-          <FinalTextArea name="address" />
-        </Form.Field>
-        <Form.Field>
-          <Translate as="label">Telephone</Translate>
-          <FinalInput name="phone" />
-        </Form.Field>
+        <FinalTextArea
+          name="address"
+          label={Translate.string('Address')}
+          required={requiredPersonFields?.includes('address')}
+        />
+        <FinalInput
+          name="phone"
+          label={Translate.string('Telephone')}
+          required={requiredPersonFields?.includes('phone')}
+        />
       </Form.Group>
     </FinalModalForm>
   );
@@ -186,6 +189,7 @@ PersonDetailsModal.propTypes = {
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
   hideEmailField: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
+  requiredPersonFields: PropTypes.array,
   extraParams: PropTypes.object,
 };
 
@@ -194,10 +198,11 @@ PersonDetailsModal.defaultProps = {
   otherPersons: [],
   hideEmailField: false,
   validateEmailUrl: null,
+  requiredPersonFields: [],
   extraParams: {},
 };
 
-function EmailField({validateUrl, person, otherPersons}) {
+function EmailField({validateUrl, person, otherPersons, ...rest}) {
   let response, msg;
   const [message, setMessage] = useState({status: '', message: ''});
   const form = useForm();
@@ -350,6 +355,7 @@ function EmailField({validateUrl, person, otherPersons}) {
       // hide the normal error tooltip if we have an error from our async validation
       hideValidationError={message.status === 'error' ? 'message' : false}
       loaderWhileValidating
+      {...rest}
     >
       {!!message.message && (
         <Message

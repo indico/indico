@@ -21,7 +21,7 @@ from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events.persons import persons_settings
+from indico.modules.events.persons import CustomPersonsMode, persons_settings
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
@@ -108,10 +108,18 @@ class PersonLinkListFieldBase(PrincipalListField):
         return persons_settings.get(self.event, 'default_search_external')
 
     @property
-    def can_enter_manually(self):
+    def custom_persons_mode(self):
         if self.event is None:
-            return True
-        return self.event.can_manage(session.user) or not persons_settings.get(self.event, 'disallow_custom_persons')
+            return persons_settings.defaults['custom_persons_mode']
+        return persons_settings.get(self.event, 'custom_persons_mode')
+
+    @property
+    def disallow_enter_manually(self):
+        return self.custom_persons_mode == CustomPersonsMode.never
+
+    @property
+    def required_person_fields(self):
+        return values_from_signal(signals.event.person_required_fields.send(self.get_form()), multi_value_types=list)
 
     @property
     def name_format(self):
@@ -136,14 +144,20 @@ class PersonLinkListFieldBase(PrincipalListField):
         identifier = data.get('identifier')
         affiliations_disabled = self.extra_params.get('disable_affiliations', False)
         data = PersonLinkSchema(unknown=EXCLUDE).load(data)
-        if not self.can_enter_manually and not data.get('type'):
-            raise UserValueError('Manually entered persons are not allowed')
+        if not data.get('type'):
+            if self.disallow_enter_manually:
+                raise UserValueError('Manually entered persons are not allowed')
+            required_fields = values_from_signal(signals.event.person_required_fields.send(self.get_form()),
+                                                 multi_value_types=list)
+            if not all(data.get(field) for field in required_fields):
+                raise UserValueError('Missing required person fields')
         if identifier and identifier.startswith('ExternalUser:'):
             # if the data came from an external user, look up their affiliation if the names still match;
             # we do not have an affiliation ID yet since it may not exist in the local DB yet
             cache = make_scoped_cache('external-user')
             external_user_data = cache.get(identifier.removeprefix('ExternalUser:'), {})
-            if not self.can_enter_manually:
+            if self.custom_persons_mode != CustomPersonsMode.always:
+                # if we don't allow entering persons manually before searching, we don't allow edits either
                 for key in ('first_name', 'last_name', 'email', 'affiliation', 'phone', 'address'):
                     data[key] = external_user_data.get(key, '')
                 data['_title'] = UserTitle.none
@@ -164,7 +178,8 @@ class PersonLinkListFieldBase(PrincipalListField):
             person_link = self.person_link_cls.query.filter_by(person=person, object=self.object).first()
         if not person_link:
             person_link = self.person_link_cls(person=person)
-        if not self.can_enter_manually:
+        if self.disallow_enter_manually:
+            # if we don't allow entering persons manually before searching, we don't allow edits either
             person_link.populate_from_dict(data, keys=('display_order',))
             return person_link
         person_link.populate_from_dict(data, keys=('first_name', 'last_name', 'affiliation', 'affiliation_link',
