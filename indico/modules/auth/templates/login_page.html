@@ -13,6 +13,7 @@
                         {{ login_reason }}
                     </div>
                 {% endif %}
+                {% block custom_message %}{% endblock %}
                 {% include 'flashed_messages.html' %}
                 {% if retry_in %}
                     {% call message_box('error') %}
