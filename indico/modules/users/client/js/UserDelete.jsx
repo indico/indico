@@ -93,7 +93,7 @@ function UserDeleteDialogBody({firstName, lastName, disabled, inProgress, onDele
         </Translate>
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={onClose} content={Translate.string("No, I don't")} />
+        <Button onClick={onClose} disabled={disabled} content={Translate.string("No, I don't")} />
         {isButtonDisabled ? (
           <Button color="red" disabled>
             <Translate>
@@ -183,7 +183,14 @@ function UserDelete({userId, isAdmin, firstName, lastName}) {
           <Button size="small" color="red" onClick={() => setIsDialogOpen(true)}>
             <Translate>Delete User</Translate>
           </Button>
-          <Modal size="small" open={isDialogOpen} onClose={handleCloseDialog} closeIcon>
+          <Modal
+            size="small"
+            open={isDialogOpen}
+            onClose={handleCloseDialog}
+            closeIcon={!deleting}
+            closeOnEscape={!deleting}
+            closeOnDimmerClick={!deleting}
+          >
             <UserDeleteDialogBody
               firstName={firstName}
               lastName={lastName}
