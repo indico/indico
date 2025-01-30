@@ -31,8 +31,8 @@
                                 {% trans %}Unblock User{% endtrans %}
                             </button>
                         {% endif %}
-                        {% if delete_user_from_ui_enabled %}
-                            <ind-user-delete-button user-id={{ (user.id if user != session.user else none) | tojson }}
+                        {% if allow_deletion %}
+                            <ind-user-delete-button user-id="{{ (user.id if user != session.user else none) | tojson }}"
                                                     user-is-admin="{{ user.is_admin | tojson }}"
                                                     user-first-name="{{ user.first_name }}"
                                                     user-last-name="{{ user.last_name }}">

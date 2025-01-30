@@ -242,7 +242,7 @@ class RHPersonalData(RHUserBase):
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations,
-                                                  delete_user_from_ui_enabled=config.ENABLE_DELETE_USER_FROM_UI)
+                                                  allow_deletion=config.ALLOW_ADMIN_USER_DELETION)
 
 
 class RHUserDataExport(RHUserBase):
@@ -1023,7 +1023,7 @@ class RHUserDelete(RHUserBase):
 
     def _check_access(self):
         RHUserBase._check_access(self)
-        if not session.user.is_admin or not config.ENABLE_DELETE_USER_FROM_UI:
+        if not session.user.is_admin or not config.ALLOW_ADMIN_USER_DELETION:
             raise Forbidden
         if self.user == session.user:
             raise Forbidden('You cannot delete your own account.')
