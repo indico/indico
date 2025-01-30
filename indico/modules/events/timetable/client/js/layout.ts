@@ -16,12 +16,19 @@ function overlap<T extends Entry>(a: T, b: T) {
   return a.startDt.isBefore(bEnd) && b.startDt.isBefore(aEnd);
 }
 
+/**
+ * Recompute the layout of multiple days
+ */
 export function layoutDays(dayEntries: DayEntries): DayEntries {
   return Object.fromEntries(
     Object.entries(dayEntries).map(([day, entries]) => [day, layout(entries)])
   );
 }
 
+/**
+ * Recompute the layout of a list of entries.
+ * These can be either top-level entries or child entries.
+ */
 export function layout<T extends Entry>(entries: T[]) {
   const groups = getGroups(entries);
   let newEntries: T[] = [];
@@ -32,30 +39,46 @@ export function layout<T extends Entry>(entries: T[]) {
   return newEntries;
 }
 
+/**
+ * Recompute the layout of a group of entries. A group is a set of entries
+ * that all overlap with each other either directly or transitively via some
+ * other common entry.
+ *
+ * This function can be used either for the initial layout (even if the entries don't have
+ * .column set) or to recompute the layout after removing an entry from the group.
+ * The function takes care of removing any 'holes' in the layout.
+ * */
 export function layoutGroup<T extends Entry>(group: T[], {layoutChildren = true} = {}) {
   if (layoutChildren) {
     group = group.map(entry =>
       entry.type === 'block' ? {...entry, children: layout(entry.children)} : entry
     );
   }
-  const sortedGroup = [...group].sort((a, b) => a.column - b.column);
+  const sortedGroup = [...group].sort((a, b) => a.column - b.column); // TODO: secondary sort by duration(DESC)
   const newGroup: T[] = [];
+  let newMaxColumn = 0;
   for (const entry of sortedGroup) {
     const overlappingEntries = newGroup.filter(e => overlap(e, entry));
     const maxColumn = Math.max(...overlappingEntries.map(e => e.column), 0);
     const newColumn = overlappingEntries.length === 0 ? 0 : maxColumn + 1;
+    newMaxColumn = Math.max(newMaxColumn, newColumn);
     newGroup.push({
       ...entry,
       column: newColumn,
     });
   }
-  const maxColumn = getMaximumParallelEntries(newGroup);
   return newGroup.map(entry => ({
     ...entry,
-    maxColumn,
+    maxColumn: newMaxColumn,
   }));
 }
 
+/**
+ * Similar to layoutGroup, but used after a new entry was
+ * added to the group. Based on the mouse position, the new entry
+ * is placed in a corresponding column and the existing entries are shifted
+ * to the left or right to make space for it.
+ */
 export function layoutGroupAfterMove<T extends Entry>(
   group: T[],
   newEntry: T,
@@ -127,6 +150,11 @@ export function layoutGroupAfterMove<T extends Entry>(
   return layoutGroup(group);
 }
 
+/**
+ * Finds all groups of overlapping entries.
+ * You can think of this as finding all connected components in a graph.
+ * See getGroup for more details on what a 'group' is.
+ */
 export function getGroups(entries: TopLevelEntry[]) {
   const groups: Set<number>[] = [];
   const seen = new Set<number>();
@@ -146,6 +174,13 @@ export function getGroups(entries: TopLevelEntry[]) {
   return groups;
 }
 
+/**
+ * Finds all entries that overlap (either directly via another entry) with the
+ * given entry.
+ *
+ * For example, for entries A (8-10), B (10-12) and C (9:11) the group of A would
+ * be {B, C}. because B is 'reachable' from A via C.
+ */
 export function getGroup(entry: TopLevelEntry, entries: TopLevelEntry[]) {
   const group = new Set<number>();
   const seen = new Set<number>();
@@ -168,10 +203,6 @@ function dfs(curr: Entry, entries: TopLevelEntry[], group: Set<number>, seen: Se
   }
 }
 
-function getMaximumParallelEntries(entries: TopLevelEntry[]) {
-  return Math.max(...entries.map(entry => entry.column), 0);
-}
-
 export function getParallelEntries(entry: TopLevelEntry, entries: TopLevelEntry[]) {
   return entries.filter(e => overlap(e, entry));
 }
@@ -188,6 +219,7 @@ export function computeYoffset(entries: TopLevelEntry[], startHour: number): Top
       return {...entry, y: minutesToPixels(offsetMinutes)};
     }
     const children = entry.children.map(child => ({
+      // TODO: no need to compute y offset for children here
       ...child,
       y: minutesToPixels(moment(child.startDt).diff(entry.startDt, 'minutes')),
     }));
@@ -195,6 +227,18 @@ export function computeYoffset(entries: TopLevelEntry[], startHour: number): Top
   });
 }
 
+/**
+ * The column and maxColumn property of an entry determines
+ * the width and horizontal position in the timetable (or in a block).
+ *
+ * For example for 4 overlapping entries the column property
+ * the width and offset would be:
+ *
+ * A: {column: 0, maxColumn: 3} -> {width: 25%, offset:  0%}
+ * B: {column: 1, maxColumn: 3} -> {width: 25%, offset: 25%}
+ * C: {column: 2, maxColumn: 3} -> {width: 25%, offset: 50%}
+ * D: {column: 3, maxColumn: 3} -> {width: 25%, offset: 75%}
+ */
 export function getWidthAndOffset(column, maxColumn) {
   const columnWidth = 100 / (maxColumn + 1);
   return {
