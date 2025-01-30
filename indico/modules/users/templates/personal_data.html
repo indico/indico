@@ -8,10 +8,10 @@
                     {%- trans %}Details{% endtrans -%}
                 </div>
                 {% if session.user.is_admin %}
-                    <div class="i-box-buttons">
+                    <div class="i-box-buttons i-box-align-buttons">
                         {% if not user.is_blocked %}
                             <div {%- if user == session.user %} title="{% trans %}You cannot block yourself{% endtrans %}"{% endif %}>
-                                <button class="ui negative small button"
+                                <button class="ui orange small button"
                                         data-href="{{ url_for('.user_block') }}"
                                         data-method="PUT"
                                         data-confirm="{% trans %}This user will no longer have access to Indico.
@@ -30,6 +30,13 @@
                                     data-reload-after>
                                 {% trans %}Unblock User{% endtrans %}
                             </button>
+                        {% endif %}
+                        {% if allow_deletion %}
+                            <ind-user-delete-button user-id="{{ (user.id if user != session.user else none) | tojson }}"
+                                                    user-is-admin="{{ user.is_admin | tojson }}"
+                                                    user-first-name="{{ user.first_name }}"
+                                                    user-last-name="{{ user.last_name }}">
+                            </ind-user-delete-button>
                         {% endif %}
                     </div>
                 {% endif %}
