@@ -8,7 +8,6 @@
 import CustomElementBase from 'indico/custom_elements/_base';
 import {domReady} from 'indico/utils/domstate';
 import * as positioning from 'indico/utils/positioning';
-import {focusLost} from 'indico/utils/special_events';
 
 import './tips.scss';
 
@@ -17,61 +16,29 @@ customElements.define(
   class extends CustomElementBase {
     static observedAttributes = ['shown'];
 
-    constructor() {
-      super();
-
-      Object.defineProperty(this, 'shown', {
-        get() {
-          return this.hasAttribute('shown');
-        },
-        set(val) {
-          this.toggleAttribute('shown', val);
-        },
-      });
-    }
-
-    attributeChangedCallback() {
-      const trigger = this.querySelector('[data-trigger]');
-      const tip = this.querySelector('[data-tip-content]');
-
-      this.stopHandlingFocusLost?.();
-      this.stopPositioning?.();
-
-      trigger.setAttribute('aria-expanded', this.shown);
-
-      if (this.shown) {
-        this.toggleAttribute('data-position-check', true);
-        tip.innerHTML = this._tipHTML;
-        tip.hidden = false;
-        this.stopPositioning = positioning.position(
-          tip,
-          this,
-          positioning.verticalTooltipPositionStrategy,
-          () => {
-            this.removeAttribute('data-position-check');
-          }
-        );
-        this.stopHandlingFocusLost = focusLost(this, () => {
-          this.shown = false;
-        });
-      } else {
-        tip.innerHTML = '';
-        tip.hidden = true;
-      }
-    }
+    static attributes = {
+      shown: Boolean,
+    };
 
     setup() {
       domReady.then(() => {
         const trigger = this.querySelector('[data-trigger]');
         const tip = this.querySelector('[data-tip-content]');
-        this._tipHTML = tip.innerHTML;
+
+        let stopPositioning;
+        const tipHTML = tip.innerHTML;
 
         // Clear the tip initially so that the screen reader will announce it
         // correctly when the tip is opened.
         tip.innerHTML = '';
+        tip.tabIndex = -1;
 
         trigger.addEventListener('click', () => {
           this.shown = !this.shown;
+        });
+
+        trigger.addEventListener('blur', () => {
+          this.shown = false;
         });
 
         this.addEventListener('keydown', evt => {
@@ -79,14 +46,33 @@ customElements.define(
             this.shown = false;
           }
         });
-      });
 
-      this.onconnect = () => {
-        this.addUnmountEventListener(() => {
-          this.stopHandlingFocusLost?.();
-          this.stopPositioning?.();
+        this.addEventListener('x-attrchange.shown', () => {
+          console.log('x-attrchange', this.shown);
+          trigger.setAttribute('aria-expanded', this.shown);
+          if (this.shown) {
+            tip.innerHTML = tipHTML;
+            stopPositioning = positioning.position(
+              tip,
+              this,
+              positioning.verticalTooltipPositionStrategy,
+              () => {
+                tip.hidden = false;
+              }
+            );
+          } else {
+            stopPositioning?.();
+            tip.hidden = true;
+            tip.innerHTML = '';
+          }
         });
-      };
+
+        this.onconnect = () => {
+          this.addUnmountEventListener(() => {
+            stopPositioning?.();
+          });
+        };
+      });
     }
   }
 );

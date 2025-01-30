@@ -244,12 +244,24 @@ div.main-breadcrumb {
     }
   }
 
+  #protection-details-link .protection-mode-label {
+    @extend %visually-hidden;
+  }
+
   #tz-selector-link::before {
     @extend %icon-time;
   }
 
+  #tz-selector-link .tz-selector-label {
+    @extend %visually-hidden;
+  }
+
   #user-settings-link::before {
     @extend %icon-user;
+  }
+
+  #user-settings-link .user-settings-link-label {
+    @extend %visually-hidden;
   }
 
   .login::before {
