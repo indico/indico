@@ -1,5 +1,5 @@
 // This file is part of Indico.
-// Copyright (C) 2002 - 2025 CERN
+// Copyright (C) 2002 - 2024 CERN
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
@@ -9,11 +9,11 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {useSelector} from 'react-redux';
 import {Icon, Label, List, Modal} from 'semantic-ui-react';
 
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
+import {useTimetableSelector} from '../hooks';
 import * as selectors from '../selectors';
 import {entryColorSchema, entrySchema, entryTypes, isChildOf} from '../util';
 
@@ -155,7 +155,7 @@ Change.propTypes = {
 };
 
 function EntryChangeList({change, old, new: new_, color, children, ...rest}) {
-  const blocks = useSelector(selectors.getBlocks);
+  const blocks = useTimetableSelector(selectors.getBlocks);
   const {title, icon, formatTitle} = entryTypes[new_.type];
   return (
     <DetailsSegment title={formatTitle(new_)} subtitle={title} color={color} icon={icon} {...rest}>
@@ -211,8 +211,8 @@ EntryChangeList.defaultProps = {
 };
 
 export default function ReviewChangesButton({as: Component, ...rest}) {
-  const changesMap = useSelector(selectors.getMergedChanges);
-  const blocks = useSelector(selectors.getBlocks);
+  const changesMap = useTimetableSelector(selectors.getMergedChanges);
+  const blocks = useTimetableSelector(selectors.getBlocks);
   const changes = Object.values(changesMap);
   const blockChanges = _.sortBy(
     [
