@@ -48,6 +48,14 @@ function minLength(length) {
   };
 }
 
+function maxLength(length) {
+  return value => {
+    if (value.length > length) {
+      return Translate.string('Value must be at most {length} chars', {length});
+    }
+  };
+}
+
 function url(value) {
   if (!value.match(/https?:\/\/.+/)) {
     return Translate.string('Please provide a valid URL');
@@ -120,6 +128,7 @@ export default {
   max,
   range,
   minLength,
+  maxLength,
   url,
   required,
   optional,
