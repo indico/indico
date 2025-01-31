@@ -26,6 +26,7 @@ import {
   getChangedValues,
   handleSubmitError,
   parsers as p,
+  validators as v,
 } from 'indico/react/forms';
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -92,6 +93,7 @@ function PersonalDataForm({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={v.maxLength(250)}
               />
               <SyncedFinalInput
                 name="last_name"
@@ -100,6 +102,7 @@ function PersonalDataForm({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={v.maxLength(250)}
               />
             </Form.Group>
             {hasPredefinedAffiliations ? (
@@ -118,6 +121,7 @@ function PersonalDataForm({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={value => value !== undefined && v.maxLength(250)(value)}
               />
             )}
             <SyncedFinalTextArea
@@ -126,6 +130,7 @@ function PersonalDataForm({
               syncedValues={syncedValues}
               lockedFields={lockedFields}
               lockedFieldMessage={lockedFieldMessage}
+              validate={v.maxLength(500)}
             />
             <SyncedFinalInput
               name="phone"
@@ -133,6 +138,7 @@ function PersonalDataForm({
               syncedValues={syncedValues}
               lockedFields={lockedFields}
               lockedFieldMessage={lockedFieldMessage}
+              validate={v.maxLength(100)}
             />
             <SyncedFinalInput
               name="email"
