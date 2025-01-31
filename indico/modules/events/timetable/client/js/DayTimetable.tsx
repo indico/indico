@@ -10,6 +10,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
+import {FinalModalForm} from 'indico/react/forms/final-form';
+
 import {ContributionCreateForm} from '../../../contributions/client/js/ContributionForm';
 
 import * as actions from './actions';
@@ -18,12 +20,18 @@ import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, BaseEntry} from './types';
+import TimetableCreateModal from './TimetableCreateModal';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {minutesToPixels, pixelsToMinutes} from './utils';
+import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
+
+interface TimetableEntry extends Omit<TopLevelEntry, 'id'> {
+  id: number;
+  width: string;
+}
 
 interface DayTimetableProps {
   dt: Moment;
@@ -82,9 +90,9 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
-  const [blockModal, setOpenBlockModal] = useState<ContributionCreateForm | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [newEntry, setNewEntry] = useState<BaseEntry | null>(null);
+  const [newEntry, setNewEntry] = useState<TimetableEntry | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -163,60 +171,34 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   }, []);
 
   useEffect(() => {
-    function onCloseModal() {
-      setOpenBlockModal(null);
-      setNewEntry(null);
-    }
-
     function handler() {
-      setOpenBlockModal(
-        <ContributionCreateForm
-          eventId={5}
-          onClose={onCloseModal}
-          customFields={[
-            {
-              id: 'fields_test',
-              fieldType: 'text',
-              title: 'test',
-              description: 'Field for testing',
-              isRequired: false,
-              fieldData: {},
-            },
-          ]}
-          customInitialValues={{duration: 50000}}
-        />
-      );
+      setIsModalOpen(true);
     }
 
-    calendarRef.current.addEventListener('click', handler);
+    const calendarNode = calendarRef.current;
+    calendarNode.addEventListener('click', handler);
 
     return () => {
-      calendarRef.current.removeEventListener('click', handler);
+      calendarNode.removeEventListener('click', handler);
     };
-  }, [blockModal]);
+  }, [newEntry]);
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
-      // TODO: (Ajob) uncomment this after checking why this is invalid all the time
-      // if (event.target !== calendarRef.current) {
-      //   return;
-      // }
-      setIsDragging(true);
       const rect = calendarRef.current.getBoundingClientRect();
-      const minuteStepSize = 5;
-      const y = Math.floor((event.clientY - rect.top) / minuteStepSize) * minuteStepSize;
+      const y = Math.ceil((event.clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
       const startDt = moment(dt)
         .startOf('day')
         .add(y, 'minutes');
 
+      setIsDragging(true);
       setNewEntry({
         id: -1,
         type: 'contrib',
         startDt,
-        duration: 0,
-        x: 0,
+        duration: y,
         y,
-        title: 'New entry',
+        title: 'New entry for this!',
         width: '100%',
         column: 0,
         maxColumn: 0,
@@ -233,10 +215,14 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
         pixelsToMinutes(y) -
         pixelsToMinutes(newEntry.startDt.diff(moment(dt).startOf('day'), 'minutes'));
 
-      const newDuration = Math.max(Math.floor(duration / 5) * 5, 5);
+      const newDuration = Math.max(
+        Math.ceil(duration / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES,
+        GRID_SIZE_MINUTES
+      );
       if (duration === newDuration) {
         return;
       }
+
       setNewEntry({...newEntry, duration: newDuration});
     }
 
@@ -245,7 +231,6 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
         // TODO: (Ajob) Move to actual place to create and uncomment once implemented
         // dispatch(actions.createEntry(newEntry));
         setIsDragging(false);
-        setNewEntry(null);
       }
     }
 
@@ -277,7 +262,16 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
                   <MemoizedTopLevelEntries dt={dt} entries={[newEntry]} />
                 </div>
               )}
-              {blockModal}
+              {isModalOpen && newEntry && (
+                <TimetableCreateModal
+                  open={isModalOpen}
+                  onClose={() => {
+                    setNewEntry(null);
+                    setIsModalOpen(false);
+                  }}
+                  newEntry={newEntry}
+                />
+              )}
             </div>
           </DnDCalendar>
         </div>
