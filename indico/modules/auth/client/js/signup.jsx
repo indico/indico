@@ -27,6 +27,7 @@ import {
   FinalSubmitButton,
   handleSubmitError,
   getValuesForFields,
+  validators as v,
 } from 'indico/react/forms';
 import {Fieldset, FinalTextArea, FinalCheckbox} from 'indico/react/forms/fields';
 import {Translate, Param} from 'indico/react/i18n';
@@ -197,6 +198,7 @@ function Signup({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={v.maxLength(250)}
               />
               <SyncedFinalInput
                 name="last_name"
@@ -205,6 +207,7 @@ function Signup({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={v.maxLength(250)}
               />
             </Form.Group>
             {hasPredefinedAffiliations ? (
@@ -226,6 +229,7 @@ function Signup({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={value => value !== undefined && v.maxLength(250)(value)}
               />
             )}
             {'address' in syncedValues && (
@@ -235,6 +239,7 @@ function Signup({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={v.maxLength(500)}
               />
             )}
             {'phone' in syncedValues && (
@@ -244,13 +249,19 @@ function Signup({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                validate={v.maxLength(100)}
               />
             )}
           </Fieldset>
           {showAccountForm && (
             <Fieldset legend={Translate.string('Login details')}>
               {showUsernameField && (
-                <FinalInput name="username" label={Translate.string('Username')} required />
+                <FinalInput
+                  name="username"
+                  label={Translate.string('Username')}
+                  required
+                  validate={v.maxLength(100)}
+                />
               )}
               <Form.Group widths="equal">
                 <FinalInput
@@ -259,6 +270,7 @@ function Signup({
                   label={Translate.string('Password')}
                   autoComplete="new-password"
                   required
+                  validate={v.maxLength(100)}
                 />
                 <FinalInput
                   name="password_confirm"
@@ -266,6 +278,7 @@ function Signup({
                   label={Translate.string('Confirm password')}
                   autoComplete="new-password"
                   required
+                  validate={v.maxLength(100)}
                 />
               </Form.Group>
               {renderPluginComponents('signup-form-after-password')}
@@ -287,6 +300,7 @@ function Signup({
                 description={Translate.string(
                   'You can provide additional information or a comment for the administrators who will review your registration.'
                 )}
+                validate={value => value !== undefined && v.maxLength(1000)(value)}
               />
             </Fieldset>
           )}
