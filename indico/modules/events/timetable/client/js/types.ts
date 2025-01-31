@@ -21,7 +21,7 @@ export interface BaseEntry {
   duration: number;
 }
 
-interface ScheduledMixin {
+export interface ScheduledMixin {
   startDt: Moment;
   // position information
   y: number;

@@ -7,8 +7,8 @@
 
 import moment, {Moment} from 'moment';
 
-const GRID_SIZE_MINUTES = 5;
-const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
+export const GRID_SIZE_MINUTES = 5;
+export const GRID_SIZE = minutesToPixels(GRID_SIZE_MINUTES);
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;
