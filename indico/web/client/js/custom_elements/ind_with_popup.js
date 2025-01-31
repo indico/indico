@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import CustomElementBase from 'indico/custom_elements/_base';
+import {focusLost} from 'indico/utils/composite-events';
 import {domReady} from 'indico/utils/domstate';
 import * as positioning from 'indico/utils/positioning';
 
@@ -53,6 +54,12 @@ customElements.define(
             dialog.dispatchEvent(new Event('close'));
           }
         });
+
+        this.addUnmountEventListener(
+          focusLost(this, () => {
+            this.shown = false;
+          })
+        );
       });
     }
 
