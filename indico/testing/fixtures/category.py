@@ -19,7 +19,10 @@ def create_category(db):
         kwargs.setdefault('timezone', 'UTC')
         if 'parent' not in kwargs:
             kwargs['parent'] = Category.get_root()
-        return Category(id=id_, acl_entries=set(), **kwargs)
+        category = Category(id=id_, acl_entries=set(), **kwargs)
+        db.session.add(category)
+        db.session.flush()
+        return category
 
     return _create_category
 
