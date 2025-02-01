@@ -89,14 +89,14 @@ ind-select {
     }
   }
 
-  &[open] .option-filter input:not([data-top]) {
+  &[open]:not([data-top]) .option-filter input {
     @include sui_debt.field-override() {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
   }
 
-  &[open] .option-filter input[data-top] {
+  &[open][data-top] .option-filter input {
     @include sui_debt.field-override() {
       border-top-left-radius: 0 !important;
       border-top-right-radius: 0 !important;
@@ -122,15 +122,14 @@ ind-select {
     @include sui_debt.border-radius();
   }
 
-  [role='listbox']:not([data-top]) {
+  &:not([data-top]) [role='listbox'] {
     border-top: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
 
-  [role='listbox'][data-top] {
+  &[data-top] [role='listbox'] {
     border-bottom: 0;
-    bottom: 100%;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
