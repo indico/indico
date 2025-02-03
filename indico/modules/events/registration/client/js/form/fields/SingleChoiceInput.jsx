@@ -191,6 +191,7 @@ function SingleChoiceRadioGroup({
   const management = useSelector(getManagement);
   const formatPrice = useSelector(getPriceFormatter);
   const selectedChoice = choices.find(c => c.id in value) || {id: ''};
+  const selectedSeats = value[selectedChoice.id] || 0;
   const radioChoices = [...choices];
   if (!isRequired) {
     radioChoices.unshift({id: '', isEnabled: true, caption: Translate.string('None', 'Choice')});
@@ -234,7 +235,11 @@ function SingleChoiceRadioGroup({
                 />
               </td>
               <td>
-                {c.isEnabled && !!c.price && <Label pointing="left">{formatPrice(c.price)}</Label>}
+                {c.isEnabled && !!c.price && (
+                  <Label pointing="left" styleName={isPurged || !isChecked(c) ? 'greyed' : ''}>
+                    {formatPrice(c.price)}
+                  </Label>
+                )}
               </td>
               <td>
                 {c.id !== '' && c.placesLimit !== 0 && (
@@ -259,7 +264,7 @@ function SingleChoiceRadioGroup({
                           (c.placesLimit > 0 &&
                             (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
                         }
-                        value={value[selectedChoice.id]}
+                        value={selectedSeats}
                         onChange={(e, data) => onChange({[selectedChoice.id]: data.value})}
                         options={_.range(1, c.maxExtraSlots + 2).map(i => ({
                           key: i,
@@ -282,7 +287,9 @@ function SingleChoiceRadioGroup({
                           Total:{' '}
                           <Param
                             name="price"
-                            value={formatPrice(value[selectedChoice.id] * c.price)}
+                            value={formatPrice(
+                              (selectedChoice.extraSlotsPay ? selectedSeats : 1) * c.price
+                            )}
                           />
                         </Translate>
                       </Label>
