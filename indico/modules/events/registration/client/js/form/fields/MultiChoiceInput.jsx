@@ -64,7 +64,10 @@ function MultiChoiceInputComponent({
     }
   };
 
-  const formatPrice = choice => {
+  const formatPrice = (choice, total = false) => {
+    if (!total) {
+      return _formatPrice(choice.price);
+    }
     const val = value[choice.id] || 0;
     return _formatPrice((val === 0 ? 0 : choice.extraSlotsPay ? val : 1) * choice.price);
   };
@@ -103,7 +106,9 @@ function MultiChoiceInputComponent({
               </td>
               <td>
                 {choice.isEnabled && !!choice.price && (
-                  <Label pointing="left">{formatPrice(choice)}</Label>
+                  <Label pointing="left" styleName={!value[choice.id] ? 'greyed' : ''}>
+                    {formatPrice(choice)}
+                  </Label>
                 )}
               </td>
               <td>
@@ -146,9 +151,9 @@ function MultiChoiceInputComponent({
               {withExtraSlots && (
                 <td>
                   {choice.isEnabled && !!choice.price && (
-                    <Label pointing="left">
+                    <Label pointing="left" styleName={!value[choice.id] ? 'greyed' : ''}>
                       <Translate>
-                        Total: <Param name="price" value={formatPrice(choice)} />
+                        Total: <Param name="price" value={formatPrice(choice, true)} />
                       </Translate>
                     </Label>
                   )}
