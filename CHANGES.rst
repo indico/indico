@@ -41,6 +41,7 @@ Bugfixes
 - Fix sending emails if site name contains an ``@`` character (:pr:`6687`)
 - Do not show country field description twice in registration forms (:pr:`6708`)
 - Do not show "other" document templates from deleted events/categories (:pr:`6711`)
+- Fix price display of choice fields in registration form (:issue:`6728`, :pr:`6729`)
 
 Accessibility
 ^^^^^^^^^^^^^
