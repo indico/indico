@@ -71,8 +71,12 @@ class Affiliation(db.Model):
 
     @classmethod
     def get_or_create_from_data(cls, affiliation_data):
-        existing = cls.query.filter_by(name=affiliation_data['name'], city=affiliation_data['city'],
-                                       country_code=affiliation_data['country_code']).order_by(Affiliation.id).first()
+        existing = (cls.query
+                    .filter_by(name=affiliation_data['name'],
+                               city=(affiliation_data['city'] or ''),
+                               country_code=(affiliation_data['country_code'] or ''))
+                    .order_by(Affiliation.id)
+                    .first())
         if existing:
             return existing
         return cls(**affiliation_data)
