@@ -54,7 +54,7 @@ customElements.define(
       const noOptionFoundMessage = listbox.querySelector('.no-option');
       const clear = this.querySelector('button[value=clear]');
       const id = `x-select-${this.constructor.lastId++}`;
-      const defaultCaption = caption.textContent;
+      const defaultCaption = caption.innerHTML;
       const internals = this.attachInternals();
 
       // Prepare the initial state
@@ -212,7 +212,7 @@ customElements.define(
             option.hidden = false;
             numMatches++;
           } else {
-            const label = getOptionLabel(option).toLowerCase();
+            const label = getOptionLabelText(option).toLowerCase();
             option.hidden = !_.deburr(label).includes(_.deburr(keyword));
             numMatches += Number(!option.hidden);
             if (label === keyword && !option.hasAttribute('aria-disabled')) {
@@ -265,15 +265,14 @@ customElements.define(
         $option.setAttribute('aria-selected', true);
         filter.setAttribute('aria-activedescendant', $option.id);
         indSelect.setAttribute('aria-activedescendant', $option.id);
-        const optionLabel = getOptionLabel($option);
-        caption.textContent = optionLabel;
-        filter.placeholder = optionLabel;
+        caption.innerHTML = $option.innerHTML;
+        filter.placeholder = getOptionLabelText($option);
         setValue($option.dataset.value);
       }
 
       function clearValue() {
         unmarkSelectedOption();
-        caption.textContent = defaultCaption;
+        caption.innerHTML = defaultCaption;
         filter.placeholder = '';
         setValue('');
       }
@@ -302,7 +301,7 @@ customElements.define(
         indSelect.dispatchEvent(new Event('change', {bubbles: true}));
       }
 
-      function getOptionLabel($option) {
+      function getOptionLabelText($option) {
         return (
           $option.querySelector('[data-label]')?.textContent ??
           $option.getAttribute('aria-label') ??

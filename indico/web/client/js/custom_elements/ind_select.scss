@@ -26,12 +26,18 @@ ind-select {
     user-select: none;
 
     @include sui_debt.field_override() {
-      padding-right: 2.5em;
+      padding-right: 2.2em;
     }
 
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  &[data-clearable='true'] .caption {
+    @include sui_debt.field_override() {
+      padding-right: 4em;
+    }
   }
 
   &:focus-visible .caption {
