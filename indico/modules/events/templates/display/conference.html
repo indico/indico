@@ -3,7 +3,7 @@
 {% from 'attachments/_attachments.html' import render_attachments %}
 
 {% block content %}
-    <div class="conferenceDetails">
+    <div class="conferenceDetails" id="main-content" data-bypass-target="{% trans %}Skip to main content{% endtrans %}">
         <div itemprop="description" class="description js-mathjax editor-output">
             {{ event.description }}
         </div>
