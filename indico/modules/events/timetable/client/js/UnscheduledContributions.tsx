@@ -82,7 +82,7 @@ function UnscheduledContributionList({
             key={contrib.id}
             styleName="contribution"
             entry={{...contrib, deleted: true}}
-            title={entryTypes.contribution.formatTitle(contrib)}
+            title={entryTypes.contrib.formatTitle(contrib)}
             uses24HourFormat={uses24HourFormat}
             dispatch={dispatch}
             onDragStart={makeHandleDrag(contrib.id)}
