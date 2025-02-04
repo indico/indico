@@ -34,4 +34,4 @@ def downgrade():
          system_app_type, allow_pkce_flow)
         VALUES
         ('Flower', '', '{uuid4()}', '{uuid4()}', '{{read:user}}', '{{}}', true, true, 2, false);
-    ''')
+    ''')  # noqa: S608
