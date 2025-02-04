@@ -32,7 +32,7 @@ unlock = 'indico.core.celery.cli:UnlockCommand'
 indico = 'indico.testing.pytest_plugin'
 
 [build-system]
-requires = ['hatchling==1.26.3', 'hatch-requirements-txt==0.4.1']
+requires = ['hatchling==1.27.0', 'hatch-requirements-txt==0.4.1']
 build-backend = 'hatchling.build'
 
 [tool.hatch]

@@ -68,7 +68,7 @@ h11==0.14.0
     # via uvicorn
 hatch-requirements-txt==0.4.1
     # via -r requirements.dev.in
-hatchling==1.26.3
+hatchling==1.27.0
     # via
     #   -r requirements.dev.in
     #   hatch-requirements-txt
