@@ -150,8 +150,8 @@ function MultiChoiceInputComponent({
               )}
               {withExtraSlots && (
                 <td>
-                  {choice.isEnabled && !!choice.price && (
-                    <Label pointing="left" styleName={!value[choice.id] ? 'greyed' : ''}>
+                  {choice.isEnabled && !!choice.price && !!value[choice.id] && (
+                    <Label pointing="left">
                       <Translate>
                         Total: <Param name="price" value={formatPrice(choice, true)} />
                       </Translate>
