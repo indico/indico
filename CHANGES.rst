@@ -50,6 +50,8 @@ Accessibility
   (:pr:`6324`, thanks :user:`foxbunny`)
 - Implement a new date range picker and use it in the Room Booking module
   (:pr:`6464`, thanks :user:`foxbunny`)
+- Make main section title in the base layout the default bypass blocks target
+  (:pr:`6726`, hanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

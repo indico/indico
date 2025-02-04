@@ -11,7 +11,9 @@
                        or event.contact_emails or event.contact_phones
                        or (event.references and event.type == 'meeting') or hook_event_header %}
 
-<div class="event-wrapper {% block event_classes %}{% endblock %}">
+<div class="event-wrapper {% block event_classes %}{% endblock %}"
+     id="main-content"
+     data-bypass-target="{% trans %}Skip to main content{% endtrans %}">
     {% block header %}
         <div class="event-header event-header-lecture {%- if not has_subheader %} round-bottom-corners{% endif %}">
             <div class="event-title">
