@@ -218,20 +218,18 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
       } else if (!_.isEmpty(basicDetails)) {
         await indicoAxios.patch(roomURL({room_id: roomId}), basicDetails);
       }
+      const roomIdArgs = {room_id: isNewRoom ? response.data.id : roomId};
       if (availableEquipment) {
-        await indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}), {
+        await indicoAxios.post(updateRoomEquipmentURL(roomIdArgs), {
           available_equipment: availableEquipment,
         });
       }
       if (attributes) {
-        await indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
+        await indicoAxios.post(updateRoomAttributesURL(roomIdArgs), {attributes});
       }
       if (bookableHours || nonbookablePeriods) {
         const availability = {bookableHours, nonbookablePeriods};
-        await indicoAxios.post(
-          updateRoomAvailabilityURL({room_id: isNewRoom ? response.data.id : roomId}),
-          snakifyKeys(availability)
-        );
+        await indicoAxios.post(updateRoomAvailabilityURL(roomIdArgs), snakifyKeys(availability));
       }
       // reload room so the form gets new initialValues
       if (!isNewRoom) {
