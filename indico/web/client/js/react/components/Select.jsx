@@ -39,7 +39,7 @@ export default function Select({
   useNativeEvent(indSelectRef, 'change', onChange);
 
   return (
-    <ind-select ref={indSelectRef} value={value} {...inputProps}>
+    <ind-select ref={indSelectRef} value={value} {...inputProps} data-clearable={!required}>
       <div className="caption" data-caption>
         <Translate>Select a choice</Translate>
       </div>
