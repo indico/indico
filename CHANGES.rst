@@ -42,6 +42,8 @@ Bugfixes
 - Do not show country field description twice in registration forms (:pr:`6708`)
 - Do not show "other" document templates from deleted events/categories (:pr:`6711`)
 - Fix price display of choice fields in registration form (:issue:`6728`, :pr:`6729`)
+- Fix error when creating a new room and setting attributes or equipment during creation
+  (:pr:`6730`)
 
 Accessibility
 ^^^^^^^^^^^^^
