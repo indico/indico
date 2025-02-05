@@ -167,6 +167,10 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   }, []);
 
   useEffect(() => {
+    if (!newEntry) {
+      return;
+    }
+
     function handler() {
       setIsModalOpen(true);
     }
@@ -183,7 +187,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     function onMouseDown(event: MouseEvent) {
       const rect = calendarRef.current.getBoundingClientRect();
       const y = minutesToPixels(
-        Math.ceil(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
+        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
       );
 
       const startDt = moment(dt)
@@ -211,7 +215,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
       }
       const rect = calendarRef.current.getBoundingClientRect();
       const duration = Math.max(
-        Math.ceil(pixelsToMinutes(event.clientY - rect.top - newEntry.y) / GRID_SIZE_MINUTES) *
+        Math.round(pixelsToMinutes(event.clientY - rect.top - newEntry.y) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES,
         GRID_SIZE_MINUTES // TODO: Replace with default duration
       );
@@ -221,6 +225,13 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
       }
 
       setNewEntry({...newEntry, duration});
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsDragging(false);
+        setNewEntry(null);
+      }
     }
 
     function onMouseUp() {
@@ -234,11 +245,13 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     calendarRef.current.addEventListener('mousedown', onMouseDown);
     calendarRef.current.addEventListener('mousemove', onMouseMove);
     calendarRef.current.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('keydown', onKeyDown);
 
     return () => {
       calendarRef.current.removeEventListener('mousedown', onMouseDown);
       calendarRef.current.removeEventListener('mousemove', onMouseMove);
       calendarRef.current.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('keydown', onKeyDown);
     };
   }, [isDragging, newEntry, dt, dispatch]);
 
@@ -255,7 +268,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
               {newEntry && (
-                <div style={{opacity: 0.5}}>
+                <div style={{opacity: 0.5, pointerEvents: 'none'}}>
                   <MemoizedTopLevelEntries dt={dt} entries={[newEntry]} />
                 </div>
               )}

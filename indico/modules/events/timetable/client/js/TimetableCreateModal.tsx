@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import {Modal, Button, Divider} from 'semantic-ui-react';
 
+import { FinalDatePicker } from 'indico/react/components';
+import {FinalInput, FinalTextArea} from 'indico/react/forms';
+import { FinalDuration, FinalField } from 'indico/react/forms/fields';
 import { FinalModalForm } from 'indico/react/forms/final-form';
+import { Translate } from 'indico/react/i18n';
 
 import {ContributionCreateForm, ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
-import { Translate } from 'indico/react/i18n';
-import {FinalInput, FinalTextArea} from 'indico/react/forms';
-import { FinalDatePicker } from 'indico/react/components';
-import { FinalDuration, FinalField } from 'indico/react/forms/fields';
 // import {SessionBlockCreateForm} from 'indico/modules/events/sessions/client/js/SessionBlockForm';
 
 interface TimetableCreateModalProps {
