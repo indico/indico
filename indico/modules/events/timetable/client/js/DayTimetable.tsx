@@ -10,10 +10,6 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
-import {FinalModalForm} from 'indico/react/forms/final-form';
-
-import {ContributionCreateForm} from '../../../contributions/client/js/ContributionForm';
-
 import * as actions from './actions';
 import {createRestrictToElement, Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
@@ -186,19 +182,23 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
       const rect = calendarRef.current.getBoundingClientRect();
-      const y = Math.ceil((event.clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
+      const y = minutesToPixels(
+        Math.ceil(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
+      );
+
       const startDt = moment(dt)
-        .startOf('day')
-        .add(y, 'minutes');
+        .startOf('days')
+        .add(minHour, 'hours')
+        .add(pixelsToMinutes(y), 'minutes');
 
       setIsDragging(true);
       setNewEntry({
         id: -1,
         type: 'contrib',
         startDt,
-        duration: y,
+        duration: GRID_SIZE_MINUTES, // TODO: Replace with default duration
         y,
-        title: 'New entry for this!',
+        title: 'New entry',
         width: '100%',
         column: 0,
         maxColumn: 0,
@@ -210,20 +210,17 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
-      const y = event.clientY - rect.top;
-      const duration =
-        pixelsToMinutes(y) -
-        pixelsToMinutes(newEntry.startDt.diff(moment(dt).startOf('day'), 'minutes'));
-
-      const newDuration = Math.max(
-        Math.ceil(duration / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES,
-        GRID_SIZE_MINUTES
+      const duration = Math.max(
+        Math.ceil(pixelsToMinutes(event.clientY - rect.top - newEntry.y) / GRID_SIZE_MINUTES) *
+          GRID_SIZE_MINUTES,
+        GRID_SIZE_MINUTES // TODO: Replace with default duration
       );
-      if (duration === newDuration) {
+
+      if (newEntry.duration === duration) {
         return;
       }
 
-      setNewEntry({...newEntry, duration: newDuration});
+      setNewEntry({...newEntry, duration});
     }
 
     function onMouseUp() {
@@ -347,7 +344,7 @@ function layoutAfterDropOnCalendar(
 ) {
   const id = parseInt(who, 10);
   const {y} = delta;
-  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
+  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined = entries.find(e => e.id === id);

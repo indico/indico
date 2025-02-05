@@ -60,61 +60,19 @@ interface ContributionFormProps {
   [key: string]: any; // Allow additional props
 }
 
-function ContributionForm({
-  eventId,
-  personLinkFieldParams = {},
+interface ContributionFormFieldsProps {
+  locationParent?: Record<string, any>;
+  initialValues: Record<string, any>;
+  sessionBlock?: Record<string, any>;
+  customFields?: CustomField[];
+}
+
+export function ContributionFormFields({
   locationParent = {},
-  customFields = [],
-  onSubmit,
   initialValues = {},
   sessionBlock = null,
-  loading,
-  includeModal = true,
-  ...rest
-}: ContributionFormProps) {
-  const handleSubmit = (formData: any) => {
-    const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
-      id: parseInt(key.replace('field_', ''), 10),
-      data,
-    }));
-    const personLinks = formData.person_links.map(
-      ({
-        affiliationMeta,
-        avatarURL,
-        favoriteUsers,
-        fullName,
-        id,
-        isAdmin,
-        language,
-        name,
-        userId,
-        userIdentifier,
-        invalid,
-        detail,
-        ...personLinkData
-      }: any) => ({
-        ...personLinkData,
-      })
-    );
-    formData = {
-      ...formData,
-      custom_fields: customFieldsData,
-      person_links: snakifyKeys(personLinks),
-    };
-    onSubmit({
-      ...formData,
-      references: formData.references.map(({id, ...refs}: any) => refs),
-    });
-  };
-
-  if (loading) {
-    return (
-      <Dimmer active>
-        <Loader />
-      </Dimmer>
-    );
-  }
-
+  customFields = [],
+}: ContributionFormFieldsProps) {
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
@@ -166,7 +124,7 @@ function ContributionForm({
     }
   );
 
-  const finalForm = (
+  return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
@@ -230,25 +188,73 @@ function ContributionForm({
       </CollapsibleContainer>
     </>
   );
+}
 
-  console.log('the rest');
-  console.log(rest);
-
-  if (includeModal) {
-    return (
-      <FinalModalForm
-        id="contribution-form"
-        onSubmit={handleSubmit}
-        initialValues={initialValues}
-        size="small"
-        {...rest}
-      >
-        {finalForm}
-      </FinalModalForm>
+export function ContributionForm({
+  eventId,
+  personLinkFieldParams = {},
+  locationParent = {},
+  customFields = [],
+  onSubmit,
+  initialValues = {},
+  sessionBlock = null,
+  loading,
+  ...rest
+}: ContributionFormProps) {
+  const handleSubmit = (formData: any) => {
+    const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
+      id: parseInt(key.replace('field_', ''), 10),
+      data,
+    }));
+    const personLinks = formData.person_links.map(
+      ({
+        affiliationMeta,
+        avatarURL,
+        favoriteUsers,
+        fullName,
+        id,
+        isAdmin,
+        language,
+        name,
+        userId,
+        userIdentifier,
+        invalid,
+        detail,
+        ...personLinkData
+      }: any) => ({
+        ...personLinkData,
+      })
     );
-  } else {
-    return finalForm;
+    formData = {
+      ...formData,
+      custom_fields: customFieldsData,
+      person_links: snakifyKeys(personLinks),
+    };
+    onSubmit({
+      ...formData,
+      references: formData.references.map(({id, ...refs}: any) => refs),
+    });
+  };
+
+  if (loading) {
+    return (
+      <Dimmer active>
+        <Loader />
+      </Dimmer>
+    );
   }
+
+  return (
+    <FinalModalForm
+      id="contribution-form"
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      size="small"
+      {...rest}
+    >
+      <ContributionFormFields {...{locationParent, initialValues, sessionBlock, customFields}} />
+    </FinalModalForm>
+  );
 }
 
 export function ContributionEditForm({eventId, contribId, onClose}: {eventId: number; contribId: number; onClose: () => void}) {
@@ -311,13 +317,11 @@ export function ContributionCreateForm({
   onClose,
   customFields = {},
   customInitialValues = {},
-  includeModal = true,
 }: {
   eventId: number;
   onClose: () => void;
   customFields?: Record<string, any>;
   customInitialValues?: Record<string, any>;
-  includeModal?: boolean;
 }) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     personLinkFieldParamsURL({event_id: eventId}),
@@ -380,7 +384,6 @@ export function ContributionCreateForm({
       onClose={onClose}
       initialValues={initialValues}
       loading={loading}
-      includeModal={includeModal}
     />
   );
 }
