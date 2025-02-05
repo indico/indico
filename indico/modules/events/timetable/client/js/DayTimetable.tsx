@@ -287,25 +287,22 @@ function layoutAfterDropOnCalendar(
     }));
   }
 
+  // Find all the entries that are linked to the new entry and recompute their layout
   const groupIds = getGroup(newEntry, entries.filter(e => e.id !== newEntry.id));
   let group = entries.filter(e => groupIds.has(e.id));
   group = layoutGroupAfterMove(group, newEntry, mousePosition);
 
   if (!fromBlock) {
+    // Drop from top level to top level
     const oldGroupIds = getGroup(fromEntry, entries.filter(e => e.id !== fromEntry.id));
-    if (oldGroupIds.intersection(groupIds).size > 0) {
-      const otherEntries = entries.filter(
-        e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== newEntry.id
-      );
-      return [...otherEntries, ...group];
-    }
-    let oldGroup = entries.filter(e => oldGroupIds.has(e.id));
+    let oldGroup = entries.filter(e => oldGroupIds.has(e.id) && !groupIds.has(e.id));
     const otherEntries = entries.filter(
       e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== newEntry.id
     );
     oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
     return [...otherEntries, ...oldGroup, ...group];
   } else {
+    // Drop from block to top level (== a break)
     const otherEntries = entries.filter(
       e => !groupIds.has(e.id) && e.id !== newEntry.id && e.id !== fromBlock.id
     );
