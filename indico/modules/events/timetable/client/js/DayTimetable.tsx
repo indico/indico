@@ -185,9 +185,14 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
+      if (event.target !== calendarRef.current) {
+        return;
+      }
+
       const rect = calendarRef.current.getBoundingClientRect();
       const y = minutesToPixels(
-        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES
+        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
+          GRID_SIZE_MINUTES
       );
 
       const startDt = moment(dt)
@@ -253,7 +258,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
       calendarRef.current.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [isDragging, newEntry, dt, dispatch]);
+  }, [newEntry, dt, dispatch]);
 
   const restrictToCalendar = useMemo(() => createRestrictToElement(calendarRef), [calendarRef]);
 
@@ -267,9 +272,10 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
+              {/* TODO: Use cleaner solution to style draggable entry */}
               {newEntry && (
                 <div style={{opacity: 0.5, pointerEvents: 'none'}}>
-                  <MemoizedTopLevelEntries dt={dt} entries={[newEntry]} />
+                  <DraggableEntry key={newEntry.id} setDuration={newEntry.duration} {...newEntry} />
                 </div>
               )}
               {isModalOpen && newEntry && (
