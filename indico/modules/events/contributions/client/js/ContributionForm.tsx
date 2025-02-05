@@ -73,6 +73,8 @@ export function ContributionFormFields({
   sessionBlock = null,
   customFields = [],
 }: ContributionFormFieldsProps) {
+  console.log('initial values!')
+  console.log(initialValues);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
@@ -124,13 +126,15 @@ export function ContributionFormFields({
     }
   );
 
+  const { duration, start_dt } = initialValues;
+
   return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
       {initialValues.start_dt ? (
         <>
-          <Field name="duration" subscription={{value: true}}>
+          <Field name="start_dt" subscription={{value: true}}>
             {({input: {value: duration}}) => (
               <FinalDateTimePicker
                 name="start_dt"
@@ -138,11 +142,12 @@ export function ContributionFormFields({
                 sessionBlock={sessionBlock}
                 minStartDt={sessionBlock && toMoment(sessionBlock.startDt)}
                 maxEndDt={sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second')}
+                defaultValue={start_dt.format('YYYY-MM-DDTHH:mm:ss')}
                 required
               />
             )}
           </Field>
-          <Field name="start_dt" subscription={{value: true}}>
+          <Field name="duration" subscription={{value: true}}>
             {({input: {value: startDt}}) => (
               <FinalDuration
                 name="duration"
@@ -150,6 +155,7 @@ export function ContributionFormFields({
                 max={
                   sessionBlock && toMoment(sessionBlock.endDt).diff(toMoment(startDt), 'seconds')
                 }
+                defaultValue={duration ?? undefined}
               />
             )}
           </Field>

@@ -17,7 +17,6 @@ interface TimetableCreateModalProps {
 }
 
 const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({open, onClose, newEntry}) => {
-  console.log('A new entry!', newEntry)
   const forms = {
     'Contribution': (
       <ContributionFormFields
