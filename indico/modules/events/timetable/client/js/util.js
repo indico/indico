@@ -116,7 +116,9 @@ const updateEntries = (entries, newEntries) => [
  */
 export const appendSessionAttributes = (entries, sessions) =>
   entries.map(e =>
-    e.sessionId ? {...e, ..._.pick(sessions.get(e.sessionId), ['color', 'isPoster'])} : e
+    e.sessionId
+      ? {...e, ..._.pick(sessions[e.sessionId], ['backgroundColor', 'textColor', 'isPoster'])}
+      : e
   );
 
 /**

@@ -11,15 +11,16 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
-import {createRestrictToElement, Transform, Over, MousePosition} from './dnd';
+import {Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
+import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
 import TimetableCreateModal from './TimetableCreateModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
+import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
@@ -95,17 +96,34 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
-  function handleDragEnd(who: string, over: Over[], delta: Transform, mouse: MousePosition) {
+  function handleDragEnd(
+    who: string,
+    over: Over[],
+    delta: Transform,
+    mouse: MousePosition,
+    offset
+  ) {
     if (over.length === 0) {
       return;
     }
 
-    // if (who.startsWith('unscheduled-')) {
-    //   handleUnscheduledDrop(who, over[0], delta, mouse);
-    // }
-
     // Cannot drop on itself
     over = over.filter(o => o.id !== who);
+
+    if (who.startsWith('unscheduled-')) {
+      const calendar = over.find(o => o.id === 'calendar');
+      if (!calendar) {
+        return;
+      }
+      if (over.length === 1) {
+        handleUnscheduledDrop(who, calendar, delta, mouse, offset);
+      } else {
+        const block = over.find(o => o.id !== 'calendar');
+        if (block) {
+          handleUnscheduledDropOnBlock(who, block, delta, mouse, offset, calendar);
+        }
+      }
+    }
 
     const calendar = over.find(o => o.id === 'calendar');
     if (!calendar) {
@@ -126,10 +144,37 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     who: UniqueId,
     over: Over,
     delta: Transform,
-    mouse: MousePosition
+    mouse: MousePosition,
+    offset
   ) {
     const [newLayout, newUnscheduled] =
-      layoutAfterUnscheduledDrop(dt, unscheduled, entries, who, over, delta, mouse) || [];
+      layoutAfterUnscheduledDrop(dt, unscheduled, entries, who, over, delta, mouse, offset) || [];
+    if (!newLayout) {
+      return;
+    }
+    dispatch(actions.scheduleEntry(dt.format('YYYYMMDD'), newLayout, newUnscheduled));
+  }
+
+  function handleUnscheduledDropOnBlock(
+    who: UniqueId,
+    over: Over,
+    delta: Transform,
+    mouse: MousePosition,
+    offset,
+    calendar: Over
+  ) {
+    const [newLayout, newUnscheduled] =
+      layoutAfterUnscheduledDropOnBlock(
+        dt,
+        unscheduled,
+        entries,
+        who,
+        over,
+        delta,
+        mouse,
+        offset,
+        calendar
+      ) || [];
     if (!newLayout) {
       return;
     }
@@ -250,16 +295,18 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     return () => {
       calendarRef.current.removeEventListener('mousedown', onMouseDown);
       calendarRef.current.removeEventListener('mousemove', onMouseMove);
+      // TODO: Fix this warning below:
+      // The ref value 'calendarRef.current' will likely have changed by the time this effect cleanup function runs
       calendarRef.current.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [newEntry, dt, dispatch]);
+  }, [newEntry, dt, dispatch, isDragging, minHour]);
 
-  const restrictToCalendar = useMemo(() => createRestrictToElement(calendarRef), [calendarRef]);
+  const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
 
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
-      <UnscheduledContributions />
+      <UnscheduledContributions dt={dt} />
       <div className="wrapper">
         <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
@@ -549,29 +596,36 @@ function layoutAfterUnscheduledDrop(
   dt: Moment,
   unscheduled: TopLevelEntry[],
   entries: TopLevelEntry[],
-  who: UniqueId,
-  over: Over,
+  who: string,
+  calendar: Over,
   delta: Transform,
-  mouse: MousePosition
+  mouse: MousePosition,
+  offset
 ) {
   const id = parseInt(who.slice('unscheduled-'.length), 10);
-  const {x, y} = delta;
-  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
-  const mousePositionX = (mouse.x - over.rect.left) / over.rect.width;
-  const mousePositionY = mouse.y - over.rect.top - window.scrollY;
-
+  const deltaMinutes = 0;
+  const mousePositionX = (mouse.x - calendar.rect.left) / calendar.rect.width;
+  const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
   const startDt = moment(dt)
     .startOf('day')
-    .add(Math.ceil(pixelsToMinutes(mousePositionY) / 5) * 5, 'minutes');
+    .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
 
   let entry = unscheduled.find(e => e.id === id);
   if (!entry) {
     return;
   }
+
+  if (entry.type !== 'contrib') {
+    return;
+  }
+
+  if (entry.sessionId) {
+    return;
+  }
+
   entry = {
     ...entry,
     startDt,
-    x,
     y: minutesToPixels(
       moment(startDt)
         .add(deltaMinutes, 'minutes')
@@ -585,4 +639,101 @@ function layoutAfterUnscheduledDrop(
 
   const otherEntries = entries.filter(e => !groupIds.has(e.id) && e.id !== entry.id);
   return [layout([...otherEntries, ...group]), unscheduled.filter(e => e.id !== id)];
+}
+
+function layoutAfterUnscheduledDropOnBlock(
+  dt: Moment,
+  unscheduled: TopLevelEntry[],
+  entries: TopLevelEntry[],
+  who: string,
+  over: Over,
+  delta: Transform,
+  mouse: MousePosition,
+  offset,
+  calendar: Over
+) {
+  const id = parseInt(who.slice('unscheduled-'.length), 10);
+  const overId = parseInt(over.id, 10);
+  const toBlock = entries.find(e => e.id === overId);
+  if (toBlock.type !== 'block') {
+    return;
+  }
+  const deltaMinutes = 0;
+  const mousePositionX = (mouse.x - over.rect.left) / over.rect.width;
+  const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
+
+  const startDt = moment(dt)
+    .startOf('day')
+    .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
+
+  const entry = unscheduled.find(e => e.id === id);
+  if (!entry) {
+    return;
+  }
+
+  if (entry.type !== 'contrib') {
+    return;
+  }
+
+  if (entry.sessionId !== toBlock.sessionId) {
+    if (!entry.sessionId) {
+      return layoutAfterUnscheduledDrop(
+        dt,
+        unscheduled,
+        entries,
+        who,
+        calendar,
+        delta,
+        mouse,
+        offset
+      );
+    }
+    return;
+  }
+
+  if (entry.duration > toBlock.duration) {
+    return; // TODO: auto-resize the block?
+  }
+
+  const newEntry = {
+    ...entry,
+    startDt,
+    y: minutesToPixels(
+      moment(startDt)
+        .add(deltaMinutes, 'minutes')
+        .diff(moment(toBlock.startDt), 'minutes')
+    ),
+    parentId: toBlock.id,
+  };
+
+  // TODO
+  if (newEntry.backgroundColor) {
+    delete newEntry.backgroundColor;
+  }
+
+  if (newEntry.startDt.isBefore(moment(toBlock.startDt))) {
+    // move start time to the start of the block
+    newEntry.startDt = moment(toBlock.startDt);
+  } else if (
+    moment(newEntry.startDt)
+      .add(newEntry.duration, 'minutes')
+      .isAfter(moment(toBlock.startDt).add(toBlock.duration, 'minutes'))
+  ) {
+    // move end time to the end of the block
+    newEntry.startDt = moment(toBlock.startDt).add(toBlock.duration - newEntry.duration, 'minutes');
+  }
+
+  const groupIds = getGroup(newEntry, toBlock.children.filter(e => e.id !== newEntry.id));
+  let group = toBlock.children.filter(e => groupIds.has(e.id));
+  group = layoutGroupAfterMove(group, newEntry, mousePositionX);
+
+  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== newEntry.id);
+
+  return [
+    layout([
+      ...entries.filter(e => e.id !== newEntry.id && e.id !== toBlock.id),
+      {...toBlock, children: [...otherChildren, ...group]},
+    ]),
+    unscheduled.filter(e => e.id !== id),
+  ];
 }
