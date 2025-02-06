@@ -71,7 +71,14 @@ class TildeStrikeInlineProcessor(markdown.inlinepatterns.InlineProcessor):
 
 class TildeStrikeExtension(markdown.extensions.Extension):
     def extendMarkdown(self, md):  # noqa: N802
-        md.inlinePatterns.register(TildeStrikeInlineProcessor(r'~~(.*?)~~', md), 'del', 175)
+        proc = markdown.inlinepatterns.SimpleTagInlineProcessor(r'(~~)(.*?)(~~)', 'del')
+        md.inlinePatterns.register(proc, 'del', 175)
+
+
+class MarkExtension(markdown.extensions.Extension):
+    def extendMarkdown(self, md):  # noqa: N802
+        proc = markdown.inlinepatterns.SimpleTagInlineProcessor(r'(==)(.*?)(==)', 'mark')
+        md.inlinePatterns.register(proc, 'mark', 176)
 
 
 class HTMLLinker:
@@ -136,7 +143,7 @@ class HTMLLinker:
 # basic list of tags, used for markdown content
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS | {
     'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
-    'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote', 'del'
+    'h5', 'h6', 'pre', 'dl', 'dd', 'dt', 'figure', 'blockquote', 'del', 'mark'
 }
 BLEACH_ALLOWED_ATTRIBUTES = {**bleach.ALLOWED_ATTRIBUTES, 'img': ['src', 'alt', 'style']}
 # extended list of tags, used for HTML content
@@ -265,6 +272,7 @@ def render_markdown(text, escape_latex_math=True, md=None, extra_html=False, **k
         extensions = set(kwargs.pop('extensions', ()))
         extensions.add('fenced_code')
         extensions.add(TildeStrikeExtension())
+        extensions.add(MarkExtension())
         result = markdown.markdown(text, extensions=tuple(extensions), **kwargs)
         if extra_html:
             result = sanitize_html(result)
