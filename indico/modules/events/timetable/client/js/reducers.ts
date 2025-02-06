@@ -207,12 +207,35 @@ export default {
           ],
         };
       }
-      case actions.SCHEDULE_CONTRIBS:
+      case actions.SCHEDULE_CONTRIBS: {
+        const [entries, unscheduled] = scheduleContribs(
+          state,
+          action.contribs,
+          action.gap,
+          action.startDt,
+          action.dt
+        );
+        const date = action.startDt.format('YYYYMMDD');
+        const newEntries = Object.fromEntries(
+          Object.entries(state.changes[state.currentChangeIdx].entries).map(([day, dayEntries]) => [
+            day,
+            day === date ? entries : dayEntries,
+          ])
+        );
         return {
           ...state,
-          ...scheduleContribs(state, action.contribs, action.gap),
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'schedule',
+              unscheduled,
+            },
+          ],
           draggedIds: new Set(),
         };
+      }
       case actions.CHANGE_COLOR:
         return action.sessionId ? state : {...state, ...changeBreakColor(state, action.color)};
       case actions.UNDO_CHANGE:
@@ -256,7 +279,7 @@ export default {
         return state;
     }
   },
-  display: (state = {mode: 'compact', showUnscheduled: false, showAllTimeslots: false}, action) => {
+  display: (state = {mode: 'compact', showUnscheduled: false, showAllTimeslots: true}, action) => {
     switch (action.type) {
       case actions.SET_DISPLAY_MODE:
         return {...state, mode: action.mode};

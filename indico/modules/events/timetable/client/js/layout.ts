@@ -93,13 +93,15 @@ export function layoutGroupAfterMove<T extends Entry>(
     maxColumn: newColumnCount,
   }));
 
+  const selectedColumn = Math.floor(newColumnCount * mousePosition);
+  const isUnscheduled = !Number.isInteger(newEntry.column);
   newEntry = {
     ...newEntry,
-    column: ((newEntry.column + 1) * newColumnCount) / (1 + newEntry.maxColumn) - 1,
+    column: isUnscheduled
+      ? selectedColumn
+      : ((newEntry.column + 1) * newColumnCount) / (1 + newEntry.maxColumn) - 1,
     maxColumn: newColumnCount,
   };
-
-  const selectedColumn = Math.floor(newColumnCount * mousePosition);
 
   const rightToLeft = selectedColumn < newEntry.column;
   if (newColumnCount === 1) {
