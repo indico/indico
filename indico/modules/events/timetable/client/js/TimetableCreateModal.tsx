@@ -1,47 +1,133 @@
+import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
+import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
+import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
+import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
+import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
+
 import React, {useState} from 'react';
-import {Modal, Button, Divider} from 'semantic-ui-react';
+import {Button, Divider} from 'semantic-ui-react';
 
-import { FinalDatePicker } from 'indico/react/components';
-import {FinalInput, FinalTextArea} from 'indico/react/forms';
-import { FinalDuration, FinalField } from 'indico/react/forms/fields';
-import { FinalModalForm } from 'indico/react/forms/final-form';
-import { Translate } from 'indico/react/i18n';
+import {FinalInput} from 'indico/react/forms';
+import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
+import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 
-import {ContributionCreateForm, ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
+import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
 // import {SessionBlockCreateForm} from 'indico/modules/events/sessions/client/js/SessionBlockForm';
 
 interface TimetableCreateModalProps {
-  open: boolean;
-  onClose: () => void;
+  eventId: number;
   newEntry: any;
+  onClose: () => void;
 }
 
-const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({open, onClose, newEntry}) => {
+const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
+  eventId,
+  onClose,
+  newEntry,
+}) => {
+  // const {data: personLinkFieldParams } = useIndicoAxios(
+  //   personLinkFieldParamsURL({event_id: eventId}),
+  //   {camelize: true}
+  // );
+  const personLinkFieldParams = {
+    allowAuthors: true,
+    canEnterManually: true,
+    defaultSearchExternal: false,
+    extraParams: {},
+    hasPredefinedAffiliations: true,
+    nameFormat: 'first_last',
+  };
+
+  const initialValues = {
+    duration: newEntry.duration * 60,
+    person_links: [],
+    keywords: [],
+    references: [],
+    location_data: {inheriting: false},
+    custom_fields: {},
+    start_dt: newEntry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
+  };
+
+  // const testObj = {
+  //   "locationParent": {
+  //     "location_data": {
+  //       "address": "",
+  //       "inheriting": false,
+  //       "room_id": null,
+  //       "room_name": "",
+  //       "venue_id": null,
+  //       "venue_name": ""
+  //     },
+  //     "title": "Parallel Stuff",
+  //     "type": "Event"
+  //   },
+  //   "initialValues": {
+  //     "duration": 1200,
+  //     "person_links": [],
+  //     "keywords": [],
+  //     "references": [],
+  //     "location_data": {
+  //       "address": "",
+  //       "inheriting": true,
+  //       "room_id": null,
+  //       "room_name": "",
+  //       "venue_id": null,
+  //       "venue_name": ""
+  //     },
+  //     "custom_fields": {}
+  //   },
+  //   "sessionBlock": null,
+  //   "customFields": [],
+  //   "personLinkFieldParams": {
+  //     "allowAuthors": true,
+  //     "canEnterManually": true,
+  //     "defaultSearchExternal": false,
+  //     "extraParams": {},
+  //     "hasPredefinedAffiliations": true,
+  //     "nameFormat": "first_last"
+  //   }
+  // }
+
   const forms = {
     'Contribution': (
       <ContributionFormFields
-        eventId={5}
-        initialValues={{duration: newEntry?.duration * 60, start_dt: newEntry?.startDt}}
+        eventId={eventId}
+        initialValues={initialValues}
+        personLinkFieldParams={personLinkFieldParams}
       />
     ),
-    'Session Block': (<FinalInput label="Dummy field for session block" name="sessionBlock" />),
-  }
+    'Session Block': <FinalInput label="Dummy field for session block" name="sessionBlock" />,
+  };
   const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
 
   const renderForm = () => forms[activeForm];
 
+  const handleSubmit = () => async (formData: any) => {
+    try {
+      await indicoAxios.post(contributionCreateURL({event_id: eventId}), formData);
+    } catch (e) {
+      return handleSubmitError(e);
+    }
+    location.reload();
+    // never finish submitting to avoid fields being re-enabled
+    await new Promise(() => {});
+  };
+
   return (
     <FinalModalForm
-        id="contribution-form"
-        onSubmit={() => ({})}
-        onClose={onClose}
-        initialValues={{}}
-        size="small"
-        header={Translate.string('Create new timetable entry')}
+      id="contribution-form"
+      onSubmit={() => ({})}
+      onClose={onClose}
+      initialValues={initialValues}
+      size="small"
+      header={Translate.string('Create new timetable entry')}
     >
       <Button.Group>
-        {Object.keys(forms).map((key) => (
-          <Button key={key} onClick={() => setActiveForm(key)} active={activeForm === key}>{key}</Button>
+        {Object.keys(forms).map(key => (
+          <Button key={key} onClick={() => setActiveForm(key)} active={activeForm === key}>
+            {key}
+          </Button>
         ))}
       </Button.Group>
       <Divider />

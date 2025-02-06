@@ -61,20 +61,25 @@ interface ContributionFormProps {
 }
 
 interface ContributionFormFieldsProps {
+  eventId: number;
   locationParent?: Record<string, any>;
+  personLinkFieldParams?: Record<string, any>;
   initialValues: Record<string, any>;
   sessionBlock?: Record<string, any>;
   customFields?: CustomField[];
 }
 
 export function ContributionFormFields({
-  locationParent = {},
+  eventId,
+  locationParent = {inheriting: false},
+  personLinkFieldParams = {},
   initialValues = {},
   sessionBlock = null,
   customFields = [],
 }: ContributionFormFieldsProps) {
   console.log('initial values!')
   console.log(initialValues);
+  console.log(personLinkFieldParams)
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
@@ -127,6 +132,11 @@ export function ContributionFormFields({
   );
 
   const { duration, start_dt } = initialValues;
+  const sessionUser = {...Indico.User, userId: Indico.User.id};
+  console.log('Session user', sessionUser);
+  console.log(personLinkFieldParams);
+  console.log(initialValues)
+  console.log('sesh block', sessionBlock)
 
   return (
     <>
@@ -134,7 +144,7 @@ export function ContributionFormFields({
       <FinalTextArea name="description" label={Translate.string('Description')} />
       {initialValues.start_dt ? (
         <>
-          <Field name="start_dt" subscription={{value: true}}>
+          <Field name="duration" subscription={{value: true}}>
             {({input: {value: duration}}) => (
               <FinalDateTimePicker
                 name="start_dt"
@@ -142,12 +152,11 @@ export function ContributionFormFields({
                 sessionBlock={sessionBlock}
                 minStartDt={sessionBlock && toMoment(sessionBlock.startDt)}
                 maxEndDt={sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second')}
-                defaultValue={start_dt.format('YYYY-MM-DDTHH:mm:ss')}
                 required
               />
             )}
           </Field>
-          <Field name="duration" subscription={{value: true}}>
+          <Field name="start_dt" subscription={{value: true}}>
             {({input: {value: startDt}}) => (
               <FinalDuration
                 name="duration"
@@ -155,7 +164,6 @@ export function ContributionFormFields({
                 max={
                   sessionBlock && toMoment(sessionBlock.endDt).diff(toMoment(startDt), 'seconds')
                 }
-                defaultValue={duration ?? undefined}
               />
             )}
           </Field>
@@ -163,19 +171,19 @@ export function ContributionFormFields({
       ) : (
         <FinalDuration name="duration" label={Translate.string('Duration')} />
       )}
-      {/* <FinalContributionPersonLinkField
+      <FinalContributionPersonLinkField
         name="person_links"
         label={Translate.string('People')}
         eventId={eventId}
         sessionUser={{...Indico.User, userId: Indico.User.id}}
         {...personLinkFieldParams}
-      /> */}
-      <FinalLocationField
+      />
+      {/* <FinalLocationField
         name="location_data"
         label={Translate.string('Location')}
         locationParent={locationParent}
       />
-      {/* <FinalTagList
+      <FinalTagList
         name="keywords"
         label={Translate.string('Keywords')}
         placeholder={Translate.string('Please enter a keyword')}
@@ -250,6 +258,9 @@ export function ContributionForm({
     );
   }
 
+  console.log('SOME')
+  console.log({locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams})
+
   return (
     <FinalModalForm
       id="contribution-form"
@@ -258,7 +269,7 @@ export function ContributionForm({
       size="small"
       {...rest}
     >
-      <ContributionFormFields {...{locationParent, initialValues, sessionBlock, customFields}} />
+      <ContributionFormFields {...{locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams}} />
     </FinalModalForm>
   );
 }
