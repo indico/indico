@@ -68,7 +68,7 @@ export default function ContributionEntry({
     top: y,
     left: offset,
     width: `calc(${width} - 6px)`,
-    height: minutesToPixels(Math.max(duration, minutesToPixels(5)) - 2),
+    height: minutesToPixels(Math.max(duration, minutesToPixels(5)) - 1),
     zIndex: isDragging || isResizing ? 1000 : selected ? 80 : style.zIndex,
     cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
@@ -139,7 +139,7 @@ export default function ContributionEntry({
   );
 }
 
-function EntryTitle({
+export function EntryTitle({
   title,
   duration,
   timeRange,
@@ -213,7 +213,7 @@ function LongTitle({
       return;
     }
     const lineHeight = parseInt(getComputedStyle(ref.current).lineHeight, 10);
-    setLines(Math.floor((minutesToPixels(duration - 2) - 8) / lineHeight) - 1);
+    setLines(Math.floor((minutesToPixels(duration - 1) - 9) / lineHeight) - 1);
   }, [duration]);
 
   return (
