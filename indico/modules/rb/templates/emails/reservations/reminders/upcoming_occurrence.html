@@ -22,7 +22,7 @@
 
 
 {% macro _render_time(occurrence) -%}
-    {{ occurrence.start_dt | format_time }} - {{ occurrence.end_dt | format_time }}
+    {{ format_interval(occurrence.start_dt, occurrence.end_dt, 'Hm') }}
 {%- endmacro %}
 
 
