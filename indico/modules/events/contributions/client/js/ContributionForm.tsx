@@ -77,9 +77,6 @@ export function ContributionFormFields({
   sessionBlock = null,
   customFields = [],
 }: ContributionFormFieldsProps) {
-  console.log('initial values!')
-  console.log(initialValues);
-  console.log(personLinkFieldParams)
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
@@ -131,13 +128,6 @@ export function ContributionFormFields({
     }
   );
 
-  const { duration, start_dt } = initialValues;
-  const sessionUser = {...Indico.User, userId: Indico.User.id};
-  console.log('Session user', sessionUser);
-  console.log(personLinkFieldParams);
-  console.log(initialValues)
-  console.log('sesh block', sessionBlock)
-
   return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
@@ -178,7 +168,7 @@ export function ContributionFormFields({
         sessionUser={{...Indico.User, userId: Indico.User.id}}
         {...personLinkFieldParams}
       />
-      {/* <FinalLocationField
+      <FinalLocationField
         name="location_data"
         label={Translate.string('Location')}
         locationParent={locationParent}
@@ -187,14 +177,14 @@ export function ContributionFormFields({
         name="keywords"
         label={Translate.string('Keywords')}
         placeholder={Translate.string('Please enter a keyword')}
-      /> */}
+      />
       {customFieldsSection}
       <CollapsibleContainer title={Translate.string('Advanced')} dividing>
-        {/* <FinalReferences
+        <FinalReferences
           name="references"
           label={Translate.string('External IDs')}
           description={Translate.string('Manage external resources for this contribution')}
-        /> */}
+        />
         <Form.Group widths="equal">
           <FinalInput name="board_number" label={Translate.string('Board number')} />
           <FinalInput name="code" label={Translate.string('Program code')} />
@@ -257,9 +247,6 @@ export function ContributionForm({
       </Dimmer>
     );
   }
-
-  console.log('SOME')
-  console.log({locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams})
 
   return (
     <FinalModalForm
