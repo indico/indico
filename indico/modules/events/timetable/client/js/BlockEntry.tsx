@@ -73,7 +73,7 @@ export default function BlockEntry({
     top: y,
     left: offset,
     width: `calc(${width} - 6px)`,
-    height: minutesToPixels(duration - 2),
+    height: minutesToPixels(duration - 1),
     textAlign: 'left',
     zIndex: isDragging || isResizing ? 90 : selected ? 80 : style.zIndex,
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
@@ -255,7 +255,7 @@ function LongTitle({
       return;
     }
     const lineHeight = parseInt(getComputedStyle(ref.current).lineHeight, 10);
-    setLines(Math.floor((minutesToPixels(duration - 2) - 8) / lineHeight) - 1);
+    setLines(Math.floor((minutesToPixels(duration - 1) - 9) / lineHeight) - 1);
   }, [duration]);
 
   return (

@@ -8,16 +8,11 @@
 @use 'base/palette' as *;
 
 .contributions-container {
-  margin: 1em 1em 1em 0;
-  padding: 1em 1em 0.2em 0;
-  width: 25em;
+  width: min(25vw, 30em);
   flex-shrink: 0;
 
   .content {
-    top: 6em;
-    height: 90vh;
-    overflow-y: auto;
-    padding-right: 0.8em;
+    overflow: visible;
 
     & > h4 {
       display: flex;
@@ -29,6 +24,7 @@
 
     .contribution {
       cursor: pointer;
+      user-select: none;
 
       :global(.square.outline.icon) {
         cursor: pointer;
@@ -41,5 +37,18 @@
       font-style: italic;
       color: $gray;
     }
+  }
+}
+
+.pane-resize-handle {
+  width: 12px;
+  min-width: 12px;
+  height: 100%;
+  cursor: ew-resize;
+  user-select: none;
+  border-left: 1px solid #d4d4d5;
+
+  &:hover {
+    border-left: 4px solid #007cac;
   }
 }
