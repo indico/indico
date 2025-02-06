@@ -6,6 +6,7 @@ import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import React, {useState} from 'react';
 import {Button, Divider} from 'semantic-ui-react';
+import {FormSpy} from 'react-final-form';
 
 import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
@@ -26,10 +27,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   onClose,
   newEntry,
 }) => {
-  // const {data: personLinkFieldParams } = useIndicoAxios(
-  //   personLinkFieldParamsURL({event_id: eventId}),
-  //   {camelize: true}
-  // );
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -49,46 +46,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     start_dt: newEntry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
   };
 
-  // const testObj = {
-  //   "locationParent": {
-  //     "location_data": {
-  //       "address": "",
-  //       "inheriting": false,
-  //       "room_id": null,
-  //       "room_name": "",
-  //       "venue_id": null,
-  //       "venue_name": ""
-  //     },
-  //     "title": "Parallel Stuff",
-  //     "type": "Event"
-  //   },
-  //   "initialValues": {
-  //     "duration": 1200,
-  //     "person_links": [],
-  //     "keywords": [],
-  //     "references": [],
-  //     "location_data": {
-  //       "address": "",
-  //       "inheriting": true,
-  //       "room_id": null,
-  //       "room_name": "",
-  //       "venue_id": null,
-  //       "venue_name": ""
-  //     },
-  //     "custom_fields": {}
-  //   },
-  //   "sessionBlock": null,
-  //   "customFields": [],
-  //   "personLinkFieldParams": {
-  //     "allowAuthors": true,
-  //     "canEnterManually": true,
-  //     "defaultSearchExternal": false,
-  //     "extraParams": {},
-  //     "hasPredefinedAffiliations": true,
-  //     "nameFormat": "first_last"
-  //   }
-  // }
-
   const forms = {
     'Contribution': (
       <ContributionFormFields
@@ -97,13 +54,20 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         personLinkFieldParams={personLinkFieldParams}
       />
     ),
-    'Session Block': <FinalInput label="Dummy field for session block" name="sessionBlock" />,
+    'Session Block': (
+      <>
+        <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
+        <FinalInput label="Dummy field for session block" name="sessionBlock" />
+      </>
+    ),
   };
+
   const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
+  const [formValues, setFormValues] = useState(initialValues);
 
   const renderForm = () => forms[activeForm];
 
-  const handleSubmit = () => async (formData: any) => {
+  const handleSubmit = async (formData: any) => {
     try {
       await indicoAxios.post(contributionCreateURL({event_id: eventId}), formData);
     } catch (e) {
@@ -114,24 +78,42 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     await new Promise(() => {});
   };
 
+  const changeForm = (key: string) => {
+    switch (key) {
+      case 'Contribution':
+        setFormValues(initialValues);
+        break;
+      case 'Session Block':
+        // return <SessionBlockCreateForm eventId={eventId} sessionId={sessionId} onClose={onClose} />;
+        break;
+    }
+
+    setActiveForm(key);
+  };
+
   return (
     <FinalModalForm
       id="contribution-form"
-      onSubmit={() => ({})}
+      onSubmit={handleSubmit}
       onClose={onClose}
-      initialValues={initialValues}
+      initialValues={formValues}
       size="small"
       header={Translate.string('Create new timetable entry')}
     >
+      <FormSpy
+        subscription={{values: true}}
+        onChange={({values}) => {
+          setFormValues(values);
+        }}
+      />
       <Button.Group>
         {Object.keys(forms).map(key => (
-          <Button key={key} onClick={() => setActiveForm(key)} active={activeForm === key}>
+          <Button key={key} onClick={() => changeForm(key)} active={activeForm === key}>
             {key}
           </Button>
         ))}
       </Button.Group>
       <Divider />
-      {/* <FinalDuration name="duration" label={undefined} defaultValue={undefined} /> */}
       {activeForm && renderForm()}
     </FinalModalForm>
   );
