@@ -113,8 +113,8 @@ export function dropUnscheduledContribs(contribs, args) {
   return {type: DROP_UNSCHEDULED_CONTRIBS, contribs, args};
 }
 
-export function scheduleContribs(contribs, gap) {
-  return {type: SCHEDULE_CONTRIBS, contribs, gap};
+export function scheduleContribs(contribs, gap, startDt, dt) {
+  return {type: SCHEDULE_CONTRIBS, contribs, gap, startDt, dt};
 }
 
 export function scheduleEntry(

@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Rect, Transform} from './types';
+import {Rect, Transform, Modifier} from './types';
 
 /**
  * Restrict a rect to be contained within another bounding rect. Taken from dnd-kit.
@@ -39,7 +39,10 @@ function restrictToBoundingRect(transform: Transform, rect: Rect, boundingRect: 
  * @param containerRef React ref to the container element
  * @returns A new Transform object
  */
-export const createRestrictToElement = containerRef => ({draggingNodeRect, transform}) => {
+export const createRestrictToElement = (containerRef): Modifier => ({
+  draggingNodeRect,
+  transform,
+}) => {
   if (!draggingNodeRect || !containerRef.current) {
     return transform;
   }
@@ -69,8 +72,10 @@ export function getScrollParent(element: HTMLElement): HTMLElement {
   const overflowRegex = /(auto|scroll)/;
   let parent: HTMLElement | undefined = element;
   do {
+    if (!parent.parentElement) {
+      return document.body;
+    }
     parent = parent.parentElement;
-
     const style = getComputedStyle(parent);
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
       return parent;
@@ -92,3 +97,21 @@ export function getTotalScroll(element: HTMLElement): {top: number; left: number
 
   return {top, left};
 }
+
+/**
+ * Restrict the dragged node to be contained within the calendar if it's
+ * already scheduled.
+ * @param containerRef React ref to the container element
+ * @returns A new Transform object
+ */
+export const createRestrictToCalendar = (containerRef): Modifier => ({
+  draggingNodeRect,
+  transform,
+  id,
+}) => {
+  if (id.startsWith('unscheduled-')) {
+    // return createRestrictToElement(unscheduledRef)({draggingNodeRect, transform, id});
+    return transform;
+  }
+  return createRestrictToElement(containerRef)({draggingNodeRect, transform, id});
+};
