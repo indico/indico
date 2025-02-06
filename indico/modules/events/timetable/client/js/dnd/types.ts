@@ -39,11 +39,14 @@ export interface Droppable {
 
 export interface Draggable {
   node: HTMLRef;
+  fixed: boolean;
 }
 
 export interface DraggableData {
   rect?: Rect;
   transform?: {x: number; y: number};
+  mouse?: MousePosition;
+  initialOffset?: Coords;
 }
 
 export interface DragEvent {
@@ -52,12 +55,20 @@ export interface DragEvent {
   delta: Transform;
   mouse: MousePosition;
 }
-export type OnDrop = (who: string, over: Over[], delta: Transform, mouse: MousePosition) => void;
+export type OnDrop = (
+  who: string,
+  over: Over[],
+  delta: Transform,
+  mouse: MousePosition,
+  offset: MousePosition
+) => void;
 
 export type Modifier = ({
   draggingNodeRect,
   transform,
+  id,
 }: {
   draggingNodeRect: Rect;
   transform: Transform;
+  id: string;
 }) => Transform;
