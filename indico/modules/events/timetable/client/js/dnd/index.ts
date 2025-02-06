@@ -9,4 +9,4 @@ export {createRestrictToElement} from './modifiers';
 // export type {Transform} from './types'; // prettier can't handle this
 //export {UniqueId} from './types';
 export type {Transform, Over, MousePosition, Rect} from './types';
-export {DnDProvider, useDraggable, useDroppable} from './dnd';
+export {DnDProvider, useDraggable, useDroppable, useDroppableData} from './dnd';
