@@ -14,6 +14,7 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
+import {SessionFormFields} from '../../../sessions/client/js/SessionForm';
 // import {SessionBlockCreateForm} from 'indico/modules/events/sessions/client/js/SessionBlockForm';
 
 interface TimetableCreateModalProps {
@@ -56,8 +57,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     ),
     'Session Block': (
       <>
-        <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
-        <FinalInput label="Dummy field for session block" name="sessionBlock" />
+        <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} />
+        {/* <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
+        <FinalInput label="Dummy field for session block" name="sessionBlock" /> */}
       </>
     ),
   };
