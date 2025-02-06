@@ -18,9 +18,11 @@ type Timeout = ReturnType<typeof setInterval>;
 export function useScrollIntent({
   state,
   draggables,
+  enabled,
 }: {
   state: any;
   draggables: Record<string, Draggable>;
+  enabled: boolean;
 }) {
   const scrollSpeed = useRef<{x: number; y: number}>({x: 0, y: 0});
   const intervalRef = useRef<Timeout | null>(null);
@@ -36,7 +38,11 @@ export function useScrollIntent({
     }
 
     function handleMouseMove(event: MouseEvent) {
-      if (state.current.state !== 'dragging' || state.current.activeDraggable === null) {
+      if (
+        !enabled ||
+        state.current.state !== 'dragging' ||
+        state.current.activeDraggable === null
+      ) {
         cleanUp();
         return;
       }
@@ -62,7 +68,7 @@ export function useScrollIntent({
       window.removeEventListener('mousemove', handleMouseMove);
       clearInterval(id);
     };
-  }, [state, draggables]);
+  }, [state, draggables, enabled]);
 }
 
 function getScrollSpeed(mouse: MousePosition, scrollParent: HTMLElement) {
