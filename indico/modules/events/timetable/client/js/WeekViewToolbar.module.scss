@@ -7,6 +7,14 @@
 
 @use 'base/palette' as *;
 
+.weekend {
+  color: $light-black !important;
+}
+
+.weekdays {
+  font-weight: bold !important;
+}
+
 .toolbar {
   // position: sticky;
   top: 0;

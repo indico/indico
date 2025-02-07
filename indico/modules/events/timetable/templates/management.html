@@ -7,9 +7,11 @@
 {% endblock %}
 
 {% block content %}
+    {# TODO: Modernize this warning (hidden at the moment as its annoying to work on the timetable with it)
     {% if show_draft_warning %}
         {{ render_draft_mode_warning(event) }}
     {% endif %}
+    #}
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
          data-event-info="{{ event_info | tojson | forceescape }}"

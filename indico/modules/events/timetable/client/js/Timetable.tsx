@@ -29,14 +29,12 @@ import './Timetable.module.scss';
 export default function Timetable() {
   const dispatch = useDispatch();
   const entries = useSelector(selectors.getDayEntries);
-
-  // const blocks = useSelector(selectors.getBlocks);
-  const selectedId = useSelector(selectors.getSelectedId);
-  // const selectedId = null;
-
-  // const draggedContribs = useSelector(selectors.getDraggedContribs);
   const [date, setDate] = useState(moment(getEarliestDate(Object.keys(entries))));
-  const [placeholderEntry, setPlaceholderEntry] = useState(null);
+  const [offset, setOffset] = useState(0);
+  const selectedId = useSelector(selectors.getSelectedId);
+  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
+  const numDays = useSelector(selectors.getEventNumDays);
+
   const currentDateEntries = entries[date.format('YYYYMMDD')];
 
   let selectedEntry = currentDateEntries.find(e => e.id === selectedId);
@@ -45,9 +43,8 @@ export default function Timetable() {
       .flatMap(e => (e.type === 'block' ? e.children : []))
       .find(e => e.id === selectedId);
   }
-  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
 
-  const useWeekView = false;
+  const useWeekView = true;
 
   const minHour = Math.max(
     0,
@@ -93,20 +90,29 @@ export default function Timetable() {
     return () => document.removeEventListener('keydown', onKeydown);
   }, [dispatch]);
 
+  const currentWeekLength = Math.min(7, numDays - offset);
+
   return (
     <div styleName={`timetable`}>
-      {/* <div style={{height: 50}}>
-        <Checkbox
-          toggle
-          checked={popupsEnabled}
-          onChange={() => dispatch(actions.experimentalTogglePopups())}
-          label="Experminetal: Use popups instead of sidebar"
+      {useWeekView && (
+        <WeekViewToolbar
+          date={date}
+          onNavigate={d => setDate(d)}
+          onOffsetChange={setOffset}
+          offset={offset}
         />
-      </div> */}
-      {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
+      )}
       {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
       <div styleName="content">
-        {useWeekView && <WeekTimetable minHour={0} maxHour={24} entries={entries} />}
+        {useWeekView && (
+          <WeekTimetable
+            minHour={0}
+            maxHour={24}
+            entries={entries}
+            offset={offset}
+            weekLength={currentWeekLength}
+          />
+        )}
         {!useWeekView && (
           <DayTimetable dt={date} minHour={0} maxHour={24} entries={currentDateEntries} />
         )}

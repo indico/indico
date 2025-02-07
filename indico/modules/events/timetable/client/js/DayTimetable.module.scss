@@ -25,18 +25,23 @@
 }
 
 .lines {
+  background: repeating-linear-gradient(
+    0deg,
+    #d4d4d5,
+    #d4d4d5 1px,
+    transparent 1px,
+    transparent 30px
+  );
+
   .line::after {
     position: absolute;
-    border-bottom: 1px solid #d4d4d5;
+    border-bottom: 2px solid #d4d4d5;
     content: '';
     width: 100%;
   }
 
-  &.first {
-    .line::after {
-      left: -10px;
-      width: calc(10px + 100%);
-    }
+  &.disabled {
+    background: none !important;
   }
 }
 
@@ -57,6 +62,12 @@
   }
 }
 
+.calendar.day.greyed-out {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
 .entry {
   // background-color: #5b1aff;
   color: white;
@@ -68,6 +79,7 @@
   border: none;
   padding: 0;
   outline: none;
+  user-select: none;
 
   &.block {
     // background-color: rgb(4, 115, 134);

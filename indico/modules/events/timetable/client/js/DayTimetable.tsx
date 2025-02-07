@@ -213,7 +213,7 @@ export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
 
 function TimeSlot({height, time}: {height: number; time: string}) {
   return (
-    <div styleName="time-slot" style={{height}}>
+    <div styleName="time-slot" style={{height}} className="ui">
       <div>{time}</div>
     </div>
   );

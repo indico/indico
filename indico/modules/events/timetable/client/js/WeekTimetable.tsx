@@ -24,53 +24,63 @@ export function WeekTimetable({
   entries,
   minHour,
   maxHour,
+  offset,
+  weekLength,
 }: {
   entries: Record<string, TopLevelEntry[]>;
   minHour: number;
   maxHour: number;
+  offset: number;
+  weekLength: number;
 }) {
   const dispatch = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
-  entries = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(entries)
-          .slice(0, 5)
-          .map(([dt, es]) => [dt, computeYoffset(es, minHour)])
-      ),
-    [entries, minHour]
+  const days = useMemo(() => {
+    const allDays = Object.keys(entries);
+    const startDay = moment(allDays[0]).add(offset, 'days');
+    return Array.from({length: 7}, (_, i) =>
+      startDay
+        .clone()
+        .add(i, 'days')
+        .format('YYYYMMDD')
+    );
+  }, [entries, offset]);
+
+  const filteredEntries = useMemo(
+    () => Object.fromEntries(days.map(dt => [dt, computeYoffset(entries[dt] || [], minHour)])),
+    [entries, days, minHour]
   );
 
   const setDurations = useMemo(() => {
     const obj = {};
-    for (const dt in entries) {
+    for (const dt in filteredEntries) {
       obj[dt] = {};
-      for (const e of entries[dt]) {
+      for (const e of filteredEntries[dt]) {
         obj[dt][e.id] = (duration: number) => dispatch(actions.resizeEntry(dt, e.id, duration));
       }
     }
     return obj;
-  }, [entries, dispatch]);
+  }, [filteredEntries, dispatch]);
 
   const setChildDurations = useMemo(() => {
     const obj = {};
-    for (const dt in entries) {
+    for (const dt in filteredEntries) {
       obj[dt] = {};
-      for (const e of entries[dt]) {
+      for (const e of filteredEntries[dt]) {
         obj[dt][e.id] = (id: number) => (duration: number) =>
           dispatch(actions.resizeEntry(dt, id, duration, e.id));
       }
     }
     return obj;
-  }, [entries, dispatch]);
+  }, [filteredEntries, dispatch]);
 
   function handleDragEnd(who: string, over: Over[], delta: Transform, mouse: MousePosition) {
     if (over.length === 0) {
       return;
     }
-    const days = Object.keys(entries);
+    const days = Object.keys(filteredEntries);
 
     // Cannot drop on itself
     over = over.filter(o => o.id !== who);
@@ -84,7 +94,7 @@ export function WeekTimetable({
   }
 
   function handleDropOnDay(who: UniqueId, over: Over, delta: Transform, mouse: MousePosition) {
-    const [from, to] = layoutAfterDropOnDay(entries, who, over, delta, mouse) || [];
+    const [from, to] = layoutAfterDropOnDay(filteredEntries, who, over, delta, mouse) || [];
     if (!from) {
       return;
     }
@@ -108,24 +118,28 @@ export function WeekTimetable({
   }, []);
 
   const restrictToCalendar = useMemo(() => createRestrictToElement(calendarRef), [calendarRef]);
-  const days = Object.entries(entries).map(([dt, entries], i) => (
-    <DnDDay key={dt} dt={dt}>
-      <Lines minHour={minHour} maxHour={maxHour} first={i === 0} />
-      {entries.map(entry =>
-        entry.type === 'block' ? (
-          <DraggableBlockEntry
-            key={entry.id}
-            renderChildren={false}
-            setDuration={setDurations[dt][entry.id]}
-            setChildDuration={setChildDurations[dt][entry.id]}
-            {...entry}
-          />
-        ) : (
-          <DraggableEntry key={entry.id} {...entry} setDuration={setDurations[dt][entry.id]} />
-        )
-      )}
-    </DnDDay>
-  ));
+  const dayComponents = days.map((dt, i) => {
+    const isWithinEvent = entries.hasOwnProperty(dt);
+    return (
+      <DnDDay key={dt} dt={dt} isWithinEvent={isWithinEvent}>
+        <Lines minHour={minHour} maxHour={maxHour} first={i === 0} />
+        {isWithinEvent &&
+          filteredEntries[dt].map(entry =>
+            entry.type === 'block' ? (
+              <DraggableBlockEntry
+                key={entry.id}
+                renderChildren={false}
+                setDuration={setDurations[dt][entry.id]}
+                setChildDuration={setChildDurations[dt][entry.id]}
+                {...entry}
+              />
+            ) : (
+              <DraggableEntry key={entry.id} {...entry} setDuration={setDurations[dt][entry.id]} />
+            )
+          )}
+      </DnDDay>
+    );
+  });
 
   return (
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar}>
@@ -134,22 +148,29 @@ export function WeekTimetable({
         <div styleName="wrapper">
           <TimeGutter minHour={minHour} maxHour={maxHour} />
           <div ref={calendarRef} style={{display: 'flex', width: '100%', marginTop: 10}}>
-            {days}
+            {dayComponents}
           </div>
-          {/* {days} */}
         </div>
       </div>
     </DnDProvider>
   );
 }
 
-function DnDDay({dt, children}: {dt: string; children: React.ReactNode}) {
+function DnDDay({
+  dt,
+  children,
+  isWithinEvent,
+}: {
+  dt: string;
+  children: React.ReactNode;
+  isWithinEvent: boolean;
+}) {
   const {setNodeRef} = useDroppable({
     id: dt,
   });
 
   return (
-    <div ref={setNodeRef} styleName="calendar day">
+    <div ref={setNodeRef} styleName={`calendar day ${isWithinEvent ? '' : 'greyed-out'}`}>
       {children}
     </div>
   );
