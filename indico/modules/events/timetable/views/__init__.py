@@ -28,7 +28,16 @@ register_template_hook('week-meeting-body', inject_week_timetable)
 class WPManageTimetable(WPEventManagement):
     template_prefix = 'events/timetable/'
     sidemenu_option = 'timetable'
-    bundles = ('module_events.contributions.js',)
+    bundles = (
+        'module_events.contributions.js',
+        'module_events.sessions.js',
+        'module_events.sessions.css',
+        'module_events.timetable.js',
+        'module_events.timetable.css'
+    )
+
+    # def _get_footer(self):
+    #     return ''  # YYY
 
     def __init__(self, rh, event_, **kwargs):
         custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))

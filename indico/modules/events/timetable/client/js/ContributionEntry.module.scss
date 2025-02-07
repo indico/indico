@@ -1,0 +1,44 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.title-wrapper {
+  &.tiny {
+    white-space: nowrap;
+    padding-left: 8px;
+    padding-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1rem;
+  }
+
+  &.small {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 8px;
+    line-height: 1rem;
+  }
+
+  &.long {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .multiline-ellipsis {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .title {
+    font-weight: bold;
+  }
+}

@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.3",
+    "@babel/runtime": "^7.24.0",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@tinymce/tinymce-react": "^4.3.0",
@@ -100,6 +100,7 @@
     "ua-parser-js": "^1.0.2",
     "underscore": "^1.13.4",
     "updated-jqplot": "1.0.9-2",
+    "use-context-selector": "^2.0.0",
     "vanderlee-colorpicker": "^1.2.16"
   },
   "devDependencies": {

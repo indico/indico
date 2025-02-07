@@ -1,0 +1,111 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2024 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.time-gutter {
+  max-width: 50px;
+  padding-right: 10px;
+  border-right: 1px solid #d4d4d5;
+
+  .time-slot {
+    div {
+      position: relative;
+      top: -8px;
+    }
+  }
+}
+
+.lines {
+  background: repeating-linear-gradient(
+    0deg,
+    #d4d4d5,
+    #d4d4d5 1px,
+    transparent 1px,
+    transparent 30px
+  );
+
+  .line::after {
+    position: absolute;
+    border-bottom: 2px solid #d4d4d5;
+    content: '';
+    width: 100%;
+  }
+
+  &.disabled {
+    background: none !important;
+  }
+}
+
+.dragging::before {
+  content: attr(data-dragging);
+}
+
+.dragging {
+  background-color: paleturquoise;
+}
+
+.calendar {
+  position: relative;
+  width: 100%;
+
+  &.day:not(:last-child) {
+    border-right: 1px solid #d4d4d5;
+  }
+}
+
+.calendar.day.greyed-out {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.entry {
+  // background-color: #5b1aff;
+  color: white;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: unset;
+  border: none;
+  padding: 0;
+  outline: none;
+  user-select: none;
+
+  &.block {
+    // background-color: rgb(4, 115, 134);
+  }
+
+  &.break {
+    // background-color: #f09000;
+  }
+}
+
+.drag-handle {
+  text-align: left;
+  font-size: 15px;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.resize-handle {
+  position: absolute;
+  cursor: ns-resize;
+  width: 100%;
+  height: 4px;
+  bottom: 0;
+  z-index: 10;
+
+  &.block {
+    z-index: 9;
+  }
+}
