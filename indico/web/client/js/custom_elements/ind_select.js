@@ -167,6 +167,18 @@ customElements.define(
         if ($option) {
           selectOption($option);
           dispatchChange();
+        } else {
+          // If no option was selected, but the click happened
+          // within the listbox, it likely means the user was using
+          // the scrollbar. We will temporarily block the closing of
+          // the listbox.
+          indSelect._noImmediateClose = true;
+          setTimeout(() => {
+            // Refocus the filter because some of the behavior depends
+            // on its losing focus.
+            filter.focus();
+            delete indSelect._noImmediateClose;
+          });
         }
       });
 
@@ -189,7 +201,13 @@ customElements.define(
       // Internal functions
 
       function toggleListbox(shouldOpen = !indSelect.open) {
+        // Special case: request to close, but closing blocked
+        if (!shouldOpen && indSelect._noImmediateClose) {
+          return;
+        }
+
         indSelect.open = shouldOpen;
+
         if (shouldOpen) {
           dialog.show();
           positioning.position(listbox, indSelect, positioning.dropdownPositionStrategy, fit => {
