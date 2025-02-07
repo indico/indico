@@ -8,8 +8,8 @@ A valid reason!
 Room: 1/2-3
 For: Guinea Pig
 Reason: Testing
-Dates: Thursday 10/11/2022 - Saturday 12/11/2022
-Hours: 13:37 - 14:37
+Dates: Thu, 10/11/2022 – Sat, 12/11/2022
+Hours: 13:37–14:37
 
 Booking details:
 http://localhost/rooms/booking/0
