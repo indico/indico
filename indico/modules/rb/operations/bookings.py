@@ -355,7 +355,8 @@ def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
         criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_dt,
                                 ReservationOccurrence.reservation_id > last_reservation_id))
 
-    query = (_bookings_query(filters, noload_room=True)
+    hide_booking_details = rb_settings.get('hide_booking_details')
+    query = (_bookings_query(filters, noload_room=(not hide_booking_details), load_room_acl=hide_booking_details)
              .filter(db.or_(*criteria))
              .order_by(ReservationOccurrence.start_dt,
                        ReservationOccurrence.reservation_id,
