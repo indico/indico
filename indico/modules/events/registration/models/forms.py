@@ -620,7 +620,7 @@ def _mappers_configured():
     query = (select([db.func.coalesce(db.func.sum(Registration.occupied_slots), 0)])
              .where(db.and_(Registration.registration_form_id == RegistrationForm.id,
                             ~Registration.is_deleted,
-                            Registration.checked_in))
+                            Registration.has_checked_in))
              .correlate_except(Registration)
              .scalar_subquery())
     RegistrationForm.checked_in_registrations_count = column_property(query, deferred=True)

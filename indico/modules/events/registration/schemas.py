@@ -13,6 +13,7 @@ from webargs import fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events import Event
+from indico.modules.events.registration.models.checks import RegistrationCheckRule, RegistrationCheckType
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.models.tags import RegistrationTag
@@ -56,6 +57,14 @@ class CheckinRegFormSchema(mm.SQLAlchemyAutoSchema):
     is_open = fields.Bool()
     registration_count = fields.Int(attribute='existing_registrations_count')
     checked_in_count = fields.Int(attribute='checked_in_registrations_count')
+
+
+class CheckinCheckTypeSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = RegistrationCheckType
+        fields = ('id', 'title', 'rule', 'check_out_allowed', 'is_system_defined')
+
+    rule = fields.Enum(RegistrationCheckRule)
 
 
 class CheckinRegistrationSchema(mm.SQLAlchemyAutoSchema):

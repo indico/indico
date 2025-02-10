@@ -227,6 +227,12 @@ class RegistrantToPDF(PDFBase):
             if 'checked_in_date' in self.static_items:
                 check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
                 _print_row(_('Check-in date'), check_in_date)
+            if 'checked_out' in self.static_items:
+                checked_out = 'Yes' if registration.checked_out else 'No'
+                _print_row(_('Checked out'), checked_out)
+            if 'checked_out_date' in self.static_items:
+                check_in_date = format_datetime(registration.checked_out_dt) if registration.checked_out else ''
+                _print_row(_('Check-out date'), check_in_date)
             if 'tags_present' in self.static_items and registration.tags:
                 tags = ', '.join(sorted(t.title for t in registration.tags))
                 _print_row(_('Tags'), tags)
@@ -394,6 +400,10 @@ class RegistrantsListToPDF(PDFBase):
             lp.append(Paragraph('<b>{}</b>'.format(_('Checked in')), text_format))
         if 'checked_in_date' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Check-in date')), text_format))
+        if 'checked_out' in self.static_items:
+            lp.append(Paragraph('<b>{}</b>'.format(_('Checked out')), text_format))
+        if 'checked_out_date' in self.static_items:
+            lp.append(Paragraph('<b>{}</b>'.format(_('Check-out date')), text_format))
         if 'tags_present' in self.static_items:
             lp.append(Paragraph('<b>{}</b>'.format(_('Tags')), text_format))
         l.append(lp)
@@ -442,6 +452,12 @@ class RegistrantsListToPDF(PDFBase):
             if 'checked_in_date' in self.static_items:
                 check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
                 lp.append(Paragraph(check_in_date, text_format))
+            if 'checked_out' in self.static_items:
+                checked_out = 'Yes' if registration.checked_out else 'No'
+                lp.append(Paragraph(checked_out, text_format))
+            if 'checked_out_date' in self.static_items:
+                check_out_date = format_datetime(registration.checked_out_dt) if registration.checked_out else ''
+                lp.append(Paragraph(check_out_date, text_format))
             if 'tags_present' in self.static_items:
                 tags = ', '.join(sorted(t.title for t in registration.tags))
                 lp.append(Paragraph(escape(tags), text_format))
