@@ -7,23 +7,23 @@
 
 import {createSelector} from 'reselect';
 
-import {ReduxState} from './reducers';
+import {RootState} from './store';
 import {appendSessionAttributes, mergeChanges} from './util';
 
 export const getStaticData = state => state.staticData;
-export const getEntries = (state: ReduxState) => state.entries;
-export const getDayEntries = (state: ReduxState) =>
+export const getEntries = (state: RootState) => state.entries;
+export const getDayEntries = (state: RootState) =>
   state.entries.changes[state.entries.currentChangeIdx].entries;
 export const getSessions = state => state.sessions;
 export const getNavigation = state => state.navigation;
 export const getDisplay = state => state.display;
 export const getOpenModal = state => state.openModal;
-export const getLatestChange = (state: ReduxState) =>
+export const getLatestChange = (state: RootState) =>
   state.entries.changes[state.entries.currentChangeIdx];
 
-export const getNumUnscheduled = (state: ReduxState) =>
+export const getNumUnscheduled = (state: RootState) =>
   state.entries.changes[state.entries.currentChangeIdx].unscheduled.length;
-export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
+export const getSelectedId = (state: RootState) => state.entries.selectedId;
 
 export const getEventStartDt = createSelector(
   getStaticData,

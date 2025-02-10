@@ -9,7 +9,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Field, Form as FinalForm} from 'react-final-form';
-import {useDispatch, useSelector} from 'react-redux';
 import {Form, Icon} from 'semantic-ui-react';
 
 import {CollapsibleContainer} from 'indico/react/components';
@@ -19,6 +18,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import * as actions from './actions';
 import {useDraggable} from './dnd';
 import {ContributionDetails} from './EntryDetails';
+import {useTimetableDispatch, useTimetableSelector} from './hooks';
 import * as selectors from './selectors';
 import {entrySchema, entryTypes, formatTitle} from './util';
 
@@ -54,7 +54,7 @@ function UnscheduledContributionList({
   setSelected,
   showSession,
 }) {
-  const sessions = useSelector(selectors.getSessions);
+  const sessions = useTimetableSelector(selectors.getSessions);
 
   const makeHandleSelect = id => e => {
     e.stopPropagation();
@@ -123,10 +123,10 @@ UnscheduledContributionList.defaultProps = {
 };
 
 export default function UnscheduledContributions() {
-  const dispatch = useDispatch();
-  const contribs = useSelector(selectors.getUnscheduled);
-  const showUnscheduled = useSelector(selectors.showUnscheduled);
-  // const selectedEntry = useSelector(selectors.getSelectedEntry);
+  const dispatch = useTimetableDispatch();
+  const contribs = useTimetableSelector(selectors.getUnscheduled);
+  const showUnscheduled = useTimetableSelector(selectors.showUnscheduled);
+  // const selectedEntry = useTimetableSelector(selectors.getSelectedEntry);
   const selectedEntry = null;
 
   const [selected, setSelected] = useState(new Set());
@@ -167,7 +167,9 @@ export default function UnscheduledContributions() {
         </h4>
         {currentContribs.length > 0 ? (
           <FinalForm
-            onSubmit={values => dispatch(actions.scheduleContribs(values.contribs, values.gap))}
+            onSubmit={({contribs, gap}) =>
+              dispatch(actions.scheduleContribs({contribIds: contribs, gap}))
+            }
             initialValues={{
               contribs: new Set(),
               gap: 0,

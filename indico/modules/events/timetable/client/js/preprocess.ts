@@ -27,6 +27,8 @@ interface SchemaSession extends SchemaEntry {
   isPoster: boolean;
 }
 
+export type SessionData = Record<string, SchemaSession>[];
+
 interface SchemaBlock extends SchemaEntry {
   startDate: SchemaDate;
   duration: number;
@@ -40,9 +42,7 @@ const entryTypeMapping = {
   b: 'break',
 };
 
-export function preprocessSessionData(
-  data: Record<string, SchemaSession>
-): Record<number, Session> {
+export function preprocessSessionData(data: SessionData): Record<number, Session> {
   return Object.fromEntries(
     Object.entries(data).map(([, s]) => [
       s.id,
@@ -57,9 +57,14 @@ export function preprocessSessionData(
 
 const dateToMoment = (dt: SchemaDate) => moment.tz(`${dt.date} ${dt.time}`, dt.tz);
 
+export type TimetableData = Record<string, Record<string, SchemaBlock>>;
+export interface EventInfo {
+  contributions?: {uniqueId: number; title: string; duration: number}[];
+}
+
 export function preprocessTimetableEntries(
-  data: Record<string, Record<string, SchemaBlock>>,
-  eventInfo: {contributions?: {uniqueId: number; title: string; duration: number}[]}
+  data: TimetableData,
+  eventInfo: EventInfo
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
   // console.log(data);
   // console.log('einfo', eventInfo);
