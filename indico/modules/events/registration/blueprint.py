@@ -10,8 +10,8 @@ from indico.modules.events.registration.controllers.api import checkin as api_ch
 from indico.modules.events.registration.controllers.api import checkin_legacy as api_checkin_legacy
 from indico.modules.events.registration.controllers.api import misc as api_misc
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.management import (fields, invitations, privacy, regforms, reglists,
-                                                                       sections, tags, tickets)
+from indico.modules.events.registration.controllers.management import (checks, fields, invitations, privacy, regforms,
+                                                                       reglists, sections, tags, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -93,8 +93,6 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:regi
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/schedule-modification',
                  'registration_schedule_modification',
                  reglists.RHRegistrationScheduleModification, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
-                 'registration_check_in', reglists.RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
 _bp.add_url_rule(
     '/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/receipts/<int:file_id>/<filename>',
     'download_receipt', reglists.RHDownloadReceipt)
@@ -129,8 +127,6 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/reset', '
                  reglists.RHRegistrationsReset, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/update-price', 'registrations_update_price',
                  reglists.RHRegistrationsBasePrice, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in', 'registrations_check_in',
-                 reglists.RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments', 'registrations_attachments_export',
                  reglists.RHRegistrationsExportAttachments, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/receipts', 'registrations_receipts_export',
@@ -183,6 +179,28 @@ _bp.add_url_rule('/manage/registration/tags/<int:tag_id>/delete', 'manage_regist
                  tags.RHRegistrationTagDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tags/assign', 'manage_registration_tags_assign',
                  tags.RHRegistrationTagsAssign, methods=('POST',))
+
+# Registration checks management
+_bp.add_url_rule('/manage/registration/checks', 'manage_registration_check_types',
+                 checks.RHManageRegistrationCheckTypes, methods=('GET',))
+_bp.add_url_rule('/manage/registration/checks/add', 'manage_registration_check_types_add',
+                 checks.RHRegistrationCheckTypeAdd, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/checks/<int:check_type_id>/delete', 'manage_registration_check_types_delete',
+                 checks.RHRegistrationCheckTypeDelete, methods=('POST',))
+_bp.add_url_rule('/manage/registration/checks/<int:check_type_id>/edit', 'manage_registration_check_types_edit',
+                 checks.RHRegistrationCheckTypeEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/checks/toggle', 'manage_registration_check_types_toggle',
+                 checks.RHRegistrationCheckTypeToggleDefault, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check',
+                 'add_registration_check', checks.RHRegistrationChecksAdd, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/checks',
+                 'registration_checks', checks.RHRegistrationChecks)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reset-checks',
+                 'reset_registration_checks', checks.RHRegistrationChecksReset, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/delete-check/<int:check_id>',
+                 'delete_registration_check', checks.RHRegistrationChecksDelete, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check', 'registrations_check',
+                 checks.RHRegistrationBulkCheck, methods=('POST',))
 
 # Regform edition: sections
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section',

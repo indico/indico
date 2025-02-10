@@ -1,0 +1,53 @@
+{% macro render_check_types(check_types, default_check_type) %}
+    <table class="i-table-widget">
+        <tr>
+            <th>{% trans -%}Title{%- endtrans %}</th>
+            <th>{% trans -%}Rule{%- endtrans %}</th>
+            <th>{% trans -%}Can check out{%- endtrans %}</th>
+            <th></th>
+        </tr>
+        {% for check_type in check_types %}
+            <tr>
+                <td>
+                    {{ check_type.title }}
+                </td>
+                <td>
+                    {{ check_type.rule.title }}
+                </td>
+                <td>
+                    {{ check_type.check_out_allowed }}
+                </td>
+                <td>
+                    <span class="right hide-if-locked">
+                        <button class="icon-bookmark i-button text-color borderless" style="{{ 'opacity: 0.3;' if default_check_type != check_type }}"
+                                data-href="{{ url_for('.toggle_default_check_type', check_type_id=check_type.id) }}"
+                                {% if default_check_type == check_type %}
+                                    title="{% trans %}This is the default check type for this instance{% endtrans %}"
+                                {% else %}
+                                    title="{% trans %}Make default check type for this instance{% endtrans %}"
+                                    data-method="POST"
+                                    data-update="#check-types"
+                                {% endif %}
+                                ></button>
+                        <button class="icon-edit i-button text-color borderless"
+                                data-href="{{ url_for('.update_check_type', check_type) }}"
+                                data-title
+                                title="{% trans %}Edit check type{% endtrans %}"
+                                data-ajax-dialog
+                                data-update="#check-types"></button>
+                        <button class="icon-remove i-button text-color borderless danger {{ 'disabled' if default_check_type == check_type }}"
+                                    data-href="{{ url_for('.delete_check_type', check_type) }}"
+                                    data-title
+                                    data-update="#check-types"
+                                    title="{% trans %}Delete check type{% endtrans %}"
+                                    data-confirm="{% trans %}Do you really want to delete this check type?
+                                                            This will delete all previously performed checks of this type on registrations
+                                                  {% endtrans %}"
+                                    data-method="DELETE">
+                            </button>
+                    </span>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endmacro %}
