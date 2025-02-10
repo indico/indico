@@ -55,6 +55,16 @@ class RegistrationListGenerator(ListGeneratorBase):
             'checked_in_date': {
                 'title': _('Check-in date'),
             },
+            'checked_out': {
+                'title': _('Checked out'),
+                'filter_choices': {
+                    '0': _('No'),
+                    '1': _('Yes')
+                }
+            },
+            'checked_out_date': {
+                'title': _('Check-out date'),
+            },
             'payment_date': {
                 'title': _('Payment date'),
             },
@@ -180,6 +190,12 @@ class RegistrationListGenerator(ListGeneratorBase):
             # If both values 'true' and 'false' are selected, there's no point in filtering
             if len(checked_in_values) == 1:
                 items_criteria.append(Registration.checked_in == bool(int(checked_in_values[0])))
+
+        if 'checked_out' in filters['items']:
+            checked_out_values = filters['items']['checked_out']
+            # If both values 'true' and 'false' are selected, there's no point in filtering
+            if len(checked_out_values) == 1:
+                items_criteria.append(Registration.checked_out == bool(int(checked_out_values[0])))
 
         if 'state' in filters['items']:
             states = [RegistrationState(int(state)) for state in filters['items']['state']]
