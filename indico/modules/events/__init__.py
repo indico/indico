@@ -154,6 +154,8 @@ def _sidemenu_items(sender, **kwargs):
                            section='customization')
         yield SideMenuItem('data_retention', _('Data Retention'), url_for('events.data_retention'),
                            section='customization')
+        yield SideMenuItem('check_types', _('Check Types'), url_for('events.check_types'),
+                           section='customization')
 
 
 @signals.menu.sections.connect_via('top-menu')

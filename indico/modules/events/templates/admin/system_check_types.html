@@ -1,0 +1,22 @@
+{% extends 'layout/admin_page.html' %}
+{% from 'events/admin/_system_check_type_list.html' import render_check_types %}
+
+{%- block content %}
+    <div class="i-box">
+        <div class="i-box-header">
+            <div class="i-box-title">{%- trans %}System check types{% endtrans -%}</div>
+            <div class="i-box-buttons toolbar right">
+                <button class="i-button icon-plus"
+                        data-ajax-dialog
+                        data-href="{{ url_for('.create_check_type') }}"
+                        data-title="{% trans %}Create new check type{% endtrans %}"
+                        data-update="#check-types">
+                    {%- trans %}Create new check type{% endtrans -%}
+                </button>
+            </div>
+        </div>
+        <div id="check-types" class="i-box-table-widget">
+            {{ render_check_types(check_types, default_check_type) }}
+        </div>
+    </div>
+{%- endblock %}
