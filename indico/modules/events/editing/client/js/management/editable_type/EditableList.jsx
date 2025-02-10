@@ -759,7 +759,7 @@ function EditableListDisplay({
             {({height, isScrolling, onChildScroll, scrollTop}) => (
               <Table
                 autoHeight
-                width={1000}
+                width={1115}
                 styleName="table"
                 height={height}
                 isScrolling={isScrolling}
