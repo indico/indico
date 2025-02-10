@@ -15,7 +15,7 @@ from flask.helpers import get_root_path
 
 from indico.core import signals
 from indico.core.settings import ACLProxyBase, SettingProperty, SettingsProxyBase
-from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
+from indico.core.settings.converters import DatetimeConverter, ModelConverter, TimedeltaConverter
 from indico.core.settings.proxy import SettingsProxy
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl, preload_settings_bulk
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
@@ -284,4 +284,10 @@ data_retention_settings = SettingsProxy('data_retention', {
 }, converters={
     'minimum_data_retention': TimedeltaConverter,
     'maximum_data_retention': TimedeltaConverter
+})
+
+default_check_type_settings = SettingsProxy('default_check_type', {
+    'default_check_type': None,
+}, converters={
+    'default_check_type': ModelConverter('RegistrationCheckType'),
 })

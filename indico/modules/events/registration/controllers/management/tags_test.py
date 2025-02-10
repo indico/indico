@@ -33,7 +33,7 @@ def test_assign_tags_logs_added(dummy_reg, create_tag):
 
     _assign_registration_tags([dummy_reg], add={tag_a, tag_b}, remove=set())
 
-    entry = dummy_reg.event.log_entries.one()
+    entry = dummy_reg.event.log_entries.filter_by(realm=EventLogRealm.management).one()
     assert entry.realm == EventLogRealm.management
     assert entry.kind == LogKind.positive
     assert entry.module == 'Registration'
@@ -50,7 +50,7 @@ def test_assign_tags_logs_removed(db, dummy_reg, create_tag):
 
     _assign_registration_tags([dummy_reg], add=set(), remove={tag_a})
 
-    entry = dummy_reg.event.log_entries.one()
+    entry = dummy_reg.event.log_entries.filter_by(realm=EventLogRealm.management).one()
     assert entry.realm == EventLogRealm.management
     assert entry.kind == LogKind.negative
     assert entry.module == 'Registration'
@@ -67,7 +67,7 @@ def test_assign_tags_logs_both(db, dummy_reg, create_tag):
 
     _assign_registration_tags([dummy_reg], add={tag_b}, remove={tag_a})
 
-    entries = dummy_reg.event.log_entries.all()
+    entries = dummy_reg.event.log_entries.filter_by(realm=EventLogRealm.management).all()
     assert len(entries) == 2
     kinds = {e.kind for e in entries}
     assert kinds == {LogKind.positive, LogKind.negative}
@@ -78,12 +78,12 @@ def test_assign_tags_no_log_when_nothing_changes(dummy_reg, create_tag):
     tag_b = create_tag('Beta')
     # empty changeset
     _assign_registration_tags([dummy_reg], add=set(), remove=set())
-    assert not dummy_reg.event.log_entries.has_rows()
+    assert not dummy_reg.event.log_entries.filter_by(realm=EventLogRealm.management).has_rows()
     # redundant changes
     dummy_reg.tags = {tag_a}
     _assign_registration_tags([dummy_reg], add={tag_a}, remove=set())
     _assign_registration_tags([dummy_reg], add=set(), remove={tag_b})
-    assert not dummy_reg.event.log_entries.has_rows()
+    assert not dummy_reg.event.log_entries.filter_by(realm=EventLogRealm.management).has_rows()
     # nonsense change
     _assign_registration_tags([dummy_reg], add={tag_b}, remove={tag_b})
-    assert not dummy_reg.event.log_entries.has_rows()
+    assert not dummy_reg.event.log_entries.filter_by(realm=EventLogRealm.management).has_rows()
