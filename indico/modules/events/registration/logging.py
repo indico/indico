@@ -15,18 +15,21 @@ from indico.util.i18n import orig_string
 
 
 def connect_log_signals():
-    signals.event.registration_checkin_updated.connect(log_registration_check_in)
+    signals.event.registration_check_added.connect(log_registration_check)
     signals.event.registration_state_updated.connect(log_registration_updated)
 
 
-def log_registration_check_in(registration, **kwargs):
+def log_registration_check(registration_check, **kwargs):
     """Log a registration check-in action to the event log."""
-    if registration.checked_in:
-        log_text = f'"{registration.full_name}" has been checked in'
+    registration = registration_check.registration
+    check_type = registration_check.check_type
+    user = session.user if session else None
+    if registration_check.is_check_out:
+        log_text = 'Registration check "{}" of type "check-out" has been performed on "{}"'
     else:
-        log_text = '"{}" check-in has been reset'
+        log_text = 'Registration check "{}" of type "check-in" has been performed on "{}"'
     registration.log(EventLogRealm.participants, LogKind.change, 'Registration',
-                     log_text.format(registration.full_name), session.user)
+                     log_text.format(check_type.title, registration.full_name), user)
 
 
 def log_registration_updated(registration, previous_state, silent=False, **kwargs):
