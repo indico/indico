@@ -64,6 +64,7 @@ Improvements
   (:pr:`6758`)
 - Add setting to disallow entering custom affiliations when predefined affiliations are used
   (:pr:`6809`)
+- Log changes to event payment methods (:pr:`6739`)
 
 Bugfixes
 ^^^^^^^^
