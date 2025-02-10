@@ -30,6 +30,39 @@ interface SessionBlockEditFormProps {
   onClose: () => void;
 }
 
+interface SessionBlockFormFieldProps {
+  eventId: number;
+  locationParent: any;
+}
+
+export function SessionBlockFormFields({eventId, locationParent}: SessionBlockFormFieldProps) {
+  return (
+    <>
+      <FinalInput
+        name="title"
+        label={Translate.string('Title')}
+        description={Translate.string('Title of the session block')}
+        autoFocus
+        required
+      />
+      <FinalTimePicker name="start_dt" label={Translate.string('Start time')} required />
+      <FinalDuration name="duration" label={Translate.string('Duration')} required />
+      <FinalSessionBlockPersonLinkField
+        name="conveners"
+        label={Translate.string('Conveners')}
+        eventId={eventId}
+        sessionUser={{...Indico.User, userId: Indico.User.id}}
+      />
+      <FinalLocationField
+        name="location_data"
+        label={Translate.string('Location')}
+        locationParent={locationParent}
+      />
+      <FinalInput name="code" label={Translate.string('Program code')} />
+    </>
+  );
+}
+
 export default function SessionBlockEditForm({
   eventId,
   sessionId,
@@ -101,27 +134,7 @@ export default function SessionBlockEditForm({
       initialValues={{...blockData, conveners: camelizeKeys(blockData.conveners)}}
       size="small"
     >
-      <FinalInput
-        name="title"
-        label={Translate.string('Title')}
-        description={Translate.string('Title of the session block')}
-        autoFocus
-        required
-      />
-      <FinalTimePicker name="start_dt" label={Translate.string('Start time')} required />
-      <FinalDuration name="duration" label={Translate.string('Duration')} required />
-      <FinalSessionBlockPersonLinkField
-        name="conveners"
-        label={Translate.string('Conveners')}
-        eventId={eventId}
-        sessionUser={{...Indico.User, userId: Indico.User.id}}
-      />
-      <FinalLocationField
-        name="location_data"
-        label={Translate.string('Location')}
-        locationParent={locationParent}
-      />
-      <FinalInput name="code" label={Translate.string('Program code')} />
+      <SessionBlockFormFields eventId={eventId} locationParent={locationParent} />
     </FinalModalForm>
   );
 }

@@ -1,14 +1,15 @@
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 
 import React, {useState} from 'react';
-import {Button, Divider} from 'semantic-ui-react';
 import {FormSpy} from 'react-final-form';
+import {Button, Divider, Form, Header} from 'semantic-ui-react';
 
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
+import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockForm';
 import {SessionFormFields} from '../../../sessions/client/js/SessionForm';
 // import {SessionBlockCreateForm} from 'indico/modules/events/sessions/client/js/SessionBlockForm';
 
@@ -41,6 +42,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     location_data: {inheriting: false},
     custom_fields: {},
     start_dt: newEntry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
+    conveners: [],
   };
 
   const forms = {
@@ -52,7 +54,13 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       />
     ),
     'Session Block': (
-      <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} />
+      <>
+        <Header as="h3">{Translate.string('Session Block')}</Header>
+        <SessionBlockFormFields eventId={13} locationParent={undefined} {...initialValues} />
+        <Divider />
+        <Header as="h3">{Translate.string('Session')}</Header>
+        <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} />
+      </>
     ),
   };
 
