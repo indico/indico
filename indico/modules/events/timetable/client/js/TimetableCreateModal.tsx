@@ -1,14 +1,9 @@
-import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
-import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
-import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
-import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import React, {useState} from 'react';
 import {Button, Divider} from 'semantic-ui-react';
 import {FormSpy} from 'react-final-form';
 
-import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -38,6 +33,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const initialValues = {
+    title: '',
     duration: newEntry.duration * 60,
     person_links: [],
     keywords: [],
@@ -56,15 +52,11 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       />
     ),
     'Session Block': (
-      <>
-        <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} />
-        {/* <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
-        <FinalInput label="Dummy field for session block" name="sessionBlock" /> */}
-      </>
+      <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} />
     ),
   };
 
-  const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
+  const [activeForm, setActiveForm] = useState(Object.keys(forms)[1]);
   const [formValues, setFormValues] = useState(initialValues);
 
   const renderForm = () => forms[activeForm];
@@ -81,15 +73,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const changeForm = (key: string) => {
-    switch (key) {
-      case 'Contribution':
-        setFormValues(initialValues);
-        break;
-      case 'Session Block':
-        // return <SessionBlockCreateForm eventId={eventId} sessionId={sessionId} onClose={onClose} />;
-        break;
-    }
-
     setActiveForm(key);
   };
 
@@ -105,7 +88,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       <FormSpy
         subscription={{values: true}}
         onChange={({values}) => {
-          setFormValues(values);
+          setFormValues({...formValues, ...values});
         }}
       />
       <Button.Group>
