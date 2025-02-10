@@ -39,6 +39,7 @@ Improvements
   use the email address (:pr:`6751`)
 - Tell search engines to not index events marked as "invisible" (:pr:`6762`, thanks
   :user:`openprojects`)
+- Log changes to event payment methods (:pr:`6739`)
 
 Bugfixes
 ^^^^^^^^
