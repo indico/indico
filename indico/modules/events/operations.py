@@ -22,6 +22,7 @@ from indico.modules.events.management.settings import privacy_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.settings import default_check_type_settings
 from indico.modules.events.util import format_log_person, format_log_ref, split_log_location_changes
 from indico.modules.logs.models.entries import CategoryLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
@@ -94,7 +95,8 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     :param cloning: Whether the event is created via cloning or not
     """
     from indico.modules.rb.operations.bookings import create_booking_for_event
-    event = Event(category=category, type_=event_type)
+    check_type = default_check_type_settings.get('default_check_type')
+    event = Event(category=category, type_=event_type, default_check_type_id=check_type.id)
     data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
     create_booking = data.pop('create_booking', False)
