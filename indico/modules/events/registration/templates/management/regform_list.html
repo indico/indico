@@ -97,6 +97,22 @@
                     </div>
                 </div>
             {% endblock %}
+            {% block check_types_sectioon %}
+                <div class="section">
+                    <div class="icon icon-user-check"></div>
+                    <div class="text">
+                        <div class="label">{% trans %}Registration checks{% endtrans %}</div>
+                        {% trans %}Define registration verification checks and rules{% endtrans %}
+                    </div>
+                    <div class="toolbar">
+                        <div class="group">
+                            <a href="{{ url_for('.manage_registration_check_types', event) }}" class="i-button icon-settings">
+                                {%- trans %}Configure{% endtrans -%}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
         </div>
     {% endblock %}
     {{ template_hook('extra-registration-settings', event=event) }}
