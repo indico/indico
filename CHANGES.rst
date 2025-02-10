@@ -45,7 +45,7 @@ Bugfixes
 - Fix price display of choice fields in registration form (:issue:`6728`, :pr:`6729`)
 - Fix error when creating a new room and setting attributes or equipment during creation
   (:pr:`6730`)
-- Fix the usage of select list scrollbar causing it to close immediately (:issue:`6735`, 
+- Fix the usage of select list scrollbar causing it to close immediately (:issue:`6735`,
   :pr:`6736`, thanks :user:`foxbunny`)
 
 Accessibility
