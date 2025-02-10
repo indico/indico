@@ -7,7 +7,6 @@
 
 from uuid import UUID, uuid4
 
-from babel.numbers import format_currency
 from flask import session
 from sqlalchemy import orm, select
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -26,7 +25,7 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.registrations import (PublishRegistrationsMode, Registration,
                                                                      RegistrationState)
 from indico.util.caching import memoize_request
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_currency, now_utc
 from indico.util.enum import RichIntEnum
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
