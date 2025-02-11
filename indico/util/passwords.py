@@ -156,7 +156,7 @@ def validate_secure_password(context, password, *, username='', emails=frozenset
 
     A password is considered secure if it:
 
-    - is at least LOCAL_PASSWORD_MIN_LENGTH characters long
+    - is at least :data:`LOCAL_PASSWORD_MIN_LENGTH` characters long
     - does not contain the username unless the username is <5 chars and the password is >16 chars long
     - does not contain the strings 'indico' (or common variations)
     - is not in the pwned password list
