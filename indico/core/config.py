@@ -307,7 +307,7 @@ class IndicoConfig:
         if self.SMTP_ALLOWED_SENDERS and not self.SMTP_SENDER_FALLBACK:
             raise ValueError('Cannot restrict SMTP senders without a fallback')
         if not self.DEBUG and self.LOCAL_PASSWORD_MIN_LENGTH < 8:
-            raise ValueError('Minimum password length cannot be less than 8')
+            raise ValueError('Minimum password length cannot be less than 8 characters long')
 
     def __getattr__(self, name):
         try:
