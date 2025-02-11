@@ -51,7 +51,7 @@ def _attrs_for_validators(field, validators):
             if validator.max >= 0:
                 attrs['maxlength'] = validator.max
         elif isinstance(validator, SecurePassword):
-            attrs['minlength'] = validator.MIN_LENGTH
+            attrs['minlength'] = validator.minlength
         elif isinstance(validator, IndicoRegexp) and validator.client_side:
             attrs['pattern'] = validator.regex.pattern
         elif isinstance(validator, NumberRange):
