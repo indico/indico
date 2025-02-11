@@ -289,8 +289,7 @@ class RegistrationAmountPlaceholder(RegistrationPlaceholder):
 
     @classmethod
     def render(cls, registration):
-        with registration.event.force_event_locale(registration.user):
-            # XXX: Should this be the registrant's locale?
+        with registration.event.force_event_locale():
             return format_currency(registration.price, '')
 
 
@@ -300,8 +299,7 @@ class RegistrationPricePlaceholder(RegistrationPlaceholder):
 
     @classmethod
     def render(cls, registration):
-        with registration.event.force_event_locale(registration.user):
-            # XXX: Should this be the registrant's locale?
+        with registration.event.force_event_locale():
             return format_currency(registration.price, registration.currency)
 
 
