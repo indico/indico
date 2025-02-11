@@ -74,7 +74,7 @@ click-repl==0.3.0
     # via celery
 colorclass==2.2.2
     # via -r requirements.in
-cryptography==44.0.0
+cryptography==44.0.1
     # via authlib
 cssselect2==0.7.0
     # via weasyprint
