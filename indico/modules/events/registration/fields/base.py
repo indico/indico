@@ -8,14 +8,52 @@
 from copy import deepcopy
 from decimal import Decimal
 
-from marshmallow import fields, validate
+from marshmallow import ValidationError, fields, validate, validates
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.marshmallow import not_empty
 
 
-class BillableFieldDataSchema(mm.Schema):
+class FieldSetupSchemaBase(mm.Schema):
+    show_if_field_id = fields.Integer(required=False, load_default=None)
+    show_if_field_value = fields.String(required=False)
+
+    @validates('show_if_field_id')
+    def _check_if_field_id(self, field_id, **kwargs):
+        from indico.modules.events.registration.models.form_fields import RegistrationFormItem
+        if field_id is None:
+            return
+        field = self.context['field']
+        if field.is_manager_only or (field.parent is not None and field.parent.is_manager_only):
+            raise ValueError('Manager-only fields cannot be conditionally shown')
+        used_field_ids = set()
+        if field.id is not None:
+            if field.id == field_id:
+                raise ValueError('The field cannot conditionally depend on itself to be shown')
+            used_field_ids.add(field.id)
+        regform = self.context['regform']
+        is_same_regform = (RegistrationFormItem.query.filter_by(
+            id=field_id, registration_form_id=regform.id).scalar() is not None)
+        if not is_same_regform:
+            raise ValidationError('The field to show does not belong to the same registration form.')
+        # Avoid cycles
+        next_field_id = field_id
+        while next_field_id is not None:
+            if next_field_id in used_field_ids:
+                raise ValidationError('Field conditions may not have cycles (a -> b -> c -> a)')
+            else:
+                used_field_ids.add(next_field_id)
+            next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one_or_none()
+            if not next_field:
+                # TODO: there is a field that does not exist in the chain. Should we raise an error in this case?
+                break
+            if next_field.is_manager_only or (next_field.parent is not None and next_field.parent.is_manager_only):
+                raise ValidationError('Field conditions may not depend on fields in manager-only sections')
+            next_field_id = next_field.data.get('show_if_field_id')
+
+
+class BillableFieldDataSchema(FieldSetupSchemaBase):
     price = fields.Float(load_default=0)
 
 
@@ -37,7 +75,7 @@ class RegistrationFormFieldBase:
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
     #: a dict with extra marshmallow fields to include in the setup schema
     setup_schema_fields = {}
     #: whether this field is associated with a file instead of normal data
@@ -90,10 +128,10 @@ class RegistrationFormFieldBase:
         """
         return RegistrationData.data.op('#>>')('{}').in_(data_list)
 
-    def create_setup_schema(self):
+    def create_setup_schema(self, context=None):
         name = f'{type(self).__name__}SetupDataSchema'
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
-        return schema()
+        return schema(context=context)
 
     def create_mm_field(self, registration=None, override_required=False):
         """
@@ -218,7 +256,7 @@ class RegistrationFormBillableField(RegistrationFormFieldBase):
 
 
 class RegistrationFormBillableItemsField(RegistrationFormBillableField):
-    setup_schema_base_cls = mm.Schema
+    setup_schema_base_cls = FieldSetupSchemaBase
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
