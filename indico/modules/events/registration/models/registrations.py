@@ -659,10 +659,7 @@ class Registration(db.Model):
         return picture_attachements
 
     def _render_price(self, price):
-        locale = 'en_GB'
-        if has_request_context():
-            locale = session.lang or 'en_GB'
-        return format_currency(price, self.currency, locale=locale)
+        return format_currency(price, self.currency)
 
     def render_price(self):
         return self._render_price(self.price)
@@ -945,7 +942,7 @@ class RegistrationData(StoredFileMixin, db.Model):
         return config.ATTACHMENT_STORAGE, path
 
     def _render_price(self, price):
-        return format_currency(price, self.registration.currency, locale=(session.lang or 'en_GB'))
+        return format_currency(price, self.registration.currency)
 
     def render_price(self):
         return self._render_price(self.price)
