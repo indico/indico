@@ -7,7 +7,6 @@
 
 from uuid import UUID, uuid4
 
-from flask import session
 from sqlalchemy import orm, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import UUID as pg_UUID  # noqa: N811
@@ -588,7 +587,7 @@ class RegistrationForm(db.Model):
         return self.ticket_apple_wallet and self.is_apple_wallet_configured
 
     def render_base_price(self):
-        return format_currency(self.base_price, self.currency, locale=session.lang or 'en_GB')
+        return format_currency(self.base_price, self.currency)
 
     def get_personal_data_field_id(self, personal_data_type):
         """Return the field id corresponding to the personal data field with the given name."""
