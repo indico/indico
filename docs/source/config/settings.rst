@@ -63,6 +63,13 @@ Authentication
 
     Default: ``True``
 
+.. data:: LOCAL_PASSWORD_MIN_LENGTH
+
+    This setting controls the minimum number of characters required in
+    the new password for a local account.
+
+    Default: ``8``
+
 .. data:: LOCAL_MODERATION
 
     This setting controls whether a new registration needs to be approved
