@@ -233,6 +233,7 @@ const searchFactory = config => {
     results,
     total,
     loading,
+    pristine,
     onAdd,
     onRemove,
     onEnterManually,
@@ -265,24 +266,19 @@ const searchFactory = config => {
           {total > results.length && <Message info>{tooManyText}</Message>}
         </>
       ) : (
-        <>
-          <Divider horizontal>{noResultsText}</Divider>
-          {onEnterManually && (
-            <Message>
-              <div style={{display: 'flex'}}>
-                <div>
-                  <Translate as={Message.Header}>Add a new person</Translate>
-                  <Translate as="p">Add a person by manually entering their details</Translate>
-                </div>
-                <Button
-                  className="right"
-                  content={Translate.string('Add')}
-                  onClick={onEnterManually}
-                />
-              </div>
-            </Message>
-          )}
-        </>
+        <Divider horizontal>{noResultsText}</Divider>
+      )}
+      {onEnterManually && !pristine && (
+        <Message>
+          <Translate as={Message.Header}>I did not find who i was looking for</Translate>
+          <Translate as={Message.Content}>
+            If nobody on the search results corresponds to the person you were looking for, you can{' '}
+            <Param name="enterManuallyLink" wrapper={<a onClick={onEnterManually} />}>
+              add them manually
+            </Param>
+            .
+          </Translate>
+        </Message>
       )}
     </div>
   );
@@ -335,6 +331,7 @@ const searchFactory = config => {
           <SearchResults
             styleName="results"
             loading={loading}
+            pristine={pristine.current}
             results={resultDisplay.results}
             total={resultDisplay.total}
             favorites={favorites}
