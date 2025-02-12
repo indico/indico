@@ -13,7 +13,8 @@ from indico.modules.events.sessions.controllers.display import (RHDisplaySession
 from indico.modules.events.sessions.controllers.management.sessions import (RHAPICreateSession, RHAPISession,
                                                                             RHAPISessionBlock,
                                                                             RHAPISessionBlocksInheritedLocation,
-                                                                            RHAPISessionColors, RHAPISessionRandomColor,
+                                                                            RHAPISessionColors, RHAPISessionList,
+                                                                            RHAPISessionRandomColor,
                                                                             RHAPISessionsInheritedLocation,
                                                                             RHAPISessionTypes, RHCreateSession,
                                                                             RHCreateSessionType, RHDeleteSessions,
@@ -81,6 +82,7 @@ _compat_bp.add_url_rule('!/sessionDisplay.py', 'session_modpython',
                                                                   'sessionId': 'legacy_session_id'}))
 
 # API
+_bp.add_url_rule('/api/sessions/session_list', 'api_session_list', RHAPISessionList)
 _bp.add_url_rule('/api/sessions/colors', 'api_session_colors', RHAPISessionColors)
 _bp.add_url_rule('/api/sessions/random-color', 'api_random_session_color', RHAPISessionRandomColor)
 _bp.add_url_rule('/api/sessions/create', 'api_create_session', RHAPICreateSession, methods=('POST',))
