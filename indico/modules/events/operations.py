@@ -184,7 +184,7 @@ def clone_event(event, n_occurrence, start_dt, cloners, category=None, refresh_u
         'end_dt': end_dt,
         'timezone': event.timezone,
         'title': event.title,
-        'description': event.description,
+        'description': event._description,
         'own_map_url': event.own_map_url
     }
     new_event = create_event(category or event.category, event.type_, data,
