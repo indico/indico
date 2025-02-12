@@ -48,9 +48,14 @@ export function PictureWebcam({
             onUserMedia={() => setUserMediaActive(true)}
             mirrored
           />
-          <p>
-            <Translate>Click anywhere on the image to take a picture</Translate>
-          </p>
+          <div styleName="capture-controls">
+            <button styleName="trigger" type="button" onClick={onCapture}>
+              <Translate>Capture</Translate>
+            </button>
+            <p>
+              <Translate>Or click anywhere on the image to take a picture</Translate>
+            </p>
+          </div>
           <Icon
             styleName="back"
             name="arrow left"

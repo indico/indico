@@ -55,9 +55,9 @@ body {
   --control-disabled-indented-bg-color: var(--text-disabled-color);
   --control-disabled-inset-indented-color: var(--text-disabled-color);
   --control-border-width: 1px;
-  --control-border-radius: 0.15em;
+  --control-border-radius: 0.3em;
   --control-border: var(--control-border-width) solid var(--control-border-color);
-  --control-padding: 0.5em;
+  --control-padding: 0.5em 1em;
   --control-internal-gap: 0.2em;
   --control-raised-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.3);
 
