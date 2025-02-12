@@ -2,15 +2,15 @@ import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 
 import React, {useState} from 'react';
 import {FormSpy} from 'react-final-form';
-import {Button, Divider, Form, Header} from 'semantic-ui-react';
+import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
+import {SessionSelect} from 'indico/react/components/SessionSelect';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
 import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockForm';
-import {SessionFormFields} from '../../../sessions/client/js/SessionForm';
 // import {SessionBlockCreateForm} from 'indico/modules/events/sessions/client/js/SessionBlockForm';
 
 interface TimetableCreateModalProps {
@@ -55,16 +55,17 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     ),
     'Session Block': (
       <>
-        <Header as="h3">{Translate.string('Session Block')}</Header>
-        <SessionBlockFormFields eventId={13} locationParent={undefined} {...initialValues} />
-        <Divider />
+        {/* <Header as="h3">{Translate.string('Session Block')}</Header> */}
+        <SessionSelect eventId={eventId} required />
+        <SessionBlockFormFields eventId={eventId} locationParent={undefined} {...initialValues} />
+        {/* <Divider />
         <Header as="h3">{Translate.string('Session')}</Header>
-        <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} />
+        <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} /> */}
       </>
     ),
   };
 
-  const [activeForm, setActiveForm] = useState(Object.keys(forms)[1]);
+  const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
   const [formValues, setFormValues] = useState(initialValues);
 
   const renderForm = () => forms[activeForm];
@@ -99,13 +100,20 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
           setFormValues({...formValues, ...values});
         }}
       />
-      <Button.Group>
+      <Segment textAlign="center">
+        <Header as="h4">
+          <Translate>Entry Type</Translate>
+        </Header>
         {Object.keys(forms).map(key => (
-          <Button key={key} onClick={() => changeForm(key)} active={activeForm === key}>
+          <Button
+            key={key}
+            onClick={() => changeForm(key)}
+            color={activeForm === key ? 'blue' : undefined}
+          >
             {key}
           </Button>
         ))}
-      </Button.Group>
+      </Segment>
       <Divider />
       {activeForm && renderForm()}
     </FinalModalForm>

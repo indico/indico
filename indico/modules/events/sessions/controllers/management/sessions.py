@@ -200,6 +200,12 @@ class RHAPISession(RHManageSessionBase):
         return SessionSchema().jsonify(self.session)
 
 
+class RHAPISessionList(RHManageSessionsBase):
+
+    def _process(self):
+        return SessionSchema(many=True).jsonify(self.event.sessions)
+
+
 class RHAPICreateSession(RHManageSessionsBase):
 
     @use_args(SessionSchema)
