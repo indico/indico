@@ -52,9 +52,7 @@ export function PictureWebcam({
             <button styleName="trigger" type="button" onClick={onCapture}>
               <Translate>Capture</Translate>
             </button>
-            <p>
-              <Translate>Or click anywhere on the image to take a picture</Translate>
-            </p>
+            <Translate as="p">Or click anywhere on the image to take a picture</Translate>
           </div>
           <Icon
             styleName="back"
