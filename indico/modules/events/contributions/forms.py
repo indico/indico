@@ -27,7 +27,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
-                                     IndicoProtectionField, IndicoTagListField)
+                                     IndicoMarkdownField, IndicoProtectionField, IndicoTagListField)
 from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless, MaxDuration
@@ -37,7 +37,7 @@ from indico.web.forms.widgets import SwitchWidget
 class ContributionForm(IndicoForm):
     _submitter_editable_fields = ('title', 'description', 'person_link_data')
     title = StringField(_('Title'), [DataRequired()])
-    description = TextAreaField(_('Description'))
+    description = IndicoMarkdownField(_('Description'), editor=True, mathjax=True)
     start_dt = IndicoDateTimeField(_('Start date'),
                                    [DataRequired(),
                                     DateTimeRange(earliest=lambda form, field: form._get_earliest_start_dt(),
