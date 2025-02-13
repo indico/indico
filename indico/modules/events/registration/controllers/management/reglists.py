@@ -41,7 +41,8 @@ from indico.modules.events.registration.badges import (RegistrantsListToBadgesPD
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             UploadRegistrationFileMixin, UploadRegistrationPictureMixin)
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
-                                                                       RHManageRegistrationBase)
+                                                                       RHManageRegistrationBase,
+                                                                       RHManageRegistrationFieldActionBase)
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm, PublishReceiptForm,
                                                       RegistrationBasePriceForm,
@@ -655,7 +656,7 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
-class RHRegistrationUploadFile(UploadRegistrationFileMixin, RHManageRegFormBase):
+class RHRegistrationUploadFile(UploadRegistrationFileMixin, RHManageRegistrationFieldActionBase):
     """Upload a file from a registration form."""
 
 

@@ -119,6 +119,9 @@ class UploadRegistrationFileMixin(UploadFileMixin):
     def get_file_context(self):
         return 'event', self.event.id, 'regform', self.regform.id, 'registration'
 
+    def get_file_metadata(self):
+        return {'regform_field_id': self.field.id}
+
 
 class UploadRegistrationPictureMixin:
     """Perform additional validation for regform picture uploads.
@@ -132,4 +135,4 @@ class UploadRegistrationPictureMixin:
         return super()._save_file(file, resized_image_stream)
 
     def get_file_metadata(self):
-        return {'registration_picture_checked': True}
+        return super().get_file_metadata() | {'registration_picture_checked': True}
