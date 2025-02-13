@@ -20,7 +20,7 @@ import {getStaticData} from '../selectors';
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function FileInput({htmlId, htmlName, disabled, isRequired}) {
+export default function FileInput({fieldId, htmlId, htmlName, disabled, isRequired}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const isUpdateMode = useSelector(getUpdateMode);
   const isManagement = useSelector(getManagement);
@@ -34,6 +34,7 @@ export default function FileInput({htmlId, htmlName, disabled, isRequired}) {
   const urlParams = {
     event_id: eventId,
     reg_form_id: regformId,
+    field_id: fieldId,
   };
   if (registrationUuid) {
     urlParams.token = registrationUuid;
@@ -59,6 +60,7 @@ export default function FileInput({htmlId, htmlName, disabled, isRequired}) {
 }
 
 FileInput.propTypes = {
+  fieldId: PropTypes.number.isRequired,
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
