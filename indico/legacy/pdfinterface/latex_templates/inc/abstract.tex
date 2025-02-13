@@ -157,8 +157,9 @@
         \JINJA{endif}
     \JINJA{endif}
 
-    \VAR{(_('Submitted by {0} on {1}')|latex(true)).format(
+    \VAR{(_('Submitted by {0} <{1}> on {2}')|latex(true)).format(
         '\\textbf{%s}'|rawlatex|format(abstract.submitter.get_full_name(abbrev_first_name=false, show_title=true)),
+        abstract.submitter.email,
         '\\textbf{%s}'|rawlatex|format(abstract.submitted_dt|format_date('full'))
     )|rawlatex}
     \JINJA{if abstract.modified_dt}
