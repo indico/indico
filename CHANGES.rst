@@ -30,6 +30,7 @@ Improvements
 - Add a new setting (:data:`ALLOW_ADMIN_USER_DELETION`) to let administrators permanently
   delete Indico users from the user management UI (:pr:`6652`, thanks :user:`SegiNyn`)
 - Support ``==text==`` to highlight text in markdown (:issue:`6731`, :pr:`6732`)
+- Log changes to event payment methods (:pr:`6739`)
 
 Bugfixes
 ^^^^^^^^
