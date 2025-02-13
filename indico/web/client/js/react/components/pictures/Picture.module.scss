@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'design_system';
 
 .dropzone-area {
   :global(.ui.segment) {
@@ -85,4 +86,17 @@
 
 .show {
   display: block;
+}
+
+.trigger {
+  @extend %button;
+  font-size: 120%;
+}
+
+.capture-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  padding-bottom: 1em;
 }
