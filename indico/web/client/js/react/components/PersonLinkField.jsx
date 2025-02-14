@@ -192,7 +192,7 @@ const PersonLinkSection = ({
               onEdit={scope => onEdit(idx, scope)}
               onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
               canDelete={canDelete}
-              canEdit={canEdit}
+              canEdit={canEdit || !p.type} // allow editing manually entered persons
               roles={defaultRoles.map(({name, ...rest}) => ({
                 ...rest,
                 name,
