@@ -270,7 +270,7 @@ const searchFactory = config => {
       )}
       {onEnterManually && !pristine && (
         <Message>
-          <Translate as={Message.Header}>I did not find who i was looking for</Translate>
+          <Translate as={Message.Header}>I could not find the right person</Translate>
           <Translate as={Message.Content}>
             If nobody on the search results corresponds to the person you were looking for, you can{' '}
             <Param name="enterManuallyLink" wrapper={<a onClick={onEnterManually} />}>
