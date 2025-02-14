@@ -426,13 +426,10 @@ const searchFactory = config => {
       setStaged(prev => prev.filter(it => it.identifier !== item.identifier));
     };
 
-    const handleEnterManually =
-      onEnterManually &&
-      (() => {
-        setOpen(false);
-        onEnterManually();
-      });
-
+    const handleEnterManually = () => {
+      setOpen(false);
+      onEnterManually();
+    };
     const handleAddButtonClick = () => {
       onAddItems(single ? staged[0] : staged);
       setStaged([]);
@@ -501,7 +498,7 @@ const searchFactory = config => {
             favorites={favorites}
             onAdd={handleAdd}
             onRemove={handleRemove}
-            onEnterManually={handleEnterManually}
+            onEnterManually={onEnterManually ? handleEnterManually : null}
             isAdded={isAdded}
             single={single}
             withEventPersons={withEventPersons}
