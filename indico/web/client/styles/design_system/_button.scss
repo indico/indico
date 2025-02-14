@@ -23,10 +23,11 @@
   gap: var(--control-internal-gap);
   padding: var(--control-padding);
 
-  border: var(--control-border-width) solid var(--button-border-color);
+  border: 0;
   color: var(--button-text-color);
   background: var(--button-surface-color);
   line-height: 1.1;
+  font-weight: bold;
 
   &:focus,
   &:hover {
