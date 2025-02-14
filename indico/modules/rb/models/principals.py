@@ -46,3 +46,30 @@ class RoomPrincipal(PrincipalPermissionsMixin, db.Model):
 
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'principal', read_access=False, full_access=False, permissions=[])
+
+
+class LocationPrincipal(PrincipalPermissionsMixin, db.Model):
+    __tablename__ = 'location_principals'
+    principal_backref_name = 'in_location_acls'
+    principal_for = 'Location'
+    unique_columns = ('location_id',)
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls, schema='roombooking')
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    location_id = db.Column(
+        db.ForeignKey('roombooking.locations.id'),
+        index=True,
+        nullable=False
+    )
+
+    # relationship backrefs:
+    # - location (Location.acl_entries)
+
+    def __repr__(self):
+        return format_repr(self, 'id', 'location_id', 'principal', read_access=False, full_access=False, permissions=[])
