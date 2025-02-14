@@ -1,22 +1,29 @@
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
+import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block';
 
+import _ from 'lodash';
 import React, {useState} from 'react';
-import {FormSpy} from 'react-final-form';
 import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
 import {SessionSelect} from 'indico/react/components/SessionSelect';
+import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import {ContributionFormFields} from '../../../contributions/client/js/ContributionForm';
 import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockForm';
-// import {SessionBlockCreateForm} from 'indico/modules/events/sessions/client/js/SessionBlockForm';
 
 interface TimetableCreateModalProps {
   eventId: number;
   newEntry: any;
   onClose: () => void;
+}
+
+enum FormType {
+  Contribution = 'Contribution',
+  SessionBlock = 'Session Block',
+  Break = 'Break',
 }
 
 const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
@@ -45,40 +52,75 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     conveners: [],
   };
 
-  const forms = {
-    'Contribution': (
+  const forms: {[key in FormType]: React.ReactElement} = {
+    [FormType.Contribution]: (
       <ContributionFormFields
         eventId={eventId}
         initialValues={initialValues}
         personLinkFieldParams={personLinkFieldParams}
       />
     ),
-    'Session Block': (
+    [FormType.SessionBlock]: (
       <>
-        {/* <Header as="h3">{Translate.string('Session Block')}</Header> */}
         <SessionSelect eventId={eventId} required />
         <SessionBlockFormFields eventId={eventId} locationParent={undefined} {...initialValues} />
-        {/* <Divider />
-        <Header as="h3">{Translate.string('Session')}</Header>
-        <SessionFormFields eventType="conference" sessionTypes={[]} locationParent={{}} /> */}
+      </>
+    ),
+    [FormType.Break]: (
+      <>
+        {/* TODO: Make actual Break form */}
+        <FinalInput
+          name="title"
+          label={Translate.string('Title')}
+          required
+          type={undefined}
+          nullIfEmpty={undefined}
+          noAutoComplete={undefined}
+        />
       </>
     ),
   };
 
   const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
-  const [formValues, setFormValues] = useState(initialValues);
 
-  const renderForm = () => forms[activeForm];
+  const handleSubmitContribution = async (data: any) => {
+    return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
+  };
+
+  const handleSubmitSessionBlock = async (data: any) => {
+    // data = _.omitBy(data, 'conveners'); // TODO person links
+    console.log('person links', data);
+    data['person_links'] = data['person_links'] || [];
+    return await indicoAxios.post(
+      sessionBlockCreateURL({event_id: eventId, session_id: data.session_id}),
+      data
+    );
+  };
+
+  // TODO: Implement logic for breaks
+  const handleSubmitBreak = async (formData: any) => {
+    return [];
+  };
 
   const handleSubmit = async (formData: any) => {
     try {
-      await indicoAxios.post(contributionCreateURL({event_id: eventId}), formData);
+      switch (activeForm) {
+        case FormType.Contribution:
+          await handleSubmitContribution(formData);
+          break;
+        case FormType.SessionBlock:
+          await handleSubmitSessionBlock(formData);
+          break;
+        case FormType.Break:
+          await handleSubmitBreak(formData);
+          break;
+        default:
+          throw new Error('Invalid form');
+      }
     } catch (e) {
       return handleSubmitError(e);
     }
     location.reload();
-    // never finish submitting to avoid fields being re-enabled
-    await new Promise(() => {});
   };
 
   const changeForm = (key: string) => {
@@ -90,16 +132,12 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       id="contribution-form"
       onSubmit={handleSubmit}
       onClose={onClose}
-      initialValues={formValues}
+      initialValues={initialValues}
+      disabledUntilChange={false}
+      keepDirtyOnReinitialize
       size="small"
       header={Translate.string('Create new timetable entry')}
     >
-      <FormSpy
-        subscription={{values: true}}
-        onChange={({values}) => {
-          setFormValues({...formValues, ...values});
-        }}
-      />
       <Segment textAlign="center">
         <Header as="h4">
           <Translate>Entry Type</Translate>
@@ -107,7 +145,10 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         {Object.keys(forms).map(key => (
           <Button
             key={key}
-            onClick={() => changeForm(key)}
+            type="button"
+            onClick={() => {
+              changeForm(key);
+            }}
             color={activeForm === key ? 'blue' : undefined}
           >
             {key}
@@ -115,7 +156,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         ))}
       </Segment>
       <Divider />
-      {activeForm && renderForm()}
+      {forms[activeForm]}
     </FinalModalForm>
   );
 };

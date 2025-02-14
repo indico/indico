@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import locationParentURL from 'indico-url:sessions.api_blocks_location_parent';
-import sessionBlockCreateURL from 'indico-url:sessions.api_create_block';
+import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block';
 import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
 import _ from 'lodash';
@@ -151,7 +151,7 @@ export function SessionBlockCreateForm({eventId, sessionId, onClose}: SessionBlo
   );
 
   const handleSubmit = async (formData: any) => {
-    formData = _.omitBy(formData, 'conveners'); // TODO person links
+    formData = _.omitBy(formData, 'person_links'); // TODO person links
     try {
       await indicoAxios.patch(
         sessionBlockCreateURL({event_id: eventId, session_id: sessionId}),

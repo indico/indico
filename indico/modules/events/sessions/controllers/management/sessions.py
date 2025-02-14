@@ -19,13 +19,13 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin, RHManageEventBase
 from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
                                                                    RHManageSessionsBase)
-from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionForm, SessionProtectionForm,
-                                                  SessionTypeForm)
+from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionBlockForm, SessionForm,
+                                                  SessionProtectionForm, SessionTypeForm)
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
-from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
-                                                       update_session_block)
+from indico.modules.events.sessions.operations import (create_session, create_session_block, delete_session,
+                                                       update_session, update_session_block)
 from indico.modules.events.sessions.schemas import (LocationParentSchema, SessionBlockSchema, SessionColorSchema,
                                                     SessionSchema, SessionTypeSchema)
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
@@ -213,6 +213,11 @@ class RHAPICreateSession(RHManageSessionsBase):
         print('session data', data)
         create_session(self.event, data)
 
+class RHAPICreateSessionBlock(RHManageSessionBase):
+
+    @use_args(SessionBlockSchema)
+    def _process_POST(self, data):
+        create_session_block(self.session, data)
 
 class RHAPISessionRandomColor(RHManageSessionsBase):
 

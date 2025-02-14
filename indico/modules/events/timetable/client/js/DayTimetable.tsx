@@ -31,6 +31,7 @@ interface TimetableEntry extends Omit<TopLevelEntry, 'id'> {
 
 interface DayTimetableProps {
   dt: Moment;
+  eventId: number;
   minHour: number;
   maxHour: number;
   entries: TopLevelEntry[];
@@ -80,7 +81,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
-export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps) {
+export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimetableProps) {
   const dispatch = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
@@ -280,7 +281,7 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
               )}
               {isModalOpen && newEntry && (
                 <TimetableCreateModal
-                  eventId={5} // TODO: Change this to an actual ID
+                  eventId={eventId}
                   open={isModalOpen}
                   onClose={() => {
                     setNewEntry(null);

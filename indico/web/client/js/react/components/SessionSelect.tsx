@@ -47,15 +47,13 @@ const processSessions = (sessions: Session[]) => {
 
 export function SessionSelect({eventId, required}: SessionSelectProps) {
   const {data} = useIndicoAxios(sessionListURL({event_id: eventId}), {camelize: true});
-  console.log(data);
   const sessions = processSessions(data || []);
-  console.log(sessions);
 
   return (
     <FinalDropdown
-      name="session-select"
+      name="session_id"
       label={Translate.string('Session')}
-      placeholder={Translate.string('Select Session')}
+      placeholder={Translate.string('Select a session')}
       options={sessions}
       required={required}
       selection

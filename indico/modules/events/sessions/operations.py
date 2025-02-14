@@ -37,6 +37,7 @@ def create_session_block(session_, data):
     session_.event.log(EventLogRealm.management, LogKind.positive, 'Sessions',
                        f'Session block "{block.title}" for session "{session_.title}" has been created', session.user,
                        meta={'session_block_id': block.id})
+    print('STEP 4')
     logger.info('Session block %s created by %s', block, session.user)
     return block
 
