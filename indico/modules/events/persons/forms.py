@@ -8,15 +8,17 @@
 from wtforms.fields import BooleanField
 
 from indico.core.auth import multipass
+from indico.modules.events.persons import CustomPersonsMode
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoEnumSelectField
 from indico.web.forms.widgets import SwitchWidget
 
 
 class ManagePersonListsForm(IndicoForm):
-    disallow_custom_persons = BooleanField(_('Disallow manually entering persons'), widget=SwitchWidget(),
-                                           description=_('Prohibit submitters from adding new speakers/authors '
-                                                         'manually and only allow searching for existing users.'))
+    custom_persons_mode = IndicoEnumSelectField(_('Allow manually adding people'), enum=CustomPersonsMode,
+                                                description=_('Controls when users can manually add people to person '
+                                                              'lists, such as speakers/authors of contributions.'))
     default_search_external = BooleanField(_('Include users with no Indico account by default'), widget=SwitchWidget(),
                                            description=_('If enabled, searching people for speakers/authors will '
                                                          'include those with no Indico account by default.'))

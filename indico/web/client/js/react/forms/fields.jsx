@@ -374,6 +374,10 @@ export function FinalField({name, adapter, component, description, required, onC
   if (extraProps.validate && rest.validate) {
     extraProps.validate = validators.chain(extraProps.validate, rest.validate);
     delete rest.validate;
+  } else if (rest.validate === null || rest.validate === undefined) {
+    // avoid overwriting default (required) validator e.g. when conditionally setting a validator
+    // on a field (and using null/undefined in case no validator is needed)
+    delete rest.validate;
   }
 
   return (

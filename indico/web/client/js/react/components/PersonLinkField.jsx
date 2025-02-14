@@ -192,7 +192,7 @@ const PersonLinkSection = ({
               onEdit={scope => onEdit(idx, scope)}
               onClickRole={(roleIdx, value) => onClickRole(idx, roleIdx, value)}
               canDelete={canDelete}
-              canEdit={canEdit}
+              canEdit={canEdit || !p.type} // allow editing manually entered persons
               roles={defaultRoles.map(({name, ...rest}) => ({
                 ...rest,
                 name,
@@ -242,7 +242,8 @@ function PersonLinkField({
   autoSort,
   setAutoSort,
   hasPredefinedAffiliations,
-  canEnterManually,
+  customPersonsMode,
+  requiredPersonFields,
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
@@ -338,7 +339,7 @@ function PersonLinkField({
                 onChange={values =>
                   onChange(persons.filter(p => !filterCondition(p)).concat(values))
                 }
-                canEdit={canEnterManually}
+                canEdit={customPersonsMode === 'always'}
                 extraParams={extraParams}
               />
             );
@@ -352,7 +353,7 @@ function PersonLinkField({
               defaultRoles={roles}
               onEdit={(idx, scope) => onEdit(persons.findIndex(p => p === others[idx]), scope)}
               onChange={values => onChange(persons.filter(p => !othersCondition(p)).concat(values))}
-              canEdit={canEnterManually}
+              canEdit={customPersonsMode === 'always'}
               extraParams={extraParams}
             />
           )}
@@ -380,6 +381,7 @@ function PersonLinkField({
             favorites={favoriteUsers}
             existing={persons.map(p => p.userIdentifier)}
             onAddItems={onAdd}
+            onEnterManually={customPersonsMode === 'never' ? null : () => setModalOpen('details')}
             triggerFactory={props => (
               <Button type="button" {...props}>
                 <Icon name="search" />
@@ -392,7 +394,7 @@ function PersonLinkField({
             eventId={eventId}
             disabled={!sessionUser}
           />
-          {canEnterManually && (
+          {customPersonsMode === 'always' && (
             <Button type="button" onClick={() => setModalOpen('details')}>
               <Icon name="keyboard" />
               <Translate>Enter manually</Translate>
@@ -404,6 +406,7 @@ function PersonLinkField({
               onSubmit={onSubmit}
               person={persons[selected]}
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
+              requiredPersonFields={requiredPersonFields}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
               validateEmailUrl={validateEmailUrl}
               extraParams={extraParams}
@@ -434,7 +437,8 @@ PersonLinkField.propTypes = {
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
-  canEnterManually: PropTypes.bool,
+  customPersonsMode: PropTypes.oneOf(['always', 'after_search', 'never']),
+  requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
   nameFormat: PropTypes.string,
   validateEmailUrl: PropTypes.string,
@@ -449,7 +453,8 @@ PersonLinkField.defaultProps = {
   autoSort: true,
   setAutoSort: null,
   hasPredefinedAffiliations: false,
-  canEnterManually: true,
+  customPersonsMode: 'always',
+  requiredPersonFields: [],
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,
@@ -464,7 +469,8 @@ export function WTFPersonLinkField({
   sessionUser,
   emptyMessage,
   hasPredefinedAffiliations,
-  canEnterManually,
+  customPersonsMode,
+  requiredPersonFields,
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
@@ -520,7 +526,8 @@ export function WTFPersonLinkField({
       autoSort={autoSort}
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
-      canEnterManually={canEnterManually}
+      customPersonsMode={customPersonsMode}
+      requiredPersonFields={requiredPersonFields}
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
       validateEmailUrl={validateEmailUrl}
@@ -538,7 +545,8 @@ WTFPersonLinkField.propTypes = {
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
   nameFormat: PropTypes.string,
-  canEnterManually: PropTypes.bool,
+  customPersonsMode: PropTypes.oneOf(['always', 'after_search', 'never']),
+  requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
@@ -551,7 +559,8 @@ WTFPersonLinkField.defaultProps = {
   sessionUser: null,
   emptyMessage: null,
   hasPredefinedAffiliations: false,
-  canEnterManually: true,
+  customPersonsMode: 'always',
+  requiredPersonFields: [],
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,

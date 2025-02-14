@@ -233,8 +233,10 @@ const searchFactory = config => {
     results,
     total,
     loading,
+    pristine,
     onAdd,
     onRemove,
+    onEnterManually,
     isAdded,
     favorites,
     // eslint-disable-next-line no-shadow
@@ -266,12 +268,25 @@ const searchFactory = config => {
       ) : (
         <Divider horizontal>{noResultsText}</Divider>
       )}
+      {onEnterManually && !pristine && (
+        <Message>
+          <Translate as={Message.Header}>I could not find the right person</Translate>
+          <Translate as={Message.Content}>
+            If nobody on the search results corresponds to the person you were looking for, you can{' '}
+            <Param name="enterManuallyLink" wrapper={<a onClick={onEnterManually} />}>
+              add them manually
+            </Param>
+            .
+          </Translate>
+        </Message>
+      )}
     </div>
   );
 
   const SearchContent = ({
     onAdd,
     onRemove,
+    onEnterManually,
     isAdded,
     favorites,
     single,
@@ -316,11 +331,13 @@ const searchFactory = config => {
           <SearchResults
             styleName="results"
             loading={loading}
+            pristine={pristine.current}
             results={resultDisplay.results}
             total={resultDisplay.total}
             favorites={favorites}
             onAdd={onAdd}
             onRemove={onRemove}
+            onEnterManually={onEnterManually}
             isAdded={isAdded}
             getResultsText={total =>
               resultDisplay.results === favoriteResults
@@ -385,6 +402,7 @@ const searchFactory = config => {
     alwaysConfirm,
     onOpen,
     onClose,
+    onEnterManually,
     withEventPersons,
     eventId,
   }) => {
@@ -408,6 +426,10 @@ const searchFactory = config => {
       setStaged(prev => prev.filter(it => it.identifier !== item.identifier));
     };
 
+    const handleEnterManually = () => {
+      setOpen(false);
+      onEnterManually();
+    };
     const handleAddButtonClick = () => {
       onAddItems(single ? staged[0] : staged);
       setStaged([]);
@@ -476,6 +498,7 @@ const searchFactory = config => {
             favorites={favorites}
             onAdd={handleAdd}
             onRemove={handleRemove}
+            onEnterManually={onEnterManually ? handleEnterManually : null}
             isAdded={isAdded}
             single={single}
             withEventPersons={withEventPersons}
@@ -507,6 +530,7 @@ const searchFactory = config => {
     alwaysConfirm: PropTypes.bool,
     onOpen: PropTypes.func,
     onClose: PropTypes.func,
+    onEnterManually: PropTypes.func,
     withEventPersons: PropTypes.bool,
     eventId: PropTypes.number,
   };
@@ -520,6 +544,7 @@ const searchFactory = config => {
     alwaysConfirm: false,
     onOpen: () => {},
     onClose: () => {},
+    onEnterManually: null,
     withEventPersons: false,
     eventId: null,
   };
