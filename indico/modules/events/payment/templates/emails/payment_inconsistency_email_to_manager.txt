@@ -11,7 +11,7 @@
 {% block body %}
 {% filter dedent %}
     {% filter wordwrap(width=78, break_long_words=false) -%}
-        {% trans id=registration.friendly_id, paid_amount=format_currency(amount, currency, locale='en_GB'), expected_price=registration.render_price() %}
+        {% trans id=registration.friendly_id, paid_amount=format_currency(amount, currency), expected_price=registration.render_price() %}
             It appears that the payment of the registration with ID {{ id }} has an incorrect
             amount of money (received {{ paid_amount }} while expecting {{ expected_price }}).
             Please, check with the registrant to see if there was some misunderstanding.
