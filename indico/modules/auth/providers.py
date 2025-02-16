@@ -8,6 +8,7 @@
 from flask import flash, session
 from flask_multipass import AuthInfo, AuthProvider, InvalidCredentials, NoSuchUser
 from flask_multipass.providers.sqlalchemy import SQLAlchemyIdentityProviderBase
+from markupsafe import Markup
 
 from indico.core.config import config
 from indico.core.db import db
@@ -17,6 +18,7 @@ from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.util.i18n import _
 from indico.util.passwords import validate_secure_password
+from indico.web.flask.util import url_for
 
 
 class IndicoAuthProvider(AuthProvider):
@@ -63,9 +65,10 @@ class IndicoAuthProvider(AuthProvider):
         if not (identity := next((ide for ide in identities if self.check_password(ide, data['password'])), None)):
             raise InvalidCredentials(provider=self)
         if data['identifier'] != identity.identifier and data['identifier'] in identity.user.secondary_emails:
-            flash(_('You are logging in with a secondary email address. Please note that account-related '
-                    'notifications will always be sent to your primary email address. Go to "My profile" to '
-                    'manage your emails.'), 'warning')
+            msg = _('You are logging in with a secondary email address. Please note that any email notifications '
+                    'will always be sent to your primary email address ({email}). Go to '
+                    '<a href="{url}">"My profile"</a> to manage your emails.')
+            flash(Markup(msg).format(email=identity.user.email, url=url_for('users.user_emails')), 'warning')
         auth_info = AuthInfo(self, identity=identity)
         return self.multipass.handle_auth_success(auth_info)
 
