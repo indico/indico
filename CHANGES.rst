@@ -33,6 +33,8 @@ Improvements
 - Add an event setting to allow enforcing search before entering a person manually to
   a persons list in abstracts and contributions (:pr:`6689`)
 - Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
+- Add new setting :data:`LOCAL_USERNAMES` to disable usernames for logging in and only
+  using the email address (:pr:`6751`)
 
 Bugfixes
 ^^^^^^^^

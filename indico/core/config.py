@@ -60,6 +60,7 @@ DEFAULTS = {
     'IDENTITY_PROVIDERS': {},
     'LATEX_RATE_LIMIT': '2 per 3 seconds',
     'LOCAL_IDENTITIES': True,
+    'LOCAL_USERNAMES': True,
     'LOCAL_MODERATION': False,
     'LOCAL_REGISTRATION': True,
     'LOCAL_GROUPS': True,

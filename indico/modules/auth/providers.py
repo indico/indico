@@ -9,6 +9,7 @@ from flask import flash, session
 from flask_multipass import AuthInfo, AuthProvider, InvalidCredentials, NoSuchUser
 from flask_multipass.providers.sqlalchemy import SQLAlchemyIdentityProviderBase
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.auth import Identity, logger
 from indico.modules.auth.forms import LocalLoginForm
@@ -36,13 +37,17 @@ class IndicoAuthProvider(AuthProvider):
         # In some very rare edge cases we can get more than one, e.g. when a user has an old identity
         # with a username that happens to be the email address of another user (this is no longer possible,
         # but existing accounts could have it).
+        username_filter = (
+            db.or_(Identity.identifier == data['identifier'], UserEmail.email == data['identifier'])
+            if config.LOCAL_USERNAMES
+            else (UserEmail.email == data['identifier'])
+        )
         identities = (
             Identity.query
             .join(User)
             .join(UserEmail)
             .filter(Identity.provider == self.name,
-                    db.or_(Identity.identifier == data['identifier'],
-                           UserEmail.email == data['identifier']),
+                    username_filter,
                     ~User.is_pending,
                     ~UserEmail.is_user_deleted)
             .order_by(Identity.id)
@@ -58,7 +63,7 @@ class IndicoAuthProvider(AuthProvider):
         if not (identity := next((ide for ide in identities if self.check_password(ide, data['password'])), None)):
             raise InvalidCredentials(provider=self)
         if data['identifier'] != identity.identifier and data['identifier'] in identity.user.secondary_emails:
-            flash(_('You are logging in with a secondary email address. Please note that account related '
+            flash(_('You are logging in with a secondary email address. Please note that account-related '
                     'notifications will always be sent to your primary email address. Go to "My profile" to '
                     'manage your emails.'), 'warning')
         auth_info = AuthInfo(self, identity=identity)

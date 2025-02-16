@@ -10,6 +10,7 @@ import os
 import pytest
 from flask_webpackext.ext import _FlaskWebpackExtState
 
+from indico.core.config import config
 from indico.web.flask.app import make_app
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.rh import RH
@@ -37,6 +38,14 @@ def app(request):
         'NO_REPLY_EMAIL': 'noreply@example.com',
     }
     return make_app(testing=True, config_override=config_override)
+
+
+@pytest.fixture
+def patch_indico_config(monkeypatch):
+    """Patch an Indico config setting."""
+    def _patcher(name, value):
+        monkeypatch.setattr(type(config), name, property(lambda self: value), raising=False)
+    return _patcher
 
 
 @pytest.fixture(autouse=True)
