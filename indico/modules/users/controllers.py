@@ -9,6 +9,7 @@ from collections import namedtuple
 from io import BytesIO
 from operator import attrgetter
 from urllib.parse import urlsplit
+from uuid import uuid4
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, render_template, request, session
@@ -759,7 +760,8 @@ class RHUsersAdminCreate(RHAdminBase):
         if form.validate_on_submit():
             data = form.data
             if data.pop('create_identity', False):
-                identity = Identity(provider='indico', identifier=data.pop('username'), password=data.pop('password'))
+                identifier = data.pop('username') if config.LOCAL_USERNAMES else uuid4()
+                identity = Identity(provider='indico', identifier=identifier, password=data.pop('password'))
             else:
                 identity = None
                 data.pop('username', None)
