@@ -24,7 +24,14 @@ import {getStaticData} from '../selectors';
 import '../../../styles/regform.module.scss';
 import './FileInput.module.scss';
 
-export default function PictureInput({htmlName, htmlId, disabled, isRequired, minPictureSize}) {
+export default function PictureInput({
+  fieldId,
+  htmlName,
+  htmlId,
+  disabled,
+  isRequired,
+  minPictureSize,
+}) {
   const {eventId, regformId, registrationUuid, fileData} = useSelector(getStaticData);
   const initialPictureDetails = fileData ? fileData[htmlName] || null : null;
   const isManagement = useSelector(getManagement);
@@ -38,6 +45,7 @@ export default function PictureInput({htmlName, htmlId, disabled, isRequired, mi
   const uploadUrlParams = {
     event_id: eventId,
     reg_form_id: regformId,
+    field_id: fieldId,
   };
   if (registrationUuid) {
     uploadUrlParams.token = registrationUuid;
@@ -66,6 +74,7 @@ export default function PictureInput({htmlName, htmlId, disabled, isRequired, mi
 }
 
 PictureInput.propTypes = {
+  fieldId: PropTypes.number.isRequired,
   htmlId: PropTypes.string.isRequired,
   htmlName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,

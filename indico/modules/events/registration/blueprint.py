@@ -64,10 +64,10 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-ema
                  reglists.RHRegistrationCheckEmail)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 'delete_registrations',
                  reglists.RHRegistrationDelete, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/upload', 'upload_file_management',
-                 reglists.RHRegistrationUploadFile, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/upload-picture', 'upload_picture_management',
-                 reglists.RHRegistrationUploadPicture, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/upload/<int:field_id>',
+                 'upload_file_management', reglists.RHRegistrationUploadFile, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/upload-picture/<int:field_id>',
+                 'upload_picture_management', reglists.RHRegistrationUploadPicture, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
                  reglists.RHRegistrationDetails)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
@@ -218,10 +218,10 @@ _bp.add_url_rule('/registrations/', 'display_regform_list', display.RHRegistrati
 _bp.add_url_rule('/registrations/participants', 'participant_list', display.RHParticipantList)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform', display.RHRegistrationForm,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/registrations/<int:reg_form_id>/upload', 'upload_registration_file',
-                 display.RHUploadRegistrationFile, methods=('POST',))
-_bp.add_url_rule('/registrations/<int:reg_form_id>/upload-picture', 'upload_registration_picture',
-                 display.RHUploadRegistrationPicture, methods=('POST',))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/upload/<int:field_id>',
+                 'upload_registration_file', display.RHUploadRegistrationFile, methods=('POST',))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/upload-picture/<int:field_id>',
+                 'upload_registration_picture', display.RHUploadRegistrationPicture, methods=('POST',))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/edit', 'edit_registration_display',
                  display.RHRegistrationDisplayEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/registrations/<int:reg_form_id>/withdraw', 'withdraw_registration',
