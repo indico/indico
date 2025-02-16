@@ -32,6 +32,7 @@ Improvements
 - Support ``==text==`` to highlight text in markdown (:issue:`6731`, :pr:`6732`)
 - Add an event setting to allow enforcing search before entering a person manually to
   a persons list in abstracts and contributions (:pr:`6689`)
+- Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^

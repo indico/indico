@@ -17,6 +17,7 @@ from indico.modules.auth import Identity
 from indico.modules.core.captcha import WTFCaptchaField
 from indico.modules.users import User, user_management_settings
 from indico.util.i18n import _
+from indico.util.string import validate_email
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import ConfirmPassword, SecurePassword
 
@@ -46,13 +47,19 @@ def _check_not_blacklisted(form, field):
             raise ValidationError(error_msg)
 
 
+def _check_not_email_address(form, field):
+    if validate_email(field.data, check_dns=False):
+        raise ValidationError(_('Your username cannot be an email address.'))
+
+
 class LocalLoginForm(IndicoForm):
     identifier = StringField(_('Username'), [DataRequired()], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired()])
 
 
 class AddLocalIdentityForm(IndicoForm):
-    username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
+    username = StringField(_('Username'), [DataRequired(), _check_existing_username, _check_not_email_address],
+                           filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), SecurePassword('set-user-password',
                                                                             username_field='username')],
                              render_kw={'autocomplete': 'new-password'})
@@ -81,6 +88,8 @@ class EditLocalIdentityForm(IndicoForm):
             raise ValidationError(_('Wrong current password'))
 
     def validate_username(self, field):
+        if validate_email(field.data, check_dns=False) and field.data != self.identity.identifier:
+            raise ValidationError(_('Your username cannot be an email address.'))
         query = Identity.query.filter(Identity.provider == 'indico',
                                       Identity.identifier == field.data,
                                       Identity.identifier != self.identity.identifier)
@@ -124,6 +133,10 @@ class LocalRegistrationForm(IndicoForm):
         data = super().data
         data.pop('confirm_password', None)
         return data
+
+    def validate_username(self, field):
+        if validate_email(field.data, check_dns=False):
+            raise ValidationError(_('Your username cannot be an email address.'))
 
 
 class ResetPasswordEmailForm(IndicoForm):
