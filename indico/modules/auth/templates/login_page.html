@@ -57,7 +57,7 @@
                 {% include 'flashed_messages.html' %}
             </div>
         {% endif %}
-        {% set external_providers = providers|selectattr('is_external') %}
+        {% set external_providers = providers|selectattr('is_external')|list %}
         {% if external_providers %}
             {% if active_provider %}
                 <div class="titled-rule">
