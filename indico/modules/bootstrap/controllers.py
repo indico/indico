@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from platform import python_version
+from uuid import uuid4
 
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
@@ -56,7 +57,8 @@ class RHBootstrap(RH):
         user.email = setup_form.email.data
         user.is_admin = True
 
-        identity = Identity(provider='indico', identifier=setup_form.username.data, password=setup_form.password.data)
+        identifier = setup_form.username.data if config.LOCAL_USERNAMES else uuid4()
+        identity = Identity(provider='indico', identifier=identifier, password=setup_form.password.data)
         user.identities.add(identity)
 
         db.session.add(user)

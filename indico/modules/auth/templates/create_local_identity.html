@@ -12,9 +12,15 @@
     {% include 'flashed_messages.html' %}
 
     {% call message_box('info') %}
-        {% trans email=user.email, name=user.full_name %}
-            You're setting username and password for your Indico account <strong>{{ name }}</strong> ({{ email }}).
-        {% endtrans %}
+        {% if indico_config.LOCAL_USERNAMES %}
+            {% trans email=user.email, name=user.full_name %}
+                You're setting username and password for your Indico account <strong>{{ name }}</strong> ({{ email }}).
+            {% endtrans %}
+        {% else %}
+            {% trans email=user.email, name=user.full_name %}
+                You're setting a password for your Indico account <strong>{{ name }}</strong> ({{ email }}).
+            {% endtrans %}
+        {% endif %}
     {% endcall %}
 
     {{ simple_form(form, back_button=false) }}

@@ -5,8 +5,14 @@
 {%- endblock %}
 
 {% block local_identity_details -%}
-    {%- trans %}
-        Currently there is no username/password set, but you can use the link below (within an hour)
-        to set one:
-    {% endtrans -%}
+    {%- if indico_config.LOCAL_USERNAMES -%}
+        {%- trans %}
+            Currently there is no username/password set, but you can use the link below (within an hour)
+            to set one:
+        {% endtrans -%}
+    {%- else -%}
+        {%- trans %}
+            Currently there is no password set, but you can use the link below (within an hour) to set one:
+        {% endtrans -%}
+    {%- endif -%}
 {%- endblock %}

@@ -45,6 +45,7 @@ function Signup({
   initialValues,
   hasPredefinedAffiliations,
   showAccountForm,
+  showUsernameField,
   syncedValues,
   emails,
   affiliationMeta,
@@ -246,7 +247,9 @@ function Signup({
           </Fieldset>
           {showAccountForm && (
             <Fieldset legend={Translate.string('Login details')}>
-              <FinalInput name="username" label={Translate.string('Username')} required />
+              {showUsernameField && (
+                <FinalInput name="username" label={Translate.string('Username')} required />
+              )}
               <Form.Group widths="equal">
                 <FinalInput
                   name="password"
@@ -345,6 +348,7 @@ Signup.propTypes = {
   initialValues: PropTypes.object.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
   showAccountForm: PropTypes.bool.isRequired,
+  showUsernameField: PropTypes.bool,
   syncedValues: PropTypes.object.isRequired,
   emails: PropTypes.arrayOf(PropTypes.string).isRequired,
   affiliationMeta: PropTypes.object,
@@ -361,6 +365,7 @@ Signup.defaultProps = {
   privacyPolicyUrl: '',
   termsRequireAccept: false,
   termsEffectiveDate: null,
+  showUsernameField: false,
   affiliationMeta: null,
   hasPendingUser: false,
   lockedFields: [],

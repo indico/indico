@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from uuid import uuid4
+
 import click
 from flask_multipass import IdentityInfo
 from sqlalchemy.exc import IntegrityError
@@ -12,6 +14,7 @@ from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
 from indico.core import signals
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.scopes import SCOPES
@@ -129,14 +132,17 @@ def create(grant_admin):
     last_name = click.prompt('Last name').strip()
     affiliation = click.prompt('Affiliation', '').strip()
     print()
-    while True:
-        username = click.prompt('Enter username').lower().strip()
-        if validate_email(username, check_dns=False):
-            click.secho('The username cannot be an email address.', fg='red')
-            continue
-        if not Identity.query.filter_by(provider='indico', identifier=username).has_rows():
-            break
-        click.secho('Username already exists', fg='red')
+    if not config.LOCAL_USERNAMES:
+        username = uuid4()
+    else:
+        while True:
+            username = click.prompt('Enter username').lower().strip()
+            if validate_email(username, check_dns=False):
+                click.secho('The username cannot be an email address.', fg='red')
+                continue
+            if not Identity.query.filter_by(provider='indico', identifier=username).has_rows():
+                break
+            click.secho('Username already exists', fg='red')
     password = prompt_pass()
     if password is None:
         return

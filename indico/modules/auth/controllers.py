@@ -7,6 +7,7 @@
 
 import math
 from operator import itemgetter
+from uuid import uuid4
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from flask_multipass import AuthProvider
@@ -370,19 +371,21 @@ class RHAccounts(RHUserBase):
             defaults = FormDefaults(username=self.user.local_identity.identifier)
             local_account_form = EditLocalIdentityForm(identity=self.user.local_identity, obj=defaults)
         else:
-            local_account_form = AddLocalIdentityForm()
+            local_account_form = AddLocalIdentityForm(user_emails=self.user.all_emails)
         return local_account_form
 
     def _handle_add_local_account(self, form):
-        identity = Identity(provider='indico', identifier=form.data['username'], password=form.data['password'])
+        identifier = form.username.data if config.LOCAL_USERNAMES else uuid4()  # uuid to have something unique
+        identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
         self.user.identities.add(identity)
         logger.info('User %s added a local account (%s)', self.user, identity.identifier)
         flash(_('Local account added successfully'), 'success')
 
     def _handle_edit_local_account(self, form):
-        self.user.local_identity.identifier = form.data['username']
+        if config.LOCAL_USERNAMES:
+            self.user.local_identity.identifier = form.username.data
         if form.data['new_password']:
-            self.user.local_identity.password = form.data['new_password']
+            self.user.local_identity.password = form.new_password.data
             session.pop('insecure_password_error', None)
             logger.info('User %s (%s) changed their password', self.user, self.user.local_identity.identifier)
         flash(_('Your local account credentials have been updated successfully'), 'success')
@@ -702,6 +705,7 @@ class LocalRegistrationHandler(RegistrationHandler):
             **base_signup_config,
             'initialValues': initial_values,
             'showAccountForm': True,
+            'showUsernameField': config.LOCAL_USERNAMES,
             'syncedValues': {},
             'emails': [email],
             'hasPendingUser': bool(pending_data),
@@ -711,20 +715,23 @@ class LocalRegistrationHandler(RegistrationHandler):
         class LocalSignupSchema(super().create_schema()):
             first_name = fields.String(required=True, validate=not_empty)
             last_name = fields.String(required=True, validate=not_empty)
-            username = LowercaseString(required=True, validate=not_empty)
+            if config.LOCAL_USERNAMES:
+                username = LowercaseString(required=True, validate=not_empty)
             password = fields.String(required=True, validate=not_empty)
 
-            @validates('username')
-            def validate_username(self, username, **kwargs):
-                if Identity.query.filter_by(provider='indico', identifier=username).has_rows():
-                    raise ValidationError(_('This username is already in use.'))
-                if validate_email(username, check_dns=False):
-                    raise ValidationError(_('Your username cannot be an email address.'))
+            if config.LOCAL_USERNAMES:
+                @validates('username')
+                def validate_username(self, username, **kwargs):
+                    if Identity.query.filter_by(provider='indico', identifier=username).has_rows():
+                        raise ValidationError(_('This username is already in use.'))
+                    if validate_email(username, check_dns=False):
+                        raise ValidationError(_('Your username cannot be an email address.'))
 
             @validates_schema(skip_on_field_errors=False)
             def validate_password(self, data, **kwargs):
                 if error := validate_secure_password('set-user-password', data['password'],
-                                                     username=data.get('username', '')):
+                                                     username=data.get('username', ''),
+                                                     emails={session['register_verified_email']}):
                     raise ValidationError(error, 'password')
 
         return LocalSignupSchema
@@ -748,8 +755,11 @@ class LocalRegistrationHandler(RegistrationHandler):
 
     def get_identity_data(self, data):
         del session['register_verified_email']
-        return {'provider': 'indico', 'identifier': data['username'],
-                'password_hash': Identity.password.backend.create_hash(data['password'])}
+        return {
+            'provider': 'indico',
+            'identifier': data['username'] if config.LOCAL_USERNAMES else str(uuid4()),
+            'password_hash': Identity.password.backend.create_hash(data['password']),
+        }
 
     def redirect_success(self):
         return redirect(session.pop('register_next_url', url_for_index()))
@@ -805,7 +815,7 @@ class RHResetPassword(RH):
                                       email_sent=session.pop('resetpass_email_sent', False))
 
     def _reset_password(self, identity):
-        form = ResetPasswordForm()
+        form = ResetPasswordForm(user_emails=identity.user.all_emails)
         if form.validate_on_submit():
             identity.password = form.password.data
             flash(_('Your password has been changed successfully.'), 'success')
@@ -813,7 +823,8 @@ class RHResetPassword(RH):
             logger.info('Password reset confirmed for user %s', identity.user)
             # We usually come here from a multipass login page so we should have a target url
             return multipass.redirect_success()
-        form.username.data = identity.identifier
+        if config.LOCAL_USERNAMES:
+            form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity, email_sent=False,
                                       widget_attrs={'username': {'disabled': True}})
 
@@ -837,9 +848,10 @@ class RHCreateLocalIdentity(RH):
         return self._create_local_identity(user)
 
     def _create_local_identity(self, user):
-        form = AddLocalIdentityForm()
+        form = AddLocalIdentityForm(user_emails=user.all_emails)
         if form.validate_on_submit():
-            identity = Identity(provider='indico', identifier=form.username.data, password=form.password.data)
+            identifier = form.username.data if config.LOCAL_USERNAMES else uuid4()  # uuid to have something unique
+            identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
             user.identities.add(identity)
             flash(_('Local account added successfully'), 'success')
             login_user(identity.user, identity)
