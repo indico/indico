@@ -334,6 +334,7 @@ class SetupWizard:
         self.default_timezone = None
         self.rb_active = None
         self.system_notices = True
+        self.local_password_min_length = 15
 
     def run(self, dev):
         self._check_root()
@@ -630,6 +631,7 @@ class SetupWizard:
             'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache')),
             'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
             'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
+            f'LOCAL_PASSWORD_MIN_LENGTH = {self.local_password_min_length!r}',
             f'STORAGE_BACKENDS = {storage_backends!r}',
             "ATTACHMENT_STORAGE = 'default'",
             '',
