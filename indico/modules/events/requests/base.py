@@ -169,15 +169,16 @@ class RequestDefinitionBase:
         notify_new_modified_request(req, is_new)
 
     @classmethod
-    def withdraw(cls, req, notify_event_managers=True):
+    def withdraw(cls, req, notify_event_managers=True, notify_request_managers=True):
         """Withdraw the request.
 
         :param req: the :class:`Request` of the request
         :param notify_event_managers: if event managers should be notified
+        :param notify_request_managers: if request managers should be notified
         """
         from indico.modules.events.requests.models.requests import RequestState
         req.state = RequestState.withdrawn
-        notify_withdrawn_request(req, notify_event_managers)
+        notify_withdrawn_request(req, notify_event_managers, notify_request_managers)
 
     @classmethod
     def accept(cls, req, data, user):
