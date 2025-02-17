@@ -76,7 +76,19 @@
     </div>
 {% endif %}
 
-{% if published_registrations %}
+{% if event.type == 'conference' and (published_registrations or num_hidden_registrations) %}
+    <div class="event-details-row">
+        <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
+        <div class="event-details-content">
+            <span class="ui circular label">
+                {{ published_registrations|length + num_hidden_registrations }}
+            </span>
+            <a href="{{ url_for('event_registration.participant_list', event) }}">
+                {% trans %}View full list{% endtrans %}
+            </a>
+        </div>
+    </div>
+{% elif published_registrations %}
     <div class="event-details-row">
         <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
         <div class="event-details-content">

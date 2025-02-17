@@ -33,6 +33,8 @@ Improvements
 - Add an event setting to allow enforcing search before entering a person manually to
   a persons list in abstracts and contributions (:pr:`6689`)
 - Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
+- Do not "inline" the full participant list in conference events using a meeting-style
+  timetable and link to the conference participant list instead (:pr:`6753`)
 
 Bugfixes
 ^^^^^^^^
