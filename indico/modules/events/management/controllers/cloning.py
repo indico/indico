@@ -17,6 +17,7 @@ from indico.modules.events.management.forms import (CLONE_REPEAT_CHOICES, CloneC
                                                     CloneRepeatabilityForm, CloneRepeatIntervalForm,
                                                     CloneRepeatOnceForm, CloneRepeatPatternForm, ImportContentsForm,
                                                     ImportSourceEventForm)
+from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.operations import clone_event, clone_into_event
 from indico.modules.events.util import get_event_from_url
 from indico.util.i18n import _
@@ -178,16 +179,21 @@ class RHCloneEvent(RHManageEventBase):
                         self.event, 0, form.start_dt.data, set(form.selected_items.data), form.category.data,
                         form.refresh_users.data
                     )
+                    notify_event_creation(clone)
                     flash(_('Welcome to your cloned event!'), 'success')
                     return jsonify_data(redirect=url_for('event_management.settings', clone), flash=False)
                 else:
                     # recurring event
                     clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
                     dates = clone_calculator.calculate(request.form)[0]
-                    for n, start_dt in enumerate(dates, 1):
+                    clones = [
                         clone_event(self.event, n, start_dt, set(form.selected_items.data), form.category.data,
                                     form.refresh_users.data)
-                    flash(_('{} new events created.').format(len(dates)), 'success')
+                        for n, start_dt in enumerate(dates, 1)
+                    ]
+                    if clones:
+                        notify_event_creation(clones[0], clones)
+                        flash(_('{} new events created.').format(len(clones)), 'success')
                     return jsonify_data(redirect=form.category.data.url, flash=False)
             else:
                 # back to step 4, since there's been an error
