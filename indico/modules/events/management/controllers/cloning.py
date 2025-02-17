@@ -186,11 +186,14 @@ class RHCloneEvent(RHManageEventBase):
                     # recurring event
                     clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
                     dates = clone_calculator.calculate(request.form)[0]
-                    for n, start_dt in enumerate(dates, 1):
-                        clone = clone_event(self.event, n, start_dt, set(form.selected_items.data), form.category.data,
-                                            form.refresh_users.data)
-                        notify_event_creation(clone)
-                    flash(_('{} new events created.').format(len(dates)), 'success')
+                    clones = [
+                        clone_event(self.event, n, start_dt, set(form.selected_items.data), form.category.data,
+                                    form.refresh_users.data)
+                        for n, start_dt in enumerate(dates, 1)
+                    ]
+                    if clones:
+                        notify_event_creation(clones[0], clones)
+                        flash(_('{} new events created.').format(len(clones)), 'success')
                     return jsonify_data(redirect=form.category.data.url, flash=False)
             else:
                 # back to step 4, since there's been an error
