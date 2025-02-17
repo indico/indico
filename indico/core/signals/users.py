@@ -94,3 +94,13 @@ favorite_category_removed = _signals.signal('favorite-category-removed', '''
 Called when a new category is removed from a user's favorites. The *sender* is
 the user object and the category is passed in the `category` kwarg.
 ''')
+
+handle_login = _signals.signal('handle-login', '''
+Expected to return a ``(login_allowed, message)`` tuple.
+Called during the login process. The *sender* is the identity submitted.
+''')
+
+handle_signin = _signals.signal('handle-signin', '''
+Expected to return a ``(signin_allowed, message)`` tuple.
+Called during the signin process. The *sender* is the identity submitted.
+''')
