@@ -12,11 +12,13 @@ from wtforms import HiddenField
 from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
+from indico.core import signals
 from indico.core.config import config
 from indico.modules.auth import Identity
 from indico.modules.core.captcha import WTFCaptchaField
 from indico.modules.users import User, user_management_settings
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.util.string import validate_email
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import ConfirmPassword, SecurePassword
@@ -50,6 +52,13 @@ def _check_not_blacklisted(form, field):
 def _check_not_email_address(form, field):
     if validate_email(field.data, check_dns=False):
         raise ValidationError(_('Your username cannot be an email address.'))
+
+
+def _check_signin(form, field):
+    signal_response = values_from_signal(signals.users.handle_signin.send(field.data), as_list=True)
+    if signal_response and not signal_response[0][0]:
+        raise ValidationError(signal_response[0][1])
+    return True
 
 
 class LocalLoginForm(IndicoForm):
@@ -120,7 +129,7 @@ class SelectEmailForm(IndicoForm):
 
 class RegistrationEmailForm(IndicoForm):
     email = EmailField(_('Email address'),
-                       [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email],
+                       [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email, _check_signin],
                        filters=[_tolower])
     captcha = WTFCaptchaField()
     is_email_verification = HiddenField()
