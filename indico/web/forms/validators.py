@@ -399,16 +399,18 @@ class SecurePassword:
     # not need to hard-code it.
     MIN_LENGTH = 8
 
-    def __init__(self, context='wtforms-field', username_field=None):
+    def __init__(self, context='wtforms-field', username_field=None, emails=None):
         self.context = context
         self.username_field = username_field
+        self.get_emails = emails
 
     def __call__(self, form, field):
         username = ''
-        if self.username_field:
+        if self.username_field and self.username_field in form:
             username = form[self.username_field].data or ''
         password = field.data or ''
-        if error := validate_secure_password(self.context, password, username=username):
+        emails = self.get_emails(form) if self.get_emails else set()
+        if error := validate_secure_password(self.context, password, username=username, emails=emails):
             raise ValidationError(error)
 
 

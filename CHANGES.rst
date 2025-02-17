@@ -35,6 +35,8 @@ Improvements
 - Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
 - Do not "inline" the full participant list in conference events using a meeting-style
   timetable and link to the conference participant list instead (:pr:`6753`)
+- Add new setting :data:`LOCAL_USERNAMES` to disable usernames for logging in and only
+  use the email address (:pr:`6751`)
 
 Bugfixes
 ^^^^^^^^

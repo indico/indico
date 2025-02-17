@@ -34,6 +34,14 @@ Authentication
 
     Default: ``True``
 
+.. data:: LOCAL_USERNAMES
+
+    This setting controls whether local Indico accounts have usernames
+    for logging in. If disabled, only the email address is used as the
+    "username", otherwise both can be used.
+
+    Default: ``True``
+
 .. data:: LOCAL_GROUPS
 
     This setting controls whether local Indico groups are available.

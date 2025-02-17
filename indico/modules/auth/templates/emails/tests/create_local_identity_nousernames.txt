@@ -1,0 +1,12 @@
+Dear Guinea,
+
+You requested a password reset for your Indico account.
+
+Currently there is no password set, but you can use the link below (within
+an hour) to set one:
+
+<link>
+
+--
+Indico :: Email Notifier
+http://localhost/
