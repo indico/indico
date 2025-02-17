@@ -1,7 +1,7 @@
 {% extends 'auth/emails/reset_password.txt' %}
 
 {% block subject -%}
-    {% trans %}Create local account{% endtrans %}
+    {% trans %}Set your password{% endtrans %}
 {%- endblock %}
 
 {% block local_identity_details -%}
