@@ -51,9 +51,9 @@ def _merge_users(target, source, **kwargs):
 def _event_deleted(event, **kwargs):
     from indico.modules.events.requests.models.requests import Request, RequestState
 
-    is_past_event = event.start_dt < now_utc()
+    is_past_event = event.end_dt < now_utc()
 
     query = (Request.query.with_parent(event)
              .filter(Request.state.in_((RequestState.accepted, RequestState.pending))))
     for req in query:
-        req.definition.withdraw(req, notify_event_managers=False, notify_request_managers=not is_past_event)
+        req.definition.withdraw(req, notify_event_managers=False, notify_request_managers=(not is_past_event))

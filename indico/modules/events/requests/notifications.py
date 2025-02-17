@@ -66,7 +66,7 @@ def notify_new_modified_request(req, new):
 
 
 @email_sender
-def notify_withdrawn_request(req, email_event_managers, email_request_managers):
+def notify_withdrawn_request(req, *, email_event_managers, email_request_managers):
     """Notify event managers and request managers about a withdrawn request.
 
     :param req: the :class:`Request`
