@@ -441,6 +441,7 @@ class EventExporter:
             affiliation = Affiliation.get(value)
             self.affiliations[uuid] = {
                 'name': affiliation.name,
+                'alt_names': affiliation.alt_names,
                 'street': affiliation.street,
                 'postcode': affiliation.postcode,
                 'city': affiliation.city,
