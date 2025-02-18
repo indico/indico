@@ -55,9 +55,10 @@ def _check_not_email_address(form, field):
 
 
 def _check_signin(form, field):
-    signal_response = values_from_signal(signals.users.handle_signin.send(field.data), as_list=True)
-    if signal_response and not signal_response[0][0]:
-        raise ValidationError(signal_response[0][1])
+    signal_responses = values_from_signal(signals.users.handle_signin.send(field.data))
+    signal_response = next((response for response in signal_responses if not response[0]), None)
+    if signal_response:
+        raise ValidationError(signal_response[1])
     return True
 
 
