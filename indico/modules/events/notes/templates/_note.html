@@ -78,7 +78,7 @@
                   data-icon
                   data-api-url="{{ url_for('event_notes.api', note) }}"
                   data-modal-title="{{ title ~ ': ' ~ note.object.title }}"
-                  {% if note.event.can_manage_attachments(session.user) %}
+                  {% if note.object.can_manage_attachments(session.user) %}
                       data-image-upload-url="{{ url_for('attachments.upload_editor', note) }}"
                   {% endif %}></span>
         {% endif %}
