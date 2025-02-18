@@ -312,14 +312,14 @@ class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
         exact_match = unaccent_match(Affiliation.searchable_names, f'|||{q}|||', exact=False)
-        substring_match = unaccent_match(Affiliation.searchable_names, q, exact=False)
-        q_filter = substring_match if len(q) > 2 else exact_match
+        prefix_match = unaccent_match(Affiliation.searchable_names, f'|||{q}', exact=False)
+        q_filter = prefix_match if len(q) > 2 else exact_match
         res = (
             Affiliation.query
             .filter(~Affiliation.is_deleted, q_filter)
             .order_by(
                 exact_match.desc(),
-                substring_match.desc(),
+                prefix_match.desc(),
                 db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)),
             )
             .limit(20)
