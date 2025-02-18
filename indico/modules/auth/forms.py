@@ -54,8 +54,8 @@ def _check_not_email_address(form, field):
         raise ValidationError(_('Your username cannot be an email address.'))
 
 
-def _check_signin(form, field):
-    signal_responses = values_from_signal(signals.users.handle_signin.send(field.data))
+def _check_signup(form, field):
+    signal_responses = values_from_signal(signals.users.handle_signup.send(field.data))
     signal_response = next((response for response in signal_responses if not response[0]), None)
     if signal_response:
         raise ValidationError(signal_response[1])
@@ -130,7 +130,7 @@ class SelectEmailForm(IndicoForm):
 
 class RegistrationEmailForm(IndicoForm):
     email = EmailField(_('Email address'),
-                       [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email, _check_signin],
+                       [DataRequired(), Email(), _check_not_blacklisted, _check_existing_email, _check_signup],
                        filters=[_tolower])
     captcha = WTFCaptchaField()
     is_email_verification = HiddenField()
