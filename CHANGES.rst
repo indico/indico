@@ -55,6 +55,8 @@ Bugfixes
 - Fix the usage of select list scrollbar causing it to close immediately (:issue:`6735`,
   :pr:`6736`, thanks :user:`foxbunny`)
 - Trigger event creation notification emails when cloning events (:pr:`6744`)
+- Fix image uploading not working when editing an existing note without having permissions
+  to manage materials on the event level (:pr:`6760`)
 
 Accessibility
 ^^^^^^^^^^^^^
