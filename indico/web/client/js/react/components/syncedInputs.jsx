@@ -181,6 +181,10 @@ export function SyncedFinalAffiliationDropdown({
       fluid
       additionLabel={Translate.string('Use custom affiliation:') + ' '} // eslint-disable-line prefer-template
       onSearchChange={searchAffiliationChange}
+      search={options => [
+        ...(options.find(o => o.key === 'addition') || []),
+        ...options.filter(o => o.key !== 'addition'),
+      ]}
       placeholder={Translate.string('Select an affiliation or add your own')}
       noResultsMessage={Translate.string('Search an affiliation or enter one manually')}
       renderCustomOptionContent={value => (
