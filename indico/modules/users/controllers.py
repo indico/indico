@@ -310,14 +310,17 @@ class RHPersonalDataUpdate(RHUserBase):
 class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
-        exact_match = db.func.lower(Affiliation.name) == q.lower()
-        q_filter = Affiliation.name.ilike(f'%{q}%') if len(q) > 2 else exact_match
+        exact_match = lambda col: db.func.lower(col) == q.lower()
+        q_filter = lambda col: db.or_(col.ilike(f'%{w}%') for w in q.split()) if len(q) > 2 else exact_match(col)
         res = (
             Affiliation.query
-            .filter(~Affiliation.is_deleted, q_filter)
+            .select_from(db.func.unnest(Affiliation.alt_names).alias('alts'))
+            .filter(~Affiliation.is_deleted, db.or_(q_filter(Affiliation.name), q_filter(db.column('alts'))))
             .order_by(
-                exact_match.desc(),
+                exact_match(Affiliation.name).desc(),
+                exact_match(db.column('alts')).desc(),
                 db.func.lower(Affiliation.name).startswith(q.lower()).desc(),
+                db.func.lower(db.column('alts')).startswith(q.lower()).desc(),
                 db.func.lower(Affiliation.name)
             )
             .limit(20)

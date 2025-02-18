@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 from indico.core.db import db
 from indico.util.string import format_repr
@@ -23,6 +23,12 @@ class Affiliation(db.Model):
     name = db.Column(
         db.String,
         nullable=False,
+        index=True
+    )
+    alt_names = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[],
         index=True
     )
     is_deleted = db.Column(
