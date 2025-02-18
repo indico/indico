@@ -100,7 +100,7 @@ Expected to return a ``(login_allowed, message)`` tuple.
 Called during the login process. The *sender* is the identity submitted.
 ''')
 
-handle_signin = _signals.signal('handle-signin', '''
-Expected to return a ``(signin_allowed, message)`` tuple.
+handle_signup = _signals.signal('handle-signup', '''
+Expected to return a ``(signup_allowed, message)`` tuple.
 Called during the signin process. The *sender* is the identity submitted.
 ''')
