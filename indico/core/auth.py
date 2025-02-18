@@ -120,9 +120,10 @@ class IndicoMultipass(Multipass):
         return super().handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
     def handle_login_form(self, provider, data):
-        signal_response = values_from_signal(signals.users.handle_login.send(data.get('identifier', '')), as_list=True)
-        if signal_response and not signal_response[0][0]:
-            flash(signal_response[0][1], 'warning')
+        signal_responses = values_from_signal(signals.users.handle_login.send(data.get('identifier', '')))
+        signal_response = next((response for response in signal_responses if not response[0]), None)
+        if signal_response:
+            flash(signal_response[1], 'warning')
             return
         return super().handle_login_form(provider, data)
 
