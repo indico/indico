@@ -28,6 +28,7 @@ from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
@@ -310,18 +311,16 @@ class RHPersonalDataUpdate(RHUserBase):
 class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
-        exact_match = lambda col: db.func.lower(col) == q.lower()
-        q_filter = lambda col: db.or_(col.ilike(f'%{w}%') for w in q.split()) if len(q) > 2 else exact_match(col)
+        exact_match = unaccent_match(Affiliation.searchable_names, f'|||{q}|||', exact=False)
+        substring_match = unaccent_match(Affiliation.searchable_names, q, exact=False)
+        q_filter = substring_match if len(q) > 2 else exact_match
         res = (
             Affiliation.query
-            .select_from(db.func.unnest(Affiliation.alt_names).alias('alts'))
-            .filter(~Affiliation.is_deleted, db.or_(q_filter(Affiliation.name), q_filter(db.column('alts'))))
+            .filter(~Affiliation.is_deleted, q_filter)
             .order_by(
-                exact_match(Affiliation.name).desc(),
-                exact_match(db.column('alts')).desc(),
-                db.func.lower(Affiliation.name).startswith(q.lower()).desc(),
-                db.func.lower(db.column('alts')).startswith(q.lower()).desc(),
-                db.func.lower(Affiliation.name)
+                exact_match.desc(),
+                substring_match.desc(),
+                db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)),
             )
             .limit(20)
             .all())
