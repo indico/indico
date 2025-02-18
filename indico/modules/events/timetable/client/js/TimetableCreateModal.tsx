@@ -16,7 +16,7 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 interface TimetableCreateModalProps {
   eventId: number;
-  newEntry: any;
+  newEntry: any; // TODO: Make proper interface
   onClose: () => void;
 }
 
@@ -47,7 +47,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     keywords: [],
     references: [],
     location_data: {inheriting: false},
-    custom_fields: {},
     start_dt: newEntry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
     conveners: [],
   };
@@ -69,6 +68,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     [FormType.Break]: (
       <>
         {/* TODO: Make actual Break form */}
+        {/*       Includes: Title, Description, Start time, Duration, Location (incl use default), colours */}
         <FinalInput
           name="title"
           label={Translate.string('Title')}
