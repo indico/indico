@@ -21,7 +21,8 @@ from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import (CheckEmailMixin, RegistrationEditMixin,
                                                             RegistrationFormMixin, UploadRegistrationFileMixin,
                                                             UploadRegistrationPictureMixin)
-from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData, RegistrationFormItem
+from indico.modules.events.registration.models.form_fields import (RegistrationFormField, RegistrationFormFieldData,
+                                                                   RegistrationFormItem)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
@@ -92,6 +93,26 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
 
     def _check_restricted_event_access(self):
         return self.regform.in_event_acls.filter_by(event_id=self.event.id).has_rows()
+
+
+class RHRegistrationFormFieldActionBase(RHRegistrationFormBase):
+    """Base class for a specific registration field in the public part of the registration form."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.field
+        },
+        'skipped_args': {'section_id'}
+    }
+
+    def _process_args(self):
+        RHRegistrationFormBase._process_args(self)
+        self.field = (RegistrationFormField.query
+                      .filter(RegistrationFormField.id == request.view_args['field_id'],
+                              RegistrationFormField.registration_form == self.regform,
+                              RegistrationFormField.is_enabled,
+                              ~RegistrationFormField.is_deleted)
+                      .one())
 
 
 class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
@@ -404,7 +425,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
                                                captcha_settings=get_captcha_settings())
 
 
-class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHRegistrationFormBase):
+class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHRegistrationFormFieldActionBase):
     """Upload a file from a registration form."""
 
     ALLOW_PROTECTED_EVENT = True
@@ -413,14 +434,14 @@ class RHUploadRegistrationFile(UploadRegistrationFileMixin, InvitationMixin, RHR
         'token': UUIDString(load_default=None),
     }, location='query')
     def _process_args(self, token):
-        RHRegistrationFormBase._process_args(self)
+        RHRegistrationFormFieldActionBase._process_args(self)
         InvitationMixin._process_args(self)
         self.existing_registration = self.regform.get_registration(uuid=token) if token else None
 
     def _check_access(self):
         if not self.existing_registration:
             try:
-                RHRegistrationFormBase._check_access(self)
+                RHRegistrationFormFieldActionBase._check_access(self)
             except ForbiddenPrivateRegistrationForm:
                 if not self.invitation:
                     raise

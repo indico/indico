@@ -380,6 +380,14 @@ class FileField(RegistrationFormFieldBase):
             return ''
         return registration_data.filename
 
+    def get_validators(self, existing_registration):
+        def _check_field_upload(value):
+            file = File.query.filter_by(uuid=value).first()
+            if self.form_item.id != file.meta.get('regform_field_id'):
+                raise ValidationError('The file was not uploaded for this field')
+
+        return [_check_field_upload]
+
 
 class EmailField(RegistrationFormFieldBase):
     name = 'email'
@@ -419,7 +427,7 @@ class PictureField(FileField):
             if min_picture_size and min(pic.size) < min_picture_size:
                 raise ValidationError(_('The uploaded picture pixels is smaller than the minimum size of {}.')
                                       .format(min_picture_size))
-        return _picture_size_and_type
+        return [_picture_size_and_type, *super().get_validators(existing_registration)]
 
     @make_interceptable
     def _get_min_size(self):

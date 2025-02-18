@@ -11,6 +11,7 @@ from sqlalchemy.orm import contains_eager, defaultload
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.lists import RegistrationListGenerator
+from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
 
@@ -52,3 +53,23 @@ class RHManageRegistrationBase(RHManageRegFormBase):
                              .options(defaultload(Registration.data)
                                       .joinedload('field_data'))
                              .one())
+
+
+class RHManageRegistrationFieldActionBase(RHManageRegFormBase):
+    """Base class for a specific registration field."""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.field
+        },
+        'skipped_args': {'section_id'}
+    }
+
+    def _process_args(self):
+        RHManageRegFormBase._process_args(self)
+        self.field = (RegistrationFormField.query
+                      .filter(RegistrationFormField.id == request.view_args['field_id'],
+                              RegistrationFormField.registration_form == self.regform,
+                              RegistrationFormField.is_enabled,
+                              ~RegistrationFormField.is_deleted)
+                      .one())
