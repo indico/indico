@@ -36,7 +36,7 @@ def create_unaccent_function(conn):
     DDL(SQL_FUNCTION_UNACCENT).execute_if(callable_=_should_create_function).execute(conn)
 
 
-def define_unaccented_lowercase_index(column):
+def define_unaccented_lowercase_index(column, table=None, custom_name=None):
     """Define an index that uses the indico_unaccent function.
 
     Since this is usually used for searching, the column's value is
@@ -50,14 +50,21 @@ def define_unaccented_lowercase_index(column):
 
     :param column: The column the index should be created on, e.g.
                    ``User.first_name``
+    :param table: The table in case the column is a column property
+    :param custom_name: The name of the index, in case the column is
+                         a column property
     """
-    @listens_for(column.table, 'after_create')
+    if table is None:
+        table = column.table
+
+    @listens_for(table, 'after_create')
     def _after_create(target, conn, **kw):
-        assert target is column.table
+        assert target is table
         col_func = func.indico.indico_unaccent(func.lower(column))
         index_kwargs = {'postgresql_using': 'gin',
                         'postgresql_ops': {col_func.key: 'gin_trgm_ops'}}
-        Index(conv(f'ix_{column.table.name}_{column.name}_unaccent'), col_func, **index_kwargs).create(conn)
+        index_name = custom_name or f'ix_{column.table.name}_{column.name}_unaccent'
+        Index(conv(index_name), col_func, **index_kwargs).create(conn)
 
 
 def unaccent_match(column, value, exact):

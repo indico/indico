@@ -16,13 +16,43 @@ branch_labels = None
 depends_on = None
 
 
+SQL_FUNCTION_TEXT_ARRAY_APPEND = '''
+    CREATE FUNCTION indico.text_array_append(arr text[], item text)
+        RETURNS text[]
+    AS $$
+    BEGIN
+        RETURN array_append(arr, item);
+    END;
+    $$
+    LANGUAGE plpgsql IMMUTABLE STRICT;
+'''
+
+SQL_FUNCTION_TEXT_ARRAY_TO_STRING = '''
+    CREATE FUNCTION indico.text_array_to_string(arr text[], sep text)
+        RETURNS text
+    AS $$
+    BEGIN
+        RETURN array_to_string(arr, sep);
+    END;
+    $$
+    LANGUAGE plpgsql IMMUTABLE STRICT;
+'''
+
+
 def upgrade():
+    op.execute(SQL_FUNCTION_TEXT_ARRAY_APPEND)
+    op.execute(SQL_FUNCTION_TEXT_ARRAY_TO_STRING)
     op.add_column('affiliations', sa.Column('alt_names', postgresql.ARRAY(sa.String()),
                                             nullable=False, server_default='{}'), schema='indico')
     op.alter_column('affiliations', 'alt_names', server_default=None, schema='indico')
-    op.create_index(None, 'affiliations', ['alt_names'], unique=False, schema='indico')
+    op.execute('''
+        CREATE INDEX ix_affiliations_searchable_names_unaccent
+        ON indico.affiliations
+        USING gin (indico.indico_unaccent(lower(indico.text_array_to_string(((ARRAY[''::text] || indico.text_array_append((alt_names)::text[], (name)::text)) || ARRAY[''::text]), '|||'::text))) gin_trgm_ops);
+    ''')
 
 
 def downgrade():
-    op.drop_index('ix_affiliations_alt_names', table_name='affiliations', schema='indico')
     op.drop_column('affiliations', 'alt_names', schema='indico')
+    op.execute('DROP FUNCTION indico.text_array_append(arr text[], item text)')
+    op.execute('DROP FUNCTION indico.text_array_to_string(arr text[], sep text)')
