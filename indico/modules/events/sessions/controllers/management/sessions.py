@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime, timedelta
+
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
@@ -19,18 +21,19 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin, RHManageEventBase
 from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
                                                                    RHManageSessionsBase)
-from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionForm, SessionProtectionForm,
-                                                  SessionTypeForm)
+from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionBlockForm, SessionForm,
+                                                  SessionProtectionForm, SessionTypeForm)
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
-from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
-                                                       update_session_block)
+from indico.modules.events.sessions.operations import (create_session, create_session_block, delete_session,
+                                                       update_session, update_session_block)
 from indico.modules.events.sessions.schemas import (LocationParentSchema, SessionBlockSchema, SessionColorSchema,
                                                     SessionSchema, SessionTypeSchema)
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
+from indico.modules.events.timetable.operations import create_session_block_entry
 from indico.modules.events.util import get_random_color, track_location_changes, track_time_changes
 from indico.modules.logs import LogKind
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -200,6 +203,12 @@ class RHAPISession(RHManageSessionBase):
         return SessionSchema().jsonify(self.session)
 
 
+class RHAPISessionList(RHManageSessionsBase):
+
+    def _process(self):
+        return SessionSchema(many=True).jsonify(self.event.sessions)
+
+
 class RHAPICreateSession(RHManageSessionsBase):
 
     @use_args(SessionSchema)
@@ -207,6 +216,11 @@ class RHAPICreateSession(RHManageSessionsBase):
         print('session data', data)
         create_session(self.event, data)
 
+class RHAPICreateSessionBlock(RHManageSessionBase):
+
+    @use_args(SessionBlockSchema)
+    def _process_POST(self, data: SessionBlock):
+        create_session_block_entry(self.session, data)
 
 class RHAPISessionRandomColor(RHManageSessionsBase):
 
