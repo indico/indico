@@ -88,9 +88,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const handleSubmitSessionBlock = async (data: any) => {
-    // data = _.omitBy(data, 'conveners'); // TODO person links
-    console.log('person links', data);
-    data['person_links'] = data['person_links'] || [];
+    data = _.omitBy(data, 'conveners'); // TODO person links
+    data.conveners = [];
+    data.start_dt = new Date(data.start_dt).toISOString();
     return await indicoAxios.post(
       sessionBlockCreateURL({event_id: eventId, session_id: data.session_id}),
       data

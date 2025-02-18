@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import datetime, timedelta
+
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
@@ -31,6 +33,7 @@ from indico.modules.events.sessions.schemas import (LocationParentSchema, Sessio
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
+from indico.modules.events.timetable.operations import create_session_block_entry
 from indico.modules.events.util import get_random_color, track_location_changes, track_time_changes
 from indico.modules.logs import LogKind
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -216,8 +219,8 @@ class RHAPICreateSession(RHManageSessionsBase):
 class RHAPICreateSessionBlock(RHManageSessionBase):
 
     @use_args(SessionBlockSchema)
-    def _process_POST(self, data):
-        create_session_block(self.session, data)
+    def _process_POST(self, data: SessionBlock):
+        create_session_block_entry(self.session, data)
 
 class RHAPISessionRandomColor(RHManageSessionsBase):
 
