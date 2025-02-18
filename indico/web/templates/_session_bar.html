@@ -67,23 +67,29 @@
                 <form id="tz-mode-form" action="{{ url_for('core.change_tz') }}" method="post">
                     <fieldset id="tz-modes">
                         <legend>{% trans %}Use timezone based on:{% endtrans %}</legend>
-                        <input type="radio" name="tz_mode" id="tz-mode-local" value="local"
-                               {{ 'checked' if timezone_data.tz_mode == 'local' }}
-                               aria-label="{% trans %}Use the event/category timezone{% endtrans %}">
-                        <label for="tz-mode-local">{% trans %}Event/category{% endtrans %}</label>
-                        {% if session.user %}
-                            <input type="radio" name="tz_mode" id="tz-mode-user" value="user"
-                                   data-user-tz="{{ profile_timezone }}"
-                                   {{ 'checked' if timezone_data.tz_mode == 'user' }}
-                                   aria-label="{% trans %}Use the default timezone of your profile{% endtrans %}">
-                            <label for="tz-mode-user">
-                                {% trans %}Profile{% endtrans %}
+                        <div class="options">
+                            <label>
+                                <input type="radio" name="tz_mode" value="local"
+                                {{ 'checked' if timezone_data.tz_mode == 'local' }}
+                                aria-label="{% trans %}Use the event/category timezone{% endtrans %}">
+                                <span>{% trans %}Event/category{% endtrans %}</span>
                             </label>
-                        {% endif %}
-                        <input type="radio" name="tz_mode" id="tz-mode-custom" value="custom"
-                               {{ 'checked' if timezone_data.tz_mode == 'custom' }}
-                               aria-label="{% trans %}Use a custom timezone{% endtrans %}">
-                        <label for="tz-mode-custom">{% trans %}Custom{% endtrans %}</label>
+                            {% if session.user %}
+                                <label>
+                                    <input type="radio" name="tz_mode" value="user"
+                                        data-user-tz="{{ profile_timezone }}"
+                                        {{ 'checked' if timezone_data.tz_mode == 'user' }}
+                                        aria-label="{% trans %}Use the default timezone of your profile{% endtrans %}">
+                                    <span>{% trans %}Profile{% endtrans %}</span>
+                                </label>
+                            {% endif %}
+                            <label>
+                                <input type="radio" name="tz_mode" value="custom"
+                                    {{ 'checked' if timezone_data.tz_mode == 'custom' }}
+                                    aria-label="{% trans %}Use a custom timezone{% endtrans %}">
+                                <span>{% trans %}Custom{% endtrans %}</span>
+                            </label>
+                        </div>
                     </fieldset>
                     <label id="tz-custom-field">
                         <span>{% trans %}Select a custom timezone{% endtrans %}</span>

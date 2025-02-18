@@ -124,26 +124,9 @@
         color: rgba(0, 0, 0, 0.2);
       }
 
-      .number-field,
-      .boolean-field {
+      .number-field {
         display: flex;
         align-items: center;
-      }
-
-      .boolean-field :global(.ui.button:not(.active):not(:hover):focus) {
-        background-color: #e0e1e2;
-        color: rgba(0, 0, 0, 0.6);
-      }
-
-      :global(.error) .boolean-field :global(.ui.buttons .ui.button) {
-        background-color: #fff6f6;
-        color: $dark-red;
-        outline: 1px solid $dark-red;
-
-        &:hover {
-          background-color: $light-red;
-          color: $pastel-red;
-        }
       }
 
       .date-field {

@@ -66,9 +66,10 @@ Accessibility
 - Implement a new date range picker and use it in the Room Booking module
   (:pr:`6464`, thanks :user:`foxbunny`)
 - Make main section title in the base layout the default bypass blocks target
-  (:pr:`6726`, hanks :user:`foxbunny`)
-- Improve places selection accessibility in SingleChoiceInput 
+  (:pr:`6726`, thanks :user:`foxbunny`)
+- Improve places selection accessibility in SingleChoiceInput
   (:pr:`6763`, thanks :user:`foxbunny`)
+- Improve BooleanInput accessibility (:pr:`6756`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
