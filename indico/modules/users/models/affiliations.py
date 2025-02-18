@@ -5,9 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, array
+from sqlalchemy.orm import column_property
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.util.string import format_repr
 
 
@@ -29,7 +31,6 @@ class Affiliation(db.Model):
         ARRAY(db.String),
         nullable=False,
         default=[],
-        index=True
     )
     is_deleted = db.Column(
         db.Boolean,
@@ -62,6 +63,16 @@ class Affiliation(db.Model):
         nullable=False,
         default={},
     )
+    #: An indexed string containing all names for effective searching
+    #: This string looks like ``|||name|||altname|||altname2|||...|||`` so a normal ``*foo*`` query
+    #: against it lets you do a substring search, and searching for ``|||foo|||`` lets you do an
+    #: exact match.
+    searchable_names = column_property(
+        db.func.indico.text_array_to_string(array(['']) +
+                                            db.func.indico.text_array_append(alt_names, name) +
+                                            array(['']), '|||'),
+        deferred=True,
+    )
 
     # relationship backrefs:
     # - abstract_links (AbstractPersonLink._affiliation_link)
@@ -86,3 +97,7 @@ class Affiliation(db.Model):
         if existing:
             return existing
         return cls(**affiliation_data)
+
+
+define_unaccented_lowercase_index(Affiliation.searchable_names, Affiliation.__table__,
+                                  'ix_affiliations_searchable_names_unaccent')
