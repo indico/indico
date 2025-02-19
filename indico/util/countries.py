@@ -37,7 +37,7 @@ def get_country(code, locale=None):
     return _get_country(code, locale)
 
 
-def get_country_reverse(name, locale=None):
+def get_country_reverse(name, locale=None, case_sensitive=True):
     """Get the country code from a country name.
 
     Note: You almost certainly should not use this but rather store
@@ -48,7 +48,8 @@ def get_country_reverse(name, locale=None):
     """
     if locale is None:
         locale = get_current_locale()
-    return next((code for code, title in get_countries(locale).items() if title == name), None)
+    return next((code for code, title in get_countries(locale).items()
+                 if title == name or (not case_sensitive and title.lower() == name.lower())), None)
 
 
 @lru_cache
