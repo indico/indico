@@ -331,6 +331,9 @@ class RH:
             res = ''
 
         response = current_app.make_response(res)
+        if hasattr(self, 'noindex'):
+            # If the event is invisible, avoid web search engine indexing
+            response.headers['X-Robots-Tag'] = 'noindex, nofollow, noarchive, nosnippet'
         if self.DENY_FRAMES:
             response.headers['X-Frame-Options'] = 'DENY'
         return response
