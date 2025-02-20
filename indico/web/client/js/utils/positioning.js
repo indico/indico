@@ -80,14 +80,14 @@ const geometry = {
     const scrollOffset = window.pageYOffset - this.initialPageYOffset;
     this.target.style.setProperty(
       '--target-top',
-      `clamp(0px, ${top - scrollOffset}px, calc(100% - ${this.targetHeight}px))`
+      `clamp(0.5em, ${top - scrollOffset}px, calc(100dvh - ${this.targetHeight}px - 0.5em))`
     );
   },
   setLeft(left) {
     const scrollOffset = window.pageXOffset - this.initialPageXOffset;
     this.target.style.setProperty(
       '--target-left',
-      `clamp(0px, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px))`
+      `clamp(0.5em, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px - 0.5em))`
     );
   },
 };
@@ -230,8 +230,9 @@ export const dropdownPositionStrategy = {
 export const popupPositionStrategy = {
   ...geometry,
   ...verticalPreferAbovePosition,
-  ...unaligned,
-  ...withoutArrow,
+  ...horizontalCenter,
+  ...withArrow,
+  ...verticalArrowPosition,
 };
 
 /**
