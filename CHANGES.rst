@@ -67,6 +67,8 @@ Accessibility
   (:pr:`6464`, thanks :user:`foxbunny`)
 - Make main section title in the base layout the default bypass blocks target
   (:pr:`6726`, hanks :user:`foxbunny`)
+- Improve places selection accessibility in SingleChoiceInput 
+  (:pr:`6763`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

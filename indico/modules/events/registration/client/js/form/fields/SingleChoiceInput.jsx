@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {useSelector} from 'react-redux';
-import {Form, Label, Dropdown} from 'semantic-ui-react';
+import {Form, Label} from 'semantic-ui-react';
 
 import {RadioButton, Select} from 'indico/react/components';
 import {FinalCheckbox, FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
@@ -254,7 +254,7 @@ function SingleChoiceRadioGroup({
                 <>
                   <td>
                     {c.isEnabled && (
-                      <Dropdown
+                      <Select
                         id={id ? `${id}-extraslot` : ''}
                         selection
                         styleName="dropdown"
@@ -264,12 +264,10 @@ function SingleChoiceRadioGroup({
                           (c.placesLimit > 0 &&
                             (placesUsed[c.id] || 0) - (existingValue[c.id] || 0) >= c.placesLimit)
                         }
-                        value={selectedSeats}
-                        onChange={(e, data) => onChange({[selectedChoice.id]: data.value})}
+                        value={String(selectedSeats)}
+                        onChange={evt => onChange({[selectedChoice.id]: evt.target.value})}
                         options={_.range(1, c.maxExtraSlots + 2).map(i => ({
-                          key: i,
                           value: i,
-                          text: i,
                           disabled:
                             selectedChoice.placesLimit > 0 &&
                             (placesUsed[selectedChoice.id] || 0) -
@@ -277,6 +275,7 @@ function SingleChoiceRadioGroup({
                               i >
                               selectedChoice.placesLimit,
                         }))}
+                        required
                       />
                     )}
                   </td>
