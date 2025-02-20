@@ -72,6 +72,8 @@ Accessibility
 - Improve places selection accessibility in SingleChoiceInput
   (:pr:`6763`, thanks :user:`foxbunny`)
 - Improve BooleanInput accessibility (:pr:`6756`, thanks :user:`foxbunny`)
+- Improve places selection accessibility in MultiChoiceInput 
+  (:pr:`6764`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
