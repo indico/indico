@@ -8,7 +8,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Button, Label} from 'semantic-ui-react';
+import {Label} from 'semantic-ui-react';
 
 import {FinalDropdown, FinalField, FinalInput, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -19,6 +19,8 @@ import {getFieldValue} from '../../form_submission/selectors';
 import {PlacesLeft} from './PlacesLeftLabel';
 
 import '../../../styles/regform.module.scss';
+
+import './BooleanInput.module.scss';
 
 function BooleanInputComponent({
   id,
@@ -35,36 +37,55 @@ function BooleanInputComponent({
   const formatPrice = useSelector(getPriceFormatter);
   const existingValue = useSelector(state => getFieldValue(state, fieldId));
 
-  const makeOnClick = newValue => () => {
-    if (value === newValue && !required) {
-      onChange(null);
-    } else {
-      onChange(newValue);
-    }
+  const handleSelect = targetValue => () => onChange(targetValue);
+  const handleUncheck = targetValue =>
+    required
+      ? () => {}
+      : () => {
+          if (targetValue === value) {
+            onChange(null);
+          }
+        };
+  const handleUncheckViaKeyboard = targetValue => {
+    const callback = handleUncheck(targetValue);
+    return evt => {
+      if (evt.code === 'Space' && value === targetValue) {
+        evt.preventDefault();
+        callback();
+      }
+    };
   };
 
   return (
     <div styleName="boolean-field">
-      <Button.Group id={id}>
-        <Button
-          id={`${id}-0`}
-          type="button"
-          active={!isPurged && value === true}
+      <label>
+        <input
+          type="radio"
+          name={`boolean-field-${id}`}
+          value="yes"
+          onChange={handleSelect(true)}
+          onClick={handleUncheck(true)}
+          onKeyDown={handleUncheckViaKeyboard(true)}
+          checked={!isPurged && value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
-          onClick={makeOnClick(true)}
-        >
-          <Translate>Yes</Translate>
-        </Button>
-        <Button
-          id={`${id}-1`}
-          type="button"
-          active={!isPurged && value === false}
+          required={required}
+        />
+        <Translate as="span">Yes</Translate>
+      </label>
+      <label>
+        <input
+          type="radio"
+          name={`boolean-field-${id}`}
+          value="no"
+          onChange={handleSelect(false)}
+          onClick={handleUncheck(false)}
+          onKeyDown={handleUncheckViaKeyboard(false)}
+          checked={!isPurged && value === false} // It can be null, so must use equality with false
           disabled={disabled}
-          onClick={makeOnClick(false)}
-        >
-          <Translate>No</Translate>
-        </Button>
-      </Button.Group>
+          required={required}
+        />
+        <Translate as="span">No</Translate>
+      </label>
       {!!price && (
         <Label pointing="left" styleName={`price-tag ${value !== true ? 'greyed' : ''}`}>
           {formatPrice(price)}

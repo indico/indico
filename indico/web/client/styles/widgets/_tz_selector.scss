@@ -26,11 +26,15 @@
     --flex-gap: var(--container-padding);
   }
 
-  fieldset {
+  legend {
+    @extend %form-label-block;
+  }
+
+  .options {
     @extend %button-group;
   }
 
-  fieldset label {
+  .label-text {
     flex: 1;
   }
 

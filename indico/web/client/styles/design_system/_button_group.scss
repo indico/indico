@@ -14,21 +14,43 @@
 %button-group-base {
   // Recommended structure:
   //
-  // FIELDSET
-  //   LEGEND
-  //   INPUT[type="radio"] LABEL
-  //   INPUT[type="radio"] LABEL
+  // DIV
+  //   LABEL
+  //     INPUT[type="radio"]
+  //     *.label-text
+  //   LABEL
+  //     INPUT[type="radio"]
+  //     *.label-text
+  //
+  // It's also recommended to wrap the whole button group
+  // in a <fieldset> with the appropriate <legend> to
+  // more closely describe what the group is for.
 
   @extend %flex-row;
   --flex-gap: 0;
 
-  legend {
-    @extend %form-label-block;
-  }
+  position: relative;
 
   label {
+    display: contents;
+  }
+
+  input[type='radio'] {
+    // Make an invisible target that spans the width and height of the
+    // parent <label> element. This helps with the positoning of the
+    // error messages.
+    appearance: none;
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  input + * {
     @extend %button-base;
-    flex: 1;
+    flex: 1 0 auto;
 
     &::before {
       @extend %icon;
@@ -44,12 +66,12 @@
     }
   }
 
-  :focus-visible + label {
+  :focus-visible + * {
     @extend %default-focus-ring;
     z-index: 1;
   }
 
-  :checked + label {
+  :checked + * {
     @extend %button-alt-state;
     cursor: default;
 
@@ -58,7 +80,7 @@
     }
   }
 
-  :disabled + label {
+  :disabled + * {
     @extend %button-disabled-state;
   }
 }
@@ -67,15 +89,15 @@
   @extend %button-group-base;
   align-items: center;
 
-  label:not(:last-child) {
+  label:not(:last-child) input + * {
     margin-right: -1px;
   }
 
-  label:first-of-type {
+  label:first-of-type input + * {
     @extend %button-rounded-left;
   }
 
-  label:last-of-type {
+  label:last-of-type input + * {
     @extend %button-rounded-right;
   }
 }
@@ -85,15 +107,15 @@
   flex-direction: column;
   align-items: stretch;
 
-  label {
+  input + * {
     justify-content: space-between;
   }
 
-  label:first-of-type {
+  label:first-of-type input + * {
     @extend %button-rounded-top;
   }
 
-  label:last-of-type {
+  label:last-of-type input + * {
     @extend %button-rounded-bottom;
   }
 }
