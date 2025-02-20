@@ -42,8 +42,6 @@ function MultiChoiceInputComponent({
   const management = useSelector(getManagement);
   const _formatPrice = useSelector(getPriceFormatter);
 
-  console.log('render', value);
-
   const markTouched = () => {
     onFocus();
     onBlur();
