@@ -88,6 +88,7 @@ export const getConfig = (
     {start: '*', end: '*', format: 'italic'},
     {start: '**', end: '**', format: 'bold'},
     {start: '~~', end: '~~', format: 'strikethrough'},
+    {start: '==', end: '==', format: 'mark'},
     {start: '`', end: '`', format: 'code'},
     {start: '#', format: 'h1'},
     {start: '##', format: 'h2'},
@@ -98,6 +99,55 @@ export const getConfig = (
     {start: '1. ', cmd: 'InsertOrderedList'},
     {start: '* ', cmd: 'InsertUnorderedList'},
     {start: '- ', cmd: 'InsertUnorderedList'},
+  ],
+  formats: {
+    mark: {inline: 'mark'},
+  },
+  // This is the default, with "Mark" added to the list.
+  // https://www.tiny.cloud/docs/tinymce/latest/user-formatting-options/#style_formats
+  style_formats: [
+    {
+      title: 'Headings',
+      items: [
+        {title: 'Heading 1', format: 'h1'},
+        {title: 'Heading 2', format: 'h2'},
+        {title: 'Heading 3', format: 'h3'},
+        {title: 'Heading 4', format: 'h4'},
+        {title: 'Heading 5', format: 'h5'},
+        {title: 'Heading 6', format: 'h6'},
+      ],
+    },
+    {
+      title: 'Inline',
+      items: [
+        {title: 'Bold', format: 'bold'},
+        {title: 'Italic', format: 'italic'},
+        {title: 'Underline', format: 'underline'},
+        {title: 'Strikethrough', format: 'strikethrough'},
+        {title: 'Mark', format: 'mark'},
+        {title: 'Superscript', format: 'superscript'},
+        {title: 'Subscript', format: 'subscript'},
+        {title: 'Code', format: 'code'},
+      ],
+    },
+    {
+      title: 'Blocks',
+      items: [
+        {title: 'Paragraph', format: 'p'},
+        {title: 'Blockquote', format: 'blockquote'},
+        {title: 'Div', format: 'div'},
+        {title: 'Pre', format: 'pre'},
+      ],
+    },
+    {
+      title: 'Align',
+      items: [
+        {title: 'Left', format: 'alignleft'},
+        {title: 'Center', format: 'aligncenter'},
+        {title: 'Right', format: 'alignright'},
+        {title: 'Justify', format: 'alignjustify'},
+      ],
+    },
   ],
   codesample_global_prismjs: true,
   codesample_languages: [
@@ -144,6 +194,7 @@ export const getConfig = (
         'italic',
         'underline',
         'strikethrough',
+        'mark',
         'removeformat',
         '|',
         'link',
@@ -208,6 +259,14 @@ export const getConfig = (
     args.content = sanitizeHtml(args.content);
   },
   setup: editor => {
+    editor.ui.registry.addButton('mark', {
+      tooltip: 'Mark',
+      icon: 'permanent-pen',
+      onAction() {
+        editor.formatter.toggle('mark');
+      },
+    });
+
     // auto-save to hidden field (or trigger change event) on input
     editor.on(
       'change input compositionend setcontent CommentChange',
