@@ -66,7 +66,7 @@ function BooleanInputComponent({
           onChange={handleSelect(true)}
           onClick={handleUncheck(true)}
           onKeyDown={handleUncheckViaKeyboard(true)}
-          checked={!isPurged && value}
+          checked={!isPurged && value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit && !existingValue)}
           required={required}
         />
