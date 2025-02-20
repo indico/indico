@@ -90,6 +90,7 @@ export default function FormItem({
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
 
+  const {htmlName} = rest;
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
@@ -151,6 +152,7 @@ export default function FormItem({
 
   return (
     <div
+      data-html-name={htmlName}
       styleName={`form-item ${toClasses({
         'disabled': !isEnabled || paidItemLocked,
         'purged-disabled': showPurged,
