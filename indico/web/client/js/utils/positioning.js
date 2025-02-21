@@ -71,7 +71,7 @@ const geometry = {
     delete this.initialPageYOffset;
 
     this.setAnchorGeometry();
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       this.getGeometry();
       callback();
     });
@@ -274,12 +274,12 @@ export function position(target, anchor, strategy, callback) {
   // we are only interested in the client rect and not its other visual properties.
   target.toggleAttribute('data-position-check', true);
 
-  setTimeout(() => {
-    strategy.resetGeometry(() => {
-      strategy.calculateFit();
-      strategy.calculateAlignment();
-      target.removeAttribute('data-position-check');
-      adjustPosition();
+  strategy.resetGeometry(() => {
+    strategy.calculateFit();
+    strategy.calculateAlignment();
+    target.removeAttribute('data-position-check');
+    adjustPosition();
+    requestAnimationFrame(() => {
       callback?.(strategy.fitsPreferredDirection);
     });
   });
