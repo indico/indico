@@ -103,11 +103,11 @@ class RHDisplayEventBase(RHProtectedEventBase):
     def _do_process(self):
         with self.event_rh_contexts:
             try:
-                ret = RHEventBase._do_process(self)
+                rv = RHEventBase._do_process(self)
                 if self.event.visibility == 0:
                     # If the event is invisible, avoid web search engine indexing
                     self.noindex = True
-                return ret
+                return rv
             except AccessKeyRequired:
                 return self._show_access_key_form()
             except RegistrationRequired:
