@@ -330,7 +330,8 @@ class RHSearchAffiliations(RH):
         score = (_weighted_param(exact_match, 150) +
                  _weighted_param(_match_search(q, prefix=True), 60) +
                  _weighted_param(_match_search(q), 20))
-        for word in q.split():
+        word_list = q.split()
+        for word in word_list:
             if (country_code := get_country_reverse(word, case_sensitive=False)):
                 score += _weighted_param(Affiliation.country_code.ilike(country_code), 20)
                 continue
@@ -338,7 +339,7 @@ class RHSearchAffiliations(RH):
                       _weighted_param(_match_search(word, exact=True), 40) +
                       _weighted_param(_match_search(word, prefix=True), 30) +
                       _weighted_param(_match_search(word), 10))
-        q_filter = score >= 20 if len(q) > 2 else exact_match
+        q_filter = db.or_(_match_search(w) for w in word_list) if len(q) > 2 else exact_match
         res = (
             Affiliation.query
             .filter(~Affiliation.is_deleted, q_filter)
