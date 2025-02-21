@@ -45,8 +45,6 @@ def upgrade():
     op.add_column('affiliations', sa.Column('alt_names', postgresql.ARRAY(sa.String()),
                                             nullable=False, server_default='{}'), schema='indico')
     op.alter_column('affiliations', 'alt_names', server_default=None, schema='indico')
-    op.create_index('ix_affiliations_city_unaccent_lower', 'affiliations', [sa.text('indico.indico_unaccent(lower(city))')], schema='indico')
-    op.create_index(None, 'affiliations', ['country_code'], schema='indico')
     op.execute('''
         CREATE INDEX ix_affiliations_searchable_names_unaccent
         ON indico.affiliations
@@ -56,8 +54,6 @@ def upgrade():
 
 def downgrade():
     op.drop_index('ix_affiliations_searchable_names_unaccent', table_name='affiliations', schema='indico')
-    op.drop_index('ix_affiliations_city_unaccent_lower', table_name='affiliations', schema='indico')
-    op.drop_index('ix_affiliations_country_code', table_name='affiliations', schema='indico')
     op.drop_column('affiliations', 'alt_names', schema='indico')
     op.execute('DROP FUNCTION indico.text_array_append(arr text[], item text)')
     op.execute('DROP FUNCTION indico.text_array_to_string(arr text[], sep text)')
