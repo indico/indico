@@ -7,7 +7,6 @@
 
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, array
 from sqlalchemy.event import listens_for
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import column_property, mapper
 
 from indico.core.db import db
@@ -18,11 +17,8 @@ from indico.util.string import format_repr
 class Affiliation(db.Model):
     __tablename__ = 'affiliations'
 
-    @declared_attr
-    def __table_args__(cls):
-        return (db.Index('ix_affiliations_city_unaccent_lower', db.func.indico.indico_unaccent(db.func.lower(cls.city))),
-                db.Index(None, 'meta', postgresql_using='gin'),
-                {'schema': 'indico'})
+    __table_args__ = (db.Index(None, 'meta', postgresql_using='gin'),
+                      {'schema': 'indico'})
 
     id = db.Column(
         db.Integer,
@@ -62,7 +58,6 @@ class Affiliation(db.Model):
         db.String,
         nullable=False,
         default='',
-        index=True,
     )
     #: Opaque external data related to this affiliation
     meta = db.Column(
