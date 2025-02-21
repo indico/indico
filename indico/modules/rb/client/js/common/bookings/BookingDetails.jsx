@@ -348,7 +348,7 @@ class BookingDetails extends React.Component {
         {
           id: 'created',
           timestamp: createdOn,
-          info: ['Booking created'],
+          info: [Translate.string('Booking created')],
           userName: createdBy,
         },
       ];
