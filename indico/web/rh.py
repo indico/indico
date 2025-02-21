@@ -85,6 +85,7 @@ class RH:
 
     def __init__(self):
         self.commit = True
+        self.noindex = False
 
     # Methods =============================================================
 
@@ -331,6 +332,8 @@ class RH:
             res = ''
 
         response = current_app.make_response(res)
+        if self.noindex:
+            response.headers['X-Robots-Tag'] = 'noindex, nofollow, noarchive, nosnippet'
         if self.DENY_FRAMES:
             response.headers['X-Frame-Options'] = 'DENY'
         return response
