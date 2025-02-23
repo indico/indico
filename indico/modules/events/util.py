@@ -553,8 +553,8 @@ def register_location_change(entry):
 
 def serialize_event_for_ical(event):
     title = event.title
-    if label := getattr(event, 'label', None):
-        title += f' [{label.title}]'
+    if event.label:
+        title += f' [{event.label.title}]'
 
     return {
         '_fossil': 'conferenceMetadata',
