@@ -25,5 +25,6 @@ privacy_settings = EventSettingsProxy('privacy', {
 })
 
 global_event_settings = SettingsProxy('events', {
-    'allowed_keywords': [],
+    'allowed_event_keywords': [],
+    'allowed_contribution_keywords': [],
 })

@@ -210,7 +210,7 @@ class RHCreateContribution(RHManageContributionsBase):
         default_duration = contribution_settings.get(self.event, 'default_duration')
         contrib_form_class = make_contribution_form(self.event)
         form = contrib_form_class(obj=FormDefaults(location_data=inherited_location, duration=default_duration),
-                                  event=self.event)
+                                  event=self.event, keywords=[])
         if form.validate_on_submit():
             # Create empty contribution so it can be compared to the new one in flash_if_unregistered
             contrib = Contribution()
@@ -238,7 +238,7 @@ class RHEditContribution(RHManageContributionBase):
 
     def _process(self):
         can_manage = self.contrib.can_manage(session.user)
-        contrib_form_class = make_contribution_form(self.event, management=can_manage)
+        contrib_form_class = make_contribution_form(self.event, contrib=self.contrib, management=can_manage)
         custom_field_values = {f'custom_{x.contribution_field_id}': x.data for x in self.contrib.field_values}
         parent_session_block = (self.contrib.timetable_entry.parent.session_block
                                 if (self.contrib.timetable_entry and self.contrib.timetable_entry.parent) else None)

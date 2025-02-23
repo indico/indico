@@ -159,7 +159,7 @@ class RHEditEventClassification(RHEditEventDataBase):
 
     @property
     def form_class(self):
-        if allowed_keywords := global_event_settings.get('allowed_keywords'):
+        if allowed_keywords := global_event_settings.get('allowed_event_keywords'):
             choices = [{'id': kw, 'name': kw} for kw in (set(allowed_keywords) | set(self.event.keywords))]
             keywords = IndicoStrictKeywordsField(_('Keywords'), choices=choices)
         else:

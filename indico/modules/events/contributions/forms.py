@@ -21,13 +21,14 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
-                                     IndicoMarkdownField, IndicoProtectionField, IndicoTagListField)
+                                     IndicoMarkdownField, IndicoProtectionField)
 from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import DateTimeRange, HiddenUnless, MaxDuration
@@ -49,7 +50,7 @@ class ContributionForm(IndicoForm):
     type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
     person_link_data = ContributionPersonLinkListField(_('People'))
     location_data = IndicoLocationField(_('Location'))
-    keywords = IndicoTagListField(_('Keywords'))
+    # keywords = the field is dynamically added when creating the form
     references = ReferencesField(_('External IDs'), reference_class=ContributionReference,
                                  description=_('Manage external resources for this contribution'))
     board_number = StringField(_('Board Number'))
@@ -102,6 +103,12 @@ class ContributionForm(IndicoForm):
                 raise ValidationError(_('With the current duration the contribution exceeds the block end date'))
             if end_dt > self.event.end_dt:
                 raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
+
+    def validate_keywords(self, field):
+        allowed_keywords = set(global_event_settings.get('allowed_contribution_keywords')) | set(field.object_data)
+        keywords = set(field.data)
+        if allowed_keywords and not (keywords <= allowed_keywords):
+            raise ValidationError(_('Invalid keyword found'))
 
     @property
     def custom_field_names(self):
