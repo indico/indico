@@ -67,6 +67,8 @@ Bugfixes
 - Fix display issues after reacting to a favorite category suggestion (:pr:`6771`)
 - Include event labels in dashboard ICS export (:issue:`5886, 6372`, :pr:`6769`, thanks
   :user:`amCap1712`)
+- Do not show default values for purged registration fields (:issue:`5898`, :pr:`6772`,
+  thanks :user:`amCap1712`)
 
 Accessibility
 ^^^^^^^^^^^^^
