@@ -240,8 +240,8 @@
                                     'class': 'category-action icon-star active',
                                     'title': $T('You have favorited this category')
                                 }));
-                            container.appendTo('#yourCategories ol');
-                            if(!$('#suggestedCategories ol > li').length) {
+                            container.appendTo('#yourCategories > ul');
+                            if (!$('#suggestedCategories > ul > li').length) {
                                 $('#suggestedCategories').remove();
                             }
                         }
@@ -259,7 +259,7 @@
                         error: handleAjaxError,
                         success: function() {
                             container.remove();
-                            if (!$('#suggestedCategories ol > li').length) {
+                            if (!$('#suggestedCategories > ul > li').length) {
                                 $('#suggestedCategories').remove();
                             }
                         }
