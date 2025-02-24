@@ -67,7 +67,7 @@ def _inject_announcement_header(**kwargs):
         return
 
     # Only show the banner for admins
-    if not session.user.is_admin:
+    if not session.user.is_admin and 'login_as_orig_user' not in session:
         return
 
     # Don't show the banner on the accept terms page
@@ -105,7 +105,7 @@ def confirm_rh_terms_required():
         return
 
     # If you are admin, we'll show the banner instead
-    if session.user.is_admin:
+    if session.user.is_admin or 'login_as_orig_user' in session:
         return
 
     # Certain endpoints need to be always allowed
