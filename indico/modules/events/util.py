@@ -552,10 +552,14 @@ def register_location_change(entry):
 
 
 def serialize_event_for_ical(event):
+    title = event.title
+    if event.label:
+        title += f' [{event.label.title}]'
+
     return {
         '_fossil': 'conferenceMetadata',
         'id': event.id,
-        'title': event.title,
+        'title': title,
         'description': event.description,
         'startDate': event.start_dt,
         'endDate': event.end_dt,

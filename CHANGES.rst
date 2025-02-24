@@ -61,6 +61,8 @@ Bugfixes
   to manage materials on the event level (:pr:`6760`)
 - Do not redirect to the ToS acceptance page when impersonating a user (:pr:`6770`)
 - Fix display issues after reacting to a favorite category suggestion (:pr:`6771`)
+- Include event labels in dashboard ICS export (:issue:`5886, 6372`, :pr:`6769`, thanks
+  :user:`amCap1712`)
 
 Accessibility
 ^^^^^^^^^^^^^
