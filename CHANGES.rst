@@ -41,6 +41,8 @@ Improvements
   :user:`openprojects`)
 - Make the minimum length of local account passwords configurable, and default to ``15``
   instead of ``8`` for new installations (:issue:`6629`, :pr:`6740`, thanks :user:`amCap1712`)
+- Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
+  :user:`amCap1712`)
 
 Bugfixes
 ^^^^^^^^
