@@ -29,7 +29,7 @@ Improvements
 - Improve the appearance of the date pickers (:issue:`6719`, :pr:`6720`, thanks :user:`foxbunny`)
 - Add a new setting (:data:`ALLOW_ADMIN_USER_DELETION`) to let administrators permanently
   delete Indico users from the user management UI (:pr:`6652`, thanks :user:`SegiNyn`)
-- Support ``==text==`` to highlight text in markdown (:issue:`6731`, :pr:`6732`)
+- Support ``==text==`` to highlight text in markdown (:issue:`6731`, :pr:`6732, 6767`)
 - Add an event setting to allow enforcing search before entering a person manually to
   a persons list in abstracts and contributions (:pr:`6689`)
 - Allow users to login using their email address (:pr:`6522`, thanks :user:`SegiNyn`)
