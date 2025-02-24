@@ -1,3 +1,9 @@
-{% trans link='<a href="%s">'|format(url_for('legal.accept_agreement'))|safe, endlink='</a>'|safe -%}
-    You have not accepted the latest terms. Please {{ link }}review them{{ endlink }} at your earliest convenience.
-{%- endtrans %}
+{% if session.login_as_orig_user %}
+    {% trans -%}
+        This user has not accepted the latest terms.
+    {%- endtrans %}
+{% else %}
+    {% trans link='<a href="%s">'|format(url_for('legal.accept_agreement'))|safe, endlink='</a>'|safe -%}
+        You have not accepted the latest terms. Please {{ link }}review them{{ endlink }} at your earliest convenience.
+    {%- endtrans %}
+{% endif %}

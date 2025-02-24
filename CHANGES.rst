@@ -59,6 +59,7 @@ Bugfixes
 - Trigger event creation notification emails when cloning events (:pr:`6744`)
 - Fix image uploading not working when editing an existing note without having permissions
   to manage materials on the event level (:pr:`6760`)
+- Do not redirect to the ToS acceptance page when impersonating a user (:pr:`6770`)
 
 Accessibility
 ^^^^^^^^^^^^^
