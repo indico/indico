@@ -62,6 +62,7 @@ DEFAULTS = {
     'LOCAL_IDENTITIES': True,
     'LOCAL_USERNAMES': True,
     'LOCAL_MODERATION': False,
+    'LOCAL_PASSWORD_MIN_LENGTH': 8,
     'LOCAL_REGISTRATION': True,
     'LOCAL_GROUPS': True,
     'LOGGING_CONFIG_FILE': 'logging.yaml',
@@ -305,6 +306,8 @@ class IndicoConfig:
             raise ValueError(f'Invalid default timezone: {self.DEFAULT_TIMEZONE}')
         if self.SMTP_ALLOWED_SENDERS and not self.SMTP_SENDER_FALLBACK:
             raise ValueError('Cannot restrict SMTP senders without a fallback')
+        if not self.DEBUG and self.LOCAL_PASSWORD_MIN_LENGTH < 8:
+            raise ValueError('Minimum password length cannot be less than 8 characters long')
 
     def __getattr__(self, name):
         try:

@@ -39,6 +39,8 @@ Improvements
   use the email address (:pr:`6751`)
 - Tell search engines to not index events marked as "invisible" (:pr:`6762`, thanks
   :user:`openprojects`)
+- Make the minimum length of local account passwords configurable, and default to ``15``
+  instead of ``8`` for new installations (:issue:`6629`, :pr:`6740`, thanks :user:`amCap1712`)
 
 Bugfixes
 ^^^^^^^^

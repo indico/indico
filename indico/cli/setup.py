@@ -630,6 +630,7 @@ class SetupWizard:
             'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache')),
             'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp')),
             'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log')),
+            'LOCAL_PASSWORD_MIN_LENGTH = 15',  # use NIST recommendation for new installations
             f'STORAGE_BACKENDS = {storage_backends!r}',
             "ATTACHMENT_STORAGE = 'default'",
             '',

@@ -12,6 +12,7 @@ import re
 import bcrypt
 import requests
 
+from indico.core.config import config
 from indico.util.i18n import _
 
 
@@ -155,7 +156,7 @@ def validate_secure_password(context, password, *, username='', emails=frozenset
 
     A password is considered secure if it:
 
-    - is at least 8 characters long
+    - is at least :data:`LOCAL_PASSWORD_MIN_LENGTH` characters long
     - does not contain the username unless the username is <5 chars and the password is >16 chars long
     - does not contain the strings 'indico' (or common variations)
     - is not in the pwned password list
@@ -184,8 +185,8 @@ def validate_secure_password(context, password, *, username='', emails=frozenset
                                     as_list=True):
         return errors[0]
 
-    if len(password) < 8:
-        return _('Passwords must be at least 8 characters long.')
+    if len(password) < config.LOCAL_PASSWORD_MIN_LENGTH:
+        return _('Passwords must be at least {} characters long.').format(config.LOCAL_PASSWORD_MIN_LENGTH)
 
     if re.search(r'[i1|]nd[1i|]c[o0]', password.lower()):
         return _('Passwords may not contain the word "indico" or variations.')

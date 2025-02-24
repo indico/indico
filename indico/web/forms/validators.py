@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
+from indico.core.config import config
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.users.util import get_mastodon_server_name
 from indico.util.date_time import as_utc, format_date, format_datetime, format_human_timedelta, format_time, now_utc
@@ -395,10 +396,6 @@ class SoftLength(Length):
 class SecurePassword:
     """Validate that a string is a secure password."""
 
-    # This is only defined here so the `_attrs_for_validators` util does
-    # not need to hard-code it.
-    MIN_LENGTH = 8
-
     def __init__(self, context='wtforms-field', username_field=None, emails=None):
         self.context = context
         self.username_field = username_field
@@ -412,6 +409,12 @@ class SecurePassword:
         emails = self.get_emails(form) if self.get_emails else set()
         if error := validate_secure_password(self.context, password, username=username, emails=emails):
             raise ValidationError(error)
+
+    # This is only defined here so the `_attrs_for_validators` util does
+    # not need to hard-code it.
+    @property
+    def minlength(self):
+        return config.LOCAL_PASSWORD_MIN_LENGTH
 
 
 class NoRelativeURLs:

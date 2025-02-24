@@ -63,6 +63,21 @@ Authentication
 
     Default: ``True``
 
+.. data:: LOCAL_PASSWORD_MIN_LENGTH
+
+    This setting controls the minimum number of characters required for a
+    local account password.
+
+    Outside debug mode, this cannot be set to a value less than ``8``, which
+    is considered the bare minimum for a (somewhat) secure password.
+
+    The default value is ``8`` to avoid suddenly changing it for existing
+    installations which would require users to change their password at the
+    next login. Any new installation has a default of ``15``, which is the
+    recommendation from the NIST standard.
+
+    Default: ``8``
+
 .. data:: LOCAL_MODERATION
 
     This setting controls whether a new registration needs to be approved
