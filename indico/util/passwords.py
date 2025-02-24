@@ -186,7 +186,7 @@ def validate_secure_password(context, password, *, username='', emails=frozenset
         return errors[0]
 
     if len(password) < config.LOCAL_PASSWORD_MIN_LENGTH:
-        return _('Password must be at least {} characters long.').format(config.LOCAL_PASSWORD_MIN_LENGTH)
+        return _('Passwords must be at least {} characters long.').format(config.LOCAL_PASSWORD_MIN_LENGTH)
 
     if re.search(r'[i1|]nd[1i|]c[o0]', password.lower()):
         return _('Passwords may not contain the word "indico" or variations.')
