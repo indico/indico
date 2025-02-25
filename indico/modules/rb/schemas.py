@@ -25,7 +25,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
-from indico.modules.rb.models.principals import RoomPrincipal
+from indico.modules.rb.models.principals import LocationPrincipal, RoomPrincipal
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import (ReservationOccurrence, ReservationOccurrenceLink,
                                                               ReservationOccurrenceState)
@@ -385,10 +385,11 @@ class LocationsSchema(mm.SQLAlchemyAutoSchema):
 
 class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
     can_delete = Function(lambda loc: not loc.rooms)
+    acl_entries = PrincipalPermissionList(LocationPrincipal)
 
     class Meta:
         model = Location
-        fields = ('id', 'name', 'can_delete', 'map_url_template', 'room_name_format')
+        fields = ('id', 'name', 'can_delete', 'map_url_template', 'room_name_format', 'acl_entries')
 
 
 class RBUserSchema(UserSchema):
@@ -491,6 +492,7 @@ class LocationArgs(mm.Schema):
     name = fields.String(required=True)
     room_name_format = fields.String(required=True)
     map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, load_default='')
+    acl_entries = PrincipalPermissionList(LocationPrincipal)
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):
