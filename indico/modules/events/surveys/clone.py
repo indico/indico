@@ -40,14 +40,12 @@ class EventSurveyCloner(EventCloner):
             survey = Survey()
             survey.populate_from_attrs(old_survey, survey_attrs)
             item_map = {}
-            for old_item in old_survey.items:
+            # Clone sections first so they can be referenced later when items are cloned.
+            for old_item in sorted(old_survey.items, key=lambda x: (x.parent is not None, x.position)):
                 item = self._clone_item(survey, old_item)
                 if old_item.parent:
                     assert old_item.parent != old_item
-                    try:
-                        item.parent = item_map[old_item.parent]
-                    except KeyError:
-                        item.parent = item_map[old_item.parent] = self._clone_item(survey, old_item.parent)
+                    item.parent = item_map[old_item.parent]
                 item_map[old_item] = item
             new_event.surveys.append(survey)
 
