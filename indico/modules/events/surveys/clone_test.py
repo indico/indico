@@ -31,6 +31,9 @@ def test_survey_clone(db, create_event, dummy_event):
 
     assert len(new_event.surveys) == 1
     assert len(new_event.surveys[0].items) == len(survey.items)
-    for i, item in enumerate(new_event.surveys[0].items):
+    for i, section in enumerate(new_event.surveys[0].sections):
         for attr in get_attrs_to_clone(SurveyItem):
-            assert getattr(item, attr) == getattr(survey.items[i], attr)
+            assert getattr(section, attr) == getattr(survey.sections[i], attr)
+        for j, child in enumerate(section.children):
+            for attr in get_attrs_to_clone(SurveyItem):
+                assert getattr(child, attr) == getattr(survey.sections[i].children[j], attr)
