@@ -6,9 +6,9 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {useCallback, useEffect, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Dropdown, Icon, Label, Menu, Message} from 'semantic-ui-react';
+import React from 'react';
+import {useSelector} from 'react-redux';
+import {Icon} from 'semantic-ui-react';
 
 import * as selectors from './selectors';
 
@@ -27,10 +27,10 @@ export default function WeekViewToolbar({
 }) {
   const eventStart = useSelector(selectors.getEventStartDt);
   const numDays = useSelector(selectors.getEventNumDays);
-  const weekLength = 7; // Default week length
+  const WEEK_LENGTH = 7; // Default week length
 
   const isPrevDisabled = offset === 0;
-  const isNextDisabled = offset + weekLength >= numDays;
+  const isNextDisabled = offset + WEEK_LENGTH >= numDays;
 
   const getDateFromIdx = idx => moment(eventStart).add(idx, 'days');
 
@@ -38,7 +38,7 @@ export default function WeekViewToolbar({
     if (isPrevDisabled) {
       return;
     }
-    const newOffset = Math.max(0, offset - weekLength);
+    const newOffset = Math.max(0, offset - WEEK_LENGTH);
     onOffsetChange(newOffset);
   };
 
@@ -46,21 +46,18 @@ export default function WeekViewToolbar({
     if (isNextDisabled) {
       return;
     }
-    const newOffset = Math.min(numDays - 1, offset + weekLength);
+    const newOffset = Math.min(numDays - 1, offset + WEEK_LENGTH);
     onOffsetChange(newOffset);
   };
 
   return (
-    <div style={{display: 'flex', fontSize: 18, paddingBottom: 10}} className="ui">
+    <div styleName="toolbar" className="ui">
       <Icon
         name="chevron left"
         onClick={handlePrevWeek}
-        style={{
-          cursor: isPrevDisabled ? 'not-allowed' : 'pointer',
-          color: isPrevDisabled ? 'lightgray' : 'black',
-        }}
+        styleName={`${isPrevDisabled ? 'navigation-disabled' : 'navigation-chevron'}`}
       />
-      {[...Array(weekLength).keys()].map(n => {
+      {[...Array(WEEK_LENGTH).keys()].map(n => {
         const d = getDateFromIdx(n + offset);
         const isWithinEvent = n + offset < numDays;
         const isWeekend = d.isoWeekday() > 5;
@@ -75,7 +72,9 @@ export default function WeekViewToolbar({
             }}
             styleName="weekdays"
           >
-            <span styleName={isWeekend && isWithinEvent ? 'weekend' : ''}>{d.format('ddd ')}</span>
+            <div styleName={`weekday ${isWeekend && isWithinEvent ? 'weekend' : ''}`}>
+              {d.format('ddd ')}
+            </div>
             {d.format('DD/MM')}
           </div>
         );
@@ -83,10 +82,7 @@ export default function WeekViewToolbar({
       <Icon
         name="chevron right"
         onClick={handleNextWeek}
-        style={{
-          cursor: isNextDisabled ? 'not-allowed' : 'pointer',
-          color: isNextDisabled ? 'lightgray' : 'black',
-        }}
+        styleName={`${isNextDisabled ? 'navigation-disabled' : 'navigation-chevron'}`}
       />
     </div>
   );

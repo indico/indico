@@ -7,15 +7,40 @@
 
 @use 'base/palette' as *;
 
-.weekend {
-  color: $light-black !important;
-}
-
 .weekdays {
-  font-weight: bold !important;
+  font-weight: bold;
+
+  .weekday {
+    font-size: 15px;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+
+  .weekend {
+    color: $light-black;
+  }
 }
 
 .toolbar {
+  display: flex;
+  font-size: 18px;
+  padding-bottom: 15px;
+  align-items: center;
+  box-shadow: 0 5px 5px 0 rgba($light-black, 0.15);
+  z-index: 1;
+
+  .navigation-chevron {
+    cursor: pointer;
+    color: $jet-black;
+  }
+
+  .navigation-disabled {
+    cursor: not-allowed;
+    color: $hazy-gray;
+  }
+}
+
+/*.toolbar {
   // position: sticky;
   top: 0;
   // padding-top: 1.5em;
@@ -48,4 +73,4 @@
       left: auto;
     }
   }
-}
+}*/

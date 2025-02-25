@@ -40,8 +40,11 @@
     width: 100%;
   }
 
-  &.disabled {
-    background: none !important;
+  &.first {
+    .line::after {
+      left: -10px;
+      width: calc(10px + 100%);
+    }
   }
 }
 
@@ -60,12 +63,12 @@
   &.day:not(:last-child) {
     border-right: 1px solid #d4d4d5;
   }
-}
 
-.calendar.day.greyed-out {
-  background-color: #f0f0f0;
-  color: #a0a0a0;
-  cursor: not-allowed;
+  &.day.greyed-out {
+    background-color: #f0f0f0;
+    color: #a0a0a0;
+    cursor: not-allowed;
+  }
 }
 
 .entry {
