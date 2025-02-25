@@ -44,6 +44,7 @@ Improvements
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
+- Add a button to (un-)select all listed rooms for an action in the room list (:pr:`6773`)
 
 Bugfixes
 ^^^^^^^^
