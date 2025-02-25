@@ -69,6 +69,7 @@ Bugfixes
   :user:`amCap1712`)
 - Do not show default values for purged registration fields (:issue:`5898`, :pr:`6772`,
   thanks :user:`amCap1712`)
+- Do not create empty survey sections during event cloning (:pr:`6774`)
 
 Accessibility
 ^^^^^^^^^^^^^
