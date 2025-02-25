@@ -444,6 +444,7 @@ class User(PersonMixin, db.Model):
     # - blockings (Blocking.created_by_user)
     # - category_log_entries (CategoryLogEntry.user)
     # - category_roles (CategoryRole.members)
+    # - registration_checks_performed (RegistrationCheck.user)
     # - content_reviewer_for_contributions (Contribution.paper_content_reviewers)
     # - created_events (Event.creator)
     # - data_export_request (DataExportRequest.user)

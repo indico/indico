@@ -109,7 +109,7 @@ class RHCheckinAPIRegistration(RHCheckinAPIRegFormBase):
     def _process_PATCH(self, checked_in=None, paid=None):
         if checked_in is not None:
             self.registration.checked_in = checked_in
-            signals.event.registration_checkin_updated.send(self.registration)
+            signals.event.registration_check_updated.send(self.registration)
         if paid is not None and paid != self.registration.is_paid and self.registration.price:
             toggle_registration_payment(self.registration, paid=paid)
         return CheckinRegistrationSchema().jsonify(self.registration)

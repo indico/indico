@@ -10,6 +10,7 @@ import posixpath
 import time
 from decimal import Decimal
 from email.mime.image import MIMEImage
+from operator import attrgetter
 from uuid import uuid4
 
 from babel.numbers import format_currency
@@ -18,7 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
-from sqlalchemy.orm import column_property, mapper
+from sqlalchemy.orm import aliased, column_property, mapper
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
@@ -28,7 +29,9 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.errors import NoReportError
 from indico.core.storage import StoredFileMixin
+from indico.modules.events.models.events import Event
 from indico.modules.events.payment.models.transactions import TransactionStatus
+from indico.modules.events.registration.models.checks import RegistrationCheck, RegistrationCheckRule
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.wallets.apple import AppleWalletManager
 from indico.modules.events.registration.wallets.google import GoogleWalletManager
@@ -218,18 +221,6 @@ class Registration(db.Model):
         nullable=False,
         default=lambda: str(uuid4())
     )
-    #: Whether the person has checked in. Setting this also sets or clears
-    #: `checked_in_dt`.
-    checked_in = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    #: The date/time when the person has checked in
-    checked_in_dt = db.Column(
-        UTCDateTime,
-        nullable=True
-    )
     #: If given a reason for rejection
     rejection_reason = db.Column(
         db.String,
@@ -314,6 +305,7 @@ class Registration(db.Model):
         default='',
     )
     # relationship backrefs:
+    # - checks (RegistrationCheck.registration)
     # - invitation (RegistrationInvitation.registration)
     # - legacy_mapping (LegacyRegistrationMapping.registration)
     # - receipt_files (ReceiptFile.registration)
@@ -591,6 +583,102 @@ class Registration(db.Model):
     def published_receipts(self):
         return [receipt for receipt in self.receipt_files if receipt.is_published]
 
+    @property
+    def last_check(self):
+        checks = sorted(self.checks, key=attrgetter('timestamp'), reverse=True)
+        return next((check for check in checks if check.check_type_id == self.event.default_check_type_id), None)
+
+    @hybrid_property
+    def has_checked_in(self):
+        return any(check for check in self.checks if check.check_type_id == self.event.default_check_type_id
+                   and not check.is_check_out)
+
+    @has_checked_in.expression
+    def has_checked_in(cls):
+        return (RegistrationCheck.query.filter(
+                    RegistrationCheck.registration_id == cls.id,
+                    ~RegistrationCheck.is_check_out,
+                    cls.event.has(Event.default_check_type_id == RegistrationCheck.check_type_id))
+                    .exists())
+
+    @hybrid_property
+    def checked_in(self):
+        if self.last_check is None:
+            return False
+        return not self.last_check.is_check_out
+
+    @checked_in.expression
+    def checked_in(cls):
+        last_check = aliased(RegistrationCheck)
+        query = (
+            db.select(last_check.is_check_out)
+            .where(
+                last_check.registration_id == cls.id,
+                cls.event.has(Event.default_check_type_id == last_check.check_type_id)
+            )
+            .order_by(last_check.timestamp.desc())
+            .limit(1)
+            .scalar_subquery()
+        )
+        return db.case(
+            (query.is_(False), True),
+            else_=False
+        )
+
+    @checked_in.setter
+    def checked_in(self, value):
+        from indico.modules.events.registration.util import perform_registration_check
+
+        if value is True:
+            result = self.can_perform_check()
+            if result['can_check']:
+                perform_registration_check(self)
+
+    @property
+    def checked_in_dt(self):
+        if self.checked_in:
+            return self.last_check.timestamp
+        return None
+
+    @hybrid_property
+    def checked_out(self):
+        if self.last_check is None:
+            return False
+        return self.last_check.is_check_out
+
+    @checked_out.expression
+    def checked_out(cls):
+        last_check = aliased(RegistrationCheck)
+        query = (
+            db.select(last_check.is_check_out)
+            .where(
+                last_check.registration_id == cls.id,
+                cls.event.has(Event.default_check_type_id == last_check.check_type_id)
+            )
+            .order_by(last_check.timestamp.desc())
+            .limit(1)
+            .scalar_subquery()
+        )
+        return db.case(
+            (query.is_(True), True),
+            else_=False
+        )
+
+    @checked_out.setter
+    def checked_out(self, value):
+        from indico.modules.events.registration.util import perform_registration_check
+
+        if value is True:
+            result = self.can_perform_check(is_check_out=True)
+            if result['can_check']:
+                perform_registration_check(self, is_check_out=True)
+
+    @property
+    def checked_out_dt(self):
+        if self.checked_out:
+            return self.last_check.timestamp
+        return None
+
     @classproperty
     @classmethod
     def order_by_name(cls):
@@ -775,7 +863,7 @@ class Registration(db.Model):
             return False
         else:
             raise BadRequest(_('The registration cannot be reset in its current state.'))
-        self.checked_in = False
+        self.checks.clear()
         return True
 
     def has_conflict(self):
@@ -821,6 +909,28 @@ class Registration(db.Model):
         awm = AppleWalletManager(self.event)
         if awm.is_configured:
             return awm.get_ticket(self)
+
+    def can_perform_check(self, *, check_type=None, is_check_out=False):
+        can_check = True
+        reason = _('Check can be performed.')
+        if not check_type:
+            check_type = self.event.default_check_type
+        if not check_type:
+            can_check = False
+            reason = _('Check type not specified and no default check type has been set for this event.')
+        if is_check_out and not check_type.check_out_allowed:
+            can_check = False
+            reason = _('This check type cannot be "checked-out".')
+        previous_checks_for_type = [check for check in self.checks if check.check_type == check_type and
+                                    check.is_check_out == is_check_out]
+        if previous_checks_for_type and check_type.rule == RegistrationCheckRule.once:
+            can_check = False
+            reason = _('This check type can only be performed once.')
+        if (check_type.rule == RegistrationCheckRule.once_daily and
+                any(check.timestamp.date() == now_utc().date() for check in previous_checks_for_type)):
+            can_check = False
+            reason = _('This check type has alread been performed once today.')
+        return {'can_check': can_check, 'reason': reason}
 
 
 class RegistrationData(StoredFileMixin, db.Model):
@@ -969,13 +1079,6 @@ def _mapper_configured():
     @listens_for(Registration.registration_form, 'set')
     def _set_event_id(target, value, *unused):
         target.event_id = value.event_id
-
-    @listens_for(Registration.checked_in, 'set')
-    def _set_checked_in_dt(target, value, *unused):
-        if not value:
-            target.checked_in_dt = None
-        elif target.checked_in != value:
-            target.checked_in_dt = now_utc()
 
     @listens_for(Registration.transaction, 'set')
     def _set_transaction_id(target, value, *unused):

@@ -50,7 +50,7 @@ class RHAPIRegistrant(RH):
             if self._registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
                 raise BadRequest('This registration cannot be marked as checked-in')
             self._registration.checked_in = bool(request.json['checked_in'])
-            signals.event.registration_checkin_updated.send(self._registration)
+            signals.event.registration_check_updated.send(self._registration)
 
         return jsonify(build_registration_api_data(self._registration))
 
