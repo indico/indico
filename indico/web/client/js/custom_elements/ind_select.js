@@ -210,10 +210,15 @@ customElements.define(
 
         if (shouldOpen) {
           dialog.show();
-          positioning.position(listbox, indSelect, positioning.dropdownPositionStrategy, fit => {
-            indSelect.setAttribute('aria-expanded', true);
-            filter.toggleAttribute('data-top', !fit);
-          });
+          positioning.position(
+            listbox,
+            indSelect,
+            positioning.dropdownPositionStrategy,
+            fitsPreferredDirection => {
+              indSelect.setAttribute('aria-expanded', true);
+              indSelect.toggleAttribute('data-top', !fitsPreferredDirection);
+            }
+          );
         } else {
           dialog.close();
           indSelect.setAttribute('aria-expanded', false);
