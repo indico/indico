@@ -1,5 +1,14 @@
 {% extends 'events/management/base.html' %}
 
+<span class="back-button-container">
+    {%- if self.back_button_url()|trim -%}
+        <a href="{% filter trim %}{% block back_button_url %}{% endblock %}{% endfilter %}"
+           class="icon-prev back-button"
+           title="{% if self.back_button_title()|trim %}{% block back_button_title %}{% endblock %}{% else %}{% trans %}Back{% endtrans %}{% endif %}">
+        </a>
+    {%- endif -%}
+</span>
+
 {% block title %}
     {% trans %}Registration{% endtrans %}
 {% endblock %}
