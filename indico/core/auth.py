@@ -7,13 +7,15 @@
 
 import functools
 
-from flask import current_app, request
+from flask import current_app, flash, request
 from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
 from werkzeug.local import LocalProxy
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.limiter import make_rate_limiter
 from indico.core.logger import Logger
+from indico.util.signals import values_from_signal
 
 
 logger = Logger.get('auth')
@@ -116,6 +118,14 @@ class IndicoMultipass(Multipass):
             fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc_str,
                exc.details)
         return super().handle_auth_error(exc, redirect_to_login=redirect_to_login)
+
+    def handle_login_form(self, provider, data):
+        signal_responses = values_from_signal(signals.users.handle_login.send(data.get('identifier', '')))
+        signal_response = next((response for response in signal_responses if not response[0]), None)
+        if signal_response:
+            flash(signal_response[1], 'warning')
+            return
+        return super().handle_login_form(provider, data)
 
 
 multipass = IndicoMultipass()
