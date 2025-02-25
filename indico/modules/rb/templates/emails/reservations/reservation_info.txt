@@ -1,5 +1,5 @@
 {% trans %}Room:{% endtrans %} {{ reservation.room.full_name }}
 {% trans %}For:{% endtrans %} {{ reservation.booked_for_name }}
 {% trans %}Reason:{% endtrans %} {{ reservation.booking_reason }}
-{% trans %}Dates:{% endtrans %} {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} - {{ reservation.end_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }}
-{% trans %}Hours:{% endtrans %} {{ reservation.start_dt | format_time(locale='en_GB') }} - {{ reservation.end_dt | format_time(locale='en_GB') }}
+{% trans %}Dates:{% endtrans %} {{ format_interval(reservation.start_dt, reservation.end_dt, 'EyMd') }}
+{% trans %}Hours:{% endtrans %} {{ format_interval(reservation.start_dt, reservation.end_dt, 'Hm') }}
