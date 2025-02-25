@@ -43,6 +43,7 @@ Improvements
   instead of ``8`` for new installations (:issue:`6629`, :pr:`6740`, thanks :user:`amCap1712`)
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
+- Add a button to (un-)select all listed rooms for an action in the room list (:pr:`6773`)
 
 Bugfixes
 ^^^^^^^^
