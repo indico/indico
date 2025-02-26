@@ -25,6 +25,10 @@ export const getNumUnscheduled = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx].unscheduled.length;
 export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
 
+export const getEventId = createSelector(
+  getStaticData,
+  staticData => staticData.eventId
+);
 export const getEventStartDt = createSelector(
   getStaticData,
   staticData => staticData.startDt

@@ -15,7 +15,6 @@ import contributionURL from 'indico-url:contributions.api_manage_contrib';
 import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {Field} from 'react-final-form';
 import {Button, Dimmer, Form, Loader} from 'semantic-ui-react';
@@ -36,61 +35,47 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 import {toMoment} from 'indico/utils/date';
 
-function ContributionForm({
-  eventId,
-  personLinkFieldParams,
-  locationParent,
-  customFields,
-  onSubmit,
-  initialValues,
-  sessionBlock,
-  loading,
-  ...rest
-}) {
-  const handleSubmit = formData => {
-    // formData = _.omit(formData, ['person_links']); // TODO person links
-    const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
-      id: parseInt(key.replace('field_', ''), 10),
-      data,
-    }));
-    const personLinks = formData.person_links.map(
-      ({
-        affiliationMeta,
-        avatarURL,
-        favoriteUsers,
-        fullName,
-        id,
-        isAdmin,
-        language,
-        name,
-        userId,
-        userIdentifier,
-        invalid,
-        detail,
-        ...personLinkData
-      }) => ({
-        ...personLinkData,
-      })
-    );
-    formData = {
-      ...formData,
-      custom_fields: customFieldsData,
-      person_links: snakifyKeys(personLinks),
-    };
-    onSubmit({
-      ...formData,
-      references: formData.references.map(({id, ...refs}) => refs),
-    });
+interface CustomField {
+  id: number;
+  fieldType: string;
+  title: string;
+  description: string;
+  isRequired: boolean;
+  fieldData: {
+    multiline?: boolean;
+    options?: {id: string; option: string}[];
   };
+}
 
-  if (loading) {
-    return (
-      <Dimmer active>
-        <Loader />
-      </Dimmer>
-    );
-  }
+interface ContributionFormProps {
+  eventId: number;
+  personLinkFieldParams?: Record<string, any>;
+  locationParent?: Record<string, any>;
+  customFields: CustomField[];
+  onSubmit: (formData: any) => void;
+  initialValues: Record<string, any>;
+  sessionBlock?: Record<string, any>;
+  loading: boolean;
+  [key: string]: any; // Allow additional props
+}
 
+interface ContributionFormFieldsProps {
+  eventId: number;
+  locationParent?: Record<string, any>;
+  personLinkFieldParams?: Record<string, any>;
+  initialValues: Record<string, any>;
+  sessionBlock?: Record<string, any>;
+  customFields?: CustomField[];
+}
+
+export function ContributionFormFields({
+  eventId,
+  locationParent = {inheriting: false},
+  personLinkFieldParams = {},
+  initialValues = {},
+  sessionBlock = null,
+  customFields = [],
+}: ContributionFormFieldsProps) {
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       const key = `custom_field_${id}`;
@@ -118,7 +103,7 @@ function ContributionForm({
           );
         }
       } else if (fieldType === 'single_choice') {
-        const options = fieldData.options.map(opt => ({
+        const options = fieldData.options!.map(opt => ({
           key: opt.id,
           text: opt.option,
           value: opt.id,
@@ -143,13 +128,7 @@ function ContributionForm({
   );
 
   return (
-    <FinalModalForm
-      id="contribution-form"
-      onSubmit={handleSubmit}
-      initialValues={initialValues}
-      size="small"
-      {...rest}
-    >
+    <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
       {initialValues.start_dt ? (
@@ -210,44 +189,78 @@ function ContributionForm({
           <FinalInput name="code" label={Translate.string('Program code')} />
         </Form.Group>
       </CollapsibleContainer>
+    </>
+  );
+}
+
+export function ContributionForm({
+  eventId,
+  personLinkFieldParams = {},
+  locationParent = {},
+  customFields = [],
+  onSubmit,
+  initialValues = {},
+  sessionBlock = null,
+  loading,
+  ...rest
+}: ContributionFormProps) {
+  const handleSubmit = (formData: any) => {
+    const customFieldsData = Object.entries(formData.custom_fields).map(([key, data]) => ({
+      id: parseInt(key.replace('field_', ''), 10),
+      data,
+    }));
+    const personLinks = formData.person_links.map(
+      ({
+        affiliationMeta,
+        avatarURL,
+        favoriteUsers,
+        fullName,
+        id,
+        isAdmin,
+        language,
+        name,
+        userId,
+        userIdentifier,
+        invalid,
+        detail,
+        ...personLinkData
+      }: any) => ({
+        ...personLinkData,
+      })
+    );
+    formData = {
+      ...formData,
+      custom_fields: customFieldsData,
+      person_links: snakifyKeys(personLinks),
+    };
+    onSubmit({
+      ...formData,
+      references: formData.references.map(({id, ...refs}: any) => refs),
+    });
+  };
+
+  if (loading) {
+    return (
+      <Dimmer active>
+        <Loader />
+      </Dimmer>
+    );
+  }
+
+  return (
+    <FinalModalForm
+      id="contribution-form"
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      size="small"
+      {...rest}
+    >
+      <ContributionFormFields {...{locationParent, initialValues, sessionBlock, customFields, personLinkFieldParams}} />
     </FinalModalForm>
   );
 }
 
-ContributionForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  personLinkFieldParams: PropTypes.object,
-  locationParent: PropTypes.object,
-  customFields: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      fieldType: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired,
-      isRequired: PropTypes.bool,
-      fieldData: PropTypes.shape({
-        multiline: PropTypes.bool,
-        options: PropTypes.arrayOf(
-          PropTypes.shape({id: PropTypes.string.isRequired, option: PropTypes.string.isRequired})
-        ),
-      }).isRequired,
-    })
-  ),
-  onSubmit: PropTypes.func.isRequired,
-  initialValues: PropTypes.object,
-  sessionBlock: PropTypes.object,
-  loading: PropTypes.bool.isRequired,
-};
-
-ContributionForm.defaultProps = {
-  personLinkFieldParams: {},
-  locationParent: {},
-  customFields: [],
-  initialValues: {},
-  sessionBlock: null,
-};
-
-export function ContributionEditForm({eventId, contribId, onClose}) {
+export function ContributionEditForm({eventId, contribId, onClose}: {eventId: number; contribId: number; onClose: () => void}) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     contribPersonLinkFieldParamsURL({event_id: eventId, contrib_id: contribId}),
     {camelize: true}
@@ -262,7 +275,7 @@ export function ContributionEditForm({eventId, contribId, onClose}) {
   const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
   const {data: contrib, loading: contribLoading} = useIndicoAxios(contribURL);
 
-  const handleSubmit = async formData => {
+  const handleSubmit = async (formData: any) => {
     try {
       await indicoAxios.patch(contribURL, formData);
     } catch (e) {
@@ -291,7 +304,7 @@ export function ContributionEditForm({eventId, contribId, onClose}) {
           : {
               ..._.omit(contrib, 'session_block'),
               custom_fields: Object.fromEntries(
-                contrib.custom_fields.map(field => [`field_${field.id}`, field.data])
+                contrib.custom_fields.map((field: any) => [`field_${field.id}`, field.data])
               ),
               person_links: camelizeKeys(contrib.person_links),
             }
@@ -302,13 +315,17 @@ export function ContributionEditForm({eventId, contribId, onClose}) {
   );
 }
 
-ContributionEditForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  contribId: PropTypes.number.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-export function ContributionCreateForm({eventId, onClose}) {
+export function ContributionCreateForm({
+  eventId,
+  onClose,
+  customFields = {},
+  customInitialValues = {},
+}: {
+  eventId: number;
+  onClose: () => void;
+  customFields?: Record<string, any>;
+  customInitialValues?: Record<string, any>;
+}) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     personLinkFieldParamsURL({event_id: eventId}),
     {camelize: true}
@@ -324,7 +341,7 @@ export function ContributionCreateForm({eventId, onClose}) {
     locationParentURL({event_id: eventId})
   );
 
-  const handleSubmit = async formData => {
+  const handleSubmit = async (formData: any) => {
     try {
       await indicoAxios.post(contributionCreateURL({event_id: eventId}), formData);
     } catch (e) {
@@ -344,38 +361,42 @@ export function ContributionCreateForm({eventId, onClose}) {
     fieldsLoading ||
     personLinkFieldParamsLoading;
 
+  const initialValues = loading
+    ? {}
+    : {
+        duration: defaultDuration,
+        person_links: [],
+        keywords: [],
+        references: [],
+        location_data: locationData,
+        custom_fields: {
+          ...Object.fromEntries(fields.map((field: any) => [`field_${field.id}`, ''])),
+          ...customFields,
+        },
+        ...customInitialValues,
+      };
+
   return (
     <ContributionForm
       eventId={eventId}
       personLinkFieldParams={personLinkFieldParams}
       locationParent={locationParent}
-      customFields={fields}
+      customFields={(fields ?? []).concat(Object.values(customFields))}
       header={Translate.string('Add new contribution')}
       onSubmit={handleSubmit}
       onClose={onClose}
-      initialValues={
-        loading
-          ? {}
-          : {
-              duration: defaultDuration,
-              person_links: [],
-              keywords: [],
-              references: [],
-              location_data: locationData,
-              custom_fields: Object.fromEntries(fields.map(field => [`field_${field.id}`, ''])),
-            }
-      }
+      initialValues={initialValues}
       loading={loading}
     />
   );
 }
 
-ContributionCreateForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-export function EditContributionButton({eventId, contribId, eventTitle, triggerSelector, ...rest}) {
+export function EditContributionButton({eventId, contribId, eventTitle, triggerSelector, ...rest}: {
+  eventId: number;
+  contribId: number;
+  eventTitle: string;
+  triggerSelector?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -407,18 +428,10 @@ export function EditContributionButton({eventId, contribId, eventTitle, triggerS
   );
 }
 
-EditContributionButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  contribId: PropTypes.number.isRequired,
-  eventTitle: PropTypes.string.isRequired,
-  triggerSelector: PropTypes.string,
-};
-
-EditContributionButton.defaultProps = {
-  triggerSelector: null,
-};
-
-export function CreateContributionButton({eventId, triggerSelector, ...rest}) {
+export function CreateContributionButton({eventId, triggerSelector, ...rest}: {
+  eventId: number;
+  triggerSelector?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -438,16 +451,14 @@ export function CreateContributionButton({eventId, triggerSelector, ...rest}) {
           <Translate>Edit contribution</Translate>
         </Button>
       )}
-      {open && <ContributionCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
+      {open && (
+        <ContributionCreateForm
+          eventId={eventId}
+          onClose={() => setOpen(false)}
+          customFields={{}}
+          customInitialValues={{}}
+        />
+      )}
     </>
   );
 }
-
-CreateContributionButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  triggerSelector: PropTypes.string,
-};
-
-CreateContributionButton.defaultProps = {
-  triggerSelector: null,
-};

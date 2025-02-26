@@ -26,7 +26,9 @@ export const RESIZE_WINDOW = 'Resize window';
 export const SET_DISPLAY_MODE = 'Set display mode';
 export const TOGGLE_SHOW_UNSCHEDULED = 'Toggle show unscheduled';
 export const TOGGLE_SHOW_ALL_TIMESLOTS = 'Toggle show all timeslots';
+// TODO: (Ajob) Evaluate if ADD_ENTRY and CREATE_ENTRY can be combined
 export const ADD_ENTRY = 'Add entry';
+export const CREATE_ENTRY = 'Create entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
 export const EXPERIMENTAL_TOGGLE_POPUPS = 'Experimental toggle popups';
@@ -57,7 +59,18 @@ interface ScheduleEntryAction {
   unscheduled: any[];
 }
 
-export type Action = ResizeEntryAction | MoveEntryAction | SelectEntryAction | ScheduleEntryAction;
+interface CreateEntryAction {
+  type: typeof CREATE_ENTRY;
+  entryType: string;
+  entry: TopLevelEntry;
+}
+
+export type Action =
+  | ResizeEntryAction
+  | MoveEntryAction
+  | SelectEntryAction
+  | ScheduleEntryAction
+  | CreateEntryAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -144,8 +157,13 @@ export function toggleShowAllTimeslots() {
   return {type: TOGGLE_SHOW_ALL_TIMESLOTS};
 }
 
+// TODO: (Ajob) Evaluate need for both ADD and CREATE entry
 export function addEntry(entryType) {
   return {type: ADD_ENTRY, entryType};
+}
+
+export function createEntry(entryType, entry) {
+  return {type: CREATE_ENTRY, entryType, entry};
 }
 
 export function editEntry(entryType, entry) {

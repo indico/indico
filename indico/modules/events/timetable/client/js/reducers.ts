@@ -81,6 +81,34 @@ export default {
           ],
         };
       }
+      case actions.CREATE_ENTRY: {
+        const {entry} = action;
+        const {startDt} = entry;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+
+        const dayKey = moment(startDt)
+          .utc()
+          .format('YYYYMMDD');
+        console.log('The day key is:', dayKey);
+        console.log(newEntries);
+        console.log(dayKey in newEntries);
+        newEntries[dayKey].push(entry);
+        newEntries[dayKey] = layout(newEntries[dayKey]);
+        console.log('THE NEXT NEW ENTRIES', newEntries);
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'create',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
       case actions.RESIZE_ENTRY: {
         const {date, id, parentId, duration} = action;
         let newDayEntries;
