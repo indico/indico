@@ -106,6 +106,19 @@ class RoomList extends React.Component {
     return Object.keys(selection).length === results.length;
   };
 
+  selectAllBtnProps = () => {
+    if (this.allSelected()) {
+      return {
+        selectAllIcon: 'minus',
+        selectAllText: 'Deselect all rooms',
+      }
+    }
+    return {
+      selectAllIcon: 'plus',
+      selectAllText: 'Select all rooms',
+    }
+  }
+
   selectAll = () => {
     if (this.allSelected()) {
       this.setState({selection: {}});
@@ -176,6 +189,7 @@ class RoomList extends React.Component {
         icon: 'file excel',
       },
     ];
+    const {selectAllIcon, selectAllText} = this.selectAllBtnProps();
 
     return (
       <Grid columns={2}>
@@ -192,6 +206,16 @@ class RoomList extends React.Component {
                     <div styleName="actions">
                       {selectionMode ? (
                         <>
+                          <ResponsivePopup
+                            trigger={
+                              <Button
+                                icon={selectAllIcon}
+                                onClick={this.selectAll}
+                                circular
+                              />
+                            }
+                            content={Translate.string(selectAllText)}
+                          />
                           <Button
                             icon="check"
                             disabled={Object.keys(selection).length === 0}
@@ -203,11 +227,6 @@ class RoomList extends React.Component {
                               }
                             }}
                             primary
-                            circular
-                          />
-                          <Button
-                            icon={this.allSelected() ? 'minus' : 'plus'}
-                            onClick={this.selectAll}
                             circular
                           />
                           <Button icon="cancel" onClick={this.clearSelectionMode} circular />
