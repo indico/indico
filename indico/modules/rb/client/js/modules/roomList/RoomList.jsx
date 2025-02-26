@@ -109,22 +109,22 @@ class RoomList extends React.Component {
   selectAllBtnProps = () => {
     if (this.allSelected()) {
       return {
+        selectAllFct: () => {
+          this.setState({selection: {}});
+        },
+        selectAllPrimary: true,
         selectAllText: Translate.string('Deselect all rooms'),
       };
     }
     return {
+      selectAllFct: () => {
+        const {results} = this.props;
+        const allRooms = Object.fromEntries(results.map(room => [room.id, room]));
+        this.setState({selection: allRooms});
+      },
+      selectAllPrimary: false,
       selectAllText: Translate.string('Select all rooms'),
     };
-  };
-
-  selectAll = () => {
-    if (this.allSelected()) {
-      this.setState({selection: {}});
-    } else {
-      const {results} = this.props;
-      const allRooms = Object.assign({}, ...results.map(room => ({[room.id]: room})));
-      this.setState({selection: allRooms});
-    }
   };
 
   clearSelectionMode = () => {
@@ -187,7 +187,7 @@ class RoomList extends React.Component {
         icon: 'file excel',
       },
     ];
-    const {selectAllText} = this.selectAllBtnProps();
+    const {selectAllFct, selectAllPrimary, selectAllText} = this.selectAllBtnProps();
 
     return (
       <Grid columns={2}>
@@ -208,8 +208,8 @@ class RoomList extends React.Component {
                             trigger={
                               <Button
                                 icon="check square"
-                                onClick={this.selectAll}
-                                primary={this.allSelected()}
+                                onClick={selectAllFct}
+                                primary={selectAllPrimary}
                                 style={{marginRight: '1.5rem'}}
                                 circular
                               />
