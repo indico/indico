@@ -155,8 +155,9 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     with force_locale(None) if 'user' not in template_args else template_args['user'].force_user_locale():
         template_module = get_template_module(template, email=email, url=url, **template_args)
         send_email(make_email(email, template=template_module))
+    # TODO: Should we not display different flash messages?
     flash(_('We have sent you a verification email. Please check your mailbox within the next hour and open '
-            'the link in that email.'))
+            'the link in that email.'), 'highlight')
     return redirect(url_for(endpoint, **url_args))
 
 
