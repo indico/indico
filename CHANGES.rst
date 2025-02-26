@@ -66,6 +66,7 @@ Improvements
   (:pr:`6809`)
 - Log changes to event payment methods (:pr:`6739`)
 - Add a button to (un-)select all listed rooms for an action in the room list (:pr:`6773`)
+- Add a button to (un-)select all listed rooms for an action in the room list (:pr:`6773`, thanks :user:`Michi03`)
 
 Bugfixes
 ^^^^^^^^
