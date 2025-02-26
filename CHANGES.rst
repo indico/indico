@@ -45,6 +45,7 @@ Improvements
   :user:`amCap1712`)
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
 - Add a button to (un-)select all listed rooms for an action in the room list (:pr:`6773`)
+- Add a button to (un-)select all listed rooms for an action in the room list (:pr:`6773`, thanks :user:`Michi03`)
 
 Bugfixes
 ^^^^^^^^
