@@ -110,12 +110,12 @@ class RoomList extends React.Component {
     if (this.allSelected()) {
       return {
         selectAllIcon: 'minus',
-        selectAllText: 'Deselect all rooms',
+        selectAllText: Translate.string('Deselect all rooms'),
       };
     }
     return {
       selectAllIcon: 'plus',
-      selectAllText: 'Select all rooms',
+      selectAllText: Translate.string('Select all rooms'),
     };
   };
 
@@ -210,7 +210,7 @@ class RoomList extends React.Component {
                             trigger={
                               <Button icon={selectAllIcon} onClick={this.selectAll} circular />
                             }
-                            content={Translate.string(selectAllText)}
+                            content={selectAllText}
                           />{' '}
                           <Button
                             icon="check"
