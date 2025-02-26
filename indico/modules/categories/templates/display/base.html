@@ -100,18 +100,18 @@
         {% endblock %}
     </div>
 
-    {% if self.sidebar() %}
-        <div class="category-sidebar">
-            {%- block sidebar %}{% endblock -%}
-        </div>
-    {% endif %}
-
     <div class="category-content-wrapper">
         <div class="category-content">
             {% include 'flashed_messages.html' %}
             {% block content %}{% endblock %}
         </div>
     </div>
+
+    {% if self.sidebar() %}
+        <div class="category-sidebar" id="sidebar" data-bypass-target="{% trans %}Skip to sidebar{% endtrans %}">
+            {%- block sidebar %}{% endblock -%}
+        </div>
+    {% endif %}
 </div>
 <script>
     $('#navigate-button').on('click', function(evt) {
