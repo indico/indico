@@ -56,7 +56,6 @@ interface ContributionFormProps {
   initialValues: Record<string, any>;
   sessionBlock?: Record<string, any>;
   loading: boolean;
-  includeModal?: boolean;
   [key: string]: any; // Allow additional props
 }
 

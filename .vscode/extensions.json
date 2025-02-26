@@ -17,5 +17,6 @@
   "unwantedRecommendations": [
     "ms-azuretools.vscode-docker",
     "ms-edgedevtools.vscode-edge-devtools",
+    "melishev.feather-vscode",
   ]
 }

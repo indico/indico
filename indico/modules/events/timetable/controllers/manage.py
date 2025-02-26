@@ -13,17 +13,21 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.operations import delete_contribution
+from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.legacy import (TimetableSerializer, serialize_entry_update, serialize_event_info,
                                                     serialize_session)
+from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.operations import (create_timetable_entry, delete_timetable_entry,
-                                                        update_timetable_entry)
+from indico.modules.events.timetable.operations import (create_break_entry, create_timetable_entry,
+                                                        delete_timetable_entry, update_timetable_entry)
+from indico.modules.events.timetable.schemas import BreakSchema, TimetableEntrySchema
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import should_show_draft_warning, track_time_changes
+from indico.web.args import use_args
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -127,6 +131,14 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_contribution(self.entry.contribution)
         else:
             delete_timetable_entry(self.entry)
+
+
+class RHAPICreateBreak(RHManageEventBase):
+
+    @use_args(BreakSchema)
+    def _process_POST(self, data: Break):
+        created_break = create_break_entry(self.event, data)
+        return TimetableEntrySchema().jsonify(created_break)
 
 
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):

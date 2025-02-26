@@ -13,10 +13,11 @@ import _ from 'lodash';
 import React, {useState, useEffect} from 'react';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
+import {LocationParent} from 'indico/modules/events/timetable/client/js/types';
 import {FinalLocationField} from 'indico/react/components';
 import {FinalSessionBlockPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput} from 'indico/react/forms';
-import {FinalDuration, FinalTimePicker} from 'indico/react/forms/fields';
+import {FinalDateTimePicker, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -32,7 +33,7 @@ interface SessionBlockEditFormProps {
 
 interface SessionBlockFormFieldProps {
   eventId: number;
-  locationParent: any;
+  locationParent: LocationParent;
 }
 
 export function SessionBlockFormFields({eventId, locationParent}: SessionBlockFormFieldProps) {
@@ -45,10 +46,10 @@ export function SessionBlockFormFields({eventId, locationParent}: SessionBlockFo
         autoFocus
         required
       />
-      <FinalTimePicker name="start_dt" label={Translate.string('Start time')} required />
+      <FinalDateTimePicker name="start_dt" label={Translate.string('Start time')} required />
       <FinalDuration name="duration" label={Translate.string('Duration')} required />
       <FinalSessionBlockPersonLinkField
-        name="conveners"
+        name="person_links"
         label={Translate.string('Conveners')}
         eventId={eventId}
         sessionUser={{...Indico.User, userId: Indico.User.id}}
@@ -186,27 +187,7 @@ export function SessionBlockCreateForm({eventId, sessionId, onClose}: SessionBlo
       initialValues={{location_data: locationData}}
       size="small"
     >
-      <FinalInput
-        name="title"
-        label={Translate.string('Title')}
-        description={Translate.string('Title of the session block')}
-        autoFocus
-        required
-      />
-      <FinalTimePicker name="start_dt" label={Translate.string('Start time')} required />
-      <FinalDuration name="duration" label={Translate.string('Duration')} required />
-      <FinalSessionBlockPersonLinkField
-        name="conveners"
-        label={Translate.string('Conveners')}
-        eventId={eventId}
-        sessionUser={Indico.User}
-      />
-      <FinalLocationField
-        name="location_data"
-        label={Translate.string('Location')}
-        locationParent={locationParent}
-      />
-      <FinalInput name="code" label={Translate.string('Program code')} />
+      <SessionBlockFormFields eventId={eventId} locationParent={locationParent} />
     </FinalModalForm>
   );
 }

@@ -282,7 +282,6 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
               {isModalOpen && newEntry && (
                 <TimetableCreateModal
                   eventId={eventId}
-                  open={isModalOpen}
                   onClose={() => {
                     setNewEntry(null);
                     setIsModalOpen(false);

@@ -57,7 +57,8 @@ export function SessionSelect({eventId, required}: SessionSelectProps) {
       options={sessions}
       required={required}
       selection
-      multiple={undefined}
+      search={false}
+      multiple={false}
     />
   );
 }
