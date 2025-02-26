@@ -1,4 +1,5 @@
 """Add alternate names to affiliations
+
 Revision ID: c7d6c3641918
 Revises: 9251bc3e2106
 Create Date: 2025-02-14 11:36:35.560567
