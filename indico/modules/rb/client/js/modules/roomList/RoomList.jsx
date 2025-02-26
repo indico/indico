@@ -109,12 +109,10 @@ class RoomList extends React.Component {
   selectAllBtnProps = () => {
     if (this.allSelected()) {
       return {
-        selectAllIcon: 'minus',
         selectAllText: Translate.string('Deselect all rooms'),
       };
     }
     return {
-      selectAllIcon: 'plus',
       selectAllText: Translate.string('Select all rooms'),
     };
   };
@@ -189,7 +187,7 @@ class RoomList extends React.Component {
         icon: 'file excel',
       },
     ];
-    const {selectAllIcon, selectAllText} = this.selectAllBtnProps();
+    const {selectAllText} = this.selectAllBtnProps();
 
     return (
       <Grid columns={2}>
@@ -208,10 +206,16 @@ class RoomList extends React.Component {
                         <>
                           <ResponsivePopup
                             trigger={
-                              <Button icon={selectAllIcon} onClick={this.selectAll} circular />
+                              <Button
+                                icon="check square"
+                                onClick={this.selectAll}
+                                primary={this.allSelected()}
+                                style={{marginRight: '1.5rem'}}
+                                circular
+                              />
                             }
                             content={selectAllText}
-                          />{' '}
+                          />
                           <Button
                             icon="check"
                             disabled={Object.keys(selection).length === 0}
