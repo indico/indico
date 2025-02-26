@@ -215,6 +215,7 @@ class RoomList extends React.Component {
                               />
                             }
                             content={selectAllText}
+                            position="bottom center"
                           />
                           <Button
                             icon="check"
