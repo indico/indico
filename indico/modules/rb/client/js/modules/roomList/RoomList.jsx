@@ -111,13 +111,13 @@ class RoomList extends React.Component {
       return {
         selectAllIcon: 'minus',
         selectAllText: 'Deselect all rooms',
-      }
+      };
     }
     return {
       selectAllIcon: 'plus',
       selectAllText: 'Select all rooms',
-    }
-  }
+    };
+  };
 
   selectAll = () => {
     if (this.allSelected()) {
@@ -208,14 +208,10 @@ class RoomList extends React.Component {
                         <>
                           <ResponsivePopup
                             trigger={
-                              <Button
-                                icon={selectAllIcon}
-                                onClick={this.selectAll}
-                                circular
-                              />
+                              <Button icon={selectAllIcon} onClick={this.selectAll} circular />
                             }
                             content={Translate.string(selectAllText)}
-                          />
+                          />{' '}
                           <Button
                             icon="check"
                             disabled={Object.keys(selection).length === 0}
