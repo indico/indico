@@ -164,11 +164,6 @@ class LocalRegistrationForm(IndicoForm):
 class ResetPasswordEmailForm(IndicoForm):
     email = EmailField(_('Email address'), [DataRequired(), Email()], filters=[_tolower])
 
-    def validate_email(self, field):
-        user = self.user
-        if user is None:
-            raise ValidationError(_('There is no profile with this email address.'))
-
     @property
     def user(self):
         if not self.is_submitted() or not self.email.data:

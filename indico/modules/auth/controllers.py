@@ -108,13 +108,14 @@ class RHLogin(RH):
         if request.method == 'POST':
             active_provider = provider = _get_provider(request.form['_provider'], False)
             form = provider.login_form()
-            rate_limit_exceeded = not login_rate_limiter.test()
-            if not rate_limit_exceeded and form.validate_on_submit():
-                response = multipass.handle_login_form(provider, form.data)
-                if response:
-                    return response
-                # re-check since a failed login may have triggered the rate limit
-                rate_limit_exceeded = not login_rate_limiter.test()
+            if form.validate_on_submit():
+                rate_limit_exceeded = not login_rate_limiter.test(form.data['identifier'])
+                if not rate_limit_exceeded:
+                    response = multipass.handle_login_form(provider, form.data)
+                    if response:
+                        return response
+                    # re-check since a failed login may have triggered the rate limit
+                    rate_limit_exceeded = not login_rate_limiter.test()
         # Otherwise we show the form for the default provider
         else:
             active_provider = multipass.default_local_auth_provider
@@ -154,8 +155,9 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     with force_locale(None) if 'user' not in template_args else template_args['user'].force_user_locale():
         template_module = get_template_module(template, email=email, url=url, **template_args)
         send_email(make_email(email, template=template_module))
+    # TODO: Should we not display different flash messages?
     flash(_('We have sent you a verification email. Please check your mailbox within the next hour and open '
-            'the link in that email.'))
+            'the link in that email.'), 'highlight')
     return redirect(url_for(endpoint, **url_args))
 
 
@@ -293,16 +295,15 @@ class RHRegister(RH):
     def _process_verify(self, handler):
         email_sent = session.pop('register_verification_email_sent', False)
         form = handler.create_verify_email_form()
-        rate_limit_exceeded = not signup_rate_limiter.test()
-        if not email_sent and rate_limit_exceeded:
-            # tell users that they exceeded the rate limit, but NOT if they just
-            # used their last attempt successfully
-            retry_in = login_rate_limiter.get_reset_delay()
-            delay = format_human_timedelta(retry_in, 'minutes')
-            flash(_('Too many signup attempts. Please wait {}').format(delay), 'error')
-        if not rate_limit_exceeded and form.validate_on_submit():
-            signup_rate_limiter.hit()
-            return self._send_confirmation(form.email.data)
+        if form.validate_on_submit():
+            rate_limit_exceeded = not signup_rate_limiter.test(form.email.data)
+            if not rate_limit_exceeded:
+                signup_rate_limiter.hit(form.email.data)
+                return self._send_confirmation(form.email.data)
+            else:
+                retry_in = login_rate_limiter.get_reset_delay()
+                delay = format_human_timedelta(retry_in, 'minutes')
+                flash(_('Too many signup attempts. Please wait {}').format(delay), 'error')
         return WPSignup.render_template('register_verify.html', form=form, email_sent=email_sent)
 
     def _process_post(self, handler):
@@ -788,19 +789,11 @@ class RHResetPassword(RH):
         form = ResetPasswordEmailForm()
         if form.validate_on_submit():
             user = form.user
-            # The only case where someone would have more than one identity is after a merge.
-            # And the worst case that can happen here is that we send the user a different
-            # username than the one he expects. But he still gets back into his profile.
-            alternatives = sorted([
-                {
-                    'name': provider.title,
-                    'identifier': identity.identifier,
-                    'last_login_dt': identity.last_login_dt,
-                }
-                for identity in user.external_identities
-                if (provider := multipass.identity_providers.get(identity.provider)) and identity.last_login_dt
-            ], key=itemgetter('last_login_dt'), reverse=True)
-            if identity := user.local_identity:
+            alternatives = self._get_alternatives(user) if user else None
+            if not user:
+                _send_confirmation(form.email.data, 'register-email', '.register',
+                                   'auth/emails/register_verify_email.txt')
+            elif identity := user.local_identity:
                 _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
                                    {'user': user, 'username': identity.identifier, 'alternatives': alternatives},
                                    data={'id': identity.id, 'hash': crc32(identity.password_hash)})
@@ -810,7 +803,7 @@ class RHResetPassword(RH):
                                    {'user': user, 'alternatives': alternatives}, data={'id': user.id})
             session['resetpass_email_sent'] = True
             logger.info('Password reset requested for user %s', user)
-            return redirect(url_for('.resetpass'))
+            return redirect(url_for('.login'))
         return WPAuth.render_template('reset_password.html', form=form, identity=None, widget_attrs={},
                                       email_sent=session.pop('resetpass_email_sent', False))
 
@@ -827,6 +820,20 @@ class RHResetPassword(RH):
             form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity, email_sent=False,
                                       widget_attrs={'username': {'disabled': True}})
+
+    def _get_alternatives(self, user):
+        # The only case where someone would have more than one identity is after a merge.
+        # And the worst case that can happen here is that we send the user a different
+        # username than the one he expects. But he still gets back into his profile.
+        return sorted([
+            {
+                'name': provider.title,
+                'identifier': identity.identifier,
+                'last_login_dt': identity.last_login_dt,
+            }
+            for identity in user.external_identities
+            if (provider := multipass.identity_providers.get(identity.provider)) and identity.last_login_dt
+        ], key=itemgetter('last_login_dt'), reverse=True)
 
 
 class RHCreateLocalIdentity(RH):
