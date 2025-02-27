@@ -135,10 +135,6 @@ $toolbar-spacing: 10px;
       border-top-left-radius: 0;
     }
   }
-
-  #search-box {
-    margin: 0 2em;
-  }
 }
 
 @mixin toolbar-group-slider {
@@ -197,10 +193,6 @@ $toolbar-spacing: 10px;
   flex-shrink: 0;
   align-items: center;
   min-height: $toolbar-height;
-
-  &.fixed-height {
-    max-height: 1.75rem;
-  }
 
   &.space-before {
     margin-top: $toolbar-spacing;

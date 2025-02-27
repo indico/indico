@@ -33,10 +33,16 @@
 }
 
 .category-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+
   background-image: linear-gradient(to bottom, #fcfcfc, #f2f2f2);
   border-bottom: 1px solid #e6e6e6;
   border-top: 1px solid #fff;
-  padding: 20px;
+  padding: 1em 2em;
   line-height: initial;
 
   .back-button {
@@ -45,18 +51,32 @@
 }
 
 .category-title {
+  flex: 1 1 20em;
   font-size: 2em;
   color: $dark-orange;
   font-weight: normal;
-  margin: auto;
-  max-width: 850px;
-  margin-left: 0;
   text-align: left;
+  margin: 0; // FIXME: needs reset!
 
   .subtitle {
     font-style: italic;
     font-size: 0.8em;
   }
+}
+
+.category-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+  gap: 1em;
+}
+
+.group.toolbox {
+  display: flex;
+  gap: 0.2em;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .category-description {

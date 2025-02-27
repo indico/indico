@@ -85,6 +85,8 @@ Accessibility
 - Improve places selection accessibility in MultiChoiceInput
   (:pr:`6764`, thanks :user:`foxbunny`)
 - Improve BooleanInput accessibility (:pr:`6756`, thanks :user:`foxbunny`)
+- Improve category page header responsiveness
+  (:pr:`6780`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
