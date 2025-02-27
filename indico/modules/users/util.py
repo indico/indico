@@ -532,15 +532,15 @@ def send_default_avatar(user: User | str | None):
 
     :param user: A `User` object, string (external search results, registrations) or `None` (blank avatar)
     """
-    if isinstance(user, str):
-        text = user[0].upper()
-        color = get_color_for_user_id(user)
-    elif user and user.full_name:
-        text = user.full_name[0].upper()
-        color = get_color_for_user_id(user.id)
-    else:
+    if not user:
         text = ''
         color = '#cccccc'
+    elif isinstance(user, str):
+        text = user[0].upper()
+        color = get_color_for_user_id(user)
+    elif user.full_name:
+        text = user.full_name[0].upper()
+        color = get_color_for_user_id(user.id)
     avatar = render_template('users/avatar.svg', bg_color=color, text=text)
     return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
                      no_cache=False, inline=True, safe=False, max_age=86400*7)
