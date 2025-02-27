@@ -473,6 +473,8 @@ def anonymize_user(user):
     for cls in principal_classes:
         cls.query.filter(cls.user == user).delete()
 
+    user.local_groups.clear()
+
     user.is_deleted = True
     db.session.flush()
     signals.users.anonymized.send(user, flushed=True)

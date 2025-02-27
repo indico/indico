@@ -43,6 +43,7 @@ Improvements
   instead of ``8`` for new installations (:issue:`6629`, :pr:`6740`, thanks :user:`amCap1712`)
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
+- Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
