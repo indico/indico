@@ -104,10 +104,13 @@ class IndicoMultipass(Multipass):
                 raise ValueError('There is no default auth provider')
 
     def handle_auth_error(self, exc, redirect_to_login=False):
-        if isinstance(exc, (NoSuchUser, InvalidCredentials)):
-            login_rate_limiter.hit()
-            logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
+        if isinstance(exc, NoSuchUser):
+            logger.warning('Invalid identifier (ip=%s, provider=%s): %s',
                            request.remote_addr, exc.provider.name if exc.provider else None, exc)
+        elif isinstance(exc, InvalidCredentials):
+            login_rate_limiter.hit(exc.identifier)
+            logger.warning('Invalid credentials (ip=%s, provider=%s, identifier=%s): %s',
+                           request.remote_addr, exc.provider.name if exc.provider else None, exc.identifier, exc)
         else:
             exc_str = str(exc)
             fn = logger.error
