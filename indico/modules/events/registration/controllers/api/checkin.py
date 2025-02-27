@@ -13,10 +13,11 @@ from werkzeug.exceptions import NotFound
 from indico.core import signals
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.payment.util import toggle_registration_payment
+from indico.modules.events.registration.models.checks import RegistrationCheckType
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.schemas import (CheckinEventSchema, CheckinRegFormSchema,
-                                                        CheckinRegistrationSchema)
+from indico.modules.events.registration.schemas import (CheckinCheckTypeSchema, CheckinEventSchema,
+                                                        CheckinRegFormSchema, CheckinRegistrationSchema)
 from indico.web.args import use_kwargs
 from indico.web.rh import cors, json_errors, oauth_scope
 
@@ -47,6 +48,15 @@ class RHCheckinAPIRegForms(RHCheckinAPIBase):
                     .options(undefer('existing_registrations_count'), undefer('checked_in_registrations_count'))
                     .all())
         return CheckinRegFormSchema(many=True).jsonify(regforms)
+
+
+class RHCheckinAPICheckTypes(RHCheckinAPIBase):
+    """Get details about the check types in the event."""
+
+    def _process(self):
+        check_types = (self.event.check_types +
+                       RegistrationCheckType.query.filter(RegistrationCheckType.is_system_defined).all())
+        return CheckinCheckTypeSchema(many=True).jsonify(check_types)
 
 
 class RHCheckinAPIRegFormBase(RHCheckinAPIBase):
@@ -109,7 +119,7 @@ class RHCheckinAPIRegistration(RHCheckinAPIRegFormBase):
     def _process_PATCH(self, checked_in=None, paid=None):
         if checked_in is not None:
             self.registration.checked_in = checked_in
-            signals.event.registration_checkin_updated.send(self.registration)
+            signals.event.registration_check_updated.send(self.registration)
         if paid is not None and paid != self.registration.is_paid and self.registration.price:
             toggle_registration_payment(self.registration, paid=paid)
         return CheckinRegistrationSchema().jsonify(self.registration)

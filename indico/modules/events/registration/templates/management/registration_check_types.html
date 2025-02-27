@@ -1,0 +1,112 @@
+{% extends 'events/management/base.html' %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Registration checks{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    <p>
+        {% trans -%}
+            Define checks and rules to check-in/check-out registrations. Example:
+            "Entrance Check" or "Collect souvenir".
+        {%- endtrans %}
+    </p>
+    <p>
+        {% trans -%}
+            Also specify rules such as once, daily or multiple and whether it can be checked out.
+            Do not define 2 checks for inverse actions, e.g "Entered room" and "Exited room".
+            Instead define one check "Entered room" with "Check out" enabled.
+        {%- endtrans %}
+    </p>
+{% endblock %}
+
+{% macro render_check_types(check_types) %}
+    <table class="i-table-widget">
+        <tr>
+            <th>{% trans -%}Title{%- endtrans %}</th>
+            <th>{% trans -%}Rule{%- endtrans %}</th>
+            <th>{% trans -%}Can check out{%- endtrans %}</th>
+            <th></th>
+        </tr>
+        {% for check_type in check_types|sort(attribute='title', case_sensitive=false) %}
+            <tr>
+                <td>
+                    {{ check_type.title }}
+                </td>
+                <td>
+                    {{ check_type.rule.title }}
+                </td>
+                <td>
+                    {{ check_type.check_out_allowed }}
+                </td>
+                <td>
+                    <span class="right hide-if-locked">
+                        <button class="icon-star i-button text-color borderless" style="{{ 'opacity: 0.3;' if event.default_check_type_id != check_type.id }}"
+                                data-href="{{ url_for('.manage_registration_check_types_toggle', event, check_type_id=check_type.id) }}"
+                                {% if event.default_check_type_id == check_type.id %}
+                                    title="{% trans %}This is the default check type for this event{% endtrans %}"
+                                {% else %}
+                                    title="{% trans %}Make default check type for this event{% endtrans %}"
+                                    data-confirm="{% trans %}Do you really want to make this the default check type of this event?
+                                                             It will be used to calculate the checked-in state of the registration
+                                                             on the registration list, participant list and other places in indico.
+                                                  {% endtrans %}"
+                                    data-method="POST"
+                                    data-reload-after
+                                {% endif %}
+                                ></button>
+                        {% if not check_type.is_system_defined %}
+                            <button class="icon-edit i-button text-color borderless" data-href="{{ url_for('.manage_registration_check_types_edit', check_type) }}"
+                                    data-title
+                                    title="{% trans %}Edit check type{% endtrans %}"
+                                    data-ajax-dialog
+                                    data-reload-after></button>
+                            <button class="icon-remove i-button text-color borderless danger"
+                                    data-method="POST" data-href="{{ url_for('.manage_registration_check_types_delete', check_type) }}"
+                                    data-title
+                                    title="{% trans %}Delete check type{% endtrans %}"
+                                    data-confirm="{% trans %}Do you really want to delete this check type?
+                                                            This will delete all previously performed checks of this type on registrations
+                                                  {% endtrans %}">
+                            </button>
+                        {% endif %}
+                    </span>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endmacro %}
+
+{% block content %}
+    <div class="i-box-group vert fixed-width">
+        <div class="i-box">
+            <div class="i-box-header" style="margin-bottom: 10px;">
+                <div class="i-box-title">{%- trans %}Event Defined Check Types{% endtrans -%}</div>
+                <div class="i-box-buttons hide-if-locked">
+                    <button class="i-button icon-plus" data-href="{{ url_for('.manage_registration_check_types_add', event) }}"
+                       data-title="{%- trans %}Create a check type{% endtrans -%}"
+                       data-ajax-dialog
+                       data-reload-after>
+                        {%- trans %}Create a check type{% endtrans -%}
+                    </button>
+                </div>
+            </div>
+            {% if event.check_types %}
+                <div class="i-box-content">
+                    {{ render_check_types(event.check_types) }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="i-box-group vert fixed-width">
+        <div class="i-box">
+            <div class="i-box-header" style="margin-bottom: 10px;">
+                <div class="i-box-title">{%- trans %}System Defined Check Types{% endtrans -%}</div>
+            </div>
+            <div class="i-box-content">
+                {{ render_check_types(system_check_types) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
