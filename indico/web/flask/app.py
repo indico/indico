@@ -9,7 +9,7 @@ import os
 import uuid
 from urllib.parse import urlsplit
 
-from babel.numbers import format_currency, get_currency_name
+from babel.numbers import get_currency_name
 from flask import has_app_context, render_template, request
 from flask.globals import app_ctx
 from flask.helpers import get_root_path
@@ -205,7 +205,7 @@ def setup_jinja(app):
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     app.add_template_global(render_field, '_render_field')
     app.add_template_global(iter_form_fields, '_iter_form_fields')
-    app.add_template_global(format_currency)
+    app.add_template_global(date_time_util.format_currency)
     app.add_template_global(date_time_util.format_interval)
     app.add_template_global(get_currency_name)
     app.add_template_global(url_for_index)
