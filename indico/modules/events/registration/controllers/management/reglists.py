@@ -705,7 +705,7 @@ class RHRegistrationReset(RHManageRegistrationBase):
 
     def _process(self):
         if self.registration.state == RegistrationState.pending:
-            raise BadRequest(_('The registration cannot be reset in its current state.'))
+            raise NoReportError.wrap_exc(BadRequest(_('The registration cannot be reset in its current state.')))
         try:
             self.registration.reset_state()
         except IndicoError as exc:
