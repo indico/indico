@@ -767,7 +767,7 @@ class Registration(db.Model):
         elif self.state == RegistrationState.withdrawn:
             self.update_state(withdrawn=False)
         elif self.state != RegistrationState.pending:
-            raise ValueError(_('Cannot reset registration state {} back to Pending.').format(self.state.title))
+            raise ValueError(f'Cannot reset registration state from {self.state.name}')
         self.checked_in = False
 
     def has_conflict(self):
