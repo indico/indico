@@ -100,7 +100,9 @@ Expected to return a ``(login_allowed, message)`` tuple.
 Called during the login process. The *sender* is the identity submitted.
 ''')
 
-handle_signup = _signals.signal('handle-signup', '''
-Expected to return a ``(signup_allowed, message)`` tuple.
-Called during the signin process. The *sender* is the identity submitted.
+check_signup_email = _signals.signal('check-signup-email', '''
+Called during the email validation phase of the local account signup process.
+The *sender* is the email address the user is trying to use. If this signal returns
+a string, the signup will be refused with the returned message; otherwise (``None``
+return value) the signup can continue as normal.
 ''')

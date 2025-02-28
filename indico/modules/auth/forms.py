@@ -55,11 +55,8 @@ def _check_not_email_address(form, field):
 
 
 def _check_signup(form, field):
-    signal_responses = values_from_signal(signals.users.handle_signup.send(field.data))
-    signal_response = next((response for response in signal_responses if not response[0]), None)
-    if signal_response:
-        raise ValidationError(signal_response[1])
-    return True
+    if errors := values_from_signal(signals.users.check_signup_email.send(field.data), as_list=True):
+        raise ValidationError(errors[0])
 
 
 class LocalLoginForm(IndicoForm):
