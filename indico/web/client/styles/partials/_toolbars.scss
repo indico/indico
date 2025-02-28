@@ -20,8 +20,7 @@ $toolbar-spacing: 10px;
   @include toolbar-group-slider();
   @extend .flexrow;
 
-  & ~ .i-button,
-  & ~ .group {
+  & ~ .i-button {
     margin-left: buttons.$i-button-spacing;
   }
 
@@ -135,10 +134,6 @@ $toolbar-spacing: 10px;
       border-top-left-radius: 0;
     }
   }
-
-  #search-box {
-    margin: 0 2em;
-  }
 }
 
 @mixin toolbar-group-slider {
@@ -197,10 +192,6 @@ $toolbar-spacing: 10px;
   flex-shrink: 0;
   align-items: center;
   min-height: $toolbar-height;
-
-  &.fixed-height {
-    max-height: 1.75rem;
-  }
 
   &.space-before {
     margin-top: $toolbar-spacing;
@@ -295,7 +286,7 @@ $toolbar-spacing: 10px;
   }
 
   .search-box {
-    min-width: 300px;
+    min-width: min(100%, 300px);
   }
 }
 
