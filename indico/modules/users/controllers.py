@@ -328,7 +328,7 @@ class RHSearchAffiliations(RH):
     def _process(self, q):
         exact_match = _match_search(q, exact=True)
         score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
-        word_list = q.split()
+        word_list = [x for x in q.split() if len(x) >= 3]
         for word in word_list:
             if (country_code := get_country_reverse(word, case_sensitive=False)):
                 score += _weighted_score((Affiliation.country_code.ilike(country_code), 20))
