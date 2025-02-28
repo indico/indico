@@ -95,9 +95,13 @@ Called when a new category is removed from a user's favorites. The *sender* is
 the user object and the category is passed in the `category` kwarg.
 ''')
 
-handle_login = _signals.signal('handle-login', '''
-Expected to return a ``(login_allowed, message)`` tuple.
-Called during the login process. The *sender* is the identity submitted.
+check_login_data = _signals.signal('check-login-data', '''
+Called when logging in using a form-based login provider.
+The *sender* is the flask-multipass auth provider class used for the login, and
+the data entered in the login form is passed in the `data` kwarg. The provider
+instance is passed in the `provider` kwarg.
+If this signal returns a string, the login will fail with the returned message;
+otherwise (``None`` return value) the signup can continue as normal.
 ''')
 
 check_signup_email = _signals.signal('check-signup-email', '''
