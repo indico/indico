@@ -69,7 +69,7 @@ Bugfixes
 - Include event labels in dashboard ICS export (:issue:`5886, 6372`, :pr:`6769`, thanks
   :user:`amCap1712`)
 - Do not show default values for purged registration fields (:issue:`5898`, :pr:`6772`,
-  thanks :user:`amCap1712`)
+  :pr:6781, thanks :user:`amCap1712`)
 - Do not create empty survey sections during event cloning (:pr:`6774`)
 
 Accessibility
