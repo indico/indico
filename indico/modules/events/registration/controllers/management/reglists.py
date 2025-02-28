@@ -708,8 +708,8 @@ class RHRegistrationReset(RHManageRegistrationBase):
             raise BadRequest(_('The registration cannot be reset in its current state.'))
         try:
             self.registration.reset_state()
-        except IndicoError as err:
-            raise NoReportError(str(err))
+        except IndicoError as exc:
+            raise NoReportError.wrap_exc(exc)
         logger.info('Registration %r was reset by %r', self.registration, session.user)
         return jsonify_data(html=_render_registration_details(self.registration))
 
