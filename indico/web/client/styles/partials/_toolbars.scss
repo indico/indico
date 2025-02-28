@@ -20,8 +20,7 @@ $toolbar-spacing: 10px;
   @include toolbar-group-slider();
   @extend .flexrow;
 
-  & ~ .i-button,
-  & ~ .group {
+  & ~ .i-button {
     margin-left: buttons.$i-button-spacing;
   }
 
@@ -287,7 +286,7 @@ $toolbar-spacing: 10px;
   }
 
   .search-box {
-    min-width: 300px;
+    min-width: min(100%, 300px);
   }
 }
 

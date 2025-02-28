@@ -51,12 +51,13 @@
 }
 
 .category-title {
-  flex: 1 1 20em;
-  font-size: 2em;
+  flex: 1 1 auto;
   color: $dark-orange;
   font-weight: normal;
   text-align: left;
   margin: 0; // FIXME: needs reset!
+  width: fit-content;
+  text-wrap-style: balance;
 
   .subtitle {
     font-style: italic;
@@ -67,16 +68,15 @@
 .category-toolbar {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
+  width: fit-content;
   gap: 1em;
 }
 
 .group.toolbox {
   display: flex;
-  gap: 0.2em;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  gap: 0.5em;
 }
 
 .category-description {
