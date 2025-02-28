@@ -92,6 +92,8 @@ Internal Changes
 
 - Remove the `marshmallow-enum` dependency (:issue:`6701`, :pr:`6703`, thanks
   :user:`federez-tba`)
+- Add new signals during signup email validation and login which can make the
+  process fail with a custom message (:pr:`6759`, thanks :user:`openprojects`)
 
 
 Version 3.3.5
