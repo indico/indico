@@ -28,6 +28,7 @@ from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
@@ -58,6 +59,7 @@ from indico.modules.users.util import (anonymize_user, get_avatar_url_from_name,
                                        set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
+from indico.util.countries import get_country_reverse
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -307,18 +309,42 @@ class RHPersonalDataUpdate(RHUserBase):
         return '', 204
 
 
+def _match_search(q, exact=False, prefix=False):
+    if exact:
+        match_str = f'|||{q}|||'
+    elif prefix:
+        match_str = f'|||{q}'
+    else:
+        match_str = q
+    return unaccent_match(Affiliation.searchable_names, match_str, exact=False)
+
+
+def _weighted_score(*params):
+    return sum(db.cast(param, db.Integer) * weight for param, weight in params)
+
+
 class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
-        exact_match = db.func.lower(Affiliation.name) == q.lower()
-        q_filter = Affiliation.name.ilike(f'%{q}%') if len(q) > 2 else exact_match
+        exact_match = _match_search(q, exact=True)
+        score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
+        word_list = [x for x in q.split() if len(x) >= 3]
+        for word in word_list:
+            if (country_code := get_country_reverse(word, case_sensitive=False)):
+                score += _weighted_score((Affiliation.country_code.ilike(country_code), 20))
+                continue
+            score += _weighted_score((unaccent_match(Affiliation.city, word, exact=False), 20),
+                                     (_match_search(word, exact=True), 40),
+                                     (_match_search(word, prefix=True), 30),
+                                     (_match_search(word), 10),
+                                     (Affiliation.popularity, 1))
+        q_filter = db.or_(_match_search(w) for w in word_list) if len(q) > 2 else exact_match
         res = (
             Affiliation.query
             .filter(~Affiliation.is_deleted, q_filter)
             .order_by(
-                exact_match.desc(),
-                db.func.lower(Affiliation.name).startswith(q.lower()).desc(),
-                db.func.lower(Affiliation.name)
+                score.desc(),
+                db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)),
             )
             .limit(20)
             .all())
