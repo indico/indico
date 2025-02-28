@@ -26,6 +26,8 @@
 }
 
 .category-container {
+  --horizontal-padding: 3em;
+
   display: grid;
   grid-template-columns: auto 26em;
   grid-template-areas:
@@ -55,7 +57,7 @@
   background-image: linear-gradient(to bottom, #fcfcfc, #f2f2f2);
   border-bottom: 1px solid #e6e6e6;
   border-top: 1px solid #fff;
-  padding: 20px;
+  padding: 1.5em var(--horizontal-padding);
   line-height: initial;
 
   .back-button {
@@ -95,7 +97,7 @@
 .category-content-wrapper {
   grid-area: ct;
   overflow-x: hidden;
-  padding: 2em;
+  padding: 2em var(--horizontal-padding);
 }
 
 .category-stats-container {
