@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useForm, useFormState} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Icon, Popup} from 'semantic-ui-react';
@@ -94,6 +94,7 @@ export default function FormItem({
   setupActions,
   showIfFieldId,
   showIfFieldValue,
+  htmlName,
   ...rest
 }) {
   // TODO move outside like with setupActions etc?
@@ -104,7 +105,6 @@ export default function FormItem({
   const formState = useFormState();
   const form = useForm();
 
-  const {htmlName} = rest;
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
@@ -180,13 +180,19 @@ export default function FormItem({
           disabled={disabled}
           isPurged={showPurged}
           htmlId={htmlId}
+          htmlName={htmlName}
           {...inputProps}
         />
       </>
     ) : null;
 
+  useEffect(() => {
+    if (!show && !setupMode) {
+      form.change(htmlName, undefined);
+    }
+  }, [show, setupMode, form, htmlName]);
+
   if (!show && !setupMode) {
-    form.change(rest.htmlName, null);
     return null;
   }
 
@@ -212,6 +218,7 @@ export default function FormItem({
               isPurged={showPurged}
               retentionPeriodIcon={retentionPeriodIcon}
               htmlId={htmlId}
+              htmlName={htmlName}
               {...inputProps}
             />
           ) : (
