@@ -15,7 +15,7 @@ from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField
+from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField, IndicoMarkdownField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf, ValidationError
 from indico.web.forms.widgets import SwitchWidget
 
@@ -93,13 +93,12 @@ class SectionForm(IndicoForm):
                                       description=_('Whether this is going to be displayed as a section or standalone'))
     title = StringField(_('Title'), [HiddenUnless('display_as_section', preserve_data=True), DataRequired()],
                         description=_('The title of the section.'))
-    description = TextAreaField(_('Description'), [HiddenUnless('display_as_section', preserve_data=True)],
-                                description=_('You may use Markdown for formatting.'))
+    description = IndicoMarkdownField(_('Description'), [HiddenUnless('display_as_section', preserve_data=True)],
+                                      editor=True)
 
 
 class TextForm(IndicoForm):
-    description = TextAreaField(_('Text'),
-                                description=_('The text that should be displayed.'))
+    description = IndicoMarkdownField(_('Text'), description=_('The text that should be displayed.'), editor=True)
 
 
 class ImportQuestionnaireForm(IndicoForm):
