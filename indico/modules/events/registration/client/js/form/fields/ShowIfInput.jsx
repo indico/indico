@@ -17,7 +17,7 @@ import {Translate} from 'indico/react/i18n';
 import {getItemsForConditionalDisplay} from '../selectors';
 
 export function ShowIfInput({hasValueSelected}) {
-  const itemsForConditionalDisplay = useSelector(state => getItemsForConditionalDisplay(state));
+  const itemsForConditionalDisplay = useSelector(getItemsForConditionalDisplay);
   const form = useForm();
   const [showValue, setShowValue] = useState(hasValueSelected);
   const [, setSelectedField] = useState(null);
@@ -43,9 +43,10 @@ export function ShowIfInput({hasValueSelected}) {
         placeholder={Translate.string('Select field...')}
         options={itemsForConditionalDisplay
           .filter(({id}) => id !== thisFieldId)
-          .map(({title, id: fieldId}) => ({
+          .map(({title, id: fieldId, isEnabled}) => ({
             value: fieldId,
             text: title,
+            disabled: !isEnabled,
           }))}
         closeOnChange
         selection
