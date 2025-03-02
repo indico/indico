@@ -14,12 +14,12 @@ import {FinalDropdown} from 'indico/react/forms';
 import {Fieldset} from 'indico/react/forms/fields';
 import {Translate} from 'indico/react/i18n';
 
-import {getItemsForConditionalDisplay} from '../selectors';
+import {getItems} from '../selectors';
 
 import {getFieldRegistry} from './registry';
 
 export function ShowIfInput({hasValueSelected}) {
-  const itemsForConditionalDisplay = useSelector(getItemsForConditionalDisplay);
+  const items = Object.values(useSelector(getItems));
   const fieldRegistry = getFieldRegistry();
   const form = useForm();
   const [showValue, setShowValue] = useState(hasValueSelected);
@@ -27,7 +27,7 @@ export function ShowIfInput({hasValueSelected}) {
   let options = [];
   const {showIfFieldId, id: thisFieldId} = form.getState().values;
   if (showValue) {
-    const [field] = itemsForConditionalDisplay.filter(({id}) => id === showIfFieldId);
+    const [field] = items.filter(({id}) => id === showIfFieldId);
     options = fieldRegistry[field.inputType].showIfOptions(field);
     if (!options) {
       throw new Error(`Input ${field.inputType} field has no options defined`);
@@ -40,8 +40,10 @@ export function ShowIfInput({hasValueSelected}) {
         name="showIfFieldId"
         label={Translate.string('Field')}
         placeholder={Translate.string('Select field...')}
-        options={itemsForConditionalDisplay
-          .filter(({id}) => id !== thisFieldId)
+        options={items
+          .filter(
+            ({id, inputType}) => id !== thisFieldId && !!fieldRegistry[inputType].showIfOptions
+          )
           .map(({title, id: fieldId, isEnabled}) => ({
             value: fieldId,
             text: title,
