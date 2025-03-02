@@ -10,15 +10,16 @@ import {getPluginObjects} from 'indico/utils/plugins';
 
 import AccommodationInput, {
   AccommodationSettings,
-  accommodationSettingsInitialData,
   accommodationSettingsFormValidator,
+  accommodationSettingsInitialData,
+  accommodationShowIfOptions,
 } from './AccommodationInput';
 import AccompanyingPersonsInput, {
   AccompanyingPersonsSettings,
   accompanyingPersonsSettingsInitialData,
 } from './AccompanyingPersonsInput';
-import BooleanInput, {BooleanSettings} from './BooleanInput';
-import CheckboxInput, {CheckboxSettings} from './CheckboxInput';
+import BooleanInput, {BooleanSettings, booleanShowIfOptions} from './BooleanInput';
+import CheckboxInput, {CheckboxSettings, checkBoxShowIfOptions} from './CheckboxInput';
 import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
 import CountryInput, {CountrySettings} from './CountryInput';
 import DateInput, {
@@ -40,13 +41,14 @@ import SingleChoiceInput, {
   SingleChoiceSettings,
   singleChoiceSettingsFormDecorator,
   singleChoiceSettingsInitialData,
+  singleChoiceShowIfOptions,
 } from './SingleChoiceInput';
 import TextAreaInput, {TextAreaSettings} from './TextAreaInput';
 import TextInput, {TextSettings, textSettingsFormValidator} from './TextInput';
 import TimetableSessionsInput, {
+  sessionsSettingsFormValidator,
   TimetableSessionsSettings,
   timetableSessionsSettingsInitialData,
-  sessionsSettingsFormValidator,
 } from './TimetableSessions';
 
 /*
@@ -112,6 +114,7 @@ const fieldRegistry = {
     hasPrice: true,
     icon: 'checkbox-checked',
     customFormItem: true,
+    showIfOptions: checkBoxShowIfOptions,
   },
   date: {
     title: Translate.string('Date'),
@@ -128,6 +131,7 @@ const fieldRegistry = {
     hasPrice: true,
     icon: 'switchon',
     renderAsFieldset: true,
+    showIfOptions: booleanShowIfOptions,
   },
   phone: {
     title: Translate.string('Phone'),
@@ -160,6 +164,7 @@ const fieldRegistry = {
     settingsFormInitialData: singleChoiceSettingsInitialData,
     icon: 'dropmenu',
     renderAsFieldset: options => options.itemType === 'radiogroup',
+    showIfOptions: singleChoiceShowIfOptions,
   },
   multi_choice: {
     title: Translate.string('Multiple Choice'),
@@ -183,6 +188,7 @@ const fieldRegistry = {
     alwaysRequired: true,
     icon: 'home',
     renderAsFieldset: true,
+    showIfOptions: accommodationShowIfOptions,
   },
   accompanying_persons: {
     title: Translate.string('Accompanying Persons'),

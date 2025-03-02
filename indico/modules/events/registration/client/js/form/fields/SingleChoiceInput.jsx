@@ -511,3 +511,7 @@ export function SingleChoiceSettings() {
     </>
   );
 }
+
+export function singleChoiceShowIfOptions(field) {
+  return field.choices.map(({caption, id}) => ({value: id, text: caption}));
+}

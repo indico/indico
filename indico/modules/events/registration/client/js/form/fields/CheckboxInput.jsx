@@ -100,3 +100,7 @@ export function CheckboxSettings() {
     />
   );
 }
+
+export function checkBoxShowIfOptions() {
+  return [{value: '1', text: Translate.string('Yes')}, {value: '0', text: Translate.string('No')}];
+}
