@@ -1,6 +1,8 @@
 {% extends 'events/abstracts/emails/base.html' %}
 
-{% block subject_message %}{% trans %}New abstract comment{% endtrans %}{% endblock %}
+{% block subject_message %}
+    {%- trans title=abstract.verbose_title %}New comment on abstract {{ title }}{% endtrans -%}
+{% endblock %}
 
 {% block header_subtitle %}{% trans %}New abstract comment{% endtrans %}{% endblock %}
 
