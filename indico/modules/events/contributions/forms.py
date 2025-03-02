@@ -128,7 +128,7 @@ class ContributionProtectionForm(IndicoForm):
 class SubContributionForm(IndicoForm):
     _submitter_editable_fields = ('title', 'description', 'speakers')
     title = StringField(_('Title'), [DataRequired()])
-    description = TextAreaField(_('Description'))
+    description = IndicoMarkdownField(_('Description'), editor=True, mathjax=True)
     duration = IndicoDurationField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                                    default=timedelta(minutes=20))
     speakers = SubContributionPersonLinkListField(_('Speakers'), allow_submitters=False, allow_authors=False,
