@@ -7,7 +7,7 @@
 
 from uuid import uuid4
 
-from sqlalchemy import literal
+from sqlalchemy import Integer, cast, literal
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import aliased
@@ -344,6 +344,17 @@ class RegistrationFormItem(db.Model):
     @property
     def is_active(self):
         return self.is_enabled and not self.is_deleted and self.parent.is_enabled and not self.parent.is_deleted
+
+    @property
+    def is_conditional(self):
+        """Whether this field is being used by other fields to be conditionally shown or not."""
+        return (
+            RegistrationFormItem.query
+            .filter(
+                RegistrationFormItem.data['show_if_field_id'].isnot(None),
+                cast(RegistrationFormItem.data['show_if_field_id'].astext, Integer) == self.id
+            ).has_rows()
+        )
 
     @hybrid_property
     def is_section(self):
