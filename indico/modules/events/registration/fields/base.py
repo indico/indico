@@ -46,6 +46,8 @@ class FieldSetupSchemaBase(mm.Schema):
             next_field = RegistrationFormItem.query.filter_by(id=next_field_id).one()
             if next_field.is_manager_only or (next_field.parent is not None and next_field.parent.is_manager_only):
                 raise ValidationError('Field conditions may not depend on fields in manager-only sections')
+            if not next_field.is_enabled:
+                raise ValidationError('Field conditions may not depend on disabled fields')
             next_field_id = next_field.data.get('show_if_field_id')
 
 

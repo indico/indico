@@ -9,6 +9,7 @@ from datetime import timedelta
 
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
+from sqlalchemy import Integer, cast
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import BadRequest
 
@@ -19,7 +20,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.fields import get_field_types
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
-from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
+from indico.modules.events.registration.models.items import (RegistrationFormItem, RegistrationFormItemType,
+                                                             RegistrationFormText)
 from indico.modules.events.registration.util import get_flat_section_positions_setup_data, update_regform_item_positions
 from indico.modules.events.settings import data_retention_settings
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
@@ -134,6 +136,14 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
+        if not enabled:
+            # Check this field is not conditional for other fields.
+            is_conditional = (db.session.query(RegistrationFormItem)
+                              .filter(RegistrationFormItem.data['show_if_field_id'].isnot(None))
+                              .filter(
+                cast(RegistrationFormItem.data['show_if_field_id'].astext, Integer) == self.field.id).has_rows())
+            if is_conditional:
+                raise BadRequest('Fields used as conditional cannot be disabled')
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
