@@ -11,8 +11,7 @@ from decimal import Decimal
 from marshmallow import ValidationError, fields, pre_load, validate, validates_schema
 from PIL import Image
 
-from indico.core.marshmallow import mm
-from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (BillableFieldDataSchema, FieldSetupSchemaBase,
                                                             LimitedPlacesBillableFieldDataSchema,
                                                             RegistrationFormBillableField, RegistrationFormFieldBase)
 from indico.modules.files.models.files import File
@@ -30,7 +29,7 @@ from indico.util.string import remove_accents, str_to_ascii, validate_email
 KEEP_EXISTING_FILE_UUID = '00000000-0000-0000-0000-000000000001'
 
 
-class TextFieldDataSchema(mm.Schema):
+class TextFieldDataSchema(FieldSetupSchemaBase):
     min_length = fields.Integer(load_default=0, validate=validate.And(validate.Range(0), validate.NoneOf((1,))))
     max_length = fields.Integer(load_default=0, validate=validate.Range(0))
 
@@ -154,7 +153,7 @@ class CheckboxField(RegistrationFormBillableField):
         return False
 
 
-class DateFieldDataSchema(mm.Schema):
+class DateFieldDataSchema(FieldSetupSchemaBase):
     date_format = fields.String(required=True, validate=validate.OneOf([
         '%d/%m/%Y %I:%M %p',
         '%d.%m.%Y %I:%M %p',
