@@ -16,22 +16,21 @@ import {Translate} from 'indico/react/i18n';
 
 import {getItemsForConditionalDisplay} from '../selectors';
 
+import {getFieldRegistry} from './registry';
+
 export function ShowIfInput({hasValueSelected}) {
   const itemsForConditionalDisplay = useSelector(getItemsForConditionalDisplay);
+  const fieldRegistry = getFieldRegistry();
   const form = useForm();
   const [showValue, setShowValue] = useState(hasValueSelected);
   const [, setSelectedField] = useState(null);
   let options = [];
   const {showIfFieldId, id: thisFieldId} = form.getState().values;
   if (showValue) {
-    const [{choices}] = itemsForConditionalDisplay.filter(({id}) => id === showIfFieldId);
-    if (!choices) {
-      options = [
-        {value: '1', text: Translate.string('Yes')},
-        {value: '0', text: Translate.string('No')},
-      ];
-    } else {
-      options = choices.map(({caption, id}) => ({value: id, text: caption}));
+    const [field] = itemsForConditionalDisplay.filter(({id}) => id === showIfFieldId);
+    options = fieldRegistry[field.inputType].showIfOptions(field);
+    if (!options) {
+      throw new Error(`Input ${field.inputType} field has no options defined`);
     }
   }
 
