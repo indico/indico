@@ -109,9 +109,10 @@ class RHRegistrationFormToggleSection(RHManageRegFormSectionBase):
         if not enabled:
             if self.section.type == RegistrationFormItemType.section_pd:
                 raise BadRequest
-            for field in self.section.children:
-                if field.is_condition:
-                    raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
+            if any(f.is_condition for f in self.section.children):
+                raise NoReportError.wrap_exc(
+                    BadRequest(_('Sections with fields used as conditional cannot be disabled'))
+                )
         self.section.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
