@@ -19,7 +19,7 @@ import AccompanyingPersonsInput, {
   accompanyingPersonsSettingsInitialData,
 } from './AccompanyingPersonsInput';
 import BooleanInput, {BooleanSettings, booleanShowIfOptions} from './BooleanInput';
-import CheckboxInput, {CheckboxSettings, checkBoxShowIfOptions} from './CheckboxInput';
+import CheckboxInput, {CheckboxSettings, checkboxShowIfOptions} from './CheckboxInput';
 import {choiceFieldsSettingsFormDecorator} from './ChoicesSetup';
 import CountryInput, {CountrySettings} from './CountryInput';
 import DateInput, {
@@ -114,7 +114,7 @@ const fieldRegistry = {
     hasPrice: true,
     icon: 'checkbox-checked',
     customFormItem: true,
-    showIfOptions: checkBoxShowIfOptions,
+    showIfOptions: checkboxShowIfOptions,
   },
   date: {
     title: Translate.string('Date'),
