@@ -160,6 +160,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
+        if self.field.is_conditional:
+            raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be deleted')))
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
         db.session.add(self.field)
