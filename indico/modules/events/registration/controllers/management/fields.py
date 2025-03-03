@@ -135,7 +135,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
-        if not enabled and self.field.is_conditional:
+        if not enabled and self.field.is_condition:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
@@ -160,7 +160,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
-        if self.field.is_conditional:
+        if self.field.is_condition:
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be deleted')))
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True

@@ -346,7 +346,7 @@ class RegistrationFormItem(db.Model):
         return self.is_enabled and not self.is_deleted and self.parent.is_enabled and not self.parent.is_deleted
 
     @property
-    def is_conditional(self):
+    def is_condition(self):
         """Whether this field is being used by other fields to be conditionally shown or not."""
         return (
             RegistrationFormItem.query
