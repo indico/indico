@@ -14,6 +14,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.errors import NoReportError
 from indico.core.marshmallow import mm
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
@@ -135,7 +136,7 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 self.field.personal_data_type.is_required):
             raise BadRequest
         if not enabled and self.field.is_conditional:
-            raise BadRequest('Fields used as conditional cannot be disabled')
+            raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
