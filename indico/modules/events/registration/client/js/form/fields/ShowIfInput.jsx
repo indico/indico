@@ -27,7 +27,7 @@ export function ShowIfInput({hasValueSelected}) {
   let options = [];
   const {showIfFieldId, id: thisFieldId} = form.getState().values;
   if (showValue) {
-    const [field] = items.filter(({id}) => id === showIfFieldId);
+    const field = items.find(({id}) => id === showIfFieldId);
     options = fieldRegistry[field.inputType].showIfOptions(field);
     if (!options) {
       throw new Error(`Input ${field.inputType} field has no options defined`);
