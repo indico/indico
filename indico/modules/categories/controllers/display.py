@@ -631,7 +631,7 @@ class RHCategoryCalendarViewEvents(RHDisplayCategoryBase):
         categories = {}
         rooms = {}
         keywords = {}
-        allowed_keywords = global_event_settings.get('allowed_keywords')
+        allowed_keywords = global_event_settings.get('allowed_event_keywords')
         allowed_keywords_set = set(allowed_keywords)
         tz = self.category.display_tzinfo
         for event in event_query:
