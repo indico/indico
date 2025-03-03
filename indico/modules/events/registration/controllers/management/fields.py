@@ -166,7 +166,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         self.field.is_deleted = True
         if 'show_if_field_id' in (self.field.data or {}):
             self.field.data.pop('show_if_field_id')
-            self.field.data.pop('show_if_field_value')
+            self.field.data.pop('show_if_field_value', None)
             flag_modified(self.field, 'data')
         update_regform_item_positions(self.regform)
         db.session.flush()
