@@ -164,7 +164,6 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
             raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be deleted')))
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
-        db.session.add(self.field)
         if 'show_if_field_id' in (self.field.data or {}):
             self.field.data.pop('show_if_field_id')
             self.field.data.pop('show_if_field_value')

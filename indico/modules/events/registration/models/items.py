@@ -351,6 +351,7 @@ class RegistrationFormItem(db.Model):
         return (
             RegistrationFormItem.query
             .filter(
+                ~RegistrationFormItem.is_deleted,
                 RegistrationFormItem.data['show_if_field_id'].isnot(None),
                 cast(RegistrationFormItem.data['show_if_field_id'].astext, Integer) == self.id
             ).has_rows()
