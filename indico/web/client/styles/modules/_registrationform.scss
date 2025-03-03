@@ -51,7 +51,7 @@
   }
 }
 
-.regform-section:has(> .i-box-content:empty) {
+form .regform-section:has(> .i-box-content:empty) {
   display: none;
 }
 
