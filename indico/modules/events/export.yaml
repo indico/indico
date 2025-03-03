@@ -505,6 +505,37 @@ export:
   RegistrationFormItem:
     # top-level items first to satisfy top_level_sections check constraint
     order: RegistrationFormItem.parent_id.isnot(None)
+    # we need to make sure that the idrefs inside `data` can be resolved during import time
+    python_order: |
+      def _topological_sort(objects):
+          def _get_ref_id(obj):
+              match obj.data:
+                  case {'show_if_field_id': id}:
+                      return id
+                  case _:
+                      return None
+
+          from graphlib import TopologicalSorter
+          sorter = TopologicalSorter()
+          obj_by_id = {obj.id: obj for obj in objects}  # Mapping from id to object
+          for obj in objects:
+              ref_id = _get_ref_id(obj)
+              if ref_obj := obj_by_id.get(ref_id):
+                  sorter.add(obj.id, ref_obj.id)
+              else:
+                  sorter.add(obj.id)
+          return [obj_by_id[x] for x in sorter.static_order()]
+
+      rows = _topological_sort(ROWS)
+    cols:
+      data: |
+        if VALUE is None or 'show_if_field_id' not in VALUE:
+          data = VALUE
+        else:
+          data = {
+            _k: (_v if _k != 'show_if_field_id' else MAKE_ID_REF(RegistrationFormItem.id, _v))
+            for _k, _v in VALUE.items()
+          }
     fks:
       - RegistrationFormFieldData.field_id
 
@@ -643,6 +674,16 @@ import:
             for _k, (_is_ref, _v) in VALUE.items()
             if not _is_ref or (_id := RESOLVE_ID_REF(_v, None)) is not None
         }
+
+    RegistrationFormItem:
+      data: |
+        if VALUE is None:
+          data = VALUE
+        else:
+          data = {
+            _k: (_v if _k != 'show_if_field_id' else RESOLVE_ID_REF(_v))
+            for _k, _v in VALUE.items()
+          }
 
 
   # How user references should be handled if the user does not exist.
