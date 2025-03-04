@@ -100,16 +100,16 @@ class RoomList extends React.Component {
     this.clearSelectionMode();
   };
 
-  allSelected = () => {
+  get allSelected() {
     const {results} = this.props;
     const {selection} = this.state;
     return Object.keys(selection).length === results.length;
-  };
+  }
 
-  selectAllBtnProps = () => {
-    if (this.allSelected()) {
+  get selectAllBtnProps() {
+    if (this.allSelected) {
       return {
-        selectAllFct: () => {
+        selectAllFunc: () => {
           this.setState({selection: {}});
         },
         selectAllPrimary: true,
@@ -117,7 +117,7 @@ class RoomList extends React.Component {
       };
     }
     return {
-      selectAllFct: () => {
+      selectAllFunc: () => {
         const {results} = this.props;
         const allRooms = Object.fromEntries(results.map(room => [room.id, room]));
         this.setState({selection: allRooms});
@@ -125,7 +125,7 @@ class RoomList extends React.Component {
       selectAllPrimary: false,
       selectAllText: Translate.string('Select all rooms'),
     };
-  };
+  }
 
   clearSelectionMode = () => {
     this.setState({selectionMode: null, selection: {}});
@@ -187,7 +187,7 @@ class RoomList extends React.Component {
         icon: 'file excel',
       },
     ];
-    const {selectAllFct, selectAllPrimary, selectAllText} = this.selectAllBtnProps();
+    const {selectAllFunc, selectAllPrimary, selectAllText} = this.selectAllBtnProps;
 
     return (
       <Grid columns={2}>
@@ -208,7 +208,7 @@ class RoomList extends React.Component {
                             trigger={
                               <Button
                                 icon="check square"
-                                onClick={selectAllFct}
+                                onClick={selectAllFunc}
                                 primary={selectAllPrimary}
                                 style={{marginRight: '1.5rem'}}
                                 circular
