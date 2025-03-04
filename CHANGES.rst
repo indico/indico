@@ -7,6 +7,9 @@ Version 3.3.6
 
 *Unreleased*
 
+- Implement conditional fields (:issue:`1228`, :pr:`6678`,
+thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
+
 Improvements
 ^^^^^^^^^^^^
 
