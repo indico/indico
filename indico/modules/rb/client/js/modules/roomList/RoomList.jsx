@@ -204,19 +204,23 @@ class RoomList extends React.Component {
                     <div styleName="actions">
                       {selectionMode ? (
                         <>
-                          <ResponsivePopup
-                            trigger={
-                              <Button
-                                icon="check square"
-                                onClick={selectAllFunc}
-                                primary={selectAllPrimary}
-                                style={{marginRight: '1.5rem'}}
-                                circular
-                              />
-                            }
-                            content={selectAllText}
-                            position="bottom center"
-                          />
+                          {selectionMode === 'export' ? (
+                            <ResponsivePopup
+                              trigger={
+                                <Button
+                                  icon="check square"
+                                  onClick={selectAllFunc}
+                                  primary={selectAllPrimary}
+                                  style={{marginRight: '1.5rem'}}
+                                  circular
+                                />
+                              }
+                              content={selectAllText}
+                              position="bottom center"
+                            />
+                          ) : (
+                            <></>
+                          )}
                           <Button
                             icon="check"
                             disabled={Object.keys(selection).length === 0}
