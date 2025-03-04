@@ -109,8 +109,8 @@
         {{- friendly_data.choice -}}
     {%- else -%}
         {{- friendly_data.choice }} {# -#}
-        ({{ friendly_data.arrival_date | format_date(locale='en_GB') }} - {# -#}
-        {{ friendly_data.departure_date | format_date(locale='en_GB') -}})
+        ({{ friendly_data.arrival_date | format_date }} - {# -#}
+        {{ friendly_data.departure_date | format_date -}})
     {%- endif -%}
 {% endmacro %}
 
