@@ -17,7 +17,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
-from indico.modules.events.registration.fields.base import (FieldSetupSchemaBase, LimitedPlacesBillableFieldDataSchema,
+from indico.modules.events.registration.fields.base import (FieldSetupSchemaBase, LimitedPlacesBillableItemSchema,
                                                             RegistrationFormBillableField,
                                                             RegistrationFormBillableItemsField)
 from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
@@ -59,10 +59,7 @@ def _get_choice_by_id(choice_id, choices):
             return choice
 
 
-class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
-    class Meta:
-        exclude = ('show_if_field_id', 'show_if_field_values')
-
+class ChoiceItemSchema(LimitedPlacesBillableItemSchema):
     id = fields.UUID()
     is_enabled = fields.Bool(required=True)
     max_extra_slots = fields.Integer(load_default=0, validate=validate.Range(0, 99))
@@ -397,10 +394,7 @@ def _to_date(date):
     return datetime.strptime(date, '%Y-%m-%d').date()
 
 
-class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
-    class Meta:
-        exclude = ('show_if_field_id', 'show_if_field_values')
-
+class AccommodationItemSchema(LimitedPlacesBillableItemSchema):
     id = fields.UUID()
     is_enabled = fields.Bool(required=True)
     is_no_accommodation = fields.Bool(load_default=False)
