@@ -59,6 +59,11 @@ class LimitedPlacesBillableFieldDataSchema(BillableFieldDataSchema):
     places_limit = fields.Integer(load_default=0, validate=validate.Range(0))
 
 
+class LimitedPlacesBillableItemSchema(LimitedPlacesBillableFieldDataSchema):
+    class Meta:
+        exclude = ('show_if_field_id', 'show_if_field_values')
+
+
 class RegistrationFormFieldBase:
     """Base class for a registration form field definition."""
 
