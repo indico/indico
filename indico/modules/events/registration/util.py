@@ -1065,7 +1065,7 @@ def create_registration_check(registration, check_type=None, is_check_out=False,
     check = RegistrationCheck(registration=registration, check_type=check_type, is_check_out=is_check_out,
                               checked_by_user=checked_by_user)
     db.session.add(check)
-    db.session.commit()
+    db.session.flush()
     signals.event.registration_check_added.send(check)
     logger.info('Registration %s checked as "%s" by %s', registration, check_type.title, checked_by_user)
     return check
