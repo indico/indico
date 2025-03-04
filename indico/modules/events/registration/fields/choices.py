@@ -398,6 +398,9 @@ def _to_date(date):
 
 
 class AccommodationItemSchema(LimitedPlacesBillableFieldDataSchema):
+    class Meta:
+        exclude = ('show_if_field_id', 'show_if_field_values')
+
     id = fields.UUID()
     is_enabled = fields.Bool(required=True)
     is_no_accommodation = fields.Bool(load_default=False)
