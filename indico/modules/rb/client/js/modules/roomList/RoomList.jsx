@@ -219,7 +219,7 @@ class RoomList extends React.Component {
                               position="bottom center"
                             />
                           ) : (
-                            <></>
+                            undefined
                           )}
                           <Button
                             icon="check"
