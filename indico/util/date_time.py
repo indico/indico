@@ -143,12 +143,22 @@ def format_timedelta(td, format='short', threshold=0.85, locale=None):
     return _format_timedelta(td, format=format, locale=locale, threshold=threshold)
 
 
-def format_interval(start_dt, end_dt, format='yMd', locale=None):
-    """Basically a wrapper around Babel's own format_interval."""
+def format_interval(start_dt, end_dt, format=None, locale=None, *, skeleton=None):
+    """Basically a wrapper around Babel's own format_interval.
+    
+    The `format` parameter is kept for backwards compatibility with the default
+    document templates which use `format_interval`. Prefer using the `skeleton`
+    parameter instead.
+    """
     if not locale:
         locale = get_current_locale()
 
-    return _format_interval(start_dt, end_dt, format, locale=locale)
+    if format:
+        skeleton = format
+    elif not skeleton:
+        skeleton = 'yMd'
+
+    return _format_interval(start_dt, end_dt, skeleton, locale=locale)
 
 
 def _adjust_skeleton(format, skeleton):
