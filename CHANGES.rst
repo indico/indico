@@ -86,9 +86,6 @@ Security fixes
     ``indico.conf`` data, which is otherwise only accessible to people with direct server
     access.
 
-- Implement conditional fields (:issue:`1228`, :pr:`6678`,
-thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
-
 Improvements
 ^^^^^^^^^^^^
 
@@ -146,6 +143,8 @@ Improvements
   :user:`tomako, unconventionaldotdev`)
 - Add a log for user actions, similar to that in events and categories (:pr:`6779`, :pr:`6813`,
   thanks :user:`tomako`)
+- Implement conditional fields (:issue:`1228`, :pr:`6678`,
+thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
 
 Bugfixes
 ^^^^^^^^
