@@ -204,7 +204,7 @@ class RoomList extends React.Component {
                     <div styleName="actions">
                       {selectionMode ? (
                         <>
-                          {selectionMode === 'export' ? (
+                          {selectionMode === 'export' && (
                             <ResponsivePopup
                               trigger={
                                 <Button
@@ -218,8 +218,6 @@ class RoomList extends React.Component {
                               content={selectAllText}
                               position="bottom center"
                             />
-                          ) : (
-                            undefined
                           )}
                           <Button
                             icon="check"
