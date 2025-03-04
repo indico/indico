@@ -45,7 +45,7 @@ Improvements
   :user:`amCap1712`)
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
 - Implement conditional fields (:issue:`1228`, :pr:`6678`,
-thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
+  thanks :user:`Moliholy, omegak, unconventionaldotdev`).
 
 Bugfixes
 ^^^^^^^^
