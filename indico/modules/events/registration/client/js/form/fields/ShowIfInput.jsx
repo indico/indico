@@ -33,6 +33,7 @@ export function ShowIfInput({hasValueSelected}) {
       throw new Error(`Input ${field.inputType} field has no options defined`);
     }
   }
+  const isMultipleChoice = options.length > 2;
 
   return (
     <Fieldset legend={Translate.string('Show if')}>
@@ -69,9 +70,10 @@ export function ShowIfInput({hasValueSelected}) {
           label={Translate.string('Has values')}
           placeholder={Translate.string('Select values...')}
           options={options}
+          format={value => (isMultipleChoice ? value : value[0])}
           closeOnChange
           selection
-          multiple={options.length >= 2}
+          multiple={isMultipleChoice}
         />
       )}
     </Fieldset>
