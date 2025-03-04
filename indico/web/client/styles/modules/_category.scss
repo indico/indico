@@ -53,6 +53,11 @@
 
 .category-header {
   grid-area: hd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1em;
 
   background-image: linear-gradient(to bottom, #fcfcfc, #f2f2f2);
   border-bottom: 1px solid #e6e6e6;
@@ -66,6 +71,7 @@
 }
 
 .category-title {
+  flex: 1 1 auto;
   font-size: 2em;
   color: $dark-orange;
   font-weight: normal;
@@ -77,6 +83,15 @@
     font-style: italic;
     font-size: 0.8em;
   }
+}
+
+#category-toolbar {
+  flex: 0 1 auto;
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  justify-self: flex-end;
+  width: fit-content;
 }
 
 .category-description {
