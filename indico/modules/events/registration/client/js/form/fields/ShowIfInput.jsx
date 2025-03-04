@@ -71,6 +71,7 @@ export function ShowIfInput({hasValueSelected}) {
           placeholder={Translate.string('Select values...')}
           options={options}
           format={value => (isMultipleChoice ? value : value[0])}
+          singleValueAsList={!isMultipleChoice}
           closeOnChange
           selection
           multiple={isMultipleChoice}
