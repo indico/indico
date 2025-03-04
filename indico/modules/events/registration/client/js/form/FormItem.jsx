@@ -111,6 +111,9 @@ export default function FormItem({
   const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
+  if (!!showIfFieldValues && showIfFieldValues.length && showIfFieldValues.length <= 2) {
+    showIfFieldValues = showIfFieldValues[0];
+  }
 
   const fieldOptions = {
     id,
