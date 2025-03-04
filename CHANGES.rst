@@ -86,6 +86,9 @@ Security fixes
     ``indico.conf`` data, which is otherwise only accessible to people with direct server
     access.
 
+- Implement conditional fields (:issue:`1228`, :pr:`6678`,
+thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
+
 Improvements
 ^^^^^^^^^^^^
 
