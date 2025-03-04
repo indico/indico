@@ -20,8 +20,7 @@ $toolbar-spacing: 10px;
   @include toolbar-group-slider();
   @extend .flexrow;
 
-  & ~ .i-button,
-  & ~ .group {
+  & ~ .i-button {
     margin-left: buttons.$i-button-spacing;
   }
 
@@ -134,10 +133,6 @@ $toolbar-spacing: 10px;
       border-bottom-left-radius: 0;
       border-top-left-radius: 0;
     }
-  }
-
-  #search-box {
-    margin: 0 2em;
   }
 }
 
