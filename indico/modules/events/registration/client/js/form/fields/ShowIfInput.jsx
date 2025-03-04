@@ -52,7 +52,7 @@ export function ShowIfInput({hasValueSelected}) {
         closeOnChange
         selection
         onChange={value => {
-          form.change('showIfFieldValue', null);
+          form.change('showIfFieldValues', null);
           if (!value) {
             form.change('showIfFieldId', null);
             setSelectedField(null);
@@ -65,12 +65,13 @@ export function ShowIfInput({hasValueSelected}) {
       {showValue && (
         <FinalDropdown
           required
-          name="showIfFieldValue"
-          label={Translate.string('Has value')}
-          placeholder={Translate.string('Select value...')}
+          name="showIfFieldValues"
+          label={Translate.string('Has values')}
+          placeholder={Translate.string('Select values...')}
           options={options}
           closeOnChange
           selection
+          multiple={options.length >= 2}
         />
       )}
     </Fieldset>

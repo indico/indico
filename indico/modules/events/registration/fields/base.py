@@ -18,7 +18,7 @@ from indico.util.marshmallow import not_empty
 
 class FieldSetupSchemaBase(mm.Schema):
     show_if_field_id = fields.Integer(required=False, load_default=None)
-    show_if_field_value = fields.String(required=False)
+    show_if_field_values = fields.List(fields.String(), required=False)
 
     @validates('show_if_field_id')
     def _check_if_field_id(self, field_id, **kwargs):

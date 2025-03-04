@@ -93,7 +93,7 @@ export default function FormItem({
   setupMode,
   setupActions,
   showIfFieldId,
-  showIfFieldValue,
+  showIfFieldValues,
   htmlName,
   ...rest
 }) {
@@ -126,28 +126,27 @@ export default function FormItem({
     setupMode,
     setupActions,
     showIfFieldId,
-    showIfFieldValue,
+    showIfFieldValues,
     ...rest,
     meta,
   };
 
-  const parseConditionalValue = value => {
+  const parseConditionalValues = value => {
     if (typeof value === 'boolean') {
-      return value ? '1' : '0';
+      return value ? ['1'] : ['0'];
     } else if (value !== null && typeof value === 'object') {
       if (value.choice) {
-        return value.choice;
+        return [value.choice];
       }
-      const [selected] = Object.entries(value)
+      return Object.entries(value)
         .filter(([, enabled]) => enabled === 1)
         .map(([key]) => key);
-      return selected || '';
     }
-    return value;
+    return value || undefined;
   };
 
-  const conditionalValue = conditionalField
-    ? parseConditionalValue(formState.values[conditionalField.htmlName])
+  const conditionalValues = conditionalField
+    ? parseConditionalValues(formState.values[conditionalField.htmlName])
     : undefined;
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
@@ -170,7 +169,8 @@ export default function FormItem({
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
   const show =
-    (!conditionalField && conditionalValue === undefined) || showIfFieldValue === conditionalValue;
+    (!conditionalField && conditionalValues === undefined) ||
+    conditionalValues.some(value => showIfFieldValues.includes(value));
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
@@ -296,7 +296,7 @@ FormItem.propTypes = {
   /** The ID of the field to use as condition for display */
   showIfFieldId: PropTypes.number,
   /** The value of the field to use as condition for display */
-  showIfFieldValue: PropTypes.string,
+  showIfFieldValues: PropTypes.node,
   // ... and various other field-specific keys (billing, limited-places, other config)
 };
 
@@ -311,5 +311,5 @@ FormItem.defaultProps = {
   setupMode: false,
   setupActions: null,
   showIfFieldId: null,
-  showIfFieldValue: null,
+  showIfFieldValues: null,
 };
