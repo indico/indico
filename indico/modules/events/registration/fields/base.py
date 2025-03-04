@@ -8,7 +8,7 @@
 from copy import deepcopy
 from decimal import Decimal
 
-from marshmallow import ValidationError, fields, pre_load, validate, validates
+from marshmallow import ValidationError, fields, validate, validates
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
@@ -18,13 +18,7 @@ from indico.util.marshmallow import not_empty
 
 class FieldSetupSchemaBase(mm.Schema):
     show_if_field_id = fields.Integer(required=False, load_default=None)
-    show_if_field_values = fields.List(fields.String(), required=False, load_default=lambda: [])
-
-    @pre_load
-    def wrap_to_list(self, data, **kwargs):
-        if isinstance(data.get('show_if_field_values'), str):
-            data['show_if_field_values'] = [data['show_if_field_values']]
-        return data
+    show_if_field_values = fields.List(fields.String(), required=False)
 
     @validates('show_if_field_id')
     def _check_if_field_id(self, field_id, **kwargs):
