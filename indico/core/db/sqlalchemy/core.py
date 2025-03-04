@@ -20,7 +20,8 @@ from sqlalchemy.orm import CompositeProperty, mapper
 from sqlalchemy.sql.ddl import CreateSchema
 
 from indico.core import signals
-from indico.core.db.sqlalchemy.custom.array_is_unique import create_array_is_unique_function
+from indico.core.db.sqlalchemy.custom.array_utils import (create_array_append_function, create_array_is_unique_function,
+                                                          create_array_to_string_function)
 from indico.core.db.sqlalchemy.custom.natsort import create_natsort_function
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
@@ -140,6 +141,8 @@ def _before_create(target, connection, **kw):
     create_unaccent_function(connection)
     create_natsort_function(connection)
     create_array_is_unique_function(connection)
+    create_array_to_string_function(connection)
+    create_array_append_function(connection)
 
 
 def _mapper_configured(mapper, class_):
