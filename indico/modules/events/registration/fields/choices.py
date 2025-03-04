@@ -60,6 +60,9 @@ def _get_choice_by_id(choice_id, choices):
 
 
 class ChoiceItemSchema(LimitedPlacesBillableFieldDataSchema):
+    class Meta:
+        exclude = ('show_if_field_id', 'show_if_field_values')
+
     id = fields.UUID()
     is_enabled = fields.Bool(required=True)
     max_extra_slots = fields.Integer(load_default=0, validate=validate.Range(0, 99))
