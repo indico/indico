@@ -7,9 +7,6 @@ Version 3.3.6
 
 *Unreleased*
 
-- Implement conditional fields (:issue:`1228`, :pr:`6678`,
-thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
-
 Improvements
 ^^^^^^^^^^^^
 
@@ -47,6 +44,8 @@ Improvements
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
+- Implement conditional fields (:issue:`1228`, :pr:`6678`,
+thanks :user:`omegak, unconventionaldotdev` and :user:`Moliholy, unconventionaldotdev`).
 
 Bugfixes
 ^^^^^^^^
