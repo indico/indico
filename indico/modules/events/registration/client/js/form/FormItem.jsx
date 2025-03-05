@@ -172,8 +172,7 @@ export default function FormItem({
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
   const show =
-    (!conditionalField && conditionalValues === undefined) ||
-    conditionalValues.some(value => showIfFieldValues.includes(value));
+    !conditionalField || conditionalValues?.some(value => showIfFieldValues.includes(value));
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
