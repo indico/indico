@@ -74,18 +74,20 @@ class EventLabelForm(IndicoForm):
             raise ValidationError(_('This title is already in use.'))
 
 
-class EventKeywordsForm(IndicoForm):
-    keywords = IndicoTagListField(_('Keywords'))
+class AllowedKeywordsForm(IndicoForm):
+    event_keywords = IndicoTagListField(_('Event Keywords'))
+    contribution_keywords = IndicoTagListField(_('Contribution Keywords'))
 
     def post_validate(self):
         # case-insensitive keywords deduplication
-        keywords = []
-        seen_keywords = set()
-        for keyword in self.keywords.data:
-            if keyword.lower() not in seen_keywords:
-                keywords.append(keyword)
-                seen_keywords.add(keyword.lower())
-        self.keywords.data = keywords
+        for keywords_field in [self.event_keywords, self.contribution_keywords]:
+            keywords = []
+            seen_keywords = set()
+            for keyword in keywords_field.data:
+                if keyword.lower() not in seen_keywords:
+                    keywords.append(keyword)
+                    seen_keywords.add(keyword.lower())
+            keywords_field.data = keywords
 
 
 class EventCreationFormBase(IndicoForm):
