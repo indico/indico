@@ -9,6 +9,7 @@ import {TopLevelEntry} from './types';
 
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
+export const ADD_SESSION_DATA = 'Add session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
@@ -79,6 +80,11 @@ export function setTimetableData(data, eventInfo) {
 export function setSessionData(data) {
   return {type: SET_SESSION_DATA, data};
 }
+
+export function addSessionData(data) {
+  return {type: ADD_SESSION_DATA, data};
+}
+
 
 export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {
   return {type: MOVE_ENTRY, date, entries};

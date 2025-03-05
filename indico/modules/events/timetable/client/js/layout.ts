@@ -54,6 +54,7 @@ export function layoutGroup<T extends Entry>(group: T[], {layoutChildren = true}
       entry.type === 'block' ? {...entry, children: layout(entry.children)} : entry
     );
   }
+
   const sortedGroup = [...group].sort((a, b) => a.column - b.column); // TODO: secondary sort by duration(DESC)
   const newGroup: T[] = [];
   let newMaxColumn = 0;

@@ -202,8 +202,6 @@ class IndicoModel(Model):
         cls = type(self)
         changed = {}
         for key, value in data.items():
-            print('lets populate:')
-            print(key, value)
             if keys and key not in keys:
                 continue
             if skip and key in skip:

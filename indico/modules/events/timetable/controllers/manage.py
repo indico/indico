@@ -12,22 +12,27 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
-from indico.modules.events.contributions.operations import delete_contribution
+from indico.modules.events.contributions.operations import create_contribution, delete_contribution
+from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.management.controllers.base import RHManageEventBase
-from indico.modules.events.sessions.operations import delete_session_block
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.operations import create_session_block, delete_session_block
+from indico.modules.events.sessions.schemas import SessionBlockSchema
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.legacy import (TimetableSerializer, serialize_entry_update, serialize_event_info,
                                                     serialize_session)
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.operations import (create_break_entry, create_timetable_entry,
-                                                        delete_timetable_entry, update_timetable_entry)
+from indico.modules.events.timetable.operations import (create_break_entry, create_contribution_entry,
+                                                        create_session_block_entry, create_timetable_entry,
+                                                        delete_timetable_entry, schedule_contribution,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, TimetableEntrySchema
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import should_show_draft_warning, track_time_changes
-from indico.web.args import use_args
+from indico.web.args import use_args, use_args_schema_context
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -133,12 +138,30 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
+# TODO: (Ajob) Evaluate need for these three classes below
 class RHAPICreateBreak(RHManageEventBase):
 
-    @use_args(BreakSchema)
+    @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Break):
-        created_break = create_break_entry(self.event, data)
-        return TimetableEntrySchema().jsonify(created_break)
+        break_entry = create_break_entry(self.event, data, extend_parent=False)
+        return TimetableEntrySchema().jsonify(break_entry)
+
+
+class RHAPICreateContribution(RHManageEventBase):
+
+    @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
+    def _process_POST(self, data: Contribution):
+        contrib_entry = create_contribution_entry(self.event, data, extend_parent=False)
+        return TimetableEntrySchema().jsonify(contrib_entry)
+
+
+class RHAPICreateSessionBlock(RHManageEventBase):
+
+    @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
+    def _process_POST(self, data: SessionBlock):
+        session = self.event.get_session(data['session_id'])
+        block_entry = create_session_block_entry(session, data, extend_parent=False)
+        return TimetableEntrySchema().jsonify(block_entry)
 
 
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):

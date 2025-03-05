@@ -89,12 +89,12 @@ export default {
         const dayKey = moment(startDt)
           .utc()
           .format('YYYYMMDD');
-        console.log('The day key is:', dayKey);
-        console.log(newEntries);
-        console.log(dayKey in newEntries);
+
         newEntries[dayKey].push(entry);
         newEntries[dayKey] = layout(newEntries[dayKey]);
-        console.log('THE NEXT NEW ENTRIES', newEntries);
+
+        console.log('new entries');
+        console.log(newEntries);
 
         return {
           ...state,
@@ -238,6 +238,11 @@ export default {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
+      case actions.ADD_SESSION_DATA:
+        return preprocessSessionData({
+          ...Object.fromEntries(Object.entries(state)),
+          [action.data.id]: {...action.data, isPoster: false},
+        });
       case actions.CHANGE_COLOR:
         return action.sessionId ? changeSessionColor(state, action.sessionId, action.color) : state;
       default:

@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from indico.modules.events.sessions.controllers.management.sessions import RHAPISessionBlock
 from indico.modules.events.timetable.controllers.display import (RHTimetable, RHTimetableEntryInfo,
                                                                  RHTimetableExportDefaultPDF, RHTimetableExportPDF)
 from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddBreak,
@@ -22,7 +23,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableShiftEntries,
                                                                 RHLegacyTimetableSwapEntries)
-from indico.modules.events.timetable.controllers.manage import (RHAPICreateBreak, RHCloneContribution,
+from indico.modules.events.timetable.controllers.manage import (RHAPICreateBreak, RHAPICreateContribution,
+                                                                RHAPICreateSessionBlock, RHCloneContribution,
                                                                 RHManageSessionTimetable, RHManageTimetable,
                                                                 RHManageTimetableEntryInfo, RHTimetableREST)
 from indico.web.flask.util import make_compat_redirect_func
@@ -68,7 +70,10 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
     _bp.add_url_rule('/clone-contribution', 'clone_contribution', RHCloneContribution, methods=('POST',))
 
 # API
+# TODO: (Ajob) Evaluate if we can make this one endpoint for entries
 _bp.add_url_rule('/api/breaks/create', 'api_create_break', RHAPICreateBreak, methods=('POST',))
+_bp.add_url_rule('/api/contrib/create', 'api_create_contrib', RHAPICreateContribution, methods=('POST',))
+_bp.add_url_rule('/api/session-block/create', 'api_create_session_block', RHAPICreateSessionBlock, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

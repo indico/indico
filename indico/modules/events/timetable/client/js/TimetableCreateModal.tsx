@@ -1,6 +1,6 @@
-import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
-import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block';
 import breakCreateURL from 'indico-url:timetable.api_create_break';
+import contributionCreateURL from 'indico-url:timetable.api_create_contrib';
+import sessionBlockCreateURL from 'indico-url:timetable.api_create_session_block';
 
 import _ from 'lodash';
 import moment from 'moment';
@@ -27,6 +27,8 @@ interface EntryColors {
   text: string;
 }
 
+// TOOD: (Ajob) Make for each entry an interface and then make
+//              the draftentry be the union of it.
 interface DraftEntry {
   title: string;
   duration: number;
@@ -37,6 +39,7 @@ interface DraftEntry {
   start_dt: Date;
   conveners?: any[];
   colors?: EntryColors;
+  session_id?: number;
 }
 
 // Prop interface
@@ -73,6 +76,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     location_data: {inheriting: false},
     start_dt: newEntry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
     conveners: [],
+    session_id: -1,
   };
 
   const forms: {[key in EntryType]: React.ReactElement} = {
@@ -109,8 +113,8 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       column,
       maxColumn,
     } = data;
-    let type: EntryType = EntryType.SessionBlock;
 
+    let type;
     switch (objType) {
       case 'BREAK':
         type = EntryType.Break;
@@ -121,6 +125,8 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       case 'SESSION_BLOCK':
         type = EntryType.SessionBlock;
         break;
+      default:
+        throw new Error('Invalid entry type');
     }
 
     return {
@@ -129,40 +135,63 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       title,
       duration,
       startDt: moment(startDt),
-      textColor: colors ? colors.text : '',
-      backgroundColor: colors ? colors.background : '',
       x: x || 0,
       y: y || 0,
       column: column || 0,
       maxColumn: maxColumn || 0,
+      children: [],
+      // TODO: (Ajob) Get rid of hardcoded colors
+      textColor: colors ? colors.text : '',
+      backgroundColor: colors ? colors.background : '',
+      sessionId: data.session_id ? data.session_id : -1,
     };
   };
 
-  const handleSubmitContribution = async data => {
+  const _handleSubmitContribution = async data => {
+    data = _.pick(data, [
+      'title',
+      'duration',
+      'person_links',
+      'keywords',
+      'references',
+      'location_data',
+      'inheriting',
+      'start_dt',
+    ]);
+    data['event_id'] = eventId;
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
-  const handleSubmitSessionBlock = async data => {
+  const _handleSubmitSessionBlock = async data => {
     // data = _.omitBy(data, 'conveners'); // TODO person links
     // data.conveners = [];
-    data.start_dt = new Date(data.start_dt).toISOString();
-    return await indicoAxios.post(
-      sessionBlockCreateURL({event_id: eventId, session_id: data.session_id}),
-      data
-    );
+    // TODO: (Ajob) Evaluate if we should pass the session_id by url or not.
+    //              I presume not as we might get in the situation where we
+    //              like to create a session while creating a block.
+    data = _.pick(data, [
+      'title',
+      'duration',
+      'location_data',
+      'inheriting',
+      'start_dt',
+      'conveners',
+      'session_id',
+    ]);
+    return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
 
   // TODO: Implement logic for breaks
-  const handleSubmitBreak = async data => {
-    data.start_dt = new Date(data.start_dt).toISOString();
+  const _handleSubmitBreak = async data => {
+    data = _.pick(data, ['title', 'duration', 'location_data', 'inheriting', 'start_dt']);
+    // data.start_dt = new Date(data.start_dt).toISOString();
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
   const handleSubmit = async data => {
     const submitHandlers = {
-      [EntryType.Contribution]: handleSubmitContribution,
-      [EntryType.SessionBlock]: handleSubmitSessionBlock,
-      [EntryType.Break]: handleSubmitBreak,
+      [EntryType.Contribution]: _handleSubmitContribution,
+      [EntryType.SessionBlock]: _handleSubmitSessionBlock,
+      [EntryType.Break]: _handleSubmitBreak,
     };
 
     const submitHandler = submitHandlers[activeForm];
@@ -179,7 +208,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     resData.duration /= 60;
 
     const newTopLevelEntry = mapDataToEntry({type, ...resData});
+    console.log('The new toplevelentry', newTopLevelEntry);
     dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
+    console.log('post dispatch');
     onSubmit();
     onClose();
   };
