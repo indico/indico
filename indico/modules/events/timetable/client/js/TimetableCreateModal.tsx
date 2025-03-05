@@ -101,6 +101,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
 
   const mapDataToEntry = (data: any): TopLevelEntry => {
+    const {object} = data;
+    delete data['object'];
+    data['duration'] /= 60;
     const {
       id,
       title,
@@ -112,7 +115,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       x,
       column,
       maxColumn,
-    } = data;
+    } = {...object, ...data};
+
+    console.log(' the type is: ', {...object, ...data});
 
     let type;
     switch (objType) {
@@ -126,7 +131,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         type = EntryType.SessionBlock;
         break;
       default:
-        throw new Error('Invalid entry type');
+        throw new Error('Invalid entry type', objType);
     }
 
     return {
@@ -201,16 +206,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     }
 
     // TODO: (Ajob) Make sure that all create fns return the same way
-    const {
-      data: {type, object: resData},
-    } = await submitHandler(data);
-
-    resData.duration /= 60;
-
-    const newTopLevelEntry = mapDataToEntry({type, ...resData});
-    console.log('The new toplevelentry', newTopLevelEntry);
+    const {data: resData} = await submitHandler(data);
+    const newTopLevelEntry = mapDataToEntry(resData);
     dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
-    console.log('post dispatch');
     onSubmit();
     onClose();
   };
