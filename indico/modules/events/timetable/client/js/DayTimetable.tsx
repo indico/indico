@@ -286,7 +286,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
                     setNewEntry(null);
                     setIsModalOpen(false);
                   }}
-                  newEntry={newEntry}
+                  entry={newEntry}
                 />
               )}
             </div>

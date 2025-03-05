@@ -66,7 +66,7 @@ export interface BlockEntry extends BaseEntry, ScheduledMixin {
   children: ChildEntry[];
 }
 
-// TODO: Find correct place for these interfaces
+// TODO: (Ajob) Find correct place for these interfaces
 
 export interface LocationParent {
   venue: string;
@@ -75,6 +75,27 @@ export interface LocationParent {
   room_name: string;
   address: string;
   inheriting: boolean;
+}
+
+export interface RequestEntryObjectData {
+  description: string;
+  duration: number;
+  start_dt: string;
+  end_dt: string;
+  event_id: number;
+  location: Location;
+  title: string;
+  type: string;
+}
+
+export interface RequestEntryObject {
+  duration: number;
+  end_dt: string;
+  event_id: number;
+  id: number;
+  object: RequestEntryObjectData;
+  start_dt: string;
+  type: string;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;

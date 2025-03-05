@@ -18,7 +18,7 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
-import {EntryType, TopLevelEntry} from './types';
+import {EntryType, Requestentryect, TopLevelEntry} from './types';
 
 // Generic models
 
@@ -40,23 +40,27 @@ interface DraftEntry {
   conveners?: any[];
   colors?: EntryColors;
   session_id?: number;
+  code?: string;
+  id?: number; // Indicates whether or not we are editing an entry
 }
 
 // Prop interface
 interface TimetableCreateModalProps {
   eventId: number;
-  newEntry: any;
+  entry: any;
   onClose?: () => void;
   onSubmit?: () => void;
 }
 
 const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   eventId,
-  newEntry,
+  entry,
   onClose = () => null,
   onSubmit = () => null,
 }) => {
   const dispatch = useDispatch();
+
+  const isEditing = !!entry.id;
 
   const personLinkFieldParams = {
     allowAuthors: true,
@@ -69,14 +73,15 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
 
   const initialValues: DraftEntry = {
     title: '',
-    duration: newEntry.duration * 60,
     person_links: [],
     keywords: [],
     references: [],
     location_data: {inheriting: false},
-    start_dt: newEntry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
     conveners: [],
-    session_id: -1,
+    start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
+    duration: entry.duration * 60, // Minutes to seconds
+    session_id: null,
+    code: null,
   };
 
   const forms: {[key in EntryType]: React.ReactElement} = {
@@ -98,12 +103,16 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     ),
   };
 
-  const [activeForm, setActiveForm] = useState(Object.keys(forms)[0]);
+  console.log('etype', entry['type']);
 
+  // TODO: (Ajob) Implement properly in next issue on editing existing entries
+  const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
+
+  // TODO: (Ajob) Clean up 'Requestentryect' and use that type instead
   const mapDataToEntry = (data: any): TopLevelEntry => {
     const {object} = data;
     delete data['object'];
-    data['duration'] /= 60;
+    data['duration'] /= 60; // Seconds to minutes
     const {
       id,
       title,
@@ -115,9 +124,8 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       x,
       column,
       maxColumn,
+      session_id: sessionId,
     } = {...object, ...data};
-
-    console.log(' the type is: ', {...object, ...data});
 
     let type;
     switch (objType) {
@@ -148,7 +156,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       // TODO: (Ajob) Get rid of hardcoded colors
       textColor: colors ? colors.text : '',
       backgroundColor: colors ? colors.background : '',
-      sessionId: data.session_id ? data.session_id : -1,
+      sessionId: sessionId ? sessionId : -1,
     };
   };
 
@@ -163,7 +171,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       'inheriting',
       'start_dt',
     ]);
-    data['event_id'] = eventId;
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
@@ -205,9 +212,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       throw new Error('Invalid form or no submit function found');
     }
 
-    // TODO: (Ajob) Make sure that all create fns return the same way
     const {data: resData} = await submitHandler(data);
     const newTopLevelEntry = mapDataToEntry(resData);
+
     dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
     onSubmit();
     onClose();
