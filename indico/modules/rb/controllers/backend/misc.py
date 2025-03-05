@@ -18,6 +18,7 @@ from indico.modules.legal import legal_settings
 from indico.modules.rb import rb_cache, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.equipment import EquipmentType
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -128,7 +129,13 @@ class RHEquipmentTypes(RHRoomBookingBase):
         return jsonify(self._get_equipment_types())
 
 
-class RHPermissionTypes(RHRoomBookingBase):
+class RHRoomPermissionTypes(RHRoomBookingBase):
     def _process(self):
         permissions, tree, default = get_permissions_info(Room)
+        return jsonify(permissions=permissions, tree=tree, default=default)
+
+
+class RHLocationPermissionTypes(RHRoomBookingBase):
+    def _process(self):
+        permissions, tree, default = get_permissions_info(Location)
         return jsonify(permissions=permissions, tree=tree, default=default)

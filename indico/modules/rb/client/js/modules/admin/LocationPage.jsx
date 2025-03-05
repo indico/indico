@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import locationPermissionInfoURL from 'indico-url:rb.location_permission_types';
+
 import createDecorator from 'final-form-calculate';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -14,7 +16,10 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {List} from 'semantic-ui-react';
 
-import {validators as v, FinalDropdown, FinalInput} from 'indico/react/forms';
+import {ACLField} from 'indico/react/components';
+import {PermissionInfoProvider} from 'indico/react/components/principals/hooks';
+import {validators as v, FinalDropdown, FinalInput, FinalField} from 'indico/react/forms';
+import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {snakifyKeys} from 'indico/utils/case';
 
@@ -199,6 +204,30 @@ class LocationPage extends React.PureComponent {
           />
         )}
       </Field>
+      <FavoritesProvider>
+        {favoriteUsersController => (
+          <PermissionInfoProvider url={locationPermissionInfoURL()}>
+            {(permissionManager, permissionInfo) => (
+              <div style={{marginBottom: '20px'}}>
+                {permissionManager && permissionInfo && (
+                  <FinalField
+                    name="acl_entries"
+                    component={ACLField}
+                    favoriteUsersController={favoriteUsersController}
+                    label={Translate.string('Permissions')}
+                    permissions={false}
+                    readAccessAllowed={false}
+                    isEqual={_.isEqual}
+                    withGroups
+                    permissionInfo={permissionInfo}
+                    permissionManager={permissionManager}
+                  />
+                )}
+              </div>
+            )}
+          </PermissionInfoProvider>
+        )}
+      </FavoritesProvider>
     </>
   );
 
@@ -217,6 +246,7 @@ class LocationPage extends React.PureComponent {
       'room_name_format',
       'map_url_template',
       '_map_url_template_choice',
+      'acl_entries',
     ]);
     if (!loc.map_url_template) {
       loc.map_url_template = null;
@@ -246,6 +276,7 @@ class LocationPage extends React.PureComponent {
           room_name_format: '{building}/{floor}-{number}',
           _map_url_template_choice: 'none',
           map_url_template: null,
+          acl_entries: [],
         }}
         addFormProps={{decorators: [formDecorator]}}
         editFormProps={{decorators: [formDecorator]}}
