@@ -9,10 +9,10 @@
                 </div>
                 {% if session.user.is_admin %}
                     <div class="i-box-buttons i-box-align-buttons">
-                        <ind-user-block-button user-id={{ user.id }}
+                        <ind-user-block-button user-id="{{ user.id }}"
+                                               user-is-blocked="{{ user.is_blocked | tojson }}"
                                                user-first-name="{{ user.first_name }}"
-                                               user-last-name="{{ user.last_name }}"
-                                               {% if user.is_blocked %}user-is-blocked{% endif %}>
+                                               user-last-name="{{ user.last_name }}">
                         </ind-user-block-button>
                         {% if allow_deletion %}
                             <ind-user-delete-button user-id="{{ (user.id if user != session.user else none) | tojson }}"

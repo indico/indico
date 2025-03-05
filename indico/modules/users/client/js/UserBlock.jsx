@@ -175,7 +175,7 @@ customElements.define(
       ReactDOM.render(
         <UserBlock
           userId={JSON.parse(this.getAttribute('user-id'))}
-          isUserBlocked={this.getAttribute('user-is-blocked') !== null}
+          isUserBlocked={JSON.parse(this.getAttribute('user-is-blocked'))}
           firstName={this.getAttribute('user-first-name')}
           lastName={this.getAttribute('user-last-name')}
         />,
