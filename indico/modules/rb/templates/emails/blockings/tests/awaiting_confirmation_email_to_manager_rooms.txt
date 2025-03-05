@@ -7,7 +7,7 @@ Rooms:
     1/2-3
     
 Reason: Blocked
-Dates: 11 Nov 2022 - 11 Nov 2022
+Dates: 11/11/2022
 
 You can approve or reject this blocking request here:
 http://localhost/rooms/blocking/1
