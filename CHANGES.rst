@@ -44,6 +44,7 @@ Improvements
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
+- Modernize user block button UI (:pr:`6788`)
 
 Bugfixes
 ^^^^^^^^
