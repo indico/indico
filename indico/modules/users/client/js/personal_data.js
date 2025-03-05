@@ -5,8 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import PersonalDataForm from './PersonalDataForm.jsx';
-import UserBlock from './UserBlock.jsx';
-import UserDelete from './UserDelete.jsx';
-
-export {PersonalDataForm, UserDelete, UserBlock};
+import './PersonalDataForm.jsx';
+import './UserBlock.jsx';
+import './UserDelete.jsx';
