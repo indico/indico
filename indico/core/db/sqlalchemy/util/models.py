@@ -218,6 +218,8 @@ class IndicoModel(Model):
             if old_value != new_value:
                 # XXX: we copy because of https://github.com/sqlalchemy/sqlalchemy/issues/3913
                 changed[key] = (copy(old_value), copy(new_value))
+
+        print('we got to the populated model!')
         return changed if track_changes else None
 
     def populate_from_attrs(self, obj, attrs):

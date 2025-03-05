@@ -79,6 +79,7 @@ _bp.add_url_rule('/api/contributions/<int:contrib_id>', 'api_manage_contrib', ma
                  methods=('GET', 'PATCH'))
 _bp.add_url_rule('/api/contributions/create', 'api_create_contrib', management.RHAPIContributionCreate,
                  methods=('POST',))
+
 _bp.add_url_rule('/api/contributions/location-parent', 'api_contribs_location_parent',
                  management.RHAPIContributionsInheritedLocation)
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/location-parent', 'api_contrib_location_parent',

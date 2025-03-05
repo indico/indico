@@ -47,7 +47,7 @@ export function preprocessSessionData(
     Object.entries(data).map(([, s]) => [
       s.id,
       {
-        ..._.pick(s, ['title', 'isPoster']), // TODO(Duarte) get other attrs
+        ..._.pick(s, ['title', 'isPoster']), // TODO: (Duarte) get other attrs
         textColor: s.textColor,
         backgroundColor: s.color,
       },
@@ -61,8 +61,6 @@ export function preprocessTimetableEntries(
   data: Record<string, Record<string, SchemaBlock>>,
   eventInfo: {contributions?: {uniqueId: number; title: string; duration: number}[]}
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
-  // console.log(data);
-  // console.log('einfo', eventInfo);
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];

@@ -81,6 +81,34 @@ export default {
           ],
         };
       }
+      case actions.CREATE_ENTRY: {
+        const {entry} = action;
+        const {startDt} = entry;
+        const newEntries = {...state.changes[state.currentChangeIdx].entries};
+
+        const dayKey = moment(startDt)
+          .utc()
+          .format('YYYYMMDD');
+
+        newEntries[dayKey].push(entry);
+        newEntries[dayKey] = layout(newEntries[dayKey]);
+
+        console.log('new entries');
+        console.log(newEntries);
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'create',
+              unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+            },
+          ],
+        };
+      }
       case actions.RESIZE_ENTRY: {
         const {date, id, parentId, duration} = action;
         let newDayEntries;
@@ -210,6 +238,11 @@ export default {
     switch (action.type) {
       case actions.SET_SESSION_DATA:
         return preprocessSessionData(action.data);
+      case actions.ADD_SESSION_DATA:
+        return preprocessSessionData({
+          ...Object.fromEntries(Object.entries(state)),
+          [action.data.id]: {...action.data, isPoster: false},
+        });
       case actions.CHANGE_COLOR:
         return action.sessionId ? changeSessionColor(state, action.sessionId, action.color) : state;
       default:
