@@ -70,7 +70,7 @@ export function ShowIfInput({hasValueSelected}) {
           label={Translate.string('Has values')}
           placeholder={Translate.string('Select values...')}
           options={options}
-          format={value => (isMultipleChoice ? value : value[0])}
+          format={value => (isMultipleChoice || value === null ? value : value[0])}
           singleValueAsList={!isMultipleChoice}
           closeOnChange
           selection
