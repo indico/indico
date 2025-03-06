@@ -95,6 +95,7 @@ export default function FormItem({
   showIfFieldId,
   showIfFieldValues,
   htmlName,
+  defaultValue,
   ...rest
 }) {
   // TODO move outside like with setupActions etc?
@@ -191,9 +192,9 @@ export default function FormItem({
 
   useEffect(() => {
     if (!show && !setupMode) {
-      form.change(htmlName, undefined);
+      form.change(htmlName, defaultValue);
     }
-  }, [show, setupMode, form, htmlName]);
+  }, [show, setupMode, form, htmlName, defaultValue]);
 
   if (!show && !setupMode) {
     return null;
@@ -299,6 +300,8 @@ FormItem.propTypes = {
   showIfFieldId: PropTypes.number,
   /** The value of the field to use as condition for display */
   showIfFieldValues: PropTypes.node,
+  /** The default value for a given field **/
+  defaultValue: PropTypes.any,
   // ... and various other field-specific keys (billing, limited-places, other config)
 };
 
@@ -314,4 +317,5 @@ FormItem.defaultProps = {
   setupActions: null,
   showIfFieldId: null,
   showIfFieldValues: null,
+  defaultValue: null,
 };
