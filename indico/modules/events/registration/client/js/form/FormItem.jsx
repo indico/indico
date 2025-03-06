@@ -6,7 +6,8 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect} from 'react';
+import {useForm, useFormState} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Icon, Popup} from 'semantic-ui-react';
 
@@ -17,7 +18,7 @@ import {renderPluginComponents} from 'indico/utils/plugins';
 import {getManagement, getUpdateMode, isPaidItemLocked} from '../form_submission/selectors';
 
 import {getFieldRegistry} from './fields/registry';
-
+import {getItemById} from './selectors';
 import '../../styles/regform.module.scss';
 
 function PaidItemLocked({management}) {
@@ -63,6 +64,14 @@ ItemLocked.propTypes = {
   reason: PropTypes.string.isRequired,
 };
 
+function ItemHidden({reason}) {
+  return <Popup trigger={<Icon name="hide" />}>{reason}</Popup>;
+}
+
+ItemHidden.propTypes = {
+  reason: PropTypes.string.isRequired,
+};
+
 function renderAsFieldset(fieldOptions, meta) {
   if (typeof meta.renderAsFieldset === 'function') {
     return meta.renderAsFieldset(fieldOptions);
@@ -83,20 +92,29 @@ export default function FormItem({
   sortHandle,
   setupMode,
   setupActions,
+  showIfFieldId,
+  showIfFieldValues,
+  htmlName,
+  defaultValue,
   ...rest
 }) {
   // TODO move outside like with setupActions etc?
   const paidItemLocked = useSelector(state => isPaidItemLocked(state, id));
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
+  const conditionalField = useSelector(state => getItemById(state, showIfFieldId));
+  const formState = useFormState();
+  const form = useForm();
 
-  const {htmlName} = rest;
   const fieldRegistry = getFieldRegistry();
   const meta = fieldRegistry[inputType] || {};
   const InputComponent = meta.inputComponent;
   const inputProps = {title, description, isEnabled, fieldId: id, ...rest};
   const showPurged = !setupMode && isPurged;
   const disabled = !isEnabled || showPurged || !!lockedReason || (paidItemLocked && !isManagement);
+  if (!!showIfFieldValues && showIfFieldValues.length && showIfFieldValues.length <= 2) {
+    showIfFieldValues = showIfFieldValues[0];
+  }
 
   const fieldOptions = {
     id,
@@ -111,10 +129,29 @@ export default function FormItem({
     sortHandle,
     setupMode,
     setupActions,
+    showIfFieldId,
+    showIfFieldValues,
     ...rest,
     meta,
   };
 
+  const parseConditionalValues = value => {
+    if (typeof value === 'boolean') {
+      return value ? ['1'] : ['0'];
+    } else if (value !== null && typeof value === 'object') {
+      if (value.choice) {
+        return [value.choice];
+      }
+      return Object.entries(value)
+        .filter(([, enabled]) => enabled === 1)
+        .map(([key]) => key);
+    }
+    return value || undefined;
+  };
+
+  const conditionalValues = conditionalField
+    ? parseConditionalValues(formState.values[conditionalField.htmlName])
+    : undefined;
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
     retentionPeriodIcon = (
@@ -135,6 +172,8 @@ export default function FormItem({
   const showAsRequired = meta.alwaysRequired || isRequired;
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
+  const show =
+    !conditionalField || conditionalValues?.some(value => showIfFieldValues.includes(value));
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
@@ -145,10 +184,21 @@ export default function FormItem({
           disabled={disabled}
           isPurged={showPurged}
           htmlId={htmlId}
+          htmlName={htmlName}
           {...inputProps}
         />
       </>
     ) : null;
+
+  useEffect(() => {
+    if (!show && !setupMode) {
+      form.change(htmlName, defaultValue);
+    }
+  }, [show, setupMode, form, htmlName, defaultValue]);
+
+  if (!show && !setupMode) {
+    return null;
+  }
 
   return (
     <div
@@ -158,6 +208,7 @@ export default function FormItem({
         'purged-disabled': showPurged,
         'paid-disabled': !showPurged && paidItemLocked,
         'editable': setupMode,
+        'management-hidden': !show,
       })}`}
     >
       {sortHandle}
@@ -171,6 +222,7 @@ export default function FormItem({
               isPurged={showPurged}
               retentionPeriodIcon={retentionPeriodIcon}
               htmlId={htmlId}
+              htmlName={htmlName}
               {...inputProps}
             />
           ) : (
@@ -205,6 +257,9 @@ export default function FormItem({
       </div>
       {setupActions && <div styleName="actions">{setupActions}</div>}
       {lockedReason && <ItemLocked reason={lockedReason} />}
+      {!!showIfFieldId && setupMode && (
+        <ItemHidden reason={Translate.string('This field is conditionally shown')} />
+      )}
       {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
       {!lockedReason && !showPurged && paidItemLocked && (
         <PaidItemLocked management={isManagement} />
@@ -241,6 +296,12 @@ FormItem.propTypes = {
   setupMode: PropTypes.bool,
   /** Actions available during form setup */
   setupActions: PropTypes.node,
+  /** The ID of the field to use as condition for display */
+  showIfFieldId: PropTypes.number,
+  /** The value of the field to use as condition for display */
+  showIfFieldValues: PropTypes.node,
+  /** The default value for a given field **/
+  defaultValue: PropTypes.any,
   // ... and various other field-specific keys (billing, limited-places, other config)
 };
 
@@ -254,4 +315,7 @@ FormItem.defaultProps = {
   sortHandle: null,
   setupMode: false,
   setupActions: null,
+  showIfFieldId: null,
+  showIfFieldValues: null,
+  defaultValue: null,
 };
