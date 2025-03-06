@@ -29,7 +29,7 @@
   --horizontal-padding: 3em;
 
   display: grid;
-  grid-template-columns: auto 26em;
+  grid-template-columns: 1fr minmax(0, auto);
   grid-template-areas:
     'hd hd'
     'ct sb';
@@ -38,10 +38,8 @@
   background: #fff;
   margin-bottom: 0.75em;
   overflow-x: hidden;
-}
 
-@media (width < 66em) {
-  .category-container {
+  @media (width < 66em) {
     grid-template-columns: auto;
     grid-template-areas:
       'hd'
@@ -151,6 +149,7 @@
 
 .category-sidebar {
   grid-area: sb;
+  min-width: 26em;
 
   background: #fafafa;
   background-image: linear-gradient(to bottom, #fafafa 95%, #fff 100%);
