@@ -32,6 +32,7 @@ class AdminArea extends React.Component {
   static propTypes = {
     isAdmin: PropTypes.bool.isRequired,
     isMapEnabled: PropTypes.bool.isRequired,
+    isUserRBLocationManager: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
       fetchLocations: PropTypes.func.isRequired,
       fetchRooms: PropTypes.func.isRequired,
@@ -47,9 +48,9 @@ class AdminArea extends React.Component {
   }
 
   render() {
-    const {isAdmin, isMapEnabled} = this.props;
+    const {isAdmin, isMapEnabled, isUserRBLocationManager} = this.props;
 
-    if (!isAdmin) {
+    if (!isAdmin && !isUserRBLocationManager) {
       return null;
     }
 
@@ -90,6 +91,7 @@ export default connect(
   state => ({
     isAdmin: userSelectors.isUserRBAdmin(state),
     isMapEnabled: mapSelectors.isMapEnabled(state),
+    isUserRBLocationManager: userSelectors.isUserRBLocationManager(state),
   }),
   dispatch => ({
     actions: bindActionCreators(

@@ -384,24 +384,31 @@ class LocationsSchema(mm.SQLAlchemyAutoSchema):
 
 
 class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
-    can_delete = Function(lambda loc: not loc.rooms)
+    can_delete = Function(lambda loc: loc.can_delete(session.user) and not loc.rooms)
     acl_entries = PrincipalPermissionList(LocationPrincipal)
+    can_edit = Function(lambda loc: loc.can_edit(session.user))
 
     class Meta:
         model = Location
-        fields = ('id', 'name', 'can_delete', 'map_url_template', 'room_name_format', 'acl_entries')
+        fields = ('id', 'name', 'can_edit', 'can_delete', 'map_url_template', 'room_name_format', 'acl_entries')
 
 
 class RBUserSchema(UserSchema):
     has_owned_rooms = mm.Method('has_managed_rooms')
     is_rb_admin = mm.Function(lambda user: rb_is_admin(user))
+    is_rb_location_manager = mm.Method('has_managed_locations')
 
     class Meta:
-        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'is_admin', 'is_rb_admin', 'identifier', 'full_name')
+        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'is_admin', 'is_rb_admin', 'is_rb_location_manager',
+                  'identifier', 'full_name')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb.operations.rooms import has_managed_rooms
         return has_managed_rooms(user)
+
+    def has_managed_locations(self, user):
+        from indico.modules.rb.operations.locations import has_managed_locations
+        return has_managed_locations(user)
 
 
 class CreateBookingSchema(mm.Schema):

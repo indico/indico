@@ -23,6 +23,8 @@ import {FavoritesProvider} from 'indico/react/hooks';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {snakifyKeys} from 'indico/utils/case';
 
+import {selectors as userSelectors} from '../../common/user';
+
 import * as adminActions from './actions';
 import EditableList from './EditableList';
 import * as adminSelectors from './selectors';
@@ -62,6 +64,7 @@ class LocationPage extends React.PureComponent {
   static propTypes = {
     locations: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
+    canAddItem: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
       fetchLocations: PropTypes.func.isRequired,
       deleteLocation: PropTypes.func.isRequired,
@@ -262,6 +265,7 @@ class LocationPage extends React.PureComponent {
     const {
       isFetching,
       locations,
+      canAddItem,
       actions: {createLocation, updateLocation, deleteLocation},
     } = this.props;
 
@@ -282,6 +286,7 @@ class LocationPage extends React.PureComponent {
         editFormProps={{decorators: [formDecorator]}}
         renderItem={this.renderItem}
         canDeleteItem={loc => loc.canDelete}
+        canAddItem={canAddItem}
         renderAddForm={this.renderForm}
         renderEditForm={this.renderForm}
         renderDeleteMessage={this.renderDeleteMessage}
@@ -297,6 +302,7 @@ export default connect(
   state => ({
     locations: adminSelectors.getAllLocations(state),
     isFetching: adminSelectors.isFetchingLocations(state),
+    canAddItem: userSelectors.isUserRBAdmin(state),
   }),
   dispatch => ({
     actions: bindActionCreators(
