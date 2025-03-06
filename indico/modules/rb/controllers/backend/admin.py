@@ -11,7 +11,7 @@ from operator import itemgetter
 from flask import jsonify, request, session
 from marshmallow import missing, validate
 from PIL import Image
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
@@ -83,13 +83,12 @@ class RHLocations(RHRoomBookingAdminBase):
         self.location = Location.get_or_404(id_, is_deleted=False) if id_ is not None else None
 
     def _jsonify_one(self, location):
-        return jsonify(admin_locations_schema.dump(location, many=False))
+        return admin_locations_schema.jsonify(location, many=False)
 
     def _jsonify_many(self):
-        query = Location.query.filter(~Location.is_deleted).options(load_only('id'),
-                                                                    joinedload('acl_entries'))
+        query = Location.query.filter(~Location.is_deleted).options(joinedload('acl_entries'))
         locations = [loc for loc in query if loc.can_manage(session.user, allow_admin=True)]
-        return jsonify(admin_locations_schema.dump(locations))
+        return admin_locations_schema.jsonify(locations)
 
     def _process_GET(self):
         if self.location:
