@@ -382,7 +382,8 @@ class FileField(RegistrationFormFieldBase):
 
     def get_validators(self, existing_registration):
         def _check_field_upload(value):
-            file = File.query.filter_by(uuid=value).first()
+            if not (file := File.query.filter_by(uuid=value).first()):
+                raise ValidationError('The file no longer exists')
             if self.form_item.id != file.meta.get('regform_field_id'):
                 raise ValidationError('The file was not uploaded for this field')
 
