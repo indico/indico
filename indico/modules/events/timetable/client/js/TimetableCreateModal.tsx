@@ -240,7 +240,10 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     [EntryType.Break]: Translate.string('Break'),
   };
 
-  const canSubmit = () => {
+  const meetsSubmitConditions = () => {
+    // Allows to prevent submitting with pre-conditions, such as
+    // not having any sessions available for session blocks. Can
+    // be extended for other conditions and forms.
     if (activeForm === EntryType.SessionBlock) {
       return !!sessionValues.length;
     }
@@ -249,7 +252,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
 
   return (
     <FinalModalForm
-      id="timetable-create-form"
+      id="tt-create"
       onClose={onClose}
       onSubmit={handleSubmit}
       initialValues={initialValues}
@@ -263,9 +266,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       }
       noSubmitButton
       extraActions={
-        canSubmit() ? (
+        meetsSubmitConditions() ? (
           <FinalSubmitButton
-            form="timetable-create-form"
+            form="final-modal-form-tt-create"
             label={Translate.string('Submit')}
             disabledUntilChange
             disabledAfterSubmit
@@ -280,7 +283,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
               <Translate>Entry Type</Translate>
             </Header>
             <div>
-              {Object.keys(forms).map(key => (
+              {Object.keys(forms).map((key: EntryType) => (
                 <Button
                   key={key}
                   type="button"
