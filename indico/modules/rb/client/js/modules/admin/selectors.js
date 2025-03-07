@@ -10,7 +10,8 @@ import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
 
-const makeSorter = attr => (a, b) => a[attr].localeCompare(b[attr]);
+const makeSorter = attr => (a, b) =>
+  a[attr].localeCompare(b[attr], undefined, {numeric: true, sensitivity: 'base'});
 
 const _getAllLocations = ({admin}) => admin.locations;
 const _getAllRooms = ({admin}) => admin.rooms;
