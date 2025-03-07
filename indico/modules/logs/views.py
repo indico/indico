@@ -7,6 +7,7 @@
 
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events.management.views import WPEventManagement
+from indico.modules.users.views import WPUser
 
 
 class WPEventLogs(WPEventManagement):
@@ -16,5 +17,10 @@ class WPEventLogs(WPEventManagement):
 
 
 class WPCategoryLogs(WPCategoryManagement):
+    bundles = ('module_logs.js', 'module_logs.css')
+    template_prefix = 'logs/'
+
+
+class WPUserLogs(WPUser):
     bundles = ('module_logs.js', 'module_logs.css')
     template_prefix = 'logs/'
