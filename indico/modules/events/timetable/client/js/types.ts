@@ -14,6 +14,7 @@ export enum EntryType {
 }
 
 export interface Session {
+  id?: number;
   title: string;
   isPoster: boolean;
   textColor: string;

@@ -5,10 +5,10 @@ import sessionBlockCreateURL from 'indico-url:timetable.api_create_session_block
 import _ from 'lodash';
 import moment from 'moment';
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {Button, Divider, Header, Segment} from 'semantic-ui-react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Button, Divider, Header, Message, Segment} from 'semantic-ui-react';
 
-import {SessionSelect} from 'indico/react/components/SessionSelect';
+import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm} from 'indico/react/forms/final-form';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -18,7 +18,9 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
-import {EntryType, Requestentryect, TopLevelEntry} from './types';
+import {getSessions} from './selectors';
+import {SessionSelect} from './SessionSelect';
+import {EntryType, Session, TopLevelEntry} from './types';
 
 // Generic models
 
@@ -32,21 +34,23 @@ interface EntryColors {
 interface DraftEntry {
   title: string;
   duration: number;
-  person_links: any[];
   keywords: string[];
   references: string[];
   location_data: object;
   start_dt: Date;
+  person_links?: any[];
   conveners?: any[];
+  description?: string;
   colors?: EntryColors;
   session_id?: number;
   code?: string;
-  id?: number; // Indicates whether or not we are editing an entry
+  id?: number;
 }
 
 // Prop interface
 interface TimetableCreateModalProps {
   eventId: number;
+  // TODO: (Ajob) Replace with proper passed entry, probably define it higher in hierarchy
   entry: any;
   onClose?: () => void;
   onSubmit?: () => void;
@@ -73,6 +77,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
 
   const initialValues: DraftEntry = {
     title: '',
+    description: '',
     person_links: [],
     keywords: [],
     references: [],
@@ -84,6 +89,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     code: null,
   };
 
+  const sessions = useSelector(getSessions);
+  const sessionValues: Session[] = Object.values(sessions);
+
   const forms: {[key in EntryType]: React.ReactElement} = {
     [EntryType.Contribution]: (
       <ContributionFormFields
@@ -92,11 +100,18 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         personLinkFieldParams={personLinkFieldParams}
       />
     ),
-    [EntryType.SessionBlock]: (
+    [EntryType.SessionBlock]: sessionValues.length ? (
       <>
-        <SessionSelect eventId={eventId} required />
+        <SessionSelect sessions={sessionValues} required />
         <SessionBlockFormFields eventId={eventId} locationParent={undefined} />
       </>
+    ) : (
+      <Message
+        icon="question circle"
+        header={Translate.string('No sessions available')}
+        color="yellow"
+        content={Translate.string('Please create a session before creating a session block.')}
+      />
     ),
     [EntryType.Break]: (
       <BreakFormFields eventId={eventId} locationParent={undefined} initialValues={initialValues} />
@@ -106,8 +121,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
 
-  // TODO: (Ajob) Clean up 'Requestentryect' and use that type instead
-  const mapDataToEntry = (data: any): TopLevelEntry => {
+  const _mapDataToEntry = (data): TopLevelEntry => {
     const {object} = data;
     delete data['object'];
     data['duration'] /= 60; // Seconds to minutes
@@ -151,10 +165,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       column: column || 0,
       maxColumn: maxColumn || 0,
       children: [],
-      // TODO: (Ajob) Get rid of hardcoded colors
       textColor: colors ? colors.text : '',
       backgroundColor: colors ? colors.background : '',
-      sessionId: sessionId ? sessionId : -1,
+      sessionId: sessionId ? sessionId : null,
     };
   };
 
@@ -175,9 +188,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   const _handleSubmitSessionBlock = async data => {
     // data = _.omitBy(data, 'conveners'); // TODO person links
     // data.conveners = [];
-    // TODO: (Ajob) Evaluate if we should pass the session_id by url or not.
-    //              I presume not as we might get in the situation where we
-    //              like to create a session while creating a block.
     data = _.pick(data, [
       'title',
       'duration',
@@ -210,15 +220,18 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     }
 
     const {data: resData} = await submitHandler(data);
-    const newTopLevelEntry = mapDataToEntry(resData);
+    const newTopLevelEntry = _mapDataToEntry(resData);
 
     dispatch(actions.createEntry(newTopLevelEntry.type, newTopLevelEntry));
     onSubmit();
     onClose();
   };
 
-  const changeForm = (key: string) => {
+  const changeForm = (key: EntryType) => {
     setActiveForm(key);
+    if (key === EntryType.SessionBlock && !sessionValues.length) {
+      forms[activeForm];
+    }
   };
 
   const btnNames = {
@@ -227,9 +240,17 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     [EntryType.Break]: Translate.string('Break'),
   };
 
+  const canSubmit = () => {
+    console.log('activeForm', activeForm);
+    if (activeForm === EntryType.SessionBlock) {
+      return !!sessionValues.length;
+    }
+    return true;
+  };
+
   return (
     <FinalModalForm
-      id="contribution-form"
+      id="timetable-create-form"
       onClose={onClose}
       onSubmit={handleSubmit}
       initialValues={initialValues}
@@ -240,6 +261,17 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         isEditing
           ? Translate.string('Edit timetable entry')
           : Translate.string('Create new timetable entry')
+      }
+      noSubmitButton
+      extraActions={
+        canSubmit() ? (
+          <FinalSubmitButton
+            form="timetable-create-form"
+            label={Translate.string('Submit')}
+            disabledUntilChange
+            disabledAfterSubmit
+          />
+        ) : null
       }
     >
       {!isEditing && (

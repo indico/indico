@@ -5,35 +5,30 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import sessionListURL from 'indico-url:sessions.api_session_list';
-
 import React from 'react';
 import {Label} from 'semantic-ui-react';
 
-import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-import {FinalDropdown} from '../forms';
+import {FinalDropdown} from '../../../../../web/client/js/react/forms';
 
-interface Session {
-  id: number;
-  title: string;
-  colors: {
-    background: string;
-    text: string;
-  };
+import {Session} from './types';
+
+interface SessionOption {
+  key: string;
+  text: string | React.ReactNode;
+  value: number;
 }
 
 interface SessionSelectProps {
-  eventId: number;
-  onChange?: (value: any) => void;
-  required?: boolean;
+  sessions?: Session[];
+  [key: string]: unknown;
 }
 
 const processSessions = (sessions: Session[]) => {
   return sessions.length
-    ? sessions.flatMap(session => {
-        const {background, text} = session.colors;
+    ? sessions.flatMap((session: Session): SessionOption[] => {
+        const {backgroundColor: background, textColor: text} = session;
         return [
           {
             key: `session:${session.id}`,
@@ -45,20 +40,20 @@ const processSessions = (sessions: Session[]) => {
     : [];
 };
 
-export function SessionSelect({eventId, required}: SessionSelectProps) {
-  const {data} = useIndicoAxios(sessionListURL({event_id: eventId}), {camelize: true});
-  const sessions = processSessions(data || []);
+export function SessionSelect({sessions, ...rest}: SessionSelectProps) {
+  const sessionOptions = processSessions(sessions || []);
 
   return (
     <FinalDropdown
       name="session_id"
       label={Translate.string('Session')}
       placeholder={Translate.string('Select a session')}
-      options={sessions}
-      required={required}
+      options={sessionOptions}
       selection
       search={false}
       multiple={false}
+      disabled={!sessions.length}
+      {...rest}
     />
   );
 }

@@ -234,6 +234,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
 
     function onKeyDown(event: KeyboardEvent) {
+      // TODO: (Ajob) Get rid of memory-leak warning
       if (event.key === 'Escape') {
         setIsDragging(false);
         setNewEntry(null);
