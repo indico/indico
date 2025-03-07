@@ -122,8 +122,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
 
   const _mapPersonLinkToSchema = data => {
-    console.log('The data');
-    console.log(data);
     return {
       title: data.title,
       name: data.name,
@@ -189,8 +187,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       sessionId: sessionId ? sessionId : null,
     };
 
-    console.log(Object.keys(data));
-
     return mappedObj;
   };
 
@@ -219,9 +215,10 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       'location_data',
       'inheriting',
       'start_dt',
-      'conveners',
+      'person_links',
       'session_id',
     ]);
+    data.person_links = data.person_links.map(_mapPersonLinkToSchema);
     return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
 
