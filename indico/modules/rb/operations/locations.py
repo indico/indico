@@ -31,8 +31,9 @@ def _query_managed_location(user):
 
 
 def _query_all_locations_for_acl_check():
-    return (Location.query.filter(~Location.is_deleted).options(load_only('id'),
-                                                                joinedload('acl_entries')))
+    return (Location.query
+            .filter(~Location.is_deleted)
+            .options(load_only('id'), joinedload('acl_entries')))
 
 
 @memoize_redis(900)
