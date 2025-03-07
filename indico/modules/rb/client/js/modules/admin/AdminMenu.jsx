@@ -51,7 +51,7 @@ function AdminMenu({
   isFetchingLocations,
   isMapEnabled,
   actions: {clearTextFilter},
-  isRBLocationManager,
+  isAdmin,
 }) {
   if (isFetchingLocations) {
     return renderMenuPlaceholder();
@@ -60,7 +60,7 @@ function AdminMenu({
   const locationURL = locationId => `/admin/locations/${locationId}`;
   return (
     <Menu size="large" styleName="admin-menu" vertical fluid>
-      {!isRBLocationManager && (
+      {isAdmin && (
         <>
           <Menu.Item>
             <NavLink exact to="/admin">
@@ -124,7 +124,7 @@ AdminMenu.propTypes = {
   locations: PropTypes.array.isRequired,
   isFetchingLocations: PropTypes.bool.isRequired,
   isMapEnabled: PropTypes.bool.isRequired,
-  isRBLocationManager: PropTypes.bool.isRequired,
+  isAdmin: PropTypes.bool.isRequired,
   actions: PropTypes.exact({
     clearTextFilter: PropTypes.func.isRequired,
   }).isRequired,
@@ -136,7 +136,7 @@ export default withRouter(
       locations: adminSelectors.getAllLocations(state),
       isMapEnabled: mapSelectors.isMapEnabled(state),
       isFetchingLocations: adminSelectors.isFetchingLocations(state),
-      isRBLocationManager: userSelectors.isUserRBLocationManager(state),
+      isAdmin: userSelectors.isUserRBAdmin(state),
     }),
     dispatch => ({
       actions: bindActionCreators(

@@ -72,7 +72,9 @@ class RHSettings(RHRoomBookingAdminBase):
 
 class RHLocations(RHRoomBookingAdminBase):
     def _skip_admin_check(self):
-        if rb_is_location_manager(session.user):
+        # allow location managers to view/manage their location
+        if request.method in {'GET', 'PATCH'} and ((not self.location and rb_is_location_manager(session.user))
+                                                   or (self.location and self.location.can_manage(session.user))):
             return True
         # GET on this endpoint does not expose anything sensitive, so
         # we allow any room manager to use it if they can edit rooms
@@ -240,11 +242,12 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
 class RHAttributes(RHRoomBookingAdminBase):
     def _skip_admin_check(self):
-        if rb_is_location_manager(session.user):
-            return True
         # GET on this endpoint does not expose anything sensitive, so
         # we allow any room manager to use it if they can edit rooms
-        return request.method == 'GET' and rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user)
+        return request.method == 'GET' and (
+            rb_is_location_manager(session.user)
+            or (rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user))
+        )
 
     def _process_args(self):
         id_ = request.view_args.get('attribute_id')
@@ -397,7 +400,7 @@ class RHRoom(RHRoomAdminBase):
         return '', 204
 
     def _process_DELETE(self):
-        if not rb_is_admin(session.user) and not self.room.location.can_manage(session.user):
+        if not self.room.location.can_manage(session.user):
             raise Forbidden
         logger.info('Room %r deleted by %r', self.room, session.user)
         self.room.is_deleted = True
@@ -444,6 +447,9 @@ class RHRooms(RHRoomBookingAdminBase):
     @use_kwargs({'location_id': fields.Int(required=True)})
     @use_args(RoomUpdateArgsSchema)
     def _process_POST(self, args, location_id):
+        location = Location.get_or_404(location_id, is_deleted=False)
+        if not location.can_manage(session.user):
+            raise Forbidden
         room = Room()
         args['location_id'] = location_id
         update_room(room, args)

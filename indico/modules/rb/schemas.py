@@ -386,7 +386,7 @@ class LocationsSchema(mm.SQLAlchemyAutoSchema):
 class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
     can_delete = Function(lambda loc: loc.can_delete(session.user) and not loc.rooms)
     acl_entries = PrincipalPermissionList(LocationPrincipal)
-    can_edit = Function(lambda loc: loc.can_edit(session.user))
+    can_edit = Function(lambda loc: loc.can_manage(session.user))
 
     class Meta:
         model = Location
