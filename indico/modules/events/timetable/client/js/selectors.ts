@@ -27,7 +27,9 @@ export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
 
 export const getEventId = createSelector(
   getStaticData,
-  staticData => staticData.eventId
+  staticData => {
+    return staticData.eventId;
+  }
 );
 export const getEventStartDt = createSelector(
   getStaticData,

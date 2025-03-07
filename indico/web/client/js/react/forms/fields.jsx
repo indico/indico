@@ -357,7 +357,6 @@ ComboDropdownAdapter.defaultProps = {
 
 function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
   // TODO: Make more props overridable
-  // console.log('start_dt', value);
 
   const markTouched = () => {
     onFocus();
@@ -434,7 +433,6 @@ function DateTimePickerComponent({
   maxEndDt,
 }) {
   const [dateValue, timeValue] = value.split('T');
-  // console.log('start_dt split', value, dateValue, timeValue);
 
   const handleDateChange = newDate => onChange(`${newDate || ''}T${timeValue}`);
   const handleTimeChange = newTime =>

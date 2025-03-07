@@ -78,8 +78,7 @@ export function BreakFormFields({
                 label={Translate.string('Location')}
                 locationParent={locationParent}
             />
-            {/* TODO: Add colors to base model */}
-            {/* <FinalSessionColorPicker name="colors" label={Translate.string('Color')} /> */}
+            <FinalSessionColorPicker name="colors" label={Translate.string('Color')} />
         </>
     );
 }

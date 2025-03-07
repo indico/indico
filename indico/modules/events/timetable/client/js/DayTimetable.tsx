@@ -17,16 +17,17 @@ import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
 import TimetableCreateModal from './TimetableCreateModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, ScheduledMixin} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
 
-interface TimetableEntry extends Omit<TopLevelEntry, 'id'> {
-  id: number;
-  width: string;
+interface DraftEntry extends Omit<ScheduledMixin, 'id' | 'type'> {
+  title: string;
+  duration: number;
+  width: number | string;
 }
 
 interface DayTimetableProps {
@@ -89,7 +90,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [newEntry, setNewEntry] = useState<TimetableEntry | null>(null);
+  const [newEntry, setNewEntry] = useState<DraftEntry | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -203,13 +204,12 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
       setIsDragging(true);
       setNewEntry({
-        id: -1,
-        type: 'contrib',
         startDt,
-        duration: GRID_SIZE_MINUTES, // TODO: Replace with default duration
+        duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
         y,
         title: 'New entry',
         width: '100%',
+        x: 0,
         column: 0,
         maxColumn: 0,
       });

@@ -103,8 +103,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     ),
   };
 
-  console.log('etype', entry['type']);
-
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
 
@@ -194,8 +192,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
 
   // TODO: Implement logic for breaks
   const _handleSubmitBreak = async data => {
-    data = _.pick(data, ['title', 'duration', 'location_data', 'inheriting', 'start_dt']);
-    // data.start_dt = new Date(data.start_dt).toISOString();
+    data = _.pick(data, ['title', 'duration', 'location_data', 'inheriting', 'start_dt', 'colors']);
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
@@ -229,6 +226,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     [EntryType.SessionBlock]: Translate.string('Session Block'),
     [EntryType.Break]: Translate.string('Break'),
   };
+
   return (
     <FinalModalForm
       id="contribution-form"
@@ -238,28 +236,36 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       disabledUntilChange={false}
       keepDirtyOnReinitialize
       size="small"
-      header={Translate.string('Create new timetable entry')}
+      header={
+        isEditing
+          ? Translate.string('Edit timetable entry')
+          : Translate.string('Create new timetable entry')
+      }
     >
-      <Segment textAlign="center">
-        <Header as="h4">
-          <Translate>Entry Type</Translate>
-        </Header>
-        <div>
-          {Object.keys(forms).map(key => (
-            <Button
-              key={key}
-              type="button"
-              onClick={() => {
-                changeForm(key);
-              }}
-              color={activeForm === key ? 'blue' : undefined}
-            >
-              {btnNames[key]}
-            </Button>
-          ))}
-        </div>
-      </Segment>
-      <Divider />
+      {!isEditing && (
+        <>
+          <Segment textAlign="center">
+            <Header as="h4">
+              <Translate>Entry Type</Translate>
+            </Header>
+            <div>
+              {Object.keys(forms).map(key => (
+                <Button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    changeForm(key);
+                  }}
+                  color={activeForm === key ? 'blue' : undefined}
+                >
+                  {btnNames[key]}
+                </Button>
+              ))}
+            </div>
+          </Segment>
+          <Divider />
+        </>
+      )}
       {forms[activeForm]}
     </FinalModalForm>
   );

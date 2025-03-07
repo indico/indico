@@ -82,19 +82,16 @@ export default {
         };
       }
       case actions.CREATE_ENTRY: {
-        const {entry} = action;
-        const {startDt} = entry;
+        const {
+          entry,
+          entry: {startDt},
+        } = action;
         const newEntries = {...state.changes[state.currentChangeIdx].entries};
 
-        const dayKey = moment(startDt)
-          .utc()
-          .format('YYYYMMDD');
+        const dayKey = moment(startDt).format('YYYYMMDD');
 
         newEntries[dayKey].push(entry);
         newEntries[dayKey] = layout(newEntries[dayKey]);
-
-        console.log('new entries');
-        console.log(newEntries);
 
         return {
           ...state,
