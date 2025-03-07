@@ -90,7 +90,7 @@ class RHLocations(RHRoomBookingAdminBase):
 
     def _jsonify_many(self):
         query = Location.query.filter(~Location.is_deleted).options(joinedload('acl_entries'))
-        locations = [loc for loc in query if loc.can_manage(session.user, allow_admin=True)]
+        locations = [loc for loc in query if loc.can_manage(session.user)]
         return admin_locations_schema.jsonify(locations)
 
     def _process_GET(self):
