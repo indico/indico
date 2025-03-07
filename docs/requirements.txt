@@ -33,7 +33,7 @@ imagesize==1.4.1
     # via sphinx
 itsdangerous==2.2.0
     # via flask
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   flask
     #   flask-babel
