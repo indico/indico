@@ -29,8 +29,8 @@ interface EntryColors {
   text: string;
 }
 
-// TOOD: (Ajob) Make for each entry an interface and then make
-//              the draftentry be the union of it.
+// TOOD: (Ajob) Make an interface for each entry and then make
+//              the draftentry the union of it.
 interface DraftEntry {
   title: string;
   duration: number;
@@ -121,6 +121,25 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
 
+  const _mapPersonLinkToSchema = data => {
+    console.log('The data');
+    console.log(data);
+    return {
+      title: data.title,
+      name: data.name,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      affiliation: data.affiliation,
+      affiliation_id: data.affiliationId,
+      email: data.email,
+      address: data.address,
+      phone: data.phone,
+      roles: data.roles,
+      type: data.type,
+      avatar_url: data.avatarURL,
+    };
+  };
+
   const _mapDataToEntry = (data): TopLevelEntry => {
     const {object} = data;
     delete data['object'];
@@ -154,7 +173,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         throw new Error('Invalid entry type', objType);
     }
 
-    return {
+    const mappedObj = {
       id: id || -1,
       type,
       title,
@@ -169,6 +188,10 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       backgroundColor: colors ? colors.background : '',
       sessionId: sessionId ? sessionId : null,
     };
+
+    console.log(Object.keys(data));
+
+    return mappedObj;
   };
 
   const _handleSubmitContribution = async data => {
@@ -182,6 +205,8 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       'inheriting',
       'start_dt',
     ]);
+    data['person_link_data'] = data.person_links.map(_mapPersonLinkToSchema);
+    delete data.person_links;
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
@@ -271,7 +296,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
             form="final-modal-form-tt-create"
             label={Translate.string('Submit')}
             disabledUntilChange
-            disabledAfterSubmit
           />
         ) : null
       }
