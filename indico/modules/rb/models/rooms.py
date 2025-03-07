@@ -508,22 +508,38 @@ class Room(ProtectionManagersMixin, db.Model):
 
         criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
         for group in user.local_groups:
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,  # noqa: PERF401
-                                    RoomPrincipal.local_group_id == group.id))
+            criteria.append(  # noqa: PERF401
+                db.and_(
+                    RoomPrincipal.type == PrincipalType.local_group,
+                    RoomPrincipal.local_group_id == group.id,
+                )
+            )
         for group in user.iter_all_multipass_groups():
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,  # noqa: PERF401
-                                    RoomPrincipal.multipass_group_provider == group.provider.name,
-                                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
+            criteria.append(  # noqa: PERF401
+                db.and_(
+                    RoomPrincipal.type == PrincipalType.multipass_group,
+                    RoomPrincipal.multipass_group_provider == group.provider.name,
+                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
+                )
+            )
 
         location_criteria = [db.and_(LocationPrincipal.type == PrincipalType.user,
                                      LocationPrincipal.user_id == user.id)]
         for group in user.local_groups:
-            location_criteria.append(db.and_(LocationPrincipal.type == PrincipalType.local_group,  # noqa: PERF401
-                                    LocationPrincipal.local_group_id == group.id))
+            location_criteria.append(  # noqa: PERF401
+                db.and_(
+                    LocationPrincipal.type == PrincipalType.local_group,
+                    LocationPrincipal.local_group_id == group.id,
+                )
+            )
         for group in user.iter_all_multipass_groups():
-            location_criteria.append(db.and_(LocationPrincipal.type == PrincipalType.multipass_group,  # noqa: PERF401
-                                    LocationPrincipal.multipass_group_provider == group.provider.name,
-                                    db.func.lower(LocationPrincipal.multipass_group_name) == group.name.lower()))
+            location_criteria.append(  # noqa: PERF401
+                db.and_(
+                    LocationPrincipal.type == PrincipalType.multipass_group,
+                    LocationPrincipal.multipass_group_provider == group.provider.name,
+                    db.func.lower(LocationPrincipal.multipass_group_name) == group.name.lower(),
+                )
+            )
 
         data = {}
         permissions = {'book', 'prebook', 'override', 'moderate', 'manage'}
