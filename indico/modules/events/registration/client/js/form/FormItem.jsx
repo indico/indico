@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
-import {useForm, useFormState} from 'react-final-form';
+import {useForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 import {Form, Icon, Popup} from 'semantic-ui-react';
 
@@ -96,6 +96,7 @@ export default function FormItem({
   showIfFieldValues,
   htmlName,
   defaultValue,
+  fieldValues,
   ...rest
 }) {
   // TODO move outside like with setupActions etc?
@@ -103,7 +104,6 @@ export default function FormItem({
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
   const conditionalField = useSelector(state => getItemById(state, showIfFieldId));
-  const formState = useFormState();
   const form = useForm();
 
   const fieldRegistry = getFieldRegistry();
@@ -150,7 +150,7 @@ export default function FormItem({
   };
 
   const conditionalValues = conditionalField
-    ? parseConditionalValues(formState.values[conditionalField.htmlName])
+    ? parseConditionalValues(fieldValues[conditionalField.htmlName])
     : undefined;
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
@@ -302,6 +302,8 @@ FormItem.propTypes = {
   showIfFieldValues: PropTypes.node,
   /** The default value for a given field **/
   defaultValue: PropTypes.any,
+  /** Rest of the form's fields */
+  fieldValues: PropTypes.object,
   // ... and various other field-specific keys (billing, limited-places, other config)
 };
 
@@ -318,4 +320,5 @@ FormItem.defaultProps = {
   showIfFieldId: null,
   showIfFieldValues: null,
   defaultValue: null,
+  fieldValues: {},
 };
