@@ -621,9 +621,10 @@ class Room(ProtectionManagersMixin, db.Model):
             return False
         if self.is_public and not self.reservations_need_confirmation:
             return True
-        if self.location.can_manage(user, permission='book', allow_admin=allow_admin):
-            return True
-        return self.can_manage(user, permission='book', allow_admin=allow_admin)
+        return (
+            self.can_manage(user, permission='book', allow_admin=allow_admin) or
+            self.location.can_manage(user, permission='book', allow_admin=allow_admin)
+        )
 
     def can_prebook(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
@@ -637,9 +638,10 @@ class Room(ProtectionManagersMixin, db.Model):
         # up for admins or room managers unless they are actually in the ACL with the prebook
         # permission.
         explicit = not self.reservations_need_confirmation
-        if self.location.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit):
-            return True
-        return self.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit)
+        return (
+            self.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit) or
+            self.location.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit)
+        )
 
     def can_override(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
@@ -647,9 +649,10 @@ class Room(ProtectionManagersMixin, db.Model):
 
     def can_moderate(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
-        if self.location.can_manage(user, permission='moderate', allow_admin=allow_admin):
-            return True
-        return self.can_manage(user, permission='moderate', allow_admin=allow_admin)
+        return (
+           self.can_manage(user, permission='moderate', allow_admin=allow_admin) or
+           self.location.can_manage(user, permission='moderate', allow_admin=allow_admin)
+        )
 
     def can_edit(self, user):
         if not user:
