@@ -186,4 +186,4 @@ parenthesize-tuple-in-subscript = true
 # latex generation is much more readable without curly braces used for formatting
 'indico/util/mdx_latex.py' = ['UP031']
 # vendored code - don't care about most stuff in there
-'indico/vendor/*.py' = ['N', 'F841', 'UP', 'D', 'PIE', 'TID252', 'TRY']
+'indico/vendor/*.py' = ['N', 'F841', 'UP', 'D', 'PIE', 'TID252', 'TRY', 'RUF059']
