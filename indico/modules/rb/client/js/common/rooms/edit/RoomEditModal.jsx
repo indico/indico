@@ -203,8 +203,9 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
+    let {attributes} = changedValues;
+    const isAttributesDirty = form.getFieldState('attributes').dirty;
     const {
-      attributes,
       bookable_hours: bookableHours,
       nonbookable_periods: nonbookablePeriods,
       available_equipment: availableEquipment,
@@ -224,6 +225,9 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
         await indicoAxios.post(updateRoomEquipmentURL(roomIdArgs), {
           available_equipment: availableEquipment,
         });
+      }
+      if (!attributes && isAttributesDirty) {
+        attributes = [];
       }
       if (attributes) {
         await indicoAxios.post(updateRoomAttributesURL(roomIdArgs), {attributes});
