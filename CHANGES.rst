@@ -12,10 +12,13 @@ Security fixes
 
 - Update the `Jinja2 <https://pypi.org/project/Jinja2/>`__ library due to a
   sandbox escape vulnerability (:cve:`2025-27516`).
-  Since document templates can only be managed by Indico admins (unless granted to
-  specific other trusted users as well), the impact of this vulnerability is considered
-  low, but a malicious admin could abuse this to read e.g. ``indico.conf`` data, which
-  is otherwise only accessible with direct server access.
+
+.. note::
+    Since document templates can only be managed by Indico admins (unless granted to
+    specific other trusted users as well), the impact of this vulnerability is considered
+    low to medium, as it would require a malicious admin to abuse this e.g. to to read
+    ``indico.conf`` data, which is otherwise only accessible to people with direct server
+    access.
 
 Improvements
 ^^^^^^^^^^^^
