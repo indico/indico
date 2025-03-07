@@ -42,6 +42,7 @@ from indico.modules.rb.util import (WEEKDAYS, build_rooms_spritesheet, get_resiz
 from indico.util.date_time import overlaps
 from indico.util.i18n import _
 from indico.util.iterables import group_list
+from indico.util.marshmallow import ModelField
 from indico.web.args import use_args, use_kwargs, use_rh_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
@@ -444,14 +445,13 @@ class RHRooms(RHRoomBookingAdminBase):
         rooms = Room.query.filter_by(is_deleted=False).order_by(db.func.indico.natsort(Room.full_name)).all()
         return AdminRoomSchema().jsonify(rooms, many=True)
 
-    @use_kwargs({'location_id': fields.Int(required=True)})
+    @use_kwargs({'location': ModelField(Location, filter_deleted=True, required=True, data_key='location_id')})
     @use_args(RoomUpdateArgsSchema)
-    def _process_POST(self, args, location_id):
-        location = Location.get_or_404(location_id, is_deleted=False)
+    def _process_POST(self, args, location):
         if not location.can_manage(session.user):
             raise Forbidden
         room = Room()
-        args['location_id'] = location_id
+        args['location'] = location
         update_room(room, args)
         db.session.add(room)
         db.session.flush()
