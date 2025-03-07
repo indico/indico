@@ -531,7 +531,7 @@ class Room(ProtectionManagersMixin, db.Model):
         non_reservable_rooms = set()
         for room in all_rooms_query:
             is_owner = user == room.owner
-            is_location_manager = room.location.can_manage(user)
+            is_location_manager = room.location.can_manage(user, allow_admin=allow_admin)
             data[room.id] = dict.fromkeys(permissions, False)
             if room.reservations_need_confirmation:
                 prebooking_required_rooms.add(room.id)
@@ -539,7 +539,8 @@ class Room(ProtectionManagersMixin, db.Model):
                 non_reservable_rooms.add(room.id)
             if ((room.is_reservable and (room.is_public or is_owner or is_location_manager))
                 or (is_admin and allow_admin)):
-                if not room.reservations_need_confirmation or is_owner or (is_admin and allow_admin):
+                if (not room.reservations_need_confirmation or is_owner or is_location_manager or
+                        (is_admin and allow_admin)):
                     data[room.id]['book'] = True
                 if room.reservations_need_confirmation:
                     data[room.id]['prebook'] = True
