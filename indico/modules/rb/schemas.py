@@ -25,7 +25,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
-from indico.modules.rb.models.principals import RoomPrincipal
+from indico.modules.rb.models.principals import LocationPrincipal, RoomPrincipal
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import (ReservationOccurrence, ReservationOccurrenceLink,
                                                               ReservationOccurrenceState)
@@ -384,23 +384,31 @@ class LocationsSchema(mm.SQLAlchemyAutoSchema):
 
 
 class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
-    can_delete = Function(lambda loc: not loc.rooms)
+    can_delete = Function(lambda loc: loc.can_delete(session.user) and not loc.rooms)
+    acl_entries = PrincipalPermissionList(LocationPrincipal)
+    can_edit = Function(lambda loc: loc.can_manage(session.user))
 
     class Meta:
         model = Location
-        fields = ('id', 'name', 'can_delete', 'map_url_template', 'room_name_format')
+        fields = ('id', 'name', 'can_edit', 'can_delete', 'map_url_template', 'room_name_format', 'acl_entries')
 
 
 class RBUserSchema(UserSchema):
     has_owned_rooms = mm.Method('has_managed_rooms')
     is_rb_admin = mm.Function(lambda user: rb_is_admin(user))
+    is_rb_location_manager = mm.Method('has_managed_locations')
 
     class Meta:
-        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'is_admin', 'is_rb_admin', 'identifier', 'full_name')
+        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'is_admin', 'is_rb_admin', 'is_rb_location_manager',
+                  'identifier', 'full_name')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb.operations.rooms import has_managed_rooms
         return has_managed_rooms(user)
+
+    def has_managed_locations(self, user):
+        from indico.modules.rb.operations.locations import has_managed_locations
+        return has_managed_locations(user)
 
 
 class CreateBookingSchema(mm.Schema):
@@ -491,6 +499,7 @@ class LocationArgs(mm.Schema):
     name = fields.String(required=True)
     room_name_format = fields.String(required=True)
     map_url_template = fields.URL(schemes={'http', 'https'}, allow_none=True, load_default='')
+    acl_entries = PrincipalPermissionList(LocationPrincipal)
 
     @validates('name')
     def _check_name_unique(self, name, **kwargs):

@@ -10,7 +10,6 @@ import eventCategoryRolesURL from 'indico-url:event_management.api_category_role
 import eventRolesURL from 'indico-url:event_management.api_event_roles';
 import eventPrincipalsURL from 'indico-url:event_management.api_principals';
 import registrationFormsURL from 'indico-url:event_registration.api_registration_forms';
-import permissionInfoURL from 'indico-url:rb.permission_types';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
@@ -52,11 +51,11 @@ export const useFetchPrincipals = (principalIds, eventId = null) => {
  * This hook will handle fetching information about available permissions from the backend
  * and returning a `PermissionManager` that follows their structure.
  */
-export const usePermissionInfo = () => {
+export const usePermissionInfo = url => {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState(null);
 
-  const {data: reqData} = useIndicoAxios(permissionInfoURL(), {camelize: true});
+  const {data: reqData} = useIndicoAxios(url, {camelize: true});
 
   if (!loaded && reqData) {
     setData({...reqData});
@@ -64,6 +63,18 @@ export const usePermissionInfo = () => {
   }
 
   return [loaded ? new PermissionManager(data.tree, data.default) : null, data];
+};
+
+/**
+ * PermissionInfoProvider can be used to get the permissionInfo
+ * in a class-based component.
+ *
+ * Do not use this for new components; write them as functional
+ * components instead!
+ */
+export const PermissionInfoProvider = ({url, children}) => {
+  const [permissionManager, permissionInfo] = usePermissionInfo(url);
+  return children(permissionManager, permissionInfo);
 };
 
 const _useFetchPrincipalList = (eventId, enabled, urlFunc, options = {}) => {

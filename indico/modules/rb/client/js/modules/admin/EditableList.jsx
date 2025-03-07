@@ -81,6 +81,7 @@ export default class EditableList extends React.PureComponent {
     initialEditValues: PropTypes.func,
     renderItem: PropTypes.func.isRequired,
     canDeleteItem: PropTypes.func,
+    canAddItem: PropTypes.bool,
     renderAddForm: PropTypes.func.isRequired,
     renderEditForm: PropTypes.func.isRequired,
     addFormProps: PropTypes.object,
@@ -95,6 +96,7 @@ export default class EditableList extends React.PureComponent {
     initialAddValues: {},
     initialEditValues: undefined,
     canDeleteItem: undefined,
+    canAddItem: true,
     addFormProps: {},
     editFormProps: {},
   };
@@ -133,6 +135,7 @@ export default class EditableList extends React.PureComponent {
       addFormProps,
       editFormProps,
       canDeleteItem,
+      canAddItem,
       isFetching,
       items,
       onDelete,
@@ -144,7 +147,9 @@ export default class EditableList extends React.PureComponent {
       <>
         <Header as="h2" styleName="header">
           {title}
-          <Button size="small" content={Translate.string('Add')} onClick={this.handleAddClick} />
+          {canAddItem && (
+            <Button size="small" content={Translate.string('Add')} onClick={this.handleAddClick} />
+          )}
         </Header>
         {isFetching ? (
           <Placeholder fluid>

@@ -40,7 +40,6 @@ const SettingsPage = props => {
     settings,
     actions: {fetchSettings, updateSettings},
   } = props;
-
   const favoriteUsersController = useFavoriteUsers();
   useEffect(() => {
     fetchSettings();
@@ -130,8 +129,8 @@ const SettingsPage = props => {
               label={Translate.string('Allow owners/managers to edit their rooms')}
               description={
                 <Translate>
-                  By default only admins can modify rooms, but you can allow room owners and
-                  managers to modify them as well.
+                  By default only admins and location managers can modify rooms, but you can allow
+                  room owners and managers to modify them as well.
                 </Translate>
               }
             />

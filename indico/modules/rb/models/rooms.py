@@ -11,7 +11,7 @@ from datetime import date, time
 from sqlalchemy import and_, or_
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import contains_eager, joinedload, load_only
+from sqlalchemy.orm import contains_eager, joinedload, load_only, selectinload
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -22,7 +22,8 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
-from indico.modules.rb.models.principals import RoomPrincipal
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.principals import LocationPrincipal, RoomPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
@@ -469,7 +470,7 @@ class Room(ProtectionManagersMixin, db.Model):
 
     @property
     def protection_parent(self):
-        return None
+        return self.location
 
     @staticmethod
     def is_user_admin(user):
@@ -491,8 +492,9 @@ class Room(ProtectionManagersMixin, db.Model):
         all_rooms_query = (Room.query
                            .filter(~Room.is_deleted)
                            .options(load_only('id', 'protection_mode', 'reservations_need_confirmation',
-                                              'is_reservable', 'owner_id'),
+                                              'is_reservable', 'owner_id', 'location_id'),
                                     joinedload('owner').load_only('id'),
+                                    selectinload('location').joinedload('acl_entries'),
                                     joinedload('acl_entries')))
         is_admin = allow_admin and cls.is_user_admin(user)
         if (is_admin and allow_admin) or not user.can_get_all_multipass_groups:
@@ -507,33 +509,64 @@ class Room(ProtectionManagersMixin, db.Model):
 
         criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
         for group in user.local_groups:
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,  # noqa: PERF401
-                                    RoomPrincipal.local_group_id == group.id))
+            criteria.append(  # noqa: PERF401
+                db.and_(
+                    RoomPrincipal.type == PrincipalType.local_group,
+                    RoomPrincipal.local_group_id == group.id,
+                )
+            )
         for group in user.iter_all_multipass_groups():
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,  # noqa: PERF401
-                                    RoomPrincipal.multipass_group_provider == group.provider.name,
-                                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
+            criteria.append(  # noqa: PERF401
+                db.and_(
+                    RoomPrincipal.type == PrincipalType.multipass_group,
+                    RoomPrincipal.multipass_group_provider == group.provider.name,
+                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
+                )
+            )
+
+        location_criteria = [db.and_(LocationPrincipal.type == PrincipalType.user,
+                                     LocationPrincipal.user_id == user.id)]
+        for group in user.local_groups:
+            location_criteria.append(  # noqa: PERF401
+                db.and_(
+                    LocationPrincipal.type == PrincipalType.local_group,
+                    LocationPrincipal.local_group_id == group.id,
+                )
+            )
+        for group in user.iter_all_multipass_groups():
+            location_criteria.append(  # noqa: PERF401
+                db.and_(
+                    LocationPrincipal.type == PrincipalType.multipass_group,
+                    LocationPrincipal.multipass_group_provider == group.provider.name,
+                    db.func.lower(LocationPrincipal.multipass_group_name) == group.name.lower(),
+                )
+            )
 
         data = {}
         permissions = {'book', 'prebook', 'override', 'moderate', 'manage'}
         prebooking_required_rooms = set()
         non_reservable_rooms = set()
+        # Set permissions that do not originate from room ACL entries
         for room in all_rooms_query:
             is_owner = user == room.owner
+            is_location_manager = room.location.can_manage(user, allow_admin=allow_admin)
             data[room.id] = dict.fromkeys(permissions, False)
             if room.reservations_need_confirmation:
                 prebooking_required_rooms.add(room.id)
             if not room.is_reservable:
                 non_reservable_rooms.add(room.id)
-            if (room.is_reservable and (room.is_public or is_owner)) or (is_admin and allow_admin):
-                if not room.reservations_need_confirmation or is_owner or (is_admin and allow_admin):
+            if ((room.is_reservable and (room.is_public or is_owner or is_location_manager))
+                or (is_admin and allow_admin)):
+                if (not room.reservations_need_confirmation or is_owner or is_location_manager or
+                        (is_admin and allow_admin)):
                     data[room.id]['book'] = True
                 if room.reservations_need_confirmation:
                     data[room.id]['prebook'] = True
-            if is_owner or (is_admin and allow_admin):
+            if is_owner or is_location_manager or (is_admin and allow_admin):
                 data[room.id]['override'] = True
                 data[room.id]['moderate'] = True
                 data[room.id]['manage'] = True
+        # Set permissions based on room ACL entries
         query = (RoomPrincipal.query
                  .join(Room)
                  .filter(~Room.is_deleted, db.or_(*criteria))
@@ -547,6 +580,27 @@ class Room(ProtectionManagersMixin, db.Model):
                 check_permission = None if permission == 'manage' else permission
                 if principal.has_management_permission(check_permission, explicit=explicit):
                     data[principal.room_id][permission] = True
+        # Set permissions based on location ACL entries
+        _rooms_strategy = contains_eager('location').selectinload('rooms')
+        _rooms_strategy.noload('owner')
+        _rooms_strategy.load_only('id')
+        query = (LocationPrincipal.query
+                 .join(Location)
+                 .filter(~Location.is_deleted, db.or_(*location_criteria))
+                 .options(load_only('location_id', 'full_access', 'permissions'),
+                          _rooms_strategy))
+        for principal in query:
+            for room in principal.location.rooms:
+                is_reservable = room.id not in non_reservable_rooms
+                for permission in permissions:
+                    if permission == 'override':  # this does not exist as a location permission
+                        continue
+                    if not is_reservable and not (is_admin and allow_admin) and permission in ('book', 'prebook'):
+                        continue
+                    explicit = permission == 'prebook' and room.id not in prebooking_required_rooms
+                    check_permission = None if permission == 'manage' else permission
+                    if principal.has_management_permission(check_permission, explicit=explicit):
+                        data[room.id][permission] = True
         return data
 
     def can_access(self, user, allow_admin=True):
@@ -567,7 +621,10 @@ class Room(ProtectionManagersMixin, db.Model):
             return False
         if self.is_public and not self.reservations_need_confirmation:
             return True
-        return self.can_manage(user, permission='book', allow_admin=allow_admin)
+        return (
+            self.can_manage(user, permission='book', allow_admin=allow_admin) or
+            self.location.can_manage(user, permission='book', allow_admin=allow_admin)
+        )
 
     def can_prebook(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
@@ -581,7 +638,10 @@ class Room(ProtectionManagersMixin, db.Model):
         # up for admins or room managers unless they are actually in the ACL with the prebook
         # permission.
         explicit = not self.reservations_need_confirmation
-        return self.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit)
+        return (
+            self.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit) or
+            self.location.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit)
+        )
 
     def can_override(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
@@ -589,7 +649,10 @@ class Room(ProtectionManagersMixin, db.Model):
 
     def can_moderate(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
-        return self.can_manage(user, permission='moderate', allow_admin=allow_admin)
+        return (
+           self.can_manage(user, permission='moderate', allow_admin=allow_admin) or
+           self.location.can_manage(user, permission='moderate', allow_admin=allow_admin)
+        )
 
     def can_edit(self, user):
         if not user:

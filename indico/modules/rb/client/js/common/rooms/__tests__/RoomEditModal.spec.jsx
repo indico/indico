@@ -7,7 +7,7 @@
 
 import attributesURL from 'indico-url:rb.admin_attributes';
 import locationsURL from 'indico-url:rb.admin_locations';
-import permissionInfoURL from 'indico-url:rb.permission_types';
+import roomPermissionInfoURL from 'indico-url:rb.room_permission_types';
 
 import {mount} from 'enzyme';
 import axiosMock from 'jest-mock-axios';
@@ -47,7 +47,7 @@ describe('RoomEditModal', () => {
       </Provider>
     );
     act(() => {
-      axiosMock.mockResponseFor({url: permissionInfoURL()}, {data: {tree: {}, default: ''}});
+      axiosMock.mockResponseFor({url: roomPermissionInfoURL()}, {data: {tree: {}, default: ''}});
       axiosMock.mockResponseFor({url: attributesURL()}, {data: [{name: 'foo', value: 'bar'}]});
       axiosMock.mockResponseFor(
         {url: locationsURL({location_id: 1})},

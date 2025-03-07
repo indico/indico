@@ -10,13 +10,16 @@ import re
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin
 from indico.util.string import format_repr
 
 
-class Location(db.Model):
+class Location(ProtectionManagersMixin, db.Model):
     __tablename__ = 'locations'
     __table_args__ = (db.Index(None, 'name', unique=True, postgresql_where=db.text('NOT is_deleted')),
                       {'schema': 'roombooking'})
+
+    disable_protection_mode = True
 
     id = db.Column(
         db.Integer,
@@ -75,6 +78,14 @@ class Location(db.Model):
         lazy=True
     )
 
+    acl_entries = db.relationship(
+        'LocationPrincipal',
+        lazy=True,
+        backref='location',
+        cascade='all, delete-orphan',
+        collection_class=set
+    )
+
     # relationship backrefs:
     # - breaks (Break.own_venue)
     # - contributions (Contribution.own_venue)
@@ -84,3 +95,20 @@ class Location(db.Model):
 
     def __repr__(self):
         return format_repr(self, 'id', 'name', is_deleted=False)
+
+    @property
+    def protection_parent(self):
+        return None
+
+    @staticmethod
+    def is_user_admin(user):
+        from indico.modules.rb.util import rb_is_admin
+
+        return rb_is_admin(user)
+
+    def can_delete(self, user):
+        from indico.modules.rb.util import rb_is_admin
+
+        if not user:
+            return False
+        return rb_is_admin(user)

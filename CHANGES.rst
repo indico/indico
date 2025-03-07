@@ -44,6 +44,8 @@ Improvements
 - Include submitter email in abstract PDF export (:issue:`3631`, :pr:`6748`, thanks
   :user:`amCap1712`)
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
+- Add ACLs for room booking locations which can grant privileges on the location itself
+  and/or all its rooms (:pr:`6566`, thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
