@@ -241,7 +241,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const canSubmit = () => {
-    console.log('activeForm', activeForm);
     if (activeForm === EntryType.SessionBlock) {
       return !!sessionValues.length;
     }
