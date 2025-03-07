@@ -445,16 +445,25 @@ def modify_registration(registration, data, management=False, notify_user=True):
         registration.user = get_user_by_email(data['email'])
 
     billable_items_locked = not management and registration.is_paid
-    for form_item in regform.active_fields:
+    active_fields = regform.active_fields
+    for form_item in active_fields:
         if form_item.is_purged or form_item.get_locked_reason(registration):
             continue
 
         field_impl = form_item.field_impl
         has_data = form_item.html_field_name in data
         can_modify = management or not form_item.parent.is_manager_only
+        show_if_field_id = field_impl.view_data.get('show_if_field_id')
+        show_if_field = next(
+            field for field in active_fields if field.id == show_if_field_id) if show_if_field_id else None
+        show_if_field_values = field_impl.view_data.get('show_if_field_values')
+        show = data.get(
+            show_if_field.html_field_name) in show_if_field_values if show_if_field and show_if_field_values else True
 
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
+        elif not show:
+            value = field_impl.empty_value
         elif not has_data and form_item.id not in data_by_field and not management:
             # set default value for a field if it didn't have one before (including manager-only fields).
             # but we do so only if it's the user editing their registration - if a manager edits
