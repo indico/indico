@@ -1,7 +1,7 @@
 """Add event_registrations.checkins table.
 
 Revision ID: 1a5139970d93
-Revises: 9251bc3e2106
+Revises: b212f6d17229
 Create Date: 2025-01-30 11:39:30.511470
 """
 
@@ -15,7 +15,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 
 # revision identifiers, used by Alembic.
 revision = '1a5139970d93'
-down_revision = '9251bc3e2106'
+down_revision = 'b212f6d17229'
 branch_labels = None
 depends_on = None
 
