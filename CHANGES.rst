@@ -221,7 +221,7 @@ Security fixes
   process, so it can only target newly created (and thus unprivileged) Indico users.
   We consider this vulnerability to be of "medium" severity since the ability to abuse
   this is somewhat limited, but you should update as soon as possible nonetheless
-  (:cve:`CVE-2024-45399`)
+  (:cve:`2024-45399`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -674,7 +674,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Update `Werkzeug <https://pypi.org/project/Werkzeug/>`__ library due to a
-  DoS vulnerability while parsing certain file uploads (:cve:`CVE-2023-46136`)
+  DoS vulnerability while parsing certain file uploads (:cve:`2023-46136`)
 - Fix registration form CAPTCHA not being fully validated (:pr:`6096`)
 
 Improvements
@@ -713,7 +713,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Update `Pillow <https://pypi.org/project/Pillow/>`__ library due to
-  vulnerabilities in libwebp (:cve:`CVE-2023-4863`)
+  vulnerabilities in libwebp (:cve:`2023-4863`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -758,7 +758,7 @@ Security fixes
   considering that event organizers may indeed delete suspicious-looking content when
   encountering it, there is a non-negligible risk of such an attack to succeed. Because
   of this it is strongly recommended to upgrade as soon as possible (:pr:`5862`,
-  :cve:`CVE-2023-37901`)
+  :cve:`2023-37901`)
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -934,9 +934,9 @@ Security fixes
 
 - Sanitize HTML in global announcement messages
 - Update `cryptography <https://pypi.org/project/cryptography/>`__ library due to
-  vulnerabilities in OpenSSL (:cve:`CVE-2023-0286`)
+  vulnerabilities in OpenSSL (:cve:`2023-0286`)
 - Update `werkzeug <https://pypi.org/project/werkzeug/>`__ library due to a potential
-  Denial of Service vulnerability (:cve:`CVE-2023-25577`)
+  Denial of Service vulnerability (:cve:`2023-25577`)
 
 .. note::
 
@@ -1068,7 +1068,7 @@ Security fixes
 ^^^^^^^^^^^^^^
 
 - Update `cryptography <https://pypi.org/project/cryptography/>`__ library due to
-  vulnerabilities in OpenSSL (:cve:`CVE-2022-3602`, :cve:`CVE-2022-3786`)
+  vulnerabilities in OpenSSL (:cve:`2022-3602`, :cve:`2022-3786`)
 
 .. note::
 
