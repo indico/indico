@@ -55,7 +55,7 @@
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
     "qs": "^6.11.0",
-    "qtip2": "git+https://indico@github.com/indico/qTip2.git#8951e5538a5c0833021b2d2b5d8a587a2c24faae",
+    "qtip2": "git+https://indico@github.com/indico/qTip2.git#95a42a3be49767a631310a5a8bd924f386220799",
     "rc-time-picker": "^3.7.3",
     "react": "^17.0.2",
     "react-charts": "2.0.0-beta.7",
