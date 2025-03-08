@@ -418,6 +418,21 @@ class Registration(db.Model):
             loc['token'] = self.uuid
         return loc
 
+    def is_field_shown(self, field):
+        show_if_field_id = field.data.get('show_if_field_id')
+        show_if_field_values = field.data.get('show_if_field_values')
+        if (not show_if_field_id or not show_if_field_values or
+            not (show_if_data := self.data_by_field.get(show_if_field_id))):
+            return True
+        data = show_if_data.data
+        if isinstance(data, dict):
+            values = data.keys()
+        elif isinstance(data, bool):
+            values = ['1'] if data else ['0']
+        else:
+            values = data
+        return any(v in show_if_field_values for v in values)
+
     @locator.uuid
     def locator(self):
         """A locator that uses uuid instead of id."""
