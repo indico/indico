@@ -334,7 +334,7 @@ def test_admin_permissions(dummy_room, create_user, is_admin):
 @pytest.mark.parametrize('allow_admin', (True, False))
 @pytest.mark.parametrize('bulk_possible', (True, False))
 def test_get_permissions_for_user(dummy_room, create_user, monkeypatch, bulk_possible, allow_admin, is_admin, is_owner,
-                                  is_reservable, reservations_need_confirmation, protection_mode, acl_perm):
+                                  is_reservable, reservations_need_confirmation, protection_mode, acl_perm, db):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
     user = create_user(123)
     if is_owner:
@@ -344,6 +344,7 @@ def test_get_permissions_for_user(dummy_room, create_user, monkeypatch, bulk_pos
     dummy_room.protection_mode = protection_mode
     dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
+    # test with room-level permissions
     if acl_perm == '*':
         dummy_room.update_principal(user, full_access=True)
     elif acl_perm:
@@ -356,3 +357,20 @@ def test_get_permissions_for_user(dummy_room, create_user, monkeypatch, bulk_pos
         'moderate': dummy_room.can_moderate(user, allow_admin=allow_admin),
         'manage': dummy_room.can_manage(user, allow_admin=allow_admin),
     }
+    # test with location-level permissions; this would be nicer to do via parametrization, but this
+    # would bump the already kind of excessive ~800 tests to ~4k tests
+    if acl_perm != 'override':
+        dummy_room.remove_principal(user)
+        db.session.flush()
+        if acl_perm == '*':
+            dummy_room.location.update_principal(user, full_access=True)
+        elif acl_perm:
+            dummy_room.location.update_principal(user, permissions={acl_perm})
+        perms = Room.get_permissions_for_user(user, allow_admin=allow_admin)
+        assert perms[dummy_room.id] == {
+            'book': dummy_room.can_book(user, allow_admin=allow_admin),
+            'prebook': dummy_room.can_prebook(user, allow_admin=allow_admin),
+            'override': dummy_room.can_override(user, allow_admin=allow_admin),
+            'moderate': dummy_room.can_moderate(user, allow_admin=allow_admin),
+            'manage': dummy_room.can_manage(user, allow_admin=allow_admin),
+        }

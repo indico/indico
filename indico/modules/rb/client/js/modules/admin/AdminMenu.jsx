@@ -15,6 +15,7 @@ import {Icon, Menu, Placeholder} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import {selectors as mapSelectors} from '../../common/map';
+import {selectors as userSelectors} from '../../common/user';
 
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
@@ -45,44 +46,53 @@ function renderMenuPlaceholder() {
   );
 }
 
-function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clearTextFilter}}) {
+function AdminMenu({
+  locations,
+  isFetchingLocations,
+  isMapEnabled,
+  actions: {clearTextFilter},
+  isAdmin,
+}) {
   if (isFetchingLocations) {
     return renderMenuPlaceholder();
   }
-
   const hasLocations = locations.length !== 0;
   const locationURL = locationId => `/admin/locations/${locationId}`;
   return (
     <Menu size="large" styleName="admin-menu" vertical fluid>
-      <Menu.Item>
-        <NavLink exact to="/admin">
-          <Translate>General Settings</Translate>
-        </NavLink>
-      </Menu.Item>
-      {isMapEnabled && (
-        <Menu.Item>
-          <NavLink exact to="/admin/map-areas">
-            <Translate>Map Areas</Translate>
-          </NavLink>
-        </Menu.Item>
+      {isAdmin && (
+        <>
+          <Menu.Item>
+            <NavLink exact to="/admin">
+              <Translate>General settings</Translate>
+            </NavLink>
+          </Menu.Item>
+          {isMapEnabled && (
+            <Menu.Item>
+              <NavLink exact to="/admin/map-areas">
+                <Translate>Map Areas</Translate>
+              </NavLink>
+            </Menu.Item>
+          )}
+          <Menu.Item>
+            <Menu.Header>
+              <Translate>Room Metadata</Translate>
+            </Menu.Header>
+            <Menu.Menu>
+              <Menu.Item>
+                <NavLink exact to="/admin/attributes">
+                  <Translate>Attributes</Translate>
+                </NavLink>
+              </Menu.Item>
+              <Menu.Item>
+                <NavLink exact to="/admin/equipment">
+                  <Translate>Equipment & Features</Translate>
+                </NavLink>
+              </Menu.Item>
+            </Menu.Menu>
+          </Menu.Item>
+        </>
       )}
-      <Menu.Item>
-        <Menu.Header>
-          <Translate>Room Metadata</Translate>
-        </Menu.Header>
-        <Menu.Menu>
-          <Menu.Item>
-            <NavLink exact to="/admin/attributes">
-              <Translate>Attributes</Translate>
-            </NavLink>
-          </Menu.Item>
-          <Menu.Item>
-            <NavLink exact to="/admin/equipment">
-              <Translate>Equipment & Features</Translate>
-            </NavLink>
-          </Menu.Item>
-        </Menu.Menu>
-      </Menu.Item>
       <Menu.Item>
         <Link to="/admin/locations/">
           <Menu.Header styleName="locations-header">
@@ -93,11 +103,15 @@ function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clea
         {hasLocations && (
           <Menu.Menu>
             {locations.map(location => (
-              <Menu.Item key={location.id}>
-                <NavLink to={locationURL(location.id)} onClick={clearTextFilter} exact>
-                  {location.name}
-                </NavLink>
-              </Menu.Item>
+              <div key={location.id}>
+                {location.canEdit && (
+                  <Menu.Item key={location.id}>
+                    <NavLink to={locationURL(location.id)} onClick={clearTextFilter} exact>
+                      {location.name}
+                    </NavLink>
+                  </Menu.Item>
+                )}
+              </div>
             ))}
           </Menu.Menu>
         )}
@@ -110,6 +124,7 @@ AdminMenu.propTypes = {
   locations: PropTypes.array.isRequired,
   isFetchingLocations: PropTypes.bool.isRequired,
   isMapEnabled: PropTypes.bool.isRequired,
+  isAdmin: PropTypes.bool.isRequired,
   actions: PropTypes.exact({
     clearTextFilter: PropTypes.func.isRequired,
   }).isRequired,
@@ -121,6 +136,7 @@ export default withRouter(
       locations: adminSelectors.getAllLocations(state),
       isMapEnabled: mapSelectors.isMapEnabled(state),
       isFetchingLocations: adminSelectors.isFetchingLocations(state),
+      isAdmin: userSelectors.isUserRBAdmin(state),
     }),
     dispatch => ({
       actions: bindActionCreators(

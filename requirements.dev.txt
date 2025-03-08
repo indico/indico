@@ -87,7 +87,7 @@ itsdangerous==2.2.0
     # via
     #   -c requirements.txt
     #   flask
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   -c requirements.txt
     #   flask
@@ -168,7 +168,7 @@ requests==2.32.3
     #   sphinx
 responses==0.25.3
     # via -r requirements.dev.in
-ruff==0.9.9
+ruff==0.9.10
     # via -r requirements.dev.in
 schemainspect==3.1.1663587362
     # via migra
@@ -242,7 +242,7 @@ urllib3==1.26.20
     #   -c requirements.txt
     #   requests
     #   responses
-uv==0.6.3
+uv==0.6.5
     # via -r requirements.dev.in
 uvicorn==0.32.1
     # via sphinx-autobuild

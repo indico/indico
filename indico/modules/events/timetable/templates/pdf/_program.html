@@ -2,7 +2,7 @@
     {% for day, entries in days.items() %}
         <div class="day pagebreak program-{{loop.index}} {{ 'pagebreak-children' if config.new_page_per_session else '' }}" id="day-{{ loop.index }}">
             <div class="day-title">
-                <h2>{{ day|format_skeleton('EEEEdMMMM', timezone=event.tzinfo) }}</h2>
+                <h2>{{ day|format_skeleton('EEEEdMMMM') }}</h2>
             </div>
             {% for entry in entries %}
                 {% set show_children_location = program_config.show_children_location[entry.id] %}
@@ -259,7 +259,7 @@
 {% macro _render_block_date(entry, day, print_date_close_to_sessions) %}
     {% if print_date_close_to_sessions %}
         <p class="session-block-date">
-            <b>{{ day|format_skeleton('EEEEdMMMM', timezone=entry.event.tzinfo) }}</b>
+            <b>{{ day|format_skeleton('EEEEdMMMM') }}</b>
             <span class="timebox">
                 {{ format_interval(entry.start_dt.astimezone(entry.event.tzinfo), entry.end_dt.astimezone(entry.event.tzinfo), format='HHmm') }}
             </span>

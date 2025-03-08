@@ -94,3 +94,19 @@ favorite_category_removed = _signals.signal('favorite-category-removed', '''
 Called when a new category is removed from a user's favorites. The *sender* is
 the user object and the category is passed in the `category` kwarg.
 ''')
+
+check_login_data = _signals.signal('check-login-data', '''
+Called when logging in using a form-based login provider.
+The *sender* is the flask-multipass auth provider class used for the login, and
+the data entered in the login form is passed in the `data` kwarg. The provider
+instance is passed in the `provider` kwarg.
+If this signal returns a string, the login will fail with the returned message;
+otherwise (``None`` return value) the signup can continue as normal.
+''')
+
+check_signup_email = _signals.signal('check-signup-email', '''
+Called during the email validation phase of the local account signup process.
+The *sender* is the email address the user is trying to use. If this signal returns
+a string, the signup will be refused with the returned message; otherwise (``None``
+return value) the signup can continue as normal.
+''')

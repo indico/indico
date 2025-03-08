@@ -3,9 +3,8 @@
   "partials": {
     "dashboard": "./dashboard.jsx",
     "profile_picture": "./ProfilePicture.jsx",
-    "personal_data": "./PersonalDataForm.jsx",
+    "personal_data": "./personal_data.js",
     "favorites": "./Favorites.jsx",
-    "data_export": "./DataExport.jsx",
-    "user_delete": "./UserDelete.jsx"
+    "data_export": "./DataExport.jsx"
   }
 }

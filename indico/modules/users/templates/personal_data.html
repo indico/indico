@@ -9,28 +9,11 @@
                 </div>
                 {% if session.user.is_admin %}
                     <div class="i-box-buttons i-box-align-buttons">
-                        {% if not user.is_blocked %}
-                            <div {%- if user == session.user %} title="{% trans %}You cannot block yourself{% endtrans %}"{% endif %}>
-                                <button class="ui orange small button"
-                                        data-href="{{ url_for('.user_block') }}"
-                                        data-method="PUT"
-                                        data-confirm="{% trans %}This user will no longer have access to Indico.
-                                        Are you sure you want to revoke their access?{% endtrans %}"
-                                        data-reload-after
-                                        {% if user == session.user %}disabled{% endif %}>
-                                    {% trans %}Block User{% endtrans %}
-                                </button>
-                            </div>
-                        {% else %}
-                            <button class="ui small button"
-                                    data-href="{{ url_for('.user_block') }}"
-                                    data-method="DELETE"
-                                    data-confirm="{% trans %}This user will regain access to Indico.
-                                    Are you sure you want to restore their access?{% endtrans %}"
-                                    data-reload-after>
-                                {% trans %}Unblock User{% endtrans %}
-                            </button>
-                        {% endif %}
+                        <ind-user-block-button user-id="{{ user.id }}"
+                                               user-is-blocked="{{ user.is_blocked | tojson }}"
+                                               user-first-name="{{ user.first_name }}"
+                                               user-last-name="{{ user.last_name }}">
+                        </ind-user-block-button>
                         {% if allow_deletion %}
                             <ind-user-delete-button user-id="{{ (user.id if user != session.user else none) | tojson }}"
                                                     user-is-admin="{{ user.is_admin | tojson }}"
