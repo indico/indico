@@ -9,10 +9,12 @@ from datetime import timedelta
 
 from flask import jsonify, request, session
 from marshmallow import EXCLUDE, ValidationError, fields, post_load, validates
+from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.errors import NoReportError
 from indico.core.marshmallow import mm
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
@@ -89,7 +91,7 @@ class TextDataSchema(GeneralFieldDataSchema):
         exclude = ('is_required', 'retention_period', 'input_type')
 
 
-def _fill_form_field_with_data(field, field_data, is_static_text=False):
+def _fill_form_field_with_data(field, field_data, is_static_text=False, context=None):
     schema_cls = TextDataSchema if is_static_text else GeneralFieldDataSchema
     schema = schema_cls(context={'field': field})
     general_data, raw_field_specific_data = schema.load(field_data)
@@ -100,7 +102,7 @@ def _fill_form_field_with_data(field, field_data, is_static_text=False):
             changes[key] = (old_value, value)
         setattr(field, key, value)
     if not is_static_text:
-        schema = field.field_impl.create_setup_schema()
+        schema = field.field_impl.create_setup_schema(context=context)
         field_specific_data = schema.load(raw_field_specific_data)
         if field.id is None:  # new field
             field.data, field.versioned_data = field.field_impl.process_field_data(field_specific_data)
@@ -133,6 +135,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
+        if not enabled and self.field.is_condition:
+            raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be disabled')))
         self.field.is_enabled = enabled
         update_regform_item_positions(self.regform)
         db.session.flush()
@@ -156,8 +160,14 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
     def _process_DELETE(self):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
+        if self.field.is_condition:
+            raise NoReportError.wrap_exc(BadRequest(_('Fields used as conditional cannot be deleted')))
         signals.event.registration_form_field_deleted.send(self.field)
         self.field.is_deleted = True
+        if 'show_if_field_id' in (self.field.data or {}):
+            self.field.data.pop('show_if_field_id')
+            self.field.data.pop('show_if_field_values', None)
+            flag_modified(self.field, 'data')
         update_regform_item_positions(self.regform)
         db.session.flush()
         self.field.log(
@@ -174,7 +184,8 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         elif 'input_type' in field_data and self.field.input_type != field_data['input_type']:
             raise BadRequest
         field_data['input_type'] = self.field.input_type
-        changes = _fill_form_field_with_data(self.field, field_data)
+        changes = _fill_form_field_with_data(self.field, field_data,
+                                             context={'regform': self.regform, 'field': self.field})
         changes = make_diff_log(changes, {
             'title': {'title': 'Title', 'type': 'string'},
             'description': {'title': 'Description'},
@@ -221,7 +232,7 @@ class RHRegistrationFormAddField(RHManageRegFormSectionBase):
     def _process(self):
         field_data = snakify_keys(request.json['fieldData'])
         form_field = RegistrationFormField(parent_id=self.section.id, registration_form=self.regform)
-        _fill_form_field_with_data(form_field, field_data)
+        _fill_form_field_with_data(form_field, field_data, context={'regform': self.regform, 'field': form_field})
         db.session.add(form_field)
         db.session.flush()
         form_field.log(
