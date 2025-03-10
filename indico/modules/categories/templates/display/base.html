@@ -1,7 +1,7 @@
 {% from 'events/management/_create_event_button.html' import create_event_button %}
 
 <div class="category-container">
-    <div class="category-header flexrow">
+    <div class="category-header">
         <h1 class="category-title">
             {% block title %}
                 {% if category.title == 'Home' and category.is_root %}
@@ -16,7 +16,7 @@
             {% endblock %}
         </h1>
         {% block cat_toolbar %}
-            <div id="category-toolbar" class="toolbar fixed-height">
+            <div id="category-toolbar" class="toolbar">
                 <div class="group">
                     <div id="search-box" class="search-box"
                          data-category="{{ {'id': category.id, 'isRoot': category.is_root, 'title': category.title} | tojson | forceescape }}"
@@ -100,18 +100,18 @@
         {% endblock %}
     </div>
 
-    {% if self.sidebar() %}
-        <div class="category-sidebar">
-            {%- block sidebar %}{% endblock -%}
-        </div>
-    {% endif %}
-
     <div class="category-content-wrapper">
         <div class="category-content">
             {% include 'flashed_messages.html' %}
             {% block content %}{% endblock %}
         </div>
     </div>
+
+    {% if self.sidebar() %}
+        <div class="category-sidebar" id="sidebar" data-bypass-target="{% trans %}Skip to sidebar{% endtrans %}">
+            {%- block sidebar %}{% endblock -%}
+        </div>
+    {% endif %}
 </div>
 <script>
     $('#navigate-button').on('click', function(evt) {
