@@ -18,6 +18,7 @@ from babel.dates import format_interval as _format_interval
 from babel.dates import format_time as _format_time
 from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone, match_skeleton
+from babel.numbers import format_currency as _format_currency
 from babel.numbers import format_number as _format_number
 from dateutil.relativedelta import relativedelta as _relativedelta
 from dateutil.rrule import DAILY, FR, MO, TH, TU, WE, rrule
@@ -358,6 +359,12 @@ def format_number(number, locale=None):
     if not locale:
         locale = get_current_locale()
     return _format_number(number, locale=locale)
+
+
+def format_currency(number, currency, locale=None):
+    if not locale:
+        locale = get_current_locale()
+    return _format_currency(number, currency, locale=locale)
 
 
 def timedelta_split(delta):

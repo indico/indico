@@ -26,7 +26,7 @@
     {% endfor %}
 {%- endif %}
 {% trans %}Reason:{% endtrans %} {{ blocking.reason }}
-{% trans %}Dates:{% endtrans %} {{ blocking.start_date | format_date(locale='en_GB') }} - {{ blocking.end_date | format_date(locale='en_GB') }}
+{% trans %}Dates:{% endtrans %} {{ format_interval(blocking.start_date, blocking.end_date, 'yMd') }}
 
 {% trans %}You can approve or reject this blocking request here:{% endtrans %}
 {{ blocking.external_details_url }}
