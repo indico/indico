@@ -200,11 +200,10 @@ const PictureManager = ({
         onChange(data.uuid);
       } else {
         dispatch({type: 'FAILED', errors});
-        setPicturePreview(previewURL);
         onChange(null);
       }
     },
-    [deleteUploadedPicture, onChange, uploadURL, previewURL]
+    [deleteUploadedPicture, onChange, uploadURL]
   );
 
   const onImageCrop = () => {
