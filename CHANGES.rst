@@ -59,6 +59,7 @@ Improvements
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
 - Add ACLs for room booking locations which can grant privileges on the location itself
   and/or all its rooms (:pr:`6566`, thanks :user:`SegiNyn`)
+- Add date picker to calendar export to enable export past default 4 weeks (:pr:`6792`, thanks :user:`bhngupta`)
 
 Bugfixes
 ^^^^^^^^

@@ -355,9 +355,20 @@ class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
 @allow_signed_url
 class RHExportCategoryICAL(RHDisplayCategoryBase):
     def _process(self):
+        start_date = request.args.get('start_date')
+        if start_date:
+            try:
+                from dateutil import parser
+
+                start_dt = parser.parse(start_date)
+                date_filter = Event.end_dt >= start_dt
+            except (ValueError, Exception):
+                date_filter = Event.end_dt >= (now_utc() - timedelta(weeks=4))
+        else:
+            date_filter = Event.end_dt >= (now_utc() - timedelta(weeks=4))
+
         filename = f'{secure_filename(self.category.title, str(self.category.id))}-category.ics'
-        buf = serialize_categories_ical([self.category.id], session.user,
-                                        Event.end_dt >= (now_utc() - timedelta(weeks=4)))
+        buf = serialize_categories_ical([self.category.id], session.user, date_filter)
         return send_file(filename, buf, 'text/calendar')
 
 
