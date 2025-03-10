@@ -59,6 +59,9 @@ Improvements
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
 - Add ACLs for room booking locations which can grant privileges on the location itself
   and/or all its rooms (:pr:`6566`, thanks :user:`SegiNyn`)
+- Introduce new :data:`FAILED_LOGIN_RATE_LIMIT_USER` and :data:`SIGNUP_RATE_LIMIT_EMAIL`
+  settings for preventing locking out users during brute-force attacks behind a
+  NAT or proxy (:pr:`6576`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
