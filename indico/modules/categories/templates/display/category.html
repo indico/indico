@@ -68,11 +68,11 @@
 {% endblock %}
 
 {% block sidebar -%}
-    {% block sidebar_managers %}
+    {%- block sidebar_managers %}
         {{- render_managers(managers) -}}
-    {% endblock %}
-    {% block sidebar_attachments %}
+    {% endblock -%}
+    {%- block sidebar_attachments %}
         {{- render_attachments(category) -}}
-    {% endblock %}
+    {% endblock -%}
     {{ template_hook('category-sidebar', category=category) }}
 {%- endblock %}
