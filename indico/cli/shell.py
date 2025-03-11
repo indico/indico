@@ -17,6 +17,7 @@ from operator import attrgetter, itemgetter
 import click
 import sqlalchemy.orm
 from flask import current_app
+from sqlalchemy.orm.attributes import flag_modified
 
 import indico
 from indico.core import signals
@@ -85,6 +86,7 @@ def _make_shell_context():
                  'undefer_group', 'load_only')
     add_to_context_multi([getattr(datetime, attr) for attr in datetime_attrs] +
                          [getattr(sqlalchemy.orm, attr) for attr in orm_attrs] +
+                         [flag_modified] +
                          [itertools, re, sys, os],
                          color='yellow')
     # Models
