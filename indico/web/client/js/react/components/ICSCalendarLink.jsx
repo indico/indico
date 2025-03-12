@@ -109,7 +109,7 @@ export default function ICSCalendarLink({
 
   const fetchURL = async (extraParams, controller) => {
     try {
-      const reminderParams = reminder !== null ? {reminder: reminder.toString()} : {};
+      const reminderParams = reminder !== null ? {reminder} : {};
 
       const {
         data: {url: signedURL},
@@ -228,7 +228,7 @@ export default function ICSCalendarLink({
           <Translate>Reminder Alerts</Translate>
         </strong>
         <p>
-          <Translate>Add alerts to each event in your calendar.</Translate>
+          <Translate as="p">Add alerts to each event in your calendar.</Translate>
         </p>
         <div styleName="reminder-options">
           <Dropdown

@@ -20,7 +20,7 @@ from indico.util.string import sanitize_html
 
 def serialize_categories_ical(
     category_ids, user, event_filter=True, event_filter_fn=None,
-    update_query=None, reminder_minutes=None
+    update_query=None, *, reminder_minutes=None
 ):
     """Export the events in a category to iCal.
 
@@ -32,7 +32,7 @@ def serialize_categories_ical(
     :param event_filter_fn: A callable that determines which events to include (after querying)
     :param update_query: A callable that can update the query used to retrieve the events.
                          Must return the updated query object.
-    :param reminder_minutes: If specified, add reminders to all events, handled in ical.py file
+    :param reminder_minutes: If specified, enable reminders in the ical events
     """
     own_room_strategy = joinedload('own_room')
     own_room_strategy.load_only('location_id', 'site', 'building', 'floor', 'number', 'verbose_name')

@@ -354,21 +354,16 @@ class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
 
 @allow_signed_url
 class RHExportCategoryICAL(RHDisplayCategoryBase):
-    def _process(self):
-        reminder = request.args.get('reminder')
-        reminder_minutes = None
-        if reminder:
-            try:
-                reminder_minutes = int(reminder)
-            except ValueError:
-                pass
-
+    @use_kwargs({
+        'reminder': fields.Int(load_default=None, validate=validate.Range(0))
+    }, location='query')
+    def _process(self, reminder):
         filename = f'{secure_filename(self.category.title, str(self.category.id))}-category.ics'
         buf = serialize_categories_ical(
             [self.category.id],
             session.user,
             Event.end_dt >= (now_utc() - timedelta(weeks=4)),
-            reminder_minutes=reminder_minutes
+            reminder_minutes=reminder
         )
         return send_file(filename, buf, 'text/calendar')
 
