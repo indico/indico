@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.3",
+    "@babel/runtime": "^7.26.10",
     "@dr.pogodin/babel-plugin-react-css-modules": "~6.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@tinymce/tinymce-react": "^4.3.0",
