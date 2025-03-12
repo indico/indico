@@ -102,7 +102,7 @@ Accessibility
 - Improve places selection accessibility in MultiChoiceInput
   (:pr:`6764`, thanks :user:`foxbunny`)
 - Improve BooleanInput accessibility (:pr:`6756`, thanks :user:`foxbunny`)
-- Improve keyboard navigation order within the category list page 
+- Improve keyboard navigation order within the category list page
   (:pr:`6776`, thanks :user:`foxbunny`)
 
 Internal Changes
@@ -189,6 +189,7 @@ Bugfixes
 - Use locale-aware price formatting in registration form fields (:pr:`6586`)
 - Handle badge designer items exceeding the canvas boundaries more gracefully (:pr:`6603`,
   thanks :user:`SegiNyn`)
+- Fix tips not correctly positioning when contents are changed (thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^
