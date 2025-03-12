@@ -51,7 +51,7 @@
     "nanoid": "^5.0.6",
     "pagedown": "^1.1.0",
     "pagedown-editor": "0.0.10",
-    "prismjs": "^1.29.0",
+    "prismjs": "^1.30.0",
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
     "qs": "^6.11.0",
