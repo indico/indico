@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import {toOptionalDate} from 'indico/utils/date';
+import {domReady} from 'indico/utils/domstate';
 
 function toKebabCase(propertyName) {
   return propertyName.replace(/[^A-Z][A-Z]/g, s => `${s[0]}-${s[1].toLowerCase()}`).toLowerCase();
@@ -146,16 +147,18 @@ export default class CustomElementBase extends HTMLElement {
     // and disconnect, and the setup() method is expected to set up
     // listeners that will perform such operations.
 
-    this.setup?.();
-    this.setup = null;
-    this.dispatchEvent(new Event('x-connect'));
+    domReady.then(() => {
+      this.setup?.();
+      this.setup = null;
+      this.dispatchEvent(new Event('x-connect'));
+    });
   }
 
   setup() {
     throw Error('Custom element must implement a setup() method');
   }
 
-  disconnectedCallbasck() {
+  disconnectedCallback() {
     this.dispatchEvent(new Event('x-disconnect'));
   }
 
