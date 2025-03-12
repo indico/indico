@@ -227,9 +227,7 @@ export default function ICSCalendarLink({
         <strong styleName="export-option">
           <Translate>Reminder Alerts</Translate>
         </strong>
-        <p>
-          <Translate as="p">Add alerts to each event in your calendar.</Translate>
-        </p>
+        <Translate as="p">Add alerts to each event in your calendar.</Translate>
         <div styleName="reminder-options">
           <Dropdown
             selection
