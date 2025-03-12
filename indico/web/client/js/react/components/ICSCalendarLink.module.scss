@@ -72,9 +72,17 @@
 .popup .content {
   width: 0;
   min-width: 100%;
+  text-align: center;
 }
 
 .button-group :global(.ui.labeled.button) button:global(.ui.button):last-child {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+.reminder-options {
+  margin: 0 auto;
+  max-width: 50%;
+  display: flex;
+  justify-content: center;
 }

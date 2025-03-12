@@ -28,16 +28,29 @@ class RHExportEventICAL(RHDisplayEventBase):
     @use_kwargs({
         'scope': fields.Enum(CalendarScope, load_default=None),
         'detail': fields.String(load_default=None),
-        'series': fields.Boolean(load_default=False)  # Export the full event series
+        'series': fields.Boolean(load_default=False),  # Export the full event series
+        'reminder': fields.Int(load_default=None)
     }, location='query')
-    def _process(self, scope, detail, series):
+    def _process(self, scope, detail, series, reminder):
         if not scope and detail == 'contributions':
             scope = CalendarScope.contribution
+
+        reminder_minutes = None
+        if reminder:
+            try:
+                reminder_minutes = int(reminder)
+            except ValueError:
+                pass
+
         if not series:
-            event_ical = event_to_ical(self.event, session.user, scope)
+            event_ical = event_to_ical(self.event, session.user, scope, reminder_minutes=reminder_minutes)
             return send_file('event.ics', BytesIO(event_ical), 'text/calendar')
         else:
-            events_ical = events_to_ical(self.event.series.events, session.user, scope)
+            events_ical = events_to_ical(
+                self.event.series.events,
+                session.user, scope,
+                reminder_minutes=reminder_minutes
+            )
             return send_file('event-series.ics', BytesIO(events_ical), 'text/calendar')
 
 

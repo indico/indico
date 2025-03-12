@@ -165,7 +165,8 @@ def event_to_ical(
     *,
     skip_access_check: bool = False,
     method: str | None = None,
-    organizer: tuple[str, str] | None = None
+    organizer: tuple[str, str] | None = None,
+    reminder_minutes: int | None = None
 ):
     """Serialize an event into an ical.
 
@@ -175,9 +176,10 @@ def event_to_ical(
     :param skip_access_check: Do not perform access checks. Defaults to False.
     :param method: METHOD field of the iCalendar object
     :param organizer: ORGANIZER field of the iCalendar object
+    :param reminder_minutes: If specified, add reminders to event
     """
     return events_to_ical([event], user, scope, skip_access_check=skip_access_check, method=method,
-                          organizer=organizer)
+                          organizer=organizer, reminder_minutes=reminder_minutes)
 
 
 def events_to_ical(
@@ -187,7 +189,8 @@ def events_to_ical(
     *,
     skip_access_check: bool = False,
     method: str | None = None,
-    organizer: tuple[str, str] | None = None
+    organizer: tuple[str, str] | None = None,
+    reminder_minutes: int | None = None
 ):
     """Serialize multiple events into an ical.
 
@@ -197,6 +200,7 @@ def events_to_ical(
     :param skip_access_check: Do not perform access checks. Defaults to False.
     :param method: METHOD field of the iCalendar object
     :param organizer: ORGANIZER field of the iCalendar object
+    :param reminder_minutes: If specified, add reminders to all events
     """
     from indico.modules.events.contributions.ical import generate_contribution_component
     from indico.modules.events.sessions.ical import generate_session_block_component
@@ -234,6 +238,14 @@ def events_to_ical(
             components = [
                 generate_event_component(event, user, organizer=organizer, skip_access_check=skip_access_check)
             ]
+
+        if reminder_minutes is not None:
+            for component in components:
+                alarm = icalendar.Alarm()
+                alarm.add('action', 'DISPLAY')
+                alarm.add('trigger', timedelta(minutes=-reminder_minutes))
+                alarm.add('description', component.get('description', f"Reminder: {component['summary']}"))
+                component.add_component(alarm)
 
         for component in components:
             calendar.add_component(component)
