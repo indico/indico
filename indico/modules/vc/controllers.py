@@ -203,7 +203,6 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                                        existing_event_vc_room=self.event_vc_room)
 
         if form.validate_on_submit():
-
             self.plugin.update_data_vc_room(self.vc_room, form.data)
 
             event_vc_room = process_vc_room_association(
