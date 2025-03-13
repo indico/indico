@@ -14,6 +14,7 @@ Security fixes
   sandbox escape vulnerability (:cve:`2025-27516`).
 
 .. note::
+
     Since document templates can only be managed by Indico admins (unless granted to
     specific other trusted users as well), the impact of this vulnerability is considered
     low to medium, as it would require a malicious admin to abuse this e.g. to to read
@@ -102,7 +103,7 @@ Accessibility
 - Improve places selection accessibility in MultiChoiceInput
   (:pr:`6764`, thanks :user:`foxbunny`)
 - Improve BooleanInput accessibility (:pr:`6756`, thanks :user:`foxbunny`)
-- Improve keyboard navigation order within the category list page 
+- Improve keyboard navigation order within the category list page
   (:pr:`6776`, thanks :user:`foxbunny`)
 
 Internal Changes
