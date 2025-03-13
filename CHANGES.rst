@@ -102,7 +102,7 @@ Accessibility
 - Improve places selection accessibility in MultiChoiceInput
   (:pr:`6764`, thanks :user:`foxbunny`)
 - Improve BooleanInput accessibility (:pr:`6756`, thanks :user:`foxbunny`)
-- Improve keyboard navigation order within the category list page 
+- Improve keyboard navigation order within the category list page
   (:pr:`6776`, thanks :user:`foxbunny`)
 
 Internal Changes
@@ -211,6 +211,7 @@ Internal Changes
 - ``renderAsFieldset`` option in the registration field registry can now be a function that
   returns a boolean (:pr:`6621`, thanks :user:`foxbunny`)
 - Allow overriding global theme settings for custom meeting themes (:pr:`6622`)
+- Add ``ind-with-popup`` custom element (:pr:`6801`, thanks :user:`foxbunny`)
 
 
 Version 3.3.4
