@@ -11,6 +11,7 @@ from sqlalchemy.orm import column_property, mapper
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
+from indico.core.db.sqlalchemy.searchable import make_fts_index
 from indico.util.string import format_repr
 
 
@@ -103,6 +104,7 @@ class Affiliation(db.Model):
 
 define_unaccented_lowercase_index(Affiliation.searchable_names, Affiliation.__table__,
                                   'ix_affiliations_searchable_names_unaccent')
+make_fts_index(Affiliation, 'searchable_names')
 
 
 @listens_for(mapper, 'after_configured', once=True)
