@@ -1,7 +1,7 @@
 """Add alternate names to affiliations
 
 Revision ID: c7d6c3641918
-Revises: 9251bc3e2106
+Revises: b212f6d17229
 Create Date: 2025-02-14 11:36:35.560567
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'c7d6c3641918'
-down_revision = '9251bc3e2106'
+down_revision = 'b212f6d17229'
 branch_labels = None
 depends_on = None
 
