@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import re
 from functools import lru_cache
 
 import pycountry
@@ -50,6 +51,18 @@ def get_country_reverse(name, locale=None, case_sensitive=True):
         locale = get_current_locale()
     return next((code for code, title in get_countries(locale).items()
                  if title == name or (not case_sensitive and title.lower() == name.lower())), None)
+
+
+def get_countries_regex(locale=None):
+    """Get a regex to search for country names in a string."""
+    if locale is None:
+        locale = get_current_locale()
+    return _get_countries_regex(locale)
+
+
+@lru_cache
+def _get_countries_regex(locale):
+    return re.compile('|'.join(fr'\b{re.escape(title)}\b' for title in get_countries(locale).values()), re.IGNORECASE)
 
 
 @lru_cache

@@ -51,6 +51,11 @@ def upgrade():
         ON indico.affiliations
         USING gin (indico.indico_unaccent(lower(indico.text_array_to_string(((ARRAY[''::text] || indico.text_array_append((alt_names)::text[], (name)::text)) || ARRAY[''::text]), '|||'::text))) gin_trgm_ops);
     ''')
+    op.execute('''
+        CREATE INDEX ix_affiliations_searchable_names_fts
+        ON indico.affiliations
+        USING gin (to_tsvector('simple'::regconfig, indico.text_array_to_string(((ARRAY[''::text] || indico.text_array_append((alt_names)::text[], (name)::text)) || ARRAY[''::text]), '|||'::text)));
+    ''')
 
 
 def downgrade():
