@@ -836,6 +836,17 @@ class RHRegistrationsReject(RHRegistrationsActionBase):
         return jsonify_form(form, disabled_until_change=False, submit=_('Reject'), message=message)
 
 
+class RHRegistrationsReset(RHRegistrationsActionBase):
+    """Reset selected registration from registration list."""
+
+    def _process(self):
+        for registration in self.registrations:
+            registration.reset_state()
+        db.session.flush()
+        flash(_('The selected registrations were successfully reset.'), 'success')
+        return jsonify_data(**self.list_generator.render_list())
+
+
 class RHRegistrationsBasePrice(RHRegistrationsActionBase):
     """Edit the base price of the selected registrations."""
 
