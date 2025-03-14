@@ -21,6 +21,7 @@ interface SchemaEntry {
   title: string;
   textColor?: string;
   color?: string;
+  slotTitle?: string;
 }
 
 interface SchemaSession extends SchemaEntry {
@@ -72,7 +73,7 @@ export function preprocessTimetableEntries(
       dayEntries[day].push({
         type,
         id,
-        title: entry.title,
+        title: entry.slotTitle || entry.title,
         startDt: dateToMoment(entry.startDate),
         duration: entry.duration,
         x: 0,
