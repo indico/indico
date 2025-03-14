@@ -43,13 +43,13 @@
 
 {% macro render_registration_info() %}
     {% if event.start_dt_local.date() == event.end_dt_local.date() %}
-        ({{ event.start_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }}
+        ({{ event.start_dt|format_datetime(timezone=event.tzinfo) }}
         -
-        {{ event.end_dt|format_time(timezone=event.tzinfo, locale='en_GB') }})
+        {{ event.end_dt|format_time(timezone=event.tzinfo) }})
     {% else %}
-        ({{ event.start_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }}
+        ({{ event.start_dt|format_datetime(timezone=event.tzinfo) }}
         -
-        {{ event.end_dt|format_datetime(timezone=event.tzinfo, locale='en_GB') }})
+        {{ event.end_dt|format_datetime(timezone=event.tzinfo) }})
     {% endif %}
 {% endmacro %}
 

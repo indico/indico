@@ -29,7 +29,7 @@
 
 
 {% macro _render_dates(reservation) -%}
-    <strong>{{ reservation.start_dt|format_datetime('EEEE dd/MM/yyyy HH:mm', locale='en_GB') }}</strong> - <strong>{{ reservation.end_dt|format_datetime('EEEE dd/MM/yyyy HH:mm', locale='en_GB') }}</strong>
+    <strong>{{ reservation.start_dt|format_datetime('EEEE dd/MM/yyyy HH:mm') }}</strong> - <strong>{{ reservation.end_dt|format_datetime('EEEE dd/MM/yyyy HH:mm') }}</strong>
 {%- endmacro %}
 
 
