@@ -78,8 +78,8 @@ export default function BlockEntry({
     zIndex: isDragging || isResizing ? 90 : selected ? 80 : style.zIndex,
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
     containerType: 'inline-size',
-    backgroundColor: sessionData.backgroundColor,
-    color: sessionData.textColor,
+    backgroundColor: sessionData?.backgroundColor,
+    color: sessionData?.textColor,
     // overflow: 'hidden',
   };
 
