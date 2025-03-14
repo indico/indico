@@ -7,13 +7,16 @@
 
 import signURL from 'indico-url:core.sign_url';
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, {useReducer, useState} from 'react';
+import React, {useReducer, useState, useEffect} from 'react';
 import {Button, Icon, Input, Label, Grid, Popup, Header} from 'semantic-ui-react';
 
+import SingleDatePicker from 'indico/react/components/dates/SingleDatePicker';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+import {toMoment, serializeDate} from 'indico/utils/date';
 
 import Checkbox from './Checkbox';
 
@@ -94,6 +97,14 @@ export default function ICSCalendarLink({
 }) {
   const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [exportEventSeries, setExportEventSeries] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [startFocused, setStartFocused] = useState(false);
+
+  useEffect(() => {
+    const fourWeeksAgo = moment().subtract(4, 'weeks');
+
+    setStartDate(serializeDate(fourWeeksAgo));
+  }, []);
 
   const copyButton = (
     <Button
@@ -106,13 +117,19 @@ export default function ICSCalendarLink({
     />
   );
 
-  const fetchURL = async (extraParams, controller) => {
+  const fetchURL = async (extraParams, controller, dateOverride = null) => {
     try {
+      const dateParams = {};
+      const dateToUse = dateOverride || startDate;
+      if (dateToUse) {
+        dateParams.start_date = dateToUse;
+      }
+
       const {
         data: {url: signedURL},
       } = await indicoAxios.post(
         signURL(),
-        snakifyKeys({endpoint, params: {...params, ...extraParams}}),
+        snakifyKeys({endpoint, params: {...params, ...extraParams, ...dateParams}}),
         {signal: controller.signal}
       );
       return signedURL;
@@ -129,13 +146,13 @@ export default function ICSCalendarLink({
     dispatch({type: 'CLOSE'});
   };
 
-  const _handleSetOption = async (key, extraParams) => {
+  const _handleSetOption = async (key, extraParams, dateOverride = null) => {
     if (popupState.controller) {
       popupState.controller.abort();
     }
     const controller = new AbortController();
     dispatch({type: 'OPEN', key, controller});
-    const url = await fetchURL(extraParams, controller);
+    const url = await fetchURL(extraParams, controller, dateOverride);
     if (url !== null) {
       dispatch({type: 'LOADED', url});
     }
@@ -147,6 +164,16 @@ export default function ICSCalendarLink({
         extraParams = {...extraParams, series: true};
       }
       _handleSetOption(key, extraParams);
+    }
+  };
+
+  const handleStartDateChange = date => {
+    const serialized = serializeDate(date);
+    setStartDate(serialized);
+
+    if (popupState.key) {
+      const option = options.find(opt => opt.key === popupState.key);
+      _handleSetOption(popupState.key, option?.extraParams || {}, serialized);
     }
   };
 
@@ -206,6 +233,23 @@ export default function ICSCalendarLink({
             </div>
           </>
         )}
+        <strong styleName="export-option">
+          <Translate>Show events from</Translate>
+        </strong>
+        <div styleName="date-range-container">
+          <div styleName="date-input">
+            <SingleDatePicker
+              id="start-date"
+              small
+              date={toMoment(startDate)}
+              onDateChange={handleStartDateChange}
+              focused={startFocused}
+              onFocusChange={({focused}) => setStartFocused(focused)}
+              showDefaultInputIcon={false}
+              isOutsideRange={() => false}
+            />
+          </div>
+        </div>
         <strong styleName="export-option">
           <Translate>Synchronize with your calendar</Translate>
         </strong>
@@ -269,7 +313,7 @@ ICSCalendarLink.propTypes = {
 ICSCalendarLink.defaultProps = {
   params: {},
   renderButton: null,
-  popupPosition: 'left center',
+  popupPosition: 'bottom left',
   options: ICSExportOptions.defaultProps.options,
   eventInSeries: false,
 };

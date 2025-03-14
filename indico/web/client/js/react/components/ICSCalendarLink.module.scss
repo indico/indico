@@ -72,9 +72,29 @@
 .popup .content {
   width: 0;
   min-width: 100%;
+  text-align: center;
 }
 
 .button-group :global(.ui.labeled.button) button:global(.ui.button):last-child {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+.date-range-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem 0;
+  border: none;
+}
+
+.date-input {
+  flex: 1;
+
+  :global(.DateInput_input) {
+    cursor: pointer;
+    border: none !important;
+    padding: 6px 8px 4px !important;
+    font-size: 1rem !important;
+  }
 }
