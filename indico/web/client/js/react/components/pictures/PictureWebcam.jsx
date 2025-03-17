@@ -38,16 +38,19 @@ export function PictureWebcam({
           <Header as="h3" icon textAlign="center" color="grey">
             <Translate>Camera</Translate>
           </Header>
-          <Webcam
-            ref={cameraRef}
-            audio={false}
-            height={height}
-            width={width}
-            screenshotFormat="image/png"
-            onUserMediaError={onUserMediaError}
-            onUserMedia={() => setUserMediaActive(true)}
-            mirrored
-          />
+          {/* XXX: Container and class to be used by plugins */}
+          <div className="webcam-container" style={{position: 'relative'}}>
+            <Webcam
+              ref={cameraRef}
+              audio={false}
+              height={height}
+              width={width}
+              screenshotFormat="image/png"
+              onUserMediaError={onUserMediaError}
+              onUserMedia={() => setUserMediaActive(true)}
+              mirrored
+            />
+          </div>
           <div styleName="capture-controls">
             <button styleName="trigger" type="button" onClick={onCapture}>
               {/* i18n: Capture an image with a webcam */}
