@@ -50,7 +50,7 @@ Improvements
 - Do not "inline" the full participant list in conference events using a meeting-style
   timetable and link to the conference participant list instead (:pr:`6753`)
 - Add new setting :data:`LOCAL_USERNAMES` to disable usernames for logging in and only
-  use the email address (:pr:`6751`)
+  use the email address (:pr:`6751`, :pr:`6810`)
 - Tell search engines to not index events marked as "invisible" (:pr:`6762`, thanks
   :user:`openprojects`)
 - Make the minimum length of local account passwords configurable, and default to ``15``
