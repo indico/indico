@@ -57,7 +57,7 @@ def memoize_request(f):
     return memoizer
 
 
-def memoize_redis(ttl):
+def memoize_redis(ttl, *, versioned=False):
     """Memoize a function in redis.
 
     The cached value can be cleared by calling the method
@@ -73,14 +73,24 @@ def memoize_redis(ttl):
     cache = make_scoped_cache('memoize')
 
     def decorator(f):
+        version_key = '_version_', f.__module__, f.__name__
+
         def _get_key(args, kwargs):
-            return f.__module__, f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
+            version_parts = ()
+            if versioned:
+                version_parts = (cache.get(version_key, 0),)
+            return *version_parts, f.__module__, f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
 
         def _clear_cached(*args, **kwargs):
             cache.delete(_get_key(args, kwargs))
 
         def _is_cached(*args, **kwargs):
             return cache.get(_get_key(args, kwargs), _notset) is not _notset
+
+        def _bump_version(new_version=None):
+            if new_version is None:
+                new_version = cache.get(version_key, 0) + 1
+            cache.set(version_key, new_version)
 
         @wraps(f)
         def memoizer(*args, **kwargs):
@@ -97,6 +107,8 @@ def memoize_redis(ttl):
 
         memoizer.clear_cached = _clear_cached
         memoizer.is_cached = _is_cached
+        if versioned:
+            memoizer.bump_version = _bump_version
         return memoizer
 
     return decorator

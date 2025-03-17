@@ -60,6 +60,8 @@ Improvements
 - Remove anonymized users from local groups (:pr:`6738`, thanks :user:`SegiNyn`)
 - Add ACLs for room booking locations which can grant privileges on the location itself
   and/or all its rooms (:pr:`6566`, thanks :user:`SegiNyn`)
+- Support alternative names in predefined affiliations and make its search more powerful
+  (:pr:`6758`)
 
 Bugfixes
 ^^^^^^^^
