@@ -46,7 +46,6 @@ ignore = [
     'RUF015',  # not always more readable, and we don't do it for huge lists
     'RUF022',  # autofix messes up our formatting instead of just sorting
     'RUF027',  # also triggers on i18n functions -> too noisy for now
-    'RUF035',  # somewhat noisy and many FPs: see https://github.com/astral-sh/ruff/issues/14523
     'RUF052',  # we often use underscore-prefixed variables in tests and to cache regexps in function definitions
     'UP038',   # it looks kind of weird and it slower than a tuple
     'D205',    # too many docstrings which have no summary line
@@ -63,6 +62,7 @@ ignore = [
     'S405',    # we don't use lxml in unsafe ways
     'S603',    # useless, triggers on *all* subprocess calls: https://github.com/astral-sh/ruff/issues/4045
     'S607',    # we trust the PATH to be sane
+    'S704',    # somewhat noisy and many FPs: see https://github.com/astral-sh/ruff/issues/14523
     'B011',    # we don't run python with `-O` (also see S101)
     'B904',    # possibly useful but too noisy
     'COM812',  # trailing commas on multiline lists are nice, but we have 2.5k violations
