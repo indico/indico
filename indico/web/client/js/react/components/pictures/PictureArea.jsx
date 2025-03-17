@@ -59,7 +59,10 @@ export function PictureArea({
               {!isDragActive && picture && (
                 <Grid.Column width={10} verticalAlign="middle">
                   <Card styleName="picture-card" key={picture.filename} centered>
-                    <Image src={picturePreview()} size="large" rounded />
+                    {/* XXX: Container and class to be used by plugins */}
+                    <div className="picture-preview-container">
+                      <Image src={picturePreview()} size="large" rounded />
+                    </div>
                     {picture.upload && !picture.upload.finished && (
                       <Progress
                         percent={picture.upload.progress}
