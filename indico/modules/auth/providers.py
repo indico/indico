@@ -59,7 +59,11 @@ class IndicoAuthProvider(AuthProvider):
         # XXX This is intentional, having an account on an Indico instance is generally not considered
         # secret information, and we want to give users the benefit of more verbose error messages.
         if not identities:
-            raise NoSuchUser(provider=self)
+            exc = NoSuchUser(provider=self)
+            if not config.LOCAL_USERNAMES and '@' not in data['identifier']:
+                exc = NoSuchUser(_('Please use your email address to log in'), provider=self)
+                exc._indico_no_rate_limit = True
+            raise exc
         # From all the matching identities (usually just one), get one where the password matches, or
         # fail with invalid-password if there is none.
         if not (identity := next((ide for ide in identities if self.check_password(ide, data['password'])), None)):
