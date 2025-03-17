@@ -5,13 +5,13 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import fields, post_dump, post_load, validate
+from marshmallow import ValidationError, fields, post_dump, post_load, validate, validates_schema
 from marshmallow.fields import List, String
 
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
 from indico.modules.events import Event
-from indico.modules.users import User
+from indico.modules.users import User, user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle, syncable_fields
 from indico.util.countries import get_country
@@ -90,6 +90,12 @@ class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
             # clear link if we update only the affiliation text for some reason
             data['affiliation_link'] = None
         return data
+
+    @validates_schema(skip_on_field_errors=True)
+    def check_restricted_affiliation(self, data, **kwargs):
+        restricted = user_management_settings.get('only_predefined_affiliations')
+        if restricted and data['affiliation'] and not data['affiliation_link']:
+            raise ValidationError('Custom affiliations are not allowed', field_name='affiliation_data')
 
 
 class BasicCategorySchema(mm.SQLAlchemyAutoSchema):

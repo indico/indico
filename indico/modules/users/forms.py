@@ -16,6 +16,7 @@ from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.core.settings import social_settings
 from indico.modules.users import User
+from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import NameFormat
 from indico.util.i18n import _, get_all_locales
@@ -145,11 +146,16 @@ class AdminUserSettingsForm(IndicoForm):
         choices=[('affiliation', _('Affiliation')), ('comment', _('Comment'))],
         description=_('Fields a new user has to fill in when requesting an account')
     )
+    only_predefined_affiliations = BooleanField(_('Restrict affiliations'), widget=SwitchWidget(),
+                                                description=_('If enabled, users can only choose from predefined '
+                                                              'affiliations but not enter custom ones.'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not multipass.has_moderated_providers:
             del self.mandatory_fields_account_request
+        if not Affiliation.query.filter(~Affiliation.is_deleted).has_rows():
+            del self.only_predefined_affiliations
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):

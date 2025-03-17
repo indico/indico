@@ -238,11 +238,13 @@ class RHPersonalData(RHUserBase):
         if self.user.affiliation_link:
             current_affiliation = AffiliationSchema().dump(self.user.affiliation_link)
         has_predefined_affiliations = Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
+        allow_custom_affiliations = not user_management_settings.get('only_predefined_affiliations')
         return WPUserPersonalData.render_template('personal_data.html', 'personal_data', user=self.user,
                                                   titles=titles, user_values=user_values, locked_fields=locked_fields,
                                                   locked_field_message=multipass.locked_field_message,
                                                   current_affiliation=current_affiliation,
                                                   has_predefined_affiliations=has_predefined_affiliations,
+                                                  allow_custom_affiliations=allow_custom_affiliations,
                                                   allow_deletion=config.ALLOW_ADMIN_USER_DELETION)
 
 

@@ -1,6 +1,7 @@
 {% from 'events/_affiliation.html' import render_affiliation %}
 
-{% macro render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations) %}
+{% macro render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations,
+                           allow_custom_affiliations) %}
     {% set person = person_data.person %}
     <td class="i-table thin-column hide-if-locked">
         <input type="checkbox" value="{{ person.identifier }}" class="select-row id-field"
@@ -91,7 +92,8 @@
                 setupEditEventPerson(
                     {{ person.event_id }},
                     {{ person_schema.dump(person) | tojson }},
-                    {{ has_predefined_affiliations | tojson }}
+                    {{ has_predefined_affiliations | tojson }},
+                    {{ allow_custom_affiliations | tojson }}
                 );
             </script>
         {% else %}

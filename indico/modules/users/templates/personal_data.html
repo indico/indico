@@ -39,7 +39,8 @@
             {{ user.synced_values | tojson }},
             {{ locked_fields | tojson }},
             {{ locked_field_message | tojson }},
-            {{ has_predefined_affiliations | tojson }}
+            {{ has_predefined_affiliations | tojson }},
+            {{ allow_custom_affiliations | tojson }}
         );
     </script>
 {% endblock %}

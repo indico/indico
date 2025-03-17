@@ -40,6 +40,7 @@ function PersonalDataForm({
   lockedFields,
   lockedFieldMessage,
   hasPredefinedAffiliations,
+  allowCustomAffiliations,
 }) {
   const userIdArgs = userId !== null ? {user_id: userId} : {};
 
@@ -110,6 +111,7 @@ function PersonalDataForm({
                 syncedValues={syncedValues}
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
+                allowCustomAffiliations={allowCustomAffiliations}
               />
             ) : (
               <SyncedFinalInput
@@ -178,6 +180,7 @@ PersonalDataForm.propTypes = {
   lockedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
   lockedFieldMessage: PropTypes.string.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
+  allowCustomAffiliations: PropTypes.bool.isRequired,
 };
 
 PersonalDataForm.defaultProps = {
@@ -193,7 +196,8 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
   syncedValues,
   lockedFields,
   lockedFieldMessage,
-  hasPredefinedAffiliations
+  hasPredefinedAffiliations,
+  allowCustomAffiliations
 ) {
   document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
@@ -206,6 +210,7 @@ window.setupPersonalDataForm = function setupPersonalDataForm(
         lockedFields={lockedFields}
         lockedFieldMessage={lockedFieldMessage}
         hasPredefinedAffiliations={hasPredefinedAffiliations}
+        allowCustomAffiliations={allowCustomAffiliations}
       />,
       document.querySelector('#personal-details-form-container')
     );
