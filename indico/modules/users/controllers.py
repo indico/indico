@@ -28,8 +28,6 @@ from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
-from indico.core.db.sqlalchemy.searchable import fts_matches
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
@@ -56,11 +54,10 @@ from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema
 from indico.modules.users.util import (anonymize_user, get_avatar_url_from_name, get_gravatar_for_user,
                                        get_linked_events, get_mastodon_server_name, get_related_categories,
                                        get_suggested_categories, get_unlisted_events, get_user_by_email,
-                                       get_user_titles, merge_users, search_users, send_avatar, serialize_user,
-                                       set_user_avatar)
+                                       get_user_titles, merge_users, search_affiliations, search_users, send_avatar,
+                                       serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
-from indico.util.countries import get_countries_regex, get_country_reverse
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, force_locale
 from indico.util.images import square
@@ -310,46 +307,10 @@ class RHPersonalDataUpdate(RHUserBase):
         return '', 204
 
 
-def _match_search(q, exact=False, prefix=False):
-    if exact:
-        match_str = f'|||{q}|||'
-    elif prefix:
-        match_str = f'|||{q}'
-    else:
-        match_str = q
-    return unaccent_match(Affiliation.searchable_names, match_str, exact=False)
-
-
-def _weighted_score(*params):
-    return sum(db.cast(param, db.Integer) * weight for param, weight in params)
-
-
 class RHSearchAffiliations(RH):
     @use_kwargs({'q': fields.String(load_default='')}, location='query')
     def _process(self, q):
-        exact_match = _match_search(q, exact=True)
-        score = _weighted_score((exact_match, 150), (_match_search(q, prefix=True), 60), (_match_search(q), 20))
-        countries = set(get_countries_regex().findall(q))
-        for country in countries:
-            q = q.replace(country, '')
-            if (country_code := get_country_reverse(country, case_sensitive=False)):
-                score += _weighted_score((Affiliation.country_code.ilike(country_code), 50))
-        for word in q.split():
-            score += _weighted_score((unaccent_match(Affiliation.city, word, exact=False), 20),
-                                     (_match_search(word, exact=True), 40),
-                                     (_match_search(word, prefix=True), 30),
-                                     (_match_search(word), 10),
-                                     (Affiliation.popularity, 1))
-        q_filter = fts_matches(Affiliation.searchable_names, q)
-        res = (
-            Affiliation.query
-            .filter(~Affiliation.is_deleted, q_filter)
-            .order_by(
-                score.desc(),
-                db.func.indico.indico_unaccent(db.func.lower(Affiliation.name)),
-            )
-            .limit(20)
-            .all())
+        res = search_affiliations(q)
         return AffiliationSchema(many=True).jsonify(res)
 
 
