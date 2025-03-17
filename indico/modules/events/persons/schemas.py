@@ -64,6 +64,15 @@ class PersonLinkSchema(mm.Schema):
 
     @validates_schema(skip_on_field_errors=True)
     def check_restricted_affiliation(self, data, **kwargs):
+        if self.context.get('affiliations_disabled'):
+            # XXX This is a horrible hack to fix the jacow plugin which implements multiple affiliations.
+            # Ideally, we would completely ignore affiliation data in this schema when a plugin disables
+            # affiliations, and then let the plugin's server-side code deal with assigning everything it
+            # wants stored in the core (such as a semicolon-separated list of the affiliations in the
+            # normal affiliation string).
+            # Anyway, for now we accept the fact that the affiliation string is not really "protected"
+            # by the check here when such a plugin is used.
+            return
         restricted = user_management_settings.get('only_predefined_affiliations')
         if restricted and data['affiliation'] and not data['affiliation_link']:
             raise ValidationError('Custom affiliations are not allowed')

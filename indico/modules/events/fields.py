@@ -149,8 +149,9 @@ class PersonLinkListFieldBase(PrincipalListField):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         identifier = data.get('identifier')
         affiliations_disabled = self.extra_params.get('disable_affiliations', False)
+        schema = PersonLinkSchema(unknown=EXCLUDE, context={'affiliations_disabled': affiliations_disabled})
         try:
-            data = PersonLinkSchema(unknown=EXCLUDE).load(data)
+            data = schema.load(data)
         except MMValidationError as exc:
             # XXX this happens when custom affiliations are disabled but someone sends one anyway.
             # it should never happen so we don't bother formatting it in a pretty way
