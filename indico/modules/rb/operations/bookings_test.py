@@ -6,8 +6,10 @@
 # LICENSE file for more details.
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import pytest
+from flask import session
 
 from indico.modules.rb.models.reservations import RepeatFrequency
 
@@ -47,11 +49,16 @@ def test_ongoing_bookings_are_not_split(create_reservation, start_dt, end_dt):
     assert split_booking(reservation, {}, extra_fields={}) is None
 
 
-def past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
+@pytest.mark.usefixtures('request_context')
+def test_past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
     from indico.modules.rb.operations.bookings import split_booking
 
-    start_dt = datetime.today().replace(hour=8, minutes=30) - timedelta(days=2)
-    end_dt = datetime.today().replace(hour=17, minutes=30) + timedelta(days=4)
+    session['_user_id'] = dummy_user.id
+
+    datetime_now = datetime.today().replace(hour=12, minute=0, second=0, microsecond=0)
+    start_dt = datetime_now.replace(hour=8, minute=30) - timedelta(days=2)
+    end_dt = datetime_now.replace(hour=17, minute=30) + timedelta(days=4)
+
     reservation = create_reservation(start_dt=start_dt, end_dt=end_dt, repeat_frequency=RepeatFrequency.DAY)
     new_booking_data = {
         'booking_reason': 'test reason',
@@ -61,12 +68,34 @@ def past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
         'repeat_frequency': RepeatFrequency.DAY,
         'repeat_interval': reservation.repeat_interval
     }
-    new_reservation = split_booking(
-        reservation,
-        new_booking_data,
-        extra_fields={},
-    )
 
-    number_of_cancelled_occurrences = [occ for occ in reservation.occurrences if occ.is_cancelled]
-    assert number_of_cancelled_occurrences == 2
-    assert len(new_reservation.occurrences) == 4
+    class MockDatetime:
+        @staticmethod
+        def now():
+            return datetime_now
+
+        @staticmethod
+        def combine(date_obj, time_obj):
+            return datetime.combine(date_obj, time_obj)
+
+    class MockDate:
+        @staticmethod
+        def today():
+            return datetime_now.date()
+
+    with patch('indico.core.notifications.send_email'), \
+        patch('indico.modules.rb.operations.bookings.datetime', MockDatetime), \
+        patch('indico.modules.rb.operations.bookings.date', MockDate), \
+        patch('indico.modules.rb.models.reservation_occurrences.ReservationOccurrence.cancel') as mock_cancel:
+
+        new_reservation = split_booking(
+            reservation,
+            new_booking_data,
+            extra_fields={},
+        )
+
+        assert mock_cancel.called
+        assert mock_cancel.call_count == 4
+
+    new_occurrences_count = len(list(new_reservation.occurrences))
+    assert new_occurrences_count == 4
