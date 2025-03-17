@@ -24,6 +24,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users.models.users import User
 from indico.util.date_time import now_utc
 from indico.util.enum import IndicoEnum
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 
 
@@ -244,7 +245,8 @@ def events_to_ical(
                 alarm = icalendar.Alarm()
                 alarm.add('action', 'DISPLAY')
                 alarm.add('trigger', timedelta(minutes=-reminder_minutes))
-                alarm.add('description', component.get('description', f"Reminder: {component['summary']}"))
+                reminder_text = _('Reminder: {summary}').format(summary=component['summary'])
+                alarm.add('description', component.get('description', reminder_text))
                 component.add_component(alarm)
 
         for component in components:

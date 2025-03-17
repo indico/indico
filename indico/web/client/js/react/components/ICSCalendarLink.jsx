@@ -233,12 +233,12 @@ export default function ICSCalendarLink({
             selection
             placeholder={Translate.string('Select alert time')}
             options={[
-              {key: 'None', text: Translate.string('None'), value: 0},
+              {key: 'None', text: Translate.string('None', 'alert'), value: 0},
               {key: '5', text: Translate.string('5 minutes before'), value: 5},
               {key: '15', text: Translate.string('15 minutes before'), value: 15},
               {key: '30', text: Translate.string('30 minutes before'), value: 30},
             ]}
-            value={reminder === null ? 0 : reminder}
+            value={reminder ?? 0}
             onChange={(_, {value}) => handleReminderChange(value === 0 ? null : value)}
           />
         </div>
