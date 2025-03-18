@@ -100,6 +100,33 @@ class RoomList extends React.Component {
     this.clearSelectionMode();
   };
 
+  get allSelected() {
+    const {results} = this.props;
+    const {selection} = this.state;
+    return Object.keys(selection).length === results.length;
+  }
+
+  get selectAllBtnProps() {
+    if (this.allSelected) {
+      return {
+        selectAllFunc: () => {
+          this.setState({selection: {}});
+        },
+        selectAllPrimary: true,
+        selectAllText: Translate.string('Deselect all rooms'),
+      };
+    }
+    return {
+      selectAllFunc: () => {
+        const {results} = this.props;
+        const allRooms = Object.fromEntries(results.map(room => [room.id, room]));
+        this.setState({selection: allRooms});
+      },
+      selectAllPrimary: false,
+      selectAllText: Translate.string('Select all rooms'),
+    };
+  }
+
   clearSelectionMode = () => {
     this.setState({selectionMode: null, selection: {}});
   };
@@ -160,6 +187,7 @@ class RoomList extends React.Component {
         icon: 'file excel',
       },
     ];
+    const {selectAllFunc, selectAllPrimary, selectAllText} = this.selectAllBtnProps;
 
     return (
       <Grid columns={2}>
@@ -176,6 +204,21 @@ class RoomList extends React.Component {
                     <div styleName="actions">
                       {selectionMode ? (
                         <>
+                          {selectionMode === 'export' && (
+                            <ResponsivePopup
+                              trigger={
+                                <Button
+                                  icon="check square"
+                                  onClick={selectAllFunc}
+                                  primary={selectAllPrimary}
+                                  style={{marginRight: '1.5rem'}}
+                                  circular
+                                />
+                              }
+                              content={selectAllText}
+                              position="bottom center"
+                            />
+                          )}
                           <Button
                             icon="check"
                             disabled={Object.keys(selection).length === 0}
