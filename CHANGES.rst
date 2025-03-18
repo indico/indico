@@ -324,6 +324,7 @@ Improvements
   :user:`tomako, unconventionaldotdev`)
 - Add a log for user actions, similar to that in events and categories (:pr:`6779`, :pr:`6813`,
   thanks :user:`tomako`)
+- Add an option to request changes in bulk on the editable list (:pr:`6466`)
 
 Bugfixes
 ^^^^^^^^
@@ -525,7 +526,6 @@ Improvements
   module (:issue:`6503`, :pr:`6502`)
 - Add quick setup button to configure default notifications in Call for Abstracts
   (:pr:`6454`, thanks :user:`jbtwist`)
-- Add an option to request changes in bulk on the editable list (:pr:`6466`)
 
 Bugfixes
 ^^^^^^^^
