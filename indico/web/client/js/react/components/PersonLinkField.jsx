@@ -242,6 +242,7 @@ function PersonLinkField({
   autoSort,
   setAutoSort,
   hasPredefinedAffiliations,
+  allowCustomAffiliations,
   customPersonsMode,
   requiredPersonFields,
   defaultSearchExternal,
@@ -408,6 +409,7 @@ function PersonLinkField({
               otherPersons={selected === null ? persons : _.without(persons, persons[selected])}
               requiredPersonFields={requiredPersonFields}
               hasPredefinedAffiliations={hasPredefinedAffiliations}
+              allowCustomAffiliations={allowCustomAffiliations}
               validateEmailUrl={validateEmailUrl}
               extraParams={extraParams}
             />
@@ -437,6 +439,7 @@ PersonLinkField.propTypes = {
   autoSort: PropTypes.bool,
   setAutoSort: PropTypes.func,
   hasPredefinedAffiliations: PropTypes.bool,
+  allowCustomAffiliations: PropTypes.bool,
   customPersonsMode: PropTypes.oneOf(['always', 'after_search', 'never']),
   requiredPersonFields: PropTypes.array,
   defaultSearchExternal: PropTypes.bool,
@@ -453,6 +456,7 @@ PersonLinkField.defaultProps = {
   autoSort: true,
   setAutoSort: null,
   hasPredefinedAffiliations: false,
+  allowCustomAffiliations: true,
   customPersonsMode: 'always',
   requiredPersonFields: [],
   defaultSearchExternal: false,
@@ -469,6 +473,7 @@ export function WTFPersonLinkField({
   sessionUser,
   emptyMessage,
   hasPredefinedAffiliations,
+  allowCustomAffiliations,
   customPersonsMode,
   requiredPersonFields,
   defaultSearchExternal,
@@ -526,6 +531,7 @@ export function WTFPersonLinkField({
       autoSort={autoSort}
       setAutoSort={setAutoSort}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
+      allowCustomAffiliations={allowCustomAffiliations}
       customPersonsMode={customPersonsMode}
       requiredPersonFields={requiredPersonFields}
       defaultSearchExternal={defaultSearchExternal}
@@ -544,6 +550,7 @@ WTFPersonLinkField.propTypes = {
   sessionUser: PropTypes.object,
   emptyMessage: PropTypes.string,
   hasPredefinedAffiliations: PropTypes.bool,
+  allowCustomAffiliations: PropTypes.bool,
   nameFormat: PropTypes.string,
   customPersonsMode: PropTypes.oneOf(['always', 'after_search', 'never']),
   requiredPersonFields: PropTypes.array,
@@ -559,6 +566,7 @@ WTFPersonLinkField.defaultProps = {
   sessionUser: null,
   emptyMessage: null,
   hasPredefinedAffiliations: false,
+  allowCustomAffiliations: true,
   customPersonsMode: 'always',
   requiredPersonFields: [],
   defaultSearchExternal: false,

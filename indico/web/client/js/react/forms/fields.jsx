@@ -583,7 +583,7 @@ FinalDropdown.defaultProps = {
 /**
  * Like `FinalField` but for a dropdown with support for adding a custom freetext item.
  */
-export function FinalComboDropdown({name, label, ...rest}) {
+export function FinalComboDropdown({name, label, allowAdditions, ...rest}) {
   return (
     <FinalField
       name={name}
@@ -591,7 +591,7 @@ export function FinalComboDropdown({name, label, ...rest}) {
       label={label}
       format={x => (x.id === null ? x.text : x.id)}
       parse={identity}
-      allowAdditions
+      allowAdditions={allowAdditions}
       search
       selection
       {...rest}
@@ -602,10 +602,12 @@ export function FinalComboDropdown({name, label, ...rest}) {
 FinalComboDropdown.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
+  allowAdditions: PropTypes.bool,
 };
 
 FinalComboDropdown.defaultProps = {
   label: null,
+  allowAdditions: true,
 };
 
 /**

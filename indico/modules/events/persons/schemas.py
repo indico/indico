@@ -5,10 +5,11 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import fields, post_dump, post_load, pre_load
+from marshmallow import ValidationError, fields, post_dump, post_load, pre_load, validates_schema
 
 from indico.core.marshmallow import mm
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.schemas import AffiliationSchema
@@ -61,6 +62,21 @@ class PersonLinkSchema(mm.Schema):
             data['title'] = None
         return data
 
+    @validates_schema(skip_on_field_errors=True)
+    def check_restricted_affiliation(self, data, **kwargs):
+        if self.context.get('affiliations_disabled'):
+            # XXX This is a horrible hack to fix the jacow plugin which implements multiple affiliations.
+            # Ideally, we would completely ignore affiliation data in this schema when a plugin disables
+            # affiliations, and then let the plugin's server-side code deal with assigning everything it
+            # wants stored in the core (such as a semicolon-separated list of the affiliations in the
+            # normal affiliation string).
+            # Anyway, for now we accept the fact that the affiliation string is not really "protected"
+            # by the check here when such a plugin is used.
+            return
+        restricted = user_management_settings.get('only_predefined_affiliations')
+        if restricted and data['affiliation'] and not data['affiliation_link']:
+            raise ValidationError('Custom affiliations are not allowed')
+
 
 class EventPersonSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
@@ -100,3 +116,9 @@ class EventPersonUpdateSchema(EventPersonSchema):
         fields = ('title', 'first_name', 'last_name', 'address', 'phone', 'affiliation', 'affiliation_link')
 
     title = fields.Enum(UserTitle)
+
+    @validates_schema(skip_on_field_errors=True)
+    def check_restricted_affiliation(self, data, **kwargs):
+        restricted = user_management_settings.get('only_predefined_affiliations')
+        if restricted and data['affiliation'] and not data['affiliation_link']:
+            raise ValidationError('Custom affiliations are not allowed', field_name='affiliation_data')

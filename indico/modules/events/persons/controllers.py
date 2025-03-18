@@ -42,6 +42,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.logs import LogKind
+from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
@@ -258,10 +259,12 @@ class RHPersonsList(RHPersonsBase):
         for person_data in persons.values():
             if not person_data['registrations']:
                 person_data['roles']['no_registration'] = True
+        allow_custom_affiliations = not user_management_settings.get('only_predefined_affiliations')
         return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
                                                num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,
                                                custom_roles=custom_roles, person_schema=EventPersonSchema(),
-                                               has_predefined_affiliations=Affiliation.query.has_rows())
+                                               has_predefined_affiliations=Affiliation.query.has_rows(),
+                                               allow_custom_affiliations=allow_custom_affiliations)
 
 
 class RHEmailEventPersonsBase(RHManageEventBase):
@@ -431,8 +434,10 @@ class RHUpdateEventPerson(RHEventPersonActionBase):
         update_person(self.person, args)
         person_data = self.get_persons()[self.person.email or self.person.id]
         tpl = get_template_module('events/persons/management/_person_list_row.html')
+        allow_custom_affiliations = not user_management_settings.get('only_predefined_affiliations')
         return jsonify(html=tpl.render_person_row(person_data, bool(self.event.registration_forms),
-                                                  EventPersonSchema(), Affiliation.query.has_rows()))
+                                                  EventPersonSchema(), Affiliation.query.has_rows(),
+                                                  allow_custom_affiliations))
 
 
 class RHDeleteUnusedEventPerson(RHEventPersonActionBase):
@@ -452,8 +457,10 @@ class RHSyncEventPerson(RHEventPersonActionBase):
         logger.info('EventPerson synced with user in event %r: %r', self.event, self.person)
         person_data = self.get_persons()[self.person.email or self.person.id]
         tpl = get_template_module('events/persons/management/_person_list_row.html')
+        allow_custom_affiliations = not user_management_settings.get('only_predefined_affiliations')
         return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms),
-                                                       EventPersonSchema(), Affiliation.query.has_rows()))
+                                                       EventPersonSchema(), Affiliation.query.has_rows(),
+                                                       allow_custom_affiliations))
 
 
 class RHEventPersonSearch(RHAuthenticatedEventBase):

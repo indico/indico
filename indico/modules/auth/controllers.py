@@ -463,6 +463,7 @@ class RegistrationHandler:
             'cancelURL': url_for_logout(),
             'moderated': self.moderate_registrations,
             'hasPredefinedAffiliations': Affiliation.query.has_rows(),
+            'allowCustomAffiliations': not user_management_settings.get('only_predefined_affiliations'),
             'mandatoryFields': user_management_settings.get('mandatory_fields_account_request'),
             'tosUrl': legal_settings.get('tos_url'),
             'tos': legal_settings.get('tos'),
@@ -512,6 +513,12 @@ class RegistrationHandler:
             def check_email_unique(self, email, **kwargs):
                 if User.query.filter(~User.is_deleted, ~User.is_pending, User.all_emails == email).has_rows():
                     raise ValidationError('Email already in use')
+
+            @validates_schema(skip_on_field_errors=True)
+            def check_restricted_affiliation(self, data, **kwargs):
+                restricted = user_management_settings.get('only_predefined_affiliations')
+                if restricted and data['affiliation'] and not data['affiliation_link']:
+                    raise ValidationError('Custom affiliations are not allowed', field_name='affiliation_data')
 
         return SignupSchema
 

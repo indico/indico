@@ -17,7 +17,13 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
-function EditEventPerson({eventId, person, hasPredefinedAffiliations, replacePersonRow}) {
+function EditEventPerson({
+  eventId,
+  person,
+  hasPredefinedAffiliations,
+  allowCustomAffiliations,
+  replacePersonRow,
+}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSubmit = async (data, form) => {
@@ -37,7 +43,7 @@ function EditEventPerson({eventId, person, hasPredefinedAffiliations, replacePer
         snakifyKeys(changedValues)
       );
     } catch (e) {
-      return handleSubmitError(e);
+      return handleSubmitError(e, {affiliation_data: 'affiliationData'});
     }
 
     replacePersonRow(resp.data.html);
@@ -55,6 +61,7 @@ function EditEventPerson({eventId, person, hasPredefinedAffiliations, replacePer
         <PersonDetailsModal
           person={person}
           hasPredefinedAffiliations={hasPredefinedAffiliations}
+          allowCustomAffiliations={allowCustomAffiliations}
           hideEmailField
           onClose={() => setModalOpen(false)}
           onSubmit={handleSubmit}
@@ -68,10 +75,16 @@ EditEventPerson.propTypes = {
   eventId: PropTypes.number.isRequired,
   person: PropTypes.object.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
+  allowCustomAffiliations: PropTypes.bool.isRequired,
   replacePersonRow: PropTypes.func.isRequired,
 };
 
-window.setupEditEventPerson = (eventId, person, hasPredefinedAffiliations) => {
+window.setupEditEventPerson = (
+  eventId,
+  person,
+  hasPredefinedAffiliations,
+  allowCustomAffiliations
+) => {
   const container = document.querySelector(`#edit-person-${person.id}`);
   const replacePersonRow = html => {
     ReactDOM.unmountComponentAtNode(container);
@@ -84,6 +97,7 @@ window.setupEditEventPerson = (eventId, person, hasPredefinedAffiliations) => {
       eventId={eventId}
       person={camelizeKeys(person)}
       hasPredefinedAffiliations={hasPredefinedAffiliations}
+      allowCustomAffiliations={allowCustomAffiliations}
       replacePersonRow={replacePersonRow}
     />,
     container

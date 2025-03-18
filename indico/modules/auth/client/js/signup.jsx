@@ -44,6 +44,7 @@ function Signup({
   termsEffectiveDate,
   initialValues,
   hasPredefinedAffiliations,
+  allowCustomAffiliations,
   showAccountForm,
   showUsernameField,
   syncedValues,
@@ -215,6 +216,7 @@ function Signup({
                 lockedFields={lockedFields}
                 lockedFieldMessage={lockedFieldMessage}
                 currentAffiliation={affiliationMeta}
+                allowCustomAffiliations={allowCustomAffiliations}
               />
             ) : (
               <SyncedFinalInput
@@ -347,6 +349,7 @@ Signup.propTypes = {
   termsEffectiveDate: PropTypes.string,
   initialValues: PropTypes.object.isRequired,
   hasPredefinedAffiliations: PropTypes.bool.isRequired,
+  allowCustomAffiliations: PropTypes.bool.isRequired,
   showAccountForm: PropTypes.bool.isRequired,
   showUsernameField: PropTypes.bool,
   syncedValues: PropTypes.object.isRequired,

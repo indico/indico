@@ -10,6 +10,7 @@ from operator import attrgetter
 
 from flask import session
 from marshmallow import EXCLUDE
+from marshmallow import ValidationError as MMValidationError
 from sqlalchemy import inspect
 from wtforms import RadioField, SelectField
 
@@ -23,6 +24,7 @@ from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.persons import CustomPersonsMode, persons_settings
 from indico.modules.events.persons.util import get_event_person
+from indico.modules.users import user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
@@ -102,6 +104,10 @@ class PersonLinkListFieldBase(PrincipalListField):
         return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 
     @property
+    def allow_custom_affiliations(self):
+        return not user_management_settings.get('only_predefined_affiliations')
+
+    @property
     def default_search_external(self):
         if not self.event:
             return False
@@ -143,7 +149,13 @@ class PersonLinkListFieldBase(PrincipalListField):
         from indico.modules.events.persons.schemas import PersonLinkSchema
         identifier = data.get('identifier')
         affiliations_disabled = self.extra_params.get('disable_affiliations', False)
-        data = PersonLinkSchema(unknown=EXCLUDE).load(data)
+        schema = PersonLinkSchema(unknown=EXCLUDE, context={'affiliations_disabled': affiliations_disabled})
+        try:
+            data = schema.load(data)
+        except MMValidationError as exc:
+            # XXX this happens when custom affiliations are disabled but someone sends one anyway.
+            # it should never happen so we don't bother formatting it in a pretty way
+            raise UserValueError(f'Validation failed: {exc}')
         if not data.get('type'):
             if self.disallow_enter_manually:
                 raise UserValueError('Manually entered persons are not allowed')

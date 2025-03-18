@@ -262,7 +262,7 @@
                             class="i-table {{ 'untrusted' if person_data.person.is_untrusted }} {{ 'no-roles' if person_data.roles.no_roles }}"
                             data-person-roles="{{ person_data.roles | tojson | forceescape }}"
                             {{ 'data-no-account' if person_data.roles.no_account }}>
-                            {{ render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations) }}
+                            {{ render_person_row(person_data, event_has_registration_forms, person_schema, has_predefined_affiliations, allow_custom_affiliations) }}
                         </tr>
                     {%- else -%}
                         <tr class="i-table">
