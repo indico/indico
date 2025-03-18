@@ -50,6 +50,13 @@ export const EditingReviewAction = {
   requestUpdate: 'request_update',
 };
 
+export const EditingActionState = {
+  [EditingReviewAction.accept]: 'accepted',
+  [EditingReviewAction.reject]: 'rejected',
+  [EditingReviewAction.update]: 'needs_submitter_confirmation',
+  [EditingReviewAction.requestUpdate]: 'needs_submitter_changes',
+};
+
 export const EditableType = {
   paper: 'paper',
   slides: 'slides',

@@ -62,6 +62,7 @@ Improvements
   and/or all its rooms (:pr:`6566`, thanks :user:`SegiNyn`)
 - Support alternative names in predefined affiliations and make its search more powerful
   (:pr:`6758`)
+- Add an option to request changes in bulk on the editable list (:pr:`6466`)
 
 Bugfixes
 ^^^^^^^^
