@@ -18,6 +18,7 @@ from indico.modules.events.payment.util import get_active_payment_plugins, get_p
 from indico.modules.events.payment.views import WPPaymentAdmin, WPPaymentEvent, WPPaymentEventManagement
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -109,6 +110,16 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         if can_modify and form.validate_on_submit():
             self.plugin.event_settings.set_multi(self.event, form.data)
+            match plugin_event_settings.get('enabled'), form.enabled.data:
+                case True, False:
+                    self.event.log(EventLogRealm.management, LogKind.negative, 'Payment',
+                                   f'Payment method disabled: {self.plugin.title}', user=session.user)
+                case False, True:
+                    self.event.log(EventLogRealm.management, LogKind.positive, 'Payment',
+                                   f'Payment method enabled: {self.plugin.title}', user=session.user)
+            if log_data := {k: v for k, v in form.data.items() if k != 'enabled'}:
+                self.event.log(EventLogRealm.management, LogKind.change, 'Payment',
+                            f'Payment method updated: {self.plugin.title}', user=session.user, data=log_data)
             flash(_('Settings for {} saved').format(self.plugin.title), 'success')
             if self.protection_overridden:
                 return jsonify_data()
