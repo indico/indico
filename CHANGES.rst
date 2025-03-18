@@ -67,6 +67,8 @@ Improvements
 - Log changes to event payment methods (:pr:`6739`)
 - Add button to select all rooms for exporting in the room list (:pr:`6773`, thanks
   :user:`Michi03`)
+- Include abstract details in comment notification email subject (:issue:`6449`, :pr:`6782`,
+  thanks :user:`amCap1712`)
 
 Bugfixes
 ^^^^^^^^
