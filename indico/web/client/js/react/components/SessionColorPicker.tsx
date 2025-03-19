@@ -100,7 +100,10 @@ const SessionColorPickerAdapter: React.FC<SessionColorPickerAdapterProps> = ({in
       <Button
         type="button"
         icon="paint brush"
-        style={{color: input.value?.text, backgroundColor: input.value?.background}}
+        style={{
+          color: input.value ? input.value.text : undefined,
+          backgroundColor: input.value ? input.value.background : undefined,
+        }}
         content={Translate.string('Choose')}
         circular
       />
