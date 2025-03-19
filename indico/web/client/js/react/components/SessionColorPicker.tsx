@@ -7,6 +7,7 @@
 
 import React, {useState} from 'react';
 import {Button, Popup} from 'semantic-ui-react';
+
 import {FinalField, FormFieldAdapter} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
@@ -72,7 +73,7 @@ export default function SessionColorPicker({value, onChange, trigger}: SessionCo
               icon="tint"
               styleName={toClasses({
                 choice: true,
-                selected: color.background === value?.background,
+                selected: color.background === (value ? value.background : undefined),
               })}
               circular
             />
