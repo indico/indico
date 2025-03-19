@@ -124,7 +124,14 @@
                                 {% endfor %}
                                 {% for item in dynamic_columns %}
                                     {% set search_value = data[item.id].search_data if item.id in data else '' %}
-                                    {% if item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
+                                    {% if item.id in data and data[item.id].field_data.field.is_purged %}
+                                        <td class="i-table">
+                                            <span class="icon-warning purged-field-warning"
+                                                  data-qtip-style="warning"
+                                                  title="{% trans %}The field data has been purged due to an expired retention period{% endtrans %}">
+                                            </span>
+                                        </td>
+                                    {% elif item.id in data and data[item.id].field_data.field.input_type == 'checkbox' %}
                                         <td class="i-table{%- if data[item.id].data %} icon-checkmark{% endif %}"
                                             data-text="{{ search_value }}"></td>
                                     {% elif item.id in data and data[item.id].field_data.field.input_type == 'accommodation' %}
