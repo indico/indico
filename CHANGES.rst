@@ -199,6 +199,8 @@ Bugfixes
 - Use locale-aware price formatting in registration form fields (:pr:`6586`)
 - Handle badge designer items exceeding the canvas boundaries more gracefully (:pr:`6603`,
   thanks :user:`SegiNyn`)
+- Fix tips not correctly positioning when contents are changed (:pr:`6797`, thanks
+  :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^

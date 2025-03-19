@@ -5,29 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {domReady} from 'indico/utils/domstate';
+import CustomElementBase from 'indico/custom_elements/_base';
 import * as positioning from 'indico/utils/positioning';
 
 import './tips.scss';
 
-export class TipBase extends HTMLElement {
+export class TipBase extends CustomElementBase {
   constructor() {
     super();
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);
     this.dismiss = this.dismiss.bind(this);
-  }
-
-  connectedCallback() {
-    domReady.then(() => {
-      this.$tip = this.querySelector('[data-tip-content]');
-      console.assert(this.$tip, 'Must contain a *[data-tip-content] element');
-      this.setup();
-    });
-  }
-
-  disconnectedCallback() {
-    window.removeEventListener('keydown', this.dismiss);
   }
 
   get orientation() {
@@ -70,7 +58,28 @@ export class TipBase extends HTMLElement {
   }
 
   setup() {
-    window.addEventListener('keydown', this.dismiss);
+    this.$tip = this.querySelector('[data-tip-content]');
+
+    console.assert(this.$tip, 'Must contain a *[data-tip-content] element');
+
+    this.addEventListener('x-connect', () => {
+      window.addEventListener('keydown', this.dismiss);
+    });
+    this.addEventListener('x-disconnect', () => {
+      window.removeEventListener('keydown', this.dismiss);
+    });
+    this.addEventListener('x-connect', () => {
+      this.contentMutationObserver = new MutationObserver(() => {
+        this.updatePosition();
+      }).observe(this.$tip, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+      });
+    });
+    this.addEventListener('x-disconnect', () => {
+      this.contentMutationObserver.disconnect();
+    });
     this.$tip.addEventListener('click', evt => {
       evt.preventDefault();
     });
