@@ -50,7 +50,7 @@ class ContributionForm(IndicoForm):
     type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
     person_link_data = ContributionPersonLinkListField(_('People'))
     location_data = IndicoLocationField(_('Location'))
-    # keywords = the field is dynamically added when creating the form
+    # The 'keywords' field is dynamically added when creating the form.
     references = ReferencesField(_('External IDs'), reference_class=ContributionReference,
                                  description=_('Manage external resources for this contribution'))
     board_number = StringField(_('Board Number'))
