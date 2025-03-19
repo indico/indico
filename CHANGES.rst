@@ -74,6 +74,8 @@ Improvements
   :user:`amCap1712`)
 - Allow resetting registrations back to pending in bulk (:issue:`5954`, :pr:`6784`, thanks
   :user:`amCap1712`)
+- Allow to configure a restrictive set of allowed contribution keywords (:pr:`6778`, thanks
+  :user:`tomako, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
@@ -579,7 +581,7 @@ Improvements
 - Add a legend to the category calendar, allowing to filter events either by category, venue,
   room or keywords (:issue:`6105, 6106, 6128, 6148, 6149, 6127`, :pr:`6110, 6158, 6183`,
   thanks :user:`Moliholy, unconventionaldotdev`)
-- Allow to configure a restrictive set of allowed keywords (:issue:`6127`, :pr:`6183`,
+- Allow to configure a restrictive set of allowed event keywords (:issue:`6127`, :pr:`6183`,
   thanks :user:`Moliholy, unconventionaldotdev`).
 - Add week and day views in the category calendar and improve navigation controls
   (:issue:`6108, 6129, 6107`, :pr:`6110`, thanks :user:`Moliholy, unconventionaldotdev`).
