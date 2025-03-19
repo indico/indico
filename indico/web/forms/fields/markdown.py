@@ -24,9 +24,9 @@ class IndicoMarkdownField(TextAreaField):
 
     widget = JinjaWidget('forms/markdown_widget.html', single_kwargs=True, rows=5)
 
-    def __init__(self, *args, **kwargs):
-        self.use_editor = kwargs.pop('editor', False)
-        self.use_mathjax = kwargs.pop('mathjax', False)
+    def __init__(self, *args, editor=False, mathjax=False, **kwargs):
+        self.use_editor = editor
+        self.use_mathjax = mathjax
         orig_id = kwargs['_prefix'] + kwargs['name']
         if self.use_editor:
             # WMD relies on this awful ID :/
