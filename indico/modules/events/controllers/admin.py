@@ -130,7 +130,8 @@ class RHUpdateAllowedKeywords(RHAdminBase):
     def _process(self):
         form = AllowedKeywordsForm(
             event_keywords=global_event_settings.get('allowed_event_keywords'),
-            contribution_keywords=global_event_settings.get('allowed_contribution_keywords'))
+            contribution_keywords=global_event_settings.get('allowed_contribution_keywords'),
+        )
         if form.validate_on_submit():
             event_keywords = sorted(set(form.data.get('event_keywords', [])), key=natural_sort_key)
             global_event_settings.set('allowed_event_keywords', event_keywords)
