@@ -17,17 +17,18 @@ import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
 import TimetableCreateModal from './TimetableCreateModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry, ScheduledMixin} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
 
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
 
-interface DraftEntry extends Omit<ScheduledMixin, 'id' | 'type'> {
-  title: string;
+interface DraftEntry {
+  startDt: Moment;
   duration: number;
-  width: number | string;
+  height?: number;
+  y?: number;
 }
 
 interface DayTimetableProps {
@@ -207,11 +208,6 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         startDt,
         duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
         y,
-        title: 'New entry',
-        width: '100%',
-        x: 0,
-        column: 0,
-        maxColumn: 0,
       });
     }
 
@@ -234,7 +230,6 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     }
 
     function onKeyDown(event: KeyboardEvent) {
-      // TODO: (Ajob) Get rid of memory-leak warning
       if (event.key === 'Escape') {
         setIsDragging(false);
         setNewEntry(null);
@@ -243,8 +238,6 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
 
     function onMouseUp() {
       if (isDragging && newEntry) {
-        // TODO: (Ajob) Move to actual place to create and uncomment once implemented
-        // dispatch(actions.createEntry(newEntry));
         setIsDragging(false);
       }
     }
@@ -274,10 +267,15 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
-              {/* TODO: Use cleaner solution to style draggable entry */}
               {newEntry && (
                 <div style={{opacity: 0.5, pointerEvents: 'none'}}>
-                  <DraggableEntry key={newEntry.id} setDuration={newEntry.duration} {...newEntry} />
+                  <DraggableEntry
+                    id="draft"
+                    width="100%"
+                    title="New entry"
+                    maxColumn={0}
+                    {...newEntry}
+                  />
                 </div>
               )}
               {isModalOpen && newEntry && (

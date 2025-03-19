@@ -57,19 +57,23 @@ export function BreakFormFields({
             {initialValues.start_dt ? (
                 <>
                     <Field name="duration" subscription={{value: true}}>
-                        <FinalDateTimePicker
-                            name="start_dt"
-                            label={Translate.string('Start time')}
-                            required
-                            minStartDt={minStartDt}
-                            maxEndDt={maxEndDt}
-                        />
+                        {() => (
+                            <FinalDateTimePicker
+                                name="start_dt"
+                                label={Translate.string('Start time')}
+                                required
+                                minStartDt={minStartDt}
+                                maxEndDt={maxEndDt}
+                            />
+                        )}
                     </Field>
                     <Field name="start_dt" subscription={{value: true}}>
-                        <FinalDuration
-                            name="duration"
-                            label={Translate.string('Duration')}
-                        />
+                        {() => (
+                            <FinalDuration
+                                name="duration"
+                                label={Translate.string('Duration')}
+                            />
+                        )}
                     </Field>
                 </>
             ) : (
