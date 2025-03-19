@@ -105,9 +105,9 @@ class ContributionForm(IndicoForm):
                 raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
     def validate_keywords(self, field):
-        allowed_keywords = set(global_event_settings.get('allowed_contribution_keywords')) | set(field.object_data)
+        allowed_keywords = set(global_event_settings.get('allowed_contribution_keywords'))
         keywords = set(field.data)
-        if allowed_keywords and not (keywords <= allowed_keywords):
+        if allowed_keywords and not (keywords <= (allowed_keywords | set(field.object_data))):
             raise ValidationError(_('Invalid keyword found'))
 
     @property
