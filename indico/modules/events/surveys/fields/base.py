@@ -5,19 +5,20 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from wtforms.fields import BooleanField, StringField, TextAreaField
+from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.util.i18n import _
 from indico.web.fields import BaseField
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoMarkdownField
 from indico.web.forms.widgets import SwitchWidget
 
 
 class SurveyFieldConfigForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()], description=_('The title of the question'))
-    description = TextAreaField(_('Description'), description=_("The description (shown below the question's field). "
-                                                                'You may use Markdown for formatting.'))
+    description = IndicoMarkdownField(_('Description'), editor=True,
+                                      description=_("The description (shown below the question's field)."))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
                                description=_('If the user has to answer the question.'))
 

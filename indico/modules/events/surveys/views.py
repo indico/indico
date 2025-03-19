@@ -7,13 +7,14 @@
 
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDisplayBase
+from indico.util.mathjax import MathjaxMixin
 from indico.web.views import WPJinjaMixin
 
 
-class WPManageSurvey(WPEventManagement):
+class WPManageSurvey(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/surveys/'
     sidemenu_option = 'surveys'
-    bundles = ('module_events.surveys.js', 'module_events.surveys.css')
+    bundles = ('markdown.js', 'module_events.surveys.js', 'module_events.surveys.css')
 
 
 class WPSurveyResults(WPManageSurvey):
