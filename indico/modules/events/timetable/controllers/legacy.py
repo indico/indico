@@ -44,6 +44,7 @@ from indico.util.date_time import as_utc, iterdays
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.fields.simple import make_keywords_field
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -98,7 +99,12 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
 
     def _process(self):
         defaults = self._get_form_defaults(location_parent=self.session_block)
-        form = ContributionEntryForm(obj=defaults, to_schedule=True, **self._get_form_params())
+        form_cls = type(
+            '_ContributionEntryForm',
+            (ContributionEntryForm,),
+            {'keywords': make_keywords_field('contribution')},
+        )
+        form = form_cls(obj=defaults, to_schedule=True, keywords=[], **self._get_form_params())
         if form.validate_on_submit():
             contrib = Contribution()
             with track_time_changes(auto_extend=True, user=session.user) as changes:
@@ -183,9 +189,14 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
         if self.entry.contribution:
             contrib = self.entry.contribution
             tt_entry_dt = self.entry.start_dt.astimezone(self.event.tzinfo)
-            form = ContributionEntryForm(obj=FormDefaults(contrib, time=tt_entry_dt.time()),
-                                         event=self.event, contrib=contrib, to_schedule=False,
-                                         day=tt_entry_dt.date(), session_block=parent_session_block)
+            form_cls = type(
+                '_ContributionEntryForm',
+                (ContributionEntryForm,),
+                {'keywords': make_keywords_field('contribution', contrib.keywords)},
+            )
+            form = form_cls(obj=FormDefaults(contrib, time=tt_entry_dt.time()),
+                            event=self.event, contrib=contrib, to_schedule=False,
+                            day=tt_entry_dt.date(), session_block=parent_session_block)
             if form.validate_on_submit():
                 with (
                     track_time_changes(auto_extend=True, user=session.user) as changes,
