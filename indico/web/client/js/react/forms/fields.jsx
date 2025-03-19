@@ -447,6 +447,8 @@ function DateTimePickerComponent({
           onBlur={onBlur}
           onFocus={onFocus}
           disabled={disabled}
+          min={minStartDt ? minStartDt.toISOString() : undefined}
+          max={maxEndDt ? maxEndDt.toISOString() : undefined}
         />
       </Form.Field>
       <Form.Field>

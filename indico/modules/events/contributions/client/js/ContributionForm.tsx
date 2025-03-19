@@ -35,6 +35,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 import {toMoment} from 'indico/utils/date';
 
+
 interface CustomField {
   id: number;
   fieldType: string;
@@ -66,6 +67,8 @@ interface ContributionFormFieldsProps {
   initialValues: Record<string, any>;
   sessionBlock?: Record<string, any>;
   customFields?: CustomField[];
+  extraOptions?: Record<string, any>;
+  [key: string]: any; // Allow additional props
 }
 
 export function ContributionFormFields({
@@ -75,6 +78,7 @@ export function ContributionFormFields({
   initialValues = {},
   sessionBlock = null,
   customFields = [],
+  extraOptions = {},
 }: ContributionFormFieldsProps) {
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
@@ -127,6 +131,10 @@ export function ContributionFormFields({
     }
   );
 
+
+
+  const {minStartDt, maxEndDt} = extraOptions;
+
   return (
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
@@ -139,8 +147,8 @@ export function ContributionFormFields({
                 name="start_dt"
                 label={Translate.string('Start date')}
                 sessionBlock={sessionBlock}
-                minStartDt={sessionBlock && toMoment(sessionBlock.startDt)}
-                maxEndDt={sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second')}
+                minStartDt={minStartDt || sessionBlock && toMoment(sessionBlock.startDt)}
+                maxEndDt={maxEndDt || sessionBlock && toMoment(sessionBlock.endDt).subtract(duration, 'second')}
                 required
               />
             )}

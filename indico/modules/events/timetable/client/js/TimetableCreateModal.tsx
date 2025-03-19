@@ -18,7 +18,7 @@ import {SessionBlockFormFields} from '../../../sessions/client/js/SessionBlockFo
 
 import * as actions from './actions';
 import {BreakFormFields} from './BreakForm';
-import {getSessions} from './selectors';
+import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {EntryType, Session, TopLevelEntry} from './types';
 
@@ -89,8 +89,16 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     code: null,
   };
 
-  const sessions = useSelector(getSessions);
+  const sessions = useSelector(selectors.getSessions);
+  // const eventStartDt = useSelector(selectors.getEventStartDt);
+  // const eventEndDt = useSelector(selectors.getEventEndDt);
+
   const sessionValues: Session[] = Object.values(sessions);
+
+  const extraOptions = {
+    minStartDt: useSelector(selectors.getEventStartDt),
+    maxEndDt: useSelector(selectors.getEventEndDt),
+  };
 
   const forms: {[key in EntryType]: React.ReactElement} = {
     [EntryType.Contribution]: (
@@ -98,12 +106,13 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
         eventId={eventId}
         initialValues={initialValues}
         personLinkFieldParams={personLinkFieldParams}
+        extraOptions={extraOptions}
       />
     ),
     [EntryType.SessionBlock]: sessionValues.length ? (
       <>
         <SessionSelect sessions={sessionValues} required />
-        <SessionBlockFormFields eventId={eventId} locationParent={undefined} />
+        <SessionBlockFormFields eventId={eventId} extraOptions={extraOptions} />
       </>
     ) : (
       <Message
@@ -114,7 +123,12 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       />
     ),
     [EntryType.Break]: (
-      <BreakFormFields eventId={eventId} locationParent={undefined} initialValues={initialValues} />
+      <BreakFormFields
+        eventId={eventId}
+        locationParent={undefined}
+        initialValues={initialValues}
+        extraOptions={extraOptions}
+      />
     ),
   };
 

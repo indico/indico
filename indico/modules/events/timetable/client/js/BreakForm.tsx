@@ -24,6 +24,7 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
+
 import { LocationParent } from './types';
 
 interface BreakFormProps {
@@ -39,13 +40,16 @@ interface BreakFormFieldsProps {
     eventId: number;
     locationParent?: LocationParent;
     initialValues: Record<string, any>;
+    extraOptions?: Record<string, any>;
+    [key: string]: any; // Allow additional props
 }
 
 export function BreakFormFields({
-    eventId,
     locationParent = {inheriting: false},
-    initialValues = {}
+    initialValues = {},
+    extraOptions = {},
 }: BreakFormFieldsProps) {
+    const {minStartDt, maxEndDt} = extraOptions;
     return (
         <>
             <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
@@ -53,21 +57,19 @@ export function BreakFormFields({
             {initialValues.start_dt ? (
                 <>
                     <Field name="duration" subscription={{value: true}}>
-                        {({input: {value: duration}}) => (
-                            <FinalDateTimePicker
-                                name="start_dt"
-                                label={Translate.string('Start time')}
-                                required
-                            />
-                        )}
+                        <FinalDateTimePicker
+                            name="start_dt"
+                            label={Translate.string('Start time')}
+                            required
+                            minStartDt={minStartDt}
+                            maxEndDt={maxEndDt}
+                        />
                     </Field>
                     <Field name="start_dt" subscription={{value: true}}>
-                        {({input: {value: startDt}}) => (
-                            <FinalDuration
-                                name="duration"
-                                label={Translate.string('Duration')}
-                            />
-                        )}
+                        <FinalDuration
+                            name="duration"
+                            label={Translate.string('Duration')}
+                        />
                     </Field>
                 </>
             ) : (

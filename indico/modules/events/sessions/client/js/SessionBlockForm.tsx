@@ -34,9 +34,17 @@ interface SessionBlockEditFormProps {
 interface SessionBlockFormFieldProps {
   eventId: number;
   locationParent: LocationParent;
+  extraOptions?: Record<string, any>;
+  [key: string]: any; // Allow additional props
 }
 
-export function SessionBlockFormFields({eventId, locationParent}: SessionBlockFormFieldProps) {
+export function SessionBlockFormFields({
+  eventId,
+  locationParent,
+  extraOptions = {},
+}: SessionBlockFormFieldProps) {
+  const {minStartDt, maxEndDt} = extraOptions;
+
   return (
     <>
       <FinalInput
@@ -46,7 +54,13 @@ export function SessionBlockFormFields({eventId, locationParent}: SessionBlockFo
         autoFocus
         required
       />
-      <FinalDateTimePicker name="start_dt" label={Translate.string('Start time')} required />
+      <FinalDateTimePicker
+        name="start_dt"
+        label={Translate.string('Start time')}
+        required
+        minStartDt={minStartDt}
+        maxEndDt={maxEndDt}
+      />
       <FinalDuration name="duration" label={Translate.string('Duration')} required />
       <FinalSessionBlockPersonLinkField
         name="person_links"

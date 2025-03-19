@@ -108,6 +108,7 @@ export function fromISOLocalDate(dateString) {
   if (!dateString) {
     return;
   }
-  const [year, month, date] = dateString.split('-');
+
+  const [year, month, date] = dateString.slice(0, 10).split('-');
   return new Date(year, month - 1, date);
 }
