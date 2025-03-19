@@ -74,6 +74,9 @@ Improvements
   :user:`amCap1712`)
 - Allow resetting registrations back to pending in bulk (:issue:`5954`, :pr:`6784`, thanks
   :user:`amCap1712`)
+- Introduce new :data:`FAILED_LOGIN_RATE_LIMIT_USER` and :data:`SIGNUP_RATE_LIMIT_EMAIL`
+  settings for preventing locking out users during brute-force attacks behind a
+  NAT or proxy (:pr:`6576`, thanks :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^
