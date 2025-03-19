@@ -21,6 +21,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {EntryType, Session, TopLevelEntry} from './types';
+import { mapPersonLinkToSchema } from './utils';
 
 // Generic models
 
@@ -135,23 +136,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
 
-  const _mapPersonLinkToSchema = data => {
-    return {
-      title: data.title,
-      name: data.name,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      affiliation: data.affiliation,
-      affiliation_id: data.affiliationId,
-      email: data.email,
-      address: data.address,
-      phone: data.phone,
-      roles: data.roles,
-      type: data.type,
-      avatar_url: data.avatarURL,
-    };
-  };
-
   const _mapDataToEntry = (data): TopLevelEntry => {
     const {object} = data;
     delete data['object'];
@@ -215,7 +199,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       'inheriting',
       'start_dt',
     ]);
-    data['person_link_data'] = data.person_links.map(_mapPersonLinkToSchema);
+    data['person_link_data'] = data.person_links.map(mapPersonLinkToSchema);
     delete data.person_links;
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
@@ -232,7 +216,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       'person_links',
       'session_id',
     ]);
-    data.person_links = data.person_links.map(_mapPersonLinkToSchema);
+    data.person_links = data.person_links.map(mapPersonLinkToSchema);
     return await indicoAxios.post(sessionBlockCreateURL({event_id: eventId}), data);
   };
 

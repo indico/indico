@@ -44,3 +44,19 @@ function gcd(a: number, b: number) {
   }
   return a;
 }
+
+// Data mapping functions
+export const mapPersonLinkToSchema = data => ({
+  title: data.title,
+  name: data.name,
+  first_name: data.firstName,
+  last_name: data.lastName,
+  affiliation: data.affiliation,
+  affiliation_id: data.affiliationId,
+  email: data.email,
+  address: data.address,
+  phone: data.phone,
+  roles: data.roles,
+  type: data.type,
+  avatar_url: data.avatarURL,
+});
