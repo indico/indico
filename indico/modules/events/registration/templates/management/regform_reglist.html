@@ -171,6 +171,14 @@
                                     {%- trans %}Reject registrations{% endtrans -%}
                                 </a>
                             </li>
+                            <li>
+                                <a href="#" class="icon-loop js-requires-selected-row disabled js-modify-status"
+                                   data-href="{{ url_for('.registrations_reset', regform) }}"
+                                   data-method="POST"
+                                   data-confirm="{% trans %}Do you really want to reset the selected registrations?{% endtrans %}">
+                                    {%- trans %}Reset registrations{% endtrans -%}
+                                </a>
+                            </li>
                         </ul>
                     {% endif %}
                     {% if not event.is_locked %}

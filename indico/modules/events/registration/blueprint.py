@@ -125,6 +125,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/approve',
                  reglists.RHRegistrationsApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/reject', 'registrations_reject',
                  reglists.RHRegistrationsReject, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/reset', 'registrations_reset',
+                 reglists.RHRegistrationsReset, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/update-price', 'registrations_update_price',
                  reglists.RHRegistrationsBasePrice, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in', 'registrations_check_in',

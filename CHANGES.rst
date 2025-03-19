@@ -70,6 +70,8 @@ Improvements
 - Include abstract details in comment notification email subject (:issue:`6449`, :pr:`6782`,
   thanks :user:`amCap1712`)
 - Use markdown editor field in survey questionnaire setup (:pr:`6783`, thanks :user:`amCap1712`)
+- Allow resetting registrations back to pending in bulk (:issue:`5954`, :pr:`6784`, thanks
+  :user:`amCap1712`)
 
 Bugfixes
 ^^^^^^^^
