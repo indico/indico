@@ -99,7 +99,6 @@ Bugfixes
 - Do not create empty survey sections during event cloning (:pr:`6774`)
 - Fix inaccurate timezone in the dates of the timetable PDF (:pr:`6786`)
 
-
 Accessibility
 ^^^^^^^^^^^^^
 
