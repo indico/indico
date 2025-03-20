@@ -89,9 +89,9 @@ export default {
         const newEntries = {...state.changes[state.currentChangeIdx].entries};
 
         const dayKey = moment(startDt).format('YYYYMMDD');
+        const dayEntries = newEntries[dayKey];
 
-        newEntries[dayKey].push(entry);
-        newEntries[dayKey] = layout(newEntries[dayKey]);
+        newEntries[dayKey] = layout([...dayEntries, entry]);
 
         return {
           ...state,

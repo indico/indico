@@ -84,7 +84,6 @@ export function addSessionData(data) {
   return {type: ADD_SESSION_DATA, data};
 }
 
-
 export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {
   return {type: MOVE_ENTRY, date, entries};
 }

@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import fields, post_dump
+from marshmallow import fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events.sessions.schemas import LocationDataSchema, SessionBlockSchema, SessionColorSchema
@@ -28,17 +28,15 @@ class TimetableEntrySchema(mm.SQLAlchemyAutoSchema):
         return obj.type.name
 
     def get_object(self, obj):
-        if obj.type == TimetableEntryType.SESSION_BLOCK:
-            return SessionBlockSchema().dump(obj.session_block)
-        elif obj.type == TimetableEntryType.CONTRIBUTION:
-            return ContributionSchema().dump(obj.contribution)
-        elif obj.type == TimetableEntryType.BREAK:
-            return BreakSchema().dump(obj.break_)
-        return None
-
-    @post_dump
-    def remove_nulls(self, data, **kwargs):
-        return {key: value for key, value in data.items() if value is not None}
+        match obj.type:
+            case TimetableEntryType.SESSION_BLOCK:
+                return SessionBlockSchema().dump(obj.session_block)
+            case TimetableEntryType.CONTRIBUTION:
+                return ContributionSchema().dump(obj.contribution)
+            case TimetableEntryType.BREAK:
+                return BreakSchema().dump(obj.break_)
+            case _:
+                return None
 
 
 class BreakSchema(mm.SQLAlchemyAutoSchema):
