@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 import pytest
 from flask import session
+from freezegun import freeze_time
 
 from indico.modules.rb.models.reservations import RepeatFrequency
 
@@ -53,7 +54,7 @@ def test_ongoing_bookings_are_not_split(create_reservation, start_dt, end_dt):
 def test_past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
     from indico.modules.rb.operations.bookings import split_booking
 
-    session['_user_id'] = dummy_user.id
+    session.set_session_user(dummy_user)
 
     datetime_now = datetime.today().replace(hour=12, minute=0, second=0, microsecond=0)
     start_dt = datetime_now.replace(hour=8, minute=30) - timedelta(days=2)
@@ -69,23 +70,8 @@ def test_past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
         'repeat_interval': reservation.repeat_interval
     }
 
-    class MockDatetime:
-        @staticmethod
-        def now():
-            return datetime_now
-
-        @staticmethod
-        def combine(date_obj, time_obj):
-            return datetime.combine(date_obj, time_obj)
-
-    class MockDate:
-        @staticmethod
-        def today():
-            return datetime_now.date()
-
-    with patch('indico.core.notifications.send_email'), \
-        patch('indico.modules.rb.operations.bookings.datetime', MockDatetime), \
-        patch('indico.modules.rb.operations.bookings.date', MockDate), \
+    with freeze_time(datetime_now), \
+        patch('indico.core.notifications.send_email'), \
         patch('indico.modules.rb.models.reservation_occurrences.ReservationOccurrence.cancel') as mock_cancel:
 
         new_reservation = split_booking(
