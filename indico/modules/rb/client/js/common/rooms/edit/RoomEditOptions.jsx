@@ -48,10 +48,7 @@ export default function RoomEditOptions({active, showEquipment, globalAttributes
         {globalAttributes && globalAttributes.length > 0 && (
           <FieldArray name="attributes" isEqual={_.isEqual}>
             {({fields}) => {
-              if (!fields.value) {
-                return null;
-              }
-              const fieldsByName = new Set(fields.value.map(x => x.name));
+              const fieldsByName = new Set(fields.value?.map(x => x.name));
               const options = globalAttributes
                 .map(x => ({
                   key: x.name,
@@ -81,7 +78,7 @@ export default function RoomEditOptions({active, showEquipment, globalAttributes
                     <FinalInput
                       key={attribute}
                       name={`${attribute}.value`}
-                      label={attributeTitles[fields.value[index].name]}
+                      label={attributeTitles[(fields.value[index]?.name)]}
                       required
                       icon={{
                         name: 'remove',
