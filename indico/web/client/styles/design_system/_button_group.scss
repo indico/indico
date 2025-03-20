@@ -14,43 +14,23 @@
 %button-group-base {
   // Recommended structure:
   //
-  // DIV
-  //   LABEL
-  //     INPUT[type="radio"]
-  //     *.label-text
-  //   LABEL
-  //     INPUT[type="radio"]
-  //     *.label-text
-  //
-  // It's also recommended to wrap the whole button group
-  // in a <fieldset> with the appropriate <legend> to
-  // more closely describe what the group is for.
+  // FIELDSET
+  //   LEGEND
+  //   INPUT[type="radio"] LABEL
+  //   INPUT[type="radio"] LABEL
 
   @extend %flex-row;
   --flex-gap: 0;
 
-  position: relative;
+  legend {
+    @extend %form-label-block;
+  }
 
   label {
-    display: contents;
-  }
-
-  input[type='radio'] {
-    // Make an invisible target that spans the width and height of the
-    // parent <label> element. This helps with the positoning of the
-    // error messages.
-    appearance: none;
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  input + * {
     @extend %button-base;
-    flex: 1 0 auto;
+    flex: 1;
+
+    white-space: nowrap;
 
     &::before {
       @extend %icon;
@@ -62,16 +42,16 @@
       // NB: fake icon to balance the layout
       @extend %icon;
       content: ' ';
-      width: 1ch;
+      width: 1em;
     }
   }
 
-  :focus-visible + * {
+  :focus-visible + label {
     @extend %default-focus-ring;
     z-index: 1;
   }
 
-  :checked + * {
+  :checked + label {
     @extend %button-alt-state;
     cursor: default;
 
@@ -80,7 +60,7 @@
     }
   }
 
-  :disabled + * {
+  :disabled + label {
     @extend %button-disabled-state;
   }
 }
@@ -89,15 +69,15 @@
   @extend %button-group-base;
   align-items: center;
 
-  label:not(:last-child) input + * {
+  label:not(:last-child) {
     margin-right: -1px;
   }
 
-  label:first-of-type input + * {
+  label:first-of-type {
     @extend %button-rounded-left;
   }
 
-  label:last-of-type input + * {
+  label:last-of-type {
     @extend %button-rounded-right;
   }
 }
@@ -107,15 +87,15 @@
   flex-direction: column;
   align-items: stretch;
 
-  input + * {
+  label {
     justify-content: space-between;
   }
 
-  label:first-of-type input + * {
+  label:first-of-type {
     @extend %button-rounded-top;
   }
 
-  label:last-of-type input + * {
+  label:last-of-type {
     @extend %button-rounded-bottom;
   }
 }
