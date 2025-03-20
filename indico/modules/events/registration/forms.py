@@ -11,7 +11,6 @@ from decimal import Decimal
 from operator import itemgetter
 
 import jsonschema
-from babel.numbers import format_currency
 from flask import request, session
 from wtforms.fields import (BooleanField, DecimalField, EmailField, FloatField, HiddenField, IntegerField, SelectField,
                             StringField, TextAreaField)
@@ -31,6 +30,7 @@ from indico.modules.events.registration.models.items import RegistrationFormItem
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode, Registration
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.settings import data_retention_settings
+from indico.util.date_time import format_currency
 from indico.util.i18n import _, ngettext
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.util.spreadsheets import CSVFieldDelimiter

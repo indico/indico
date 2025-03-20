@@ -5,8 +5,8 @@ There is a new pre-booking for your room.
 Room: 1/2-3
 For: Guinea Pig
 Reason: Testing
-Dates: Friday 11/11/2022 - Monday 21/11/2022
-Hours: 13:37 - 14:37
+Dates: Fri, 11/11/2022 – Mon, 21/11/2022
+Hours: 13:37–14:37
 
 You can check the details of the booking here:
 http://localhost/rooms/booking/1337

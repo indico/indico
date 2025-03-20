@@ -3,11 +3,11 @@
 {% block subject_prefix %}{% endblock %}
 {% block subject -%}
     {% if prebooking -%}
-        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('short') -%}
             [{{ room }}] New Pre-Booking ({{ start }})
         {%- endtrans %}
     {%- else -%}
-        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+        {% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('short') -%}
             [{{ room }}] New booking ({{ start }})
         {%- endtrans %}
     {%- endif %}

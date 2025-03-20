@@ -14,8 +14,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import yaml
-from babel.numbers import format_currency
-from flask import current_app, g, session
+from flask import current_app, g
 from jinja2 import TemplateRuntimeError, Undefined
 from jinja2.exceptions import SecurityError, TemplateSyntaxError
 from jinja2.sandbox import SandboxedEnvironment
@@ -42,7 +41,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.receipts.models.files import ReceiptFile
 from indico.modules.receipts.models.templates import ReceiptTemplate
 from indico.modules.receipts.settings import receipts_settings
-from indico.util.date_time import format_date, format_datetime, format_interval, format_time, now_utc
+from indico.util.date_time import format_currency, format_date, format_datetime, format_interval, format_time, now_utc
 from indico.util.i18n import _
 from indico.util.iterables import materialize_iterable
 
@@ -141,12 +140,6 @@ def get_other_templates(obj: Event | Category, user) -> list[ReceiptTemplate]:
     return sorted(templates, key=attrgetter('title'))
 
 
-def _format_currency(amount, currency, locale=None):
-    # XXX same logic as in render_price - should probably use the event language in both places!
-    locale = session.lang or 'en_GB'
-    return format_currency(amount, currency, locale=locale)
-
-
 def _format_placeholders(value, **kwargs):
     for k, v in kwargs.items():
         value = value.replace(f'{{{k}}}', v)
@@ -162,7 +155,7 @@ def compile_jinja_code(code: str, template_context: dict, *, use_stack: bool = F
             'format_date': format_date,
             'format_datetime': format_datetime,
             'format_time': format_time,
-            'format_currency': _format_currency,
+            'format_currency': format_currency,
             'format_placeholders': _format_placeholders,
         })
         env.globals.update({

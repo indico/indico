@@ -12,7 +12,6 @@ from decimal import Decimal
 from email.mime.image import MIMEImage
 from uuid import uuid4
 
-from babel.numbers import format_currency
 from flask import has_request_context, request, session
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -32,7 +31,7 @@ from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.wallets.apple import AppleWalletManager
 from indico.modules.events.registration.wallets.google import GoogleWalletManager
 from indico.modules.users.models.users import format_display_full_name
-from indico.util.date_time import now_utc
+from indico.util.date_time import format_currency, now_utc
 from indico.util.decorators import classproperty
 from indico.util.enum import RichIntEnum
 from indico.util.fs import secure_filename
@@ -660,10 +659,7 @@ class Registration(db.Model):
         return picture_attachements
 
     def _render_price(self, price):
-        locale = 'en_GB'
-        if has_request_context():
-            locale = session.lang or 'en_GB'
-        return format_currency(price, self.currency, locale=locale)
+        return format_currency(price, self.currency)
 
     def render_price(self):
         return self._render_price(self.price)
@@ -946,7 +942,7 @@ class RegistrationData(StoredFileMixin, db.Model):
         return config.ATTACHMENT_STORAGE, path
 
     def _render_price(self, price):
-        return format_currency(price, self.registration.currency, locale=(session.lang or 'en_GB'))
+        return format_currency(price, self.registration.currency)
 
     def render_price(self):
         return self._render_price(self.price)

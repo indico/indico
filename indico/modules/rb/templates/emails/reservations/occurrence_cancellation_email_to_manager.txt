@@ -1,11 +1,11 @@
 {% extends 'rb/emails/reservations/base_email_to_manager.txt' %}
 {% block subject_prefix %}{% endblock %}
-{% block subject -%}{% trans room=reservation.room.full_name, start=occurrence.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+{% block subject -%}{% trans room=reservation.room.full_name, start=occurrence.start_dt|format_datetime('short') -%}
     [{{ room }}] Booking cancelled ({{ start }}) (SINGLE OCCURRENCE)
 {%- endtrans %}{%- endblock %}
 
 {% block email_body -%}
-    {% trans date=occurrence.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') -%}
+    {% trans date=occurrence.start_dt | format_date('EEEE dd/MM/yyyy') -%}
         The date {{ date }} from a booking that concerns one of your rooms has been CANCELLED by the user.
     {%- endtrans %}
 {%- endblock %}

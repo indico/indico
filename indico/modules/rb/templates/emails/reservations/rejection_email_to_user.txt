@@ -1,6 +1,6 @@
 {% extends 'rb/emails/reservations/base_email_to_user.txt' %}
 {% block subject_prefix %}{% endblock %}
-{% block subject -%}{% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('dd/MM/yyyy HH:mm', locale='en_GB') -%}
+{% block subject -%}{% trans room=reservation.room.full_name, start=reservation.start_dt|format_datetime('short') -%}
     [{{ room }}] Booking rejected ({{ start }})
 {%- endtrans %}{%- endblock %}
 

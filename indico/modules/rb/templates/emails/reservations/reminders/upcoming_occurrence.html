@@ -22,14 +22,14 @@
 
 
 {% macro _render_time(occurrence) -%}
-    {{ occurrence.start_dt | format_time(locale='en_GB') }} - {{ occurrence.end_dt | format_time(locale='en_GB') }}
+    {{ format_interval(occurrence.start_dt, occurrence.end_dt, 'Hm') }}
 {%- endmacro %}
 
 
 {% macro _render_occurrence(occurrence) -%}
     {% set reservation = occurrence.reservation -%}
 
-    <strong>{{ occurrence.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }}</strong> (<strong>{{ _render_time(occurrence) }}</strong>)<br>
+    <strong>{{ occurrence.start_dt | format_date('EEEE dd/MM/yyyy') }}</strong> (<strong>{{ _render_time(occurrence) }}</strong>)<br>
     {% trans %}Room:{% endtrans %} <strong>{{ reservation.room.full_name }}</strong><br>
     {% trans %}Reason:{% endtrans %} <strong>{{ reservation.booking_reason }}</strong><br>
     <br>
