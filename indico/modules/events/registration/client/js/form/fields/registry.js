@@ -75,7 +75,7 @@ Available keys:
 
 const fieldRegistry = {
   label: {
-    title: Translate.string('Label'),
+    title: Translate.string('Label', 'Classification'),
     inputComponent: LabelInput,
     noRequired: true,
     noRetentionPeriod: true,

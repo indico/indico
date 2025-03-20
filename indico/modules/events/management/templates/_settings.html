@@ -220,7 +220,7 @@
                 </dd>
             {% endif %}
             {% if has_event_labels %}
-                <dt>{% trans %}Label{% endtrans %}</dt>
+                <dt>{% trans 'Classification' %}Label{% endtrans %}</dt>
                 <dd>
                     {% call with_default() %}
                         {{ event.get_label_markup('mini') }}
