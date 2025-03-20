@@ -10,7 +10,7 @@ from webargs import fields
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.forms import (DataRetentionSettingsForm, EventKeywordsForm, EventLabelForm,
+from indico.modules.events.forms import (AllowedKeywordsForm, DataRetentionSettingsForm, EventLabelForm,
                                          ReferenceTypeForm, UnlistedEventsForm)
 from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.labels import EventLabel
@@ -124,17 +124,22 @@ class RHCreateEventLabel(RHAdminBase):
         return jsonify_form(form)
 
 
-class RHUpdateEventKeywords(RHAdminBase):
+class RHUpdateAllowedKeywords(RHAdminBase):
     """Update event keywords."""
 
     def _process(self):
-        form = EventKeywordsForm(keywords=global_event_settings.get('allowed_keywords'))
+        form = AllowedKeywordsForm(
+            event_keywords=global_event_settings.get('allowed_event_keywords'),
+            contribution_keywords=global_event_settings.get('allowed_contribution_keywords'),
+        )
         if form.validate_on_submit():
-            keywords = sorted(set(form.data.get('keywords', [])), key=natural_sort_key)
-            global_event_settings.set('allowed_keywords', keywords)
+            event_keywords = sorted(set(form.data.get('event_keywords', [])), key=natural_sort_key)
+            global_event_settings.set('allowed_event_keywords', event_keywords)
+            contribution_keywords = sorted(set(form.data.get('contribution_keywords', [])), key=natural_sort_key)
+            global_event_settings.set('allowed_contribution_keywords', contribution_keywords)
             flash(_('Allowed keywords have been saved'), 'success')
-            return redirect(url_for('.event_keywords'))
-        return WPEventAdmin.render_template('admin/event_keywords.html', 'event_keywords', form=form)
+            return redirect(url_for('.allowed_keywords'))
+        return WPEventAdmin.render_template('admin/allowed_keywords.html', 'allowed_keywords', form=form)
 
 
 class RHEditEventLabel(RHManageEventLabelBase):

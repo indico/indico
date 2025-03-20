@@ -37,6 +37,7 @@ from indico.util.string import format_email_with_name, validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields.simple import make_keywords_field
 from indico.web.util import jsonify_data
 
 
@@ -174,10 +175,10 @@ def generate_spreadsheet_from_contributions(contributions):
     return headers, rows
 
 
-def make_contribution_form(event, *, management=True, only_custom_fields=False):
+def make_contribution_form(event, *, contrib=None, management=True, only_custom_fields=False):
     """Extend the contribution WTForm to add the extra fields.
 
-    Each extra field will use a field named ``custom_ID``.
+    Each extra field will use a field named ``custom_ID`` (except `keywords`).
 
     :param event: The `Event` for which to create the contribution form.
     :return: A `ContributionForm` subclass.
@@ -186,6 +187,8 @@ def make_contribution_form(event, *, management=True, only_custom_fields=False):
 
     base_class = IndicoForm if only_custom_fields else ContributionForm
     form_class = type('_ContributionForm', (base_class,), {})
+    if not only_custom_fields:
+        form_class.keywords = make_keywords_field('contribution', contrib.keywords if contrib else [])
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:

@@ -27,9 +27,10 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
-                                     IndicoMarkdownField, IndicoProtectionField, IndicoTagListField)
+                                     IndicoMarkdownField, IndicoProtectionField)
 from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
+from indico.web.forms.fields.simple import validate_keywords_field
 from indico.web.forms.validators import DateTimeRange, HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
@@ -49,7 +50,7 @@ class ContributionForm(IndicoForm):
     type = QuerySelectField(_('Type'), get_label='name', allow_blank=True, blank_text=_('No type selected'))
     person_link_data = ContributionPersonLinkListField(_('People'))
     location_data = IndicoLocationField(_('Location'))
-    keywords = IndicoTagListField(_('Keywords'))
+    # The 'keywords' field is dynamically added when creating the form.
     references = ReferencesField(_('External IDs'), reference_class=ContributionReference,
                                  description=_('Manage external resources for this contribution'))
     board_number = StringField(_('Board Number'))
@@ -102,6 +103,9 @@ class ContributionForm(IndicoForm):
                 raise ValidationError(_('With the current duration the contribution exceeds the block end date'))
             if end_dt > self.event.end_dt:
                 raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
+
+    def validate_keywords(self, field):
+        validate_keywords_field('contribution', field)
 
     @property
     def custom_field_names(self):

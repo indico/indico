@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 import json
+import typing as t
 
 from markupsafe import escape
 from wtforms import ValidationError
@@ -13,6 +14,7 @@ from wtforms.fields import (BooleanField, Field, HiddenField, PasswordField, Rad
                             TextAreaField)
 from wtforms.widgets import CheckboxInput
 
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.registration.models.registrations import PublishRegistrationsMode
 from indico.util.i18n import _
 from indico.util.string import sanitize_email, validate_email
@@ -188,6 +190,29 @@ class IndicoStrictKeywordsField(Field):
 
 class IndicoTagListField(HiddenFieldList):
     widget = JinjaWidget('forms/tag_list_widget.html', single_kwargs=True)
+
+
+def make_keywords_field(obj_type: t.Literal['event', 'contribution'], current_keywords=frozenset()):
+    setting = {
+        'event': 'allowed_event_keywords',
+        'contribution': 'allowed_contribution_keywords',
+    }[obj_type]
+    if allowed_keywords := global_event_settings.get(setting):
+        choices = [{'id': kw, 'name': kw} for kw in (set(allowed_keywords) | set(current_keywords))]
+        return IndicoStrictKeywordsField(_('Keywords'), choices=choices)
+    else:
+        return IndicoTagListField(_('Keywords'))
+
+
+def validate_keywords_field(obj_type: t.Literal['event', 'contribution'], field):
+    setting = {
+        'event': 'allowed_event_keywords',
+        'contribution': 'allowed_contribution_keywords',
+    }[obj_type]
+    if allowed_keywords := set(global_event_settings.get(setting)):
+        keywords = set(field.data)
+        if not (keywords <= (allowed_keywords | set(field.object_data))):
+            raise ValidationError(_('Invalid keyword found'))
 
 
 class IndicoMultipleTagSelectField(SelectMultipleField):
