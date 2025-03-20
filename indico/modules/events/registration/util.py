@@ -194,7 +194,7 @@ def get_initial_form_values(regform, *, management=False):
         if can_modify:
             impl = item.field_impl
             if not impl.is_invalid_field:
-                initial_values[item.html_field_name] = camelize_keys(impl.default_value)
+                initial_values[item.html_field_name] = camelize_keys(impl.ui_default_value)
     return initial_values
 
 
@@ -401,6 +401,8 @@ def create_registration(regform, data, invitation=None, management=False, notify
         default = form_item.field_impl.default_value
         can_modify = management or not form_item.parent.is_manager_only
         value = data.get(form_item.html_field_name, default) if can_modify else default
+        if value is NotImplemented:  # un-modifiable field w/ no default value
+            continue
         data_entry = RegistrationData()
         registration.data.append(data_entry)
         for attr, field_value in form_item.field_impl.process_form_data(registration, value).items():
@@ -460,6 +462,9 @@ def modify_registration(registration, data, management=False, notify_user=True):
             value = field_impl.default_value
         else:
             # keep current value
+            continue
+
+        if value is NotImplemented:  # un-modifiable field w/ no existing nor default value
             continue
 
         if (field_impl.is_file_field and (file_data := data_by_field.get(form_item.id))

@@ -285,6 +285,8 @@ class RHRegistrationFormNotificationPreview(RHManageRegFormBase):
                 value = getattr(mock_registration, form_item.personal_data_type.column)
             else:
                 value = form_item.field_impl.default_value
+            if value is NotImplemented:
+                continue
             data_entry = RegistrationData()
             mock_registration.data.append(data_entry)
             for attr, field_value in form_item.field_impl.process_form_data(mock_registration, value).items():

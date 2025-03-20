@@ -104,6 +104,8 @@ Bugfixes
   thanks :user:`amCap1712`)
 - Do not create empty survey sections during event cloning (:pr:`6774`)
 - Fix inaccurate timezone in the dates of the timetable PDF (:pr:`6786`)
+- Fix error with accommodation fields that have the "no accommodation" option disabled
+  (:pr:`6812`)
 
 Accessibility
 ^^^^^^^^^^^^^
