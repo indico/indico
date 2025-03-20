@@ -28,7 +28,6 @@ from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import Event, LegacyEventMapping
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
-from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import EventReference, ReferenceType
@@ -45,7 +44,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
                                      IndicoSelectMultipleCheckboxField, IndicoTimezoneSelectField,
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
-from indico.web.forms.fields.simple import IndicoLinkListField
+from indico.web.forms.fields.simple import IndicoLinkListField, validate_keywords_field
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import PrefixedTextWidget, SwitchWidget, TinyMCEWidget
 
@@ -236,10 +235,7 @@ class EventClassificationForm(IndicoForm):
             del self.label_message
 
     def validate_keywords(self, field):
-        allowed_keywords = set(global_event_settings.get('allowed_event_keywords'))
-        keywords = set(field.data)
-        if allowed_keywords and not (keywords <= (allowed_keywords | set(field.object_data))):
-            raise ValidationError(_('Invalid keyword found'))
+        validate_keywords_field('event', field)
 
 
 class EventPrivacyForm(IndicoForm):

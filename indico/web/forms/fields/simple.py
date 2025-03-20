@@ -204,6 +204,17 @@ def make_keywords_field(obj_type: t.Literal['event', 'contribution'], current_ke
         return IndicoTagListField(_('Keywords'))
 
 
+def validate_keywords_field(obj_type: t.Literal['event', 'contribution'], field):
+    setting = {
+        'event': 'allowed_event_keywords',
+        'contribution': 'allowed_contribution_keywords',
+    }[obj_type]
+    if allowed_keywords := set(global_event_settings.get(setting)):
+        keywords = set(field.data)
+        if not (keywords <= (allowed_keywords | set(field.object_data))):
+            raise ValidationError(_('Invalid keyword found'))
+
+
 class IndicoMultipleTagSelectField(SelectMultipleField):
     widget = JinjaWidget('forms/multiple_tag_select_widget.html', single_kwargs=True, single_line=True)
 

@@ -21,7 +21,6 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
-from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
@@ -31,6 +30,7 @@ from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, Indic
                                      IndicoMarkdownField, IndicoProtectionField)
 from indico.web.forms.fields.datetime import IndicoDurationField
 from indico.web.forms.fields.principals import PermissionsField
+from indico.web.forms.fields.simple import validate_keywords_field
 from indico.web.forms.validators import DateTimeRange, HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
@@ -105,10 +105,7 @@ class ContributionForm(IndicoForm):
                 raise ValidationError(_('With the current duration the contribution exceeds the event end date'))
 
     def validate_keywords(self, field):
-        allowed_keywords = set(global_event_settings.get('allowed_contribution_keywords'))
-        keywords = set(field.data)
-        if allowed_keywords and not (keywords <= (allowed_keywords | set(field.object_data))):
-            raise ValidationError(_('Invalid keyword found'))
+        validate_keywords_field('contribution', field)
 
     @property
     def custom_field_names(self):
