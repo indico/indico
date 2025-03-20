@@ -65,10 +65,14 @@ def delete_field_data():
             # expect structured data e.g. Accommodation & {Single,Multi}Choice.
             # This makes the React code relatively simple and we can always distinguish
             # purged fields since they have the 'is_purged' flag set to True
-            data.data = snakify_keys(data.field_data.field.field_impl.default_value)
+            default = data.field_data.field.field_impl.default_value
             if data.field_data.field.field_impl.is_file_field:
                 _delete_file(data)
             data.field_data.field.is_purged = True
+            if default is not NotImplemented:
+                data.data = snakify_keys(default)
+            else:
+                db.session.delete(data)
     db.session.commit()
 
 

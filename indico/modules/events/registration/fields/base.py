@@ -52,15 +52,38 @@ class RegistrationFormFieldBase:
 
     @property
     def default_value(self):
+        """A default value to store when the field does not have a real value.
+
+        This is used e.g. for manager-only fields when a user registers, when purging
+        a field's data, or when generating the preview for a notification email.
+
+        This may return `NotImplemented` to indicate that no default value exists. In
+        that case, it is mandatory to override `ui_default_value` and `empty_value`.
+        """
         return ''
 
     @property
+    def ui_default_value(self):
+        """A default value that is passed to the registration form UI.
+
+        For most fields this is the same as the `default_value`, but in some cases
+        it may not be possible to get a valid default value to be used in the backend
+        code or stored in the database; in that case the UI can use a more suitable
+        default while the backend uses something else (or no value at all).
+        """
+        default = self.default_value
+        assert default is not NotImplemented
+        return default
+
+    @property
     def empty_value(self):
-        # THis value is used when a manager edits an existing registration, and
+        # This value is used when a manager edits an existing registration, and
         # it should be something that, especially in case of choice fields, does
         # not preselect any of the available choices (such as "no accommodation"
         # or whatever default value is set for a field).
-        return self.default_value
+        default = self.default_value
+        assert default is not NotImplemented
+        return default
 
     def get_validators(self, existing_registration):
         """Return a list of marshmallow validators for this field.
@@ -172,7 +195,7 @@ class RegistrationFormFieldBase:
     @property
     def view_data(self):
         return (self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data) |
-                {'default_value': self.default_value, 'is_purged': self.form_item.is_purged})
+                {'default_value': self.ui_default_value, 'is_purged': self.form_item.is_purged})
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         """Return the data contained in the field.
