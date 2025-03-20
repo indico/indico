@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-12-24 11:25+0100\n"
+"POT-Creation-Date: 2025-03-25 17:55+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -162,6 +162,7 @@ msgstr ""
 #: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx
 #: indico/modules/receipts/client/js/printing/print.jsx
 #: indico/modules/receipts/client/js/templates/Editor.jsx
+#: indico/modules/users/client/js/UserBlock.jsx
 #: indico/web/client/js/react/components/RequestConfirm.jsx
 #: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx
 #: indico/web/client/js/react/components/principals/Search.jsx
@@ -2392,6 +2393,10 @@ msgid "{price} per night"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
+msgid "Pick the arrival and departure dates"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/AccommodationInput.jsx
 msgid "Arrival"
 msgstr ""
 
@@ -2765,10 +2770,6 @@ msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/TimetableSessions.jsx
 msgid "No minimum"
-msgstr ""
-
-#: indico/modules/events/registration/client/js/form/fields/registry.js
-msgid "Label"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form/fields/registry.js
@@ -3599,6 +3600,7 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditModal.jsx
 #: indico/modules/rb/client/js/common/rooms/edit/RoomEditPermissions.jsx
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx
 msgid "Permissions"
 msgstr ""
 
@@ -4001,6 +4003,10 @@ msgid "My Blockings"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/SidebarMenu.jsx
+msgid "My Locations"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx
 #: indico/web/client/js/react/components/UserMenu.jsx
 msgid "Administration"
 msgstr ""
@@ -4050,8 +4056,7 @@ msgid "There are no rooms for the specified location."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
-msgid "General Settings"
+msgid "General settings"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx
@@ -4286,6 +4291,10 @@ msgid "Not for events"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
+msgid "General Settings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid "Specify who has access to the room booking system."
 msgstr ""
 
@@ -4313,8 +4322,18 @@ msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
 msgid ""
-"By default only admins can modify rooms, but you can allow room owners and "
-"managers to modify them as well."
+"By default only admins and location managers can modify rooms, but you can "
+"allow room owners and managers to modify them as well."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
+msgid "Hide booking details"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
+msgid ""
+"If enabled, only room managers and people involved in a booking can see "
+"details such as who made the booking and its history."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx
@@ -4969,6 +4988,14 @@ msgid "Show only..."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
+msgid "Deselect all rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
+msgid "Select all rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx
 msgid "Block rooms"
 msgstr ""
 
@@ -5564,6 +5591,111 @@ msgstr ""
 msgid "Custom picture"
 msgstr ""
 
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Unblock {first_name} {last_name}?"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Block {first_name} {last_name}?"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Are you sure you want to unblock {first_name}?"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Are you sure you want to block {first_name}?"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "{first_name} {last_name} will regain access to Indico."
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "{first_name} {last_name} will no longer be able to access Indico."
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Unblock {first_name}"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Block {first_name}"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Block User"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "You cannot block yourself"
+msgstr ""
+
+#: indico/modules/users/client/js/UserBlock.jsx
+msgid "Unblock User"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Delete {first_name} {last_name}?"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "This action is irreversible"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Deleted user accounts cannot be restored."
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Once deleted, the following will happen:"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "{first_name} will no longer be able to access Indico."
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid ""
+"{first_name} will be removed from all areas of Indico - this does not "
+"affect their presence in events as a speaker or other role; they will still "
+"be listed in such capacities where applicable."
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid ""
+"Where it is not possible to delete {first_name}, they will be anonymized "
+"and all personal data associated with the user will be removed from Indico."
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Are you sure you want to delete {first_name} {last_name}?"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "No, I don't"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Yes, I want to delete {first_name} ({countdown_seconds})"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Yes, I want to delete {first_name}"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "Delete User"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "You cannot delete an admin account"
+msgstr ""
+
+#: indico/modules/users/client/js/UserDelete.jsx
+msgid "You cannot delete your own account"
+msgstr ""
+
 #: indico/modules/users/client/js/dashboard.jsx
 msgid "Events at hand"
 msgstr ""
@@ -5695,26 +5827,12 @@ msgid "Click again to confirm ({delay})"
 msgstr ""
 
 #: indico/web/client/js/react/components/DatePicker.jsx
+#: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Open a calendar"
 msgstr ""
 
 #: indico/web/client/js/react/components/DatePicker.jsx
-msgid "Previous year"
-msgstr ""
-
-#: indico/web/client/js/react/components/DatePicker.jsx
-msgid "Previous month"
-msgstr ""
-
-#: indico/web/client/js/react/components/DatePicker.jsx
-msgid "Next month"
-msgstr ""
-
-#: indico/web/client/js/react/components/DatePicker.jsx
-msgid "Next year"
-msgstr ""
-
-#: indico/web/client/js/react/components/DatePicker.jsx
+#: indico/web/client/js/react/components/DateRangePicker.jsx
 msgid "Date format: {format}"
 msgstr ""
 
@@ -5728,6 +5846,58 @@ msgstr ""
 
 #: indico/web/client/js/react/components/DatePicker.jsx
 msgid "The entered date cannot be later than {max}."
+msgstr ""
+
+#: indico/web/client/js/react/components/DatePickerCalendar.jsx
+msgid "Previous year"
+msgstr ""
+
+#: indico/web/client/js/react/components/DatePickerCalendar.jsx
+msgid "Previous month"
+msgstr ""
+
+#: indico/web/client/js/react/components/DatePickerCalendar.jsx
+msgid "Next month"
+msgstr ""
+
+#: indico/web/client/js/react/components/DatePickerCalendar.jsx
+msgid "Next year"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Select a date range"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Start"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "End"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Please enter the start date using the specified format"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Please provide the start date"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Please enter the end date using the specified format"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Please provide the end date"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Please make sure the start date is between {start} and {end}"
+msgstr ""
+
+#: indico/web/client/js/react/components/DateRangePicker.jsx
+msgid "Please make sure the end date is between {start} and {end}"
 msgstr ""
 
 #: indico/web/client/js/react/components/EmailListField.jsx
@@ -5817,7 +5987,17 @@ msgstr ""
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
 #: indico/web/client/js/react/components/syncedInputs.jsx
+msgid "Select an affiliation"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx
+#: indico/web/client/js/react/components/syncedInputs.jsx
 msgid "Search an affiliation or enter one manually"
+msgstr ""
+
+#: indico/web/client/js/react/components/PersonDetailsModal.jsx
+#: indico/web/client/js/react/components/syncedInputs.jsx
+msgid "Search an affiliation"
 msgstr ""
 
 #: indico/web/client/js/react/components/PersonDetailsModal.jsx
@@ -6152,15 +6332,12 @@ msgid "Drag a picture here"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
+#. Crop an image
 msgid "Crop"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureCropper.jsx
 msgid "Rotate"
-msgstr ""
-
-#: indico/web/client/js/react/components/pictures/PictureCropper.jsx
-msgid "Done"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureManager.jsx
@@ -6186,7 +6363,12 @@ msgid "Camera"
 msgstr ""
 
 #: indico/web/client/js/react/components/pictures/PictureWebcam.jsx
-msgid "Click anywhere on the image to take a picture"
+#. Capture an image with a webcam
+msgid "Capture"
+msgstr ""
+
+#: indico/web/client/js/react/components/pictures/PictureWebcam.jsx
+msgid "Or click anywhere on the image to take a picture"
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/ACLField.jsx
@@ -6226,6 +6408,16 @@ msgstr ""
 
 #: indico/web/client/js/react/components/principals/Search.jsx
 msgid "Person does not have an Indico account yet"
+msgstr ""
+
+#: indico/web/client/js/react/components/principals/Search.jsx
+msgid "I could not find the right person"
+msgstr ""
+
+#: indico/web/client/js/react/components/principals/Search.jsx
+msgid ""
+"If nobody on the search results corresponds to the person you were looking "
+"for, you can {enterManuallyLink}add them manually{/enterManuallyLink}."
 msgstr ""
 
 #: indico/web/client/js/react/components/principals/Search.jsx
@@ -6570,6 +6762,11 @@ msgstr ""
 #: indico/modules/events/registration/client/js/form/fields/PictureInput.jsx
 msgctxt "Minimum size"
 msgid "Unlimited"
+msgstr ""
+
+#: indico/modules/events/registration/client/js/form/fields/registry.js
+msgctxt "Classification"
+msgid "Label"
 msgstr ""
 
 #: indico/modules/events/registration/client/js/form_submission/RegistrationFormSubmission.jsx
