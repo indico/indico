@@ -94,7 +94,7 @@ export default function ICSCalendarLink({
 }) {
   const [popupState, dispatch] = useReducer(popupReducer, initialState);
   const [exportEventSeries, setExportEventSeries] = useState(false);
-  const [reminder, setReminder] = useState(null);
+  const [reminder, setReminder] = useState(0);
 
   const copyButton = (
     <Button
@@ -108,14 +108,14 @@ export default function ICSCalendarLink({
   );
 
   const fetchURL = async (extraParams, controller) => {
+    const {reminder: reminderValue, ...rest} = extraParams;
+    extraParams = reminderValue === 0 ? rest : extraParams;
     try {
-      const reminderParams = reminder !== null ? {reminder} : {};
-
       const {
         data: {url: signedURL},
       } = await indicoAxios.post(
         signURL(),
-        snakifyKeys({endpoint, params: {...params, ...extraParams, ...reminderParams}}),
+        snakifyKeys({endpoint, params: {...params, ...extraParams}}),
         {signal: controller.signal}
       );
       return signedURL;
@@ -149,21 +149,19 @@ export default function ICSCalendarLink({
       if (exportEventSeries) {
         extraParams = {...extraParams, series: true};
       }
-      _handleSetOption(key, extraParams);
+      _handleSetOption(key, {...extraParams, reminder});
     }
   };
 
-  const handleReminderChange = newReminder => {
-    const reminderValue = newReminder === 0 ? null : Number(newReminder);
-    setReminder(reminderValue);
+  const handleReminderChange = newValue => {
+    setReminder(newValue);
 
     if (popupState.key) {
       const option = options.find(opt => opt.key === popupState.key);
-      const reminderParams = reminderValue !== null ? {reminder: reminderValue.toString()} : {};
 
       _handleSetOption(popupState.key, {
+        reminder: newValue,
         ...option?.extraParams,
-        ...reminderParams,
       });
     }
   };
@@ -216,7 +214,7 @@ export default function ICSCalendarLink({
                   extraParams = {...extraParams, series: true};
                 }
                 setExportEventSeries(!exportEventSeries);
-                _handleSetOption(popupState.key, extraParams);
+                _handleSetOption(popupState.key, {...extraParams, reminder});
               }}
             >
               <Translate>Export all events in this event series</Translate>
@@ -238,8 +236,8 @@ export default function ICSCalendarLink({
               {key: '15', text: Translate.string('15 minutes before'), value: 15},
               {key: '30', text: Translate.string('30 minutes before'), value: 30},
             ]}
-            value={reminder ?? 0}
-            onChange={(_, {value}) => handleReminderChange(value === 0 ? null : value)}
+            value={reminder}
+            onChange={(_, {value}) => handleReminderChange(value)}
           />
         </div>
         <strong styleName="export-option">
