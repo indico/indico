@@ -439,7 +439,10 @@ customElements.define(
         const focusableButton =
           listbox.querySelector('[aria-selected]') ||
           listbox.querySelector('button:not(:disabled)');
-        focusableButton.tabIndex = 0;
+
+        if (focusableButton) {
+          focusableButton.tabIndex = 0;
+        }
       }
     }
 
