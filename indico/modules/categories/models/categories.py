@@ -285,7 +285,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - events (Event.category)
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
-    # - log_entries (CategoryLogEntry.event)
+    # - log_entries (CategoryLogEntry.category)
     # - parent (Category.children)
     # - receipt_templates (ReceiptTemplate.category)
     # - roles (CategoryRole.category)

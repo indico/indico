@@ -33,6 +33,12 @@ class CategoryLogRealm(RichIntEnum):
     events = 2
 
 
+class UserLogRealm(RichIntEnum):
+    __titles__ = (None, _('User'), _('Management'))
+    user = 1
+    management = 2
+
+
 class LogKind(IndicoIntEnum):
     other = 1
     positive = 2
@@ -122,7 +128,8 @@ class LogEntryBase(db.Model):
             backref=db.backref(
                 cls.user_backref_name,
                 lazy='dynamic'
-            )
+            ),
+            foreign_keys=[cls.user_id]
         )
 
     @property
@@ -192,18 +199,50 @@ class CategoryLogEntry(LogEntryBase):
         index=True,
         nullable=False
     )
-    #: The general area of the event the entry comes from
+    #: The general area of the category the entry comes from
     realm = db.Column(
         PyIntEnum(CategoryLogRealm),
         nullable=False
     )
 
     #: The Category this log entry is associated with
-    event = db.relationship(
+    category = db.relationship(
         'Category',
         lazy=True,
         backref=db.backref(
             'log_entries',
             lazy='dynamic'
         )
+    )
+
+
+class UserLogEntry(LogEntryBase):
+    """Log entries for users."""
+
+    __auto_table_args = {'schema': 'users'}
+    user_backref_name = 'user_log_entries'
+    link_fk_name = 'user_id'
+
+    #: The ID of the user
+    target_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=False
+    )
+    #: The general area of the user the entry comes from
+    realm = db.Column(
+        PyIntEnum(UserLogRealm),
+        nullable=False
+    )
+
+    #: The User this log entry is associated with
+    target_user = db.relationship(
+        'User',
+        lazy=True,
+        backref=db.backref(
+            'log_entries',
+            lazy='dynamic'
+        ),
+        foreign_keys=[target_user_id]
     )

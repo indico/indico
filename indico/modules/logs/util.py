@@ -167,7 +167,7 @@ def _diff_list(a, b):
     return Markup(', ').join(output)
 
 
-def serialize_log_entry(entry):
+def serialize_log_entry(entry, tzinfo):
     return {
         'id': entry.id,
         'type': entry.type,
@@ -176,7 +176,7 @@ def serialize_log_entry(entry):
         'module': entry.module,
         'description': entry.summary,
         'meta': entry.meta,
-        'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
+        'time': entry.logged_dt.astimezone(tzinfo).isoformat(),
         'payload': entry.data,
         'user': {
             'fullName': entry.user.full_name if entry.user else None,

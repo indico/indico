@@ -28,6 +28,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
+from indico.modules.logs.models.entries import UserLogEntry
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_category_table, favorite_event_table, favorite_user_table
@@ -476,6 +477,7 @@ class User(PersonMixin, db.Model):
     # - judged_papers (PaperRevision.judge)
     # - layout_reviewer_for_contributions (Contribution.paper_layout_reviewers)
     # - local_groups (LocalGroup.members)
+    # - log_entries (UserLogEntry.target_user)
     # - merged_from_users (User.merged_into_user)
     # - moderated_event_move_requests (EventMoveRequest.moderator)
     # - modified_abstract_comments (AbstractComment.modified_by)
@@ -495,6 +497,7 @@ class User(PersonMixin, db.Model):
     # - review_comments (PaperReviewComment.user)
     # - static_sites (StaticSite.creator)
     # - survey_submissions (SurveySubmission.user)
+    # - user_log_entries (UserLogEntry.user)
     # - vc_rooms (VCRoom.created_by_user)
 
     @staticmethod
@@ -608,6 +611,34 @@ class User(PersonMixin, db.Model):
 
     def __repr__(self):
         return format_repr(self, 'id', 'email', is_deleted=False, is_pending=False, _text=self.full_name)
+
+    def log(self, realm, kind, module, summary, user=None, type_='simple', data=None, meta=None):
+        """Create a new log entry for the user.
+
+        :param realm: A value from :class:`.UserLogRealm` indicating
+                      the realm of the action.
+        :param kind: A value from :class:`.LogKind` indicating
+                     the kind of the action that was performed.
+        :param module: A human-friendly string describing the module
+                       related to the action.
+        :param summary: A one-line summary describing the logged action.
+        :param user: The user who performed the action.
+        :param type_: The type of the log entry. This is used for custom
+                      rendering of the log message/data
+        :param data: JSON-serializable data specific to the log type.
+        :param meta: JSON-serializable data that won't be displayed.
+        :return: The newly created `UserLogEntry`
+
+        In most cases the ``simple`` log type is fine. For this type,
+        any items from data will be shown in the detailed view of the
+        log entry.  You may either use a dict (which will be sorted)
+        alphabetically or a list of ``key, value`` pairs which will
+        be displayed in the given order.
+        """
+        entry = UserLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
+                             data=(data or {}), meta=(meta or {}))
+        self.log_entries.append(entry)
+        return entry
 
     def can_be_modified(self, user):
         """If this user can be modified by the given user."""

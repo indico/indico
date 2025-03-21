@@ -1,4 +1,10 @@
-{% extends 'categories/management/base.html' if category|default(none) else 'events/management/base.html' %}
+{% if category|default(none) %}
+    {% extends 'categories/management/base.html' %}
+{% elif event|default(none) %}
+    {% extends 'events/management/base.html' %}
+{% else %}
+    {% extends 'users/base.html' %}
+{% endif %}
 
 {% block title %}
     {%- trans %}Logs{% endtrans -%}

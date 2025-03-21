@@ -5,15 +5,20 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import jsonify, request
+from babel.dates import get_timezone
+from flask import jsonify, request, session
+from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.logs.models.entries import CategoryLogEntry, CategoryLogRealm, EventLogEntry, EventLogRealm
+from indico.modules.logs.models.entries import (CategoryLogEntry, CategoryLogRealm, EventLogEntry, EventLogRealm,
+                                                UserLogEntry, UserLogRealm)
 from indico.modules.logs.util import serialize_log_entry
-from indico.modules.logs.views import WPCategoryLogs, WPEventLogs
+from indico.modules.logs.views import WPCategoryLogs, WPEventLogs, WPUserLogs
+from indico.modules.users.controllers import RHUserBase
 from indico.web.flask.util import url_for
 
 
@@ -52,12 +57,32 @@ class RHCategoryLogs(RHManageCategoryBase):
                                               logs_api_url=url_for('.api_category_logs', self.category))
 
 
+class RHUserLogs(RHUserBase):
+    """Show the modification/action log for the user."""
+
+    def _check_access(self):
+        RHUserBase._check_access(self)
+        if not session.user.is_admin:
+            raise Forbidden
+
+    def _process(self):
+        metadata_query = _get_metadata_query()
+        realms = {realm.name: realm.title for realm in UserLogRealm}
+        return WPUserLogs.render_template('logs.html', 'logs', user=self.user,
+                                          realms=realms, metadata_query=metadata_query,
+                                          logs_api_url=url_for('.api_user_logs', self.user))
+
+
 class LogsAPIMixin:
     model = None
     realm_enum = None
 
     @property
     def object(self):
+        raise NotImplementedError
+
+    @property
+    def object_tzinfo(self):
         raise NotImplementedError
 
     def _process(self):
@@ -91,7 +116,8 @@ class LogsAPIMixin:
             query = query.filter(self.model.meta.contains(metadata_query))
 
         query = query.paginate(page=page, per_page=LOG_PAGE_SIZE)
-        entries = [dict(serialize_log_entry(entry), index=index, html=entry.render())
+        tzinfo = self.object_tzinfo
+        entries = [dict(serialize_log_entry(entry, tzinfo), index=index, html=entry.render())
                    for index, entry in enumerate(query.items)]
         return jsonify(current_page=page, pages=list(query.iter_pages()), total_page_count=query.pages, entries=entries)
 
@@ -104,6 +130,10 @@ class RHEventLogsJSON(LogsAPIMixin, RHManageEventBase):
     def object(self):
         return self.event
 
+    @property
+    def object_tzinfo(self):
+        return self.event.tzinfo
+
 
 class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
     model = CategoryLogEntry
@@ -112,3 +142,20 @@ class RHCategoryLogsJSON(LogsAPIMixin, RHManageCategoryBase):
     @property
     def object(self):
         return self.category
+
+    @property
+    def object_tzinfo(self):
+        return self.category.tzinfo
+
+
+class RHUserLogsJSON(LogsAPIMixin, RHUserBase):
+    model = UserLogEntry
+    realm_enum = UserLogRealm
+
+    @property
+    def object(self):
+        return self.user
+
+    @property
+    def object_tzinfo(self):
+        return get_timezone(config.DEFAULT_TIMEZONE)

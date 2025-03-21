@@ -26,6 +26,13 @@ def _extend_event_management_menu(sender, event, **kwargs):
     return SideMenuItem('logs', _('Logs'), url_for('logs.event', event), section='reports')
 
 
+@signals.menu.items.connect_via('user-profile-sidemenu')
+def _extend_profile_sidemenu(sender, user, **kwargs):
+    if not session.user.is_admin:
+        return
+    return SideMenuItem('logs', _('Logs'), url_for('logs.user'), -100)
+
+
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     EventLogEntry.query.filter_by(user_id=source.id).update({EventLogEntry.user_id: target.id})

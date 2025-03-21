@@ -76,6 +76,8 @@ Improvements
   :user:`amCap1712`)
 - Allow to configure a restrictive set of allowed contribution keywords (:pr:`6778`, thanks
   :user:`tomako, unconventionaldotdev`)
+- Add a log for user actions, similar to that in events and categories (:pr:`6779`, thanks
+  :user:`tomako`)
 
 Bugfixes
 ^^^^^^^^
