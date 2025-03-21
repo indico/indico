@@ -108,6 +108,7 @@ Bugfixes
 - Fix inaccurate timezone in the dates of the timetable PDF (:pr:`6786`)
 - Fix error with accommodation fields that have the "no accommodation" option disabled
   (:pr:`6812`)
+- Reset token-based links for correct user when done by an admin (:pr:`6814`)
 
 Accessibility
 ^^^^^^^^^^^^^
