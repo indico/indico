@@ -547,7 +547,7 @@ FinalRadio.propTypes = {
 /**
  * Like `FinalField` but for a dropdown.
  */
-export function FinalDropdown({name, label, multiple, ...rest}) {
+export function FinalDropdown({name, label, multiple, singleValueAsList, format, ...rest}) {
   const extraProps = {};
   if (multiple) {
     extraProps.isEqual = unsortedArraysEqual;
@@ -557,8 +557,8 @@ export function FinalDropdown({name, label, multiple, ...rest}) {
       name={name}
       adapter={DropdownAdapter}
       label={label}
-      format={identity}
-      parse={identity}
+      format={format}
+      parse={value => (singleValueAsList && !multiple ? [value] : value)}
       search
       deburr
       // https://github.com/final-form/react-final-form/issues/544
@@ -573,11 +573,15 @@ FinalDropdown.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
   multiple: PropTypes.bool,
+  singleValueAsList: PropTypes.bool,
+  format: PropTypes.func,
 };
 
 FinalDropdown.defaultProps = {
   label: null,
   multiple: false,
+  singleValueAsList: false,
+  format: identity,
 };
 
 /**

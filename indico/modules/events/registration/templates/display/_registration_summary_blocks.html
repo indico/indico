@@ -5,6 +5,7 @@
             <td colspan="2">{{ section.title }}</td>
         </tr>
         {% for field in section.children if (field.is_field and field.id in registration.data_by_field and
+                                             registration.is_field_shown(field) and
                                              (from_management or not field.is_deleted)) -%}
             <tr class="{{ 'deleted-field' if from_management and (field.is_deleted or section.is_deleted) }}">
                 <th class="regform-done-caption">{{ field.title }}</th>
