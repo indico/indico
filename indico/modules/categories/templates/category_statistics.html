@@ -2,17 +2,15 @@
 
 <div class="category-container">
     <div class="category-header">
-        <div class="category-statistics center">
-            <span class="right">
-                <a class="i-button icon-prev" style="margin-top:0.4em;" href="{{ category.url }}">
-                    {%- trans %}Category page{% endtrans -%}
-                </a>
-            </span>
-            <div class="category-title" style="margin-left:0px; text-align:left;">
-                {{ category.title }}&nbsp;
-                <span style="font-style: italic; font-size: 0.8em;">({% trans %}statistics{% endtrans %})</span>
-            </div>
-        </div>
+        <h1 class="category-title">
+            {% if category.is_root %}
+                {% trans %}Global statistics{% endtrans %}
+            {% else %}
+                {% trans category=category.title -%}
+                    Statistics for {{ category }}
+                {%- endtrans%}
+            {% endif %}
+        </h1>
     </div>
     <div id="category-stats-root"
          class="category-stats-container"

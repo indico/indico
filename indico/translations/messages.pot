@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico 3.3.6-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-20 17:54+0100\n"
+"POT-Creation-Date: 2025-03-21 11:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2656,11 +2656,12 @@ msgid "Inheriting: Use value from parent category (Disabled)"
 msgstr ""
 
 #: indico/modules/categories/templates/category_statistics.html
-msgid "Category page"
+msgid "Global statistics"
 msgstr ""
 
 #: indico/modules/categories/templates/category_statistics.html
-msgid "statistics"
+#, python-format
+msgid "Statistics for %(category)s"
 msgstr ""
 
 #: indico/modules/categories/templates/display/_calendar_ongoing_events.html
