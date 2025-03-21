@@ -120,5 +120,5 @@ class EventPersonUpdateSchema(EventPersonSchema):
     @validates_schema(skip_on_field_errors=True)
     def check_restricted_affiliation(self, data, **kwargs):
         restricted = user_management_settings.get('only_predefined_affiliations')
-        if restricted and data['affiliation'] and not data['affiliation_link']:
+        if restricted and data.get('affiliation') and not data.get('affiliation_link'):
             raise ValidationError('Custom affiliations are not allowed', field_name='affiliation_data')
