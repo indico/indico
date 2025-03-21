@@ -33,6 +33,7 @@ from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.legal import legal_settings
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.date_time import server_to_utc
@@ -306,6 +307,7 @@ class RHSignURL(RH):
 class RHResetSignatureTokens(RHUserBase):
     def _process(self):
         self.user.reset_signing_secret()
+        self.user.log(UserLogRealm.user, LogKind.change, 'API', 'Token-based links invalidated', session.user)
         flash(_('All your token-based links have been invalidated'), 'success')
         return redirect(url_for('api.user_profile'))
 
