@@ -15,7 +15,7 @@ from indico.modules.users import User, user_management_settings
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.users import UserTitle, syncable_fields
 from indico.util.countries import get_country
-from indico.util.marshmallow import ModelField, NoneValueEnumField
+from indico.util.marshmallow import ModelField, NoneValueEnumField, not_empty
 
 
 class AffiliationSchema(mm.SQLAlchemyAutoSchema):
@@ -65,8 +65,13 @@ class BasicUserSchema(UserSchema):
 
 class UserPersonalDataSchema(mm.SQLAlchemyAutoSchema):
     title = NoneValueEnumField(UserTitle, none_value=UserTitle.none, attribute='_title')
+    first_name = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
+    last_name = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
     email = String(dump_only=True)
+    address = fields.String(validate=validate.Length(max=500))
+    phone = fields.String(validate=validate.Length(max=100))
     synced_fields = List(String(validate=validate.OneOf(syncable_fields)))
+    affiliation = fields.String(validate=validate.Length(max=250))
     affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None, load_only=True)
     affiliation_data = fields.Function(lambda u: {'id': u.affiliation_id, 'text': u.affiliation}, dump_only=True)
 
