@@ -9,6 +9,8 @@ import hashlib
 from uuid import UUID
 
 from authlib.oauth2.rfc6749 import list_to_scope, scope_to_list
+from flask import has_request_context
+from flask import request as flask_request
 from sqlalchemy.dialects.postgresql.array import ARRAY
 from sqlalchemy.orm import joinedload
 
@@ -17,6 +19,7 @@ from indico.core.oauth.logger import logger
 from indico.core.oauth.models.applications import OAuthApplication, OAuthApplicationUserLink
 from indico.core.oauth.models.personal_tokens import PersonalToken
 from indico.core.oauth.models.tokens import OAuthToken
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 
 
 # The maximum number of tokens to keep for any given app/user and scope combination
@@ -65,6 +68,10 @@ def save_token(token_data, request):
 
     if link is None:
         link = OAuthApplicationUserLink(application=application, user=request.user, scopes=requested_scopes)
+        request.user.log(UserLogRealm.user, LogKind.positive, 'OAuth', f'App authorized: {application.name}',
+                         data={'IP': flask_request.remote_addr if has_request_context() else None,
+                               'Scopes': ', '.join(sorted(requested_scopes))},
+                         meta={'app_id': application.id})
     else:
         if not requested_scopes:
             # for already-authorized apps not specifying a scope uses all scopes the
@@ -74,6 +81,11 @@ def save_token(token_data, request):
         new_scopes = requested_scopes - set(link.scopes)
         if new_scopes:
             logger.info('New scopes for %r: %s', link, new_scopes)
+            request.user.log(UserLogRealm.user, LogKind.change, 'OAuth',
+                             f'App authorized (new scopes): {application.name}',
+                             data={'IP': flask_request.remote_addr if has_request_context() else None,
+                                   'Scopes': ', '.join(sorted(requested_scopes))},
+                             meta={'app_id': application.id})
             link.update_scopes(new_scopes)
 
     link.tokens.append(OAuthToken(access_token=token_data['access_token'], scopes=requested_scopes))

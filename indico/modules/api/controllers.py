@@ -14,6 +14,7 @@ from indico.modules.api import APIMode, api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.oauth.util import can_manage_personal_tokens
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
@@ -78,6 +79,9 @@ class RHAPICreateKey(RHUserAPIBase):
             if old_key.is_blocked and not session.user.is_admin:
                 raise Forbidden
             old_key.is_active = False
+            self.user.log(UserLogRealm.user, LogKind.negative, 'API Keys', 'API key revoked', session.user,
+                          data={'IP': request.remote_addr},
+                          meta={'api_key_id': old_key.id})
             db.session.flush()
         key = APIKey(user=self.user)
         db.session.add(key)
@@ -93,6 +97,9 @@ class RHAPICreateKey(RHUserAPIBase):
             else:
                 flash(_('Your API key has been successfully created.'), 'success')
         db.session.flush()
+        self.user.log(UserLogRealm.user, LogKind.positive, 'API Keys', 'API key created', session.user,
+                      data={'IP': request.remote_addr},
+                      meta={'api_key_id': key.id})
         return redirect_or_jsonify(url_for('api.user_profile'), flash=not quiet,
                                    is_persistent_allowed=key.is_persistent_allowed)
 
@@ -103,6 +110,8 @@ class RHAPIDeleteKey(RHUserAPIBase):
     def _process(self):
         key = self.user.api_key
         key.is_active = False
+        self.user.log(UserLogRealm.user, LogKind.negative, 'API Keys', 'API key revoked', session.user,
+                      meta={'api_key_id': key.id})
         flash(_('Your API key has been deleted.'), 'success')
         return redirect(url_for('api.user_profile'))
 
@@ -114,6 +123,12 @@ class RHAPITogglePersistent(RHUserAPIBase):
         quiet = request.form.get('quiet') == '1'
         key = self.user.api_key
         key.is_persistent_allowed = api_settings.get('allow_persistent') and request.form['enabled'] == '1'
+        if key.is_persistent_allowed:
+            self.user.log(UserLogRealm.user, LogKind.positive, 'API Keys', 'Persistent signatures enabled',
+                          session.user, data={'IP': request.remote_addr}, meta={'api_key_id': key.id})
+        else:
+            self.user.log(UserLogRealm.user, LogKind.negative, 'API Keys', 'Persistent signatures disabled',
+                          session.user, meta={'api_key_id': key.id})
         if not quiet:
             if key.is_persistent_allowed:
                 flash(_('You can now use persistent signatures.'), 'success')
@@ -134,7 +149,11 @@ class RHAPIBlockKey(RHUserAPIBase):
         key = self.user.api_key
         key.is_blocked = not key.is_blocked
         if key.is_blocked:
+            self.user.log(UserLogRealm.management, LogKind.negative, 'API Keys', 'API key blocked', session.user,
+                          meta={'api_key_id': key.id})
             flash(_('The API key has been blocked.'), 'success')
         else:
+            self.user.log(UserLogRealm.management, LogKind.positive, 'API Keys', 'API key unblocked', session.user,
+                          meta={'api_key_id': key.id})
             flash(_('The API key has been unblocked.'), 'success')
         return redirect(url_for('api.user_profile'))
