@@ -12,6 +12,7 @@ from werkzeug.datastructures import MultiDict
 
 from indico.core.config import config
 from indico.modules.auth import Identity
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users.operations import create_user
 from indico.util.signals import make_interceptable
 from indico.util.signing import secure_serializer
@@ -78,6 +79,7 @@ def impersonate_user(user):
             'user_name': session.user.get_full_name(last_name_first=False, last_name_upper=False)
         }
     login_user(user, admin_impersonation=True)
+    user.log(UserLogRealm.management, LogKind.other, 'Impersonation', 'Impersonated by admin', current_user)
     logger.info('Admin %r is impersonating user %r', current_user, user)
 
 

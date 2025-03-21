@@ -29,6 +29,8 @@ from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
+from indico.modules.logs.util import make_diff_log
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
@@ -625,3 +627,29 @@ def search_affiliations(q):
         .limit(20)
         .all()
     )
+
+
+def log_user_update(user, changes, *, from_sync=False):
+    log_fields = {
+        '_title': 'Title',
+        'synced_fields': 'Synced fields',
+        'first_name': {'title': 'First name', 'type': 'string'},
+        'last_name': {'title': 'Last name', 'type': 'string'},
+        'address': 'Address',
+        'phone': {'title': 'Phone', 'type': 'string'},
+        'affiliation': {'title': 'Affiliation', 'type': 'string'},
+        'affiliation_link': {
+            'title': 'Affiliation link',
+            'type': 'number',
+            'convert': lambda changes: [x.id if x else None for x in changes]
+        },
+    }
+    if len(changes) == 1:
+        what = log_fields[list(changes)[0]]
+        if isinstance(what, dict):
+            what = what['title']
+    else:
+        what = 'Data'
+    log_msg = f'{what} synchronized' if from_sync else f'{what} updated'
+    user.log(UserLogRealm.user, LogKind.change, 'Profile', log_msg, None if from_sync else session.user,
+             data={'Changes': make_diff_log(changes, log_fields)})

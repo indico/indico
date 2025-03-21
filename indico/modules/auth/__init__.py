@@ -21,6 +21,7 @@ from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
+from indico.modules.users.util import log_user_update
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -108,7 +109,8 @@ def login_user(user, identity=None, admin_impersonation=False):
             session['login_identity'] = identity.id
         else:
             session.pop('login_identity', None)
-        user.synchronize_data()
+        if changes := user.synchronize_data():
+            log_user_update(user, changes, from_sync=True)
     signals.users.logged_in.send(user, identity=identity, admin_impersonation=admin_impersonation)
 
 
