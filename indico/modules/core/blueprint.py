@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from flask import request
+
 from indico.modules.core.controllers import (RHAPIGenerateCaptcha, RHChangeLanguage, RHChangeTimezone, RHConfig,
                                              RHContact, RHPrincipals, RHRenderMarkdown, RHReportErrorAPI,
                                              RHResetSignatureTokens, RHSessionExpiry, RHSessionRefresh, RHSettings,
@@ -28,7 +30,8 @@ _bp.add_url_rule('/session-expiry', 'session_expiry', RHSessionExpiry)
 _bp.add_url_rule('/session-refresh', 'session_refresh', RHSessionRefresh, methods=('POST',))
 _bp.add_url_rule('/api/principals', 'principals', RHPrincipals, methods=('POST',))
 _bp.add_url_rule('/api/sign-url', 'sign_url', RHSignURL, methods=('POST',))
-_bp.add_url_rule('/api/reset-signature-tokens', 'reset_signature_tokens', RHResetSignatureTokens, methods=('POST',))
+with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
+    _bp.add_url_rule('/reset-signature-tokens', 'reset_signature_tokens', RHResetSignatureTokens, methods=('POST',))
 _bp.add_url_rule('/api/config', 'config', RHConfig)
 _bp.add_url_rule('/api/render-markdown', 'markdown', RHRenderMarkdown, methods=('POST',))
 
@@ -41,3 +44,9 @@ _bp.add_url_rule('/ping', 'ping', lambda: ('', 204))
 
 # CAPTCHA
 _bp.add_url_rule('/api/captcha/generate', 'generate_captcha', RHAPIGenerateCaptcha)
+
+
+@_bp.url_defaults
+def _add_user_id(endpoint, values):
+    if endpoint == 'core.reset_signature_tokens' and 'user_id' not in values:
+        values['user_id'] = request.view_args.get('user_id')
