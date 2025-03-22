@@ -34,7 +34,7 @@ ind-with-toggletip {
     z-index: 1;
 
     width: max-content;
-    max-width: min(calc(100dvw - 1em), 40ch);
+    max-width: min(calc(100% - 1em), 40ch);
     padding: 0.5em;
 
     // XXX: The transparent border serves as faux margin to reduce the number of HTML elements involved
@@ -68,7 +68,8 @@ ind-with-toggletip {
     border-width: 0.5em 0;
   }
 
-  &:not([shown]) [data-tip-content] {
+  &:not([shown]) [data-tip-content],
+  &[data-position-check] [data-tip-content] {
     opacity: 0;
     pointer-events: none;
   }
@@ -93,34 +94,21 @@ ind-with-toggletip {
   }
 
   // Arrows
-  &[shown]::after {
+  &[shown]:not([data-position-check]) {
+    @extend %popup-arrow;
+    --arrow-color: var(--tooltip-surface-color);
     --arrow-size: 0.5em;
-
-    content: '';
-    position: absolute;
-    display: inline-block;
-
-    // The default appearance of the arrow always has it pointing up
-    // and the actual direction is controlled via rotation
-    border-style: solid;
-    border-color: transparent transparent var(--tooltip-surface-color) transparent;
-    border-width: var(--arrow-size);
-    transform: rotate(var(--arrow-direction));
   }
 
-  &[orientation='horizontal']::after {
-    left: calc(var(--arrow-left) - var(--arrow-size) + 0.1em);
-    right: calc(100% - var(--arrow-size) + 0.1em);
-    top: calc(50% - var(--arrow-size));
+  &[orientation='horizontal'] {
+    @extend %popup-arrow-horizontal;
   }
 
   // The orientation attribute may be unset, so instead
   // of testing that [orientation='vertical'] we test that
   // :not([orientation='horizontal'])
-  &:not([orientation='horizontal'])::after {
-    top: calc(var(--arrow-top) - var(--arrow-size) + 0.1em);
-    bottom: calc(100% - var(--arrow-size) + 0.1em);
-    left: calc(50% - var(--arrow-size));
+  &:not([orientation='horizontal']) {
+    @extend %popup-arrow-vertical;
   }
 }
 
