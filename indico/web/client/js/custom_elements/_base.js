@@ -22,6 +22,20 @@ export default class CustomElementBase extends HTMLElement {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, value);
   };
 
+  static define(tagName, subclass) {
+    console.assert(
+      Object.prototype.isPrototypeOf.call(CustomElementBase.prototype, subclass.prototype),
+      'Must extends CustomElementBase'
+    );
+    customElements.define(tagName, subclass);
+  }
+
+  static defineWhenDomReady(tagName, subclass) {
+    domReady.then(() => {
+      this.define(tagName, subclass);
+    });
+  }
+
   /**
    * Specification of attributes that will be used in the
    * custom element.
@@ -147,11 +161,9 @@ export default class CustomElementBase extends HTMLElement {
     // and disconnect, and the setup() method is expected to set up
     // listeners that will perform such operations.
 
-    domReady.then(() => {
-      this.setup?.();
-      this.setup = null;
-      this.dispatchEvent(new Event('x-connect'));
-    });
+    this.setup?.();
+    this.setup = null;
+    this.dispatchEvent(new Event('x-connect'));
   }
 
   setup() {
