@@ -5,11 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import CustomElementBase from 'indico/custom_elements/_base';
 import {TipBase} from 'indico/custom_elements/TipBase';
 
 const tipDelay = 500; // ms
 
-customElements.define(
+CustomElementBase.defineWhenDomReady(
   'ind-with-tooltip',
   class extends TipBase {
     show() {

@@ -37,7 +37,7 @@ const START_NEEDED = 0;
 const END_NEEDED = 1;
 const BOTH_POPULATED = 2;
 
-customElements.define(
+CustomElementBase.define(
   'ind-date-picker',
   class extends CustomElementBase {
     // Last value of the internal id used in the widgets
@@ -125,7 +125,7 @@ customElements.define(
   }
 );
 
-customElements.define(
+CustomElementBase.define(
   'ind-date-range-picker',
   class extends CustomElementBase {
     // Last value of the internal id used in the widgets
@@ -317,7 +317,7 @@ customElements.define(
   }
 );
 
-customElements.define(
+CustomElementBase.define(
   'ind-inline-date-picker',
   class extends CustomElementBase {
     static attributes = {
@@ -353,7 +353,7 @@ customElements.define(
   }
 );
 
-customElements.define(
+CustomElementBase.define(
   'ind-inline-date-range-picker',
   class extends CustomElementBase {
     static attributes = {
@@ -520,7 +520,7 @@ class InlineModeController {
   tearDownGlobalEvents() {}
 }
 
-customElements.define(
+CustomElementBase.define(
   'ind-calendar',
   class extends CustomElementBase {
     static attributes = {
@@ -815,7 +815,7 @@ customElements.define(
   }
 );
 
-customElements.define(
+CustomElementBase.define(
   'ind-date-grid',
   class extends CustomElementBase {
     static lastId = 0;

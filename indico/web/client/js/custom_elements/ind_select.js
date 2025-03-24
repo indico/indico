@@ -13,7 +13,7 @@ import * as positioning from 'indico/utils/positioning';
 
 import './ind_select.scss';
 
-customElements.define(
+CustomElementBase.define(
   'ind-select',
   class extends CustomElementBase {
     static formAssociated = true;
