@@ -57,7 +57,7 @@ class RHBootstrap(RH):
         user.email = setup_form.email.data
         user.is_admin = True
 
-        identifier = setup_form.username.data if config.LOCAL_USERNAMES else uuid4()
+        identifier = setup_form.username.data if config.LOCAL_USERNAMES else str(uuid4())
         identity = Identity(provider='indico', identifier=identifier, password=setup_form.password.data)
         user.identities.add(identity)
 

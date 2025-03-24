@@ -776,7 +776,7 @@ class RHUsersAdminCreate(RHAdminBase):
         if form.validate_on_submit():
             data = form.data
             if data.pop('create_identity', False):
-                identifier = data.pop('username') if config.LOCAL_USERNAMES else uuid4()
+                identifier = data.pop('username') if config.LOCAL_USERNAMES else str(uuid4())
                 identity = Identity(provider='indico', identifier=identifier, password=data.pop('password'))
             else:
                 identity = None

@@ -379,7 +379,7 @@ class RHAccounts(RHUserBase):
         return local_account_form
 
     def _handle_add_local_account(self, form):
-        identifier = form.username.data if config.LOCAL_USERNAMES else uuid4()  # uuid to have something unique
+        identifier = form.username.data if config.LOCAL_USERNAMES else str(uuid4())  # uuid to have something unique
         identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
         self.user.identities.add(identity)
         self.user.log(UserLogRealm.user, LogKind.positive, 'Accounts', 'Local account created', session.user,
@@ -870,7 +870,7 @@ class RHCreateLocalIdentity(RH):
     def _create_local_identity(self, user):
         form = AddLocalIdentityForm(user_emails=user.all_emails)
         if form.validate_on_submit():
-            identifier = form.username.data if config.LOCAL_USERNAMES else uuid4()  # uuid to have something unique
+            identifier = form.username.data if config.LOCAL_USERNAMES else str(uuid4())  # uuid to have something unique
             identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
             user.identities.add(identity)
             flash(_('Local account added successfully'), 'success')
