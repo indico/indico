@@ -90,14 +90,8 @@ export default class DateNavigator extends React.Component {
    */
   setDateWithMode(date, mode, force = false) {
     const {onDateChange, dateRange} = this.props;
-    let expectedDate;
-
-    if (mode === 'weeks') {
-      expectedDate = date.clone().startOf('week');
-    } else if (mode === 'months') {
-      expectedDate = date.clone().startOf('month');
-    } else {
-      expectedDate = date.clone();
+    let expectedDate = date.clone();
+    if (mode !== 'weeks' && mode !== 'month') {
       // check that we're not on a day that has no data
       if (this.dateBounds && dateRange.indexOf(serializeDate(date)) === -1) {
         expectedDate = toMoment(dateRange[0], 'YYYY-MM-DD');
@@ -123,13 +117,6 @@ export default class DateNavigator extends React.Component {
     const {mode, dateRange} = this.props;
     const freeRange = dateRange.length === 0;
     if (freeRange || isDateWithinRange(date, dateRange, toMoment)) {
-      if (mode === 'weeks') {
-        date = date.clone().startOf('week');
-      } else if (mode === 'months') {
-        date = date.clone().startOf('month');
-      } else {
-        date = date.clone();
-      }
       this.setDateWithMode(date, mode, true);
     }
     this.onClose();
@@ -239,7 +226,10 @@ export default class DateNavigator extends React.Component {
             {mode === 'months' && this.selectedDate.format('MMMM YYYY')}
             {mode === 'weeks' &&
               Translate.string('Week of {date}', {
-                date: this.selectedDate.format('MMM Do YYYY'),
+                date: this.selectedDate
+                  .clone()
+                  .startOf('week')
+                  .format('MMM Do YYYY'),
               })}
           </Button>
         }
