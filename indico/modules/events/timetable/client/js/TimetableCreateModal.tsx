@@ -21,7 +21,7 @@ import {BreakFormFields} from './BreakForm';
 import * as selectors from './selectors';
 import {SessionSelect} from './SessionSelect';
 import {EntryType, Session, TopLevelEntry} from './types';
-import { mapPersonLinkToSchema } from './utils';
+import {mapPersonLinkToSchema} from './utils';
 
 // Generic models
 
@@ -91,8 +91,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const sessions = useSelector(selectors.getSessions);
-  // const eventStartDt = useSelector(selectors.getEventStartDt);
-  // const eventEndDt = useSelector(selectors.getEventEndDt);
 
   const sessionValues: Session[] = Object.values(sessions);
 
@@ -137,36 +135,22 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
 
   const _mapDataToEntry = (data): TopLevelEntry => {
-    const {object} = data;
-    delete data['object'];
-    data['duration'] /= 60; // Seconds to minutes
     const {
-      id,
-      title,
-      type: objType,
-      duration,
+      type: rawType,
       start_dt: startDt,
-      colors,
-      y,
-      x,
-      column,
-      maxColumn,
-      session_id: sessionId,
-    } = {...object, ...data};
+      id,
+      object: {title, duration: rawDuration, colors, session_id: sessionId},
+    } = data;
 
-    let type;
-    switch (objType) {
-      case 'BREAK':
-        type = EntryType.Break;
-        break;
-      case 'CONTRIBUTION':
-        type = EntryType.Contribution;
-        break;
-      case 'SESSION_BLOCK':
-        type = EntryType.SessionBlock;
-        break;
-      default:
-        throw new Error('Invalid entry type', objType);
+    const duration = rawDuration / 60; // Seconds to minutes
+    const type = {
+      BREAK: EntryType.Break,
+      CONTRIBUTION: EntryType.Contribution,
+      SESSION_BLOCK: EntryType.SessionBlock,
+    }[rawType];
+
+    if (!type) {
+      throw new Error('Invalid entry type', rawType);
     }
 
     const mappedObj = {
@@ -175,14 +159,14 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       title,
       duration,
       startDt: moment(startDt),
-      x: x || 0,
-      y: y || 0,
-      column: column || 0,
-      maxColumn: maxColumn || 0,
+      x: 0,
+      y: 0,
+      column: 0,
+      maxColumn: 0,
       children: [],
       textColor: colors ? colors.text : '',
       backgroundColor: colors ? colors.background : '',
-      sessionId: sessionId ? sessionId : null,
+      sessionId: sessionId || null,
     };
 
     return mappedObj;

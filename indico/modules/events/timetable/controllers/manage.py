@@ -14,8 +14,6 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.contributions.schemas import ContributionSchema
-from indico.modules.events.management.controllers.base import RHManageEventBase
-from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.sessions.schemas import SessionBlockSchema
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
@@ -138,7 +136,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 
 
 # TODO: (Ajob) Evaluate need for these three classes below
-class RHAPICreateBreak(RHManageEventBase):
+class RHAPICreateBreak(RHManageTimetableBase):
 
     @use_args_schema_context(BreakSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Break):
@@ -146,7 +144,7 @@ class RHAPICreateBreak(RHManageEventBase):
         return TimetableEntrySchema().jsonify(break_entry)
 
 
-class RHAPICreateContribution(RHManageEventBase):
+class RHAPICreateContribution(RHManageTimetableBase):
 
     @use_args_schema_context(ContributionSchema, lambda self: {'event': self.event})
     def _process_POST(self, data: Contribution):
@@ -154,11 +152,15 @@ class RHAPICreateContribution(RHManageEventBase):
         return TimetableEntrySchema().jsonify(contrib_entry)
 
 
-class RHAPICreateSessionBlock(RHManageEventBase):
+class RHAPICreateSessionBlock(RHManageTimetableBase):
 
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event})
-    def _process_POST(self, data: SessionBlock):
+    def _process_POST(self, data: SessionBlockSchema):
         session = self.event.get_session(data['session_id'])
+
+        if not session:
+            raise NotFound
+
         block_entry = create_session_block_entry(session, data, extend_parent=False)
         return TimetableEntrySchema().jsonify(block_entry)
 
