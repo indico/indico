@@ -242,7 +242,8 @@ class UserLogEntry(LogEntryBase):
         lazy=True,
         backref=db.backref(
             'log_entries',
-            lazy='dynamic'
+            lazy='dynamic',
+            cascade='all, delete-orphan',
         ),
         foreign_keys=[target_user_id]
     )
