@@ -40,6 +40,7 @@ from indico.modules.categories import Category
 from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
 from indico.modules.events.util import serialize_event_for_ical
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.export_schemas import DataExportRequestSchema
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
@@ -54,8 +55,8 @@ from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema
 from indico.modules.users.util import (anonymize_user, get_avatar_url_from_name, get_gravatar_for_user,
                                        get_linked_events, get_mastodon_server_name, get_related_categories,
                                        get_suggested_categories, get_unlisted_events, get_user_by_email,
-                                       get_user_titles, merge_users, search_affiliations, search_users, send_avatar,
-                                       serialize_user, set_user_avatar)
+                                       get_user_titles, log_user_update, merge_users, search_affiliations, search_users,
+                                       send_avatar, serialize_user, set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
@@ -290,9 +291,9 @@ class RHPersonalDataUpdate(RHUserBase):
     allow_system_user = True
 
     @use_args(UserPersonalDataSchema, partial=True)
-    def _process(self, changes):
-        logger.info('Profile of user %r updated by %r: %r', self.user, session.user, changes)
-        synced_fields = set(changes.pop('synced_fields', self.user.synced_fields))
+    def _process(self, updates):
+        logger.info('Profile of user %r updated by %r: %r', self.user, session.user, updates)
+        synced_fields = set(updates.pop('synced_fields', self.user.synced_fields))
         if not session.user.is_admin:
             synced_fields |= multipass.locked_fields & self.user.synced_fields
         syncable_fields = {k for k, v in self.user.synced_values.items()
@@ -300,11 +301,19 @@ class RHPersonalDataUpdate(RHUserBase):
         # we set this first so these fields are skipped below and only
         # get updated in synchronize_data which will flash a message
         # informing the user about the changes made by the sync
+        old_synced_fields = self.user.synced_fields
         self.user.synced_fields = synced_fields & syncable_fields
-        for key, value in changes.items():
-            if key not in self.user.synced_fields:
+        changes = {}
+        if old_synced_fields != self.user.synced_fields:
+            changes['synced_fields'] = (old_synced_fields, self.user.synced_fields)
+        for key, value in updates.items():
+            old = getattr(self.user, key)
+            if key not in self.user.synced_fields and old != value:
+                changes[key] = (old, value)
                 setattr(self.user, key, value)
-        self.user.synchronize_data(refresh=True)
+        changes.update(self.user.synchronize_data(refresh=True))
+        if changes:
+            log_user_update(self.user, changes)
         flash(_('Your personal data was successfully updated.'), 'success')
         return '', 204
 
@@ -378,6 +387,7 @@ class RHSaveProfilePicture(RHUserBase):
             self.user.picture = None
             self.user.picture_metadata = None
             logger.info('Profile picture of user %s removed by %s', self.user, session.user)
+            self.user.log(UserLogRealm.user, LogKind.negative, 'Profile', 'Picture removed', session.user)
             return '', 204
 
         if source == ProfilePictureSource.custom:
@@ -402,6 +412,8 @@ class RHSaveProfilePicture(RHUserBase):
             set_user_avatar(self.user, content, source.name, lastmod)
 
         logger.info('Profile picture of user %s updated by %s', self.user, session.user)
+        self.user.log(UserLogRealm.user, LogKind.change, 'Profile', 'Picture updated', session.user,
+                      data={'Source': source.name.title()})
         return '', 204
 
 
@@ -579,6 +591,8 @@ class RHUserEmails(RHUserBase):
         form = UserEmailsForm()
         if form.validate_on_submit():
             self._send_confirmation(form.email.data)
+            self.user.log(UserLogRealm.user, LogKind.other, 'Profile', 'Validating new secondary email',
+                          session.user, data={'Email': form.email.data})
             flash(_('We have sent an email to {email}. Please click the link in that email within 24 hours to '
                     'confirm your new email address.').format(email=form.email.data), 'success')
             return redirect(url_for('.user_emails'))
@@ -626,6 +640,8 @@ class RHUserEmailsVerify(RHUserBase):
                 existing.is_pending = False
 
             self.user.secondary_emails.add(data['email'])
+            self.user.log(UserLogRealm.user, LogKind.positive, 'Profile', 'Secondary email added', session.user,
+                          data={'Email': data['email']})
             signals.users.email_added.send(self.user, email=data['email'], silent=False)
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
@@ -636,6 +652,8 @@ class RHUserEmailsDelete(RHUserBase):
         email = request.view_args['email']
         if email in self.user.secondary_emails:
             self.user.secondary_emails.remove(email)
+            self.user.log(UserLogRealm.user, LogKind.negative, 'Profile', 'Secondary email removed', session.user,
+                          data={'Email': email})
         return jsonify(success=True)
 
 
@@ -645,7 +663,10 @@ class RHUserEmailsSetPrimary(RHUserBase):
 
         email = request.form['email']
         if email in self.user.secondary_emails:
+            old = self.user.email
             self.user.make_email_primary(email)
+            self.user.log(UserLogRealm.user, LogKind.change, 'Profile', 'Primary email updated',
+                          session.user, data={'Old': old, 'New': email})
             db.session.commit()
             if self.user.picture_source in (ProfilePictureSource.gravatar, ProfilePictureSource.identicon):
                 update_gravatars.delay(self.user)
@@ -671,10 +692,14 @@ class RHAdmins(RHAdminBase):
             removed = admins - form.admins.data
             for user in added:
                 user.is_admin = True
+                user.log(UserLogRealm.management, LogKind.positive, 'Admins', 'Admin privileges granted', session.user,
+                         data={'IP': request.remote_addr})
                 logger.warning('Admin rights granted to %r by %r [%s]', user, session.user, request.remote_addr)
                 flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
             for user in removed:
                 user.is_admin = False
+                user.log(UserLogRealm.management, LogKind.negative, 'Admins', 'Admin privileges revoked', session.user,
+                         data={'IP': request.remote_addr})
                 logger.warning('Admin rights revoked from %r by %r [%s]', user, session.user, request.remote_addr)
                 flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
             return redirect(url_for('.admins'))
@@ -751,7 +776,7 @@ class RHUsersAdminCreate(RHAdminBase):
         if form.validate_on_submit():
             data = form.data
             if data.pop('create_identity', False):
-                identifier = data.pop('username') if config.LOCAL_USERNAMES else uuid4()
+                identifier = data.pop('username') if config.LOCAL_USERNAMES else str(uuid4())
                 identity = Identity(provider='indico', identifier=identifier, password=data.pop('password'))
             else:
                 identity = None
@@ -996,12 +1021,14 @@ class RHUserBlock(RHUserBase):
         if self.user == session.user:
             raise Forbidden(_('You cannot block yourself'))
         self.user.is_blocked = True
+        self.user.log(UserLogRealm.management, LogKind.negative, 'User', 'User blocked', session.user)
         logger.info('User %s blocked %s', session.user, self.user)
         flash(_('{name} has been blocked.').format(name=self.user.name), 'success')
         return jsonify(success=True)
 
     def _process_DELETE(self):
         self.user.is_blocked = False
+        self.user.log(UserLogRealm.management, LogKind.positive, 'User', 'User unblocked', session.user)
         logger.info('User %s unblocked %s', session.user, self.user)
         flash(_('{name} has been unblocked.').format(name=self.user.name), 'success')
         return jsonify(success=True)
@@ -1034,6 +1061,7 @@ class RHUserDelete(RHUserBase):
             db.session.rollback()
             logger.info('User %r could not be deleted %s', self.user, str(exc))
             anonymize_user(self.user)
+            self.user.log(UserLogRealm.management, LogKind.negative, 'User', 'User anonymized', session.user)
             logger.info('User %r anonymized %s', session.user, user_repr)
             flash(_('{user_name} has been anonymized.').format(user_name=user_name), 'success')
         else:

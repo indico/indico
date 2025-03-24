@@ -221,7 +221,7 @@ class UserLogEntry(LogEntryBase):
 
     __auto_table_args = {'schema': 'users'}
     user_backref_name = 'user_log_entries'
-    link_fk_name = 'user_id'
+    link_fk_name = 'target_user_id'
 
     #: The ID of the user
     target_user_id = db.Column(
@@ -242,7 +242,8 @@ class UserLogEntry(LogEntryBase):
         lazy=True,
         backref=db.backref(
             'log_entries',
-            lazy='dynamic'
+            lazy='dynamic',
+            cascade='all, delete-orphan',
         ),
         foreign_keys=[target_user_id]
     )

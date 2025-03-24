@@ -23,6 +23,7 @@ from indico.core.oauth.models.tokens import OAuthToken
 from indico.core.oauth.oauth2 import auth_server
 from indico.core.oauth.scopes import SCOPES
 from indico.modules.admin import RHAdminBase
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.oauth.forms import ApplicationForm, PersonalTokenForm
 from indico.modules.oauth.util import can_manage_personal_tokens
 from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
@@ -231,6 +232,8 @@ class RHOAuthUserAppRevoke(RHUserBase):
         link = OAuthApplicationUserLink.query.with_parent(self.user).with_parent(self.application).first()
         if link:
             logger.info('Deauthorizing app %r for user %r (scopes: %r)', self.application, self.user, link.scopes)
+            session.user.log(UserLogRealm.user, LogKind.negative, 'OAuth', f'App deauthorized: {self.application.name}',
+                             meta={'app_id': self.application.id})
             db.session.delete(link)
         flash(_("Access for '{}' has been successfully revoked.").format(self.application.name), 'success')
         return redirect(url_for('.user_apps'))
@@ -281,6 +284,9 @@ class RHEditPersonalToken(RHPersonalTokenBase):
             old_name = self.token.name
             form.populate_obj(self.token)
             logger.info('Updated token %r', self.token)
+            self.user.log(UserLogRealm.user, LogKind.change, 'API Tokens', 'Token updated', session.user,
+                          data={'ID': self.token.id, 'Name': self.token.name, 'Scopes': ', '.join(self.token._scopes)},
+                          meta={'token_id': self.token.id})
             flash(_("Token '{}' updated").format(old_name), 'success')
             return jsonify_data(flash=False)
         return jsonify_form(form)
@@ -303,6 +309,10 @@ class RHCreatePersonalToken(RHPersonalTokensUserBase):
             db.session.flush()
             logger.info('Created token %r', token)
             session['personal_token_created'] = (token.id, access_token)
+            self.user.log(UserLogRealm.user, LogKind.positive, 'API Tokens', 'Token created', session.user,
+                          data={'ID': token.id, 'Name': token.name, 'Scopes': ', '.join(token._scopes),
+                                'IP': request.remote_addr},
+                          meta={'token_id': token.id})
             return jsonify_data(flash=False)
         return jsonify_form(form)
 
@@ -313,6 +323,9 @@ class RHRevokePersonalToken(RHPersonalTokenBase):
     def _process(self):
         self.token.revoke()
         logger.info('Revoked token %r', self.token)
+        self.user.log(UserLogRealm.user, LogKind.negative, 'API Tokens', 'Token revoked', session.user,
+                      data={'ID': self.token.id, 'Name': self.token.name},
+                      meta={'token_id': self.token.id})
         flash(_("The token '{}' has been successfully revoked.").format(self.token.name), 'success')
         return redirect(url_for('.user_tokens'))
 
@@ -324,4 +337,7 @@ class RHResetPersonalToken(RHPersonalTokenBase):
         access_token = self.token.generate_token()
         logger.info('Regenerated token %r', self.token)
         session['personal_token_created'] = (self.token.id, access_token)
+        self.user.log(UserLogRealm.user, LogKind.change, 'API Tokens', 'Token regenerated', session.user,
+                      data={'ID': self.token.id, 'Name': self.token.name, 'IP': request.remote_addr},
+                      meta={'token_id': self.token.id})
         return redirect(url_for('.user_tokens'))

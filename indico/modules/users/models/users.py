@@ -738,12 +738,13 @@ class User(PersonMixin, db.Model):
         from indico.modules.users import logger
         identity = self._get_synced_identity(refresh=refresh)
         if identity is None:
-            return
+            return {}
         if not any(identity.data.values()):
             # refuse to sync with empty identities, just in case - if there is no
             # data at all there's a good chance something is wrong!
-            return
+            return {}
         affiliation_data = identity.data.get('affiliation_data')
+        changes = {}
         for field in self.synced_fields:
             old_value = getattr(self, field)
             new_value = identity.data.get(field) or ''
@@ -760,13 +761,18 @@ class User(PersonMixin, db.Model):
                 continue
             logger.info('Syncing %s for %r from %r to %r', field, self, old_value, new_value)
             if field == 'email':
+                old_email = self.email
                 if not self._synchronize_email(new_value, silent=silent):
                     continue
+                else:
+                    changes['email'] = (old_email, self.email)
             else:
+                changes[field] = (getattr(self, field), new_value)
                 setattr(self, field, new_value)
             if not silent:
                 flash(_("Your {field_name} has been synchronized from '{old_value}' to '{new_value}'.").format(
                     field_name=syncable_fields[field], old_value=old_value, new_value=new_value))
+        return changes
 
     def _synchronize_email(self, email, silent=False):
         from indico.modules.users import logger

@@ -32,6 +32,7 @@ from indico.modules.auth.util import (impersonate_user, load_identity_info, regi
                                       url_for_logout)
 from indico.modules.auth.views import WPAuth, WPAuthUser, WPSignup
 from indico.modules.legal import legal_settings
+from indico.modules.logs.models.entries import LogKind, UserLogRealm
 from indico.modules.users import User, user_management_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.models.affiliations import Affiliation
@@ -212,6 +213,9 @@ class RHLinkAccount(RH):
         identity = Identity(user=self.user, provider=self.identity_info['provider'],
                             identifier=self.identity_info['identifier'], data=self.identity_info['data'],
                             multipass_data=self.identity_info['multipass_data'])
+        self.user.log(UserLogRealm.user, LogKind.positive, 'Accounts', 'External account linked',
+                      data={'Provider': multipass.identity_providers[identity.provider].title,
+                            'Identifier': identity.identifier})
         logger.info('Created new identity for %s: %s', self.user, identity)
         del session['login_identity_info']
         db.session.flush()
@@ -375,9 +379,11 @@ class RHAccounts(RHUserBase):
         return local_account_form
 
     def _handle_add_local_account(self, form):
-        identifier = form.username.data if config.LOCAL_USERNAMES else uuid4()  # uuid to have something unique
+        identifier = form.username.data if config.LOCAL_USERNAMES else str(uuid4())  # uuid to have something unique
         identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
         self.user.identities.add(identity)
+        self.user.log(UserLogRealm.user, LogKind.positive, 'Accounts', 'Local account created', session.user,
+                      data={'Identifier': identifier})
         logger.info('User %s added a local account (%s)', self.user, identity.identifier)
         flash(_('Local account added successfully'), 'success')
 
@@ -388,6 +394,7 @@ class RHAccounts(RHUserBase):
             self.user.local_identity.password = form.new_password.data
             session.pop('insecure_password_error', None)
             logger.info('User %s (%s) changed their password', self.user, self.user.local_identity.identifier)
+            self.user.log(UserLogRealm.user, LogKind.change, 'Accounts', 'Password changed', session.user)
         flash(_('Your local account credentials have been updated successfully'), 'success')
 
     def _process(self):
@@ -425,6 +432,8 @@ class RHRemoveAccount(RHUserBase):
             provider_title = multipass.identity_providers[self.identity.provider].title
         except KeyError:
             provider_title = self.identity.provider.title()
+        self.user.log(UserLogRealm.user, LogKind.negative, 'Accounts', 'External account removed', session.user,
+                      data={'Provider': provider_title, 'Identifier': self.identity.identifier})
         flash(_('{provider} ({identifier}) successfully removed from your accounts')
               .format(provider=provider_title, identifier=self.identity.identifier), 'success')
         return redirect(url_for('.accounts'))
@@ -815,6 +824,8 @@ class RHResetPassword(RH):
                 _send_confirmation(form.email.data, 'create-local-identity', '.create_local_identity',
                                    'auth/emails/create_local_identity.txt',
                                    {'user': user, 'alternatives': alternatives}, data={'id': user.id})
+            user.log(UserLogRealm.user, LogKind.other, 'Accounts', 'Password reset requested',
+                     data={'IP': request.remote_addr})
             session['resetpass_email_sent'] = True
             logger.info('Password reset requested for user %s', user)
             return redirect(url_for('.resetpass'))
@@ -827,6 +838,8 @@ class RHResetPassword(RH):
             identity.password = form.password.data
             flash(_('Your password has been changed successfully.'), 'success')
             login_user(identity.user, identity)
+            identity.user.log(UserLogRealm.user, LogKind.change, 'Accounts', 'Password reset', session.user,
+                              data={'IP': request.remote_addr})
             logger.info('Password reset confirmed for user %s', identity.user)
             # We usually come here from a multipass login page so we should have a target url
             return multipass.redirect_success()
@@ -857,11 +870,13 @@ class RHCreateLocalIdentity(RH):
     def _create_local_identity(self, user):
         form = AddLocalIdentityForm(user_emails=user.all_emails)
         if form.validate_on_submit():
-            identifier = form.username.data if config.LOCAL_USERNAMES else uuid4()  # uuid to have something unique
+            identifier = form.username.data if config.LOCAL_USERNAMES else str(uuid4())  # uuid to have something unique
             identity = Identity(provider='indico', identifier=identifier, password=form.password.data)
             user.identities.add(identity)
             flash(_('Local account added successfully'), 'success')
             login_user(identity.user, identity)
+            user.log(UserLogRealm.user, LogKind.positive, 'Accounts', 'Local account created (password reset)',
+                     session.user, data={'Identifier': identifier, 'IP': request.remote_addr})
             logger.info('Password reset confirmed for user %s; local identity created', user)
             # We usually come here from a multipass login page so we should have a target url
             return multipass.redirect_success()
