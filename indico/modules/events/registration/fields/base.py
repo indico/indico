@@ -12,6 +12,7 @@ from marshmallow import fields, validate
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.models.registrations import RegistrationData
+from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 
 
@@ -206,7 +207,10 @@ class RegistrationFormFieldBase:
         return registration_data.data
 
     def iter_placeholder_info(self):
-        yield None, f'Value of "{self.form_item.title}" ({self.form_item.parent.title})'
+        yield None, _('Value of "{form_item}" ({parent_form_item})').format(
+            form_item=self.form_item.title,
+            parent_form_item=self.form_item.parent.title
+        )
 
     def render_placeholder(self, data, key=None):
         return self.get_friendly_data(data)
