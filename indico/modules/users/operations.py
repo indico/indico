@@ -5,9 +5,10 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from flask import session
+from flask import has_request_context, request, session
 
 from indico.core import signals
+from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.modules.logs.models.entries import LogKind, UserLogRealm
@@ -63,8 +64,10 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     signals.users.registered.send(user, from_moderation=from_moderation, identity=identity)
     data = {'Moderated': from_moderation}
     if identity:
-        data |= {'Identity provider': identity.provider,
+        data |= {'Provider': multipass.identity_providers[identity.provider].title,
                  'Identifier': identity.identifier}
+    if has_request_context():
+        data['IP'] = request.remote_addr
     user.log(UserLogRealm.user, LogKind.positive, 'User', 'User created', session.user if session else None, data=data)
     db.session.flush()
     return user
