@@ -391,6 +391,21 @@ Customization
 
     Default: ``{}``
 
+.. data:: ALLOWED_LANGUAGES
+
+    A dict with language name overrides.  This can be useful if the
+    only specific languages should made available in your Indico instance's
+    despite all other existing vocabularies.
+
+    For example, if you want to display only English and Spanish
+    you would use:
+
+    .. code-block:: python
+
+        ALLOWED_LANGUAGES = ['en_GB', 'es_ES']
+
+    Default: ``[]``
+
 .. data:: CHECKIN_APP_URL
 
     The URL of the mobile checkin app. The app is purely client-side and only
