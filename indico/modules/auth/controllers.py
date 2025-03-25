@@ -491,14 +491,14 @@ class RegistrationHandler:
                 unknown = RAISE
 
             email = fields.String(required=True, validate=validate.OneOf(emails))
-            first_name = fields.String(required=True)
-            last_name = fields.String(required=True)
-            address = fields.String(load_default='')
+            first_name = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
+            last_name = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
+            address = fields.String(load_default='', validate=validate.Length(max=500))
             if self.moderate_registrations and 'affiliation' in mandatory_fields:
-                affiliation = fields.String(required=True, validate=not_empty)
+                affiliation = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
             else:
-                affiliation = fields.String(load_default='')
-            phone = fields.String(load_default='')
+                affiliation = fields.String(load_default='', validate=validate.Length(max=250))
+            phone = fields.String(load_default='', validate=validate.Length(max=100))
             affiliation_link = ModelField(Affiliation, data_key='affiliation_id', load_default=None)
 
             if legal_settings.get('terms_require_accept'):
@@ -729,11 +729,11 @@ class LocalRegistrationHandler(RegistrationHandler):
 
     def create_schema(self):
         class LocalSignupSchema(super().create_schema()):
-            first_name = fields.String(required=True, validate=not_empty)
-            last_name = fields.String(required=True, validate=not_empty)
+            first_name = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
+            last_name = fields.String(required=True, validate=[not_empty, validate.Length(max=250)])
             if config.LOCAL_USERNAMES:
-                username = LowercaseString(required=True, validate=not_empty)
-            password = fields.String(required=True, validate=not_empty)
+                username = LowercaseString(required=True, validate=[not_empty, validate.Length(max=100)])
+            password = fields.String(required=True, validate=[not_empty, validate.Length(max=100)])
 
             if config.LOCAL_USERNAMES:
                 @validates('username')
