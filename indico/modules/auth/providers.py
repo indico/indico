@@ -61,13 +61,14 @@ class IndicoAuthProvider(AuthProvider):
         if not identities:
             exc = NoSuchUser(provider=self)
             if not config.LOCAL_USERNAMES and '@' not in data['identifier']:
-                exc = NoSuchUser(_('Please use your email address to log in'), provider=self)
+                exc = NoSuchUser(_('Please use your email address to log in'),
+                                 provider=self, identifier=data['identifier'])
                 exc._indico_no_rate_limit = True
             raise exc
         # From all the matching identities (usually just one), get one where the password matches, or
         # fail with invalid-password if there is none.
         if not (identity := next((ide for ide in identities if self.check_password(ide, data['password'])), None)):
-            raise InvalidCredentials(provider=self)
+            raise InvalidCredentials(provider=self, identifier=data['identifier'])
         if data['identifier'] != identity.identifier and data['identifier'] in identity.user.secondary_emails:
             msg = _('You are logging in with a secondary email address. Please note that any email notifications '
                     'will always be sent to your primary email address ({email}). Go to '
