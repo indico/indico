@@ -252,9 +252,14 @@ def get_all_locales():
         return {}
     else:
         missing = object()
-        languages = {str(t): config.CUSTOM_LANGUAGES.get(str(t), (t.language_name.title(), t.territory_name))
-                     for t in babel.list_translations()
-                     if config.CUSTOM_LANGUAGES.get(str(t), missing) is not None}
+        languages = {
+            str(t): config.CUSTOM_LANGUAGES.get(str(t), (t.language_name.title(), t.territory_name))
+            for t in babel.list_translations()
+            if (
+                config.CUSTOM_LANGUAGES.get(str(t), missing) is not None
+                and (not config.ALLOWED_LANGUAGES or str(t) in config.ALLOWED_LANGUAGES)
+            )
+        }
         counts = Counter(x[0] for x in languages.values())
         return {code: (name, territory or '', counts[name] > 1) for code, (name, territory) in languages.items()}
 

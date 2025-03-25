@@ -10,7 +10,8 @@ Version 3.3.7
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Add a new :data:`ALLOWED_LANGUAGES` setting to ``indico.conf`` to restrict which
+  languages can be used (:pr:`6818`, thanks :user:`openprojects`)
 
 Bugfixes
 ^^^^^^^^

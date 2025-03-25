@@ -391,6 +391,20 @@ Customization
 
     Default: ``{}``
 
+.. data:: ALLOWED_LANGUAGES
+
+    A set of allowed language names. This can be useful if only specific languages
+    should be available in your Indico instance, instead of all languages for which
+    Indico provides translations.
+
+    For example, if you want to display only English and Spanish you can use:
+
+    .. code-block:: python
+
+        ALLOWED_LANGUAGES = {'en_GB', 'es_ES'}
+
+    Default: ``None``
+
 .. data:: CHECKIN_APP_URL
 
     The URL of the mobile checkin app. The app is purely client-side and only
