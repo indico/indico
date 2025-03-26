@@ -13,6 +13,8 @@ Improvements
 - Add a new :data:`ALLOWED_LANGUAGES` setting to ``indico.conf`` to restrict which
   languages can be used (:pr:`6818`, thanks :user:`openprojects`)
 - Set reasonable maximum lengths on signup form fields (:pr:`6724`)
+- Preserve the selected day when switching between room booking calendar view modes
+  (:pr:`6817`)
 
 Bugfixes
 ^^^^^^^^
