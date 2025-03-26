@@ -34,7 +34,7 @@ from indico.modules.events.registration.operations import update_registration_fo
 from indico.modules.events.registration.settings import event_registration_settings
 from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
 from indico.modules.events.registration.util import (close_registration, create_personal_data_fields,
-                                                     get_flat_section_setup_data)
+                                                     get_flat_section_setup_data, clone_registration_form)
 from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
                                                       WPManageRegistrationStats)
 from indico.modules.events.settings import data_retention_settings
@@ -321,14 +321,12 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
 class RHRegistrationFormClone(RHManageRegFormBase):
     """Clone a registration form."""
 
-    from indico.modules.events.registration.util import clone_registration_form
-
     def _process(self):
         form = clone_registration_form(self.regform)
         flash(_('Registration form cloned. You can now modify it.'), 'success')
         logger.info('Registration form %s cloned by %s', self.regform, session.user)
-        form.log(EventLogRealm.management, LogKind.positive, 'Registration',
-                 f'Registration form cloned from "{self.regform.title}"', session.user)
+        log_text = f'Registration form cloned from "{self.regform.title}"'
+        self.regform.log(EventLogRealm.managment, LogKind.positive, 'Registration', log_text, session.user)
         return redirect(url_for('.manage_regform', form))
 
 
