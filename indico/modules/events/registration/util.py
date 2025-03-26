@@ -1094,6 +1094,7 @@ def clone_registration_form(regform):
 
     # Use the cloning logic from RegistrationFormCloner with the current event
     cloner = RegistrationFormCloner(regform.event)
+    cloner._field_data_map = {}  # Initialize field_data_map attribute (normally done in run())
     cloner._clone_form_items(regform, cloned_form, clone_all_revisions=False)
 
     db.session.add(cloned_form)
