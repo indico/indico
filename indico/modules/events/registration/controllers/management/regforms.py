@@ -321,8 +321,15 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
 class RHRegistrationFormClone(RHManageRegFormBase):
     """Clone a registration form."""
 
+    from indico.modules.events.registration.util import clone_registration_form
+
     def _process(self):
-        pass
+        form = clone_registration_form(self.regform)
+        flash(_('Registration form cloned. You can now modify it.'), 'success')
+        logger.info('Registration form %s cloned by %s', self.regform, session.user)
+        form.log(EventLogRealm.management, LogKind.positive, 'Registration',
+                 f'Registration form cloned from "{self.regform.title}"', session.user)
+        return redirect(url_for('.manage_regform', form))
 
 
 class RHRegistrationFormOpen(RHManageRegFormBase):
