@@ -30,6 +30,7 @@ class RHManageTimetableBase(RHManageEventBase):
     def _process_args(self):
         RHManageEventBase._process_args(self)
         self.session = None
+
         if 'session_id' in request.view_args:
             self.session = self.event.get_session(request.view_args['session_id'])
             if self.session is None:
