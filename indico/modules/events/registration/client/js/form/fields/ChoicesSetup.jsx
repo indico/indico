@@ -9,7 +9,7 @@ import createDecorator from 'final-form-calculate';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Input} from 'semantic-ui-react';
+import {Input, Button} from 'semantic-ui-react';
 
 import {ItemListField} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
@@ -107,6 +107,7 @@ export function Choices({
           <Translate>All prices are per night</Translate>
         </p>
       )}
+      {/* eslint-disable-next-line no-undef */}
       <Button type="button" onClick={handleAdd} disabled={disabled}>
         <Translate context="Choice">Add new</Translate>
       </Button>
