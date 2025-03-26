@@ -15,7 +15,6 @@ import {OnChange} from 'react-final-form-listeners';
 import {Button, Dropdown, Form, Input, Popup, Radio, TextArea, Icon} from 'semantic-ui-react';
 
 import Checkbox from 'indico/react/components/Checkbox';
-
 import {toMoment} from 'indico/utils/date';
 
 import {DatePicker} from '../components';
@@ -358,7 +357,6 @@ ComboDropdownAdapter.defaultProps = {
 
 function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
   // TODO: Make more props overridable
-  console.log('start_dt', value);
 
   const markTouched = () => {
     onFocus();
@@ -435,7 +433,6 @@ function DateTimePickerComponent({
   maxEndDt,
 }) {
   const [dateValue, timeValue] = value.split('T');
-  console.log('start_dt split', value, dateValue, timeValue);
 
   const handleDateChange = newDate => onChange(`${newDate || ''}T${timeValue}`);
   const handleTimeChange = newTime =>
@@ -450,6 +447,8 @@ function DateTimePickerComponent({
           onBlur={onBlur}
           onFocus={onFocus}
           disabled={disabled}
+          min={minStartDt.format('YYYY-MM-DD')}
+          max={maxEndDt.format('YYYY-MM-DD')}
         />
       </Form.Field>
       <Form.Field>
