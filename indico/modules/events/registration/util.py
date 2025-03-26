@@ -1073,8 +1073,33 @@ def close_registration(regform):
         regform.start_dt = regform.end_dt
 
 
-def clone_registration_form(regform, event=None):
-    pass
+@no_autoflush
+def clone_registration_form(regform):
+    """Clone a registration form within the same event.
+
+    :param regform: The registration form to clone
+    :return: The cloned registration form
+    """
+    from indico.modules.events.cloning import get_attrs_to_clone
+    from indico.modules.events.registration.models.forms import RegistrationForm
+    from indico.modules.events.registration.clone import RegistrationFormCloner
+
+    attrs = get_attrs_to_clone(RegistrationForm,
+                               # registration form open times probably not needed
+                               skip={'start_dt', 'end_dt', 'modification_end_dt', 'is_purged', 'uuid'})
+
+    cloned_form = RegistrationForm(event=regform.event, title=f"Copy of {regform.title}",
+                                   **{attr: getattr(regform, attr) for attr in attrs
+                                   if attr != 'title'})
+
+    # Use the cloning logic from RegistrationFormCloner with the current event
+    cloner = RegistrationFormCloner(regform.event)
+    cloner._clone_form_items(regform, cloned_form, clone_all_revisions=False)
+
+    db.session.add(cloned_form)
+    db.session.flush()
+
+    return cloned_form
 
 
 def get_persons(registrations, include_accompanying_persons=False):
