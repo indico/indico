@@ -6,25 +6,84 @@
 // LICENSE file for more details.
 
 import locationParentURL from 'indico-url:sessions.api_blocks_location_parent';
-import sessionBlockCreateURL from 'indico-url:sessions.api_create_block';
+import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block';
 import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
+import {LocationParent} from 'indico/modules/events/timetable/client/js/types';
 import {FinalLocationField} from 'indico/react/components';
 import {FinalSessionBlockPersonLinkField} from 'indico/react/components/PersonLinkField';
 import {FinalInput} from 'indico/react/forms';
-import {FinalDuration, FinalTimePicker} from 'indico/react/forms/fields';
+import {FinalDateTimePicker, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys, snakifyKeys} from 'indico/utils/case';
 
-export default function SessionBlockEditForm({eventId, sessionId, blockId, onClose}) {
+interface SessionBlockEditFormProps {
+  eventId: number;
+  sessionId: number;
+  blockId: number;
+  onClose: () => void;
+}
+
+interface SessionBlockFormFieldProps {
+  eventId: number;
+  locationParent: LocationParent;
+  extraOptions?: Record<string, any>;
+  [key: string]: any; // Allow additional props
+}
+
+export function SessionBlockFormFields({
+  eventId,
+  locationParent,
+  extraOptions = {},
+}: SessionBlockFormFieldProps) {
+  const {minStartDt, maxEndDt} = extraOptions;
+
+  return (
+    <>
+      <FinalInput
+        name="title"
+        label={Translate.string('Title')}
+        description={Translate.string('Title of the session block')}
+        autoFocus
+        required
+      />
+      <FinalDateTimePicker
+        name="start_dt"
+        label={Translate.string('Start time')}
+        required
+        minStartDt={minStartDt}
+        maxEndDt={maxEndDt}
+      />
+      <FinalDuration name="duration" label={Translate.string('Duration')} required />
+      <FinalSessionBlockPersonLinkField
+        name="person_links"
+        label={Translate.string('Conveners')}
+        eventId={eventId}
+        sessionUser={{...Indico.User, userId: Indico.User.id}}
+      />
+      <FinalLocationField
+        name="location_data"
+        label={Translate.string('Location')}
+        locationParent={locationParent}
+      />
+      <FinalInput name="code" label={Translate.string('Program code')} />
+    </>
+  );
+}
+
+export default function SessionBlockEditForm({
+  eventId,
+  sessionId,
+  blockId,
+  onClose,
+}: SessionBlockEditFormProps) {
   const {data: blockData, loading} = useIndicoAxios(
     sessionBlockURL({event_id: eventId, session_id: sessionId, block_id: blockId})
   );
@@ -32,7 +91,7 @@ export default function SessionBlockEditForm({eventId, sessionId, blockId, onClo
     locationParentURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = async formData => {
+  const handleSubmit = async (formData: any) => {
     const personLinks = formData.conveners.map(
       ({
         affiliationMeta,
@@ -50,7 +109,7 @@ export default function SessionBlockEditForm({eventId, sessionId, blockId, onClo
         invalid,
         detail,
         ...rest
-      }) => ({
+      }: any) => ({
         ...rest,
       })
     );
@@ -90,45 +149,24 @@ export default function SessionBlockEditForm({eventId, sessionId, blockId, onClo
       initialValues={{...blockData, conveners: camelizeKeys(blockData.conveners)}}
       size="small"
     >
-      <FinalInput
-        name="title"
-        label={Translate.string('Title')}
-        description={Translate.string('Title of the session block')}
-        autoFocus
-        required
-      />
-      <FinalTimePicker name="start_dt" label={Translate.string('Start time')} required />
-      <FinalDuration name="duration" label={Translate.string('Duration')} required />
-      <FinalSessionBlockPersonLinkField
-        name="conveners"
-        label={Translate.string('Conveners')}
-        eventId={eventId}
-        sessionUser={{...Indico.User, userId: Indico.User.id}}
-      />
-      <FinalLocationField
-        name="location_data"
-        label={Translate.string('Location')}
-        locationParent={locationParent}
-      />
-      <FinalInput name="code" label={Translate.string('Program code')} />
+      <SessionBlockFormFields eventId={eventId} locationParent={locationParent} />
     </FinalModalForm>
   );
 }
 
-SessionBlockEditForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  sessionId: PropTypes.number.isRequired,
-  blockId: PropTypes.number.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+interface SessionBlockCreateFormProps {
+  eventId: number;
+  sessionId: number;
+  onClose: () => void;
+}
 
-function SessionBlockCreateForm({eventId, sessionId, onClose}) {
+export function SessionBlockCreateForm({eventId, sessionId, onClose}: SessionBlockCreateFormProps) {
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = async formData => {
-    formData = _.omitBy(formData, 'conveners'); // TODO person links
+  const handleSubmit = async (formData: any) => {
+    formData = _.omitBy(formData, 'person_links'); // TODO person links
     try {
       await indicoAxios.patch(
         sessionBlockCreateURL({event_id: eventId, session_id: sessionId}),
@@ -163,36 +201,19 @@ function SessionBlockCreateForm({eventId, sessionId, onClose}) {
       initialValues={{location_data: locationData}}
       size="small"
     >
-      <FinalInput
-        name="title"
-        label={Translate.string('Title')}
-        description={Translate.string('Title of the session block')}
-        autoFocus
-        required
-      />
-      <FinalTimePicker name="start_dt" label={Translate.string('Start time')} required />
-      <FinalDuration name="duration" label={Translate.string('Duration')} required />
-      <FinalSessionBlockPersonLinkField
-        name="conveners"
-        label={Translate.string('Conveners')}
-        eventId={eventId}
-        sessionUser={Indico.User}
-      />
-      <FinalLocationField
-        name="location_data"
-        label={Translate.string('Location')}
-        locationParent={locationParent}
-      />
-      <FinalInput name="code" label={Translate.string('Program code')} />
+      <SessionBlockFormFields eventId={eventId} locationParent={locationParent} />
     </FinalModalForm>
   );
 }
 
-SessionBlockCreateForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  sessionId: PropTypes.number.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+interface EditSessionBlockButtonProps {
+  eventId: number;
+  sessionId: number;
+  blockId: number;
+  eventTitle: string;
+  eventType: string;
+  triggerSelector?: string;
+}
 
 export function EditSessionBlockButton({
   eventId,
@@ -202,7 +223,7 @@ export function EditSessionBlockButton({
   eventType,
   triggerSelector,
   ...rest
-}) {
+}: EditSessionBlockButtonProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -236,18 +257,13 @@ export function EditSessionBlockButton({
   );
 }
 
-EditSessionBlockButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  sessionId: PropTypes.number.isRequired,
-  blockId: PropTypes.number.isRequired,
-  eventType: PropTypes.string.isRequired,
-  eventTitle: PropTypes.string.isRequired,
-  triggerSelector: PropTypes.string,
-};
-
-EditSessionBlockButton.defaultProps = {
-  triggerSelector: null,
-};
+interface EditSessionBlockCreateButtonProps {
+  eventId: number;
+  sessionId: number;
+  eventTitle: string;
+  eventType: string;
+  triggerSelector?: string;
+}
 
 export function EditSessionBlockCreateButton({
   eventId,
@@ -256,7 +272,7 @@ export function EditSessionBlockCreateButton({
   eventType,
   triggerSelector,
   ...rest
-}) {
+}: EditSessionBlockCreateButtonProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -288,16 +304,3 @@ export function EditSessionBlockCreateButton({
     </>
   );
 }
-
-EditSessionBlockCreateButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  sessionId: PropTypes.number.isRequired,
-  blockId: PropTypes.number.isRequired,
-  eventType: PropTypes.string.isRequired,
-  eventTitle: PropTypes.string.isRequired,
-  triggerSelector: PropTypes.string,
-};
-
-EditSessionBlockCreateButton.defaultProps = {
-  triggerSelector: null,
-};

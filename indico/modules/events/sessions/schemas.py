@@ -128,7 +128,7 @@ class SessionBlockPersonLinkSchema(mm.SQLAlchemyAutoSchema):
 class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data')
+        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'conveners', 'location_data', 'session_id')
 
     start_dt = fields.DateTime()
     location_data = fields.Nested(LocationDataSchema)
