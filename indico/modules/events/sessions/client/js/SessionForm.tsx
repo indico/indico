@@ -11,7 +11,6 @@ import sessionColorURL from 'indico-url:sessions.api_random_session_color';
 import locationParentURL from 'indico-url:sessions.api_sessions_location_parent';
 import typesURL from 'indico-url:sessions.types_rest';
 
-import PropTypes from 'prop-types';
 import React, {useState, useEffect} from 'react';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
@@ -23,24 +22,29 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
-function SessionForm({
+interface SessionFormProps {
+  eventType: string;
+  sessionTypes: {key: number; text: string; value: number}[];
+  initialValues: any;
+  header: string;
+  locationParent: any;
+  onSubmit: (formData: any) => void;
+  onClose: () => void;
+}
+
+interface SessionFormFieldsProps {
+  eventType: string;
+  sessionTypes: {key: number; text: string; value: number}[];
+  locationParent: any;
+}
+
+export function SessionFormFields({
   eventType,
   sessionTypes,
-  initialValues,
-  header,
   locationParent,
-  onSubmit,
-  onClose,
-}) {
+}: SessionFormFieldsProps) {
   return (
-    <FinalModalForm
-      id="session-form"
-      header={header}
-      onSubmit={onSubmit}
-      onClose={onClose}
-      initialValues={initialValues}
-      size="small"
-    >
+    <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
       {eventType === 'conference' && sessionTypes.length > 0 && (
@@ -76,25 +80,46 @@ function SessionForm({
         description={Translate.string('Default location for blocks inside the session.')}
         locationParent={locationParent}
       />
+    </>
+  );
+}
+
+function SessionForm({
+  eventType,
+  sessionTypes,
+  initialValues,
+  header,
+  locationParent,
+  onSubmit,
+  onClose,
+}: SessionFormProps) {
+  return (
+    <FinalModalForm
+      id="session-form"
+      header={header}
+      onSubmit={onSubmit}
+      onClose={onClose}
+      initialValues={initialValues}
+      size="small"
+    >
+      <SessionFormFields {...{eventType, sessionTypes, locationParent}} />
     </FinalModalForm>
   );
 }
 
-SessionForm.propTypes = {
-  eventType: PropTypes.string.isRequired,
-  sessionTypes: PropTypes.array.isRequired,
-  initialValues: PropTypes.object.isRequired,
-  header: PropTypes.string.isRequired,
-  locationParent: PropTypes.object,
-  onSubmit: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+interface SessionEditFormProps {
+  eventId: number;
+  sessionId: number;
+  eventType: string;
+  onClose: () => void;
+}
 
-SessionForm.defaultProps = {
-  locationParent: null,
-};
-
-export default function SessionEditForm({eventId, sessionId, eventType, onClose}) {
+export default function SessionEditForm({
+  eventId,
+  sessionId,
+  eventType,
+  onClose,
+}: SessionEditFormProps) {
   const {data: sessionTypesData, loading: typesLoading} = useIndicoAxios(
     typesURL({event_id: eventId})
   );
@@ -105,7 +130,7 @@ export default function SessionEditForm({eventId, sessionId, eventType, onClose}
     sessionURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = async formData => {
+  const handleSubmit = async (formData: any) => {
     if (formData.type === '') {
       formData.type = null;
     }
@@ -127,7 +152,7 @@ export default function SessionEditForm({eventId, sessionId, eventType, onClose}
     );
   }
 
-  const sessionTypes = sessionTypesData.map(({id, name}) => ({
+  const sessionTypes = sessionTypesData.map(({id, name}: {id: number; name: string}) => ({
     key: id,
     text: name,
     value: id,
@@ -148,18 +173,16 @@ export default function SessionEditForm({eventId, sessionId, eventType, onClose}
   );
 }
 
-SessionEditForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  sessionId: PropTypes.number.isRequired,
-  eventType: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+interface SessionCreateFormProps {
+  eventId: number;
+  eventType: string;
+  onClose: () => void;
+}
 
-export function SessionCreateForm({eventId, eventType, onClose}) {
+export function SessionCreateForm({eventId, eventType, onClose}: SessionCreateFormProps) {
   const {data: sessionTypesData, loading: typesLoading} = useIndicoAxios(
     typesURL({event_id: eventId})
   );
-  // const {data: locationsData, loading: locationsLoading} = useIndicoAxios(locationsURL());
   const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
     locationParentURL({event_id: eventId})
   );
@@ -167,9 +190,7 @@ export function SessionCreateForm({eventId, eventType, onClose}) {
     sessionColorURL({event_id: eventId})
   );
 
-  // const {data, loading} = useIndicoAxios(sessionFormDataURL({event_id: eventId}));
-
-  const handleSubmit = async formData => {
+  const handleSubmit = async (formData: any) => {
     if (formData.type === '') {
       formData.type = null;
     }
@@ -191,7 +212,7 @@ export function SessionCreateForm({eventId, eventType, onClose}) {
     );
   }
 
-  const sessionTypes = sessionTypesData.map(({id, name}) => ({
+  const sessionTypes = sessionTypesData.map(({id, name}: {id: number; name: string}) => ({
     key: id,
     text: name,
     value: id,
@@ -214,11 +235,14 @@ export function SessionCreateForm({eventId, eventType, onClose}) {
   );
 }
 
-SessionCreateForm.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  eventType: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+interface EditSessionButtonProps {
+  eventId: number;
+  sessionId: number;
+  eventTitle: string;
+  eventType: string;
+  triggerSelector?: string;
+  [key: string]: any;
+}
 
 export function EditSessionButton({
   eventId,
@@ -227,7 +251,7 @@ export function EditSessionButton({
   eventType,
   triggerSelector,
   ...rest
-}) {
+}: EditSessionButtonProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -252,7 +276,6 @@ export function EditSessionButton({
           eventId={eventId}
           sessionId={sessionId}
           eventType={eventType}
-          eventTitle={eventTitle}
           onClose={() => setOpen(false)}
         />
       )}
@@ -260,19 +283,19 @@ export function EditSessionButton({
   );
 }
 
-EditSessionButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  sessionId: PropTypes.number.isRequired,
-  eventType: PropTypes.string.isRequired,
-  eventTitle: PropTypes.string.isRequired,
-  triggerSelector: PropTypes.string,
-};
+interface AddSessionButtonProps {
+  eventId: number;
+  eventType: string;
+  triggerSelector?: string;
+  [key: string]: any;
+}
 
-EditSessionButton.defaultProps = {
-  triggerSelector: null,
-};
-
-export function AddSessionButton({eventId, eventType, triggerSelector, ...rest}) {
+export function AddSessionButton({
+  eventId,
+  eventType,
+  triggerSelector,
+  ...rest
+}: AddSessionButtonProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -298,13 +321,3 @@ export function AddSessionButton({eventId, eventType, triggerSelector, ...rest})
     </>
   );
 }
-
-AddSessionButton.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  eventType: PropTypes.string.isRequired,
-  triggerSelector: PropTypes.string,
-};
-
-AddSessionButton.defaultProps = {
-  triggerSelector: null,
-};

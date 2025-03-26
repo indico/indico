@@ -11,8 +11,8 @@ import {Entry, TopLevelEntry, DayEntries} from './types.ts';
 import {lcm, minutesToPixels} from './utils.ts';
 
 function overlap<T extends Entry>(a: T, b: T) {
-  const aEnd = a.startDt.clone().add(a.duration, 'minutes');
-  const bEnd = b.startDt.clone().add(b.duration, 'minutes');
+  const aEnd = a.startDt.clone().add(Math.max(a.duration, 10), 'minutes');
+  const bEnd = b.startDt.clone().add(Math.max(b.duration, 10), 'minutes');
   return a.startDt.isBefore(bEnd) && b.startDt.isBefore(aEnd);
 }
 
@@ -54,6 +54,7 @@ export function layoutGroup<T extends Entry>(group: T[], {layoutChildren = true}
       entry.type === 'block' ? {...entry, children: layout(entry.children)} : entry
     );
   }
+
   const sortedGroup = [...group].sort((a, b) => a.column - b.column); // TODO: secondary sort by duration(DESC)
   const newGroup: T[] = [];
   let newMaxColumn = 0;
