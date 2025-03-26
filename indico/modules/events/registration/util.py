@@ -1073,6 +1073,10 @@ def close_registration(regform):
         regform.start_dt = regform.end_dt
 
 
+def clone_registration_form(regform, event=None):
+    pass
+
+
 def get_persons(registrations, include_accompanying_persons=False):
     persons = []
     for registration in registrations:
