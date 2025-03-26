@@ -7,37 +7,45 @@
 
 import {Moment} from 'moment';
 
+export enum EntryType {
+  Contribution = 'contrib',
+  SessionBlock = 'block',
+  Break = 'break',
+}
+
 export interface Session {
+  id?: number;
   title: string;
   isPoster: boolean;
   textColor: string;
   backgroundColor: string;
 }
 
-interface BaseEntry {
-  type: 'contrib' | 'block' | 'break';
+export interface BaseEntry {
+  type: EntryType;
   id: number;
   title: string;
   duration: number;
 }
 
-interface ScheduledMixin {
+export interface ScheduledMixin {
   startDt: Moment;
   // position information
+  x: number;
   y: number;
   column: number;
   maxColumn: number;
 }
 
 export interface UnscheduledContrib extends BaseEntry {
-  type: 'contrib';
+  type: EntryType.Contribution;
   sessionId?: number;
 }
 
 export interface ContribEntry extends UnscheduledContrib, ScheduledMixin {}
 
 export interface BreakEntry extends BaseEntry, ScheduledMixin {
-  type: 'break';
+  type: EntryType.Break;
   sessionId?: number;
   textColor: string;
   backgroundColor: string;
@@ -54,9 +62,41 @@ export interface ChildBreakEntry extends BreakEntry {
 export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
-  type: 'block';
+  type: EntryType.SessionBlock;
   sessionId: number;
   children: ChildEntry[];
+}
+
+// TODO: (Ajob) Find correct place for these interfaces
+
+export interface LocationParent {
+  venue: string;
+  room: string;
+  venue_name: string;
+  room_name: string;
+  address: string;
+  inheriting: boolean;
+}
+
+export interface RequestEntryObjectData {
+  description: string;
+  duration: number;
+  start_dt: string;
+  end_dt: string;
+  event_id: number;
+  location: Location;
+  title: string;
+  type: string;
+}
+
+export interface RequestEntryObject {
+  duration: number;
+  end_dt: string;
+  event_id: number;
+  id: number;
+  object: RequestEntryObjectData;
+  start_dt: string;
+  type: string;
 }
 
 export type TopLevelEntry = ContribEntry | BlockEntry | BreakEntry;

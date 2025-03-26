@@ -10,10 +10,11 @@ from functools import partial
 from indico.modules.events.sessions.controllers.compat import compat_session
 from indico.modules.events.sessions.controllers.display import (RHDisplaySession, RHDisplaySessionList,
                                                                 RHExportSessionTimetableToPDF, RHExportSessionToICAL)
-from indico.modules.events.sessions.controllers.management.sessions import (RHAPICreateSession, RHAPISession,
-                                                                            RHAPISessionBlock,
+from indico.modules.events.sessions.controllers.management.sessions import (RHAPICreateSession, RHAPICreateSessionBlock,
+                                                                            RHAPISession, RHAPISessionBlock,
                                                                             RHAPISessionBlocksInheritedLocation,
-                                                                            RHAPISessionColors, RHAPISessionRandomColor,
+                                                                            RHAPISessionColors, RHAPISessionList,
+                                                                            RHAPISessionRandomColor,
                                                                             RHAPISessionsInheritedLocation,
                                                                             RHAPISessionTypes, RHCreateSession,
                                                                             RHCreateSessionType, RHDeleteSessions,
@@ -81,6 +82,7 @@ _compat_bp.add_url_rule('!/sessionDisplay.py', 'session_modpython',
                                                                   'sessionId': 'legacy_session_id'}))
 
 # API
+_bp.add_url_rule('/api/sessions/session_list', 'api_session_list', RHAPISessionList)
 _bp.add_url_rule('/api/sessions/colors', 'api_session_colors', RHAPISessionColors)
 _bp.add_url_rule('/api/sessions/random-color', 'api_random_session_color', RHAPISessionRandomColor)
 _bp.add_url_rule('/api/sessions/create', 'api_create_session', RHAPICreateSession, methods=('POST',))
@@ -89,7 +91,7 @@ _bp.add_url_rule('/api/sessions/<int:session_id>', 'api_manage_session', RHAPISe
 _bp.add_url_rule('/api/sessions/location-parent', 'api_sessions_location_parent', RHAPISessionsInheritedLocation)
 _bp.add_url_rule('/api/sessions/<int:session_id>/blocks/location-parent', 'api_blocks_location_parent',
                  RHAPISessionBlocksInheritedLocation)
-_bp.add_url_rule('/api/sessions/<int:session_id>/blocks/create', 'api_create_block', RHAPICreateSession,
+_bp.add_url_rule('/api/sessions/<int:session_id>/blocks/create', 'api_create_session_block', RHAPICreateSessionBlock,
                  methods=('POST',))
 
 _bp.add_url_rule('/api/sessions/<int:session_id>/blocks/<int:block_id>/', 'api_manage_block', RHAPISessionBlock,
