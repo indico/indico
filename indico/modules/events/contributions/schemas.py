@@ -8,8 +8,7 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import fields, post_dump
-from marshmallow import ValidationError, post_load, validates
+from marshmallow import ValidationError, fields, post_dump, post_load, validates
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.db.sqlalchemy.util.session import no_autoflush

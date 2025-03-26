@@ -28,6 +28,7 @@ import './Timetable.module.scss';
 export default function Timetable() {
   const dispatch = useDispatch();
   const entries = useSelector(selectors.getDayEntries);
+  const eventId = useSelector(selectors.getEventId);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
@@ -108,6 +109,7 @@ export default function Timetable() {
         {!useWeekView && (
           <DayTimetable
             dt={date}
+            eventId={eventId}
             minHour={minHour}
             maxHour={maxHour}
             entries={currentDateEntries}

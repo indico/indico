@@ -5,17 +5,26 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Button, Popup} from 'semantic-ui-react';
 
 import {FinalField, FormFieldAdapter} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
-
 import './SessionColorPicker.module.scss';
 
-const AVAILABLE_COLORS = [
+interface ColorSchema {
+  text: string;
+  background: string;
+}
+
+interface SessionColorPickerProps {
+  value: ColorSchema | null;
+  onChange: (color: ColorSchema) => void;
+  trigger: React.ReactNode;
+}
+
+const AVAILABLE_COLORS: ColorSchema[] = [
   {text: '#1D041F', background: '#EEE0EF'},
   {text: '#253F08', background: '#E3F2D3'},
   {text: '#1F1F02', background: '#FEFFBF'},
@@ -38,15 +47,10 @@ const AVAILABLE_COLORS = [
   {text: '#202020', background: '#EFEBC2'},
 ];
 
-export const colorSchema = PropTypes.shape({
-  text: PropTypes.string,
-  background: PropTypes.string,
-});
-
-export default function SessionColorPicker({value, onChange, trigger}) {
+export default function SessionColorPicker({value, onChange, trigger}: SessionColorPickerProps) {
   const [open, setOpen] = useState(false);
 
-  const makePickHandler = color => () => {
+  const makePickHandler = (color: ColorSchema) => () => {
     onChange(color);
     setOpen(false);
   };
@@ -69,7 +73,7 @@ export default function SessionColorPicker({value, onChange, trigger}) {
               icon="tint"
               styleName={toClasses({
                 choice: true,
-                selected: color.background === value?.background,
+                selected: color.background === (value ? value.background : undefined),
               })}
               circular
             />
@@ -80,44 +84,37 @@ export default function SessionColorPicker({value, onChange, trigger}) {
   );
 }
 
-SessionColorPicker.propTypes = {
-  value: colorSchema,
-  trigger: PropTypes.node.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-SessionColorPicker.defaultProps = {
-  value: null,
-};
-
-function SessionColorPickerAdapter({input, ...rest}) {
-  console.log('input', input);
-  return (
-    <FormFieldAdapter
-      input={input}
-      {...rest}
-      as={SessionColorPicker}
-      trigger={
-        <Button
-          type="button"
-          icon="paint brush"
-          style={{color: input.value?.text, backgroundColor: input.value?.background}}
-          content={Translate.string('Choose')}
-          circular
-        />
-      }
-    />
-  );
+interface SessionColorPickerAdapterProps {
+  input: {
+    value: ColorSchema | null;
+    onChange: (color: ColorSchema) => void;
+  };
 }
 
-SessionColorPickerAdapter.propTypes = {
-  input: PropTypes.object.isRequired,
-};
+const SessionColorPickerAdapter: React.FC<SessionColorPickerAdapterProps> = ({input, ...rest}) => (
+  <FormFieldAdapter
+    input={input}
+    {...rest}
+    as={SessionColorPicker}
+    trigger={
+      <Button
+        type="button"
+        icon="paint brush"
+        style={{
+          color: input.value ? input.value.text : undefined,
+          backgroundColor: input.value ? input.value.background : undefined,
+        }}
+        content={Translate.string('Choose')}
+        circular
+      />
+    }
+  />
+);
 
-export function FinalSessionColorPicker({name, ...rest}) {
+interface FinalSessionColorPickerProps {
+  name: string;
+}
+
+export function FinalSessionColorPicker({name, ...rest}: FinalSessionColorPickerProps) {
   return <FinalField name={name} adapter={SessionColorPickerAdapter} {...rest} />;
 }
-
-FinalSessionColorPicker.propTypes = {
-  name: PropTypes.string.isRequired,
-};
