@@ -318,6 +318,13 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
         return redirect(url_for('.manage_regform_list', self.event))
 
 
+class RHRegistrationFormClone(RHManageRegFormBase):
+    """Clone a registration form."""
+
+    def _process(self):
+        pass
+
+
 class RHRegistrationFormOpen(RHManageRegFormBase):
     """Open registration for a registration form."""
 
