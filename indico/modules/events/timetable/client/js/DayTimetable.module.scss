@@ -25,6 +25,8 @@
 }
 
 .lines {
+  pointer-events: none;
+
   .line::after {
     position: absolute;
     border-bottom: 1px solid #d4d4d5;

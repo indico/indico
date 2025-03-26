@@ -6,22 +6,34 @@
 // LICENSE file for more details.
 
 import moment, {Moment} from 'moment';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import './DayTimetable.module.scss';
 import * as actions from './actions';
-import {createRestrictToElement, Transform, Over, MousePosition, UniqueId} from './dnd';
+import {createRestrictToElement, Transform, Over, MousePosition} from './dnd';
 import {useDroppable, DnDProvider} from './dnd/dnd';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
+import TimetableCreateModal from './TimetableCreateModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
-import {minutesToPixels, pixelsToMinutes} from './utils';
+import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes} from './utils';
+
+// TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
+type UniqueId = string;
+
+interface DraftEntry {
+  startDt: Moment;
+  duration: number;
+  height?: number;
+  y?: number;
+}
 
 interface DayTimetableProps {
   dt: Moment;
+  eventId: number;
   minHour: number;
   maxHour: number;
   entries: TopLevelEntry[];
@@ -71,11 +83,15 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
 
 const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
 
-export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps) {
+export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimetableProps) {
   const dispatch = useDispatch();
   const mouseEventRef = useRef<MouseEvent | null>(null);
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [newEntry, setNewEntry] = useState<DraftEntry | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -153,6 +169,92 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
     };
   }, []);
 
+  useEffect(() => {
+    if (!newEntry) {
+      return;
+    }
+
+    function handler() {
+      setIsModalOpen(true);
+    }
+
+    const calendarNode = calendarRef.current;
+    calendarNode.addEventListener('click', handler);
+
+    return () => {
+      calendarNode.removeEventListener('click', handler);
+    };
+  }, [newEntry]);
+
+  useEffect(() => {
+    function onMouseDown(event: MouseEvent) {
+      if (event.target !== calendarRef.current) {
+        return;
+      }
+
+      const rect = calendarRef.current.getBoundingClientRect();
+      const y = minutesToPixels(
+        Math.round(pixelsToMinutes(event.clientY - rect.top) / GRID_SIZE_MINUTES) *
+          GRID_SIZE_MINUTES
+      );
+
+      const startDt = moment(dt)
+        .startOf('days')
+        .add(minHour, 'hours')
+        .add(pixelsToMinutes(y), 'minutes');
+
+      setIsDragging(true);
+      setNewEntry({
+        startDt,
+        duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
+        y,
+      });
+    }
+
+    function onMouseMove(event: MouseEvent) {
+      if (!isDragging || !newEntry) {
+        return;
+      }
+      const rect = calendarRef.current.getBoundingClientRect();
+      const duration = Math.max(
+        Math.round(pixelsToMinutes(event.clientY - rect.top - newEntry.y) / GRID_SIZE_MINUTES) *
+          GRID_SIZE_MINUTES,
+        GRID_SIZE_MINUTES // TODO: Replace with default duration
+      );
+
+      if (newEntry.duration === duration) {
+        return;
+      }
+
+      setNewEntry({...newEntry, duration});
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsDragging(false);
+        setNewEntry(null);
+      }
+    }
+
+    function onMouseUp() {
+      if (isDragging && newEntry) {
+        setIsDragging(false);
+      }
+    }
+
+    calendarRef.current.addEventListener('mousedown', onMouseDown);
+    calendarRef.current.addEventListener('mousemove', onMouseMove);
+    calendarRef.current.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      calendarRef.current.removeEventListener('mousedown', onMouseDown);
+      calendarRef.current.removeEventListener('mousemove', onMouseMove);
+      calendarRef.current.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [newEntry, dt, dispatch]);
+
   const restrictToCalendar = useMemo(() => createRestrictToElement(calendarRef), [calendarRef]);
 
   return (
@@ -165,6 +267,27 @@ export function DayTimetable({dt, minHour, maxHour, entries}: DayTimetableProps)
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
+              {newEntry && (
+                <div style={{opacity: 0.5, pointerEvents: 'none'}}>
+                  <DraggableEntry
+                    id="draft"
+                    width="100%"
+                    title="New entry"
+                    maxColumn={0}
+                    {...newEntry}
+                  />
+                </div>
+              )}
+              {isModalOpen && newEntry && (
+                <TimetableCreateModal
+                  eventId={eventId}
+                  onClose={() => {
+                    setNewEntry(null);
+                    setIsModalOpen(false);
+                  }}
+                  entry={newEntry}
+                />
+              )}
             </div>
           </DnDCalendar>
         </div>
@@ -240,7 +363,7 @@ function layoutAfterDropOnCalendar(
 ) {
   const id = parseInt(who, 10);
   const {y} = delta;
-  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / 5) * 5;
+  const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
   const mousePosition = (mouse.x - over.rect.left) / over.rect.width;
 
   let fromEntry: Entry | undefined = entries.find(e => e.id === id);
