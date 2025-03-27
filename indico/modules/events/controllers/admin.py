@@ -9,6 +9,7 @@ from flask import flash, redirect, request
 from webargs import fields
 
 from indico.core.db import db
+from indico.core.errors import NoReportError
 from indico.modules.admin import RHAdminBase
 from indico.modules.events.forms import (AllowedKeywordsForm, DataRetentionSettingsForm, EventLabelForm,
                                          ReferenceTypeForm, UnlistedEventsForm)
@@ -17,8 +18,13 @@ from indico.modules.events.models.labels import EventLabel
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import (create_event_label, create_reference_type, delete_event_label,
                                               delete_reference_type, update_event_label, update_reference_type)
+from indico.modules.events.registration.forms import RegistrationCheckTypeForm
+from indico.modules.events.registration.models.checks import RegistrationCheckType
+from indico.modules.events.registration.util import (create_registration_check_type, delete_registration_check_type,
+                                                     update_registration_check_type)
 from indico.modules.events.schemas import AutoLinkerRuleSchema
-from indico.modules.events.settings import autolinker_settings, data_retention_settings, unlisted_events_settings
+from indico.modules.events.settings import (autolinker_settings, data_retention_settings, default_check_type_settings,
+                                            unlisted_events_settings)
 from indico.modules.events.views import WPEventAdmin
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
@@ -202,3 +208,83 @@ class RHDataRetentionSettings(RHAdminBase):
             flash(_('Settings have been saved'), 'success')
             return redirect(url_for('events.data_retention'))
         return WPEventAdmin.render_template('admin/data_retention.html', 'data_retention', form=form)
+
+
+def _get_all_system_check_types():
+    return (RegistrationCheckType.query
+            .filter(RegistrationCheckType.is_system_defined)
+            .order_by(db.func.lower(RegistrationCheckType.title)).all())
+
+
+def _render_check_types():
+    tpl = get_template_module('events/admin/_system_check_type_list.html')
+    default_check_type = default_check_type_settings.get('default_check_type')
+    return tpl.render_check_types(_get_all_system_check_types(), default_check_type)
+
+
+class RHManageCheckTypeBase(RHAdminBase):
+    """Base class for a specific check type."""
+
+    def _process_args(self):
+        RHAdminBase._process_args(self)
+        self.check_type = RegistrationCheckType.get_or_404(request.view_args['check_type_id'])
+
+
+class RHCheckTypes(RHAdminBase):
+    """Manage check types in server admin area."""
+
+    def _process(self):
+        check_types = _get_all_system_check_types()
+        default_check_type = default_check_type_settings.get('default_check_type')
+        return WPEventAdmin.render_template('admin/system_check_types.html', 'check_types', check_types=check_types,
+                                            default_check_type=default_check_type)
+
+
+class RHCreateCheckType(RHAdminBase):
+    """Create a new check type."""
+
+    def _process(self):
+        form = RegistrationCheckTypeForm()
+        if form.validate_on_submit():
+            check_type = create_registration_check_type(form.data)
+            flash(_('Check type "{}" created successfully').format(check_type.title), 'success')
+            return jsonify_data(html=_render_check_types())
+        return jsonify_form(form)
+
+
+class RHEditCheckType(RHManageCheckTypeBase):
+    """Edit an existing check type."""
+
+    def _process(self):
+        form = RegistrationCheckTypeForm(obj=FormDefaults(self.check_type), check_type=self.check_type)
+        if form.validate_on_submit():
+            update_registration_check_type(self.check_type, form.data)
+            flash(_('Check type "{}" successfully updated').format(self.check_type.title), 'success')
+            return jsonify_data(html=_render_check_types())
+        return jsonify_form(form)
+
+
+class RHDeleteCheckType(RHManageCheckTypeBase):
+    """Delete an existing check type."""
+
+    def _process_DELETE(self):
+        default_check_type = default_check_type_settings.get('default_check_type')
+        if default_check_type == self.check_type:
+            raise NoReportError('Cannot delete check type currently set as default')
+        delete_registration_check_type(self.check_type)
+        flash(_('Check type "{}" successfully deleted').format(self.check_type.title), 'success')
+        return jsonify_data(html=_render_check_types())
+
+
+class RHToggleDefaultCheckType(RHAdminBase):
+    """Toggle the default check type for this instance."""
+
+    @use_kwargs({
+        'check_type_id': fields.Integer(),
+    }, location='query')
+    def _process(self, check_type_id):
+        check_type = RegistrationCheckType.get_or_404(check_type_id)
+        if not check_type.is_system_defined:
+            raise Exception('Invalid check type')
+        default_check_type_settings.set('default_check_type', check_type)
+        return jsonify_data(html=_render_check_types())
