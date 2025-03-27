@@ -21,6 +21,7 @@ const initialUserInfoState = {
   isRBAdmin: false,
   isAdminOverrideEnabled: false,
   hasOwnedRooms: false,
+  hasModeratedRooms: false,
   isRBLocationManager: false,
 };
 
@@ -59,6 +60,7 @@ export default combineReducers({
           isAdmin: user.is_admin,
           isRBAdmin: user.is_rb_admin,
           hasOwnedRooms: user.has_owned_rooms,
+          hasModeratedRooms: user.has_moderated_rooms,
           isRBLocationManager: user.is_rb_location_manager && !user.is_rb_admin,
         };
       }

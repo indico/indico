@@ -534,7 +534,7 @@ class ProtectionManagersMixin(ProtectionMixin):
             managers.update(self.protection_parent.get_manager_list(recursive=True, include_groups=include_groups))
         return managers
 
-    def get_manager_emails(self, include_groups=True):
+    def get_manager_emails(self, *, include_groups=True, permission=None, explicit=False):
         """Get the emails of all managers.
 
         :param include_groups: whether to also include group members
@@ -542,7 +542,8 @@ class ProtectionManagersMixin(ProtectionMixin):
         return set(itertools.chain.from_iterable(
             x.get_emails()
             for x in self.acl_entries
-            if x.has_management_permission() and (include_groups or x.type == PrincipalType.user)
+            if (x.has_management_permission(permission=permission, explicit=explicit) and
+                (include_groups or x.type == PrincipalType.user))
         ))
 
     def get_access_list(self, skip_managers=False, skip_self_acl=False):

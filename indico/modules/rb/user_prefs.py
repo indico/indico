@@ -19,14 +19,14 @@ class RBUserPreferences(ExtraUserPreferences):
     @property
     def fields(self):
         query = (Room.query
-                 .filter(~Room.is_deleted, Room.id.in_(get_managed_room_ids(self.user)))
+                 .filter(~Room.is_deleted, Room.id.in_(get_managed_room_ids(self.user, permission='moderate')))
                  .order_by(func.indico.natsort(Room.full_name)))
 
         fields = {
             'email_mode': IndicoEnumSelectField(_('Room notifications'), enum=RoomEmailMode,
                                                 description=_(
-                                                    'If you own or manage any rooms, you can choose whether to '
-                                                    'receive notifications about activity related to them.')),
+                                                    'If you own, manage or moderate any rooms, you can choose whether '
+                                                    'to receive notifications about activity related to them.')),
             'email_blacklist': IndicoQuerySelectMultipleField(_('Room blacklist'),
                                                               query_factory=lambda: query,
                                                               get_label='full_name', collection_class=set,
@@ -54,4 +54,4 @@ class RBUserPreferences(ExtraUserPreferences):
     def is_active(cls, user):
         return (rb_user_settings.get(user, 'email_mode', None) is not None or
                 rb_user_settings.get(user, 'email_blacklist', None) is not None or
-                get_managed_room_ids(user))
+                get_managed_room_ids(user, permission='moderate'))

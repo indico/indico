@@ -15,7 +15,10 @@ export const isUserRBAdmin = state => getUserInfo(state).isRBAdmin;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const isUserRBLocationManager = state => getUserInfo(state).isRBLocationManager;
 export const isUserAdminOverrideEnabled = state => getUserInfo(state).isAdminOverrideEnabled;
-export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
+export const hasOwnedRooms = createSelector(
+  getUserInfo,
+  userInfo => userInfo.hasOwnedRooms || userInfo.hasModeratedRooms
+);
 export const getRealUserRoomPermissions = ({user}) => user.roomPermissions;
 export const isCheckingUserRoomPermissions = ({user}) =>
   user.requests.roomPermissions.state === RequestState.STARTED;

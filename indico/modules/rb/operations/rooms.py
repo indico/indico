@@ -48,19 +48,19 @@ def _make_room_text_filter(text):
     return db.or_(getattr(Room, col).ilike(text) for col in columns)
 
 
-def _query_managed_rooms(user):
+def _query_managed_rooms(user, *, permission=None, explicit=False):
     criteria = [db.and_(RoomPrincipal.type == PrincipalType.user,
                         RoomPrincipal.user_id == user.id,
-                        RoomPrincipal.has_management_permission())]
+                        RoomPrincipal.has_management_permission(permission=permission, explicit=explicit))]
     for group in user.local_groups:
         criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,  # noqa: PERF401
                                 RoomPrincipal.local_group_id == group.id,
-                                RoomPrincipal.has_management_permission()))
+                                RoomPrincipal.has_management_permission(permission=permission, explicit=explicit)))
     for group in user.iter_all_multipass_groups():
         criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,  # noqa: PERF401
                                 RoomPrincipal.multipass_group_provider == group.provider.name,
                                 db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
-                                RoomPrincipal.has_management_permission()))
+                                RoomPrincipal.has_management_permission(permission=permission, explicit=explicit)))
     return Room.query.filter(~Room.is_deleted, Room.acl_entries.any(db.or_(*criteria)) | (Room.owner == user))
 
 
@@ -73,21 +73,25 @@ def _query_all_rooms_for_acl_check():
 
 
 @memoize_redis(900)
-def has_managed_rooms(user):
+def has_managed_rooms(user, *, permission=None, explicit=False):
     if user.can_get_all_multipass_groups:
-        return _query_managed_rooms(user).has_rows()
+        return _query_managed_rooms(user, permission=permission, explicit=explicit).has_rows()
     else:
         query = _query_all_rooms_for_acl_check()
-        return any(r.can_manage(user, allow_admin=False) for r in query)
+        return any(r.can_manage(user, allow_admin=False, permission=permission, explicit_permission=explicit)
+                   for r in query)
 
 
 @memoize_redis(900)
-def get_managed_room_ids(user):
+def get_managed_room_ids(user, *, permission=None, explicit=False):
     if user.can_get_all_multipass_groups:
-        return {id_ for id_, in _query_managed_rooms(user).with_entities(Room.id)}
+        return {
+            id_ for id_, in _query_managed_rooms(user, permission=permission, explicit=explicit).with_entities(Room.id)
+        }
     else:
         query = _query_all_rooms_for_acl_check()
-        return {r.id for r in query if r.can_manage(user, allow_admin=False)}
+        return {r.id for r in query if r.can_manage(user, permission=permission, explicit_permission=explicit,
+                                                    allow_admin=False)}
 
 
 @memoize_redis(3600)
@@ -170,7 +174,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
     if filters.get('mine'):
-        ids = get_managed_room_ids(session.user)
+        ids = get_managed_room_ids(session.user, permission='moderate')
         query = query.filter(Room.id.in_(ids))
     query = _filter_coordinates(query, filters)
 
