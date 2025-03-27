@@ -395,16 +395,21 @@ class AdminLocationsSchema(mm.SQLAlchemyAutoSchema):
 
 class RBUserSchema(UserSchema):
     has_owned_rooms = mm.Method('has_managed_rooms')
+    has_moderated_rooms = mm.Method('_has_moderated_rooms')
     is_rb_admin = mm.Function(lambda user: rb_is_admin(user))
     is_rb_location_manager = mm.Method('has_managed_locations')
 
     class Meta:
-        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'is_admin', 'is_rb_admin', 'is_rb_location_manager',
-                  'identifier', 'full_name')
+        fields = (*UserSchema.Meta.fields, 'has_owned_rooms', 'has_moderated_rooms', 'is_admin', 'is_rb_admin',
+                  'is_rb_location_manager', 'identifier', 'full_name')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb.operations.rooms import has_managed_rooms
         return has_managed_rooms(user)
+
+    def _has_moderated_rooms(self, user):
+        from indico.modules.rb.operations.rooms import has_managed_rooms
+        return has_managed_rooms(user, permission='moderate', explicit=True)
 
     def has_managed_locations(self, user):
         from indico.modules.rb.operations.locations import has_managed_locations

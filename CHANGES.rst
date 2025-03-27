@@ -16,6 +16,8 @@ Improvements
 - Preserve the selected day when switching between room booking calendar view modes
   (:pr:`6817`)
 - Notify room moderators about new pending bookings in their rooms (:pr:`6823`)
+- Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
+  moderators (:pr:`6823`)
 
 Bugfixes
 ^^^^^^^^

@@ -65,7 +65,7 @@ class ShowOnlyForm extends FilterFormComponent {
                 <>
                   <Icon name="user" />
                   <span>
-                    <Translate>Rooms I manage</Translate>
+                    <Translate>Rooms I manage or moderate</Translate>
                   </span>
                 </>
               }

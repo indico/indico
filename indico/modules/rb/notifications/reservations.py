@@ -16,7 +16,7 @@ from indico.util.i18n import force_locale
 from indico.web.flask.templating import get_template_module
 
 
-def get_manager_emails(room):
+def get_manager_emails(room, *, include_moderators=False):
     emails = set(room.notification_emails)
     if (rb_user_settings.get(room.owner, 'email_mode') in (RoomEmailMode.owned, RoomEmailMode.all)
             and room not in rb_user_settings.get(room.owner, 'email_blacklist')):
@@ -37,7 +37,11 @@ def get_manager_emails(room):
              .filter(UserSetting.module == 'roombooking',
                      email_mode_filter | room_blacklist_filter))
     disabled_emails = {u.email for u in query}
-    emails |= room.get_manager_emails() - disabled_emails
+    if include_moderators:
+        manager_emails = room.get_manager_emails(permission='moderate')  # this includes full managers
+    else:
+        manager_emails = room.get_manager_emails()
+    emails |= manager_emails - disabled_emails
     return emails
 
 
@@ -65,9 +69,7 @@ class ReservationNotification:
 
     def compose_email_to_manager(self, *, include_moderators=False, **mail_params):
         room = self.reservation.room
-        recipients = get_manager_emails(room)
-        if include_moderators:
-            recipients |= room.get_manager_emails(permission='moderate', explicit=True)
+        recipients = get_manager_emails(room, include_moderators=include_moderators)
         with force_locale(None):  # No event, and managers are sent in one mail together
             template = self._make_template(mail_params, reservation=self.reservation)
             return make_email(to_list=recipients, template=template)

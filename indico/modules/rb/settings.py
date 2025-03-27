@@ -13,7 +13,7 @@ from indico.util.i18n import _, pgettext
 
 class RoomEmailMode(RichIntEnum):
     __titles__ = (pgettext('Room notifications', 'None'), _('Rooms I own'),
-                  _('Rooms I manage'), _('Rooms I own or manage'))
+                  _('Rooms I manage or moderate'), _('Rooms I own, manage or moderate'))
     none = 0
     owned = 1
     managed = 2
