@@ -1,6 +1,6 @@
 {% extends 'rb/emails/reservations/base_email_to_user.txt' %}
 {% set excluded_days = reservation.find_excluded_days().count() %}
-{%- set prebooking = not reservation.is_accepted -%}
+{%- set prebooking = reservation.is_pending -%}
 {% block subject_prefix %}{% endblock %}
 {% block subject -%}
     {% if prebooking -%}

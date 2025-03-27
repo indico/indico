@@ -63,11 +63,14 @@ class ReservationNotification:
             template = self._make_template(mail_params, reservation=self.reservation)
             return make_email(to_list=to_list, template=template)
 
-    def compose_email_to_manager(self, **mail_params):
+    def compose_email_to_manager(self, *, include_moderators=False, **mail_params):
         room = self.reservation.room
+        recipients = get_manager_emails(room)
+        if include_moderators:
+            recipients |= room.get_manager_emails(permission='moderate', explicit=True)
         with force_locale(None):  # No event, and managers are sent in one mail together
             template = self._make_template(mail_params, reservation=self.reservation)
-            return make_email(to_list=get_manager_emails(room), template=template)
+            return make_email(to_list=recipients, template=template)
 
 
 @email_sender
@@ -104,9 +107,10 @@ def notify_confirmation(reservation, reason=None):
 @email_sender
 def notify_creation(reservation):
     notification = ReservationNotification(reservation)
+    prebooking = reservation.is_pending
     return [_f for _f in [
         notification.compose_email_to_user(template_name='creation_email_to_user'),
-        notification.compose_email_to_manager(template_name='creation_email_to_manager'),
+        notification.compose_email_to_manager(template_name='creation_email_to_manager', include_moderators=prebooking),
     ] if _f]
 
 
