@@ -40,7 +40,7 @@ class BookingBootstrapForm extends React.Component {
   static propTypes = {
     onSearch: PropTypes.func.isRequired,
     onChange: PropTypes.func,
-    buttonCaption: PropTypes.object,
+    buttonCaption: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     children: PropTypes.node,
     buttonDisabled: PropTypes.bool,
     dayBased: PropTypes.bool,
