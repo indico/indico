@@ -152,7 +152,7 @@
 
     {% if show_location %}
         {% set loc = _render_place(contrib)|trim %}
-        {% if loc != '' %}
+        {% if loc %}
             <p>
                 <b>{% trans %}Location{% endtrans %}</b>
                 <br>
@@ -232,7 +232,7 @@
         </p>
         {% if program_config.show_siblings_location %}
             {% set loc = _render_place(entry)|trim %}
-            {% if loc != '' %}
+            {% if loc %}
                 <p>
                     <b>{% trans %}Location{% endtrans %}:</b>
                     {{ loc }}
