@@ -23,10 +23,6 @@ body {
   break-before: always;
 }
 
-.cover {
-  /* counter-reset: program-page 7; */
-}
-
 .cover .logo {
   max-width: 80%;
   max-height: 300px;
