@@ -23,10 +23,6 @@ body {
   break-before: always;
 }
 
-.cover {
-  counter-reset: program-page 7;
-}
-
 .cover .logo {
   max-width: 80%;
   max-height: 300px;
@@ -92,7 +88,7 @@ body {
   margin-left: 3px;
   margin-right: 10px;
   text-align: center;
-  content: leader(' ') target-counter(attr(href), page, decimal);
+  content: leader(' ') target-counter(attr(href), program-page, decimal);
   margin-bottom: 5px;
   border-radius: 2px;
   font-weight: bold;
@@ -112,7 +108,7 @@ body {
   width: 2.4em;
   border-radius: 3px;
   margin-right: 15px;
-  content: target-counter(attr(href), page, decimal);
+  content: target-counter(attr(href), program-page, decimal);
   background-color: var(--primary-color);
   color: white;
 }
@@ -129,7 +125,7 @@ body {
 }
 
 #footer::after {
-  content: target-counter('#footer', page, decimal);
+  content: target-counter('#footer', program-page, decimal);
 }
 
 /* Main content */
