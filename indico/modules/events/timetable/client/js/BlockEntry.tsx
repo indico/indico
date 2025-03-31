@@ -171,6 +171,7 @@ export default function BlockEntry({
       </div>
       {/* TODO cannot resize to be smaller than its contents */}
       <ResizeHandle
+        id={id}
         forBlock
         duration={duration}
         minDuration={latestChildEndDt.diff(startDt, 'minutes')}

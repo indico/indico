@@ -14,6 +14,7 @@ import './DayTimetable.module.scss';
 const gridSize = minutesToPixels(5);
 
 export default function ResizeHandle({
+  id,
   forBlock = false,
   duration,
   minDuration = 10,
@@ -23,6 +24,7 @@ export default function ResizeHandle({
   setGlobalDuration,
   setIsResizing,
 }: {
+  id: number;
   forBlock: boolean;
   duration: number;
   minDuration?: number;
@@ -77,6 +79,8 @@ export default function ResizeHandle({
       if (maxDuration !== undefined) {
         newDuration = Math.min(newDuration, maxDuration);
       }
+      console.log('id', id);
+      console.log('newDuration', newDuration);
       setGlobalDuration(newDuration);
       setIsResizing(false);
     };

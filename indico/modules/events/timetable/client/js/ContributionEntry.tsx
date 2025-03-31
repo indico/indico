@@ -128,6 +128,8 @@ export default function ContributionEntry({
         />
       </div>
       <ResizeHandle
+        id={id}
+        forBlock={false}
         duration={duration}
         maxDuration={parentEndDt ? moment(parentEndDt).diff(startDt, 'minutes') : undefined}
         resizeStartRef={resizeStartRef}
