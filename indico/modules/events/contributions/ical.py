@@ -40,7 +40,7 @@ def contribution_to_ical(contribution):
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    related_event_uid = f'indico-event-{contribution.event.id}@{urlsplit(config.BASE_URL).hostname}'
+    related_event_uid = contribution.event.ical_uid
     component = generate_contribution_component(contribution, related_event_uid)
     calendar.add_component(component)
 
