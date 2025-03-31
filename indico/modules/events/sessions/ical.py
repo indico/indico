@@ -68,7 +68,7 @@ def session_to_ical(
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
 
-    related_event_uid = f'indico-event-{session.event.id}@{urlsplit(config.BASE_URL).hostname}'
+    related_event_uid = session.event.ical_uid
 
     if not detailed and session.blocks:
         component = generate_session_component(session, related_event_uid, organizer=organizer)

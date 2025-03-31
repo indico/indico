@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from datetime import timedelta
 from email.utils import formataddr
 from operator import attrgetter
+from urllib.parse import urlsplit
 
 import pytz
 from flask import has_request_context, render_template, session
@@ -1174,6 +1175,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Check if the event has any receipt document templates."""
         from indico.modules.receipts.util import has_any_templates
         return has_any_templates(self)
+    
+    @property
+    def ical_uid(self) -> str:
+        """Return the event UID used by iCalendar."""
+        return f'indico-event-{self.id}@{urlsplit(config.BASE_URL).hostname}'
 
 
 Event.register_location_events()
