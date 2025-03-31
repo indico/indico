@@ -151,11 +151,14 @@
     {% endif %}
 
     {% if show_location %}
-        <p>
-            <b>{% trans %}Location{% endtrans %}</b>
-            <br>
-            {{ _render_place(contrib) }}
-        </p>
+        {% set loc = _render_place(contrib)|trim %}
+        {% if loc %}
+            <p>
+                <b>{% trans %}Location{% endtrans %}</b>
+                <br>
+                {{ loc }}
+            </p>
+        {% endif %}
     {% endif %}
     {% if config.show_abstract and (not contrib.session.is_poster or config.show_poster_abstract) and contrib.description %}
         <div class="description">
@@ -228,10 +231,13 @@
             </b>
         </p>
         {% if program_config.show_siblings_location %}
-            <p>
-                <b>{% trans %}Location{% endtrans %}:</b>
-                {{ _render_place(entry) }}
-            </p>
+            {% set loc = _render_place(entry)|trim %}
+            {% if loc %}
+                <p>
+                    <b>{% trans %}Location{% endtrans %}:</b>
+                    {{ loc }}
+                </p>
+            {% endif %}
         {% endif %}
         {% set people = object.person_links if type == 'SESSION_BLOCK' else object.speakers %}
         {% if type != 'BREAK' and people %}
@@ -272,7 +278,7 @@
 {% macro _render_place(entry) %}
     {# Entry argument could be both an entry or a data object attached to an entry #}
     {% set entry = entry.object or entry %}
-    {{ [entry.venue_name, entry.room_name, entry.address] | select | join(', ') }}
+    {{ [entry.venue_name, entry.room_name, entry.address] | select | join(', ') | trim }}
 {% endmacro %}
 
 {% macro _render_names(people, show_title=false, show_affiliation=false) %}

@@ -22,7 +22,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Fix inconsistent page numbering in PDF timetable (:issue:`6824`, :pr:`6827`)
 
 Accessibility
 ^^^^^^^^^^^^^
