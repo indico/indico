@@ -38,6 +38,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/notification-preview', 
                  regforms.RHRegistrationFormNotificationPreview, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete', 'delete_regform', regforms.RHRegistrationFormDelete,
                  methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/clone', 'clone_regform', regforms.RHRegistrationFormClone,
+                 methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/open', 'open_regform', regforms.RHRegistrationFormOpen,
                  methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/close', 'close_regform', regforms.RHRegistrationFormClose,
