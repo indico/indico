@@ -74,10 +74,15 @@ export const getVisibleEntries = createSelector(
   (blocks, children) => [...blocks, ...children]
 );
 export const getSelectedEntry = createSelector(
-  getVisibleEntries,
+  getDayEntries,
   getSelectedId,
-  (entries, id) => id && entries.find(e => e.id === id)
+  (entries, id) => {
+    entries = Object.values(entries).flatMap(x => x);
+    entries = entries.flatMap(e => (e.type === 'block' ? [e, ...e.children] : [e]));
+    return entries.find(e => e.id === id);
+  }
 );
+
 export const canUndo = createSelector(
   getEntries,
   entries => entries.currentChangeIdx > 0

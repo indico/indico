@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {Entry, Session} from './types';
 import moment, {Moment} from 'moment';
 
 export const GRID_SIZE_MINUTES = 5;
@@ -60,3 +61,30 @@ export const mapPersonLinkToSchema = data => ({
   type: data.type,
   avatar_url: data.avatarURL,
 });
+
+const DEFAULT_CONTRIB_TEXT_COLOR = '#ffffff';
+const DEFAULT_CONTRIB_BACKGROUND_COLOR = '#5b1aff';
+
+export function getEntryColor(
+  entry: Entry,
+  sessions: Record<number, Session>
+): {textColor: string; backgroundColor: string} {
+  if (entry.type === 'break') {
+    return {textColor: entry.textColor, backgroundColor: entry.backgroundColor};
+  }
+
+  if (entry.type === 'contrib' && !entry.sessionId) {
+    return {
+      textColor: DEFAULT_CONTRIB_TEXT_COLOR,
+      backgroundColor: DEFAULT_CONTRIB_BACKGROUND_COLOR,
+    };
+  }
+
+  const session = sessions[entry.sessionId];
+  console.assert(session, `Session ${entry.sessionId} not found for entry ${entry.id}`);
+
+  return {
+    textColor: session.textColor,
+    backgroundColor: session.backgroundColor,
+  };
+}
