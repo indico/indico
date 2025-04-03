@@ -13,6 +13,8 @@ import {DatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 
+import {INVALID} from './DatePicker';
+
 function triggerChange(id) {
   document.getElementById(id).dispatchEvent(new Event('change', {bubbles: true}));
 }
@@ -26,22 +28,41 @@ export default function WTFDateField({
   latest,
   linkedField,
 }) {
+  // The hidden field that holds the date (in isoformat) which is used during form submission.
+  // It also contains the initial value coming from the WTForms field.
   const dateField = useMemo(() => document.getElementById(dateId), [dateId]);
+  // The hidden field containing the linked field's date.
   const linkedFieldDateElem = useMemo(
     () => linkedField && document.getElementById(`${linkedField.id}-datestorage`),
     [linkedField]
   );
+  // The moment object of the linked field's date.
   const [linkedMoment, setLinkedMoment] = useState(
-    linkedFieldDateElem ? moment(linkedFieldDateElem.value, 'DD/MM/YYYY') : null
+    linkedFieldDateElem ? toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE) : null
   );
-  const [date, setDate] = useState(toMoment(dateField.value, 'DD/MM/YYYY'));
+  // The currently selected valid date, or null if there isn't one.
+  const [date, setDate] = useState(
+    dateField.value ? toMoment(dateField.value, moment.HTML5_FMT.DATE) : null
+  );
   const clearRef = useRef(null);
 
   const updateDate = useCallback(
     value => {
-      dateField.value = value ? moment(value).format('DD/MM/YYYY') : '';
-      dateField.parentElement.querySelector('ind-date-picker > input').value = dateField.value;
-      setDate(value);
+      const pickerInput = dateField.parentElement.querySelector('ind-date-picker > input');
+      if (value === INVALID) {
+        // this typically happens when the user types something in the field that's not a
+        // valid date (yet)
+        dateField.value = '';
+        pickerInput.setCustomValidity(Translate.string('The entered date is invalid.'));
+        setDate(null);
+      } else {
+        dateField.value = value || '';
+        // update the date picker's input, in case the change was done programmatically, e.g. via
+        // the clear button
+        pickerInput.value = value ? toMoment(value, moment.HTML5_FMT.DATE).format('L') : '';
+        pickerInput.setCustomValidity('');
+        setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
+      }
       triggerChange(dateId);
     },
     [dateField, dateId]
@@ -52,7 +73,7 @@ export default function WTFDateField({
       return;
     }
     function handleDateChange() {
-      const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
+      const linkedDate = toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE);
       setLinkedMoment(linkedDate);
       if (
         (linkedField.notBefore && linkedDate.isAfter(date, 'day')) ||
@@ -87,7 +108,6 @@ export default function WTFDateField({
         max={max}
         required={required}
         disabled={disabled}
-        invalidValue={null}
       />
       {date && allowClear && (
         <button type="button" onClick={clearFields} className="clear-pickers" ref={clearRef}>

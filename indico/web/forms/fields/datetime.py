@@ -205,9 +205,9 @@ class IndicoDurationField(Field):
 class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 
-    def __init__(self, *args, **kwargs):
-        self.allow_clear = kwargs.pop('allow_clear', None)
-        super().__init__(*args, parse_kwargs={'dayfirst': True}, display_format='%d/%m/%Y', **kwargs)
+    def __init__(self, *args, allow_clear=None, **kwargs):
+        self.allow_clear = allow_clear
+        super().__init__(*args, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 

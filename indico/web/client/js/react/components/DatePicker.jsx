@@ -17,7 +17,7 @@ import {fromISOLocalDate} from 'indico/utils/date_parser';
 
 import 'indico/custom_elements/ind_date_picker';
 
-const INVALID = '__invalid__';
+export const INVALID = '__invalid__';
 
 export default function DatePicker({
   onChange,
