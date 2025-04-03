@@ -53,6 +53,12 @@ ind-date-picker {
   }
 }
 
+.ui-widget ind-date-picker > button {
+  // the regular rule is not specific enough to override the font size change on `.ui-widget button`
+  // coming from the jquery ui theme css...
+  @extend %text-size-reset;
+}
+
 ind-date-range-picker {
   position: relative;
   width: fit-content;
