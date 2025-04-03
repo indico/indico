@@ -78,8 +78,8 @@ export default function WTFDateField({
       const linkedDate = toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE);
       setLinkedMoment(linkedDate);
       if (
-        (linkedField.notBefore && linkedDate.isAfter(date, 'day')) ||
-        (linkedField.notAfter && linkedDate.isBefore(date, 'day'))
+        (linkedField.notBefore && linkedDate?.isAfter(date, 'day')) ||
+        (linkedField.notAfter && linkedDate?.isBefore(date, 'day'))
       ) {
         updateDate(linkedDate, true);
       }
@@ -96,10 +96,8 @@ export default function WTFDateField({
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
 
-  const min =
-    linkedField?.notBefore && linkedMoment.isValid() ? serializeDate(linkedMoment) : earliest;
-  const max =
-    linkedField?.notAfter && linkedMoment.isValid() ? serializeDate(linkedMoment) : latest;
+  const min = linkedField?.notBefore && linkedMoment ? serializeDate(linkedMoment) : earliest;
+  const max = linkedField?.notAfter && linkedMoment ? serializeDate(linkedMoment) : latest;
 
   return (
     <>
