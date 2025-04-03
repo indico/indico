@@ -47,7 +47,7 @@ export default function WTFDateField({
   const clearRef = useRef(null);
 
   const updateDate = useCallback(
-    value => {
+    (value, updatePicker = false) => {
       const pickerInput = dateField.parentElement.querySelector('ind-date-picker > input');
       if (value === INVALID) {
         // this typically happens when the user types something in the field that's not a
@@ -57,9 +57,11 @@ export default function WTFDateField({
         setDate(null);
       } else {
         dateField.value = value || '';
-        // update the date picker's input, in case the change was done programmatically, e.g. via
-        // the clear button
-        pickerInput.value = value ? toMoment(value, moment.HTML5_FMT.DATE).format('L') : '';
+        if (updatePicker) {
+          // update the date picker's input, if the change was done programmatically, e.g. via
+          // the clear button
+          pickerInput.value = value ? toMoment(value, moment.HTML5_FMT.DATE).format('L') : '';
+        }
         pickerInput.setCustomValidity('');
         setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
       }
@@ -79,7 +81,7 @@ export default function WTFDateField({
         (linkedField.notBefore && linkedDate.isAfter(date, 'day')) ||
         (linkedField.notAfter && linkedDate.isBefore(date, 'day'))
       ) {
-        updateDate(linkedDate);
+        updateDate(linkedDate, true);
       }
     }
     linkedFieldDateElem.addEventListener('change', handleDateChange);
@@ -90,7 +92,7 @@ export default function WTFDateField({
   }, [date, linkedFieldDateElem, linkedField, updateDate]);
 
   const clearFields = () => {
-    updateDate(null);
+    updateDate(null, true);
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
 
