@@ -5,8 +5,6 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import date
-
 from flask import flash, redirect
 
 from indico.modules.admin import RHAdminBase
@@ -20,10 +18,9 @@ from indico.web.forms.base import FormDefaults
 
 class RHAnnouncement(RHAdminBase):
     def _process(self):
-        form = AnnouncementForm(obj=FormDefaults(**announcement_settings.get_all(), test_start_date=date(2025, 4, 8)))
+        form = AnnouncementForm(obj=FormDefaults(**announcement_settings.get_all()))
         if form.validate_on_submit():
-            # announcement_settings.set_multi(form.data)
-            # flash(_('Settings have been saved'), 'success')
-            flash(f'{form.test_start_date.data} - {form.test_end_date.data}', 'info')
+            announcement_settings.set_multi(form.data)
+            flash(_('Settings have been saved'), 'success')
             return redirect(url_for('announcement.manage'))
         return WPAnnouncement.render_template('settings.html', 'announcement', form=form)
