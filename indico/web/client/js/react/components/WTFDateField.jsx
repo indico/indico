@@ -81,7 +81,7 @@ export default function WTFDateField({
         (linkedField.notBefore && linkedDate?.isAfter(date, 'day')) ||
         (linkedField.notAfter && linkedDate?.isBefore(date, 'day'))
       ) {
-        updateDate(linkedDate, true);
+        updateDate(serializeDate(linkedDate), true);
       }
     }
     linkedFieldDateElem.addEventListener('change', handleDateChange);
