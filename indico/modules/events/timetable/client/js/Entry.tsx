@@ -5,32 +5,29 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
+import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
+import * as actions from './actions';
 import BlockEntry from './BlockEntry';
 import ContributionEntry from './ContributionEntry';
 import {useDraggable} from './dnd';
-import * as selectors from './selectors';
 import {TimetablePopup} from './entry_popups';
-import * as actions from './actions';
+import * as selectors from './selectors';
 
 import './DayTimetable.module.scss';
 
 export function DraggableEntry({id, ...rest}) {
   const dispatch = useDispatch();
-  const {listeners, setNodeRef, transform, isDragging, ref} = useDraggable({
+  const {listeners, setNodeRef, transform, isDragging} = useDraggable({
     id: `${id}`,
   });
   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
   const selectedId = useSelector(selectors.getSelectedId);
   const selected = useSelector(selectors.getSelectedEntry);
-  if (selectedId === id) {
-    console.log(selected);
-  }
 
-  return (
-    <>
+  if (popupsEnabled && selected && id === selectedId) {
+    const trigger = (
       <ContributionEntry
         id={id}
         {...rest}
@@ -39,32 +36,39 @@ export function DraggableEntry({id, ...rest}) {
         transform={transform}
         isDragging={isDragging}
       />
-      {popupsEnabled && selected && id === selectedId && (
-        <TimetablePopup
-          onClose={() => dispatch(actions.selectEntry(null))}
-          entry={selected}
-          type={selected.type}
-          rect={ref.current.getBoundingClientRect()}
-        />
-      )}
-    </>
+    );
+    return (
+      <TimetablePopup
+        trigger={trigger}
+        onClose={() => dispatch(actions.selectEntry(null))}
+        entry={selected}
+      />
+    );
+  }
+
+  return (
+    <ContributionEntry
+      id={id}
+      {...rest}
+      listeners={listeners}
+      setNodeRef={setNodeRef}
+      transform={transform}
+      isDragging={isDragging}
+    />
   );
 }
 
 export function DraggableBlockEntry({id, ...rest}) {
   const dispatch = useDispatch();
-  const {listeners, setNodeRef, transform, isDragging, ref} = useDraggable({
+  const {listeners, setNodeRef, transform, isDragging} = useDraggable({
     id: `${id}`,
   });
   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
   const selectedId = useSelector(selectors.getSelectedId);
   const selected = useSelector(selectors.getSelectedEntry);
-  if (selectedId === id) {
-    console.log(selected);
-  }
 
-  return (
-    <>
+  if (popupsEnabled && selected && id === selectedId) {
+    const trigger = (
       <BlockEntry
         id={id}
         {...rest}
@@ -73,14 +77,24 @@ export function DraggableBlockEntry({id, ...rest}) {
         transform={transform}
         isDragging={isDragging}
       />
-      {popupsEnabled && selected && id === selectedId && (
-        <TimetablePopup
-          onClose={() => dispatch(actions.selectEntry(null))}
-          entry={selected}
-          type={selected.type}
-          rect={ref.current.getBoundingClientRect()}
-        />
-      )}
-    </>
+    );
+    return (
+      <TimetablePopup
+        trigger={trigger}
+        onClose={() => dispatch(actions.selectEntry(null))}
+        entry={selected}
+      />
+    );
+  }
+
+  return (
+    <BlockEntry
+      id={id}
+      {...rest}
+      listeners={listeners}
+      setNodeRef={setNodeRef}
+      transform={transform}
+      isDragging={isDragging}
+    />
   );
 }
