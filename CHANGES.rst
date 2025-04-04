@@ -18,6 +18,7 @@ Improvements
 - Notify room moderators about new pending bookings in their rooms (:pr:`6823`)
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
+- Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
 
 Bugfixes
 ^^^^^^^^

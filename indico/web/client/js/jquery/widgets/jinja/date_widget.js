@@ -7,6 +7,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {WTFDateField} from 'indico/react/components';
 
 window.setupDateWidget = function setupDateWidget(options) {

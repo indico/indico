@@ -158,7 +158,7 @@ form {
 
     .form-field {
       input,
-      select,
+      select:not([data-internal]),
       textarea,
       .ui.dropdown,
       .i-table-widget {
@@ -225,7 +225,7 @@ form {
     height: auto;
   }
 
-  select {
+  select:not([data-internal]) {
     @include form-field-input();
     padding-left: 0.7em;
 
@@ -234,11 +234,11 @@ form {
     }
   }
 
-  input[type='number'] {
+  input[type='number']:not([data-internal]) {
     min-width: 80px;
   }
 
-  input[type='number'],
+  input[type='number']:not([data-internal]),
   input[type='time'] {
     padding-right: 0 !important;
 
@@ -248,10 +248,14 @@ form {
     }
   }
 
-  button:not(.tox-tbtn),
+  button:not(.tox-tbtn):not([aria-haspopup]):not([role='option']),
   input[type='button'],
   input[type='submit'] {
     @include form-field-button();
+  }
+
+  button[data-calendar-trigger] {
+    width: 1.6em;
   }
 
   a.i-button {

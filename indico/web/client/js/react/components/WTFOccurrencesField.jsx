@@ -11,8 +11,9 @@ import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React, {useState, useEffect, useMemo, useRef} from 'react';
 
-import {SingleDatePicker} from 'indico/react/components';
+import {DatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
 
 function triggerChange(field) {
   field.dispatchEvent(new Event('change', {bubbles: true}));
@@ -22,19 +23,32 @@ export default function WTFOccurrencesField({fieldId, uses24HourFormat}) {
   const field = useMemo(() => document.getElementById(fieldId), [fieldId]);
   const [values, setValues] = useState(() =>
     JSON.parse(field.value).map(value => ({
-      date: moment(value.date, 'YYYY-MM-DD'),
+      date: moment(value.date, moment.HTML5_FMT.DATE),
       duration: value.duration,
       time: moment(value.time, 'HH:mm'),
       id: _.uniqueId(),
     }))
   );
 
+  useEffect(() => {
+    // we cannot do this directly in updateOccurrences since after adding a new occurrence it
+    // doesn't exist in the DOM yet
+    const dateInputs = field.parentElement.querySelectorAll('ind-date-picker > input');
+    values.forEach(({date}, i) => {
+      // time and duration don't allow entering invalid data without the field being in an invalid
+      // state, so no need for custom validation there
+      dateInputs[i].setCustomValidity(
+        date?.isValid() ? '' : Translate.string('The entered date is invalid.')
+      );
+    });
+  }, [field, values]);
+
   const updateOccurrences = newValues => {
     setValues(newValues);
     const storageValues = newValues.map(value => ({
-      date: value.date ? value.date.format('YYYY-MM-DD') : '',
+      date: value.date?.isValid() ? value.date.format(moment.HTML5_FMT.DATE) : '',
       duration: value.duration,
-      time: value.time ? value.time.format('HH:mm') : '',
+      time: value.time?.isValid() ? value.time.format('HH:mm') : '',
     }));
     field.value = JSON.stringify(storageValues);
   };
@@ -44,7 +58,9 @@ export default function WTFOccurrencesField({fieldId, uses24HourFormat}) {
     const newValues = [
       ...values,
       {
-        date: lastElement.date ? moment(lastElement.date).add(1, 'day') : null,
+        date: lastElement.date?.isValid()
+          ? moment(lastElement.date, moment.HTML5_FMT.DATE).add(1, 'day')
+          : null,
         duration: lastElement.duration,
         time: lastElement.time,
         id: _.uniqueId(),
@@ -100,7 +116,7 @@ function Occurrence({occurrence, uses24HourFormat, changeOccurrence, removeOccur
   }, []);
 
   const updateDate = value => {
-    changeOccurrence(value, occurrence.duration, occurrence.time);
+    changeOccurrence(moment(value, moment.HTML5_FMT.DATE), occurrence.duration, occurrence.time);
   };
 
   const updateTime = value => {
@@ -113,17 +129,7 @@ function Occurrence({occurrence, uses24HourFormat, changeOccurrence, removeOccur
 
   return (
     <>
-      <SingleDatePicker
-        id=""
-        date={occurrence.date}
-        onDateChange={updateDate}
-        placeholder={moment.localeData().longDateFormat('L')}
-        verticalSpacing={10}
-        showDefaultInputIcon={false}
-        isOutsideRange={() => false}
-        noBorder
-        required
-      />
+      <DatePicker value={serializeDate(occurrence.date)} onChange={updateDate} required />
       <TimePicker
         showSecond={false}
         value={occurrence.time}
@@ -136,16 +142,17 @@ function Occurrence({occurrence, uses24HourFormat, changeOccurrence, removeOccur
         // keep the picker in the DOM tree of the surrounding element
         getPopupContainer={node => node}
       />
-      <input
-        type="number"
-        className="durationpicker"
-        value={Number.isNaN(occurrence.duration) ? '' : occurrence.duration}
-        onChange={updateDuration}
-        step="1"
-        min="1"
-        required
-      />
-      <i className="duration-info" title={Translate.string('Duration in minutes')} />
+      <span className="durationpicker">
+        <input
+          type="number"
+          value={Number.isNaN(occurrence.duration) ? '' : occurrence.duration}
+          onChange={updateDuration}
+          step="1"
+          min="1"
+          required
+        />
+        <i className="duration-info" title={Translate.string('Duration in minutes')} />
+      </span>
       {removeOccurrence && (
         <span
           className="icon-remove remove-occurrence"

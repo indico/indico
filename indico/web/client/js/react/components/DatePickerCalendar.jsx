@@ -57,8 +57,8 @@ export const DatePickerCalendar = React.forwardRef(({inline = false, children, .
           </button>
 
           <div className="month-year">
-            <select />
-            <input type="number" required />
+            <select data-internal />
+            <input type="number" required data-internal />
           </div>
 
           <button type="button" value="next-month">

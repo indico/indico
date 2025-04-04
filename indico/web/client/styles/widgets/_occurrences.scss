@@ -8,6 +8,11 @@
 @use 'base' as *;
 
 .occurrences-widget {
+  .occurrence {
+    display: flex;
+    align-items: center;
+  }
+
   .occurrence + .occurrence {
     margin-top: 5px;
   }
@@ -42,12 +47,18 @@
   }
 
   .durationpicker {
+    display: flex;
+    align-items: center;
     margin-left: 1em;
-    width: 20% !important;
 
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      display: none;
+    input {
+      min-width: unset !important;
+      width: 100px;
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        display: none;
+      }
     }
   }
 
@@ -72,7 +83,6 @@
     color: $light-black;
     position: relative;
     right: 24px;
-    top: 2px;
   }
 
   .remove-occurrence {
