@@ -5,12 +5,12 @@
     <div class="datetime-widget">
         {# the hidden field has autofocus on purpose to prevent our JS from focusing the date picker #}
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-datestorage" autofocus
-               {% if field.data and not field.date_missing %}value="{{ field.data | format_date('code', timezone=field.timezone) }}"{% endif %}
+               {% if field.data and not field.date_missing %}value="{{ field.data.astimezone(field.tzinfo).date().isoformat() }}"{% endif %}
                {{ input_args | html_params }}>{#--#}
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-timestorage"
-                {% if field.data and not field.time_missing %}value="{{ field.data | format_time('code', timezone=field.timezone) }}"{% endif %}
+                {% if field.data and not field.time_missing %}value="{{ field.data.astimezone(field.tzinfo).time().isoformat() }}"{% endif %}
                 {% if input_args.disabled %}disabled{% endif %}>
-        <span id="{{ field.id }}"></span>
+        <div id="{{ field.id }}"></span>
     </div>
 {% endblock %}
 

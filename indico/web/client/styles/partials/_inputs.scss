@@ -290,7 +290,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     @include icon-before('icon-earth');
     color: $light-black;
     position: relative;
-    left: 15px;
     top: 2px;
   }
 
@@ -308,13 +307,20 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   }
 }
 
+.datetime-widget > div {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
 .date-widget > span {
   display: flex;
   align-items: center;
   gap: 0.2em;
 }
 
-.date-widget .clear-pickers {
+.date-widget .clear-pickers,
+.datetime-widget .clear-pickers {
   display: flex;
   align-items: center;
   justify-content: center;
