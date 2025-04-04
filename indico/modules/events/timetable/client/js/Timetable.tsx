@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Checkbox} from 'semantic-ui-react';
 
@@ -85,12 +85,28 @@ export default function Timetable() {
         dispatch(actions.undoChange());
       } else if (e.ctrlKey && e.key === 'y') {
         dispatch(actions.redoChange());
+      } else if (e.key === 'Escape') {
+        // deselect selected entry
+        if (selectedId) {
+          dispatch(actions.selectEntry(null));
+        }
+      }
+    }
+
+    function onScroll() {
+      // deselect selected entry
+      if (selectedId) {
+        dispatch(actions.selectEntry(null));
       }
     }
 
     document.addEventListener('keydown', onKeydown);
-    return () => document.removeEventListener('keydown', onKeydown);
-  }, [dispatch]);
+    document.addEventListener('scroll', onScroll, true);
+    return () => {
+      document.removeEventListener('keydown', onKeydown);
+      document.removeEventListener('scroll', onScroll, true);
+    };
+  }, [dispatch, selectedId]);
 
   return (
     <div styleName="timetable">
