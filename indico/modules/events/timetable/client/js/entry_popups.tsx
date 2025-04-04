@@ -6,9 +6,7 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
-import PropTypes from 'prop-types';
 import React from 'react';
-import {createPortal} from 'react-dom';
 import {useSelector} from 'react-redux';
 import {
   Button,
@@ -18,13 +16,17 @@ import {
   DropdownItem,
   DropdownMenu,
   Icon,
+  Popup,
+  SemanticICONS,
 } from 'semantic-ui-react';
 
 import './Entry.module.scss';
+import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
-import {getEntryColor} from './utils';
+import {BreakEntry, ContribEntry, BlockEntry} from './types';
+import {formatBlockTitle, getEntryColor} from './utils';
 
-function ColoredDot({color}) {
+function ColoredDot({color}: {color: string}) {
   return (
     <div
       style={{
@@ -38,11 +40,7 @@ function ColoredDot({color}) {
   );
 }
 
-ColoredDot.propTypes = {
-  color: PropTypes.string.isRequired,
-};
-
-function CardItem({icon, children}) {
+function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactNode}) {
   return (
     <Card.Description style={{marginTop: 10, display: 'flex', alignItems: 'center', gap: 5}}>
       <Icon name={icon} size="large" />
@@ -51,20 +49,13 @@ function CardItem({icon, children}) {
   );
 }
 
-CardItem.propTypes = {
-  icon: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-};
-
-function Break({entry, onClose}) {
-  const startTime = moment(entry.startDt).format('HH:mm');
-  const endTime = moment(entry.startDt)
-    .add(entry.duration, 'minutes')
-    .format('HH:mm');
+function Break({entry, onClose}: {entry: BreakEntry; onClose: () => void}) {
+  const startTime = entry.startDt;
+  const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
 
   return (
-    <Card fluid>
-      <Card.Content style={{paddingLeft: 30, paddingBottom: 30}}>
+    <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
+      <Card.Content>
         <Card.Header>
           <div style={{display: 'flex', justifyContent: 'flex-end', gap: 5}}>
             <ButtonGroup>
@@ -90,31 +81,22 @@ function Break({entry, onClose}) {
           </div>
         </Card.Header>
         <Card.Meta style={{marginLeft: 29}}>{entry.description}</Card.Meta>
-        <CardItem icon="clock outline">
-          {startTime}-{endTime}
-        </CardItem>
+        <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
         <CardItem icon="map marker alternate">Room 101</CardItem>
       </Card.Content>
     </Card>
   );
 }
 
-Break.propTypes = {
-  entry: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-function Contribution({entry, onClose}) {
+function Contribution({entry, onClose}: {entry: ContribEntry; onClose: () => void}) {
   const sessions = useSelector(selectors.getSessions);
   const {backgroundColor} = getEntryColor(entry, sessions);
-  const startTime = moment(entry.startDt).format('HH:mm');
-  const endTime = moment(entry.startDt)
-    .add(entry.duration, 'minutes')
-    .format('HH:mm');
+  const startTime = moment(entry.startDt);
+  const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
 
   return (
-    <Card fluid>
-      <Card.Content style={{paddingLeft: 30, paddingBottom: 30}}>
+    <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
+      <Card.Content>
         <Card.Header>
           <div style={{display: 'flex', justifyContent: 'flex-end', gap: 5}}>
             <ButtonGroup>
@@ -140,9 +122,7 @@ function Contribution({entry, onClose}) {
           </div>
         </Card.Header>
         <Card.Meta style={{marginLeft: 29}}>{entry.description}</Card.Meta>
-        <CardItem icon="clock outline">
-          {startTime}-{endTime}
-        </CardItem>
+        <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
         <CardItem icon="map marker alternate">Room 101</CardItem>
         <CardItem icon="microphone">John Doe</CardItem>
         <CardItem icon="file powerpoint outline">slides.pptx</CardItem>
@@ -151,23 +131,16 @@ function Contribution({entry, onClose}) {
   );
 }
 
-Contribution.propTypes = {
-  entry: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-function Block({entry, onClose}) {
+function Block({entry, onClose}: {entry: BlockEntry; onClose: () => void}) {
   const sessions = useSelector(selectors.getSessions);
   const {backgroundColor} = getEntryColor(entry, sessions);
-  const startTime = moment(entry.startDt).format('HH:mm');
-  const endTime = moment(entry.startDt)
-    .add(entry.duration, 'minutes')
-    .format('HH:mm');
-  const title = entry.slotTitle ? `${entry.title}: ${entry.slotTitle}` : entry.title;
+  const startTime = moment(entry.startDt);
+  const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+  const title = formatBlockTitle(entry.sessionTitle, entry.title);
 
   return (
-    <Card fluid>
-      <Card.Content style={{paddingLeft: 30, paddingBottom: 30}}>
+    <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
+      <Card.Content>
         <Card.Header>
           <div style={{display: 'flex', justifyContent: 'flex-end', gap: 5}}>
             <ButtonGroup>
@@ -203,9 +176,7 @@ function Block({entry, onClose}) {
             <div>{title}</div>
           </div>
         </Card.Header>
-        <CardItem icon="clock outline">
-          {startTime}-{endTime}
-        </CardItem>
+        <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
         <CardItem icon="map marker alternate">Room 101</CardItem>
         <CardItem icon="microphone">John Doe</CardItem>
         <CardItem icon="file powerpoint outline">slides.pptx</CardItem>
@@ -214,35 +185,35 @@ function Block({entry, onClose}) {
   );
 }
 
-Block.propTypes = {
-  entry: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+export function TimetablePopup({
+  trigger,
+  onClose,
+  entry,
+}: {
+  trigger: React.ReactNode;
+  onClose: () => void;
+  entry: BreakEntry | ContribEntry | BlockEntry;
+}) {
+  let children;
+  if (entry.type === 'block') {
+    children = <Block entry={entry} onClose={onClose} />;
+  } else if (entry.type === 'contrib') {
+    children = <Contribution entry={entry} onClose={onClose} />;
+  } else {
+    children = <Break entry={entry} onClose={onClose} />;
+  }
 
-export function TimetablePopup({onClose, type, entry, rect}) {
-  return createPortal(
-    <div
-      style={{
-        position: 'absolute',
-        top: window.scrollY + rect.y - rect.height / 2 + 30,
-        left: window.scrollX + rect.x + rect.width / 2 - 250,
-        zIndex: 1000,
-        minWidth: 500,
-        maxWidth: 500,
-      }}
+  return (
+    <Popup
+      trigger={trigger}
+      on="click"
+      position="top center"
+      open
+      onClose={onClose}
+      basic
+      hideOnScroll
     >
-      {type === 'break' && <Break entry={entry} onClose={onClose} />}
-      {type === 'contrib' && <Contribution entry={entry} onClose={onClose} />}
-      {type === 'block' && <Block entry={entry} onClose={onClose} />}
-    </div>,
-    document.body
+      {children}
+    </Popup>
   );
 }
-
-TimetablePopup.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  type: PropTypes.string.isRequired,
-  entry: PropTypes.object.isRequired,
-  rect: PropTypes.object.isRequired,
-};
