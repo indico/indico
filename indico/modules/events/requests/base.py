@@ -177,7 +177,8 @@ class RequestDefinitionBase:
         """
         from indico.modules.events.requests.models.requests import RequestState
         req.state = RequestState.withdrawn
-        notify_withdrawn_request(req, notify_event_managers)
+        if not req.event.has_ended:
+            notify_withdrawn_request(req, notify_event_managers)
 
     @classmethod
     def accept(cls, req, data, user):

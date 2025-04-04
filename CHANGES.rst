@@ -24,6 +24,8 @@ Bugfixes
 
 - Fix inconsistent page numbering in PDF timetable (:issue:`6824`, :pr:`6827`)
 - Do not log logins rejected by a plugin as errors (:pr:`6834`, thanks :user:`omegak`)
+- Do not trigger notifications for withdrawn service requests when deleting past events
+  (:issue:`6700`, :pr:`6754`, thanks :user:`bhngupta`)
 
 Accessibility
 ^^^^^^^^^^^^^
