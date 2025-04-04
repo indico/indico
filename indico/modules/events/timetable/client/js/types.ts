@@ -26,6 +26,7 @@ export interface BaseEntry {
   id: number;
   title: string;
   duration: number;
+  description: string;
 }
 
 export interface ScheduledMixin {
@@ -64,6 +65,7 @@ export type ChildEntry = ChildContribEntry | ChildBreakEntry;
 export interface BlockEntry extends BaseEntry, ScheduledMixin {
   type: EntryType.SessionBlock;
   sessionId: number;
+  sessionTitle: string;
   children: ChildEntry[];
 }
 
