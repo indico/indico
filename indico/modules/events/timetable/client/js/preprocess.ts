@@ -64,6 +64,8 @@ export function preprocessTimetableEntries(
     contributions?: {uniqueId: number; title: string; duration: number; sessionId: number}[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
+  console.log('data', data);
+
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];
@@ -75,7 +77,7 @@ export function preprocessTimetableEntries(
       dayEntries[day].push({
         type,
         id,
-        title: entry.slotTitle || entry.title,
+        title: entry.title,
         startDt: dateToMoment(entry.startDate),
         duration: entry.duration,
         x: 0,
@@ -95,6 +97,8 @@ export function preprocessTimetableEntries(
       }
 
       if (type === 'block') {
+        dayEntries[day].at(-1).sessionTitle = entry.slotTitle;
+
         const children = Object.entries(entry.entries).map(
           ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
             const childEntry: ChildEntry = {
@@ -122,6 +126,8 @@ export function preprocessTimetableEntries(
       }
     }
   }
+
+  console.log('dayEntries', dayEntries);
 
   return {
     dayEntries,
