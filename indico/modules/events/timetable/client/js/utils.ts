@@ -88,3 +88,7 @@ export function getEntryColor(
     backgroundColor: session.backgroundColor,
   };
 }
+
+export function formatBlockTitle(sessionTitle: string, blockTitle: string) {
+  return blockTitle ? `${sessionTitle}: ${blockTitle}` : sessionTitle;
+}
