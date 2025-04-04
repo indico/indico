@@ -303,7 +303,7 @@ export default {
         return state;
     }
   },
-  experimental: (state = {popupsEnabled: false}, action) => {
+  experimental: (state = {popupsEnabled: true}, action) => {
     switch (action.type) {
       case actions.EXPERIMENTAL_TOGGLE_POPUPS:
         return {popupsEnabled: !state.popupsEnabled};
