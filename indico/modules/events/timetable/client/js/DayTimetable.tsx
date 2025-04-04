@@ -25,6 +25,7 @@ import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from '
 // TODO: (Ajob) Remove when discussed how to handle pre-existing uniqueID type
 type UniqueId = string;
 
+// TODO: (Ajob) Start using interface below
 interface DraftEntry {
   startDt: Moment;
   duration: number;
@@ -61,18 +62,32 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     return obj;
   }, [entries, dispatch, dt]);
 
+  const onMouseUp = entry => {
+    // TODO: (Ajob) Replace this part with popup by Tomas
+    console.log('mouseup entry', entry);
+    dispatch(actions.setDraftEntry(entry));
+  };
+
   return (
     <>
       {entries.map(entry =>
         entry.type === 'block' ? (
           <DraggableBlockEntry
             key={entry.id}
+            selected={selectedId === entry.id}
+            // setDuration={setDuration}
+            onMouseUp={() => onMouseUp(entry)}
             setDuration={setDurations[entry.id]}
             setChildDuration={setChildDurations[entry.id]}
             {...entry}
           />
         ) : (
-          <DraggableEntry key={entry.id} setDuration={setDurations[entry.id]} {...entry} />
+          <DraggableEntry
+            key={entry.id}
+            setDuration={setDurations[entry.id]}
+            onMouseUp={() => onMouseUp(entry)}
+            {...entry}
+          />
         )
       )}
     </>
@@ -87,9 +102,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
   const unscheduled = useSelector(selectors.getUnscheduled);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [newEntry, setNewEntry] = useState<DraftEntry | null>(null);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
 
@@ -200,6 +213,8 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
     dispatch(actions.moveEntry(dt.format('YYYYMMDD'), newLayout));
   }
 
+  const draftEntry = useSelector(selectors.getDraftEntry); // Select the draftEntry state from Redux
+
   useEffect(() => {
     function onMouseMove(event: MouseEvent) {
       mouseEventRef.current = event;
@@ -210,23 +225,6 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
       document.removeEventListener('mousemove', onMouseMove);
     };
   }, []);
-
-  useEffect(() => {
-    if (!newEntry) {
-      return;
-    }
-
-    function handler() {
-      setIsModalOpen(true);
-    }
-
-    const calendarNode = calendarRef.current;
-    calendarNode.addEventListener('click', handler);
-
-    return () => {
-      calendarNode.removeEventListener('click', handler);
-    };
-  }, [newEntry]);
 
   useEffect(() => {
     function onMouseDown(event: MouseEvent) {
@@ -246,40 +244,42 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
         .add(pixelsToMinutes(y), 'minutes');
 
       setIsDragging(true);
-      setNewEntry({
-        startDt,
-        duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
-        y,
-      });
+      dispatch(
+        actions.setDraftEntry({
+          startDt,
+          duration: GRID_SIZE_MINUTES, // TODO: (Ajob) Replace with default duration
+          y,
+        })
+      );
     }
 
     function onMouseMove(event: MouseEvent) {
-      if (!isDragging || !newEntry) {
+      if (!isDragging || !draftEntry) {
         return;
       }
       const rect = calendarRef.current.getBoundingClientRect();
       const duration = Math.max(
-        Math.round(pixelsToMinutes(event.clientY - rect.top - newEntry.y) / GRID_SIZE_MINUTES) *
+        Math.round(pixelsToMinutes(event.clientY - rect.top - draftEntry.y) / GRID_SIZE_MINUTES) *
           GRID_SIZE_MINUTES,
         GRID_SIZE_MINUTES // TODO: Replace with default duration
       );
 
-      if (newEntry.duration === duration) {
+      if (draftEntry.duration === duration) {
         return;
       }
 
-      setNewEntry({...newEntry, duration});
+      dispatch(actions.setDraftEntry({...draftEntry, duration}));
     }
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setIsDragging(false);
-        setNewEntry(null);
+        dispatch(actions.setDraftEntry(null));
       }
     }
 
     function onMouseUp() {
-      if (isDragging && newEntry) {
+      if (isDragging && draftEntry) {
         setIsDragging(false);
       }
     }
@@ -296,7 +296,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
       calendar.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [newEntry, dt, dispatch, isDragging, minHour]);
+  }, [draftEntry, dt, dispatch, isDragging, minHour]);
 
   const restrictToCalendar = useMemo(() => createRestrictToCalendar(calendarRef), [calendarRef]);
 
@@ -310,25 +310,24 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
             <div ref={calendarRef}>
               <Lines minHour={minHour} maxHour={maxHour} />
               <MemoizedTopLevelEntries dt={dt} entries={entries} />
-              {newEntry && (
+              {draftEntry && (
                 <div style={{opacity: 0.5, pointerEvents: 'none'}}>
                   <DraggableEntry
                     id="draft"
                     width="100%"
                     title="New entry"
                     maxColumn={0}
-                    {...newEntry}
+                    {...draftEntry}
                   />
                 </div>
               )}
-              {isModalOpen && newEntry && (
+              {!isDragging && draftEntry && (
                 <TimetableCreateModal
                   eventId={eventId}
                   onClose={() => {
-                    setNewEntry(null);
-                    setIsModalOpen(false);
+                    dispatch(actions.setDraftEntry(null));
                   }}
-                  entry={newEntry}
+                  entry={draftEntry}
                 />
               )}
             </div>
@@ -432,7 +431,7 @@ function layoutAfterDropOnCalendar(
     return; // contributions with sessions assigned cannot be scheduled at the top level
   }
 
-  const newEntry = {
+  const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
     y: minutesToPixels(
@@ -442,41 +441,41 @@ function layoutAfterDropOnCalendar(
     ),
   };
 
-  if (isChildEntry(newEntry)) {
-    delete newEntry.parentId;
+  if (isChildEntry(draftEntry)) {
+    delete draftEntry.parentId;
   }
 
-  if (newEntry.type === 'block') {
-    newEntry.children = newEntry.children.map(e => ({
+  if (draftEntry.type === 'block') {
+    draftEntry.children = draftEntry.children.map(e => ({
       ...e,
       startDt: moment(e.startDt).add(deltaMinutes, 'minutes'),
     }));
   }
 
   // Find all the entries that are linked to the new entry and recompute their layout
-  const groupIds = getGroup(newEntry, entries.filter(e => e.id !== newEntry.id));
+  const groupIds = getGroup(draftEntry, entries.filter(e => e.id !== draftEntry.id));
   let group = entries.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, newEntry, mousePosition);
+  group = layoutGroupAfterMove(group, draftEntry, mousePosition);
 
   if (!fromBlock) {
     // Drop from top level to top level
     const oldGroupIds = getGroup(fromEntry, entries.filter(e => e.id !== fromEntry.id));
     let oldGroup = entries.filter(e => oldGroupIds.has(e.id) && !groupIds.has(e.id));
     const otherEntries = entries.filter(
-      e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== newEntry.id
+      e => !groupIds.has(e.id) && !oldGroupIds.has(e.id) && e.id !== draftEntry.id
     );
     oldGroup = layoutGroup(oldGroup, {layoutChildren: false});
     return [...otherEntries, ...oldGroup, ...group];
   } else {
     // Drop from block to top level (== a break)
     const otherEntries = entries.filter(
-      e => !groupIds.has(e.id) && e.id !== newEntry.id && e.id !== fromBlock.id
+      e => !groupIds.has(e.id) && e.id !== draftEntry.id && e.id !== fromBlock.id
     );
     if (groupIds.has(fromBlock.id)) {
       fromBlock = group.find(e => e.id === fromBlock.id);
       group = group.filter(e => e.id !== fromBlock.id);
     }
-    fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== newEntry.id)};
+    fromBlock = {...fromBlock, children: fromBlock.children.filter(e => e.id !== draftEntry.id)};
     fromBlock = {...fromBlock, children: layout(fromBlock.children)};
     // group = group.filter(e => e.id !== fromBlock.id); // might contain the block
     return [...otherEntries, ...group, fromBlock];
@@ -540,7 +539,7 @@ function layoutAfterDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
-  const newEntry = {
+  const draftEntry = {
     ...fromEntry,
     startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
     y: minutesToPixels(
@@ -551,27 +550,30 @@ function layoutAfterDropOnBlock(
     parentId: toBlock.id,
   };
 
-  if (newEntry.startDt.isBefore(moment(toBlock.startDt))) {
+  if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
     // move start time to the start of the block
-    newEntry.startDt = moment(toBlock.startDt);
+    draftEntry.startDt = moment(toBlock.startDt);
   } else if (
-    moment(newEntry.startDt)
-      .add(newEntry.duration, 'minutes')
+    moment(draftEntry.startDt)
+      .add(draftEntry.duration, 'minutes')
       .isAfter(moment(toBlock.startDt).add(toBlock.duration, 'minutes'))
   ) {
     // move end time to the end of the block
-    newEntry.startDt = moment(toBlock.startDt).add(toBlock.duration - newEntry.duration, 'minutes');
+    draftEntry.startDt = moment(toBlock.startDt).add(
+      toBlock.duration - draftEntry.duration,
+      'minutes'
+    );
   }
 
-  const groupIds = getGroup(newEntry, toBlock.children.filter(e => e.id !== newEntry.id));
+  const groupIds = getGroup(draftEntry, toBlock.children.filter(e => e.id !== draftEntry.id));
   let group = toBlock.children.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, newEntry, mousePosition);
+  group = layoutGroupAfterMove(group, draftEntry, mousePosition);
 
-  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== newEntry.id);
+  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
 
   if (!fromBlock) {
     return layout([
-      ...entries.filter(e => e.id !== newEntry.id && e.id !== toBlock.id),
+      ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
       {...toBlock, children: [...otherChildren, ...group]},
     ]);
   } else if (toBlock.id === fromBlock.id) {
@@ -579,7 +581,7 @@ function layoutAfterDropOnBlock(
     return layout([...otherEntries, {...toBlock, children: [...otherChildren, ...group]}]);
   } else {
     const otherEntries = entries.filter(e => e.id !== toBlock.id && e.id !== fromBlock.id);
-    const fromChildren = fromBlock.children.filter(e => e.id !== newEntry.id);
+    const fromChildren = fromBlock.children.filter(e => e.id !== draftEntry.id);
     return layout([
       ...otherEntries,
       {...fromBlock, children: fromChildren},
@@ -691,7 +693,7 @@ function layoutAfterUnscheduledDropOnBlock(
     return; // TODO: auto-resize the block?
   }
 
-  const newEntry = {
+  const draftEntry = {
     ...entry,
     startDt,
     y: minutesToPixels(
@@ -703,31 +705,34 @@ function layoutAfterUnscheduledDropOnBlock(
   };
 
   // TODO
-  if (newEntry.backgroundColor) {
-    delete newEntry.backgroundColor;
+  if (draftEntry.backgroundColor) {
+    delete draftEntry.backgroundColor;
   }
 
-  if (newEntry.startDt.isBefore(moment(toBlock.startDt))) {
+  if (draftEntry.startDt.isBefore(moment(toBlock.startDt))) {
     // move start time to the start of the block
-    newEntry.startDt = moment(toBlock.startDt);
+    draftEntry.startDt = moment(toBlock.startDt);
   } else if (
-    moment(newEntry.startDt)
-      .add(newEntry.duration, 'minutes')
+    moment(draftEntry.startDt)
+      .add(draftEntry.duration, 'minutes')
       .isAfter(moment(toBlock.startDt).add(toBlock.duration, 'minutes'))
   ) {
     // move end time to the end of the block
-    newEntry.startDt = moment(toBlock.startDt).add(toBlock.duration - newEntry.duration, 'minutes');
+    draftEntry.startDt = moment(toBlock.startDt).add(
+      toBlock.duration - draftEntry.duration,
+      'minutes'
+    );
   }
 
-  const groupIds = getGroup(newEntry, toBlock.children.filter(e => e.id !== newEntry.id));
+  const groupIds = getGroup(draftEntry, toBlock.children.filter(e => e.id !== draftEntry.id));
   let group = toBlock.children.filter(e => groupIds.has(e.id));
-  group = layoutGroupAfterMove(group, newEntry, mousePositionX);
+  group = layoutGroupAfterMove(group, draftEntry, mousePositionX);
 
-  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== newEntry.id);
+  const otherChildren = toBlock.children.filter(e => !groupIds.has(e.id) && e.id !== draftEntry.id);
 
   return [
     layout([
-      ...entries.filter(e => e.id !== newEntry.id && e.id !== toBlock.id),
+      ...entries.filter(e => e.id !== draftEntry.id && e.id !== toBlock.id),
       {...toBlock, children: [...otherChildren, ...group]},
     ]),
     unscheduled.filter(e => e.id !== id),

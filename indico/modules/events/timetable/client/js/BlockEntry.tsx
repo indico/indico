@@ -50,6 +50,7 @@ export default function BlockEntry({
   transform,
   isDragging,
   renderChildren = true,
+  onMouseUp: _onMouseUp = () => {},
 }: DraggableBlockEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
   const dispatch = useDispatch();
@@ -130,6 +131,13 @@ export default function BlockEntry({
       styleName={`entry block ${renderChildren ? '' : 'simple'}`}
       style={style}
       ref={blockRef}
+      onMouseUp={() => {
+        if (isResizing || isDragging) {
+          return;
+        }
+
+        _onMouseUp();
+      }}
     >
       <div
         styleName="drag-handle"

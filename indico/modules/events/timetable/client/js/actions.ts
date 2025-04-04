@@ -5,8 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {TopLevelEntry, BlockEntry, BreakEntry, ChildBreakEntry, ContribEntry, ChildContribEntry} from './types';
+import {
+  TopLevelEntry,
+  BlockEntry,
+  BreakEntry,
+  ChildBreakEntry,
+  ContribEntry,
+  ChildContribEntry,
+} from './types';
 
+export const SET_DRAFT_ENTRY = 'Set draft entry';
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
 export const ADD_SESSION_DATA = 'Add session data';
@@ -35,6 +43,11 @@ export const CREATE_ENTRY = 'Create entry';
 export const EDIT_ENTRY = 'Edit entry';
 export const CLOSE_MODAL = 'Close modal';
 export const EXPERIMENTAL_TOGGLE_POPUPS = 'Experimental toggle popups';
+
+interface SetDraftEntryAction {
+  type: typeof SET_DRAFT_ENTRY;
+  data: TopLevelEntry | null;
+}
 
 interface ResizeEntryAction {
   type: typeof RESIZE_ENTRY;
@@ -96,7 +109,8 @@ export type Action =
   | UnscheduleEntryAction
   | CreateEntryAction
   | DeleteBreakAction
-  | DeleteBlockAction;
+  | DeleteBlockAction
+  | SetDraftEntryAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -108,6 +122,10 @@ export function setSessionData(data) {
 
 export function addSessionData(data) {
   return {type: ADD_SESSION_DATA, data};
+}
+
+export function setDraftEntry(data): SetDraftEntryAction {
+  return {type: SET_DRAFT_ENTRY, data};
 }
 
 export function moveEntry(date: string, entries: TopLevelEntry[]): MoveEntryAction {

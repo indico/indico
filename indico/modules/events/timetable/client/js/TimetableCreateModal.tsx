@@ -95,6 +95,13 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     duration: entry.duration * 60, // Minutes to seconds
     session_id: null,
     code: null,
+    ...entry,
+  };
+
+  const typeLongNames = {
+    [EntryType.Contribution]: Translate.string('Contribution'),
+    [EntryType.SessionBlock]: Translate.string('Session Block'),
+    [EntryType.Break]: Translate.string('Break'),
   };
 
   const sessions = useSelector(selectors.getSessions);
@@ -245,12 +252,6 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     }
   };
 
-  const btnNames = {
-    [EntryType.Contribution]: Translate.string('Contribution'),
-    [EntryType.SessionBlock]: Translate.string('Session Block'),
-    [EntryType.Break]: Translate.string('Break'),
-  };
-
   const meetsSubmitConditions = () => {
     // Allows to prevent submitting with pre-conditions, such as
     // not having any sessions available for session blocks. Can
@@ -272,7 +273,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       size="small"
       header={
         isEditing
-          ? Translate.string('Edit timetable entry')
+          ? `${Translate.string('Edit')} ${typeLongNames[entry.type]}`
           : Translate.string('Create new timetable entry')
       }
       noSubmitButton
@@ -302,7 +303,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
                   }}
                   color={activeForm === key ? 'blue' : undefined}
                 >
-                  {btnNames[key]}
+                  {typeLongNames[key]}
                 </Button>
               ))}
             </div>

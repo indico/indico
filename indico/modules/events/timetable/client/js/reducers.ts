@@ -27,6 +27,7 @@ interface Change {
 }
 
 interface Entries {
+  draftEntry: any | null;
   changes: Change[];
   currentChangeIdx: number;
   selectedId: number | null;
@@ -46,6 +47,7 @@ export interface ReduxState {
 export default {
   entries: (
     state: Entries = {
+      draftEntry: null,
       changes: [],
       currentChangeIdx: 0,
       selectedId: null,
@@ -55,6 +57,9 @@ export default {
     action: actions.Action
   ) => {
     switch (action.type) {
+      case actions.SET_DRAFT_ENTRY:
+        console.log('draftentry', action.data);
+        return {...state, draftEntry: action.data};
       case actions.SET_TIMETABLE_DATA: {
         const {dayEntries, unscheduled} = preprocessTimetableEntries(action.data, action.eventInfo);
         return {...state, changes: [{entries: layoutDays(dayEntries), unscheduled}]};

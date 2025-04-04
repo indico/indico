@@ -48,6 +48,7 @@ export default function ContributionEntry({
   column,
   maxColumn,
   setDuration: _setDuration,
+  onMouseUp: _onMouseUp = () => {},
   parentEndDt,
 }: DraggableEntryProps) {
   const {width, offset} = getWidthAndOffset(column, maxColumn);
@@ -110,8 +111,27 @@ export default function ContributionEntry({
   }, [isDragging, isResizing, blockRef]);
 
   return (
-    <div role="button" styleName={`entry ${type === 'break' ? 'break' : ''}`} style={style}>
-      <div styleName="drag-handle" ref={setNodeRef} {...listeners}>
+    <div
+      role="button"
+      styleName={`entry ${type === 'break' ? 'break' : ''}`}
+      style={style}
+      onMouseUp={() => {
+        if (isResizing || isDragging) {
+          return;
+        }
+
+        _onMouseUp();
+      }}
+    >
+      <div
+        styleName="drag-handle"
+        ref={setNodeRef}
+        {...listeners}
+        onClick={e => {
+          e.stopPropagation();
+          dispatch(actions.selectEntry(id));
+        }}
+      >
         <EntryTitle
           title={title}
           duration={duration}
