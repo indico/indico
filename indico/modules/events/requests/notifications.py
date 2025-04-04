@@ -66,17 +66,15 @@ def notify_new_modified_request(req, new):
 
 
 @email_sender
-def notify_withdrawn_request(req, *, email_event_managers, email_request_managers):
+def notify_withdrawn_request(req, email_event_managers):
     """Notify event managers and request managers about a withdrawn request.
 
     :param req: the :class:`Request`
     :param email_event_managers: if event managers should be notified
-    :param notify_request_managers: if request managers should be notified
     """
     if email_event_managers:
         yield notify_event_managers(req, 'withdrawn_to_event_managers.txt')
-    if email_request_managers:
-        yield notify_request_managers(req, 'withdrawn_to_request_managers.txt')
+    yield notify_request_managers(req, 'withdrawn_to_request_managers.txt')
 
 
 @email_sender

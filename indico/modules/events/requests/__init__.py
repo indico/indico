@@ -10,7 +10,6 @@ from flask import session
 from indico.core import signals
 from indico.modules.events.requests.base import RequestDefinitionBase, RequestFormBase
 from indico.modules.events.requests.util import get_request_definitions, is_request_manager
-from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -50,10 +49,7 @@ def _merge_users(target, source, **kwargs):
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
     from indico.modules.events.requests.models.requests import Request, RequestState
-
-    is_past_event = event.end_dt < now_utc()
-
     query = (Request.query.with_parent(event)
              .filter(Request.state.in_((RequestState.accepted, RequestState.pending))))
     for req in query:
-        req.definition.withdraw(req, notify_event_managers=False, notify_request_managers=(not is_past_event))
+        req.definition.withdraw(req, notify_event_managers=False)
