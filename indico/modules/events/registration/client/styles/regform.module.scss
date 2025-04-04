@@ -344,26 +344,6 @@
     }
   }
 
-  :global(.DateRangePickerInput__disabled) {
-    background: inherit;
-  }
-
-  :global(.DateRangePickerInput_calendarIcon)[disabled] {
-    visibility: hidden;
-  }
-
-  :global(.SingleDatePickerInput) {
-    border-radius: 4px;
-
-    & > :global(.DateInput) {
-      max-width: 130px;
-    }
-
-    & > button {
-      margin-left: 5px;
-    }
-  }
-
   :global(.rc-time-picker) {
     max-width: 110px;
   }
