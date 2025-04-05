@@ -71,7 +71,7 @@ const geometry = {
     delete this.initialPageYOffset;
 
     this.setAnchorGeometry();
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       this.getGeometry();
       callback();
     });
@@ -80,14 +80,14 @@ const geometry = {
     const scrollOffset = window.pageYOffset - this.initialPageYOffset;
     this.target.style.setProperty(
       '--target-top',
-      `clamp(0px, ${top - scrollOffset}px, calc(100% - ${this.targetHeight}px))`
+      `clamp(0.5em, ${top - scrollOffset}px, calc(100dvh - ${this.targetHeight}px - 0.5em))`
     );
   },
   setLeft(left) {
     const scrollOffset = window.pageXOffset - this.initialPageXOffset;
     this.target.style.setProperty(
       '--target-left',
-      `clamp(0px, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px))`
+      `clamp(0.5em, ${left - scrollOffset}px, calc(100% - ${this.targetWidth}px - 0.5em))`
     );
   },
 };
@@ -117,11 +117,6 @@ const verticalPreferBelowPosition = {
       this.setTop(this.anchorTop - this.targetHeight);
     }
   },
-};
-
-const unaligned = {
-  calculateAlignment() {},
-  setAlignment() {},
 };
 
 const verticalCenter = {
@@ -230,8 +225,9 @@ export const dropdownPositionStrategy = {
 export const popupPositionStrategy = {
   ...geometry,
   ...verticalPreferAbovePosition,
-  ...unaligned,
-  ...withoutArrow,
+  ...horizontalCenter,
+  ...withArrow,
+  ...verticalArrowPosition,
 };
 
 /**
@@ -274,12 +270,12 @@ export function position(target, anchor, strategy, callback) {
   // we are only interested in the client rect and not its other visual properties.
   target.toggleAttribute('data-position-check', true);
 
-  strategy.resetGeometry(() => {
-    strategy.calculateFit();
-    strategy.calculateAlignment();
-    target.removeAttribute('data-position-check');
-    adjustPosition();
-    requestAnimationFrame(() => {
+  setTimeout(() => {
+    strategy.resetGeometry(() => {
+      strategy.calculateFit();
+      strategy.calculateAlignment();
+      target.removeAttribute('data-position-check');
+      adjustPosition();
       callback?.(strategy.fitsPreferredDirection);
     });
   });

@@ -271,6 +271,7 @@ Internal Changes
 - ``renderAsFieldset`` option in the registration field registry can now be a function that
   returns a boolean (:pr:`6621`, thanks :user:`foxbunny`)
 - Allow overriding global theme settings for custom meeting themes (:pr:`6622`)
+- Add ``ind-with-popup`` custom element (:pr:`6801`, thanks :user:`foxbunny`)
 
 
 Version 3.3.4
