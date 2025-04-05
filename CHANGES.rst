@@ -18,6 +18,7 @@ Improvements
 - Notify room moderators about new pending bookings in their rooms (:pr:`6823`)
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
+- Add a new column in the editable list for the contribution tags (:pr:`6615`)
 
 Bugfixes
 ^^^^^^^^
