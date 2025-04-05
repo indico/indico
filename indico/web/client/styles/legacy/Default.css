@@ -653,30 +653,30 @@ div.invalid {
   z-index: 1000;
 }
 
-.settingsWidget {
-  padding: 0 5px 5px;
-  min-width: 250px;
+.settingsWidget[data-position-check],
+.settingsWidget[open] {
+  min-width: 24em;
 }
 
-.settingsWidget a,
-.protectionWidget a {
-  font-size: 12px !important;
+.settingsWidget > :first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 1em;
 }
 
-.settingsWidget .settingsWidgetSection,
-.protectionWidget .protectionWidgetSection {
-  padding: 10px 0 0;
-  text-align: justify;
-}
-
-.settingsWidget .settingsWidgetHeader {
+.settingsWidget .settingsWidgetHeading {
   font-weight: bold;
-  font-size: 14px;
+}
+
+.settingsWidget .settingsWidgetSubheading {
+  font-size: 87.5%;
 }
 
 .settingsWidget .settingsSeparator {
+  margin: 0.5em 0;
+
   border-bottom: 1px solid #ddd;
-  margin-bottom: 5px;
 }
 
 .protectionWidget {
