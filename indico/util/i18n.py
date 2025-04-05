@@ -72,7 +72,7 @@ def lazy_pgettext(context, string, plugin_name=None):
 
 def orig_string(lazy_string):
     """Get the original string from a lazy string."""
-    return lazy_string._args[0] if is_lazy_string(lazy_string) else lazy_string
+    return lazy_string._args[-1] if is_lazy_string(lazy_string) else lazy_string
 
 
 def smart_func(func_name, plugin_name=None):
