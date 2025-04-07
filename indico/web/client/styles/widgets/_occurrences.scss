@@ -11,6 +11,7 @@
   .occurrence {
     display: flex;
     align-items: center;
+    gap: 1em;
   }
 
   .occurrence + .occurrence {
@@ -24,7 +25,6 @@
   .rc-time-picker {
     width: 22%;
     vertical-align: top;
-    margin-left: 1em;
     color: $black;
     font-size: 1em;
   }
@@ -49,7 +49,6 @@
   .durationpicker {
     display: flex;
     align-items: center;
-    margin-left: 1em;
 
     input {
       min-width: unset !important;
