@@ -55,6 +55,12 @@ CustomElementBase.define(
       return this.querySelector('input').value;
     }
 
+    set value(value) {
+      const input = this.querySelector('input');
+      CustomElementBase.setValue(input, value ? formatDate(this.format, new Date(value)) : '');
+      input.dispatchEvent(new Event('input', {bubbles: true}));
+    }
+
     setup() {
       const indDatePicker = this;
       const id = `date-picker-${this.constructor.lastId++}`;

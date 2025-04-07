@@ -48,7 +48,8 @@ export default function WTFDateField({
 
   const updateDate = useCallback(
     (value, updatePicker = false) => {
-      const pickerInput = dateField.parentElement.querySelector('ind-date-picker > input');
+      const picker = dateField.parentElement.querySelector('ind-date-picker');
+      const pickerInput = picker.querySelector('input');
       if (value === INVALID) {
         // this typically happens when the user types something in the field that's not a
         // valid date (yet)
@@ -60,9 +61,7 @@ export default function WTFDateField({
         if (updatePicker) {
           // update the date picker's input, if the change was done programmatically, e.g. via
           // the clear button or linked fields
-          pickerInput.value = value ? toMoment(value, moment.HTML5_FMT.DATE).format('L') : '';
-          // let the date picker component update its calendar
-          pickerInput.dispatchEvent(new Event('input'));
+          picker.value = value ? serializeDate(toMoment(value, moment.HTML5_FMT.DATE)) : '';
         }
         pickerInput.setCustomValidity('');
         setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
