@@ -273,19 +273,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     cursor: default;
   }
 
-  .SingleDatePicker {
-    width: 170px;
-  }
-
-  .DayPicker_weekHeader_ul {
-    padding-left: 0 !important;
-    line-height: 1em;
-  }
-
-  .CalendarDay {
-    font-size: 1em;
-  }
-
   .timezone {
     @include icon-before('icon-earth');
     color: $light-black;

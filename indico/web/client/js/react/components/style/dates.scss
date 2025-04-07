@@ -5,37 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.ui.form input[type='text'].DateInput_input {
-  border: none;
-  text-align: center;
-}
-
-.DateInput_input[disabled] {
-  font-style: normal;
-}
-
-.ui.form input[type='text'].DateInput_input__small {
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-}
-
-.CalendarMonth_caption {
-  padding-top: 18px !important;
-  padding-bottom: 42px !important;
-}
-
-.DateRangePicker_picker,
-.SingleDatePicker_picker {
-  // ensure date pickers don't have SUI checkbox switches (z-index 3) in front of them
-  z-index: 4 !important;
-  line-height: normal;
-}
-
-.DateRangePicker_picker.DateRangePicker_picker__fullScreenPortal,
-.SingleDatePicker_picker.SingleDatePicker_picker__fullScreenPortal {
-  z-index: 1001 !important;
-}
-
 .datepicker-container {
   display: flex;
   justify-content: center;
