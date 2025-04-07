@@ -298,6 +298,12 @@ $dropdown-transition: $dropdown-transition-step ease-out;
   display: flex;
   gap: 1em;
   align-items: center;
+
+  .rc-time-picker {
+    // awful hack to make the slight size difference between the date and time picker
+    // pretty much invisible
+    align-self: flex-start;
+  }
 }
 
 .date-widget > span {

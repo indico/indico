@@ -10,7 +10,7 @@
 .occurrences-widget {
   .occurrence {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1em;
   }
 
@@ -85,6 +85,7 @@
   }
 
   .remove-occurrence {
+    align-self: center;
     font-size: 1.3em;
     vertical-align: sub;
 
