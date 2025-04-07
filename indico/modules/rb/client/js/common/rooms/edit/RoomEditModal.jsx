@@ -203,7 +203,7 @@ function RoomEditModal({roomId, locationId, onClose, afterCreation}) {
 
   const handleSubmit = async (data, form) => {
     const changedValues = getChangedValues(data, form);
-    const isAttributesDirty = form.getFieldState('attributes').dirty;
+    const isAttributesDirty = form.getFieldState('attributes')?.dirty;
     const {
       attributes,
       bookable_hours: bookableHours,
