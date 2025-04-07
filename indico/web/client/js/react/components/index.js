@@ -19,7 +19,6 @@ export {default as MessageBox} from './MessageBox';
 export {default as Modal} from './Modal';
 export {default as Paginator} from './Paginator';
 export {default as TooltipIfTruncated} from './TooltipIfTruncated';
-export {default as SingleDatePicker, FinalSingleDatePicker} from './dates/SingleDatePicker';
 export {default as DatePicker, FinalDatePicker} from './DatePicker';
 export {default as DateRangePicker, FinalDateRangePicker} from './DateRangePicker';
 export {default as CalendarSingleDatePicker} from './dates/CalendarSingleDatePicker';

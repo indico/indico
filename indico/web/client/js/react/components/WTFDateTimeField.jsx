@@ -5,16 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'react-dates/initialize';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 
-import {SingleDatePicker} from 'indico/react/components';
+import {DatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {toMoment} from 'indico/utils/date';
+import {serializeDate, toMoment} from 'indico/utils/date';
+
+import {INVALID} from './DatePicker';
 
 function triggerChange(id) {
   document.getElementById(id).dispatchEvent(new Event('change', {bubbles: true}));
@@ -34,15 +35,25 @@ export default function WTFDateTimeField({
   defaultTime,
   linkedField,
 }) {
+  // The hidden field that holds the date (in isoformat) which is used during form submission.
+  // It also contains the initial value coming from the WTForms field.
   const dateField = useMemo(() => document.getElementById(dateId), [dateId]);
   const timeField = useMemo(() => document.getElementById(timeId), [timeId]);
   const timezoneField = useMemo(() => document.getElementById(timezoneFieldId), [timezoneFieldId]);
+  // The hidden field containing the linked field's date.
   const linkedFieldDateElem = useMemo(
     () => linkedField && document.getElementById(`${linkedField.id}-datestorage`),
     [linkedField]
   );
+  // The moment object of the linked field's date.
+  const [linkedMoment, setLinkedMoment] = useState(
+    linkedFieldDateElem ? toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE) : null
+  );
+  // The currently selected valid date, or null if there isn't one.
+  const [date, setDate] = useState(
+    dateField.value ? toMoment(dateField.value, moment.HTML5_FMT.DATE) : null
+  );
   const [time, setTime] = useState(toMoment(timeField.value, 'HH:mm', true));
-  const [date, setDate] = useState(toMoment(dateField.value, 'DD/MM/YYYY', true));
   const [currentTimezone, setTimezone] = useState(timezone);
   const earliestMoment = earliest ? moment(earliest) : null;
   const latestMoment = latest ? moment(latest) : null;
@@ -60,14 +71,31 @@ export default function WTFDateTimeField({
   );
 
   const updateDate = useCallback(
-    value => {
-      if (value && timeField.value === '') {
-        updateTime(moment(defaultTime, 'HH:mm'));
+    (value, updatePicker = false) => {
+      const picker = dateField.parentElement.querySelector('ind-date-picker');
+      const pickerInput = picker.querySelector('input');
+      if (value === INVALID) {
+        // this typically happens when the user types something in the field that's not a
+        // valid date (yet)
+        dateField.value = '';
+        pickerInput.setCustomValidity(Translate.string('The entered date is invalid.'));
+        setDate(null);
+        timePickerRef.current.picker.required = false;
+      } else {
+        if (value && timeField.value === '') {
+          updateTime(moment(defaultTime, 'HH:mm'));
+        }
+        dateField.value = value || '';
+        if (updatePicker) {
+          // update the date picker's input, if the change was done programmatically, e.g. via
+          // the clear button or linked fields
+          picker.value = value ? serializeDate(toMoment(value, moment.HTML5_FMT.DATE)) : '';
+        }
+        pickerInput.setCustomValidity('');
+        setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
+        timePickerRef.current.picker.required = !!value;
       }
-      dateField.value = value ? value.format('DD/MM/YYYY') : '';
-      setDate(value);
       triggerChange(dateId);
-      timePickerRef.current.picker.required = value;
     },
     [dateField, timeField, dateId, defaultTime, updateTime]
   );
@@ -95,12 +123,13 @@ export default function WTFDateTimeField({
       return;
     }
     function handleDateChange() {
-      const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
+      const linkedDate = toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE);
+      setLinkedMoment(linkedDate);
       if (
-        (linkedField.notBefore && linkedDate.isAfter(date, 'day')) ||
-        (linkedField.notAfter && linkedDate.isBefore(date, 'day'))
+        (linkedField.notBefore && linkedDate?.isAfter(date, 'day')) ||
+        (linkedField.notAfter && linkedDate?.isBefore(date, 'day'))
       ) {
-        updateDate(linkedDate);
+        updateDate(serializeDate(linkedDate), true);
       }
     }
     linkedFieldDateElem.addEventListener('change', handleDateChange);
@@ -112,7 +141,7 @@ export default function WTFDateTimeField({
 
   const clearFields = () => {
     updateTime(null);
-    updateDate(null);
+    updateDate(null, true);
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
 
@@ -149,38 +178,24 @@ export default function WTFDateTimeField({
     [earliestMoment, latestMoment, date]
   );
 
-  const isOutsideRange = useCallback(
-    value => {
-      if (linkedField) {
-        const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
-        if (
-          (linkedField.notBefore && value.isBefore(linkedDate, 'day')) ||
-          (linkedField.notAfter && value.isAfter(linkedDate, 'day'))
-        ) {
-          return true;
-        }
-      }
-      return (
-        (earliestMoment && value.isBefore(earliestMoment, 'day')) ||
-        (latestMoment && value.isAfter(latestMoment, 'day'))
-      );
-    },
-    [earliestMoment, latestMoment, linkedField, linkedFieldDateElem]
-  );
+  const min =
+    linkedField?.notBefore && linkedMoment
+      ? serializeDate(linkedMoment)
+      : serializeDate(toMoment(earliest));
+  const max =
+    linkedField?.notAfter && linkedMoment
+      ? serializeDate(linkedMoment)
+      : serializeDate(toMoment(latest));
 
   return (
     <>
-      <SingleDatePicker
-        id=""
-        date={date}
-        onDateChange={updateDate}
-        placeholder={moment.localeData().longDateFormat('L')}
-        isOutsideRange={isOutsideRange}
+      <DatePicker
+        value={serializeDate(date)}
+        onChange={updateDate}
+        min={min}
+        max={max}
         required={!!time || required}
-        verticalSpacing={10}
-        showDefaultInputIcon={false}
         disabled={disabled}
-        noBorder
       />
       <TimePicker
         showSecond={false}
@@ -202,12 +217,9 @@ export default function WTFDateTimeField({
       />
       <i className="timezone" id={`${timeId}-timezone`} title={currentTimezone} />
       {(time || date) && allowClear && !disabled && (
-        <span
-          onClick={clearFields}
-          className="clear-pickers"
-          title={Translate.string('Clear date and time')}
-          ref={clearRef}
-        />
+        <button type="button" onClick={clearFields} className="clear-pickers" ref={clearRef}>
+          <Translate as="span">Clear date and time</Translate>
+        </button>
       )}
     </>
   );

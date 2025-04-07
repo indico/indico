@@ -10,7 +10,8 @@
 // cover.
 
 @mixin field-override {
-  .ui.form & {
+  .ui.form &,
+  & {
     @content;
   }
 }

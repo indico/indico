@@ -205,9 +205,9 @@ class IndicoDurationField(Field):
 class IndicoDateField(DateField):
     widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
 
-    def __init__(self, *args, **kwargs):
-        self.allow_clear = kwargs.pop('allow_clear', None)
-        super().__init__(*args, parse_kwargs={'dayfirst': True}, display_format='%d/%m/%Y', **kwargs)
+    def __init__(self, *args, allow_clear=None, **kwargs):
+        self.allow_clear = allow_clear
+        super().__init__(*args, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 
@@ -249,13 +249,13 @@ class IndicoDateTimeField(DateTimeField):
 
     widget = JinjaWidget('forms/datetime_widget.html', single_line=True, single_kwargs=True)
 
-    def __init__(self, *args, **kwargs):
-        self._timezone = kwargs.pop('timezone', None)
-        self.default_time = kwargs.pop('default_time', time(0, 0))
+    def __init__(self, *args, timezone=None, default_time=time(0, 0), allow_clear=None, **kwargs):
+        self._timezone = timezone
+        self.default_time = default_time
         self.date_missing = False
         self.time_missing = False
-        self.allow_clear = kwargs.pop('allow_clear', None)
-        super().__init__(*args, parse_kwargs={'dayfirst': True}, **kwargs)
+        self.allow_clear = allow_clear
+        super().__init__(*args, **kwargs)
         if self.allow_clear is None:
             self.allow_clear = not self.flags.required
 

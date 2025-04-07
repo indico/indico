@@ -5,14 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import 'react-dates/initialize';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 
-import {SingleDatePicker} from 'indico/react/components';
+import {DatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {toMoment} from 'indico/utils/date';
+import {serializeDate, toMoment} from 'indico/utils/date';
+
+import {INVALID} from './DatePicker';
 
 function triggerChange(id) {
   document.getElementById(id).dispatchEvent(new Event('change', {bubbles: true}));
@@ -27,20 +28,44 @@ export default function WTFDateField({
   latest,
   linkedField,
 }) {
+  // The hidden field that holds the date (in isoformat) which is used during form submission.
+  // It also contains the initial value coming from the WTForms field.
   const dateField = useMemo(() => document.getElementById(dateId), [dateId]);
+  // The hidden field containing the linked field's date.
   const linkedFieldDateElem = useMemo(
     () => linkedField && document.getElementById(`${linkedField.id}-datestorage`),
     [linkedField]
   );
-  const [date, setDate] = useState(toMoment(dateField.value, 'DD/MM/YYYY', true));
-  const earliestMoment = earliest ? moment(earliest) : null;
-  const latestMoment = latest ? moment(latest) : null;
+  // The moment object of the linked field's date.
+  const [linkedMoment, setLinkedMoment] = useState(
+    linkedFieldDateElem ? toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE) : null
+  );
+  // The currently selected valid date, or null if there isn't one.
+  const [date, setDate] = useState(
+    dateField.value ? toMoment(dateField.value, moment.HTML5_FMT.DATE) : null
+  );
   const clearRef = useRef(null);
 
   const updateDate = useCallback(
-    value => {
-      dateField.value = value ? value.format('DD/MM/YYYY') : '';
-      setDate(value);
+    (value, updatePicker = false) => {
+      const picker = dateField.parentElement.querySelector('ind-date-picker');
+      const pickerInput = picker.querySelector('input');
+      if (value === INVALID) {
+        // this typically happens when the user types something in the field that's not a
+        // valid date (yet)
+        dateField.value = '';
+        pickerInput.setCustomValidity(Translate.string('The entered date is invalid.'));
+        setDate(null);
+      } else {
+        dateField.value = value || '';
+        if (updatePicker) {
+          // update the date picker's input, if the change was done programmatically, e.g. via
+          // the clear button or linked fields
+          picker.value = value ? serializeDate(toMoment(value, moment.HTML5_FMT.DATE)) : '';
+        }
+        pickerInput.setCustomValidity('');
+        setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
+      }
       triggerChange(dateId);
     },
     [dateField, dateId]
@@ -51,12 +76,13 @@ export default function WTFDateField({
       return;
     }
     function handleDateChange() {
-      const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
+      const linkedDate = toMoment(linkedFieldDateElem.value, moment.HTML5_FMT.DATE);
+      setLinkedMoment(linkedDate);
       if (
-        (linkedField.notBefore && linkedDate.isAfter(date, 'day')) ||
-        (linkedField.notAfter && linkedDate.isBefore(date, 'day'))
+        (linkedField.notBefore && linkedDate?.isAfter(date, 'day')) ||
+        (linkedField.notAfter && linkedDate?.isBefore(date, 'day'))
       ) {
-        updateDate(linkedDate);
+        updateDate(serializeDate(linkedDate), true);
       }
     }
     linkedFieldDateElem.addEventListener('change', handleDateChange);
@@ -67,50 +93,27 @@ export default function WTFDateField({
   }, [date, linkedFieldDateElem, linkedField, updateDate]);
 
   const clearFields = () => {
-    updateDate(null);
+    updateDate(null, true);
     clearRef.current.dispatchEvent(new Event('indico:closeAutoTooltip'));
   };
 
-  const isOutsideRange = useCallback(
-    value => {
-      if (linkedField) {
-        const linkedDate = moment(linkedFieldDateElem.value, 'DD/MM/YYYY');
-        if (
-          (linkedField.notBefore && value.isBefore(linkedDate, 'day')) ||
-          (linkedField.notAfter && value.isAfter(linkedDate, 'day'))
-        ) {
-          return true;
-        }
-      }
-      return (
-        (earliestMoment && value.isBefore(earliestMoment, 'day')) ||
-        (latestMoment && value.isAfter(latestMoment, 'day'))
-      );
-    },
-    [earliestMoment, latestMoment, linkedField, linkedFieldDateElem]
-  );
+  const min = linkedField?.notBefore && linkedMoment ? serializeDate(linkedMoment) : earliest;
+  const max = linkedField?.notAfter && linkedMoment ? serializeDate(linkedMoment) : latest;
 
   return (
     <>
-      <SingleDatePicker
-        id=""
-        date={date}
-        onDateChange={updateDate}
-        placeholder={moment.localeData().longDateFormat('L')}
-        isOutsideRange={isOutsideRange}
+      <DatePicker
+        value={serializeDate(date)}
+        onChange={updateDate}
+        min={min}
+        max={max}
         required={required}
-        verticalSpacing={10}
-        showDefaultInputIcon={false}
         disabled={disabled}
-        noBorder
       />
       {date && allowClear && (
-        <span
-          onClick={clearFields}
-          className="clear-pickers"
-          title={Translate.string('Clear date')}
-          ref={clearRef}
-        />
+        <button type="button" onClick={clearFields} className="clear-pickers" ref={clearRef}>
+          <Translate as="span">Clear date</Translate>
+        </button>
       )}
     </>
   );

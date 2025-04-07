@@ -15,6 +15,7 @@ ind-date-picker {
   gap: var(--control-internal-gap);
   align-items: flex-start;
   position: relative;
+  width: fit-content;
 
   text-align: left;
 
@@ -52,8 +53,15 @@ ind-date-picker {
   }
 }
 
+.ui-widget ind-date-picker > button {
+  // the regular rule is not specific enough to override the font size change on `.ui-widget button`
+  // coming from the jquery ui theme css...
+  @extend %text-size-reset;
+}
+
 ind-date-range-picker {
   position: relative;
+  width: fit-content;
 
   text-align: left;
 
@@ -196,13 +204,16 @@ ind-calendar {
 
   .month-year :is(select, input[type='number']) {
     flex: 1;
+    background: var(--background-primary);
 
     @include sui_debt.field-override() {
       width: 2em;
-      padding: 0.5em;
+      padding: 0.5em !important;
+      border-width: 1px;
       border-radius: var(--control-border-radius);
       border-color: var(--control-border-color);
       -webkit-appearance: auto;
+      line-height: 1 !important;
 
       &:focus-visible {
         outline: revert;
@@ -254,6 +265,7 @@ ind-date-grid {
 
   [role='listbox'] {
     aspect-ratio: 7/6; // 7 cells across x 6 rows
+    min-width: 21em; // should match the width of the single picker when this property is not used
   }
 
   .weekdays {

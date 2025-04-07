@@ -24,7 +24,6 @@ import '../styles/editor-output.scss';
 import '../styles/tinymce.scss';
 import 'indico-sui-theme/semantic.css';
 import 'rc-time-picker/assets/index.css';
-import 'react-dates/lib/css/_datepicker.css';
 
 import showReactErrorDialog from 'indico/react/errors';
 
