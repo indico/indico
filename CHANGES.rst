@@ -37,6 +37,7 @@ Bugfixes
 - Fix error when removing the title of an event person (:pr:`6859`)
 - Fix participant visibility being set to "nobody" when a registration was modifified
   (:pr:`6863`)
+- Fix error when editing a room while no custom attributes have been defined (:pr:`6840`)
 
 Accessibility
 ^^^^^^^^^^^^^
