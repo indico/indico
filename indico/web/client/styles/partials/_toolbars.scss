@@ -270,21 +270,6 @@ $toolbar-spacing: 10px;
     }
   }
 
-  .switch {
-    height: 2.2em;
-
-    .switch-label {
-      line-height: 2.2em;
-
-      &::before,
-      &::after {
-        font-size: 1em;
-        font-weight: bold;
-        text-transform: initial;
-      }
-    }
-  }
-
   .group {
     @include toolbar-group();
   }
