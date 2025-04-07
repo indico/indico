@@ -12,7 +12,7 @@ import * as actions from './actions';
 import BlockEntry from './BlockEntry';
 import ContributionEntry from './ContributionEntry';
 import {useDraggable} from './dnd';
-import {TimetablePopup} from './entry_popups';
+import {TimetablePopup} from './EntryPopup';
 import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 

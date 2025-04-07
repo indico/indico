@@ -62,12 +62,6 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
     return obj;
   }, [entries, dispatch, dt]);
 
-  const onMouseUp = entry => {
-    // TODO: (Ajob) Replace this part with popup by Tomas
-    console.log('mouseup entry', entry);
-    dispatch(actions.setDraftEntry(entry));
-  };
-
   return (
     <>
       {entries.map(entry =>
@@ -76,18 +70,12 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
             key={entry.id}
             selected={selectedId === entry.id}
             // setDuration={setDuration}
-            onMouseUp={() => onMouseUp(entry)}
             setDuration={setDurations[entry.id]}
             setChildDuration={setChildDurations[entry.id]}
             {...entry}
           />
         ) : (
-          <DraggableEntry
-            key={entry.id}
-            setDuration={setDurations[entry.id]}
-            onMouseUp={() => onMouseUp(entry)}
-            {...entry}
-          />
+          <DraggableEntry key={entry.id} setDuration={setDurations[entry.id]} {...entry} />
         )
       )}
     </>

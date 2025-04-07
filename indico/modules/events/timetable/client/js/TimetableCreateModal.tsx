@@ -84,18 +84,17 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   const initialValues: DraftEntry = {
-    title: '',
-    description: '',
-    person_links: [],
-    keywords: [],
-    references: [],
+    title: entry.title || '',
+    description: entry.description || '',
+    person_links: entry.person_links || [],
+    keywords: entry.keywords || [],
+    references: entry.references || [],
     location_data: {inheriting: false},
-    conveners: [],
+    conveners: entry.conveners || [],
     start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
     duration: entry.duration * 60, // Minutes to seconds
-    session_id: null,
-    code: null,
-    ...entry,
+    session_id: entry.session_id || null,
+    code: entry.code || null,
   };
 
   const typeLongNames = {

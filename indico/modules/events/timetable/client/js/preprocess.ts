@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-import {ChildEntry, DayEntries, Session, UnscheduledContrib} from './types';
+import {ChildEntry, DayEntries, EntryType, Session, UnscheduledContrib} from './types';
 
 interface SchemaDate {
   date: string;
@@ -64,8 +64,6 @@ export function preprocessTimetableEntries(
     contributions?: {uniqueId: number; title: string; duration: number; sessionId: number}[];
   }
 ): {dayEntries: DayEntries; unscheduled: UnscheduledContrib[]} {
-  console.log('data', data);
-
   const dayEntries = {};
   for (const day in data) {
     dayEntries[day] = [];
@@ -77,7 +75,7 @@ export function preprocessTimetableEntries(
       dayEntries[day].push({
         type,
         id,
-        title: entry.title,
+        title: entry.slotTitle ? entry.slotTitle : entry.title,
         startDt: dateToMoment(entry.startDate),
         duration: entry.duration,
         x: 0,
@@ -91,14 +89,12 @@ export function preprocessTimetableEntries(
         dayEntries[day].at(-1).sessionId = entry.sessionId;
       }
 
-      if (type === 'break') {
+      if (type === EntryType.Break) {
         dayEntries[day].at(-1).backgroundColor = entry.color;
         dayEntries[day].at(-1).textColor = entry.textColor;
-      }
-
-      if (type === 'block') {
-        dayEntries[day].at(-1).title = entry.slotTitle;
+      } else if (type === EntryType.SessionBlock) {
         dayEntries[day].at(-1).sessionTitle = entry.title;
+        dayEntries[day].at(-1).title = entry.slotTitle;
 
         const children = Object.entries(entry.entries).map(
           ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
@@ -127,8 +123,6 @@ export function preprocessTimetableEntries(
       }
     }
   }
-
-  console.log('dayEntries', dayEntries);
 
   return {
     dayEntries,
