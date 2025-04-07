@@ -87,8 +87,10 @@ export default function WTFDateTimeField({
         dateField.value = value || '';
         if (updatePicker) {
           // update the date picker's input, if the change was done programmatically, e.g. via
-          // the clear button
+          // the clear button or linked fields
           pickerInput.value = value ? toMoment(value, moment.HTML5_FMT.DATE).format('L') : '';
+          // let the date picker component update its calendar
+          pickerInput.dispatchEvent(new Event('input'));
         }
         pickerInput.setCustomValidity('');
         setDate(value ? toMoment(value, moment.HTML5_FMT.DATE) : null);
