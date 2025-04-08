@@ -20,6 +20,8 @@ from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPMenuEdit, WPPage
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
+from indico.modules.logs import EventLogRealm, LogKind
+from indico.modules.logs.util import make_diff_log
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -69,6 +71,8 @@ class RHMenuToggleCustom(RHMenuBase):
         layout_settings.set(self.event, 'use_custom_menu', enabled)
         logger.info('Menu customization for %s %s by %s', self.event, 'enabled' if enabled else 'disabled',
                     session.user)
+        self.event.log(EventLogRealm.management, LogKind.change, 'Menu',
+                       f'Menu customization has been {'enabled' if enabled else 'disabled'}', session.user)
         return jsonify(enabled=enabled)
 
 
@@ -105,9 +109,30 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
                                     custom_title=self.entry.title is not None)
         form = form_cls(entry=self.entry, obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
+            old_title = self.entry.localized_title or self.entry.default_data.title
+            old_enable = self.entry.is_enabled
+            old_new_tab = self.entry.new_tab
+            old_link_url = self.entry.link_url
             form.populate_obj(self.entry, skip={'html', 'custom_title'})
+
+            log_fields = {'title': 'Title', 'is_enabled': 'Show', 'new_tab': 'New Tab'}
+            changes = {'title': (old_title, form.data['title']),
+                       'is_enabled': (old_enable, form.data['is_enabled']),
+                       'new_tab': (old_new_tab, form.data['new_tab'])}
+
             if self.entry.is_page:
+                log_fields['html'] = 'Content'
+                changes['html'] = (self.entry.page.html, form.html.data)
                 self.entry.page.html = form.html.data
+
+            if self.entry.is_link:
+                log_fields['link_url'] = 'URL'
+                changes['link_url'] = (old_link_url, form.data['link_url'])
+
+            self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
+                      f'{self.entry.type.title} Entry "{form.data['title']}" modified', session.user,
+                      data={'Changes': make_diff_log(changes, log_fields)})
+
             return jsonify_data(entry=_render_menu_entry(self.entry))
         return jsonify_form(form)
 
@@ -147,16 +172,25 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
                     raise BadRequest(f'New parent entry not found for Menu entry "{self.entry}".')
 
             self.entry.insert(parent_entry, position)
-
         else:
             self.entry.move(position)
 
+        log_msg = 'Separator Entry' if self.entry.is_separator else \
+            f'{self.entry.type.title} Entry "{self.entry.localized_title}"'
+        self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
+                       f"{log_msg} has been {'inserted' if parent_id != self.entry.parent_id else 'moved'} in "
+                       f"position {self.entry.position}", session.user)
         return jsonify_data(flash=False)
 
 
 class RHMenuEntryToggleEnabled(RHMenuEntryEditBase):
     def _process(self):
         self.entry.is_enabled = not self.entry.is_enabled
+        log_msg = 'Separator Entry' if self.entry.is_separator else \
+            f'{self.entry.type.title} Entry "{self.entry.localized_title}"'
+        self.entry.log(EventLogRealm.management, LogKind.positive if self.entry.is_enabled else LogKind.negative,
+                       'Menu Entry', f"{log_msg} visibility has been "
+                                     f"{'enabled' if self.entry.is_enabled else 'disabled'}", session.user)
         return jsonify(is_enabled=self.entry.is_enabled)
 
 
@@ -187,6 +221,8 @@ class RHMenuAddEntry(RHMenuBase):
             entry = MenuEntry(event=self.event, type=MenuEntryType.separator)
             db.session.add(entry)
             db.session.flush()
+            entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry', 'Separator Entry has been added',
+                      session.user)
             return jsonify_data(flash=False, entry=_render_menu_entry(entry))
 
         elif entry_type == MenuEntryType.user_link.name:
@@ -201,14 +237,27 @@ class RHMenuAddEntry(RHMenuBase):
         if form.validate_on_submit():
             entry = MenuEntry(event=self.event, type=MenuEntryType[entry_type])
             form.populate_obj(entry, skip={'html'})
+            log_fields = {'title': 'Title', 'is_enabled': 'Show', 'new_tab': 'New Tab'}
+            changes = {'title': ('', form.data['title']),
+                       'is_enabled': (None, form.data['is_enabled']),
+                       'new_tab': (None, form.data['new_tab'])}
 
             if entry.is_page:
                 page = EventPage(html=form.html.data)
                 self.event.custom_pages.append(page)
                 entry.page = page
+                log_fields['html'] = 'Content'
+                changes['html'] = ('', form.html.data)
+
+            if entry.is_link:
+                log_fields['link_url'] = 'URL'
+                changes['link_url'] = ('', form.data['link_url'])
 
             db.session.add(entry)
             db.session.flush()
+            entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
+                      f'{entry.type.title} Entry "{form.data['title']}" has been added', session.user,
+                      data={'Changes': make_diff_log(changes, log_fields)})
             return jsonify_data(entry=_render_menu_entry(entry))
         return jsonify_form(form)
 
@@ -236,6 +285,10 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
 
         db.session.delete(self.entry)
         db.session.flush()
+        log_msg = 'Separator Entry' if self.entry.is_separator else \
+            f'{self.entry.type.title} Entry "{self.entry.localized_title}"'
+        self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry', f'{log_msg} has been deleted',
+                       session.user)
 
         return jsonify_data(flash=False, menu=_render_menu_entries(self.event, connect_menu=True))
 
