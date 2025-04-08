@@ -414,6 +414,10 @@ class MenuEntry(MenuEntryMixin, ProtectionMixin, db.Model):
     def protection_parent(self):
         return self.parent or self.event_ref
 
+    def log(self, *args, **kwargs):
+        """Log with prefilled metadata for the entry."""
+        return self.event.log(*args, meta={'menu_entry_id': self.id}, **kwargs)
+
 
 class EventPage(db.Model):
     __tablename__ = 'pages'
