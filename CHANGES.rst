@@ -260,6 +260,8 @@ Accessibility
   keyboard support (:pr:`6621`, thanks :user:`foxbunny`)
 - Improve keyboard accessibility of the timetable sessions field in registration form (:pr:`6639`,
   thanks :user:`foxbunny`)
+- Improve keyboard focus for session bar popups (:pr:`6590`, thanks :user:`foxbunny`)
+- Improve screen reader support for protection details button (:pr:`6590`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
