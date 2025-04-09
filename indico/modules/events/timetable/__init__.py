@@ -38,8 +38,14 @@ def _extend_event_management_menu(sender, event, **kwargs):
     if not can_manage_sessions(session.user, event, 'ANY'):
         return
     if event.type != 'lecture':
-        return SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80,
+        yield SideMenuItem('timetable', _('Timetable'), url_for('timetable.management', event), weight=80,
                             icon='calendar')
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _extend_event_management_menu_old_timetable(sender, event, **kwargs):
+    yield SideMenuItem('old-timetable', _('Timetable (old)'), url_for('timetable.management-old', event),
+                       weight=79, icon='calendar')
 
 
 @signals.event_management.get_cloners.connect
