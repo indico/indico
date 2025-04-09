@@ -6,13 +6,14 @@
 // LICENSE file for more details.
 
 import createDecorator from 'final-form-calculate';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {Form, Input} from 'semantic-ui-react';
 
-import {DatePicker} from 'indico/react/components';
+import {DatePicker, FinalDatePicker} from 'indico/react/components';
 import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
@@ -119,6 +120,8 @@ export default function DateInput({
   isRequired,
   dateFormat,
   timeFormat,
+  minDate,
+  maxDate,
 }) {
   const friendlyDateFormat = dateFormat.replace(
     /%([HMdmY])/g,
@@ -127,6 +130,18 @@ export default function DateInput({
   const validateDateTime = dateTime => {
     if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
       return Translate.string('The provided date is invalid.');
+    }
+  };
+
+  const validateDateTimeWithMinMax = dateTime => {
+    if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
+      return Translate.string('The provided date is invalid.');
+    }
+    if (minDate && dateTime && dateTime < `${minDate}T00:00:00`) {
+      return Translate.string('The provided date cannot be earlier than {minDate}.', {minDate});
+    }
+    if (maxDate && dateTime && dateTime > `${maxDate}T00:00:00`) {
+      return Translate.string('The provided date cannot be later than {maxDate}.', {maxDate});
     }
   };
 
@@ -142,6 +157,8 @@ export default function DateInput({
         timeFormat={timeFormat}
         validate={validateDateTime}
         parse={v => v}
+        minDate={minDate}
+        maxDate={maxDate}
       />
     );
   } else {
@@ -184,7 +201,7 @@ export default function DateInput({
         placeholder={friendlyDateFormat}
         parse={parseDate}
         format={formatDate}
-        validate={validateDateTime}
+        validate={validateDateTimeWithMinMax}
       />
     );
   }
@@ -207,12 +224,16 @@ DateInput.propTypes = {
     '%Y',
   ]).isRequired,
   timeFormat: PropTypes.oneOf(['12h', '24h']),
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
 };
 
 DateInput.defaultProps = {
   disabled: false,
   isRequired: false,
   timeFormat: null,
+  minDate: undefined,
+  maxDate: undefined,
 };
 
 export const dateSettingsFormDecorator = createDecorator({
@@ -255,29 +276,90 @@ export function DateSettings() {
     {key: '24h', value: '24h', text: Translate.string('24 hours')},
   ];
   return (
-    <Form.Group widths="equal">
-      <FinalDropdown
-        name="dateFormat"
-        label={Translate.string('Date format')}
-        options={dateOptions}
-        required
-        selection
-        fluid
-      />
-      <Field name="dateFormat" subscription={{value: true}}>
-        {({input: {value: dateFormat}}) => (
-          <FinalDropdown
-            name="timeFormat"
-            label={Translate.string('Time format')}
-            options={timeOptions}
-            placeholder={Translate.string('None', 'Time format')}
-            disabled={!dateFormat.includes('%d')}
-            parse={p.nullIfEmpty}
-            selection
-            fluid
-          />
-        )}
-      </Field>
-    </Form.Group>
+    <>
+      <Form.Group widths="equal">
+        <FinalDropdown
+          name="dateFormat"
+          label={Translate.string('Date format')}
+          options={dateOptions}
+          required
+          selection
+          fluid
+        />
+        <Field name="dateFormat" subscription={{value: true}}>
+          {({input: {value: dateFormat}}) => (
+            <FinalDropdown
+              name="timeFormat"
+              label={Translate.string('Time format')}
+              options={timeOptions}
+              placeholder={Translate.string('None', 'Time format')}
+              disabled={!dateFormat.includes('%d')}
+              parse={p.nullIfEmpty}
+              selection
+              fluid
+            />
+          )}
+        </Field>
+      </Form.Group>
+      <Form.Group widths="equal">
+        <Field name="maxDate" subscription={{value: true}}>
+          {({input: {value: maxDate}}) => (
+            <FinalDatePicker
+              name="minDate"
+              label={Translate.string('Minimum date')}
+              max={maxDate.split('T')[0]}
+              parse={date => {
+                return date ? `${date}T00:00:00` : '';
+              }}
+            />
+          )}
+        </Field>
+        <Field name="minDate" subscription={{value: true}}>
+          {({input: {value: minDate}}) => (
+            <FinalDatePicker
+              name="maxDate"
+              label={Translate.string('Maximum date')}
+              min={minDate.split('T')[0]}
+              parse={date => {
+                return date ? `${date}T00:00:00` : '';
+              }}
+            />
+          )}
+        </Field>
+      </Form.Group>
+    </>
   );
+}
+
+export function DateSettingsFormValidator({minDate, maxDate, dateFormat}) {
+  if (minDate && maxDate && dateFormat) {
+    if (
+      ['%m/%Y', '%m.%Y'].includes(dateFormat) &&
+      !moment(minDate)
+        .add(1, 'month')
+        .isSameOrBefore(moment(maxDate))
+    ) {
+      const msg = Translate.string(
+        'The minimum and maximum dates must be at least one month apart for the selected date format.'
+      );
+      return {
+        minDate: msg,
+        maxDate: msg,
+      };
+    }
+    if (
+      dateFormat === '%Y' &&
+      !moment(minDate)
+        .add(1, 'year')
+        .isSameOrBefore(moment(maxDate))
+    ) {
+      const msg = Translate.string(
+        'The minimum and maximum dates must be at least one year apart for the selected date format.'
+      );
+      return {
+        minDate: msg,
+        maxDate: msg,
+      };
+    }
+  }
 }
