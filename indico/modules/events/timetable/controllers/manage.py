@@ -27,7 +27,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
                                                         delete_timetable_entry, update_timetable_entry)
 from indico.modules.events.timetable.schemas import BreakSchema, TimetableEntrySchema
 from indico.modules.events.timetable.util import render_entry_info_balloon
-from indico.modules.events.timetable.views import WPManageTimetable
+from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableOld
 from indico.modules.events.util import should_show_draft_warning, track_time_changes
 from indico.web.args import use_args_schema_context
 from indico.web.forms.colors import get_colors
@@ -42,7 +42,20 @@ class RHManageTimetable(RHManageTimetableBase):
     def _process(self):
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
-        return WPManageTimetable.render_template('management.html', self.event, event_info=event_info,
+        return WPManageTimetable.render_template('management_new.html', self.event, event_info=event_info,
+                                                 show_draft_warning=should_show_draft_warning(self.event),
+                                                 timetable_data=timetable_data)
+
+
+class RHManageTimetableOld(RHManageTimetableBase):
+    """Display timetable management page."""
+
+    session_management_level = SessionManagementLevel.coordinate
+
+    def _process(self):
+        event_info = serialize_event_info(self.event)
+        timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
+        return WPManageTimetableOld.render_template('management.html', self.event, event_info=event_info,
                                                  show_draft_warning=should_show_draft_warning(self.event),
                                                  timetable_data=timetable_data)
 
