@@ -38,11 +38,12 @@ export default function BlockEntry({
   title,
   sessionTitle,
   sessionId,
+  conveners,
   selected,
   y,
   column,
   maxColumn,
-  children: _children,
+  children: _children = [],
   setDuration: _setDuration,
   setChildDuration,
   listeners,
@@ -69,6 +70,9 @@ export default function BlockEntry({
         transform: `translate3d(${transform.x}px, ${snapPixels(transform.y)}px, 0)`,
       }
     : {};
+  renderChildren = renderChildren && _children.length > 0;
+
+  // console.log('convene me', conveners);
   style = {
     ...style,
     position: 'absolute',
@@ -107,7 +111,7 @@ export default function BlockEntry({
     startDt: moment(child.startDt)
       .add(deltaMinutes, 'minutes')
       .format(),
-  }));
+  })) ?? [];
 
   // const makeSetDuration = (id: number) => (d: number) => setChildDuration(id, d);
   // const setChildDuration = useCallback(() => {}, [])
@@ -167,7 +171,7 @@ export default function BlockEntry({
               <DraggableEntry
                 key={child.id}
                 selected={false}
-                setDuration={setChildDurations[child.id]}
+                setDuration={_children ? setChildDurations[child.id] : null}
                 blockRef={blockRef}
                 parentEndDt={moment(startDt)
                   .add(deltaMinutes + duration, 'minutes')

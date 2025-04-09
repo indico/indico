@@ -17,7 +17,7 @@ import {createRestrictToCalendar} from './dnd/modifiers';
 import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
-import TimetableCreateModal from './TimetableCreateModal';
+import TimetableManageModal from './TimetableManageModal';
 import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
@@ -310,7 +310,7 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
                 </div>
               )}
               {!isDragging && draftEntry && (
-                <TimetableCreateModal
+                <TimetableManageModal
                   eventId={eventId}
                   onClose={() => {
                     dispatch(actions.setDraftEntry(null));

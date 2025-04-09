@@ -74,8 +74,6 @@ function TimetablePopupContent({
     dispatch(actions.setDraftEntry(draftEntry));
   };
 
-  console.log(entry);
-
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
       <Card.Content>
@@ -119,7 +117,7 @@ function TimetablePopupContent({
             <div>{title}</div>
           </div>
         </Card.Header>
-        {/* <div>{entry}</div> */}
+        {/* TODO: (Ajob) Replace dummy data below */}
         <CardItem icon="clock outline">{formatTimeRange('en', startTime, endTime)}</CardItem>
         <CardItem icon="map marker alternate">Room 101</CardItem>
         {type !== EntryType.Break && (

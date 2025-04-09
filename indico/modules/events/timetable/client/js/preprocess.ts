@@ -22,6 +22,7 @@ interface SchemaEntry {
   textColor?: string;
   color?: string;
   slotTitle?: string;
+  conveners?: any[];
 }
 
 interface SchemaSession extends SchemaEntry {
@@ -83,6 +84,8 @@ export function preprocessTimetableEntries(
         width: 0,
         column: 0,
         maxColumn: 0,
+        conveners: entry.conveners,
+        // TODO: (Ajob) Get other attributes such as person_links
       });
 
       if (entry.sessionId) {

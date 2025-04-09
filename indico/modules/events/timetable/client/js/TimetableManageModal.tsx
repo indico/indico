@@ -56,7 +56,7 @@ interface DraftEntry {
 }
 
 // Prop interface
-interface TimetableCreateModalProps {
+interface TimetableManageModalProps {
   eventId: number;
   // TODO: (Ajob) Replace with proper passed entry, probably define it higher in hierarchy
   entry: any;
@@ -64,7 +64,7 @@ interface TimetableCreateModalProps {
   onSubmit?: () => void;
 }
 
-const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
+const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   eventId,
   entry,
   onClose = () => null,
@@ -92,7 +92,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     location_data: {inheriting: false},
     conveners: entry.conveners || [],
     start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
-    duration: entry.duration * 60, // Minutes to seconds
+    duration: entry.duration, // Minutes to seconds
     session_id: entry.session_id || null,
     code: entry.code || null,
   };
@@ -123,7 +123,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     ),
     [EntryType.SessionBlock]: sessionValues.length ? (
       <>
-        <SessionSelect sessions={sessionValues} required />
+        {!isEditing && <SessionSelect sessions={sessionValues} required />}
         <SessionBlockFormFields eventId={eventId} extraOptions={extraOptions} />
       </>
     ) : (
@@ -152,10 +152,9 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
       type: rawType,
       start_dt: startDt,
       id,
-      object: {title, duration: rawDuration, colors, session_id: sessionId},
+      object: {title, duration, colors, session_id: sessionId},
     } = data;
 
-    const duration = rawDuration / 60; // Seconds to minutes
     const type = {
       BREAK: EntryType.Break,
       CONTRIBUTION: EntryType.Contribution,
@@ -185,7 +184,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     return mappedObj;
   };
 
-  const _handleSubmitContribution = async data => {
+  const _handleCreateContribution = async data => {
     data = _.pick(data, [
       'title',
       'duration',
@@ -201,7 +200,7 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
     return await indicoAxios.post(contributionCreateURL({event_id: eventId}), data);
   };
 
-  const _handleSubmitSessionBlock = async data => {
+  const _handleCreateSessionBlock = async data => {
     // data = _.omitBy(data, 'conveners'); // TODO person links
     // data.conveners = [];
     data = _.pick(data, [
@@ -218,17 +217,38 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   };
 
   // TODO: Implement logic for breaks
-  const _handleSubmitBreak = async data => {
+  const _handleCreateBreak = async data => {
     data = _.pick(data, ['title', 'duration', 'location_data', 'inheriting', 'start_dt', 'colors']);
     return await indicoAxios.post(breakCreateURL({event_id: eventId}), data);
   };
 
+  const _handleEditContribution = async data => {
+    // TODO: (Ajob) Implement edit contribution
+    return data;
+  };
+
+  const _handleEditSessionBlock = async data => {
+    // TODO: (Ajob) Implement edit session block
+    return data;
+  };
+
+  const _handleEditBreak = async data => {
+    // TODO: (Ajob) Implement edit break
+    return data;
+  };
+
   const handleSubmit = async data => {
-    const submitHandlers = {
-      [EntryType.Contribution]: _handleSubmitContribution,
-      [EntryType.SessionBlock]: _handleSubmitSessionBlock,
-      [EntryType.Break]: _handleSubmitBreak,
-    };
+    const submitHandlers = isEditing
+      ? {
+          [EntryType.Contribution]: _handleEditContribution,
+          [EntryType.SessionBlock]: _handleEditSessionBlock,
+          [EntryType.Break]: _handleEditBreak,
+        }
+      : {
+          [EntryType.Contribution]: _handleCreateContribution,
+          [EntryType.SessionBlock]: _handleCreateSessionBlock,
+          [EntryType.Break]: _handleCreateBreak,
+        };
 
     const submitHandler = submitHandlers[activeForm];
 
@@ -315,4 +335,4 @@ const TimetableCreateModal: React.FC<TimetableCreateModalProps> = ({
   );
 };
 
-export default TimetableCreateModal;
+export default TimetableManageModal;
