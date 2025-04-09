@@ -25,7 +25,8 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
 from indico.modules.events.timetable.controllers.manage import (RHAPICreateBreak, RHAPICreateContribution,
                                                                 RHAPICreateSessionBlock, RHCloneContribution,
                                                                 RHManageSessionTimetable, RHManageTimetable,
-                                                                RHManageTimetableEntryInfo, RHTimetableREST)
+                                                                RHManageTimetableEntryInfo, RHManageTimetableOld,
+                                                                RHTimetableREST)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -35,6 +36,7 @@ _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtua
 
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
+_bp.add_url_rule('/manage/old-timetable/', 'management-old', RHManageTimetableOld)
 _bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
 _bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
 _bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
