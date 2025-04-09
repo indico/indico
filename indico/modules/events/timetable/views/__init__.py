@@ -43,6 +43,10 @@ class WPManageTimetable(MathjaxMixin, WPEventManagement):
         WPEventManagement.__init__(self, rh, event_, custom_links=custom_links, **kwargs)
 
 
+class WPManageTimetableOld(WPManageTimetable):
+    sidemenu_option = 'old-timetable'
+
+
 class WPDisplayTimetable(WPConferenceDisplayBase):
     template_prefix = 'events/timetable/'
     menu_entry_name = 'timetable'
