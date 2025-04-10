@@ -23,9 +23,10 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableShiftEntries,
                                                                 RHLegacyTimetableSwapEntries)
 from indico.modules.events.timetable.controllers.manage import (RHAPICreateBreak, RHAPICreateContribution,
-                                                                RHAPICreateSessionBlock, RHCloneContribution,
-                                                                RHManageSessionTimetable, RHManageTimetable,
-                                                                RHManageTimetableEntryInfo, RHTimetableREST)
+                                                                RHAPICreateSessionBlock, RHAPIEditEntryTime,
+                                                                RHCloneContribution, RHManageSessionTimetable,
+                                                                RHManageTimetable, RHManageTimetableEntryInfo,
+                                                                RHTimetableREST)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -72,6 +73,7 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
 _bp.add_url_rule('/api/breaks/create', 'api_create_break', RHAPICreateBreak, methods=('POST',))
 _bp.add_url_rule('/api/contrib/create', 'api_create_contrib', RHAPICreateContribution, methods=('POST',))
 _bp.add_url_rule('/api/session-block/create', 'api_create_session_block', RHAPICreateSessionBlock, methods=('POST',))
+_bp.add_url_rule('/api/entry/<int:entry_id>/edit/time', 'api_edit_entry_time', RHAPIEditEntryTime, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

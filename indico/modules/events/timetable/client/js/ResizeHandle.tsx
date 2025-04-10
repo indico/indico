@@ -5,16 +5,44 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {MouseEvent as SyntheticMouseEvent} from 'react';
+import editEntryTimeURL from 'indico-url:timetable.api_edit_entry_time';
 
+import React, {MouseEvent as SyntheticMouseEvent} from 'react';
+import {useSelector} from 'react-redux';
+
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
+import * as selectors from './selectors';
 import {minutesToPixels, pixelsToMinutes} from './utils';
 
 import './DayTimetable.module.scss';
 
 const gridSize = minutesToPixels(5);
 
+async function updateEntryTime(
+  id: number,
+  eventId: number,
+  startDt: moment.Moment,
+  duration: number
+) {
+  const url = editEntryTimeURL({entry_id: id, event_id: eventId});
+  const data = {
+    start_dt: startDt.format('YYYY-MM-DD HH:mm:ss'),
+    end_dt: startDt
+      .clone()
+      .add(duration, 'minutes')
+      .format('YYYY-MM-DD HH:mm:ss'),
+  };
+  try {
+    await indicoAxios.post(url, data);
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}
+
 export default function ResizeHandle({
   id,
+  startDt,
   forBlock = false,
   duration,
   minDuration = 10,
@@ -25,6 +53,7 @@ export default function ResizeHandle({
   setIsResizing,
 }: {
   id: number;
+  startDt: moment.Moment;
   forBlock: boolean;
   duration: number;
   minDuration?: number;
@@ -34,6 +63,7 @@ export default function ResizeHandle({
   setGlobalDuration: (d: number) => void;
   setIsResizing: (b: boolean) => void;
 }) {
+  const {eventId} = useSelector(selectors.getStaticData);
   function resizeHandler(e: SyntheticMouseEvent) {
     e.stopPropagation();
     resizeStartRef.current = e.clientY;
@@ -79,9 +109,11 @@ export default function ResizeHandle({
       if (maxDuration !== undefined) {
         newDuration = Math.min(newDuration, maxDuration);
       }
-      console.log('id', id);
-      console.log('newDuration', newDuration);
-      setGlobalDuration(newDuration);
+
+      if (newDuration !== duration) {
+        updateEntryTime(id, eventId, startDt, newDuration);
+        setGlobalDuration(newDuration);
+      }
       setIsResizing(false);
     };
 
