@@ -158,13 +158,14 @@ CustomElementBase.define(
         }
       });
 
-      this.addEventListener(
+      indSelect.addEventListener(
         'pointerdown',
         () => {
+          clearTimeout(indSelect._clearImmediateCloseFlagTimer);
           indSelect._noImmediateClose = true;
-          setTimeout(() => {
+          indSelect._clearImmediateCloseFlagTimer = setTimeout(() => {
             delete indSelect._noImmediateClose;
-          }, 200);
+          }, 500);
         },
         {passive: true}
       );
