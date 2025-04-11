@@ -67,10 +67,10 @@ function TimetablePopupContent({
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+  const draftEntry = {...entry, duration: entry.duration};
 
   const onEdit = () => {
     onClose();
-    const draftEntry = {...entry};
     dispatch(actions.setDraftEntry(draftEntry));
   };
 

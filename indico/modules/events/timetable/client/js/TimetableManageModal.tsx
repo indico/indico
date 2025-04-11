@@ -47,7 +47,6 @@ interface DraftEntry {
   location_data: object;
   start_dt: Date;
   person_links?: any[];
-  conveners?: any[];
   description?: string;
   colors?: EntryColors;
   session_id?: number;
@@ -73,7 +72,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const dispatch = useDispatch();
 
   const isEditing = !!entry.id;
-
   const personLinkFieldParams = {
     allowAuthors: true,
     canEnterManually: true,
@@ -90,9 +88,8 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     keywords: entry.keywords || [],
     references: entry.references || [],
     location_data: {inheriting: false},
-    conveners: entry.conveners || [],
     start_dt: entry.startDt.format('YYYY-MM-DDTHH:mm:ss'),
-    duration: entry.duration, // Minutes to seconds
+    duration: entry.duration * 60, // Minutes to seconds
     session_id: entry.session_id || null,
     code: entry.code || null,
   };
@@ -145,7 +142,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   // TODO: (Ajob) Implement properly in next issue on editing existing entries
-  const [activeForm, setActiveForm] = useState(isEditing ? entry['type'] : Object.keys(forms)[0]);
+  const [activeForm, setActiveForm] = useState(isEditing ? entry.type : Object.keys(forms)[0]);
 
   const _mapDataToEntry = (data): TopLevelEntry => {
     const {

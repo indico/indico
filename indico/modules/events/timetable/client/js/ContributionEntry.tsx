@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Icon} from 'semantic-ui-react';
+import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -17,7 +17,7 @@ import { DraggableEntry } from './Entry';
 import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
-import {ContribEntry, BreakEntry} from './types';
+import {ContribEntry, BreakEntry, EntryType, BlockEntry} from './types';
 import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes} from './utils';
 import './ContributionEntry.module.scss';
 import './DayTimetable.module.scss';
@@ -28,7 +28,7 @@ interface _DraggableEntryProps {
   parentEndDt?: moment.Moment;
 }
 
-type DraggableEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry);
+type DraggableEntryProps = _DraggableEntryProps & (ContribEntry | BreakEntry | BlockEntry);
 
 export default function ContributionEntry({
   type,
@@ -40,6 +40,7 @@ export default function ContributionEntry({
   sessionId,
   textColor,
   backgroundColor,
+  conveners,
   selected,
   y,
   listeners,
@@ -92,9 +93,6 @@ export default function ContributionEntry({
         : '#5b1aff',
     color: textColor ? textColor : sessionData ? sessionData.textColor : undefined,
   };
-
-  console.log(isChild);
-  console.log('BG COLOR', backgroundColor);
 
   const deltaMinutes = snapMinutes(pixelsToMinutes(transform ? transform.y : 0));
   const newStart = moment(startDt).add(deltaMinutes, 'minutes');
@@ -156,6 +154,11 @@ export default function ContributionEntry({
     >
       <div
         styleName="drag-handle"
+        style={{
+          cursor: isResizing ? undefined : isDragging ? 'grabbing' : 'grab',
+          display: 'flex',
+          padding: 0,
+        }}
         ref={setNodeRef}
         {...listeners}
         onClick={e => {
@@ -167,7 +170,7 @@ export default function ContributionEntry({
           title={title}
           duration={duration}
           timeRange={timeRange}
-          isBreak={type === 'break'}
+          type={type}
         />
         {children.length ? (
           <div
@@ -210,14 +213,21 @@ export function EntryTitle({
   title,
   duration,
   timeRange,
-  isBreak = false,
+  type,
 }: {
   title: string;
   duration: number;
   timeRange: string;
-  isBreak: boolean;
+  type: EntryType;
 }) {
-  const icon = isBreak ? <Icon name="coffee" style={{marginRight: 10}} /> : null;
+
+  const iconName = {
+    [EntryType.Break]: 'coffee',
+    [EntryType.Contribution]: 'file alternate outline',
+    [EntryType.SessionBlock]: 'calendar alternate outline',
+  }[type] as SemanticICONS;
+
+  const icon = iconName ? <Icon name={iconName} style={{marginRight: 10}} /> : null;
 
   if (duration <= 12) {
     return <TinyTitle title={title} timeRange={timeRange} icon={icon} />;

@@ -18,7 +18,7 @@ import {DraggableBlockEntry, DraggableEntry} from './Entry';
 import {computeYoffset, getGroup, layout, layoutGroup, layoutGroupAfterMove} from './layout';
 import * as selectors from './selectors';
 import TimetableManageModal from './TimetableManageModal';
-import {TopLevelEntry, BlockEntry, Entry, isChildEntry} from './types';
+import {TopLevelEntry, BlockEntry, Entry, isChildEntry, EntryType} from './types';
 import UnscheduledContributions from './UnscheduledContributions';
 import {GRID_SIZE_MINUTES, minutesToPixels, pixelsToMinutes, snapMinutes} from './utils';
 
@@ -65,7 +65,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
   return (
     <>
       {entries.map(entry =>
-        entry.type === 'block' ? (
+        entry.type === EntryType.SessionBlock ? (
           <DraggableBlockEntry
             key={entry.id}
             selected={selectedId === entry.id}
@@ -402,7 +402,7 @@ function layoutAfterDropOnCalendar(
     // If we didn't find the entry in the top level,
     // it must be a break inside a session block.
     fromBlock = entries
-      .filter(e => e.type === 'block')
+      .filter(e => e.type === EntryType.SessionBlock)
       .find(b => b.children.find(c => c.id === id));
 
     if (!fromBlock) {
@@ -410,12 +410,12 @@ function layoutAfterDropOnCalendar(
     }
 
     fromEntry = fromBlock.children.find(c => c.id === id);
-    if (!fromEntry || fromEntry.type !== 'break') {
+    if (!fromEntry || fromEntry.type !== EntryType.Break) {
       return;
     }
   }
 
-  if (fromEntry.type === 'contrib' && fromEntry.sessionId) {
+  if (fromEntry.type === EntryType.Contribution && fromEntry.sessionId) {
     return; // contributions with sessions assigned cannot be scheduled at the top level
   }
 
@@ -433,7 +433,7 @@ function layoutAfterDropOnCalendar(
     delete draftEntry.parentId;
   }
 
-  if (draftEntry.type === 'block') {
+  if (draftEntry.type === EntryType.SessionBlock) {
     draftEntry.children = draftEntry.children.map(e => ({
       ...e,
       startDt: moment(e.startDt).add(deltaMinutes, 'minutes'),
@@ -482,12 +482,12 @@ function layoutAfterDropOnBlock(
   const overId = parseInt(over.id, 10);
   const toBlock = entries.find(e => e.id === overId);
 
-  if (!toBlock || toBlock.type !== 'block') {
+  if (!toBlock || toBlock.type !== EntryType.SessionBlock) {
     return;
   }
 
   const fromBlock = entries
-    .filter(e => e.type === 'block')
+    .filter(e => e.type === EntryType.SessionBlock)
     .find(entry => !!entry.children.find(c => c.id === id));
 
   const {y} = delta;
@@ -508,7 +508,7 @@ function layoutAfterDropOnBlock(
     return;
   }
 
-  if (fromEntry.type === 'contrib') {
+  if (fromEntry.type === EntryType.Contribution) {
     if (!fromEntry.sessionId) {
       // Allow top level contributions being dropped on blocks to be treated as if they
       // were dropped directly on the calendar instead
@@ -517,7 +517,7 @@ function layoutAfterDropOnBlock(
     if (fromEntry.sessionId !== toBlock.sessionId) {
       return; // contributions cannot be moved to blocks of different sessions
     }
-  } else if (fromEntry.type === 'block') {
+  } else if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
     return layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
@@ -601,7 +601,7 @@ function layoutAfterUnscheduledDrop(
     return;
   }
 
-  if (entry.type !== 'contrib') {
+  if (entry.type !== EntryType.Contribution) {
     return;
   }
 
@@ -641,7 +641,7 @@ function layoutAfterUnscheduledDropOnBlock(
   const id = parseInt(who.slice('unscheduled-'.length), 10);
   const overId = parseInt(over.id, 10);
   const toBlock = entries.find(e => e.id === overId);
-  if (toBlock.type !== 'block') {
+  if (toBlock.type !== EntryType.SessionBlock) {
     return;
   }
   const deltaMinutes = 0;
@@ -657,7 +657,7 @@ function layoutAfterUnscheduledDropOnBlock(
     return;
   }
 
-  if (entry.type !== 'contrib') {
+  if (entry.type !== EntryType.Contribution) {
     return;
   }
 
