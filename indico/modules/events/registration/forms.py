@@ -786,7 +786,7 @@ class RegistrationCheckTypeForm(IndicoForm):
 class RegistrationChecksAssignForm(IndicoForm):
     """Form to perform bulk check on registrations."""
 
-    check_type = SelectField(_('Check'), [DataRequired()])
+    check_type_id = SelectField(_('Check'), [DataRequired()])
     registration_id = HiddenFieldList()
     submitted = HiddenField()
 
@@ -794,7 +794,7 @@ class RegistrationChecksAssignForm(IndicoForm):
         super().__init__(**kwargs)
         check_types = (event.check_types +
                        RegistrationCheckType.query.filter(RegistrationCheckType.is_system_defined).all())
-        self.check_type.choices = [(str(check_type.id), check_type.title) for check_type in check_types]
+        self.check_type_id.choices = [(str(check_type.id), check_type.title) for check_type in check_types]
 
     def is_submitted(self):
         return super().is_submitted() and 'submitted' in request.form

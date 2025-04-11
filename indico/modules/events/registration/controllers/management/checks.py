@@ -172,16 +172,18 @@ class RHRegistrationBulkCheck(RHRegistrationsActionBase):
         'is_check_out': fields.Bool(load_default=False),
     }, location='query')
     def _process(self, is_check_out):
-        form = RegistrationChecksAssignForm(self.event, check_type=self.event.default_check_type_id,
+        form = RegistrationChecksAssignForm(self.event, check_type_id=self.event.default_check_type_id,
                                             registration_id=[r.id for r in self.registrations])
         submit_text = _('Check-out') if is_check_out else _('Check-in')
         if form.validate_on_submit():
             action = 'Checked-out' if is_check_out else 'Checked-in'
+            check_type = RegistrationCheckType.query.get_or_404(form.check_type_id.data)
             for registration in self.registrations:
                 if registration.state not in (RegistrationState.complete, RegistrationState.unpaid):
                     continue
                 try:
-                    create_registration_check(registration, is_check_out=is_check_out, checked_by_user=session.user)
+                    create_registration_check(registration, check_type=check_type, is_check_out=is_check_out,
+                                              checked_by_user=session.user)
                 except ValueError:
                     pass
             flash(_('Selected registrations marked as {} successfully.').format(action), 'success')
