@@ -10,7 +10,7 @@
         <input type="hidden" name="{{ field.name }}" id="{{ field.id }}-timestorage"
                 {% if field.data and not field.time_missing %}value="{{ field.data.astimezone(field.tzinfo).time().isoformat() }}"{% endif %}
                 {% if input_args.disabled %}disabled{% endif %}>
-        <div id="{{ field.id }}"></span>
+        <div id="{{ field.id }}"></div>
     </div>
 {% endblock %}
 
