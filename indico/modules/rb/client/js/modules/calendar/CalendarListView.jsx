@@ -225,16 +225,19 @@ class CalendarListView extends React.Component {
     const {reservation} = booking;
     const {room, isAccepted} = reservation;
     const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
-    const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
-    const datesMatch =
-      moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
-      moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+    let datesMatch = false;
+    if (linkData) {
+      const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
+      datesMatch =
+        moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
+        moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+    }
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
     return (
       <Card
         styleName={`booking-card ${toClasses({
-          'non-overlapping': !datesMatch,
+          'non-overlapping': !!linkData && !datesMatch,
         })}`}
         key={key}
         onClick={() => openBookingDetails(reservation.id)}
