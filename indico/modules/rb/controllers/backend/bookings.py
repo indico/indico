@@ -117,6 +117,7 @@ class RHCalendar(RHRoomBookingBase):
 class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
         'start_dt': fields.DateTime(load_default=None),
+        'end_dt': fields.DateTime(load_default=None),
         'last_reservation_id': fields.Int(load_default=None),
         'my_bookings': fields.Bool(load_default=False),
         'limit': fields.Int(load_default=40),
@@ -125,11 +126,12 @@ class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
         'room_ids': fields.List(fields.Int(), load_default=None),
     })
-    def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit, text):
+    def _process(self, room_ids, start_dt, end_dt, last_reservation_id, my_bookings, limit, text):
         start_dt = start_dt or datetime.combine(date.today(), time(0, 0))
         booked_for_user = session.user if my_bookings else None
         bookings, rows_left = get_active_bookings(limit=limit,
                                                   start_dt=start_dt,
+                                                  end_dt=end_dt,
                                                   last_reservation_id=last_reservation_id,
                                                   room_ids=room_ids,
                                                   booked_for_user=booked_for_user,

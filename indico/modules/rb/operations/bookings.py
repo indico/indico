@@ -349,15 +349,17 @@ def create_booking_for_event(room_id, event):
         return None
 
 
-def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
+def get_active_bookings(limit, start_dt, end_dt=None, last_reservation_id=None, **filters):
     criteria = [ReservationOccurrence.start_dt > start_dt]
+    if end_dt is not None:
+        criteria[0] = (db.and_(criteria[0], ReservationOccurrence.end_dt <= end_dt))
     if last_reservation_id is not None:
         criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_dt,
                                 ReservationOccurrence.reservation_id > last_reservation_id))
 
     hide_booking_details = rb_settings.get('hide_booking_details')
     query = (_bookings_query(filters, noload_room=(not hide_booking_details), load_room_acl=hide_booking_details)
-             .filter(db.or_(*criteria))
+             .filter(db.and_(*criteria))
              .order_by(ReservationOccurrence.start_dt,
                        ReservationOccurrence.reservation_id,
                        db.func.indico.natsort(Room.full_name))

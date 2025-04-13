@@ -141,6 +141,18 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
       params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
     }
 
+    if (!state.linking.showNonOverlapping) {
+      params.start_dt = moment(state.linking.startDt)
+        .startOf('day')
+        .toISOString();
+      params.end_dt = moment(state.linking.endDt).toISOString();
+    } else {
+      // Set it right before the event starts
+      params.start_dt = moment(state.linking.startDt)
+        .subtract(1, 'second')
+        .toISOString();
+    }
+
     return await ajaxAction(
       () => indicoAxios.post(fetchActiveBookingsURL(), body, {params}),
       null,

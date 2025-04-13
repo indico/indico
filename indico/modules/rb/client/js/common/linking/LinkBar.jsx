@@ -11,6 +11,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Icon, Popup} from 'semantic-ui-react';
 
+import {Checkbox} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDateTimeRange} from 'indico/utils/date';
 
@@ -30,7 +31,7 @@ const messages = {
  * `LinkBar` shows an indicator in case the user's booking will be linked to
  * an event, contribution or session block.
  */
-const LinkBar = ({visible, clear, data}) => {
+const LinkBar = ({visible, clear, showNonOverlapping, data}) => {
   if (!visible) {
     return null;
   }
@@ -54,6 +55,17 @@ const LinkBar = ({visible, clear, data}) => {
           </span>
         )}
       </span>
+      <Checkbox
+        styleName="non-overlapping"
+        checked={data.showNonOverlapping}
+        onChange={(__, {checked}) => showNonOverlapping(checked)}
+        showAsToggle
+        label={
+          <span>
+            <Translate>Show non-overlapping bookings</Translate>
+          </span>
+        }
+      />
       <span styleName="clear" onClick={clear}>
         <Popup trigger={<Icon name="close" />}>
           <Translate>Exit linking mode</Translate>
@@ -65,6 +77,7 @@ const LinkBar = ({visible, clear, data}) => {
 
 LinkBar.propTypes = {
   visible: PropTypes.bool.isRequired,
+  showNonOverlapping: PropTypes.func.isRequired,
   clear: PropTypes.func.isRequired,
   data: linkDataShape,
 };
@@ -80,5 +93,6 @@ export default connect(
   }),
   dispatch => ({
     clear: bindActionCreators(linkingActions.clearObject, dispatch),
+    showNonOverlapping: bindActionCreators(linkingActions.showNonOverlapping, dispatch),
   })
 )(LinkBar);

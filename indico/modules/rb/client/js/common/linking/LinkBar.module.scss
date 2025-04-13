@@ -8,11 +8,12 @@
 @use 'rb:styles/palette' as *;
 
 .link-bar {
+  justify-content: center;
   display: flex;
   padding: 0 20px 0 10px;
   margin: 0;
-  height: 30px;
-  line-height: 30px;
+  height: 40px;
+  line-height: 40px;
   background-color: $primary-color;
   color: $white;
 
@@ -24,5 +25,9 @@
   .clear {
     margin-left: auto;
     cursor: pointer;
+  }
+
+  .non-overlapping {
+    margin-left: 1.5em;
   }
 }
