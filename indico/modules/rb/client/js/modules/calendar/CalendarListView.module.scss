@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'base/palette' as *;
+
 .active-bookings {
   margin-top: 15px;
 
@@ -37,6 +39,14 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+      }
+
+      &.non-overlapping {
+        background-color: $pastel-gray;
+
+        &:hover {
+          background-color: $pastel-gray;
+        }
       }
     }
   }
