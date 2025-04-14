@@ -27,7 +27,7 @@ def get_feature_definition(name):
     try:
         return get_feature_definitions()[name]
     except KeyError:
-        raise RuntimeError(f'Feature does not exist: {name}.')
+        raise RuntimeError(f'Feature does not exist: {name}')
 
 
 def get_enabled_features(event, only_explicit=False):
@@ -110,11 +110,8 @@ def require_feature(event, name):
     """
     if not is_feature_enabled(event, name):
         feature = get_feature_definition(name)
-        raise NotFound(
-            _("The '{feature_name}' feature is not enabled for this event.").format(
-                feature_name=feature.friendly_name
-            )
-        )
+        raise NotFound(_("The '{feature_name}' feature is not enabled for this event.")
+                       .format(feature_name=feature.friendly_name))
 
 
 def format_feature_names(names):
