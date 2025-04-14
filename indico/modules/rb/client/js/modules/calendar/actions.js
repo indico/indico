@@ -140,11 +140,11 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
       ).startDt;
       params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
     } else if (state.linking.showNonOverlapping) {
-      // Set it right before the event starts
       params.start_dt = moment(state.linking.startDt)
         .startOf('day')
         .toISOString();
     } else {
+      // Set it right before the event starts
       params.start_dt = moment(state.linking.startDt)
         .subtract(1, 'second')
         .toISOString();
