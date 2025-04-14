@@ -359,7 +359,7 @@ def get_active_bookings(limit, start_dt, end_dt=None, last_reservation_id=None, 
 
     hide_booking_details = rb_settings.get('hide_booking_details')
     query = (_bookings_query(filters, noload_room=(not hide_booking_details), load_room_acl=hide_booking_details)
-             .filter(db.and_(*criteria))
+             .filter(db.or_(*criteria))
              .order_by(ReservationOccurrence.start_dt,
                        ReservationOccurrence.reservation_id,
                        db.func.indico.natsort(Room.full_name))
