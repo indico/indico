@@ -27,7 +27,7 @@ export const getItemById = createSelector(
 export const isItemHidden = createSelector(
   getHiddenItemIds,
   (__, itemId) => itemId,
-  (hiddenIds, itemId) => hiddenIds.includes(itemId)
+  (hiddenIds, itemId) => !!itemId && hiddenIds.includes(itemId)
 );
 
 /** Get the currency used by the registration form. */
