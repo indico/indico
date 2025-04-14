@@ -27,6 +27,8 @@ Bugfixes
 - Do not log logins rejected by a plugin as errors (:pr:`6834`, thanks :user:`omegak`)
 - Do not trigger notifications for withdrawn service requests when deleting past events
   (:issue:`6700`, :pr:`6754`, thanks :user:`bhngupta`)
+- Fix ind-select/ind-combobox (FinalDropDown) issues on Safari iOS
+  (:issue:`6830`, :pr:`6839`, thanks :user:`foxbunny`)
 
 Accessibility
 ^^^^^^^^^^^^^

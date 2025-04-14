@@ -158,28 +158,27 @@ CustomElementBase.define(
         }
       });
 
-      listbox.addEventListener('pointerdown', evt => {
-        // Instead of click we use pointerdown
-        // to intercept focusout that fires before
-        // click, closing the dialog and making the
-        // target option unavailable before selection.
-        const $option = evt.target.closest('[role=option]');
-        if ($option) {
-          selectOption($option);
-          dispatchChange();
-        } else {
-          // If no option was selected, but the click happened
-          // within the listbox, it likely means the user was using
-          // the scrollbar. We will temporarily block the closing of
-          // the listbox.
+      indSelect.addEventListener(
+        'pointerdown',
+        () => {
+          clearTimeout(indSelect._clearImmediateCloseFlagTimer);
           indSelect._noImmediateClose = true;
-          setTimeout(() => {
-            // Refocus the filter because some of the behavior depends
-            // on its losing focus.
-            filter.focus();
+          indSelect._clearImmediateCloseFlagTimer = setTimeout(() => {
             delete indSelect._noImmediateClose;
-          });
+          }, 500);
+        },
+        {passive: true}
+      );
+
+      listbox.addEventListener('click', evt => {
+        const $option = evt.target.closest('[role=option]');
+        if (!$option) {
+          return;
         }
+        delete indSelect._noImmediateClose;
+        selectOption($option);
+        toggleListbox(false);
+        dispatchChange();
       });
 
       clear?.addEventListener('click', () => {
