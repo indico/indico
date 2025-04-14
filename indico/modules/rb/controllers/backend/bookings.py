@@ -40,7 +40,7 @@ from indico.modules.rb.util import (WEEKDAYS, check_impossible_repetition, check
                                     generate_spreadsheet_from_occurrences, get_linked_object, get_prebooking_collisions,
                                     group_by_occurrence_date, is_booking_start_within_grace_period,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
-from indico.util.date_time import now_utc, overlaps, server_to_utc, utc_to_server
+from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -452,10 +452,6 @@ class RHBookingOccurrenceLink(RHBookingBase):
         self.admin_override_enabled = admin_override_enabled
         if self.occurrence.link is not None:
             raise BadRequest('This booking occurrence is already linked')
-        if not overlaps((self.event.start_dt, self.event.end_dt),
-                        (server_to_utc(self.occurrence.start_dt), server_to_utc(self.occurrence.end_dt)),
-                        inclusive=True):
-            raise BadRequest('The event and booking occurrence times do not overlap')
 
     def _check_access(self):
         RHBookingBase._check_access(self)
