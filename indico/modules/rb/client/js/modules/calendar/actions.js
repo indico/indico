@@ -139,18 +139,16 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
         moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
       ).startDt;
       params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
-    }
-
-    if (!state.linking.showNonOverlapping) {
+    } else if (state.linking.showNonOverlapping) {
+      // Set it right before the event starts
       params.start_dt = moment(state.linking.startDt)
         .startOf('day')
         .toISOString();
-      params.end_dt = moment(state.linking.endDt).toISOString();
     } else {
-      // Set it right before the event starts
       params.start_dt = moment(state.linking.startDt)
         .subtract(1, 'second')
         .toISOString();
+      params.end_dt = moment(state.linking.endDt).toISOString();
     }
 
     return await ajaxAction(
