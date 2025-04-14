@@ -13,8 +13,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.features import features_event_settings
-from indico.util.signals import named_objects_from_signal
 from indico.util.i18n import _
+from indico.util.signals import named_objects_from_signal
 
 
 def get_feature_definitions():
@@ -27,7 +27,7 @@ def get_feature_definition(name):
     try:
         return get_feature_definitions()[name]
     except KeyError:
-        raise RuntimeError(_('Feature does not exist: {feature_name}.').format(feature_name=name))
+        raise RuntimeError(f'Feature does not exist: {name}.')
 
 
 def get_enabled_features(event, only_explicit=False):
