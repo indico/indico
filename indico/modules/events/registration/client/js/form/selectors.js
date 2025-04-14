@@ -14,12 +14,20 @@ export const getStaticData = state => state.staticData;
 
 export const getFlatSections = state => state.sections;
 export const getItems = state => state.items;
+export const getHiddenItemIds = state => state.hiddenItemIds;
 
 /** Get an item by its ID. */
 export const getItemById = createSelector(
   getItems,
   (__, itemId) => itemId,
   (fields, itemId) => fields[itemId]
+);
+
+/** Check whether an item is hidden. */
+export const isItemHidden = createSelector(
+  getHiddenItemIds,
+  (__, itemId) => itemId,
+  (hiddenIds, itemId) => hiddenIds.includes(itemId)
 );
 
 /** Get the currency used by the registration form. */

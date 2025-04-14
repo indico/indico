@@ -18,7 +18,8 @@ import {renderPluginComponents} from 'indico/utils/plugins';
 import {getManagement, getUpdateMode, isPaidItemLocked} from '../form_submission/selectors';
 
 import {getFieldRegistry} from './fields/registry';
-import {getItemById} from './selectors';
+import {isItemHidden} from './selectors';
+
 import '../../styles/regform.module.scss';
 
 function PaidItemLocked({management}) {
@@ -96,14 +97,12 @@ export default function FormItem({
   showIfFieldValues,
   htmlName,
   defaultValue,
-  fieldValues,
   ...rest
 }) {
   // TODO move outside like with setupActions etc?
   const paidItemLocked = useSelector(state => isPaidItemLocked(state, id));
   const isManagement = useSelector(getManagement);
   const isUpdateMode = useSelector(getUpdateMode);
-  const conditionalField = useSelector(state => getItemById(state, showIfFieldId));
   const form = useForm();
 
   const fieldRegistry = getFieldRegistry();
@@ -134,24 +133,6 @@ export default function FormItem({
     ...rest,
     meta,
   };
-
-  const parseConditionalValues = value => {
-    if (typeof value === 'boolean') {
-      return value ? ['1'] : ['0'];
-    } else if (value !== null && typeof value === 'object') {
-      if (value.choice) {
-        return [value.choice];
-      }
-      return Object.entries(value)
-        .filter(([, enabled]) => enabled === 1)
-        .map(([key]) => key);
-    }
-    return value || undefined;
-  };
-
-  const conditionalValues = conditionalField
-    ? parseConditionalValues(fieldValues[conditionalField.htmlName])
-    : undefined;
   let retentionPeriodIcon = null;
   if (setupMode && retentionPeriod) {
     retentionPeriodIcon = (
@@ -172,8 +153,8 @@ export default function FormItem({
   const showAsRequired = meta.alwaysRequired || isRequired;
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
-  const show =
-    !conditionalField || conditionalValues?.some(value => showIfFieldValues.includes(value));
+
+  const show = useSelector(state => !isItemHidden(state, id));
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
@@ -302,8 +283,6 @@ FormItem.propTypes = {
   showIfFieldValues: PropTypes.node,
   /** The default value for a given field **/
   defaultValue: PropTypes.any,
-  /** Rest of the form's fields */
-  fieldValues: PropTypes.object,
   // ... and various other field-specific keys (billing, limited-places, other config)
 };
 
@@ -320,5 +299,4 @@ FormItem.defaultProps = {
   showIfFieldId: null,
   showIfFieldValues: null,
   defaultValue: null,
-  fieldValues: {},
 };

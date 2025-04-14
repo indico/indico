@@ -7,7 +7,6 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {useFormState} from 'react-final-form';
 import {Form, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -28,7 +27,6 @@ export default function FormSection({
   setupMode,
   setupActions,
 }) {
-  const {values: fieldValues} = useFormState();
   const enabledFields = items.filter(item => item.isEnabled);
   const disabledFields = setupMode ? items.filter(item => !item.isEnabled) : [];
 
@@ -64,7 +62,6 @@ export default function FormSection({
             key={item.id}
             index={index}
             setupMode={setupMode}
-            fieldValues={fieldValues}
             {...itemProps}
             {...item}
           />
@@ -83,7 +80,6 @@ export default function FormSection({
                 key={item.id}
                 index={index}
                 setupMode={setupMode}
-                fieldValues={fieldValues}
                 {...itemProps}
                 {...item}
               />
