@@ -26,6 +26,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {getPluginObjects, renderPluginComponents} from 'indico/utils/plugins';
 
 import ConsentToPublishDropdown from '../components/ConsentToPublishDropdown';
+import ConditionalFieldsController from '../form/ConditionalFieldsController';
 import FormErrorList from '../form/FormErrorList';
 import FormSection from '../form/FormSection';
 import {getNestedSections, getStaticData} from '../form/selectors';
@@ -175,6 +176,7 @@ export default function RegistrationFormSubmission() {
     >
       {fprops => (
         <form onSubmit={fprops.handleSubmit}>
+          <ConditionalFieldsController />
           {renderPluginComponents('regformBeforeSections')}
           {sections.map(section => (
             <FormSection key={section.id} {...section} />
