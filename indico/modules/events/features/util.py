@@ -13,6 +13,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.features import features_event_settings
+from indico.util.i18n import _
 from indico.util.signals import named_objects_from_signal
 
 
@@ -109,7 +110,8 @@ def require_feature(event, name):
     """
     if not is_feature_enabled(event, name):
         feature = get_feature_definition(name)
-        raise NotFound(f"The '{feature.friendly_name}' feature is not enabled for this event.")
+        raise NotFound(_("The '{feature_name}' feature is not enabled for this event.")
+                       .format(feature_name=feature.friendly_name))
 
 
 def format_feature_names(names):
