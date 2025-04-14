@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2025-03-25 17:55+0100\n"
+"POT-Creation-Date: 2025-04-25 11:59+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -5022,7 +5022,7 @@ msgid "My favorite rooms"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx
-msgid "Rooms I manage"
+msgid "Rooms I manage or moderate"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx
@@ -6120,6 +6120,12 @@ msgid "Logout"
 msgstr ""
 
 #: indico/web/client/js/react/components/WTFDateField.jsx
+#: indico/web/client/js/react/components/WTFDateTimeField.jsx
+#: indico/web/client/js/react/components/WTFOccurrencesField.jsx
+msgid "The entered date is invalid."
+msgstr ""
+
+#: indico/web/client/js/react/components/WTFDateField.jsx
 msgid "Clear date"
 msgstr ""
 
@@ -6596,6 +6602,10 @@ msgstr ""
 
 #: indico/web/client/js/react/forms/validators.js
 msgid "Value must be at least {length} chars"
+msgstr ""
+
+#: indico/web/client/js/react/forms/validators.js
+msgid "Value must be at most {length} chars"
 msgstr ""
 
 #: indico/web/client/js/utils/palette.js

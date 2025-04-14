@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Indico 3.3.6-dev\n"
+"Project-Id-Version: Indico 3.3.7-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-03-21 11:01+0100\n"
+"POT-Creation-Date: 2025-04-14 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -767,6 +767,7 @@ msgid "API Keys"
 msgstr ""
 
 #: indico/modules/api/templates/admin_keys.html indico/modules/events/surveys/templates/management/survey.html
+#: indico/modules/logs/models/entries.py
 msgid "User"
 msgstr ""
 
@@ -8273,6 +8274,10 @@ msgid_plural "Features disabled: {features}"
 msgstr[0] ""
 msgstr[1] ""
 
+#: indico/modules/events/features/util.py
+msgid "The '{feature_name}' feature is not enabled for this event."
+msgstr ""
+
 #: indico/modules/events/features/templates/features.html
 msgid "You can enable/disable various features for your event. Disabling a feature will hide it from both managers and users."
 msgstr ""
@@ -12352,6 +12357,10 @@ msgstr ""
 
 #: indico/modules/events/registration/fields/accompanying.py indico/modules/events/registration/fields/simple.py
 msgid "There are no places left for this option."
+msgstr ""
+
+#: indico/modules/events/registration/fields/base.py
+msgid "Value of \"{form_item}\" ({parent_form_item})"
 msgstr ""
 
 #: indico/modules/events/registration/fields/choices.py
@@ -17618,11 +17627,11 @@ msgid "Rooms I own"
 msgstr ""
 
 #: indico/modules/rb/settings.py
-msgid "Rooms I manage"
+msgid "Rooms I manage or moderate"
 msgstr ""
 
 #: indico/modules/rb/settings.py
-msgid "Rooms I own or manage"
+msgid "Rooms I own, manage or moderate"
 msgstr ""
 
 #: indico/modules/rb/user_prefs.py
@@ -17630,7 +17639,9 @@ msgid "Room notifications"
 msgstr ""
 
 #: indico/modules/rb/user_prefs.py
-msgid "If you own or manage any rooms, you can choose whether to receive notifications about activity related to them."
+msgid ""
+"If you own, manage or moderate any rooms, you can choose whether to receive notifications about activity related to "
+"them."
 msgstr ""
 
 #: indico/modules/rb/user_prefs.py
