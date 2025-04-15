@@ -39,7 +39,9 @@ export default function ConditionalFieldsController() {
     .map(field => {
       const conditionalField = fields[field.showIfFieldId];
       const conditionalValues = parseConditionalValues(values[conditionalField.htmlName]);
-      const hidden = !conditionalValues?.some(value => field.showIfFieldValues.includes(value));
+      const hidden =
+        currentlyHiddenItemIds.includes(conditionalField.id) ||
+        !conditionalValues?.some(value => field.showIfFieldValues.includes(value));
       return hidden ? field.id : null;
     })
     .filter(id => id !== null);
