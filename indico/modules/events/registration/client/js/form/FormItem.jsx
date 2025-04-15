@@ -154,9 +154,7 @@ export default function FormItem({
   const inputRequired = !isManagement && showAsRequired;
   const htmlId = `input-${inputProps.fieldId}`;
 
-  const show = useSelector(
-    state => !isItemHidden(state, id) && !isItemHidden(state, showIfFieldId)
-  );
+  const show = useSelector(state => !isItemHidden(state, id));
 
   const fieldControls =
     InputComponent && !meta.customFormItem ? (
