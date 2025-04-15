@@ -31,7 +31,7 @@ const messages = {
  * `LinkBar` shows an indicator in case the user's booking will be linked to
  * an event, contribution or session block.
  */
-const LinkBar = ({visible, clear, showNonOverlapping, data}) => {
+const LinkBar = ({visible, clear, toggleNonOverlapping, data}) => {
   if (!visible) {
     return null;
   }
@@ -57,8 +57,8 @@ const LinkBar = ({visible, clear, showNonOverlapping, data}) => {
       </span>
       <Checkbox
         styleName="non-overlapping"
-        checked={data.showNonOverlapping}
-        onChange={(__, {checked}) => showNonOverlapping(checked)}
+        checked={data.toggleNonOverlapping}
+        onChange={(__, {checked}) => toggleNonOverlapping(checked)}
         showAsToggle
         label={
           <span>
@@ -77,7 +77,7 @@ const LinkBar = ({visible, clear, showNonOverlapping, data}) => {
 
 LinkBar.propTypes = {
   visible: PropTypes.bool.isRequired,
-  showNonOverlapping: PropTypes.func.isRequired,
+  toggleNonOverlapping: PropTypes.func.isRequired,
   clear: PropTypes.func.isRequired,
   data: linkDataShape,
 };
@@ -93,6 +93,6 @@ export default connect(
   }),
   dispatch => ({
     clear: bindActionCreators(linkingActions.clearObject, dispatch),
-    showNonOverlapping: bindActionCreators(linkingActions.showNonOverlapping, dispatch),
+    toggleNonOverlapping: bindActionCreators(linkingActions.toggleNonOverlapping, dispatch),
   })
 )(LinkBar);

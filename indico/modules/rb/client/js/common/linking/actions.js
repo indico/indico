@@ -56,7 +56,7 @@ export function clearObject() {
   return {type: CLEAR_OBJECT};
 }
 
-export function showNonOverlapping(value) {
+export function toggleNonOverlapping(value) {
   return {
     type: SHOW_NON_OVERLAPPING,
     value,
