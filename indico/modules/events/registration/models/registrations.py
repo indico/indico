@@ -424,6 +424,7 @@ class Registration(db.Model):
         if (not show_if_field_id or not show_if_field_values or
             not (show_if_data := self.data_by_field.get(show_if_field_id))):
             return True
+        show_if_field = show_if_data.field_data.field
         data = show_if_data.data
         if isinstance(data, dict):
             values = data.keys()
@@ -431,7 +432,7 @@ class Registration(db.Model):
             values = ['1'] if data else ['0']
         else:
             values = data
-        return any(v in show_if_field_values for v in values)
+        return any(v in show_if_field_values for v in values) and self.is_field_shown(show_if_field)
 
     @locator.uuid
     def locator(self):
