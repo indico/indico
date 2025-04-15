@@ -89,14 +89,14 @@ class CalendarListView extends React.Component {
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
     const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
-    const showNonOverlappingChanged =
-      linkData?.showNonOverlapping !== prevLinkData?.showNonOverlapping;
+    const toggleNonOverlappingChanged =
+      linkData?.toggleNonOverlapping !== prevLinkData?.toggleNonOverlapping;
     if (
       prevDate !== selectedDate ||
       mode !== prevMode ||
       roomFiltersChanged ||
       calendarFiltersChanged ||
-      showNonOverlappingChanged
+      toggleNonOverlappingChanged
     ) {
       this.refetchActiveBookings(roomFiltersChanged);
     }
