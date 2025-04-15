@@ -26,7 +26,7 @@ export function toClasses(...params) {
  * It takes a function which will be called with `resolve, reject` and render
  * the actual component.
  */
-export function injectModal(renderFunc, position = undefined) {
+export function injectModal(renderFunc, position = undefined, resolveOnClickOutside = false) {
   const container = document.createElement('div');
   document.body.appendChild(container);
 
@@ -38,13 +38,32 @@ export function injectModal(renderFunc, position = undefined) {
     container.style.zIndex = '1001';
   }
 
+  const abortController = new AbortController();
+
   const cleanup = () =>
     _.defer(() => {
       ReactDOM.unmountComponentAtNode(container);
       document.body.removeChild(container);
+      abortController.abort();
     });
 
   return new Promise((resolve, reject) => {
+    if (resolveOnClickOutside) {
+      // defer adding the listener so the click event that resulted in injectModal being called
+      // doesn't get caught and immediately close the modal again
+      _.defer(() => {
+        document.body.addEventListener(
+          'click',
+          evt => {
+            if (!container.contains(evt.target)) {
+              resolve();
+            }
+          },
+          {signal: abortController.signal}
+        );
+      });
+    }
+
     ReactDOM.render(renderFunc(resolve, reject), container);
   }).finally(cleanup);
 }

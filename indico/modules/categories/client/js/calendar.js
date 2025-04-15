@@ -9,13 +9,13 @@
 
 import {Calendar} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {CalendarSingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {injectModal} from 'indico/react/util';
+import {serializeDate, toMoment} from 'indico/utils/date';
 import {$T} from 'indico/utils/i18n';
 
 import CalendarLegend from './components/CalendarLegend';
@@ -25,8 +25,7 @@ import CalendarLegend from './components/CalendarLegend';
   const filteredLegendElements = new Set();
   const filteredKeywords = new Set();
   const filteringByKeyword = () => groupBy === 'keywords';
-  let closeCalendar = null;
-  let ignoreClick = false;
+  let calendarOpen = false;
   global.setupCategoryCalendar = function setupCategoryCalendar(
     containerCalendarSelector,
     containerLegendSelector,
@@ -45,44 +44,38 @@ import CalendarLegend from './components/CalendarLegend';
       customButtons: {
         goToDate: {
           text: Translate.string('Go to...'),
-          icon: 'i-button icon-calendar',
+          icon: 'i-button icon-calendar js-goto-date-button',
           click: async (_, element) => {
-            if (ignoreClick) {
-              ignoreClick = false;
-              return;
-            }
-            if (closeCalendar) {
-              closeCalendar();
+            if (calendarOpen) {
+              // clicking the button while the calendar is already open should not reopen it
+              calendarOpen = false;
               return;
             }
             const button = element.closest('button');
             const rect = button.getBoundingClientRect();
             const position = {
               left: rect.left,
-              top: rect.bottom + 10,
+              top: rect.bottom,
             };
-            closeCalendar = (resolve, evt = undefined) => {
-              closeCalendar = null;
-              resolve();
-              if (evt && button.contains(evt.target)) {
-                // if the calendar was closed by clicking again on the button, we have to
-                // ignore that click event to avoid opening it again immediately
-                ignoreClick = true;
-              }
-            };
-            await injectModal(
+            calendarOpen = true;
+            const selectedDate = await injectModal(
               resolve => (
-                <CalendarSingleDatePicker
-                  date={moment(calendar.getDate())}
-                  onDateChange={date => calendar.gotoDate(date.toDate())}
-                  onOutsideClick={evt => closeCalendar(resolve, evt)}
-                  onClose={() => closeCalendar(resolve)}
-                  isOutsideRange={() => false}
-                  numberOfMonths={1}
-                />
+                <div className="ui popup bottom left visible" style={{position: 'relative'}}>
+                  <CalendarSingleDatePicker
+                    date={serializeDate(toMoment(calendar.getDate()))}
+                    onChange={date => {
+                      resolve(serializeDate(toMoment(date)));
+                    }}
+                  />
+                </div>
               ),
-              position
+              position,
+              true
             );
+            if (selectedDate) {
+              calendar.gotoDate(selectedDate);
+            }
+            calendarOpen = false;
           },
         },
       },
