@@ -6,13 +6,15 @@
 # LICENSE file for more details.
 
 from flask import has_request_context, request, session
+from sqlalchemy.exc import IntegrityError
 
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.modules.logs.models.entries import LogKind, UserLogRealm
-from indico.modules.users import User
+from indico.modules.users import User, logger
+from indico.modules.users.util import anonymize_user
 
 
 def create_user(email, data, identity=None, settings=None, other_emails=None, from_moderation=True):
@@ -71,3 +73,24 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     user.log(UserLogRealm.user, LogKind.positive, 'User', 'User created', session.user if session else None, data=data)
     db.session.flush()
     return user
+
+
+def delete_or_anonymize_user(user):
+    """Delete or anonymize a user.
+
+    Deletes the user, and all their associated data. If it is not possible to delete the user, it will
+    instead fallback to anonymizing the user.
+    """
+    user_repr = repr(user)
+    signals.users.db_deleted.send(user, flushed=False)
+    try:
+        db.session.delete(user)
+        db.session.flush()
+    except IntegrityError as exc:
+        db.session.rollback()
+        logger.info('User %r could not be deleted %s', user, str(exc))
+        anonymize_user(user)
+        logger.info('User %r anonymized %s', session.user, user_repr)
+    else:
+        signals.users.db_deleted.send(user, flushed=True)
+        logger.info('User %r deleted %s', session.user, user_repr)

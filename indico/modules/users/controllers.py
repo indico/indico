@@ -17,7 +17,6 @@ from itsdangerous import BadSignature
 from markupsafe import Markup, escape
 from marshmallow import fields
 from PIL import Image
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only, subqueryload
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
@@ -49,14 +48,14 @@ from indico.modules.users.models.affiliations import Affiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.export import DataExportOptions, DataExportRequestState
 from indico.modules.users.models.users import ProfilePictureSource, UserTitle
-from indico.modules.users.operations import create_user
+from indico.modules.users.operations import create_user, delete_or_anonymize_user
 from indico.modules.users.schemas import (AffiliationSchema, BasicCategorySchema, FavoriteEventSchema,
                                           UserPersonalDataSchema)
-from indico.modules.users.util import (anonymize_user, get_avatar_url_from_name, get_gravatar_for_user,
-                                       get_linked_events, get_mastodon_server_name, get_related_categories,
-                                       get_suggested_categories, get_unlisted_events, get_user_by_email,
-                                       get_user_titles, log_user_update, merge_users, search_affiliations, search_users,
-                                       send_avatar, serialize_user, set_user_avatar)
+from indico.modules.users.util import (get_avatar_url_from_name, get_gravatar_for_user, get_linked_events,
+                                       get_mastodon_server_name, get_related_categories, get_suggested_categories,
+                                       get_unlisted_events, get_user_by_email, get_user_titles, log_user_update,
+                                       merge_users, search_affiliations, search_users, send_avatar, serialize_user,
+                                       set_user_avatar)
 from indico.modules.users.views import (WPUser, WPUserDashboard, WPUserDataExport, WPUserFavorites, WPUserPersonalData,
                                         WPUserProfilePic, WPUsersAdmin)
 from indico.util.date_time import now_utc
@@ -1035,7 +1034,7 @@ class RHUserBlock(RHUserBase):
 
 
 class RHUserDelete(RHUserBase):
-    """Delete a user.
+    """Delete or anonymize a user.
 
     Deletes the user, and all their associated data. If it is not possible to delete the user, it will
     instead fallback to anonymizing the user.
@@ -1052,20 +1051,9 @@ class RHUserDelete(RHUserBase):
 
     def _process(self):
         user_name = self.user.name
-        user_repr = repr(self.user)
-        signals.users.db_deleted.send(self.user, flushed=False)
-        try:
-            db.session.delete(self.user)
-            db.session.flush()
-        except IntegrityError as exc:
-            db.session.rollback()
-            logger.info('User %r could not be deleted %s', self.user, str(exc))
-            anonymize_user(self.user)
-            self.user.log(UserLogRealm.management, LogKind.negative, 'User', 'User anonymized', session.user)
-            logger.info('User %r anonymized %s', session.user, user_repr)
-            flash(_('{user_name} has been anonymized.').format(user_name=user_name), 'success')
-        else:
-            signals.users.db_deleted.send(self.user, flushed=True)
-            logger.info('User %r deleted %s', session.user, user_repr)
+        delete_or_anonymize_user(self.user)
+        if self.user not in db.session:
             flash(_('{user_name} has been deleted.').format(user_name=user_name), 'success')
+        else:
+            flash(_('{user_name} has been anonymized.').format(user_name=user_name), 'success')
         return '', 204
