@@ -319,7 +319,9 @@
   > .actions {
     visibility: hidden;
 
-    a + a {
+    a + a,
+    a + i,
+    i + i {
       margin-left: 3px;
     }
   }

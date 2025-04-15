@@ -238,15 +238,17 @@ export default function FormItem({
         )}
         {renderPluginComponents(`regform-${inputType}-field-item`, inputProps)}
       </div>
-      {setupActions && <div styleName="actions">{setupActions}</div>}
-      {lockedReason && <ItemLocked reason={lockedReason} />}
-      {!!showIfFieldId && setupMode && (
-        <ItemHidden reason={Translate.string('This field is conditionally shown')} />
-      )}
-      {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
-      {!lockedReason && !showPurged && paidItemLocked && (
-        <PaidItemLocked management={isManagement} />
-      )}
+      <div styleName="actions">
+        {setupActions}
+        {lockedReason && <ItemLocked reason={lockedReason} />}
+        {!!showIfFieldId && setupMode && (
+          <ItemHidden reason={Translate.string('This field is conditionally shown')} />
+        )}
+        {!lockedReason && showPurged && <PurgedItemLocked isUpdateMode={isUpdateMode} />}
+        {!lockedReason && !showPurged && paidItemLocked && (
+          <PaidItemLocked management={isManagement} />
+        )}
+      </div>
     </div>
   );
 }
