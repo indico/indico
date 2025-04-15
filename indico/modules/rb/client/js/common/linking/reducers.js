@@ -17,7 +17,7 @@ const initialState = {
   eventTitle: null,
   ownRoomId: null,
   ownRoomName: null,
-  showNonOverlapping: false,
+  toggleNonOverlapping: false,
 };
 
 export default (state = initialState, action) => {
@@ -33,10 +33,10 @@ export default (state = initialState, action) => {
         ownRoomName: action.ownRoomName,
         startDt: action.startDt,
         endDt: action.endDt,
-        showNonOverlapping: action.showNonOverlapping || false,
+        toggleNonOverlapping: action.toggleNonOverlapping || false,
       };
     case linkingActions.SHOW_NON_OVERLAPPING:
-      return {...state, showNonOverlapping: action.value};
+      return {...state, toggleNonOverlapping: action.value};
     case linkingActions.CLEAR_OBJECT:
     case bookRoomActions.CREATE_BOOKING_SUCCESS:
       return initialState;
