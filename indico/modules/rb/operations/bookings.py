@@ -350,9 +350,10 @@ def create_booking_for_event(room_id, event):
 
 
 def get_active_bookings(limit, start_dt, end_dt=None, last_reservation_id=None, **filters):
-    criteria = [ReservationOccurrence.start_dt > start_dt]
-    if end_dt is not None:
-        criteria[0] = (db.and_(criteria[0], ReservationOccurrence.end_dt <= end_dt))
+    if end_dt:
+        criteria = [(ReservationOccurrence.start_dt > start_dt) & (ReservationOccurrence.end_dt <= end_dt)]
+    else:
+        criteria = [ReservationOccurrence.start_dt > start_dt]
     if last_reservation_id is not None:
         criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_dt,
                                 ReservationOccurrence.reservation_id > last_reservation_id))
