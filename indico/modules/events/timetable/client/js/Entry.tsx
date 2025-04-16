@@ -26,27 +26,7 @@ export function DraggableEntry({id, ...rest}) {
   const selectedId = useSelector(selectors.getSelectedId);
   const selected = useSelector(selectors.getSelectedEntry);
 
-  if (popupsEnabled && selected && id === selectedId) {
-    const trigger = (
-      <ContributionEntry
-        id={id}
-        {...rest}
-        listeners={listeners}
-        setNodeRef={setNodeRef}
-        transform={transform}
-        isDragging={isDragging}
-      />
-    );
-    return (
-      <TimetablePopup
-        trigger={trigger}
-        onClose={() => dispatch(actions.selectEntry(null))}
-        entry={selected}
-      />
-    );
-  }
-
-  return (
+  const entry = (
     <ContributionEntry
       id={id}
       {...rest}
@@ -56,6 +36,18 @@ export function DraggableEntry({id, ...rest}) {
       isDragging={isDragging}
     />
   );
+
+  if (popupsEnabled && selected && !isDragging && id === selectedId) {
+    return (
+      <TimetablePopup
+        trigger={entry}
+        onClose={() => dispatch(actions.selectEntry(null))}
+        entry={selected}
+      />
+    );
+  }
+
+  return entry;
 }
 
 export function DraggableBlockEntry({id, ...rest}) {
@@ -67,27 +59,7 @@ export function DraggableBlockEntry({id, ...rest}) {
   const selectedId = useSelector(selectors.getSelectedId);
   const selected = useSelector(selectors.getSelectedEntry);
 
-  if (popupsEnabled && selected && id === selectedId) {
-    const trigger = (
-      <BlockEntry
-        id={id}
-        {...rest}
-        listeners={listeners}
-        setNodeRef={setNodeRef}
-        transform={transform}
-        isDragging={isDragging}
-      />
-    );
-    return (
-      <TimetablePopup
-        trigger={trigger}
-        onClose={() => dispatch(actions.selectEntry(null))}
-        entry={selected}
-      />
-    );
-  }
-
-  return (
+  const entry = (
     <BlockEntry
       id={id}
       {...rest}
@@ -97,4 +69,16 @@ export function DraggableBlockEntry({id, ...rest}) {
       isDragging={isDragging}
     />
   );
+
+  if (popupsEnabled && selected && !isDragging && id === selectedId) {
+    return (
+      <TimetablePopup
+        trigger={entry}
+        onClose={() => dispatch(actions.selectEntry(null))}
+        entry={selected}
+      />
+    );
+  }
+
+  return entry;
 }
