@@ -57,7 +57,7 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
 function Break({entry, onClose}: {entry: BreakEntry; onClose: () => void}) {
   const dispatch = useDispatch();
   const {id} = entry;
-  const startTime = entry.startDt;
+  const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const eventId = useSelector(selectors.getEventId);
 
