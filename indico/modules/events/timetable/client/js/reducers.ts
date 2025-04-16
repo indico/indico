@@ -170,6 +170,8 @@ export default {
       }
       case actions.SELECT_ENTRY:
         return {...state, selectedId: action.id};
+      case actions.DESELECT_ENTRY:
+        return {...state, selectedId: null};
       // return {...state};
       case actions.DELETE_BREAK: {
         const {id} = action.entry;
