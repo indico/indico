@@ -5,9 +5,11 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import entryActionsURL from 'indico-url:timetable.timetable_rest';
+
 import moment from 'moment';
 import React from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   Button,
   ButtonGroup,
@@ -20,7 +22,10 @@ import {
   SemanticICONS,
 } from 'semantic-ui-react';
 
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
 import './Entry.module.scss';
+import * as actions from './actions';
 import {formatTimeRange} from './i18n';
 import * as selectors from './selectors';
 import {BreakEntry, ContribEntry, BlockEntry} from './types';
@@ -50,8 +55,23 @@ function CardItem({icon, children}: {icon: SemanticICONS; children: React.ReactN
 }
 
 function Break({entry, onClose}: {entry: BreakEntry; onClose: () => void}) {
+  const dispatch = useDispatch();
+  const {id} = entry;
   const startTime = entry.startDt;
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
+  const eventId = useSelector(selectors.getEventId);
+
+  async function deleteBreak(e) {
+    e.stopPropagation();
+    const url = entryActionsURL({event_id: eventId, entry_id: id});
+    try {
+      await indicoAxios.delete(url);
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    dispatch(actions.deleteEntry(entry));
+  }
 
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
@@ -61,7 +81,7 @@ function Break({entry, onClose}: {entry: BreakEntry; onClose: () => void}) {
             <ButtonGroup>
               <Button icon="edit" />
               <Button icon="paint brush" />
-              <Button icon="trash" />
+              <Button icon="trash" onClick={deleteBreak} />
             </ButtonGroup>
             <ButtonGroup>
               <Button
