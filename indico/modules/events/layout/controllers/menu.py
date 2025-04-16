@@ -109,25 +109,22 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
                                     custom_title=self.entry.title is not None)
         form = form_cls(entry=self.entry, obj=defaults, event=self.event, **form_kwargs)
         if form.validate_on_submit():
-            old_title = self.entry.localized_title or self.entry.default_data.title
-            old_enable = self.entry.is_enabled
-            old_new_tab = self.entry.new_tab
-            old_link_url = self.entry.link_url
-            form.populate_obj(self.entry, skip={'html', 'custom_title'})
+            log_fields = {'title': 'Title',
+                          'is_enabled': 'Show',
+                          'new_tab': 'New Tab',
+                          'protection_mode': 'Protection mode',
+                          'speakers_can_access': 'Grant speakers access'}
 
-            log_fields = {'title': 'Title', 'is_enabled': 'Show', 'new_tab': 'New Tab'}
-            changes = {'title': (old_title, form.data['title']),
-                       'is_enabled': (old_enable, form.data['is_enabled']),
-                       'new_tab': (old_new_tab, form.data['new_tab'])}
+            if self.entry.is_link:
+                log_fields['link_url'] = 'URL'
+
+            form_data = {key: getattr(form, key).data for key in log_fields.keys()}
+            changes = self.entry.populate_from_dict(form_data, skip={'acl'})
 
             if self.entry.is_page:
                 log_fields['html'] = 'Content'
                 changes['html'] = (self.entry.page.html, form.html.data)
                 self.entry.page.html = form.html.data
-
-            if self.entry.is_link:
-                log_fields['link_url'] = 'URL'
-                changes['link_url'] = (old_link_url, form.data['link_url'])
 
             self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
                       f'{self.entry.type.title} Entry "{form.data['title']}" modified', session.user,
