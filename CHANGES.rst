@@ -28,6 +28,7 @@ Bugfixes
 - Do not trigger notifications for withdrawn service requests when deleting past events
   (:issue:`6700`, :pr:`6754`, thanks :user:`bhngupta`)
 - Fix date picker on category calendar view (:issue:`6849`, :pr:`6850`)
+- Fix scheduling existing contributions not working in rare cirucmstances (:pr:`6853`)
 
 Accessibility
 ^^^^^^^^^^^^^
