@@ -70,7 +70,7 @@ function Break({entry, onClose}: {entry: BreakEntry; onClose: () => void}) {
       handleAxiosError(error);
       return;
     }
-    dispatch(actions.deleteEntry(entry));
+    dispatch(actions.deleteBreak(entry));
   }
 
   return (
@@ -152,11 +152,26 @@ function Contribution({entry, onClose}: {entry: ContribEntry; onClose: () => voi
 }
 
 function Block({entry, onClose}: {entry: BlockEntry; onClose: () => void}) {
+  const dispatch = useDispatch();
+  const {id} = entry;
   const sessions = useSelector(selectors.getSessions);
   const {backgroundColor} = getEntryColor(entry, sessions);
   const startTime = moment(entry.startDt);
   const endTime = moment(entry.startDt).add(entry.duration, 'minutes');
   const title = formatBlockTitle(entry.sessionTitle, entry.title);
+  const eventId = useSelector(selectors.getEventId);
+
+  async function deleteBlock(e) {
+    e.stopPropagation();
+    const url = entryActionsURL({event_id: eventId, entry_id: id});
+    try {
+      await indicoAxios.delete(url);
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    dispatch(actions.deleteBlock(id));
+  }
 
   return (
     <Card fluid style={{minWidth: 400, boxShadow: 'none'}}>
@@ -165,9 +180,9 @@ function Block({entry, onClose}: {entry: BlockEntry; onClose: () => void}) {
           <div style={{display: 'flex', justifyContent: 'flex-end', gap: 5}}>
             <ButtonGroup>
               <Button icon="edit" />
-              <Button icon="paint brush" />
-              <Button icon="trash" />
-              <Dropdown button inline icon="ellipsis vertical">
+              <Button icon="paint brush" disabled />
+              <Button icon="trash" onClick={deleteBlock} />
+              <Dropdown button inline icon="ellipsis vertical" disabled>
                 <DropdownMenu>
                   <DropdownItem>
                     <Icon name="edit" /> Edit session
