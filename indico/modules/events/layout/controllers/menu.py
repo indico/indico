@@ -173,7 +173,7 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
             self.entry.move(position)
 
         log_msg = ('Separator Entry' if self.entry.is_separator else
-                   f'{self.entry.type.title} Entry "{self.entry.localized_title}"')
+                   f'{self.entry.type.title} Entry "{self.entry.title}"')
         self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
                        f"{log_msg} has been {'inserted' if parent_id != self.entry.parent_id else 'moved'} in "
                        f"position {self.entry.position}", session.user)
@@ -184,7 +184,7 @@ class RHMenuEntryToggleEnabled(RHMenuEntryEditBase):
     def _process(self):
         self.entry.is_enabled = not self.entry.is_enabled
         log_msg = 'Separator Entry' if self.entry.is_separator else \
-            f'{self.entry.type.title} Entry "{self.entry.localized_title}"'
+            f'{self.entry.type.title} Entry "{self.entry.title}"'
         self.entry.log(EventLogRealm.management, LogKind.positive if self.entry.is_enabled else LogKind.negative,
                        'Menu Entry', f"{log_msg} visibility has been "
                                      f"{'enabled' if self.entry.is_enabled else 'disabled'}", session.user)
@@ -283,7 +283,7 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         db.session.delete(self.entry)
         db.session.flush()
         log_msg = 'Separator Entry' if self.entry.is_separator else \
-            f'{self.entry.type.title} Entry "{self.entry.localized_title}"'
+            f'{self.entry.type.title} Entry "{self.entry.title}"'
         self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry', f'{log_msg} has been deleted',
                        session.user)
 
