@@ -54,8 +54,9 @@ export function DraggableEntry({id, ...rest}) {
   useEffect(() => {
     if (isDragging) {
       isClick.current = false;
+      dispatch(actions.deselectEntry());
     }
-  }, [isDragging]);
+  }, [dispatch, isDragging]);
 
   const entry = (
     <ContributionEntry
@@ -117,8 +118,9 @@ export function DraggableBlockEntry({id, ...rest}) {
   useEffect(() => {
     if (isDragging) {
       isClick.current = false;
+      dispatch(actions.deselectEntry());
     }
-  }, [isDragging]);
+  }, [isDragging, dispatch]);
 
   const entry = (
     <BlockEntry
