@@ -118,7 +118,7 @@ class RHMenuEntryEdit(RHMenuEntryEditBase):
             if self.entry.is_link:
                 log_fields['link_url'] = 'URL'
 
-            form_data = {key: getattr(form, key).data for key in log_fields.keys()}
+            form_data = {key: getattr(form, key).data for key in log_fields}
             changes = self.entry.populate_from_dict(form_data, skip={'acl'})
 
             if self.entry.is_page:
@@ -172,8 +172,8 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
         else:
             self.entry.move(position)
 
-        log_msg = 'Separator Entry' if self.entry.is_separator else \
-            f'{self.entry.type.title} Entry "{self.entry.localized_title}"'
+        log_msg = ('Separator Entry' if self.entry.is_separator else
+                   f'{self.entry.type.title} Entry "{self.entry.localized_title}"')
         self.entry.log(EventLogRealm.management, LogKind.change, 'Menu Entry',
                        f"{log_msg} has been {'inserted' if parent_id != self.entry.parent_id else 'moved'} in "
                        f"position {self.entry.position}", session.user)
