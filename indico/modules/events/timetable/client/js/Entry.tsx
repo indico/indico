@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import * as actions from './actions';
@@ -20,13 +20,42 @@ import './DayTimetable.module.scss';
 
 export function DraggableEntry({id, ...rest}) {
   const dispatch = useDispatch();
-  const {listeners, setNodeRef, transform, isDragging} = useDraggable({
+  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({
     id: `${id}`,
   });
   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
+  // Used to determine whether the entry was just clicked or actually dragged
+  // if dragged, this prevents selecting the entry on drag end (and thus showing the popup)
+  const isClick = useRef<boolean>(true);
+
+  function onClick(e) {
+    e.stopPropagation();
+    if (isClick.current) {
+      dispatch(actions.selectEntry(id));
+    }
+  }
+
+  function onMouseDown() {
+    isClick.current = true;
+  }
+
+  const listeners = {
+    ..._listeners,
+    onClick,
+    onMouseDown: e => {
+      onMouseDown();
+      _listeners.onMouseDown(e);
+    },
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      isClick.current = false;
+    }
+  }, [isDragging]);
 
   const entry = (
     <ContributionEntry
@@ -54,13 +83,42 @@ export function DraggableEntry({id, ...rest}) {
 
 export function DraggableBlockEntry({id, ...rest}) {
   const dispatch = useDispatch();
-  const {listeners, setNodeRef, transform, isDragging} = useDraggable({
+  const {listeners: _listeners, setNodeRef, transform, isDragging} = useDraggable({
     id: `${id}`,
   });
   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
   );
+  // Used to determine whether the entry was just clicked or actually dragged
+  // if dragged, this prevents selecting the entry on drag end (and thus showing the popup)
+  const isClick = useRef<boolean>(true);
+
+  function onClick(e) {
+    e.stopPropagation();
+    if (isClick.current) {
+      dispatch(actions.selectEntry(id));
+    }
+  }
+
+  function onMouseDown() {
+    isClick.current = true;
+  }
+
+  const listeners = {
+    ..._listeners,
+    onClick,
+    onMouseDown: e => {
+      onMouseDown();
+      _listeners.onMouseDown(e);
+    },
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      isClick.current = false;
+    }
+  }, [isDragging]);
 
   const entry = (
     <BlockEntry
