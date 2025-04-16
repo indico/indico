@@ -96,7 +96,7 @@ function GlobalEvents() {
       } else if (e.key === 'Escape') {
         // deselect selected entry
         if (selectedId) {
-          dispatch(actions.selectEntry(null));
+          dispatch(actions.deselectEntry());
         }
       }
     }
@@ -104,7 +104,7 @@ function GlobalEvents() {
     function onScroll() {
       // deselect selected entry
       if (selectedId) {
-        dispatch(actions.selectEntry(null));
+        dispatch(actions.deselectEntry());
       }
     }
 
