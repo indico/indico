@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {TopLevelEntry} from './types';
+import {TopLevelEntry, BlockEntry, BreakEntry, ChildBreakEntry} from './types';
 
 export const SET_TIMETABLE_DATA = 'Set timetable data';
 export const SET_SESSION_DATA = 'Set session data';
@@ -65,12 +65,18 @@ interface CreateEntryAction {
   entry: TopLevelEntry;
 }
 
+interface DeleteEntryAction {
+  type: typeof DELETE_ENTRY;
+  entry: BlockEntry | BreakEntry | ChildBreakEntry;
+}
+
 export type Action =
   | ResizeEntryAction
   | MoveEntryAction
   | SelectEntryAction
   | ScheduleEntryAction
-  | CreateEntryAction;
+  | CreateEntryAction
+  | DeleteEntryAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
