@@ -90,7 +90,7 @@ def delete_or_anonymize_user(user):
         db.session.rollback()
         logger.info('User %r could not be deleted %s', user, str(exc))
         anonymize_user(user)
-        logger.info('User %r anonymized %s', session.user, user_repr)
+        logger.info('User %r anonymized %s', session.user if session else None, user_repr)
     else:
         signals.users.db_deleted.send(user, flushed=True)
-        logger.info('User %r deleted %s', session.user, user_repr)
+        logger.info('User %r deleted %s', session.user if session else None, user_repr)
