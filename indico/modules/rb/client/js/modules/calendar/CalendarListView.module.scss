@@ -48,6 +48,16 @@
           background-color: $pastel-gray;
         }
       }
+
+      &.already-linked {
+        background: repeating-linear-gradient(
+          -45deg,
+          $pastel-gray,
+          $pastel-gray 10px,
+          $light-gray 10px,
+          $light-gray 20px
+        );
+      }
     }
   }
 }

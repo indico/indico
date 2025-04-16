@@ -235,10 +235,12 @@ class CalendarListView extends React.Component {
     const nonOverlapping = !!linkData && !datesMatch;
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
+    const isLinked = !!linkData && !!booking.linkId;
     return (
       <Card
         styleName={`booking-card ${toClasses({
-          'non-overlapping': nonOverlapping,
+          'non-overlapping': !isLinked && nonOverlapping,
+          'already-linked': isLinked,
         })}`}
         key={key}
         onClick={() => openBookingDetails(reservation.id)}
@@ -269,7 +271,7 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
-          {linkData && !!booking.linkId && (
+          {isLinked && (
             <TooltipIfTruncated>
               <div styleName="booking-booked-for">
                 <Translate>Already linked</Translate>
