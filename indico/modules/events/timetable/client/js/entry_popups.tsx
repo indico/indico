@@ -248,7 +248,9 @@ export function TimetablePopup({
       basic
       hideOnScroll
     >
-      {children}
+      <div onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
+        {children}
+      </div>
     </Popup>
   );
 }
