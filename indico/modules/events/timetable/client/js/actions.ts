@@ -71,13 +71,19 @@ interface DeleteBreakAction {
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
 }
 
+interface DeleteBlockAction {
+  type: typeof DELETE_BLOCK;
+  id: number;
+}
+
 export type Action =
   | ResizeEntryAction
   | MoveEntryAction
   | SelectEntryAction
   | ScheduleEntryAction
   | CreateEntryAction
-  | DeleteBreakAction;
+  | DeleteBreakAction
+  | DeleteBlockAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -110,6 +116,10 @@ export function selectEntry(id?: number): SelectEntryAction {
 
 export function deleteBreak(entry) {
   return {type: DELETE_BREAK, entry};
+}
+
+export function deleteBlock(id: number) {
+  return {type: DELETE_BLOCK, id};
 }
 
 export function dragUnscheduledContribs(contribIds) {
