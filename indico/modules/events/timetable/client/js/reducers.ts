@@ -227,6 +227,44 @@ export default {
           };
         }
       }
+      case actions.DELETE_BLOCK: {
+        const {id} = action;
+        let block = null;
+        for (const dayEntries of Object.values(state.changes[state.currentChangeIdx].entries)) {
+          block = dayEntries.find(e => e.id === id);
+          if (block) {
+            break;
+          }
+        }
+
+        if (!block) {
+          return state;
+        }
+
+        const contribs = block.children
+          .filter(e => e.type === 'contrib')
+          .map(({startDt, ...rest}) => rest);
+        const newEntries = layoutDays(
+          Object.fromEntries(
+            Object.entries(state.changes[state.currentChangeIdx].entries).map(
+              ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
+            )
+          )
+        );
+
+        return {
+          ...state,
+          currentChangeIdx: state.currentChangeIdx + 1,
+          changes: [
+            ...state.changes.slice(0, state.currentChangeIdx + 1),
+            {
+              entries: newEntries,
+              change: 'delete',
+              unscheduled: [state.changes[state.currentChangeIdx].unscheduled, ...contribs],
+            },
+          ],
+        };
+      }
       case actions.DRAG_UNSCHEDULED_CONTRIBS:
         return {...state, draggedIds: action.contribIds};
       case actions.DROP_UNSCHEDULED_CONTRIBS:
