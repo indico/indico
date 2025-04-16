@@ -23,7 +23,17 @@ export const getLatestChange = (state: ReduxState) =>
 
 export const getNumUnscheduled = (state: ReduxState) =>
   state.entries.changes[state.entries.currentChangeIdx].unscheduled.length;
+
+// Get the selected entry ID
+// You should not use this selector directly, use makeIsSelectedSelector instead
+// to check if an entry is selected
 export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
+
+export const makeIsSelectedSelector = () =>
+  createSelector(
+    [getSelectedId, (_state: ReduxState, id: number) => id],
+    (selectedId, id) => selectedId === id
+  );
 
 export const getEventId = createSelector(
   getStaticData,
