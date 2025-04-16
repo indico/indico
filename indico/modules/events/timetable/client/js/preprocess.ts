@@ -97,7 +97,8 @@ export function preprocessTimetableEntries(
       }
 
       if (type === 'block') {
-        dayEntries[day].at(-1).sessionTitle = entry.slotTitle;
+        dayEntries[day].at(-1).title = entry.slotTitle;
+        dayEntries[day].at(-1).sessionTitle = entry.title;
 
         const children = Object.entries(entry.entries).map(
           ([childId, {title, startDate, duration}]: [string, SchemaBlock]) => {
