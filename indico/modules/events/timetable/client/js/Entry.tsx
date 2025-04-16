@@ -43,7 +43,7 @@ export function DraggableEntry({id, ...rest}) {
     return (
       <TimetablePopup
         trigger={entry}
-        onClose={() => dispatch(actions.selectEntry(null))}
+        onClose={() => dispatch(actions.deselectEntry())}
         entry={{id, ...rest}}
       />
     );
@@ -78,7 +78,7 @@ export function DraggableBlockEntry({id, ...rest}) {
     return (
       <TimetablePopup
         trigger={entry}
-        onClose={() => dispatch(actions.selectEntry(null))}
+        onClose={() => dispatch(actions.deselectEntry())}
         entry={{id, ...rest}}
       />
     );
