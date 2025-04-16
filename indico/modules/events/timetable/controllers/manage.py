@@ -184,30 +184,41 @@ class RHAPIEditEntryTime(RHManageTimetableEntryBase):
 
     @use_kwargs({
         'start_dt': fields.String(required=True),
-        'end_dt': fields.String(required=True)
+        'end_dt': fields.String(required=True),
     })
-    def _process(self, start_dt, end_dt):
-        new_start_dt = self.event.tzinfo.localize(
+    def _process_args(self, start_dt, end_dt):
+        RHManageTimetableEntryBase._process_args(self)
+        self.start_dt = self.event.tzinfo.localize(
             dateutil.parser.parse(start_dt)).astimezone(utc)
-        new_end_dt = self.event.tzinfo.localize(dateutil.parser.parse(end_dt)).astimezone(utc)
+        self.end_dt = self.event.tzinfo.localize(dateutil.parser.parse(end_dt)).astimezone(utc)
+
+    def _process(self):
+        new_start_dt = self.start_dt
+        new_end_dt = self.end_dt
         new_duration = new_end_dt - new_start_dt
+
         is_session_block = self.entry.type == TimetableEntryType.SESSION_BLOCK
         tzinfo = self.event.tzinfo
+
         if is_session_block and new_end_dt.astimezone(tzinfo).date() != self.entry.start_dt.astimezone(tzinfo).date():
             raise UserValueError(_('Session block cannot span more than one day'))
+
         with track_time_changes(auto_extend=True, user=session.user) as changes:
             update_timetable_entry_object(self.entry, {'duration': new_duration})
             if is_session_block:
                 self.entry.move(new_start_dt)
-            if not is_session_block:
+            else:
                 update_timetable_entry(self.entry, {'start_dt': new_start_dt})
+
         if is_session_block and self.entry.children:
             if new_end_dt < max(self.entry.children, key=attrgetter('end_dt')).end_dt:
                 raise UserValueError(_('Session block cannot be shortened this much because contributions contained '
                                        "wouldn't fit."))
+
         notifications = get_time_changes_notifications(changes, tzinfo=self.event.tzinfo, entry=self.entry)
         return jsonify_data(update=serialize_entry_update(self.entry),
                             notifications=notifications)
+
 
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
     """Display timetable entry info balloon in management mode."""
