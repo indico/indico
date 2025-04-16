@@ -230,7 +230,7 @@ export default function EntryDetails({entry}: {entry: Entry}) {
           <Icon
             name="close"
             color="black"
-            onClick={() => dispatch(actions.selectEntry(null))}
+            onClick={() => dispatch(actions.deselectEntry())}
             title={Translate.string('Close details')}
             link
           />
