@@ -33,7 +33,7 @@ export default (state = initialState, action) => {
         ownRoomName: action.ownRoomName,
         startDt: action.startDt,
         endDt: action.endDt,
-        toggleNonOverlapping: action.toggleNonOverlapping || false,
+        toggleNonOverlapping: false,
       };
     case linkingActions.SHOW_NON_OVERLAPPING:
       return {...state, toggleNonOverlapping: action.value};
