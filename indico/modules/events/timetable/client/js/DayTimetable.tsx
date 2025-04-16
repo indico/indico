@@ -284,17 +284,16 @@ export function DayTimetable({dt, eventId, minHour, maxHour, entries}: DayTimeta
       }
     }
 
-    calendarRef.current.addEventListener('mousedown', onMouseDown);
-    calendarRef.current.addEventListener('mousemove', onMouseMove);
-    calendarRef.current.addEventListener('mouseup', onMouseUp);
+    const calendar = calendarRef.current;
+    calendar.addEventListener('mousedown', onMouseDown);
+    calendar.addEventListener('mousemove', onMouseMove);
+    calendar.addEventListener('mouseup', onMouseUp);
     document.addEventListener('keydown', onKeyDown);
 
     return () => {
-      calendarRef.current.removeEventListener('mousedown', onMouseDown);
-      calendarRef.current.removeEventListener('mousemove', onMouseMove);
-      // TODO: Fix this warning below:
-      // The ref value 'calendarRef.current' will likely have changed by the time this effect cleanup function runs
-      calendarRef.current.removeEventListener('mouseup', onMouseUp);
+      calendar.removeEventListener('mousedown', onMouseDown);
+      calendar.removeEventListener('mousemove', onMouseMove);
+      calendar.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [newEntry, dt, dispatch, isDragging, minHour]);
