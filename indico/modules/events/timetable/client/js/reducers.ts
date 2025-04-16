@@ -11,7 +11,6 @@ import moment from 'moment';
 import * as actions from './actions';
 import {layout, layoutDays} from './layout';
 import {
-  deleteEntry,
   scheduleContribs,
   resizeWindow,
   changeSessionColor,
@@ -172,7 +171,7 @@ export default {
       case actions.SELECT_ENTRY:
         return {...state, selectedId: action.id};
       // return {...state};
-      case actions.DELETE_ENTRY: {
+      case actions.DELETE_BREAK: {
         const {id} = action.entry;
         if ('parentId' in action.entry) {
           const parentId = action.entry.parentId;
