@@ -13,7 +13,8 @@ export const ADD_SESSION_DATA = 'Add session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
-export const DELETE_ENTRY = 'Delete entry';
+export const DELETE_BREAK = 'Delete break';
+export const DELETE_BLOCK = 'Delete block';
 export const DRAG_UNSCHEDULED_CONTRIBS = 'Drag unscheduled contributions';
 export const DROP_UNSCHEDULED_CONTRIBS = 'Drop unscheduled contributions';
 export const SCHEDULE_CONTRIBS = 'Schedule contributions';
@@ -65,8 +66,8 @@ interface CreateEntryAction {
   entry: TopLevelEntry;
 }
 
-interface DeleteEntryAction {
-  type: typeof DELETE_ENTRY;
+interface DeleteBreakAction {
+  type: typeof DELETE_BREAK;
   entry: BlockEntry | BreakEntry | ChildBreakEntry;
 }
 
@@ -76,7 +77,7 @@ export type Action =
   | SelectEntryAction
   | ScheduleEntryAction
   | CreateEntryAction
-  | DeleteEntryAction;
+  | DeleteBreakAction;
 
 export function setTimetableData(data, eventInfo) {
   return {type: SET_TIMETABLE_DATA, data, eventInfo};
@@ -107,8 +108,8 @@ export function selectEntry(id?: number): SelectEntryAction {
   return {type: SELECT_ENTRY, id};
 }
 
-export function deleteEntry(entry) {
-  return {type: DELETE_ENTRY, entry};
+export function deleteBreak(entry) {
+  return {type: DELETE_BREAK, entry};
 }
 
 export function dragUnscheduledContribs(contribIds) {
