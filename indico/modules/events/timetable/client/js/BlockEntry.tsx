@@ -140,10 +140,6 @@ export default function BlockEntry({
           padding: 0,
         }}
         {...listeners}
-        onClick={e => {
-          e.stopPropagation();
-          dispatch(actions.selectEntry(id));
-        }}
       >
         <BlockTitle
           title={formatBlockTitle(sessionTitle, title)}
