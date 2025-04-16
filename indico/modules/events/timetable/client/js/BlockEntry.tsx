@@ -17,7 +17,7 @@ import {formatTimeRange} from './i18n';
 import {getWidthAndOffset} from './layout';
 import ResizeHandle from './ResizeHandle';
 import {BlockEntry as _BlockEntry} from './types';
-import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes} from './utils';
+import {minutesToPixels, pixelsToMinutes, snapPixels, snapMinutes, formatBlockTitle} from './utils';
 
 import './DayTimetable.module.scss';
 import './BlockEntry.module.scss';
@@ -36,6 +36,7 @@ export default function BlockEntry({
   startDt,
   duration: _duration,
   title,
+  sessionTitle,
   sessionId,
   selected,
   y,
@@ -78,8 +79,8 @@ export default function BlockEntry({
     zIndex: isDragging || isResizing ? 90 : selected ? 80 : style.zIndex,
     filter: selected ? 'drop-shadow(0 0 2px #000)' : undefined,
     containerType: 'inline-size',
-    backgroundColor: sessionData?.backgroundColor,
-    color: sessionData?.textColor,
+    backgroundColor: (sessionData || {}).backgroundColor,
+    color: (sessionData || {}).textColor,
     // overflow: 'hidden',
   };
 
@@ -144,7 +145,11 @@ export default function BlockEntry({
           dispatch(actions.selectEntry(id));
         }}
       >
-        <BlockTitle title={title} duration={duration} timeRange={timeRange} />
+        <BlockTitle
+          title={formatBlockTitle(sessionTitle, title)}
+          duration={duration}
+          timeRange={timeRange}
+        />
         {renderChildren ? (
           <div
             ref={setDroppableNodeRef}
