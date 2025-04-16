@@ -111,15 +111,7 @@ export default function ContributionEntry({
 
   return (
     <div role="button" styleName={`entry ${type === 'break' ? 'break' : ''}`} style={style}>
-      <div
-        styleName="drag-handle"
-        ref={setNodeRef}
-        {...listeners}
-        onClick={e => {
-          e.stopPropagation();
-          dispatch(actions.selectEntry(id));
-        }}
-      >
+      <div styleName="drag-handle" ref={setNodeRef} {...listeners}>
         <EntryTitle
           title={title}
           duration={duration}
