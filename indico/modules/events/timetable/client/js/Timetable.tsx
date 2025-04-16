@@ -12,7 +12,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
-import EntryDetails from './EntryDetails';
 import ContributionEntryForm from './forms/ContributionEntryForm';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
@@ -22,9 +21,6 @@ import WeekViewToolbar from './WeekViewToolbar';
 import './timetable.scss';
 import './Timetable.module.scss';
 
-// const localizer = momentLocalizer(moment);
-// const DnDCalendar = withDragAndDrop(Calendar);
-
 export default function Timetable() {
   const entries = useSelector(selectors.getDayEntries);
   const eventId = useSelector(selectors.getEventId);
@@ -32,13 +28,8 @@ export default function Timetable() {
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const showAllTimeslots = useSelector(selectors.showAllTimeslots);
 
-  // const blocks = useSelector(selectors.getBlocks);
-
-  // const draggedContribs = useSelector(selectors.getDraggedContribs);
   const [date, setDate] = useState(eventStartDt);
   const currentDateEntries = entries[date.format('YYYYMMDD')];
-
-  const popupsEnabled = useSelector(selectors.getPopupsEnabled);
 
   const useWeekView = false;
 
@@ -73,14 +64,6 @@ export default function Timetable() {
   return (
     <div styleName="timetable">
       <GlobalEvents />
-      {/* <div style={{height: 50}}>
-        <Checkbox
-          toggle
-          checked={popupsEnabled}
-          onChange={() => dispatch(actions.experimentalTogglePopups())}
-          label="Experminetal: Use popups instead of sidebar"
-        />
-      </div> */}
       {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
       {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
       <div styleName="content">
@@ -94,7 +77,6 @@ export default function Timetable() {
             entries={currentDateEntries}
           />
         )}
-        {/* {!popupsEnabled && selectedEntry && <EntryDetails entry={selectedEntry} />} */}
         <ContributionEntryForm />
       </div>
     </div>
