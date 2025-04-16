@@ -66,6 +66,10 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
     };
   }, []);
 
+  function hasContribs(sessionId: string) {
+    return contribs.some(c => c.sessionId === parseInt(sessionId, 10));
+  }
+
   const currentContribs = useMemo(() => {
     if (selectedFilter === 'no-session') {
       return contribs.filter(c => !c.sessionId);
@@ -103,26 +107,28 @@ export default function UnscheduledContributions({dt}: {dt: Moment}) {
             >
               No assigned session
             </Button>
-            {Object.entries(sessions).map(([id, session]) => (
-              <Button
-                key={id}
-                type="button"
-                primary={selectedFilter === id}
-                onClick={() => setSelectedFilter(id)}
-              >
-                <span style={{display: 'flex', gap: '.5em', alignItems: 'center'}}>
-                  <span>{session.title}</span>
-                  <span
-                    style={{
-                      borderRadius: '50%',
-                      backgroundColor: session.backgroundColor,
-                      width: '1em',
-                      height: '1em',
-                    }}
-                  />
-                </span>
-              </Button>
-            ))}
+            {Object.entries(sessions)
+              .filter(([id]) => hasContribs(id))
+              .map(([id, session]) => (
+                <Button
+                  key={id}
+                  type="button"
+                  primary={selectedFilter === id}
+                  onClick={() => setSelectedFilter(id)}
+                >
+                  <span style={{display: 'flex', gap: '.5em', alignItems: 'center'}}>
+                    <span>{session.title}</span>
+                    <span
+                      style={{
+                        borderRadius: '50%',
+                        backgroundColor: session.backgroundColor,
+                        width: '1em',
+                        height: '1em',
+                      }}
+                    />
+                  </span>
+                </Button>
+              ))}
           </div>
 
           <UnscheduledContributionList dt={dt} contribs={currentContribs} />
