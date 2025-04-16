@@ -13,6 +13,7 @@ import BlockEntry from './BlockEntry';
 import ContributionEntry from './ContributionEntry';
 import {useDraggable} from './dnd';
 import {TimetablePopup} from './entry_popups';
+import {ReduxState} from './reducers';
 import * as selectors from './selectors';
 
 import './DayTimetable.module.scss';
@@ -23,8 +24,9 @@ export function DraggableEntry({id, ...rest}) {
     id: `${id}`,
   });
   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
-  const selectedId = useSelector(selectors.getSelectedId);
-  const selected = useSelector(selectors.getSelectedEntry);
+  const isSelected = useSelector((state: ReduxState) =>
+    selectors.makeIsSelectedSelector()(state, id)
+  );
 
   const entry = (
     <ContributionEntry
@@ -37,12 +39,12 @@ export function DraggableEntry({id, ...rest}) {
     />
   );
 
-  if (popupsEnabled && selected && !isDragging && id === selectedId) {
+  if (popupsEnabled && isSelected && !isDragging) {
     return (
       <TimetablePopup
         trigger={entry}
         onClose={() => dispatch(actions.selectEntry(null))}
-        entry={selected}
+        entry={{id, ...rest}}
       />
     );
   }
@@ -56,8 +58,9 @@ export function DraggableBlockEntry({id, ...rest}) {
     id: `${id}`,
   });
   const popupsEnabled = useSelector(selectors.getPopupsEnabled);
-  const selectedId = useSelector(selectors.getSelectedId);
-  const selected = useSelector(selectors.getSelectedEntry);
+  const isSelected = useSelector((state: ReduxState) =>
+    selectors.makeIsSelectedSelector()(state, id)
+  );
 
   const entry = (
     <BlockEntry
@@ -67,15 +70,16 @@ export function DraggableBlockEntry({id, ...rest}) {
       setNodeRef={setNodeRef}
       transform={transform}
       isDragging={isDragging}
+      selected={isSelected}
     />
   );
 
-  if (popupsEnabled && selected && !isDragging && id === selectedId) {
+  if (popupsEnabled && isSelected && !isDragging) {
     return (
       <TimetablePopup
         trigger={entry}
         onClose={() => dispatch(actions.selectEntry(null))}
-        entry={selected}
+        entry={{id, ...rest}}
       />
     );
   }

@@ -42,7 +42,6 @@ interface DayTimetableProps {
 
 function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
   const dispatch = useDispatch();
-  const selectedId = useSelector(selectors.getSelectedId);
 
   const setDurations = useMemo(() => {
     const obj = {};
@@ -68,8 +67,6 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
         entry.type === 'block' ? (
           <DraggableBlockEntry
             key={entry.id}
-            selected={selectedId === entry.id}
-            // setDuration={setDuration}
             setDuration={setDurations[entry.id]}
             setChildDuration={setChildDurations[entry.id]}
             {...entry}
