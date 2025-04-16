@@ -8,7 +8,7 @@
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Checkbox} from 'semantic-ui-react';
+// import {Checkbox} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
@@ -110,14 +110,14 @@ export default function Timetable() {
 
   return (
     <div styleName="timetable">
-      <div style={{height: 50}}>
+      {/* <div style={{height: 50}}>
         <Checkbox
           toggle
           checked={popupsEnabled}
           onChange={() => dispatch(actions.experimentalTogglePopups())}
           label="Experminetal: Use popups instead of sidebar"
         />
-      </div>
+      </div> */}
       {useWeekView && <WeekViewToolbar date={date} onNavigate={d => setDate(d)} />}
       {!useWeekView && <Toolbar date={date} onNavigate={d => setDate(d)} />}
       <div styleName="content">
