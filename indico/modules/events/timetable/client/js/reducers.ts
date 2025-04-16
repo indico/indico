@@ -172,12 +172,62 @@ export default {
       case actions.SELECT_ENTRY:
         return {...state, selectedId: action.id};
       // return {...state};
-      case actions.DELETE_ENTRY:
-        return {
-          ...state,
-          ...deleteEntry(state, action.entry),
-          selectedId: (action.entry || {}).id === state.selectedId ? null : state.selectedId,
-        };
+      case actions.DELETE_ENTRY: {
+        const {id} = action.entry;
+        if ('parentId' in action.entry) {
+          const parentId = action.entry.parentId;
+          const newEntries = layoutDays(
+            Object.fromEntries(
+              Object.entries(state.changes[state.currentChangeIdx].entries).map(
+                ([day, dayEntries]) => [
+                  day,
+                  dayEntries.map(e => {
+                    if (e.type === 'block' && e.id === parentId) {
+                      return {
+                        ...e,
+                        children: e.children.filter(child => child.id !== id),
+                      };
+                    }
+                    return e;
+                  }),
+                ]
+              )
+            )
+          );
+          return {
+            ...state,
+            currentChangeIdx: state.currentChangeIdx + 1,
+            changes: [
+              ...state.changes.slice(0, state.currentChangeIdx + 1),
+              {
+                entries: newEntries,
+                change: 'delete',
+                unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+              },
+            ],
+          };
+        } else {
+          const newEntries = layoutDays(
+            Object.fromEntries(
+              Object.entries(state.changes[state.currentChangeIdx].entries).map(
+                ([day, dayEntries]) => [day, dayEntries.filter(e => e.id !== id)]
+              )
+            )
+          );
+          return {
+            ...state,
+            currentChangeIdx: state.currentChangeIdx + 1,
+            changes: [
+              ...state.changes.slice(0, state.currentChangeIdx + 1),
+              {
+                entries: newEntries,
+                change: 'delete',
+                unscheduled: state.changes[state.currentChangeIdx].unscheduled,
+              },
+            ],
+          };
+        }
+      }
       case actions.DRAG_UNSCHEDULED_CONTRIBS:
         return {...state, draggedIds: action.contribIds};
       case actions.DROP_UNSCHEDULED_CONTRIBS:
