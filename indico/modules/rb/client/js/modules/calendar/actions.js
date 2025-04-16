@@ -139,11 +139,11 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
         moment(rv.startDt, 'YYYY-MM-DD HH:mm').unix()
       ).startDt;
       params.last_reservation_id = data[lastDt][data[lastDt].length - 1].reservation.id;
-    } else if (state.linking.showNonOverlapping) {
+    } else if (state.linking?.type && state.linking?.showNonOverlapping) {
       params.start_dt = moment(state.linking.startDt)
         .startOf('day')
         .toISOString();
-    } else {
+    } else if (state.linking?.type) {
       // Set it right before the event starts
       params.start_dt = moment(state.linking.startDt)
         .subtract(1, 'second')
