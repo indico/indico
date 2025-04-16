@@ -92,7 +92,7 @@ function SessionDetails({entry, uses24HourFormat, dispatch}) {
           {
             icon: 'trash',
             title: Translate.string('Delete session block'),
-            onClick: () => dispatch(actions.deleteEntry(entry)),
+            onClick: () => {},
           },
         ]}
       >
@@ -150,7 +150,7 @@ export function ContributionDetails({entry, uses24HourFormat, dispatch, children
     contribActions.push({
       icon: 'trash',
       title: Translate.string('Unschedule contribution'),
-      onClick: () => dispatch(actions.deleteEntry(entry)),
+      onClick: () => {},
     });
   }
 
@@ -191,7 +191,7 @@ function BreakDetails({entry, uses24HourFormat, dispatch}) {
         {
           icon: 'trash',
           title: Translate.string('Delete break'),
-          onClick: () => dispatch(actions.deleteEntry(entry)),
+          onClick: () => {},
         },
       ]}
       entry={entry}
