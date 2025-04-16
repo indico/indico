@@ -13,6 +13,7 @@ export const ADD_SESSION_DATA = 'Add session data';
 export const MOVE_ENTRY = 'Move entry';
 export const RESIZE_ENTRY = 'Resize entry';
 export const SELECT_ENTRY = 'Select entry';
+export const DESELECT_ENTRY = 'Deselect entry';
 export const DELETE_BREAK = 'Delete break';
 export const DELETE_BLOCK = 'Delete block';
 export const DRAG_UNSCHEDULED_CONTRIBS = 'Drag unscheduled contributions';
@@ -50,7 +51,11 @@ interface MoveEntryAction {
 
 interface SelectEntryAction {
   type: typeof SELECT_ENTRY;
-  id?: number;
+  id: number;
+}
+
+interface DeselectEntryAction {
+  type: typeof DESELECT_ENTRY;
 }
 
 interface ScheduleEntryAction {
@@ -80,6 +85,7 @@ export type Action =
   | ResizeEntryAction
   | MoveEntryAction
   | SelectEntryAction
+  | DeselectEntryAction
   | ScheduleEntryAction
   | CreateEntryAction
   | DeleteBreakAction
@@ -110,8 +116,12 @@ export function resizeEntry(
   return {type: RESIZE_ENTRY, date, id, duration, parentId};
 }
 
-export function selectEntry(id?: number): SelectEntryAction {
+export function selectEntry(id: number): SelectEntryAction {
   return {type: SELECT_ENTRY, id};
+}
+
+export function deselectEntry(): DeselectEntryAction {
+  return {type: DESELECT_ENTRY};
 }
 
 export function deleteBreak(entry) {
