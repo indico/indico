@@ -425,7 +425,12 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
   } else if (type === 'text' || type === 'email' || type === 'tel') {
     extraProps.format = formatters.trim;
     extraProps.formatOnBlur = true;
-    extraProps.parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
+    const parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
+    if (type === 'email') {
+      extraProps.parse = v => parse(v.toLowerCase());
+    } else {
+      extraProps.parse = parse;
+    }
   }
 
   if (noAutoComplete) {
