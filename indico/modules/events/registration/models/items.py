@@ -75,12 +75,18 @@ class PersonalDataType(IndicoIntEnum):
             (cls.first_name, {
                 'title': cls.first_name.get_title(),
                 'input_type': 'text',
-                'position': 1
+                'position': 1,
+                'data': {
+                    'content_validation': 'no_url'
+                }
             }),
             (cls.last_name, {
                 'title': cls.last_name.get_title(),
                 'input_type': 'text',
-                'position': 2
+                'position': 2,
+                'data': {
+                    'content_validation': 'no_url'
+                }
             }),
             (cls.email, {
                 'title': cls.email.get_title(),
@@ -139,6 +145,14 @@ class PersonalDataType(IndicoIntEnum):
 
     @property
     def is_required(self):
+        return self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
+
+    @property
+    @make_interceptable
+    def is_content_validation_protected(self):
+        """
+        The setting for the content validation of the field can't be modified.
+        """
         return self in {PersonalDataType.email, PersonalDataType.first_name, PersonalDataType.last_name}
 
     @property
