@@ -10,6 +10,7 @@ from datetime import timedelta
 from flask import flash, session
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.protection import make_acl_log_fn
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings.converters import TimedeltaConverter
@@ -24,6 +25,9 @@ from indico.web.menu import SideMenuItem
 
 
 logger = Logger.get('events.contributions')
+
+# Log ACL changes
+signals.acl.entry_changed.connect(make_acl_log_fn(Contribution), sender=Contribution, weak=False)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
