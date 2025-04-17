@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Form} from 'semantic-ui-react';
 
-import {FinalInput, validators as v} from 'indico/react/forms';
+import {FinalDropdown, FinalInput, parsers as p, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {mapPropsToAttributes} from './util';
@@ -48,44 +48,60 @@ TextInput.defaultProps = {
   maxLength: 0,
 };
 
-export function TextSettings() {
+export function TextSettings(...itemData) {
+  const settings = itemData[0];
+  const contentValidationOptions = [
+    {key: 'nourl', value: 'no_url', text: Translate.string('Disallow URLs')},
+    {key: 'urlonly', value: 'url_only', text: Translate.string('Valid URL')},
+  ];
   return (
-    <Form.Group widths="equal">
-      <FinalInput
-        name="minLength"
-        type="number"
-        label={Translate.string('Min. length')}
-        placeholder={String(TextInput.defaultProps.minLength)}
-        step="1"
-        min="0"
-        validate={v.optional(
-          v.chain(val => {
-            if (val === 0) {
-              return v.STOP_VALIDATION;
-            } else if (val === 1) {
-              return Translate.string(
-                'If you want to make the field required, select the "Required field" checkbox. The minimum length only applies if the field is not empty.'
-              );
-            }
-          }, v.min(2))
-        )}
-        format={val => val || ''}
-        parse={val => +val || 0}
-        fluid
+    <>
+      <FinalDropdown
+        name="contentValidation"
+        label={Translate.string('Content Validation')}
+        options={contentValidationOptions}
+        placeholder={Translate.string('None', 'Content Validation')}
+        parse={p.nullIfEmpty}
+        selection
+        disabled={settings.fieldIsContentValidationProtected}
       />
-      <FinalInput
-        name="maxLength"
-        type="number"
-        label={Translate.string('Max. length')}
-        placeholder={Translate.string('No maximum')}
-        step="1"
-        min="0"
-        validate={v.optional(v.min(0))}
-        format={val => val || ''}
-        parse={val => +val || 0}
-        fluid
-      />
-    </Form.Group>
+      <Form.Group widths="equal">
+        <FinalInput
+          name="minLength"
+          type="number"
+          label={Translate.string('Min. length')}
+          placeholder={String(TextInput.defaultProps.minLength)}
+          step="1"
+          min="0"
+          validate={v.optional(
+            v.chain(val => {
+              if (val === 0) {
+                return v.STOP_VALIDATION;
+              } else if (val === 1) {
+                return Translate.string(
+                  'If you want to make the field required, select the "Required field" checkbox. The minimum length only applies if the field is not empty.'
+                );
+              }
+            }, v.min(2))
+          )}
+          format={val => val || ''}
+          parse={val => +val || 0}
+          fluid
+        />
+        <FinalInput
+          name="maxLength"
+          type="number"
+          label={Translate.string('Max. length')}
+          placeholder={Translate.string('No maximum')}
+          step="1"
+          min="0"
+          validate={v.optional(v.min(0))}
+          format={val => val || ''}
+          parse={val => +val || 0}
+          fluid
+        />
+      </Form.Group>
+    </>
   );
 }
 
