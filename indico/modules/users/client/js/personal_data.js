@@ -7,4 +7,3 @@
 
 import './PersonalDataForm.jsx';
 import './UserBlock.jsx';
-import './UserDelete.jsx';
