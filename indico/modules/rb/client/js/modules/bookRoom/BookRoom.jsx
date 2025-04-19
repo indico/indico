@@ -37,6 +37,7 @@ import BookingFilterBar from './BookingFilterBar';
 import BookingSuggestion from './BookingSuggestion';
 import BookingTimeline from './BookingTimeline';
 import {rules as qsBookRoomRules} from './queryString';
+import RoomLottery from './RoomLottery';
 import SearchResultCount from './SearchResultCount';
 import * as bookRoomSelectors from './selectors';
 
@@ -245,7 +246,7 @@ class BookRoom extends React.Component {
   }
 
   renderMainContent = () => {
-    const {isSearching, isTimelineVisible, showSuggestions, labels} = this.props;
+    const {isSearching, isTimelineVisible, showSuggestions, labels, results} = this.props;
     const {
       actions: {openRoomDetails},
     } = this.props;
@@ -271,6 +272,7 @@ class BookRoom extends React.Component {
           ) : (
             <>
               <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
+                <RoomLottery rooms={results} />
                 <RoomRenderer rooms={this.visibleRooms}>
                   {room => (
                     <Slot name="actions">
