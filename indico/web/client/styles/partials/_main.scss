@@ -78,24 +78,27 @@
 
 /* Header */
 
-div.page-header {
+.page-header {
   position: relative;
   background-color: $dark-blue;
   width: 100%;
 
   img.header-logo {
-    margin: 17px 0 10px 40px;
     border: none;
     height: 60px;
   }
 }
 
-div.page-header-dark {
+.page-header-dark {
   background: #424242;
 }
 
+.page-header-banner {
+  padding: 1em 1em 1em 3em;
+}
+
 /* Announcements */
-div.announcement-bar {
+.announcement-bar {
   @include font-family-title();
 
   display: flex;
@@ -191,34 +194,115 @@ div.main-breadcrumb {
 
 /* Styles for the session bar at the top right corner */
 
-div.session-bar {
+#session-bar {
   @include font-family-title();
 
-  margin: 0.5em 0.5em 0 0;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.1em;
 
-  .toolbar {
-    padding: 0;
-    margin: 0;
+  .popup-trigger,
+  .login {
+    @extend %button;
+    border: 0;
+    gap: 0.5em;
+
+    font: inherit;
   }
 
-  .icon-shield {
-    vertical-align: middle;
+  .popup-trigger::before,
+  .login::before {
+    @extend %icon;
   }
 
-  .i-button {
-    font-weight: normal;
+  .popup-trigger:is([data-protection-mode='network'], [data-protection-mode='restricted'])::before {
+    @extend %icon-shield;
+  }
 
-    &.protection-public {
-      @extend .accept;
-    }
+  .popup-trigger[data-protection-mode='public'] {
+    background: var(--surface-green-color);
+    color: var(--text-on-green-color);
 
-    &.protection-restricted {
-      @extend .danger;
+    &:is(:hover, :focus-visible) {
+      background: var(--surface-green-secondary-color);
     }
+  }
 
-    &.protection-network {
-      @extend .warning;
+  .popup-trigger[data-protection-mode='restricted'] {
+    background: var(--surface-red-color);
+    color: var(--text-on-red-color);
+
+    &:is(:hover, :focus-visible) {
+      background: var(--surface-red-secondary-color);
     }
+  }
+
+  .popup-trigger[data-protection-mode='network'] {
+    background: var(--surface-yellow-color);
+    color: var(--text-on-yellow-color);
+
+    &:is(:hover, :focus-visible) {
+      background: var(--surface-yellow-secondary-color);
+    }
+  }
+
+  #protection-details-link .protection-mode-label {
+    @extend %visually-hidden;
+  }
+
+  #tz-selector-link::before {
+    @extend %icon-time;
+  }
+
+  #tz-selector-link .tz-selector-label {
+    @extend %visually-hidden;
+  }
+
+  #user-settings-link::before {
+    @extend %icon-user;
+  }
+
+  #user-settings-link .user-settings-link-label {
+    @extend %visually-hidden;
+  }
+
+  .login::before {
+    @extend %icon-enter;
+  }
+
+  & > :first-child .popup-trigger {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  & > :not(:first-child):not(:last-child) .popup-trigger {
+    border-radius: 0;
+  }
+
+  & > :last-child .popup-trigger,
+  .login {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  #language-selector-inline {
+    display: flex;
+    justify-content: space-between;
+
+    &::after {
+      @extend %icon;
+      @extend %icon-arrow-down;
+      transition: transform 0.2s;
+    }
+  }
+
+  #language-list {
+    list-style: none;
+  }
+
+  #language-list button {
+    padding: 0.5em;
   }
 
   &.sticky-scrolling {
