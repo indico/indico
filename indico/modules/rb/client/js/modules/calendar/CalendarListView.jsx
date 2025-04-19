@@ -239,7 +239,6 @@ class CalendarListView extends React.Component {
     return (
       <Card
         styleName={`booking-card ${toClasses({
-          'non-overlapping': !isLinked && nonOverlapping,
           'already-linked': isLinked,
         })}`}
         key={key}
