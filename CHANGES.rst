@@ -19,6 +19,8 @@ Improvements
 - Show moderated rooms as "mine" and enable "bookings in my rooms" etc. for room
   moderators (:pr:`6823`)
 - Use the new date picker in more places (:issue:`6662`, :pr:`6832`)
+- Implement conditional fields in registration forms (:issue:`1228`, :pr:`6678`,
+  thanks :user:`Moliholy, omegak, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
