@@ -446,6 +446,18 @@ def modify_registration(registration, data, management=False, notify_user=True):
 
     billable_items_locked = not management and registration.is_paid
     active_fields = regform.active_fields
+
+    def _set_data(form_item, value):
+        attrs = form_item.field_impl.process_form_data(registration, value, data_by_field[form_item.id],
+                                             billable_items_locked=billable_items_locked)
+        for key, val in attrs.items():
+            setattr(data_by_field[form_item.id], key, val)
+        if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+            key = form_item.personal_data_type.column
+            if getattr(registration, key) != value:
+                personal_data_changes[key] = value
+            setattr(registration, key, value)
+
     for form_item in active_fields:
         if form_item.is_purged or form_item.get_locked_reason(registration):
             continue
@@ -453,17 +465,9 @@ def modify_registration(registration, data, management=False, notify_user=True):
         field_impl = form_item.field_impl
         has_data = form_item.html_field_name in data
         can_modify = management or not form_item.parent.is_manager_only
-        show_if_field_id = field_impl.view_data.get('show_if_field_id')
-        show_if_field = next(
-            field for field in active_fields if field.id == show_if_field_id) if show_if_field_id else None
-        show_if_field_values = field_impl.view_data.get('show_if_field_values')
-        show = data.get(
-            show_if_field.html_field_name) in show_if_field_values if show_if_field and show_if_field_values else True
 
         if has_data and can_modify:
             value = data.get(form_item.html_field_name)
-        elif not show:
-            value = field_impl.empty_value
         elif not has_data and form_item.id not in data_by_field and not management:
             # set default value for a field if it didn't have one before (including manager-only fields).
             # but we do so only if it's the user editing their registration - if a manager edits
@@ -484,16 +488,12 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if form_item.id not in data_by_field:
             data_by_field[form_item.id] = RegistrationData(registration=registration,
                                                            field_data=form_item.current_data)
+        _set_data(form_item, value)
 
-        attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
-                                             billable_items_locked=billable_items_locked)
-        for key, val in attrs.items():
-            setattr(data_by_field[form_item.id], key, val)
-        if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-            key = form_item.personal_data_type.column
-            if getattr(registration, key) != value:
-                personal_data_changes[key] = value
-            setattr(registration, key, value)
+    # Second loop to remove fields that are hidden after the changes are applied.
+    for form_item in active_fields:
+        if not registration.is_field_shown(form_item):
+            _set_data(form_item, form_item.field_impl.empty_value)
 
     if not management and regform.needs_publish_consent:
         consent_to_publish = data.get('consent_to_publish')
