@@ -7,6 +7,14 @@
 
 @use 'base/palette' as *;
 
+$already-linked: repeating-linear-gradient(
+  -45deg,
+  $pastel-gray,
+  $pastel-gray 10px,
+  $light-gray 10px,
+  $light-gray 20px
+);
+
 .active-bookings {
   margin-top: 15px;
 
@@ -41,22 +49,12 @@
         white-space: nowrap;
       }
 
-      &.non-overlapping {
-        background-color: $pastel-gray;
+      &.already-linked {
+        background: $already-linked;
 
         &:hover {
-          background-color: $pastel-gray;
+          background: $already-linked;
         }
-      }
-
-      &.already-linked {
-        background: repeating-linear-gradient(
-          -45deg,
-          $pastel-gray,
-          $pastel-gray 10px,
-          $light-gray 10px,
-          $light-gray 20px
-        );
       }
     }
   }
