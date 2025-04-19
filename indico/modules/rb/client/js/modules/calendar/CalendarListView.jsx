@@ -26,6 +26,7 @@ import {
 
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
+import {toClasses} from 'indico/react/util';
 
 import {actions as bookingsActions} from '../../common/bookings';
 import {selectors as linkingSelectors} from '../../common/linking';
@@ -77,20 +78,25 @@ class CalendarListView extends React.Component {
       datePicker: {selectedDate: prevDate, mode: prevMode},
       roomFilters: prevRoomFilters,
       calendarFilters: prevCalendarFilters,
+      linkData: prevLinkData,
     } = prevProps;
     const {
       datePicker: {selectedDate, mode},
       roomFilters,
       calendarFilters,
+      linkData,
     } = this.props;
 
     const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
     const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
+    const showNonOverlappingChanged =
+      linkData?.showNonOverlapping !== prevLinkData?.showNonOverlapping;
     if (
       prevDate !== selectedDate ||
       mode !== prevMode ||
       roomFiltersChanged ||
-      calendarFiltersChanged
+      calendarFiltersChanged ||
+      showNonOverlappingChanged
     ) {
       this.refetchActiveBookings(roomFiltersChanged);
     }
@@ -148,12 +154,8 @@ class CalendarListView extends React.Component {
     }
     const {linkingConfirm} = this.state;
     const {reservation} = booking;
-    const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
-    const datesMatch =
-      moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
-      moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
     const canLink = isAdminOverrideEnabled || reservation.bookedBySelf || reservation.bookedForSelf;
-    if (booking.linkId || !datesMatch || !canLink) {
+    if (booking.linkId || !canLink) {
       return;
     }
     const linkBtn = (
@@ -223,10 +225,25 @@ class CalendarListView extends React.Component {
     const {reservation} = booking;
     const {room, isAccepted} = reservation;
     const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
+    let datesMatch = false;
+    if (linkData) {
+      const boundaries = [moment(linkData.startDt), moment(linkData.endDt)];
+      datesMatch =
+        moment(booking.startDt).isBetween(...boundaries, undefined, '[]') &&
+        moment(booking.endDt).isBetween(...boundaries, undefined, '[]');
+    }
+    const nonOverlapping = !!linkData && !datesMatch;
     const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
     const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
+    const isLinked = !!linkData && !!booking.linkId;
     return (
-      <Card styleName="booking-card" key={key} onClick={() => openBookingDetails(reservation.id)}>
+      <Card
+        styleName={`booking-card ${toClasses({
+          'already-linked': isLinked,
+        })}`}
+        key={key}
+        onClick={() => openBookingDetails(reservation.id)}
+      >
         <Card.Content>
           <Card.Header>
             {!isAccepted && (
@@ -253,10 +270,17 @@ class CalendarListView extends React.Component {
               </Translate>
             </div>
           </TooltipIfTruncated>
-          {linkData && !!booking.linkId && (
+          {isLinked && (
             <TooltipIfTruncated>
               <div styleName="booking-booked-for">
                 <Translate>Already linked</Translate>
+              </div>
+            </TooltipIfTruncated>
+          )}
+          {nonOverlapping && (
+            <TooltipIfTruncated>
+              <div styleName="booking-booked-for">
+                <Translate>Outside of the event schedule</Translate>
               </div>
             </TooltipIfTruncated>
           )}
